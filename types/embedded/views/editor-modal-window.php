@@ -200,12 +200,12 @@ $data = array_merge(
 
     <p class="form-inline">
         <input type="radio" id="post-id" name="post_id" value="post_id" data-bind="checked: relatedPost" />
-        <label for="post-id"><?php _e( 'A specific post', 'wpcf' ); ?></label>
+        <label for="post-id"><?php _e( 'A specific post ID', 'wpcf' ); ?></label>
     </p>
     <div class="group-nested" data-bind="visible: relatedPost() == 'post_id'">
         <p class="form-inline">
             <label for="post-id-post_id"><?php _e( 'Post selection', 'wpcf' ); ?></label>
-            <input type="text" id="post-id-post_id" name="specific_post_id" data-bind="value: specificPostID" />
+            <input type="number" id="post-id-post_id" name="specific_post_id" data-bind="value: specificPostID" />
         </p>
     </div>
 

@@ -574,11 +574,9 @@ function wpcf_pr_admin_wpcf_relationship_search()
 
     $args = array(
         'numberposts' => $numberposts,
-        //      'orderby' => apply_filters( 'wpcf_pr_belongs_post_orderby', 'date' ),
-        //      'order' => apply_filters( 'wpcf_pr_belongs_post_order', 'ASC' ),
         'post_status' => apply_filters( 'wpcf_pr_belongs_post_status', array( 'publish', 'private' ) ),
         'post_type' => $_REQUEST['post_type'],
-        'suppress_filters' => 0,
+        'suppress_filters' => 1,
         's' => $_REQUEST['s'],
     );
 

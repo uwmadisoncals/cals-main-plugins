@@ -406,6 +406,10 @@ jQuery(document).ready(function($) {
                 if ( 'undefined' != typeof wptFile ) {
                     wptFile.init();
                 }
+                /**
+                 * select2
+                 */
+                wpcfBindSelect2($);
             }
         });
         return false;
@@ -449,6 +453,10 @@ jQuery(document).ready(function($) {
                     }
                 }
                 $('#wpcf-post-relationship .wpcf-pr-pagination-select').trigger('change');
+                /**
+                 * select2
+                 */
+                wpcfBindSelect2($);
             }
         });
         return false;
@@ -509,6 +517,10 @@ jQuery(document).ready(function($) {
                 $button.next().fadeOut(function() {
                     $(this).remove();
                 });
+                /**
+                 * select2
+                 */
+                wpcfBindSelect2($);
             }
         });
         return false;
@@ -547,6 +559,10 @@ jQuery(document).ready(function($) {
                 $button.next().fadeOut(function() {
                     $(this).remove();
                 });
+                /**
+                 * select2
+                 */
+                wpcfBindSelect2($);
             }
         });
         return false;
@@ -586,6 +602,10 @@ jQuery(document).ready(function($) {
                 $button.next().fadeOut(function() {
                     $(this).remove();
                 });
+                /**
+                 * select2
+                 */
+                wpcfBindSelect2($);
             }
         });
         return false;
@@ -657,6 +677,10 @@ jQuery(document).ready(function($) {
                     if ('undefined' != typeof data.errors && 0 < data.errors.length ) {
                         $('#wpcf-post-relationship h3.hndle').after(data.errors);
                     }
+                    /**
+                     * select2
+                     */
+                    wpcfBindSelect2($);
                 }
             }
         });
@@ -735,6 +759,10 @@ jQuery(document).ready(function($) {
                         $('#wpcf-post-relationship h3.hndle').after(data.errors);
                     }
                 }
+                /**
+                 * select2
+                 */
+                wpcfBindSelect2($);
             }
         });
         return false;
@@ -829,6 +857,10 @@ jQuery(document).ready(function($) {
                         wptCond.addConditionals(data.conditionals);
                     }
                 }
+                /**
+                 * select2
+                 */
+                wpcfBindSelect2($);
             }
         });
     });
@@ -885,7 +917,7 @@ function wpcfRelationshipInit(selector, context) {
 /**
  * select2
  */
-jQuery(document).ready(function($) {
+function wpcfBindSelect2($) {
     $('.wpcf-pr-belongs').select2({
         id: function(item){
             return item.ID;
@@ -968,5 +1000,8 @@ jQuery(document).ready(function($) {
             $('a.button', $(data.target)).addClass('disabled').attr('href', '#');
         });
     });
+}
+jQuery(document).ready(function($) {
+    wpcfBindSelect2($);
 });
 
