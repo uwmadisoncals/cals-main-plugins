@@ -1387,8 +1387,16 @@ class GFFormsModel {
 			$lead_table = RGFormsModel::get_lead_table_name();
 			$user_agent = self::truncate( rgar( $_SERVER, 'HTTP_USER_AGENT' ), 250 );
 			$user_agent = sanitize_text_field( $user_agent );
-			$currency   = GFCommon::get_currency();
 			$source_url = self::truncate( self::get_current_page_url(), 200 );
+
+			/**
+			 * Allow the currency code to be overridden.
+			 *
+			 * @param string $currency The three character ISO currency code to be stored in the entry. Default is value returned by GFCommon::get_currency()
+			 * @param array $form The form currently being processed.
+			 *
+			 */
+			$currency = gf_apply_filters( 'gform_currency_pre_save_entry', $form['id'], GFCommon::get_currency(), $form );
 
 			$wpdb->query( $wpdb->prepare( "INSERT INTO $lead_table(form_id, ip, source_url, date_created, user_agent, currency, created_by) VALUES(%d, %s, %s, utc_timestamp(), %s, %s, {$user_id})", $form['id'], self::get_ip(), $source_url, $user_agent, $currency ) );
 
@@ -1500,12 +1508,20 @@ class GFFormsModel {
 		$lead['date_created'] = null;
 		$lead['form_id']      = $form['id'];
 		$lead['ip']           = self::get_ip();
-		$source_url   = self::truncate( self::get_current_page_url(), 200 );
-		$lead['source_url'] = esc_url_raw( $source_url );
-		$user_agent   = strlen( $_SERVER['HTTP_USER_AGENT'] ) > 250 ? substr( $_SERVER['HTTP_USER_AGENT'], 0, 250 ) : $_SERVER['HTTP_USER_AGENT'];
-		$lead['user_agent'] = sanitize_text_field( $user_agent );
-		$lead['currency']     = GFCommon::get_currency();
+		$source_url           = self::truncate( self::get_current_page_url(), 200 );
+		$lead['source_url']   = esc_url_raw( $source_url );
+		$user_agent           = strlen( $_SERVER['HTTP_USER_AGENT'] ) > 250 ? substr( $_SERVER['HTTP_USER_AGENT'], 0, 250 ) : $_SERVER['HTTP_USER_AGENT'];
+		$lead['user_agent']   = sanitize_text_field( $user_agent );
 		$lead['created_by']   = $current_user && $current_user->ID ? $current_user->ID : 'NULL';
+
+		/**
+		 * Allow the currency code to be overridden.
+		 *
+		 * @param string $currency The three character ISO currency code to be stored in the entry. Default is value returned by GFCommon::get_currency()
+		 * @param array $form The form currently being processed.
+		 *
+		 */
+		$lead['currency'] = gf_apply_filters( 'gform_currency_pre_save_entry', $form['id'], GFCommon::get_currency(), $form );
 
 		foreach ( $form['fields'] as $field ) {
 			/* @var $field GF_Field */
@@ -3373,7 +3389,7 @@ class GFFormsModel {
 		//returning cache entry if available
 		$cache_key = 'GFFormsModel::get_lead_field_value_' . $lead['id'] . '_' . $field_id;
 
-		$cache_value = GFCache::get( $cache_key );
+		$cache_value = GFCache::get( $cache_key, $dummy, false );
 		if ( $cache_value !== false ) {
 			return $cache_value;
 		}
@@ -4954,7 +4970,10 @@ class GFFormsModel {
 
 	public static function get_encrypted_fields( $entry_id ) {
 
+
 		$encrypted_fields = gform_get_meta( $entry_id, '_encrypted_fields' );
+
+
 		if ( empty( $encrypted_fields ) ) {
 			$encrypted_fields = array();
 		}
@@ -4976,6 +4995,19 @@ class GFFormsModel {
 	}
 
 	public static function is_encrypted_field( $entry_id, $field_id ) {
+
+		/**
+		 * Determines if an entry field is stored encrypted. Use this hook to change the default behavior of decrypting fields that have been encrypted or to completely disable the
+		 * process if checking for encrypted fields.
+		 *
+		 * @param int $entry_id The current Entry ID
+		 * @param int $field_id The current Field ID.
+		 */
+		$is_encrypted = apply_filters('gform_is_encrypted_field', '', $entry_id, $field_id );
+		if (  $is_encrypted !== '' ){
+			return $is_encrypted;
+		}
+
 		$encrypted_fields = self::get_encrypted_fields( $entry_id );
 
 		return in_array( $field_id, $encrypted_fields );

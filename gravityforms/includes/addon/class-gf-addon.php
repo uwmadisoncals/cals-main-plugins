@@ -1628,13 +1628,6 @@ abstract class GFAddOn {
 		$input_field['name'] .= '_custom';
 		$input_field_display  = '';
 
-		/* If select value is "gf_custom", hide the select field and display the input field. */
-		if ( $select_field_value == 'gf_custom' ) {
-			$select_field['style'] = 'display:none;';
-		} else {
-			$input_field_display   = ' style="display:none;"';
-		}
-				
 		/* Loop through select choices and make sure option for custom exists */
 		$has_gf_custom = false;
 		foreach ( $select_field['choices'] as $choice ) {
@@ -1648,15 +1641,22 @@ abstract class GFAddOn {
 				'value' => 'gf_custom'
 			);
 		}
-				
+		
+		/* If select value is "gf_custom", hide the select field and display the input field. */
+		if ( $select_field_value == 'gf_custom' || ( count( $select_field['choices'] ) == 1 && $select_field['choices'][0]['value'] == 'gf_custom' ) ) {
+			$select_field['style'] = 'display:none;';
+		} else {
+			$input_field_display   = ' style="display:none;"';
+		}
+								
 		/* Add select field */
 		$html = $this->settings_select( $select_field, false );
 		
 		/* Add input field */
-		$html .= '<div class="gaddon-setting-select-custom-container"'. $input_field_display .'>
-			<a href="#" class="select-custom-reset">Reset</a>'.
-			$this->settings_text( $input_field, false ) .'
-		</div>';
+		$html .= '<div class="gaddon-setting-select-custom-container"'. $input_field_display .'>';
+		$html .= count( $select_field['choices'] ) > 1 ? '<a href="#" class="select-custom-reset">Reset</a>' : '';
+		$html .= $this->settings_text( $input_field, false );
+		$html .= '</div>';
 
 		if ( $echo ) {
 			echo $html;

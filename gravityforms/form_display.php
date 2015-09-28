@@ -1422,7 +1422,7 @@ class GFFormDisplay {
 		//if field can be populated dynamically, disable state validation
 		if ( $field->allowsPrepopulate ) {
 			return false;
-		} else if ( ! GFCommon::is_product_field( $field->type && $field->type != 'donation' ) ) {
+		} else if ( ! GFCommon::is_product_field( $field->type ) && $field->type != 'donation' ) {
 			return false;
 		} else if ( ! in_array( $field->inputType, array( 'singleshipping', 'singleproduct', 'hiddenproduct', 'checkbox', 'radio', 'select' ) ) ) {
 			return false;
@@ -2237,10 +2237,13 @@ class GFFormDisplay {
 	}
 
 	private static function has_price_field( $form ) {
-		$price_fields    = GFAPI::get_fields_by_type( $form, array( 'product', 'donation' ) );
-		$has_price_field = ! empty( $price_fields );
-
-		return gf_apply_filters( 'gform_has_price_field', $form['id'], $has_price_field, $form );
+		$has_price_field = false;
+		foreach ( $form['fields'] as $field ) {
+			$input_type      = GFFormsModel::get_input_type( $field );
+			$has_price_field = GFCommon::is_product_field( $input_type ) ? true : $has_price_field;
+		}
+		
+		return $has_price_field;
 	}
 
 	private static function has_fileupload_field( $form ) {
