@@ -1,5 +1,7 @@
 <?php
 
+define('SITEORIGIN_PANELS_LAYOUT_URL', 'http://layouts.siteorigin.com/');
+
 /**
  * Get builder content based on the submitted panels_data.
  */
@@ -14,7 +16,10 @@ function siteorigin_panels_ajax_builder_content(){
 	}
 
 	// echo the content
-	echo siteorigin_panels_render( intval($_POST['post_id']), false, json_decode( wp_unslash($_POST['panels_data']), true ) );
+	$panels_data = json_decode( wp_unslash( $_POST['panels_data'] ), true);
+	$panels_data['widgets'] = siteorigin_panels_process_raw_widgets($panels_data['widgets']);
+	$panels_data = siteorigin_panels_styles_sanitize_all( $panels_data );
+	echo siteorigin_panels_render( intval($_POST['post_id']), false, $panels_data );
 
 	wp_die();
 }
@@ -83,6 +88,8 @@ function siteorigin_panels_ajax_prebuilt_layouts(){
 		$post_type = str_replace('clone_', '', $_REQUEST['type'] );
 		global $wpdb;
 
+		$user_can_read_private = ( $post_type == 'post' && current_user_can( 'read_private_posts' ) || ( $post_type == 'page' && current_user_can( 'read_private_pages' ) ));
+		$include_private = $user_can_read_private ? "OR posts.post_status = 'private' " : "";
 		// Select only the posts with the given post type that also have panels_data
 		$results = $wpdb->get_results( $wpdb->prepare("
 			SELECT ID, post_title, meta.meta_value
@@ -91,10 +98,10 @@ function siteorigin_panels_ajax_prebuilt_layouts(){
 			WHERE
 				posts.post_type = %s
 				AND meta.meta_key = 'panels_data'
-				AND ( posts.post_status = 'publish' OR posts.post_status = 'draft' )
+				AND ( posts.post_status = 'publish' OR posts.post_status = 'draft' " . $include_private . ")
 			ORDER BY post_title
 			LIMIT 200
-		", $post_type) );
+		", $post_type ) );
 
 		foreach( $results as $result ) {
 			$meta_value = unserialize( $result->meta_value );
@@ -201,3 +208,76 @@ function siteorigin_panels_ajax_export_layout(){
 	wp_die();
 }
 add_action('wp_ajax_so_panels_export_layout', 'siteorigin_panels_ajax_export_layout');
+
+/**
+ * We want users to be informed of what the layout directory is, so they need to enable it.
+ */
+function siteorigin_panels_ajax_directory_enable(){
+	if( empty( $_REQUEST['_panelsnonce'] ) || !wp_verify_nonce($_REQUEST['_panelsnonce'], 'panels_action') ) wp_die();
+
+	$user = get_current_user_id();
+	update_user_meta( $user, 'so_panels_directory_enabled', true );
+
+	wp_die();
+}
+add_action('wp_ajax_so_panels_directory_enable', 'siteorigin_panels_ajax_directory_enable');
+
+/**
+ * Query the layout directory for a list of layouts
+ */
+function siteorigin_panels_ajax_directory_query(){
+	if( empty( $_REQUEST['_panelsnonce'] ) || !wp_verify_nonce($_REQUEST['_panelsnonce'], 'panels_action') ) wp_die();
+
+	$query = array();
+	if( !empty($_GET['search']) ) {
+		$query['search'] = urlencode( $_GET['search'] );
+	}
+	if( !empty($_GET['page']) ) {
+		$query['page'] = intval( $_GET['page'] );
+	}
+
+	// Lets start by contacting the remote server
+	$url = add_query_arg( $query, SITEORIGIN_PANELS_LAYOUT_URL . '/wp-admin/admin-ajax.php?action=query_layouts');
+	$response = wp_remote_get( $url );
+
+	if( $response['response']['code'] == 200 ) {
+		$results = json_decode( $response['body'] );
+		if ( empty( $results ) ) {
+			$results = array();
+		}
+
+		// For now, we'll just create a pretend list of items
+		header( 'content-type: application/json' );
+		echo json_encode( $results );
+		wp_die();
+	}
+	else {
+		// Display some sort of error message
+	}
+}
+add_action('wp_ajax_so_panels_directory_query', 'siteorigin_panels_ajax_directory_query');
+
+/**
+ * Query the layout directory for a specific item
+ */
+function siteorigin_panels_ajax_directory_item_json(){
+	if( empty( $_REQUEST['_panelsnonce'] ) || !wp_verify_nonce($_REQUEST['_panelsnonce'], 'panels_action') ) wp_die();
+	if( empty( $_REQUEST['layout_slug'] ) ) wp_die();
+
+	$response = wp_remote_get(
+		SITEORIGIN_PANELS_LAYOUT_URL . '/layout/' . urlencode($_REQUEST['layout_slug']) . '/?action=download'
+	);
+
+	// var_dump($response['body']);
+	if( $response['response']['code'] == 200 ) {
+		// For now, we'll just pretend to load this
+		header('content-type: application/json');
+		echo $response['body'];
+		wp_die();
+	}
+	else {
+		// Display some sort of error message
+	}
+
+}
+add_action('wp_ajax_so_panels_directory_item', 'siteorigin_panels_ajax_directory_item_json');
