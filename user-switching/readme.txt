@@ -2,9 +2,9 @@
 
 Contributors: johnbillion  
 Tags: users, profiles, user switching, fast user switching, multisite, buddypress, bbpress, become, user management, developer  
-Requires at least: 3.1  
-Tested up to: 4.3  
-Stable tag: 1.0.8  
+Requires at least: 3.7  
+Tested up to: 4.4  
+Stable tag: 1.0.9  
 License: GPL v2 or later  
 
 Instant switching between user accounts in WordPress.
@@ -136,13 +136,15 @@ See the plugin source code for complete hook documentation.
 
 == Upgrade Notice ==
 
-= 1.0.8 =
+= 1.0.9 =
 
-* Chinese (Taiwan) and Czech translations.
-* Updated Dutch, Spanish, Hebrew, and German translations.
-* Add an ID attribute to the links on the WordPress login screen, BuddyPress screens, and bbPress screens.
+* Remove the bundled languages in favour of language packs from translate.wordpress.org.
 
 == Changelog ==
+
+= 1.0.9 =
+
+* Remove the bundled languages in favour of language packs from translate.wordpress.org.
 
 = 1.0.8 =
 
