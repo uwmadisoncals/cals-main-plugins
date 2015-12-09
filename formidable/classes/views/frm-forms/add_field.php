@@ -68,20 +68,11 @@ if ( $field['type'] == 'divider' ) { ?>
 <?php
 include(FrmAppHelper::plugin_path() .'/classes/views/frm-fields/show-build.php');
 
-if ( $display['clear_on_focus'] ) { ?>
-    <span id="frm_clear_on_focus_<?php echo esc_attr( $field['id'] ) ?>" class="frm-show-click"><?php
-
-    if ( $display['default_blank'] ) {
-		FrmFieldsHelper::show_default_blank_js( $field['default_blank'] );
-    }
-
-	FrmFieldsHelper::show_onfocus_js( $field['clear_on_focus'] );
-?>
-    </span>
-<?php
-
-    do_action('frm_extra_field_display_options', $field);
+if ( $display['clear_on_focus'] ) {
+	FrmFieldsHelper::clear_on_focus_html( $field, $display );
+	do_action( 'frm_extra_field_display_options', $field );
 }
+
 ?>
 <div class="clear"></div>
 </div>
@@ -104,15 +95,7 @@ if ( $display['conf_field'] ) { ?>
 </div>
 	<?php if ( $display['clear_on_focus'] ) { ?>
         <div class="alignleft">
-			<span id="frm_clear_on_focus_<?php echo esc_attr( $field['id'] ) ?>_conf" class="frm-show-click">
-                <?php
-                if ( $display['default_blank'] ) {
-					FrmFieldsHelper::show_default_blank_js( $field['default_blank'] );
-                }
-
-				FrmFieldsHelper::show_onfocus_js( $field['clear_on_focus'] );
-                ?>
-            </span>
+			<?php FrmFieldsHelper::clear_on_focus_html( $field, $display, '_conf' ); ?>
         </div>
     <?php } ?>
 </div>
@@ -208,6 +191,7 @@ if ( $display['options'] ) { ?>
 					<td class="frm_150_width">
 						<div class="hide-if-no-js edit-slug-box frm_help" title="<?php esc_attr_e( 'The field key can be used as an alternative to the field ID in many cases.', 'formidable' ) ?>">
                             <?php _e( 'Field Key', 'formidable' ) ?>
+						</div>
 					</td>
 					<td>
 						<input type="text" name="field_options[field_key_<?php echo esc_attr( $field['id'] ) ?>]" value="<?php echo esc_attr( $field['field_key'] ); ?>" />

@@ -334,6 +334,7 @@ class FrmFormAction {
  	}
 
 	public function save_settings( $settings ) {
+		self::clear_cache();
 		return FrmAppHelper::save_settings( $settings, 'frm_actions' );
 	}
 
@@ -451,7 +452,7 @@ class FrmFormAction {
 	}
 
 	public function prepare_action( $action ) {
-	    $action->post_content = FrmAppHelper::maybe_json_decode($action->post_content);
+		$action->post_content = (array) FrmAppHelper::maybe_json_decode($action->post_content);
 		$action->post_excerpt = sanitize_title( $action->post_excerpt );
 
         $default_values = $this->get_global_defaults();

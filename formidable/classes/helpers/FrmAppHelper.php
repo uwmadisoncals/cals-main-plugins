@@ -10,7 +10,7 @@ class FrmAppHelper {
 	/**
 	 * @since 2.0
 	 */
-	public static $plug_version = '2.0.17';
+	public static $plug_version = '2.0.18';
 
     /**
      * @since 1.07.02
@@ -1553,6 +1553,9 @@ class FrmAppHelper {
     public static function prepare_and_encode( $post_content ) {
         //Loop through array to strip slashes and add only the needed ones
 		foreach ( $post_content as $key => $val ) {
+			// Replace problematic characters (like &quot;)
+			$val = str_replace( '&quot;', '"', $val );
+
 			self::prepare_action_slashes( $val, $key, $post_content );
             unset( $key, $val );
         }
