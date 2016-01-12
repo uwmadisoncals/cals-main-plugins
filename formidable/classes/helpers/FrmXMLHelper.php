@@ -145,6 +145,8 @@ class FrmXMLHelper {
 
             $form['options'] = FrmAppHelper::maybe_json_decode($form['options']);
 
+			self::update_custom_style_setting_on_import( $form );
+
             // if template, allow to edit if form keys match, otherwise, creation date must also match
 			$edit_query = array( 'form_key' => $form['form_key'], 'is_template' => $form['is_template'] );
             if ( ! $form['is_template'] ) {
@@ -371,6 +373,38 @@ class FrmXMLHelper {
 				}
 			}
 		}
+	}
+
+	/**
+	* Updates the custom style setting on import
+	*
+	* @since 2.0.19
+	* @param array $form
+	*
+	*/
+	private static function update_custom_style_setting_on_import( &$form ) {
+		if ( is_numeric( $form['options']['custom_style'] ) ) {
+			// Set to default
+			$form['options']['custom_style'] = 1;
+		} else {
+			// Replace the style name with the style ID on import
+			global $wpdb;
+			$table = $wpdb->prefix . 'posts';
+			$where = array(
+				'post_name' => $form['options']['custom_style'],
+				'post_type' => 'frm_styles'
+			);
+			$select = 'ID';
+			$style_id = FrmDb::get_var( $table, $where, $select );
+
+			if ( $style_id ) {
+				$form['options']['custom_style'] = $style_id;
+			} else {
+				// Set to default
+				$form['options']['custom_style'] = 1;
+			}
+		}
+
 	}
 
 	public static function import_xml_views( $views, $imported ) {
@@ -682,6 +716,34 @@ class FrmXMLHelper {
 
 		$s_message[] = isset( $strings[ $type ] ) ? $strings[ $type ] : ' ' . $m . ' ' . ucfirst( $type );
     }
+
+	/**
+	 * Prepare the form options for export
+	 *
+	 * @since 2.0.19
+	 * @param string $options
+	 * @return string
+	 */
+	public static function prepare_form_options_for_export( $options ) {
+		$options = maybe_unserialize( $options );
+		// Change custom_style to the post_name instead of ID
+		if ( isset( $options['custom_style'] ) && 1 !== $options['custom_style'] ) {
+			global $wpdb;
+			$table = $wpdb->prefix . 'posts';
+			$where = array( 'ID' => $options['custom_style'] );
+			$select = 'post_name';
+
+			$style_name = FrmDb::get_var( $table, $where, $select );
+
+			if ( $style_name ) {
+				$options['custom_style'] = $style_name;
+			} else {
+				$options['custom_style'] = 1;
+			}
+		}
+		$options = serialize( $options );
+		return self::cdata( $options );
+	}
 
 	public static function cdata( $str ) {
 	    $str = maybe_unserialize($str);

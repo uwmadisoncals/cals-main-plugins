@@ -275,6 +275,16 @@ form label.frm_primary_label input{font-size:12px;}
     border-radius:4px;
 }
 
+.frm_pro_license_msg{
+	clear:left;
+	margin-top:10px;
+}
+
+.frm-no-thumb.plugin-card .name,
+.frm-no-thumb.plugin-card .desc{
+	margin-left:0;
+}
+
 #frm_bulk_options{
     height:240px;
     width:335px;
@@ -1404,7 +1414,7 @@ span.howto{display:inline;}
 	margin-bottom:0;
 }
 .frm_sorting .no_repeat_section li.ui-state-default.edit_field_type_end_divider{
-	display:none;
+	display:none !important;
 }
 
 #postbox-container-1 .ui-state-default,
@@ -2161,8 +2171,8 @@ Responsive Design
 		display:table-cell !important;
 	}
 
-	.wp-list-table.formidable_page_formidable-entries th.frm_hidden,
-	.wp-list-table.formidable_page_formidable-entries td.frm_hidden{
+	#form_entries_page .wp-list-table th.frm_hidden,
+	#form_entries_page .wp-list-table td.frm_hidden{
 		display:none !important;
 	}
 

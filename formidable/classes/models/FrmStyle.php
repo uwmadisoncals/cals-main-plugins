@@ -371,8 +371,12 @@ class FrmStyle {
 
             'title_size'        => '20px',
             'title_color'       => '444444',
+			'title_margin_top'  => '10px',
+			'title_margin_bottom' => '10px',
             'form_desc_size'    => '14px',
             'form_desc_color'   => '666666',
+			'form_desc_margin_top' => '10px',
+			'form_desc_margin_bottom' => '25px',
 
             'font'              => '"Lucida Grande","Lucida Sans Unicode",Tahoma,sans-serif',
             'font_size'         => '14px',
@@ -398,6 +402,7 @@ class FrmStyle {
             'auto_width'        => false,
             'field_pad'         => '6px 10px',
             'field_margin'      => '20px',
+			'field_weight' => 'normal',
             'text_color'        => '555555',
             //'border_color_hv'   => 'cccccc',
             'border_color'      => 'cccccc',
@@ -406,8 +411,10 @@ class FrmStyle {
 
             'bg_color'          => 'ffffff',
             //'bg_color_hv'       => 'ffffff',
+			'remove_box_shadow' => '',
             'bg_color_active'   => 'ffffff',
 			'border_color_active' => '66afe9',
+			'remove_box_shadow_active' => '',
             'text_color_error'  => '444444',
             'bg_color_error'    => 'ffffff',
 			'border_color_error' => 'B94A48',

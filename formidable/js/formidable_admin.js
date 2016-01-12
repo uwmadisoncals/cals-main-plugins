@@ -174,38 +174,7 @@ function frmAdminBuildJS(){
 			jQuery('.frm_settings_form').attr('action', '?page=formidable-settings&t='+t.replace('#', ''));
 		}
 	}
-	
-	function deauthorize(){
-		if(!confirm(frmGlobal.deauthorize)){
-			return false;
-		}
-		var $link = jQuery(document.getElementById('frm_deauthorize_link'));
-		$link.next('.spinner').show();
-		jQuery.ajax({
-			type:'POST',url:ajaxurl,
-            data:{action:'frm_deauthorize', nonce:frmGlobal.nonce},
-			success:function(msg){
-				jQuery('.spinner').fadeOut('slow');
-				$link.fadeOut('slow');
-				showAuthForm();
-			}
-		});
-		return false;
-	}
-	
-	function showAuthForm(){
-		var form = document.getElementById('pro_cred_form');
-		var cred = jQuery('.frm_pro_installed');
-		if(cred.is(':visible')){
-			cred.hide();
-			form.style.display = 'block';
-		}else{
-			cred.show();
-			form.style.display = 'none';
-		}
-	}
-	
-	
+
 	/* Form Builder */
 	function setupSortable(sort){
 		var opts = {
@@ -1683,6 +1652,66 @@ function frmAdminBuildJS(){
 		return false;
 	}
 
+	function authorize(){
+		var button = jQuery(this);
+		var pluginSlug = button.data('plugin');
+		var license = document.getElementById('edd_'+pluginSlug+'_license_key').value;
+		jQuery.ajax({
+			type:'POST',url:ajaxurl,dataType:'json',
+			data:{action:'frm_addon_activate',license:license,plugin:pluginSlug,nonce:frmGlobal.nonce},
+			success:function(msg){
+				var messageBox = jQuery('.frm_pro_license_msg');
+				if ( msg.success === true ) {
+					document.getElementById('frm_license_top').style.display = 'none';
+					document.getElementById('frm_license_bottom').style.display = 'block';
+					messageBox.removeClass('frm_error_style').addClass('frm_message');
+				}else{
+					messageBox.addClass('frm_error_style').removeClass('frm_message');
+				}
+
+				messageBox.html(msg.message);
+				if ( msg.message !== '' ){
+					setTimeout(function(){
+						messageBox.html('');
+						messageBox.removeClass('frm_error_style frm_message');
+					},5000);
+				}
+			}
+		});
+	}
+
+	function deauthorize(){
+		if(!confirm(frmGlobal.deauthorize)){
+			return false;
+		}
+		var $link = jQuery(this);
+		$link.next('.spinner').show();
+		var pluginSlug = $link.data('plugin');
+		var license = document.getElementById('edd_'+pluginSlug+'_license_key').value;
+		jQuery.ajax({
+			type:'POST',url:ajaxurl,
+			data:{action:'frm_addon_deactivate',license:license,plugin:pluginSlug,nonce:frmGlobal.nonce},
+			success:function(msg){
+				jQuery('.spinner').fadeOut('slow');
+				$link.fadeOut('slow');
+				showAuthForm();
+			}
+		});
+		return false;
+	}
+
+	function showAuthForm(){
+		var form = document.getElementById('frm_license_top');
+		var cred = jQuery('#frm_license_bottom');
+		if(cred.is(':visible')){
+			cred.hide();
+			form.style.display = 'block';
+		}else{
+			cred.show();
+			form.style.display = 'none';
+		}
+	}
+
 	function saveAddonLicense() {
 		var button = jQuery(this);
 		var buttonName = this.name;
@@ -1701,8 +1730,9 @@ function frmAdminBuildJS(){
 				thisRow.find('.edd_frm_license').html( license );
 				if ( msg.success === true ) {
 					thisRow.find('.frm_icon_font').removeClass('frm_hidden');
+					thisRow.find('div.alignleft').toggleClass( 'frm_hidden', 1000 );
 				}
-				thisRow.find('div.alignleft').toggleClass( 'frm_hidden', 1000 );
+
 				var messageBox = thisRow.find('.frm_license_msg');
 				messageBox.html(msg.message);
 				if ( msg.message !== '' ){
@@ -1712,6 +1742,32 @@ function frmAdminBuildJS(){
 				}
 			}
 		});
+	}
+
+	function fillLicenses(){
+		var emptyFields = jQuery('.frm_addon_license_key:visible');
+		if ( emptyFields.length < 1 ){
+			return false;
+		}
+
+		jQuery.ajax({
+			type:'POST',url:ajaxurl,dataType:'json',
+			data:{action:'frm_fill_licenses', nonce:frmGlobal.nonce},
+			success:function(json){
+				var i;
+				var licenses = json.licenses;
+				for ( i in licenses ) {
+				    if (licenses.hasOwnProperty(i)) {
+						var input = jQuery('#edd_'+ licenses[i].slug +'_license_key');
+						if ( typeof input !== null && input.is(':visible') ) {
+							input.val(licenses[i].key);
+							jQuery('input[name="edd_'+ licenses[i].slug +'_license_activate"]').click();
+						}
+				    }
+				}
+			}
+		});
+		return false;
 	}
 
 	/* Import/Export page */
@@ -1765,17 +1821,24 @@ function frmAdminBuildJS(){
 	}
 
 	function checkExportTypes(){
-		var $selected = jQuery(this).find(':selected');
+		var $dropdown = jQuery(this);
+		var $selected = $dropdown.find(':selected');
 		var s = $selected.data('support');
+
+		var multiple = s.indexOf('|');
 		jQuery('input[name="type[]"]').each(function(){
-			if(s.indexOf(jQuery(this).val()) >= 0){
-				jQuery(this).prop('disabled', false);
+			this.checked = false;
+			if(s.indexOf(this.value) >= 0){
+				this.disabled = false;
+				if ( multiple == -1 ) {
+					this.checked = true;
+				}
 			}else{
-				jQuery(this).prop('disabled', true);
+				this.disabled = true;
 			}
 		});
 
-		if(jQuery(this).val() == 'csv'){
+		if($dropdown.val() == 'csv'){
 			jQuery('.csv_opts').show();
 		}else{
 			jQuery('.csv_opts').hide();
@@ -1925,6 +1988,7 @@ function frmAdminBuildJS(){
 			jQuery('.frm_select_box').focus(function(){this.select();});
 			
 			jQuery(document.getElementById('frm_deauthorize_link')).click(deauthorize);
+			jQuery('.frm_authorize_link').click(authorize);
 		},
 		
 		buildInit: function(){			
@@ -2249,8 +2313,6 @@ function frmAdminBuildJS(){
 
 					wrapper = target.parents('.accordion-section-content').first();
 
-					// upon changing tabs, we want to uncheck all checkboxes
-					jQuery('input', wrapper).removeAttr('checked');
 
 					jQuery('.tabs-panel-active', wrapper).removeClass('tabs-panel-active').addClass('tabs-panel-inactive');
 					jQuery('#' + panelId, wrapper).removeClass('tabs-panel-inactive').addClass('tabs-panel-active');
@@ -2360,13 +2422,14 @@ function frmAdminBuildJS(){
 
 			// activate addon licenses
 			jQuery('.edd_frm_save_license').click(saveAddonLicense);
+			jQuery('.edd_frm_fill_license').click(fillLicenses);
 		},
-		
+
 		exportInit: function(){
 			jQuery(document.getElementById('frm_export_xml')).submit(validateExport);
 			jQuery('#frm_export_xml input, #frm_export_xml select').change(removeExportError);
 			jQuery('input[name="frm_import_file"]').change(checkCSVExtension);
-			jQuery('select[name="format"]').change(checkExportTypes);
+			jQuery('select[name="format"]').change(checkExportTypes).change();
 			initiateMultiselect();
 		},
 		

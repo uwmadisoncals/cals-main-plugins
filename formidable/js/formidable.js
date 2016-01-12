@@ -2,7 +2,7 @@ function frmFrontFormJS(){
 	'use strict';
 	var show_fields = [];
 	var hide_later = {};
-	var hidden_fields = [];
+	var globalHiddenFields = [];
     var frm_checked_dep = [];
 	var addingRow = '';
 	var currentlyAddingRow = false;
@@ -213,7 +213,6 @@ function frmFrontFormJS(){
 
 		if ( reset !== 'persist' ) {
             show_fields = []; // reset this variable after each click
-			hidden_fields = [];
         }
 
 		var isRepeat = maybeSetRowId( changedInput );
@@ -300,6 +299,7 @@ function frmFrontFormJS(){
 		logicRules.hiddenName = 'item_meta['+ logicRules.HideField +']';
 		logicRules.containerID = 'frm_field_'+ logicRules.FieldName +'_container';
 		logicRules.hideContainerID = 'frm_field_'+ logicRules.HideField +'_container';
+		logicRules.Value = logicRules.Value.trim();
 
 		// If the trigger field is a repeating field, only check single row of repeating section
 		if ( addingRow !== '' ) {
@@ -393,21 +393,23 @@ function frmFrontFormJS(){
 			}else{
 				fieldValue = '';
 			}
+
 			return fieldValue;
 		}
 
-		// If field is on another page
 		fieldValue = jQuery('input[name="'+ f.inputName +'"][type="hidden"]').val();
-		if ( typeof fieldValue !== 'undefined' ) {
-			return fieldValue;
-		}
 
-		if ( f.Type == 'radio' || f.Type === 'data-radio' ) {
+		if ( typeof fieldValue !== 'undefined' ) {
+			// If field is on another page, read-only, or visibility setting is hiding it
+
+		} else if ( f.Type == 'radio' || f.Type === 'data-radio' ) {
 			// If radio field on the current page
 			fieldValue = jQuery('input[name="'+ f.inputName +'"]:checked').val();
+
 		} else if ( f.Type === 'select' || f.Type === 'data-select' ) {
 			// If dropdown field on the current page
 			fieldValue = jQuery('select[name^="'+ f.inputName +'"]').val();
+
 		} else {
 			// If text field on the current page
 			fieldValue = jQuery('input[name="'+ f.inputName +'"]').val();
@@ -415,6 +417,10 @@ function frmFrontFormJS(){
 
 		if ( typeof fieldValue === 'undefined' ) {
 			fieldValue = '';
+		}
+
+		if ( typeof fieldValue === 'string' ) {
+			fieldValue = fieldValue.trim();
 		}
 
 		return fieldValue;
@@ -484,7 +490,7 @@ function frmFrontFormJS(){
 	function updateShowFieldsForDynamicField( i, logicRules, fieldValue ) {
 		if ( typeof logicRules.DataType === 'undefined' || logicRules.DataType === 'data' ) {
 			if ( fieldValue === '' ) {
-				hideAndClearDynamicField( logicRules.hideContainerID, logicRules.HideField, 'hide' );
+				hideAndClearDynamicField( logicRules, 'hide' );
 			} else if ( logicRules.Type === 'data-radio' ) {
 				if ( typeof logicRules.DataType === 'undefined' ) {
 					show_fields[logicRules.hideContainerID][i] = operators(logicRules.Condition, logicRules.Value, fieldValue);
@@ -492,7 +498,7 @@ function frmFrontFormJS(){
 					show_fields[logicRules.hideContainerID][i] = {'funcName':'getData','f':logicRules,'sel':fieldValue};
 				}
 			} else if ( logicRules.Type === 'data-checkbox' || ( logicRules.Type === 'data-select' && isNotEmptyArray( fieldValue ) ) ) {
-				hideAndClearDynamicField( logicRules.hideContainerID, logicRules.HideField, 'show' );
+				hideAndClearDynamicField( logicRules, 'show' );
 				show_fields[logicRules.hideContainerID][i] = true;
 				getData(logicRules, fieldValue, 0);
 			} else if ( logicRules.Type === 'data-select' ) {
@@ -521,23 +527,19 @@ function frmFrontFormJS(){
 			return;
 		}
 
-		var display = 'none';
-		if ( f.Show === 'show' ) {
-			if ( show_fields[f.hideContainerID][i] !== true ) {
-				showField(show_fields[f.hideContainerID][i], f.FieldName, rec);
-				return;
-			}
-			display = '';
-		}
 
 		var hideFieldContainer = jQuery( document.getElementById(f.hideContainerID) );
 
-		if ( display == 'none' ) {
+		if ( f.Show === 'show' ) {
+			if ( show_fields[f.hideContainerID][i] !== true ) {
+				showField(show_fields[f.hideContainerID][i], f.FieldName, rec);
+			} else {
+				// Show the field
+				routeToShowFieldAndSetVal( hideFieldContainer, f);
+			}
+		} else {
 			// Hide the field
 			routeToHideFieldAndClearVal( hideFieldContainer, f);
-		} else {
-			// Show the field
-			routeToShowFieldAndSetVal( hideFieldContainer, f);
 		}
 	}
 
@@ -599,14 +601,10 @@ function frmFrontFormJS(){
 
 	function hideFieldAndClearValue( container, f ) {
 		container.hide();
-		if ( jQuery.inArray(container.attr('id'), hidden_fields) === -1 ) {
-			var field_id = f.HideField;
-			hidden_fields[ field_id ] = container.attr('id');
 
-			var inputs = getInputsInContainer( container );
-			if ( inputs.length ){
-				clearValueForInputs( inputs );
-			}
+		var inputs = getInputsInContainer( container );
+		if ( inputs.length ){
+			clearValueForInputs( inputs );
 		}
 	}
 
@@ -631,13 +629,7 @@ function frmFrontFormJS(){
 
 	function addToHideFields( htmlFieldId, formId ) {
 		// Get all currently hidden fields
-		var frmHideFieldsInput = document.getElementById('frm_hide_fields_' + formId);
-		var hiddenFields = frmHideFieldsInput.value;
-		if ( hiddenFields ) {
-			hiddenFields = JSON.parse( hiddenFields );
-		} else {
-			hiddenFields = [];
-		}
+		var hiddenFields = getHiddenFields( formId );
 
 		// If field id is already in the array, move on
 		if ( hiddenFields.indexOf( htmlFieldId ) > -1 ) {
@@ -645,19 +637,47 @@ function frmFrontFormJS(){
 		} else {
 			// Add new conditionally hidden field to array
 			hiddenFields.push( htmlFieldId );
+
+			// Copy hiddenFields to global variable
+			globalHiddenFields[ 'form_' + formId ] = hiddenFields;
+
+			// Set the hiddenFields value in the frm_hide_field_formID input
 			hiddenFields = JSON.stringify( hiddenFields );
+			var frmHideFieldsInput = document.getElementById('frm_hide_fields_' + formId);
 			frmHideFieldsInput.value = hiddenFields;
 		}
 	}
 
-	function hideAndClearDynamicField(hideContainer,field_id, hide){
-		if ( jQuery.inArray(hideContainer, hidden_fields) === -1 ) {
-			hidden_fields[ field_id ] = hideContainer;
-			hideContainer = jQuery(document.getElementById(hideContainer));
-			if ( hide === 'hide' ) {
-				hideContainer.hide();
+	function getHiddenFields( formId ) {
+		var hiddenFields = [];
+		if ( typeof( globalHiddenFields[ 'form_' + formId ] ) !== 'undefined' ) {
+			// If global value is already set, get it from there to save time
+			hiddenFields = globalHiddenFields[ 'form_' + formId ];
+		} else {
+			// Fetch the hidden fields from the frm_hide_fields_formId input
+			var frmHideFieldsInput = document.getElementById('frm_hide_fields_' + formId);
+			hiddenFields = frmHideFieldsInput.value;
+			if ( hiddenFields ) {
+				hiddenFields = JSON.parse( hiddenFields );
+			} else {
+				hiddenFields = [];
 			}
-			hideContainer.find('.frm_data_field_container').empty();
+			// Set the global HiddenFields variable
+			globalHiddenFields[ 'form_' + formId ] = hiddenFields;
+		}
+		return hiddenFields;
+	}
+
+	function hideAndClearDynamicField(logicRules, hideOrShow){
+		var hiddenFields = getHiddenFields( logicRules.FormId );
+
+		if ( hiddenFields.indexOf( logicRules.hideContainerID ) === -1 ) {
+			var hideContainer = jQuery( document.getElementById( logicRules.hideContainerID ) );
+			if ( hideOrShow === 'hide' ) {
+				hideContainer.hide();
+				addToHideFields( logicRules.hideContainerID, logicRules.FormId );
+			}
+			hideContainer.find('.frm_opt_container').empty();
 		}
     }
 
@@ -770,19 +790,20 @@ function frmFrontFormJS(){
 
 	function removeFromHideFields( htmlFieldId, formId ) {
 		// Get all currently hidden fields
-		var frmHideFieldsInput = document.getElementById('frm_hide_fields_' + formId);
-		var hiddenFields = frmHideFieldsInput.value;
-		if ( hiddenFields ) {
-			hiddenFields = JSON.parse( hiddenFields );
-		} else {
-			return;
-		}
+		var hiddenFields = getHiddenFields( formId );
 
 		// If field id is in the array, delete it
 		var item_index = hiddenFields.indexOf( htmlFieldId );
 		if ( item_index > -1 ) {
+			// Remove field from the hiddenFields array
 			hiddenFields.splice(item_index, 1);
+
+			// Save the hiddenFields array as a global variable
+			globalHiddenFields[ 'form_' + formId ] = hiddenFields;
+
+			// Update frm_hide_fields_formId input
 			hiddenFields = JSON.stringify( hiddenFields );
+			var frmHideFieldsInput = document.getElementById('frm_hide_fields_' + formId);
 			frmHideFieldsInput.value = hiddenFields;
 		}
 	}
@@ -837,17 +858,41 @@ function frmFrontFormJS(){
 					/* If no value, then assume no match */
 					return false;
 				}
-				return d.toLowerCase().indexOf( c.toLowerCase() ) != -1;
+
+				d = prepareEnteredValueForLikeComparison( d );
+				c = prepareLogicValueForLikeComparison( c );
+
+				return d.indexOf( c ) != -1;
 			},
 			'not LIKE': function(c,d){
 				if(!d){
 					/* If no value, then assume no match */
 					return true;
 				}
-				return d.toLowerCase().indexOf( c.toLowerCase() ) == -1;
+
+				d = prepareEnteredValueForLikeComparison( d );
+				c = prepareLogicValueForLikeComparison( c );
+
+				return d.indexOf( c ) == -1;
 			}
 		};
 		return theOperators[op](a, b);
+	}
+
+	function prepareEnteredValueForLikeComparison( d ) {
+		if ( typeof d === 'string' ) {
+			d = d.toLowerCase();
+		} else if ( typeof d === 'number' ) {
+			d = d.toString();
+		}
+		return d;
+	}
+
+	function prepareLogicValueForLikeComparison( c ) {
+		if ( typeof c === 'string' ) {
+			c = c.toLowerCase();
+		}
+		return c;
 	}
 
 	function showField(funcInfo, field_id, rec){
@@ -860,7 +905,7 @@ function frmFrontFormJS(){
 
 	function getData(f,selected,append){
         var fcont = document.getElementById(f.hideContainerID);
-		var cont = jQuery(fcont).find('.frm_data_field_container');
+		var cont = jQuery(fcont).find('.frm_opt_container');
 		if ( cont.length === 0 ) {
 			return true;
 		}
@@ -921,8 +966,13 @@ function frmFrontFormJS(){
 		frm_checked_dep.push(f.HideField);
 
         var fcont = document.getElementById(f.hideContainerID);
-		//don't get values for fields that are to remain hidden on the page
-		var $dataField = jQuery(fcont).find('.frm_data_field_container');
+
+		// If field is on a different page or hidden with visibility option, don't retrieve new options
+		if ( fcont === null ) {
+			return;
+		}
+
+		var $dataField = jQuery(fcont).find('.frm_opt_container');
         if($dataField.length === 0 && hiddenInput.length ){
 		    checkDependentField(f.HideField, 'stop', hiddenInput);
             return false;
@@ -1159,7 +1209,7 @@ function frmFrontFormJS(){
 		}
 
 		// Exit now if field is a type that can't do calculations
-		if ( field_input.type != 'text' && field_input.type != 'hidden' ) {
+		if ( ! fieldCanDoCalc( field_input.type ) ) {
 			return;
 		}
 
@@ -1174,6 +1224,16 @@ function frmFrontFormJS(){
 
 		var vals = [];
 		doSingleCalculation( all_calcs, field_key, vals, triggerField );
+	}
+
+	function fieldCanDoCalc( fieldType ) {
+		var canDoCalc = false;
+
+		if ( fieldType == 'text' || fieldType == 'hidden' || fieldType == 'number' ) {
+			canDoCalc = true;
+		}
+
+		return canDoCalc;
 	}
 
 	function getFieldKey( fieldHtmlId, fieldName ) {
@@ -1643,7 +1703,12 @@ function frmFrontFormJS(){
 							if ( ! $fieldCont.is(':visible') ) {
 								var inCollapsedSection = $fieldCont.closest('.frm_toggle_container');
 								if ( inCollapsedSection.length ) {
-									inCollapsedSection.prev('.frm_trigger').click();
+									var frmTrigger = inCollapsedSection.prev();
+									if ( ! frmTrigger.hasClass('frm_trigger') ) {
+										// If the frmTrigger object is the section description, check to see if the previous element is the trigger
+										frmTrigger = frmTrigger.prev('.frm_trigger');
+									}
+									frmTrigger.click();
 								}
 							}
 							if ( $fieldCont.is(':visible') ) {
@@ -2056,7 +2121,7 @@ function frmFrontFormJS(){
 						}
 						fieldID = this.name.replace('item_meta[', '').split(']')[2].replace('[', '');
 						if ( jQuery.inArray(fieldID, checked ) == -1 ) {
-							if ( this.id === false ) {
+							if ( this.id == false ) {
 								return;
 							}
 							fieldObject = jQuery( '#' + this.id );

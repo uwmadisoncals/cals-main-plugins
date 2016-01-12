@@ -128,12 +128,10 @@ class FrmStylesController {
 	}
 
 	public static function new_style( $return = '' ) {
-        FrmAppHelper::update_message( __( 'create multiple styling templates', 'formidable' ), 'wrap' );
         self::load_styler('default');
     }
 
 	public static function duplicate() {
-		FrmAppHelper::update_message( __( 'duplicate styling templates', 'formidable' ), 'wrap' );
 		self::load_styler('default');
 	}
 
@@ -319,6 +317,8 @@ class FrmStylesController {
         // setup meta boxes
         $meta_boxes = array(
             'general'           => __( 'General', 'formidable' ),
+            'form-title'        => __( 'Form Title', 'formidable' ),
+            'form-description'  => __( 'Form Description', 'formidable' ),
             'field-labels'      => __( 'Field Labels', 'formidable' ),
             'field-description' => __( 'Field Description', 'formidable' ),
             'field-colors'      => __( 'Field Colors', 'formidable' ),
