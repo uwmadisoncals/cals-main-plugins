@@ -4,8 +4,9 @@ Plugin Name: Peter's Post Notes
 Plugin URI: http://www.theblog.ca/wordpress-post-notes
 Description: Add notes on the "edit post" and "edit page" screens' sidebars, as well as general notes on the dashboard, in WordPress 2.8 and up. When used with Peter's Collaboration E-mails 1.2 and up, the notes are sent along with the e-mails in the collaboration workflow.
 Author: Peter Keung
-Version: 1.5.3
+Version: 1.5.4
 Change Log:
+2016-01-06  1.5.4: Make all strings translatable and put translation files in their own folder. (Thanks Luis González Jaime!)
 2014-05-10  1.5.3: Bug fix: strip slashes in Latest Note column.
 2013-10-07  1.5.2: Support PHP 5 static function calls, bumping WordPress requirement to 3.2+.
 2013-07-06  1.5.1: Tighten up spacing in notes displays.
@@ -40,7 +41,7 @@ if( is_admin() ) { // This line makes sure that all of this code only runs if so
 // Enable translations
 add_action('init', 'ppn_textdomain');
 function ppn_textdomain() {
-	load_plugin_textdomain('peters_post_notes', PLUGINDIR . '/' . dirname(plugin_basename(__FILE__)), dirname(plugin_basename(__FILE__)));
+	load_plugin_textdomain('peters_post_notes', PLUGINDIR . '/' . dirname(plugin_basename(__FILE__)) . '/languages', dirname(plugin_basename(__FILE__)) . '/languages');
 }
 
 global $wpdb;
@@ -50,7 +51,7 @@ global $ppn_version;
 // Name of the database table that will hold the post-specific notes
 $ppn_db_notes = $wpdb->prefix . 'collabnotes';
 $ppn_db_generalnotes = $wpdb->prefix . 'generalnotes';
-$ppn_version = '1.5.0';
+$ppn_version = '1.5.4';
 
 /* --------------------------------------------
 Helper functions
@@ -138,7 +139,7 @@ class ppnFunctionCollection
     // Defines the header for the "Latest note" column on the manage posts page
     static function notes_column_header( $columns )
     {
-        $columns['ppn_notes'] = __( 'Latest note' );
+        $columns['ppn_notes'] = __( 'Latest note', 'peters_post_notes' );
         return $columns;
     }
     // Defines the actual "Latest note" column content on the manage posts page
@@ -585,7 +586,7 @@ function ppn_dashboard_general() {
     
     if( !empty($ppn_dashboard_general_personal) ) {
         print '<hr />';
-        print '<h4>Personal notes:</h4>' . "\n";
+        print '<h4>'. __('Personal notes:', 'peters_post_notes') . '</h4>' . "\n";
         print '<div id="ppn_dashboard_general_personal">' . "\n";
         print $ppn_dashboard_general_personal;
         print '</div>' . "\n";
@@ -670,17 +671,17 @@ function ppn_dashboard_general_newest($ppn_page=0, $ppn_personal=0) {
             $out .= '<span id="ppn_notecontent_p_' . $ppn_newest_post->noteid . '">' . stripslashes($ppn_newest_post->notecontent) . '</span>' . "\n";
             $out .= '<br /><em>' . mysql2date(__('M j, Y \a\t G:i', 'peters_post_notes'), $ppn_newest_post->notetime) . '</em>';
             if( $current_user->ID == $ppn_newest_post->author || $is_supereditor) {
-                $out .= '<br /><a onclick="ppn_ajax_edit_form(' . $ppn_newest_post->noteid . '); return false;" href="javascript:;">Edit</a>';
+                $out .= '<br /><a onclick="ppn_ajax_edit_form(' . $ppn_newest_post->noteid . '); return false;" href="javascript:;">' . __('Edit', 'peters_post_notes') . '</a>';
             }
             $out .= '</p>';
             $out .= '</div>' . "\n";
             if( $current_user->ID == $ppn_newest_post->author || $is_supereditor ) {
                 $out .= '<form name="ppn_note_' . $ppn_newest_post->noteid . '">' . "\n";
                 $out .= '<div id="ppn_noteform_' . $ppn_newest_post->noteid . '" style="display: none;" >' . "\n";
-                $out .= '<p style="float:left;"><a onclick="ppn_ajax_delete_note(' . $ppn_newest_post->noteid . ', 0); return false;" href="#">Delete</a></p>' . "\n";
+                $out .= '<p style="float:left;"><a onclick="ppn_ajax_delete_note(' . $ppn_newest_post->noteid . ', 0); return false;" href="#">' . __('Delete', 'peters_post_notes') . '</a></p>' . "\n";
                 $out .= '<p style="clear:both;"><textarea name="ppn_note_text_' . $ppn_newest_post->noteid . '" id="ppn_note_' . $ppn_newest_post->noteid . '" cols="30" style="width: 99%;">' . ppnFunctionCollection::preserve_code( $ppn_newest_post->notecontent ) . '</textarea></p>' . "\n";
                 $out .= '<p><input type="hidden" name="note_id" value="' . $ppn_newest_post->noteid . '" /><input type="button" class="button button-highlighted" value="' . __('Save', 'peters_post_notes') . '" onclick="ppn_ajax_edit_note(' . $ppn_newest_post->noteid . ',this.form.ppn_note_text_' . $ppn_newest_post->noteid . ', 0);" />';
-                $out .= ' <a onclick="ppn_ajax_edit_form_cancel(' . $ppn_newest_post->noteid . '); return false;" href="javascript:;">' . __('Cancel') . '</a></p>' . "\n";
+                $out .= ' <a onclick="ppn_ajax_edit_form_cancel(' . $ppn_newest_post->noteid . '); return false;" href="javascript:;">' . __('Cancel', 'peters_post_notes') . '</a></p>' . "\n";
                 $out .= '</div>' . "\n";
                 $out .= '</form>' . "\n";
             }

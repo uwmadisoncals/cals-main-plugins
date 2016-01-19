@@ -52,6 +52,9 @@ Please visit the plugin page at http://www.theblog.ca/wordpress-post-notes with 
 
 == Changelog ==
 
+= 1.5.4 =
+* 2016-01-06: Make all strings translatable and put translation files in their own folder. (Thanks Luis González Jaime!)
+
 = 1.5.3 =
 * 2014-05-10: Bug fix: strip slashes in Latest Note column.
 

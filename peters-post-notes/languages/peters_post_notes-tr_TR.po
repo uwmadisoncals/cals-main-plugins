@@ -1,0 +1,227 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: peters_post_notes.php\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-01-06 17:06-0800\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Peter <peter@keung.biz>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../peters_post_notes.php:131
+msgid "User"
+msgstr "Kullanıcı"
+
+#: ../peters_post_notes.php:142
+msgid "Latest note"
+msgstr "Son Note"
+
+#: ../peters_post_notes.php:156 ../peters_post_notes.php:361
+#: ../peters_post_notes.php:529 ../peters_post_notes.php:672
+msgid "M j, Y \\a\\t G:i"
+msgstr "M j, Y \\a\\t G:i"
+
+#: ../peters_post_notes.php:285
+msgid "Successfully updated plugin settings"
+msgstr ""
+
+#: ../peters_post_notes.php:330
+msgid "Notes"
+msgstr "Notlar"
+
+#: ../peters_post_notes.php:366 ../peters_post_notes.php:674
+msgid "Edit"
+msgstr "Düzenle"
+
+#: ../peters_post_notes.php:371 ../peters_post_notes.php:681
+msgid "Delete"
+msgstr "Sil"
+
+#: ../peters_post_notes.php:373 ../peters_post_notes.php:683
+msgid "Save"
+msgstr "Kaydet"
+
+#: ../peters_post_notes.php:374 ../peters_post_notes.php:684
+msgid "Cancel"
+msgstr "İptal"
+
+#: ../peters_post_notes.php:386
+msgid "No notes for this post."
+msgstr "Bu yazı için not bulunmamaktadır."
+
+#: ../peters_post_notes.php:398 ../peters_post_notes.php:601
+msgid "Add note:"
+msgstr "Not ekle:"
+
+#: ../peters_post_notes.php:453
+msgid "Collaboration Notes"
+msgstr "Collaboration Notları"
+
+#: ../peters_post_notes.php:529
+msgid "on"
+msgstr "açık"
+
+#: ../peters_post_notes.php:537
+msgid "No relevant notes."
+msgstr "İlişkili bir not yok."
+
+#: ../peters_post_notes.php:541
+msgid "General Notes"
+msgstr "Genel Notlar"
+
+#: ../peters_post_notes.php:589
+#, fuzzy
+msgid "Personal notes:"
+msgstr "Genel Notlar"
+
+#: ../peters_post_notes.php:596
+msgid "No general notes."
+msgstr "Genel not yok."
+
+#: ../peters_post_notes.php:605 ../peters_post_notes.php:610
+msgid "Private note"
+msgstr "Özel not"
+
+#: ../peters_post_notes.php:613
+msgid "Add"
+msgstr "Ekle"
+
+#: ../peters_post_notes.php:731
+#, fuzzy
+msgid "Added notes table!"
+msgstr "<p>Not tablosu eklendi!</p>"
+
+#: ../peters_post_notes.php:749
+#, fuzzy
+msgid "Added general notes table!"
+msgstr "<p>Genel not tablosu eklendi!</p>"
+
+#: ../peters_post_notes.php:761
+msgid "Only necessary if you updated the plugin manually"
+msgstr "Sadece plug'in güncellendiğiniz zaman gereklidir."
+
+#: ../peters_post_notes.php:778
+#, fuzzy
+msgid "Peter's Post Notes settings"
+msgstr "Peter's Post Notes: durum"
+
+#: ../peters_post_notes.php:791
+msgid "Which types of notes to show on the Dashboard"
+msgstr ""
+
+#: ../peters_post_notes.php:795
+msgid "Relevant notes including the current user's notes"
+msgstr ""
+
+#: ../peters_post_notes.php:796
+msgid "Relevant notes excluding the current user's notes"
+msgstr ""
+
+#: ../peters_post_notes.php:797
+#, fuzzy
+msgid "All notes"
+msgstr "Not ekle:"
+
+#: ../peters_post_notes.php:803
+msgid "How many recent notes to display on the Dashboard. 0 = unlimited"
+msgstr ""
+
+#: ../peters_post_notes.php:811
+msgid "Character set on your site. In most cases this is \"UTF-8\""
+msgstr ""
+
+#: ../peters_post_notes.php:819
+msgid "Show \"Add note\" text area for post within publish panel"
+msgstr ""
+
+#: ../peters_post_notes.php:823 ../peters_post_notes.php:944
+#: ../peters_post_notes.php:954
+msgid "Yes"
+msgstr ""
+
+#: ../peters_post_notes.php:824 ../peters_post_notes.php:943
+#: ../peters_post_notes.php:955
+msgid "No"
+msgstr ""
+
+#: ../peters_post_notes.php:830
+msgid ""
+"Roles that are allowed to view all notes (used when the global setting is to "
+"only show relevant notes)"
+msgstr ""
+
+#: ../peters_post_notes.php:849
+msgid ""
+"Capabilities that are allowed to view all notes (used when the global "
+"setting is to only show relevant notes)"
+msgstr ""
+
+#: ../peters_post_notes.php:870
+msgid ""
+"Roles that are allowed to edit all notes (they must also be allowed to view "
+"the notes)"
+msgstr ""
+
+#: ../peters_post_notes.php:892
+msgid ""
+"Capabilities that are allowed to edit all notes (they must also be allowed "
+"to view the notes)"
+msgstr ""
+
+#: ../peters_post_notes.php:916
+msgid "List of post types on which post notes should be enabled"
+msgstr ""
+
+#: ../peters_post_notes.php:939
+msgid ""
+"Allow the same set of HTML tags in notes as are allowed in WordPress comments"
+msgstr ""
+
+#: ../peters_post_notes.php:950
+msgid "Show \"Latest note\" column in the \"Manage posts\" page"
+msgstr ""
+
+#: ../peters_post_notes.php:961
+msgid ""
+"Capability required to add a general note. (Otherwise users can only add a "
+"private note.)"
+msgstr ""
+
+#: ../peters_post_notes.php:984
+msgid "Update"
+msgstr ""
+
+#: ../peters_post_notes.php:992
+msgid "Peter's Post Notes"
+msgstr "Peter's Post Notes"
+
+#: ../peters_post_notes.php:1060
+msgid "Error: You can only edit notes that you wrote."
+msgstr "Hata: Sadece kendi notlarınızı düzenleyebilirsiniz."
+
+#: ../peters_post_notes.php:1081
+msgid "Error: Unknown or database problem when updating note."
+msgstr "Hata: Not güncellenirken veritabanı hatası oluştu."
+
+#: ../peters_post_notes.php:1120
+msgid "Error: You can only delete notes that you wrote."
+msgstr "Hata: Sadece kendi notlarınızı silebilirsiniz."
+
+#: ../peters_post_notes.php:1133
+msgid "Error: Unknown or database problem when deleting note."
+msgstr "Hata: Not silinirken bilinmeyen bir veritabanı hatası oluştu."
+
+#~ msgid ""
+#~ "The only purpose of this settings page is to install the database tables "
+#~ "when manually upgrading the plugin."
+#~ msgstr ""
+#~ "Bu ayar sadece plug'ini manuel olarak güncellediğiniz zaman gereklidir."
+
+#~ msgid "<p>Database tables for this plugin are properly installed.</p>"
+#~ msgstr "<p>Veritabanı tabloları başarıyla kuruldu.</p>"

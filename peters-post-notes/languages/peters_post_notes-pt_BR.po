@@ -1,0 +1,233 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: peters_post_notes.php\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-01-06 17:06-0800\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Peter <peter@keung.biz>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../peters_post_notes.php:131
+msgid "User"
+msgstr ""
+
+#: ../peters_post_notes.php:142
+#, fuzzy
+msgid "Latest note"
+msgstr "Nota privada"
+
+#: ../peters_post_notes.php:156 ../peters_post_notes.php:361
+#: ../peters_post_notes.php:529 ../peters_post_notes.php:672
+msgid "M j, Y \\a\\t G:i"
+msgstr "j \\d\\e M \\d\\e Y \\à\\s G:i"
+
+#: ../peters_post_notes.php:285
+msgid "Successfully updated plugin settings"
+msgstr ""
+
+#: ../peters_post_notes.php:330
+msgid "Notes"
+msgstr "Notas"
+
+#: ../peters_post_notes.php:366 ../peters_post_notes.php:674
+msgid "Edit"
+msgstr "Editar"
+
+#: ../peters_post_notes.php:371 ../peters_post_notes.php:681
+msgid "Delete"
+msgstr "Deletar"
+
+#: ../peters_post_notes.php:373 ../peters_post_notes.php:683
+msgid "Save"
+msgstr "Salvar"
+
+#: ../peters_post_notes.php:374 ../peters_post_notes.php:684
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: ../peters_post_notes.php:386
+msgid "No notes for this post."
+msgstr "Nenhuma nota para este post."
+
+#: ../peters_post_notes.php:398 ../peters_post_notes.php:601
+msgid "Add note:"
+msgstr "Adicionar nota:"
+
+#: ../peters_post_notes.php:453
+msgid "Collaboration Notes"
+msgstr "Notas Colaborativas"
+
+#: ../peters_post_notes.php:529
+msgid "on"
+msgstr ""
+
+#: ../peters_post_notes.php:537
+msgid "No relevant notes."
+msgstr "Nenhuma nota relevante."
+
+#: ../peters_post_notes.php:541
+msgid "General Notes"
+msgstr "Notas Gerais"
+
+#: ../peters_post_notes.php:589
+#, fuzzy
+msgid "Personal notes:"
+msgstr "Notas Gerais"
+
+#: ../peters_post_notes.php:596
+msgid "No general notes."
+msgstr "Nenhuma nota geral."
+
+#: ../peters_post_notes.php:605 ../peters_post_notes.php:610
+msgid "Private note"
+msgstr "Nota privada"
+
+#: ../peters_post_notes.php:613
+msgid "Add"
+msgstr "Adicionar"
+
+#: ../peters_post_notes.php:731
+#, fuzzy
+msgid "Added notes table!"
+msgstr "<p>Adicionada tabela de notas!</p>"
+
+#: ../peters_post_notes.php:749
+#, fuzzy
+msgid "Added general notes table!"
+msgstr "<p>Adicionada tabela de notas gerais!</p>"
+
+#: ../peters_post_notes.php:761
+msgid "Only necessary if you updated the plugin manually"
+msgstr "Somente necessário se o plugin for atualizado manualmente"
+
+#: ../peters_post_notes.php:778
+#, fuzzy
+msgid "Peter's Post Notes settings"
+msgstr "Notas dos Post do Peter: status"
+
+#: ../peters_post_notes.php:791
+msgid "Which types of notes to show on the Dashboard"
+msgstr ""
+
+#: ../peters_post_notes.php:795
+msgid "Relevant notes including the current user's notes"
+msgstr ""
+
+#: ../peters_post_notes.php:796
+msgid "Relevant notes excluding the current user's notes"
+msgstr ""
+
+#: ../peters_post_notes.php:797
+#, fuzzy
+msgid "All notes"
+msgstr "Adicionar nota:"
+
+#: ../peters_post_notes.php:803
+msgid "How many recent notes to display on the Dashboard. 0 = unlimited"
+msgstr ""
+
+#: ../peters_post_notes.php:811
+msgid "Character set on your site. In most cases this is \"UTF-8\""
+msgstr ""
+
+#: ../peters_post_notes.php:819
+msgid "Show \"Add note\" text area for post within publish panel"
+msgstr ""
+
+#: ../peters_post_notes.php:823 ../peters_post_notes.php:944
+#: ../peters_post_notes.php:954
+msgid "Yes"
+msgstr ""
+
+#: ../peters_post_notes.php:824 ../peters_post_notes.php:943
+#: ../peters_post_notes.php:955
+msgid "No"
+msgstr ""
+
+#: ../peters_post_notes.php:830
+msgid ""
+"Roles that are allowed to view all notes (used when the global setting is to "
+"only show relevant notes)"
+msgstr ""
+
+#: ../peters_post_notes.php:849
+msgid ""
+"Capabilities that are allowed to view all notes (used when the global "
+"setting is to only show relevant notes)"
+msgstr ""
+
+#: ../peters_post_notes.php:870
+msgid ""
+"Roles that are allowed to edit all notes (they must also be allowed to view "
+"the notes)"
+msgstr ""
+
+#: ../peters_post_notes.php:892
+msgid ""
+"Capabilities that are allowed to edit all notes (they must also be allowed "
+"to view the notes)"
+msgstr ""
+
+#: ../peters_post_notes.php:916
+msgid "List of post types on which post notes should be enabled"
+msgstr ""
+
+#: ../peters_post_notes.php:939
+msgid ""
+"Allow the same set of HTML tags in notes as are allowed in WordPress comments"
+msgstr ""
+
+#: ../peters_post_notes.php:950
+msgid "Show \"Latest note\" column in the \"Manage posts\" page"
+msgstr ""
+
+#: ../peters_post_notes.php:961
+msgid ""
+"Capability required to add a general note. (Otherwise users can only add a "
+"private note.)"
+msgstr ""
+
+#: ../peters_post_notes.php:984
+msgid "Update"
+msgstr ""
+
+#: ../peters_post_notes.php:992
+msgid "Peter's Post Notes"
+msgstr "Notas dos Post do Peter"
+
+#: ../peters_post_notes.php:1060
+msgid "Error: You can only edit notes that you wrote."
+msgstr "Erro: Você só pode editar uma nota que você criou."
+
+#: ../peters_post_notes.php:1081
+msgid "Error: Unknown or database problem when updating note."
+msgstr ""
+"Erro: Erro desconhecido ou problema no banco de dados ao atualizar a nota."
+
+#: ../peters_post_notes.php:1120
+msgid "Error: You can only delete notes that you wrote."
+msgstr "Erro: Você só pode deletar uma nota que você criou."
+
+#: ../peters_post_notes.php:1133
+msgid "Error: Unknown or database problem when deleting note."
+msgstr ""
+"Erro: Erro desconhecido ou problema no banco de dados ao deletar a nota."
+
+#~ msgid ""
+#~ "The only purpose of this settings page is to install the database tables "
+#~ "when manually upgrading the plugin."
+#~ msgstr ""
+#~ "O único propósito desta página de configuração é para instalar os banco "
+#~ "de dados quando o plugin for atualizado manualmente."
+
+#~ msgid "<p>Database tables for this plugin are properly installed.</p>"
+#~ msgstr ""
+#~ "<p>As tabelas deste plugin foram instaladas corretamente no banco de "
+#~ "dados.</p>"
