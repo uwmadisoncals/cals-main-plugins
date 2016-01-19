@@ -1,0 +1,51 @@
+# Copyright (C) 2015 Search by Google
+# This file is distributed under the same license as the Search by Google package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Search by Google 1.6\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/support/plugin/search-google\n"
+"POT-Creation-Date: 2015-05-29 02:16:44+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2015-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: search-google.php:20
+msgid "Search by Google widget"
+msgstr ""
+
+#. #-#-#-#-#  plugin.pot (Search by Google 1.6)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: search-google.php:21 search-google.php:27 search-google.php:49
+msgid "Search by Google"
+msgstr ""
+
+#: search-google.php:64
+msgid "Title:"
+msgstr ""
+
+#: search-google.php:68
+msgid "Submit button text:"
+msgstr ""
+
+#: search-google.php:72
+msgid "Search on site:"
+msgstr ""
+
+#: search-google.php:74
+msgid "Google will search on current site if left blank."
+msgstr ""
+
+#: search-google.php:95
+msgid "Support"
+msgstr ""
+
+#: search-google.php:96
+msgid "Donate"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Google search on site widget"
+msgstr ""

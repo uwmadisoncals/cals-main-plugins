@@ -1,0 +1,19 @@
+/*
+Search by Google plugin
+wordpress.org/plugins/search-google/
+*/
+
+.search_google_form input.pseudoq {
+	display: none;
+}
+.search_google_form input.pseudoq_g_img {
+	background-image: url("http://www.google.com/cse/intl/en/images/google_custom_search_watermark.gif");
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+.search_google_form input.searchgoogle {
+	display: inline;
+}
+.search_google_form input[type="submit"] {
+	cursor: pointer;
+}
