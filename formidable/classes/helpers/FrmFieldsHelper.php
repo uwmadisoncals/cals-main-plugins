@@ -374,6 +374,11 @@ DEFAULT_HTML;
 			$error_class .= ' frm_embed_form_container';
 		}
 
+		// Add class to HTML field
+		if ( $field['type'] == 'html' ) {
+			$error_class .= ' frm_html_container';
+		}
+
 		//Add classes to inline confirmation field (if it doesn't already have classes set)
 		if ( isset( $field['conf_field'] ) && $field['conf_field'] == 'inline' && ! $field['classes'] ) {
 			$error_class .= ' frm_first frm_half';
@@ -879,7 +884,7 @@ DEFAULT_HTML;
     }
 
 	public static function get_display_value( $replace_with, $field, $atts = array() ) {
-		$sep = isset( $atts['sep'] ) ? $atts['sep'] : ', ';
+		$atts['sep'] = isset( $atts['sep'] ) ? $atts['sep'] : ', ';
 
 		$replace_with = apply_filters( 'frm_get_display_value', $replace_with, $field, $atts );
 
@@ -893,7 +898,7 @@ DEFAULT_HTML;
             }
 			unset( $autop );
 		} else if ( is_array( $replace_with ) ) {
-			$replace_with = implode( $sep, $replace_with );
+			$replace_with = implode( $atts['sep'], $replace_with );
 		}
 
 		return $replace_with;

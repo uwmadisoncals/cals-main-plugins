@@ -44,10 +44,12 @@
         </ul>
         </div>
         <div class="advanced_settings tabs-panel <?php echo ($a == 'advanced_settings') ? 'frm_block' : 'frm_hidden' ?>">
+			<?php FrmTipsHelper::pro_tip( 'get_form_settings_tip', 'p' ); ?>
+
 			<h3 class="frm_first_h3"><?php _e( 'On Submit', 'formidable' ); ?>
 				<span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php esc_attr_e( 'Choose what will happen after the user submits this form.', 'formidable' );
 				if ( ! FrmAppHelper::pro_is_installed() ) {
-					esc_attr_e( ' Upgrade to Formidable Forms to get access to all options in the dropdown.', 'formidable' );
+					esc_attr_e( ' Upgrade to Formidable Pro to get access to all options in the dropdown.', 'formidable' );
 				} ?>" ></span>
             </h3>
 
@@ -177,6 +179,7 @@
 
 
         <div id="frm_notification_settings" class="frm_email_settings email_settings tabs-panel widgets-holder-wrap <?php echo ($a == 'email_settings') ? ' frm_block' : ' frm_hidden'; ?>">
+			<?php FrmTipsHelper::pro_tip( 'get_form_action_tip', 'p' ); ?>
             <div id="frm_email_addon_menu" class="manage-menus">
                 <h3><?php _e( 'Add New Action', 'formidable' ) ?></h3>
                 <ul class="frm_actions_list">

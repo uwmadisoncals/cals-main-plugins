@@ -100,7 +100,7 @@ class FrmPointers {
 
 				frm_pointer_options = $.extend(frm_pointer_options, {
 					buttons: function (event, t) {
-						var button = jQuery('<a href="<?php echo $this->get_ignore_url(); ?>" id="pointer-close" style="margin:0 5px;" class="button-secondary">' + '<?php _e( 'Close', 'formidable' ) ?>' + '</a>');
+						var button = jQuery('<a href="<?php echo esc_url( $this->get_ignore_url() ); ?>" id="pointer-close" style="margin:0 5px;" class="button-secondary">' + '<?php _e( 'Close', 'formidable' ) ?>' + '</a>');
 						button.bind('click.pointer', function () {
 							t.element.pointer('close');
 						});
@@ -111,7 +111,7 @@ class FrmPointers {
 				});
 
 				setup = function () {
-					$('<?php echo $selector; ?>').pointer(frm_pointer_options).pointer('open');
+					$('<?php echo esc_attr( $selector ); ?>').pointer(frm_pointer_options).pointer('open');
 					var lastOpenedPointer = jQuery( '.wp-pointer').slice( -1 );
 					<?php
 					$this->button2();
@@ -136,7 +136,7 @@ class FrmPointers {
 		if ( $this->button_array['button2']['text'] ) {
 			?>
 			lastOpenedPointer.find( '#pointer-close' ).after('<a id="pointer-primary" class="button-primary">' +
-				'<?php echo $this->button_array['button2']['text']; ?>' + '</a>');
+				'<?php echo esc_attr( $this->button_array['button2']['text'] ); ?>' + '</a>');
 			lastOpenedPointer.find('#pointer-primary').click(function () {
 			<?php echo $this->button_array['button2']['function']; ?>
 			});
@@ -151,7 +151,7 @@ class FrmPointers {
 		if ( $this->button_array['button3']['text'] ) {
 			?>
 			lastOpenedPointer.find('#pointer-primary').after('<a id="pointer-ternary" style="float: left;" class="button-secondary">' +
-				'<?php echo $this->button_array['button3']['text']; ?>' + '</a>');
+				'<?php echo esc_attr( $this->button_array['button3']['text'] ); ?>' + '</a>');
 			lastOpenedPointer.find('#pointer-ternary').click(function () {
 			<?php echo $this->button_array['button3']['function']; ?>
 			});
@@ -163,8 +163,9 @@ class FrmPointers {
 	 */
 	private function start_tour_pointer() {
 		$selector = 'li.toplevel_page_formidable';
+
 		$content  = '<h3>' . __( 'Congratulations!', 'formidable' ) . '</h3>'
-		            .'<p>' . sprintf( __( 'You&#8217;ve just installed new forms! Click &#8220;Start Tour&#8221; to view a quick introduction of this plugin&#8217;s core functionality.' ), 'formidable' ) . '</p>';
+		            .'<p>' . $this->opening_line() . ' ' . sprintf( __( 'Click &#8220;Start Tour&#8221; to view a quick introduction of this plugin&#8217;s core functionality.' ), 'formidable' ) . '</p>';
 		$opt_arr  = array(
 			'content'  => $content,
 			'position' => array( 'edge' => 'top', 'align' => 'center' ),
@@ -174,6 +175,15 @@ class FrmPointers {
 		$this->button_array['button2']['function'] = sprintf( 'document.location="%s";', admin_url( 'admin.php?page=formidable' ) );
 
 		$this->print_scripts( $selector, $opt_arr );
+	}
+
+	private function opening_line() {
+		$opening = __( 'You&#8217;ve just installed a new form builder plugin!', 'formidable' );
+		$affiliate = FrmAppHelper::get_affiliate();
+		if ( $affiliate == 'mojo' ) {
+			$opening = 'Your Forms plugin has been installed by MOJO Marketplace for your convenience.';
+		}
+		return $opening;
 	}
 
 	/**
@@ -341,6 +351,6 @@ class FrmPointers {
 			'nonce'            => wp_create_nonce( 'frm-ignore-tour' ),
 		);
 
-		return esc_url( add_query_arg( $arr_params ) );
+		return add_query_arg( $arr_params );
 	}
 }

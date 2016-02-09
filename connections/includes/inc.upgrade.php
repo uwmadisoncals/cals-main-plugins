@@ -14,10 +14,11 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 function connectionsShowUpgradePage() {
+
 	/*
 	 * Check whether user can access.
 	 */
-	if ( !current_user_can( 'connections_manage' ) ) {
+	if ( ! current_user_can( 'connections_manage' ) ) {
 		wp_die( '<p id="error-page" style="-moz-background-clip:border;
 				-moz-border-radius:11px;
 				background:#FFFFFF none repeat scroll 0 0;
@@ -30,43 +31,46 @@ function connectionsShowUpgradePage() {
 				padding:1em 2em;
 				text-align:center;
 				width:700px">' . __( 'You do not have sufficient permissions to access this page.', 'connections' ) . '</p>' );
-	}
-	else {
-		global $connections;
+	} else {
 
-?>
+		$url = add_query_arg(
+			array(
+				'page' => $_GET['page'],
+				'upgrade-db' => 'do',
+			),
+			self_admin_url( 'admin.php' )
+		);
+		?>
 
-			<div class="wrap nosubsub">
-				<h2>Connections : <?php _e( 'Upgrade', 'connections' ); ?></h2>
+		<div class="wrap nosubsub">
+			<h2>Connections : <?php _e( 'Upgrade', 'connections' ); ?></h2>
 
-				<div id="connections-upgrade">
+			<div id="connections-upgrade">
 
-					<?php
-		$urlPath = admin_url() . 'admin.php?page=' . $_GET['page'];
+				<?php if ( isset( $_GET['upgrade-db'] ) && 'do' === $_GET['upgrade-db'] ) :
+					cnRunDBUpgrade();
+				else : ?>
+					<h3><?php esc_html_e( 'Upgrade Required!', 'connections' ); ?></h3>
+					<p><?php esc_html_e( 'Your database tables are out of date and must be upgraded before you can continue.', 'connections' ); ?></p>
+					<p><?php esc_html_e( 'If you would like to downgrade later, please first make a complete backup of your database tables.', 'connections' ); ?></p>
+					<h4><a class="button-primary" href="<?php echo esc_url( $url ); ?>"><?php _e( 'Start Upgrade', 'connections' ); ?></a></h4>
+				<?php endif; ?>
 
-		if ( isset( $_GET['upgrade-db'] ) && $_GET['upgrade-db'] === 'do' ) {
-			cnRunDBUpgrade();
-		}
-		else {
-?>
-								<?php echo '<h3>' , __( 'Upgrade Required', 'connections' ) , '!</h3>'; ?>
-								<p><?php _e( 'Your database tables are out of date and must be upgraded before you can continue.', 'connections' ); ?></p>
-								<p><?php _e( 'If you would like to downgrade later, please first make a complete backup of your database tables.', 'connections' ); ?></p>
-								<h4><a class="button-primary" href="<?php echo $urlPath;?>&amp;upgrade-db=do"><?php _e( 'Start Upgrade', 'connections' ); ?></a></h4>
-							<?php
-		}
-
-?>
-
-				</div>
 			</div>
+		</div>
 
 		<?php
 	}
 }
 
 function cnRunDBUpgrade() {
+
+	/**
+	 * @var wpdb $wpdb
+	 * @var connectionsLoad $connections
+	 */
 	global $wpdb, $connections;
+
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	require_once CN_PATH . 'includes/class.schema.php';
 
@@ -809,7 +813,7 @@ function cnRunDBUpgrade() {
 		$connections->options->saveOptions();
 
 		echo '<h4>' , __( 'Upgrade completed.', 'connections' ) , "</h4>\n";
-		echo '<h4><a class="button-primary" href="' . $urlPath . '">' , __( 'Continue', 'connections' ) , '</a></h4>';
+		echo '<h4><a class="button-primary" href="' . esc_url( $urlPath ) . '">' , __( 'Continue', 'connections' ) , '</a></h4>';
 
 		$wpdb->hide_errors();
 	}

@@ -91,7 +91,6 @@ class FrmXMLHelper {
                 'slug'          => (string) $t->term_slug,
                 'description'   => (string) $t->term_description,
 				'parent'        => empty( $parent ) ? 0 : $parent,
-                'slug'          => (string) $t->term_slug,
             ));
 
 			if ( $term && is_array( $term ) ) {
@@ -383,6 +382,10 @@ class FrmXMLHelper {
 	*
 	*/
 	private static function update_custom_style_setting_on_import( &$form ) {
+		if ( ! isset( $form['options']['custom_style'] ) ) {
+			return;
+		}
+		
 		if ( is_numeric( $form['options']['custom_style'] ) ) {
 			// Set to default
 			$form['options']['custom_style'] = 1;
@@ -392,7 +395,7 @@ class FrmXMLHelper {
 			$table = $wpdb->prefix . 'posts';
 			$where = array(
 				'post_name' => $form['options']['custom_style'],
-				'post_type' => 'frm_styles'
+				'post_type' => 'frm_styles',
 			);
 			$select = 'ID';
 			$style_id = FrmDb::get_var( $table, $where, $select );
@@ -404,7 +407,6 @@ class FrmXMLHelper {
 				$form['options']['custom_style'] = 1;
 			}
 		}
-
 	}
 
 	public static function import_xml_views( $views, $imported ) {

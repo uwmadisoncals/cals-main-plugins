@@ -5,12 +5,12 @@ if ( ! defined('ABSPATH') ) {
 
 class FrmAppHelper {
 	public static $db_version = 27; //version of the database we are moving to
-	public static $pro_db_version = 30;
+	public static $pro_db_version = 31;
 
 	/**
 	 * @since 2.0
 	 */
-	public static $plug_version = '2.0.20';
+	public static $plug_version = '2.0.21';
 
     /**
      * @since 1.07.02
@@ -58,12 +58,21 @@ class FrmAppHelper {
     }
 
 	public static function make_affiliate_url( $url ) {
-		$affiliate_id = apply_filters( 'frm_affiliate_link', '' );
-		$allowed_affiliates = array('Mojo');
-		if ( in_array( $affiliate_id, $allowed_affiliates ) ) {
-			$url .= '?aff=' . $affiliate_id;
+		$affiliate_id = self::get_affiliate();
+		if ( ! empty( $affiliate_id ) ) {
+			$url = add_query_arg( 'aff', $affiliate_id, $url );
 		}
 		return $url;
+	}
+
+	public static function get_affiliate() {
+		$affiliate_id = apply_filters( 'frm_affiliate_link', get_option('frm_aff') );
+		$affiliate_id = strtolower( $affiliate_id );
+		$allowed_affiliates = array( 'mojo' );
+		if ( ! in_array( $affiliate_id, $allowed_affiliates ) ) {
+			$affiliate_id = false;
+		}
+		return $affiliate_id;
 	}
 
     /**
@@ -1248,16 +1257,20 @@ class FrmAppHelper {
 			$now = new DateTime( '@' . $to );
 		}
 		$ago = new DateTime( '@' . $from );
-		$diff = $now->diff( $ago );
 
-		$diff->w = floor( $diff->d / 7 );
-		$diff->d -= $diff->w * 7;
+		// Get the time difference
+		$diff_object = $now->diff( $ago );
+		$diff = get_object_vars( $diff_object );
+
+		// Add week amount and update day amount
+		$diff['w'] = floor( $diff['d'] / 7 );
+		$diff['d'] -= $diff['w'] * 7;
 
 		$time_strings = self::get_time_strings();
 
 		foreach ( $time_strings as $k => $v ) {
-			if ( $diff->$k ) {
-				$time_strings[ $k ] = $diff->$k . ' ' . ( $diff->$k > 1 ? $v[1] : $v[0] );
+			if ( $diff[ $k ] ) {
+				$time_strings[ $k ] = $diff[ $k ] . ' ' . ( $diff[ $k ] > 1 ? $v[1] : $v[0] );
 			} else {
 				unset( $time_strings[ $k ] );
 			}

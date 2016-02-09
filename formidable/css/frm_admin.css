@@ -280,6 +280,21 @@ form label.frm_primary_label input{font-size:12px;}
 	margin-top:10px;
 }
 
+.widefat.frm_pricing thead th,
+.widefat.frm_pricing td{
+	text-align:center;
+}
+
+.widefat th.frm_table_break{
+	background-color:#999;
+	color:#fff;
+	text-align:center;
+}
+
+.plugin-card.plugin-card-formidable-pro{
+	border:2px solid #0073aa;
+}
+
 .frm-no-thumb.plugin-card .name,
 .frm-no-thumb.plugin-card .desc{
 	margin-left:0;
@@ -298,6 +313,28 @@ form label.frm_primary_label input{font-size:12px;}
 
 .frm_image_from_url{
 	height:50px;
+}
+
+.frm_pro_tip{
+	font-size:12px;
+	color:#666;
+}
+
+.frm_pro_tip span,
+.frm_pro_tip .frm_check1_icon{
+	color:#0073aa;
+}
+
+.nav-tab-wrapper .frm_pro_tip{
+	float:right;
+}
+
+.frm_pro_tip:hover{
+	color:#666;
+}
+
+.frm_pro_tip:hover span{
+	color:#00a0d2;
 }
 
 /*Switch form dropdown*/
@@ -322,7 +359,6 @@ form label.frm_primary_label input{font-size:12px;}
 	list-style:none;
 	font-size:12px;
 	background-color:#ffffff;
-	border:1px solid #cccccc;
 	border:1px solid rgba(0, 0, 0, 0.15);
 	border-radius:4px;
 	-webkit-box-shadow:0 6px 12px rgba(0, 0, 0, 0.175);
@@ -682,7 +718,7 @@ textarea.inplace_field{
 	float:right;
 	background-color: #FFF !important;
 	padding-left: 4px;
-	box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.07) inset;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07) inset;
 	border: 1px solid #DDD;
 	cursor:text;
 }
@@ -902,7 +938,7 @@ select.frm_cancelnew, input.frm_enternew{width:175px;}
 .categorydiv .frm_settings_form div.tabs-panel.general_settings{border-top:none;}
 .categorydiv .frm_settings_form div.tabs-panel.general_settings .submit{padding:0;}
 .categorydiv .frm_settings_form .frm_uninstall{padding-top:1.25em;}
-#contextual-help-columns div.tabs-panel.general_settings.frm_license_box{min-height:0px;border-bottom:none;}
+#contextual-help-columns div.tabs-panel.general_settings.frm_license_box{min-height:0;border-bottom:none;}
 .general_settings #frm_license_top{float:left;width:55%}
 .categorydiv div.tabs-panel.general_settings{max-height:none;}
 .frm_38_trigger .categorydiv div.tabs-panel.general_settings .postbox{margin-bottom:0;}
@@ -970,7 +1006,7 @@ select.frm_cancelnew, input.frm_enternew{width:175px;}
 
 /*Form Settings Tab*/
 .frm_form_settings .advanced_settings .form-table{margin-top:0;}
-.frm_form_settings .advanced_settings .form-table .frm_short_tr td{padding:0px 10px 10px;}
+.frm_form_settings .advanced_settings .form-table .frm_short_tr td{padding:0 10px 10px;}
 .frm_form_settings .advanced_settings .form-table td.td_select_padding{padding:8px 10px 0;}
 .frm_form_settings td.frm_175_width{width:175px;}
 .frm_form_settings #success_url{width:95%;}
@@ -1087,7 +1123,7 @@ label.frm_action_events{
 	height:auto;
 }
 .frm_email_icons, .frm_actions_list{
-    padding: 10px 0px 10px 15px;
+    padding: 10px 0 10px 15px;
 }
 .frm_actions_list a.frm_inactive_action:before{
 	color:#d6d6d6;
@@ -1889,7 +1925,7 @@ iframe#dyncontent_ifr{min-height:150px;}
 }
 .frm_progress_bar {
   float: left;
-  width: 0%;
+  width: 0;
   height: 100%;
   font-size: 12px;
   line-height: 20px;
@@ -2203,7 +2239,7 @@ Responsive Design
 #screen-metas, #screen-meta-links, #footer, #wpfooter, .inner-sidebar, .frm_form_nav, .icon32, 
 .frm_flash_graph, .frm_no_print, object{visibility:hidden;display:none !important;}	
 #poststuff #post-body.columns-2{margin-right:0;}
-.widget, .postbox, .stuffbox, .postbox h3{border-width:0px !important;border-color:#fff;}
+.widget, .postbox, .stuffbox, .postbox h3{border-width:0 !important;border-color:#fff;}
 .postbox{background:#fff !important;border:none;position:static;}
 .postbox h3{background:#fff !important;}
 #wpbody-content{float:none;}

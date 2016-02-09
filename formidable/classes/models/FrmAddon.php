@@ -117,9 +117,10 @@ class FrmAddon {
 		} else if ( isset( $transient->response ) && isset( $transient->response[ $this->plugin_folder ] ) ) {
 			$cache_key = 'edd_plugin_' . md5( sanitize_key( $this->license . $this->version ) . '_get_version' );
 			$version_info = get_transient( $cache_key );
-			if ( $version_info !== false ) {
+			if ( $version_info !== false && version_compare( $version_info->new_version, $this->version, '>' ) ) {
 				$transient->response[ $this->plugin_folder ] = $version_info;
 			} else {
+				delete_transient( $cache_key );
 				if ( ! $this->has_been_cleared() ) {
 					// if the transient has expired, clear the update and trigger it again
 					$this->cleared_plugins();
@@ -148,7 +149,7 @@ class FrmAddon {
 
 	private function has_been_cleared() {
 		$last_cleared = get_option( 'frm_last_cleared' );
-		return ( $last_cleared < date( 'Y-m-d H:i:s', strtotime('-5 minutes') ) );
+		return ( $last_cleared && $last_cleared > date( 'Y-m-d H:i:s', strtotime('-5 minutes') ) );
 	}
 
 	private function cleared_plugins() {
