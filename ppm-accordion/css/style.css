@@ -1,0 +1,14 @@
+#ppm-tabs{font-family:arial;font-size:14px}
+
+#ppm-tabs h3 + div {height: 0px; padding: 0px; overflow: hidden; display: block!important; -webkit-transform: translateZ(0); -webkit-transition: all 0.3s ease; -moz-transition: all 0.3s ease; -o-transition: all 0.3s ease; -ms-transition:all 0.3s ease; transition: all 0.3s ease;}
+#ppm-tabs h3.open + div {height: auto; margin-bottom: 20px;}
+#ppm-tabs h3 {border-bottom: 1px solid #DDDDDD; font-size: 14px; font-weight: normal; margin: 0 0 15px; padding: 0 0 15px;line-height:20px}
+#ppm-tabs h3 a{padding: 3px 37px;display:block}
+#ppm-tabs h3 a{color:#666;text-decoration:none;}
+#ppm-tabs h3 a:hover{}
+#ppm-tabs h3 a:focus{outline:none}
+#ppm-tabs h3.open a{background-image:url(minus_icon.png); background-repeat:no-repeat;}
+#ppm-tabs h3.open a:hover, #ppm-tabs h3.close a:hover, #ppm-tabs h3.open a{background-position:0 -26px;}
+
+#ppm-tabs h3.close a{background-image:url(plus_icon.png); background-repeat:no-repeat;}
+#ppm-tabs .tab_content {overflow: hidden; padding: 0 0 0 35px;}
