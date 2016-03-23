@@ -1,0 +1,276 @@
+/* Weaver Xtreme admin style */
+.hide_me {display:none;}
+
+.wvr-green {font-weight:bold;color:green;}
+.wvr-yellow {font-weight:bold;color:orange;}
+.wvr-red {font-weight:bold;color:red;}
+.wvr-blue {font-weight:bold;color:blue;}
+.a-plus {
+	background-color:#F5FBEF;border: 1px solid #ccc;padding-left:20px;padding-right:20px;margin-left:20px;margin-right:20%;
+}
+
+.i-left {float:left;font-size:14px;}
+.i-left-bg {float:left;font-size:16px;color:#70FF29;}
+.i-left-fg {float:left;font-size:16px;color:#290BBD;}
+
+a.anchorx {display: block; position: relative; top: -40px; visibility: hidden;} /* This makes the anchor above the content, so the title shows */
+
+.options-intro {text-align:center;margin:-10px auto -5px auto;font-size:90%;background-color:ivory;padding:4px 10px 4px 10px;border:1px solid green;max-width:90%;}
+.options-intro a{font-weight: bold;text-decoration:none;color:blue;}
+.options-intro-menu {text-align:center;}
+
+#wpcontent {background-color:#FFFFF8;color:black;}
+
+input.color {border:1px solid #2BFF1C;}
+
+select { font-size:12px;}
+
+.font-bold {
+    font-weight:bold;
+}
+.font-bold-title {
+    font-weight:900;
+}
+
+.font-italic a,
+.font-italic {
+    font-style:     italic !important;
+}
+/* =sans-serif -------------------------------------------------- */
+
+.font-sans-serif {
+    font-family:    sans-serif;
+}
+
+.font-arial {
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+.font-arialNarrow {
+    font-family: "Arial Narrow", Arial, sans-serif;
+}
+
+.font-impact {
+    font-family:Impact, Haettenschweiler, Charcoal, "Arial Narrow Bold", sans-serif;
+}
+
+.font-lucidaSans {
+    font-family: "Lucida Sans", Geneva, Tahoma, sans-serif;
+}
+
+.font-trebuchetMS {
+    font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;
+}
+
+.font-verdana {
+    font-family: Verdana, Geneva, Candara, sans-serif;
+}
+
+/* =serif ------------------------------------------------------ */
+
+.font-serif {
+    font-family: TimesNewRoman, "Times New Roman", Times, Baskerville, Georgia, serif;
+}
+
+.font-garamond {
+    font-family: Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;
+}
+
+.font-georgia {
+    font-family: Georgia, Times, "Times New Roman", serif;
+}
+
+.font-lucidaBright {
+    font-family: "Lucida Bright", "Book Antiqua", Georgia, serif;
+}
+
+.font-palatino {
+    font-family: "Palatino Linotype", Palatino, "Lucida Bright", "Book Antiqua", serif;
+}
+
+.font-timesNewRoman {
+    font-family: TimesNewRoman, "Times New Roman", Times, Baskerville, Georgia, serif;
+}
+
+/* =sans-monospace -------------------------------------------------- */
+
+.font-monospace {
+    font-family: monospace;
+}
+
+.font-consolas {
+    font-family: Consolas, monaco,"Andale Mono", AndaleMono, monospace;
+}
+.font-courier {
+    font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+}
+
+.font-lucidaConsole {
+    font-family: "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;
+}
+
+.font-papyrus {
+    font-family: Papyrus, fantasy, cursive, serif;
+}
+
+.font-comicSans {
+    font-family: "Comic Sans MS", cursive,serif;
+}
+
+
+
+p {margin-right:5%;}
+.submit input {background: #f8f8f8;
+background-image: linear-gradient(#A8DDFF,#88B3CF);
+border-radius: 4px;
+}
+
+
+.atw-help ul {list-style: disc; margin-left:30px;}
+.atw-option-section {font-weight:bold;font-size:120%;color:blue;}
+
+.tab ul {
+	margin-left: 1.15em;
+	list-style: disc outside none;
+}
+.tab ol {
+	list-style-position:outside;
+	margin-left: 1.4em;
+	margin-bottom:.6em;
+}
+
+.js_button {background:#eee !important;font-weight: 600 !important;color:#585858 !important;}
+
+div.yetii {
+	width: 95%;
+	margin: 0 0 20px 0;
+}
+
+ul.yetii {
+	list-style-type: none;
+	width: 100%;
+	float: left;
+	border-bottom: 4px ridge #ddd;
+	margin-bottom: 8px;
+}
+
+ul.yetii li {
+	margin: 0 2px 0 0;
+	float: left;
+}
+
+ul.yetii a {
+	float: left;
+	display: block;
+	padding: 4px 8px;
+	border: 1px solid #ddd;
+	border-bottom: 0;
+	color: #666;
+	background: #eee;
+	text-decoration: none;
+	font-weight: bold;
+    background-image: linear-gradient(#f0f0f0,#c8c8c8);
+    border-top-left-radius:6px;
+    border-top-right-radius:6px;
+}
+
+ul.yetii a:hover {
+	background: #fff;
+}
+
+ul.yetii a.active {
+	background: #fff;
+	color: #00f;
+    background-image: linear-gradient(#f8f8f8,#eee);
+}
+/* -- */
+div.yetiisub {
+	width: 100%;
+	margin: 0 0 20px 0;
+}
+
+ul.yetiisub {
+	list-style-type: none;
+	width: 100%;
+	float: left;
+		margin-bottom: 8px;
+}
+
+ul.yetiisub li {
+	margin: 0 2px 2px 0px;
+	float: left;
+}
+
+ul.yetiisub a {
+	float: left;
+	padding: 4px 8px;
+	border: 1px solid #ccc;
+	color: #666;
+	background: #f0f0f0;
+	text-decoration: none;
+	font-style: italic;
+	font-weight: bold;
+    background-image: linear-gradient(#f8f8f8,#c8c8c8);
+    border-top-left-radius:6px;
+    border-top-right-radius:6px;
+}
+
+ul.yetiisub a:hover {
+	background: #fefefe !important;
+}
+
+ul.yetiisub a.active {
+	background: #fff;
+	color: #00f;
+    background-image: linear-gradient(#fff,#e8e8e8);
+}
+
+.atw-small-submit {
+	padding: 1.0em 0;
+	margin: 1px 0;
+	font-size:90%;
+}
+
+.atw-option-header {background:#D0D0D8;line-height:1.8em;width:95%;color:blue;font-size:large;font-weight:bold;padding-left:12px;
+    border-radius: 6px;
+    box-shadow: 3px 3px 10px #aaa;
+    background-image: linear-gradient(#eee,#ccc);
+}
+.atw-option-subheader {background:#EAEAEA;line-height:1.8em;width:95%;color:blue;font-size:larger;font-weight:bold;padding-left:18px;
+    border-radius: 6px;
+    box-shadow: 3px 3px 10px #ccc;
+    background-image: linear-gradient(#fff,#ddd);
+    }
+
+.atw-row-header {background:#D0D0D8;line-height:1.8em;padding-left:4px;
+    background-image: linear-gradient(#eee,#ccc);
+}
+.atw-row-subheader {background:#EAEAEA;padding-left:4px;
+    background: linear-gradient(#f8f8f8,#ddd);
+}
+.atw-row-subheader-alt {background:#F4F4F4;padding-left:4px;
+    background-image: linear-gradient(#f8f8f8,#dadada);
+}
+.atw-row-subheader-area {
+    background:#e8ffee;
+    background: linear-gradient(#e8ffee,#95e8b7);
+}
+/* layouts for layout boxes */
+.l_layout {display:block; width:140px; height:110px; float:left; margin-right:10px; margin-bottom:10px; display:inline;border:1px solid #888; color:black;text-align:center;font:15px arial,sans-serif;}
+.l_layout span {display:block;}
+.l_header {width:140px; height:20px;  background:#CCF; line-height:20px;}
+.l_content {width:100px; height:70px;  background:beige; float:left; display:inline;  line-height:70px;}
+.l_contentcenter {width:60px; height:70px; background:beige; float:left; display:inline;  line-height:70px;}
+.l_content2 {width:80px; height:70px; background:beige; float:left; display:inline;  line-height:70px;}
+.l_contentw {width:140px; height:70px; background:beige; float:left; display:inline; line-height:70px;}
+.l_stdbar {width:40px; height:70px; float:left; display:inline;}
+.l_widebar {width:60px; height:70px; float:left; display:inline;}
+.l_righttop {width:40px; height:20px;  background:#FE8; float:left; display:inline; line-height:20px;}
+.l_righttopwide {width:60px; height:20px;  background:#FE8; float:left; display:inline; line-height:20px;}
+.l_rightup {width:40px; height:25px; margin:0; background:#FAA; float:left; display:inline; line-height:25px;}
+.l_rightright {width:40px; height:50px; margin:0; background:#FAA; float:left; display:inline; line-height:50px;}
+.l_rightdown {width:40px; height:25px; margin:0; background:#AFA; float:left; display:inline; line-height:25px;}
+.l_leftleft {width:40px; height:70px; margin:0; background:#AFA; float:left; display:inline; line-height:70px;}
+.l_leftshort {width:30px; height:50px; margin:0; background:#AFA; float:left; display:inline; line-height:50px;}
+.l_skinny {width:30px; height:50px; margin:0; background:#FAA; float:left; display:inline; line-height:50px;}
+.l_footer {clear:left;width:140px; height:20px; background:#DDF; color:#000; line-height:20px;}
