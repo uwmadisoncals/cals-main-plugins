@@ -41,7 +41,7 @@ class my_calendar_simple_search extends WP_Widget {
 
 	function update( $new, $old ) {
 		$instance          = $old;
-		$instance['title'] = wp_kses_post( $new['title'] );
+		$instance['title'] = mc_kses_post( $new['title'] );
 		$instance['url']   = esc_url_raw( $new['url'] );
 
 		return $instance;
@@ -162,7 +162,7 @@ class my_calendar_today_widget extends WP_Widget {
 	}
 
 	function update( $new, $old ) {
-		$instance = array_map( 'wp_kses_post', array_merge( $old, $new ) );
+		$instance = array_map( 'mc_kses_post', array_merge( $old, $new ) );
 
 		return $instance;
 	}
@@ -385,7 +385,7 @@ class my_calendar_upcoming_widget extends WP_Widget {
 	}
 
 	function update( $new, $old ) {
-		$instance = array_map( 'wp_kses_post', array_merge( $old, $new ) );
+		$instance = array_map( 'mc_kses_post', array_merge( $old, $new ) );
 		if ( !isset( $new['my_calendar_upcoming_show_today'] ) ) {
 			$instance['my_calendar_upcoming_show_today'] = 'no';
 		}
@@ -416,7 +416,7 @@ function my_calendar_upcoming_events( $before = 'default', $after = 'default', $
 	$template      = ( $template == 'default' ) ? $widget_defaults['upcoming']['template'] : $template;
 	$template      = ( $template == '' ) ? $default_template : $template;
 	$no_event_text = ( $substitute == '' ) ? $widget_defaults['upcoming']['text'] : $substitute;
-	$header        = "<ul id='upcoming-events'>";
+	$header        = "<ul id='upcoming-events' class='upcoming-events'>";
 	$footer        = "</ul>";
 	$display_events = ( $display_upcoming_type == 'events' || $display_upcoming_type == 'event' ) ? true : false;
 	if ( ! $display_events ) {
@@ -564,7 +564,7 @@ function my_calendar_upcoming_events( $before = 'default', $after = 'default', $
 		}
 	}
 	if ( $output != '' ) {
-		$output = $header . $output . $footer;
+		$output = apply_filters( 'mc_upcoming_events_header', $header ) . $output . apply_filters( 'mc_upcoming_events_footer', $footer );
 
 		return ( get_option( 'mc_process_shortcodes' ) == 'true' ) ? do_shortcode( $output ) : $output;
 	} else {
@@ -961,9 +961,9 @@ class my_calendar_mini_widget extends WP_Widget {
 	}
 
 	function update( $new, $instance ) {
-		$instance['my_calendar_mini_title']    = wp_kses_post( $new['my_calendar_mini_title'] );
-		$instance['my_calendar_mini_time']     = wp_kses_post( $new['my_calendar_mini_time'] );
-		$instance['my_calendar_mini_category'] = wp_kses_post( $new['my_calendar_mini_category'] );
+		$instance['my_calendar_mini_title']    = mc_kses_post( $new['my_calendar_mini_title'] );
+		$instance['my_calendar_mini_time']     = mc_kses_post( $new['my_calendar_mini_time'] );
+		$instance['my_calendar_mini_category'] = mc_kses_post( $new['my_calendar_mini_category'] );
 		$instance['above']                     = ( isset( $new['above'] ) && $new['above'] != '' ) ? $new['above'] : 'none';
 		$instance['mc_link']                   = $new['mc_link'];
 		$instance['below']                     = ( isset( $new['below'] ) && $new['below'] != '' ) ? $new['below'] : 'none';
@@ -978,5 +978,13 @@ class my_calendar_mini_widget extends WP_Widget {
 		$instance['host']   = $host;
 
 		return $instance;
+	}
+}
+
+function mc_kses_post( $string ) {
+	if ( !is_string( $string ) ) {
+		return '';
+	} else {
+		return wp_kses_post( $string );
 	}
 }

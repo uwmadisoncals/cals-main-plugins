@@ -3,7 +3,7 @@
 	Plugin Name: Maintenance
 	Plugin URI: http://wordpress.org/plugins/maintenance/
 	Description: Take your website for maintenance away from public view. Use maintenance plugin if your website is in development or you need to change a few things, run an upgrade. Make it only accessible by login and password. Plugin has a options to add a logo, background, headline, message, colors, login, etc. Extended PRO with more features version is available for purchase.
-	Version: 2.6
+	Version: 2.7.1
 	Author: fruitfulcode
 	Author URI: http://fruitfulcode.com
 	License: GPL2
@@ -37,7 +37,6 @@ class maintenance {
 			
 			register_activation_hook  ( __FILE__, array( &$this,  'mt_activation' ));
 			register_deactivation_hook( __FILE__, array( &$this, 'mt_deactivation') );
-			register_uninstall_hook   ( 'maintenance', 'mt_uninstall');
 			
 			add_action('wp', 		array( &$this, 'mt_template_redirect'), 1);
 			add_action('wp_logout',	array( &$this, 'mt_user_logout'));
@@ -72,15 +71,18 @@ class maintenance {
 		
 		function mt_activation() {
 			/*Activation Plugin*/
+			self::mt_clear_cache();
 		}
 		
 		function mt_deactivation() {
 			/*Deactivation Plugin*/
+			self::mt_clear_cache();
 		}
 		
-		public static function mt_uninstall() {
-			delete_option('maintenance_options');
-			delete_option('maintenance_db_version');
+		public static function mt_clear_cache() {
+			global $file_prefix;
+			if ( function_exists( 'w3tc_pgcache_flush' ) ) w3tc_pgcache_flush(); 
+			if ( function_exists( 'wp_cache_clean_cache' ) ) wp_cache_clean_cache( $file_prefix, true );
 		}	
 		
 		function mt_user_logout() { 

@@ -1,4 +1,4 @@
-function ppn_ajax_edit_note( note_id, note_text, note_type ) {
+function ppn_ajax_edit_note( note_id, note_text, note_type, is_personal ) {
    var petersack = new sack( ajaxurl );    
 
     petersack.execute = 1;
@@ -6,6 +6,10 @@ function ppn_ajax_edit_note( note_id, note_text, note_type ) {
     petersack.setVar( "action", "ppn_edit_note" );
     petersack.setVar( "note_id", note_id );
     petersack.setVar( "note_type", note_type );
+    if( is_personal )
+    {
+        petersack.setVar( "is_personal", is_personal.checked === true ? 1 : 0 );
+    }
     petersack.setVar( "note_text", note_text.value );
     petersack.encVar( "cookie", document.cookie, false );
     petersack.onError = function() { alert('Ajax error in editing note' )};

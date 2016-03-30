@@ -24,14 +24,14 @@ $defaults = array(
 	)
 );
 
-$grid_template = addslashes( '<span class="event-time dtstart value-title" title="{dtstart}">{time}<span class="time-separator"> - </span>{endtime before="<span class=\'end-time dtend\' title=\'{dtend}\'>" after="</span>"}</span>
+$grid_template = addslashes( '<span class="event-time value-title" title="{dtstart}">{time}<span class="time-separator"> - </span>{endtime before="<span class=\'end-time\' title=\'{dtend}\'>" after="</span>"}</span>
 
 <div class="sub-details">
 {hcard}
 {details before="<p class=\'mc_details\'>" after="</p>"}
 <p><a href="{linking}" class="event-link external"><span class="screen-reader-text">More information about </span>{title}</a></p></div>' );
 
-$list_template = addslashes( '<span class="event-time dtstart value-title" title="{dtstart}">{time}<span class="time-separator"> - </span>{endtime before="<span class=\'end-time dtend value-title\' title=\'{dtend}\'>" after="</span>"}</span>
+$list_template = addslashes( '<span class="event-time value-title" title="{dtstart}">{time}<span class="time-separator"> - </span>{endtime before="<span class=\'end-time value-title\' title=\'{dtend}\'>" after="</span>"}</span>
 
 <h3 class="event-title">{title}</h3>
 
@@ -40,7 +40,7 @@ $list_template = addslashes( '<span class="event-time dtstart value-title" title
 {details before="<p class=\'mc_details\'>" after="</p>"}
 <p><a href="{linking}" class="event-link external"><span class="screen-reader-text">More information about </span>{title}</a></p></div>' );
 
-$mini_template = addslashes( '<span class="event-time dtstart value-title" title="{dtstart}">{time}<span class="time-separator"> - </span>{endtime before="<span class=\'end-time dtend value-title\' title=\'{dtend}\'>" after="</span>"}</span>
+$mini_template = addslashes( '<span class="event-time value-title" title="{dtstart}">{time}<span class="time-separator"> - </span>{endtime before="<span class=\'end-time value-title\' title=\'{dtend}\'>" after="</span>"}</span>
 
 <h3 class="event-title">{title}</h3>
 
@@ -49,7 +49,7 @@ $mini_template = addslashes( '<span class="event-time dtstart value-title" title
 {hcard}
 <p><a href="{linking}" class="event-link external"><span class="screen-reader-text">More information about </span>{title}</a></p></div>' );
 
-$single_template = addslashes( '<span class="event-time dtstart value-title" title="{dtstart}">{time}<span class="time-separator"> - </span><span class="end-time dtend value-title" title="{dtend}">{endtime}</span></span>
+$single_template = addslashes( '<span class="event-time value-title" title="{dtstart}">{time}<span class="time-separator"> - </span><span class="end-time value-title" title="{dtend}">{endtime}</span></span>
 
 <div class="sub-details">
 {hcard}
@@ -113,14 +113,14 @@ $initial_db = "CREATE TABLE " . my_calendar_table() . " (
  event_post BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
  event_link_expires TINYINT(1) NOT NULL,
  event_location BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
- event_label VARCHAR(60) NOT NULL,
- event_street VARCHAR(60) NOT NULL,
- event_street2 VARCHAR(60) NOT NULL,
- event_city VARCHAR(60) NOT NULL,
- event_state VARCHAR(60) NOT NULL,
+ event_label VARCHAR(255) NOT NULL,
+ event_street VARCHAR(255) NOT NULL,
+ event_street2 VARCHAR(255) NOT NULL,
+ event_city VARCHAR(255) NOT NULL,
+ event_state VARCHAR(255) NOT NULL,
  event_postcode VARCHAR(10) NOT NULL,
  event_region VARCHAR(255) NOT NULL,
- event_country VARCHAR(60) NOT NULL,
+ event_country VARCHAR(255) NOT NULL,
  event_url TEXT,
  event_longitude FLOAT(10,6) NOT NULL DEFAULT '0',
  event_latitude FLOAT(10,6) NOT NULL DEFAULT '0',
@@ -164,15 +164,15 @@ $initial_cat_db = "CREATE TABLE " . my_calendar_categories_table() . " (
 
 $initial_loc_db = "CREATE TABLE " . my_calendar_locations_table() . " ( 
  location_id INT(11) NOT NULL AUTO_INCREMENT, 
- location_label VARCHAR(60) NOT NULL,
- location_street VARCHAR(60) NOT NULL,
- location_street2 VARCHAR(60) NOT NULL,
- location_city VARCHAR(60) NOT NULL,
- location_state VARCHAR(60) NOT NULL,
+ location_label VARCHAR(255) NOT NULL,
+ location_street VARCHAR(255) NOT NULL,
+ location_street2 VARCHAR(255) NOT NULL,
+ location_city VARCHAR(255) NOT NULL,
+ location_state VARCHAR(255) NOT NULL,
  location_postcode VARCHAR(10) NOT NULL,
  location_region VARCHAR(255) NOT NULL,
  location_url TEXT,
- location_country VARCHAR(60) NOT NULL,
+ location_country VARCHAR(255) NOT NULL,
  location_longitude FLOAT(10,6) NOT NULL DEFAULT '0',
  location_latitude FLOAT(10,6) NOT NULL DEFAULT '0',
  location_zoom INT(2) NOT NULL DEFAULT '14',

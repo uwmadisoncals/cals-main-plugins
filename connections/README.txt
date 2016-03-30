@@ -1,10 +1,10 @@
 === Connections Business Directory ===
 Contributors: shazahm1@hotmail.com
 Donate link: http://connections-pro.com/
-Tags: address book, business, business directory, business directory plugin, chamber of commerce, church directory, company directory, contact directory, custom directory, directory, directory plugin, listings, member directory, staff directory, wordpress business directory, wordpress directory, wordpress directory plugin, wordpress local directory
+Tags: address book, business directory, chamber of commerce business directory, church directory, company business directory, contact directory, custom business directory, directory, listings directory, local business directory, link directory, member directory, staff directory
 Requires at least: 4.1
 Tested up to: 4.4.2
-Stable tag: 8.5.10
+Stable tag: 8.5.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,14 +24,14 @@ Quite simply, Connections Business Directory is the [best directory plugin avail
 * Dashboard admin page where you can see at a glance today's anniversaries and birthdays as well as upcoming anniversaries and birthdays of members in your directory.
 * Multiple entry types from which to choose; such as individual, organization and family. The family entry type is unique to Connections. This entry type allows you to group individuals together as a family which makes Connections ideally suited for creating a church directory.
 * You control which entries are viewable to the public and which entries are private, viewable for logged in users only. You can even have entries set as unlisted so only admins can view them.
-* **Repeatable fields** for address, phone numbers, email, IM, social media, links and dates.
+* **[Repeatable fields](http://connections-pro.com/documentation/add-entry/#Repeatable_Fields)** for address, phone numbers, email, IM, social media, links and dates.
 * Hierarchical (nested) **category support**. Businesses and members in your directory can be added to any number of categories.
 * Include a biographical text for an individual member or business description for each entry in your directory using an easy to use rich text editor.
 * You can easily add a business logo or photo of the staff member for each entry in your directory. The photo and logo images are fully responsive with **HiDPI (Retina) display support**.
 * **Scalable,** manage directories which [contain hundreds of thousands of entries](https://wordpress.org/support/topic/scales-to-at-least-250000-entries).
-* **CSV Export** of addresses, phone numbers, email addresses and dates.
-* **CSV Import** of **nested** categories.
-* **Role capability support**.
+* **[CSV Export](http://connections-pro.com/documentation/tools/#Export)** of addresses, phone numbers, email addresses and dates.
+* **[CSV Import](http://connections-pro.com/documentation/tools/#Categories-2)** of **nested** categories.
+* **[Role capability support](http://connections-pro.com/documentation/roles/)**.
 * Displaying your entries on the frontend is as simple as putting a shortcode on a page. Don't let this simplicity fool you. The shortcode provides a dizzying array of options that are just too numerous to list. To learn more, [go here](http://connections-pro.com/documentation/plugin/shortcodes/).
 * **SEO.** Every entry outputs following the [hCard](http://microformats.org/wiki/hcard) spec. Soon to be updated to following Schema.org.
 * **[Extensible](http://connections-pro.com/extensions/)** and developer friendly.
@@ -218,6 +218,56 @@ Yes this is possible but there is a special setup required to do so. It is recom
 
 
 == Changelog ==
+
+= 8.5.13 03/11/2016 =
+* TWEAK: General code cleanup of cnMessage to fix phpDoc and correct potential PHP warning/error notices by checking for existing array indexes before working with them.
+* TWEAK: Refactor cnEntryMetabox::address() to remove duplicate code.
+* DEV: Add a missing class phpDoc header.
+* I18N: Update POT file.
+* I18N: Update MO files.
+
+= 8.5.12 03/04/2016 =
+* BUG: Set format to string for lat/lng instead of float when passing the values thru wpdb->prepare() to prevent them from being rounded at 6 decimal places.
+* BUG: The "Recently Added" Dashboard widget would show entries in the moderation queue.
+* BUG: The "Recently Modified" Dashboard widget would show entries in the moderation queue.
+* BUG: Correct bug in the cnHTML::textarea() method.
+* TWEAK: Reduce image quality default from 90 to 82 to match upcoming change to WordPress to reduce image sizes without adversely affecting perceived image quality.
+* TWEAK Check for ABSPATH at top of image editor classes to help prevent direct access.
+* TWEAK: Escape URL on the Manage admin page for filter by category.
+* TWEAK: Minor tweaks to the Templates admin page.
+* TWEAK: The "Awaiting Moderation" Dashboard widget will now show the newest first instead of the oldest.
+* TWEAK: Refactor cnEntryMetabox::links() to remove duplicate code.
+* TWEAK: Refactor cnEntryMetabox::dates() to remove duplicate code.
+* TWEAK: CSS tweaks to the Templates admin page.
+* OTHER: Correct misspelling.
+* OTHER: Update the minified CSS and JS files.
+* DEV: Couple minor phpDoc fixes.
+
+= 8.5.11 02/12/2016 =
+* COMPATIBILITY: Add an Enfold theme compatibility shim when viewing a single entry.'s detail/profile view.
+* BUG: Correct bug for mouseover hover text for email links so they correctly reflect the email type.
+* BUG: Correct an error in the admin javascript which prevented a repeatable field from collapsing.
+* TWEAK: Move the geocode button to be within the `address-geo` div in the Address field metabox.
+* TWEAK: Fix the alpha index with many character from overlapping the table header.
+* TWEAK: Correct the positioning of a the repeatable field toggle arrow.
+* TWEAK: Add a margin the the `#minor-publishing` div to fix the spacing of the role capability reset metabox.
+* TWEAK: Cleanup the address field metabox inputs for a little cleaner presentation.
+* TWEAK: Add missing container div on the geocode button when editing an entry with an existing address.
+* TWEAK: Tweak styling of the phone number field metabox to add more whitespace.
+* TWEAK: Tweak styling of the email address field metabox to add more whitespace.
+* TWEAK: Tweak styling of the instant messenger field metabox to add more whitespace.
+* TWEAK: Tweak styling of the social media network field metabox to add more whitespace.
+* TWEAK: Tweak styling of the link field metabox to add more whitespace.
+* TWEAK: Tweak positioning of the repeatable fields remove button.
+* TWEAK: Refactor cnEntryMetabox::phone() to remove duplicate code.
+* TWEAK: Refactor cnEntryMetabox::email() to remove duplicate code.
+* TWEAK: Refactor cnEntryMetabox::messenger() to remove duplicate code.
+* TWEAK: Refactor cnEntryMetabox::social() to remove duplicate code.
+* OTHER: Correct a few misspellings in cnGeo in the phpDoc.
+* OTHER: Update EDD_SL_Plugin_Updater to 1.6.3.
+* OTHER: Remove unused variables in cnEntryMetabox.
+* DEV: Add a @todo to cnShortcode.
+* DEV: Minor phpDoc fixes in cnEntryMetabox.
 
 = 8.5.10 02/05/2016 =
 * NEW: Add preferred class names for entry data that has been set as the preferred option. This will allow them to be targeted with CSS to allow differentiation.
@@ -625,112 +675,9 @@ Yes this is possible but there is a special setup required to do so. It is recom
 * DEV: Adjust filters and actions in cnEmail::send() for better compatibility.
 * DEV: Prettify code in cnDate() to better meet coding standards.
 
-= 8.2.9 06/19/2015 =
-* FEATURE: Bio and Notes fields now supports oEmbed.
-* NEW: Add new helper function cnImage::sideload().
-* NEW: Introduce cnFunction::parseStringList().
-* NEW: Introduce cnFormatting::prepareINPlaceholders().
-* BUG: Default attributes for the slider field type were not properly being set in cnMetabox_Render::fields().
-* BUG: Remove unnecessary string comparisons before concatenation.
-* TWEAK: Add support for lifetime support license keys.
-* TWEAK: Change several instances of hard coded directory separators to the the PHP constant instead.
-* TWEAK: Add thank you to admin footer.
-* TWEAK: Add support for the `action` override option for wp_handle_upload() in wrapper function cnFile::upload().
-* TWEAK: Add the `cn_upload_file_options` filter to cnUpload::file() to allow the default overrides passed to wp_handle_upload() to be overridden.
-* TWEAK: Remove dead code in cnMetabox_Render::fields() in the `rte` field type.
-* TWEAK: Update the readme.txt file.
-* TWEAK: Use cnSanitize::html() for the rte field type in cnMetabox_Render::fields().
-* TWEAK: Use cnSanitize::quicktag() for the quicktag field type in cnMetabox_Render::fields().
-* TWEAK: Do not run the string thru wp_kses_post() if the current user has the unfiltered_html capability in cnSanitize::html().
-* TWEAK: Do not run the string thru wp_kses_data() if the current user has the unfiltered_html capability in cnSanitize::quicktag().
-* TWEAK: Apply all the filters applied to the post content to both the bio and notes fields when being displayed.
-* TWEAK: Remove all usages of deprecated admin message functions.
-* TWEAK: Remove unnecessary call to plugin_basename() when defining plugin constants.
-* TWEAK: Utilize cnFunction::parseStringList() throughout cnEntry to remove code duplication.
-* TWEAK: Simplify ternary in cnEntry::setAddresses().
-* OTHER: Correct a couple misspelling in the phpDoc for cnMetabox_Render::fields().
-* DEV: Add support for the bio and notes fields in cnSanitize::field(), matching the core WP filters for post_content on the content_save_pre hook.
-* DEV: Refactor cnEntry::getBio() to use cnSanitize::field().
-* DEV: Refactor cnEntry::setBio() to use cnSanitize::field().
-* DEV: Refactor cnEntry::getNotes() to use cnSanitize::field().
-* DEV: Refactor cnEntry::setNotes() to use cnSanitize::field().
-* DEV: Refactor cnOutput::getNotesBlock(), removing direct usage of WP_Embed::run_shortcode() and do_shortcode().
-* DEV: Refactor cnOutput::getBioBlock(), removing direct usage of WP_Embed::run_shortcode() and do_shortcode().
-* DEV: Refactor loadTextDomain() to be more variable for reuse.
-* DEV: Move cnFormatting::replaceWhatWith() to cnString::replaceWhatWith().
-* DEV: Move cnFormatting::normalizeString() to cnString::normalizeString().
-* DEV: Move cnFormatting::preslashit() and cnFormatting::unpreslashit() to cnURL.
-* DEV: Move cnFormatting::excerpt() to cnString::excerpt().
-* DEV: phpDoc usages of the global $wpdb in many of the methods in cnRetrieve.
-* DEV: Add support for the address fields in cnSanitize::field().
-* DEV: Add $context param to cnEntry::setAddresses().
-* DEV: Cleanup phpDoc for cnEntry::setAddresses().
-* DEV: Complete refactor of cnEntry::getAddresses() for better readability and code standards compliance.
-* DEV: Add the $context param to cnEntryMetabox::address().
-* DEV: Cleanup phpDoc of cnEntryMetabox::address().
-* DEV: Refactor cnRetrieve::setQueryVisibility() for better readability and code standards compliance.
-* DEV: Complete refactor of cnRetrieve::address() for better readability, code standards compliance and greater flexibility for defining queries.
-* DEV: Cleanup phpDoc for cnRetrieve::setQueryStatus().
-* DEV: Update phpDoc for cnRetrieve::addresses().
-
-= 8.2.8 06/05/2015 =
-* BUG: Escape URL for search message clear message button.
-* BUG: Refactor cnTemplate::locate() to fix inconsistencies in the priority loading order of template override resource files.
-* TWEAK: Remove use of deprecated function in cnTemplate::filenames().
-* TWEAK: Add support for the `license_not_activable` error message response from EDD-SL.
-* TWEAK: Add support for base name in cnLocate when searching for template files.
-* TWEAK: Add a filter to cnURL::permalink() so the URL can be filtered.
-* TWEAK: Add a filter to the URL for cnTemplatePart::searchingMessage().
-* TWEAK: Set the default template type to 'all' and only override if the `list_type` option is set in cnTemplateFactory::loadTemplate().
-* TWEAK: Clear the options/transient caches when the permalink structure is changed.
-* TWEAK: Remove the notranslate class from a link title.
-* TWEAK: Remove use of deprecated function in cnLocate::fileNames().
-* TWEAK: Prefix the contact-block class.
-* TWEAK: Tweaks to cnOutput::getLinkBlock() so filters to output could be added.
-* TWEAK: And additional filters to cnOutput::getEmailAddressBlock().
-* TWEAK: Tweak to add a bit of padding to the metabox table rows.
-* TWEAK: Tweak logic in cnURL::permalink() to properly id the page_id query var to the site's static home page when the directory and/or widgets are added to the static home page.
-* TWEAK: Change cnTemplatePart::echoOrReturn() to be a protect function.
-* TWEAK: Move the before/after action list logic to their own callback functions and add them to the cn_action_list_{before|after} action hooks.
-* TWEAK: Add the cn_list_{before|after}_body action hooks.
-* TWEAK: Allow the results list body to be overridden by using a template override file in cnTemplatePart::body().
-* TWEAK: Remove unnecessary PHP_EOL in cnTemplatePart::body().
-* TWEAK: Assign get_query_var('cn-view') to the $view var for reuse in switch in cnShortcode::view().
-* TWEAK: Make the shortcode view switch pluggable in cnShortcode::view() to allow new views to be registered and processed.
-* TWEAK: Change the default view from card to list to cleanup nomenclature for the forthcoming List View extension.
-* OTHER: Fix misspelling of search in phpDoc.
-* OTHER: Fix misspelling in code comment in cnTemplate::getPath().
-* OTHER: Fix misspelling in phpDoc.
-* OTHER: Correct misspelling in phpDoc in cnLocate.
-* OTHER: Fix misspellings in code comment.
-* DEV: Stub phpDoc for class cnTemplate.
-* DEV: Fix phpDoc for cnTemplate::__construct().
-* DEV: Cleanup phpDoc for cnTemplate::getAuthorURL().
-* DEV: Cleanup phpDoc for cnTemplate::getThumbnail().
-* DEV: Add a no inspection flag for phpStorm.
-* DEV: Add basic phpDoc to the Names template.
-* DEV: Refactor cnOutput::getEmailAddressBlock(). Cleanup code and add additional filters.
-* DEV: Refactor cnTemplatePart::listAction_ViewAll() to be more readable and add default options so the permalink would be properly resolve to the correct page.
-* DEV: Refactor cnTemplatePart::entryAction_Back() to be more readable by flowing options on multiple lines.
-
-= 8.2.7 05/12/2015 =
-* BUG: Add missing $default_term property to CN_Term_Admin_List_Table.
-* BUG: Set maximum character for indexes to 191 when creating indexes to support WordPress 4.2 move to utf8mb4.
-* BUG: Correct LinkedIn spelling.
-* BUG: Fix undefined index notice when updating entry meta.
-* TWEAK: Small schema tweaks when creating the db taxonomy tables.
-* TWEAK: Add support for WP Mailto Links plugin via a CSS tweak.
-* OTHER: Fix misspelling of urlencode().
-
 [Complete Changelog can be found here.](http://connections-pro.com/changelog/)
 
 == Upgrade Notice ==
-
-= 8.2.8 =
-It is recommended to backup before updating. Requires WordPress >= 3.8.
-
-= 8.2.9 =
-It is recommended to backup before updating. Requires WordPress >= 3.8.
 
 = 8.2.10 =
 It is recommended to backup before updating. Requires WordPress >= 4.0.
@@ -796,4 +743,13 @@ It is recommended to backup before updating. Requires WordPress >= 4.1.
 It is recommended to backup before updating. Requires WordPress >= 4.1.
 
 = 8.5.10 =
+It is recommended to backup before updating. Requires WordPress >= 4.1.
+
+= 8.5.11 =
+It is recommended to backup before updating. Requires WordPress >= 4.1.
+
+= 8.5.12 =
+It is recommended to backup before updating. Requires WordPress >= 4.1.
+
+= 8.5.13 =
 It is recommended to backup before updating. Requires WordPress >= 4.1.

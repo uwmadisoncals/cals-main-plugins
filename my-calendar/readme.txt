@@ -4,7 +4,7 @@ Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, conference, meeting, venue, location, box office, tickets, registration
 Requires at least: 4.0
 Tested up to: 4.4.2
-Stable tag: 2.4.13
+Stable tag: 2.4.15
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -53,14 +53,9 @@ Easy to use for anybody, My Calendar provides enormous flexibility for designers
 
 = Translations =
 
-Available translations so far:
-Czech, Polish, Portuguese (Portugal), Spanish (Spain), French, Danish, Swedish, Japanese, Dutch, German, Slovak, Russian, Italian, Portuguese (Brazil), Hebrew, Galician, Hindi, Turkish, Finnish, Slovenian, Ukrainian, Romanian, Norwegian (Bokmal), Catalan, Hungarian, Afrikaans, Persian, Icelandic
+Visit [Wordpress Translations](https://translate.wordpress.org/projects/wp-plugins/my-calendar) to check the progress of your translation.
 
-Visit [Wordpress Translations](https://translate.wordpress.org/projects/wp-plugins/my-calendar) to check the progress of a translation.
-
-Translating my plug-ins is always appreciated. Visit <a href="https://translate.wordpress.org/projects/wp-plugins/my-calendar">WordPress translations</a> to start getting your language into shape!
-
-<a href="http://www.joedolson.com/translator-credits/">Translator Credits</a>
+Translating my plug-ins is always appreciated. Visit <a href="https://translate.wordpress.org/projects/wp-plugins/my-calendar">WordPress translations</a> to start getting your language into shape! Translations will only be published when they reach 100% completion.
 
 == Installation ==
 
@@ -102,6 +97,19 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 * Add option to insert new occurrences into an existing event. (Make single event recurring, add arbitrary date into group, etc.)
 * Add option to insert events to both global & local calendar in multisite networks
 * Revise month by day input & calculation methods
+* Update hcalendar structures
+
+= 2.4.16 =
+
+* Minor CSS updates in calendar stylesheets
+* Bug fix in widgets
+* Bug fix in list JS with focus management (accessibility)
+
+= 2.4.15 =
+
+* Increase field length allowed for event location fields
+* Picker CSS improvements
+* Bug fixes on event search queries
 
 = 2.4.14 =
 
@@ -244,7 +252,7 @@ New features:
 Bug fixes:
 
 * Stop setting all day events to end at midnight; use 11:59:59 and filter output
-* Rewrite iCal output so that the iCal download eliminates Holiday cancellations [todo]
+* Rewrite iCal output so that the iCal download eliminates Holiday cancellations
 * Bug fix: Prevent extraneous variables from leaking into the navigation output.
 * Rendering post template in permalinks only applies within Loop.
 * Template attribute preg_match could only pick up 2 parameters

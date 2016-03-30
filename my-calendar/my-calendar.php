@@ -7,7 +7,7 @@ Author: Joseph C Dolson
 Author URI: http://www.joedolson.com
 Text Domain: my-calendar
 Domain Path: lang
-Version: 2.4.14
+Version: 2.4.16
 */
 /*  Copyright 2009-2016  Joe Dolson (email : joe@joedolson.com)
 
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 } // Exit if accessed directly
 
 global $mc_version, $wpdb;
-$mc_version = '2.4.14';
+$mc_version = '2.4.16';
 
 // Define the tables used in My Calendar
 if ( is_multisite() && get_site_option( 'mc_multisite_show' ) == 1 ) {
@@ -92,6 +92,7 @@ include( dirname( __FILE__ ) . '/my-calendar-generator.php' );
 // Enable internationalisation
 add_action( 'plugins_loaded', 'mc_load_textdomain' );
 function mc_load_textdomain() {
+	// don't change this; just gradually remove shipped translations when .org trans become complete.
 	load_plugin_textdomain( 'my-calendar', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 }
 
@@ -172,13 +173,27 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 		<div class="postbox-container jcd-narrow">
 		<div class="metabox-holder">
 		<?php if ( ! $remove ) { ?>
+			<?php if ( ! function_exists( 'mcs_submit_exists' ) ) { ?>
+				<div class="ui-sortable meta-box-sortables">
+					<div class="postbox sell support">
+						<h3 class='sales'><strong><?php _e( 'My Calendar Pro', 'my-calendar' ); ?></strong></h3>
+
+						<div class="inside resources">
+							<p class="mcbuy"><?php _e( "Buy <a href='https://www.joedolson.com/my-calendar/pro/' rel='external'>My Calendar Pro</a> &mdash; a more powerful calendar for your site.", 'my-calendar' ); ?></p>
+
+							<p class="mc-button"><a href="http://www.joedolson.com/my-calendar/pro/" rel="external"><?php _e( 'Learn more!', 'my-calendar' ); ?></a>
+							</p>
+						</div>
+					</div>
+				</div>
+			<?php } ?>			
 			<?php if ( ! function_exists( 'mt_valid' ) ) { ?>
 				<div class="ui-sortable meta-box-sortables">
-					<div class="postbox my-tickets">
+					<div class="postbox sell my-tickets">
 						<h3 class='sales'><strong><?php _e( 'My Tickets', 'my-calendar' ); ?></strong></h3>
 
 						<div class="inside resources">
-							<p class="mcsbuy"><?php _e( "Do you sell tickets to your events? <a href='https://wordpress.org/plugins/my-tickets/' rel='external'>Use My Tickets</a> and sell directly from My Calendar.", 'my-calendar' ); ?></p>
+							<p class="mcbuy"><?php _e( "Do you sell tickets to your events? <a href='https://wordpress.org/plugins/my-tickets/' rel='external'>Use My Tickets</a> and sell directly from My Calendar.", 'my-calendar' ); ?></p>
 							<p><?php _e( 'My Tickets integrates with My Calendar or sells tickets independently through posts and pages.', 'my-tickets' ); ?></p>
 
 							<p class="mc-button"><a href="https://wordpress.org/plugins/my-tickets/" rel="external"><?php _e( 'Download My Tickets', 'my-calendar' ); ?></a>
@@ -186,21 +201,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 						</div>
 					</div>
 				</div>
-			<?php } ?>			
-			<?php if ( ! function_exists( 'mcs_submit_exists' ) ) { ?>
-				<div class="ui-sortable meta-box-sortables">
-					<div class="postbox support">
-						<h3 class='sales'><strong><?php _e( 'My Calendar Pro', 'my-calendar' ); ?></strong></h3>
-
-						<div class="inside resources">
-							<p class="mcsbuy"><?php _e( "Buy <a href='https://www.joedolson.com/my-calendar/pro/' rel='external'>My Calendar Pro</a> &mdash; a more powerful calendar for your site.", 'my-calendar' ); ?></p>
-
-							<p class="mc-button"><a href="http://www.joedolson.com/my-calendar/pro/" rel="external"><?php _e( 'Learn more!', 'my-calendar' ); ?></a>
-							</p>
-						</div>
-					</div>
-				</div>
-			<?php } ?>		
+			<?php } ?>	
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox support">
 					<h3><strong><?php _e( 'Support This Plug-in', 'my-calendar' ); ?></strong></h3>

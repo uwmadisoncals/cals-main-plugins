@@ -122,15 +122,15 @@
     border: 1px solid #aaf;
 }
 
-#upcoming-events .past-event {
+.upcoming-events .past-event {
     color: #aaa;
 }
 
-#upcoming-events .today {
+.upcoming-events .today {
     color: #eee;
 }
 
-#upcoming-events .future-event {
+.upcoming-events .future-event {
     color: #bbb;
 }
 
@@ -409,6 +409,11 @@
 
 .mc-main .mini-event .details img {
     width: 100%;
+}
+
+.mc-main .list-event .details img {
+    width: auto;
+    max-width: 100%;
 }
 
 .mc-main.mini .day-with-date a {

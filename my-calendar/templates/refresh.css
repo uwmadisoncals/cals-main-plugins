@@ -98,15 +98,15 @@
     text-decoration: underline
 }
 
-#upcoming-events .past-event {
+.upcoming-events .past-event {
     color: #777
 }
 
-#upcoming-events .today {
+.upcoming-events .today {
     color: #111
 }
 
-#upcoming-events .future-event {
+.upcoming-events .future-event {
     color: #555
 }
 
@@ -423,6 +423,11 @@
 
 .mc-main .mini-event .details img {
     width: 100%
+}
+
+.mc-main .list-event .details img {
+    width: auto;
+    max-width: 100%;
 }
 
 .mc-main.mini .day-with-date a {

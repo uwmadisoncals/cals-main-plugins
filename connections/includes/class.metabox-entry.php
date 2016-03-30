@@ -13,6 +13,9 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+/**
+ * Class cnEntryMetabox
+ */
 class cnEntryMetabox {
 
 	/**
@@ -37,8 +40,7 @@ class cnEntryMetabox {
 	 * Initiate the core metaboxes and fields.
 	 *
 	 * @access private
-	 * @since 0.8
-	 * @param  object $metabox Instance of the cnMetaboxAPI.
+	 * @since  0.8
 	 *
 	 * @return void
 	 */
@@ -955,390 +957,12 @@ class cnEntryMetabox {
 	 */
 	public static function address( $entry, $atts ) {
 
-		// Grab an instance of the Connections object.
-		$instance = Connections_Directory();
-
-		// This array will store field group IDs as the fields are registered.
-		// This array will be checked for an existing ID before rendering
-		// a field to prevent multiple field group IDs from being rendered.
-		$groupIDs = array();
-
-		// This array will store field IDs as the fields are registered.
-		// This array will be checked for an existing ID before rendering
-		// a field to prevent multiple field IDs from being rendered.
-		$fieldIDs = array();
-
-		// Grab the address types.
-		$addressTypes = $instance->options->getDefaultAddressValues();
-
-		// $defaults = array(
-		// 	// Define the entry type so the correct fields will be rendered. If an entry type is all registered entry types, render all fields assuming this is new entry.
-		// 	'type'  => $entry->getEntryType() ? $entry->getEntryType() : array( 'individual', 'organization', 'family'),
-		// 	// The entry type to which the meta fields are being registered.
-		// 	'individual' => array(
-		// 		'type'          => $addressTypes,
-		// 		'preferred'     => TRUE,
-		// 		'visibility'    => $visibiltyOptions,
-		// 		// The entry type field meta. Contains the arrays that define the field groups and their respective fields.
-		// 		'meta'   => array(
-		// 			// This key is the field group ID and it must be unique. Duplicates will be discarded.
-		// 			'address-local' => array(
-		// 				// Whether or not to render the field group.
-		// 				'show'  => TRUE,
-		// 				// The fields within the field group.
-		// 				'field' => array(
-		// 					// This key is the field ID.
-		// 					'line_1' => array(
-		// 						// Each field must have an unique ID. Duplicates will be discarded.
-		// 						'id'        => 'line_1',
-		// 						// Whether or not to render the field.
-		// 						'show'      => TRUE,
-		// 						// The field label if supplied.
-		// 						'label'     => __( 'Address Line 1', 'connections' ),
-		// 						// Whether or not the field is required. If it is required 'class="required"' will be added to the field.
-		// 						// This will be used by jQuery Validate.
-		// 						'required'  => FALSE,
-		// 						// The field type.
-		// 						'type'      => 'text',
-		// 						// The field value.
-		// 						'value'     => 'line_1',
-		// 						'before'    => '<div class="address-line">',
-		// 						'after'     => '</div>',
-		// 						),
-		// 					'line_2' => array(
-		// 						// Each field must have an unique ID. Duplicates will be discarded.
-		// 						'id'        => 'line_2',
-		// 						// Whether or not to render the field.
-		// 						'show'      => TRUE,
-		// 						// The field label if supplied.
-		// 						'label'     => __( 'Address Line 2', 'connections' ),
-		// 						// Whether or not the field is required. If it is required 'class="required"' will be added to the field.
-		// 						// This will be used by jQuery Validate.
-		// 						'required'  => FALSE,
-		// 						// The field type.
-		// 						'type'      => 'text',
-		// 						// The field value.
-		// 						'value'     => 'line_2',
-		// 						'before'    => '<div class="address-line">',
-		// 						'after'     => '</div>',
-		// 						),
-		// 					'line_3' => array(
-		// 						// Each field must have an unique ID. Duplicates will be discarded.
-		// 						'id'        => 'line_3',
-		// 						// Whether or not to render the field.
-		// 						'show'      => TRUE,
-		// 						// The field label if supplied.
-		// 						'label'     => __( 'Address Line 3', 'connections' ),
-		// 						// Whether or not the field is required. If it is required 'class="required"' will be added to the field.
-		// 						// This will be used by jQuery Validate.
-		// 						'required'  => FALSE,
-		// 						// The field type.
-		// 						'type'      => 'text',
-		// 						// The field value.
-		// 						'value'     => 'line_3',
-		// 						'before'    => '<div class="address-line">',
-		// 						'after'     => '</div>',
-		// 						),
-		// 					),
-		// 				),
-		// 			'address-region' => array(
-		// 				// Whether or not to render the field group.
-		// 				'show'  => TRUE,
-		// 				// The fields within the field group.
-		// 				'field' => array(
-		// 					// This key is the field ID.
-		// 					'city' => array(
-		// 						// Each field must have an unique ID. Duplicates will be discarded.
-		// 						'id'        => 'city',
-		// 						// Whether or not to render the field.
-		// 						'show'      => TRUE,
-		// 						// The field label if supplied.
-		// 						'label'     => __( 'City', 'connections' ),
-		// 						// Whether or not the field is required. If it is required 'class="required"' will be added to the field.
-		// 						// This will be used by jQuery Validate.
-		// 						'required'  => FALSE,
-		// 						// The field type.
-		// 						'type'      => 'text',
-		// 						// The field value.
-		// 						'value'     => 'city',
-		// 						'before'    => '<span class="address-city">',
-		// 						'after'     => '</span>',
-		// 						),
-		// 					'state' => array(
-		// 						// Each field must have an unique ID. Duplicates will be discarded.
-		// 						'id'        => 'state',
-		// 						// Whether or not to render the field.
-		// 						'show'      => TRUE,
-		// 						// The field label if supplied.
-		// 						'label'     => __( 'State', 'connections' ),
-		// 						// Whether or not the field is required. If it is required 'class="required"' will be added to the field.
-		// 						// This will be used by jQuery Validate.
-		// 						'required'  => FALSE,
-		// 						// The field type.
-		// 						'type'      => 'text',
-		// 						// The field value.
-		// 						'value'     => 'state',
-		// 						'before'    => '<span class="address-state">',
-		// 						'after'     => '</span>',
-		// 						),
-		// 					'zipcode' => array(
-		// 						// Each field must have an unique ID. Duplicates will be discarded.
-		// 						'id'        => 'zipcode',
-		// 						// Whether or not to render the field.
-		// 						'show'      => TRUE,
-		// 						// The field label if supplied.
-		// 						'label'     => __( 'Zipcode', 'connections' ),
-		// 						// Whether or not the field is required. If it is required 'class="required"' will be added to the field.
-		// 						// This will be used by jQuery Validate.
-		// 						'required'  => FALSE,
-		// 						// The field type.
-		// 						'type'      => 'text',
-		// 						// The field value.
-		// 						'value'     => 'zipcode',
-		// 						'before'    => '<span class="address-zipcode">',
-		// 						'after'     => '</span>',
-		// 						),
-		// 					),
-		// 				),
-		// 			'address-country' => array(
-		// 				// Whether or not to render the field group.
-		// 				'show'  => TRUE,
-		// 				// The fields within the field group.
-		// 				'field' => array(
-		// 					// This key is the field ID.
-		// 					'country' => array(
-		// 						// Each field must have an unique ID. Duplicates will be discarded.
-		// 						'id'        => 'country',
-		// 						// Whether or not to render the field.
-		// 						'show'      => TRUE,
-		// 						// The field label if supplied.
-		// 						'label'     => __( 'Country', 'connections' ),
-		// 						// Whether or not the field is required. If it is required 'class="required"' will be added to the field.
-		// 						// This will be used by jQuery Validate.
-		// 						'required'  => FALSE,
-		// 						// The field type.
-		// 						'type'      => 'text',
-		// 						// The field value.
-		// 						'value'     => 'country',
-		// 						'before'    => '<span class="address-country">',
-		// 						'after'     => '</span>',
-		// 						),
-		// 					),
-		// 				),
-		// 			),
-		// 		),
-		// 	);
-
-		// $atts = wp_parse_args( apply_filters( 'cn_metabox_name_atts', $atts ), $defaults );
-
 		echo '<div class="widgets-sortables ui-sortable" id="addresses">' , PHP_EOL;
 
 		// --> Start template <-- \\
 		echo '<textarea id="address-template" style="display: none;">' , PHP_EOL;
 
-			echo '<div class="widget-top">' , PHP_EOL;
-
-				echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-				echo '<div class="widget-title"><h4>' , PHP_EOL;
-
-					cnHTML::field(
-						array(
-							'type'     => 'select',
-							'class'    => '',
-							'id'       => 'address[::FIELD::][type]',
-							'options'  => $addressTypes,
-							'required' => FALSE,
-							'before'   => '<span class="adddress-type">',
-							'label'    => __( 'Address Type', 'connections' ),
-							'return'   => FALSE,
-						)
-					);
-
-					cnHTML::field(
-						array(
-							'type'     => 'radio',
-							'format'   => 'inline',
-							'class'    => '',
-							'id'       => 'address[preferred]',
-							'options'  => array( '::FIELD::' => __( 'Preferred', 'connections' ) ),
-							'required' => FALSE,
-							'before'   => '<span class="preferred">',
-							'after'    => '</span></span>',
-							'return'   => FALSE,
-						)
-					);
-
-					// Only show this if there are visibility options that the user is permitted to see.
-					if ( ! empty( self::$visibility ) ) {
-
-						cnHTML::field(
-							array(
-								'type'     => 'radio',
-								'format'   => 'inline',
-								'class'    => '',
-								'id'       => 'address[::FIELD::][visibility]',
-								'options'  => self::$visibility,
-								'required' => FALSE,
-								'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
-								'after'    => '</span>',
-								'return'   => FALSE,
-							),
-							'public'
-						);
-					}
-
-				echo '</h4></div>'  , PHP_EOL;
-
-			echo '</div>' , PHP_EOL;
-
-			echo '<div class="widget-inside">';
-
-				echo '<div class="address-local">';
-
-					cnHTML::field(
-						array(
-							'type'     => 'text',
-							'class'    => '',
-							'id'       => 'address[::FIELD::][line_1]',
-							'required' => FALSE,
-							'label'    => __( 'Address Line 1', 'connections' ),
-							'before'   => '<div class="address-line">',
-							'after'    => '</div>',
-							'return'   => FALSE,
-						)
-					);
-
-					cnHTML::field(
-						array(
-							'type'     => 'text',
-							'class'    => '',
-							'id'       => 'address[::FIELD::][line_2]',
-							'required' => FALSE,
-							'label'    => __( 'Address Line 2', 'connections' ),
-							'before'   => '<div class="address-line">',
-							'after'    => '</div>',
-							'return'   => FALSE,
-						)
-					);
-
-					cnHTML::field(
-						array(
-							'type'     => 'text',
-							'class'    => '',
-							'id'       => 'address[::FIELD::][line_3]',
-							'required' => FALSE,
-							'label'    => __( 'Address Line 3', 'connections' ),
-							'before'   => '<div class="address-line">',
-							'after'    => '</div>',
-							'return'   => FALSE,
-						)
-					);
-
-				echo  '</div>';
-
-				echo '<div class="address-region">';
-
-					cnHTML::field(
-						array(
-							'type'     => 'text',
-							'class'    => '',
-							'id'       => 'address[::FIELD::][city]',
-							'required' => FALSE,
-							'label'    => __( 'City', 'connections' ),
-							'before'   => '<div class="address-city">',
-							'after'    => '</div>',
-							'return'   => FALSE,
-						)
-					);
-
-					cnHTML::field(
-						array(
-							'type'     => 'text',
-							'class'    => '',
-							'id'       => 'address[::FIELD::][state]',
-							'required' => FALSE,
-							'label'    => __( 'State', 'connections' ),
-							'before'   => '<div class="address-state">',
-							'after'    => '</div>',
-							'return'   => FALSE,
-						)
-					);
-
-					cnHTML::field(
-						array(
-							'type'     => 'text',
-							'class'    => '',
-							'id'       => 'address[::FIELD::][zipcode]',
-							'required' => FALSE,
-							'label'    => __( 'Zipcode', 'connections' ),
-							'before'   => '<div class="address-zipcode">',
-							'after'    => '</div>',
-							'return'   => FALSE,
-						)
-					);
-
-				echo '</div>';
-
-				cnHTML::field(
-					array(
-						'type'     => 'text',
-						'class'    => '',
-						'id'       => 'address[::FIELD::][country]',
-						'required' => FALSE,
-						'label'    => __( 'Country', 'connections' ),
-						'before'   => '<div class="address-country">',
-						'after'    => '</div>',
-						'return'   => FALSE,
-					)
-				);
-
-				echo '<div class="address-geo">';
-
-					cnHTML::field(
-						array(
-							'type'     => 'text',
-							'class'    => '',
-							'id'       => 'address[::FIELD::][latitude]',
-							'required' => FALSE,
-							'label'    => __( 'Latitude', 'connections' ),
-							'before'   => '<div class="address-latitude">',
-							'after'    => '</div>',
-							'return'   => FALSE,
-						)
-					);
-
-					cnHTML::field(
-						array(
-							'type'     => 'text',
-							'class'    => '',
-							'id'       => 'address[::FIELD::][longitude]',
-							'required' => FALSE,
-							'label'    => __( 'Longitude', 'connections' ),
-							'before'   => '<div class="address-longitude">',
-							'after'    => '</div>',
-							'return'   => FALSE,
-						)
-					);
-
-				echo '</div>' , PHP_EOL;
-
-				if ( is_admin() ) {
-
-					echo '<a class="geocode button" data-uid="::FIELD::" href="#">' , __( 'Geocode', 'connections' ) , '</a>';
-				}
-
-				echo '<div class="clear"></div>';
-
-				if ( is_admin() ) {
-
-					echo '<div class="map" id="map-::FIELD::" data-map-id="::FIELD::" style="display: none; height: 400px;">' , __( 'Geocoding Address.', 'connections' ) , '</div>';
-				}
-
-				echo '<br>';
-				echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="address" data-token="::FIELD::">' , __( 'Remove', 'connections' ) , '</a></p>';
-
-			echo '</div>' , PHP_EOL;
+			self::addressField( new stdClass() );
 
 		echo '</textarea>' , PHP_EOL;
 		// --> End template <-- \\
@@ -1352,387 +976,13 @@ class cnEntryMetabox {
 
 				$token = str_replace( '-', '', cnUtility::getUUID() );
 
-				$selectName = 'address['  . $token . '][type]';
-				$preferred  = $address->preferred ? $token : '';
-
 				echo '<div class="widget address" id="address-row-'  . $token . '">' , PHP_EOL;
 
-					echo '<div class="widget-top">' , PHP_EOL;
-						echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-						echo '<div class="widget-title"><h4>' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'select',
-								'class'    => '',
-								'id'       => $selectName,
-								'options'  => $addressTypes,
-								'required' => FALSE,
-								'before'   => '<span class="adddress-type">',
-								'label'    => __( 'Address Type', 'connections' ),
-								'return'   => FALSE,
-							),
-							$address->type
-						);
-
-						cnHTML::field(
-							array(
-								'type'     => 'radio',
-								'format'   => 'inline',
-								'class'    => '',
-								'id'       => 'address[preferred]',
-								'options'  => array( $token => __( 'Preferred', 'connections' ) ),
-								'required' => FALSE,
-								'before'   => '<span class="preferred">',
-								'after'    => '</span></span>',
-								'return'   => FALSE,
-							),
-							$preferred
-						);
-
-						// Only show this if there are visibility options that the user is permitted to see.
-						if ( ! empty( self::$visibility ) ) {
-
-							cnHTML::field(
-								array(
-									'type'     => 'radio',
-									'format'   => 'inline',
-									'class'    => '',
-									'id'       => 'address[' . $token . '][visibility]',
-									'options'  => self::$visibility,
-									'required' => FALSE,
-									'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
-									'after'    => '</span>',
-									'return'   => FALSE,
-								),
-								$address->visibility
-							);
-						}
-
-						echo '</h4></div>'  , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
-
-					echo '<div class="widget-inside">' , PHP_EOL;
-
-						echo '<div class="address-local">' , PHP_EOL;
-
-							cnHTML::field(
-								array(
-									'type'     => 'text',
-									'class'    => '',
-									'id'       => 'address[' . $token . '][line_1]',
-									'required' => FALSE,
-									'label'    => __( 'Address Line 1', 'connections' ),
-									'before'   => '<div class="address-line">',
-									'after'    => '</div>',
-									'return'   => FALSE,
-								),
-								$address->line_1
-							);
-
-							cnHTML::field(
-								array(
-									'type'     => 'text',
-									'class'    => '',
-									'id'       => 'address[' . $token . '][line_2]',
-									'required' => FALSE,
-									'label'    => __( 'Address Line 2', 'connections' ),
-									'before'   => '<div class="address-line">',
-									'after'    => '</div>',
-									'return'   => FALSE,
-								),
-								$address->line_2
-							);
-
-							cnHTML::field(
-								array(
-									'type'     => 'text',
-									'class'    => '',
-									'id'       => 'address[' . $token . '][line_3]',
-									'required' => FALSE,
-									'label'    => __( 'Address Line 3', 'connections' ),
-									'before'   => '<div class="address-line">',
-									'after'    => '</div>',
-									'return'   => FALSE,
-								),
-								$address->line_3
-							);
-
-						echo '</div>' , PHP_EOL;
-
-						echo '<div class="address-region">' , PHP_EOL;
-
-							cnHTML::field(
-								array(
-									'type'     => 'text',
-									'class'    => '',
-									'id'       => 'address[' . $token . '][city]',
-									'required' => FALSE,
-									'label'    => __( 'City', 'connections' ),
-									'before'   => '<div class="address-city">',
-									'after'    => '</div>',
-									'return'   => FALSE,
-								),
-								$address->city
-							);
-
-							cnHTML::field(
-								array(
-									'type'     => 'text',
-									'class'    => '',
-									'id'       => 'address[' . $token . '][state]',
-									'required' => FALSE,
-									'label'    => __( 'State', 'connections' ),
-									'before'   => '<div class="address-state">',
-									'after'    => '</div>',
-									'return'   => FALSE,
-								),
-								$address->state
-							);
-
-							cnHTML::field(
-								array(
-									'type'     => 'text',
-									'class'    => '',
-									'id'       => 'address[' . $token . '][zipcode]',
-									'required' => FALSE,
-									'label'    => __( 'Zipcode', 'connections' ),
-									'before'   => '<div class="address-zipcode">',
-									'after'    => '</div>',
-									'return'   => FALSE,
-								),
-								$address->zipcode
-							);
-
-						echo  '</div>' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'text',
-								'class'    => '',
-								'id'       => 'address[' . $token . '][country]',
-								'required' => FALSE,
-								'label'    => __( 'Country', 'connections' ),
-								'before'   => '<div class="address-country">',
-								'after'    => '</div>',
-								'return'   => FALSE,
-							),
-							$address->country
-						);
-
-						echo '<div class="address-geo">' , PHP_EOL;
-
-							cnHTML::field(
-								array(
-									'type'     => 'text',
-									'class'    => '',
-									'id'       => 'address[' . $token . '][latitude]',
-									'required' => FALSE,
-									'label'    => __( 'Latitude', 'connections' ),
-									'before'   => '<div class="address-latitude">',
-									'after'    => '</div>',
-									'return'   => FALSE,
-								),
-								$address->latitude
-							);
-
-							cnHTML::field(
-								array(
-									'type'     => 'text',
-									'class'    => '',
-									'id'       => 'address[' . $token . '][longitude]',
-									'required' => FALSE,
-									'label'    => __( 'Longitude', 'connections' ),
-									'before'   => '<div class="address-longitude">',
-									'after'    => '</div>',
-									'return'   => FALSE,
-								),
-								$address->longitude
-							);
-
-						echo '</div>' , PHP_EOL;
-
-						if ( is_admin() ) {
-
-							echo '<a class="geocode button" data-uid="' , $token , '" href="#">' , __( 'Geocode', 'connections' ) , '</a>';
-						}
-
-						echo '<div class="clear"></div>' , PHP_EOL;
-
-						if ( is_admin() ) {
-
-							echo '<div class="map" id="map-', $token, '" data-map-id="', $token, '" style="display: none; height: 400px;">', __( 'Geocoding Address.', 'connections' ), '</div>', PHP_EOL;
-						}
-
-						echo '<input type="hidden" name="address[' , $token , '][id]" value="' , $address->id , '">' , PHP_EOL;
-
-						echo '<br>';
-						echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="address" data-token="' . $token . '">' , __( 'Remove', 'connections' ) , '</a></p>' , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
+				self::addressField( $address, $token );
 
 				echo '</div>' , PHP_EOL;
 			}
 		}
-
-		// foreach ( (array) $atts['type'] as $entryType ) {
-
-		// 	if ( array_key_exists( $entryType, $atts ) ) {
-
-		// 		if ( isset( $atts[ $entryType ]['callback'] ) ) {
-
-		// 			call_user_func( $atts[ $entryType ]['callback'], $entry, $atts[ $entryType ]['meta'] );
-		// 			continue;
-		// 		}
-
-		// 		$selectName = 'address['  . $token . '][type]';
-
-		// 		echo '<div class="widget address" id="address-row-'  . $token . '">' , PHP_EOL;
-
-		// 			echo '<div class="widget-top">' , PHP_EOL;
-
-		// 				echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-		// 				echo '<div class="widget-title"><h4>' , PHP_EOL;
-
-		// 					if ( isset( $atts[ $entryType ]['type'] ) ) {
-
-		// 						cnHTML::field(
-		// 							array(
-		// 								'type'     => 'select',
-		// 								'class'    => '',
-		// 								'id'       => $selectName,
-		// 								'options'  => $addressTypes,
-		// 								'required' => FALSE,
-		// 								'label'    => __( 'Address Type', 'connections' ),
-		// 								'return'   => FALSE,
-		// 							),
-		// 							$address->type
-		// 						);
-		// 					}
-
-		// 					if ( isset( $atts[ $entryType ]['preferred'] ) ) {
-
-		// 						cnHTML::field(
-		// 							array(
-		// 								'type'     => 'radio',
-		// 								'format'   => 'inline',
-		// 								'class'    => '',
-		// 								'id'       => 'address[preferred]',
-		// 								'options'  => array( $token => __( 'Preferred', 'connections' ) ),
-		// 								'required' => FALSE,
-		// 								'before'   => '<span class="preferred">',
-		// 								'after'    => '</span>',
-		// 								'return'   => FALSE,
-		// 							),
-		// 							$preferred
-		// 						);
-		// 					}
-
-		// 					if ( isset( $atts[ $entryType ]['visibility'] ) ) {
-
-		// 						cnHTML::field(
-		// 							array(
-		// 								'type'     => 'radio',
-		// 								'format'   => 'inline',
-		// 								'class'    => '',
-		// 								'id'       => 'address[' . $token . '][visibility]',
-		// 								'options'  => $visibiltyOptions,
-		// 								'required' => FALSE,
-		// 								'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
-		// 								'after'    => '</span>',
-		// 								'return'   => FALSE,
-		// 							),
-		// 							'public'
-		// 						);
-		// 					}
-
-		// 				echo '</h4></div>'  , PHP_EOL; // END .widget-title
-
-		// 			echo '</div>' , PHP_EOL; // END .widget-top
-
-		// 			echo '<div class="widget-inside">';
-
-		// 				/*
-		// 				 * Dump the output in a var that way it can mre more easily broke up and filters added later.
-		// 				 */
-		// 				$out = '';
-
-		// 				foreach ( $atts[ $entryType ]['meta'] as $type => $meta ) {
-
-		// 					if ( in_array( $type, $groupIDs ) ) {
-
-		// 						continue;
-
-		// 					} else {
-
-		// 						$groupIDs[] = $type;
-		// 					}
-
-		// 					$out .= '<div class="cn-metabox" id="cn-metabox-section-' . $type . '">' . PHP_EOL;
-
-		// 					if ( $meta['show'] == TRUE ) {
-
-		// 						foreach( $meta['field'] as $field ) {
-
-		// 							if ( in_array( $field['id'], $fieldIDs ) ) {
-
-		// 								continue;
-
-		// 							} else {
-
-		// 								$fieldIDs[] = $field['id'];
-		// 							}
-
-		// 							if ( $field['show'] ) {
-
-		// 								$defaults = array(
-		// 									'type'     => '',
-		// 									'class'    => array(),
-		// 									'id'       => '',
-		// 									'style'    => array(),
-		// 									'options'  => array(),
-		// 									'value'    => '',
-		// 									'required' => FALSE,
-		// 									'label'    => '',
-		// 									'before'   => '',
-		// 									'after'    => '',
-		// 									'return'   => TRUE,
-		// 									);
-
-		// 								$field = wp_parse_args( $field, $defaults );
-
-		// 								$out .= cnHTML::field(
-		// 									array(
-		// 										'type'     => $field['type'],
-		// 										'class'    => $field['class'],
-		// 										'id'       => $field['id'],
-		// 										'style'    => $field['style'],
-		// 										'options'  => $field['options'],
-		// 										'required' => $field['required'],
-		// 										'label'    => $field['label'],
-		// 										'before'   => $field['before'],
-		// 										'after'    => $field['after'],
-		// 										'return'   => TRUE,
-		// 									),
-		// 									$field['value']
-		// 								);
-		// 							}
-		// 						}
-		// 					}
-
-		// 					$out .= '</div>' . PHP_EOL;
-		// 				}
-
-		// 				echo $out;
-
-		// 			echo '</div>' , PHP_EOL; // END .widget-inside
-
-		// 		echo '</div>' , PHP_EOL; // END .widget
-		// 	}
-		// }
 
 		echo  '</div>' , PHP_EOL;
 
@@ -1740,15 +990,323 @@ class cnEntryMetabox {
 	}
 
 	/**
+	 * Renders the address field.
+	 *
+	 * @access private
+	 * @since  8.5.13
+	 *
+	 * @param stdClass $address
+	 * @param string   $token
+	 */
+	private static function addressField( $address, $token = '::FIELD::' ) {
+
+		// Grab an instance of the Connections object.
+		$instance = Connections_Directory();
+
+		// Grab the address types.
+		$addressTypes = $instance->options->getDefaultAddressValues();
+
+		?>
+
+		<div class="widget-top">
+			<div class="widget-title-action"><a class="widget-action"></a></div>
+
+			<div class="widget-title">
+				<h4>
+
+					<?php
+
+					cnHTML::field(
+						array(
+							'type'     => 'select',
+							'class'    => '',
+							'id'       => 'address[' . $token . '][type]',
+							'options'  => $addressTypes,
+							'required' => FALSE,
+							'before'   => '<span class="address-type">',
+							'label'    => __( 'Address Type', 'connections' ),
+							'return'   => FALSE,
+						),
+						isset( $address->type ) ? $address->type : ''
+					);
+
+					cnHTML::field(
+						array(
+							'type'     => 'radio',
+							'format'   => 'inline',
+							'class'    => '',
+							'id'       => 'address[preferred]',
+							'options'  => array( $token => __( 'Preferred', 'connections' ) ),
+							'required' => FALSE,
+							'before'   => '<span class="preferred">',
+							'after'    => '</span></span>',
+							'return'   => FALSE,
+						),
+						isset( $address->preferred ) && $address->preferred ? $token : ''
+					);
+
+					// Only show this if there are visibility options that the user is permitted to see.
+					if ( ! empty( self::$visibility ) ) {
+
+						cnHTML::field(
+							array(
+								'type'     => 'radio',
+								'format'   => 'inline',
+								'class'    => '',
+								'id'       => 'address[' . $token . '][visibility]',
+								'options'  => self::$visibility,
+								'required' => FALSE,
+								'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
+								'after'    => '</span>',
+								'return'   => FALSE,
+							),
+							isset( $address->visibility ) ? $address->visibility : 'public'
+						);
+					}
+
+					?>
+
+				</h4>
+			</div>
+
+		</div>
+
+		<div class="widget-inside">
+
+			<div class="address-local">
+
+				<?php
+
+				cnHTML::field(
+					array(
+						'type'     => 'text',
+						'class'    => '',
+						'id'       => 'address[' . $token . '][line_1]',
+						'required' => FALSE,
+						'label'    => __( 'Address Line 1', 'connections' ),
+						'before'   => '<div class="address-line">',
+						'after'    => '</div>',
+						'return'   => FALSE,
+					),
+					isset( $address->line_1 ) ? $address->line_1 : ''
+				);
+
+				cnHTML::field(
+					array(
+						'type'     => 'text',
+						'class'    => '',
+						'id'       => 'address[' . $token . '][line_2]',
+						'required' => FALSE,
+						'label'    => __( 'Address Line 2', 'connections' ),
+						'before'   => '<div class="address-line">',
+						'after'    => '</div>',
+						'return'   => FALSE,
+					),
+					isset( $address->line_2 ) ? $address->line_2 : ''
+				);
+
+				cnHTML::field(
+					array(
+						'type'     => 'text',
+						'class'    => '',
+						'id'       => 'address[' . $token . '][line_3]',
+						'required' => FALSE,
+						'label'    => __( 'Address Line 3', 'connections' ),
+						'before'   => '<div class="address-line">',
+						'after'    => '</div>',
+						'return'   => FALSE,
+					),
+					isset( $address->line_3 ) ? $address->line_3 : ''
+				);
+
+				?>
+
+			</div>
+
+			<div class="address-region">
+
+				<?php
+
+				cnHTML::field(
+					array(
+						'type'     => 'text',
+						'class'    => '',
+						'id'       => 'address[' . $token . '][city]',
+						'required' => FALSE,
+						'label'    => __( 'City', 'connections' ),
+						'before'   => '<div class="address-city">',
+						'after'    => '</div>',
+						'return'   => FALSE,
+					),
+					isset( $address->city ) ? $address->city : ''
+				);
+
+				cnHTML::field(
+					array(
+						'type'     => 'text',
+						'class'    => '',
+						'id'       => 'address[' . $token . '][state]',
+						'required' => FALSE,
+						'label'    => __( 'State', 'connections' ),
+						'before'   => '<div class="address-state">',
+						'after'    => '</div>',
+						'return'   => FALSE,
+					),
+					isset( $address->state ) ? $address->state : ''
+				);
+
+				cnHTML::field(
+					array(
+						'type'     => 'text',
+						'class'    => '',
+						'id'       => 'address[' . $token . '][zipcode]',
+						'required' => FALSE,
+						'label'    => __( 'Zipcode', 'connections' ),
+						'before'   => '<div class="address-zipcode">',
+						'after'    => '</div>',
+						'return'   => FALSE,
+					),
+					isset( $address->zipcode ) ? $address->zipcode : ''
+				);
+
+				?>
+
+			</div>
+
+			<?php
+
+			cnHTML::field(
+				array(
+					'type'     => 'text',
+					'class'    => '',
+					'id'       => 'address[' . $token . '][country]',
+					'required' => FALSE,
+					'label'    => __( 'Country', 'connections' ),
+					'before'   => '<div class="address-country">',
+					'after'    => '</div>',
+					'return'   => FALSE,
+				),
+				isset( $address->country ) ? $address->country : ''
+			);
+
+			?>
+
+			<div class="address-geo">
+
+				<?php
+
+				cnHTML::field(
+					array(
+						'type'     => 'text',
+						'class'    => '',
+						'id'       => 'address[' . $token . '][latitude]',
+						'required' => FALSE,
+						'label'    => __( 'Latitude', 'connections' ),
+						'before'   => '<div class="address-latitude">',
+						'after'    => '</div>',
+						'return'   => FALSE,
+					),
+					isset( $address->latitude ) ? $address->latitude : ''
+				);
+
+				cnHTML::field(
+					array(
+						'type'     => 'text',
+						'class'    => '',
+						'id'       => 'address[' . $token . '][longitude]',
+						'required' => FALSE,
+						'label'    => __( 'Longitude', 'connections' ),
+						'before'   => '<div class="address-longitude">',
+						'after'    => '</div>',
+						'return'   => FALSE,
+					),
+					isset( $address->longitude ) ? $address->longitude : ''
+				);
+
+				?>
+
+				<?php if ( is_admin() ) : ?>
+					<div class="geocode-button-container">
+						<a class="geocode button" data-uid="<?php echo $token; ?>" href="#"><?php esc_html_e( 'Geocode', 'connections' ); ?></a>
+					</div>
+				<?php endif; ?>
+
+			</div>
+
+			<div class="clear"></div>
+
+			<?php if ( is_admin() ) : ?>
+				<div class="map" id="map-<?php echo $token; ?>" data-map-id="<?php echo $token; ?>" style="display: none; height: 400px;"><?php esc_html_e( 'Geocoding Address.', 'connections' ); ?></div>
+			<?php endif; ?>
+
+			<?php if ( isset( $address->id ) ) : ?>
+			<input type="hidden" name="address[<?php echo $token; ?>][id]" value="<?php echo $address->id; ?>">
+			<?php endif; ?>
+
+			<p class="cn-remove-button">
+				<a href="#" class="cn-remove cn-button button cn-button-warning"
+				   data-type="address"
+				   data-token="<?php echo $token; ?>"><?php esc_html_e( 'Remove', 'connections' ); ?></a>
+			</p>
+
+		</div>
+		<?php
+	}
+
+	/**
 	 * Renders the phone metabox.
 	 *
 	 * @access public
 	 * @since  0.8
-	 * @param  object $entry   An instance of the cnEntry object.
-	 * @param  array  $metabox The metabox options array from self::register().
-	 * @return string          The phone metabox.
+	 *
+	 * @param  cnEntry $entry   An instance of the cnEntry object.
+	 * @param  array   $metabox The metabox options array from self::register().
+	 *
+	 * @return string The phone metabox.
 	 */
 	public static function phone( $entry, $metabox ) {
+
+		echo '<div class="widgets-sortables ui-sortable" id="phone-numbers">' , PHP_EOL;
+
+		// --> Start template <-- \\
+		echo '<textarea id="phone-template" style="display: none;">' , PHP_EOL;
+
+			self::phoneField( new stdClass() );
+
+		echo '</textarea>' , PHP_EOL;
+		// --> End template <-- \\
+
+		$phoneNumbers = $entry->getPhoneNumbers( array(), FALSE );
+
+		if ( ! empty( $phoneNumbers ) ) {
+
+			foreach ( $phoneNumbers as $phone ) {
+
+				$token = str_replace( '-', '', cnUtility::getUUID() );
+
+				echo '<div class="widget phone" id="phone-row-' . $token . '">' , PHP_EOL;
+
+					self::phoneField( $phone, $token );
+
+				echo '</div>' , PHP_EOL;
+			}
+		}
+
+		echo '</div>' , PHP_EOL;
+
+		echo '<p class="add"><a href="#" class="cn-add cn-button button" data-type="phone" data-container="phone-numbers">' , __( 'Add Phone Number', 'connections' ) , '</a></p>' , PHP_EOL;
+	}
+
+	/**
+	 * Renders the phone field.
+	 *
+	 * @access private
+	 * @since  8.5.11
+	 *
+	 * @param stdClass $phone
+	 * @param string   $token
+	 */
+	private static function phoneField( $phone, $token = '::FIELD::' ) {
 
 		// Grab an instance of the Connections object.
 		$instance = Connections_Directory();
@@ -1756,27 +1314,27 @@ class cnEntryMetabox {
 		// Grab the phone types.
 		$phoneTypes = $instance->options->getDefaultPhoneNumberValues();
 
-		echo '<div class="widgets-sortables ui-sortable" id="phone-numbers">' , PHP_EOL;
+		?>
 
-		// --> Start template <-- \\
-		echo '<textarea id="phone-template" style="display: none;">' , PHP_EOL;
+		<div class="widget-top">
+			<div class="widget-title-action"><a class="widget-action"></a></div>
 
-			echo '<div class="widget-top">' , PHP_EOL;
+			<div class="widget-title">
+				<h4>
 
-				echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-				echo '<div class="widget-title"><h4>' , PHP_EOL;
+					<?php
 
 					cnHTML::field(
 						array(
 							'type'     => 'select',
 							'class'    => '',
-							'id'       => 'phone[::FIELD::][type]',
+							'id'       => 'phone[' . $token . '][type]',
 							'options'  => $phoneTypes,
 							'required' => FALSE,
 							'label'    => __( 'Phone Type', 'connections' ),
 							'return'   => FALSE,
-						)
+						),
+						isset( $phone->type ) ? $phone->type : ''
 					);
 
 					cnHTML::field(
@@ -1785,12 +1343,13 @@ class cnEntryMetabox {
 							'format'   => 'inline',
 							'class'    => '',
 							'id'       => 'phone[preferred]',
-							'options'  => array( '::FIELD::' => __( 'Preferred', 'connections' ) ),
+							'options'  => array( $token => __( 'Preferred', 'connections' ) ),
 							'required' => FALSE,
 							'before'   => '<span class="preferred">',
 							'after'    => '</span>',
 							'return'   => FALSE,
-						)
+						),
+						isset( $phone->preferred ) && $phone->preferred ? $token : ''
 					);
 
 					// Only show this if there are visibility options that the user is permitted to see.
@@ -1801,142 +1360,66 @@ class cnEntryMetabox {
 								'type'     => 'radio',
 								'format'   => 'inline',
 								'class'    => '',
-								'id'       => 'phone[::FIELD::][visibility]',
+								'id'       => 'phone[' . $token . '][visibility]',
 								'options'  => self::$visibility,
 								'required' => FALSE,
 								'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
 								'after'    => '</span>',
 								'return'   => FALSE,
 							),
-							'public'
+							isset( $phone->visibility ) ? $phone->visibility : 'public'
 						);
 					}
 
-				echo '</h4></div>'  , PHP_EOL;
+					?>
 
-			echo '</div>' , PHP_EOL;
+				</h4>
+			</div>
 
-			echo '<div class="widget-inside">';
+		</div>
+
+		<div class="widget-inside">
+
+			<div class="phone-number-container">
+
+				<?php
 
 				cnHTML::field(
 					array(
 						'type'     => 'text',
 						'class'    => '',
-						'id'       => 'phone[::FIELD::][number]',
+						'id'       => 'phone[' . $token . '][number]',
 						'required' => FALSE,
 						'label'    => __( 'Phone Number', 'connections' ),
 						'before'   => '',
 						'after'    => '',
 						'return'   => FALSE,
-					)
+					),
+					isset( $phone->number ) ? $phone->number : ''
 				);
 
-				echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="phone" data-token="::FIELD::">' , __( 'Remove', 'connections' ) , '</a></p>';
+				?>
 
-			echo '</div>' , PHP_EOL;
+			</div>
 
-		echo '</textarea>' , PHP_EOL;
-		// --> End template <-- \\
+			<?php
 
-		$phoneNumbers = $entry->getPhoneNumbers( array(), FALSE );
-		//print_r($phoneNumbers);
+			if ( isset( $phone->id ) ) {
 
-		if ( ! empty( $phoneNumbers ) ) {
-
-			foreach ( $phoneNumbers as $phone ) {
-
-				$token = str_replace( '-', '', cnUtility::getUUID() );
-
-				$selectName = 'phone['  . $token . '][type]';
-				$preferred  = $phone->preferred ? $token : '';
-
-				echo '<div class="widget phone" id="phone-row-'  . $token . '">' , PHP_EOL;
-
-					echo '<div class="widget-top">' , PHP_EOL;
-						echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-						echo '<div class="widget-title"><h4>' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'select',
-								'class'    => '',
-								'id'       => 'phone[' . $token . '][type]',
-								'options'  => $phoneTypes,
-								'required' => FALSE,
-								'label'    => __( 'Phone Type', 'connections' ),
-								'return'   => FALSE,
-							),
-							$phone->type
-						);
-
-						cnHTML::field(
-							array(
-								'type'     => 'radio',
-								'format'   => 'inline',
-								'class'    => '',
-								'id'       => 'phone[preferred]',
-								'options'  => array( $token => __( 'Preferred', 'connections' ) ),
-								'required' => FALSE,
-								'before'   => '<span class="preferred">',
-								'after'    => '</span>',
-								'return'   => FALSE,
-							),
-							$preferred
-						);
-
-						// Only show this if there are visibility options that the user is permitted to see.
-						if ( ! empty( self::$visibility ) ) {
-
-							cnHTML::field(
-								array(
-									'type'     => 'radio',
-									'format'   => 'inline',
-									'class'    => '',
-									'id'       => 'phone[' . $token . '][visibility]',
-									'options'  => self::$visibility,
-									'required' => FALSE,
-									'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
-									'after'    => '</span>',
-									'return'   => FALSE,
-								),
-								$phone->visibility
-							);
-						}
-
-						echo '</h4></div>'  , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
-
-					echo '<div class="widget-inside">' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'text',
-								'class'    => '',
-								'id'       => 'phone[' . $token . '][number]',
-								'required' => FALSE,
-								'label'    => __( 'Phone Number', 'connections' ),
-								'before'   => '',
-								'after'    => '',
-								'return'   => FALSE,
-							),
-							$phone->number
-						);
-
-						echo '<input type="hidden" name="phone[' , $token , '][id]" value="' , $phone->id , '">' , PHP_EOL;
-
-						echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="phone" data-token="' . $token . '">' , __( 'Remove', 'connections' ) , '</a></p>' , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
-
-				echo '</div>' , PHP_EOL;
+				echo '<input type="hidden" name="phone[', $token, '][id]" value="', $phone->id, '">', PHP_EOL;
 			}
-		}
 
-		echo  '</div>' , PHP_EOL;
+			?>
 
-		echo  '<p class="add"><a href="#" class="cn-add cn-button button" data-type="phone" data-container="phone-numbers">' , __( 'Add Phone Number', 'connections' ) , '</a></p>' , PHP_EOL;
+			<p class="cn-remove-button">
+				<a href="#" class="cn-remove cn-button button cn-button-warning"
+				   data-type="phone"
+				   data-token="<?php echo $token; ?>"><?php esc_html_e( 'Remove', 'connections' ); ?></a>
+			</p>
+
+		</div>
+
+		<?php
 	}
 
 	/**
@@ -1944,96 +1427,20 @@ class cnEntryMetabox {
 	 *
 	 * @access public
 	 * @since  0.8
-	 * @param  object $entry   An instance of the cnEntry object.
-	 * @param  array  $metabox The metabox options array from self::register().
-	 * @return string          The email metabox.
+	 *
+	 * @param  cnEntry $entry   An instance of the cnEntry object.
+	 * @param  array   $metabox The metabox options array from self::register().
+	 *
+	 * @return string The email metabox.
 	 */
 	public static function email( $entry, $metabox ) {
-
-		// Grab an instance of the Connections object.
-		$instance = Connections_Directory();
-
-		// Grab the email types.
-		$emailTypes = $instance->options->getDefaultEmailValues();
 
 		echo '<div class="widgets-sortables ui-sortable" id="email-addresses">' , PHP_EOL;
 
 		// --> Start template <-- \\
 		echo '<textarea id="email-template" style="display: none;">' , PHP_EOL;
 
-			echo '<div class="widget-top">' , PHP_EOL;
-
-				echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-				echo '<div class="widget-title"><h4>' , PHP_EOL;
-
-					cnHTML::field(
-						array(
-							'type'     => 'select',
-							'class'    => '',
-							'id'       => 'email[::FIELD::][type]',
-							'options'  => $emailTypes,
-							'required' => FALSE,
-							'label'    => __( 'Email Type', 'connections' ),
-							'return'   => FALSE,
-						)
-					);
-
-					cnHTML::field(
-						array(
-							'type'     => 'radio',
-							'format'   => 'inline',
-							'class'    => '',
-							'id'       => 'email[preferred]',
-							'options'  => array( '::FIELD::' => __( 'Preferred', 'connections' ) ),
-							'required' => FALSE,
-							'before'   => '<span class="preferred">',
-							'after'    => '</span>',
-							'return'   => FALSE,
-						)
-					);
-
-					// Only show this if there are visibility options that the user is permitted to see.
-					if ( ! empty( self::$visibility ) ) {
-
-						cnHTML::field(
-							array(
-								'type'     => 'radio',
-								'format'   => 'inline',
-								'class'    => '',
-								'id'       => 'email[::FIELD::][visibility]',
-								'options'  => self::$visibility,
-								'required' => FALSE,
-								'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
-								'after'    => '</span>',
-								'return'   => FALSE,
-							),
-							'public'
-						);
-					}
-
-				echo '</h4></div>'  , PHP_EOL;
-
-			echo '</div>' , PHP_EOL;
-
-			echo '<div class="widget-inside">';
-
-				cnHTML::field(
-					array(
-						'type'     => 'text',
-						'class'    => '',
-						'id'       => 'email[::FIELD::][address]',
-						'required' => FALSE,
-						'label'    => __( 'Email Address', 'connections' ),
-						'before'   => '',
-						'after'    => '',
-						'return'   => FALSE,
-					)
-				);
-
-				echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="email" data-token="::FIELD::">' , __( 'Remove', 'connections' ) , '</a></p>';
-
-			echo '</div>' , PHP_EOL;
+			self::emailField( new stdClass() );
 
 		echo '</textarea>' , PHP_EOL;
 		// --> End template <-- \\
@@ -2047,88 +1454,9 @@ class cnEntryMetabox {
 
 				$token = str_replace( '-', '', cnUtility::getUUID() );
 
-				$selectName = 'email['  . $token . '][type]';
-				$preferred  = $email->preferred ? $token : '';
+				echo '<div class="widget email" id="email-row-' . $token . '">' , PHP_EOL;
 
-				echo '<div class="widget email" id="email-row-'  . $token . '">' , PHP_EOL;
-
-					echo '<div class="widget-top">' , PHP_EOL;
-						echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-						echo '<div class="widget-title"><h4>' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'select',
-								'class'    => '',
-								'id'       => 'email[' . $token . '][type]',
-								'options'  => $emailTypes,
-								'required' => FALSE,
-								'label'    => __( 'Email Type', 'connections' ),
-								'return'   => FALSE,
-							),
-							$email->type
-						);
-
-						cnHTML::field(
-							array(
-								'type'     => 'radio',
-								'format'   => 'inline',
-								'class'    => '',
-								'id'       => 'email[preferred]',
-								'options'  => array( $token => __( 'Preferred', 'connections' ) ),
-								'required' => FALSE,
-								'before'   => '<span class="preferred">',
-								'after'    => '</span>',
-								'return'   => FALSE,
-							),
-							$preferred
-						);
-
-						// Only show this if there are visibility options that the user is permitted to see.
-						if ( ! empty( self::$visibility ) ) {
-
-							cnHTML::field(
-								array(
-									'type'     => 'radio',
-									'format'   => 'inline',
-									'class'    => '',
-									'id'       => 'email[' . $token . '][visibility]',
-									'options'  => self::$visibility,
-									'required' => FALSE,
-									'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
-									'after'    => '</span>',
-									'return'   => FALSE,
-								),
-								$email->visibility
-							);
-						}
-
-						echo '</h4></div>'  , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
-
-					echo '<div class="widget-inside">' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'text',
-								'class'    => '',
-								'id'       => 'email[' . $token . '][address]',
-								'required' => FALSE,
-								'label'    => __( 'Email Address', 'connections' ),
-								'before'   => '',
-								'after'    => '',
-								'return'   => FALSE,
-							),
-							$email->address
-						);
-
-						echo '<input type="hidden" name="email[' , $token , '][id]" value="' , $email->id , '">' , PHP_EOL;
-
-						echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="email" data-token="' . $token . '">' , __( 'Remove', 'connections' ) , '</a></p>' , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
+					self::emailField( $email, $token );
 
 				echo '</div>' , PHP_EOL;
 			}
@@ -2140,43 +1468,43 @@ class cnEntryMetabox {
 	}
 
 	/**
-	 * Renders the instant messenger metabox.
+	 * Renders the email field.
 	 *
-	 * @access public
-	 * @since  0.8
-	 * @param  object $entry   An instance of the cnEntry object.
-	 * @param  array  $metabox The metabox options array from self::register().
-	 * @return string          The instant messenger metabox.
+	 * @access private
+	 * @since  8.5.11
+	 *
+	 * @param stdClass $email
+	 * @param string   $token
 	 */
-	public static function messenger( $entry, $metabox ) {
+	private static function emailField( $email, $token = '::FIELD::' ) {
 
 		// Grab an instance of the Connections object.
 		$instance = Connections_Directory();
 
 		// Grab the email types.
-		$messengerTypes = $instance->options->getDefaultIMValues();
+		$emailTypes = $instance->options->getDefaultEmailValues();
 
-		echo '<div class="widgets-sortables ui-sortable" id="im-ids">' , PHP_EOL;
+		?>
 
-		// --> Start template <-- \\
-		echo '<textarea id="im-template" style="display: none;">' , PHP_EOL;
+		<div class="widget-top">
+			<div class="widget-title-action"><a class="widget-action"></a></div>
 
-			echo '<div class="widget-top">' , PHP_EOL;
+			<div class="widget-title">
+				<h4>
 
-				echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-				echo '<div class="widget-title"><h4>' , PHP_EOL;
+					<?php
 
 					cnHTML::field(
 						array(
 							'type'     => 'select',
 							'class'    => '',
-							'id'       => 'im[::FIELD::][type]',
-							'options'  => $messengerTypes,
+							'id'       => 'email[' . $token . '][type]',
+							'options'  => $emailTypes,
 							'required' => FALSE,
-							'label'    => __( 'IM Type', 'connections' ),
+							'label'    => __( 'Email Type', 'connections' ),
 							'return'   => FALSE,
-						)
+						),
+						isset( $email->type ) ? $email->type : ''
 					);
 
 					cnHTML::field(
@@ -2184,13 +1512,14 @@ class cnEntryMetabox {
 							'type'     => 'radio',
 							'format'   => 'inline',
 							'class'    => '',
-							'id'       => 'im[preferred]',
-							'options'  => array( '::FIELD::' => __( 'Preferred', 'connections' ) ),
+							'id'       => 'email[preferred]',
+							'options'  => array( $token => __( 'Preferred', 'connections' ) ),
 							'required' => FALSE,
 							'before'   => '<span class="preferred">',
 							'after'    => '</span>',
 							'return'   => FALSE,
-						)
+						),
+						isset( $email->preferred ) && $email->preferred ? $token : ''
 					);
 
 					// Only show this if there are visibility options that the user is permitted to see.
@@ -2201,39 +1530,87 @@ class cnEntryMetabox {
 								'type'     => 'radio',
 								'format'   => 'inline',
 								'class'    => '',
-								'id'       => 'im[::FIELD::][visibility]',
+								'id'       => 'email[' . $token . '][visibility]',
 								'options'  => self::$visibility,
 								'required' => FALSE,
 								'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
 								'after'    => '</span>',
 								'return'   => FALSE,
 							),
-							'public'
+							isset( $email->visibility ) ? $email->visibility : 'public'
 						);
 					}
 
-				echo '</h4></div>'  , PHP_EOL;
+					?>
 
-			echo '</div>' , PHP_EOL;
+				</h4>
+			</div>
 
-			echo '<div class="widget-inside">';
+		</div>
+
+		<div class="widget-inside">
+
+			<div class="email-address-container">
+
+				<?php
 
 				cnHTML::field(
 					array(
 						'type'     => 'text',
 						'class'    => '',
-						'id'       => 'im[::FIELD::][id]',
+						'id'       => 'email[' . $token . '][address]',
 						'required' => FALSE,
-						'label'    => __( 'IM Network ID', 'connections' ),
+						'label'    => __( 'Email Address', 'connections' ),
 						'before'   => '',
 						'after'    => '',
 						'return'   => FALSE,
-					)
+					),
+					isset( $email->address ) ? $email->address : ''
 				);
 
-				echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="im" data-token="::FIELD::">' , __( 'Remove', 'connections' ) , '</a></p>';
+				?>
 
-			echo '</div>' , PHP_EOL;
+			</div>
+
+			<?php
+
+			if ( isset( $email->id ) ) {
+
+				echo '<input type="hidden" name="email[' , $token , '][id]" value="' , $email->id , '">' , PHP_EOL;
+			}
+
+			?>
+
+			<p class="cn-remove-button">
+				<a href="#" class="cn-remove cn-button button cn-button-warning"
+				   data-type="email"
+				   data-token="<?php echo $token; ?>"><?php esc_html_e( 'Remove', 'connections' ); ?></a>
+			</p>
+
+		</div>
+
+		<?php
+	}
+
+	/**
+	 * Renders the instant messenger metabox.
+	 *
+	 * @access public
+	 * @since  0.8
+	 *
+	 * @param  cnEntry $entry   An instance of the cnEntry object.
+	 * @param  array   $metabox The metabox options array from self::register().
+	 *
+	 * @return string The instant messenger metabox.
+	 */
+	public static function messenger( $entry, $metabox ) {
+
+		echo '<div class="widgets-sortables ui-sortable" id="im-ids">' , PHP_EOL;
+
+		// --> Start template <-- \\
+		echo '<textarea id="im-template" style="display: none;">' , PHP_EOL;
+
+			self::messengerField( new stdClass() );
 
 		echo '</textarea>' , PHP_EOL;
 		// --> End template <-- \\
@@ -2247,88 +1624,9 @@ class cnEntryMetabox {
 
 				$token = str_replace( '-', '', cnUtility::getUUID() );
 
-				$selectName = 'im['  . $token . '][type]';
-				$preferred  = $network->preferred ? $token : '';
-
 				echo '<div class="widget im" id="im-row-'  . $token . '">' , PHP_EOL;
 
-					echo '<div class="widget-top">' , PHP_EOL;
-						echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-						echo '<div class="widget-title"><h4>' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'select',
-								'class'    => '',
-								'id'       => 'im[' . $token . '][type]',
-								'options'  => $messengerTypes,
-								'required' => FALSE,
-								'label'    => __( 'IM Type', 'connections' ),
-								'return'   => FALSE,
-							),
-							$network->type
-						);
-
-						cnHTML::field(
-							array(
-								'type'     => 'radio',
-								'format'   => 'inline',
-								'class'    => '',
-								'id'       => 'im[preferred]',
-								'options'  => array( $token => __( 'Preferred', 'connections' ) ),
-								'required' => FALSE,
-								'before'   => '<span class="preferred">',
-								'after'    => '</span>',
-								'return'   => FALSE,
-							),
-							$preferred
-						);
-
-						// Only show this if there are visibility options that the user is permitted to see.
-						if ( ! empty( self::$visibility ) ) {
-
-							cnHTML::field(
-								array(
-									'type'     => 'radio',
-									'format'   => 'inline',
-									'class'    => '',
-									'id'       => 'im[' . $token . '][visibility]',
-									'options'  => self::$visibility,
-									'required' => FALSE,
-									'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
-									'after'    => '</span>',
-									'return'   => FALSE,
-								),
-								$network->visibility
-							);
-						}
-
-						echo '</h4></div>'  , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
-
-					echo '<div class="widget-inside">' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'text',
-								'class'    => '',
-								'id'       => 'im[' . $token . '][id]',
-								'required' => FALSE,
-								'label'    => __( 'IM Network ID', 'connections' ),
-								'before'   => '',
-								'after'    => '',
-								'return'   => FALSE,
-							),
-							$network->id
-						);
-
-						echo '<input type="hidden" name="im[' , $token , '][uid]" value="' , $network->uid , '">' , PHP_EOL;
-
-						echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="im" data-token="' . $token . '">' , __( 'Remove', 'connections' ) , '</a></p>' , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
+					self::messengerField( $network, $token );
 
 				echo '</div>' , PHP_EOL;
 			}
@@ -2340,43 +1638,43 @@ class cnEntryMetabox {
 	}
 
 	/**
-	 * Renders the social media network metabox.
+	 * Renders the email field.
 	 *
-	 * @access public
-	 * @since  0.8
-	 * @param  object $entry   An instance of the cnEntry object.
-	 * @param  array  $metabox The metabox options array from self::register().
-	 * @return string          The social media network metabox.
+	 * @access private
+	 * @since  8.5.11
+	 *
+	 * @param stdClass $network
+	 * @param string   $token
 	 */
-	public static function social( $entry, $metabox ) {
+	private static function messengerField( $network, $token = '::FIELD::' ) {
 
 		// Grab an instance of the Connections object.
 		$instance = Connections_Directory();
 
 		// Grab the email types.
-		$socialTypes = $instance->options->getDefaultSocialMediaValues();
+		$messengerTypes = $instance->options->getDefaultIMValues();
 
-		echo '<div class="widgets-sortables ui-sortable" id="social-media">' , PHP_EOL;
+		?>
 
-		// --> Start template <-- \\
-		echo '<textarea id="social-template" style="display: none;">' , PHP_EOL;
+		<div class="widget-top">
+			<div class="widget-title-action"><a class="widget-action"></a></div>
 
-			echo '<div class="widget-top">' , PHP_EOL;
+			<div class="widget-title">
+				<h4>
 
-				echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-				echo '<div class="widget-title"><h4>' , PHP_EOL;
+					<?php
 
 					cnHTML::field(
 						array(
 							'type'     => 'select',
 							'class'    => '',
-							'id'       => 'social[::FIELD::][type]',
-							'options'  => $socialTypes,
+							'id'       => 'im[' . $token . '][type]',
+							'options'  => $messengerTypes,
 							'required' => FALSE,
-							'label'    => __( 'Social Network', 'connections' ),
+							'label'    => __( 'IM Type', 'connections' ),
 							'return'   => FALSE,
-						)
+						),
+						isset( $network->type ) ? $network->type : ''
 					);
 
 					cnHTML::field(
@@ -2384,13 +1682,14 @@ class cnEntryMetabox {
 							'type'     => 'radio',
 							'format'   => 'inline',
 							'class'    => '',
-							'id'       => 'social[preferred]',
-							'options'  => array( '::FIELD::' => __( 'Preferred', 'connections' ) ),
+							'id'       => 'im[preferred]',
+							'options'  => array( $token => __( 'Preferred', 'connections' ) ),
 							'required' => FALSE,
 							'before'   => '<span class="preferred">',
 							'after'    => '</span>',
 							'return'   => FALSE,
-						)
+						),
+						isset( $network->preferred ) && $network->preferred ? $token : ''
 					);
 
 					// Only show this if there are visibility options that the user is permitted to see.
@@ -2401,39 +1700,87 @@ class cnEntryMetabox {
 								'type'     => 'radio',
 								'format'   => 'inline',
 								'class'    => '',
-								'id'       => 'social[::FIELD::][visibility]',
+								'id'       => 'im[' . $token . '][visibility]',
 								'options'  => self::$visibility,
 								'required' => FALSE,
 								'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
 								'after'    => '</span>',
 								'return'   => FALSE,
 							),
-							'public'
+							isset( $network->visibility ) ? $network->visibility : 'public'
 						);
 					}
 
-				echo '</h4></div>'  , PHP_EOL;
+					?>
 
-			echo '</div>' , PHP_EOL;
+				</h4>
+			</div>
 
-			echo '<div class="widget-inside">';
+		</div>
+
+		<div class="widget-inside">
+
+			<div class="messenger-container">
+
+				<?php
 
 				cnHTML::field(
 					array(
 						'type'     => 'text',
 						'class'    => '',
-						'id'       => 'social[::FIELD::][url]',
+						'id'       => 'im[' . $token . '][id]',
 						'required' => FALSE,
-						'label'    => __( 'URL', 'connections' ),
+						'label'    => __( 'IM Network ID', 'connections' ),
 						'before'   => '',
 						'after'    => '',
 						'return'   => FALSE,
-					)
+						),
+					isset( $network->id ) ? $network->id : ''
 				);
 
-				echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="social" data-token="::FIELD::">' , __( 'Remove', 'connections' ) , '</a></p>';
+				?>
 
-			echo '</div>' , PHP_EOL;
+			</div>
+
+			<?php
+
+			if ( isset( $network->uid ) ) {
+
+				echo '<input type="hidden" name="im[', $token, '][uid]" value="', $network->uid, '">' , PHP_EOL;
+			}
+
+			?>
+
+			<p class="cn-remove-button">
+				<a href="#" class="cn-remove cn-button button cn-button-warning"
+				   data-type="im"
+				   data-token="<?php echo $token; ?>"><?php esc_html_e( 'Remove', 'connections' ); ?></a>
+			</p>
+
+		</div>
+
+		<?php
+	}
+
+	/**
+	 * Renders the social media network metabox.
+	 *
+	 * @access public
+	 * @since  0.8
+	 *
+	 * @param  cnEntry $entry   An instance of the cnEntry object.
+	 * @param  array   $metabox The metabox options array from self::register().
+	 *
+	 * @return string The social media network metabox.
+	 */
+	public static function social( $entry, $metabox ) {
+
+		echo '<div class="widgets-sortables ui-sortable" id="social-media">' , PHP_EOL;
+
+		// --> Start template <-- \\
+		echo '<textarea id="social-template" style="display: none;">' , PHP_EOL;
+
+			self::socialField( new stdClass() );
 
 		echo '</textarea>' , PHP_EOL;
 		// --> End template <-- \\
@@ -2447,88 +1794,9 @@ class cnEntryMetabox {
 
 				$token = str_replace( '-', '', cnUtility::getUUID() );
 
-				$selectName = 'social['  . $token . '][type]';
-				$preferred  = $network->preferred ? $token : '';
-
 				echo '<div class="widget social-media" id="social-row-'  . $token . '">' , PHP_EOL;
 
-					echo '<div class="widget-top">' , PHP_EOL;
-						echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-						echo '<div class="widget-title"><h4>' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'select',
-								'class'    => '',
-								'id'       => 'social[' . $token . '][type]',
-								'options'  => $socialTypes,
-								'required' => FALSE,
-								'label'    => __( 'Social Network', 'connections' ),
-								'return'   => FALSE,
-							),
-							$network->type
-						);
-
-						cnHTML::field(
-							array(
-								'type'     => 'radio',
-								'format'   => 'inline',
-								'class'    => '',
-								'id'       => 'social[preferred]',
-								'options'  => array( $token => __( 'Preferred', 'connections' ) ),
-								'required' => FALSE,
-								'before'   => '<span class="preferred">',
-								'after'    => '</span>',
-								'return'   => FALSE,
-							),
-							$preferred
-						);
-
-						// Only show this if there are visibility options that the user is permitted to see.
-						if ( ! empty( self::$visibility ) ) {
-
-							cnHTML::field(
-								array(
-									'type'     => 'radio',
-									'format'   => 'inline',
-									'class'    => '',
-									'id'       => 'social[' . $token . '][visibility]',
-									'options'  => self::$visibility,
-									'required' => FALSE,
-									'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
-									'after'    => '</span>',
-									'return'   => FALSE,
-								),
-								$network->visibility
-							);
-						}
-
-						echo '</h4></div>'  , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
-
-					echo '<div class="widget-inside">' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'text',
-								'class'    => '',
-								'id'       => 'social[' . $token . '][url]',
-								'required' => FALSE,
-								'label'    => __( 'URL', 'connections' ),
-								'before'   => '',
-								'after'    => '',
-								'return'   => FALSE,
-							),
-							$network->url
-						);
-
-						echo '<input type="hidden" name="social[' , $token , '][id]" value="' , $network->id , '">' , PHP_EOL;
-
-						echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="social" data-token="' . $token . '">' , __( 'Remove', 'connections' ) , '</a></p>' , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
+					self::socialField( $network, $token );
 
 				echo '</div>' , PHP_EOL;
 			}
@@ -2540,43 +1808,43 @@ class cnEntryMetabox {
 	}
 
 	/**
-	 * Renders the links metabox.
+	 * Renders the social media network field.
 	 *
-	 * @access public
-	 * @since  0.8
-	 * @param  object $entry   An instance of the cnEntry object.
-	 * @param  array  $metabox The metabox options array from self::register().
-	 * @return string          The links metabox.
+	 * @access private
+	 * @since  8.5.11
+	 *
+	 * @param stdClass $network
+	 * @param string   $token
 	 */
-	public static function links( $entry, $metabox ) {
+	private static function socialField( $network, $token = '::FIELD::' ) {
 
 		// Grab an instance of the Connections object.
 		$instance = Connections_Directory();
 
 		// Grab the email types.
-		$linkTypes = $instance->options->getDefaultLinkValues();
+		$socialTypes = $instance->options->getDefaultSocialMediaValues();
 
-		echo '<div class="widgets-sortables ui-sortable" id="links">' , PHP_EOL;
+		?>
 
-		// --> Start template <-- \\
-		echo '<textarea id="link-template" style="display: none;">' , PHP_EOL;
+		<div class="widget-top">
+			<div class="widget-title-action"><a class="widget-action"></a></div>
 
-			echo '<div class="widget-top">' , PHP_EOL;
+			<div class="widget-title">
+				<h4>
 
-				echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-				echo '<div class="widget-title"><h4>' , PHP_EOL;
+					<?php
 
 					cnHTML::field(
 						array(
 							'type'     => 'select',
 							'class'    => '',
-							'id'       => 'link[::FIELD::][type]',
-							'options'  => $linkTypes,
+							'id'       => 'social[' . $token . '][type]',
+							'options'  => $socialTypes,
 							'required' => FALSE,
-							'label'    => __( 'Type', 'connections' ),
+							'label'    => __( 'Social Network', 'connections' ),
 							'return'   => FALSE,
-						)
+						),
+						isset( $network->type ) ? $network->type : ''
 					);
 
 					cnHTML::field(
@@ -2584,13 +1852,14 @@ class cnEntryMetabox {
 							'type'     => 'radio',
 							'format'   => 'inline',
 							'class'    => '',
-							'id'       => 'link[preferred]',
-							'options'  => array( '::FIELD::' => __( 'Preferred', 'connections' ) ),
+							'id'       => 'social[preferred]',
+							'options'  => array( $token => __( 'Preferred', 'connections' ) ),
 							'required' => FALSE,
 							'before'   => '<span class="preferred">',
 							'after'    => '</span>',
 							'return'   => FALSE,
-						)
+						),
+						isset( $network->preferred ) && $network->preferred ? $token : ''
 					);
 
 					// Only show this if there are visibility options that the user is permitted to see.
@@ -2601,104 +1870,86 @@ class cnEntryMetabox {
 								'type'     => 'radio',
 								'format'   => 'inline',
 								'class'    => '',
-								'id'       => 'link[::FIELD::][visibility]',
+								'id'       => 'social[' . $token . '][visibility]',
 								'options'  => self::$visibility,
 								'required' => FALSE,
 								'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
 								'after'    => '</span>',
 								'return'   => FALSE,
 							),
-							'public'
+							isset( $network->visibility ) ? $network->visibility : 'public'
 						);
 					}
 
-				echo '</h4></div>'  , PHP_EOL;
+					?>
 
-			echo '</div>' , PHP_EOL;
+				</h4>
+			</div>
 
-			echo '<div class="widget-inside">';
+		</div>
 
-				echo '<div>';
+		<div class="widget-inside">
 
-					cnHTML::field(
-						array(
-							'type'     => 'text',
-							'class'    => '',
-							'id'       => 'link[::FIELD::][title]',
-							'required' => FALSE,
-							'label'    => __( 'Title', 'connections' ),
-							'before'   => '',
-							'after'    => '',
-							'return'   => FALSE,
-						)
-					);
+			<div class="social-media-container">
 
-					cnHTML::field(
-						array(
-							'type'     => 'text',
-							'class'    => '',
-							'id'       => 'link[::FIELD::][url]',
-							'required' => FALSE,
-							'label'    => __( 'URL', 'connections' ),
-							'before'   => '',
-							'after'    => '',
-							'return'   => FALSE,
-						)
-					);
+				<?php
 
-				echo '</div>';
+				cnHTML::field(
+					array(
+						'type'     => 'text',
+						'class'    => '',
+						'id'       => 'social[' . $token . '][url]',
+						'required' => FALSE,
+						'label'    => __( 'URL', 'connections' ),
+						'before'   => '',
+						'after'    => '',
+						'return'   => FALSE,
+					),
+					isset( $network->url ) ? $network->url : ''
+				);
 
-				echo '<div>';
+				?>
 
-					cnHTML::field(
-						array(
-							'type'     => 'select',
-							'class'    => '',
-							'id'       => 'link[::FIELD::][target]',
-							'options'  => array(
-								'new'  => __( 'New Window', 'connections' ),
-								'same' => __( 'Same Window', 'connections' ),
-								),
-							'required' => FALSE,
-							'label'    => __( 'Target', 'connections' ),
-							'before'   => '<span class="target">',
-							'after'    => '</span>',
-							'return'   => FALSE,
-						),
-						'same'
-					);
+			</div>
 
-					cnHTML::field(
-						array(
-							'type'     => 'select',
-							'class'    => '',
-							'id'       => 'link[::FIELD::][follow]',
-							'options'  => array(
-								'nofollow' => 'nofollow',
-								'dofollow' => 'dofollow',
-								),
-							'required' => FALSE,
-							'label'    => '',
-							'before'   => '<span class="follow">',
-							'after'    => '</span>',
-							'return'   => FALSE,
-						),
-						'nofollow'
-					);
+			<?php
 
-				echo '</div>';
+			if ( isset( $network->id ) ) {
 
-				echo '<div class="link-assignment">';
+				echo '<input type="hidden" name="social[' , $token , '][id]" value="' , $network->id , '">' , PHP_EOL;
+			}
+			?>
 
-					echo '<label><input type="radio" name="link[image]" value="::FIELD::">' , __( 'Assign link to the image.', 'connections' ) , '</label>';
-					echo '<label><input type="radio" name="link[logo]" value="::FIELD::">' , __( 'Assign link to the logo.', 'connections' ) , '</label>';
-					// echo '<label><input type="checkbox" name="link[none]" value="::FIELD::">' , __( 'None', 'connections' ) , '</label>';
+			<p class="cn-remove-button">
+				<a href="#" class="cn-remove cn-button button cn-button-warning"
+				   data-type="social"
+				   data-token="<?php echo $token; ?>"><?php esc_html_e( 'Remove', 'connections' ); ?></a>
+			</p>
 
-				echo '</div>';
+		</div>
 
-				echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="link" data-token="::FIELD::">' , __( 'Remove', 'connections' ) , '</a></p>';
+		<?php
+	}
 
-			echo '</div>' , PHP_EOL;
+	/**
+	 * Renders the links metabox.
+	 *
+	 * @access public
+	 * @since  0.8
+	 *
+	 * @param  cnEntry $entry   An instance of the cnEntry object.
+	 * @param  array   $metabox The metabox options array from self::register().
+	 *
+	 * @return string  The links metabox.
+	 */
+	public static function links( $entry, $metabox ) {
+
+		echo '<div class="widgets-sortables ui-sortable" id="links">' , PHP_EOL;
+
+		// --> Start template <-- \\
+		echo '<textarea id="link-template" style="display: none;">' , PHP_EOL;
+
+			self::linkField( new stdClass() );
 
 		echo '</textarea>' , PHP_EOL;
 		// --> End template <-- \\
@@ -2712,156 +1963,9 @@ class cnEntryMetabox {
 
 				$token = str_replace( '-', '', cnUtility::getUUID() );
 
-				$selectName = 'link['  . $token . '][type]';
-				$preferred  = $link->preferred ? $token : '';
-				$imageLink  = checked( $link->image, TRUE, FALSE );
-				$logoLink   = checked( $link->logo, TRUE, FALSE );
-
 				echo '<div class="widget link" id="link-row-'  . $token . '">' , PHP_EOL;
 
-					echo '<div class="widget-top">' , PHP_EOL;
-						echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-						echo '<div class="widget-title"><h4>' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'select',
-								'class'    => '',
-								'id'       => 'link[' . $token . '][type]',
-								'options'  => $linkTypes,
-								'required' => FALSE,
-								'label'    => __( 'Type', 'connections' ),
-								'return'   => FALSE,
-							),
-							$link->type
-						);
-
-						cnHTML::field(
-							array(
-								'type'     => 'radio',
-								'format'   => 'inline',
-								'class'    => '',
-								'id'       => 'link[preferred]',
-								'options'  => array( $token => __( 'Preferred', 'connections' ) ),
-								'required' => FALSE,
-								'before'   => '<span class="preferred">',
-								'after'    => '</span>',
-								'return'   => FALSE,
-							),
-							$preferred
-						);
-
-						// Only show this if there are visibility options that the user is permitted to see.
-						if ( ! empty( self::$visibility ) ) {
-
-							cnHTML::field(
-								array(
-									'type'     => 'radio',
-									'format'   => 'inline',
-									'class'    => '',
-									'id'       => 'link[' . $token . '][visibility]',
-									'options'  => self::$visibility,
-									'required' => FALSE,
-									'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
-									'after'    => '</span>',
-									'return'   => FALSE,
-								),
-								$link->visibility
-							);
-						}
-
-						echo '</h4></div>'  , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
-
-					echo '<div class="widget-inside">' , PHP_EOL;
-
-						echo '<div>';
-
-							cnHTML::field(
-								array(
-									'type'     => 'text',
-									'class'    => '',
-									'id'       => 'link[' . $token . '][title]',
-									'required' => FALSE,
-									'label'    => __( 'Title', 'connections' ),
-									'before'   => '',
-									'after'    => '',
-									'return'   => FALSE,
-								),
-								$link->title
-							);
-
-							cnHTML::field(
-								array(
-									'type'     => 'text',
-									'class'    => '',
-									'id'       => 'link[' . $token . '][url]',
-									'required' => FALSE,
-									'label'    => __( 'URL', 'connections' ),
-									'before'   => '',
-									'after'    => '',
-									'return'   => FALSE,
-								),
-								$link->url
-							);
-
-						echo '</div>';
-
-						echo '<div>';
-
-							cnHTML::field(
-								array(
-									'type'     => 'select',
-									'class'    => '',
-									'id'       => 'link[' . $token . '][target]',
-									'options'  => array(
-										'new'  => __( 'New Window', 'connections' ),
-										'same' => __( 'Same Window', 'connections' ),
-										),
-									'required' => FALSE,
-									'label'    => __( 'Target', 'connections' ),
-									'before'   => '<span class="target">',
-									'after'    => '</span>',
-									'return'   => FALSE,
-								),
-								$link->target
-							);
-
-							cnHTML::field(
-								array(
-									'type'     => 'select',
-									'class'    => '',
-									'id'       => 'link[' . $token . '][follow]',
-									'options'  => array(
-										'nofollow' => 'nofollow',
-										'dofollow' => 'dofollow',
-										),
-									'required' => FALSE,
-									'label'    => '',
-									'before'   => '<span class="follow">',
-									'after'    => '</span>',
-									'return'   => FALSE,
-								),
-								$link->followString
-							);
-
-						echo '</div>';
-
-						echo '<div class="link-assignment">';
-
-							echo '<label><input type="radio" name="link[image]" value="' , $token , '" ' , $imageLink , '>' , __( 'Assign link to the image.', 'connections' ) , '</label>';
-							echo '<label><input type="radio" name="link[logo]" value="' , $token , '" ' , $logoLink , '>' , __( 'Assign link to the logo.', 'connections' ) , '</label>';
-							// echo '<label><input type="checkbox" name="link[none]" value="' , $token , '">' , __( 'None', 'connections' ) , '</label>';
-
-						echo '</div>';
-
-						echo '<input type="hidden" name="link[' , $token , '][id]" value="' , $link->id , '">' , PHP_EOL;
-
-						echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="link" data-token="' . $token . '">' , __( 'Remove', 'connections' ) , '</a></p>' , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
+					self::linkField( $link, $token );
 
 				echo '</div>' , PHP_EOL;
 			}
@@ -2873,43 +1977,43 @@ class cnEntryMetabox {
 	}
 
 	/**
-	 * Renders the dates metabox.
+	 * Renders the link field.
 	 *
-	 * @access public
-	 * @since  0.8
-	 * @param  object $entry   An instance of the cnEntry object.
-	 * @param  array  $metabox The metabox options array from self::register().
-	 * @return string          The dates metabox.
+	 * @access private
+	 * @since  8.5.12
+	 *
+	 * @param stdClass $link
+	 * @param string   $token
 	 */
-	public static function date( $entry, $metabox ) {
+	private static function linkField( $link, $token = '::FIELD::' ) {
 
 		// Grab an instance of the Connections object.
 		$instance = Connections_Directory();
 
 		// Grab the email types.
-		$dateTypes = $instance->options->getDateOptions();
+		$linkTypes = $instance->options->getDefaultLinkValues();
 
-		echo '<div class="widgets-sortables ui-sortable" id="dates">' , PHP_EOL;
+		?>
 
-		// --> Start template <-- \\
-		echo '<textarea id="date-template" style="display: none;">' , PHP_EOL;
+		<div class="widget-top">
+			<div class="widget-title-action"><a class="widget-action"></a></div>
 
-			echo '<div class="widget-top">' , PHP_EOL;
+			<div class="widget-title">
+				<h4>
 
-				echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-				echo '<div class="widget-title"><h4>' , PHP_EOL;
+					<?php
 
 					cnHTML::field(
 						array(
 							'type'     => 'select',
 							'class'    => '',
-							'id'       => 'date[::FIELD::][type]',
-							'options'  => $dateTypes,
+							'id'       => 'link[' . $token . '][type]',
+							'options'  => $linkTypes,
 							'required' => FALSE,
 							'label'    => __( 'Type', 'connections' ),
 							'return'   => FALSE,
-						)
+						),
+						isset( $link->type ) ? $link->type : ''
 					);
 
 					cnHTML::field(
@@ -2917,13 +2021,14 @@ class cnEntryMetabox {
 							'type'     => 'radio',
 							'format'   => 'inline',
 							'class'    => '',
-							'id'       => 'date[preferred]',
-							'options'  => array( '::FIELD::' => __( 'Preferred', 'connections' ) ),
+							'id'       => 'link[preferred]',
+							'options'  => array( $token => __( 'Preferred', 'connections' ) ),
 							'required' => FALSE,
 							'before'   => '<span class="preferred">',
 							'after'    => '</span>',
 							'return'   => FALSE,
-						)
+						),
+						isset( $link->preferred ) && $link->preferred ? $token : ''
 					);
 
 					// Only show this if there are visibility options that the user is permitted to see.
@@ -2934,39 +2039,161 @@ class cnEntryMetabox {
 								'type'     => 'radio',
 								'format'   => 'inline',
 								'class'    => '',
-								'id'       => 'date[::FIELD::][visibility]',
+								'id'       => 'link[' . $token . '][visibility]',
 								'options'  => self::$visibility,
 								'required' => FALSE,
 								'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
 								'after'    => '</span>',
 								'return'   => FALSE,
 							),
-							'public'
+							isset( $link->visibility ) ? $link->visibility : 'public'
 						);
 					}
 
-				echo '</h4></div>'  , PHP_EOL;
+					?>
 
-			echo '</div>' , PHP_EOL;
+				</h4>
+			</div>
 
-			echo '<div class="widget-inside">';
+		</div>
+
+		<div class="widget-inside">
+
+			<div class="link-title-container">
+
+				<?php
 
 				cnHTML::field(
 					array(
 						'type'     => 'text',
-						'class'    => 'datepicker',
-						'id'       => 'date[::FIELD::][date]',
+						'class'    => '',
+						'id'       => 'link[' . $token . '][title]',
 						'required' => FALSE,
-						'label'    => __( 'Date', 'connections' ),
+						'label'    => __( 'Title', 'connections' ),
 						'before'   => '',
 						'after'    => '',
 						'return'   => FALSE,
-					)
+					),
+					isset( $link->title ) ? $link->title : ''
 				);
 
-				echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="date" data-token="::FIELD::">' , __( 'Remove', 'connections' ) , '</a></p>';
+				?>
 
-			echo '</div>' , PHP_EOL;
+			</div>
+
+			<div class="link-url-container">
+
+				<?php
+
+				cnHTML::field(
+					array(
+						'type'     => 'text',
+						'class'    => '',
+						'id'       => 'link[' . $token . '][url]',
+						'required' => FALSE,
+						'label'    => __( 'URL', 'connections' ),
+						'before'   => '',
+						'after'    => '',
+						'return'   => FALSE,
+					),
+					isset( $link->url ) ? $link->url : ''
+				);
+
+				?>
+
+			</div>
+
+			<div class="link-target-follow-container">
+
+				<?php
+
+				cnHTML::field(
+					array(
+						'type'     => 'select',
+						'class'    => '',
+						'id'       => 'link[' . $token . '][target]',
+						'options'  => array(
+							'new'  => __( 'New Window', 'connections' ),
+							'same' => __( 'Same Window', 'connections' ),
+						),
+						'required' => FALSE,
+						'label'    => __( 'Target', 'connections' ),
+						'before'   => '<span class="target">',
+						'after'    => '</span>',
+						'return'   => FALSE,
+					),
+					isset( $link->target ) ? $link->target : ''
+				);
+
+				cnHTML::field(
+					array(
+						'type'     => 'select',
+						'class'    => '',
+						'id'       => 'link[' . $token . '][follow]',
+						'options'  => array(
+							'nofollow' => 'nofollow',
+							'dofollow' => 'dofollow',
+						),
+						'required' => FALSE,
+						'label'    => '',
+						'before'   => '<span class="follow">',
+						'after'    => '</span>',
+						'return'   => FALSE,
+					),
+					isset( $link->followString ) ? $link->followString : ''
+				);
+
+				?>
+
+			</div>
+
+			<div class="link-assignment">
+
+				<label>
+					<input type="radio" name="link[image]" value="<?php echo $token; ?>" <?php if ( isset( $link->image ) ) checked( $link->image, TRUE ); ?>>
+					<?php esc_html_e( 'Assign link to the image.', 'connections' ); ?>
+				</label>
+				<label>
+					<input type="radio" name="link[logo]" value="<?php echo $token; ?>" <?php if ( isset( $link->logo ) ) checked( $link->logo, TRUE ); ?>>
+					<?php esc_html_e( 'Assign link to the logo.', 'connections' ); ?>
+				</label>
+
+			</div>
+
+			<?php if ( isset( $link->id ) ) : ?>
+			<input type="hidden" name="link[<?php echo $token; ?>][id]" value="<?php echo $link->id; ?>">
+			<?php endif; ?>
+
+			<p class="cn-remove-button">
+				<a href="#" class="cn-remove cn-button button cn-button-warning"
+				   data-type="link"
+				   data-token="<?php echo $token; ?>"><?php esc_html_e( 'Remove', 'connections' ); ?></a>
+			</p>
+
+		</div>
+
+		<?php
+	}
+
+	/**
+	 * Renders the dates metabox.
+	 *
+	 * @access public
+	 * @since  0.8
+	 *
+	 * @param  cnEntry $entry   An instance of the cnEntry object.
+	 * @param  array   $metabox The metabox options array from self::register().
+	 *
+	 * @return string The dates metabox.
+	 */
+	public static function date( $entry, $metabox ) {
+
+		echo '<div class="widgets-sortables ui-sortable" id="dates">' , PHP_EOL;
+
+		// --> Start template <-- \\
+		echo '<textarea id="date-template" style="display: none;">' , PHP_EOL;
+
+			self::dateField( new stdClass() );
 
 		echo '</textarea>' , PHP_EOL;
 		// --> End template <-- \\
@@ -2980,88 +2207,9 @@ class cnEntryMetabox {
 
 				$token = str_replace( '-', '', cnUtility::getUUID() );
 
-				$selectName = 'date['  . $token . '][type]';
-				$preferred  = $date->preferred ? $token : '';
-
 				echo '<div class="widget date" id="date-row-'  . $token . '">' , PHP_EOL;
 
-					echo '<div class="widget-top">' , PHP_EOL;
-						echo '<div class="widget-title-action"><a class="widget-action"></a></div>' , PHP_EOL;
-
-						echo '<div class="widget-title"><h4>' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'select',
-								'class'    => '',
-								'id'       => 'date[' . $token . '][type]',
-								'options'  => $dateTypes,
-								'required' => FALSE,
-								'label'    => __( 'Type', 'connections' ),
-								'return'   => FALSE,
-							),
-							$date->type
-						);
-
-						cnHTML::field(
-							array(
-								'type'     => 'radio',
-								'format'   => 'inline',
-								'class'    => '',
-								'id'       => 'date[preferred]',
-								'options'  => array( $token => __( 'Preferred', 'connections' ) ),
-								'required' => FALSE,
-								'before'   => '<span class="preferred">',
-								'after'    => '</span>',
-								'return'   => FALSE,
-							),
-							$preferred
-						);
-
-						// Only show this if there are visibility options that the user is permitted to see.
-						if ( ! empty( self::$visibility ) ) {
-
-							cnHTML::field(
-								array(
-									'type'     => 'radio',
-									'format'   => 'inline',
-									'class'    => '',
-									'id'       => 'date[' . $token . '][visibility]',
-									'options'  => self::$visibility,
-									'required' => FALSE,
-									'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
-									'after'    => '</span>',
-									'return'   => FALSE,
-								),
-								$date->visibility
-							);
-						}
-
-						echo '</h4></div>'  , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
-
-					echo '<div class="widget-inside">' , PHP_EOL;
-
-						cnHTML::field(
-							array(
-								'type'     => 'text',
-								'class'    => 'datepicker',
-								'id'       => 'date[' . $token . '][date]',
-								'required' => FALSE,
-								'label'    => __( 'Date', 'connections' ),
-								'before'   => '',
-								'after'    => '',
-								'return'   => FALSE,
-							),
-							date( 'm/d/Y', strtotime( $date->date ) )
-						);
-
-						echo '<input type="hidden" name="date[' , $token , '][id]" value="' , $date->id , '">' , PHP_EOL;
-
-						echo '<p class="cn-remove-button"><a href="#" class="cn-remove cn-button button cn-button-warning" data-type="date" data-token="' . $token . '">' , __( 'Remove', 'connections' ) , '</a></p>' , PHP_EOL;
-
-					echo '</div>' , PHP_EOL;
+					self::dateField( $date, $token );
 
 				echo '</div>' , PHP_EOL;
 			}
@@ -3070,6 +2218,122 @@ class cnEntryMetabox {
 		echo  '</div>' , PHP_EOL;
 
 		echo  '<p class="add"><a href="#" class="cn-add cn-button button" data-type="date" data-container="dates">' , __( 'Add Date', 'connections' ) , '</a></p>' , PHP_EOL;
+	}
+
+	/**
+	 * Renders the social media network field.
+	 *
+	 * @access private
+	 * @since  8.5.11
+	 *
+	 * @param stdClass $date
+	 * @param string   $token
+	 */
+	private static function dateField( $date, $token = '::FIELD::' ) {
+
+		// Grab an instance of the Connections object.
+		$instance = Connections_Directory();
+
+		// Grab the date types.
+		$dateTypes = $instance->options->getDateOptions();
+
+		?>
+
+		<div class="widget-top">
+			<div class="widget-title-action"><a class="widget-action"></a></div>
+
+			<div class="widget-title">
+				<h4>
+
+					<?php
+
+					cnHTML::field(
+						array(
+							'type'     => 'select',
+							'class'    => '',
+							'id'       => 'date[' . $token . '][type]',
+							'options'  => $dateTypes,
+							'required' => FALSE,
+							'label'    => __( 'Type', 'connections' ),
+							'return'   => FALSE,
+						),
+						isset( $date->type ) ? $date->type : ''
+					);
+
+					cnHTML::field(
+						array(
+							'type'     => 'radio',
+							'format'   => 'inline',
+							'class'    => '',
+							'id'       => 'date[preferred]',
+							'options'  => array( $token => __( 'Preferred', 'connections' ) ),
+							'required' => FALSE,
+							'before'   => '<span class="preferred">',
+							'after'    => '</span>',
+							'return'   => FALSE,
+						),
+						isset( $date->preferred ) && $date->preferred ? $token : ''
+					);
+
+					// Only show this if there are visibility options that the user is permitted to see.
+					if ( ! empty( self::$visibility ) ) {
+
+						cnHTML::field(
+							array(
+								'type'     => 'radio',
+								'format'   => 'inline',
+								'class'    => '',
+								'id'       => 'date[' . $token . '][visibility]',
+								'options'  => self::$visibility,
+								'required' => FALSE,
+								'before'   => '<span class="visibility">' . __( 'Visibility', 'connections' ) . ' ',
+								'after'    => '</span>',
+								'return'   => FALSE,
+							),
+							isset( $date->visibility ) ? $date->visibility : 'public'
+						);
+					}
+
+					?>
+
+				</h4>
+			</div>
+
+		</div>
+
+		<div class="widget-inside">
+
+			<?php
+
+			cnHTML::field(
+				array(
+					'type'     => 'text',
+					'class'    => 'datepicker',
+					'id'       => 'date[' . $token . '][date]',
+					'required' => FALSE,
+					'label'    => __( 'Date', 'connections' ),
+					'before'   => '',
+					'after'    => '',
+					'return'   => FALSE,
+				),
+				isset( $date->date ) ? date( 'm/d/Y', strtotime( $date->date ) ) : ''
+			);
+
+			?>
+
+			<?php if ( isset( $date->id ) ) : ?>
+				<input type="hidden" name="date[<?php echo $token; ?>][id]" value="<?php echo $date->id; ?>">
+			<?php endif; ?>
+
+			<p class="cn-remove-button">
+				<a href="#" class="cn-remove cn-button button cn-button-warning"
+				   data-type="date"
+				   data-token="<?php echo $token; ?>"><?php esc_html_e( 'Remove', 'connections' ); ?></a>
+			</p>
+
+		</div>
+
+		<?php
 	}
 
 	/**

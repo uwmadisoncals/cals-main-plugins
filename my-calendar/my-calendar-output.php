@@ -457,7 +457,11 @@ function mc_build_date_switcher( $type = 'calendar', $cid = 'all', $time = 'mont
 	}
 	foreach ( $qsa as $name => $argument ) {
 		$name     = esc_attr( strip_tags( $name ) );
-		$argument = esc_attr( strip_tags( $argument ) );
+		if ( is_array( $argument ) ) {
+			$argument = '';
+		} else {
+			$argument = esc_attr( strip_tags( $argument ) );
+		}
 		if ( $name != 'month' && $name != 'yr' && $name != 'dy' ) {
 			$date_switcher .= '<input type="hidden" name="' . $name . '" value="' . $argument . '" />';
 		}
@@ -579,7 +583,7 @@ function mc_format_toggle( $format, $toggle, $time ) {
 	} else {
 		$toggle = '';
 	}
-
+	
 	return apply_filters( 'mc_format_toggle_html', $toggle, $format, $time );
 }
 
@@ -721,6 +725,7 @@ function mc_search_results( $query ) {
 	}
 	
 	$event_array = mc_get_search_results( $search );
+
 	//$event_array = mc_flatten_array( $event_array );
 
 	if ( ! empty( $event_array ) ) {
@@ -770,7 +775,8 @@ function mc_get_search_results( $search ) {
 		$host = ( isset( $search['host'] ) ) ? $search['host'] : null;
 		$search = ( isset( $search['search'] ) ) ? $search['search'] : '';
 		
-		$event_array = my_calendar_events( $from, $to, $category, $ltype, $lvalue, 'search', $author, $host, $search );
+		$event_array = my_calendar_events( $from, $to, $category, $ltype, $lvalue, 'search', $author, $host, $search );	
+		
 	} else {
 		$date = date( 'Y', current_time( 'timestamp' ) ) . '-' . date( 'm', current_time( 'timestamp' ) ) . '-' . date( 'd', current_time( 'timestamp' ) );
 		// if a value is non-zero, I'll grab a handful of extra events so I can throw out holidays and others like that.
@@ -781,18 +787,18 @@ function mc_get_search_results( $search ) {
 			JOIN " . MY_CALENDAR_TABLE . " 
 			ON (event_id=occur_event_id) 
 			JOIN " . MY_CALENDAR_CATEGORIES_TABLE . " 
-			ON (event_category=category_id) WHERE $search event_approved = 1 AND event_flagged <> 1 
+			ON (event_category=category_id) WHERE event_approved = 1 $search AND event_flagged <> 1 
 			AND DATE(occur_begin) < '$date' ORDER BY occur_begin DESC LIMIT 0,$before" );
 		} else {
 			$events1 = array();
 		}
 		$events3 = $mcdb->get_results( "SELECT *, UNIX_TIMESTAMP(occur_begin) AS ts_occur_begin, UNIX_TIMESTAMP(occur_end) AS ts_occur_end 
-			FROM " . MY_CALENDAR_EVENTS_TABLE . " 
-			JOIN " . MY_CALENDAR_TABLE . " 
-			ON (event_id=occur_event_id) 
-			JOIN " . MY_CALENDAR_CATEGORIES_TABLE . " 
-			ON (event_category=category_id) WHERE $search event_approved = 1 AND event_flagged <> 1 
-			AND DATE(occur_begin) = '$date'" );
+		FROM " . MY_CALENDAR_EVENTS_TABLE . " 
+		JOIN " . MY_CALENDAR_TABLE . " 
+		ON (event_id=occur_event_id) 
+		JOIN " . MY_CALENDAR_CATEGORIES_TABLE . " 
+		ON (event_category=category_id) WHERE event_approved = 1 $search AND event_flagged <> 1 
+		AND DATE(occur_begin) = '$date'" );
 		if ( $after > 0 ) {
 			$after   = $after + 5;
 			$events2 = $mcdb->get_results( "SELECT *, UNIX_TIMESTAMP(occur_begin) AS ts_occur_begin, UNIX_TIMESTAMP(occur_end) AS ts_occur_end 
@@ -800,7 +806,7 @@ function mc_get_search_results( $search ) {
 			JOIN " . MY_CALENDAR_TABLE . " 
 			ON (event_id=occur_event_id) 
 			JOIN " . MY_CALENDAR_CATEGORIES_TABLE . " 
-			ON (event_category=category_id) WHERE $search event_approved = 1 AND event_flagged <> 1 
+			ON (event_category=category_id) WHERE event_approved = 1 $search AND event_flagged <> 1 
 			AND DATE(occur_begin) > '$date' ORDER BY occur_begin ASC LIMIT 0,$after" );
 		} else {
 			$events2 = array();
@@ -1177,9 +1183,8 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 		} else {
 			$this_dates = mc_date_array( $current_date, $time );
 		}
-		$from = $this_dates['from'];
-		$to   = $this_dates['to'];
-		//echo "<pre>$num $from, $to ($c_month,$c_day,$c_year)</pre>";
+		$from        = apply_filters( 'mc_from_date', $this_dates['from'] );
+		$to          = apply_filters( 'mc_to_date', $this_dates['to'] );
 		$event_array = my_calendar_events( $from, $to, $category, $ltype, $lvalue, 'calendar', $author, $host );
 		$no_events   = ( empty( $event_array ) ) ? true : false;
 
@@ -1353,7 +1358,7 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 			$through_month_header = date_i18n( $month_format, $through_date );
 			$values               = array( 'date' => date( 'Y-m-d', $current_date ) );
 			// Add the calendar table and heading
-			$caption_text = ' ' . stripslashes( trim( get_option( 'mc_caption' ) ) ); // this option should be replaced JCD TODO
+			$caption_text = ' ' . stripslashes( trim( get_option( 'mc_caption' ) ) );
 			$my_calendar_body .= $mc_topnav;
 			if ( $format == "calendar" || $format == "mini" ) {
 				$table = apply_filters( 'mc_grid_wrapper', 'table', $format );

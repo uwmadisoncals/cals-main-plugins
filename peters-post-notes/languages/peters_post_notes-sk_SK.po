@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: peters_post_notes.php\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-06 17:06-0800\n"
+"POT-Creation-Date: 2016-02-12 09:06-0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Patrik Žec (PATWIST) <patrik.zec@gmail.com>\n"
 "Language-Team: Patrik Žec (PATWIST), patwist.com <patrik.zec@gmail.com>\n"
@@ -16,140 +16,141 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: ../peters_post_notes.php:131
+#: ../peters_post_notes.php:132
 msgid "User"
 msgstr "Používateľ"
 
-#: ../peters_post_notes.php:142
+#: ../peters_post_notes.php:143
 msgid "Latest note"
 msgstr "Posledná poznámka"
 
-#: ../peters_post_notes.php:156 ../peters_post_notes.php:361
-#: ../peters_post_notes.php:529 ../peters_post_notes.php:672
+#: ../peters_post_notes.php:157 ../peters_post_notes.php:374
+#: ../peters_post_notes.php:574 ../peters_post_notes.php:718
 msgid "M j, Y \\a\\t G:i"
 msgstr "j.n.Y \\v G:i "
 
-#: ../peters_post_notes.php:285
+#: ../peters_post_notes.php:286
 msgid "Successfully updated plugin settings"
 msgstr "Nastavenia pluginu boli úspešne aktualizované"
 
-#: ../peters_post_notes.php:330
+#: ../peters_post_notes.php:331
 msgid "Notes"
 msgstr "Poznámky"
 
-#: ../peters_post_notes.php:366 ../peters_post_notes.php:674
+#: ../peters_post_notes.php:379 ../peters_post_notes.php:720
 msgid "Edit"
 msgstr "Upraviť"
 
-#: ../peters_post_notes.php:371 ../peters_post_notes.php:681
+#: ../peters_post_notes.php:384 ../peters_post_notes.php:727
 msgid "Delete"
 msgstr "Odstrániť"
 
-#: ../peters_post_notes.php:373 ../peters_post_notes.php:683
+#: ../peters_post_notes.php:391 ../peters_post_notes.php:421
+#: ../peters_post_notes.php:651 ../peters_post_notes.php:656
+msgid "Private note"
+msgstr "Súkromná poznámka"
+
+#: ../peters_post_notes.php:393 ../peters_post_notes.php:730
 msgid "Save"
 msgstr "Uložiť"
 
-#: ../peters_post_notes.php:374 ../peters_post_notes.php:684
+#: ../peters_post_notes.php:394 ../peters_post_notes.php:731
 msgid "Cancel"
 msgstr "Zrušiť"
 
-#: ../peters_post_notes.php:386
+#: ../peters_post_notes.php:406
 msgid "No notes for this post."
 msgstr "Príspevok neobsahuje žiadne poznámky."
 
-#: ../peters_post_notes.php:398 ../peters_post_notes.php:601
+#: ../peters_post_notes.php:419 ../peters_post_notes.php:647
 msgid "Add note:"
 msgstr "Pridať poznámku:"
 
-#: ../peters_post_notes.php:453
+#: ../peters_post_notes.php:487
 msgid "Collaboration Notes"
 msgstr "Poznámky spolupracovníkov"
 
-#: ../peters_post_notes.php:529
+#: ../peters_post_notes.php:574
 msgid "on"
 msgstr "na"
 
-#: ../peters_post_notes.php:537
+#: ../peters_post_notes.php:582
 msgid "No relevant notes."
 msgstr "Žiadne relevantné poznámky."
 
-#: ../peters_post_notes.php:541
+#: ../peters_post_notes.php:586
 msgid "General Notes"
 msgstr "Všeobecné poznámky"
 
-#: ../peters_post_notes.php:589
+#: ../peters_post_notes.php:635
 #, fuzzy
 msgid "Personal notes:"
 msgstr "Všeobecné poznámky"
 
-#: ../peters_post_notes.php:596
+#: ../peters_post_notes.php:642
 msgid "No general notes."
 msgstr "Žiadné všeobecné poznámky."
 
-#: ../peters_post_notes.php:605 ../peters_post_notes.php:610
-msgid "Private note"
-msgstr "Súkromná poznámka"
-
-#: ../peters_post_notes.php:613
+#: ../peters_post_notes.php:659
 msgid "Add"
 msgstr "Pridať"
 
-#: ../peters_post_notes.php:731
+#: ../peters_post_notes.php:802
 msgid "Added notes table!"
 msgstr "Pridána tabuľa poznámok!"
 
-#: ../peters_post_notes.php:749
+#: ../peters_post_notes.php:820
 msgid "Added general notes table!"
 msgstr "Pridána tabuľa všeobecných poznámok!"
 
-#: ../peters_post_notes.php:761
+#: ../peters_post_notes.php:834
 msgid "Only necessary if you updated the plugin manually"
 msgstr "Potrebné len ak aktualizujete plugin manuálne"
 
-#: ../peters_post_notes.php:778
+#: ../peters_post_notes.php:851
 msgid "Peter's Post Notes settings"
 msgstr "Nastavenia Petrových Poznámok k príspevkom"
 
-#: ../peters_post_notes.php:791
+#: ../peters_post_notes.php:864
 msgid "Which types of notes to show on the Dashboard"
 msgstr "Ktoré typy poznámok zobraziť na nástenke"
 
-#: ../peters_post_notes.php:795
+#: ../peters_post_notes.php:868
 msgid "Relevant notes including the current user's notes"
 msgstr "Relevantné poznámky vrátane poznámok daného používateľa"
 
-#: ../peters_post_notes.php:796
+#: ../peters_post_notes.php:869
 msgid "Relevant notes excluding the current user's notes"
 msgstr "Relevantné poznámky bez poznámok daného používateľa"
 
-#: ../peters_post_notes.php:797
+#: ../peters_post_notes.php:870
 msgid "All notes"
 msgstr "Všetky poznámky"
 
-#: ../peters_post_notes.php:803
+#: ../peters_post_notes.php:876
 msgid "How many recent notes to display on the Dashboard. 0 = unlimited"
 msgstr "Koľko posledných poznámok zobraziť na nátenke. 0 = neobmedzene"
 
-#: ../peters_post_notes.php:811
+#: ../peters_post_notes.php:884
 msgid "Character set on your site. In most cases this is \"UTF-8\""
 msgstr "Znaková sada pre váš web. Väčšinou sa jedná o \"UTF-8\""
 
-#: ../peters_post_notes.php:819
+#: ../peters_post_notes.php:892
 msgid "Show \"Add note\" text area for post within publish panel"
 msgstr ""
 "Zobraziť textové poľe \"Pridať poznámku\" pre príspevky v publikovacom paneli"
 
-#: ../peters_post_notes.php:823 ../peters_post_notes.php:944
-#: ../peters_post_notes.php:954
+#: ../peters_post_notes.php:896 ../peters_post_notes.php:1017
+#: ../peters_post_notes.php:1027
 msgid "Yes"
 msgstr "Áno"
 
-#: ../peters_post_notes.php:824 ../peters_post_notes.php:943
-#: ../peters_post_notes.php:955
+#: ../peters_post_notes.php:897 ../peters_post_notes.php:1016
+#: ../peters_post_notes.php:1028
 msgid "No"
 msgstr "Nie"
 
-#: ../peters_post_notes.php:830
+#: ../peters_post_notes.php:903
 msgid ""
 "Roles that are allowed to view all notes (used when the global setting is to "
 "only show relevant notes)"
@@ -157,7 +158,7 @@ msgstr ""
 "Úrovne používateľov, ktorí môžu zobraziť všetky poznámky (použité ak je "
 "všeobecne nastavené zobrazovanie len releventných poznámok)"
 
-#: ../peters_post_notes.php:849
+#: ../peters_post_notes.php:922
 msgid ""
 "Capabilities that are allowed to view all notes (used when the global "
 "setting is to only show relevant notes)"
@@ -165,7 +166,7 @@ msgstr ""
 "Spôsobilosti, pre ktoré je možné zobrazenie všetkých poznámok (použité ak je "
 "všeobecne nastavené zobrazovanie len releventných poznámok)"
 
-#: ../peters_post_notes.php:870
+#: ../peters_post_notes.php:943
 msgid ""
 "Roles that are allowed to edit all notes (they must also be allowed to view "
 "the notes)"
@@ -173,7 +174,7 @@ msgstr ""
 "Úrovne používateľov, ktorí môžu upravovať všetky poznámky (musia mať aj "
 "umožňené zobraziť poznámky)"
 
-#: ../peters_post_notes.php:892
+#: ../peters_post_notes.php:965
 msgid ""
 "Capabilities that are allowed to edit all notes (they must also be allowed "
 "to view the notes)"
@@ -181,21 +182,21 @@ msgstr ""
 "Spôsobilosti, pre ktoré je umožnené upravovanie všetkých poznámok (musia mať "
 "aj umožňené zobraziť poznámky)"
 
-#: ../peters_post_notes.php:916
+#: ../peters_post_notes.php:989
 msgid "List of post types on which post notes should be enabled"
 msgstr "Zoznam typov príspevku, pre ktoré majú byť poznámky povolené"
 
-#: ../peters_post_notes.php:939
+#: ../peters_post_notes.php:1012
 msgid ""
 "Allow the same set of HTML tags in notes as are allowed in WordPress comments"
 msgstr ""
 "Povoliť v poznámkach rovnaký súbor HTML tagov ako vo WordPress komentároch"
 
-#: ../peters_post_notes.php:950
+#: ../peters_post_notes.php:1023
 msgid "Show \"Latest note\" column in the \"Manage posts\" page"
 msgstr "Zobrazit \"Poslední poznámka\" na stránce \"Přehled příspěvků\" "
 
-#: ../peters_post_notes.php:961
+#: ../peters_post_notes.php:1034
 msgid ""
 "Capability required to add a general note. (Otherwise users can only add a "
 "private note.)"
@@ -203,26 +204,26 @@ msgstr ""
 "Spôsobilosti, pre ktoré je povolené pridanie všeobecnej poznámky. (Inak môžu "
 "používatelia pridávať len súkromné poznámky.)"
 
-#: ../peters_post_notes.php:984
+#: ../peters_post_notes.php:1057
 msgid "Update"
 msgstr "Uložiť"
 
-#: ../peters_post_notes.php:992
+#: ../peters_post_notes.php:1065
 msgid "Peter's Post Notes"
 msgstr "Petrove poznámky k príspevkom"
 
-#: ../peters_post_notes.php:1060
+#: ../peters_post_notes.php:1137
 msgid "Error: You can only edit notes that you wrote."
 msgstr "Chyba: Môžete upravovať len poznámky, ktoré ste napísali."
 
-#: ../peters_post_notes.php:1081
+#: ../peters_post_notes.php:1174
 msgid "Error: Unknown or database problem when updating note."
 msgstr "Chyba: Neznámy alebo databázový problém pri aktualizácií poznámky."
 
-#: ../peters_post_notes.php:1120
+#: ../peters_post_notes.php:1213
 msgid "Error: You can only delete notes that you wrote."
 msgstr "Chyba: Môžete odstraňovať len poznámky, ktoré ste napísali."
 
-#: ../peters_post_notes.php:1133
+#: ../peters_post_notes.php:1226
 msgid "Error: Unknown or database problem when deleting note."
 msgstr "Chyba: Neznámy alebo databázový problém pri odstraňovaní poznámky."

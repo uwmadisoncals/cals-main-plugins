@@ -52,6 +52,12 @@ Please visit the plugin page at http://www.theblog.ca/wordpress-post-notes with 
 
 == Changelog ==
 
+= 1.6.1 =
+* 2016-02-13: Improve UX by wrapping checkboxes inside labels. (Thanks Hrohh!)
+
+= 1.6.0 =
+* 2016-02-12: Support private notes on posts.
+
 = 1.5.4 =
 * 2016-01-06: Make all strings translatable and put translation files in their own folder. (Thanks Luis González Jaime!)
 

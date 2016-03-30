@@ -7,7 +7,7 @@
 	background: #fff;
 }
 
-.mcbuy, .mcsbuy {
+.mcbuy {
     font-size: 1.1em;
     line-height: 1.5
 }
@@ -20,9 +20,10 @@
 
 .mc-button a {
     padding: 3px 8px;
-    border: 1px solid;
-    border-radius: 5px;
-    background: #f6f7f8;
+    border: 1px outset;
+    border-radius: 7px;
+    background: #fff;
+	font-weight: 700;
 }
 
 .mcd {
@@ -532,6 +533,11 @@ strong.label {
 
 .mc-search {
     float: right;
+}
+
+.postbox.sell {
+	background: #fff;
+	color: #000;
 }
 
 .sales {

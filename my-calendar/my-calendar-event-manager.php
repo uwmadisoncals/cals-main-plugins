@@ -419,12 +419,7 @@ function manage_my_calendar() {
 			</div>
 		</div>
 
-		<?php /* Todo 
-	if ( isset( $_POST['mc-import-csv'] ) ) {
-		
-	}
-	$add = array( 'Import Events'=>'<form action="'.admin_url('admin.php?page=my-calendar-manage').'" method="POST"><div><label for="mc-import-csv">'.__('Upload CSV File','my-calendar').'<input type="file" name="mc-import-csv" id="mc-import-csv" /><input type="submit" value="'.__('Import Events','my-calendar').'" /></div></form>'); */
-		mc_show_sidebar(); ?>
+		<?php mc_show_sidebar(); ?>
 	</div>
 <?php
 }
@@ -640,12 +635,13 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 		if ( mc_can_edit_event( $event_author ) ) {
 			$update       = $output[2];
 			$update       = apply_filters( 'mc_before_save_update', $update, $event_id );
+			$endtime      = date( "H:i:00", strtotime( $update['event_endtime'] ) );
 			$date_changed = (
 				$update['event_begin'] != $_POST['prev_event_begin'] ||
 				date( "H:i:00", strtotime( $update['event_time'] ) ) != $_POST['prev_event_time'] ||
 				$update['event_end'] != $_POST['prev_event_end'] ||
-				( date( "H:i:00", strtotime( $update['event_endtime'] ) ) != $_POST['prev_event_endtime'] && ( $_POST['prev_event_endtime'] != '' && date( "H:i:00", strtotime( $update['event_endtime'] ) ) != '23:59:59' ) ) ) 
-				? true : false; // this may need to be 00:00:00; will have to verify JCD TODO
+				( $endtime != $_POST['prev_event_endtime'] && ( $_POST['prev_event_endtime'] != '' && $endtime != '23:59:59' ) ) ) 
+				? true : false; 
 			if ( isset( $_POST['event_instance'] ) ) {
 				$is_changed     = mc_compare( $update, $event_id );// compares the information sent to the information saved for a given event.
 				$event_instance = (int) $_POST['event_instance'];
@@ -1627,7 +1623,7 @@ function mc_list_events() {
 		}
 		if ( isset( $_POST['mcs'] ) ) {
 			$query = $_POST['mcs'];
-			$limit .= ' AND ' . mc_prepare_search_query( $query, 'admin' );			
+			$limit .= mc_prepare_search_query( $query );			
 		}
 		$limit .= ( $restrict != 'archived' ) ? " AND event_status = 1" : ' AND event_status = 0';
 		$events     = $mcdb->get_results( "SELECT SQL_CALC_FOUND_ROWS * FROM " . my_calendar_table() . " $limit ORDER BY $sortbyvalue $sortbydirection LIMIT " . ( ( $current - 1 ) * $items_per_page ) . ", " . $items_per_page );

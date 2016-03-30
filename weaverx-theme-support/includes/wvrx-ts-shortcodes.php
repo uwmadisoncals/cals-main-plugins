@@ -186,19 +186,34 @@ function wvrx_ts_show_hide_if($args = '', $text, $show) {
 
 
 // ===============  [header_image style='customstyle'] ===================
-function wvrx_ts_sc_header_image($args = ''){
+function wvrx_ts_sc_header_image($args = '') {
     extract(shortcode_atts(array(
 	    'style' => '',	// STYLE
 	    'h' => '',
 	    'w' => ''
     ), $args));
 
-    $width = $w ? ' width="' . $w . '"' : '';
-    $height = $h ? ' height="' . $h . '"' : '';
-    $st = $style ? ' style="' . $style . '"' : '';
+	$hdr = get_header_image();
+	if (!$hdr)
+		return '';
+	$hdr = str_replace(array('http://', 'https://'),'//', $hdr);
 
-	$hdrimg = '<img src="' . get_header_image() . '"' . $st . $width . $height
-	 . ' alt="' . esc_attr( get_bloginfo( 'name', 'display' ) ) . '" />' ;
+	$width = weaverx_getopt_default('theme_width_int',940);
+	$custom_header_sizes = apply_filters( 'weaverx_custom_header_sizes', "(max-width: {$width}px) 100vw, 1920px" );
+
+    $width = $w ?  $w  : get_custom_header()->width;
+    $height = $h ? $h : get_custom_header()->height;
+    $st = $style ? ' style="' . $style . '"' : '';
+	$srcset = esc_attr( wp_get_attachment_image_srcset( get_custom_header()->attachment_id ) );
+	$sizes = esc_attr( $custom_header_sizes );
+
+	if ( stripos($hdr, '.gif') !== false ) {
+		$hdrimg = '<img src="' .  $hdr . '" width="' . $width .'" height="' . $height . '"'
+		. $st . ' alt="' . esc_attr( get_bloginfo( 'name', 'display' ) ) . '" />' ;
+	} else {
+		$hdrimg = '<img src="' .  $hdr . '" srcset="' . $srcset . '" sizes="' . $sizes . '" width="' . $width .'" height="' . $height . '"'
+		. $st . ' alt="' . esc_attr( get_bloginfo( 'name', 'display' ) ) . '" />' ;
+	}
 
     return $hdrimg;
 }

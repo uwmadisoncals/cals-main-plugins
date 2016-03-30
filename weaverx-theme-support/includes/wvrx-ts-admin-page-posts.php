@@ -204,12 +204,7 @@ function wvrx_ts_page_extras() {
 		|| (current_user_can('edit_pages') && !isset($opts['_hide_editor_per']))	// Editor
 		|| (current_user_can('edit_posts') && !isset($opts['_hide_author_per'])))    // Author/Contributor
 	) {
-		if (isset($opts['_show_per_post_all']) && $opts['_show_per_post_all'])
-			echo '<p>' .
-__('You can enable Weaver Xtreme Per Page Options for Custom Post Types on the Weaver Xtreme:Advanced Options:Admin Options tab.','weaverx-theme-support' /*adm*/) .
-		'</p>';
-		else
-			echo '<p>' . __('Weaver Xtreme Per Page Options not available for your User Role.','weaverx-theme-support' /*adm*/) . '</p>';
+		echo '<p>' . __('Weaver Xtreme Per Page Options not available for your User Role.','weaverx-theme-support' /*adm*/) . '</p>';
 		return;	// don't show per post panel
 	   }
 
@@ -428,6 +423,17 @@ settings for "Page with Posts" will be displayed here. Current page template:','
 	<input type='hidden' id='post_meta' name='post_meta' value='post_meta'/>
 	</div>
 <?php
+}
+
+function wvrx_ts_post_extras_pt() {
+	// special handling for non-Weaver Custom Post Types
+	if ((isset($opts['_show_per_post_all']) && $opts['_show_per_post_all']) || function_exists('atw_slider_plugins_loaded') )
+		wvrx_ts_post_extras();
+	else {
+		echo '<p>' .
+__('You can enable Weaver Xtreme Per Post Options for Custom Post Types on the Weaver Xtreme:Advanced Options:Admin Options tab.','weaverx-theme-support' /*adm*/) .
+		'</p>';
+	}
 }
 
 function wvrx_ts_post_extras() {

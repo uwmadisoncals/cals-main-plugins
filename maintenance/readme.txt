@@ -3,12 +3,12 @@ Contributors: fruitfulcode
 Donate link: http://fruitfulcode.com/
 Tags: maintenance, maintenance mode, coming soon, splash page, under-construction, 503 error, administration, login, customize page, background, fullscreen, blur
 Requires at least: 3.4
-Tested up to: 4.4
-Stable tag: 2.6
+Tested up to: 4.4.2
+Stable tag: 2.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Maintenance - easy configure and customize coming soon, under construction page when site have updates or changes.
+Maintenance - easy configure and customize coming soon, under construction page when site have updates, changes or in development process.
 
 == Description ==
 
@@ -21,7 +21,7 @@ https://www.youtube.com/watch?v=Z5v9Ju52nmg
 <li>Html/CSS layout without images (retina ready) </li>
 <li>Fullscreen background (<a target="_blank" href="https://github.com/srobbin/jquery-backstretch">Backstretch</a>)</li>
 <li>Blur background effect</li>
-<li>Upload own logo</li>
+<li>Upload own logo and retina</li>
 <li>Configurable colors: fonts, icons, background</li>
 <li>Add your title, headline, text</li>
 <li>User login with validation</li>
@@ -119,6 +119,24 @@ You can check <a href="http://wordpress.org/support/plugin/maintenance">support 
 
 
 == Change log ==
+
+= 2.7.1 =
+* Update: Language files
+* Bug fix: Default values and checkbox changes in preferences
+* Bug fix: Lost password link if WooCommerce exist
+
+= 2.7 =
+* New: Google fonts subsets
+* New: WP Super Cache support
+* New: WP Total Cache support
+* New: Retina logo
+* New: Logo width and height fields
+* New: uninstal.php
+* Update: WordPress 4.4.2 support
+* Improvements: Responsive version
+* Improvements: Time format
+* Bug fix: Maintenance not working on French Language
+
 
 = 2.6 =
 * Update: WordPress 4.4 support

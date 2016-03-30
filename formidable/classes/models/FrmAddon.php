@@ -157,6 +157,7 @@ class FrmAddon {
 	}
 
 	public static function activate() {
+		FrmAppHelper::permission_check('frm_change_settings');
 	 	check_ajax_referer( 'frm_ajax', 'nonce' );
 
 		if ( ! isset( $_POST['license'] ) || empty( $_POST['license'] ) ) {
@@ -204,6 +205,7 @@ class FrmAddon {
 	}
 
 	public static function deactivate() {
+		FrmAppHelper::permission_check('frm_change_settings');
 		check_ajax_referer( 'frm_ajax', 'nonce' );
 
 		$plugin_slug = sanitize_text_field( $_POST['plugin'] );
@@ -255,7 +257,7 @@ class FrmAddon {
 		if ( is_wp_error( $resp ) ) {
 			$message = sprintf( __( 'You had an error communicating with Formidable Pro\'s API. %1$sClick here%2$s for more information.', 'formidable' ), '<a href="http://formidablepro.com/knowledgebase/why-cant-i-activate-formidable-pro/" target="_blank">', '</a>');
 			if ( is_wp_error( $resp ) ) {
-				$message .= ' '. $resp->get_error_message();
+				$message .= ' ' . $resp->get_error_message();
 			}
 		} else if ( $body == 'error' || is_wp_error( $body ) ) {
 			$message = __( 'You had an HTTP error connecting to Formidable Pro\'s API', 'formidable' );
@@ -268,14 +270,14 @@ class FrmAddon {
 					$message = $json_res;
 				}
 			} else if ( isset( $resp['response'] ) && isset( $resp['response']['code'] ) ) {
-				$message = sprintf( __( 'There was a %1$s error: %2$s', 'formidable' ), $resp['response']['code'], $resp['response']['message'] .' '. $resp['body'] );
+				$message = sprintf( __( 'There was a %1$s error: %2$s', 'formidable' ), $resp['response']['code'], $resp['response']['message'] . ' ' . $resp['body'] );
 			}
 		}
 
 		return $message;
 	}
 
-    public function manually_queue_update(){
+    public function manually_queue_update() {
         set_site_transient( 'update_plugins', null );
     }
 }

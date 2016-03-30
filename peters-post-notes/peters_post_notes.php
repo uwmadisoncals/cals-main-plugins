@@ -4,8 +4,10 @@ Plugin Name: Peter's Post Notes
 Plugin URI: http://www.theblog.ca/wordpress-post-notes
 Description: Add notes on the "edit post" and "edit page" screens' sidebars, as well as general notes on the dashboard, in WordPress 2.8 and up. When used with Peter's Collaboration E-mails 1.2 and up, the notes are sent along with the e-mails in the collaboration workflow.
 Author: Peter Keung
-Version: 1.5.4
+Version: 1.6.1
 Change Log:
+2016-02-13  1.6.1: Improve UX by wrapping checkboxes inside labels. (Thanks Hrohh!)
+2016-02-12  1.6.0: Support private notes on posts.
 2016-01-06  1.5.4: Make all strings translatable and put translation files in their own folder. (Thanks Luis González Jaime!)
 2014-05-10  1.5.3: Bug fix: strip slashes in Latest Note column.
 2013-10-07  1.5.2: Support PHP 5 static function calls, bumping WordPress requirement to 3.2+.
@@ -51,7 +53,7 @@ global $ppn_version;
 // Name of the database table that will hold the post-specific notes
 $ppn_db_notes = $wpdb->prefix . 'collabnotes';
 $ppn_db_generalnotes = $wpdb->prefix . 'generalnotes';
-$ppn_version = '1.5.4';
+$ppn_version = '1.6.1';
 
 /* --------------------------------------------
 Helper functions
@@ -335,8 +337,12 @@ function ppn_add_meta_box() {
 Output within meta box
 ---------------------------------------------*/
 
-function ppn_meta_contents($post) {
+function ppn_meta_contents($post)
+{
     global $wpdb, $ppn_db_notes;
+    
+    // Upgrade check here because we know they need this information to visit this page
+    ppn_upgrade();
 
     // Get information about the currently logged in user
     $current_user = wp_get_current_user();
@@ -347,17 +353,25 @@ function ppn_meta_contents($post) {
     $ppn_superedit_caps = ppnFunctionCollection::get_settings( 'superedit_caps' );
 
     // Show all notes for this post
-    $ppn_notes = $wpdb->get_results('SELECT noteid, notecontent, author, notetime FROM ' . $ppn_db_notes . ' WHERE postid = ' . $post->ID . ' ORDER BY notetime DESC', OBJECT);
+    $ppn_notes = $wpdb->get_results('SELECT noteid, notecontent, author, notetime, personal FROM ' . $ppn_db_notes . ' WHERE postid = ' . $post->ID . ' AND (personal = 0 OR author = ' . $current_user->ID . ') ORDER BY notetime DESC', OBJECT);
         
     // If they are part of groups, get the moderator info for each group
-    if( $ppn_notes ) {
+    if( $ppn_notes )
+    {
         $ppn_num_notes = count($ppn_notes);
         $ppn_this_note = 1;
         $is_supereditor = ppnFunctionCollection::is_super( $current_user, $ppn_superedit_roles, $ppn_superedit_caps );
         foreach ($ppn_notes as $ppn_note) {
             $author_name = ppnFunctionCollection::get_author_name( $ppn_note->author );
             print '<div id="ppn_entire_note_' . $ppn_note->noteid . '">' . "\n";
-            print '<p><strong>' . $author_name . '</strong></p>' . "\n";
+            print '<p><strong>';
+            print '<span id="ppn_private_' . $ppn_note->noteid . '"';
+            if( !$ppn_note->personal )
+            {
+                print ' style="display:none"';
+            }
+            print '>[private] </span>';
+            print $author_name . '</strong></p>' . "\n";
             print '<p><em>' . mysql2date(__('M j, Y \a\t G:i', 'peters_post_notes'), $ppn_note->notetime) . '</em></p>' . "\n";
             print '<div id="ppn_noteerror_' . $ppn_note->noteid . '"></div>' . "\n";
             print '<div id="ppn_notecontent_' . $ppn_note->noteid . '">';
@@ -369,8 +383,15 @@ function ppn_meta_contents($post) {
             if( $current_user->ID == $ppn_note->author || $is_supereditor ) {
                 print '<div id="ppn_noteform_' . $ppn_note->noteid . '" style="display: none;" >' . "\n";
                 print '<p style="float:right;"><a onclick="ppn_ajax_delete_note(' . $ppn_note->noteid . ', 1); return false;" href="#">' . __('Delete', 'peters_post_notes') . '</a></p>' . "\n";
-                print '<p><textarea name="ppn_note_text_' . $ppn_note->noteid . '" id="ppn_note_' . $ppn_note->noteid . '" cols="30" style="width: 99%;">' . ppnFunctionCollection::preserve_code( $ppn_note->notecontent ) . '</textarea></p>' . "\n";
-                print '<p><input type="hidden" name="note_id" value="' . $ppn_note->noteid . '" /><input type="button" class="button button-highlighted" value="' . __('Save', 'peters_post_notes') . '" onclick="ppn_ajax_edit_note(' . $ppn_note->noteid . ',this.form.ppn_note_text_' . $ppn_note->noteid . ', 1);" />';
+                print '<p><textarea name="ppn_note_text_' . $ppn_note->noteid . '" id="ppn_note_' . $ppn_note->noteid . '" cols="30" style="width: 99%;">' . ppnFunctionCollection::preserve_code( $ppn_note->notecontent ) . '</textarea>';
+                print '<br /><br /><label><input type="checkbox" id="ppn_note_personal_' . $ppn_note->noteid . '"';
+                if( $ppn_note->personal )
+                {
+                    print ' checked="checked"';
+                }
+                print '"/>' . __('Private note', 'peters_post_notes');
+                print '</label></p>' . "\n";
+                print '<p><input type="hidden" name="note_id" value="' . $ppn_note->noteid . '" /><input type="button" class="button button-highlighted" value="' . __('Save', 'peters_post_notes') . '" onclick="ppn_ajax_edit_note(' . $ppn_note->noteid . ',this.form.ppn_note_text_' . $ppn_note->noteid . ', 1, this.form.ppn_note_personal_' . $ppn_note->noteid . ');" />';
                 print ' <a onclick="ppn_ajax_edit_form_cancel(' . $ppn_note->noteid . '); return false;" href="#">' . __('Cancel', 'peters_post_notes') . '</a></p>' . "\n";
                 print '</div>' . "\n";
             }
@@ -395,14 +416,19 @@ function ppn_meta_contents($post) {
     else {
         print '<hr />';
     }
-    print '<div id="ppn_add_post_note" style="margin: 10px 0 10px 0;"><label for="ppn_post_note">' . __('Add note:', 'peters_post_notes') . '</label><br /><textarea rows="3" cols="30" name="ppn_post_note" id="ppn_post_note" style="width: 99%"></textarea></div>';
+    print '<div id="ppn_add_post_note" style="margin: 10px 0 10px 0;">';
+    print '<label for="ppn_post_note">' . __('Add note:', 'peters_post_notes') . '</label><br />';
+    print '<textarea rows="3" cols="30" name="ppn_post_note" id="ppn_post_note" style="width: 99%"></textarea><br /><br />';
+    print '<label><input type="checkbox" name="ppn_private" /> ' . __('Private note', 'peters_post_notes') . "</label>\n";
+    print '</div>';
 }
 
 /* --------------------------------------------
 Add a note during any post save or update action
 ---------------------------------------------*/
 
-function ppn_save_note($post_id, $post) {
+function ppn_save_note($post_id, $post)
+{
     global $wpdb, $ppn_db_notes, $_POST;
 
     // Get information about the currently logged in user, as the person submitting the post for review or approving it
@@ -420,6 +446,14 @@ function ppn_save_note($post_id, $post) {
                                                         WHERE `postid` = %d
                                                         ORDER BY `notetime` DESC
                                                         LIMIT 1;", $post_id ) );
+                                                        
+        // Default to a private note
+        $ppn_private = 1;
+        if( !isset( $_POST['ppn_private'] ) )
+        {
+            $ppn_private = 0;
+        }
+
         if( $ppn_post_note != $latest_note )
         {
             // Insert the note into the database if they haven't already posted the same thing
@@ -428,7 +462,8 @@ function ppn_save_note($post_id, $post) {
                 array('postid' => $post_id,
                     'notecontent' => $ppn_post_note,
                     'author' => $current_user->ID,
-                    'notetime' => current_time('mysql')
+                    'notetime' => current_time('mysql'),
+                    'personal' => $ppn_private
                 )
             );
         }
@@ -456,6 +491,9 @@ function ppn_add_dashboard() {
 function ppn_dashboard() {
     global $wpdb, $ppn_db_notes;
 
+    // Upgrade check here because we know they need this information to visit this page
+    ppn_upgrade();
+
     $current_user = wp_get_current_user();
 
     // Basic variable setup
@@ -472,11 +510,13 @@ function ppn_dashboard() {
         // Do another check to see whether this user has an exempted role or capability to be able to view all notes
         $is_super = ppnFunctionCollection::is_super( $current_user, $ppn_super_roles, $ppn_super_caps );
 
-        if( !$is_super ) {
+        if( !$is_super )
+        {
             // Get posts this author has written
             $ppn_author_posts = query_posts('author=' . $current_user->ID . '&orderby=modified&order=DESC&showposts=100');
             $ppn_relevant_posts = array();
-            if( $ppn_author_posts ) {
+            if( $ppn_author_posts )
+            {
                 foreach ($ppn_author_posts as $ppn_author_post) {
                     $ppn_relevant_posts[] = $ppn_author_post->ID;
                 }
@@ -515,17 +555,23 @@ function ppn_dashboard() {
         else {
             $ppn_num_notes = ' LIMIT ' . $ppn_num_notes_limit;
         }
-
-        $ppn_newest_posts = $wpdb->get_results('SELECT postid, author, notetime, notecontent FROM ' . $ppn_db_notes . $ppn_query_options . ' ORDER BY notetime DESC' . $ppn_num_notes, OBJECT);
+        
+        $ppn_newest_posts = $wpdb->get_results( 'SELECT postid, author, notetime, notecontent, personal FROM ' . $ppn_db_notes . $ppn_query_options . ' AND ( personal = 0 OR author = ' . $current_user->ID . ' ) ORDER BY notetime DESC' . $ppn_num_notes, OBJECT );
     }
 
     if( $ppn_newest_posts ) {
         print '<ul>' . "\n";
-        foreach ($ppn_newest_posts as $ppn_newest_post) {
+        foreach ($ppn_newest_posts as $ppn_newest_post)
+        {
             $author_name = ppnFunctionCollection::get_author_name( $ppn_newest_post->author );
             $ppn_post = get_post($ppn_newest_post->postid, OBJECT);
             
-            print '<li><strong>' . $author_name . '</strong>: ' . stripslashes($ppn_newest_post->notecontent) . '<br />';
+            print '<li><strong>';
+            if( $ppn_newest_post->personal )
+            {
+                print '[private] ';
+            }
+            print $author_name . '</strong>: ' . stripslashes($ppn_newest_post->notecontent) . '<br />';
             print '<em>' . mysql2date(__('M j, Y \a\t G:i', 'peters_post_notes'), $ppn_newest_post->notetime) . '</em> '.__('on', 'peters_post_notes').' ';
             print '<a href="post.php?action=edit&post=' . $ppn_newest_post->postid . '">' . $ppn_post->post_title . '</a> (' . $ppn_post->post_status . ')';
             print '</li>' . "\n";
@@ -541,7 +587,8 @@ function ppn_add_dashboard_general() {
     wp_add_dashboard_widget( 'ppn_dashboard_general', __('General Notes', 'peters_post_notes'), 'ppn_dashboard_general' );
 }
 
-function ppn_dashboard_general() {
+function ppn_dashboard_general()
+{
     global $wpdb, $ppn_db_generalnotes;
 
     $current_user = wp_get_current_user();
@@ -602,12 +649,12 @@ function ppn_dashboard_general() {
     print '<textarea rows="3" cols="60" name="ppn_post_generalnote" style="width: 99%;"></textarea><br />' . "\n";
     if( current_user_can( $ppn_general_notes_required_capability ) )
     {
-        print '<input type="checkbox" name="ppn_private" /> ' . __('Private note', 'peters_post_notes') . "\n";
+        print '<label><input type="checkbox" name="ppn_private" /> ' . __('Private note', 'peters_post_notes') . "</label>\n";
     }
     else
     {
         // Force the note to be private
-        print '<input type="checkbox" name="ppn_private_forced" checked="checked" disabled="true" /> ' . __('Private note', 'peters_post_notes') . "\n";
+        print '<label><input type="checkbox" name="ppn_private_forced" checked="checked" disabled="true" /> ' . __('Private note', 'peters_post_notes') . "</label>\n";
         print '<input type="hidden" name="ppn_private" value="on" />' . "\n";
     }
     print '<input name="ppn_submit_generalnote" type="submit" class="button" value="' . __('Add', 'peters_post_notes') . '" />' . "\n";
@@ -679,8 +726,9 @@ function ppn_dashboard_general_newest($ppn_page=0, $ppn_personal=0) {
                 $out .= '<form name="ppn_note_' . $ppn_newest_post->noteid . '">' . "\n";
                 $out .= '<div id="ppn_noteform_' . $ppn_newest_post->noteid . '" style="display: none;" >' . "\n";
                 $out .= '<p style="float:left;"><a onclick="ppn_ajax_delete_note(' . $ppn_newest_post->noteid . ', 0); return false;" href="#">' . __('Delete', 'peters_post_notes') . '</a></p>' . "\n";
-                $out .= '<p style="clear:both;"><textarea name="ppn_note_text_' . $ppn_newest_post->noteid . '" id="ppn_note_' . $ppn_newest_post->noteid . '" cols="30" style="width: 99%;">' . ppnFunctionCollection::preserve_code( $ppn_newest_post->notecontent ) . '</textarea></p>' . "\n";
-                $out .= '<p><input type="hidden" name="note_id" value="' . $ppn_newest_post->noteid . '" /><input type="button" class="button button-highlighted" value="' . __('Save', 'peters_post_notes') . '" onclick="ppn_ajax_edit_note(' . $ppn_newest_post->noteid . ',this.form.ppn_note_text_' . $ppn_newest_post->noteid . ', 0);" />';
+                $out .= '<p style="clear:both;"><textarea name="ppn_note_text_' . $ppn_newest_post->noteid . '" id="ppn_note_' . $ppn_newest_post->noteid . '" cols="30" style="width: 99%;">' . ppnFunctionCollection::preserve_code( $ppn_newest_post->notecontent ) . '</textarea>';
+                $out .= '</p>' . "\n";
+                $out .= '<p><input type="hidden" name="note_id" value="' . $ppn_newest_post->noteid . '" /><input type="button" class="button button-highlighted" value="' . __('Save', 'peters_post_notes') . '" onclick="ppn_ajax_edit_note(' . $ppn_newest_post->noteid . ',this.form.ppn_note_text_' . $ppn_newest_post->noteid . ', 0 );" />';
                 $out .= ' <a onclick="ppn_ajax_edit_form_cancel(' . $ppn_newest_post->noteid . '); return false;" href="javascript:;">' . __('Cancel', 'peters_post_notes') . '</a></p>' . "\n";
                 $out .= '</div>' . "\n";
                 $out .= '</form>' . "\n";
@@ -710,7 +758,30 @@ function ppn_dashboard_general_newest($ppn_page=0, $ppn_personal=0) {
 Add and remove tables when installing and uninstalling
 ---------------------------------------------*/
 
-function ppn_install() {
+// Perform upgrade functions
+// Some newer operations are duplicated from ppn_install() as there's no guarantee that the user will follow a specific upgrade procedure
+function ppn_upgrade()
+{
+    global $wpdb, $ppn_version, $ppn_db_notes;
+
+    // Turn version into an integer for comparisons
+    $current_version = intval( str_replace( '.', '', get_option( 'ppn_version' ) ) );
+
+    if( $current_version < 160 )
+    {
+        $wpdb->query( "ALTER TABLE $ppn_db_notes ADD `personal` BOOLEAN NOT NULL DEFAULT '0' AFTER `notetime`" );
+    }
+
+    if( $current_version != intval( str_replace( '.', '', $ppn_version ) ) )
+    {
+        // Add the version number to the database
+        delete_option( 'ppn_version' );
+        add_option( 'ppn_version', $ppn_version, '', 'no' );
+    }
+}
+
+function ppn_install()
+{
     global $wpdb, $ppn_db_notes, $ppn_db_generalnotes, $ppn_version;
     
     $return = '';
@@ -723,6 +794,7 @@ function ppn_install() {
         `notecontent` text NOT NULL,
         `author` bigint(20) NOT NULL,
         `notetime` datetime NOT NULL,
+        `personal` BOOLEAN NOT NULL DEFAULT \'1\',
         UNIQUE KEY `noteid` (noteid)
         ) AUTO_INCREMENT=1;';
         
@@ -739,7 +811,7 @@ function ppn_install() {
         `notecontent` text NOT NULL,
         `author` bigint(20) NOT NULL,
         `notetime` datetime NOT NULL,
-        `personal` BINARY NOT NULL DEFAULT \'1\',
+        `personal` BOOLEAN NOT NULL DEFAULT \'1\',
         UNIQUE KEY `noteid` (noteid)
         ) AUTO_INCREMENT=1;';
 
@@ -752,6 +824,8 @@ function ppn_install() {
 
     // Store version number in the database
     add_option( 'ppn_version', $ppn_version, '', 'no' );
+    
+    ppn_upgrade();
     
     return $return;
 }
@@ -834,12 +908,12 @@ function ppn_options_page() {
                 $ppn_role_names = ppnFunctionCollection::get_role_names();
                 foreach( $ppn_role_names as $ppn_role_name )
                 {
-                    print '<p><input name="ppn_super_roles[]" type="checkbox" value="' . $ppn_role_name . '"';
+                    print '<p><label><input name="ppn_super_roles[]" type="checkbox" value="' . $ppn_role_name . '"';
                     if( in_array( $ppn_role_name, $ppn_settings['super_roles'] ) )
                     {
                         print ' checked="checked"';
                     }
-                    print ' /> ' . $ppn_role_name . '</p>';
+                    print ' /> ' . $ppn_role_name . '</label></p>';
                 }
             ?>
         </td>
@@ -877,12 +951,12 @@ function ppn_options_page() {
                 }
                 foreach( $ppn_role_names as $ppn_role_name )
                 {
-                    print '<p><input name="ppn_superedit_roles[]" type="checkbox" value="' . $ppn_role_name . '"';
+                    print '<p><label><input name="ppn_superedit_roles[]" type="checkbox" value="' . $ppn_role_name . '"';
                     if( in_array( $ppn_role_name, $ppn_settings['superedit_roles'] ) )
                     {
                         print ' checked="checked"';
                     }
-                    print ' /> ' . $ppn_role_name . '</p>';
+                    print ' /> ' . $ppn_role_name . '</label></p>';
                 }
             ?>
         </td>
@@ -923,12 +997,12 @@ function ppn_options_page() {
                     // Don't show revisions, attachments, or navigation menu items, as they're not traditional posts
                     if( !in_array( $ppn_post_type, array( 'revision', 'attachment', 'nav_menu_item' ) ) )
                     {
-                        print '<p><input name="ppn_post_types[]" type="checkbox" value="' . $ppn_post_type . '"';
+                        print '<p><label><input name="ppn_post_types[]" type="checkbox" value="' . $ppn_post_type . '"';
                         if( in_array( $ppn_post_type, $ppn_settings['post_types'] ) )
                         {
                             print ' checked="checked"';
                         }
-                        print ' /> ' . $ppn_post_type . '</p>';
+                        print ' /> ' . $ppn_post_type . '</label></p>';
                     }
                 }
             ?>
@@ -1043,7 +1117,11 @@ function ppn_edit_note() {
     // read submitted information
 
     $note_id = intval($_POST['note_id']);
-    
+    if( isset( $_POST['is_personal'] ) )
+    {
+        $is_personal = intval($_POST['is_personal']);
+    }
+
     $note_text = ppnFunctionCollection::note_scrub( $_POST['note_text'] );
     
     $note_type = substr($_POST['note_type'], 0, 7);
@@ -1063,18 +1141,34 @@ function ppn_edit_note() {
     }
     
     // Edit the note!
+    $fields_to_update = array( 'notecontent' => $note_text );
+    if( isset( $is_personal ) )
+    {
+        $fields_to_update['personal'] = $is_personal;
+    }
+
     $ppn_editnotesuccess = $wpdb->update(
         $ppn_db_table,
-        array ('notecontent' => $note_text),
-        array ('noteid' => $note_id));
+        $fields_to_update,
+        array( 'noteid' => $note_id )
+    );
         
     if( $ppn_editnotesuccess ) {
         $note_text = str_replace( "\n", '\\n', $note_text );
         $note_text = str_replace( "\r", '\\r', $note_text );
-        die( 'document.getElementById("ppn_noteerror_' . $note_id . '").innerHTML = "";
+        $success_action = 'document.getElementById("ppn_noteerror_' . $note_id . '").innerHTML = "";
             document.getElementById("ppn_notecontent_p_' . $note_id . '").innerHTML = "' . ppnFunctionCollection::prepare_js_from_kses( $note_text ) . '"; ppn_fadeedit("ppn_notecontent_p_' . $note_id . '");
             document.getElementById("ppn_noteform_' . $note_id . '").style.display = "none";
-            document.getElementById("ppn_notecontent_' . $note_id . '").style.display = "";');
+            document.getElementById("ppn_notecontent_' . $note_id . '").style.display = "";';
+        if( $is_personal )
+        {
+            $success_action .= 'document.getElementById("ppn_private_' . $note_id . '").style.display = "";';
+        }
+        else
+        {
+            $success_action .= 'document.getElementById("ppn_private_' . $note_id . '").style.display = "none";';
+        }
+        die( $success_action );
     }
     // Database error
     elseif( $ppn_editnotesuccess === false ) {

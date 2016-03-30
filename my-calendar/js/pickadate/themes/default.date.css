@@ -37,11 +37,11 @@
     }
 }
 
-.picker__select--month {
+.picker__holder .picker__box .picker__select--month {
     width: 35%
 }
 
-.picker__select--year {
+.picker__holder .picker__box .picker__select--year {
     width: 22.5%
 }
 

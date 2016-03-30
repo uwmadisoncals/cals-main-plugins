@@ -698,7 +698,7 @@ function check_my_calendar() {
 function mc_do_upgrades( $upgrade_path ) {
 	foreach ( $upgrade_path as $upgrade ) {
 		switch ( $upgrade ) {
-			case '2.4.13':
+			case '2.4.15':
 				update_option( 'mc_db_version', $mc_version );
 				mc_upgrade_db();
 				break;
@@ -1509,7 +1509,7 @@ Version: $version
 DB Version: $mc_db_version
 URI: $mc_uri
 CSS: $mc_css
-License: Submissions: $license / Ticketing: $tickets_license
+Licenses: Pro - $license; Ticketing - $tickets_license
 Requester Email: $current_user->user_email
 Admin Email: $admin_email
 

@@ -146,6 +146,15 @@ function frmFrontFormJS(){
 		}
 
 		if ( fieldName === '' ) {
+			if ( field instanceof jQuery ) {
+				fieldName = field.data('name');
+			} else {
+				fieldName = field.getAttribute('data-name');
+			}
+
+			if ( fieldName !== '' && fieldName ) {
+				return fieldName;
+			}
 			return 0;
 		}
 
@@ -164,6 +173,11 @@ function frmFrontFormJS(){
 
 		// Check if 'this' is in a repeating section
 		if ( jQuery('input[name="item_meta['+ field_id +'][form]"]').length ) {
+			// If item_meta[370][0]
+			if ( nameParts.length === 2 && nameParts[1] == '[0' ) {
+				return 0;
+			}
+
 			// this is a repeatable section with name: item_meta[370][0][414]
 			field_id = nameParts[2].replace('[', '');
 			isRepeating = true;
@@ -182,7 +196,11 @@ function frmFrontFormJS(){
 
 		if ( fullID === true ) {
 			// For use in the container div id
-			field_id = field_id +'-'+ nameParts[0] +'-'+ nameParts[1].replace('[', '');
+			if ( field_id === nameParts[0] ) {
+				field_id = field_id +'-'+ nameParts[1].replace('[', '');
+			} else {
+				field_id = field_id +'-'+ nameParts[0] +'-'+ nameParts[1].replace('[', '');
+			}
 		}
 
 		return field_id;
@@ -412,7 +430,7 @@ function frmFrontFormJS(){
 
 		} else {
 			// If text field on the current page
-			fieldValue = jQuery('input[name="'+ f.inputName +'"]').val();
+			fieldValue = jQuery('input[name="'+ f.inputName +'"], textarea[name="'+ f.inputName +'"]').val();
 		}
 
 		if ( typeof fieldValue === 'undefined' ) {
@@ -1480,20 +1498,60 @@ function frmFrontFormJS(){
 		return jQuery(currentOpt).closest('.frm_other_container').find('.frm_other_input').val();
 	}
 
+	function shouldJSValidate( object ) {
+		var validate = jQuery(object).hasClass('frm_js_validate');
+		if ( validate ) {
+			if ( savingDraftEntry( object ) || goingToPrevPage( object ) ) {
+				validate = false;
+			}
+		}
+
+		return validate;
+	}
+
+	function savingDraftEntry( object ) {
+		var isDraft = false;
+		var savingDraft = jQuery(object).find('.frm_saving_draft');
+		if ( savingDraft.length ) {
+			isDraft = savingDraft.val();
+		}
+		return isDraft;
+	}
+
+	function goingToPrevPage( object ) {
+		var goingBack = false;
+		var nextPage = jQuery(object).find('.frm_next_page');
+		if ( nextPage.length && nextPage.val() ) {
+			var formID = jQuery(object).find('input[name="form_id"]').val();
+			var prevPage = jQuery(object).find('input[name="frm_page_order_'+ formID +'"]');
+			if ( prevPage.length ) {
+				prevPage = prevPage.val();
+			} else {
+				prevPage = 0;
+			}
+
+			if ( ! prevPage || ( nextPage.val() < prevPage ) ) {
+				goingBack = true;
+			}
+		}
+
+		return goingBack;
+	}
+
 	function validateForm( object ) {
 		var errors = [];
-		return errors; // TODO: remove this line when ready to release
 
 		// Make sure required text field is filled in
-		var requiredFields = jQuery(object).find('.frm_required_field input, .frm_required_field select, .frm_required_field textarea');
+		var requiredFields = jQuery(object).find(
+			'.frm_required_field:visible input, .frm_required_field:visible select, .frm_required_field:visible textarea'
+		).filter(':not(.frm_optional)');
 		if ( requiredFields.length ) {
 			for ( var r = 0, rl = requiredFields.length; r < rl; r++ ) {
-				// this won't work with radio/checkbox
 				errors = checkRequiredField( requiredFields[r], errors );
 			}
 		}
 
-		var emailFields = jQuery(object).find('input[type=email]');
+		var emailFields = jQuery(object).find('input[type=email]').filter(':visible');
 		var fields = jQuery(object).find('input,select,textarea');
 		if ( fields.length ) {
 			for ( var n = 0, nl = fields.length; n < nl; n++ ) {
@@ -1513,15 +1571,16 @@ function frmFrontFormJS(){
 			}
 		}
 
+		errors = validateRecaptcha( object, errors );
+
 		return errors;
 	}
 
 	function validateField( fieldId, field ) {
 		var errors = [];
-		return errors; // TODO: remove this line when ready to release
 
 		var $fieldCont = jQuery(field).closest('.frm_form_field');
-		if ( $fieldCont.hasClass('.frm_required_field') ) {
+		if ( $fieldCont.hasClass('.frm_required_field') && ! jQuery(field).hasClass('.frm_optional') ) {
 			errors = checkRequiredField( field, errors );
 		}
 
@@ -1536,24 +1595,44 @@ function frmFrontFormJS(){
 			}
 		}
 
+		removeFieldError( $fieldCont );
 		if (  Object.keys(errors).length > 0 ) {
 			for ( var key in errors ) {
-				removeFieldError( $fieldCont );
 				addFieldError( $fieldCont, key, errors );
 			}
-		} else {
-			removeFieldError( $fieldCont );
 		}
 	}
 
 	function checkRequiredField( field, errors ) {
+		if ( field.type == 'hidden' ) {
+			return errors;
+		}
+
 		var val = '';
+		var fieldID = '';
 		if ( field.type == 'checkbox' || field.type == 'radio' ) {
-			var checked = document.querySelector('input[name="'+field.name+'"]:checked');
-			if ( checked !== null ) {
-				val = checked.value;
+			var checkGroup = jQuery('input[name="'+field.name+'"]').closest('.frm_required_field').find('input:checked');
+			jQuery(checkGroup).each(function() {
+			    val = this.value;
+			});
+		} else if ( field.type == 'file' ) {
+			var fileID = jQuery(field).data('fid');
+			if ( typeof fileID === 'undefined' ) {
+				fileID = getFieldId( field, true );
+				fileID = fileID.replace('file', '');
 			}
+
+			if ( typeof errors[ fileID ] === 'undefined' ) {
+				val = getFileVals( fileID );
+			}
+			fieldID = fileID;
 		} else {
+			var fieldClasses = field.className;
+			if ( fieldClasses.indexOf('frm_pos_none') !== -1 ) {
+				// skip hidden other fields
+				return errors;
+			}
+
 			val = jQuery(field).val();
 			if ( typeof val !== 'string' ) {
 				var tempVal = val;
@@ -1564,15 +1643,35 @@ function frmFrontFormJS(){
 					}
 				}
 			}
+
+			if ( fieldClasses.indexOf('frm_other_input') === -1 ) {
+				fieldID = getFieldId( field, true );
+			} else {
+				fieldID = getFieldId( field, false );
+			}
 		}
 
 		if ( val === '' ) {
-			var fieldID = getFieldId( field, true );
+			if ( fieldID === '' ) {
+				fieldID = getFieldId( field, true );
+			}
 			if ( !(fieldID in errors) ) {
 				errors[ fieldID ] = getFieldValidationMessage( field, 'data-reqmsg' );
 			}
 		}
+
 		return errors;
+	}
+
+	function getFileVals( fileID ) {
+		var val = '';
+		var fileFields = jQuery('input[name="file'+ fileID +'"], input[name="file'+ fileID +'[]"], input[name^="item_meta['+ fileID +']"]');
+		fileFields.each(function(){
+			if ( val === '' ) {
+				val = this.value;
+			}
+		});
+		return val;
 	}
 
 	function checkEmailField( field, errors, emailFields ) {
@@ -1585,8 +1684,9 @@ function frmFrontFormJS(){
 		var isConf = (fieldID.indexOf('conf_') === 0);
 		if ( emailAddress !== '' || isConf ) {
 			var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+			var invalidMsg = getFieldValidationMessage( field, 'data-invmsg' );
 			if ( emailAddress !== '' && re.test( emailAddress ) === false ) {
-				errors[ fieldID ] = '';
+				errors[ fieldID ] = invalidMsg;
 				if ( isConf ) {
 					errors[ fieldID.replace('conf_', '') ] = '';
 				}
@@ -1594,7 +1694,7 @@ function frmFrontFormJS(){
 				var confName = field.name.replace('conf_', '');
 				var match = emailFields.filter('[name="'+ confName +'"]').val();
 				if ( match !== emailAddress ) {
-					errors[ fieldID ] = getFieldValidationMessage( field, 'data-invmsg' );
+					errors[ fieldID ] = '';
 					errors[ fieldID.replace('conf_', '') ] = '';
 				}
 			}
@@ -1629,6 +1729,21 @@ function frmFrontFormJS(){
 		return errors;
 	}
 
+	function validateRecaptcha( form, errors ) {
+		var $recaptcha = jQuery(form).find('.frm-g-recaptcha');
+		if ( $recaptcha.length ) {
+			var recaptchaID = $recaptcha.data('rid');
+			var response = grecaptcha.getResponse( recaptchaID );
+
+			if ( response.length === 0 ) {
+				var fieldContainer = $recaptcha.closest('.frm_form_field');
+				var fieldID = fieldContainer.attr('id').replace('frm_field_', '').replace('_container', '');
+				errors[ fieldID ] = '';
+			}
+		}
+		return errors;
+	}
+
 	function getFieldValidationMessage( field, messageType ) {
 		var msg = field.getAttribute(messageType);
 		if ( msg === null ) {
@@ -1653,6 +1768,7 @@ function frmFrontFormJS(){
 				if(errObj.indexOf('{') === 0){
 					errObj = jQuery.parseJSON(errObj);
 				}
+
 				if(errObj === '' || !errObj || errObj === '0' || (typeof(errObj) != 'object' && errObj.indexOf('<!DOCTYPE') === 0)){
 					var $loading = document.getElementById('frm_loading');
 					if($loading !== null){
@@ -1663,7 +1779,7 @@ function frmFrontFormJS(){
 							},2000);
 						}
 					}
-					var $recapField = jQuery(object).find('.g-recaptcha');
+					var $recapField = jQuery(object).find('.frm-g-recaptcha, .g-recaptcha');
 					if($recapField.length && (jQuery(object).find('.frm_next_page').length < 1 || jQuery(object).find('.frm_next_page').val() < 1)){
                         $recapField.closest('.frm_form_field').replaceWith('<input type="hidden" name="recaptcha_checked" value="'+ frm_js.nonce +'">');
 					}
@@ -1690,12 +1806,13 @@ function frmFrontFormJS(){
 					jQuery(object).find('.frm_ajax_loading').removeClass('frm_loading_now');
 
 					//show errors
-					var cont_submit=true;
+					var cont_submit = true;
 					jQuery('.form-field').removeClass('frm_blank_field');
 					jQuery('.form-field .frm_error').replaceWith('');
-					var jump = '';
+
 					var show_captcha = false;
-                    var $fieldCont = null;
+					var $fieldCont = null;
+
 					for (var key in errObj){
 						$fieldCont = jQuery(object).find('#frm_field_'+key+'_container');
 
@@ -1711,35 +1828,43 @@ function frmFrontFormJS(){
 									frmTrigger.click();
 								}
 							}
-							if ( $fieldCont.is(':visible') ) {
-								cont_submit = false;
-								if ( jump === '' ) {
-									frmFrontForm.scrollMsg( key, object, true );
-									jump = '#frm_field_'+key+'_container';
-								}
-								var $recapcha = jQuery(object).find('#frm_field_'+key+'_container .g-recaptcha');
-								if ( $recapcha.length ) {
-									show_captcha = true;
-									grecaptcha.reset();
-								}
 
+							if ( $fieldCont.is(':visible') ) {
 								addFieldError( $fieldCont, key, errObj );
+
+								cont_submit = false;
+
+								var $recaptcha = jQuery(object).find('#frm_field_'+key+'_container .frm-g-recaptcha, #frm_field_'+key+'_container .g-recaptcha');
+								if ( $recaptcha.length ) {
+									show_captcha = true;
+									var recaptchaID = $recaptcha.data('rid');
+									if ( recaptchaID ) {
+										grecaptcha.reset( recaptchaID );
+									} else {
+										grecaptcha.reset();
+									}
+								}
 							}
 						}else if(key == 'redirect'){
 							window.location = errObj[key];
 							return;
 						}
 					}
+
+					scrollToFirstField( object );
+
 					if(show_captcha !== true){
-						jQuery(object).find('.g-recaptcha').closest('.frm_form_field').replaceWith('<input type="hidden" name="recaptcha_checked" value="'+ frm_js.nonce +'">');
+						jQuery(object).find('.frm-g-recaptcha, .g-recaptcha').closest('.frm_form_field').replaceWith('<input type="hidden" name="recaptcha_checked" value="'+ frm_js.nonce +'">');
 					}
+
 					if(cont_submit){
 						object.submit();
 					}
 				}
 			},
 			error:function(){
-				jQuery(object).find('input[type="submit"], input[type="button"]').removeAttr('disabled');object.submit();
+				jQuery(object).find('input[type="submit"], input[type="button"]').removeAttr('disabled');
+				object.submit();
 			}
 		});
 	}
@@ -1758,6 +1883,13 @@ function frmFrontFormJS(){
 	function removeFieldError( $fieldCont ) {
 		$fieldCont.removeClass('frm_blank_field');
 		$fieldCont.find('.frm_error').remove();
+	}
+
+	function scrollToFirstField( object ) {
+		var field = jQuery(object).find('.frm_blank_field:first');
+		if ( field.length ) {
+			frmFrontForm.scrollMsg( field, object, true );
+		}
 	}
 
 	function clearDefault(){
@@ -2121,7 +2253,7 @@ function frmFrontFormJS(){
 						}
 						fieldID = this.name.replace('item_meta[', '').split(']')[2].replace('[', '');
 						if ( jQuery.inArray(fieldID, checked ) == -1 ) {
-							if ( this.id == false ) {
+							if ( this.id === false ) {
 								return;
 							}
 							fieldObject = jQuery( '#' + this.id );
@@ -2616,10 +2748,13 @@ function frmFrontFormJS(){
 
 			action = jQuery(object).find('input[name="frm_action"]').val();
 			jsErrors = [];
-			frmFrontForm.getAjaxFormErrors( object );
 
-			if ( Object.keys(jsErrors).length ) {
-				frmFrontForm.addAjaxFormErrors( object );
+			if ( shouldJSValidate( object ) ) {
+				frmFrontForm.getAjaxFormErrors( object );
+
+				if ( Object.keys(jsErrors).length ) {
+					frmFrontForm.addAjaxFormErrors( object );
+				}
 			}
 
 			return jsErrors;
@@ -2645,9 +2780,17 @@ function frmFrontFormJS(){
 			jQuery('.form-field .frm_error').replaceWith('');
 
 			for ( var key in jsErrors ) {
-				var $fieldCont = jQuery(object).find(jQuery('#frm_field_'+key+'_container'));
-				addFieldError( $fieldCont, key, jsErrors );
+				var $fieldCont = jQuery(object).find('#frm_field_'+key+'_container');
+
+				if ( $fieldCont.length ) {
+					addFieldError( $fieldCont, key, jsErrors );
+				} else {
+					// we are unable to show the error, so remove it
+					delete jsErrors[ key ];
+				}
 			}
+
+			scrollToFirstField( object );
 		},
 
 		checkFormErrors: function(object, action){
@@ -2660,12 +2803,15 @@ function frmFrontFormJS(){
         },
 
 		scrollMsg: function( id, object, animate ) {
-			var newPos = '';
+			var scrollObj = '';
 			if(typeof(object) == 'undefined'){
-				newPos = jQuery(document.getElementById('frm_form_'+id+'_container')).offset().top;
-			}else{
-				newPos = jQuery(object).find('#frm_field_'+id+'_container').offset().top;
+				scrollObj = jQuery(document.getElementById('frm_form_'+id+'_container'));
+			} else if ( typeof id == 'string' ) {
+				scrollObj = jQuery(object).find('#frm_field_'+id+'_container');
+			} else {
+				scrollObj = id;
 			}
+			var newPos = scrollObj.offset().top;
 
 			if(!newPos){
 				return;
@@ -2692,6 +2838,14 @@ function frmFrontFormJS(){
 					return false;
 				}
 			}
+		},
+
+		savingDraft: function(object){
+			return savingDraftEntry(object);
+		},
+
+		goingToPreviousPage: function(object){
+			return goingToPrevPage(object);
 		},
 
 		hideCondFields: function(ids){
@@ -2779,6 +2933,18 @@ var frmFrontForm = frmFrontFormJS();
 jQuery(document).ready(function($){
 	frmFrontForm.init();
 });
+
+function frmRecaptcha() {
+	var captchas = jQuery('.frm-g-recaptcha');
+	for ( var c = 0, cl = captchas.length; c < cl; c++ ) {
+		var recaptchaID = grecaptcha.render( captchas[c].id, {
+			'sitekey': captchas[c].getAttribute('data-sitekey'),
+			'size': captchas[c].getAttribute('data-size'),
+			'theme': captchas[c].getAttribute('data-theme')
+		} );
+		captchas[c].setAttribute('data-rid', recaptchaID);
+	}
+}
 
 function frmUpdateField(entry_id,field_id,value,message,num){
 	jQuery(document.getElementById('frm_update_field_'+entry_id+'_'+field_id)).html('<span class="frm-loading-img"></span>');

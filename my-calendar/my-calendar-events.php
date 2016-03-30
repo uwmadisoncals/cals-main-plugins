@@ -305,6 +305,7 @@ function mc_related_events( $id, $return = false ) {
 */
 function my_calendar_events( $from, $to, $category, $ltype, $lvalue, $source, $author, $host, $search = '' ) {
 	$events = my_calendar_grab_events( $from, $to, $category, $ltype, $lvalue, $source, $author, $host, null, $search );
+		
 	if ( ! get_option( 'mc_skip_holidays_category' ) || get_option( 'mc_skip_holidays_category' ) == '' ) {
 		$holidays = array();
 	} else {
@@ -421,6 +422,7 @@ function my_calendar_grab_events( $from, $to, $category = null, $ltype = '', $lv
 	if ( ! mc_checkdate( $from ) || ! mc_checkdate( $to ) ) {
 		return array();
 	} // not valid dates
+		
 	$caching = apply_filters( 'mc_caching_enabled', false, $ccategory, $ltype, $lvalue, $author, $host );
 	$hash    = md5( $from . $to . $ccategory . $cltype . $clvalue . $clauth . $clhost );
 	if ( $source != 'upcoming' ) { // no caching on upcoming events by days widgets or lists
@@ -439,7 +441,7 @@ function my_calendar_grab_events( $from, $to, $category = null, $ltype = '', $lv
 	$select_author   = ( $clauth != 'all' ) ? mc_select_author( $clauth ) : '';
 	$select_host     = ( $clhost != 'all' ) ? mc_select_host( $clhost ) : '';
 	$select_location = mc_limit_string( 'grab', $cltype, $clvalue );
-
+	
 	if ( $caching && $source != 'upcoming' ) {
 		$select_category = '';
 		$select_location = '';
@@ -451,6 +453,7 @@ function my_calendar_grab_events( $from, $to, $category = null, $ltype = '', $lv
 	$arr_events   = array();
 	$limit_string = "event_flagged <> 1 AND event_approved = 1";
 	$search = mc_prepare_search_query( $search );
+
 	$event_query = "SELECT *, UNIX_TIMESTAMP(occur_begin) AS ts_occur_begin, UNIX_TIMESTAMP(occur_end) AS ts_occur_end
 					FROM " . MY_CALENDAR_EVENTS_TABLE . " 
 					JOIN " . MY_CALENDAR_TABLE . "
@@ -464,6 +467,7 @@ function my_calendar_grab_events( $from, $to, $category = null, $ltype = '', $lv
 						OR ( DATE('$to') BETWEEN DATE(occur_begin) AND DATE(occur_end) ) ) 
 					ORDER BY " . apply_filters( 'mc_primary_sort', 'occur_begin' ) . ", " . apply_filters( 'mc_secondary_sort', 'event_title ASC' );
 	$events      = $mcdb->get_results( $event_query );
+			
 	if ( ! empty( $events ) ) {
 		foreach ( array_keys( $events ) as $key ) {
 			$event        =& $events[ $key ];

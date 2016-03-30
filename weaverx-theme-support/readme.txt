@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: weaverx-theme-support
 Requires at least: 4.0
 Tested up to: 4.4
-Stable tag: 2.0.3
+Stable tag: 2.0.5
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -75,13 +75,21 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 This is the initial release of this plugin.
 
 == ChangeLog ==
-== 2.0.3 =
+
+= 2.0.4 =
+* Change: [header_image] updated to support WP 4.4 srcset image sizes
+* New: Pre and Post #header div position for Header Widget Area
+* New: Hide Font Family/Size options on Page/Post editor for Weaver Xtreme Plus
+* Fix: [tabs] box styling for current tab
+
+
+= 2.0.3 =
 * New: 'weaverx_paget_posts' filter to allow multiple page with posts templates in child themes
 
-== 2.0.2 =
+= 2.0.2 =
 * Change: added required theme options support for Disable Integrated Google Fonts
 
-= 2.0.1 =
+= 2.0.1 ==
 * Change: wp-updates.com is long term down, so remove update check
 
 = 2.0 =

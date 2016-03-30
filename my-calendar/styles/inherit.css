@@ -290,6 +290,11 @@
     width: 100%;
 }
 
+.mc-main .list-event .details img {
+    width: auto;
+    max-width: 100%;
+}
+
 .mc-main.mini .day-with-date a {
     display: block;
     margin: -2px;

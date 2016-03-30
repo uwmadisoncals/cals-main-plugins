@@ -6,12 +6,14 @@
         $(document).on("click", ".event-date button",
             function (e) {
                 e.preventDefault();
-                $(this).closest( '.mc-events' ).find( '.vevent' ).toggle().attr("tabindex", "-1").focus();
+				var vevent = $( this ).closest( '.mc-events' ).find( '.vevent:first' );
+                $( this ).closest( '.mc-events' ).find( '.vevent' ).toggle();
+				vevent.attr("tabindex", "-1").focus();
                 var visible = $(this).closest( '.mc-events' ).find(".vevent").is(":visible");
                 if (visible) {
-                    $(this).closest( '.mc-events' ).find(".vevent").attr("aria-expanded", "true");
+                    $(this).closest( '.mc-events' ).attr("aria-expanded", "true");
                 } else {
-                    $(this).closest( '.mc-events' ).find(".vevent").attr("aria-expanded", "false");
+                    $(this).closest( '.mc-events' ).attr("aria-expanded", "false");
                 }
             });
     });

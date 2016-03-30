@@ -363,6 +363,8 @@ function weaverx_mainopts_header() {
 			array('val' => 'after_header', 'desc' => __('After Header Image', 'weaver-xtreme' /*adm*/)),
 			array('val' => 'after_html', 'desc' => __('After HTML Block', 'weaver-xtreme' /*adm*/)),
 			array('val' => 'after_menu', 'desc' => __('After Lower Menu', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'pre_header', 'desc' => __('Pre-#header &lt;div&gt;', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'post_header', 'desc' => __('Post-#header &lt;div&gt;', 'weaver-xtreme' /*adm*/)),
 			)),
 
 	array( 'type' => 'submit'),

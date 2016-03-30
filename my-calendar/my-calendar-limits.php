@@ -74,21 +74,20 @@ function mc_select_category( $category, $type = 'event', $group = 'events' ) {
 	}
 }
 
-function mc_prepare_search_query( $query, $context = 'public' ) {
+function mc_prepare_search_query( $query ) {
 	$query = esc_sql( $query );
 	$db_type = mc_get_db_type();
 	if ( $query != '' ) {
-		$append = ( $context == 'public' ) ? ' AND ' : '';
 		if ( $db_type == 'MyISAM' ) {
-			$search = " MATCH(" . apply_filters( 'mc_search_fields', 'event_title,event_desc,event_short,event_label,event_city,event_postcode,event_registration' ) . ") AGAINST ( '$query' IN BOOLEAN MODE ) $append ";
+			$search = " AND MATCH(" . apply_filters( 'mc_search_fields', 'event_title,event_desc,event_short,event_label,event_city,event_postcode,event_registration' ) . ") AGAINST ( '$query' IN BOOLEAN MODE ) ";
 		} else {
-			$search = " event_title LIKE '%$query%' OR
+			$search = " AND event_title LIKE '%$query%' OR
 						event_desc LIKE '%$query%' OR
 						event_short LIKE '%$query%' OR
 						event_label LIKE '%$query%' OR
 						event_city LIKE '%$query%' OR
 						event_postcode LIKE '%$query%' OR
-						event_registration LIKE '%$query%' $append";
+						event_registration LIKE '%$query%' ";
 		}
 	} else {
 		$search = '';

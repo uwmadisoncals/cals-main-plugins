@@ -2,7 +2,7 @@
 <div class="wrap">
     <?php FrmStylesHelper::style_menu(); ?>
 
-	<?php include(FrmAppHelper::plugin_path() .'/classes/views/shared/errors.php'); ?>
+	<?php include( FrmAppHelper::plugin_path() . '/classes/views/shared/errors.php' ); ?>
 
 	<?php do_action( 'frm_style_switcher', $style, $styles ) ?>
 
@@ -11,7 +11,7 @@
 		<input type="hidden" name="frm_action" value="save" />
         <textarea name="<?php echo esc_attr( $frm_style->get_field_name('custom_css') ) ?>" class="frm_hidden"><?php echo FrmAppHelper::esc_textarea( $style->post_content['custom_css'] ) ?></textarea>
 		<?php wp_nonce_field( 'frm_style_nonce', 'frm_style' ); ?>
-
+		<?php FrmTipsHelper::pro_tip( 'get_styling_tip', 'p' ); ?>
 	<div id="nav-menus-frame">
 	<div id="menu-settings-column" class="metabox-holder">
 		<div class="clear"></div>
@@ -54,7 +54,7 @@
 					<div id="post-body">
 						<div id="post-body-content">
 
-							<?php include( dirname(__FILE__) .'/_sample_form.php') ?>
+							<?php include( dirname( __FILE__ ) . '/_sample_form.php' ); ?>
 
 						</div><!-- /#post-body-content -->
 					</div><!-- /#post-body -->
@@ -65,7 +65,7 @@
 						    <?php } ?>
 						    <?php
 						    if ( $style->ID ) {
-							    echo '<span class="howto"><span>.frm_style_'. esc_attr( $style->post_name ) .'</span></span>';
+								echo '<span class="howto"><span>.frm_style_' . esc_attr( $style->post_name ) . '</span></span>';
 							} ?>
                             <div class="publishing-action">
                                 <input type="button" value="<?php esc_attr_e( 'Reset to Default', 'formidable' ) ?>" class="button-secondary frm_reset_style" />

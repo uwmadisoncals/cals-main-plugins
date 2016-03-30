@@ -24,17 +24,13 @@
 	function mt_get_plugin_options($is_current = false) {
 		$saved	  = (array) get_option('maintenance_options');
 		if (!$is_current) {
-			$defaults = mt_get_default_array();
-			$defaults = apply_filters('mt_plugin_default_options', $defaults );
-			$options  = wp_parse_args($saved, $defaults );
-			$options  = array_intersect_key( $options, $defaults );
+			$options  = wp_parse_args(get_option('maintenance_options', array()),  mt_get_default_array());
 		} else {
 			$options  = $saved;
 		}
-		
 		return $options;
 	}
-	
+
 	function generate_input_filed($title, $id, $name, $value, $placeholder = '') {
 		$out_filed = '';
 		$out_filed .= '<tr valign="top">';
@@ -47,7 +43,19 @@
 		$out_filed .= '</tr>';			
 		echo $out_filed;
 	}	
-	
+
+	function generate_number_filed($title, $id, $name, $value, $placeholder = '') {
+		$out_filed = '';
+		$out_filed .= '<tr valign="top">';
+		$out_filed .= '<th scope="row">' . esc_attr($title) .'</th>';
+			$out_filed .= '<td>';
+				$out_filed .= '<filedset>';
+					$out_filed .= '<input type="number" min="0" step="1" pattern="[0-9]{10}" id="'.esc_attr($id).'" name="lib_options['.$name.']" value="'. wp_kses_post(stripslashes($value)) .'" placeholder="'.$placeholder.'"/>';
+				$out_filed .= '</filedset>';
+			$out_filed .= '</td>';
+		$out_filed .= '</tr>';			
+		echo $out_filed;
+	}
 	
 	function generate_textarea_filed($title, $id, $name, $value) {
 		$out_filed = '';
@@ -180,7 +188,38 @@
 					$out_filed .= '</td>';	
 				$out_filed .= '</tr>';
 			return $out_filed;
-	}		
+	}
+
+	function get_fonts_subsets($title, $id, $name, $value) {
+			global $standart_fonts;
+			$out_items = $gg_fonts = $curr_font = $mt_option = '';
+			$mt_option = mt_get_plugin_options(true);
+			$curr_font = esc_attr($mt_option['body_font_family']);
+			$vars 	   = "subsets";
+			
+			if (file_exists(MAINTENANCE_INCLUDES .'fonts/googlefonts.json')) {
+				$gg_fonts = json_decode(file_get_contents(MAINTENANCE_INCLUDES .'fonts/googlefonts.json'), true);
+			}	
+			
+			if (!empty($gg_fonts)) {
+			
+				$out_filed = '';
+				$out_filed .= '<tr valign="top">';
+						$out_filed .= '<th scope="row">'. esc_attr($title) .'</th>';
+						$out_filed .= '<td>';
+							$out_filed .= '<filedset>';
+								$out_filed .= '<select class="select2_customize" name="lib_options['.$name.']" id="'.esc_attr($id).'">';
+								foreach ($gg_fonts[$curr_font][$vars] as $key) {
+									$out_filed .= '<option value="'.$key['id'] .'" '. selected( $value, $key['id'], false ) .'>'.$key['name'].'</option>';
+								}
+								$out_filed .= '</select>';
+							
+							$out_filed .= '<filedset>';
+						$out_filed .= '</td>';	
+					$out_filed .= '</tr>';
+			}
+			return $out_filed;
+	}	
 	
 	function maintenance_page_create_meta_boxes() {
 		global $maintenance_variable;
@@ -220,13 +259,15 @@
 		$is_blur   = false; 
 		
 		/*Deafult Variable*/
-		$page_title = $heading = $description = '';
+		$page_title = $heading = $description = $logo_width = $logo_height = '';
 		
 		
 		if (isset($mt_option['page_title'])) $page_title = wp_kses_post($mt_option['page_title']);
 		if (isset($mt_option['heading']))  $heading = wp_kses_post($mt_option['heading']);
 		if (isset($mt_option['description'])) $description = wp_kses_post($mt_option['description']);
 		if (isset($mt_option['footer_text'])) $footer_text = wp_kses_post($mt_option['footer_text']);
+		if (isset($mt_option['logo_width'])) $logo_width = wp_kses_post($mt_option['logo_width']);
+		if (isset($mt_option['logo_height'])) $logo_height = wp_kses_post($mt_option['logo_height']);
 		
 		?>
 		<table class="form-table">
@@ -236,12 +277,15 @@
 				generate_input_filed(__('Headline', 'maintenance'),	'heading', 'heading', $heading);
 				generate_textarea_filed(__('Description', 'maintenance'), 'description', 'description', $description);
 				generate_input_filed(__('Footer Text', 'maintenance'),	'footer_text', 'footer_text', 	$footer_text);
+				generate_number_filed(__('Logo width', 'maintenance'), 'logo_width', 'logo_width', $logo_width);
+				generate_number_filed(__('Logo height', 'maintenance'), 'logo_height', 'logo_height', $logo_height);
 				generate_image_filed(__('Logo', 'maintenance'), 'logo', 'logo', intval($mt_option['logo']), 'boxes box-logo', __('Upload Logo', 'maintenance'), 'upload_logo upload_btn button');
+				generate_image_filed(__('Retina logo', 'maintenance'), 'retina_logo', 'retina_logo', intval($mt_option['retina_logo']), 'boxes box-logo', __('Upload Retina Logo', 'maintenance'), 'upload_logo upload_btn button');
 				do_action('maintenance_background_field');
 				do_action('maintenance_color_fields');
 				do_action('maintenance_font_fields');
 				generate_check_filed(__('Admin bar', 'maintenance'), __('Show admin bar', 'maintenance'), 'admin_bar_enabled', 'admin_bar_enabled', isset($mt_option['admin_bar_enabled']));
-				generate_check_filed(__('503', 'maintenance'), __('Service temporarily unavailable', 'maintenance'), '503_enabled', '503_enabled',  isset($mt_option['503_enabled']));
+				generate_check_filed(__('503', 'maintenance'), __('Service temporarily unavailable, Google analytics will be disable.', 'maintenance'), '503_enabled', '503_enabled',  isset($mt_option['503_enabled']));
 				
 				$gg_analytics_id = '';
 				if (!empty($mt_option['gg_analytics_id'])) {
@@ -358,6 +402,7 @@
 	function get_font_fileds_action() {
 		$mt_option = mt_get_plugin_options(true);
 		echo get_fonts_field(__('Font family', 'maintenance'), 'body_font_family', 'body_font_family', esc_attr($mt_option['body_font_family'])); 	
+		echo get_fonts_subsets(__('Subsets', 'maintenance'), 'body_font_subset', 'body_font_subset', esc_attr($mt_option['body_font_subset'])); 			
 	}	
 	add_action ('maintenance_font_fields', 'get_font_fileds_action', 10);
 	
@@ -486,8 +531,8 @@
 		$vCurrDate_start = $vCurrDate_end = $vCurrTime = '';
 		
 		$vdate_start = $vdate_end = date_i18n( 'Y-m-d', strtotime( current_time('mysql', 0) )); 
-		$vtime_start = date_i18n( 'h:i a', strtotime( '12:00 am')); 
-		$vtime_end 	 = date_i18n( 'h:i a', strtotime( '12:00 pm')); 
+		$vtime_start = date_i18n( 'h:i:s A', strtotime( '01:00:00 am')); 
+		$vtime_end 	 = date_i18n( 'h:i:s A', strtotime( '12:59:59 pm')); 
 			
 		
 		$mt_options	= mt_get_plugin_options(true);
@@ -505,15 +550,14 @@
 						$vtime_end = $mt_options['expiry_time_end'];
 					 
 						$vCurrTime 		 = strtotime(current_time('mysql', 0));
+						
 						$vCurrDate_start = strtotime($vdate_start . ' ' . $vtime_start); 
 						$vCurrDate_end 	 = strtotime($vdate_end   . ' ' . $vtime_end); 
 						
 						if (mtCheckExclude()) return true;
 						
-						if ($vCurrTime < $vCurrDate_start) return true;
-						if ($vCurrTime >= $vCurrDate_end) {
+						if (($vCurrTime > $vCurrDate_start) && ($vCurrTime > $vCurrDate_end)) 
 							if (!empty($mt_options['is_down'])) return true;
-						}
 						
 				} else {
 					return true;		
@@ -523,8 +567,6 @@
 				  	 include_once MAINTENANCE_LOAD . 'index.php';
 					 exit;
 				}	
-				
-				
 			}
 	}
 	
@@ -615,19 +657,22 @@
 		}
 	}
 	
-	
 	function mt_get_default_array() {
-		return array(
+		$defaults = array(
 			'state'		  		=> true,
-			'page_title'  		=> __('Website is under construction', 'maintenance'),
+			'page_title'  	=> __('Website is under construction', 'maintenance'),
 			'heading'	  		=> __('Maintenance mode is on', 'maintenance'),	
-			'description' 		=> __('Website will be available soon', 'maintenance'),
+			'description' 	=> __('Website will be available soon', 'maintenance'),
 			'footer_text'		=> '&copy; ' . get_bloginfo( 'name' ) . ' ' . date('Y'),
+			'logo_width'  	=> 220,
+			'logo_height'  	=> '',
 			'logo'		  		=> '',
+			'retina_logo'		=> '',
 			'body_bg'	  		=> mt_insert_attach_sample_files(),
-			'body_bg_color'    	=> '#111111',
+			'body_bg_color' => '#111111',
 			'font_color' 		=> '#ffffff',
 			'body_font_family' 	=> 'Open Sans',
+			'body_font_subset'	=> 'Latin',
 			'is_blur'			=> false,
 			'blur_intensity'	=> 5,	
 			'admin_bar_enabled' => true,
@@ -637,4 +682,5 @@
 			'custom_css'		=> '',
 			'exclude_pages'		=> ''
 		);
+		return apply_filters( 'mt_get_default_array', $defaults );
 	}
