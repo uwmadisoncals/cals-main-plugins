@@ -4,12 +4,12 @@
  Plugin URI: http://wordpress.org/extend/plugins/shibboleth
  Description: Easily externalize user authentication to a <a href="http://shibboleth.internet2.edu">Shibboleth</a> Service Provider
  Author: Will Norris, mitcho (Michael 芳貴 Erlewine)
- Version: 1.7
+ Version: 1.6
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
  */
 
 define ( 'SHIBBOLETH_PLUGIN_REVISION', preg_replace( '/\$Rev: (.+) \$/', '\\1',
-	'$Rev: 1375073 $') ); // this needs to be on a separate line so that svn:keywords can work its magic
+	'$Rev: 889085 $') ); // this needs to be on a separate line so that svn:keywords can work its magic
 
 
 // run activation function if new revision of plugin
@@ -459,8 +459,7 @@ add_filter( 'shibboleth_user_nicename', 'sanitize_user' );
  */
 function shibboleth_login_form() {
 	$login_url = add_query_arg('action', 'shibboleth');
-	$login_url = remove_query_arg('reauth', $login_url);
-	echo '<p id="shibboleth_login"><a href="' . esc_url($login_url) . '">' . __('Login with Shibboleth', 'shibboleth') . '</a></p>';
+	echo '<p id="shibboleth_login"><a href="' . $login_url . '">' . __('Login with Shibboleth', 'shibboleth') . '</a></p>';
 }
 add_action('login_form', 'shibboleth_login_form');
 
@@ -471,7 +470,7 @@ add_action('login_form', 'shibboleth_login_form');
 function shibboleth_insert_htaccess() {
 	if ( got_mod_rewrite() ) {
 		$htaccess = get_home_path() . '.htaccess';
-		$rules = array('AuthType shibboleth', 'Require shibboleth');
+		$rules = array('AuthType Shibboleth', 'Require Shibboleth');
 		insert_with_markers($htaccess, 'Shibboleth', $rules);
 	}
 }
@@ -506,10 +505,3 @@ function shibboleth_delete_option($key) {
 	return function_exists('delete_site_option') ? delete_site_option($key) : delete_option($key);
 }
 
-/**
- * Load localization files.
- */
-function shibboleth_load_textdomain() {
-	load_plugin_textdomain('shibboleth', false, dirname( plugin_basename( __FILE__ ) ) . '/localization/');
-}
-add_action('plugins_loaded', 'shibboleth_load_textdomain');
