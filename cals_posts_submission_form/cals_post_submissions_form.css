@@ -1,0 +1,28 @@
+/*reset all elements in form, so users can change them later*/
+
+#cals_posts_submission_form{
+
+}
+
+#cals_post_submissions_form fieldset{
+border:1px solid #E7E7E7;
+margin:0 0 24px;
+padding:24px;
+}
+
+#cals_post_submissions_form .cals_psf_field_label{
+color:#888888;
+font-size:12px;
+font-weight:bold;
+padding:12px 0;
+}
+
+.cals_psf_required_field, .cals_psf_error{
+color:red;
+}
+
+
+/*classes*/
+.cals_psf_post{background-color:#FFFFE0;}
+.cals_psf_title_msg{color:#d54e21;}
+.cals_psf_cat_list{padding:12px 8px 0; background-color:#efefef; margin-bottom:24px !important}
