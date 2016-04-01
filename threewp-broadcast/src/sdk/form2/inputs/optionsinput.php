@@ -26,4 +26,17 @@ class optionsinput
 		return $this->options;
 	}
 
+	/**
+		@brief		Sort the options.
+		@since		2016-01-12 22:25:10
+	**/
+	public function sort_inputs()
+	{
+		// The sort_inputs() method from the sort_order trait requires inputs, which a select doesn't have.
+		$this->inputs = $this->options;
+		parent::sort_inputs();
+		$this->options = $this->inputs;
+		return $this;
+	}
+
 }

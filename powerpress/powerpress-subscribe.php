@@ -81,7 +81,7 @@ function powerpresssubscribe_get_settings($ExtraData)
 			
 			if( !empty($Settings) )
 			{
-				$Settings['title'] = $Settings['title'];
+				//$Settings['title'] = $Settings['title'];
 				if( empty($Settings['title']) )
 					$Settings['title'] = get_bloginfo('name') . get_wp_title_rss(); // Get category title
 				if( !empty($Settings['feed_redirect_url']) )
@@ -225,7 +225,7 @@ function powerpressplayer_link_subscribe_pre($content, $media_url, $ExtraData = 
 	$player_links = '';
 	$separator = false;
 	if( !empty($itunes_url) ) {
-		$player_links .= "<a href=\"".  htmlspecialchars($itunes_url) ."\" class=\"powerpress_link_subscribe powerpress_link_subscribe_itunes\" title=\"". __('Subscribe on iTunes', 'powerpress') ."\" rel=\"nofollow\">". __('iTunes','powerpress') ."</a>".PHP_EOL;
+		$player_links .= "<a href=\"".  htmlspecialchars($itunes_url) ."\" class=\"powerpress_link_subscribe powerpress_link_subscribe_itunes\" title=\"". __('Subscribe on iTunes', 'powerpress') ."\" rel=\"nofollow\">". __('iTunes','powerpress') ."</a>".PHP_EOL_WEB;
 		$separator = true;
 	}
 	
@@ -236,12 +236,12 @@ function powerpressplayer_link_subscribe_pre($content, $media_url, $ExtraData = 
 			$separator = true;
 		
 		$android_url =  $matches[1] . 'subscribeonandroid.com/' . $matches[2];
-		$player_links .= "<a href=\"".  htmlspecialchars($android_url) ."\" class=\"powerpress_link_subscribe powerpress_link_subscribe_android\" title=\"". __('Subscribe on Android', 'powerpress') ."\" rel=\"nofollow\">". __('Android','powerpress') ."</a>".PHP_EOL;
+		$player_links .= "<a href=\"".  htmlspecialchars($android_url) ."\" class=\"powerpress_link_subscribe powerpress_link_subscribe_android\" title=\"". __('Subscribe on Android', 'powerpress') ."\" rel=\"nofollow\">". __('Android','powerpress') ."</a>".PHP_EOL_WEB;
 		if( !empty($SubscribeSettings['subscribe_feature_email']) )
 		{
 			$player_links .= ' '.POWERPRESS_LINK_SEPARATOR .' ';
 			$email_url =  $matches[1] . 'subscribebyemail.com/' . $matches[2];
-			$player_links .= "<a href=\"".  htmlspecialchars($email_url) ."\" class=\"powerpress_link_subscribe powerpress_link_subscribe_email\" title=\"". __('Subscribe by Email', 'powerpress') ."\" rel=\"nofollow\">". __('Email','powerpress') ."</a>".PHP_EOL;
+			$player_links .= "<a href=\"".  htmlspecialchars($email_url) ."\" class=\"powerpress_link_subscribe powerpress_link_subscribe_email\" title=\"". __('Subscribe by Email', 'powerpress') ."\" rel=\"nofollow\">". __('Email','powerpress') ."</a>".PHP_EOL_WEB;
 		}
 		
 	}
@@ -250,7 +250,7 @@ function powerpressplayer_link_subscribe_pre($content, $media_url, $ExtraData = 
 		$player_links .= ' '.POWERPRESS_LINK_SEPARATOR .' ';
 	else
 		$separator = true;
-	$player_links .= "<a href=\"". htmlspecialchars($feed_url) ."\" class=\"powerpress_link_subscribe powerpress_link_subscribe_rss\" title=\"". __('Subscribe via RSS', 'powerpress') ."\" rel=\"nofollow\">". __('RSS','powerpress') ."</a>".PHP_EOL;
+	$player_links .= "<a href=\"". htmlspecialchars($feed_url) ."\" class=\"powerpress_link_subscribe powerpress_link_subscribe_rss\" title=\"". __('Subscribe via RSS', 'powerpress') ."\" rel=\"nofollow\">". __('RSS','powerpress') ."</a>".PHP_EOL_WEB;
 	
 	if( !empty($SubscribeSettings['subscribe_page_url']) )
 	{
@@ -260,7 +260,7 @@ function powerpressplayer_link_subscribe_pre($content, $media_url, $ExtraData = 
 			$separator = true;
 			
 		$label = (empty($SubscribeSettings['subscribe_page_link_text'])?__('More Subscribe Options', 'powerpress'):$SubscribeSettings['subscribe_page_link_text']);
-		$player_links .= "<a href=\"{$SubscribeSettings['subscribe_page_url']}\" class=\"powerpress_link_subscribe powerpress_link_subscribe_more\" title=\"". htmlspecialchars($label) ."\" rel=\"nofollow\">". htmlspecialchars($label) ."</a>".PHP_EOL;
+		$player_links .= "<a href=\"{$SubscribeSettings['subscribe_page_url']}\" class=\"powerpress_link_subscribe powerpress_link_subscribe_more\" title=\"". htmlspecialchars($label) ."\" rel=\"nofollow\">". htmlspecialchars($label) ."</a>".PHP_EOL_WEB;
 	}
 	$content .= $player_links;
 	return $content;
@@ -307,10 +307,13 @@ function powerpress_subscribe_shortcode( $attr ) {
 		//'taxonomy'=>'', // Used for PowerPress (specify taxonomy name)
 		
 		'title'	=> '', // Display custom title of show/program
+		'subtitle'=>'', // Subtitle for podcast (optional)
 		'feed_url'=>'', // provide subscribe widget for specific RSS feed
 		'itunes_url'=>'', // provide subscribe widget for specific iTunes subscribe URL
 		'image_url'=>'', // provide subscribe widget for specific iTunes subscribe URL
-		'heading'=>'', // heading label for 
+		'heading'=>'', // heading label for podcast
+		
+		'itunes_subtitle'=>'', // Set to 'true' to include the iTunes subtitle in subscribe widget
 		
 		// Appearance attributes
 		'itunes_button'=>'', // Set to 'true' to use only the iTunes button
@@ -375,11 +378,19 @@ function powerpress_subscribe_shortcode( $attr ) {
 	
 	// Podcast title handling
 	if( isset($attr['title']) && empty($attr['title']) && isset($Settings['title']) )
-		unset( $Settings['title'] ); // Special case, if the title is unset, then it shuld not be displayed
+		unset( $Settings['title'] ); // Special case, if the title is unset, then it should not be displayed
 	else if( !empty($attr['title']) )
 		$Settings['title'] = $attr['title'];
 	else if( !isset($Settings['title']) )
 		$Settings['title'] = ''; // This way the title can be detected
+		
+	unset($Settings['subtitle']); // Make sure no subtitle passes this point
+	if( !empty($attr['itunes_subtitle']) && !empty($Settings['itunes_subtitle']) ) {
+		$Settings['subtitle'] = $Settings['itunes_subtitle'];
+	} else if( !empty($attr['subtitle']) ) {
+		$Settings['subtitle'] = $attr['subtitle'];
+	}
+		
 	
 	if( !empty($attr['itunes_url']) )
 		$Settings['itunes_url'] = $attr['itunes_url'];
@@ -394,6 +405,7 @@ function powerpress_subscribe_shortcode( $attr ) {
 		return '';	
 		
 	$Settings['itunes_url'] = powerpresssubscribe_get_itunes_url($Settings);
+	wp_enqueue_style( 'powerpress-subscribe-style' );
 	
 	if( !empty($attr['itunes_button']) && !empty($Settings['itunes_url']) )
 	{
@@ -463,17 +475,27 @@ function powerpress_do_subscribe_widget($settings)
 	$html .= '<div class="pp-sub-widget pp-sub-widget-'. esc_attr($settings['style']) .'">';
 	if( !empty($settings['title']) )
 	{
-		if( !isset($settings['heading']) )
+		if( !isset($settings['heading']) ) { // If not specified in the shortcode
 				$settings['heading'] = __('Subscribe to', 'powerpress');
-			
-		if( !empty($settings['heading']) ) {
-			$html .= '<div class="pp-sub-h">'.  esc_html($settings['heading']) .'</div>'; }
+		}
+
+		if( !empty($settings['heading']) ) { // If there is a value set for the heading, lets use it
+			$html .= '<div class="pp-sub-h">'.  esc_html($settings['heading']) .'</div>';
+		}
+
 		$html .= '<h2 class="pp-sub-t">'.  esc_html( $settings['title'] ) .'</h2>';
 	}
 	else
 	{
 		$settings['title'] = ''; // Make sure it's an empty string
 	}
+	
+	if( !empty($settings['subtitle']) )
+	{
+		$html .= '<p class="pp-sub-st">'.  esc_html( $settings['subtitle'] ) .'</p>';
+	}
+		
+		// Lets build the subscribe box...
 			$html .= '<div class="pp-sub-bx">';
 				$html .= '<img class="pp-sub-l" src="'. esc_url( $settings['image_url'] ) .'" '. (!empty($settings['title'])?' title="'.  esc_attr($settings['title']).'" ':'') .'/>';
 				$html .= '<div class="pp-sub-btns">';

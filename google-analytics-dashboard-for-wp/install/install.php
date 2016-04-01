@@ -1,8 +1,8 @@
 <?php
-
 /**
  * Author: Alin Marcu
  * Author URI: https://deconf.com
+ * Copyright 2013 Alin Marcu 
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -16,7 +16,6 @@ class GADWP_Install {
 	public static function install() {
 		if ( ! get_option( 'ga_dash_token' ) ) {
 			$options = array();
-			$options['ga_dash_apikey'] = '';
 			$options['ga_dash_clientid'] = '';
 			$options['ga_dash_clientsecret'] = '';
 			$options['ga_dash_access_front'][] = 'administrator';
@@ -36,9 +35,7 @@ class GADWP_Install {
 			$options['ga_target_geomap'] = '';
 			$options['ga_realtime_pages'] = 10;
 			$options['ga_dash_token'] = '';
-			$options['ga_dash_refresh_token'] = '';
 			$options['ga_dash_profile_list'] = array();
-			$options['ga_dash_tableid'] = '';
 			$options['ga_dash_frontend_keywords'] = 0;
 			$options['ga_tracking_code'] = '';
 			$options['ga_enhanced_links'] = 0;
@@ -61,9 +58,11 @@ class GADWP_Install {
 			$options['frontend_item_reports'] = 0;
 			$options['dashboard_widget'] = 1;
 			$options['api_backoff'] = 0;
+			$options['ga_cookiedomain'] = '';
+			$options['ga_cookiename'] = '';
+			$options['ga_cookieexpires'] = '';
 		} else {
 			$options = array();
-			$options['ga_dash_apikey'] = get_option( 'ga_dash_apikey' );
 			$options['ga_dash_clientid'] = get_option( 'ga_dash_clientid' );
 			$options['ga_dash_clientsecret'] = get_option( 'ga_dash_clientsecret' );
 			$options['ga_dash_access'] = get_option( 'ga_dash_access' );
@@ -89,9 +88,7 @@ class GADWP_Install {
 			$options['ga_target_geomap'] = get_option( 'ga_target_geomap' );
 			$options['ga_realtime_pages'] = get_option( 'ga_realtime_pages' );
 			$options['ga_dash_token'] = get_option( 'ga_dash_token' );
-			$options['ga_dash_refresh_token'] = get_option( 'ga_dash_refresh_token' );
 			$options['ga_dash_profile_list'] = get_option( 'ga_dash_profile_list' );
-			$options['ga_dash_tableid'] = get_option( 'ga_dash_tableid' );
 			$options['ga_dash_frontend_keywords'] = 0;
 			$options['ga_enhanced_links'] = 0;
 			$options['ga_dash_remarketing'] = 0;
@@ -110,8 +107,10 @@ class GADWP_Install {
 			$options['frontend_item_reports'] = 0;
 			$options['dashboard_widget'] = 1;
 			$options['api_backoff'] = 0;
-
-			delete_option( 'ga_dash_apikey' );
+			$options['ga_cookiedomain'] = '';
+			$options['ga_cookiename'] = '';
+			$options['ga_cookieexpires'] = '';
+			
 			delete_option( 'ga_dash_clientid' );
 			delete_option( 'ga_dash_clientsecret' );
 			delete_option( 'ga_dash_access' );
@@ -135,7 +134,6 @@ class GADWP_Install {
 			delete_option( 'ga_dash_token' );
 			delete_option( 'ga_dash_refresh_token' );
 			delete_option( 'ga_dash_profile_list' );
-			delete_option( 'ga_dash_tableid' );
 		}
 		add_option( 'gadash_options', json_encode( $options ) );
 	}

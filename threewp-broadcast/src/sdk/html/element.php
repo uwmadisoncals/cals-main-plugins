@@ -174,6 +174,19 @@ trait element
 	}
 
 	/**
+		@brief		Convenience method to set or get a data attribute.
+		@since		2015-11-29 11:21:10
+	**/
+	public function data( $key, $value = null )
+	{
+		$key = 'data-' . $key;
+		if ( $value === null )
+			return $this->get_attribute( $key );
+		else
+			return $this->attribute( $key, $value );
+	}
+
+	/**
 		@brief		Returns the value of an attribute.
 		@param		string		$attribute			Type of attribute to retrieve.
 		@return		mixed						Null, if the attribute does not exist, or the attribute value.

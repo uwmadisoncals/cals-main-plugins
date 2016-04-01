@@ -1,0 +1,598 @@
+msgid ""
+msgstr "MIME-Version: 1.0\n"
+
+#. Short description.
+msgid "WordPress Related Posts - the plugin for related posts with thumbnails. Caching included."
+msgstr ""
+
+#. Screenshot description.
+msgid "WordPress Related Posts Default Theme."
+msgstr ""
+
+#. Screenshot description.
+msgid "WordPress Related Posts responsive theme on a Galaxy Nexus and iPhone 4s."
+msgstr ""
+
+#. Found in description paragraph.
+msgid "Quickly increase your readers' engagement with your posts by adding Related Posts in the footer of your content. Automatically added Related Posts can increase your internal traffic up to 10%. Just install and activate. To attract attention and improve SEO, link out to Related Posts across the web from your compose screen. Search for posts and hand-pick them with ease. Recommendations are provided by Zemanta's world-class semantic service. Plugin supports different styles, thumbnails, is fully customizable and includes caching for improved performance."
+msgstr ""
+
+#. Found in description paragraph.
+msgid "After installation, go to Settings -&gt; Related Posts in your plugins list and Turn on Advanced Features!"
+msgstr ""
+
+#. Found in description paragraph.
+msgid "<a href=\"http://zem.si/1kc5j9Z\">Click here to read more about this plugin.</a>"
+msgstr ""
+
+#. Found in description paragraph.
+msgid "<strong>Share the Link Love</strong>"
+msgstr ""
+
+#. Found in description paragraph.
+msgid "[vimeo http://vimeo.com/91619827]"
+msgstr ""
+
+#. Found in installation header.
+msgid "Via admin:"
+msgstr ""
+
+#. Found in installation header.
+msgid "Via upload:"
+msgstr ""
+
+#. Found in installation list item.
+msgid "Go to Plugins -&gt; Add New"
+msgstr ""
+
+#. Found in installation list item.
+msgid "Search for WordPress Related Posts"
+msgstr ""
+
+#. Found in installation list item.
+msgid "Install the plugin called \"WordPress Related Posts\" and activate it"
+msgstr ""
+
+#. Found in installation list item.
+msgid "After activation click Turn on to get advanced features"
+msgstr ""
+
+#. Found in installation list item.
+msgid "If you use any caching plugin please clear the cache"
+msgstr ""
+
+#. Found in installation list item.
+msgid "Done!"
+msgstr ""
+
+#. Found in installation list item.
+msgid "Download the plugin .zip file"
+msgstr ""
+
+#. Found in installation list item.
+msgid "Log in to yourdomain.com/wp-admin"
+msgstr ""
+
+#. Found in installation list item.
+msgid "Click Plugins -&gt; Add New -&gt; Upload"
+msgstr ""
+
+#. Found in installation list item.
+msgid "After installation activate the plugin and check advanced features"
+msgstr ""
+
+#. Found in installation list item.
+msgid "You're finished!"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Support for category names in related posts"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed bug that prevented image download from posts"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Pinterest theme fixes"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed missing featured image"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed missing thumbnail for selected related articles"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Article upload support"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed non-object bug"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed the index database error after activation"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Related posts query optimization"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed excerpt bug"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "The subscription API forwards blog URLs"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Responsive themes bugfix"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Removed statistics"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Updated HTTPS urls"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed registration process"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Responsive themes bug fix"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Better related post summary shortening"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Custom CSS bugfix"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Custom default thumbnail bugfix"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed theme bug"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed link to Terms of Service"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added support for HTTPS dashboard"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "More organized settings"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Option to subscribe to email newsletter"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Moved all links to plugin settings under Settings"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Improved compatibility with Editorial Assistant"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed Zemanta Readside plugins incompatibility"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Uninstallation added"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed migration bugs"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed default thumbnail title to image file name"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Bug fixes for thumbnailer"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed compatibility issues with Open Graph plugins "
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added setting for admins to restrict the ability to edit automatically added Related posts to admins only"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Getting ready to reorganize settings page"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed compatibility issues with Zemanta Editorial Assistant"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed transparency for images on settings page"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Bug fixes for \"Edit related posts\" feature"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed URL for static content"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added settings to fix custom size thumbnails issues (re-generating thumbnails might take a few minutes)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Related content (articles) on compose screen for all users with English WordPress interface"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Language detection for WordPressP interface: non-English users don't get the widget, existing ones get opt-out"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Opt-out for Related recommendations (articles)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Improved caching"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Themes are now included with the plugin to simplify loading and customization"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Simplified javascript loading"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "New thumbnailer"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Edit Related Posts gets a visual upgrade, search functionality and a dose of awesome"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Removed AB testing on mobile infinite stream"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Bugfix in tag generator"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Improved thumbnailer"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Due to popular demand, \"Edit related posts\" is back in action. Send us more feedback to support@zemanta.com. Thanks!"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fix for Cross-Site Request Forgery vulnerability. Credits for finding and reporting the vulnerability go to Charlie Eriksen via Secunia SVCRP."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed post excerpt bug"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Link back to Zemanta is off by default"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Removed \"edit related posts\" functionality (already edited posts won't revert back)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Improved editorial control"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Changed plugin content filter priority from 101 to 10"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Improved AB testing on mobile infinite stream"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Bugfixes"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Mobile themes settings"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Editorial control"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "New Pinterest inspired theme"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Support us by displaying our logo (opt-in)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Small output html layout change"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Limit related post age"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Bugfix for thumbnail extraction"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Earn money by displaying promoted content"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Updated theme settings with one new theme"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Option to enable related posts in article text"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Support for blogging network"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "qTranslate support"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Christmas Surprise"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Ho ho ho"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Exlude attachments"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Use WP_Image_Editor on WP 3.5"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Extract thumbnails from post content"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Statistics for mobile devices"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Exclude pages from related posts"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed bug for post_types with no tags"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Fixed bug for short_open_tag=Off"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "New recommendation engine"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Statistics in dashboard"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Exclude categories makes sense"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Improved thumbnail handling"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Settings cleanup"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Traffic exchange and revenue share options (beta)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Removed scroll up related posts experiment"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Settings page update"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Scroll up related posts experiment"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Opt-in remote assets"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Help promote our plugin option added"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Pageview statistics in settings"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Custom CSS"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Improved thumbnail support"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Optimized random posts generation"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Drop support for WordPress 2.x"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Code cleanup"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "First two CSS themes added to Settings. More designs to come."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "WordPress featured images are now used for related post thumbnails"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Bugfix: Filter HTML and WP tags from post excerpts"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Sane defaults"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Compatible with WordPress 3.0"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "fix don't display in Feed problem"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Thumbnail"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Post Excerpt"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Widget"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "first version"
+msgstr ""
+
+#. Found in faq header.
+msgid "What does this plugin do?"
+msgstr ""
+
+#. Found in faq header.
+msgid "Why should I use this plugin and not any other?"
+msgstr ""
+
+#. Found in faq header.
+msgid "Are there any settings? Plenty!"
+msgstr ""
+
+#. Found in faq header.
+msgid "Does it support mobile themes?"
+msgstr ""
+
+#. Found in faq header.
+msgid "Can I customize the widget?"
+msgstr ""
+
+#. Found in faq header.
+msgid "Will Zemanta steal my \"link-juice\"?"
+msgstr ""
+
+#. Found in faq header.
+msgid "What about Terms of Service and Privacy Policy?"
+msgstr ""
+
+#. Found in faq list item.
+msgid "responsive themes"
+msgstr ""
+
+#. Found in faq list item.
+msgid "thumbnail size, style"
+msgstr ""
+
+#. Found in faq list item.
+msgid "number of posts"
+msgstr ""
+
+#. Found in faq list item.
+msgid "display post excerpt, publish date, number of comments"
+msgstr ""
+
+#. Found in faq list item.
+msgid "categories to exclude"
+msgstr ""
+
+#. Found in faq list item.
+msgid "set default image"
+msgstr ""
+
+#. Found in faq paragraph.
+msgid "It places a list of links with thumbnails at the bottom of your posts. It increases pageviews and engages readers to stay on your site longer and discover more of your content.  It also recommends related posts from across the web and in turn promotes your posts to other users. In this way you get new unique visitors to your site and improve SEO."
+msgstr ""
+
+#. Found in faq paragraph.
+msgid "WordPress Related Posts is constantly improved to bring you the highest rates of audience engagement with your content. Our highest Click-Through rates speak for themselves."
+msgstr ""
+
+#. Found in faq paragraph.
+msgid "Yes, related posts are responsive so they adapt to the screen size to ensure maximum click-through rates."
+msgstr ""
+
+#. Found in faq paragraph.
+msgid "Yes, Zemanta is offered in different themes which you can also customize with simple CSS."
+msgstr ""
+
+#. Found in faq paragraph.
+msgid "No, Zemanta does not use redirects and is juice friendly. :)"
+msgstr ""
+
+#. Found in faq paragraph.
+msgid "Before using the plugin please read the full version of <a href=\"http://www.zemanta.com/legal/terms-of-service/\">Zemanta Terms of Service</a> and <a href=\"http://www.zemanta.com/legal/privacy/\">Zemanta Privacy Policy</a>."
+msgstr ""
+
+#. Found in remaining content header.
+msgid "Terms of service"
+msgstr ""
+
+#. Found in remaining content paragraph.
+msgid "The plugin source code is released under GPLv2. Usage of our service is governed by <a href=\"http://www.zemanta.com/legal/terms-of-service/\">Zemanta Terms of Service</a> and <a href=\"http://www.zemanta.com/legal/privacy/\">Zemanta Privacy Policy</a>."
+msgstr ""

@@ -26,7 +26,7 @@ trait meta_boxes
 			$action = new actions\get_post_types;
 			$action->execute();
 			foreach( $action->post_types as $post_type )
-				add_meta_box( 'threewp_broadcast', $this->_( 'Broadcast' ), array( &$this, 'threewp_broadcast_add_meta_box' ), $post_type, 'side', 'low' );
+				add_meta_box( 'threewp_broadcast', $this->_( 'Broadcast' ), [ $this, 'threewp_broadcast_add_meta_box' ], $post_type, 'side', 'low' );
 			return;
 		}
 
@@ -206,7 +206,7 @@ trait meta_boxes
 			$blogs_input->option( $label, $blog->id );
 			$input_name = 'blogs_' . $blog->id;
 			$option = $blogs_input->input( $input_name );
-			$option->get_label()->content = $label;
+			$option->get_label()->content = htmlspecialchars( $label );
 			$option->css_class( 'blog ' . $blog->id );
 			if ( $blog->is_disabled() )
 				$option->disabled()->css_class( 'disabled' );

@@ -142,6 +142,12 @@ class broadcasting_data
 	public $parent_blog_id;
 
 	/**
+		@brief		[IN]: The broadcast data of the parent post on the parent blog. If any.
+		@since		2016-03-06 16:39:02
+	**/
+	public $parent_broadcast_data = false;
+
+	/**
 		@brief		IN: The ID of the parent post.
 		@var		$parent_post_id
 		@since		20130603
@@ -302,7 +308,7 @@ class broadcasting_data
 		if ( isset( $this->attachment_data[ $id ] ) )
 			return false;
 
-		$ad = attachment_data::from_attachment_id( $id, $this->upload_dir );
+		$ad = attachment_data::from_attachment_id( $id );
 		$this->attachment_data[ $id ] = $ad;
 		return true;
 	}

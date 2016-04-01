@@ -49,6 +49,7 @@ class MediaSettings extends WPfilter
                 $this->setting[] = array(
                     'id' => $account->ID,
                     'type' => $remoteAccount->get('type'),
+                    'accounttitle' => $account->post_title,
                     'title' => 'Insert '.$account->post_title,
                     'filterable' => $remoteAccount->get('library_filterable', ''),
                     'filters' => $remoteAccount->get('library_filters', ''),

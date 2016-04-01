@@ -52,9 +52,20 @@ trait db_aware_object
 
 	public static function __db_load( $id )
 	{
+		$array_requested = is_array( $id );
+
+		// Make everything an array anyways.
+		if ( ! $array_requested )
+			$id = [ $id ];
+
 		global $wpdb;
-		$sql = sprintf( "SELECT * FROM `%s` WHERE `%s` = '%s'", self::db_table(), self::id_key(), $id );
+		$sql = sprintf( "SELECT * FROM `%s` WHERE `%s` IN ('%s')", self::db_table(), self::id_key(), implode( "','", $id ) );
 		$result = $wpdb->get_results( $sql );
+
+		if ( $array_requested )
+			return self::sqls( $result );
+
+		// Single ID requested.
 		if ( count( $result ) != 1 )
 			return false;
 		$result = reset( $result );

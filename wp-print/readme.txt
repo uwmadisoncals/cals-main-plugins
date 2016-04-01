@@ -3,8 +3,8 @@ Contributors: GamerZ
 Donate link: http://lesterchan.net/site/donation/  
 Tags: print, printer, wp-print  
 Requires at least: 2.8  
-Tested up to: 4.2  
-Stable tag: 2.56  
+Tested up to: 4.4  
+Stable tag: 2.57.1  
 
 Displays a printable version of your WordPress blog's post/page.
 
@@ -89,7 +89,14 @@ if(function_exists('wp_print')) {
 
 
 == Changelog ==
-= 2.66 =
+= 2.57.1 =
+* NEW: Use translate.wordpress.org to translate the plugin
+* FIXED: Unable to update options
+
+= 2.57 =
+* FIXED: Notices
+
+= 2.56 =
 * NEW: Updated print HTML code. Props @Luanramos
 
 = 2.55 =

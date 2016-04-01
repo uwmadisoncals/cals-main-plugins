@@ -2,62 +2,67 @@
 /*
  * wp.media.editor.send.attachment remote extension
  */
-oldSendAttachment = wp.media.editor.send.attachment;
-wp.media.editor.send.attachment = function( props, attachment ) {
-	if (typeof attachment.isOcsRemote === 'undefined' ||
-        attachment.isOcsRemote === false
-    ) {
-		return oldSendAttachment(props, attachment);
-	}
-	var caption = attachment.caption,
-	options, html;
-
-	// If captions are disabled, clear the caption.
-	if ( ! wp.media.view.settings.captions )
-		delete attachment.caption;
-
-	props = wp.media.string.props( props, attachment );
-
-	options = {
-		id: attachment.id,
-        title: attachment.title,
-		type: attachment.type,
-        subtype: attachment.subtype,
-        remotetype: attachment.remotetype,
-		accountId: attachment.accountId || 0,
-        remotedata: attachment.remotedata || [],
-	};
-
-	if ( props.linkUrl )
-		options.url = props.linkUrl;
-
-	if ( 'image' === attachment.type ) {
-        _.each({
-            align: 'align',
-            size:  'image-size',
-            alt:   'image_alt',
-        }, function( option, prop ) {
-            if ( props[ prop ] )
-                options[ option ] = props[ prop ];
-        });
-        options.width  = attachment.width || 0;
-        options.height = attachment.height || 0;
-        options.imgurl = attachment.url || options.url;
-        if (options['image-size'].length > 0 &&
-            typeof attachment.sizes[options['image-size']] !== 'undefined'
+//Override send attachment method at ready time. 
+//This provide a quick fix for plugin like visual composer v4.10 that also override the method but does not ensure the original method is run.
+$(document).ready(function () {
+    var oldSendAttachment = wp.media.editor.send.attachment,
+    sendRemoteAttachment = function( props, attachment ) {
+        if (typeof attachment.isOcsRemote === 'undefined' ||
+            attachment.isOcsRemote === false
         ) {
-            options.imgurl = attachment.sizes[options['image-size']].url || options.imgurl;
-            options.width  = attachment.sizes[options['image-size']].width || options.width;
-            options.height = attachment.sizes[options['image-size']].height || options.height;
+            return oldSendAttachment(props, attachment);
         }
-    }
+        var caption = attachment.caption,
+        options, html;
 
-	return wp.media.post( 'send-remote-attachment-to-editor', {
-		nonce:      rmlSendToEditorParams.nonce,
-		attachment: options,
-		post_id:    wp.media.view.settings.post.id
-	});
-};
+        // If captions are disabled, clear the caption.
+        if ( ! wp.media.view.settings.captions )
+            delete attachment.caption;
+
+        props = wp.media.string.props( props, attachment );
+
+        options = {
+            id: attachment.id,
+            title: attachment.title,
+            type: attachment.type,
+            subtype: attachment.subtype,
+            remotetype: attachment.remotetype,
+            accountId: attachment.accountId || 0,
+            remotedata: attachment.remotedata || [],
+        };
+
+        if ( props.linkUrl )
+            options.url = props.linkUrl;
+
+        if ( 'image' === attachment.type ) {
+            _.each({
+                align: 'align',
+                size:  'image-size',
+                alt:   'image_alt',
+            }, function( option, prop ) {
+                if ( props[ prop ] )
+                    options[ option ] = props[ prop ];
+            });
+            options.width  = attachment.width || 0;
+            options.height = attachment.height || 0;
+            options.imgurl = attachment.url || options.url;
+            if (options['image-size'].length > 0 &&
+                typeof attachment.sizes[options['image-size']] !== 'undefined'
+            ) {
+                options.imgurl = attachment.sizes[options['image-size']].url || options.imgurl;
+                options.width  = attachment.sizes[options['image-size']].width || options.width;
+                options.height = attachment.sizes[options['image-size']].height || options.height;
+            }
+        }
+
+        return wp.media.post( 'send-remote-attachment-to-editor', {
+            nonce:      rmlSendToEditorParams.nonce,
+            attachment: options,
+            post_id:    wp.media.view.settings.post.id
+        });
+    };
+    wp.media.editor.send.attachment = sendRemoteAttachment;
+});
 /**
  * wp.media.view.RemoteUploaderInline
  */
@@ -287,7 +292,6 @@ wp.media.view.MediaFrame.Post = oldMediaFrame.extend({
 
         var options = this.options,
             that = this;
-    
         _.each(wp.media.view.settings.remoteMediaAccounts, function(account) {
             var serviceSettings = wp.media.view.settings.remoteServiceSettings[account.type] || [];
             that.states.add([
@@ -304,7 +308,9 @@ wp.media.view.MediaFrame.Post = oldMediaFrame.extend({
                         isOcsRemote: true,
                         account_id: account.id,
                         remotefilters: account.filters || [],
-                        uioptions: account.uioptions || []
+                        uioptions: account.uioptions || [],
+                        orderby: 'menuOrder',
+                        order: 'ASC'
                     }, options.library ) ),
                     state:    'remote-library-'+account.id,
                     editable:   true,
@@ -424,7 +430,7 @@ wp.media.view.Attachment.RemoteSelection = wp.media.view.Attachment.Selection.ex
  * 
  * Use new RemoteSelection view by default
  */
-oldAttachmentsSelection = wp.media.view.Attachments.Selection;
+var oldAttachmentsSelection = wp.media.view.Attachments.Selection;
 wp.media.view.Attachments.Selection = oldAttachmentsSelection.extend({
     initialize: function() {
         _.defaults( this.options, {
@@ -434,7 +440,5 @@ wp.media.view.Attachments.Selection = oldAttachmentsSelection.extend({
         return oldAttachmentsSelection.prototype.initialize.apply( this, arguments );
     }
 });
-/*
 
-*/
 }(jQuery));

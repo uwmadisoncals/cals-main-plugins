@@ -44,13 +44,16 @@ trait broadcasting
 	{
 		$bcd = $broadcasting_data;
 
+		// To prevent recursion
+		array_push( $this->broadcasting, $bcd );
+
 		$this->debug( 'Broadcast version %s.', THREEWP_BROADCAST_VERSION );
 
 		$this->debug( 'Broadcasting the post %s <pre>%s</pre>', $bcd->post->ID, $bcd->post );
 
 		$this->debug( 'The POST is <pre>%s</pre>', $bcd->_POST );
 
-		// For nested broadcasts. Just in case.
+		// See: For nested broadcasts. Just in case.
 		switch_to_blog( $bcd->parent_blog_id );
 
 		if ( $bcd->link )
@@ -65,7 +68,12 @@ trait broadcasting
 				// Does this post type have parent support, so that we can link to a parent?
 				if ( $bcd->post_type_is_hierarchical && $bcd->post->post_parent > 0)
 				{
-					$parent_broadcast_data = $this->get_post_broadcast_data( $bcd->parent_blog_id, $bcd->post->post_parent );
+					// Load the parent's bcd
+					$bcd->parent_broadcast_data = $this->get_post_broadcast_data( $bcd->parent_blog_id, $bcd->post->post_parent );
+					// And, if necessary, load the bcd of the parent post.
+					$parent_bcd = $bcd->parent_broadcast_data->get_linked_parent();
+					if ( $parent_bcd )
+						$bcd->parent_broadcast_data = $this->get_post_broadcast_data( $parent_bcd[ 'blog_id' ], $parent_bcd[ 'post_id' ] );
 				}
 				$this->debug( 'Post type is hierarchical: %s', $this->yes_no( $bcd->post_type_is_hierarchical ) );
 			}
@@ -77,6 +85,7 @@ trait broadcasting
 		{
 			$this->debug( 'Will broadcast taxonomies.' );
 			$this->collect_post_type_taxonomies( $bcd );
+			$this->debug( 'Parent taxonomies dump: %s', $bcd->parent_post_taxonomies );
 		}
 		else
 			$this->debug( 'Will not broadcast taxonomies.' );
@@ -91,7 +100,7 @@ trait broadcasting
 			{
 				try
 				{
-					$data = attachment_data::from_attachment_id( $attached_file, $bcd->upload_dir );
+					$data = attachment_data::from_attachment_id( $attached_file );
 					$data->set_attached_to_parent( $bcd->post );
 					$bcd->attachment_data[ $attached_file->ID ] = $data;
 					$this->debug( 'Attachment %s found.', $attached_file->ID );
@@ -115,7 +124,6 @@ trait broadcasting
 				$this->debug( 'Yoast SEO detected. Activating workaround. Asking metabox to save its settings.' );
 				$GLOBALS[ 'wpseo_metabox' ]->save_postdata( $bcd->post->ID );
 			}
-
 
 			// Save the original custom fields for future use.
 			$bcd->custom_fields->original = get_post_custom( $bcd->post->ID );
@@ -144,11 +152,9 @@ trait broadcasting
 				$bcd->custom_fields()->forget( '_thumbnail_id' );	// There is a new thumbnail id for each blog.
 				try
 				{
-					$data = attachment_data::from_attachment_id( $bcd->thumbnail, $bcd->upload_dir);
+					$data = attachment_data::from_attachment_id( $thumbnail_id );
 					$data->set_attached_to_parent( $bcd->post );
-					$bcd->attachment_data[ 'thumbnail' ] = $data;
-					// Now that we know what the attachment id the thumbnail has, we must remove it from the attached files to avoid duplicates.
-					unset( $bcd->attachment_data[ $bcd->thumbnail_id ] );
+					$bcd->attachment_data[ $thumbnail_id ] = $data;
 				}
 				catch( Exception $e )
 				{
@@ -214,7 +220,7 @@ trait broadcasting
 				$this->debug( 'Gallery has attachment %s.', $id );
 				try
 				{
-					$data = attachment_data::from_attachment_id( $id, $bcd->upload_dir );
+					$data = attachment_data::from_attachment_id( $id );
 					$data->set_attached_to_parent( $bcd->post );
 					$bcd->attachment_data[ $id ] = $data;
 				}
@@ -225,17 +231,26 @@ trait broadcasting
 			}
 		}
 
-		// To prevent recursion
-		array_push( $this->broadcasting, $bcd );
-
-		// Handle sticky.
-		$bcd->post_is_sticky = isset( $_POST[ 'sticky' ]  );
+		// Handle sticky status. This can be done in two ways: by _POST and by the options.
+		// If the user is using the nromal editor, look in the post.
+		if ( isset( $_POST[ '_wp_http_referer' ] ) )
+		{
+			$this->debug( 'Sticky data found in POST.' );
+			$bcd->post_is_sticky = isset( $_POST[ 'sticky' ] );
+		}
+		else
+		{
+			// Look in the options table.
+			$this->debug( 'Looking for sticky data via a function.' );
+			$bcd->post_is_sticky = is_sticky( $bcd->post->ID );
+		}
 		$this->debug( 'Post sticky status: %s', intval( $bcd->post_is_sticky ) );
 
 		// POST is no longer needed. Empty it so that other plugins don't use it.
 		$action = new actions\maybe_clear_post;
 		$action->post = $_POST;
 		$action->execute();
+		// This is for any other plugins that might be interested in the _POST.
 		$_POST = $action->post;
 
 		// This is a stupid exception: edit_post() checks the _POST for the sticky checkbox.
@@ -245,6 +260,11 @@ trait broadcasting
 		// Neither solution is any good: not clearing the post makes _some_ plugins go crazy, updating twice is not expected behavior.
 		if ( $bcd->post_is_sticky )
 			$_POST[ 'sticky'] = 'sticky';
+
+		// wp_upload_dir is incorrect on child sites, so we override it during broadcasting.
+		// See the broadcasting_upload_dir method.
+		$this->__siteurl = get_option( 'siteurl' );
+		$this->add_action( 'upload_dir', 'broadcasting_upload_dir' );
 
 		$action = new actions\broadcasting_started;
 		$action->broadcasting_data = $bcd;
@@ -264,8 +284,10 @@ trait broadcasting
 			$bcd->new_post = clone( $bcd->post );
 			$bcd->new_child_created = false;
 
-			foreach( [ 'comment_count', 'guid', 'ID', 'post_parent' ] as $key )
+			foreach( [ 'guid', 'ID' ] as $key )
 				unset( $bcd->new_post->$key );
+			foreach( [ 'comment_count', 'post_parent' ] as $key )
+				$bcd->new_post->$key = 0;
 
 			$action = new actions\broadcasting_after_switch_to_blog;
 			$action->broadcasting_data = $bcd;
@@ -282,12 +304,27 @@ trait broadcasting
 			$bcd->broadcast_data = $this->get_post_broadcast_data( $bcd->parent_blog_id, $bcd->post->ID );
 
 			// Post parent
-			if ( $bcd->link && isset( $parent_broadcast_data) )
-				if ( $parent_broadcast_data->has_linked_child_on_this_blog() )
+			if ( $bcd->link AND $bcd->parent_broadcast_data !== false )
+			{
+				// Check first for linked children.
+				if ( $bcd->parent_broadcast_data->has_linked_child_on_this_blog() )
 				{
-					$linked_parent = $parent_broadcast_data->get_linked_child_on_this_blog();
+					$linked_parent = $bcd->parent_broadcast_data->get_linked_child_on_this_blog();
 					$bcd->new_post->post_parent = $linked_parent;
+					$this->debug( "Parent post has a child here. The post's new parent is %s", $linked_parent );
 				}
+				else
+				{
+					// Maybe the parent post is a parent post on this blog?
+					if ( $bcd->parent_broadcast_data->blog_id == $bcd->current_child_blog_id )
+					{
+						$bcd->new_post->post_parent = $bcd->parent_broadcast_data->post_id;
+						$this->debug( "Parent post has a parent here. The post's new parent is %s", $bcd->new_post->post_parent );
+					}
+				}
+			}
+			else
+				$this->debug( "Ignoring post's parent." );
 
 			// Insert new? Or update? Depends on whether the parent post was linked before or is newly linked?
 			$need_to_insert_post = true;
@@ -351,6 +388,7 @@ trait broadcasting
 				foreach( $bcd->parent_post_taxonomies as $parent_post_taxonomy => $parent_post_terms )
 				{
 					$this->debug( 'Taxonomies: %s', $parent_post_taxonomy );
+
 					// If we're updating a linked post, remove all the taxonomies and start from the top.
 					if ( $bcd->link )
 						if ( $bcd->broadcast_data->has_linked_child_on_this_blog() )
@@ -451,8 +489,6 @@ trait broadcasting
 			$this->debug( 'Looking through %s attachments.', count( $bcd->attachment_data ) );
 			foreach( $bcd->attachment_data as $key => $attachment )
 			{
-				if ( $key == 'thumbnail' )
-					continue;
 				$o = clone( $bcd );
 				$o->attachment_data = clone( $attachment );
 				$o->attachment_data->post = clone( $attachment->post );
@@ -608,40 +644,9 @@ trait broadcasting
 				// Attached files are custom fields... but special custom fields.
 				if ( $bcd->has_thumbnail )
 				{
-					$o = clone( $bcd );
-					$o->attachment_data = $bcd->attachment_data[ 'thumbnail' ];
-					$o->attachment_id = $bcd->copied_attachments()->get( $o->attachment_data->post->ID );
-
-					if ( $o->attachment_id > 0 )
-					{
-						$this->debug( 'Custom fields: Thumbnail already exists as another attachment. Using that.' );
-					}
-					else
-					{
-						$this->debug( 'Custom fields: Re-adding thumbnail.' );
-						if ( $o->attachment_data->is_attached_to_parent() )
-						{
-							$this->debug( 'Assigning new parent ID (%s) to attachment %s.', $bcd->new_post( 'ID' ), $o->attachment_data->post->ID );
-							$o->attachment_data->post->post_parent = $bcd->new_post( 'ID' );
-						}
-						else
-						{
-							$this->debug( 'Resetting post parent for attachment %s.', $o->attachment_data->post->ID );
-							$o->attachment_data->post->post_parent = 0;
-						}
-
-						$this->debug( 'Custom fields: Maybe copying attachment.' );
-						$this->maybe_copy_attachment( $o );
-						$this->debug( 'Custom fields: Maybe copied attachment.' );
-
-						$bcd->copied_attachments()->add( $o->attachment_data->post, get_post( $o->attachment_id ) );
-					}
-
-					if ( $o->attachment_id !== false )
-					{
-						$this->debug( 'Handling post thumbnail for post %s. Thumbnail ID is now %s', $bcd->new_post( 'ID' ), $o->attachment_id );
-						update_post_meta( $bcd->new_post( 'ID' ), '_thumbnail_id', $o->attachment_id );
-					}
+					$new_thumbnail_id = $bcd->copied_attachments()->get( $bcd->thumbnail_id );
+					$this->debug( 'Handling post thumbnail for post %s. Thumbnail ID is now %s', $bcd->new_post( 'ID' ), $new_thumbnail_id );
+					update_post_meta( $bcd->new_post( 'ID' ), '_thumbnail_id', $new_thumbnail_id );
 				}
 				$this->debug( 'Custom fields: Finished.' );
 			}
@@ -679,12 +684,16 @@ trait broadcasting
 			$child_blog->switch_from();
 		}
 
-		// For nested broadcasts. Just in case.
+		// SEE: For nested broadcasts. Just in case.
 		restore_current_blog();
 
 		$action = new actions\broadcasting_finished;
 		$action->broadcasting_data = $bcd;
 		$action->execute();
+
+		// We are done with the upload dir override.
+		unset( $this->__siteurl );
+		remove_action( 'upload_dir', [ $this, 'broadcasting_upload_dir' ] );
 
 		// Finished broadcasting.
 		array_pop( $this->broadcasting );
@@ -712,6 +721,25 @@ trait broadcasting
 		$this->load_language();
 
 		return $bcd;
+	}
+
+	/**
+		@brief		Filter the upload dir so that it works when switched.
+		@details	Requires that the __siteurl property is set.
+		@see		https://core.trac.wordpress.org/ticket/25650
+		@since		2015-10-23 09:36:49
+	**/
+	public function broadcasting_upload_dir( $upload_dir )
+	{
+		if ( ! isset( $this->__siteurl ) )
+			return $upload_dir;
+
+		$current_url = get_option( 'siteurl' );
+		foreach( [ 'url', 'baseurl' ] as $key )
+			if ( substr( $upload_dir[ $key ], 0, strlen( $current_url ) ) != $current_url )
+				$upload_dir[ $key ] = str_replace( $this->__siteurl, $current_url, $upload_dir[ $key ] );
+
+		return $upload_dir;
 	}
 
 	/**
@@ -745,26 +773,26 @@ trait broadcasting
 		$action = new actions\get_post_types;
 		$action->execute();
 		if ( ! in_array( $post->post_type, $action->post_types ) )
-		{
-			$this->debug( 'We do not care about the %s post type.', $post->post_type );
-			return;
-		}
+			return $this->debug( 'We do not care about the %s post type.', $post->post_type );
 
 		// No post?
 		if ( count( $_POST ) < 1 )
-			return;
+			return $this->debug( 'No _POST available. Not broadcasting.' );
+
+		// Does this post_id match up with the one in the post?
+		$_post_id = $_POST[ 'ID' ];
+		if ( isset( $_post_id ) )
+			if ( $_post_id != $post_id )
+				return $this->debug( 'Post ID %s does not match up with ID in POST %s.', $post_id, $_post_id );
 
 		// Is this post a child?
 		$broadcast_data = $this->get_post_broadcast_data( get_current_blog_id(), $post_id );
 		if ( $broadcast_data->get_linked_parent() !== false )
-			return;
+			return $this->debug( 'Post is a child. Not broadcasting.' );
 
 		// No permission.
 		if ( ! static::user_has_roles( $this->get_site_option( 'role_broadcast' ) ) )
-		{
-			$this->debug( 'User does not have permission to use Broadcast.' );
-			return;
-		}
+			return $this->debug( 'User does not have permission to use Broadcast. Not broadcasting.' );
 
 		// Save the user's last settings.
 		if ( isset( $_POST[ 'broadcast' ] ) )
@@ -783,14 +811,12 @@ trait broadcasting
 		$action->broadcasting_data = $broadcasting_data;
 		$action->execute();
 
-		$this->debug( 'Prepared.' );
+		$this->debug( 'Broadcasting data prepared.' );
 
 		if ( $broadcasting_data->has_blogs() )
 			$this->filters( 'threewp_broadcast_broadcast_post', $broadcasting_data );
 		else
-		{
-			$this->debug( 'No blogs are selected. Not broadcasting anything.' );
-		}
+			$this->debug( 'No blogs are selected. Not broadcasting.' );
 	}
 
 	/**

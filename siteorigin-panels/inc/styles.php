@@ -11,8 +11,7 @@ function siteorigin_panels_ajax_action_style_form(){
 	$current = isset( $_REQUEST['style'] ) ? $_REQUEST['style'] : array();
 	$post_id = empty( $_REQUEST['postId'] ) ? 0 : $_REQUEST['postId'];
 
-	$args = filter_input( INPUT_POST, 'args', FILTER_DEFAULT );
-	$args = json_decode($args, true);
+	$args = !empty( $_POST['args'] ) ? json_decode( $_POST['args'], true) : array();
 
 	switch($type) {
 		case 'row':
@@ -94,13 +93,14 @@ function siteorigin_panels_render_styles_fields( $section, $before = '', $after 
 			<div class="style-section-fields" style="display: none">
 				<?php
 				foreach( $fields as $field_id => $field ) {
+					$default = isset($field['default']) ? $field['default'] : false;
 
 					if($field['group'] == $group_id){
 						?>
 						<div class="style-field-wrapper">
 							<label><?php echo $field['name'] ?></label>
 							<div class="style-field style-field-<?php echo sanitize_html_class( $field['type'] ) ?>">
-								<?php siteorigin_panels_render_style_field( $field, isset( $current[$field_id] ) ? $current[$field_id] : false, $field_id ) ?>
+								<?php siteorigin_panels_render_style_field( $field, isset( $current[$field_id] ) ? $current[$field_id] : $default, $field_id ) ?>
 							</div>
 						</div>
 						<?php
@@ -133,6 +133,7 @@ function siteorigin_panels_style_get_measurements_list() {
 		'ex',
 		'pt',
 		'pc',
+		'rem'
 	);
 
 	// Allow themes and plugins to trim or enhance the list.

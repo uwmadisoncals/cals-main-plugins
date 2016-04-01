@@ -7,7 +7,7 @@ add_filter( 'qw_fields', 'qw_field_meta_value' );
  * Add field to qw_fields
  */
 function qw_field_meta_value( $fields ) {
-	$show_silent_meta = get_option( 'qw_show_silent_meta', FALSE );
+	$show_silent_meta = QW_Settings::get_instance()->get( 'show_silent_meta', FALSE );
 
 	// add meta keys to field list
 	$meta = qw_get_meta_keys();
@@ -133,9 +133,7 @@ function qw_meta_value_form_callback( $field ) {
  * Display the post meta field based on field settings
  */
 function qw_display_post_meta_value( $post, $field ) {
-	//dbw($field);
-	$display_handlers    = apply_filters( 'qw_meta_value_display_handlers',
-		array() );
+	$display_handlers    = apply_filters( 'qw_meta_value_display_handlers', array() );
 	$display_handler_key = ( isset( $field['display_handler'] ) ) ? $field['display_handler'] : 'none';
 	$handler             = ( isset( $display_handlers[ $display_handler_key ] ) ) ? $display_handlers[ $display_handler_key ] : $display_handlers['none'];
 

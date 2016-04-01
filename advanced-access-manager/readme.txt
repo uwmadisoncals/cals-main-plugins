@@ -1,97 +1,153 @@
 === Advanced Access Manager ===
 Contributors: vasyltech
-Tags: security, login, access manager, access, access control, capability, role, user, post filter, category 
-Requires at least: 3.4.2
-Tested up to: 4.3.1
-Stable tag: 2.9.2
+Tags: access, access manager, role, user, capability, admin, page, post, widget
+Requires at least: 3.8
+Tested up to: 4.4
+Stable tag: 3.1.3.1
 
-The powerful and easy-to-use tool to improve security and define access to your 
-posts, pages and backend areas for single blog or multisite network.
+One of the best tools in WordPress repository to manage access to your posts, 
+pages, categories and backend area for users, roles and visitors.
 
 == Description ==
 
-**Advanced Access Manager** (aka **AAM**) is known to be one of the very best access control
-security enhancement tools available for WordPress. A very powerful yet easy-to-use plugin, 
-AAM gives you flexible and customizable control over your single blog or multisite network.
- 
-With **AAM**, you can control access to various areas of your website, including posts, pages, 
-categories, widgets, or menus. The access you set can be defined and tailored for any user, role, 
-or visitor. 
+> Advanced Access Manager (aka AAM) is the only free plugin that allows you to
+> control access to your posts, pages or backend area on user, visitor and role
+> levels.
 
-Below is the list of highlighted features that have been implemented and proven in the current 
-version of **AAM**: 
+AAM is well documented so even unexperienced WordPress user can easily understand 
+how to use it in the most efficient way.
 
-**Secure Admin Login**: Control the login process to your website. AAM allows you to define the 
-number of possible login attempts, trace a failed login request's geographical location, and even 
-lockout selected IP addresses by default to protect from potential hacker attacks. 
+AAM the main objectives are to control access to your:
 
-**Control Access to Posts, Pages or Categories**: This feature allows you to restrict access to 
-your posts, pages, and custom post types or categories for any user, role, or visitor. Define 
-whether the viewer can "see", "read" or "comment" on any post or page. For a more extended list 
-of possible options, consider getting the [AAM Plus Package](http://wpaam.com/aam-extensions/aam-plus-package/). To learn more about this feature and 
-its use, check out our [Posts and Pages Tutorial](http://wpaam.com/tutorials/posts-pages-general-overview/). 
+* posts, pages, custom post types and categories;
+* backend metaboxes and widgets as well as frontend widgets;
+* backend menu;
+* comments;
 
-**Control Access to Media Files**: AAM allows you to configure custom access to media files for 
-any user, role, or visitor. This feature works without any additional changes to your server’s 
-.htaccess file. You can find more information about this topic in our [Tutorial](http://wpaam.com/tutorials).
+> AAM is very flexible and customizable plugin that is used by a lot of developers
+> around the globe to create secure and powerful WordPress solutions.
 
-**Manage Roles and Capabilities**: This feature has been designed and tested by hundreds of 
-experienced WordPress user and developers. It gives you the ability to create, update, or delete 
-any role or capability. For security reasons, this feature is limited by default, but can be easily 
-activated. Read more about this feature, including how to activate its full functionality, in our [AAM 
-Super Admin Tutorial](http://wpaam.com/tutorials/aam-super-admin/). 
-
-**Track User Activity**: Track logged-in user activities like when user was logged in or logged out. 
-To expand the tracking capabilities available, check out our [AAM Activities](http://wpaam.com/aam-extensions/aam-activities/) extension. 
-
-**Filter Backend Menu**: Control access to backend menu, (including submenus). For more 
-information on how this feature works, and for directions on how to use it, check out this tutorial- 
-[How to Manage Admin Menu](http://wpaam.com/tutorials/how-to-manage-admin-menu/).
-
-**Filter Metaboxes and Widgets**: Filter available metaboxes or widgets for any user, role or 
-visitor. 
-
-And many, many more... Check out our tutorials for more information about some of these 
-
-features, including step-by-step directions on how to use them. 
-
-To take AAM even further, check out the [additional extensions](http://wpaam.com/extensions/) we offer.
-
-The **AAM** has multi-language UI:
-
- * English
- * German (by Kolja www.Reggae-Party.de)
- * Spanish (by Etruel www.netmdp.com)
- * Polish (by Gustaw Lasek www.servitium.pl)
- * French (by Moskito7)
- * Russian (by Maxim Kernozhickii www.aeromultimedia.com)
- * Persian (by Ghaem Omidi www.forum.wp-parsi.com)
- * Norwegian (by Christer Berg Johannesen www.improbus.com)
+Check our [website page](http://vasyltech.com/advanced-access-manager) to find 
+out more about the Advanced Access Manager.
 
 == Installation ==
 
 1. Upload `advanced-access-manager` folder to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 
-== Frequently Asked Questions ==
-
-= What is "Initiate URL" button, under "Metaboxes & Widgets" Tab? =
-
-Sometimes list of additional metaboxes is conditional on edit post page. Like e.g.
-display custom metabox "Photos" only if Post Status is Published. Access Manager
-initiates the list of metaboxes for each post in default status ("auto-draft").
-That is why you have to manually initialize the URL to the edit post page where
-the list of additional metaboxes can be picked by AAM.
-
 == Screenshots ==
 
-1. General view of Access Manager
-2. List of Metaboxes to Manage
-3. List of Capabilities
-4. Post/Page Tree View
-5. ConfigPress
+1. Backend menu manager
+2. Metaboxes & Widgets manager
+3. User/Role Capabilities manager
+4. Posts & Pages manager
+5. Posts & Pages access control form
 
 == Changelog ==
+
+= 3.1.3.1 =
+* One more minor issue
+
+= 3.1.3 =
+* Fixed bug with default post settings
+* Filtering roles and capabilities form malicious code 
+
+= 3.1.2 =
+* Quick fix
+
+= 3.1.1 =
+* Fixed potential bug with check user capability functionality
+* Added social links to the AAM page
+
+= 3.1 =
+* Integrated User Switch with AAM
+* Fixed bugs reported by WP Error Fix
+* Removed intro message
+* Improved AAM speed
+* Updated AAM Utilities extension
+* Updated AAM Plus Package extension
+* Added new AAM Skeleton Extension for developers
+
+= 3.0.10 =
+* Fixed bug reported by WP Error Fix when user's first role does not exist
+* Fixed bug reported by WP Error Fix when roles has invalid capability set
+
+= 3.0.9 =
+* Added ability to extend the AAM Utilities property list
+* Updated AAM Plus Package with ability to toggle the page categories feature
+* Added WP Error Fix promotion tab
+* Finalized and resolved all known issues
+
+= 3.0.8 =
+* Extended AAM with few extra core filters and actions
+* Added role list sorting by name
+* Added WP Error Fix item to the extension list
+* Fixed the issue with language file
+
+= 3.0.7 =
+* Fixed the warning issue with newly installed AAM instance
+
+= 3.0.6 =
+* Fixed issue when server has security policy regarding file_get_content as URL
+* Added filters to support Edit/Delete caps with AAM Utilities extension
+* Updated AAM Utilities extension
+* Refactored extension list manager
+* Added AAM Role Filter extension
+* Added AAM Post Filter extension
+* Standardize the extension folder name
+
+= 3.0.5 =
+* Wrapped all *.phtml files into condition to avoid crash on direct file access
+* Fixed bug with Visitor subject API
+* Added internal capability id to the list of capabilities
+* Fixed bug with strict standard notice
+* Fixed bug when extension after update still indicates that update is needed
+* Fixed bug when extensions were not able to load js & css on windows server
+* Updated AAM Utilities extension
+* Updated AAM Multisite extension
+
+= 3.0.4 =
+* Improved the Metaboxes & Widget filtering on user level
+* Improved visual feedback for already installed extensions
+* Fixed the bug when posts and categories were filtered on the AAM page
+* Significantly improved the posts & pages inheritance mechanism
+* Updated and fixed bugs in AAM Plus Package and AAM Utilities
+* Improved AAM navigation during page reload
+* Removed Trash post access option. Now Delete option is the same
+* Added UI feedback on current posts, menu and metaboxes inheritance status
+* Updated AAM Multisite extension
+
+= 3.0.3 =
+* Fixed bug with backend menu saving
+* Fixed bug with metaboxes & widgets saving
+* Fixed bug with WP_Filesystem when non-standard filesystem is used
+* Optimized Posts & Pages breadcrumb load
+
+= 3.0.2 =
+* Fixed a bug with posts access within categories
+* Significantly improved the caching mechanism
+* Added mandatory notification if caching is not turned on
+* Added more help content
+
+= 3.0.1 =
+* Fixed the bug with capability saving
+* Fixed the bug with capability drop-down menu
+* Made backend menu help is more clear
+* Added tooltips to some UI buttons
+
+= 3.0 =
+* Brand new and much more intuitive user interface
+* Fully responsive design
+* Better, more reliable and faster core functionality
+* Completely new extension handler
+* Added "Manage Access" action to the list of user
+* Tested against WP 3.8 and PHP 5.2.17 versions
+
+= 2.9.4 =
+* Added missing files from the previous commit.
+
+= 2.9.3 =
+* Introduced AAM version 3 alpha
 
 = 2.9.2 =
 * Small fix in core

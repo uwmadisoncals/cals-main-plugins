@@ -36,6 +36,7 @@ class plugins
 		foreach( $this->items as $plugin )
 			if ( $plugin->is_loaded() )
 				$plugin->activate();
+		return $this;
 	}
 
 	/**
@@ -65,6 +66,7 @@ class plugins
 		foreach( $this->items as $plugin )
 			if ( $plugin->is_loaded() )
 				$plugin->deactivate();
+		return $this;
 	}
 
 	/**
@@ -104,6 +106,7 @@ class plugins
 				$this->need_to_save();
 			}
 		}
+		return $this;
 	}
 
 	/**
@@ -114,7 +117,7 @@ class plugins
 	{
 		if ( ! isset( $this->__need_to_save ) )
 			return;
-		$this->save();
+		return $this->save();
 	}
 
 	/**
@@ -147,6 +150,7 @@ class plugins
 			$plugin->set_classname( $classname );
 			$this->set( $classname, $plugin );
 		}
+		return $this;
 	}
 
 	/**
@@ -171,5 +175,6 @@ class plugins
 		$classnames = array_flip( $classnames );
 		$classnames = array_flip( $classnames );
 		$this->pp()->set_enabled_plugins( $classnames );
+		return $this;
 	}
 }

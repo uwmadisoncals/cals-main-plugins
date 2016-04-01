@@ -33,9 +33,56 @@ abstract class plugin_pack
 		$this->plugins()->activate();
 	}
 
+	/**
+		@brief		Convenience method to activate a plugin.
+		@details	Can take a single classname string, or an array.
+		@since		2015-12-22 18:10:59
+	**/
+	public function activate_plugin( $classnames )
+	{
+		if ( ! is_array( $classnames ) )
+			$classnames = [ $classnames ];
+
+		$this->plugins()->populate( $classnames );	// Load all of the plugins.
+
+		foreach( $classnames as $classname )
+			$this->plugins()
+			->get( $classname )
+				->plugin()	// Return the plugin itself
+				->activate_internal();	// And tell it to activate.
+
+		return $this->plugins()->save();
+	}
+
 	public function deactivate()
 	{
 		$this->plugins()->deactivate();
+	}
+
+	/**
+		@brief		Convenience method to deactivate a plugin.
+		@details	Can take a single classname string, or an array.
+		@since		2015-12-22 18:10:59
+	**/
+	public function deactivate_plugin( $classnames )
+	{
+		if ( ! is_array( $classnames ) )
+			$classnames = [ $classnames ];
+
+		foreach( $classnames as $classname )
+		{
+			if ( ! $this->plugins()->has( $classname ) )
+				continue;
+
+			$this->plugins()
+				->get( $classname )
+				->plugin()	// Return the plugin itself
+				->deactivate_internal();	// And tell it to deactivate.
+
+			$this->plugins()
+				->forget( $classname );
+		}
+		return $this->plugins()->save();
 	}
 
 	/**
@@ -72,13 +119,7 @@ abstract class plugin_pack
 	public function get_plugins_table()
 	{
 		$form = $this->form2();
-		$r = '<style>
-			table.plugin_pack th.plugin_group
-			{
-				background-color: #ddd;
-				font-weight: bold;
-			}
-		</style>';
+		$r = '';
 		$table = $this->table();
 
 		$plugins = new plugins( $this );
@@ -93,7 +134,7 @@ abstract class plugin_pack
 		$plugins->populate( $action->classes );
 
 		// Plugins class for the coloring.
-		$table = $this->table()->css_class( 'plugin_pack plugins' );
+		$table = $this->table()->css_class( 'plugin_pack plugins with_groups' );
 		$row = $table->head()->row();
 		$table->bulk_actions()
 			->form( $form )
@@ -133,6 +174,8 @@ abstract class plugin_pack
 							$this->plugins()->forget( $classname );
 							$message = $this->_( 'The selected plugin(s) have been uninstalled.' );
 							break;
+						default:
+							$this->plugins()->forget( $classname );
 					}
 					$this->plugins()->save();
 				}
@@ -149,11 +192,21 @@ abstract class plugin_pack
 				if ( $old_group != $group )
 				{
 					$old_group = $group;
-					$row = $table->body()->row();
-					$row->th()->css_class( 'plugin_group' )->colspan( 3 )->text( $group );
+
+					// The group slug helps the javascript to group the rows together.
+					$group_slug = sanitize_title( $group );
+
+					$row = $table->body()->row()
+						->css_class( 'inactive group' )
+						->data( 'group', $group_slug );
+
+					$row->th()->css_class( 'plugin_group name' )->colspan( 3 )->text( $group );
 				}
 
-				$row = $table->body()->row();
+				$row = $table->body()->row()
+					->css_class( 'plugin' )
+					->data( 'group', $group_slug );
+
 				$cb = $table->bulk_actions()->cb( $row, $plugin->get_id() );
 
 				$td = $row->td();
@@ -194,7 +247,6 @@ abstract class plugin_pack
 		$this->__plugins = new plugins( $this );
 		$this->__plugins->populate( $this->get_enabled_plugins() );
 		$this->__plugins->load();
-		$this->__plugins->maybe_save();
 		return $this->plugins();
 	}
 

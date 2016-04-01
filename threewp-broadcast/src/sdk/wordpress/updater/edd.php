@@ -442,7 +442,7 @@ trait edd
 		$response = wp_remote_get( $url, [ 'timeout' => 15, 'sslverify' => false ] );
 
 		if ( is_wp_error( $response ) )
-			throw new Exception( 'Invalid response from the updater service.' );
+			throw new Exception( 'Invalid response from the updater service: ' . json_encode( $response ) );
 
 		return $response;
 	}

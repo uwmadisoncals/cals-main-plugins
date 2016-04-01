@@ -17,6 +17,7 @@ class ThreeWP_Broadcast
 	use traits\meta_boxes;
 	use traits\post_actions;
 	use traits\terms_and_taxonomies;
+	use traits\savings_calculator;
 
 	/**
 		@brief		Broadcasting stack.
@@ -98,7 +99,12 @@ class ThreeWP_Broadcast
 			$this->add_filter( 'post_type_link', 'post_link', 10, 3 );
 		}
 
+		$this->attachments_init();
+		$this->post_actions_init();
+		$this->savings_calculator_init();
+
 		$this->add_action( 'network_admin_menu', 'admin_menu' );
+		$this->add_action( 'plugins_loaded' );
 
 		$this->add_filter( 'threewp_broadcast_add_meta_box' );
 		$this->add_filter( 'threewp_broadcast_admin_menu', 'add_post_row_actions_and_hooks', 100 );
@@ -107,35 +113,17 @@ class ThreeWP_Broadcast
 		// Don't want to break anyone's plugins.
 		$this->add_action( 'threewp_broadcast_broadcast_post' );
 
-		$this->add_action( 'threewp_broadcast_copy_attachment', 100 );
 		$this->add_action( 'threewp_broadcast_each_linked_post' );
-		$this->add_action( 'threewp_broadcast_get_post_actions' );
-		$this->add_action( 'threewp_broadcast_get_post_bulk_actions' );
 		$this->add_action( 'threewp_broadcast_get_user_writable_blogs', 100 );		// Allow other plugins to do this first.
 		$this->add_filter( 'threewp_broadcast_get_post_types', 5 );					// Add our custom post types to the array of broadcastable post types.
-		$this->add_action( 'threewp_broadcast_manage_posts_custom_column', 5 );
 		$this->add_action( 'threewp_broadcast_maybe_clear_post', 100 );
 		$this->add_action( 'threewp_broadcast_menu', 5 );
 		$this->add_action( 'threewp_broadcast_menu', 'threewp_broadcast_menu_final', 100 );
-		$this->add_action( 'threewp_broadcast_post_action' );
 		$this->add_action( 'threewp_broadcast_prepare_broadcasting_data' );
 		$this->add_filter( 'threewp_broadcast_prepare_meta_box', 5 );
 		$this->add_filter( 'threewp_broadcast_prepare_meta_box', 'threewp_broadcast_prepared_meta_box', 100 );
 		$this->add_action( 'threewp_broadcast_wp_insert_term', 5 );
 		$this->add_action( 'threewp_broadcast_wp_update_term', 5 );
-		$this->add_action( 'wp_ajax_broadcast_post_action_form' );
-		$this->add_action( 'wp_ajax_broadcast_post_bulk_action' );
-
-		// Hook into the actions so that we can keep track of the broadcast data.
-		$this->add_action( 'wp_trash_post', 'trash_post' );
-		$this->add_action( 'trash_post' );
-		$this->add_action( 'trash_page', 'trash_post' );
-
-		$this->add_action( 'untrash_post' );
-		$this->add_action( 'untrash_page', 'untrash_post' );
-
-		$this->add_action( 'delete_post' );
-		$this->add_action( 'delete_page', 'delete_post' );
 
 		if ( $this->get_site_option( 'canonical_url' ) )
 			$this->add_action( 'wp_head', 1 );
@@ -154,6 +142,15 @@ class ThreeWP_Broadcast
 
 		$db_ver = $this->get_site_option( 'database_version', 0 );
 
+		// 2016-01-05 Always run the create if not exists.
+		$this->query("CREATE TABLE IF NOT EXISTS `". $this->broadcast_data_table() . "` (
+		  `blog_id` int(11) NOT NULL COMMENT 'Blog ID',
+		  `post_id` int(11) NOT NULL COMMENT 'Post ID',
+		  `data` longtext NOT NULL COMMENT 'Serialized BroadcastData',
+		  KEY `blog_id` (`blog_id`,`post_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+		");
+
 		if ( $db_ver < 1 )
 		{
 			// Remove old options
@@ -163,14 +160,6 @@ class ThreeWP_Broadcast
 			$this->delete_site_option( 'activity_monitor_broadcasts' );
 			$this->delete_site_option( 'activity_monitor_group_changes' );
 			$this->delete_site_option( 'activity_monitor_unlinks' );
-
-			$this->query("CREATE TABLE IF NOT EXISTS `". $this->broadcast_data_table() . "` (
-			  `blog_id` int(11) NOT NULL COMMENT 'Blog ID',
-			  `post_id` int(11) NOT NULL COMMENT 'Post ID',
-			  `data` longtext NOT NULL COMMENT 'Serialized BroadcastData',
-			  KEY `blog_id` (`blog_id`,`post_id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-			");
 
 			// Cats and tags replaced by taxonomy support. Version 1.5
 			$this->delete_site_option( 'role_categories' );
@@ -214,11 +203,8 @@ class ThreeWP_Broadcast
 			$db_ver = 4;
 		}
 
-		if ( $db_ver < 5 )
-		{
-			$this->create_broadcast_data_id_column();
-			$db_ver = 5;
-		}
+		// 2016-01-05 This used to be v5, but is now always run.
+		$this->create_broadcast_data_id_column();
 
 		if ( $db_ver < 6 )
 		{
@@ -266,6 +252,17 @@ class ThreeWP_Broadcast
 	// --------------------------------------------------------------------------------------------
 	// ----------------------------------------- Callbacks
 	// --------------------------------------------------------------------------------------------
+
+	/**
+		@brief		Broadcast is ready for broadcasting.
+		@since		2015-10-29 12:22:53
+	**/
+	public function plugins_loaded()
+	{
+		$this->__loaded = true;
+		$action = new actions\loaded();
+		$action->execute();
+	}
 
 	public function post_link( $link, $post )
 	{
@@ -464,7 +461,12 @@ class ThreeWP_Broadcast
 		remove_action( 'wp_head', 'rel_canonical' );
 
 		// Remove Canonical Link Added By Yoast WordPress SEO Plugin
-		$this->add_filter( 'wpseo_canonical', 'wp_head_remove_wordpress_seo_canonical' );;
+		if ( class_exists( '\\WPSEO_Frontend' ) )
+		{
+			$this->add_filter( 'wpseo_canonical', 'wp_head_remove_wordpress_seo_canonical' );;
+			$wpseo_frontend = \WPSEO_Frontend::get_instance();
+			remove_action( 'wpseo_head', array( $wpseo_frontend, 'canonical' ), 20 );
+		}
 	}
 
 	/**
@@ -495,9 +497,9 @@ class ThreeWP_Broadcast
 		@brief		Convenience function to return a Plainview SDK Collection.
 		@since		2014-10-31 13:21:06
 	**/
-	public static function collection()
+	public static function collection( $items = [] )
 	{
-		return new \plainview\sdk_broadcast\collections\Collection();
+		return new \plainview\sdk_broadcast\collections\Collection( $items );
 	}
 
 	/**
@@ -701,6 +703,21 @@ class ThreeWP_Broadcast
 	}
 
 	/**
+		@brief		Return the plugin pack instance.
+		@since		2015-10-28 14:42:18
+	**/
+	public function plugin_pack()
+	{
+		if ( ! isset( $this->__plugin_pack ) )
+		{
+			$this->__plugin_pack = new premium_pack\ThreeWP_Broadcast_Plugin_Pack();
+			if ( $this->__loaded )
+				$this->__plugin_pack->plugins_ready = true;
+		}
+		return $this->__plugin_pack;
+	}
+
+	/**
 		@brief		Save the user's last used settings.
 		@details	Since v8 the data is stored in the user's meta.
 		@since		2014-10-09 06:19:53
@@ -723,6 +740,8 @@ class ThreeWP_Broadcast
 			'database_version' => 0,							// Version of database and settings
 			'debug' => false,									// Display debug information?
 			'debug_ips' => '',									// List of IP addresses that can see debug information, when debug is enabled.
+			'debug_to_browser' => false,						// Display debug info in the browser?
+			'debug_to_file' => false,							// Save debug info to a file.
 			'save_post_decoys' => 1,							// How many nop() hooks to insert into the save_post action before Broadcast itself.
 			'save_post_priority' => 640,						// Priority of save_post action. Higher = lets other plugins do their stuff first
 			'override_child_permalinks' => false,				// Make the child's permalinks link back to the parent item?
@@ -734,6 +753,7 @@ class ThreeWP_Broadcast
 			'role_broadcast_scheduled_posts' => [ 'super_admin' ],	// Role required to broadcast scheduled, future posts
 			'role_taxonomies' => [ 'super_admin' ],					// Role required to broadcast the taxonomies
 			'role_custom_fields' => [ 'super_admin' ],				// Role required to broadcast the custom fields
+			'savings_calculator_data' => '',						// Data for the savings calculator.
 		], parent::site_options() );
 	}
 

@@ -9,7 +9,7 @@ Plugin URI:        http://daggerhart.com
 Description:       Query Wrangler provides an intuitive interface for creating complex WP queries as pages or widgets. Based on Drupal Views.
 Author:            Jonathan Daggerhart
 Author URI:        http://daggerhart.com
-Version:           1.5.38
+Version:           1.5.40
 
 ******************************************************************
 
@@ -30,19 +30,23 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 // some useful definitions
-define( 'QW_VERSION', 1.538 );
+define( 'QW_VERSION', 1.540 );
 define( 'QW_PLUGIN_DIR', dirname( __FILE__ ) );
 define( 'QW_PLUGIN_URL', plugins_url( '', __FILE__ ) );
 define( 'QW_DEFAULT_THEME', 'views' );
 define( 'QW_FORM_PREFIX', "qw-query-options" );
 
-// Query Widget
+
+include_once QW_PLUGIN_DIR . '/includes/class-qw-settings.php';
+include_once QW_PLUGIN_DIR . '/includes/class-qw-query.php';
 include_once QW_PLUGIN_DIR . '/widget.query.php';
 
 /*
  * Init functions
  */
 function qw_init_frontend() {
+	$settings = QW_Settings::get_instance();
+
 	// include Template Wrangler
 	if ( ! function_exists( 'theme' ) ) {
 		include_once QW_PLUGIN_DIR . '/template-wrangler.php';
@@ -51,7 +55,8 @@ function qw_init_frontend() {
 	include_once QW_PLUGIN_DIR . '/includes/hooks.php';
 	include_once QW_PLUGIN_DIR . '/includes/exposed.php';
 	include_once QW_PLUGIN_DIR . '/includes/handlers.php';
-	include_once QW_PLUGIN_DIR . '/includes/shortcodes.php';
+	include_once QW_PLUGIN_DIR . '/includes/class-qw-shortcodes.php';
+	QW_Shortcodes::register();
 
 	// basics
 	include_once QW_PLUGIN_DIR . '/includes/basics/display_title.php';
@@ -79,11 +84,10 @@ function qw_init_frontend() {
 	include_once QW_PLUGIN_DIR . '/includes/fields/callback_field.php';
 
 	// meta value field as a setting
-	$meta_value_handler = (int) get_option( 'qw_meta_value_field_handler', 0 );
-
-	if ( $meta_value_handler === 1 ) {
+	if ( $settings->get( 'meta_value_field_handler', 0 ) ) {
 		include_once QW_PLUGIN_DIR . '/includes/fields/meta_value_new.php';
-	} else {
+	}
+	else {
 		include_once QW_PLUGIN_DIR . '/includes/fields/meta_value.php';
 	}
 
@@ -108,6 +112,7 @@ function qw_init_frontend() {
 
 	// overrides
 	include_once QW_PLUGIN_DIR . '/includes/overrides/categories.php';
+	include_once QW_PLUGIN_DIR . '/includes/overrides/post_type_archive.php';
 	include_once QW_PLUGIN_DIR . '/includes/overrides/tags.php';
 	include_once QW_PLUGIN_DIR . '/includes/overrides/taxonomies.php';
 
@@ -115,13 +120,15 @@ function qw_init_frontend() {
 	include_once QW_PLUGIN_DIR . '/includes/query.php';
 	include_once QW_PLUGIN_DIR . '/includes/theme.php';
 	include_once QW_PLUGIN_DIR . '/includes/pages.php';
-	include_once QW_PLUGIN_DIR . '/includes/override.php';
-	new QW_Override();
+	include_once QW_PLUGIN_DIR . '/includes/class-qw-override.php';
+	QW_Override::register();
 
 }
 
 function qw_admin_init() {
-	if ( get_option( 'qw_live_preview' ) === FALSE ) {
+	$settings = QW_Settings::get_instance();
+
+	if ( $settings->get( 'qw_live_preview', FALSE ) === FALSE ) {
 		add_option( 'qw_live_preview', 'on' );
 	}
 

@@ -20,6 +20,7 @@ trait admin_menu
 
 		$action = new actions\menu;
 		$action->broadcast = $this;
+		$action->menu_page = $this->menu_page();
 		$action->execute();
 
 		// Hook into save_post, no matter is the meta box is displayed or not.
@@ -49,28 +50,12 @@ trait admin_menu
 		echo $maintenance;
 	}
 
-	public function admin_menu_post_types()
-	{
-		$form = $this->form2();
-		$r = '';
-
-		if ( $form->is_posting() )
-		{
-			$this->message_( 'Custom post types saved!' );
-		}
-
-		$r .= $form->open_tag();
-		$r .= $form->display_form_table();
-		$r .= $form->close_tag();
-		echo $r;
-	}
-
 	public function admin_menu_premium_pack_info()
 	{
 		$r = '';
 		$r .= $this->html_css();
 		$contents = file_get_contents( __DIR__ . '/../../html/premium_pack_info.html' );
-		$r .= $this->wrap( $contents, $this->_( 'ThreeWP Broadcast Premium Pack info' ) );
+		$r .= $this->wrap( $contents, $this->_( 'Broadcast plugin packs info' ) );
 		echo $r;
 	}
 
@@ -190,12 +175,17 @@ trait admin_menu
 			->size( 3, 3 )
 			->value( $this->get_site_option( 'blogs_hide_overview' ) );
 
+		$get_existing_attachment_actions = new actions\get_existing_attachment_actions();
+		$get_existing_attachment_actions->execute();
+		$actions = $get_existing_attachment_actions->get_actions();
+		$actions = array_flip( $actions );
+		ksort( $actions );
+
 		$existing_attachments = $fs->select( 'existing_attachments' )
 			->description_( 'Action to take when attachments with the same filename already exist on the child blog.' )
 			->label_( 'Existing attachments' )
-			->option_( 'Use the existing attachment on the child blog', 'use' )
-			->option_( 'Overwrite the attachment', 'overwrite' )
-			->option_( 'Create a new attachment with a randomized suffix', 'randomize' )
+			// Array flip because we till be getting [ key => description ]
+			->options( $actions )
 			->required()
 			->value( $this->get_site_option( 'existing_attachments', 'use' ) );
 
@@ -310,7 +300,7 @@ trait admin_menu
 
 			$this->save_debug_settings_from_form( $form );
 
-			$this->message( 'Options saved!' );
+			echo $this->info_message_box()->_( 'Options saved!' );
 
 			$_POST = [];
 			echo $this->admin_menu_settings();
@@ -395,10 +385,26 @@ trait admin_menu
 		$this->load_language();
 
 		$tabs = $this->tabs();
-		$tabs->tab( 'settings' )		->callback_this( 'admin_menu_settings' )		->name_( 'Settings' );
-		$tabs->tab( 'maintenance' )		->callback_this( 'admin_menu_maintenance' )		->name_( 'Maintenance' );
-		$tabs->tab( 'system_info' )		->callback_this( 'admin_menu_system_info' )		->name_( 'System info' );
-		$tabs->tab( 'uninstall' )		->callback_this( 'admin_uninstall' )			->name_( 'Uninstall' );
+
+		$tabs->tab( 'settings' )
+			->callback_this( 'admin_menu_settings' )
+			->name_( 'Settings' )
+			->sort_order( 25 );		// Always first.
+
+		$tabs->tab( 'maintenance' )
+			->callback_this( 'admin_menu_maintenance' )
+			->name_( 'Maintenance' );
+
+		$tabs->tab( 'system_info' )
+			->callback_this( 'admin_menu_system_info' )
+			->name_( 'System info' );
+
+		$this->savings_calculator_tabs( $tabs );
+
+		$tabs->tab( 'uninstall' )
+			->callback_this( 'admin_uninstall' )
+			->name_( 'Uninstall' )
+			->sort_order( 90 );		// Always last.
 
 		echo $tabs;
 	}
@@ -468,7 +474,9 @@ trait admin_menu
 			}
 		}
 
-		$tabs->tab( 'admin_menu_broadcast_info' )->name_( 'Broadcast information' );
+		$tabs->tab( 'admin_menu_broadcast_info' )
+			->callback_this( 'admin_menu_broadcast_info' )
+			->name_( 'Broadcast information' );
 
 		$action = new actions\broadcast_menu_tabs();
 		$action->tabs = $tabs;
@@ -485,10 +493,10 @@ trait admin_menu
 	public function threewp_broadcast_menu( $action )
 	{
 		if ( $this->display_premium_pack_info && is_super_admin() )
-			$this->add_submenu_page(
+		$this->add_submenu_page(
 				'threewp_broadcast',
-				$this->_( 'Premium Pack info' ),
-				$this->_( 'Premium Pack' ),
+				$this->_( 'Plugin packs info' ),
+				$this->_( 'Plugin packs' ),
 				'edit_posts',
 				'threewp_broadcast_premium_pack_info',
 				[ &$this, 'admin_menu_premium_pack_info' ]
@@ -513,16 +521,16 @@ trait admin_menu
 		else
 			$target = 'broadcast_menu_tabs';
 
-		add_menu_page(
-			$this->_( 'ThreeWP Broadcast' ),
-			$this->_( 'Broadcast' ),
-			'edit_posts',
-			'threewp_broadcast',
-			[ &$this, $target ],
-			'none'
-		);
+		$this->menu_page()
+			->callback_this( $target )
+			->capability( 'edit_posts' )
+			->menu_slug( 'threewp_broadcast' )
+			->menu_title( $this->_( 'Broadcast' ) )
+			->page_title( $this->_( 'ThreeWP Broadcast' ) )
+			->icon_url( 'dashicons-rss' );
 
-		$this->add_submenu_pages();
+		$this->menu_page()
+			->add_all();
 	}
 
 }

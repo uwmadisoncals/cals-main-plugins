@@ -58,7 +58,27 @@ class TableTest extends \plainview\sdk_broadcast\tests\TestCase
 		$first->td();
 		// Row has one td cell.
 		$this->assertEquals( 1, count( $t->body()->row( 'first' ) ) );
+	}
 
+	/**
+		@brief		Test cell extraction.
+		@since		2015-12-10 13:47:43
+	**/
+	public function test_cell_extraction()
+	{
+		$t = $this->table();
+		$row = $t->body()->row();
+
+		// Create a cell with an ID.
+		$row->td( 'testid' );
+
+		// Retrieve the same cell.
+		$cell = $row->cell( 'testid' );
+		$this->assertTrue( is_object( $cell ) );
+
+		// And now retrieve a nonexistent cell. Should be false, not null.
+		$value = $row->cell( 'bad_id' );
+		$this->assertTrue( $value === false );
 	}
 
 	public function table()

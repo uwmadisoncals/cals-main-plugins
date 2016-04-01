@@ -2,8 +2,8 @@
 Contributors: willnorris, mitchoyoshitaka
 Tags: shibboleth, authentication, login, saml
 Requires at least: 3.3
-Tested up to: 3.9
-Stable tag: 1.6
+Tested up to: 4.5
+Stable tag: 1.7
 
 Allows WordPress to externalize user authentication and account creation to a
 Shibboleth Service Provider.
@@ -48,8 +48,8 @@ configured with requireSession set to "false".  Upon activation, the plugin
 will attempt to set the appropriate directives in WordPress's .htaccess file.
 If it is unable to do so, you can add this manually:
 
-    AuthType Shibboleth
-    Require Shibboleth
+    AuthType shibboleth
+    Require shibboleth
 
 The option to automatically login the users into WordPress also works when not
 using the lazy session options as it will force login into WordPress. In other
@@ -62,14 +62,14 @@ helpdesk functions where any access to content requires authentication.
 Consider the following .htaccess options when used in conjunction with the
 automatic login feature
 
-    AuthType Shibboleth
-    ShibRequireSession on
+    AuthType shibboleth
+    ShibRequestSetting requireSession 1
     Require valid-user
 
 OR
 
-    Authtype Shibboleth
-    ShibRequireSession on
+    Authtype shibboleth
+    ShibRequestSetting requireSession 1
     Require isMemberOf group1 group2
     Require sAMAccountName user1 user 2
 
@@ -143,6 +143,13 @@ have to make that call as to what is most appropriate.
 3. Assign users into WordPress roles based on arbitrary data provided by Shibboleth
 
 == Changelog ==
+
+= version 1.7 (2016-03-20) =
+ - fixed a security vulnerability reported by WordPress security team
+ - load multisite options correctly; [thanks to jdelsemme for reporting](https://github.com/mitcho/shibboleth/issues/8)
+ - updated htaccess setting strings; [props dericcrago](https://github.com/mitcho/shibboleth/pull/6)
+ - fix reauth loop; [props jrchamp](https://github.com/mitcho/shibboleth/pull/5)
+ - set l10n text domain; [props jrchamp](https://github.com/mitcho/shibboleth/pull/5)
 
 = version 1.6 (2014-04-07) =
  - tested for compatibility with recent WordPress versions; now requires WordPress 3.3

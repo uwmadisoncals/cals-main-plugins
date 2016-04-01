@@ -145,6 +145,7 @@ class form
 		inputs\traits\container::validate insteadof inputs\traits\validation;
 	}
 	use inputs\traits\prefix;
+	use inputs\traits\sort_order;
 
 	/**
 		@brief		Has the form handled the POST array?

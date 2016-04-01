@@ -2,8 +2,8 @@
 Contributors: loumray
 Tags: youtube, vimeo, vimeo pro, dailymotion, flickr, API, Media Manager, Media Library Extension, Integration, direct upload, private videos, remote medias libraries, media explorer, embeded
 Requires at least: 3.5
-Tested up to: 4.3.1
-Stable tag: 1.3.0
+Tested up to: 4.4.2
+Stable tag: 1.3.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -73,6 +73,9 @@ We do work hard to bring you the best of the RML plugin. As normal programmers a
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=P9N89H4AJ5PCL">Buy us a coffee »</a>
 
 == Changelog ==
+= 1.3.1 =
+* Improve stability preventing interference by other plugins.
+
 = 1.3.0 =
 * Re-enable youtube support. Now using API V3. V2 being deprecated.
 
@@ -100,8 +103,11 @@ We do work hard to bring you the best of the RML plugin. As normal programmers a
 * Initial Release.
 
 == Upgrade Notice ==
+= 1.3.1 =
+Stability improvements.
+
 = 1.3.0 =
-* Youtube support is back.
+Youtube support is back.
 
 = 1.2.0 =
 This version add instagram support and multiple fixes.
@@ -117,7 +123,7 @@ Added Flickr Basic Support & Improved Remote Libraries Admin Section
 
 * WordPress 3.5 or greater
 * PHP version 5.3.3 or greater
-* PHP cURl module intsalled
+* PHP cURL module installed
 
 = Manual installation =
 

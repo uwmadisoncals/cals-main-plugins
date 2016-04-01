@@ -99,7 +99,11 @@ class SSP_Admin {
 
 		}
 
+		// Add ajax action for plugin rating
 		add_action( 'wp_ajax_ssp_rated', array( $this, 'rated' ) );
+
+		// Add ajax action for customising episode embed code
+		add_action( 'wp_ajax_update_episode_embed_code', array( $this, 'update_episode_embed_code' ) );
 
 		// Setup activation and deactivation hooks
 		register_activation_hook( $file, array( $this, 'activate' ) );
@@ -114,9 +118,13 @@ class SSP_Admin {
 	 */
 	public function setup_permastruct() {
 
-		// Episode download links
+		// Episode download & player URLs
 		add_rewrite_rule( '^podcast-download/([^/]*)/([^/]*)/?', 'index.php?podcast_episode=$matches[1]', 'top' );
+		add_rewrite_rule( '^podcast-player/([^/]*)/([^/]*)/?', 'index.php?podcast_episode=$matches[1]&podcast_ref=player', 'top' );
+
+		// Custom query variables
 		add_rewrite_tag( '%podcast_episode%', '([^&]+)' );
+		add_rewrite_tag( '%podcast_ref%', '([^&]+)' );
 
 		// Series feed URLs
 		$feed_slug = apply_filters( 'ssp_feed_slug', $this->token );
@@ -143,7 +151,10 @@ class SSP_Admin {
 			'not_found' =>  sprintf( __( 'No %s Found' , 'seriously-simple-podcasting' ), __( 'Episodes' , 'seriously-simple-podcasting' ) ),
 			'not_found_in_trash' => sprintf( __( 'No %s Found In Trash' , 'seriously-simple-podcasting' ), __( 'Episodes' , 'seriously-simple-podcasting' ) ),
 			'parent_item_colon' => '',
-			'menu_name' => __( 'Podcast' , 'seriously-simple-podcasting' )
+			'menu_name' => __( 'Podcast' , 'seriously-simple-podcasting' ),
+			'filter_items_list' => sprintf( __( 'Filter %s list' , 'seriously-simple-podcasting' ), __( 'Episode' , 'seriously-simple-podcasting' ) ),
+			'items_list_navigation' => sprintf( __( '%s list navigation' , 'seriously-simple-podcasting' ), __( 'Episode' , 'seriously-simple-podcasting' ) ),
+			'items_list' => sprintf( __( '%s list' , 'seriously-simple-podcasting' ), __( 'Episode' , 'seriously-simple-podcasting' ) ),
 		);
 
 		$slug = apply_filters( 'ssp_archive_slug', __( 'podcast' , 'seriously-simple-podcasting' ) );
@@ -165,6 +176,7 @@ class SSP_Admin {
 			'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'comments', 'author', 'custom-fields', 'publicize' ),
 			'menu_position' => 5,
 			'menu_icon' => 'dashicons-microphone',
+			'show_in_rest' => true,
 		);
 
 		$args = apply_filters( 'ssp_register_post_type_args', $args );
@@ -200,13 +212,16 @@ class SSP_Admin {
             'add_or_remove_items' => __( 'Add or remove Series' , 'seriously-simple-podcasting' ),
             'choose_from_most_used' => __( 'Choose from the most used Series' , 'seriously-simple-podcasting' ),
             'not_found' => __( 'No Series Found' , 'seriously-simple-podcasting' ),
+            'items_list_navigation' => __( 'Series list navigation' , 'seriously-simple-podcasting' ),
+            'items_list' => __( 'Series list' , 'seriously-simple-podcasting' ),
         );
 
         $series_args = array(
             'public' => true,
             'hierarchical' => true,
             'rewrite' => array( 'slug' => apply_filters( 'ssp_series_slug', 'series' ) ),
-            'labels' => $series_labels
+            'labels' => $series_labels,
+            'show_in_rest' => true,
         );
 
         $series_args = apply_filters( 'ssp_register_taxonomy_args', $series_args, 'series' );
@@ -227,24 +242,13 @@ class SSP_Admin {
 	public function register_custom_column_headings( $defaults ) {
 		$new_columns = apply_filters( 'ssp_admin_columns_episodes', array( 'series' => __( 'Series' , 'seriously-simple-podcasting' ) , 'image' => __( 'Image' , 'seriously-simple-podcasting' ) ) );
 
-		$last_item = '';
+		// remove date column
+		unset( $defaults['date'] );
 
-		if ( isset( $defaults['date'] ) ) { unset( $defaults['date'] ); }
+		// add new columns before last default one
+		$columns = array_slice( $defaults, 0, -1 ) + $new_columns + array_slice( $defaults, -1 );
 
-		if ( count( $defaults ) > 2 ) {
-			$last_item = array_slice( $defaults, -1 );
-			array_pop( $defaults );
-		}
-		$defaults = array_merge( $defaults, $new_columns );
-
-		if ( $last_item ) {
-			foreach ( (array) $last_item as $k => $v ) {
-				$defaults[$k] = $v;
-				break;
-			}
-		}
-
-		return $defaults;
+		return $columns;
 	}
 
     /**
@@ -259,18 +263,9 @@ class SSP_Admin {
 		switch ( $column_name ) {
 
 			case 'series':
-				$value = '';
-
 				$terms = wp_get_post_terms( $id , 'series' );
-
-				$i = 0;
-				foreach ( $terms as $term ) {
-					if ( $i > 0 ) { $value .= ', '; }
-					else { ++$i; }
-					$value .= $term->name;
-				}
-
-				echo $value;
+				$term_names = wp_list_pluck( $terms, 'name' );
+				echo join( ', ', $term_names );
 			break;
 
 			case 'image':
@@ -304,9 +299,12 @@ class SSP_Admin {
 
     /**
      * Display column data in series list table
+     *
      * @param string  $column_data Default column content
      * @param string  $column_name Name of current column
      * @param integer $term_id     ID of term
+     *
+     * @return string
      */
     public function add_series_columns( $column_data , $column_name , $term_id ) {
 
@@ -319,10 +317,16 @@ class SSP_Admin {
 					$feed_slug = apply_filters( 'ssp_feed_slug', $this->token );
 					$feed_url = $this->home_url . 'feed/' . $feed_slug . '/' . $series_slug;
 				} else {
-					$feed_url = $this->home_url . '?feed=' . $this->token . '&podcast_series=' . $series_slug;
+					$feed_url = add_query_arg(
+						array(
+							'feed' => $this->token,
+							'podcast_series' => $series_slug
+						),
+						$this->home_url
+					);
 				}
 
-                $column_data = '<a href="' . $feed_url . '" target="_blank">' . $feed_url . '</a>';
+                $column_data = '<a href="' . esc_attr( $feed_url ) . '" target="_blank">' . esc_html( $feed_url ) . '</a>';
             break;
         }
 
@@ -374,12 +378,58 @@ class SSP_Admin {
 	 * @return void
 	 */
 	public function meta_box_setup ( $post ) {
+		global $pagenow;
 
 		add_meta_box( 'podcast-episode-data', __( 'Podcast Episode Details' , 'seriously-simple-podcasting' ), array( $this, 'meta_box_content' ), $post->post_type, 'normal', 'high' );
+
+		if( 'post.php' == $pagenow && 'publish' == $post->post_status && function_exists( 'get_post_embed_html' ) ) {
+			add_meta_box( 'episode-embed-code', __( 'Episode Embed Code' , 'seriously-simple-podcasting' ), array( $this, 'embed_code_meta_box_content' ), $post->post_type, 'side', 'low' );
+		}
 
 		// Allow more metaboxes to be added
 		do_action( 'ssp_meta_boxes', $post );
 
+	}
+
+	/**
+	 * Get content for episode embed code meta box
+	 * @param  object $post Current post object
+	 * @return void
+	 */
+	public function embed_code_meta_box_content ( $post ) {
+
+		// Get post embed code
+		$embed_code = get_post_embed_html( 500, 350, $post );
+
+		// Generate markup for meta box
+		$html = '<p><em>' . __( 'Customise the size of your episode embed below, then copy the HTML to your clipboard.', 'seriously-simple-podcasting' ) . '</em></p>';
+		$html .= '<p><label for="episode_embed_code_width">' . __( 'Width:', 'seriously-simple-podcasting' ) . '</label> <input id="episode_embed_code_width" class="episode_embed_code_size_option" type="number" value="500" length="3" min="0" step="1" /> &nbsp;&nbsp;&nbsp;&nbsp;<label for="episode_embed_code_height">' . __( 'Height:', 'seriously-simple-podcasting' ) . '</label> <input id="episode_embed_code_height" class="episode_embed_code_size_option" type="number" value="350" length="3" min="0" step="1" /></p>';
+		$html .= '<p><textarea readonly id="episode_embed_code">' . esc_textarea( $embed_code ) . '</textarea></p>';
+
+		echo $html;
+	}
+
+	/**
+	 * Update the epiaode embed code via ajax
+	 * @return void
+	 */
+	public function update_episode_embed_code () {
+
+		// Make sure we have a valid post ID
+		if( empty( $_POST['post_id'] ) ) {
+			return;
+		}
+
+		// Get info for embed code
+		$post_id = (int) $_POST['post_id'];
+		$width = (int) $_POST['width'];
+		$height = (int) $_POST['height'];
+
+		// Generate embed code
+		echo get_post_embed_html( $width, $height, $post_id );
+
+		// Exit after ajax request
+		exit;
 	}
 
 	/**
@@ -413,16 +463,34 @@ class SSP_Admin {
 					$class = $v['class'];
 				}
 
+				$disabled = false;
+				if ( isset( $v['disabled'] ) && $v['disabled'] ) {
+					$disabled = true;
+				}
+
 				if ( $k == 'audio_file' ) {
-					$html .= '<tr valign="top"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><input type="button" class="button" id="upload_audio_file_button" value="'. __( 'Upload File' , 'seriously-simple-podcasting' ) . '" data-uploader_title="Choose a file" data-uploader_button_text="Insert audio file" /><input name="' . esc_attr( $k ) . '" type="text" id="upload_audio_file" class="regular-text" value="' . esc_attr( $data ) . '" />' . "\n";
+					$html .= '<tr valign="top"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><input name="' . esc_attr( $k ) . '" type="text" id="upload_audio_file" class="regular-text" value="' . esc_attr( $data ) . '" /> <input type="button" class="button" id="upload_audio_file_button" value="' . __( 'Upload File' , 'seriously-simple-podcasting' ) . '" data-uploader_title="' . __( 'Choose a file', 'seriously-simple-podcasting' ) . '" data-uploader_button_text="' . __( 'Insert podcast file', 'seriously-simple-podcasting' ) . '" />' . "\n";
 					$html .= '<p class="description">' . $v['description'] . '</p>' . "\n";
 					$html .= '</td><tr/>' . "\n";
 				} else {
 					if ( $v['type'] == 'checkbox' ) {
 						$html .= '<tr valign="top"><th scope="row">' . $v['name'] . '</th><td><input name="' . esc_attr( $k ) . '" type="checkbox" class="' . esc_attr( $class ) . '" id="' . esc_attr( $k ) . '" ' . checked( 'on' , $data , false ) . ' /> <label for="' . esc_attr( $k ) . '"><span class="description">' . $v['description'] . '</span></label>' . "\n";
 						$html .= '</td><tr/>' . "\n";
+					} elseif ( $v['type'] == 'radio' ) {
+						$html .= '<tr valign="top"><th scope="row">' . $v['name'] . '</th><td>' ."\n";
+						foreach( $v['options'] as $option => $label ) {
+
+							$html .= '<input style="vertical-align: bottom;" name="' . esc_attr( $k ) . '" type="radio" class="' . esc_attr( $class ) . '" id="' . esc_attr( $k ) . '_' . esc_attr( $option ) . '" ' . checked( $option , $data , false ) . ' value="' . esc_attr( $option ) . '" /> <label style="margin-right:10px;" for="' . esc_attr( $k ) . '_' . esc_attr( $option ) . '">' . esc_html( $label ) . '</label>' . "\n";
+						}
+						$html .= '<p class="description">' . $v['description'] . '</p>' . "\n";
+						$html .= '</td><tr/>' . "\n";
 					} elseif ( $v['type'] == 'datepicker' ) {
-						$html .= '<tr valign="top"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td class="hasDatepicker"><input name="' . esc_attr( $k ) . '" type="text" id="' . esc_attr( $k ) . '" class="ssp-datepicker ' . esc_attr( $class ) . '" value="' . esc_attr( $data ) . '" />' . "\n";
+						$display_date = '';
+						if( $data ) {
+							$display_date = date( 'j F, Y', strtotime( $data ) );
+						}
+						$html .= '<tr valign="top"><th scope="row"><label for="' . esc_attr( $k ) . '_display">' . $v['name'] . '</label></th><td class="hasDatepicker"><input type="text" id="' . esc_attr( $k ) . '_display" class="ssp-datepicker ' . esc_attr( $class ) . '" value="' . esc_attr( $display_date ) . '" />' . "\n";
+						$html .= '<input name="' . esc_attr( $k ) . '" id="' . esc_attr( $k ) . '" type="hidden" value="' . esc_attr( $data ) . '" />' . "\n";
 						$html .= '<p class="description">' . $v['description'] . '</p>' . "\n";
 						$html .= '</td><tr/>' . "\n";
 					} else {
@@ -443,7 +511,7 @@ class SSP_Admin {
 	/**
 	 * Save episoe meta box content
 	 * @param  integer $post_id ID of post
-	 * @return void
+	 * @return mixed
 	 */
 	public function meta_box_save( $post_id ) {
 		global $ss_podcasting;
@@ -456,7 +524,7 @@ class SSP_Admin {
 		}
 
 		// Security check
-		if ( ! wp_verify_nonce( $_POST['seriouslysimple_' . $this->token . '_nonce'], plugin_basename( $this->dir ) ) ) {
+		if ( ! isset( $_POST['seriouslysimple_' . $this->token . '_nonce'] ) || ! ( isset( $_POST['seriouslysimple_' . $this->token . '_nonce'] ) && wp_verify_nonce( $_POST['seriouslysimple_' . $this->token . '_nonce'], plugin_basename( $this->dir ) ) ) ) {
 			return $post_id;
 		}
 
@@ -475,6 +543,10 @@ class SSP_Admin {
 		$enclosure = '';
 
 		foreach ( $field_data as $k => $field ) {
+
+			if( 'embed_code' == $k ) {
+				continue;
+			}
 
 			$val = '';
 			if ( isset( $_POST[ $k ] ) ) {
@@ -514,7 +586,7 @@ class SSP_Admin {
 				}
 			}
 
-			// Save audio file to 'enclosure' meta field for standards-sake
+			// Save podcast file to 'enclosure' meta field for standards-sake
 			update_post_meta( $post_id, 'enclosure', $enclosure );
 
 		}
@@ -526,11 +598,22 @@ class SSP_Admin {
 	 * @return array Custom fields
 	 */
 	public function custom_fields() {
+		global $pagenow;
 		$fields = array();
 
+		$fields['episode_type'] = array(
+			'name' => __( 'Episode type:' , 'seriously-simple-podcasting' ),
+		    'description' => '',
+		    'type' => 'radio',
+		    'default' => 'audio',
+		    'options' => array( 'audio' => __( 'Audio', 'seriously-simple-podcasting' ), 'video' => __( 'Video', 'seriously-simple-podcasting' ) ),
+		    'section' => 'info',
+		);
+
+		// In v1.14+ the `audio_file` field can actually be either audio or video, but we're keeping the field name here for backwards compatibility
 		$fields['audio_file'] = array(
-		    'name' => __( 'Audio file:' , 'seriously-simple-podcasting' ),
-		    'description' => __( 'Upload the primary podcast audio file. If the file is hosted on another server simply paste the URL here.' , 'seriously-simple-podcasting' ),
+		    'name' => __( 'Podcast file:' , 'seriously-simple-podcasting' ),
+		    'description' => __( 'Upload the primary podcast file or paste the file URL here.' , 'seriously-simple-podcasting' ),
 		    'type' => 'url',
 		    'default' => '',
 		    'section' => 'info',
@@ -538,7 +621,7 @@ class SSP_Admin {
 
 		$fields['duration'] = array(
 		    'name' => __( 'Duration:' , 'seriously-simple-podcasting' ),
-		    'description' => __( 'Duration of audio file for display (calculated automatically if possible).' , 'seriously-simple-podcasting' ),
+		    'description' => __( 'Duration of podcast file for display (calculated automatically if possible).' , 'seriously-simple-podcasting' ),
 		    'type' => 'text',
 		    'default' => '',
 		    'section' => 'info',
@@ -546,7 +629,7 @@ class SSP_Admin {
 
 		$fields['filesize'] = array(
 		    'name' => __( 'File size:' , 'seriously-simple-podcasting' ),
-		    'description' => __( 'Size of the audio file for display (calculated automatically if possible).' , 'seriously-simple-podcasting' ),
+		    'description' => __( 'Size of the podcast file for display (calculated automatically if possible).' , 'seriously-simple-podcasting' ),
 		    'type' => 'text',
 		    'default' => '',
 		    'section' => 'info',
@@ -569,8 +652,8 @@ class SSP_Admin {
 		);
 
 		$fields['block'] = array(
-		    'name' => __( 'Block from iTunes:' , 'seriously-simple-podcasting' ),
-		    'description' => __( 'Block this episode from appearing in iTunes.' , 'seriously-simple-podcasting' ),
+		    'name' => __( 'Block:' , 'seriously-simple-podcasting' ),
+		    'description' => __( 'Block this episode from appearing in the iTunes & Google Play podcast libraries.' , 'seriously-simple-podcasting' ),
 		    'type' => 'checkbox',
 		    'default' => '',
 		    'section' => 'info',
@@ -616,16 +699,9 @@ class SSP_Admin {
 			return $plugin_meta;
 		}
 
-		$donate_link = 'http://www.hughlashbrooke.com/donate';
-
-		$plugin_meta['docs'] = '<a href="http://www.seriouslysimplepodcasting.com/" target="_blank">' . __( 'Documentation', 'seriously-simple-podcasting' ) . '</a>';
+		$plugin_meta['docs'] = '<a href="http://www.seriouslysimplepodcasting.com/documentation/" target="_blank">' . __( 'Documentation', 'seriously-simple-podcasting' ) . '</a>';
+		$plugin_meta['addons'] = '<a href="http://www.seriouslysimplepodcasting.com/add-ons/" target="_blank">' . __( 'Add-ons', 'seriously-simple-podcasting' ) . '</a>';
 		$plugin_meta['review'] = '<a href="https://wordpress.org/support/view/plugin-reviews/' . $plugin_data['slug'] . '?rate=5#postform" target="_blank">' . __( 'Write a review', 'seriously-simple-podcasting' ) . '</a>';
-		$plugin_meta['donate'] = '<a href="' . esc_url( $donate_link ) . '" target="_blank">' . __( 'Donate', 'seriously-simple-podcasting' ) . '</a>';
-
-		if ( isset( $plugin_data['Version'] ) ) {
-			global $wp_version;
-			$plugin_meta['compatibility'] = '<a href="https://wordpress.org/plugins/' . $plugin_data['slug'] . '/?compatibility%5Bversion%5D=' . $wp_version . '&compatibility%5Btopic_version%5D=' . $plugin_data['Version'] . '&compatibility%5Bcompatible%5D=1" target="_blank">' . __( 'Confirm compatibility', 'seriously-simple-podcasting' ) . '</a>';
-		}
 
 		return $plugin_meta;
 	}
@@ -705,7 +781,6 @@ class SSP_Admin {
 
 	/**
 	 * Hide RSS footer created by WordPress SEO from podcast RSS feed
-	 * Will only work if/when my patch is accepted: https://github.com/Yoast/wordpress-seo/pull/1990
 	 * @param  boolean $include_footer Default inclusion value
 	 * @return boolean                 Modified inclusion value
 	 */
@@ -731,7 +806,7 @@ class SSP_Admin {
 
     	$file_name = 'feed-podcast.php';
 
-    	$user_template_file = apply_filters( 'ssp_feed_template_file', trailingslashit( get_template_directory() ) . $file_name );
+    	$user_template_file = apply_filters( 'ssp_feed_template_file', trailingslashit( get_stylesheet_directory() ) . $file_name );
 
 		// Any functions hooked in here must NOT output any data or else feed will break
 		do_action( 'ssp_before_feed' );
@@ -789,7 +864,7 @@ class SSP_Admin {
 
 		$previous_version = get_option( 'ssp_version', '1.0' );
 
-		if ( version_compare( $previous_version, '1.9.0', '<' ) ) {
+		if ( version_compare( $previous_version, '1.13.1', '<' ) ) {
 			flush_rewrite_rules();
 		}
 

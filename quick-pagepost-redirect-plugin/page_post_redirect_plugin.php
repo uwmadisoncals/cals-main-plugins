@@ -1,18 +1,18 @@
 <?php 
 /*
 Plugin Name: Quick Page/Post Redirect Plugin
-Plugin URI: http://www.fischercreativemedia.com/wordpress-plugins/quick-pagepost-redirect-plugin/
+Plugin URI: http://www.anadnet.com/quick-pagepost-redirect-plugin/
 Description: Redirect Pages, Posts or Custom Post Types to another location quickly (for internal or external URLs). Includes individual post/page options, redirects for Custom Post types, non-existant 301 Quick Redirects (helpful for sites converted to WordPress), New Window functionality, and rel=nofollow functionality.
-Author: Don Fischer
-Author URI: http://www.fischercreativemedia.com/
-Donate link: http://www.fischercreativemedia.com/donations/
-Version: 5.1.5
+Author: anadnet
+Author URI: http://www.anadnet.com/
+Donate link: 
+Version: 5.1.7
 Text Domain: quick-pagepost-redirect-plugin
 Domain Path: /lang
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
- * Copyright (C) 2009-2015 Donald J. Fischer <dfischer [at] fischercreativemedia [dot] com>
+ * Copyright (C) 2009-2015 anadnet.com <info [at] anadnet [dot] com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the [GNU General Public License](http://wordpress.org/about/gpl/)
@@ -71,7 +71,7 @@ class quick_page_post_reds {
 	public $pprptypes_ok;
 	
 	function __construct() {
-		$this->ppr_curr_version 		= '5.1.5';
+		$this->ppr_curr_version 		= '5.1.7';
 		$this->ppr_nofollow 			= array();
 		$this->ppr_newindow 			= array();
 		$this->ppr_url 					= array();
@@ -93,7 +93,7 @@ class quick_page_post_reds {
 		$this->pprmeta_seconds			= get_option( 'qppr_meta_addon_sec', get_option( 'ppr_meta-seconds', 0 ) );
 		$this->pproverride_casesensitive= get_option( 'ppr_override-casesensitive' );
 		$this->adminlink 				= admin_url('/', 'admin');
-		$this->fcmlink					= 'http://www.fischercreativemedia.com/plugins';
+		$this->fcmlink					= 'http://www.anadnet.com/quick-pagepost-redirect-plugin/';
 		$this->ppr_metaurl				= '';
 		$this->updatemsg				= '';
 		$this->pprshowcols				= get_option( 'ppr_show-columns', '1' );
@@ -701,7 +701,7 @@ class quick_page_post_reds {
 
 	function ppr_wp_feed_options( $cache, $url ){
 		// this is only for testing cached FAQ
-		if( $url == "http://www.fischercreativemedia.com/?feed=qppr_faqs" )
+		if( $url == "http://www.anadnet.com/?feed=qppr_faqs" )
 			$cache = '1';
 		return $cache;
 	}
@@ -711,10 +711,10 @@ class quick_page_post_reds {
 		echo '
 		<div class="wrap">
 		 	<h2>' . __( 'Quick Page/Post Redirect FAQs/Help', 'quick-pagepost-redirect-plugin' ) . '</h2>
-			<div align="left"><p>' . __( 'The FAQS are now on a feed that can be updated on the fly. If you have a question and don\'t see an answer, please send an email to <a href="mailto:plugins@fischercreativemedia.com">plugins@fischercreativemedia.com</a> and ask your question. If it is relevant to the plugin, it will be added to the FAQs feed so it will show up here. Please be sure to include the plugin you are asking a question about (Quick Page/Post Redirect Plugin) and any other information like your WordPress version and examples if the plugin is not working correctly for you. THANKS!', 'quick-pagepost-redirect-plugin' ) . '</p>
+			<div align="left"><p>' . __( 'The FAQS are now on a feed that can be updated on the fly. If you have a question and don\'t see an answer, please send an email to <a href="mailto:info@anadnet.com">info@anadnet.com</a> and ask your question. If it is relevant to the plugin, it will be added to the FAQs feed so it will show up here. Please be sure to include the plugin you are asking a question about (Quick Page/Post Redirect Plugin) and any other information like your WordPress version and examples if the plugin is not working correctly for you. THANKS!', 'quick-pagepost-redirect-plugin' ) . '</p>
 			<hr noshade color="#C0C0C0" size="1" />
 		';
-		$rss 			= fetch_feed( 'http://www.fischercreativemedia.com/?feed=qppr_faqs&ver=' . $this->ppr_curr_version . '&loc=' . urlencode( $this->homelink ) );
+		$rss 			= fetch_feed( 'http://www.anadnet.com/?feed=qppr_faqs&ver=' . $this->ppr_curr_version . '&loc=' . urlencode( $this->homelink ) );
 		$linkfaq 		= array();
 		$linkcontent 	= array();
 		if (!is_wp_error( $rss ) ) : 
@@ -1499,54 +1499,120 @@ class quick_page_post_reds {
 		return $vars;
 	}
 	
-	function ppr_parse_request_new($wp) {
+	function ppr_parse_request_new($wp) {	
 		global $wp, $wpdb;
 		$this->ppr_all_redir_array	= $this->get_main_array();
 		$this->pprptypes_ok	= get_option( 'ppr_qpprptypeok', array() );
-		if ( isset( $_GET['action'] ) && $_GET['action'] == 'export-quick-redirects-file' ) {
-			$newQPPR_Array = array();
-			check_admin_referer( 'export-redirects-qppr' );
-			$type = isset( $_GET['qppr-file-type'] ) && sanitize_text_field( $_GET['qppr-file-type'] ) == 'encoded' ? 'encoded' : 'pipe' ; // can be 'encoded' or 'pipe';
-			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' ); 
-			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' ); 
-			header( 'Cache-Control: no-store, no-cache, must-revalidate' ); 
-			header( 'Cache-Control: post-check=0, pre-check=0', false ); 
-			header( 'Pragma: no-cache' ); 
-			header( "Content-Type: application/force-download" );
-			header( "Content-Type: application/octet-stream" );
-			header( "Content-Type: application/download" );
-			header( "Content-Disposition: attachment; filename=qppr-quick-redirects-export-" . date('U') . ".txt;" );
-			$newQPPR_Array['quickppr_redirects'] 		= get_option( 'quickppr_redirects', array() );
-			$newQPPR_Array['quickppr_redirects_meta'] 	= get_option( 'quickppr_redirects_meta', array() );
-			if( $type == 'encoded' ){
-				die( 'QUICKPAGEPOSTREDIRECT' . base64_encode( serialize( $newQPPR_Array ) ) );
-			}else{
-				if( is_array( $newQPPR_Array ) ){
-					$qpprs = $newQPPR_Array['quickppr_redirects'];
-					$qpprm = $newQPPR_Array['quickppr_redirects_meta'];
-					foreach($qpprs as $key=>$val){
-						$nw 	= ( isset( $qpprm[$key]['newwindow'] ) && $qpprm[$key]['newwindow'] == '1' ) ? $qpprm[$key]['newwindow'] : '0' ;
-						$nf 	= ( isset( $qpprm[$key]['nofollow'] ) && $qpprm[$key]['nofollow'] == '1' ) ? $qpprm[$key]['nofollow'] : '0' ;
-						$temps 	= str_replace( '|', '%7C', $key ) . '|' . str_replace( '|', '%7C', $val ) . '|' . $nw . '|' . $nf;
-						if($temps!='|||'){
-							$newline[] = $temps;
+		if( current_user_can( 'manage_options' ) ){
+			if ( isset( $_GET['action'] ) && $_GET['action'] == 'export-quick-redirects-file' ) {
+				$newQPPR_Array = array();
+				check_admin_referer( 'export-redirects-qppr' );
+				$type = isset( $_GET['qppr-file-type'] ) && sanitize_text_field( $_GET['qppr-file-type'] ) == 'encoded' ? 'encoded' : 'pipe' ; // can be 'encoded' or 'pipe';
+				header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' ); 
+				header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' ); 
+				header( 'Cache-Control: no-store, no-cache, must-revalidate' ); 
+				header( 'Cache-Control: post-check=0, pre-check=0', false ); 
+				header( 'Pragma: no-cache' ); 
+				header( "Content-Type: application/force-download" );
+				header( "Content-Type: application/octet-stream" );
+				header( "Content-Type: application/download" );
+				header( "Content-Disposition: attachment; filename=qppr-quick-redirects-export-" . date('U') . ".txt;" );
+				$newQPPR_Array['quickppr_redirects'] 		= get_option( 'quickppr_redirects', array() );
+				$newQPPR_Array['quickppr_redirects_meta'] 	= get_option( 'quickppr_redirects_meta', array() );
+				if( $type == 'encoded' ){
+					die( 'QUICKPAGEPOSTREDIRECT' . base64_encode( serialize( $newQPPR_Array ) ) );
+				}else{
+					if( is_array( $newQPPR_Array ) ){
+						$qpprs = $newQPPR_Array['quickppr_redirects'];
+						$qpprm = $newQPPR_Array['quickppr_redirects_meta'];
+						foreach($qpprs as $key=>$val){
+							$nw 	= ( isset( $qpprm[$key]['newwindow'] ) && $qpprm[$key]['newwindow'] == '1' ) ? $qpprm[$key]['newwindow'] : '0' ;
+							$nf 	= ( isset( $qpprm[$key]['nofollow'] ) && $qpprm[$key]['nofollow'] == '1' ) ? $qpprm[$key]['nofollow'] : '0' ;
+							$temps 	= str_replace( '|', '%7C', $key ) . '|' . str_replace( '|', '%7C', $val ) . '|' . $nw . '|' . $nf;
+							if($temps!='|||'){
+								$newline[] = $temps;
+							}
+						}
+						$newfile 	= implode( "\r\n", $newline );
+					}else{
+						$newfile 	= $newtext;
+					}
+					die( $newfile );				
+				}
+				exit;
+			} elseif( isset( $_POST['import-quick-redrects-file'] ) && isset( $_FILES['qppr_file'] ) ) {
+				check_admin_referer( 'import-quick-redrects-file' );
+				if ( $_FILES['qppr_file']['error'] > 0 ) {
+					wp_die( __( 'An error occured during the file upload. Please fix your server configuration and retry.', 'quick-pagepost-redirect-plugin' ) , __( 'SERVER ERROR - Could Not Load', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
+					exit;
+				} else {
+					$config_file = file_get_contents( $_FILES['qppr_file']['tmp_name'] );
+					if ( substr($config_file, 0, strlen('QUICKPAGEPOSTREDIRECT')) !== 'QUICKPAGEPOSTREDIRECT' ) {
+						if(strpos($config_file,'|') !== false){
+							$delim = '|';
+						}elseif(strpos($config_file,',') !== false){
+							$delim = ',';
+						}elseif(strpos($config_file,"\t") !== false){
+							$delim = "\t";
+						}else{
+							$delim = false;
+						}
+						if($delim != false){
+							$config_file = str_replace("\r\n", "\n", $config_file);  
+							$config_file = str_replace("\r", "\n", $config_file);
+							$text		 = explode( "\n", $config_file );
+							$newfile1 	 = array();
+							if( is_array( $text ) && !empty( $text ) ){
+								foreach( $text as $nl ){
+									if( $nl != '' ){
+										$elem 	= explode( $delim, $nl );
+										if( isset( $elem[0] ) && isset( $elem[1] ) ){
+											$newfile1['quickppr_redirects'][esc_url($elem[0])] = esc_url($elem[1]);
+											$nw 	= isset($elem[2]) && $elem[2] == '1' ? '1' : '0';
+											$nf 	= isset($elem[3]) && $elem[3] == '1' ? '1' : '0';
+											$newfile1['quickppr_redirects_meta'][$elem[0]]['newwindow'] = $nw;
+											$newfile1['quickppr_redirects_meta'][$elem[0]]['nofollow'] = $nf;
+										}
+									}
+								}
+								if(is_array($newfile1) && !empty( $newfile1 )){
+									if( isset( $newfile1['quickppr_redirects'] ) ){
+										update_option( 'quickppr_redirects', $newfile1['quickppr_redirects'] );
+									}
+									if( isset( $newfile1['quickppr_redirects_meta'] ) ){
+										update_option( 'quickppr_redirects_meta', $newfile1['quickppr_redirects_meta'] );
+									}
+								}
+							}
+							$this->qppr_try_to_clear_cache_plugins();
+							wp_redirect( admin_url( 'admin.php?page=redirect-import-export&update=4' ), 302 );
+							exit;
+						}else{
+							wp_die( __( 'This does not look like a Quick Page Post Redirect file - it is possibly damaged or corrupt.', 'quick-pagepost-redirect-plugin' ) , __( 'ERROR - Not a valid File', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
+							exit;
+						}
+					} else {
+						$config_file = unserialize(base64_decode(substr($config_file, strlen('QUICKPAGEPOSTREDIRECT'))));
+						if ( !is_array( $config_file ) ) {
+							wp_die( __( 'This does not look like a Quick Page Post Redirect file - it is possibly damaged or corrupt.', 'quick-pagepost-redirect-plugin' ) , __( 'ERROR - Not a valid File', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
+							exit;
+						} else {
+							$newQPPRRedirects 	= $config_file['quickppr_redirects'];
+							$newQPPRMeta 		= $config_file['quickppr_redirects_meta'];
+							update_option('quickppr_redirects', $newQPPRRedirects);
+							update_option('quickppr_redirects_meta', $newQPPRMeta);
+							$this->qppr_try_to_clear_cache_plugins();
+							wp_redirect(admin_url('admin.php?page=redirect-import-export&update=4'),302);
 						}
 					}
-					$newfile 	= implode( "\r\n", $newline );
-				}else{
-					$newfile 	= $newtext;
 				}
-				die( $newfile );				
-			}
-			exit;
-		} elseif( isset( $_POST['import-quick-redrects-file'] ) && isset( $_FILES['qppr_file'] ) ) {
-			check_admin_referer( 'import-quick-redrects-file' );
-			if ( $_FILES['qppr_file']['error'] > 0 ) {
-				wp_die( __( 'An error occured during the file upload. Please fix your server configuration and retry.', 'quick-pagepost-redirect-plugin' ) , __( 'SERVER ERROR - Could Not Load', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
-				exit;
-			} else {
-				$config_file = file_get_contents( $_FILES['qppr_file']['tmp_name'] );
-				if ( substr($config_file, 0, strlen('QUICKPAGEPOSTREDIRECT')) !== 'QUICKPAGEPOSTREDIRECT' ) {
+			} elseif( isset($_POST['import_redirects_add_qppr']) && isset($_FILES['qppr_file_add']) ) {
+				check_admin_referer( 'import_redirects_add_qppr' );
+				if ( $_FILES['qppr_file_add']['error'] > 0 ) {
+					wp_die(__( 'An error occured during the file upload. It might me that the file is too large or you do not have the premissions to write to the temporary upload directory. Please fix your server configuration and retry.', 'quick-pagepost-redirect-plugin' ) , __( 'SERVER ERROR - Could Not Load', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
+					exit;
+				} else {
+					$config_file = file_get_contents( $_FILES['qppr_file_add']['tmp_name'] );
 					if(strpos($config_file,'|') !== false){
 						$delim = '|';
 					}elseif(strpos($config_file,',') !== false){
@@ -1556,15 +1622,20 @@ class quick_page_post_reds {
 					}else{
 						$delim = false;
 					}
-					if($delim != false){
+					if ( strpos( $config_file, $delim ) === false ) {
+						wp_die( __( 'This does not look like the file is in the correct format - it is possibly damaged or corrupt.<br/>Be sure the redirects are 1 per line and the redirect and destination are seperated by a PIPE (|), COMMA (,) or a TAB.', 'quick-pagepost-redirect-plugin' ) . '<br/>Example:<br/><br/><code>redirect|destination</code>', __( 'ERROR - Not a valid File', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
+						exit;
+					} else {
+						$tempArr	 = array();
+						$tempMArr	 = array();
 						$config_file = str_replace("\r\n", "\n", $config_file);  
-        				$config_file = str_replace("\r", "\n", $config_file);
-						$text		 = explode( "\n", $config_file );
+						$config_file = str_replace("\r", "\n", $config_file);
+						$QR_Array 	 = explode( "\n", $config_file );
 						$newfile1 	 = array();
-						if( is_array( $text ) && !empty( $text ) ){
-							foreach( $text as $nl ){
-								if( $nl != '' ){
-									$elem 	= explode( $delim, $nl );
+						if( !empty( $QR_Array ) && is_array( $QR_Array )):
+							foreach( $QR_Array as $qrtoadd ):
+								if( $qrtoadd != '' && $delim != false && strpos( $qrtoadd, $delim ) !== false ){
+									$elem 	= explode( $delim, str_replace( array( "\r", "\n" ), array( '', '' ), $qrtoadd ) );	
 									if( isset( $elem[0] ) && isset( $elem[1] ) ){
 										$newfile1['quickppr_redirects'][esc_url($elem[0])] = esc_url($elem[1]);
 										$nw 	= isset($elem[2]) && $elem[2] == '1' ? '1' : '0';
@@ -1573,99 +1644,30 @@ class quick_page_post_reds {
 										$newfile1['quickppr_redirects_meta'][$elem[0]]['nofollow'] = $nf;
 									}
 								}
-							}
+							endforeach;	
 							if(is_array($newfile1) && !empty( $newfile1 )){
 								if( isset( $newfile1['quickppr_redirects'] ) ){
-									update_option( 'quickppr_redirects', $newfile1['quickppr_redirects'] );
+									$currQRs 	= get_option( 'quickppr_redirects', array() );
+									$resultQRs 	= array_replace($currQRs, $newfile1['quickppr_redirects']);
+									update_option( 'quickppr_redirects', $resultQRs );
 								}
 								if( isset( $newfile1['quickppr_redirects_meta'] ) ){
-									update_option( 'quickppr_redirects_meta', $newfile1['quickppr_redirects_meta'] );
+									$currQRM 	= get_option( 'quickppr_redirects_meta', array() );
+									$resultQRMs = array_replace($currQRM, $newfile1['quickppr_redirects_meta']);
+									update_option( 'quickppr_redirects_meta', $resultQRMs );
 								}
 							}
-						}
-						$this->qppr_try_to_clear_cache_plugins();
-						wp_redirect( admin_url( 'admin.php?page=redirect-import-export&update=4' ), 302 );
-						exit;
-					}else{
-						wp_die( __( 'This does not look like a Quick Page Post Redirect file - it is possibly damaged or corrupt.', 'quick-pagepost-redirect-plugin' ) , __( 'ERROR - Not a valid File', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
-						exit;
-					}
-				} else {
-					$config_file = unserialize(base64_decode(substr($config_file, strlen('QUICKPAGEPOSTREDIRECT'))));
-					if ( !is_array( $config_file ) ) {
-						wp_die( __( 'This does not look like a Quick Page Post Redirect file - it is possibly damaged or corrupt.', 'quick-pagepost-redirect-plugin' ) , __( 'ERROR - Not a valid File', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
-						exit;
-					} else {
-						$newQPPRRedirects 	= $config_file['quickppr_redirects'];
-						$newQPPRMeta 		= $config_file['quickppr_redirects_meta'];
-						update_option('quickppr_redirects', $newQPPRRedirects);
-						update_option('quickppr_redirects_meta', $newQPPRMeta);
-						$this->qppr_try_to_clear_cache_plugins();
-						wp_redirect(admin_url('admin.php?page=redirect-import-export&update=4'),302);
+							$this->qppr_try_to_clear_cache_plugins();
+							wp_redirect(admin_url('admin.php?page=redirect-import-export&update=5'),302);
+							exit;
+						else:
+							wp_die( __( 'It does not look like there are any valid items to import - check the file and try again.', 'quick-pagepost-redirect-plugin' ) , __( 'ERROR - No Valid items to add.', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
+							exit;
+						endif;
 					}
 				}
-			}
-		} elseif( isset($_POST['import_redirects_add_qppr']) && isset($_FILES['qppr_file_add']) ) {
-			check_admin_referer( 'import_redirects_add_qppr' );
-			if ( $_FILES['qppr_file_add']['error'] > 0 ) {
-				wp_die(__( 'An error occured during the file upload. It might me that the file is too large or you do not have the premissions to write to the temporary upload directory. Please fix your server configuration and retry.', 'quick-pagepost-redirect-plugin' ) , __( 'SERVER ERROR - Could Not Load', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
-				exit;
-			} else {
-				$config_file = file_get_contents( $_FILES['qppr_file_add']['tmp_name'] );
-				if(strpos($config_file,'|') !== false){
-					$delim = '|';
-				}elseif(strpos($config_file,',') !== false){
-					$delim = ',';
-				}elseif(strpos($config_file,"\t") !== false){
-					$delim = "\t";
-				}else{
-					$delim = false;
-				}
-				if ( strpos( $config_file, $delim ) === false ) {
-					wp_die( __( 'This does not look like the file is in the correct format - it is possibly damaged or corrupt.<br/>Be sure the redirects are 1 per line and the redirect and destination are seperated by a PIPE (|), COMMA (,) or a TAB.', 'quick-pagepost-redirect-plugin' ) . '<br/>Example:<br/><br/><code>redirect|destination</code>', __( 'ERROR - Not a valid File', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
-					exit;
-				} else {
-					$tempArr	 = array();
-					$tempMArr	 = array();
-					$config_file = str_replace("\r\n", "\n", $config_file);  
-        			$config_file = str_replace("\r", "\n", $config_file);
-					$QR_Array 	 = explode( "\n", $config_file );
-					$newfile1 	 = array();
-					if( !empty( $QR_Array ) && is_array( $QR_Array )):
-						foreach( $QR_Array as $qrtoadd ):
-							if( $qrtoadd != '' && $delim != false && strpos( $qrtoadd, $delim ) !== false ){
-								$elem 	= explode( $delim, str_replace( array( "\r", "\n" ), array( '', '' ), $qrtoadd ) );	
-								if( isset( $elem[0] ) && isset( $elem[1] ) ){
-									$newfile1['quickppr_redirects'][esc_url($elem[0])] = esc_url($elem[1]);
-									$nw 	= isset($elem[2]) && $elem[2] == '1' ? '1' : '0';
-									$nf 	= isset($elem[3]) && $elem[3] == '1' ? '1' : '0';
-									$newfile1['quickppr_redirects_meta'][$elem[0]]['newwindow'] = $nw;
-									$newfile1['quickppr_redirects_meta'][$elem[0]]['nofollow'] = $nf;
-								}
-							}
-						endforeach;	
-						if(is_array($newfile1) && !empty( $newfile1 )){
-							if( isset( $newfile1['quickppr_redirects'] ) ){
-								$currQRs 	= get_option( 'quickppr_redirects', array() );
-								$resultQRs 	= array_replace($currQRs, $newfile1['quickppr_redirects']);
-								update_option( 'quickppr_redirects', $resultQRs );
-							}
-							if( isset( $newfile1['quickppr_redirects_meta'] ) ){
-								$currQRM 	= get_option( 'quickppr_redirects_meta', array() );
-								$resultQRMs = array_replace($currQRM, $newfile1['quickppr_redirects_meta']);
-								update_option( 'quickppr_redirects_meta', $resultQRMs );
-							}
-						}
-						$this->qppr_try_to_clear_cache_plugins();
-						wp_redirect(admin_url('admin.php?page=redirect-import-export&update=5'),302);
-						exit;
-					else:
-						wp_die( __( 'It does not look like there are any valid items to import - check the file and try again.', 'quick-pagepost-redirect-plugin' ) , __( 'ERROR - No Valid items to add.', 'quick-pagepost-redirect-plugin' ), array( 'response' => '200', 'back_link' => '1' ) );
-						exit;
-					endif;
-				}
-			}
-		}		return;
+			}		return;
+		}	return;
 	}
 		
 	function qppr_pprhidemessage_ajax(){

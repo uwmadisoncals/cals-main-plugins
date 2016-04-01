@@ -70,6 +70,11 @@ class plugin
 		}
 
 		$text = $this->get_file_contents();
+		// Strip off everything after the first comment to save memory in the tokenizer.
+		$text = preg_replace( '/\*\*\\/.*/s', '', $text );
+		// Terminate the comment.
+		$text .= '**/';
+
 		$comments = array_filter( token_get_all( $text ), function( $entry )
 		{
 			return $entry[0] == T_DOC_COMMENT;

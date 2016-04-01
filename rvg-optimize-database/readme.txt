@@ -3,13 +3,13 @@ Contributors: CAGE Web Design | Rolf van Gelder
 Donate link: http://cagewebdev.com/index.php/donations-odb/
 Plugin Name: Optimize Database after Deleting Revisions
 Plugin URI: http://cagewebdev.com/index.php/optimize-database-after-deleting-revisions-wordpress-plugin
-Tags: database, delete, revisions, optimize, post, posts, page, pages, clean, clean up, trash, spam, trashed, spammed, database size, scheduler, transients, unused tags, pingback, trackback
+Tags: database, delete, revisions, optimize, post, posts, page, pages, clean, clean up, trash, spam, trashed, spammed, database size, scheduler, transients, unused tags, pingback, trackback, unix cron tab, crontab
 Author URI: http://cagewebdev.com
 Author: CAGE Web Design | Rolf van Gelder, Eindhoven, The Netherlands
 Requires at least: 2.8
-Tested up to: 4.3
-Stable tag: 3.4.8
-Version: 3.4.8
+Tested up to: 4.4.2
+Stable tag: 4.1.5
+Version: 4.1.5
 License: GPLv2 or later
 
 == Description ==
@@ -24,7 +24,7 @@ This plugin is a 'One Click' WordPress Database Cleaner / Optimizer.
 * Deletes 'expired transients' (optional)
 * Deletes 'pingbacks' and 'trackbacks' (optional)
 * Deletes 'orphan postmeta items'
-* Optimizes the database tables (optionally you can exclude certain tables from optimization)
+* Optimizes the database tables (optionally you can exclude certain tables, or even specific posts/pages, from optimization)
 * Creates a log file of the optimizations (optional)
 * Optimization can be scheduled to automatically run once hourly, twice daily, once daily or once weekly at a specific time (optional)
 * 'Optimize DB (1 click)' link in the admin bar (optional)
@@ -34,16 +34,27 @@ This plugin is a 'One Click' WordPress Database Cleaner / Optimizer.
 = Settings =
 You can find the settings page in the WP Admin Panel &raquo; Optimize Database -or- via the WP Admin Panel &raquo; Optimize Database icon (depends on settings)
 
+= Excluding specific posts/pages from deleting revisions =
+If you want to keep revisions for a specific post/page (no matter what the other settings are), create a custom field named 'keep_revisions' for that post/page and give it the value 'Y'<br>
+
 = Starting the Optimization =
-You can start the Optimization in the WP Admin Panel &raquo; Optimize Database.<br />
-Note: if you use the Scheduler the Optimization will run automatically!<br />
+You can start the Optimization in the WP Admin Panel &raquo; Optimize Database.<br>
+Note: if you use the Scheduler the Optimization will run automatically!<br>
 Note: you also can click the 'Optimize DB (1 click)' link in the admin bar (if enabled)
 
 = Multisite Support =
 * Install the plugin as Network Administrator (Network Admin &raquo; Plugins)
 * 'Network Activate' the plugin
-* The settings are the same for ALL sites in the network, so if you change a setting for one site, it will be used for all other sites.
-* If you run the plugin from any of the sites, it will cleanup ALL the sites in the network!
+* You only can configure and run the plugin on the main network site, but it will optimize ALL the sub-sites too!
+
+= Running the plug in from a Unix crontab =
+In case you cannot use WPCron, but you can edit the Unix crontab:<br><br>
+Create a .php file, in the root directory of your site, with:<br>
+&lt;?php<br>
+define('RUN_OPTIMIZE_DATABASE', true);<br>
+require_once('wp-load.php');<br>
+?&gt;<br><br>
+Then, start the .php file from your crontab!<br>
 
 = Supported languages =
 * Danish [da_DK] - translated by Alexander Leo-Hansen - http://alexanderleohansen.dk
@@ -51,9 +62,12 @@ Note: you also can click the 'Optimize DB (1 click)' link in the admin bar (if e
 * English [en_US] - translated by Rolf van Gelder, CAGE Web Design - http://cagewebdev.com
 * German [de_DE] - translated by the.mnbvcx
 * Italian [it_IT] - translated by Fabio Marzocca
+* Persian [fa_IR] - translated by Milad Mordi, http://seodaramal.ir
+* Portuguese [po_BR] - translated by Rede Sul Mineira de Comunicações
 * Russian [ru_RU] - translated by Vadim Sokhin, PluginZone - http://pluginzone.ru
 * Serbian [sr_RS] - translated by Ogi Djuraskovic, FirstSiteGuide  - http://firstsiteguide.com
 * Swedish [sv_SE] - translated by P.E.
+* Turkish [tr_TR] - translated by Keremcan Buyuktaskin
 * Ukranian [uk_UA] - translated by Anna Goriacha, Coupofy - http://coupofy.com
 
 = Author =
@@ -69,7 +83,7 @@ http://wordpress.org/plugins/rvg-optimize-database/
 NO WARRANTY, USE IT AT YOUR OWN RISK!
 
 = Plugins by CAGE Web Design | Rolf van Gelder =
-WordPress plugins created by CAGE Web Design | Rolf van Gelder<br />
+WordPress plugins created by CAGE Web Design | Rolf van Gelder<br>
 http://cagewebdev.com/index.php/wordpress-plugins/
 
 == Installation ==
@@ -86,6 +100,55 @@ http://cagewebdev.com/index.php/wordpress-plugins/
 * If you run the plugin from any of the sites, it will cleanup ALL the sites in the network!
 
 == Changelog ==
+= 4.1.5 [03/11/2016] =
+* NEW: Turkish (tr_TR) translation added (thanks Keremcan Buyuktaskin!)
+
+= 4.1.4 [03/02/2016] =
+* NEW: Custom field 'keep_revisions', for excluding the deletion of revisions for specific posts/pages
+* NEW: Run the optimization from a Unix crontab (if possible)
+
+= 4.1.3 [02/22/2016] =
+* BUG FIX: Saving settings didn't work well for multi-sites
+
+= 4.1.2 [02/14/2016] =
+* NEW: Brasilian Portuguese (po_BR) translation added
+* NEW: Network: True added to the plugin header 
+
+= 4.1.1 [01/17/2016] =
+* CHANGE: Use can use the 'Delete revisions older than' AND 'Keep max number of revisions' options at the same time! 
+
+= 4.1 [01/14/2016] =
+* NEW: New option: delete revisions older than...
+* NEW: Persian translation (fa_IR) added
+* CHANGE: For multi-site installations you only can use the plugin on the Main site, but all other sites will be cleaned too.
+* CHANGE: Some minor updates / changes
+
+= 4.0.3 [12/17/2015] =
+* BUG FIX: Bug fix for Cron Schedules
+* BUG FIX: Un-installation generated an error
+* CHANGE: Some minor updates / changes
+
+= 4.0.2 [11/28/2015] =
+* BUG FIX: Settings weren't saved correctly for MultiSites
+
+= 4.0.1 [11/27/2015] =
+* NEW: New option: optimize InnoDB tables too
+* BUG FIX: Localization fixed for extra cron schedules
+* BUG FIX: De-activation issue on update fixed
+
+= 4.0 [11/22/2015] =
+* NEW: Total rewrite of the code (OO code)
+* CHANGE: Many changes and bug fixes
+
+= 3.5.1 [11/01/2015] =
+* BUG FIX: Views are skipped from the optimization
+
+= 3.5 [10/24/2015] =
+* CHANGE: Stylesheet is only loaded on required admin pages
+
+= 3.4.9 [10/23/2015] =
+* BUG FIX: Bug fixed for deleting unused tags
+
 = 3.4.8 [09/14/2015] =
 * BUG FIX: Bug fixed for deleting transients
 
@@ -335,6 +398,7 @@ http://cagewebdev.com/index.php/wordpress-plugins/
 
 = Why do I see 'InnoDB table: skipped...'? =
 * That's because optimizing InnoDB tables is not really efficient, so change the table type to MyISAM to have them being optimized.
+* Update: if you want to optimize your InnoDB tables too, just check the 'Optimize InnoDB tables too' option on the settings page
 
 = I scheduled the optimization for 8pm but it runs at 6pm (my local time) =
 * The scheduler uses the local time of the web server which can differ from your own local time

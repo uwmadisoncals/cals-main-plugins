@@ -20,7 +20,7 @@ namespace plainview\sdk_broadcast\wordpress\tabs;
 	@version	20131006
 **/
 
-class tabs
+abstract class tabs
 	implements \Countable
 {
 	use \plainview\sdk_broadcast\traits\method_chaining;
@@ -78,7 +78,7 @@ class tabs
 		@since		20130503
 		@var		$tab_heading_prefix
 	**/
-	public $tab_heading_prefix = '<h2>';
+	public $tab_heading_prefix = '<h1>';
 
 	/**
 		@brief		The default suffix of the displayed tab name.
@@ -86,7 +86,7 @@ class tabs
 		@since		20130503
 		@var		$tab_heading_suffix
 	**/
-	public $tab_heading_suffix = '</h2>';
+	public $tab_heading_suffix = '</h1>';
 
 	/**
 		@brief		The default prefix of the displayed tab name.
@@ -105,11 +105,11 @@ class tabs
 	public $tab_name_suffix = '';
 
 	/**
-		@brief		Array of \\plainview\\sdk_broadcast\\wordpress\\tabs\\tab objects.
+		@brief		Collection of \\plainview\\sdk_broadcast\\wordpress\\tabs\\tab objects.
 		@since		20130503
 		@var		$tabs
 	**/
-	public $tabs = array();
+	public $tabs;
 
 	/**
 		@brief		The HTML element tag.
@@ -127,6 +127,16 @@ class tabs
 	public function __construct( $base )
 	{
 		$this->base = $base;
+		$this->tabs = new \plainview\sdk_broadcast\collections\Collection();
+		$this->_construct();
+	}
+
+	/**
+		@brief		Overridable constructor for the subclasses.
+		@since		2015-12-27 12:42:15
+	**/
+	public function _construct()
+	{
 	}
 
 	public function __toString()
@@ -143,6 +153,12 @@ class tabs
 	{
 		return count( $this->tabs );
 	}
+
+	/**
+		@brief		Create a tab.
+		@since		2015-12-27 12:48:51
+	**/
+	public abstract function create_tab();
 
 	/**
 		@brief		Sets the current tab.
@@ -199,6 +215,15 @@ class tabs
 	}
 
 	/**
+		@brief		Return the separator between tabs, if any.
+		@since		2015-12-27 13:11:01
+	**/
+	public function get_separator()
+	{
+		return '';
+	}
+
+	/**
 		@brief		Return the tabs.
 		@details	Although the tabs can be displayed using __toString, this method allows for finding and catching exceptions, which isn't allowed in __toString.
 		@return		string		The tabs as a string.
@@ -216,21 +241,23 @@ class tabs
 			return '';
 
 		// Check that the default exists.
-		if ( ! is_object( $this->tab( $this->default_tab ) ) )
-			$this->default_tab = key( $this->tabs );
+		if ( ! $this->tabs->has( $this->default_tab ) )
+			$this->default_tab = key( $this->tabs->to_array() );
 
 		// Select the default tab if none is selected.
 		if ( ! isset( $get[ $get_key ] ) )
 			$get[ $get_key ] = $this->default_tab;
 		$selected = $get[ $get_key ];
 
-		$r = '';
+		$r = '<div class="wrap">';
+
+		if ( $this->display_tab_name )
+			$r .= $this->tab( $selected )
+				->get_heading();
 
 		if ( count( $this->tabs ) > 1 )
 		{
 			// Step 1: display all the tabs
-			$this->css_class( 'subsubsub' );
-			$this->css_class( 'plainview_sdk_tabs' );
 			$r .= $this->open_tag();
 			$original_link = $_SERVER['REQUEST_URI'];
 
@@ -239,66 +266,72 @@ class tabs
 					$original_link = remove_query_arg( $key, $original_link );
 
 			$counter = 1;
-			foreach( $this->tabs as $tab_id => $tab )
+
+			// Sort the tabs.
+			$sorted = $this->tabs->sort_by( function( $tab )
+			{
+				return $tab->get_sort_order() . $tab->name;
+			} );
+
+			foreach( $sorted as $tab_id => $tab )
 			{
 				// Make the link.
 				// If we're already on that tab, just return the current url.
 				if ( $get[ $get_key ] == $tab_id )
-					$link = add_query_arg( $get_key, $tab_id, $original_link );
+					$url = add_query_arg( $get_key, $tab_id, $original_link );
 				else
 				{
 					if ( $tab_id == $this->default_tab )
-						$link = remove_query_arg( $get_key, $original_link );
+						$url = remove_query_arg( $get_key, $original_link );
 					else
-						$link = add_query_arg( $get_key, $tab_id, $original_link );
+						$url = add_query_arg( $get_key, $tab_id, $original_link );
 				}
+				$tab->url( $url );
 
-				$text = $tab->display_name();
-
-				if ( $tab->count != '' )
-					$text .= sprintf( ' <span class="count">%s</span>', $tab->count );
-
-				$separator = ( $counter < count( $this->tabs ) ? '&nbsp;|&nbsp;' : '' );
-				$current = ( $tab_id == $selected ? ' class="current"' : '' );
-
-				$title = '';
-				if ( $tab->title != '' )
-					$title = sprintf( ' title="%s"', $tab->title );
+				if ( $tab_id == $selected )
+					$tab->current( true );
 
 				$tab->css_class( 'tab_' . $tab_id );
+
 				$r .= $tab->open_tag();
-				$r .= sprintf( '<a%s%s href="%s">%s</a>%s',
-					$current,
-					$title,
-					$link,
-					$text,
-					$separator
-				);
+				$r .= $tab->display_link();
 				$r .= $tab->close_tag();
+
+				if ( $counter < count( $this->tabs ) )
+					$r .= $this->get_separator();
+
 				$counter++;
 			}
-			$r .= '</ul>';
+
+			$r .= $this->close_tag();
+
+			$r .= '<div class="clear" />';
 		}
 
 		// Step 2: maybe display the tab itself
 		if ( $this->display_tab )
 		{
 			$tab = $this->tab( $selected );
+
+			$r .= '<div class="tab_contents">';
+
 			ob_start();
-			echo '<div class="wrap">';
-			if ( $this->display_tab_name )
-				echo $tab->display_heading();
 
-			echo $r;
-			echo '<div style="clear: both"></div>';
-			echo '<div class="tab_contents">';
+			try
+			{
+				call_user_func_array( $tab->callback, $tab->parameters );
+			}
+			catch ( \Exception $e )
+			{
+				echo $e->getMessage();
+			}
 
-			call_user_func_array( $tab->callback, $tab->parameters );
+			$r .= ob_get_clean();
 
-			echo '</div><!-- tab_contents -->';
-			echo '</div>';
-			$r = ob_get_clean();
+			$r .= '</div><!-- tab_contents -->';
 		}
+
+		$r .= '</div>';	// wrap
 
 		return $r;
 	}
@@ -313,13 +346,13 @@ class tabs
 	{
 		if ( $id == '' )
 			return false;
-		if ( isset( $this->tabs[ $id ] ) )
-			return $this->tabs[ $id ];
-		$tab = new tab( $this );
+		if ( $this->tabs->has( $id ) )
+			return $this->tabs->get( $id );
+		$tab = $this->create_tab();
 		$tab->id( $id );
 		$tab->callback_this( $id );		// Usually the tab's callback is the same as the ID.
-		$this->tabs[ $id ] = $tab;
-		return $this->tabs[ $id ];
+		$this->tabs->set( $id, $tab );
+		return $tab;
 	}
 
 	/**

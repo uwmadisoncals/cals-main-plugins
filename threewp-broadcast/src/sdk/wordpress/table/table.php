@@ -48,7 +48,7 @@ class table
 
 	public function __toString()
 	{
-		$r = '<style>table.plainview_sdk_table tr:hover{ background-color: #e5e5e5; }</style>';
+		$r = '';
 		if ( isset( $this->top ) )
 			$r .= $this->top;
 		$r .= parent::__toString();

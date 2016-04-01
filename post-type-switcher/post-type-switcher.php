@@ -5,17 +5,20 @@
  *
  * Allow switching of a post type while editing a post (in post publish section)
  *
- * @package PostTypeSwitcher
- * @subpackage Main
+ * @package Plugins/Admin/Post/TypeSwitcher
  */
 
 /**
  * Plugin Name: Post Type Switcher
- * Plugin URI:  http://wordpress.org/extend/post-type-switcher/
+ * Plugin URI:  https://wordpress.org/plugins/post-type-switcher/
+ * Author:      John James Jacoby
+ * Author URI:  https://profiles.wordpress.org/johnjamesjacoby/
+ * License:     GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Description: Allow switching of a post type while editing a post (in post publish section)
- * Version:     1.5
- * Author:      johnjamesjacoby
- * Author URI:  http://johnjamesjacoby.com
+ * Version:     1.7.0
+ * Text Domain: post-type-switcher
+ * Domain Path: /assets/lang/
  */
 
 // Exit if accessed directly
@@ -24,27 +27,50 @@ defined( 'ABSPATH' ) || exit;
 /**
  * The main post type switcher class
  *
- * @package PostTypeSwitcher
+ * @since 1.0.0
  */
 final class Post_Type_Switcher {
 
 	/**
-	 * Setup the actions needed to execute class methods where needed
+	 * Hook in the basic early actions
 	 *
-	 * @since PostTypeSwitcher (1.1)
+	 * @since 1.1.0
 	 */
 	public function __construct() {
+		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
+		add_action( 'admin_init',     array( $this, 'admin_init'      ) );
+	}
 
+	/**
+	 * Load the plugin text domain for translation strings
+	 *
+	 * @since 1.6.0
+	 */
+	public function load_textdomain() {
+		load_plugin_textdomain( 'post-type-switcher' );
+	}
+
+	/**
+	 * Setup admin actions
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return void
+	 */
+	public function admin_init() {
+
+		// Bail if page not allowed
 		if ( ! $this->is_allowed_page() ) {
 			return;
 		}
 
-		// @todo Remove this; since it's janky to need to do this.
+		// Add column for quick-edit support
 		add_action( 'manage_posts_columns',        array( $this, 'add_column'       )         );
 		add_action( 'manage_pages_columns',        array( $this, 'add_column'       )         );
 		add_action( 'manage_posts_custom_column',  array( $this, 'manage_column'    ), 10,  2 );
 		add_action( 'manage_pages_custom_column',  array( $this, 'manage_column'    ), 10,  2 );
 
+		// Add UI to "Publish" metabox
 		add_action( 'post_submitbox_misc_actions', array( $this, 'metabox'          )         );
 		add_action( 'quick_edit_custom_box',       array( $this, 'quickedit'        ), 10,  2 );
 		add_action( 'bulk_edit_custom_box',        array( $this, 'quickedit'        ), 10,  2 );
@@ -58,7 +84,7 @@ final class Post_Type_Switcher {
 	 *
 	 * Adds post_publish metabox to allow changing post_type
 	 *
-	 * @since PostTypeSwitcher (0.3)
+	 * @since 1.0.0
 	 */
 	public function metabox() {
 
@@ -68,6 +94,8 @@ final class Post_Type_Switcher {
 			'public'  => true,
 			'show_ui' => true
 		) );
+
+		// Post types
 		$post_types = get_post_types( $args, 'objects' );
 		$cpt_object = get_post_type_object( get_post_type() );
 
@@ -78,17 +106,17 @@ final class Post_Type_Switcher {
 
 		// Force-add current post type if it's not in the list
 		// https://wordpress.org/support/topic/dont-show-for-non-public-post-types?replies=4#post-5849287
-		if ( ! in_array( $cpt_object, $post_types ) ) {
+		if ( ! in_array( $cpt_object, $post_types, true ) ) {
 			$post_types[ get_post_type() ] = $cpt_object;
 		} ?>
 
 		<div class="misc-pub-section misc-pub-section-last post-type-switcher">
-			<label for="pts_post_type"><?php _e( 'Post Type:' ); ?></label>
+			<label for="pts_post_type"><?php esc_html_e( 'Post Type:', 'post-type-switcher' ); ?></label>
 			<span id="post-type-display"><?php echo esc_html( $cpt_object->labels->singular_name ); ?></span>
 
 			<?php if ( current_user_can( $cpt_object->cap->publish_posts ) ) : ?>
 
-				<a href="#" id="edit-post-type-switcher" class="hide-if-no-js"><?php _e( 'Edit' ); ?></a>
+				<a href="#" id="edit-post-type-switcher" class="hide-if-no-js"><?php esc_html_e( 'Edit', 'post-type-switcher' ); ?></a>
 
 				<?php wp_nonce_field( 'post-type-selector', 'pts-nonce-select' ); ?>
 
@@ -106,8 +134,8 @@ final class Post_Type_Switcher {
 						<?php endforeach; ?>
 
 					</select>
-					<a href="#" id="save-post-type-switcher" class="hide-if-no-js button"><?php _e( 'OK' ); ?></a>
-					<a href="#" id="cancel-post-type-switcher" class="hide-if-no-js"><?php _e( 'Cancel' ); ?></a>
+					<a href="#" id="save-post-type-switcher" class="hide-if-no-js button"><?php esc_html_e( 'OK', 'post-type-switcher' ); ?></a>
+					<a href="#" id="cancel-post-type-switcher" class="hide-if-no-js"><?php esc_html_e( 'Cancel', 'post-type-switcher' ); ?></a>
 				</div>
 
 			<?php endif; ?>
@@ -120,16 +148,16 @@ final class Post_Type_Switcher {
 	/**
 	 * Adds the post type column
 	 *
-	 * @since PostTypeSwitcher (1.2)
+	 * @since 1.2.0
 	 */
 	public function add_column( $columns ) {
-		return array_merge( $columns,  array( 'post_type' => __( 'Type' ) ) );
+		return array_merge( $columns,  array( 'post_type' => esc_html__( 'Type', 'post-type-switcher' ) ) );
 	}
 
 	/**
 	 * Manages the post type column
 	 *
-	 * @since PostTypeSwitcher (1.1.1)
+	 * @since 1.1.1
 	 */
 	public function manage_column( $column, $post_id ) {
 		switch( $column ) {
@@ -146,19 +174,19 @@ final class Post_Type_Switcher {
 	/**
 	 * Adds quickedit button for bulk-editing post types
 	 *
-	 * @since PostTypeSwitcher (1.2)
+	 * @since 1.2.0
 	 */
 	public function quickedit( $column_name, $post_type ) {
 
 		// Bail to prevent multiple dropdowns in each column
-		if ( $column_name !== 'post_type' ) {
+		if ( 'post_type' !== $column_name ) {
 			return;
 		} ?>
 
 		<fieldset class="inline-edit-col-right">
 			<div class="inline-edit-col">
 				<label class="alignleft">
-					<span class="title"><?php _e( 'Post Type' ); ?></span>
+					<span class="title"><?php esc_html_e( 'Post Type', 'post-type-switcher' ); ?></span>
 					<?php wp_nonce_field( 'post-type-selector', 'pts-nonce-select' ); ?>
 					<?php $this->select_box(); ?>
 				</label>
@@ -171,20 +199,21 @@ final class Post_Type_Switcher {
 	/**
 	 * Adds quickedit script for getting values into quickedit box
 	 *
-	 * @since PostTypeSwitcher (1.2)
+	 * @since 1.2
 	 */
 	public function quickedit_script( $hook = '' ) {
+
 		if ( 'edit.php' !== $hook ) {
 			return;
 		}
 
-		wp_enqueue_script( 'pts_quickedit', plugins_url( 'js/quickedit.js', __FILE__ ), array( 'jquery' ), '', true );
+		wp_enqueue_script( 'pts_quickedit', plugin_dir_url( __FILE__ ) . 'assets/js/quickedit.js', array( 'jquery' ), '', true );
 	}
 
 	/**
 	 * Output a post-type dropdown
 	 *
-	 * @since PostTypeSwitcher (1.2)
+	 * @since 1.2
 	 */
 	public function select_box() {
 		$args = (array) apply_filters( 'pts_post_type_filter', array(
@@ -224,53 +253,77 @@ final class Post_Type_Switcher {
 	 * - Check new post-type exists
 	 * - Check that user can publish posts of new type
 	 *
-	 * @since PostTypeSwitcher (0.3)
-	 * @param int $post_id
-	 * @param object $post
+	 * @since 1.0.0
+	 *
+	 * @param  int     $post_id
+	 * @param  object  $post
+	 *
 	 * @return If any number of condtions are met
 	 */
 	public function save_post( $post_id, $post ) {
 
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		// Post type information.
+		$post_type        = $_REQUEST['pts_post_type'];
+		$post_type_object = get_post_type_object( $post_type );
+
+		// Add nonce for security and authentication.
+		$nonce_name   = $_REQUEST['pts-nonce-select'];
+		$nonce_action = 'post-type-selector';
+
+		// Check if a nonce is set.
+		if ( ! isset( $nonce_name ) ) {
 			return;
 		}
 
-		if ( ! isset( $_REQUEST['pts-nonce-select'] ) ) {
+		// Check if a nonce is valid.
+		if ( ! wp_verify_nonce( $nonce_name, $nonce_action ) ) {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( $_REQUEST['pts-nonce-select'], 'post-type-selector' ) ) {
-			return;
-		}
-
+		// Check if the user has permissions to 'edit_post'.
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
 
-		if ( empty( $_REQUEST['pts_post_type'] ) ) {
+		// Check if it's not an autosave.
+		if ( wp_is_post_autosave( $post_id ) ) {
 			return;
 		}
 
-		if ( in_array( $post->post_type, array( $_REQUEST['pts_post_type'], 'revision' ) ) ) {
+		// Check if it's not a revision.
+		if ( wp_is_post_revision( $post_id ) ) {
 			return;
 		}
 
-		$new_post_type_object = get_post_type_object( $_REQUEST['pts_post_type'] );
-		if ( empty( $new_post_type_object ) ) {
+		// Check if a post type is set.
+		if ( empty( $post_type ) ) {
 			return;
 		}
 
-		if ( ! current_user_can( $new_post_type_object->cap->publish_posts ) ) {
+		// Check if a post type object is set.
+		if ( empty( $post_type_object ) ) {
 			return;
 		}
 
-		set_post_type( $post_id, $new_post_type_object->name );
+		// Check if it's not a revision.
+		if ( in_array( $post->post_type, array( $post_type, 'revision' ), true ) ) {
+			return;
+		}
+
+		// Check if the user has permissions to 'publish_posts'.
+		if ( ! current_user_can( $post_type_object->cap->publish_posts ) ) {
+			return;
+		}
+
+		// Set the new post type.
+		set_post_type( $post_id, $post_type_object->name );
 	}
 
 	/**
 	 * Adds needed JS and CSS to admin header
 	 *
-	 * @since PostTypeSwitcher (0.3)
+	 * @since 1.0.0
+	 *
 	 * @return If on post-new.php
 	 */
 	public function admin_head() {
@@ -284,14 +337,12 @@ final class Post_Type_Switcher {
 					jQuery( '#post-type-select' ).slideDown();
 					e.preventDefault();
 				});
-
 				jQuery( '#save-post-type-switcher' ).on( 'click', function(e) {
 					jQuery( '#post-type-select' ).slideUp();
 					jQuery( '#edit-post-type-switcher' ).show();
 					jQuery( '#post-type-display' ).text( jQuery( '#pts_post_type :selected' ).text() );
 					e.preventDefault();
 				});
-
 				jQuery( '#cancel-post-type-switcher' ).on( 'click', function(e) {
 					jQuery( '#post-type-select' ).slideUp();
 					jQuery( '#edit-post-type-switcher' ).show();
@@ -315,7 +366,6 @@ final class Post_Type_Switcher {
 			#post-type-display {
 				font-weight: bold;
 			}
-
 			#post-body .post-type-switcher::before {
 				content: '\f109';
 				font: 400 20px/1 dashicons;
@@ -339,14 +389,14 @@ final class Post_Type_Switcher {
 	/**
 	 * Whether or not the current file requires the post type switcher
 	 *
-	 * @since PostTypeSwitcher (1.1)
+	 * @since 1.1.0
+	 *
 	 * @return bool True if it should load, false if not
 	 */
 	private static function is_allowed_page() {
-		global $pagenow;
 
 		// Only for admin area
-		if ( ! is_admin() ) {
+		if ( ! is_blog_admin() ) {
 			return false;
 		}
 
@@ -358,7 +408,7 @@ final class Post_Type_Switcher {
 		) );
 
 		// Only show switcher when editing
-		return (bool) in_array( $pagenow, $pages );
+		return (bool) in_array( $GLOBALS['pagenow'], $pages, true );
 	}
 }
 new Post_Type_Switcher();

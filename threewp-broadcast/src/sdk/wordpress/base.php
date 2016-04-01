@@ -175,21 +175,21 @@ class base
 
 	/**
 		@brief		Queues a submenu page for adding later.
-
-		@details	Used to ensure alphabetic sorting of submenu pages independent of language.
-
-		Uses the same parameters as Wordpress' add_submenu_page. Uses the menu title as the sorting key.
-
-		After all pages have been add_submenu_page'd, call add_submenu_pages to actually sort and add them.
-
+		@details	20151226 Switched to use menu_page object.
+		@see		menu_page()
 		@since		20130416
 	**/
 	public function add_submenu_page()
 	{
+		//			0			1			2			3			4				5
+		// ( $parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function = '' )
 		$args = func_get_args();
-		$key = $args[ 4 ];
-		$key = $this->strtolower( $key );
-		$this->submenu_pages->set( $key, $args );
+		$this->menu_page()
+			->submenu( $args[ 4 ] )
+			->callback( $args[ 5 ] )
+			->capability( $args[ 3 ] )
+			->menu_title( $args[ 2 ] )
+			->page_title( $args[ 1 ] );
 	}
 
 	/**
@@ -199,12 +199,7 @@ class base
 	**/
 	public function add_submenu_pages()
 	{
-		$this->submenu_pages->sortBy( function( $item )
-		{
-			return $item[ 2 ];
-		} );
-		foreach( $this->submenu_pages as $submenu )
-			call_user_func_array( 'add_submenu_page', $submenu );
+		$this->menu_page()->add_all();
 	}
 
 	/**
@@ -286,6 +281,29 @@ class base
 	}
 
 	/**
+		@brief		Display a warning about the function being deprecated.
+		@since		2015-12-25 13:29:48
+	**/
+	public function deprecated_function( $message )
+	{
+		if ( ! defined( 'WP_DEBUG' ) )
+			return;
+		if ( ! WP_DEBUG )
+			return;
+
+		$args = func_get_args();
+		$s = @ call_user_func_array( 'sprintf', $args );
+		if ( $s == '' )
+			$s = $message;
+
+		$backtrace = debug_backtrace();
+		array_shift( $backtrace );
+		$caller = reset( $backtrace );
+
+		echo sprintf( 'Deprecated in %s, function %s, line %s: %s', $caller[ 'class' ], $caller[ 'function' ], $caller[ 'line' ], $s );
+	}
+
+	/**
 		@brief		Loads this plugin's language files.
 
 		Reads the language data from the class's name domain as default.
@@ -324,26 +342,22 @@ class base
 	**/
 	public function _( $string )
 	{
-		$new_string = __( $string, $this->language_domain );
+		$translated = __( $string, $this->language_domain );
 
-		$count = substr_count( $string, '%s' );
-		if ( $count > 0 )
-		{
-			$args = func_get_args();
-			array_shift( $args );
+		$args = func_get_args();
+		// Remove the original string from the args.
+		array_shift( $args );
+		// Replace the original with the translated.
+		array_unshift( $args, $translated );
+		// Run it through sprintf.
+		$string =  @ call_user_func_array( 'sprintf', $args );
+		// Did sprintf fail? Then return the translated.
+		if ( $string == '' )
+			$string = $translated;
+		else
+			$translated = $string;
 
-			if ( $count != count( $args ) )
-				throw new \Exception( sprintf(
-					'_() requires the same amount of arguments as occurrences of %%s. Needed: %s, given %s',
-					$count,
-					count( $args )
-				) );
-
-			array_unshift( $args, $new_string );
-			$new_string =  call_user_func_array( 'sprintf', $args );
-		}
-
-		return $new_string;
+		return $translated;
 	}
 
 	/**
@@ -377,6 +391,9 @@ class base
 		global $wpdb;
 		$key = sprintf( '%scapabilities', $wpdb->prefix );
 		$r = get_user_meta( get_current_user_id(), $key, true );
+
+		if ( ! is_array( $r ) )
+			$r = [];
 
 		if ( is_super_admin() )
 			$r[ 'super_admin' ] = true;
@@ -528,6 +545,24 @@ class base
 		echo '<div class="message_box '.$type.'">
 			<p class="message_timestamp">'.$this->now().'</p>
 			<p>'.$string.'</p></div>';
+	}
+
+	/**
+		@brief		Return a message box of type 'info'.
+		@since		2015-12-21 20:26:14
+	**/
+	public function error_message_box()
+	{
+		return new message_boxes\Error( $this );
+	}
+
+	/**
+		@brief		Return a message box of type 'info'.
+		@since		2015-12-21 20:26:14
+	**/
+	public function info_message_box()
+	{
+		return new message_boxes\Info( $this );
 	}
 
 	/**
@@ -1161,67 +1196,6 @@ class base
 	}
 
 	/**
-		@brief		Displays an array of inputs using Wordpress table formatting.
-		@param		array		$inputs		Array of \\plainview\\sdk_broadcast\\wordpress\\form inputs.
-		@param		array		$options	Array of options.
-		@since		20130416
-	**/
-	public function display_form_table( $inputs, $options = array() )
-	{
-		$options = \plainview\sdk_broadcast\base::merge_objects( array(
-			'form' => null,
-			'header' => '',
-			'header_level' => 'h3',
-		), $options );
-
-		$r = '';
-
-		if ( $options->form === null )
-			$options->form = $this->form();
-
-		$table = $this->table()->set_attribute( 'class', 'form-table' );
-
-		foreach( $inputs as $name => $input )
-		{
-			if ( ! isset( $input[ 'name' ] ) )
-				$input[ 'name' ] = $name;
-
-			if ( $input[ 'type' ] == 'hidden' )
-			{
-				$r .= $options->form->make_input( $input );
-				continue;
-			}
-			$o = new \stdClass();
-			$o->input = $input;
-			$o->form = $options->form;
-
-			if ( $input[ 'type' ] == 'markup' )
-			{
-				$table->body()->row()->td()->set_attribute( 'colspan', 2 )->text( $options->form->make_input( $input ) );
-				continue;
-			}
-
-			$table->body()->row()
-				->th()->text( $options->form->make_label( $input ) )->row()
-				->td()->textf( '<div class="input_itself">%s</div><div class="input_description">%s</div>',
-					$options->form->make_input( $input ),
-					$options->form->make_description( $input )
-				);
-		}
-
-		if ( $options->header != '' )
-			$r .= sprintf( '<%s>%s</%s>',
-				$options->header_level,
-				$options->header,
-				$options->header_level
-			);
-
-		$r .= $table;
-
-		return $r;
-	}
-
-	/**
 		@brief		Handles command line arguments.
 		@details	Using an array of long options, will call the respective method to handle the option.
 
@@ -1416,27 +1390,24 @@ class base
 	}
 
 	/**
-		@brief		Creates a new form.
-		@param		array		$options	Default options to send to the form constructor.
-		@return		object					A new \\plainview\\sdk_broadcast\\wordpress\\form object.
+		@brief		Creates a form2 object.
+		@see		form2
 		@since		20130416
 	**/
-	public function form( $options = array())
+	public function form()
 	{
-		$options = array_merge( $options, array( 'language' => preg_replace( '/_.*/', '', get_locale())) );
-
-		return new \plainview\sdk_broadcast\wordpress\form( $options );
+		$form = new \plainview\sdk_broadcast\wordpress\form2\form( $this );
+		return $form;
 	}
 
 	/**
-		@brief		Creates a form2 object.
+		@brief		Backwards compatibility alias for form.
 		@return		\\plainview\\sdk_broadcast\\form2\\form		A new form object.
 		@since		20130509
 	**/
 	public function form2()
 	{
-		$form = new \plainview\sdk_broadcast\wordpress\form2\form( $this );
-		return $form;
+		return $this->form();
 	}
 
 	/**
@@ -1461,13 +1432,49 @@ class base
 	}
 
 	/**
+		@brief		Load the PHPmailer object, if necessary.
+		@since		2016-02-01 20:11:34
+	**/
+	public static function mail()
+	{
+		// This ensures that the PHPmailer class is loaded and ready.
+		require_once( ABSPATH . WPINC . '/pluggable.php' );
+		wp_mail( '' , '', '' );
+		return parent::mail();
+	}
+
+	/**
+		@brief		Return the menu_page object.
+		@since		2015-12-26 19:04:58
+	**/
+	public function menu_page()
+	{
+		if ( ! isset( $this->__menu_page ) )
+		{
+			$this->__menu_page = new menu_page\Menu();
+			$this->__menu_page->set_parent( $this );
+		}
+		return $this->__menu_page;
+	}
+
+	/**
+		@brief		Create a nav tabs instance.
+		@since		2015-12-28 00:05:11
+	**/
+	public function nav_tabs()
+	{
+		$tabs = new \plainview\sdk_broadcast\wordpress\tabs\Nav_Tabs( $this );
+		return $tabs;
+	}
+
+	/**
 		@brief		Returns WP's current timestamp (corrected for UTC)
 		@return		string		Current timestamp in MYSQL datetime format.
 		@since		20130416
 	**/
 	public static function now()
 	{
-		return date( 'Y-m-d H:i:s', current_time( 'timestamp' ));
+		return date( 'Y-m-d H:i:s', current_time( 'timestamp' ) );
 	}
 
 	/**
@@ -1532,119 +1539,12 @@ class base
 	}
 
 	/**
-		@brief		Sends mail via SMTP.
-		@param		array		$mail_data					Mail data.
-		@since		20130416
+		@brief		Create a row actions object.
+		@since		2015-12-21 23:24:18
 	**/
-	public function send_mail( $mail_data )
+	public function row_actions()
 	{
-		require_once ABSPATH . WPINC . '/class-phpmailer.php';
-		$mail = new \PHPMailer();
-
-		// Mandatory
-		$from_email		= key( $mail_data[ 'from' ] );
-		$from_name		= reset( $mail_data[ 'from' ] );
-		$mail->From		= $from_email;
-		$mail->FromName	= $from_name;
-		$mail->Sender	= $from_email;
-		$mail->Subject  = $mail_data[ 'subject' ];
-
-		if ( isset( $mail_data[ 'to' ] ) )
-			foreach( $mail_data[ 'to' ] as $email => $name )
-			{
-				if ( is_int( $email) )
-					$email = $name;
-				$mail->AddAddress( $email, $name );
-			}
-
-		if ( isset( $mail_data[ 'cc' ] ) )
-			foreach( $mail_data[ 'cc' ] as $email => $name )
-			{
-				if ( is_int( $email) )
-					$email = $name;
-				$mail->AddCC( $email, $name );
-			}
-
-		if ( isset( $mail_data[ 'bcc' ] ) )
-			foreach( $mail_data[ 'bcc' ] as $email => $name )
-			{
-				if ( is_int( $email) )
-					$email = $name;
-				$mail->AddBCC( $email, $name );
-			}
-
-		if ( isset( $mail_data[ 'body_html' ] ) )
-			$mail->MsgHTML( $mail_data[ 'body_html' ] );
-
-		if ( isset( $mail_data[ 'body' ] ) )
-			$mail->Body = $mail_data[ 'body' ];
-
-		if ( isset( $mail_data[ 'attachments' ] ) )
-			foreach( $mail_data[ 'attachments' ] as $filepath => $filename )
-			{
-				$encoding = 'base64';
-				$mime_type = self::mime_type ( $filepath );
-
-				if ( is_numeric( $filepath ) )
-					$mail->AddAttachment( $filename, '', $encoding, $mime_type );
-				else
-					$mail->AddAttachment( $filepath, $filename, $encoding, $mime_type );
-			}
-
-		if ( isset( $mail_data[ 'reply_to' ] ) )
-		{
-			foreach( $mail_data[ 'reply_to' ] as $email => $name )
-			{
-				if ( is_int( $email) )
-					$email = $name;
-				$mail->AddReplyTo( $email, $name );
-			}
-		}
-
-		// Seldom used settings...
-
-		if ( isset( $mail_data[ 'wordwrap' ] ) )
-			$mail->WordWrap = $mail_data[ 'wordwrap' ];
-
-		if ( isset( $mail_data[ 'confirm_reading_to' ] ) )
-			$mail->ConfirmReadingTo = true;
-
-		if ( isset( $mail_data[ 'single_to' ] ) )
-		{
-			$mail->SingleTo = true;
-			$mail->SMTPKeepAlive = true;
-		}
-
-		if ( isset( $mail_data[ 'SMTP' ] ) )									// SMTP? Or just plain old mail()
-		{
-			$mail->IsSMTP();
-			$mail->Host	= $mail_data[ 'smtp_server' ];
-			$mail->Port = $mail_data[ 'smtp_port' ];
-		}
-		else
-			$mail->IsMail();
-
-		if ( isset( $mail_data[ 'charset' ] ) )
-			$mail->CharSet = $mail_data[ 'charset' ];
-		else
-			$mail->CharSet = 'UTF-8';
-
-		if ( isset( $mail_data[ 'content_type' ] ) )
-			$mail->ContentType  = $mail_data[ 'content_type' ];
-
-		if ( isset( $mail_data[ 'encoding' ] ) )
-			$mail->Encoding  = $mail_data[ 'encoding' ];
-
-		// Done setting up.
-
-		if ( !$mail->Send() )
-			$r = $mail->ErrorInfo;
-		else
-			$r = true;
-
-		$mail->SmtpClose();
-
-		return $r;
+		return new row_actions\Row( $this );
 	}
 
 	/**
@@ -1656,6 +1556,16 @@ class base
 	public static function slug( $string )
 	{
 		return sanitize_title( $string );
+	}
+
+	/**
+		@brief		Create a subsubsub tabs instance.
+		@since		2015-12-28 00:05:11
+	**/
+	public function subsubsub_tabs()
+	{
+		$tabs = new \plainview\sdk_broadcast\wordpress\tabs\Subsubsub_Tabs( $this );
+		return $tabs;
 	}
 
 	/**
@@ -1683,127 +1593,12 @@ class base
 	}
 
 	/**
-		@brief		Displays Wordpress tabs OR creates a tabs instance.
-		@details	The \\tabs functionality was introduced 20130501.
-		@param		array		$options		See options.
+		@brief		Create a tabs instance.
 		@since		20130416
 	**/
-	public function tabs( $options = array() )
+	public function tabs()
 	{
-		if ( count( $options ) == 0 )
-		{
-			$tabs = new \plainview\sdk_broadcast\wordpress\tabs\tabs( $this );
-			return $tabs;
-		}
-
-		$options = $this->merge_objects(array(
-			'count' =>			array(),			// Optional array of a strings to display after each tab name. Think: page counts.
-			'default' => null,						// Default tab index.
-			'descriptions' =>	array(),			// Descriptions (link titles) for each tab
-			'display' => true,						// Display the tabs or return them.
-			'display_tab_name' => true,				// If display==true, display the tab name.
-			'display_before_tab_name' => '<h2>',	// If display_tab_name==true, what to display before the tab name.
-			'display_after_tab_name' => '</h2>',	// If display_tab_name==true, what to display after the tab name.
-			'functions' =>	array(),				// Array of functions associated with each tab name.
-			'get_key' =>	'tab',					// $_GET key to get the tab value from.
-			'page_titles' =>	array(),			// Array of page titles associated with each tab.
-			'tabs' =>			array(),			// Array of tab names
-			'valid_get_keys' => array(),			// Display only these _GET keys.
-		), $options);
-
-		$get = $_GET;						// Work on a copy of the _GET.
-		$get_key = $options->get_key;		// Convenience.
-
-		// Is the default not set or set to something stupid? Fix it.
-		if ( ! isset( $options->tabs[ $options->default ] ) )
-			$options->default = key( $options->tabs );
-
-		// Select the default tab if none is selected.
-		if ( ! isset( $get[ $get_key ] ) )
-			$get[ $get_key ] = $options->default;
-		$selected = $get[ $get_key ];
-
-		$options->valid_get_keys['page'] = 'page';
-
-		$r = '';
-
-		if ( count( $options->tabs ) > 1 )
-		{
-			$r .= '<ul class="subsubsub">';
-			$original_link = $_SERVER['REQUEST_URI'];
-
-			foreach( $get as $key => $value )
-				if ( !in_array( $key, $options->valid_get_keys) )
-					$original_link = remove_query_arg( $key, $original_link );
-
-			$index = 0;
-			foreach( $options->tabs as $tab_slug => $text )
-			{
-				// Make the link.
-				// If we're already on that tab, just return the current url.
-				if ( $get[ $get_key ]  == $tab_slug )
-					$link = remove_query_arg( time() );
-				else
-				{
-					if ( $tab_slug == $options->default )
-						$link = remove_query_arg( $get_key, $original_link );
-					else
-						$link = add_query_arg( $get_key, $tab_slug, $original_link );
-				}
-
-				if ( isset( $options->count[ $tab_slug ] ) )
-					$text .= ' <span class="count">( ' . $options->count[ $tab_slug ] . ' )</span>';
-
-				$separator = ( $index+1 < count( $options->tabs) ? ' | ' : '' );
-
-				$current = ( $tab_slug == $selected ? ' class="current"' : '' );
-
-				if ( $current)
-					$selected_index = $tab_slug;
-
-				$title = '';
-				if ( isset( $options->descriptions[ $tab_slug ] ) )
-					$title = 'title="' . $options->descriptions[ $tab_slug ] . '"';
-
-				$r .= '<li><a'.$current.' '. $title .' href="'.$link.'">'.$text.'</a>'.$separator.'</li>';
-				$index++;
-			}
-			$r .= '</ul>';
-		}
-
-		if ( !isset( $selected_index) )
-			$selected_index = $options->default;
-
-		if ( $options->display)
-		{
-			ob_start();
-			echo '<div class="wrap">';
-			if ( $options->display_tab_name)
-			{
-				if ( isset( $options->page_titles[ $selected_index ] ) )
-					$page_title = $options->page_titles[ $selected_index ];
-				else
-					$page_title = $options->tabs[ $selected_index ];
-
-				echo $options->display_before_tab_name . $page_title . $options->display_after_tab_name;
-			}
-			echo $r;
-			echo '<div style="clear: both"></div>';
-			if ( isset( $options->functions[ $selected_index ] ) )
-			{
-				$functionName = $options->functions[ $selected_index ];
-				if ( is_array( $functionName ) )
-				{
-					$functionName[0]->$functionName[1]();
-				}
-				else
-					$this->$functionName();
-			}
-			echo '</div>';
-			ob_end_flush();
-		}
-		else
-			return $r;
+		return $this->nav_tabs();
 	}
 
 	/**

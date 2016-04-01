@@ -18,6 +18,7 @@ class tab
 {
 	use \plainview\sdk_broadcast\traits\method_chaining;
 	use \plainview\sdk_broadcast\html\element;
+	use \plainview\sdk_broadcast\traits\sort_order;
 
 	/**
 		@brief		Tab callback function.
@@ -35,6 +36,12 @@ class tab
 		@var		$count
 	**/
 	public $count = '';
+
+	/**
+		@brief		The current / active status of the tab.
+		@since		2015-12-27 13:08:44
+	**/
+	public $current = false;
 
 	/**
 		@brief		Optional heading to display as the page heading instead of the tab name.
@@ -99,7 +106,7 @@ class tab
 	public $tag = 'li';
 
 	/**
-		@brief		The \\plainview\\sdk_broadcast_pvam\\wordpress\\tabs\\tabs object this tab belongs to.
+		@brief		The \\plainview\\sdk_broadcast\\wordpress\\tabs\\tabs object this tab belongs to.
 		@since		20130503
 		@var		$tabs
 	**/
@@ -111,6 +118,12 @@ class tab
 		@var		$title
 	**/
 	public $title;
+
+	/**
+		@brief		The URL for this tab.
+		@since		2015-12-27 13:09:54
+	**/
+	public $url;
 
 	public function __construct( $tabs )
 	{
@@ -146,13 +159,35 @@ class tab
 	**/
 	public function callback_this( $method )
 	{
-		return $this->callback( $this->tabs->base, $method );
+		// Retrieve the class object that called this.
+		$trace = debug_backtrace();
+		array_shift( $trace );
+		$trace = reset( $trace );
+		$class = $trace[ 'object' ];
+		return $this->callback( $class, $method );
 	}
 
-	public function display_heading()
+	/**
+		@brief		Set the current / active status of the tab.
+		@since		2015-12-27 13:09:13
+	**/
+	public function current( $current )
+	{
+		return $this->set_key( 'current', $current );
+	}
+
+	public function get_heading()
 	{
 		$name = ( $this->heading != '' ? $this->heading : $this->name );
-		echo $this->heading_prefix . $name . $this->heading_suffix;
+		return $this->heading_prefix . $name . $this->heading_suffix;
+	}
+
+	/**
+		@brief		Return the complete link HTML.
+		@since		2015-12-27 13:12:24
+	**/
+	public function display_link()
+	{
 	}
 
 	public function display_name()
@@ -182,7 +217,7 @@ class tab
 	**/
 	public function heading_( $heading )
 	{
-		return $this->heading( call_user_func_array( array( $this->tabs->base, '_' ), func_get_args() ) );
+		return $this->heading( call_user_func_array( [ $this->tabs->base, '_' ], func_get_args() ) );
 	}
 
 	/**
@@ -307,5 +342,14 @@ class tab
 	public function title_( $title )
 	{
 		return $this->title( call_user_func_array( array( $this->tabs->base, '_' ), func_get_args() ) );
+	}
+
+	/**
+		@brief		Set the url.
+		@since		2015-12-27 13:09:13
+	**/
+	public function url( $url )
+	{
+		return $this->set_key( 'url', $url );
 	}
 }

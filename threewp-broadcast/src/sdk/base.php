@@ -11,8 +11,31 @@ namespace plainview\sdk_broadcast;
 
 	@par			Changelog
 
-	This list only shows which classes were modified. For a detailed list, see the class' changelog.
-
+	- 20160112		form: select inputs can now be sorted.
+	- 20160102		Deleted Wordpress options_object class.
+	- 20160102		Added object_stores trait to replace Wordpress Options_Object.
+	- 20151227		Wordpress: Removed old tabs functionality. Use only the tabs classes now.
+	- 20151227		Wordpress: Split tabs into nav tabs and subsubsub tabs.
+	- 20151225		Wordpress: Added menu_page() instead of add_submenu_page() methods.
+	- 20151225		form: Old form class retired. form() is now an alias for form2().
+	- 20151225		form2: Added sort order trait to inputs.
+	- 20151225		Wordpress: Added deprecated_function().
+	- 20151224		Wordpress: Allow tabs to be sorted using ->order();
+	- 20151223		Wordpress: Update EDD updater. Less validity checks. Better fail message.
+	- 20151222		Wordpress: Added row_actions();
+	- 20151221		Wordpress: Added message boxes.
+	- 20151221		Wordpress: Removed send_mail(). Use ->mail() instead.
+	- 20151215		Wordpress: Allow db object to load several IDs at once.
+	- 20151206		Wordpress: Table grouping + js.
+	- 20151203		Wordpress tables: Remove hover effect.
+	- 20151202		Wordpress: Do not base64 options object.
+	- 20151129		HTML: Added data convenience method and test.
+	- 20151106		Collections/html: Redone handling, with test.
+	- 20151105		Wordpress: add wp_editor form2 input type.
+	- 20151028		Wordpress: do not activate pack plugins if no action is selected.
+	- 20151028		Wordpress: prevent array_intersect warning if the user does not have capabilities on this blog.
+	- 20151025		Wordpress: Bulk action column has a unique ID.
+	- 20151024		Wordpress: Add Options_Object class.
 	- 20151009		Wordpress: Update plugin pack table.
 	- 20151003		Wordpress: More detailed debug trait.
 	- 20151003		Wordpress: Allow custom directory for language file.
@@ -170,7 +193,7 @@ class base
 		@since		20130416
 		@var		$sdk_version
 	**/
-	protected $sdk_version = 20151009;
+	protected $sdk_version = 20160112;
 
 	/**
 		@brief		Constructor.
@@ -337,9 +360,9 @@ class base
 	/**
 		@brief		Creates a form2 object.
 		@return		\\plainview\\sdk_broadcast\\form2\\form		A new form object.
-		@since		20130509
+		@since		2015-12-25 17:21:03
 	**/
-	public function form2()
+	public function form()
 	{
 		if ( ! class_exists( '\\plainview\\sdk_broadcast\\form2\\form' ) )
 			require_once( dirname( __FILE__ ) . '/form2/form.php' );
@@ -349,6 +372,16 @@ class base
 
 		$form = new \plainview\sdk_broadcast\wordpress\form2\form();
 		return $form;
+	}
+
+	/**
+		@brief		Backwards compatibility alias for form.
+		@see		form()
+		@since		20130509
+	**/
+	public function form2()
+	{
+		return $this->form();
 	}
 
 	/**

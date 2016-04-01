@@ -55,6 +55,9 @@ class SSP_Settings {
 		// Mark date on which feed redirection was activated
 		add_action( 'update_option', array( $this, 'mark_feed_redirect_date' ) , 10 , 3 );
 
+		// New caps for editors and above.
+		add_action( 'admin_init', array( $this, 'add_caps' ), 1 );
+
 	}
 
 	public function load_settings() {
@@ -66,7 +69,45 @@ class SSP_Settings {
 	 * @return  void
 	 */
 	public function add_menu_item() {
-		add_submenu_page( 'edit.php?post_type=podcast' , __( 'Podcast Settings', 'seriously-simple-podcasting' ) , __( 'Settings', 'seriously-simple-podcasting' ), 'manage_options' , 'podcast_settings' , array( $this , 'settings_page' ) );
+		add_submenu_page( 'edit.php?post_type=podcast' , __( 'Podcast Settings', 'seriously-simple-podcasting' ) , __( 'Settings', 'seriously-simple-podcasting' ), 'manage_podcast' , 'podcast_settings' , array( $this , 'settings_page' ) );
+	}
+
+	/**
+	 * Add cabilities to edit podcast settings to admins, and editors.
+	 */
+	public function add_caps() {
+
+		// Roles you'd like to have administer the podcast settings page.
+		// Admin and Editor, as default.
+		$roles = apply_filters( 'ssp_manage_podcast', array( 'administrator', 'editor' ) );
+
+		// Loop through each role and assign capabilities
+		foreach( $roles as $the_role ) {
+
+			$role = get_role( $the_role );
+			$caps = array(
+				'manage_podcast',
+			);
+
+			// Add the caps.
+			foreach ( $caps as $cap ) {
+				$this->maybe_add_cap( $role, $cap );
+			}
+		}
+	}
+
+	/**
+	 * Check to see if the given role has a cap, and add if it doesn't exist.
+	 *
+	 * @param  object $role User Cap object, part of WP_User.
+	 * @param  string $cap  Cap to test against.
+	 * @return void
+	 */
+	public function maybe_add_cap( $role, $cap ) {
+		// Update the roles, if needed.
+		if ( ! $role->has_cap( $cap ) ) {
+			$role->add_cap( $cap );
+		}
 	}
 
 	/**
@@ -180,6 +221,10 @@ class SSP_Settings {
 			'Other' => array( 'label' => __( 'Other', 'seriously-simple-podcasting' ), 'group' => __( 'Religion & Spirituality', 'seriously-simple-podcasting' ) ),
 			'Spirituality' => array( 'label' => __( 'Spirituality', 'seriously-simple-podcasting' ), 'group' => __( 'Religion & Spirituality', 'seriously-simple-podcasting' ) ),
 
+			'Medicine' => array( 'label' => __( 'Medicine', 'seriously-simple-podcasting' ), 'group' => __( 'Science & Medicine', 'seriously-simple-podcasting' ) ),
+			'Natural Sciences' => array( 'label' => __( 'Natural Sciences', 'seriously-simple-podcasting' ), 'group' => __( 'Science & Medicine', 'seriously-simple-podcasting' ) ),
+			'Social Sciences' => array( 'label' => __( 'Social Sciences', 'seriously-simple-podcasting' ), 'group' => __( 'Science & Medicine', 'seriously-simple-podcasting' ) ),
+
 			'History' => array( 'label' => __( 'History', 'seriously-simple-podcasting' ), 'group' => __( 'Society & Culture', 'seriously-simple-podcasting' ) ),
 			'Personal Journals' => array( 'label' => __( 'Personal Journals', 'seriously-simple-podcasting' ), 'group' => __( 'Society & Culture', 'seriously-simple-podcasting' ) ),
 			'Philosophy' => array( 'label' => __( 'Philosophy', 'seriously-simple-podcasting' ), 'group' => __( 'Society & Culture', 'seriously-simple-podcasting' ) ),
@@ -220,16 +265,16 @@ class SSP_Settings {
 				),
 				array(
 					'id' 			=> 'player_locations',
-					'label'			=> __( 'Audio player locations', 'seriously-simple-podcasting' ),
-					'description'	=> __( 'Select where to show the podcast audio player along with the episode data (download link, duration and file size)', 'seriously-simple-podcasting' ),
+					'label'			=> __( 'Media player locations', 'seriously-simple-podcasting' ),
+					'description'	=> __( 'Select where to show the podcast media player along with the episode data (download link, duration and file size)', 'seriously-simple-podcasting' ),
 					'type'			=> 'checkbox_multi',
-					'options'		=> array( 'content' => __( 'Full content', 'seriously-simple-podcasting' ), 'excerpt' => __( 'Excerpt', 'seriously-simple-podcasting' ) ),
+					'options'		=> array( 'content' => __( 'Full content', 'seriously-simple-podcasting' ), 'excerpt' => __( 'Excerpt', 'seriously-simple-podcasting' ),  'excerpt_embed' => __( 'oEmbed Excerpt', 'seriously-simple-podcasting' ) ),
 					'default'		=> array(),
 				),
 				array(
 					'id' 			=> 'player_content_location',
-					'label'			=> __( 'Audio player position', 'seriously-simple-podcasting' ),
-					'description'	=> __( 'Select whether to display the audio player above or below the full post content.', 'seriously-simple-podcasting' ),
+					'label'			=> __( 'Media player position', 'seriously-simple-podcasting' ),
+					'description'	=> __( 'Select whether to display the media player above or below the full post content.', 'seriously-simple-podcasting' ),
 					'type'			=> 'radio',
 					'options'		=> array( 'above' => __( 'Above content', 'seriously-simple-podcasting' ), 'below' => __( 'Below content', 'seriously-simple-podcasting' ) ),
 					'default'		=> 'above',
@@ -273,8 +318,8 @@ class SSP_Settings {
 				),
 				array(
 					'id' 			=> 'data_category',
-					'label'			=> __( 'Category' , 'seriously-simple-podcasting' ),
-					'description'	=> __( 'Your podcast\'s category.', 'seriously-simple-podcasting' ),
+					'label'			=> __( 'Primary Category' , 'seriously-simple-podcasting' ),
+					'description'	=> __( 'Your podcast\'s primary category.', 'seriously-simple-podcasting' ),
 					'type'			=> 'select',
 					'options'		=> $category_options,
 					'default'		=> '',
@@ -282,8 +327,44 @@ class SSP_Settings {
 				),
 				array(
 					'id' 			=> 'data_subcategory',
-					'label'			=> __( 'Sub-Category' , 'seriously-simple-podcasting' ),
-					'description'	=> __( 'Your podcast\'s sub-category (if available) - must be a sub-category of the category selected above.', 'seriously-simple-podcasting' ),
+					'label'			=> __( 'Primary Sub-Category' , 'seriously-simple-podcasting' ),
+					'description'	=> __( 'Your podcast\'s primary sub-category (if available) - must be a sub-category of the primary category selected above.', 'seriously-simple-podcasting' ),
+					'type'			=> 'select',
+					'options'		=> $subcategory_options,
+					'default'		=> '',
+					'callback'		=> 'wp_strip_all_tags',
+				),
+				array(
+					'id' 			=> 'data_category2',
+					'label'			=> __( 'Secondary Category' , 'seriously-simple-podcasting' ),
+					'description'	=> __( 'Your podcast\'s secondary category.', 'seriously-simple-podcasting' ),
+					'type'			=> 'select',
+					'options'		=> $category_options,
+					'default'		=> '',
+					'callback'		=> 'wp_strip_all_tags',
+				),
+				array(
+					'id' 			=> 'data_subcategory2',
+					'label'			=> __( 'Secondary Sub-Category' , 'seriously-simple-podcasting' ),
+					'description'	=> __( 'Your podcast\'s secondary sub-category (if available) - must be a sub-category of the secondary category selected above.', 'seriously-simple-podcasting' ),
+					'type'			=> 'select',
+					'options'		=> $subcategory_options,
+					'default'		=> '',
+					'callback'		=> 'wp_strip_all_tags',
+				),
+				array(
+					'id' 			=> 'data_category3',
+					'label'			=> __( 'Tertiary Category' , 'seriously-simple-podcasting' ),
+					'description'	=> __( 'Your podcast\'s tertiary category.', 'seriously-simple-podcasting' ),
+					'type'			=> 'select',
+					'options'		=> $category_options,
+					'default'		=> '',
+					'callback'		=> 'wp_strip_all_tags',
+				),
+				array(
+					'id' 			=> 'data_subcategory3',
+					'label'			=> __( 'Tertiary Sub-Category' , 'seriously-simple-podcasting' ),
+					'description'	=> __( 'Your podcast\'s tertiary sub-category (if available) - must be a sub-category of the tertiary category selected above.', 'seriously-simple-podcasting' ),
 					'type'			=> 'select',
 					'options'		=> $subcategory_options,
 					'default'		=> '',
@@ -352,6 +433,14 @@ class SSP_Settings {
 					'id' 			=> 'explicit',
 					'label'			=> __( 'Explicit', 'seriously-simple-podcasting' ),
 					'description'	=> __( 'Mark if your podcast is explicit or not.', 'seriously-simple-podcasting' ),
+					'type'			=> 'checkbox',
+					'default'		=> '',
+					'callback'		=> 'wp_strip_all_tags',
+				),
+				array(
+					'id' 			=> 'complete',
+					'label'			=> __( 'Complete', 'seriously-simple-podcasting' ),
+					'description'	=> __( 'Mark if this podcast is complete or not. Only do this if no more episodes are going to be added to this feed.', 'seriously-simple-podcasting' ),
 					'type'			=> 'checkbox',
 					'default'		=> '',
 					'callback'		=> 'wp_strip_all_tags',
@@ -564,7 +653,7 @@ class SSP_Settings {
 		}
 	}
 
-	public function settings_section ( $section ) {
+	public function settings_section( $section ) {
 		$html = '<p>' . $this->settings[ $section['id'] ]['description'] . '</p>' . "\n";
 
 		if( 'feed-details' == $section['id'] ) {
@@ -646,10 +735,16 @@ class SSP_Settings {
 
 		}
 
-		// Get field class
+		// Get field class if supplied
 		$class = '';
 		if ( isset( $field['class'] ) ) {
 			$class = $field['class'];
+		}
+
+		// Get parent class if supplied
+		$parent_class = '';
+		if ( isset( $field['parent_class'] ) ) {
+			$parent_class = $field['parent_class'];
 		}
 
 		switch( $field['type'] ) {
@@ -791,6 +886,10 @@ class SSP_Settings {
 			}
 		}
 
+		if( $parent_class ) {
+			$html = '<div class="' . $parent_class . '">' . $html . '</div>';
+		}
+
 		echo $html;
 	}
 
@@ -876,7 +975,7 @@ class SSP_Settings {
 
 		// Build page HTML
 		$html = '<div class="wrap" id="podcast_settings">' . "\n";
-			$html .= '<h2>' . __( 'Podcast Settings' , 'seriously-simple-podcasting' ) . '</h2>' . "\n";
+			$html .= '<h1>' . __( 'Podcast Settings' , 'seriously-simple-podcasting' ) . '</h1>' . "\n";
 
 			$tab = 'general';
 			if ( isset( $_GET['tab'] ) && $_GET['tab'] ) {
@@ -926,6 +1025,15 @@ class SSP_Settings {
 				$html .= '<br/><div class="updated notice notice-success is-dismissible">
 					        <p>' . sprintf( __( '%1$s settings updated.', 'seriously-simple-podcasting' ), '<b>' . str_replace( '-', ' ', ucfirst( $tab ) ) . '</b>' ) . '</p>
 					    </div>';
+			}
+
+			if( function_exists( 'php_sapi_name') && 'security' == $tab ) {
+				$sapi_type = php_sapi_name();
+				if ( strpos( $sapi_type, 'fcgi' ) !== false ) {
+				    $html .= '<br/><div class="update-nag">
+					        <p>' . sprintf( __( 'It looks like your server has FastCGI enabled, which will prevent the feed password protection feature from working. You can fix this by following %1$sthis quick guide%2$s.', 'seriously-simple-podcasting' ), '<a href="http://www.seriouslysimplepodcasting.com/documentation/why-does-the-feed-password-protection-feature-not-work/" target="_blank">', '</a>' ) . '</p>
+					    </div>';
+				}
 			}
 
 			$current_series = '';

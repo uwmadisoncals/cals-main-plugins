@@ -36,7 +36,7 @@ class FRemoteMediaExt extends WPfeature
 {
     public static $instance;
 
-    protected $version = '1.3.0';
+    protected $version = '1.3.1';
     protected $accountPostType;
     protected $remoteServices = array();
 
@@ -140,7 +140,7 @@ class FRemoteMediaExt extends WPfeature
         $this->hook(new MediaSettings('remoteMediaAccounts'));
 
         $this->hook(new MediaTemplate(new View($this->getViewsPath().'admin/media-remote-attachment.php')));
-        $this->addScript(new WPscriptAdmin(array('post.php' => array(), 'post-new.php' => array()), 'media-remote-ext', $this->getJsUrl().'media-remote-ext.min.js', $this->getJsUrl().'media-remote-ext.js', array('media-editor','media-views'), $this->version));
+        $this->addScript(new WPscriptAdmin(array('upload.php' => array(), 'post.php' => array(), 'post-new.php' => array()), 'media-remote-ext', $this->getJsUrl().'media-remote-ext.min.js', $this->getJsUrl().'media-remote-ext.js', array('media-editor','media-views'), $this->version));
         $this->addStyle(new WPstyleAdmin(array(), 'media-remote-admin-css', $this->getCssUrl().'media-remote-admin.min.css', $this->getCssUrl().'media-remote-admin.css', array(), $this->version));
 
         // $this->hook(new MediaBanner(new View($this->getViewsPath().'admin/media-banner.php')));
@@ -191,8 +191,8 @@ class FRemoteMediaExt extends WPfeature
 
     public function initMetaboxes()
     {
-        $this->addScript(new WPscriptAdmin(array('post.php' => array('post_type' => $this->accountPostType->getSlug()), 'post-new.php' => array('post_type' => $this->accountPostType->getSlug())), 'rmedias-query-test', $this->getJsUrl().'media-remote-query-test.min.js', $this->getJsUrl().'media-remote-query-test.js', array(), $this->version));
-        $this->addScript(new WPscriptAdmin(array('post.php' => array('post_type' => $this->accountPostType->getSlug()), 'post-new.php' => array('post_type' => $this->accountPostType->getSlug())), 'media-remote-account', $this->getJsUrl().'rml-account.min.js', $this->getJsUrl().'rml-account.js', array(), $this->version));
+        $this->addScript(new WPscriptAdmin(array('post.php' => array('post_type' => $this->accountPostType->getSlug()), 'post-new.php' => array('post_type' => $this->accountPostType->getSlug())), 'rmedias-query-test', $this->getJsUrl().'media-remote-query-test.min.js', $this->getJsUrl().'media-remote-query-test.js', array('jquery'), $this->version));
+        $this->addScript(new WPscriptAdmin(array('post.php' => array('post_type' => $this->accountPostType->getSlug()), 'post-new.php' => array('post_type' => $this->accountPostType->getSlug())), 'media-remote-account', $this->getJsUrl().'rml-account.min.js', $this->getJsUrl().'rml-account.js', array('jquery'), $this->version));
         
         //Main metabox for Account Service selection
         $metabox = new MetaBoxService(

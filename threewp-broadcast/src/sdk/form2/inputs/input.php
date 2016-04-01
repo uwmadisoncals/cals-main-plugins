@@ -17,6 +17,7 @@ class input
 	use traits\datalist;		// Same reason as _disabled.
 	use traits\prefix;
 	use traits\readonly;		// Same reason as _disabled.
+	use traits\sort_order;		// Same reason as _disabled.
 	use traits\validation;		// All subinputs will inherit the validation methods.
 
 	public $container;

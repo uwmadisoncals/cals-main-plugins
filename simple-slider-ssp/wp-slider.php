@@ -2,12 +2,12 @@
 /**
 Plugin Name: WordPress Slider Plugin
 Plugin URI: http://rocketplugins.com/wordpress-slider-plugin/
-Description: The best WordPress slider plugin. Period.
-Version: 1.4.3
+Description: The best WordPress slider plugin for your website.
+Version: 1.4.5
 Author: Muneeb
 Author URI: http://rocketplugins.com/wordpress-slider-plugin/
 License: GPLv2 or later
-Copyright: 2015 Muneeb ur Rehman http://rocketplugins.com
+Copyright: 2016 Muneeb ur Rehman http://rocketplugins.com
 **/
 
 /**

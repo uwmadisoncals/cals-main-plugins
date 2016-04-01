@@ -87,6 +87,11 @@ class row
 			return false;
 		if ( ! isset( $this->cells[ $id ] ) )
 		{
+			// Does this cell not exist at all?
+			if ( $cell === null )
+				return false;
+
+			// Cell does not exist, but we want to create one.
 			$id = $cell->id;
 			$this->cells[ $id ] = $cell;
 		}

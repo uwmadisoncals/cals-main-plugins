@@ -50,7 +50,7 @@ class bulkactions
 	public function add( $label, $value )
 	{
 		$this->bulk_actions_input->option( $label, $value );
-		return $this;
+		return $this->sort_options();
 	}
 
 	/**
@@ -79,7 +79,7 @@ class bulkactions
 			$checkbox->label->css_class( 'screen-reader-text' );
 
 			$text = sprintf( '%s%s', $checkbox->display_label(), $checkbox->display_input() );
-			$row->td()
+			$row->td( 'check_column' )
 				->css_class( 'manage-column check-column' )
 				->text( $text );
 		}
@@ -116,6 +116,10 @@ class bulkactions
 			->label( _( 'Bulk actions' ) )
 			->option( _( 'Bulk Actions' ), '' );
 
+		// The default should always be first.
+		$this->bulk_actions_input->option( '' )
+			->sort_order( 25 );
+
 		return $this->set_key( 'form', $form );
 	}
 
@@ -151,5 +155,16 @@ class bulkactions
 			return false;
 		$this->form->post();
 		return $this->bulk_actions_button->pressed();
+	}
+
+	/**
+		@brief		Sort the bulk options.
+		@since		2016-01-12 22:19:52
+	**/
+	public function sort_options()
+	{
+		$this->bulk_actions_input
+			->sort_inputs();
+		return $this;
 	}
 }

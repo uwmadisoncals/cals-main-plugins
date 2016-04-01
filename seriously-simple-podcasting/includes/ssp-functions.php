@@ -112,33 +112,10 @@ if ( ! function_exists( 'ss_podcast' ) ) {
 						$title = '<a href="' . esc_url( $post->url ) . '" title="' . esc_attr( $title ) . '">' . $title . '</a>';
 					}
 
+					$meta = $ss_podcasting->episode_meta( $post->ID, 'shortcode' );
+
 					$template = str_replace( '%%CLASS%%', $class, $template );
 					$template = str_replace( '%%TITLE%%', $title, $template );
-
-					$link = $ss_podcasting->get_episode_download_link( $post->ID );
-					$duration = get_post_meta( $post->ID, 'duration', true );
-					$size = get_post_meta( $post->ID, 'filesize', true );
-
-					if ( ! $size ) {
-						$file = $ss_podcasting->get_enclosure( $post->ID );
-						$size_data = $ss_podcasting->get_file_size( $file );
-						$size = $size_data['formatted'];
-						if ( $size ) {
-							if ( isset( $size_data['formatted'] ) ) {
-								update_post_meta( $post->ID, 'filesize', $size_data['formatted'] );
-							}
-
-							if ( isset( $size_data['raw'] ) ) {
-								update_post_meta( $post->ID, 'filesize_raw', $size_data['raw'] );
-							}
-						}
-					}
-
-					$meta = '';
-					if ( $link && strlen( $link ) > 0 ) { $meta .= '<a href="' . esc_url( $link ) . '" title="' . get_the_title() . ' ">' . __( 'Download file' , 'seriously-simple-podcasting' ) . '</a>'; }
-					if ( $duration && strlen( $duration ) > 0 ) { if ( $link && strlen( $link ) > 0 ) { $meta .= ' | '; } $meta .= __( 'Duration' , 'seriously-simple-podcasting' ) . ': ' . $duration; }
-					if ( $size && strlen( $size ) > 0 ) { if ( ( $duration && strlen( $duration ) > 0 ) || ( $link && strlen( $link ) > 0 ) ) { $meta .= ' | '; } $meta .= __( 'Size' , 'seriously-simple-podcasting' ) . ': ' . $size; }
-
 					$template = str_replace( '%%META%%', $meta, $template );
 
 					$html .= $template;
@@ -328,7 +305,7 @@ if ( ! function_exists( 'ssp_episodes' ) ) {
 		}
 
 		// Do we have anything in the cache here?
-		$key   = 'episodes';
+		$key   = 'episodes_' . $series;
 		$group = 'ssp';
 		$posts = wp_cache_get( $key, $group );
 
@@ -377,6 +354,46 @@ if ( ! function_exists( 'ssp_post_types' ) ) {
 		// Return only the valid podcast post types
 		return apply_filters( 'ssp_podcast_post_types', $valid_podcast_post_types, $include_podcast );
 	}
+}
+
+if( ! function_exists( 'ssp_get_feed_category_output' ) ) {
+
+	/**
+	 * Get the XML markup for the feed category st the specified level
+	 * @param  int    $level Category level
+	 * @return string        XML output for feed vategory
+	 */
+	function ssp_get_feed_category_output ( $level = 1, $series_id ) {
+
+		$level = (int) $level;
+
+		if( 1 == $level ) {
+			$level = '';
+		}
+
+		$category = get_option( 'ss_podcasting_data_category' . $level, '' );
+		if ( $series_id ) {
+			$series_category = get_option( 'ss_podcasting_data_category' . $level . '_' . $series_id, 'no-category' );
+			if ( 'no-category' != $series_category ) {
+				$category = $series_category;
+			}
+		}
+		if ( ! $category ) {
+			$category = '';
+			$subcategory = '';
+		} else {
+			$subcategory = get_option( 'ss_podcasting_data_subcategory' . $level, '' );
+			if ( $series_id ) {
+				$series_subcategory = get_option( 'ss_podcasting_data_subcategory' . $level . '_' . $series_id, 'no-subcategory' );
+				if ( 'no-subcategory' != $series_subcategory ) {
+					$subcategory = $series_subcategory;
+				}
+			}
+		}
+
+		return apply_filters( 'ssp_feed_category_output', array( 'category' => $category, 'subcategory' => $subcategory ), $level, $series_id );
+	}
+
 }
 
 if ( ! function_exists( 'ssp_readfile_chunked' ) ) {
