@@ -263,4 +263,88 @@ trait attachments
 		$copy_attachment_action->execute();
 		$options->attachment_id = $copy_attachment_action->attachment_id;
 	}
+
+	/**
+		@brief		Modify the attachment IDs and URLs in this content.
+		@since		2016-03-29 09:09:18
+	**/
+	public function update_attachment_ids( $bcd, $content )
+	{
+		foreach( $bcd->copied_attachments() as $a )
+		{
+			$this->debug( 'Trying to replace attachment %s with %s', $a->old->guid, $a->new->guid );
+			$count = 0;
+
+			// We are going to be pregging things in order to ensure that as an exact, local match as possible is replaced with new values
+			// This minimizes the risk of similar texts being replaced in the straight content.
+
+			// Modify anchors
+			preg_match_all( '/<a [^>]+>/', $content, $matches );
+			foreach( $matches[ 0 ] as $index => $old_match )
+			{
+				// Replace the GUID with the new one.
+				$new_match = str_replace( $a->old->guid, $a->new->guid, $old_match, $count );
+				if ( $count > 0 )
+				{
+					$this->debug( 'Modified attachment guid from %s to %s: %s times', $a->old->guid, $a->new->guid, $count );
+					$content = str_replace( $old_match, $new_match, $content );
+					$old_match = $new_match;
+				}
+
+				// Modify the wp-att-XXX value.
+				$new_match = str_replace( 'wp-att-' . $a->old->ID, 'wp-att-' . $a->new->ID, $old_match, $count );
+				if ( $count > 0 )
+				{
+					$this->debug( 'Modified wp-att ID from %s to %s: %s times', $a->old->ID, $a->new->ID, $count );
+					$content = str_replace( $old_match, $new_match, $content );
+					$old_match = $new_match;
+				}
+			}
+
+			// Modify the image tags.
+			preg_match_all( '/<img [^>]+>/', $content, $matches );
+			foreach( $matches[ 0 ] as $index => $old_match )
+			{
+				// And replace the IDs present in any image captions.
+				$new_match = str_replace( 'id="attachment_' . $a->old->ID . '"', 'id="attachment_' . $a->new->ID . '"', $old_match, $count );
+				if ( $count > 0 )
+				{
+					$this->debug( 'Modified attachment link from %s to %s: %s times', $a->old->ID, $a->new->ID, $count );
+					$content = str_replace( $old_match, $new_match, $content );
+					$old_match = $new_match;
+				}
+
+				// Modify the URLs of the images in their various sizes.
+				$old_attachment = $bcd->attachment_data[ $a->old->ID ];
+				$new_attachment = $bcd->copied_attachments()->get( $a->old->ID );
+				$new_attachment = wp_get_attachment_metadata( $new_attachment );
+				if ( isset( $new_attachment[ 'sizes' ] ) )
+				{
+					$old_guid = dirname( $a->old->guid );
+					$new_guid = dirname( $a->new->guid );
+					foreach( $new_attachment[ 'sizes' ] as $size_id => $size_data )
+					{
+						$filename = '/' . $size_data[ 'file' ];
+						$new_match = str_replace( $old_guid . $filename, $new_guid . $filename, $old_match, $count );
+						if ( $count > 0 )
+						{
+							$this->debug( 'Modified URL from %s to %s: %s times', $old_guid . $filename, $new_guid . $filename, $count );
+							$content = str_replace( $old_match, $new_match, $content );
+							$old_match = $new_match;
+						}
+					}
+				}
+
+				// Modify the wp-image-XXX value.
+				$new_match = str_replace( 'wp-image-' . $a->old->ID, 'wp-image-' . $a->new->ID, $old_match, $count );
+				if ( $count > 0 )
+				{
+					$this->debug( 'Modified wp-image ID from %s to %s: %s times', $a->old->ID, $a->new->ID, $count );
+					$content = str_replace( $old_match, $new_match, $content );
+					$old_match = $new_match;
+				}
+			}
+		}
+		return $content;
+	}
 }

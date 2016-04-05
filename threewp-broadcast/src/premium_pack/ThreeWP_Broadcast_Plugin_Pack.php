@@ -38,7 +38,7 @@ class ThreeWP_Broadcast_Plugin_Pack
 	{
 		$r = '';
 
-		$r .= $this->p_( 'This table shows all Broadcast plugins that are available via the activated Broadcast plugin packs.' );
+		$r .= $this->p_( 'This table shows all Broadcast add-ons that are available via the activated Broadcast add-on packs.' );
 
 		$r .= $this->get_plugins_table();
 
@@ -59,7 +59,7 @@ class ThreeWP_Broadcast_Plugin_Pack
 
 		$tabs->tab( 'plugins' )
 			->callback_this( 'admin_menu_plugins' )
-			->name_( 'Available plugins' )
+			->name_( 'Available add-ons' )
 			->sort_order( 25 );
 
 		$action = new actions\plugin_pack_tabs();
@@ -85,10 +85,10 @@ class ThreeWP_Broadcast_Plugin_Pack
 		$form->prefix( get_class( $this ) );
 
 		$form->markup( 'uninstall_info_1' )
-			->p_( 'This button will remove the database settings for the plugin packs themselves: list of activated plugins, license keys.' );
+			->p_( 'This button will remove the database settings for the add-on packs themselves: list of activated plugins, license keys.' );
 
 		$form->markup( 'uninstall_info_2' )
-			->p_( 'To uninstall the settings for each pack plugin, use the plugin list bulk action.' );
+			->p_( 'To uninstall the settings for each pack add-on, use the add-on list bulk action.' );
 
 		$uninstall = $form->primary_button( 'uninstall' )
 			->value_( 'Uninstall the pack settings' );
@@ -147,9 +147,9 @@ class ThreeWP_Broadcast_Plugin_Pack
 			->submenu( 'bc_pp' )
 			->callback_this( 'admin_menu_tabs' )
 			// Menu item for menu
-			->menu_title( $this->_( 'Plugin packs' ) )
+			->menu_title( $this->_( 'Add-ons' ) )
 			// Page title for menu
-			->page_title( $this->_( 'Plugin packs' ) )
+			->page_title( $this->_( 'Add-ons' ) )
 			->sort_order( 25 );
 	}
 
@@ -183,7 +183,7 @@ class ThreeWP_Broadcast_Plugin_Pack
 
 	public function edd_get_url()
 	{
-		return 'https://plainviewplugins.com/';
+		return 'https://broadcast.plainviewplugins.com/';
 	}
 
 	/**

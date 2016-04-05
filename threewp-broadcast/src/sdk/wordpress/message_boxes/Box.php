@@ -54,6 +54,6 @@ class Box
 	public function get_css_class()
 	{
 		// Updated is the default.
-		return 'updated';
+		return 'updated notice is-dismissible';
 	}
 }

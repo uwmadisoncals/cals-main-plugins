@@ -512,27 +512,12 @@ trait broadcasting
 			$unmodified_post = (object)$bcd->new_post;
 			$modified_post = clone( $unmodified_post );
 
-			// If there were any image attachments copied...
-			if ( count( $bcd->copied_attachments() ) > 0 )
-			{
-				$this->debug( '%s attachments were copied.', count( $bcd->copied_attachments() ) );
-				// Update the URLs in the post to point to the new images.
-				$new_upload_dir = wp_upload_dir();
-				foreach( $bcd->copied_attachments() as $a )
-				{
-					$count = 0;
-					// Replace the GUID with the new one.
-					$modified_post->post_content = str_replace( $a->old->guid, $a->new->guid, $modified_post->post_content, $count );
-					if ( $count > 0 )
-						$this->debug( 'Modified attachment guid from %s to %s: %s times', $a->old->guid, $a->new->guid, $count );
-					// And replace the IDs present in any image captions.
-					$modified_post->post_content = str_replace( 'id="attachment_' . $a->old->id . '"', 'id="attachment_' . $a->new->id . '"', $modified_post->post_content, $count );
-					if ( $count > 0 )
-						$this->debug( 'Modified attachment link from %s to %s: %s times', $a->old->id, $a->new->id, $count );
-				}
-			}
-			else
-				$this->debug( 'No attachments were copied.' );
+			// Tell everyone it's time to parse this content.
+			$parse_content_action = new actions\parse_content();
+			$parse_content_action->broadcasting_data = $bcd;
+			$parse_content_action->content = $modified_post->post_content;
+			$parse_content_action->execute();
+			$modified_post->post_content = $parse_content_action->content;
 
 			// If there are galleries...
 			$this->debug( '%s galleries are to be handled.', count( $bcd->galleries ) );
@@ -573,7 +558,7 @@ trait broadcasting
 			// Maybe updating the post is not necessary.
 			if ( $post_modified )
 			{
-				$this->debug( 'Modifying new post.' );
+				$this->debug( 'Modifying new post: %s', $modified_post );
 				wp_update_post( $modified_post );	// Or maybe it is.
 			}
 			else
@@ -829,6 +814,23 @@ trait broadcasting
 		if ( ! is_a( $broadcasting_data, '\\threewp_broadcast\\broadcasting_data' ) )
 			return $broadcasting_data;
 		return $this->broadcast_post( $broadcasting_data );
+	}
+
+	/**
+		@brief		Parse content.
+		@since		2016-03-30 17:49:10
+	**/
+	public function threewp_broadcast_parse_content( $action )
+	{
+		// If there were any image attachments copied...
+		if ( count( $action->broadcasting_data->copied_attachments() ) > 0 )
+		{
+			$this->debug( '%s attachments were copied.', count( $action->broadcasting_data->copied_attachments() ) );
+			// Update the URLs in the post to point to the new images.
+			$action->content = $this->update_attachment_ids( $action->broadcasting_data, $action->content );
+		}
+		else
+			$this->debug( 'No attachments were copied.' );
 	}
 
 	/**

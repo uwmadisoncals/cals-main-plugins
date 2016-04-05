@@ -3,7 +3,7 @@ Tags: page builder, responsive, widget, widgets, builder, page, admin, gallery, 
 Requires at least: 4.0
 Tested up to: 4.5
 Stable tag: 2.3.2
-Build time: 2016-04-01T15:29:25+02:00
+Build time: 2016-04-04T10:35:35+02:00
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Donate link: http://siteorigin.com/page-builder/#donate
@@ -95,6 +95,14 @@ Page Builder is actively developed and updated, so generally I'd recommend that 
 We've tried to ensure that Page Builder is compatible with most plugin widgets. It's best to just download Page Builder and test for yourself.
 
 == Changelog ==
+
+= 2.4.2 - April 4 2016 =
+* Improved error handling and reporting.
+* Don't add widget class for TwentySixteen theme.
+
+= 2.4.1 - April 2 2016 =
+* Fixed: Copying content from standard editor to Page Builder
+* Fixed: Plugin conflict with Jetpack Widget Visibility and other plugins.
 
 = 2.4 - April 1 2016 =
 * Created new Live Editor.

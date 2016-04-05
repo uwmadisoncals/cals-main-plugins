@@ -2,7 +2,8 @@
 
 namespace plainview\sdk_broadcast\mail;
 
-require_once( __DIR__ . '/../thirdparty/phpmailer/class.phpmailer.php' );
+if ( ! class_exists( '\\PHPMailer' ) )
+    require_once( __DIR__ . '/../thirdparty/phpmailer/class.phpmailer.php' );
 
 /**
 	@brief		Wrapper for PHPMailer.

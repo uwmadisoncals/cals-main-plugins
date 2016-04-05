@@ -1643,7 +1643,6 @@ class base
 		$text =  call_user_func_array( 'sprintf', $args );
 		if ( $text == '' )
 			$text = $message;
-		$this->error( $text );
 		wp_die( $text );
 	}
 

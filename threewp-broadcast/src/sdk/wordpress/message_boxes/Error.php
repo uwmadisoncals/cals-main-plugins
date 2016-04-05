@@ -15,6 +15,6 @@ class Error
 	**/
 	public function get_css_class()
 	{
-		return 'error';
+		return 'error notice is-dismissable';
 	}
 }

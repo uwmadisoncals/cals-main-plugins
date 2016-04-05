@@ -17,6 +17,7 @@ class data
 		$this->checks->add_check( new checks\broadcast_data\check );
 		$this->checks->add_check( new checks\view_broadcast_data\check );
 		$this->checks->add_check( new checks\view_blog_access\check );
+		$this->checks->add_check( new checks\view_post_info\check );
 	}
 
 	/**

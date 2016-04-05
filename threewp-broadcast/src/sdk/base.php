@@ -11,6 +11,10 @@ namespace plainview\sdk_broadcast;
 
 	@par			Changelog
 
+	- 20160330		Wordpress: Updater has built in Redhat SSL Workaround.
+	- 20160210		Wordpress: Message boxes should be dismissable.
+	- 20160207		Wordpress: wp_die should not double output messages.
+	- 20160204		Wordpress: edd_admin_license_tab_text
 	- 20160112		form: select inputs can now be sorted.
 	- 20160102		Deleted Wordpress options_object class.
 	- 20160102		Added object_stores trait to replace Wordpress Options_Object.
@@ -193,7 +197,7 @@ class base
 		@since		20130416
 		@var		$sdk_version
 	**/
-	protected $sdk_version = 20160112;
+	protected $sdk_version = 20160210;
 
 	/**
 		@brief		Constructor.

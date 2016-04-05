@@ -45,6 +45,8 @@ trait edd
 		$r = '';
 		$status = $this->edd_get_cached_license_status();
 
+		$r .= $this->edd_admin_license_tab_text();
+
 		switch( $status->license )
 		{
 			case 'deactivated':
@@ -178,6 +180,14 @@ trait edd
 	}
 
 	/**
+		@brief		Allow subclasses to display a text to the user before the license information.
+		@since		2016-02-04 23:18:46
+	**/
+	public function edd_admin_license_tab_text()
+	{
+	}
+
+	/**
 		@brief		Activate this license.
 		@throws		Exception if the license was not able to be activated.
 		@since		2014-09-15 21:14:52
@@ -230,11 +240,51 @@ trait edd
 	}
 
 	/**
+		@brief		Return an array of url pieces that we might be interested in.
+		@since		2016-03-30 17:12:33
+	**/
+	public function edd_get_ssl_workaround_urls()
+	{
+		return [
+			'plainviewplugins.com',
+		];
+	}
+
+	/**
+		@brief		Disable curl but only for those addresses that we're interested in.
+		@since		2016-03-30 17:11:31
+	**/
+	public function edd_http_api_transports( $transports, $args, $url )
+	{
+		$urls = $this->edd_get_ssl_workaround_urls();
+		$match = false;
+		foreach( $urls as $u )
+			if ( strpos( $url, $u ) !== false )
+			{
+				$match = true;
+				break;
+			}
+		if ( ! $match )
+			return $transports;
+
+		// Find curl and remove it.
+		foreach( $transports as $index => $transport )
+			if ( $transport == 'curl' )
+				unset( $transports[ $index ] );
+
+		return $transports;
+	}
+
+	/**
 		@brief		Initialize the EDD updater.
 		@since		2014-09-15 20:53:54
 	**/
 	public function edd_init()
 	{
+		// Redhat / CentOS uses a broken version of OpenSSL. Work around it.
+		if ( file_exists( '/etc/redhat-release' ) AND count( $this->edd_get_ssl_workaround_urls() > 0 ) )
+			$this->add_filter( 'http_api_transports', 'edd_http_api_transports', 10, 3 );
+
 		$status = $this->edd_get_cached_license_status();
 
 		if ( $status->license == 'valid' )
