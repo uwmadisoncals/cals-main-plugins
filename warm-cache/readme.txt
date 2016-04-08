@@ -2,8 +2,8 @@
 Contributors: ramon fincken
 Tags: cache, warm, keep, xml, sitemap, load, speed, quick, tag, w3tc, optimize, page cache, preload, google, pagespeed, webmaster, generator, warmup, cold, expire, expired, google, seo, caching, refresh, varnish, nginx, fresh, preload, preloader
 Requires at least: 3.0
-Tested up to: 4.3.1
-Stable tag: 1.9.2
+Tested up to: 4.4.2
+Stable tag: 1.9.4
 
 Crawls your website-pages based on your google XML sitemap. If you have a caching plugin or Varnish/nginx caching this will keep your cache warm. Speeds up your site.
 
@@ -46,6 +46,12 @@ Note that the script is crawling your XML file (check your webhosts access log),
 I always check my tweets, so mention my name with @ramonfincken and your problem.
 
 == Changelog ==
+= 1.9.4 =
+Added: Debug notices when a sitemap is incorrect
+
+= 1.9.3 =
+Needs re-work: Bugfix: Transients without expiration (if you have no external non-persistant storage your options table will grow), Props M. Bastian
+
 = 1.9.2 =
 Added: Toggle flush settings
 

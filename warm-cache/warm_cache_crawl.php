@@ -10,6 +10,7 @@ if(defined('WARM_CACHE_CALLED'))
 	header("Cache-Control: post-check=0, pre-check=0", false);
 	header("Pragma: no-cache");
 
+	$limit = 200;
 	$warm_cache = new warm_cache();
 	$warm_cache->google_sitemap_generator_options = get_option("sm_options");
 

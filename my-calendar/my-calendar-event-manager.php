@@ -403,13 +403,13 @@ function manage_my_calendar() {
 	}	
 	?>
 	<div class='wrap jd-my-calendar'>
-		<h2 id='mc-manage'><?php _e( 'Manage Events', 'my-calendar' ); ?></h2>
+		<h1 id='mc-manage'><?php _e( 'Manage Events', 'my-calendar' ); ?></h1>
 
 		<div class="postbox-container jcd-wide">
 			<div class="metabox-holder">
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox">
-						<h3><?php _e( 'My Events', 'my-calendar' ); ?></h3>
+						<h2><?php _e( 'My Events', 'my-calendar' ); ?></h2>
 
 						<div class="inside">
 							<?php mc_list_events(); ?>
@@ -507,7 +507,7 @@ function edit_my_calendar() {
 	}
 	if ( $action == 'edit' ) {
 		?>
-		<h2><?php _e( 'Edit Event', 'my-calendar' ); ?></h2>
+		<h1><?php _e( 'Edit Event', 'my-calendar' ); ?></h1>
 		<?php
 		if ( empty( $event_id ) ) {
 			echo "<div class='error'><p>" . __( "You must provide an event id in order to edit it", 'my-calendar' ) . "</p></div>";
@@ -516,7 +516,7 @@ function edit_my_calendar() {
 		}
 	} else if ( $action == 'copy' ) {
 		?>
-		<h2><?php _e( 'Copy Event', 'my-calendar' ); ?></h2>
+		<h1><?php _e( 'Copy Event', 'my-calendar' ); ?></h1>
 		<?php
 		if ( empty( $event_id ) ) {
 			echo "<div class=\"error\"><p>" . __( "You must provide an event id in order to edit it", 'my-calendar' ) . "</p></div>";
@@ -525,7 +525,7 @@ function edit_my_calendar() {
 		}
 	} else {
 		?>
-		<h2><?php _e( 'Add Event', 'my-calendar' ); ?></h2><?php
+		<h1><?php _e( 'Add Event', 'my-calendar' ); ?></h1><?php
 		mc_edit_event_form();
 	}
 	mc_show_sidebar(); ?>
@@ -889,7 +889,7 @@ function mc_show_block( $field, $has_data, $data, $echo = true ) {
 				$return = '
 				<div class="mc-image-upload field-holder">
 					<input type="hidden" name="event_image_id" value="" class="textfield" id="e_image_id" />
-					<label for="e_image">' . __( "Add an image:", 'my-calendar' ) . '</label><br /><input type="text" name="event_image" id="e_image" size="60" value="' . esc_attr( $value ) . '" placeholder="http://yourdomain.com/image.jpg" /> <a href="#" class="button textfield-field">' . __( "Upload", 'my-calendar' ) . '</a>';
+					<label for="e_image">' . __( "Add an image:", 'my-calendar' ) . '</label><br /><input type="text" name="event_image" id="e_image" size="60" value="' . esc_attr( $value ) . '" placeholder="http://yourdomain.com/image.jpg" /> <button class="button textfield-field">' . __( "Upload", 'my-calendar' ) . '</button>';
 				if ( ! empty( $data->event_image ) ) {
 					$return .= '<div class="event_image"><img src="' . esc_attr( $data->event_image ) . '" alt="" /></div>';
 				} else {
@@ -950,7 +950,7 @@ function mc_show_block( $field, $has_data, $data, $echo = true ) {
 			}			
 			if ( $show_block && empty( $_GET['date'] ) ) {
 				$return = $pre . '
-<h3>' . __( 'Recurring', 'my-calendar' ) . '</h3>
+<h2>' . __( 'Recurring', 'my-calendar' ) . '</h2>
 	<div class="inside">' . $prev . '
 		<fieldset>
 		<legend class="screen-reader-text">' . __( 'Recurring Events', 'my-calendar' ) . '</legend>
@@ -985,7 +985,7 @@ function mc_show_block( $field, $has_data, $data, $echo = true ) {
 			if ( $show_block ) {
 				$label  = __( 'Event Access', 'my-calendar' );
 				$return = $pre . '
-						<h3>' . $label . '</h3>
+						<h2>' . $label . '</h2>
 							<div class="inside">		
 								' . mc_event_accessibility( '', $data, $label ) .
 				          apply_filters( 'mc_event_access_fields', '', $has_data, $data ) . '						
@@ -995,7 +995,7 @@ function mc_show_block( $field, $has_data, $data, $echo = true ) {
 		case 'event_open' :
 			if ( $show_block ) {
 				$return = $pre . '
-				<h3>' . __( 'Event Registration Settings', 'my-calendar' ) . '</h3>
+				<h2>' . __( 'Event Registration Settings', 'my-calendar' ) . '</h2>
 				<div class="inside">
 					<fieldset>
 					<legend class="screen-reader-text">' . __( 'Event Registration', 'my-calendar' ) . '</legend>
@@ -1161,7 +1161,7 @@ function mc_form_fields( $data, $mode, $event_id ) {
 			$text_link = '';
 		}
 		?>
-		<h3><?php echo $text; ?></h3>
+		<h2><?php echo $text; ?></h2>
 		<div class="inside">
 		<p class='mc-controls'>
 			<a href="<?php echo admin_url( 'admin.php?page=my-calendar-manage' ); ?>"><?php echo ( current_user_can( 'mc_manage_events' ) ) ? __( 'Manage events', 'my-calendar' ) : __( 'Manage your events', 'my-calendar' ); ?></a>
@@ -1262,7 +1262,7 @@ function mc_form_fields( $data, $mode, $event_id ) {
 
 <div class="ui-sortable meta-box-sortables">
 	<div class="postbox">
-		<h3><?php _e( 'Date and Time', 'my-calendar' ); ?></h3>
+		<h2><?php _e( 'Date and Time', 'my-calendar' ); ?></h2>
 
 		<div class="inside">
 			<?php if ( is_object( $data ) ) { // information for rewriting recurring data ?>
@@ -1345,7 +1345,7 @@ if ( mc_show_edit_block( 'event_location' ) || mc_show_edit_block( 'event_locati
 
 <div class="ui-sortable meta-box-sortables">
 	<div class="postbox">
-		<h3><?php _e( 'Event Location', 'my-calendar' ); ?></h3>
+		<h2><?php _e( 'Event Location', 'my-calendar' ); ?></h2>
 
 		<div class="inside location_form">
 			<fieldset>
@@ -1396,7 +1396,7 @@ if ( mc_show_edit_block( 'event_specials' ) ) {
 	?>
 	<div class="ui-sortable meta-box-sortables">
 	<div class="postbox">
-		<h3><?php _e( 'Special scheduling options', 'my-calendar' ); ?></h3>
+		<h2><?php _e( 'Special scheduling options', 'my-calendar' ); ?></h2>
 
 		<div class="inside">
 			<fieldset>
@@ -1488,7 +1488,7 @@ function mc_event_accessibility( $form, $data, $label ) {
 	if ( isset( $events_access['notes'] ) ) {
 		$note_value = esc_attr( $events_access['notes'] );
 	}
-	$form .= '<li><label for="events_access_notes">' . __( 'Notes', 'my-calendar' ) . '</label> <input type="text" name="events_access[notes]" value="' . esc_attr( $note_value ) . '" /></li>';
+	$form .= '<li><label for="events_access_notes">' . __( 'Notes', 'my-calendar' ) . '</label> <input type="text" id="events_access_notes" name="events_access[notes]" value="' . esc_attr( $note_value ) . '" /></li>';
 	$form .= "</ul>
 	</fieldset>";
 
@@ -1715,7 +1715,7 @@ function mc_list_events() {
 				<thead>
 				<tr>
 					<th scope="col" style="width: 50px;"><input type='checkbox' class='selectall' id='mass_edit'/>
-						<label for='mass_edit'><b><?php __( 'Check/Uncheck all', 'my-calendar' ); ?></b></label> <a
+						<label for='mass_edit' class="screen-reader-text"><?php _e( 'Check/Uncheck all', 'my-calendar' ); ?></label> <a
 							href="<?php echo admin_url( "admin.php?page=my-calendar-manage&amp;sort=1$sorting" ); ?>"><?php _e( 'ID', 'my-calendar' ) ?></a>
 					</th>
 					<th scope="col"><a
@@ -2096,7 +2096,7 @@ function mc_check_data( $action, $post, $i ) {
 		// Perform validation on the submitted dates - checks for valid years and months
 		if ( mc_checkdate( $begin ) && mc_checkdate( $end ) ) {
 			// Make sure dates are equal or end date is later than start date
-			if ( strtotime( $end ) < strtotime( $begin ) ) {
+			if ( strtotime( "$end $endtime" ) < strtotime( "$begin $time" ) ) {
 				$errors .= "<div class='error'><p><strong>" . __( 'Error', 'my-calendar' ) . ":</strong> " . __( 'Your event end date must be either after or the same as your event begin date', 'my-calendar' ) . "</p></div>";
 			}
 		} else {

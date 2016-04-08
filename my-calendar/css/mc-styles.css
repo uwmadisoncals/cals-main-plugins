@@ -59,10 +59,6 @@
     border: 1px solid #000
 }
 
-.jd-my-calendar .postbox h3 {
-    cursor: text
-}
-
 .active-link {
     font-weight: 700;
     text-decoration: underline
@@ -72,6 +68,13 @@ ul.links li {
     float: left;
     margin: 0 5px 10px;
     font-size: .9em
+}
+
+.jd-my-calendar .metabox-holder .postbox > h2 {
+	font-size: 14px;
+	padding: 8px 12px;
+	margin: 0;
+	line-height: 1.4;
 }
 
 #toggle {

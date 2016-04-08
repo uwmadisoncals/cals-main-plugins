@@ -393,7 +393,7 @@ function edit_my_calendar_config() {
 
 	<div class="wrap jd-my-calendar mc-settings-page" id="mc_settings">
 	<?php my_calendar_check_db(); ?>
-	<h2><?php _e( 'My Calendar Settings', 'my-calendar' ); ?></h2>
+	<h1><?php _e( 'My Calendar Settings', 'my-calendar' ); ?></h1>
 
 	<div class="mc-tabs settings postbox-container jcd-wide">
 	<div class="metabox-holder">
@@ -443,7 +443,7 @@ function edit_my_calendar_config() {
 
 	<div class="ui-sortable meta-box-sortables">
 		<div class="wptab postbox" aria-labelledby="tab_manage" role="tabpanel" aria-live="assertive" id="my-calendar-manage">
-			<h3><?php _e( 'My Calendar Management', 'my-calendar' ); ?></h3>
+			<h2><?php _e( 'My Calendar Management', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
 				<?php if ( current_user_can( 'administrator' ) ) { ?>
@@ -510,7 +510,7 @@ function edit_my_calendar_config() {
 		</div>
 
 		<div class="wptab postbox" aria-labelledby="tab_text" role="tabpanel" aria-live="assertive" id="my-calendar-text">
-			<h3><?php _e( 'Text Settings', 'my-calendar' ); ?></h3>
+			<h2><?php _e( 'Text Settings', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
 				<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#my-calendar-text" ); ?>">
@@ -563,7 +563,7 @@ function edit_my_calendar_config() {
 		</div>
 
 		<div class="wptab postbox" aria-labelledby="tab_output" role="tabpanel" aria-live="assertive" id="mc-output">
-			<h3><?php _e( 'Output Settings', 'my-calendar' ); ?></h3>
+			<h2><?php _e( 'Output Settings', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
 				<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#mc-output" ); ?>">
@@ -574,7 +574,7 @@ function edit_my_calendar_config() {
 						<legend><?php _e( 'Calendar Link Targets', 'my-calendar' ); ?></legend>
 						<ul>
 							<?php $guess = mc_guess_calendar(); ?>
-							<li><?php mc_settings_field( 'mc_uri', __( 'Where is your main calendar page?', 'my-calendar' ), '', "$guess[message]", array( 'size' => '60' ), 'url' ); ?></li>						
+							<li><?php mc_settings_field( 'mc_uri', __( 'Where is your main calendar page?', 'my-calendar' ), '', "$guess[message]", array( 'size' => '60' ), 'url' ); ?></li>
 							<li><?php mc_settings_field( 'mc_use_permalinks', __( 'Use Pretty Permalinks for Events','my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_open_uri', __( 'Open calendar links to event details URL', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_mini_uri', __( 'Target <abbr title="Uniform resource locator">URL</abbr> for mini calendar date links:', 'my-calendar' ), '', '', array( 'size' => '60' ), 'url' ); ?></li>							
@@ -714,7 +714,7 @@ function edit_my_calendar_config() {
 		</div>
 		
 		<div class="wptab postbox" aria-labelledby="tab_input" role="tabpanel" aria-live="assertive"  id="my-calendar-input">
-			<h3><?php _e( 'Calendar Input Fields', 'my-calendar' ); ?></h3>
+			<h2><?php _e( 'Calendar Input Fields', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
 				<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#my-calendar-input" ); ?>">
@@ -789,7 +789,7 @@ function edit_my_calendar_config() {
 
 	<?php if ( current_user_can( 'manage_network' ) && is_multisite() ) { ?>
 			<div class="wptab postbox" aria-labelledby="tab_multi" role="tabpanel" aria-live="assertive"  id="my-calendar-multisite">
-				<h3><?php _e( 'Multisite Settings (Network Administrators only)', 'my-calendar' ); ?></h3>
+				<h2><?php _e( 'Multisite Settings (Network Administrators only)', 'my-calendar' ); ?></h2>
 
 				<div class="inside">
 					<p><?php _e( 'The central calendar is the calendar associated with the primary site in your WordPress Multisite network.', 'my-calendar' ); ?></p>
@@ -837,7 +837,7 @@ function edit_my_calendar_config() {
 	<?php } ?>
 
 		<div class="wptab postbox" aria-labelledby="tab_permissions" role="tabpanel" aria-live="assertive"  id="my-calendar-permissions">
-			<h3><?php _e( 'My Calendar Permissions', 'my-calendar' ); ?></h3>
+			<h2><?php _e( 'My Calendar Permissions', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
 				<?php if ( current_user_can( 'administrator' ) ) { ?>
@@ -865,7 +865,7 @@ function edit_my_calendar_config() {
 							if ( $role == 'administrator' ) {
 								continue;
 							}
-							$role_container .= "<div class='mc_$role mc_permissions' id='mc_$role'><fieldset id='mc_$role' class='roles'><legend>$rolename</legend>";
+							$role_container .= "<div class='mc_$role mc_permissions' id='container_mc_$role'><fieldset id='mc_$role' class='roles'><legend>$rolename</legend>";
 							$role_container .= "<input type='hidden' value='none' name='mc_caps[" . $role . "][none]' />
 			<ul class='mc-settings checkboxes'>";
 							foreach ( $caps as $cap => $name ) {
@@ -888,7 +888,7 @@ function edit_my_calendar_config() {
 		</div>
 
 		<div class="wptab postbox" aria-labelledby="tab_email" role="tabpanel" aria-live="assertive"  id="my-calendar-email">
-			<h3><?php _e( 'Calendar Email Settings', 'my-calendar' ); ?></h3>
+			<h2><?php _e( 'Calendar Email Settings', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
 				<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#my-calendar-email" ); ?>">

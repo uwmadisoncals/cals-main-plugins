@@ -448,6 +448,7 @@ function mc_generate_map( $event, $source = 'event' ) {
 		$category_icon = "//maps.google.com/mapfiles/marker_green.png";
 	}
 	$address = addslashes( mc_map_string( $event, $source ) );
+	$latlng = ( $event->event_latitude != '0.000000' && $event->event_longitude != '0.000000' ) ? "latLng: [$event->event_latitude, $event->event_longitude]," : false;
 	if ( strlen( $address ) < 10 ) {
 		return '';
 	}
@@ -461,6 +462,7 @@ function mc_generate_map( $event, $source = 'event' ) {
 	$width  = apply_filters( 'mc_map_height', '100%', $event );
 	$height = apply_filters( 'mc_map_height', '300px', $event );
 	$styles = " style='width: $width;height: $height'";
+	$location = ( !$latlng ) ? "address: '$address'," : $latlng;
 	$value  = "
 <script type='text/javascript'>
 	(function ($) { 'use strict';
@@ -469,7 +471,7 @@ function mc_generate_map( $event, $source = 'event' ) {
 				{
 					marker:{ 
 						values:[{
-							address: '$address',
+							$location
 							options: { icon: new google.maps.MarkerImage( '$category_icon', new google.maps.Size(32,32,'px','px') ) }, 
 							data: \"$html\"
 							}], 

@@ -177,16 +177,16 @@ function mc_show_location_form( $view = 'add', $curID = '' ) {
 	$has_data = ( empty( $cur_loc ) ) ? false : true;
 	if ( $view == 'add' ) {
 		?>
-		<h2><?php _e( 'Add New Location', 'my-calendar' ); ?></h2>
+		<h1><?php _e( 'Add New Location', 'my-calendar' ); ?></h1>
 	<?php } else { ?>
-		<h2><?php _e( 'Edit Location', 'my-calendar' ); ?></h2>
+		<h1><?php _e( 'Edit Location', 'my-calendar' ); ?></h1>
 	<?php } ?>
 	<div class="postbox-container jcd-wide">
 		<div class="metabox-holder">
 
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'Location Editor', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'Location Editor', 'my-calendar' ); ?></h2>
 
 					<div class="inside location_form">
 						<form id="my-calendar" method="post"
@@ -227,7 +227,7 @@ function mc_show_location_form( $view = 'add', $curID = '' ) {
 			<?php } ?>
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'Manage Locations', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'Manage Locations', 'my-calendar' ); ?></h2>
 
 					<div class="inside">
 						<?php mc_manage_locations(); ?>

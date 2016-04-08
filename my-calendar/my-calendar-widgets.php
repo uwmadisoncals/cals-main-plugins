@@ -5,7 +5,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class my_calendar_simple_search extends WP_Widget {
 	function __construct() {
-		parent::__construct( false, $name = __( 'My Calendar: Simple Event Search', 'my-calendar' ) );
+		parent::__construct( 
+			false, 
+			$name = __( 'My Calendar: Simple Event Search', 'my-calendar' ),
+			array( 'customize_selective_refresh' => true )
+		);
 	}
 
 	function widget( $args, $instance ) {
@@ -51,7 +55,7 @@ class my_calendar_simple_search extends WP_Widget {
 class my_calendar_today_widget extends WP_Widget {
 
 	function __construct() {
-		parent::__construct( false, $name = __( 'My Calendar: Today\'s Events', 'my-calendar' ) );
+		parent::__construct( false, $name = __( 'My Calendar: Today\'s Events', 'my-calendar' ), array( 'customize_selective_refresh' => true ) );
 	}
 
 	function widget( $args, $instance ) {
@@ -171,7 +175,7 @@ class my_calendar_today_widget extends WP_Widget {
 class my_calendar_upcoming_widget extends WP_Widget {
 
 	function __construct() {
-		parent::__construct( false, $name = __( 'My Calendar: Upcoming Events', 'my-calendar' ) );
+		parent::__construct( false, $name = __( 'My Calendar: Upcoming Events', 'my-calendar' ), array( 'customize_selective_refresh' => true ) );
 	}
 
 	function widget( $args, $instance ) {
@@ -844,12 +848,11 @@ function my_calendar_todays_events( $category = 'default', $template = 'default'
 class my_calendar_mini_widget extends WP_Widget {
 
 	function __construct() {
-		parent::__construct( false, $name = __( 'My Calendar: Mini Calendar', 'my-calendar' ) );
+		parent::__construct( false, $name = __( 'My Calendar: Mini Calendar', 'my-calendar' ), array( 'customize_selective_refresh' => true ) );
 	}
 
 	function widget( $args, $instance ) {
 		extract( $args );
-		$name = $format = 'mini';
 		if ( ! empty( $instance ) ) {
 			$the_title   = apply_filters( 'widget_title', $instance['my_calendar_mini_title'], $instance, $args );
 			$category    = ( $instance['my_calendar_mini_category'] == '' ) ? 'all' : esc_attr( $instance['my_calendar_mini_category'] );
@@ -869,7 +872,7 @@ class my_calendar_mini_widget extends WP_Widget {
 		} else {
 			$title = '';
 		}
-		$the_events = my_calendar( $name, $format, $category, $time, '', '', str_replace( 'my_calendar', 'mc', $args['widget_id'] ), '', '', $author, $host, $above, $below, false, false, false, 'widget' );
+		$the_events = my_calendar( 'mini', 'mini', $category, $time, '', '', str_replace( 'my_calendar', 'mc', $args['widget_id'] ), '', '', $author, $host, $above, $below, false, false, false, 'widget' );
 		if ( $the_events != '' ) {
 			echo $before_widget . $title . $the_events . $after_widget;
 		}

@@ -7,14 +7,14 @@ function my_calendar_help() {
 	?>
 
 	<div class="wrap jd-my-calendar">
-	<h2><?php _e( 'How to use My Calendar', 'my-calendar' ); ?></h2>
+	<h1><?php _e( 'How to use My Calendar', 'my-calendar' ); ?></h1>
 
 	<div class="postbox-container jcd-wide">
 	<div class="metabox-holder">
 
 	<div class="ui-sortable meta-box-sortables" id="get-started">
 		<div class="postbox">
-			<h3 id="help"><?php _e( 'Getting Started', 'my-calendar' ); ?></h3>
+			<h2 id="help"><?php _e( 'Getting Started', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
 				<ul>
@@ -41,7 +41,7 @@ function my_calendar_help() {
 
 	<div class="ui-sortable meta-box-sortables" id="mc-generator">
 		<div class="postbox">
-			<h3 id="help"><?php _e( "My Calendar Shortcode Generator", 'my-calendar' ); ?></h3>
+			<h2 id="generator"><?php _e( "My Calendar Shortcode Generator", 'my-calendar' ); ?></h2>
 
 			<div class="inside mc-tabs">
 				<?php mc_generate(); ?>
@@ -68,7 +68,7 @@ function my_calendar_help() {
 
 	<div class="ui-sortable meta-box-sortables">
 	<div class="postbox" id="mc-shortcodes">
-		<h3><?php _e( 'Shortcode Syntax', 'my-calendar' ); ?></h3>
+		<h2><?php _e( 'Shortcode Syntax', 'my-calendar' ); ?></h2>
 
 		<div class="inside">
 
@@ -198,7 +198,7 @@ function my_calendar_help() {
 
 	<div class="ui-sortable meta-box-sortables" id="icons">
 		<div class="postbox">
-			<h3><?php _e( 'Category Icons', 'my-calendar' ); ?></h3>
+			<h2><?php _e( 'Category Icons', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
 				<p>
@@ -215,7 +215,7 @@ function my_calendar_help() {
 
 	<div class="ui-sortable meta-box-sortables" id="mc-styles">
 		<div class="postbox">
-			<h3><?php _e( 'Custom Styles', 'my-calendar' ); ?></h3>
+			<h2><?php _e( 'Custom Styles', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
 				<p>
@@ -235,7 +235,7 @@ function my_calendar_help() {
 
 	<div class="ui-sortable meta-box-sortables" id="templates">
 	<div class="postbox">
-	<h3 id="template"><?php _e( 'Template Tags', 'my-calendar' ); ?></h3>
+	<h2 id="template"><?php _e( 'Template Tags', 'my-calendar' ); ?></h2>
 
 	<div class="inside">
 	<p>
@@ -487,7 +487,7 @@ function my_calendar_help() {
 
 	<div class="ui-sortable meta-box-sortables" id="get-support">
 		<div class="postbox">
-			<h3 id="support"><?php _e( 'Get Plug-in Support', 'my-calendar' ); ?></h3>
+			<h2 id="support"><?php _e( 'Get Plug-in Support', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
 				<div class='mc-support-me'>
@@ -507,7 +507,7 @@ function my_calendar_help() {
 
 		<div class="ui-sortable meta-box-sortables" id="notes">
 			<div class="postbox">
-				<h3 id="help"><?php _e( 'Helpful Information', 'my-calendar' ); ?></h3>
+				<h2 id="info"><?php _e( 'Helpful Information', 'my-calendar' ); ?></h2>
 
 				<div class="inside">
 					<p>

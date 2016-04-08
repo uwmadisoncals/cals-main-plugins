@@ -168,12 +168,12 @@ function edit_my_calendar_styles() {
 	?>
 	<div class="wrap jd-my-calendar">
 	<?php my_calendar_check_db(); ?>
-	<h2><?php _e( 'My Calendar Styles', 'my-calendar' ); ?></h2>
+	<h1><?php _e( 'My Calendar Styles', 'my-calendar' ); ?></h1>
 	<div class="postbox-container jcd-wide">
 		<div class="metabox-holder">
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'Calendar Style Settings', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'Calendar Style Settings', 'my-calendar' ); ?></h2>
 
 					<div class="inside">
 
@@ -325,7 +325,7 @@ function mc_text_diff( $left_string, $right_string, $args = null ) {
 	if ( !$diff )
 		return '';
 	if ( $args['title'] ) {
-		$r .= "<h3>$args[title]</h3>\n";
+		$r .= "<h2>$args[title]</h2>\n";
 	}
 	
 	$r  .= "<table class='diff'>\n";

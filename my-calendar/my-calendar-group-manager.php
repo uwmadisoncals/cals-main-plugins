@@ -90,7 +90,7 @@ function edit_my_calendar_groups() {
 	my_calendar_check_db();
 	if ( $action == 'edit' ) {
 		?>
-		<h2><?php _e( 'Edit Event Group', 'my-calendar' ); ?></h2>
+		<h1><?php _e( 'Edit Event Group', 'my-calendar' ); ?></h1>
 		<?php
 		if ( empty( $event_id ) || empty( $group_id ) ) {
 			echo "<div class=\"error\"><p>" . __( "You must provide an event group id in order to edit it", 'my-calendar' ) . "</p></div>";
@@ -99,7 +99,7 @@ function edit_my_calendar_groups() {
 		}
 	} else {
 		?>
-		<h2><?php _e( 'Manage Event Groups', 'my-calendar' ); ?></h2>
+		<h1><?php _e( 'Manage Event Groups', 'my-calendar' ); ?></h1>
 		<p>
 			<?php _e( 'Grouped events can be edited simultaneously. When you choose a group of events to edit, the form will be pre-filled with the content applicable to the member of the event group you started from. (e.g., if you click on the "Edit Group" link for the 3rd of a set of events, the boxes will use the content applicable to that event.). You will also receive a set of checkboxes which will indicate which events in the group should have these changes applied. (All grouped events can also be edited individually.)', 'my-calendar' ); ?>
 		</p>
@@ -108,7 +108,7 @@ function edit_my_calendar_groups() {
 		<div class="metabox-holder">
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'Manage Event Groups', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'Manage Event Groups', 'my-calendar' ); ?></h2>
 
 					<div class="inside">
 						<p><?php _e( 'Select an event group to edit.', 'my-calendar' ); ?></p>
@@ -117,7 +117,7 @@ function edit_my_calendar_groups() {
 			</div>
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'Create/Modify Groups', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'Create/Modify Groups', 'my-calendar' ); ?></h2>
 					<?php mc_list_groups(); ?>
 				</div>
 			</div>
@@ -324,7 +324,7 @@ function my_calendar_print_group_fields( $data, $mode, $event_id, $group_id = ''
 	</div>
 	<div class="ui-sortable meta-box-sortables">
 		<div class="postbox">
-			<h3><?php _e( 'Manage Event Groups', 'my-calendar' ); ?></h3>
+			<h2><?php _e( 'Manage Event Groups', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
 				<fieldset>
@@ -490,7 +490,7 @@ function my_calendar_print_group_fields( $data, $mode, $event_id, $group_id = ''
 		?>
 		<div class="ui-sortable meta-box-sortables">
 			<div class="postbox">
-				<h3><?php _e( 'Event Registration Options', 'my-calendar' ); ?></h3>
+				<h2><?php _e( 'Event Registration Options', 'my-calendar' ); ?></h2>
 
 				<div class="inside">
 					<fieldset>
@@ -517,7 +517,7 @@ function my_calendar_print_group_fields( $data, $mode, $event_id, $group_id = ''
 
 	<div class="ui-sortable meta-box-sortables">
 		<div class="postbox">
-			<h3><?php _e( 'Event Location', 'my-calendar' ); ?></h3>
+			<h2><?php _e( 'Event Location', 'my-calendar' ); ?></h2>
 
 			<div class="inside location_form">
 				<fieldset>

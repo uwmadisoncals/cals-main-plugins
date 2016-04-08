@@ -99,3 +99,4 @@ button.mc-text-button:hover, button .mc-text-button:focus {
 }
 
 .mcjs .mc-main .details, .mcjs .mc-main .calendar-events { display: none; }
+.mcjs .mc-main .single-event .details, .mcjs .mc-main .list.day .details { display: block; }

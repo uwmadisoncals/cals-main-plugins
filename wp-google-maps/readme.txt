@@ -3,7 +3,7 @@ Contributors: WPGMaps, NickDuncan, CodeCabin_, Jarryd Long
 Donate link: http://www.wpgmaps.com
 Tags: google maps, maps, map, map markers, google, google map, google maps plugin, wp maps, wp google maps, wp google map, easy map, store locator, map plugin, directions, map directions, google map plugin, routes, polygons, polylines, streetview, location, marker, latitude, longitude, map widget, map themes
 Requires at least: 3.5
-Tested up to: 4.4.1
+Tested up to: 4.4.2
 Stable tag: trunk
 License: GPLv2
 
@@ -42,7 +42,6 @@ The [WP Google Maps Pro Version](http://www.wpgmaps.com/purchase-professional-ve
 * No advertising or links
 * Google Maps Autocomplete
 * Google Maps Transport Layer
-* Google Maps Weather Layer
 * Set the max zoom level for your map
 * Serve your map marker data via your database or an XML file
 * Compatible with caching plugins
@@ -95,9 +94,12 @@ Get a free copy of the WP Google Maps Pro version in exchange for translating ou
 * Portuguese (Jose Antonio Ribeiro)
 * Brazilian Portuguese (Roberto Costa)
 * Turkish (Suha Karalar)
+* Swedish (Martin Sleipner)
+* Bulgarian (Lyubomir Kolev)
+* Indonesian (Neno)
 * Lithuanian
 * Czechoslovakian^
-* Swedish^
+
 
 ^Language file needs to be updated
 
@@ -107,8 +109,6 @@ WP Google Maps Lite
 * [Basic Google Map with Markers](http://www.wpgmaps.com/demo/basic-google-map-with-markers/)
 * [Store Locator](http://www.wpgmaps.com/demo/wp-google-maps-store-locator-free-version/)
 * [Polygons & Polyines/Routes](http://www.wpgmaps.com/demo/polygons-and-polylines/)
-* [Google Maps Weather Layer](http://www.wpgmaps.com/demo/google-maps-weather-layer/)
-* [Google Maps Cloud Layer](http://www.wpgmaps.com/demo/google-maps-cloud-layer/)
 * [Google Maps Transit Layer](http://www.wpgmaps.com/demo/google-maps-transit-layer/)
 * [Google Maps Traffic Layer](http://www.wpgmaps.com/demo/google-maps-traffic-layer/)
 * [Google Maps Bicycle Layer](http://www.wpgmaps.com/demo/google-maps-bicycle-layer/)
@@ -205,6 +205,12 @@ We no longer support timthumb and we have opted to remove it from WP Google Maps
 Please upgrade your version of WP Google Maps to version 6.0.27 as it includes multiple security improvements.
 
 == Changelog ==
+
+= 6.3.06 - 2016-04-04 - Low priority =
+* Indonesian Translation added - Thank you Neno
+* Swedish Translation added - Thank you Martin Sleipner
+* Bulgarian Translation added - Thank you Lyubomir Kolev
+* Google Maps API sensor removed from API call 
 
 = 6.3.05 - 2016-01-14 - Low priority =
 * Multiple tab compatibility added

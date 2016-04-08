@@ -214,9 +214,9 @@ function mc_edit_category_form( $view = 'edit', $catID = '' ) {
 	}
 	if ( $view == 'add' ) {
 		?>
-		<h2><?php _e( 'Add Category', 'my-calendar' ); ?></h2>
+		<h1><?php _e( 'Add Category', 'my-calendar' ); ?></h1>
 	<?php } else { ?>
-		<h2><?php _e( 'Edit Category', 'my-calendar' ); ?></h2>
+		<h1><?php _e( 'Edit Category', 'my-calendar' ); ?></h1>
 	<?php } ?>
 
 	<div class="postbox-container jcd-wide">
@@ -224,7 +224,7 @@ function mc_edit_category_form( $view = 'edit', $catID = '' ) {
 
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'Category Editor', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'Category Editor', 'my-calendar' ); ?></h2>
 
 					<div class="inside">
 						<form id="my-calendar" method="post"
@@ -265,7 +265,7 @@ function mc_edit_category_form( $view = 'edit', $catID = '' ) {
 										echo stripslashes( esc_attr( $cur_cat->category_name ) );
 									} ?>"/>
 								<label for="cat_color"><?php _e( 'Color', 'my-calendar' ); ?></label> <input
-									type="text
+									type="text"
 									id="cat_color"
 									name="category_color"
 									class="mc-color-input"
@@ -329,7 +329,7 @@ function mc_edit_category_form( $view = 'edit', $catID = '' ) {
 			<?php } ?>
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'Category List', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'Category List', 'my-calendar' ); ?></h2>
 
 					<div class="inside">
 						<?php mc_manage_categories(); ?>
@@ -353,7 +353,7 @@ function mc_manage_categories() {
 	global $wpdb;
 	$mcdb = $wpdb;
 	?>
-	<h2><?php _e( 'Manage Categories', 'my-calendar' ); ?></h2><?php
+	<h1><?php _e( 'Manage Categories', 'my-calendar' ); ?></h1><?php
 	$co = ( ! isset( $_GET['co'] ) ) ? 1 : (int) $_GET['co'];
 	switch ( $co ) {
 		case 1:

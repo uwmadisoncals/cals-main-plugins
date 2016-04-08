@@ -3,7 +3,7 @@
 Plugin Name: Warm cache
 Plugin URI: http://www.mijnpress.nl
 Description: Crawls your website-pages based on any XML sitemap plugin. If you have a caching plugin this wil keep your cache warm. Speeds up your site.
-Version: 1.9.2
+Version: 1.9.4
 Author: Ramon Fincken
 Author URI: http://www.mijnpress.nl
 */
@@ -41,28 +41,36 @@ class warm_cache extends mijnpress_plugin_framework
 			// Check sitemap validity
 			$key = 'warm-cache-sitemapcheck';
 
-			if ( false === ( $sitemapSyntaxOK = get_transient( $key ) ) ) {			     
+			if (true || false === ( $sitemapSyntaxOK = get_transient( $key ) ) ) {			     
 				$sitemapSyntaxOK = true;
-				$xmldata = wp_remote_retrieve_body(wp_remote_get($sitemap_url));
-				if(substr_count($xmldata, '<?xml') == 0) {
+				$response = wp_remote_get($sitemap_url);
+				if(! is_array($response)) {
+					$errormsg = print_r($response, true);
 					$sitemapSyntaxOK = false;
 				} else {
-					if(substr_count($xmldata, '<urlset') == 0 && substr_count($xmldata, '<sitemap') == 0) {
+					$xmldata = wp_remote_retrieve_body($response);
+					if(substr_count($xmldata, '<?xml') == 0) {
 						$sitemapSyntaxOK = false;
-					}
-				}	
-				
+						$errormsg = 'No xml opening tag';
+					} else {
+						if(substr_count($xmldata, '<urlset') == 0 && substr_count($xmldata, '<sitemap') == 0) {
+							$sitemapSyntaxOK = false;
+							$errormsg = 'Urlset or sitemap tag';
+						}
+					}	
+				}
 				if($sitemapSyntaxOK) {
 					// If it's OK, we will re-check in 12 hours
 					set_transient( $key, $sitemapSyntaxOK, 12 * HOUR_IN_SECONDS );
 				} else {
-					// If it's NOT OK, we will re-check in 5 minutes (sooner could induce more server load)
-					set_transient( $key, $sitemapSyntaxOK, 5 * MINUTE_IN_SECONDS );
+					// If it's NOT OK, we will re-check in 2 minutes (sooner could induce more server load)
+					set_transient( $key, $sitemapSyntaxOK, 2 * MINUTE_IN_SECONDS );
 				}
 			}
 
 			if(!$sitemapSyntaxOK) {
-				echo '<div class="error"><p>A notice from plugin Warm-cache: Your configured sitemap url ( <a href="'.$sitemap_url.'">'.$sitemap_url.'</a> ) is configured, but does not appear to contain an xml opening tag, or a combination of urlset or sitemap, I cannot crawl your pages. Please check your sitemap plugin to fix your currupt sitemap.<br/>Note: this check will be cached for 5 minutes. So if you fix the problem, this notice might still be present for 5 minutes.</p></div>';
+				echo '<div class="error"><p>A notice from plugin Warm-cache: Your configured sitemap url ( <a href="'.$sitemap_url.'">'.$sitemap_url.'</a> ) is configured, but does not appear to contain an xml opening tag, or a combination of urlset or sitemap, I cannot crawl your pages. Please check your sitemap plugin to fix your currupt sitemap.<br/>Note: this check will be cached for 2 minutes. So if you fix the problem, this notice might still be present for 2 minutes.</p>
+<p>Error detail: '.$errormsg. '</p></div>';
 			}
 		}
 	}	

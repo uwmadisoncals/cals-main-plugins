@@ -7,7 +7,7 @@ Author: Joseph C Dolson
 Author URI: http://www.joedolson.com
 Text Domain: my-calendar
 Domain Path: lang
-Version: 2.4.16
+Version: 2.4.17
 */
 /*  Copyright 2009-2016  Joe Dolson (email : joe@joedolson.com)
 
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 } // Exit if accessed directly
 
 global $mc_version, $wpdb;
-$mc_version = '2.4.16';
+$mc_version = '2.4.17';
 
 // Define the tables used in My Calendar
 if ( is_multisite() && get_site_option( 'mc_multisite_show' ) == 1 ) {
@@ -176,7 +176,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 			<?php if ( ! function_exists( 'mcs_submit_exists' ) ) { ?>
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox sell support">
-						<h3 class='sales'><strong><?php _e( 'My Calendar Pro', 'my-calendar' ); ?></strong></h3>
+						<h2 class='sales'><strong><?php _e( 'My Calendar Pro', 'my-calendar' ); ?></strong></h2>
 
 						<div class="inside resources">
 							<p class="mcbuy"><?php _e( "Buy <a href='https://www.joedolson.com/my-calendar/pro/' rel='external'>My Calendar Pro</a> &mdash; a more powerful calendar for your site.", 'my-calendar' ); ?></p>
@@ -190,7 +190,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 			<?php if ( ! function_exists( 'mt_valid' ) ) { ?>
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox sell my-tickets">
-						<h3 class='sales'><strong><?php _e( 'My Tickets', 'my-calendar' ); ?></strong></h3>
+						<h2 class='sales'><strong><?php _e( 'My Tickets', 'my-calendar' ); ?></strong></h2>
 
 						<div class="inside resources">
 							<p class="mcbuy"><?php _e( "Do you sell tickets to your events? <a href='https://wordpress.org/plugins/my-tickets/' rel='external'>Use My Tickets</a> and sell directly from My Calendar.", 'my-calendar' ); ?></p>
@@ -204,7 +204,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 			<?php } ?>	
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox support">
-					<h3><strong><?php _e( 'Support This Plug-in', 'my-calendar' ); ?></strong></h3>
+					<h2><strong><?php _e( 'Support This Plug-in', 'my-calendar' ); ?></strong></h2>
 
 					<div class="inside resources">
 						<p>
@@ -230,14 +230,9 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 
 						<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 							<p class="mcd">
-								<input type="hidden" name="cmd" value="_s-xclick"/>
-								<input type="hidden" name="hosted_button_id" value="UZBQUG2LKKMRW"/>
-								<input type="image"
-								       src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif"
-								       name="submit" alt="<?php _e( 'Make a Donation', 'my-calendar' ); ?>"/>
-								<img alt=""
-								     src="https://www.paypalobjects.com/WEBSCR-640-20110429-1/en_US/i/scr/pixel.gif"
-								     width="1" height="1"/>
+								<input type="hidden" name="cmd" value="_s-xclick" />
+								<input type="hidden" name="hosted_button_id" value="UZBQUG2LKKMRW" />
+								<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="<?php _e( 'Make a Donation', 'my-calendar' ); ?>" />
 							</p>
 						</form>
 					</div>
@@ -246,7 +241,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 		<?php } ?>
 		<div class="ui-sortable meta-box-sortables">
 			<div class="postbox">
-				<h3><?php _e( 'Get Help', 'my-calendar' ); ?></h3>
+				<h2><?php _e( 'Get Help', 'my-calendar' ); ?></h2>
 
 				<div class="inside">
 					<ul>
@@ -284,7 +279,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 				?>
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox">
-						<h3><?php echo $key; ?></h3>
+						<h2><?php echo $key; ?></h2>
 
 						<div class='<?php echo sanitize_title( $key ); ?> inside'>
 							<?php echo $value; ?>
@@ -297,7 +292,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 		<?php if ( $show == 'templates' ) { ?>
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'Event Template Tags', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'Event Template Tags', 'my-calendar' ); ?></h2>
 
 					<div class='mc_template_tags inside'>
 						<dl>
@@ -347,7 +342,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 							<dd><?php _e( 'Current status of event: either "Published" or "Reserved."', 'my-calendar' ); ?></dd>
 						</dl>
 
-						<h4><?php _e( 'Location Template Tags', 'my-calendar' ); ?></h4>
+						<h3><?php _e( 'Location Template Tags', 'my-calendar' ); ?></h3>
 						<dl>
 							<dt><code>{location}</code></dt>
 							<dd><?php _e( 'Name of the location of the event.', 'my-calendar' ); ?></dd>
@@ -382,7 +377,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 							<dt><code>{link_map}</code></dt>
 							<dd><?php _e( 'Link to Google Map to the event, if address information is available.', 'my-calendar' ); ?></dd>
 						</dl>
-						<h4><?php _e( 'Category Template Tags', 'my-calendar' ); ?></h4>
+						<h3><?php _e( 'Category Template Tags', 'my-calendar' ); ?></h3>
 
 						<dl>
 							<dt><code>{category}</code></dt>

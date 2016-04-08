@@ -63,7 +63,7 @@ function edit_mc_templates() {
 	?>
 	<div class="wrap jd-my-calendar">
 	<?php my_calendar_check_db(); ?>
-	<h2><?php _e( 'My Calendar Information Templates', 'my-calendar' ); ?></h2>
+	<h1><?php _e( 'My Calendar Templates', 'my-calendar' ); ?></h1>
 
 	<div class="postbox-container jcd-wide">
 		<div class="metabox-holder">
@@ -74,7 +74,7 @@ function edit_mc_templates() {
 
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'My Calendar: Grid Event Template', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'My Calendar: Grid Event Template', 'my-calendar' ); ?></h2>
 
 					<div class="inside">
 						<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-templates" ); ?>">
@@ -104,7 +104,7 @@ function edit_mc_templates() {
 
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'My Calendar: List Event Template', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'My Calendar: List Event Template', 'my-calendar' ); ?></h2>
 
 					<div class="inside">
 						<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-templates" ); ?>">
@@ -134,7 +134,7 @@ function edit_mc_templates() {
 
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'My Calendar: Mini Calendar Template', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'My Calendar: Mini Calendar Template', 'my-calendar' ); ?></h2>
 
 					<div class="inside">
 						<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-templates" ); ?>">
@@ -164,7 +164,7 @@ function edit_mc_templates() {
 
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'My Calendar: Event Details Page Template', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'My Calendar: Event Details Page Template', 'my-calendar' ); ?></h2>
 
 					<div class="inside">
 						<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-templates" ); ?>">
@@ -194,7 +194,7 @@ function edit_mc_templates() {
 
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
-					<h3><?php _e( 'My Calendar: RSS Event Template', 'my-calendar' ); ?></h3>
+					<h2><?php _e( 'My Calendar: RSS Event Template', 'my-calendar' ); ?></h2>
 
 					<div class="inside">
 						<p><?php _e( 'Notice: HTML templates are very forgiving of errors. RSS templates are not. Be sure to test your changes.', 'my-calendar' ); ?></p>

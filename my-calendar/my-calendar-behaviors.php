@@ -41,10 +41,11 @@ function edit_my_calendar_behaviors() {
 	$mc_ajaxjs  = stripcslashes( get_option( 'mc_ajaxjs' ) );
 	$mc_show_js = stripcslashes( get_option( 'mc_show_js' ) );
 	// Now we render the form
+	
 	?>
 	<div class="wrap jd-my-calendar">
 		<?php my_calendar_check_db(); ?>
-		<h2><?php _e( 'My Calendar Scripting', 'my-calendar' ); ?></h2>
+		<h1><?php _e( 'My Calendar Scripting', 'my-calendar' ); ?></h1>
 
 		<div class="postbox-container jcd-wide">
 			<div class="metabox-holder">
@@ -52,7 +53,7 @@ function edit_my_calendar_behaviors() {
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox" id="cdiff">
 
-						<h3><?php _e( 'My Calendar Script Manager', 'my-calendar' ); ?></h3>
+						<h2><?php _e( 'My Calendar Script Manager', 'my-calendar' ); ?></h2>
 
 						<div class="inside">
 							<form id="my-calendar" method="post"

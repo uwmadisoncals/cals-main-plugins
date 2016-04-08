@@ -3,8 +3,8 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, conference, meeting, venue, location, box office, tickets, registration
 Requires at least: 4.0
-Tested up to: 4.4.2
-Stable tag: 2.4.15
+Tested up to: 4.5
+Stable tag: 2.4.16
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -98,6 +98,17 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 * Add option to insert events to both global & local calendar in multisite networks
 * Revise month by day input & calculation methods
 * Update hcalendar structures
+
+= 2.4.17 =
+
+* Bug fix: Google Maps calendar ignored Latitude/Longitude.
+* Bug fix: missing ID attribute on form field
+* Bug fix: replace an anchor with a button in admin
+* Bug fix: missing label in manage events
+* Bug fix: missing quote broke id attribute on manage categories
+* Bug fix: duplicate IDs in tab UI structure on Settings page
+* Add support for selective refresh in customizer
+* Updated HTML hierarchy
 
 = 2.4.16 =
 
@@ -677,4 +688,4 @@ The search feature in My Calendar is pretty basic; but buying My Calendar Pro gi
 
 == Upgrade Notice ==
 
-* 2.4.0 is a major new release; lots of bug fixes and feature enhancements. 2.4.11: Various bug fixes. Event & Location access strings moved out of database so they will be translatable.
+* 2.4.17: Misc. minor bug fixes; tested with WordPress 4.5

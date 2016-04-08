@@ -3,7 +3,7 @@
 Plugin Name: WP Google Maps
 Plugin URI: http://www.wpgmaps.com
 Description: The easiest to use Google Maps plugin! Create custom Google Maps with high quality markers containing locations, descriptions, images and links. Add your customized map to your WordPress posts and/or pages quickly and easily with the supplied shortcode. No fuss.
-Version: 6.3.05
+Version: 6.3.06
 Author: WP Google Maps
 Author URI: http://www.wpgmaps.com
 Text Domain: wp-google-maps
@@ -11,6 +11,12 @@ Domain Path: /languages
 */
 
 /* 
+ * 6.3.06 - 2016-04-04 - Low Priority
+ * Indonesian Translation added - Thank you Neno
+ * Swedish Translation added - Thank you Martin Sleipner
+ * Bulgarian Translation added - Thank you Lyubomir Kolev
+ * Google Maps API sensor removed from API call 
+ * 
  * 6.3.05 - 2016-01-14 - Low priority
  * Multiple tab compatibility added
  * 
@@ -630,7 +636,7 @@ function wpgmaps_admin_edit_marker_javascript() {
     ?>
     <script type="text/javascript">
         var gmapsJsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
-        document.write(unescape("%3Cscript src='" + gmapsJsHost + "maps.google.com/maps/api/js?<?php echo $api_version_string; ?>sensor=false' type='text/javascript'%3E%3C/script%3E"));
+        document.write(unescape("%3Cscript src='" + gmapsJsHost + "maps.google.com/maps/api/js?<?php echo $api_version_string; ?>' type='text/javascript'%3E%3C/script%3E"));
     </script>
     <link rel='stylesheet' id='wpgooglemaps-css'  href='<?php echo wpgmaps_get_plugin_url(); ?>/css/wpgmza_style.css' type='text/css' media='all' />
     <link rel="stylesheet" type="text/css" media="all" href="<?php echo wpgmaps_get_plugin_url(); ?>/css/data_table.css" />
@@ -787,7 +793,7 @@ function wpgmaps_admin_javascript_basic() {
         
         <script type="text/javascript">
             var gmapsJsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
-            document.write(unescape("%3Cscript src='" + gmapsJsHost + "maps.google.com/maps/api/js?<?php echo $api_version_string; ?>sensor=false&libraries=places' type='text/javascript'%3E%3C/script%3E"));
+            document.write(unescape("%3Cscript src='" + gmapsJsHost + "maps.google.com/maps/api/js?<?php echo $api_version_string; ?>libraries=places' type='text/javascript'%3E%3C/script%3E"));
         </script>
 
         
@@ -1604,7 +1610,7 @@ function wpgmaps_user_javascript_basic() {
         
         <script type="text/javascript">
             var gmapsJsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
-            document.write(unescape("%3Cscript src='" + gmapsJsHost + "maps.google.com/maps/api/js?<?php echo $api_version_string; ?>sensor=false&libraries=places' type='text/javascript'%3E%3C/script%3E"));
+            document.write(unescape("%3Cscript src='" + gmapsJsHost + "maps.google.com/maps/api/js?<?php echo $api_version_string; ?>libraries=places' type='text/javascript'%3E%3C/script%3E"));
         </script>
        
         <script type="text/javascript" >
@@ -2782,7 +2788,7 @@ function wpgmaps_action_callback_basic() {
 }
 
 function wpgmaps_load_maps_api() {
-    wp_enqueue_script('google-maps' , 'http://maps.google.com/maps/api/js?sensor=true' , false , '3');
+    wp_enqueue_script('google-maps' , 'http://maps.google.com/maps/api/js' , false , '3');
 }
 
 function wpgmaps_tag_basic( $atts ) {
