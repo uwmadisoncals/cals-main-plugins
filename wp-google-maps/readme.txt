@@ -3,7 +3,7 @@ Contributors: WPGMaps, NickDuncan, CodeCabin_, Jarryd Long
 Donate link: http://www.wpgmaps.com
 Tags: google maps, maps, map, map markers, google, google map, google maps plugin, wp maps, wp google maps, wp google map, easy map, store locator, map plugin, directions, map directions, google map plugin, routes, polygons, polylines, streetview, location, marker, latitude, longitude, map widget, map themes
 Requires at least: 3.5
-Tested up to: 4.4.2
+Tested up to: 4.5
 Stable tag: trunk
 License: GPLv2
 
@@ -46,7 +46,7 @@ The [WP Google Maps Pro Version](http://www.wpgmaps.com/purchase-professional-ve
 * Serve your map marker data via your database or an XML file
 * Compatible with caching plugins
 * Compatible with Cloudfare
-* Latest Google Maps API (V3.14, V3.15 & V3.exp)
+* Latest Google Maps API (V3.23, V3.24 & V3.exp)
 
 = Professional Edition =
 * Create multiple Google maps!
@@ -188,6 +188,7 @@ Try [Nifty Maps](http://www.niftymaps.co) - Comprehensive Map Builder for all we
 12. WP Google Maps Lite version: Store Locator Settings
 13. WP Google Maps Lite version: Store Locator Map
 14. WP Google Maps Lite version: Map Widget
+15. Select a theme for your map, or choose a theme from our theme library
 
 
 == Upgrade Notice ==
@@ -205,6 +206,16 @@ We no longer support timthumb and we have opted to remove it from WP Google Maps
 Please upgrade your version of WP Google Maps to version 6.0.27 as it includes multiple security improvements.
 
 == Changelog ==
+
+= 6.3.09 - 2016-04-15 - High priority =
+* Deprecated google maps api 3.14 and 3.15, added 3.23 and 3.24
+
+= 6.3.08 - 2016-04-14 - Medium Priority =
+* Provides a workaround for users experiencing issues with their maps loading after updating to WordPress 4.5
+
+= 6.0.07 - 2016-04-13 - Low Priority =
+* Tested on WordPress 4.5
+* You can now use your own Google Maps API key for your maps
 
 = 6.3.06 - 2016-04-04 - Low priority =
 * Indonesian Translation added - Thank you Neno
