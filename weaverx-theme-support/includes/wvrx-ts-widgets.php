@@ -127,7 +127,7 @@ class WeaverX_Widget_Login extends WP_Widget {
 		if ( $title )
 			echo $before_title . $title . $after_title;
 		global $current_user;
-		get_currentuserinfo();
+		$current_user = wp_get_current_user();
 		if (isset($current_user->display_name))
 		echo '<span class="wvrx-welcome-user">' . __('Welcome','weaverx-theme-support' /*adm*/) . ' ' . $current_user->display_name . ".</span><br />\n";
 ?>

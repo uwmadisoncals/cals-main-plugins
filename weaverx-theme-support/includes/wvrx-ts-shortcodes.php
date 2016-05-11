@@ -625,7 +625,7 @@ function wvrx_ts_weaverx_sc_info() {           // [info]  ======================
     global $current_user;
     $out = __('<strong>Theme/User Info</strong><hr />','weaverx-theme-support' /*adm*/);
 
-    get_currentuserinfo();
+    $current_user = wp_get_current_user();
     if (isset($current_user->display_name)) {
 	$out .= __('<em>User:</em> ','weaverx-theme-support' /*adm*/) . $current_user->display_name . '<br />';
     }

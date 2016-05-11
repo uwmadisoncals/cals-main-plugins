@@ -421,8 +421,10 @@ class FrmFieldsController {
         }
 
         $field = FrmFieldsHelper::setup_edit_vars($field);
-        $opts = stripslashes_deep($_POST['opts']);
-        $opts = explode("\n", rtrim($opts, "\n"));
+		$opts = FrmAppHelper::get_param( 'opts', '', 'post', 'wp_kses_post' );
+		$opts = explode( "\n", rtrim( $opts, "\n" ) );
+		$opts = array_map( 'trim', $opts );
+
         if ( $field['separate_value'] ) {
             foreach ( $opts as $opt_key => $opt ) {
                 if ( strpos($opt, '|') !== false ) {
@@ -564,7 +566,8 @@ class FrmFieldsController {
         }
 
         global $frm_vars;
-		if ( is_admin() && ! FrmAppHelper::is_preview_page() && ! in_array( $field['type'], array( 'scale', 'radio', 'checkbox', 'data' ) ) ) {
+		if ( is_admin() && ! FrmAppHelper::is_preview_page() && ! in_array( $field['type'], array( 'scale', 'radio', 'checkbox', 'data', 'lookup' ) ) ) {
+			// Add the dyn_default_value class to some field inputs on form builder page
             $class[] = 'dyn_default_value';
         }
 
@@ -574,7 +577,7 @@ class FrmFieldsController {
     }
 
 	private static function add_html_size( $field, array &$add_html ) {
-		if ( ! isset( $field['size'] ) || $field['size'] <= 0 || in_array( $field['type'], array( 'select', 'data', 'time', 'hidden' ) ) ) {
+		if ( ! isset( $field['size'] ) || $field['size'] <= 0 || in_array( $field['type'], array( 'select', 'data', 'time', 'hidden', 'lookup' ) ) ) {
             return;
         }
 

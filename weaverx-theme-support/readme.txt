@@ -8,9 +8,9 @@ Author: wpweaver
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: weaverx-theme-support
-Requires at least: 4.0
-Tested up to: 4.4
-Stable tag: 2.0.5
+Requires at least: 4.3
+Tested up to: 4.5
+Stable tag: 2.1.1
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -72,9 +72,18 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 
 == Upgrade Notice ==
 
-This is the initial release of this plugin.
+See ChangeLog for changes to this version.
 
 == ChangeLog ==
+= 2.1.1 =
+* Fix: currenet user in login widget
+
+= 2.1 =
+* Update: wp_get_current_user() deprecated call
+* Tweak: Corrected descriptions of default values for some area width options (100% vs. auto)
+* WARNING: This version corrects some incorrect wording in area width option descriptions.
+  The functionality is identical, but the new wording is correct. No one had noticed the
+  incorrect descriptions for a very long time, so it doesn't seem to be critical problem.
 
 = 2.0.4 =
 * Change: [header_image] updated to support WP 4.4 srcset image sizes

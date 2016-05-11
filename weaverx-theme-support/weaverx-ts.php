@@ -5,12 +5,12 @@ Plugin URI: http://weavertheme.com/plugins
 Description: Weaver X Theme Support - a package of useful shortcodes and widgets that integrates closely with the Weaver X theme. This plugin Will also allow you to switch from Weaver X to any other theme and still be able to use the shortcodes and widgets from Weaver X with minimal effort.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 2.0.5
+Version: 2.1.1
 License: GPL V3
 
 Weaver Xtreme Theme Support
 
-Copyright (C) 2014-2015 Bruce E. Wampler - weaver@weavertheme.com
+Copyright (C) 2014-2016 Bruce E. Wampler - weaver@weavertheme.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ $theme = get_template_directory();
 
 if ( strpos( $theme, '/weaver-xtreme') !== false ) {		// only load if Weaver Xtreme is the theme
 
-define ('WVRX_TS_VERSION','2.0.5');
+define ('WVRX_TS_VERSION','2.1.1');
 define ('WVRX_TS_MINIFY','.min');		// '' for dev, '.min' for production
 define ('WVRX_TS_APPEARANCE_PAGE', false );
 
@@ -155,11 +155,11 @@ function wvrx_ts_child_saverestore_action() {
 
 	//add_action('weaverx_check_updates', 'weaverx_check_updates_action');
 
-function weaverx_check_updates_action() {
+/*function weaverx_check_updates_action() {
 	require_once('wp-updates-theme-1411.php');
 	$theme = basename(get_template_directory());
 	new WPUpdatesThemeUpdater_1411( 'http://wp-updates.com/api/2/theme', $theme );
-}
+} */
 
 // --------------------------------------
 function wvrx_ts_per_page_report() {
@@ -219,4 +219,5 @@ function wvrx_ts_scan_section($what) {
 	echo '</ul>';
 }
 }	// end only load if Weaver Xtreme installed
+
 ?>

@@ -50,6 +50,13 @@ class FrmStylesController {
         }
 
         self::load_pro_hooks();
+
+		$style_tab = FrmAppHelper::get_param( 'frm_action', '', 'get', 'sanitize_title' );
+		if ( $style_tab == 'manage' || $style_tab == 'custom_css' ) {
+			// we only need to load these styles/scripts on the styler page
+			return;
+		}
+
         wp_enqueue_script('jquery-ui-datepicker');
 
         $version = FrmAppHelper::plugin_version();
@@ -148,7 +155,7 @@ class FrmStylesController {
 		if ( ( 'formidable' == $handle || 'jquery-theme' == $handle ) && strpos( $tag, ' property=' ) === false ) {
 			$frm_settings = FrmAppHelper::get_settings();
 			if ( $frm_settings->use_html ) {
-				$tag = str_replace( ' type=', ' property="stylesheet" type=', $tag );
+				$tag = str_replace( ' type="', ' property="stylesheet" type="', $tag );
 			}
 		}
 		return $tag;

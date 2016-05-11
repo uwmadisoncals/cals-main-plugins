@@ -31,14 +31,11 @@
 		</table>
 	</div>
 	<div class="wordfenceWrap">
-
 		<?php if (!wfConfig::liveTrafficEnabled()): ?>
-			<div style="color: #F00;">
-				Live Traffic is disabled.
-				<?php if (wfConfig::get('cacheType') == 'falcon') { ?>This is done to improve performance because you have Wordfence Falcon Engine enabled.<?php } ?>
-			</div>
-		<?php else: ?>
-			<div id="wf-live-traffic" class="wfTabsContainer">
+			<div id="wordfenceLiveActivityDisabled"><p><strong>Live activity is disabled.</strong> <?php if (wfConfig::get('cacheType') == 'falcon') { ?>This is done to improve performance because you have Wordfence Falcon Engine enabled.<?php } ?> Login and firewall activity will still appear below.</p></div>
+		<?php endif ?>
+		
+		<div id="wf-live-traffic" class="wfTabsContainer">
 
 				<div id="wf-live-traffic-legend">
 					<ul>
@@ -343,45 +340,44 @@
 								<tr>
 									<td>
 										<span data-bind="if: blocked()">
-											<button type="button" class="button button-small"
+											<a href="#" class="button button-small"
 											        data-bind="click: $root.unblockIP">
 												Unblock this IP
-											</button>
+											</a>
 										</span>
 										<span data-bind="if: rangeBlocked()">
-											<button type="button" class="button button-small"
+											<a href="#" class="button button-small"
 											        data-bind="click: $root.unblockNetwork">Unblock this range
-											</button>
+											</a>
 										</span>
 										<span data-bind="if: !blocked() && !rangeBlocked()">
-											<button type="button" class="button button-small"
+											<a href="#" class="button button-small"
 											        data-bind="click: $root.blockIP">
 												Block this IP
-											</button>
+											</a>
 										</span>
-										<button type="button" class="button button-small"
-										        data-bind="click: function() { location = 'admin.php?page=WordfenceWhois&whoisval=' + IP() + '&wfnetworkblock=1' }">
+										<a class="button button-small"
+										        data-bind="attr: { href: 'admin.php?page=WordfenceWhois&whoisval=' + IP() + '&wfnetworkblock=1'}">
 											Block this network
-										</button>
-										<button type="button" class="button button-small" data-bind="text: 'Run WHOIS on ' + IP(),
-											click: function() { window.open('admin.php?page=WordfenceWhois&whoisval=' + IP()) }"
-										        target="_blank"></button>
-										<button type="button" class="button button-small"
-										        data-bind="click: function() { window.open(WFAD.makeIPTrafLink(IP())) }">
-											See
-											recent traffic
-										</button>
+										</a>
+										<a class="button button-small" data-bind="text: 'Run WHOIS on ' + IP(),
+											attr: { href: 'admin.php?page=WordfenceWhois&whoisval=' + IP() }"
+										        target="_blank"></a>
+										<a class="button button-small"
+										        data-bind="attr: { href: WFAD.makeIPTrafLink(IP()) }" target="_blank">
+											See recent traffic
+										</a>
 										<span data-bind="if: action() == 'blocked:waf'">
-											<button type="button" class="button button-small"
+											<a href="#" class="button button-small"
 											        data-bind="click: function () { $root.whitelistWAFParamKey(actionData().path, actionData().paramKey, actionData().failedRules) }"
 											        title="If this is a false positive, you can exclude this parameter from being filtered by the firewall">
 												Whitelist param from Firewall
-											</button>
+											</a>
 											<?php if (WFWAF_DEBUG): ?>
-												<button type="button" class="button button-small"
-												        data-bind="click: function() { window.open('<?php echo esc_js(home_url()) ?>?_wfsf=debugWAF&nonce=' + WFAD.nonce + '&hitid=' + id(), 'debugWAF');}">
+												<a href="#" class="button button-small"
+												        data-bind="attr: { href: '<?php echo esc_js(home_url()) ?>?_wfsf=debugWAF&nonce=' + WFAD.nonce + '&hitid=' + id() }" target="_blank">
 													Debug this Request
-												</button>
+												</a>
 											<?php endif ?>
 										</span>
 									</td>
@@ -394,7 +390,6 @@
 					No events to report yet.
 				</div>
 			</div>
-		<?php endif ?>
 	</div>
 </div>
 

@@ -288,6 +288,10 @@ function weaverx_form_widget_area( $value, $submit = false ) {
 	   'wrapper', 'container', 'content','widget', 'post'
 	);
 
+	$default_auto = array(
+		'top', 'bottom', 'footer_sb', 'header_sb'
+	);
+
 
 	if ( in_array( $id, $no_lr_margins )) {
 		if ( $id != 'widget') {
@@ -303,11 +307,20 @@ function weaverx_form_widget_area( $value, $submit = false ) {
 			'info' => __('The width of this area is automatically determined by the enclosing area', 'weaver-xtreme' /*adm*/)));
 	} else if ( $id != 'wrapper' ) {
 
-		weaverx_form_val( array(
-			'name' => '<span class="i-left" style="font-size:150%;">&harr;</span> ' . __('Width', 'weaver-xtreme' /*adm*/),
-			'id' => $id . '_width_int', 'type' => '',
-			'info' => '<em>' . $name . '</em>' . __(': Width of Area in % of enclosing area on desktop and small tablet. Hint: use with Center align. (Default: 100%)', 'weaver-xtreme' /*adm*/),
-			'value' => array() ), '%' );
+		if ( in_array($id, $default_auto)) {
+			weaverx_form_val( array(
+				'name' => '<span class="i-left" style="font-size:150%;">&harr;</span> ' . __('Width', 'weaver-xtreme' /*adm*/),
+				'id' => $id . '_width_int', 'type' => '',
+				'info' => '<em>' . $name . '</em>' . __(': Width of Area in % of enclosing area on desktop and small tablet. Hint: use with Center align. Use 0 to force auto width. (Default if blank: auto)', 'weaver-xtreme' /*adm*/),
+				'value' => array() ), '%' );
+		} else {
+			weaverx_form_val( array(
+				'name' => '<span class="i-left" style="font-size:150%;">&harr;</span> ' . __('Width', 'weaver-xtreme' /*adm*/),
+				'id' => $id . '_width_int', 'type' => '',
+				'info' => '<em>' . $name . '</em>' . __(': Width of Area in % of enclosing area on desktop and small tablet. Hint: use with Center align. Use 0 to force auto width. (Default if blank: 100%)', 'weaver-xtreme' /*adm*/),
+				'value' => array() ), '%' );
+
+		}
 
 		weaverx_form_align(array(
 			'name' => '<span class="i-left dashicons dashicons-editor-alignleft"></span><small>' . __('Align Area', 'weaver-xtreme' /*adm*/) . '</small>',

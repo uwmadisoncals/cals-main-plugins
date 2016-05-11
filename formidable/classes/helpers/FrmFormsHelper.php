@@ -399,8 +399,9 @@ BEFORE_HTML;
 
 		if ( strpos( $html, '[button_label]' ) ) {
 			add_filter( 'frm_submit_button', 'FrmFormsHelper::submit_button_label', 1 );
-			$replace_with = apply_filters( 'frm_submit_button', $title, $form );
-			$html = str_replace( '[button_label]', $replace_with, $html );
+			$submit_label = apply_filters( 'frm_submit_button', $title, $form );
+			$submit_label = esc_attr( do_shortcode( $submit_label ) );
+			$html = str_replace( '[button_label]', $submit_label, $html );
         }
 
         $html = apply_filters('frm_form_replace_shortcodes', $html, $form, $values);
@@ -538,7 +539,7 @@ BEFORE_HTML;
 	}
 
 	public static function get_scroll_js( $form_id ) {
-        ?><script type="text/javascript">jQuery(document).ready(function(){frmFrontForm.scrollMsg(<?php echo (int) $form_id ?>);})</script><?php
+        ?><script type="text/javascript">document.addEventListener('DOMContentLoaded',function(){frmFrontForm.scrollMsg(<?php echo (int) $form_id ?>);})</script><?php
     }
 
 	public static function edit_form_link( $form_id ) {

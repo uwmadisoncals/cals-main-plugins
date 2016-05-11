@@ -72,7 +72,7 @@ auEa+7b+FGTKs7dUo2BNGR7OVifK4GZ8w/ajS0TelhrSRi3BBQCGXLzUO/UURUAh
 	}
 
 	public function getGlobal($global) {
-		if (strpos($global, '.') === false) {
+		if (wfWAFUtils::strpos($global, '.') === false) {
 			return null;
 		}
 		list($prefix, $_global) = explode('.', $global);
@@ -87,7 +87,7 @@ auEa+7b+FGTKs7dUo2BNGR7OVifK4GZ8w/ajS0TelhrSRi3BBQCGXLzUO/UURUAh
 				}
 				break;
 			case 'server':
-				$key = strtoupper($_global);
+				$key = wfWAFUtils::strtoupper($_global);
 				if (isset($_SERVER) && array_key_exists($key, $_SERVER)) {
 					return $_SERVER[$key];
 				}
@@ -141,7 +141,7 @@ auEa+7b+FGTKs7dUo2BNGR7OVifK4GZ8w/ajS0TelhrSRi3BBQCGXLzUO/UURUAh
 		if ($request->getBody('wfwaf-false-positive-verified') && $this->currentUserCanWhitelist() &&
 			wfWAFUtils::hash_equals($request->getBody('wfwaf-false-positive-nonce'), $this->getAuthCookieValue('nonce', ''))
 		) {
-			$urlParams = json_decode($request->getBody('wfwaf-false-positive-params'), true);
+			$urlParams = wfWAFUtils::json_decode($request->getBody('wfwaf-false-positive-params'), true);
 			if (is_array($urlParams) && $urlParams) {
 				$whitelistCount = 0;
 				foreach ($urlParams as $urlParam) {
@@ -763,18 +763,20 @@ HTML
 					 * @var wfWAFRuleComparisonFailure $failedComparison
 					 */
 					$rule = $failedRule['rule'];
-					$failedComparison = $failedRule['failedComparison'];
+					if ($rule->getWhitelist()) {
+						$failedComparison = $failedRule['failedComparison'];
 
-					$data = array(
-						'timestamp'   => time(),
-						'description' => 'Whitelisted while in Learning Mode.',
-						'ip'          => $this->getRequest()->getIP(),
-					);
-					if (function_exists('get_current_user_id')) {
-						$data['userID'] = get_current_user_id();
+						$data = array(
+							'timestamp' => time(),
+							'description' => 'Whitelisted while in Learning Mode.',
+							'ip' => $this->getRequest()->getIP(),
+						);
+						if (function_exists('get_current_user_id')) {
+							$data['userID'] = get_current_user_id();
+						}
+						$this->whitelistRuleForParam($this->getRequest()->getPath(), $failedComparison->getParamKey(),
+							$rule->getRuleID(), $data);
 					}
-					$this->whitelistRuleForParam($this->getRequest()->getPath(), $failedComparison->getParamKey(),
-						$rule->getRuleID(), $data);
 				}
 			}
 		}
@@ -882,7 +884,7 @@ HTML
 						)), $this->getStorageEngine()->getAttackData(), $request);
 
 					if ($response instanceof wfWAFHTTPResponse && $response->getBody()) {
-						$jsonData = json_decode($response->getBody(), true);
+						$jsonData = wfWAFUtils::json_decode($response->getBody(), true);
 						if (is_array($jsonData) && array_key_exists('success', $jsonData)) {
 							$this->getStorageEngine()->truncateAttackData();
 							$this->getStorageEngine()->unsetConfig('attackDataNextInterval');
@@ -1260,7 +1262,7 @@ class wfWAFCronFetchRulesEvent extends wfWAFCronEvent {
 					'betaFeed' => (int) $waf->getStorageEngine()->getConfig('betaThreatDefenseFeed'),
 				)));
 			if ($this->response) {
-				$jsonData = json_decode($this->response->getBody(), true);
+				$jsonData = wfWAFUtils::json_decode($this->response->getBody(), true);
 				if (is_array($jsonData)) {
 
 					if ($waf->hasOpenSSL() &&

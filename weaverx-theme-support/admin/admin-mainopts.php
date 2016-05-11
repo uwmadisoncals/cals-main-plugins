@@ -263,7 +263,7 @@ function weaverx_mainopts_header() {
 
 	array('name' => '<span class="i-left" style="font-size:120%;">&harr;</span><small>' . __('Maximum Image Width', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'header_image_max_width_dec', 'type' => '+val_percent',
-		'info' => __('Maximum width of Image (Default: 100%; (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
+		'info' => __('Maximum width of Image (Default: 100%) (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
 
 	array('name' => '<small>' . __('Use Actual Image Size', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'header_actual_size', 'type' => '+checkbox',
