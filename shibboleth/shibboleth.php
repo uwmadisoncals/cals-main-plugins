@@ -1,10 +1,10 @@
 <?php
 /*
- Plugin Name: Shibboleth
+ Plugin Name: CALS Shibboleth Authentication
  Plugin URI: http://wordpress.org/extend/plugins/shibboleth
- Description: Easily externalize user authentication to a <a href="http://shibboleth.internet2.edu">Shibboleth</a> Service Provider
- Author: Will Norris, mitcho (Michael 芳貴 Erlewine)
- Version: 1.7
+ Description: Easily externalize user authentication to a <a href="http://shibboleth.internet2.edu">Shibboleth</a> Service Provider. DO NOT MODIFY OR UPDATE
+ Author: Will Norris, mitcho (Michael 芳貴 Erlewine), Jason Pursian
+ Version: 13
  License: Apache 2 (http://www.apache.org/licenses/LICENSE-2.0.html)
  */
 
@@ -246,8 +246,15 @@ function shibboleth_session_initiator_url($redirect = null) {
 
 	// first build the target URL.  This is the WordPress URL the user will be returned to after Shibboleth 
 	// is done, and will handle actually logging the user into WordPress using the data provdied by Shibboleth 
-	if ( function_exists('switch_to_blog') ) switch_to_blog($GLOBALS['current_site']->blog_id);
-	$target = site_url('wp-login.php');
+	// if ( function_exists('switch_to_blog') ) switch_to_blog($GLOBALS['current_site']->blog_id); changed 5/20/2016 by jpursian for proper redirect
+
+	if ( function_exists('switch_to_blog') ) {
+ 		if ( is_multisite() ) switch_to_blog($GLOBALS['current_blog']->blog_id);
+		else switch_to_blog($GLOBALS['current_site']->blog_id);
+	}
+
+	// $target = site_url('wp-login.php'); changed 5/20/2016 by jpursian for proper redirec
+	$target = get_home_url(null, 'wp-login.php');
 	if ( function_exists('restore_current_blog') ) restore_current_blog();
 
 	$target = add_query_arg('action', 'shibboleth', $target);
@@ -460,9 +467,20 @@ add_filter( 'shibboleth_user_nicename', 'sanitize_user' );
 function shibboleth_login_form() {
 	$login_url = add_query_arg('action', 'shibboleth');
 	$login_url = remove_query_arg('reauth', $login_url);
-	echo '<p id="shibboleth_login"><a href="' . esc_url($login_url) . '">' . __('Login with Shibboleth', 'shibboleth') . '</a></p>';
+	echo '<p id="shibboleth_login"><a href="' . esc_url($login_url) . '">' . __('Log in using UW-Madison NetID', 'shibboleth') . '</a></p>';
 }
 add_action('login_form', 'shibboleth_login_form');
+
+/**
+ * Clear reauth problems using WPMU
+ * Added 5/20/2016 by jpursian
+ */
+function clear_reauth(){
+        if($_REQUEST['reauth'] && $_REQUEST['action'] == 'shibboleth'){
+                unset($_REQUEST['reauth']);
+        }
+}
+add_action( 'login_init', 'clear_reauth' );
 
 
 /**
