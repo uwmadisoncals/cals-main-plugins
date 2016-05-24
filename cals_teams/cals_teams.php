@@ -32,7 +32,7 @@ if(!defined('CT_PLUGIN_URL')){
 
 Class Cals_Teams{
 
-
+  
     public function __construct(){
         //global $mbox;
         $this->register_callbacks();
@@ -153,7 +153,9 @@ function calsteams_buildform_cb($post){
   foreach ($mbox['fields'] as $field) {
 
     $meta = get_post_meta($post->ID,$field['id'],true); //get meta-box data for current field
-    //logit($meta, '$meta: ');
+
+    //logit($meta,'$meta: ');
+
     echo '<tr>',
                 '<th style="width:20%"><label for="', $field['id'], '">', $field['name'], '</label></th>',
                 '<td>';
@@ -182,9 +184,7 @@ function calsteams_buildform_cb($post){
                     break;
 
                   case 'checkbox':
-
                     echo '<input type="checkbox" name="', $field['id'], '" id="', $field['id'], '"', $meta ? ' checked="checked"' : '', ' />';
-
                     break;
 
                   case 'wysiwyg':
@@ -220,9 +220,9 @@ function calsteams_mbox_save($post_id){
   //Real foreach, temporarily commented out
   foreach ($mbox['fields'] as $field) {
 
-      $input_id = $field['id']; //get the current item's input id property
+      $input_id = $field['id'];//get the current item's input id property
 
-      $input_type = $field['type']; //get field type
+      $input_type = $field['type'];//get field type
 
       // Checks for input and sanitizes/saves if needed
       if( isset( $_POST[ $input_id ] ) ) {
@@ -231,7 +231,7 @@ function calsteams_mbox_save($post_id){
         if($input_id === 'calsteams_email' ){
           if(!is_email($_POST[ $input_id ])){
             $_POST[ $input_id ] = 'invalid email';
-          }
+          } 
         }
 
         switch ($input_type){
@@ -243,6 +243,7 @@ function calsteams_mbox_save($post_id){
             break;
           default:
             update_post_meta( $post_id, $input_id, sanitize_text_field( $_POST[ $input_id ] ) );
+
         }
         //update_post_meta( $post_id, $input_id, sanitize_text_field( $_POST[ $input_id ] ) );
 
@@ -275,9 +276,9 @@ add_filter('template_include','template_chooser');
  *
  * @since 1.0
  */
-
+ 
 function ct_get_template_hierarchy( $template ) {
-
+ 
     if($template === 'single'){
       // Get the template slug
       $template_slug = rtrim( $template, '.php' );//single
@@ -290,7 +291,7 @@ function ct_get_template_hierarchy( $template ) {
       //$locateString = 'plugin_template/' . $template;
       //logit($locateString,'$locateString: ');
       //logit($locate,'$locate: ');
-
+   
       // Check if a custom template exists in the theme folder, if not, load the plugin template file
       if ( $theme_file = locate_template( array( 'cals_teams_templates/' . $template ) ) ) {
           $file = $theme_file;
@@ -300,7 +301,7 @@ function ct_get_template_hierarchy( $template ) {
       else {
           $file = CT_PLUGIN_BASE_DIR . '/includes/templates/' . $template;
       }
-
+   
       //return apply_filters( 'rc_repl_template_' . $template, $file );
       return $file;
 
@@ -318,7 +319,7 @@ function ct_get_template_hierarchy( $template ) {
       //$locateString = 'plugin_template/' . $template;
       //logit($locateString,'$locateString: ');
       //logit($locate,'$locate: ');
-
+   
       // Check if a custom template exists in the theme folder, if not, load the plugin template file
       if ( $theme_file = locate_template( array( 'cals_teams_templates/' . $template ) ) ) {
           $file = $theme_file;
@@ -329,7 +330,7 @@ function ct_get_template_hierarchy( $template ) {
           $file = CT_PLUGIN_BASE_DIR . '/includes/templates/' . $template;
            //logit($file,'$file: ');
       }
-
+   
       //return apply_filters( 'rc_repl_template_' . $template, $file );
       return $file;
     }
@@ -346,7 +347,7 @@ function ct_get_template_hierarchy( $template ) {
       //$locateString = 'plugin_template/' . $template;
       //logit($locateString,'$locateString: ');
       //logit($locate,'$locate: ');
-
+   
       // Check if a custom template exists in the theme folder, if not, load the plugin template file
       if ( $theme_file = locate_template( array( 'cals_teams_templates/' . $template ) ) ) {
           $file = $theme_file;
@@ -357,7 +358,7 @@ function ct_get_template_hierarchy( $template ) {
           $file = CT_PLUGIN_BASE_DIR . '/includes/templates/' . $template;
            //logit($file,'$file: ');
       }
-
+   
       //return apply_filters( 'rc_repl_template_' . $template, $file );
       return $file;
     }

@@ -18,42 +18,42 @@
   }
 }
 */
-
+ 
  [class^="icon-"]:before, [class*=" icon-"]:before {
   font-family: "fontello";
   font-style: normal;
   font-weight: normal;
   speak: none;
-
+ 
   display: inline-block;
   text-decoration: inherit;
   width: 1em;
   margin-right: .2em;
   text-align: center;
   /* opacity: .8; */
-
+ 
   /* For safety - reset parent styles, that can break glyph codes*/
   font-variant: normal;
   text-transform: none;
-
+ 
   /* fix buttons height, for twitter bootstrap */
   line-height: 1em;
-
+ 
   /* Animation center compensation - margins should be symmetric */
   /* remove if not needed */
   margin-left: .2em;
-
+ 
   /* you can be more comfortable with increased icons size */
   /* font-size: 120%; */
-
+ 
   /* Font smoothing. That was taken from TWBS */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
+ 
   /* Uncomment for 3D effect */
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
-
+ 
 .icon-commerical-building:before { content: '\e800'; } /* '' */
 .icon-phone:before { content: '\e801'; } /* '' */
 .icon-mail-alt:before { content: '\e802'; } /* '' */
@@ -72,7 +72,7 @@ main.cals_teams.archive_team{
 
 /* Archive Team Header  */
 main.cals_teams.archive_team header{
-
+	
 }
 
 /* Member Grouping */
@@ -92,12 +92,11 @@ overflow: hidden;
 width:300px;
 /*padding:0 2% 2% 2%;*/
 padding:0 12px 12px 12px;
-
 }
 
 /* Member Heading Wrapper*/
 main.cals_teams.archive_team .member-heading-wrapper{
-text-align:center;
+
 }
 
 /* Member */
@@ -107,8 +106,10 @@ main.cals_teams.archive_team a.member{
 
 /* Member Professional Title */
 main.cals_teams.archive_team span.protitle{
-text-align: center;
+
 }
+
+
 
 /* Member Body */
 main.cals_teams.archive_team .member-body{
@@ -117,18 +118,12 @@ main.cals_teams.archive_team .member-body{
 
 /* Member Image Wrapper */
 main.cals_teams.archive_team .member-image-wrapper{
-padding-bottom:20px;
+
 }
 
 /*Member Thumbnail */
 main.cals_teams.archive_team img.member-thumbnail{
-margin: 0 auto;
-display:block;
-}
 
-/*Member Thumbnail rounded */
-main.cals_teams.archive_team img.member-thumbnail.round{
-border-radius:50%;
 }
 
 
@@ -136,7 +131,6 @@ border-radius:50%;
 main.cals_teams.archive_team .member-data-wrapper{
 overflow:hidden;
 white-space: nowrap;
-text-align: center;
 }
 
 /* Member Data Field */
@@ -177,3 +171,6 @@ font-style:normal;
 main.cals_teams.archive_team span.field-data{
 white-space: nowrap;
 }
+
+
+
