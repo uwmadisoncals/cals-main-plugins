@@ -29,7 +29,7 @@ get_header(); ?>
 
 		
 		$mbox_fields = $mbox['fields'];//Meta data for field groups
-		logit($mbox_fields,'$mbox_fields');
+		//logit($mbox_fields,'$mbox_fields');
 
 
 		$args = array('post_type'=>'team');//WP Query Args
@@ -143,7 +143,6 @@ get_header(); ?>
 		// If no content, include the "No posts found" template.
 		else :
 			get_template_part( 'content', 'none' );
-			echo "false on have_posts();";
 
 		endif;
 		?>
