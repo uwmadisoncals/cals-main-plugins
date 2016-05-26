@@ -351,23 +351,75 @@ function ct_get_template_hierarchy( $template ) {
       // Check if a custom template exists in the theme folder, if not, load the plugin template file
       if ( $theme_file = locate_template( array( 'cals_teams_templates/' . $template ) ) ) {
           $file = $theme_file;
-          //logit($file,'$file: ');
-
       }
       else {
           $file = CT_PLUGIN_BASE_DIR . '/includes/templates/' . $template;
-           //logit($file,'$file: ');
       }
    
       //return apply_filters( 'rc_repl_template_' . $template, $file );
       return $file;
+
     }
 }
 add_filter( 'template_include', 'template_chooser' );
 
 //Register and Enqueue Plugin Stylesheet
-function calsteams_add_stylesheet(){
+function calsteams_add_stylesheets(){
+  wp_register_style('bricklayer_style', plugins_url('cals_teams/bricklayer.min.css'));
   wp_register_style( 'cals_teams_style', plugins_url('cals_teams/cals_teams_style.css') );
   wp_enqueue_style( 'cals_teams_style' );
+  wp_enqueue_style( 'bricklayer_style' );
 }
-add_action('wp_enqueue_scripts','calsteams_add_stylesheet');
+add_action('wp_enqueue_scripts','calsteams_add_stylesheets');
+
+//Register and Enqueue Scripts
+function calsteams_add_scripts(){
+$ct_script = plugins_url('cals_teams/includes/scripts/cals_teams.js');  
+$bricklayer_script = plugins_url('cals_teams/includes/scripts/bricklayer.min.js');
+
+wp_register_script( 'bricklayer', $bricklayer_script, '', '', true );
+wp_register_script( 'cals_teams_script', $ct_script, '', '', true );
+
+wp_enqueue_script( 'bricklayer' );
+wp_enqueue_script( 'cals_teams_script' );
+}
+add_action('wp_enqueue_scripts','calsteams_add_scripts');
+
+
+//Set global var for current theme template full directory
+function var_template_include( $t ){
+    $GLOBALS['current_theme_template'] = $t;
+    return $t;
+}
+add_filter( 'template_include', 'var_template_include', 1000 );
+
+//Get full directory of current theme from global var
+function get_current_template( $echo = false ) {
+    if( !isset( $GLOBALS['current_theme_template'] ) )
+        return false;
+    if( $echo )
+        echo $GLOBALS['current_theme_template'];
+    else
+        return $GLOBALS['current_theme_template'];
+}
+//add css class '.cals_team-archive-team' to <body> if current template is from cals_teams plugin
+function ct_body_classes( $classes ) {
+
+    $template_dir = get_current_template();
+
+    $stripped_val = strpos($template_dir, 'cals_teams/includes/templates/archive-team.php');
+
+    if($stripped_val !== false){
+
+      $fileName = rtrim(basename($template_dir),'.php');
+
+      $classes[] = 'cals_team-' . $fileName;
+      return $classes;
+
+    }
+    else{
+    //$classes[] = 'class-name';
+    return $classes;
+    }
+}
+add_filter( 'body_class','ct_body_classes' );

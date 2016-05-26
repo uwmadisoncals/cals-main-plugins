@@ -22,15 +22,12 @@ get_header(); ?>
 	<section id="primary" class="content-area">
 		<main id="main" class="site-main cals_teams archive_team" role="main">
 		<?php
-		 	//Uncomment this to debug template origin
-			echo 'This template is from plugin. archive-team.php';
 
 			include( WP_PLUGIN_DIR . '/cals_teams/includes/data/cals_teams_fields.php' ); //include Metabox and Metabox field group data
 
 		
 		$mbox_fields = $mbox['fields'];//Meta data for field groups
 		//logit($mbox_fields,'$mbox_fields');
-
 
 		$args = array('post_type'=>'team');//WP Query Args
 
@@ -49,7 +46,7 @@ get_header(); ?>
 				?>
 			</header><!-- .page-header -->
 
-			<div class="member-grouping">
+			<div class="member-grouping bricklayer">
 			<?php
 			// Start the Loop.
 			while ( have_posts() ) : the_post();

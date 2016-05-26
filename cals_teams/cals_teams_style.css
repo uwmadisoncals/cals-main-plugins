@@ -58,13 +58,6 @@
 .icon-phone:before { content: '\e801'; } /* '' */
 .icon-mail-alt:before { content: '\e802'; } /* '' */
 
-
-
-
-
-
-
-
 /* Archive Team Main */
 main.cals_teams.archive_team{
 	/*padding:0 5%;*/
@@ -77,21 +70,23 @@ main.cals_teams.archive_team header{
 
 /* Member Grouping */
 main.cals_teams.archive_team .member-grouping{
-display: flex;
+/*display: flex;
 flex-direction:row;
 flex-wrap:wrap;
 flex-grow:1;
-/*justify-content:space-around; */
-align-content:space-around;
+align-content:space-around;*/
+margin: 20px 0 20px 0;
 }
 
 /* Member Wrapper */
 main.cals_teams.archive_team .member-wrapper{
-background-color: lightBlue;
+background-color: #E5E5E5;
 overflow: hidden;
-width:300px;
-/*padding:0 2% 2% 2%;*/
-padding:0 12px 12px 12px;
+/*width:300px;*/
+
+/*padding:0 12px 12px 12px;*/
+padding:20px;
+margin-top:10px;
 }
 
 /* Member Heading Wrapper*/
@@ -172,5 +167,9 @@ main.cals_teams.archive_team span.field-data{
 white-space: nowrap;
 }
 
+.bricklayer-column div.member-wrapper:first-of-type{
+  background-color: #E5E5E5;
+  margin-top:0px;
+}
 
 
