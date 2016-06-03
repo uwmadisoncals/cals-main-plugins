@@ -32,9 +32,9 @@ function mc_add_inner_box() {
 	if ( $event_id ) {
 		$url = admin_url( 'admin.php?page=my-calendar&mode=edit&event_id='.$event_id );
 		$event = mc_get_event_core( $event_id );
-		$content = "<p><strong>" . $event->event_title . '</strong><br />' . $event->event_begin . ' @ ' . $event->event_time . "</p>";
+		$content = "<p><strong>" . wp_kses_post( $event->event_title ) . '</strong><br />' . $event->event_begin . ' @ ' . $event->event_time . "</p>";
 		if ( $event->event_label != '' ) {
-			$content .= "<p>" . sprintf( __( '<strong>Location:</strong> %s', 'my-calendar' ), $event->event_label ) . "</p>";
+			$content .= "<p>" . sprintf( __( '<strong>Location:</strong> %s', 'my-calendar' ), wp_kses_post( $event->event_label ) ) . "</p>";
 		}
 		$content .= "<p>" . sprintf( __( '<a href="%s">Edit event</a>.', 'my-calendar' ), $url ) . "</p>";
 		
@@ -209,7 +209,7 @@ function manage_my_calendar() {
 	if ( isset( $_GET['mode'] ) && $_GET['mode'] == 'delete' ) {
 		$sql    = "SELECT event_title, event_author FROM " . my_calendar_table() . " WHERE event_id=" . (int) $_GET['event_id'];
 		$result = $mcdb->get_results( $sql, ARRAY_A );
-		if ( mc_can_edit_event( $result[0]['event_author'] ) ) {
+		if ( mc_can_edit_event( (int) $_GET['event_id'] ) ) {
 			if ( isset( $_GET['date'] ) ) {
 				$event_instance = (int) $_GET['date'];
 				$sql            = "SELECT occur_begin FROM " . my_calendar_event_table() . " WHERE occur_id=" . $event_instance;
@@ -290,7 +290,7 @@ function manage_my_calendar() {
 			$ea     = "SELECT event_author FROM " . my_calendar_table() . " WHERE event_id = $value";
 			$result = $mcdb->get_results( $ea, ARRAY_A );
 			$total  = count( $events );
-			if ( mc_can_edit_event( $result[0]['event_author'] ) ) {
+			if ( mc_can_edit_event( $value ) ) {
 				$delete_occurrences = "DELETE FROM " . my_calendar_event_table() . " WHERE occur_event_id = $value";
 				$mcdb->query( $delete_occurrences );
 				$ids[]     = (int) $value;
@@ -591,6 +591,7 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 	if ( ( $action == 'add' || $action == 'copy' ) && $proceed == true ) {
 		$add      = $output[2]; // add format here
 		$add      = apply_filters( 'mc_before_save_insert', $add );
+		// this db write takes most of the processing time for this process.
 		$result   = $mcdb->insert( my_calendar_table(), $add, $formats );
 		$event_id = $mcdb->insert_id;
 		mc_increment_event( $event_id );
@@ -629,10 +630,10 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 		}
 	}
 	if ( $action == 'edit' && $proceed == true ) {
+		$current_user = wp_get_current_user();
 		$result       = true;
 		$url          = ( get_option( 'mc_uri' ) != '' && ! is_numeric( get_option( 'mc_uri' ) ) ) ? '' . sprintf( __( 'View <a href="%s">your calendar</a>.', 'my-calendar' ), get_option( 'mc_uri' ) ) : '';
-		$event_author = (int) ( $_POST['event_author'] );
-		if ( mc_can_edit_event( $event_author ) ) {
+		if ( mc_can_edit_event( $event_id ) ) {
 			$update       = $output[2];
 			$update       = apply_filters( 'mc_before_save_update', $update, $event_id );
 			$endtime      = date( "H:i:00", strtotime( $update['event_endtime'] ) );
@@ -1362,10 +1363,10 @@ if ( mc_show_edit_block( 'event_location' ) || mc_show_edit_block( 'event_locati
 							<option value="none"> --</option><?php
 							foreach ( $locs as $loc ) {
 								if ( is_object( $loc ) ) {
-									echo "<option value=\"" . $loc->location_id . "\">" . stripslashes( $loc->location_label ) . "</option>";
+									echo "<option value=\"" . $loc->location_id . "\">" . wp_kses_post( stripslashes( $loc->location_label ) ) . "</option>";
 									if ( is_object( $data ) ) {
 										if ( $loc->location_id == $data->event_location ) {
-											$current_location = "<span id='mc-current-location'>" . sprintf( __( 'Current location: %s', 'my-calendar' ), $loc->location_label ) . "</span>";
+											$current_location = "<span id='mc-current-location'>" . sprintf( __( 'Current location: %s', 'my-calendar' ), wp_kses_post( $loc->location_label ) ) . "</span>";
 										}
 									}
 								}
@@ -1745,7 +1746,6 @@ function mc_list_events() {
 					$class   = ( $class == 'alternate' ) ? 'even' : 'alternate';
 					$pending = ( $event->event_approved == 0 ) ? 'pending' : '';
 					$author  = ( $event->event_author != 0 ) ? get_userdata( $event->event_author ) : 'Public Submitter';
-					$title   = $event->event_title;
 
 					if ( $event->event_flagged == 1 && ( isset( $_GET['restrict'] ) && $_GET['restrict'] == 'flagged' ) ) {
 						$spam       = 'spam';
@@ -1761,7 +1761,7 @@ function mc_list_events() {
 					$delete_url = admin_url( "admin.php?page=my-calendar-manage&amp;mode=delete&amp;event_id=$event->event_id" );
 					$check = mc_test_occurrence_overlap( $event, true );
 					$problem = ( $check != '' ) ? 'problem' : ''; 
-					if ( current_user_can( 'mc_manage_events' ) || current_user_can( 'mc_approve_events' ) || mc_can_edit_event( $event->event_author ) ) {
+					if ( current_user_can( 'mc_manage_events' ) || current_user_can( 'mc_approve_events' ) || mc_can_edit_event( $event->event_id ) ) {
 						?>
 						<tr class="<?php echo "$class $spam $pending $problem"; ?>">
 							<th scope="row">
@@ -1769,11 +1769,11 @@ function mc_list_events() {
 								<label for="mc<?php echo $event->event_id; ?>"><?php echo $event->event_id; ?></label>
 							</th>
 							<td title="<?php echo esc_attr( substr( strip_tags( stripslashes( $event->event_desc ) ), 0, 240 ) ); ?>">
-								<strong><?php if ( mc_can_edit_event( $event->event_author ) ) { ?>
+								<strong><?php if ( mc_can_edit_event( $event->event_id ) ) { ?>
 									<a href="<?php echo $edit_url; ?>" class='edit'>
 										<?php } ?>
-										<?php echo $spam_label; echo stripslashes( $title ); ?>
-									<?php if ( mc_can_edit_event( $event->event_author ) ) {
+										<?php echo $spam_label; echo strip_tags( stripslashes( $event->event_title ) ); ?>
+									<?php if ( mc_can_edit_event( $event->event_id ) ) {
 										echo "</a>";
 										if ( $check != '' ) {
 											echo '<br /><strong class="error">' . sprintf( __( 'There is a problem with this event. <a href="%s">View</a>', 'my-calendar' ), $edit_url ) . '</strong>';
@@ -1783,7 +1783,7 @@ function mc_list_events() {
 								<div class='row-actions' style="visibility:visible;">
 									<a href="<?php echo $copy_url; ?>"
 									   class='copy'><?php _e( 'Copy', 'my-calendar' ); ?></a> |
-									<?php if ( mc_can_edit_event( $event->event_author ) ) { ?>
+									<?php if ( mc_can_edit_event( $event->event_id ) ) { ?>
 										<a href="<?php echo $edit_url; ?>" class='edit'><?php _e( 'Edit', 'my-calendar' ); ?></a> 
 										<?php if ( mc_event_is_grouped( $event->event_group_id ) ) { ?>
 											| <a href="<?php echo $group_url; ?>" class='edit group'><?php _e( 'Edit Group', 'my-calendar' ); ?></a>
@@ -1822,7 +1822,7 @@ function mc_list_events() {
 								</div>
 							</td>
 							<td>
-								<?php if ( $event->event_label != '' ) { ?><a class='mc_filter' href='<?php $elabel = urlencode( $event->event_label ); echo admin_url( "admin.php?page=my-calendar-manage&amp;filter=$elabel&amp;restrict=where" ); ?>' title="<?php _e( 'Filter by location', 'my-calendar' ); ?>"><span class="screen-reader-text"><?php _e( 'Show only: ', 'my-calendar' ); ?></span><?php echo stripslashes( $event->event_label ); ?></a><?php } ?>
+								<?php if ( $event->event_label != '' ) { ?><a class='mc_filter' href='<?php $elabel = urlencode( $event->event_label ); echo admin_url( "admin.php?page=my-calendar-manage&amp;filter=$elabel&amp;restrict=where" ); ?>' title="<?php _e( 'Filter by location', 'my-calendar' ); ?>"><span class="screen-reader-text"><?php _e( 'Show only: ', 'my-calendar' ); ?></span><?php echo strip_tags( stripslashes( $event->event_label ) ); ?></a><?php } ?>
 							</td>
 							<?php if ( $event->event_endtime != "23:59:59" ) {
 								$eventTime = date_i18n( get_option( 'mc_time_format' ), strtotime( $event->event_time ) );
@@ -1889,15 +1889,16 @@ function mc_list_events() {
 									$this_cat = $categories[ $key ];
 								}
 							}
+							$color = strip_tags( $this_cat->category_color );
 							?>
 							<td>
 								<div class="category-color"
-								     style="background-color:<?php echo ( strpos( $this_cat->category_color, '#' ) !== 0 ) ? '#' : '';
-								     echo $this_cat->category_color; ?>;"></div>
+								     style="background-color:<?php echo ( strpos( $color, '#' ) !== 0 ) ? '#' : ''; echo $color; ?>;">
+								</div>
 								<a class='mc_filter'
 								   href='<?php echo admin_url( "admin.php?page=my-calendar-manage&amp;filter=$event->event_category&amp;restrict=category" ); ?>'
 								   title="<?php _e( 'Filter by category', 'my-calendar' ); ?>"><span
-										class="screen-reader-text"><?php _e( 'Show only: ', 'my-calendar' ); ?></span><?php echo stripslashes( $this_cat->category_name ); ?>
+										class="screen-reader-text"><?php _e( 'Show only: ', 'my-calendar' ); ?></span><?php echo wp_kses_post( stripslashes( $this_cat->category_name ) ); ?>
 								</a></td>
 							<?php unset( $this_cat ); ?>
 						</tr>
@@ -2005,7 +2006,7 @@ function mc_check_data( $action, $post, $i ) {
 		$expires            = ! empty( $post['event_link_expires'] ) ? $post['event_link_expires'] : '0';
 		$approved           = ! empty( $post['event_approved'] ) ? $post['event_approved'] : '0';
 		$location_preset    = ! empty( $post['location_preset'] ) ? $post['location_preset'] : '';
-		$event_author       = ! empty( $post['event_author'] ) ? $post['event_author'] : $current_user->ID;
+		$event_author       = ( ! empty( $post['event_author'] ) && is_numeric( $post['event_author'] ) ) ? $post['event_author'] : '';
 		$event_open         = ( isset( $post['event_open'] ) && $post['event_open'] !== 0 ) ? $post['event_open'] : '2';
 		$event_tickets      = ( isset( $post['event_tickets'] ) ) ? trim( $post['event_tickets'] ) : '';
 		$event_registration = ( isset( $post['event_registration'] ) ) ? trim( $post['event_registration'] ) : '';
@@ -2073,6 +2074,9 @@ function mc_check_data( $action, $post, $i ) {
 					'location_phone2'    => $event_phone2,
 					'location_access'    => ( is_array( $event_access ) ) ? serialize( $event_access ) : ''
 				);
+				
+				$add_loc = array_map( 'wp_kses_post', $add_loc );
+								
 				$loc_formats = array(
 					'%s',
 					'%s',
@@ -2148,6 +2152,9 @@ function mc_check_data( $action, $post, $i ) {
 	}
 		
 	if ( $errors == '' ) {
+		$current_user = wp_get_current_user();
+		$event_author = ( $event_author == $current_user->ID || current_user_can( 'mc_manage_events' ) ) ? $event_author : $current_user->ID;
+		
 		$ok     = true;
 		$submit = array(
 			// strings
@@ -2195,6 +2202,8 @@ function mc_check_data( $action, $post, $i ) {
 			'event_longitude'    => $event_longitude,
 			'event_latitude'     => $event_latitude
 		);
+		$submit = array_map( 'wp_kses_post', $submit );
+		
 	} else {
 		$ok           = false;
 		$event_access = ( is_array( $event_access ) ) ? serialize( $event_access ) : '';

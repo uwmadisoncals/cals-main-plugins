@@ -152,7 +152,7 @@ function mc_category_icon_title( $title, $post_id = null ) {
 			if ( is_numeric( $event_id ) ) {
 				$event    = mc_get_event_core( $event_id );
 				$icon     = mc_category_icon( $event );
-				$title    = $icon . ' ' . $title;
+				$title    = $icon . ' ' . wp_kses_post( $title );
 			}
 		}
 	}
@@ -234,11 +234,11 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 	}
 
 	$event_title    = jd_draw_template( $data, $title_template );
-	$event_title    = ( $event_title == '' ) ? jd_draw_template( $data, '{title}' ) : $event_title; //prevent empty titles
+	$event_title    = ( $event_title == '' ) ? jd_draw_template( $data, '{title}' ) : wp_kses_post( $event_title ); //prevent empty titles
 
 	if ( strpos( $event_title, 'href' ) === false && $type != 'mini' && $type != 'list' ) {
 		if ( get_option( 'mc_open_uri' ) == 'true' ) {
-			$details_link = mc_get_details_link( $event );
+			$details_link = esc_url( mc_get_details_link( $event ) );
 			$wrap         = "<a href='$details_link' class='url summary$has_image'>";
 			$balance      = "</a>";
 		} else {
@@ -256,7 +256,7 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 	$event_title = ( $type == 'single' ) ? apply_filters( 'mc_single_event_title', $event_title, $event ) : $event_title;
 	$title       = ( $type == 'single' && ! is_singular( 'mc-events' ) ) ? "<h2 class='event-title summary'>$image $event_title</h2>\n" : '';
 	$title       = apply_filters( 'mc_event_title', $title, $event, $event_title, $image );
-	$header .= $title;
+	$header     .= $title;
 	$close_image = apply_filters( 'mc_close_button', "<img src=\"" . plugin_dir_url( __FILE__ ) . "images/event-close.png\" alt='" . __( 'Close', 'my-calendar' ) . "' />" );
 	$close_button = "<button aria-controls='$uid-$day_id-$type-details' class='mc-toggle close'>$close_image</button>";
 	
@@ -285,7 +285,7 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 				$details_label = mc_get_details_label( $event, $data );
 				$details_link  = mc_get_details_link( $event );
 				if ( _mc_is_url( $details_link ) ) {
-					$more = "<p class='mc_details'><a href='$details_link'>$details_label</a></p>\n";
+					$more = "<p class='mc_details'><a href='" . esc_url( $details_link ) . "'>$details_label</a></p>\n";
 				} else {
 					$more = '';
 				}
@@ -301,7 +301,7 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 
 			if ( function_exists( 'my_calendar_generate_vcal' ) && get_option( 'mc_show_event_vcal' ) == 'true' ) {
 				$url       = add_query_arg( 'vcal', $uid, home_url() );
-				$vcal_link = "<p class='ical'><a rel='nofollow' href='$url'>" . __( 'iCal', 'my-calendar' ) . "</a></p>\n";
+				$vcal_link = "<p class='ical'><a rel='nofollow' href='" . esc_url( $url ) . "'>" . __( 'iCal', 'my-calendar' ) . "</a></p>\n";
 				$vcal      = $vcal_link;
 			}
 			$sizes = get_intermediate_image_sizes();
@@ -318,21 +318,21 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 				$image = ( $event->event_image != '' ) ? "<img src='$event->event_image' alt='' class='mc-image photo' />" : '';
 			}
 			if ( get_option( 'mc_desc' ) == 'true' || $type == 'single' ) {
-				$description = wpautop( stripcslashes( $event->event_desc ), 1 );
+				$description = wpautop( stripcslashes( wp_kses_post( $event->event_desc ) ), 1 );
 				$description = "<div class='longdesc'>$description</div>";
 			}
 			if ( get_option( 'mc_short' ) == 'true' && $type != 'single' ) {
-				$short = wpautop( stripcslashes( $event->event_short ), 1 );
+				$short = wpautop( stripcslashes( wp_kses_post( $event->event_short ) ), 1 );
 				$short = "<div class='shortdesc'>$short</div>";
 			}
 
 			if ( get_option( 'mc_event_registration' ) == 'true' ) {
 				switch ( $event->event_open ) {
 					case '0':
-						$status = get_option( 'mc_event_closed' );
+						$status = wp_kses_post( get_option( 'mc_event_closed' ) );
 						break;
 					case '1':
-						$status = get_option( 'mc_event_open' );
+						$status = wp_kses_post( get_option( 'mc_event_open' ) );
 						break;
 					case '2':
 						$status = '';
@@ -363,7 +363,7 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 				$external_class = ( $is_external ) ? "class='$type-link external'" : "class='$type-link'";
 				$link_template  = ( mc_get_template( 'link' ) != '' ) ? mc_get_template( 'link' ) : '{title}';
 				$link_text      = jd_draw_template( $data, $link_template );
-				$link           = "<p><a href='$event_link' $external_class>" . $link_text . "</a></p>";
+				$link           = "<p><a href='" . esc_url( $event_link ) . "' $external_class>" . $link_text . "</a></p>";
 			}
 			$details = "\n"
 			           . $close
@@ -393,7 +393,7 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 		$img_class = ( $image != '' ) ? ' has-image' : ' no-image';
 		$container = "<div id='$uid-$day_id-$type-details' class='details$img_class' role='alert' aria-labelledby='$uid-$day_id-$type-title'>\n";
 		$container = apply_filters( 'mc_before_event', $container, $event, $type, $time );
-		$details   = $header . $container . $details;
+		$details   = $header . $container . apply_filters( 'mc_inner_content', $details, $event, $type, $time );
 		$details .= apply_filters( 'mc_after_event', '', $event, $type, $time );
 		$details .= $close; // second close button
 		$details .= "</div><!--ends .details--></div>";
@@ -416,7 +416,7 @@ add_filter( 'mc_after_event', 'mc_edit_panel', 10, 4 );
 function mc_edit_panel( $html, $event, $type, $time ) {
 	// create edit links
 	$edit = '';
-	if ( mc_can_edit_event( $event->event_author ) && get_option( 'mc_remote' ) != 'true' ) {
+	if ( mc_can_edit_event( $event->event_id ) && get_option( 'mc_remote' ) != 'true' ) {
 		$mc_id     = $event->occur_id;
 		$groupedit = ( $event->event_group_id != 0 ) ? " &bull; <a href='" . admin_url( "admin.php?page=my-calendar-groups&amp;mode=edit&amp;event_id=$event->event_id&amp;group_id=$event->event_group_id" ) . "' class='group'>" . __( 'Edit Group', 'my-calendar' ) . "</a>\n" : '';
 		$recurs    = str_split( $event->event_recur, 1 );
@@ -706,7 +706,7 @@ function mc_list_title( $events ) {
 	} else {
 		$cstate = sprintf( __( " and %d other events", 'my-calendar' ), $count );
 	}
-	$title = apply_filters( 'mc_list_event_title_hint', stripcslashes( $now->event_title ), $now ) . "<span class='mc-list-extended'>$cstate</span>";
+	$title = apply_filters( 'mc_list_event_title_hint', wp_kses_post( stripcslashes( $now->event_title ) ), $now ) . "<span class='mc-list-extended'>$cstate</span>";
 
 	return $title;
 }
@@ -759,6 +759,7 @@ function mc_flatten_array( $events ) {
 function mc_get_search_results( $search ) {
 	global $wpdb;
 	$mcdb = $wpdb;
+	$event_array = array();
 	if ( get_option( 'mc_remote' ) == 'true' && function_exists( 'mc_remote_db' ) ) {
 		$mcdb = mc_remote_db();
 	}
@@ -1225,7 +1226,13 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 		if ( in_array( 'timeframe', $used ) ) {
 			// if dy parameter not set, use today's date instead of first day of month.
 			if ( isset( $_GET['dy'] ) ) {
-				$weeks_day = first_day_of_week( $current_date );
+				$current_day = absint( $_GET['dy'] );
+				$current_set = mktime( 0, 0, 0, $c_month, $current_day, $c_year ); 
+				if ( date( 'N', $current_set ) == $start_of_week ) {
+					$weeks_day = first_day_of_week( $current_set );
+				} else {
+					$weeks_day = first_day_of_week( $current_date );
+				}
 			} else {
 				$weeks_day = first_day_of_week( current_time( 'timestamp' ) );
 			}
@@ -1233,7 +1240,7 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 			if ( isset( $_GET['time'] ) && $_GET['time'] == 'day' ) {
 				// don't adjust day if viewing day format
 			} else {
-				if ( $day > 20 ) {
+				if ( !isset( $_GET['dy'] ) && $day > 20 ) {
 					$day = date( 'j', strtotime( "$from + 1 week" ) );
 				}
 			}
@@ -1490,7 +1497,7 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 												'cid',
 												'mc_id'
 											), get_option( 'mc_mini_uri' ) );
-										$link     = ( get_option( 'mc_mini_uri' ) != '' ) ? $date_url . '#' . $atype . '-' . $c_year . '-' . $am . '-' . $ad : '#';
+										$link     = esc_url( ( get_option( 'mc_mini_uri' ) != '' ) ? $date_url . '#' . $atype . '-' . $c_year . '-' . $am . '-' . $ad : '#' );
 									}
 									$element = "a href='$link'";
 									$close   = 'a';
@@ -1509,7 +1516,6 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 										} else {
 											$title = '';
 										}
-										//if ( $monthclass != 'nextmonth' ) { // only show current month in list view.
 										if ( $event_output != '' ) {
 											$my_calendar_body .= "
 												<li id='$format-$date' class='mc-events " . esc_attr( "$dayclass $dateclass $events_class $odd" ) . "'>
@@ -1518,11 +1524,10 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 												</li>";
 											$odd = ( $odd == 'odd' ) ? 'even' : 'odd';
 										}
-										//}
 									} else {
 										$my_calendar_body .= "
 												<$td id='$format-$date' class='" . esc_attr( "$dayclass $dateclass $weekend_class $monthclass $events_class" ) . " day-with-date'>" . "
-													<$element class='mc-date $trigger'><span aria-hidden='true'>$thisday_heading</span><span class='screen-reader-text'><span class='screen-reader-text'>" . date_i18n( get_option( 'mc_date_format' ), strtotime( $date ) ) . "</span></span></$close>" .
+													<$element class='mc-date $trigger'><span aria-hidden='true'>$thisday_heading</span><span class='screen-reader-text'>" . date_i18n( get_option( 'mc_date_format' ), strtotime( $date ) ) . "</span></$close>" .
 										                     $event_output . "
 												</$td>\n";
 									}
@@ -1606,15 +1611,15 @@ function my_category_key( $category ) {
 		if ( $cat->category_private == 1 ) {
 			$class .= " private";
 		}
-		$url = add_query_arg( 'mcat', $cat->category_id, mc_get_current_url() );
+		$url = mc_build_url( array( 'mcat' => $cat->category_id ), array( 'mcat' ) );
 		if ( $cat->category_icon != "" && get_option( 'mc_hide_icons' ) != 'true' ) {
-			$key .= '<li class="cat_' . $class . '"><a href="' . $url . '"><span class="category-color-sample"><img src="' . $path . $cat->category_icon . '" alt="" style="background:' . $hex . $cat->category_color . ';" /></span>' . stripcslashes( $cat->category_name ) . "</a></li>\n";
+			$key .= '<li class="cat_' . $class . '"><a href="' . $url . '"><span class="category-color-sample"><img src="' . $path . $cat->category_icon . '" alt="" style="background:' . $hex . $cat->category_color . ';" /></span>' . wp_kses_post( stripcslashes( $cat->category_name ) ) . "</a></li>\n";
 		} else {
-			$key .= '<li class="cat_' . $class . '"><a href="' . $url . '"><span class="category-color-sample no-icon" style="background:' . $hex . $cat->category_color . ';"> &nbsp; </span>' . stripcslashes( $cat->category_name ) . "</a></li>\n";
+			$key .= '<li class="cat_' . $class . '"><a href="' . $url . '"><span class="category-color-sample no-icon" style="background:' . $hex . $cat->category_color . ';"> &nbsp; </span>' . wp_kses_post( stripcslashes( $cat->category_name ) ) . "</a></li>\n";
 		}
 	}
 	if ( isset( $_GET['mcat'] ) ) {
-		$key .= "<li><a href='" . esc_url( remove_query_arg( 'mcat', mc_get_current_url() ) ) . "'>" . __( 'All Categories', 'my-calendar' ) . "</a></li>";
+		$key .= "<li class='all-categories'><a href='" . esc_url( remove_query_arg( 'mcat', mc_get_current_url() ) ) . "'>" . apply_filters( 'mc_text_all_categories', __( 'All Categories', 'my-calendar' ) ) . "</a></li>";
 	}
 	$key .= "</ul>\n</div>";
 	$key = apply_filters( 'mc_category_key', $key, $categories );
@@ -1872,7 +1877,7 @@ function my_calendar_categories_list( $show = 'list', $context = 'public', $grou
 			<option value="all" selected="selected">' . __( 'All Categories', 'my-calendar' ) . '</option>' . "\n";
 
 		foreach ( $categories as $category ) {
-			$category_name = stripcslashes( $category->category_name );
+			$category_name = wp_kses_post( stripcslashes( $category->category_name ) );
 			$mcat          = ( empty( $_GET['mcat'] ) ) ? '' : (int) $_GET['mcat'];
 			if ( $show == 'list' ) {
 				$this_url = mc_build_url( array( 'mcat' => $category->category_id ), array() );
@@ -2183,7 +2188,7 @@ function my_calendar_locations_list( $show = 'list', $type = 'saved', $datatype 
 			if ( $type == 'saved' ) {
 				foreach ( $location as $k => $value ) {
 					$vt    = urlencode( trim( $value ) );
-					$value = stripcslashes( $value );
+					$value = wp_kses_post( stripcslashes( $value ) );
 					if ( $value == '' ) {
 						continue;
 					}
@@ -2194,7 +2199,7 @@ function my_calendar_locations_list( $show = 'list', $type = 'saved', $datatype 
 					}
 					if ( $show == 'list' ) {
 						$selected = ( $vt == $loc ) ? " class='selected'" : '';
-						$this_url = mc_build_url( array( 'loc' => $vt, 'ltype' => $datatype ), array() );
+						$this_url = esc_url( mc_build_url( array( 'loc' => $vt, 'ltype' => $datatype ), array() ) );
 						$output .= "			<li$selected><a rel='nofollow' href='$this_url'>$value</a></li>\n";
 					} else {
 						$selected = ( $vt == $loc ) ? " selected='selected'" : '';
@@ -2205,13 +2210,13 @@ function my_calendar_locations_list( $show = 'list', $type = 'saved', $datatype 
 				}
 			} else {
 				$vk       = urlencode( trim( $key ) );
-				$location = trim( $location );
+				$location = wp_kses_post( trim( $location ) );
 				if ( $location == '' ) {
 					continue;
 				}
 				if ( $show == 'list' ) {
 					$selected = ( $vk == $_GET['loc'] ) ? " class='selected'" : '';
-					$this_url = mc_build_url( array( 'loc' => $vk, 'ltype' => $datatype ), array() );
+					$this_url = esc_url( mc_build_url( array( 'loc' => $vk, 'ltype' => $datatype ), array() ) );
 					$output .= "			<li$selected><a rel='nofollow' href='$this_url'>$location</a></li>\n";
 				} else {
 					$selected = ( $vk == $_GET['loc'] ) ? " selected='selected'" : '';

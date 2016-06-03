@@ -9,7 +9,7 @@ class FrmAppController {
         }
 
 		$menu_name = FrmAppHelper::get_menu_name();
-		add_menu_page( 'Formidable', $menu_name, 'frm_view_forms', 'formidable', 'FrmFormsController::route', FrmAppHelper::plugin_url() . '/images/form_16.png', self::get_menu_position() );
+		add_menu_page( 'Formidable', $menu_name, 'frm_view_forms', 'formidable', 'FrmFormsController::route', '', self::get_menu_position() );
     }
 
 	private static function get_menu_position() {
@@ -231,6 +231,7 @@ class FrmAppController {
 		wp_register_style( 'formidable-admin', FrmAppHelper::plugin_url() . '/css/frm_admin.css', array(), $version );
         wp_register_script( 'bootstrap_tooltip', FrmAppHelper::plugin_url() . '/js/bootstrap.min.js', array( 'jquery' ), '3.3.4' );
 		wp_register_style( 'formidable-grids', FrmAppHelper::plugin_url() . '/css/frm_grids.css', array(), $version );
+		wp_register_style( 'formidable-dropzone', FrmAppHelper::plugin_url() . '/css/dropzone.css', array(), $version );
 
 		// load multselect js
 		wp_register_script( 'bootstrap-multiselect', FrmAppHelper::plugin_url() . '/js/bootstrap-multiselect.js', array( 'jquery', 'bootstrap_tooltip' ), '0.9.8', true );
@@ -249,6 +250,7 @@ class FrmAppController {
 
             wp_enqueue_style( 'formidable-admin' );
 			wp_enqueue_style( 'formidable-grids' );
+			wp_enqueue_style( 'formidable-dropzone' );
             add_thickbox();
 
             wp_register_script( 'formidable-editinplace', FrmAppHelper::plugin_url() . '/js/jquery/jquery.editinplace.packed.js', array( 'jquery' ), '2.3.0' );
@@ -277,16 +279,6 @@ class FrmAppController {
         }
     }
 
-    public static function wp_admin_body_class( $classes ) {
-        global $wp_version;
-        //we need this class everywhere in the admin for the menu
-        if ( version_compare( $wp_version, '3.7.2', '>' ) ) {
-            $classes .= ' frm_38_trigger';
-        }
-
-        return $classes;
-    }
-
     public static function load_lang() {
         load_plugin_textdomain( 'formidable', false, FrmAppHelper::plugin_folder() . '/languages/' );
     }
@@ -297,11 +289,6 @@ class FrmAppController {
     public static function widget_text_filter( $content ) {
     	$regex = '/\[\s*(formidable|display-frm-data|frm-stats|frm-graph|frm-entry-links|formresults|frm-search)\s+.*\]/';
     	return preg_replace_callback( $regex, 'FrmAppHelper::widget_text_filter_callback', $content );
-    }
-
-    public static function widget_text_filter_callback( $matches ) {
-        _deprecated_function( __FUNCTION__, '2.0', 'FrmAppHelper::widget_text_filter_callback' );
-        return FrmAppHelper::widget_text_filter_callback( $matches );
     }
 
     public static function front_head() {
@@ -328,11 +315,6 @@ class FrmAppController {
 	public static function load_css() {
 		_deprecated_function( __FUNCTION__, '2.0.9', 'FrmStylesController::load_saved_css' );
 		return FrmStylesController::load_saved_css();
-	}
-
-	public static function footer_js( $location = 'footer' ) {
-		_deprecated_function( __FUNCTION__, '2.0', 'FrmAppHelper::widget_text_filter_callback' );
-		return FrmFormsController::footer_js( $location );
 	}
 
 	/**
@@ -433,10 +415,5 @@ class FrmAppController {
     public static function get_form_shortcode( $atts ) {
         _deprecated_function( __FUNCTION__, '1.07.05', 'FrmFormsController::get_form_shortcode()' );
         return FrmFormsController::get_form_shortcode( $atts );
-    }
-
-    public static function get_postbox_class() {
-        _deprecated_function( __FUNCTION__, '2.0' );
-        return 'postbox-container';
     }
 }

@@ -285,6 +285,7 @@ function atw_posts_filter_basic() {
             <option value="comment_count" <?php selected( $cur_order == 'comment_count');?>>Number of comments</option>
             <option value="author" <?php selected( $cur_order == 'author');?>>Author</option>
             <option value="ID" <?php selected( $cur_order == 'ID');?>>Post ID</option>
+			<option value="menu_order" <?php selected( $cur_order == 'menu_order');?>>Menu/Custom Post Order</option>
             <option value="none" <?php selected( $cur_order == 'none');?>>No order</option>
         </select>
 

@@ -222,12 +222,6 @@ function frmAdminBuildJS(){
 					return;
 				}
 
-				var switchto = ui.item.data('switchto');
-				if(switchto){
-					ui.item.hide();
-					jQuery('#'+switchto).show();
-				}
-
 				insertNewFieldByDragging( fieldHTMLId, formId, sectionId, opts );
 			},
 			change:function(event, ui){
@@ -360,6 +354,7 @@ function frmAdminBuildJS(){
 				$thisField.find('.frm_ipe_field_label').mouseover().click();
 
 				updateFieldOrder();
+				initiateMultiselect();
 
 				var $thisSection = $thisField.find('ul.frm_sorting');
 				if ($thisSection.length) {
@@ -389,7 +384,7 @@ function frmAdminBuildJS(){
 
 		// moving an existing field
 		if ( ui.item.hasClass('edit_field_type_break') || ui.item.hasClass('edit_field_type_form') ||
-			ui.item.hasClass('edit_field_type_divider') || ui.item.hasClass('edit_field_type_captcha') ) {
+			ui.item.hasClass('edit_field_type_divider') ) {
 			return false;
 		}
 		return true;
@@ -436,6 +431,8 @@ function frmAdminBuildJS(){
 						loadFields($nextSet.attr('id'));
 					}
 				}
+
+				initiateMultiselect();
 			}
 		});
 	}
@@ -445,11 +442,6 @@ function frmAdminBuildJS(){
 		var field_type = $thisObj.closest('li').attr('id');
 		var form_id = this_form_id;
 		var $button = $thisObj.closest('.frmbutton');
-		var switchto = $button.data('switchto');
-		if(switchto){
-			$button.hide();
-			document.getElementById(switchto).style.display = '';
-		}
 		jQuery.ajax({
 			type:'POST',url:ajaxurl,
 			data:{
@@ -468,6 +460,7 @@ function frmAdminBuildJS(){
 				section = '#'+match[1]+'.edit_field_type_divider ul.frm_sorting';
 				setupSortable(section);
 				toggleOneSectionHolder(jQuery(section));
+				initiateMultiselect();
 			}
 		});
 		return false;
@@ -568,30 +561,7 @@ function frmAdminBuildJS(){
 				valMsg.val(frm_admin_js.default_conf);
 			}
 
-			//Add default descriptions if empty
-			var field_type = jQuery("select[name='field_options[type_"+field_id+"]']").val();
-			var $fieldDesc = jQuery(document.getElementById('field_description_'+field_id));
-			if($fieldDesc.text() == frm_admin_js.desc){
-				var newDesc = '';
-				if ( field_type == 'email' ) {
-					newDesc = frm_admin_js.enter_email;
-				} else {
-					newDesc = frm_admin_js.enter_password;
-				}
-				$fieldDesc.text(newDesc);
-				jQuery('input[name="field_options[description_'+ field_id +']"]').val(newDesc);
-			}
-
-			var $confDesc = jQuery('.frm_ipe_field_conf_desc');
-			if($confDesc.text() == frm_admin_js.desc){
-				if ( field_type == 'email' ) {
-					$confDesc.text(frm_admin_js.confirm_email);
-					jQuery('#frm_conf_field_'+field_id+'_inner_container input[type=hidden]').val(frm_admin_js.confirm_email);
-				} else {
-					$confDesc.text(frm_admin_js.confirm_password);
-					jQuery('#frm_conf_field_'+field_id+'_inner_container input[type=hidden]').val(frm_admin_js.confirm_password);
-				}
-			}
+			setConfirmationFieldDescriptions( field_id );
 
 			//Add or remove class for confirmation field styling
 			if(val == 'inline'){
@@ -608,6 +578,29 @@ function frmAdminBuildJS(){
 			setTimeout(function(){
 				$thisField.removeClass('frm_conf_inline frm_conf_below');
 			},200);
+		}
+	}
+
+	function setConfirmationFieldDescriptions( field_id ) {
+		var fieldType = document.getElementsByName( 'field_options[type_' + field_id + ']' )[0].value;
+
+		var fieldDescription = document.getElementById( 'field_description_' + field_id );
+		var hiddenDescName = 'field_options[description_' + field_id + ']';
+		var newValue = frm_admin_js['enter_' + fieldType];
+		maybeSetNewDescription( fieldDescription, hiddenDescName, newValue );
+
+		var confFieldDescription = document.getElementById( 'conf_field_description_' + field_id );
+		var hiddenConfName = 'field_options[conf_desc_' + field_id + ']';
+		var newConfValue = frm_admin_js['confirm_' + fieldType];
+		maybeSetNewDescription( confFieldDescription, hiddenConfName, newConfValue );
+	}
+
+	function maybeSetNewDescription( descriptionDiv, hiddenName, newValue ) {
+		if ( descriptionDiv.innerHTML == frm_admin_js.desc ) {
+
+			// Set the visible description value and the hidden description value
+			descriptionDiv.innerHTML = newValue;
+			document.getElementsByName( hiddenName )[0].value = newValue;
 		}
 	}
 
@@ -2196,7 +2189,9 @@ function frmAdminBuildJS(){
 			jQuery('.frm_form_builder form:first').submit(function(){
 				jQuery('.inplace_field').blur();
 			});
-			
+
+			initiateMultiselect();
+
 			jQuery('.frm_ipe_form_key').editInPlace({
 				url:ajaxurl,params:"action=frm_form_key_in_place_edit&form_id="+this_form_id+'&nonce='+frmGlobal.nonce,
 				show_buttons:"true",value_required:"true",
@@ -2422,7 +2417,7 @@ function frmAdminBuildJS(){
 			if ( $navCont !== null ) {
 				var $titleDiv = document.getElementById('titlediv');
 				$titleDiv.insertBefore($navCont, $titleDiv.firstChild);
-				$navCont.style.display = '';
+				$navCont.style.display = 'block';
 			}
 
 			// move content tabs
@@ -2559,6 +2554,8 @@ function frmAdminBuildJS(){
 					css = frm_admin_js.jquery_ui_url +'/themes/'+themeVal+'/jquery-ui.css';
 					themeName = jQuery("select[name$='[theme_selector]'] option[value='"+themeVal+"']").text();
 				}
+				themeName = themeName.trim();
+
 				updateUICSS(css);
 				document.getElementById('frm_theme_css').value = themeVal;
 				document.getElementById('frm_theme_name').value = themeName;
@@ -2641,7 +2638,7 @@ function frm_remove_tag(html_tag){
 
 function frm_show_div(div,value,show_if,class_id){
 	if(value == show_if){
-		jQuery(class_id+div).fadeIn('slow'); 
+		jQuery(class_id+div).fadeIn('slow').css('visibility', 'visible');
 	}else{
 		jQuery(class_id+div).fadeOut('slow');
 	}

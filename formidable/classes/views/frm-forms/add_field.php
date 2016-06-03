@@ -90,7 +90,8 @@ if ( $display['conf_field'] ) { ?>
 		<div class="frm_form_fields">
 			<input type="text" id="conf_field_<?php echo esc_attr( $field['field_key'] ) ?>" name="field_options[conf_input_<?php echo esc_attr( $field['id'] ) ?>]" value="<?php echo esc_attr( $field['conf_input'] ); ?>" <?php do_action('frm_field_input_html', $field) ?> />
 		</div>
-    	<div class="frm_ipe_field_conf_desc description <?php echo ($field['conf_desc'] == '') ? 'frm-show-click' : '' ?>"><?php echo ($field['conf_desc'] == '') ? __( '(Click to add description)', 'formidable' ) : force_balance_tags($field['conf_desc']); ?></div>
+    	<div id="conf_field_description_<?php echo esc_attr( $field['id'] ) ?>" class="frm_ipe_field_conf_desc description <?php echo ($field['conf_desc'] == '') ? 'frm-show-click' : '' ?>"><?php
+			echo ($field['conf_desc'] == '') ? __( '(Click to add description)', 'formidable' ) : force_balance_tags($field['conf_desc']); ?></div>
     	<input type="hidden" name="field_options[conf_desc_<?php echo esc_attr( $field['id'] ) ?>]" value="<?php echo esc_attr( $field['conf_desc'] ); ?>" />
 </div>
 	<?php if ( $display['clear_on_focus'] ) { ?>
@@ -156,7 +157,10 @@ if ( $display['options'] ) { ?>
 
                 <?php
 				if ( $display['required'] ) { ?>
-                    <label for="frm_req_field_<?php echo esc_attr( $field['id'] ) ?>" class="frm_inline_label"><input type="checkbox" id="frm_req_field_<?php echo esc_attr( $field['id'] ) ?>" class="frm_req_field" name="field_options[required_<?php echo esc_attr( $field['id'] ) ?>]" value="1" <?php echo $field['required'] ? 'checked="checked"': ''; ?> /> <?php _e( 'Required', 'formidable' ) ?></label>
+					<label for="frm_req_field_<?php echo esc_attr( $field['id'] ) ?>" class="frm_inline_label">
+						<input type="checkbox" id="frm_req_field_<?php echo esc_attr( $field['id'] ) ?>" class="frm_req_field" name="field_options[required_<?php echo esc_attr( $field['id'] ) ?>]" value="1" <?php checked( $field['required'], 1 ) ?> />
+						<?php _e( 'Required', 'formidable' ) ?>
+					</label>
                 <?php
                 }
 
@@ -174,7 +178,10 @@ if ( $display['options'] ) { ?>
                         $field['read_only'] = false;
 					}
                 ?>
-                <label for="frm_read_only_field_<?php echo esc_attr( $field['id'] ) ?>" class="frm_inline_label frm_help" title="<?php esc_attr_e( 'Read Only: Show this field but do not allow the field value to be edited from the front-end.', 'formidable' ) ?>" ><input type="checkbox" id="frm_read_only_field_<?php echo esc_attr( $field['id'] ) ?>" name="field_options[read_only_<?php echo esc_attr( $field['id'] ) ?>]" value="1" <?php echo $field['read_only'] ? ' checked="checked"' : ''; ?>/> <?php _e( 'Read Only', 'formidable' ) ?></label>
+				<label for="frm_read_only_field_<?php echo esc_attr( $field['id'] ) ?>" class="frm_inline_label frm_help" title="<?php esc_attr_e( 'Read Only: Show this field but do not allow the field value to be edited from the front-end.', 'formidable' ) ?>" >
+					<input type="checkbox" id="frm_read_only_field_<?php echo esc_attr( $field['id'] ) ?>" name="field_options[read_only_<?php echo esc_attr( $field['id'] ) ?>]" value="1" <?php checked( $field['read_only'], 1 ) ?>/>
+					<?php _e( 'Read Only', 'formidable' ) ?>
+				</label>
                 <?php }
 
                 do_action('frm_field_options_form_top', $field, $display, $values);

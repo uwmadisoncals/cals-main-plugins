@@ -5,7 +5,7 @@ Plugin URI: http://weavertheme.com/plugins
 Description: Weaver X Theme Support - a package of useful shortcodes and widgets that integrates closely with the Weaver X theme. This plugin Will also allow you to switch from Weaver X to any other theme and still be able to use the shortcodes and widgets from Weaver X with minimal effort.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 2.1.1
+Version: 2.1.2
 License: GPL V3
 
 Weaver Xtreme Theme Support
@@ -33,7 +33,7 @@ $theme = get_template_directory();
 
 if ( strpos( $theme, '/weaver-xtreme') !== false ) {		// only load if Weaver Xtreme is the theme
 
-define ('WVRX_TS_VERSION','2.1.1');
+define ('WVRX_TS_VERSION','2.1.2');
 define ('WVRX_TS_MINIFY','.min');		// '' for dev, '.min' for production
 define ('WVRX_TS_APPEARANCE_PAGE', false );
 

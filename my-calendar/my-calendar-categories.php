@@ -89,7 +89,7 @@ function my_calendar_manage_categories() {
 		}
 
 		if ( isset( $_POST['mode'] ) && $_POST['mode'] == 'add' ) {
-			$term = wp_insert_term( $_POST['category_name'], 'mc-event-category' );
+			$term = wp_insert_term( wp_kses_post( $_POST['category_name'] ), 'mc-event-category' );
 			if ( ! is_wp_error( $term ) ) {
 				$term = $term['term_id'];
 			} else {
@@ -102,6 +102,10 @@ function my_calendar_manage_categories() {
 				'category_private' => ( ( isset( $_POST['category_private'] ) ) ? 1 : 0 ),
 				'category_term'    => $term
 			);
+			
+			$add   = array_map( 'wp_kses_post', $add );		
+			
+			
 			// actions and filters
 			$add     = apply_filters( 'mc_pre_add_category', $add, $_POST );
 			$results = $mcdb->insert( my_calendar_categories_table(), $add, $formats );
@@ -256,7 +260,9 @@ function mc_edit_category_form( $view = 'edit', $catID = '' ) {
 									$color .= $cur_cat->category_color;
 								} else {
 									$color = '';
-								} ?>
+								} 
+								$color = strip_tags( $color );
+								?>
 								<ul>
 								<li>
 								<label for="cat_name"><?php _e( 'Category Name', 'my-calendar' ); ?></label> <input
@@ -271,7 +277,7 @@ function mc_edit_category_form( $view = 'edit', $catID = '' ) {
 									class="mc-color-input"
 									size="10"
 									maxlength="7"
-									value="<?php esc_attr_e( $color ); ?>"/>
+									value="<?php echo esc_attr( $color ); ?>"/>
 								</li>
 								<li>
 								<label for="cat_icon"><?php _e( 'Category Icon', 'my-calendar' ); ?></label> <select
@@ -394,7 +400,7 @@ function mc_manage_categories() {
 			?>
 		<tr class="<?php echo $class; ?>">
 			<th scope="row"><?php echo $cat->category_id; ?></th>
-			<td><?php echo stripslashes( $cat->category_name );
+			<td><?php echo stripslashes( wp_kses_post( $cat->category_name ) );
 				if ( $cat->category_id == get_option( 'mc_default_category' ) ) {
 					echo ' ' . __( '(Default)' );
 				}

@@ -2,9 +2,9 @@
 Contributors: sswells, srwells, jamie.wahlin
 Donate link: http://formidablepro.com/donate
 Tags: contact form, contact, custom form, database, email, feedback, form, forms, poll, Post, captcha, spam, survey, template, widget, multisite, form builder, form creator, form manager
-Requires at least: 3.7
-Tested up to: 4.5
-Stable tag: 2.01.01
+Requires at least: 3.8
+Tested up to: 4.5.2
+Stable tag: 2.02
 
 Beautiful forms in 60 seconds. The WordPress form builder that enables you to create forms with a simple drag-and-drop interface and in-place editing.
 
@@ -89,6 +89,87 @@ A. Try clearing your browser cache. As plugin modifications are made, frequent j
 [See more FAQs](http://formidablepro.com/formidable-faqs/ "Formidable Form FAQs")
 
 == Changelog ==
+
+= 2.02 =
+* Improve user role dropdowns in global settings
+* Remove some deprecated functions
+* More output escaping
+* Move file creation for stylesheet to its own file for an easier API
+* **Pro Features: ** *
+* Add drag and drop file uploading
+* Add options to set the file size and count limits
+* Merge the upload importer plugin into main plugin
+* Filter the media library so uploads in forms can only be viewed by those with permission to edit entries
+* Don't allow direct viewing of attachment pages
+* Add file protection options per form to prevent direct access to files
+* Add a prefix to the attachment slug to prevent the attachments from using top-level slugs that would be better used elsewhere
+* Process files during validation if javascript errors on the page, or if browser doesn't support the in-place file uploader
+* Include the error message at the top of the page when there are ajax validation errors
+* Add frm_image_html_array hook so we can tie in with modals soon
+* Add an option to use text calculations for combining values instead of requiring math operations
+* Add age shortcode for use in calculations. Use [age id=25] in a calculation, where 25 is the id of the date field.
+* If a calculation doesn't have any field triggers, trigger it on load
+* Fixed calculations using multiselect fields across page breaks
+* Fixed date calculations with an empty date field. The calculation will now wait until any date fields have been filled.
+* Only use ajax validation when ajax submit is turned on to prevent double validation checks
+* Allow recaptcha to be dragged into section
+* Fixed issue with html showing in rich text
+* Fixed filtering conditionals from parent form inside of a foreach loop
+* Change default sep for images displayed in View
+* Don't force links when displaying a non-image file
+* Make sure repeating fields watching Lookups keep custom value
+* Fix undefined index error with date field calendar style setting
+* Make sure page size and limit work together well in Views
+* Don't run date calculations until all dates are selected
+* Allow address field labels to be edited when field is initially added
+* Fix single row Lookup field checkboxes styling
+
+= 2.01.03 =
+* **Pro Features: ** *
+* Make sure HTML entities don't show in rich text fields
+
+= 2.01.02 =
+* Increased minimum required WordPress version to 3.8
+* Added frm_skip_form_action hook. This hook can be used to change whether the action is skipped or not
+* Added border radius settings to success and error messages
+* Fixed issue allowing a trashed form shortcode to still show the form
+* Fixed issue causing &amp; to show instead of & when editing paragraph fields
+* Removes French and Swedish translations since they are complete online
+* Update for better cache deletion in WP 4.0+
+* Allow a specific field type to change the value for emails and entry array
+* Prevent errors with Redis cache plugin
+* Improve styling for submit buttons on mobile devices
+* Don't let imported style override default
+* Add frm_clean_[field-type-here]_field_options_before_update hook
+* Fix &, >, and other character comparison issues
+* **Pro Features:** *
+* Added frm_combo_dropdown_label filter. This hook can be used to add a label to the blank option in combo field dropdowns (state, and country, Credit card month, year)
+* Added frm_use_embedded_form_actions hook. If this hook is used to return the value "true", form actions for embedded forms will be fired
+* Make sure the view page number is not 0
+* When getting the entry array, address fields will no longer be sent as an array
+* Don't load more than 500 options in a lookup field on the form builder page
+* Fixed rich text fields with in place edit
+* Fixed javascript error when submitting an entry from the back-end
+* Use the correct calendar locale when editing an entry from the back-end
+* Fixed issue with the unique message being replaced if it was the same as the global unique message
+* Fixed issue with dependent dynamic field change events not getting triggered
+* Exclude password and credit card fields from the default email message
+* Add views parameter to frm-search shortcode
+* Fix error that appeared when using a date field in a calculation in multi-page form
+* Fix issue with switching from a dropdown to a Lookup field
+* Fix issue with loading icon replacing Lookup field options
+* Set confirmation field description correctly
+* Allow post fields in form action conditional logic
+* Set default value correctly when address field is shown
+* Don't let spaces break conditional logic
+* Fix JS error after in-place edit
+* Fix PHP warning message for Lookup fields
+* Fix ambiguous form ID SQL error
+* Don't require credit card fields when editing
+* Make sure ampersand doesn't break Lookup fields
+* Add autopopulate option to Image URL, time, and hidden fields
+* Add hook to allow LIKE comparison with Lookup fields
+
 = 2.01.01 =
 * Use a different email regex to allow more characters, and longer TLDs
 * Only load custom styles on the styler. Don't include it on the manage styles, or custom css tabs. Bad custom css can make the page uneditable.

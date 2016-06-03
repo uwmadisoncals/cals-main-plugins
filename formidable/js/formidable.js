@@ -84,20 +84,136 @@ function frmFrontFormJS(){
 			}
 		}
 
+		if ( dateFields[ opt_key ].options.defaultDate !== '' ) {
+			dateFields[ opt_key ].options.defaultDate = new Date( dateFields[ opt_key ].options.defaultDate );
+		}
+
 		jQuery(this).datepicker( jQuery.extend(
 			jQuery.datepicker.regional[ dateFields[ opt_key ].locale ],
 			dateFields[ opt_key ].options
 		) );
 	}
 
-	// Remove the frm_transparent class from a single file upload field when it changes
-	// Hide the old file when a new file is uploaded
-	function showFileUploadText(){
+	function loadDropzones(){
+		if ( typeof __frmDropzone === 'undefined'  ) {
+			return;
+		}
+
+		var uploadFields = __frmDropzone;
+		for ( var i = 0; i < uploadFields.length; i++ ) {
+			loadDropzone( i );
+		}
+	}
+
+	function loadDropzone( i ) {
+		var uploadFields = __frmDropzone;
+		var field = jQuery( '#' + uploadFields[i].htmlID );
+		var max = uploadFields[i].maxFiles;
+		if ( typeof uploadFields[i].mockFiles !== 'undefined' ) {
+			var uploadedCount = uploadFields[i].mockFiles.length;
+			if ( max > 0 ) {
+				max = max - uploadedCount;
+			}
+		}
+
+		var form = field.closest('form');
+		var submitButton = form.find('input[type="submit"], .frm_submit input[type="button"]');
+		var loading = form.find('.frm_ajax_loading');
+
+		field.dropzone({
+			url:frm_js.ajax_url,
+			addRemoveLinks: true,
+        	paramName: uploadFields[i].paramName,
+			maxFilesize: uploadFields[i].maxFilesize,
+			maxFiles: max,
+			acceptedFiles: uploadFields[i].acceptedFiles,
+			uploadMultiple: uploadFields[i].uploadMultiple,
+			fallback: function() {
+				// Force ajax submit to turn off
+				jQuery(this.element).closest('form').removeClass('frm_ajax_submit');
+			},
+			init: function() {
+				this.on('sending', function(file, xhr, formData) {
+					formData.append('action', 'frm_submit_dropzone' );
+					formData.append('field_id', uploadFields[i].fieldID );
+					formData.append('form_id', uploadFields[i].formID );
+				});
+
+				this.on('success', function( file, response ) {
+					var mediaIDs = jQuery.parseJSON(response);
+					for ( var m = 0; m < mediaIDs.length; m++ ) {
+						if ( uploadFields[i].uploadMultiple !== true ) {
+							jQuery('input[name="'+ uploadFields[i].fieldName +'"]').val( mediaIDs[m] );
+						}
+					}
+				});
+
+				this.on('successmultiple', function( files, response ) {
+					var mediaIDs = jQuery.parseJSON(response);
+					for ( var m = 0; m < files.length; m++ ) {
+						jQuery(files[m].previewElement).append( getHiddenUploadHTML( uploadFields[i], mediaIDs[m] ) );
+					}
+				});
+
+				this.on('removedfile', function( file ) {
+					if ( uploadFields[i].uploadMultiple !== true ) {
+						jQuery('input[name="'+ uploadFields[i].fieldName +'"]').val('');
+					}
+				});
+
+				this.on('complete', function( file ) {
+					if ( uploadFields[i].uploadMultiple && typeof file.mediaID !== 'undefined' ) {
+						jQuery(file.previewElement).append( getHiddenUploadHTML( uploadFields[i], file.mediaID ) );
+					}
+				});
+
+				this.on('addedfile', function(){
+					loading.addClass('frm_loading_now');
+					submitButton.attr('disabled', 'disabled');
+				});
+
+				this.on('queuecomplete', function(){
+					loading.removeClass('frm_loading_now');
+					submitButton.removeAttr('disabled');
+				});
+
+				this.on('removedfile', function( file ) {
+					if ( typeof file.mediaID !== 'undefined' ) {
+						jQuery(file.previewElement).remove();
+						var fileCount = this.files.length;
+						this.options.maxFiles = uploadFields[i].maxFiles - fileCount;
+					}
+				});
+
+				if ( typeof uploadFields[i].mockFiles !== 'undefined' ) {
+					for ( var f = 0; f < uploadFields[i].mockFiles.length; f++ ) {
+						var mockFile = {
+							name: uploadFields[i].mockFiles[f].name,
+							size: uploadFields[i].mockFiles[f].size,
+							mediaID: uploadFields[i].mockFiles[f].id
+						};
+
+						this.emit('addedfile', mockFile);
+						this.emit('thumbnail', mockFile, uploadFields[i].mockFiles[f].url);
+						this.emit('complete', mockFile);
+						this.files.push(mockFile);
+					}
+				}
+			}
+		});
+	}
+
+	function getHiddenUploadHTML( field, mediaID ) {
+		return '<input name="'+ field.fieldName +'[]" type="hidden" value="'+ mediaID +'" data-frmfile="'+ field.fieldID +'" />';
+	}
+
+	function removeFile(){
 		/*jshint validthis:true */
-		this.className = this.className.replace( 'frm_transparent', '');
-		var currentClass = this.parentNode.getElementsByTagName('a')[0].className;
-		if ( currentClass.indexOf('frm_clear_file_link') == -1 ) {
-			currentClass += ' frm_hidden';
+		var fieldName = jQuery(this).data('frm-remove');
+		fadeOut(jQuery(this).parent('.dz-preview'));
+		var singleField = jQuery('input[name="'+ fieldName +'"]');
+		if ( singleField.length ) {
+			singleField.val('');
 		}
 	}
 
@@ -700,17 +816,10 @@ function frmFrontFormJS(){
 	}
 
 	function operators(op, a, b){
-		if ( typeof b === 'undefined' ) {
-			b = '';
-		}
-		if(jQuery.isArray(b) && jQuery.inArray(a,b) > -1){
-			b = a;
-		}
-		if(String(a).search(/^\s*(\+|-)?((\d+(\.\d+)?)|(\.\d+))\s*$/) !== -1){
-			a = parseFloat(a);
-			b = parseFloat(b);
-		}
-		if ( String(a).indexOf('&quot;') != '-1' && operators(op, a.replace('&quot;', '"'), b) ) {
+		a = prepareLogicValueForComparison( a );
+		b = prepareEnteredValueForComparison( a, b );
+
+		if ( typeof a === 'string' && a.indexOf('&quot;') != '-1' && operators(op, a.replace('&quot;', '"'), b) ) {
 			return true;
 		}
 
@@ -725,8 +834,8 @@ function frmFrontFormJS(){
 					return false;
 				}
 
-				d = prepareEnteredValueForLikeComparison( d );
-				c = prepareLogicValueForLikeComparison( c );
+				d = prepareValueForLikeComparison( d );
+				c = prepareValueForLikeComparison( c );
 
 				return d.indexOf( c ) != -1;
 			},
@@ -736,8 +845,8 @@ function frmFrontFormJS(){
 					return true;
 				}
 
-				d = prepareEnteredValueForLikeComparison( d );
-				c = prepareLogicValueForLikeComparison( c );
+				d = prepareValueForLikeComparison( d );
+				c = prepareValueForLikeComparison( c );
 
 				return d.indexOf( c ) == -1;
 			}
@@ -745,20 +854,44 @@ function frmFrontFormJS(){
 		return theOperators[op](a, b);
 	}
 
-	function prepareEnteredValueForLikeComparison( d ) {
-		if ( typeof d === 'string' ) {
-			d = d.toLowerCase();
-		} else if ( typeof d === 'number' ) {
-			d = d.toString();
+	function prepareLogicValueForComparison( a ) {
+		if ( String(a).search(/^\s*(\+|-)?((\d+(\.\d+)?)|(\.\d+))\s*$/) !== -1 ) {
+			a = parseFloat(a);
+		} else if ( typeof a === 'string' ) {
+			a = a.trim();
 		}
-		return d;
+
+		return a;
 	}
 
-	function prepareLogicValueForLikeComparison( c ) {
-		if ( typeof c === 'string' ) {
-			c = c.toLowerCase();
+	function prepareEnteredValueForComparison( a, b ) {
+		if ( typeof b === 'undefined' ) {
+			b = '';
 		}
-		return c;
+
+		if ( jQuery.isArray(b) && jQuery.inArray(a, b) > -1 ) {
+			b = a;
+		}
+
+		if ( typeof a === 'number' && typeof b === 'string' ) {
+			b = parseFloat(b);
+		}
+
+		if ( typeof b === 'string' ) {
+			b = b.trim();
+		}
+
+		return b;
+	}
+
+
+	function prepareValueForLikeComparison( val ) {
+		if ( typeof val === 'string' ) {
+			val = val.toLowerCase();
+		} else if ( typeof val === 'number' ) {
+			val = val.toString();
+		}
+		return val;
 	}
 
 	/**
@@ -1095,7 +1228,9 @@ function frmFrontFormJS(){
 			// Set the hiddenFields value in the frm_hide_field_formID input
 			hiddenFields = JSON.stringify( hiddenFields );
 			var frmHideFieldsInput = document.getElementById('frm_hide_fields_' + formId);
-			frmHideFieldsInput.value = hiddenFields;
+			if ( frmHideFieldsInput !== null ) {
+				frmHideFieldsInput.value = hiddenFields;
+			}
 		}
 	}
 
@@ -1145,6 +1280,12 @@ function frmFrontFormJS(){
 				setHiddenCheckboxDefaultValue( input.name, defaultValue );
 
 			} else {
+				var addressType = input.getAttribute('autocompletetype');
+				if ( addressType !== null ) {
+					addressType = addressType.replace( 'address-', '' );
+					defaultValue = defaultValue[addressType];
+				}
+
 				input.value = defaultValue;
 			}
 
@@ -1194,8 +1335,7 @@ function frmFrontFormJS(){
 					// TODO: accommodate for when there are multiple default values but the user has removed some
 				}
 			}
-
-		} else {
+		} else if ( hiddenInputs[0] !== null ) {
 			hiddenInputs[0].value = defaultValue;
 		}
 	}
@@ -1577,14 +1717,14 @@ function frmFrontFormJS(){
 		var optContainer = childDiv.getElementsByClassName( 'frm_opt_container' )[0];
 		var inputs = optContainer.getElementsByTagName( 'input' );
 
+		addLoadingIconJS( childDiv, optContainer );
+
 		var currentValue = '';
 		if ( childFieldArgs.inputType == 'radio' ) {
 			currentValue = getValueFromRadioInputs( inputs );
 		} else {
 			currentValue = getValuesFromCheckboxInputs(inputs);
 		}
-
-		addLoadingIconJS( optContainer );
 
 		jQuery.ajax({
 			type:'POST',
@@ -1600,6 +1740,8 @@ function frmFrontFormJS(){
 			},
 			success:function(newHtml){
 				optContainer.innerHTML = newHtml;
+
+				removeLoadingIconJS( childDiv, optContainer );
 
 				if ( inputs.length == 1 && inputs[0].value === '' ) {
 					maybeHideRadioLookup( childFieldArgs, childDiv );
@@ -1653,11 +1795,6 @@ function frmFrontFormJS(){
 			logicArgs.repeatRow = childFieldArgs.repeatRow;
 			hideOrShowSingleField( logicArgs );
 		}
-	}
-
-	// Insert the loading icon
-	function addLoadingIconJS( optContainer ) {
-		optContainer.innerHTML = '<span class="frm-loading-img"></span>';
 	}
 
 	/**
@@ -1800,8 +1937,7 @@ function frmFrontFormJS(){
 	function updateDynamicListData( depFieldArgs, onCurrentPage ){
 		if ( onCurrentPage ) {
 			var $fieldDiv = jQuery( '#' + depFieldArgs.containerId);
-			var $optContainer = $fieldDiv.find('.frm_opt_container');
-			addLoadingIcon($optContainer);
+			addLoadingIcon( $fieldDiv );
 		}
 
 		jQuery.ajax({
@@ -1815,10 +1951,13 @@ function frmFrontFormJS(){
 			},
 			success:function(html){
 				if ( onCurrentPage ) {
-
+					var $optContainer = $fieldDiv.find('.frm_opt_container');
 					$optContainer.html(html);
 					var $listInputs = $optContainer.children('input');
 					var listVal = $listInputs.val();
+
+					removeLoadingIcon( $optContainer );
+
 					if (html === '' || listVal === '') {
 						hideDynamicField(depFieldArgs);
 					} else {
@@ -1848,7 +1987,7 @@ function frmFrontFormJS(){
 		var prevVal = getPrevFieldValue( hiddenInput );
 		var defaultVal = hiddenInput.data('frmval');
 
-		addLoadingIconTemp( $fieldDiv );
+		addLoadingIcon( $fieldDiv );
 
 		jQuery.ajax({
 			type:'POST',
@@ -1868,7 +2007,7 @@ function frmFrontFormJS(){
 				$optContainer.html(html);
 				var $dynamicFieldInputs = $optContainer.find('select, input, textarea');
 
-				removeLoadingIconTemp( $fieldDiv );
+				removeLoadingIcon( $optContainer );
 
 				if ( html === '' || ( $dynamicFieldInputs.length == 1 && $dynamicFieldInputs.attr('type') == 'hidden' ) ) {
 					hideDynamicField( depFieldArgs );
@@ -1909,13 +2048,8 @@ function frmFrontFormJS(){
 		triggerChange( jQuery( listInput ) );
 	}
 
-	// Insert the loading icon
-	function addLoadingIcon( $optContainer ) {
-		$optContainer.html( '<span class="frm-loading-img"></span>' );
-	}
-
-	// Insert the loading icon
-	function addLoadingIconTemp( $fieldDiv ) {
+	// Add the loading icon with jQuery
+	function addLoadingIcon( $fieldDiv ) {
 		var currentHTML = $fieldDiv.html();
 
 		if ( currentHTML.indexOf( 'frm-loading-img' ) > -1 ) {
@@ -1929,16 +2063,36 @@ function frmFrontFormJS(){
 		}
 	}
 
-	function removeLoadingIconTemp( $fieldDiv ) {
-		var currentHTML = $fieldDiv.html();
-		currentHTML = currentHTML.replace( '<span class="frm-loading-img"></span>', '' );
-		$fieldDiv.html( currentHTML );
+	// Add the loading icon with JavaScript
+	function addLoadingIconJS( fieldDiv, optContainer ) {
+		var currentHTML = fieldDiv.innerHTML;
 
-		var $optContainer = $fieldDiv.find('.frm_opt_container');
+		if ( currentHTML.indexOf( 'frm-loading-img' ) > -1 ) {
+			// Loading image already present
+		} else {
+			optContainer.style.display = "none";
 
+			var loadingIcon = document.createElement('span');
+			loadingIcon.setAttribute("class", "frm-loading-img");
+			fieldDiv.insertBefore(loadingIcon, optContainer.nextSibling);
+		}
+	}
+
+	// Remove the loading icon with jQuery
+	function removeLoadingIcon( $optContainer ) {
+		$optContainer.next( '.frm-loading-img' ).remove();
 		$optContainer.show();
 	}
 
+	// Remove the loading icon with JavaScript
+	function removeLoadingIconJS( fieldDiv, optContainer ) {
+		var loadingIcon = fieldDiv.getElementsByClassName( 'frm-loading-img' )[0];
+		if ( loadingIcon !== null && loadingIcon !== undefined ) {
+			loadingIcon.parentNode.removeChild( loadingIcon );
+		}
+
+		optContainer.style.display = "block";
+	}
 
 	// Get the previous field value in a Dynamic field
 	function getPrevFieldValue( inputs ) {
@@ -1996,6 +2150,23 @@ function frmFrontFormJS(){
 		var triggers = __FRMCALC.triggers;
 		if ( triggers ) {
 			jQuery(triggers.join()).trigger({type:'change',selfTriggered:true});
+		}
+
+		triggerCalcWithoutFields();
+	}
+
+	function triggerCalcWithoutFields() {
+		var calcs = __FRMCALC.calc;
+		var vals = [];
+
+		for ( var field_key in calcs ) {
+			if ( calcs[field_key].fields.length < 1 ) {
+				var totalField = document.getElementById( 'field_'+ field_key );
+				if ( totalField !== null && ! isChildInputConditionallyHidden( totalField, calcs[field_key].form_id ) ) {
+					// if field is not hidden, do calculation
+					doSingleCalculation( __FRMCALC, field_key, vals );
+				}
+			}
 		}
 	}
 
@@ -2116,27 +2287,33 @@ function frmFrontFormJS(){
 		// loop through the fields in this calculation
 		thisFullCalc = getValsForSingleCalc( thisCalc, thisFullCalc, all_calcs, vals, fieldInfo );
 
-		// Set the number of decimal places
-		var dec = thisCalc.calc_dec;
+		var total = '';
 
-		// allow .toFixed for reverse compatability
-		if ( thisFullCalc.indexOf(').toFixed(') ) {
-		var calcParts = thisFullCalc.split(').toFixed(');
-			if ( isNumeric(calcParts[1]) ) {
-				dec = calcParts[1];
-				thisFullCalc = thisFullCalc.replace(').toFixed(' + dec, '');
+		if ( thisCalc.calc_type == 'text' ) {
+			total = thisFullCalc;
+		} else {
+			// Set the number of decimal places
+			var dec = thisCalc.calc_dec;
+
+			// allow .toFixed for reverse compatability
+			if ( thisFullCalc.indexOf(').toFixed(') ) {
+				var calcParts = thisFullCalc.split(').toFixed(');
+				if ( isNumeric(calcParts[1]) ) {
+					dec = calcParts[1];
+					thisFullCalc = thisFullCalc.replace(').toFixed(' + dec, '');
+				}
 			}
-		}
 
-		var total = parseFloat(eval(thisFullCalc));
+			total = parseFloat(eval(thisFullCalc));
 
-		if ( typeof total === 'undefined' || isNaN(total) ) {
-			total = 0;
-		}
+			if ( typeof total === 'undefined' || isNaN(total) ) {
+				total = 0;
+			}
 
-		// Set decimal points
-		if ( isNumeric( dec ) ) {
-			total = total.toFixed(dec);
+			// Set decimal points
+			if ( isNumeric( dec ) ) {
+				total = total.toFixed(dec);
+			}
 		}
 
 		if ( totalField.val() != total ) {
@@ -2157,10 +2334,21 @@ function frmFrontFormJS(){
 			};
 
 			field = getCallForField( field, all_calcs );
-			vals = getCalcFieldId(field, all_calcs, vals);
-
-			if ( typeof vals[field.valKey] === 'undefined' || isNaN(vals[field.valKey]) ) {
-				vals[field.valKey] = 0;
+			if ( thisCalc.calc_type == 'text' ) {
+				field.valKey = 'text' + field.valKey;
+				vals = getTextCalcFieldId( field, vals );
+				if ( typeof vals[field.valKey] === 'undefined' ) {
+					vals[field.valKey] = '';
+				}
+			} else {
+				field.valKey = 'num' + field.valKey;
+				vals = getCalcFieldId(field, all_calcs, vals);
+				if ( typeof vals[field.valKey] === 'undefined' || isNaN(vals[field.valKey]) ) {
+					vals[field.valKey] = 0;
+				}
+				if ( field.thisField.type == 'date' && vals[field.valKey] === 0 ) {
+					thisFullCalc = '';
+				}
 			}
 
 			var findVar = '['+ field.thisFieldId +']';
@@ -2259,17 +2447,8 @@ function frmFrontFormJS(){
 
 		vals[field.valKey] = 0;
 
-		var calcField;
-		if ( field.inSection === false ) {
-			calcField = jQuery(field.thisFieldCall);
-		} else {
-			calcField = getSiblingField( field );
-			if ( calcField === null || typeof calcField === 'undefined' ) {
-				calcField = jQuery(field.thisFieldCall);
-			}
-		}
-
-		if ( calcField === null || typeof calcField === 'undefined' || calcField.length < 1 ) {
+		var calcField = getCalcField( field );
+		if ( calcField === false ) {
 			return vals;
 		}
 
@@ -2299,6 +2478,45 @@ function frmFrontFormJS(){
 
 		return vals;
     }
+
+	function getTextCalcFieldId( field, vals ) {
+		if ( typeof vals[field.valKey] !== 'undefined' && vals[field.valKey] !== '' ) {
+			return vals;
+		}
+
+		vals[field.valKey] = '';
+
+		var calcField = getCalcField( field );
+		if ( calcField === false ) {
+			return vals;
+		}
+
+		calcField.each(function(){
+			var thisVal = getOptionValue( field.thisField, this );
+			thisVal = thisVal.trim();
+			vals[field.valKey] += thisVal;
+		});
+
+		return vals;
+    }
+
+	function getCalcField( field ) {
+		var calcField;
+		if ( field.inSection === false ) {
+			calcField = jQuery(field.thisFieldCall);
+		} else {
+			calcField = getSiblingField( field );
+			if ( calcField === null || typeof calcField === 'undefined' ) {
+				calcField = jQuery(field.thisFieldCall);
+			}
+		}
+
+		if ( calcField === null || typeof calcField === 'undefined' || calcField.length < 1 ) {
+			calcField = false;
+		}
+
+		return calcField;
+	}
 
 	/**
 	* Get the value from a date field regardless of whether datepicker is defined for it
@@ -2570,7 +2788,8 @@ function frmFrontFormJS(){
 	}
 
 	function checkRequiredField( field, errors ) {
-		if ( field.type == 'hidden' ) {
+		var fileID = field.getAttribute('data-frmfile');
+		if ( field.type == 'hidden' && fileID === null ) {
 			return errors;
 		}
 
@@ -2581,8 +2800,7 @@ function frmFrontFormJS(){
 			jQuery(checkGroup).each(function() {
 			    val = this.value;
 			});
-		} else if ( field.type == 'file' ) {
-			var fileID = jQuery(field).data('fid');
+		} else if ( field.type == 'file' || fileID ) {
 			if ( typeof fileID === 'undefined' ) {
 				fileID = getFieldId( field, true );
 				fileID = fileID.replace('file', '');
@@ -2720,7 +2938,6 @@ function frmFrontFormJS(){
 
 	function getFormErrors(object, action){
 		jQuery(object).find('input[type="submit"], input[type="button"]').attr('disabled','disabled');
-		jQuery(object).find('.frm_ajax_loading').addClass('frm_loading_now');
 
 		if(typeof action == 'undefined'){
 			jQuery(object).find('input[name="frm_action"]').val();
@@ -2729,38 +2946,33 @@ function frmFrontFormJS(){
 		jQuery.ajax({
 			type:'POST',url:frm_js.ajax_url,
 			data:jQuery(object).serialize() +'&action=frm_entries_'+ action +'&nonce='+frm_js.nonce,
-			success:function(errObj){
-				errObj = errObj.replace(/^\s+|\s+$/g,'');
-				if(errObj.indexOf('{') === 0){
-					errObj = jQuery.parseJSON(errObj);
+			success:function(response){
+				var defaultResponse = {'content':'', 'errors':{}, 'pass':false };
+				if ( response === null ) {
+					response = defaultResponse;
 				}
 
-				if(errObj === '' || !errObj || errObj === '0' || (typeof(errObj) != 'object' && errObj.indexOf('<!DOCTYPE') === 0)){
-					var $loading = document.getElementById('frm_loading');
-					if($loading !== null){
-						var file_val=jQuery(object).find('input[type=file]').val();
-						if(typeof(file_val) != 'undefined' && file_val !== ''){
-							setTimeout(function(){
-								jQuery($loading).fadeIn('slow');
-							},2000);
-						}
-					}
-					var $recapField = jQuery(object).find('.frm-g-recaptcha, .g-recaptcha');
-					if($recapField.length && (jQuery(object).find('.frm_next_page').length < 1 || jQuery(object).find('.frm_next_page').val() < 1)){
-                        $recapField.closest('.frm_form_field').replaceWith('<input type="hidden" name="recaptcha_checked" value="'+ frm_js.nonce +'">');
-					}
+				response = response.replace(/^\s+|\s+$/g,'');
+				if ( response.indexOf('{') === 0 ) {
+					response = jQuery.parseJSON(response);
+				}else{
+					response = defaultResponse;
+				}
 
-					object.submit();
-				}else if(typeof errObj != 'object'){
+				if ( typeof response.redirect != 'undefined' ) {
+					window.location = response.redirect;
+				} else if ( response.content !== '' ) {
+					// the form or success message was returned
+
 					jQuery(object).find('.frm_ajax_loading').removeClass('frm_loading_now');
 					var formID = jQuery(object).find('input[name="form_id"]').val();
-					jQuery(object).closest( '#frm_form_'+ formID +'_container' ).replaceWith(errObj);
+					jQuery(object).closest( '#frm_form_'+ formID +'_container' ).replaceWith( response.content );
 					frmFrontForm.scrollMsg( formID );
 
 					if(typeof(frmThemeOverride_frmAfterSubmit) == 'function'){
 						var pageOrder = jQuery('input[name="frm_page_order_'+ formID +'"]').val();
-						var formReturned = jQuery(errObj).find('input[name="form_id"]').val();
-						frmThemeOverride_frmAfterSubmit(formReturned, pageOrder, errObj, object);
+						var formReturned = jQuery(response.content).find('input[name="form_id"]').val();
+						frmThemeOverride_frmAfterSubmit(formReturned, pageOrder, response.content, object);
 					}
 
 					var entryIdField = jQuery(object).find('input[name="id"]');
@@ -2768,25 +2980,26 @@ function frmFrontFormJS(){
 						jQuery(document.getElementById('frm_edit_'+ entryIdField.val())).find('a').addClass('frm_ajax_edited').click();
 					}
 
-					var formCompleted = jQuery(errObj).find('.frm_message');
+					var formCompleted = jQuery(response.content).find('.frm_message');
 					if ( formCompleted.length ) {
 						// if the success message is showing, run the logic
 						checkConditionalLogic( 'pageLoad' );
 					}
 					checkFieldsOnPage();
-				}else{
+				} else if ( Object.keys(response.errors).length ) {
+					// errors were returned
+
 					jQuery(object).find('input[type="submit"], input[type="button"]').removeAttr('disabled');
 					jQuery(object).find('.frm_ajax_loading').removeClass('frm_loading_now');
 
 					//show errors
 					var cont_submit = true;
-					jQuery('.form-field').removeClass('frm_blank_field');
-					jQuery('.form-field .frm_error').replaceWith('');
+					removeAllErrors();
 
 					var show_captcha = false;
 					var $fieldCont = null;
 
-					for (var key in errObj){
+					for ( var key in response.errors ) {
 						$fieldCont = jQuery(object).find('#frm_field_'+key+'_container');
 
 						if ( $fieldCont.length ) {
@@ -2803,7 +3016,7 @@ function frmFrontFormJS(){
 							}
 
 							if ( $fieldCont.is(':visible') ) {
-								addFieldError( $fieldCont, key, errObj );
+								addFieldError( $fieldCont, key, response.errors );
 
 								cont_submit = false;
 
@@ -2820,21 +3033,27 @@ function frmFrontFormJS(){
 									}
 								}
 							}
-						}else if(key == 'redirect'){
-							window.location = errObj[key];
-							return;
 						}
 					}
 
 					scrollToFirstField( object );
 
 					if(show_captcha !== true){
-						jQuery(object).find('.frm-g-recaptcha, .g-recaptcha').closest('.frm_form_field').replaceWith('<input type="hidden" name="recaptcha_checked" value="'+ frm_js.nonce +'">');
+						replaceCheckedRecaptcha( object, false );
 					}
 
 					if(cont_submit){
 						object.submit();
+					}else{
+						jQuery(object).prepend(response.error_message);
 					}
+				} else {
+					// there may have been a plugin conflict, or the form is not set to submit with ajax
+
+					showFileLoading( object );
+					replaceCheckedRecaptcha( object, true );
+
+					object.submit();
 				}
 			},
 			error:function(){
@@ -2860,10 +3079,41 @@ function frmFrontFormJS(){
 		$fieldCont.find('.frm_error').remove();
 	}
 
+	function removeAllErrors() {
+		jQuery('.form-field').removeClass('frm_blank_field');
+		jQuery('.form-field .frm_error').replaceWith('');
+		jQuery('.frm_error_style').remove();
+	}
+
 	function scrollToFirstField( object ) {
 		var field = jQuery(object).find('.frm_blank_field:first');
 		if ( field.length ) {
 			frmFrontForm.scrollMsg( field, object, true );
+		}
+	}
+
+	function showFileLoading( object ) {
+		var loading = document.getElementById('frm_loading');
+		if ( loading !== null ) {
+			var file_val = jQuery(object).find('input[type=file]').val();
+			if ( typeof file_val != 'undefined' && file_val !== '' ) {
+				setTimeout(function(){
+					jQuery(loading).fadeIn('slow');
+				},2000);
+			}
+		}
+	}
+
+	function replaceCheckedRecaptcha( object, checkPage ) {
+		var $recapField = jQuery(object).find('.frm-g-recaptcha, .g-recaptcha');
+		if($recapField.length ){
+			if ( checkPage ) {
+				var morePages = jQuery(object).find('.frm_next_page').length < 1 || jQuery(object).find('.frm_next_page').val() < 1;
+				if ( ! morePages ) {
+					return;
+				}
+			}
+			$recapField.closest('.frm_form_field').replaceWith('<input type="hidden" name="recaptcha_checked" value="'+ frm_js.nonce +'">');
 		}
 	}
 
@@ -3117,47 +3367,6 @@ function frmFrontFormJS(){
 
         chart.draw(data, opts.options);
     }
-
-	/* File Fields */
-	function nextUpload(){
-		/*jshint validthis:true */
-		var obj = jQuery(this);
-		var id = obj.data('fid');
-		obj.wrap('<div class="frm_file_names frm_uploaded_files">');
-		var files = obj.get(0).files;
-		for ( var i = 0; i < files.length; i++ ) {
-			if ( 0 === i ) {
-				obj.after(files[i].name+' <a href="#" class="frm_clear_file_link">'+frm_js.remove+'</a>');
-			} else {
-				obj.after(files[i].name +'<br/>');
-			}
-		}
-
-        obj.hide();
-
-        var fileName = 'file'+ id;
-        var fname = obj.attr('name');
-        if ( fname != 'item_meta['+ id +'][]' ) {
-            // this is a repeatable field
-            var nameParts = fname.replace('item_meta[', '').replace('[]', '').split('][');
-            if ( nameParts.length == 3 ) {
-                fileName = fileName +'-'+ nameParts[1];
-            }
-        }
-
-        obj.closest('.frm_form_field').find('.frm_uploaded_files:last').after('<input name="'+ fname +'" data-fid="'+ id +'"class="frm_transparent frm_multiple_file" multiple="multiple" type="file" />');
-	}
-
-	function removeDiv(){
-		/*jshint validthis:true */
-		fadeOut(jQuery(this).parent('.frm_uploaded_files'));
-	}
-	
-	function clearFile(){
-		/*jshint validthis:true */
-		jQuery(this).parent('.frm_file_names').replaceWith('');
-		return false;
-	}
 	
 	/* Repeating Fields */
 	function removeRow(){
@@ -3300,9 +3509,6 @@ function frmFrontFormJS(){
 				$edit.html(cancel);
 				checkConditionalLogic( 'editInPlace' );
 				checkFieldsOnPage();
-
-				//TODO: Find out why this extra binding is required
-				jQuery('#'+ prefix + entry_id).on('change', 'input[name^="item_meta"], select[name^="item_meta"], textarea[name^="item_meta"]', maybeCheckDependent);
 			}
 		});
 		return false;
@@ -3363,6 +3569,7 @@ function frmFrontFormJS(){
 		checkDynamicFields();
 		checkLookupFields();
 		triggerCalc();
+		loadDropzones();
 	}
 
 	function checkPreviouslyHiddenFields() {
@@ -3589,9 +3796,7 @@ function frmFrontFormJS(){
 
 			jQuery(document.getElementById('frm_resend_email')).click(resendEmail);
 
-			jQuery(document).on('change', '.frm_multiple_file', nextUpload);
-			jQuery(document).on('click', '.frm_clear_file_link', clearFile);
-			jQuery(document).on('click', '.frm_remove_link', removeDiv);
+			jQuery(document).on('click', '.frm_remove_link', removeFile);
 
 			jQuery(document).on('focusin', 'input[data-frmmask]', function(){
 				jQuery(this).mask( jQuery(this).data('frmmask').toString() );
@@ -3602,8 +3807,6 @@ function frmFrontFormJS(){
 			jQuery(document).on('click', '.frm-show-form input[type="submit"], .frm-show-form input[name="frm_prev_page"], .frm-show-form .frm_save_draft', setNextPage);
             
             jQuery(document).on('change', '.frm_other_container input[type="checkbox"], .frm_other_container input[type="radio"], .frm_other_container select', showOtherText);
-			
-			jQuery(document).on('change', 'input[type=file].frm_transparent', showFileUploadText);
 
 			jQuery(document).on('click', '.frm_remove_form_row', removeRow);
 			jQuery(document).on('click', '.frm_add_form_row', addRow);
@@ -3657,16 +3860,21 @@ function frmFrontFormJS(){
 			var errors = frmFrontForm.validateFormSubmit( object );
 
 			if ( Object.keys(errors).length === 0 ) {
-				frmFrontForm.checkFormErrors( object, action );
+				jQuery(object).find('.frm_ajax_loading').addClass('frm_loading_now');
+				if ( classList.contains('frm_ajax_submit') ) {
+					action = jQuery(object).find('input[name="frm_action"]').val();
+					frmFrontForm.checkFormErrors( object, action );
+				} else {
+					object.submit();
+				}
 			}
 		},
 
 		validateFormSubmit: function( object ){
-			if(jQuery(this).find('.wp-editor-wrap').length && typeof(tinyMCE) != 'undefined'){
+			if ( typeof tinyMCE != 'undefined' && jQuery(this).find('.wp-editor-wrap').length ) {
 				tinyMCE.triggerSave();
 			}
 
-			action = jQuery(object).find('input[name="frm_action"]').val();
 			jsErrors = [];
 
 			if ( shouldJSValidate( object ) ) {
@@ -3683,6 +3891,7 @@ function frmFrontFormJS(){
 		getAjaxFormErrors: function( object ) {
 			jsErrors = validateForm( object );
 			if ( typeof frmThemeOverride_jsErrors == 'function' ) {
+				action = jQuery(object).find('input[name="frm_action"]').val();
 				var customErrors = frmThemeOverride_jsErrors( action, object );
 				if ( Object.keys(customErrors).length  ) {
 					for ( var key in customErrors ) {
@@ -3695,9 +3904,7 @@ function frmFrontFormJS(){
 		},
 
 		addAjaxFormErrors: function( object ) {
-			// Remove all previous errors
-			jQuery('.form-field').removeClass('frm_blank_field');
-			jQuery('.form-field .frm_error').replaceWith('');
+			removeAllErrors();
 
 			for ( var key in jsErrors ) {
 				var $fieldCont = jQuery(object).find('#frm_field_'+key+'_container');
@@ -3718,8 +3925,8 @@ function frmFrontFormJS(){
 		},
 
         scrollToID: function(id){
-            var frm_pos = jQuery(document.getElementById(id).offset());
-            window.scrollTo(frm_pos.left, frm_pos.top);
+            var object = jQuery(document.getElementById(id));
+            frmFrontForm.scrollMsg( object, false );
         },
 
 		scrollMsg: function( id, object, animate ) {

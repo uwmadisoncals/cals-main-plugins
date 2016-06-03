@@ -182,7 +182,7 @@ name with 'header_class=classname'. You can provide inline styling with 'header_
 					if ( ($col % 2) == 1 ) {	// force stuff to be even
 						$style = ' style="clear:left;"';
 					}
-					echo ('<div class="content-2-col atw-cf"' . $style . '>' . "\n");
+					echo ('<div class="atw-content-2-col atw-cf"' . $style . '>' . "\n");
                     atw_show_content( $slider, $filter);
                     echo ("</div> <!-- atw-content-2-col -->\n");
 
@@ -193,7 +193,7 @@ name with 'header_class=classname'. You can provide inline styling with 'header_
 					if ( ($col % 3) == 1 ) {	// force stuff to be even
 						$style = ' style="clear:left;"';
 					}
-					echo ('<div class="content-3-col atw-cf"' . $style . '>' . "\n");
+					echo ('<div class="atw-content-3-col atw-cf"' . $style . '>' . "\n");
                     atw_show_content( $slider, $filter );
                     echo ("</div> <!-- atw-content-3-col -->\n");
 
@@ -277,7 +277,7 @@ function atw_show_content( $slider, $filter = '' ) {
 
 	$saved_the_content_filter_key = atw_save_the_content_filters();
 
-    if ( ( !atw_posts_getopt('ignore_aspen_weaver') && (atw_posts_is_wvrx() || atw_posts_is_aspen() || atw_posts_is_wii()) )
+    if ( ( !atw_posts_getopt('ignore_aspen_weaver') && (atw_posts_is_wvrx() || atw_posts_is_aspen() || atw_posts_is_wii() ) )
         || (atw_posts_getopt('use_native_theme_templates') && atw_posts_theme_has_templates())
        ) {
 
@@ -285,14 +285,20 @@ function atw_show_content( $slider, $filter = '' ) {
             echo '<div class="sticky">';
         }
 
-        if ( atw_posts_is_wvrx() )
+        if ( atw_posts_is_wvrx() )  {
             get_template_part( 'templates/content', get_post_format() );
-        else
+        }
+		else if ( function_exists( 'twentysixteen_setup' ) ) {			// custom support for twentysixteen
+			get_template_part( 'template-parts/content', get_post_format() );
+		}
+        else {
             get_template_part( 'content', get_post_format() );
+        }
 
         if ( $sticky ) {
             echo '</div>';
         }
+		echo "<div style='clear:both;'></div>\n";
 		atw_restore_the_content_filters($saved_the_content_filter_key);
         return;
     }

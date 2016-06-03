@@ -369,6 +369,8 @@ function atw_posts_is_generic() {
 
 function atw_posts_theme_has_templates() {
     // see if the current theme has a content.php template
+	if (function_exists( 'twentysixteen_setup' ))
+		return true;
     $templates = array();
     $templates[] = 'content.php';           // see if the theme has a content.php file, assume it works as expected...
     $loc = locate_template($templates);

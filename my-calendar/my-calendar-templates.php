@@ -7,6 +7,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 function jd_draw_template( $array, $template, $type = 'list' ) {
 	$template = stripcslashes( $template );
 	foreach ( $array as $key => $value ) {
+		// disallow anything not allowed in posts
+		// everything in 'map' is already cleaned; map itself has to retain scripts
+		$value = !( 'map' == $key ) ? wp_kses_post( $value ) : $value;
 		if ( is_object( $value ) && ! empty( $value ) ) {
 			// null values return false...
 		} else {
@@ -113,6 +116,7 @@ function mc_clean_location( $event, $source = 'event' ) {
 			$event->location_label = '';
 		}
 	}
+	
 	return $event;
 }
 
@@ -125,14 +129,14 @@ function mc_maplink( $event, $request = 'map', $source = 'event' ) {
 		}
 		$zoom       = ( $event->event_zoom != 0 ) ? $event->event_zoom : '15';
 		$url        = $event->event_url;
-		$map_label = stripslashes( ( $event->event_label != "" ) ? $event->event_label : $event->event_title );		
+		$map_label = wp_kses_post( stripslashes( ( $event->event_label != "" ) ? $event->event_label : $event->event_title ) );		
 		$map_string = str_replace( " ", "+", $map_string );
 		if ( $event->event_longitude != '0.000000' && $event->event_latitude != '0.000000' ) {
 			$map_string = "$event->event_latitude,$event->event_longitude";
 		}
 	} else {
 		$url        = $event->location_url;
-		$map_label  = stripslashes( ( $event->location_label != "" ) ? $event->location_label : $event->event_title );				
+		$map_label  = wp_kses_post( stripslashes( ( $event->location_label != "" ) ? $event->location_label : $event->event_title ) );				
 		$zoom       = ( $event->location_zoom != 0 ) ? $event->location_zoom : '15';
 		$map_string = str_replace( " ", "+", $map_string );
 		if ( $event->location_longitude != '0.000000' && $event->location_latitude != '0.000000' ) {
@@ -140,11 +144,12 @@ function mc_maplink( $event, $request = 'map', $source = 'event' ) {
 		}
 	}
 	if ( strlen( trim( $map_string ) ) > 6 ) {
-		$map_url = "http://maps.google.com/maps?z=$zoom&amp;daddr=$map_string";
-		$map     = "<a href=\"$map_url\" class='map-link external'>" . sprintf( __( 'Map<span> to %s</span>', 'my-calendar' ), $map_label ) . "</a>";
+		$map_url = apply_filters( 'mc_map_url', "http://maps.google.com/maps?z=$zoom&amp;daddr=$map_string", $event );
+		$label   = sprintf( apply_filters( 'mc_map_label', __( 'Map<span> to %s</span>', 'my-calendar' ), $event ), $map_label );
+		$map     = "<a href=\"" . esc_url( $map_url ) . "\" class='map-link external'>" . $label . "</a>";
 	} else if ( esc_url( $url ) ) {
 		$map_url = $url;
-		$map     = "<a href=\"$map_url\" class='map-link external map-url'>" . sprintf( __( 'Map<span> to %s</span>', 'my-calendar' ), $map_label ) . "</a>";
+		$map     = "<a href=\"$map_url\" class='map-link external map-url'>" . $label . "</a>";
 	} else {
 		$map_url = '';
 		$map     = '';
@@ -175,14 +180,18 @@ function mc_hcard( $event, $address = 'true', $map = 'true', $source = 'event', 
 	$the_map = mc_maplink( $event, 'url', $source );
 	$event   = mc_clean_location( $event, $source );	
 	$url     = ( $source == 'event' ) ? $event->event_url : $event->location_url;
-	$label   = stripslashes( ( $source == 'event' ) ? $event->event_label : $event->location_label );
-	$street  = stripslashes( ( $source == 'event' ) ? $event->event_street : $event->location_street );
-	$street2 = stripslashes( ( $source == 'event' ) ? $event->event_street2 : $event->location_street2 );
-	$city    = stripslashes( ( $source == 'event' ) ? $event->event_city : $event->location_city );
-	$state   = stripslashes( ( $source == 'event' ) ? $event->event_state : $event->location_state );
-	$zip     = stripslashes( ( $source == 'event' ) ? $event->event_postcode : $event->location_postcode );
-	$country = stripslashes( ( $source == 'event' ) ? $event->event_country : $event->location_country );
-	$phone   = stripslashes( ( $source == 'event' ) ? $event->event_phone : $event->location_phone );
+	$url     = esc_url( $url );
+	$label   = wp_kses_post( stripslashes( ( $source == 'event' ) ? $event->event_label : $event->location_label ) );
+	$street  = wp_kses_post( stripslashes( ( $source == 'event' ) ? $event->event_street : $event->location_street ) );
+	$street2 = wp_kses_post( stripslashes( ( $source == 'event' ) ? $event->event_street2 : $event->location_street2 ) );
+	$city    = wp_kses_post( stripslashes( ( $source == 'event' ) ? $event->event_city : $event->location_city ) );
+	$state   = wp_kses_post( stripslashes( ( $source == 'event' ) ? $event->event_state : $event->location_state ) );
+	$state   = wp_kses_post( stripslashes( ( $source == 'event' ) ? $event->event_state : $event->location_state ) );
+	$zip     = wp_kses_post( stripslashes( ( $source == 'event' ) ? $event->event_postcode : $event->location_postcode ) );
+	$zip     = wp_kses_post( stripslashes( ( $source == 'event' ) ? $event->event_postcode : $event->location_postcode ) );
+	$country = wp_kses_post( stripslashes( ( $source == 'event' ) ? $event->event_country : $event->location_country ) );
+	$country = wp_kses_post( stripslashes( ( $source == 'event' ) ? $event->event_country : $event->location_country ) );
+	$phone   = wp_kses_post( stripslashes( ( $source == 'event' ) ? $event->event_phone : $event->location_phone ) );
 	if ( ! $url && ! $label && ! $street && ! $street2 && ! $city && ! $state && ! $zip && ! $country && ! $phone ) {
 		return '';
 	}
@@ -229,24 +238,25 @@ function mc_create_tags( $event, $context = 'filters' ) {
 	$e['access']        = mc_expand( get_post_meta( $event->event_post, '_mc_event_access', true ) );
 
 	// date & time fields
-	$real_end_date     = $event->occur_end;
-	$dtstart           = mc_format_timestamp( strtotime( $event->occur_begin ) );
+	$real_end_date     = ( isset( $event->occur_end ) ) ? $event->occur_end : $event->event_end . ' ' . $event->event_endtime;
+	$real_begin_date   = ( isset( $event->occur_begin ) ) ? $event->occur_begin : $event->event_begin . ' ' . $event->event_time;
+	$dtstart           = mc_format_timestamp( strtotime( $real_begin_date ) );
 	$dtend             = mc_format_timestamp( strtotime( $real_end_date ) );
 
 	$e['date_utc']     = date_i18n( apply_filters( 'mc_date_format', $date_format, 'template_begin_ts' ), $event->ts_occur_begin );
 	$e['date_end_utc'] = date_i18n( apply_filters( 'mc_date_format', $date_format, 'template_end_ts' ), $event->ts_occur_end );
 		$notime = mc_notime_label( $event );
-	$e['time']         = ( date( 'H:i:s', strtotime( $event->occur_begin ) ) == '00:00:00' ) ? $notime : date( get_option( 'mc_time_format' ), strtotime( $event->occur_begin ) );
-	$e['time24']       = ( date( 'G:i', strtotime( $event->occur_begin ) ) == '00:00:00' ) ? $notime : date( get_option( 'mc_time_format' ), strtotime( $event->occur_begin ) );
+	$e['time']         = ( date( 'H:i:s', strtotime( $real_begin_date ) ) == '00:00:00' ) ? $notime : date( get_option( 'mc_time_format' ), strtotime( $real_begin_date ) );
+	$e['time24']       = ( date( 'G:i', strtotime( $real_begin_date ) ) == '00:00' ) ? $notime : date( get_option( 'mc_time_format' ), strtotime( $real_begin_date ) );
 	$endtime           = ( $event->event_end == '23:59:59' ) ? '00:00:00' : date( 'H:i:s', strtotime( $real_end_date ) );
-	$e['endtime']      = ( $real_end_date == $event->occur_begin || $event->event_hide_end == 1 || date( 'H:i:s', strtotime( $real_end_date ) ) == '23:59:59' ) ? '' : date_i18n( get_option( 'mc_time_format' ), strtotime( $endtime ) );
+	$e['endtime']      = ( $real_end_date == $real_begin_date || $event->event_hide_end == 1 || date( 'H:i:s', strtotime( $real_end_date ) ) == '23:59:59' ) ? '' : date_i18n( get_option( 'mc_time_format' ), strtotime( $endtime ) );
 	$e['runtime']      = mc_runtime( $event->ts_occur_begin, $event->ts_occur_end, $event );
-	$e['dtstart'] = date( 'Y-m-d\TH:i:s', strtotime( $event->occur_begin ) );// hcal formatted
+	$e['dtstart'] = date( 'Y-m-d\TH:i:s', strtotime( $real_begin_date ) );// hcal formatted
 	$e['dtend']   = date( 'Y-m-d\TH:i:s', strtotime( $real_end_date ) );    //hcal formatted end
 	$e['rssdate'] = date( 'D, d M Y H:i:s +0000', strtotime( $event->event_added ) );
-	$date         = date_i18n( apply_filters( 'mc_date_format', $date_format, 'template_begin' ), strtotime( $event->occur_begin ) );
+	$date         = date_i18n( apply_filters( 'mc_date_format', $date_format, 'template_begin' ), strtotime( $real_begin_date ) );
 	$date_end     = date_i18n( apply_filters( 'mc_date_format', $date_format, 'template_end' ), strtotime( $real_end_date ) );
-	$date_arr     = array( 'occur_begin' => $event->occur_begin, 'occur_end' => $real_end_date );
+	$date_arr     = array( 'occur_begin' => $real_begin_date, 'occur_end' => $real_end_date );
 	$date_obj     = (object) $date_arr;
 	if ( $event->event_span == 1 ) {
 		$dates = mc_event_date_span( $event->event_group_id, $event->event_span, array( 0 => $date_obj ) );
@@ -261,7 +271,7 @@ function mc_create_tags( $event, $context = 'filters' ) {
 	$e['datespan']  = ( $event->event_span == 1 || ( $e['date'] != $e['enddate'] ) ) ? mc_format_date_span( $dates ) : $date;
 	$e['multidate'] = mc_format_date_span( $dates, 'complex', "<span class='fallback-date'>$date</span><span class='separator'>,</span> <span class='fallback-time'>$e[time]</span>&ndash;<span class='fallback-endtime'>$e[endtime]</span>" );
 	$e['began']     = $event->event_begin; // returns date of first occurrence of an event.
-	$e['recurs']    = mc_event_recur_string( $event );
+	$e['recurs']    = mc_event_recur_string( $event, $real_begin_date );
 	$e['repeats']   = $event->event_repeats;
 
 	// category fields
@@ -303,7 +313,7 @@ function mc_create_tags( $event, $context = 'filters' ) {
 		$e['date'],
 		$e['time']
 	);
-	$e_label      = str_replace( $tags, $replacements, $e_template );
+	$e_label   = str_replace( $tags, $replacements, $e_template );
 	//$e_label = mc_get_details_label( $event, $e ); // recursive...hmmmm.
 	$e_link    = mc_get_details_link( $event );
 	$e['link'] = mc_event_link( $event );
@@ -623,12 +633,13 @@ add_filter( 'mc_filter_shortcodes', 'mc_auto_excerpt', 10, 2 );
 function mc_auto_excerpt( $e, $event ) {
 	$description  = $e['description'];
 	$shortdesc    = $e['shortdesc'];
-	$e['excerpt'] = $shortdesc;
 	if ( $description != '' ) { // if description is empty, this won't work, so skip it.
 		$num_words    = apply_filters( 'mc_excerpt_length', 55 );
 		$excerpt      = wp_trim_words( $description, $num_words );
-		$e['excerpt'] = ( $shortdesc == '' ) ? $excerpt : $shortdesc;
+	} else {
+		$excerpt = $shortdesc;
 	}
+	$e['excerpt'] = $excerpt;
 
 	return $e;
 }
@@ -667,13 +678,13 @@ function mc_image_data( $e, $event ) {
 	return $e;
 }
 
-function mc_event_recur_string( $event ) {
+function mc_event_recur_string( $event, $real_begin_date ) {
 	$recurs      = str_split( $event->event_recur, 1 );
 	$recur       = $recurs[0];
 	$every       = ( isset( $recurs[1] ) ) ? $recurs[1] : 1;
-	$month_date  = date( 'dS', strtotime( $event->occur_begin ) );
-	$day_name    = date_i18n( 'l', strtotime( $event->occur_begin ) );
-	$week_number = mc_ordinal( week_of_month( date( 'j', strtotime( $event->occur_begin ) ) ) + 1 );
+	$month_date  = date( 'dS', strtotime( $real_begin_date ) );
+	$day_name    = date_i18n( 'l', strtotime( $real_begin_date ) );
+	$week_number = mc_ordinal( week_of_month( date( 'j', strtotime( $real_begin_date ) ) ) + 1 );
 	switch ( $recur ) {
 		case 'S':
 			$event_recur = __( 'Does not recur', 'my-calendar' );

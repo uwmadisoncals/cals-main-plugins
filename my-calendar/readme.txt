@@ -4,7 +4,7 @@ Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, conference, meeting, venue, location, box office, tickets, registration
 Requires at least: 4.0
 Tested up to: 4.5
-Stable tag: 2.4.16
+Stable tag: 2.4.19
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -82,7 +82,7 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 
 == Changelog ==
 
-= Future =
+= Future Changes =
 
 * Make annual view in list mode configurable on a calendar-specific basis rather than globally; effect date switcher; see https://www.joedolson.com/forums/topic/annual-calendar/#post-5427
 * Refactor options storage
@@ -98,6 +98,46 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 * Add option to insert events to both global & local calendar in multisite networks
 * Revise month by day input & calculation methods
 * Update hcalendar structures
+* When month starts on Sunday, shows full previous month's week?
+* Make iCal timezone configurable via URL params & eliminate that setting.
+
+= 2.5.0 = (Unreleased)
+
+Breaking Changes:
+
+* Breaking change: upcoming events widget no longer uses ID 'upcoming-events'; use class '.upcoming-events'
+* Breaking change: today's events widget no longer uses ID 'todays-events'; use class '.todays-events'
+
+= 2.4.20 =
+
+* Bug fix: PHP warning triggered on type conversion when toggling time views.
+* Bug fix: Map template tag returned raw scripts without `<script>` tags.
+
+= 2.4.19 =
+
+* IMPORTANT: SECURITY RELEASE
+* Security fix: XSS vulnerability: user who could create or edit an event could insert a XSS attack.
+* Security fix: Phishing vulnerability: user who could create or edit an event could insert an iFrame for phishing
+* Security fix: Possible to programmatically alter the event being edited to push edits into a different event.
+* Security fix: Possible to programmatically alter the author of the edited event.
+
+Other changes in this release:
+
+* Screen-reader-text class was duplicated on mini calendar dates
+* New class: 'all-categories' on all categories link
+* New filter: filter All Categories text
+* New filter: filter Map URL & Map Label
+* Bug fix: when sequentially switching from Month to Week to Month & back to Week, Week would revert to first week of month.
+* Bug fix: Maintain current view when switching categories 
+
+= 2.4.18 =
+
+* Add permalink settings notice to field note for clearer instructions.
+* New filter: inner content filter for templates.
+* Improve template handling when partial event passed to template
+* Add filters to alter wrapper elements in Today's Events & Upcoming Events lists.
+* Bug fix: {excerpt} template tag had invalid if/else logic.
+* Remove files for Spanish, French, Polish, Portuguese, Japanese, and Czech translations in favor of language packs
 
 = 2.4.17 =
 
@@ -688,4 +728,4 @@ The search feature in My Calendar is pretty basic; but buying My Calendar Pro gi
 
 == Upgrade Notice ==
 
-* 2.4.17: Misc. minor bug fixes; tested with WordPress 4.5
+* 2.4.19: CRITICAL SECURITY UPDATE. UPDATE IMMEDIATELY. 

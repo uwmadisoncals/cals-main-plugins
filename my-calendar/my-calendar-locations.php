@@ -59,6 +59,7 @@ function mc_mass_delete_locations() {
 function mc_insert_location( $add ) {
 	global $wpdb;
 	$mcdb    = $wpdb;
+	$add     = array_map( 'wp_kses_post', $add );			
 	$formats = array( '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%f', '%f', '%d', '%s', '%s', '%s' );
 	$results = $mcdb->insert( my_calendar_locations_table(), $add, $formats );
 
@@ -68,6 +69,7 @@ function mc_insert_location( $add ) {
 function mc_modify_location( $update, $where ) {
 	global $wpdb;
 	$mcdb    = $wpdb;
+	$update  = array_map( 'wp_kses_post', $update );		
 	$formats = array( '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%f', '%f', '%d', '%s', '%s', '%s' );
 	$results = $mcdb->update( my_calendar_locations_table(), $update, $where, $formats, '%d' );
 
@@ -144,10 +146,12 @@ function my_calendar_manage_locations() {
 			'location_phone2'    => $_POST['location_phone2'],
 			'location_access'    => isset( $_POST['location_access'] ) ? serialize( $_POST['location_access'] ) : ''
 		);
+				
 		$where   = array(
 			'location_id' => (int) $_POST['location_id']
 		);
 		$results = mc_modify_location( $update, $where );
+				
 		do_action( 'mc_modify_location', $where, $update );
 		if ( $results === false ) {
 			echo "<div class=\"error\"><p><strong>" . __( 'Location could not be edited.', 'my-calendar' ) . "</strong></p></div>";

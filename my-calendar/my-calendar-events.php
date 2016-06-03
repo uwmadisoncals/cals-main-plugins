@@ -189,7 +189,7 @@ function mc_get_event_core( $id ) {
 		$mcdb = mc_remote_db();
 	}
 	$event = $mcdb->get_row( "SELECT * FROM " . MY_CALENDAR_TABLE . " JOIN " . MY_CALENDAR_CATEGORIES_TABLE . " ON (event_category=category_id) WHERE event_id=$id" );
-
+	
 	return $event;
 }
 

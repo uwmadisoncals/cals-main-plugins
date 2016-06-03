@@ -86,6 +86,13 @@ ul.links li {
     margin-right: 5px
 }
 
+span.mc-notice {
+	padding: 3px;
+	background: #ffc;
+	font-weight: 700;
+	border: 1px solid #900;
+}
+
 .jd-my-calendar .spam {
     background: #ffa
 }

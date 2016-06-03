@@ -236,9 +236,16 @@ the <em></em>&mdash; Select &mdash;</em> default value.','weaverx-theme-support'
 	weaverx_html_br();
 	_e('Please click the (?) for more information about all the Weaver Xtreme Page Templates.','weaverx-theme-support' /*adm*/);
 	weaverx_html_br();
+
+	$template = !empty($post->page_template) ? $post->page_template : "Default Template";
+	$raw_template = in_array($template, array('paget-raw.php'));
+
 	echo '<strong>' . __('Per Page Options','weaverx-theme-support' /*adm*/) . '</strong>';
 	weaverx_help_link('help.html#optsperpage', __('Help for Per Page Options','weaverx-theme-support' /*adm*/));
 	weaverx_html_br();
+
+
+	if (!$raw_template) {
 	_e('These settings let you hide various elements on a per page basis.','weaverx-theme-support' /*adm*/);
 	weaverx_html_br();
 
@@ -255,6 +262,7 @@ the <em></em>&mdash; Select &mdash;</em> default value.','weaverx-theme-support'
 	wvrx_ts_page_checkbox('_pp_full_browser_height',__('Force full browser height','weaverx-theme-support' /*adm*/),33,2);
 
 	wvrx_ts_page_cols();
+	} // not raw
 
 	_e('<em>Note:</em> the following options work with the default menu - not custom menus.','weaverx-theme-support' /*adm*/);
 	weaverx_html_br();
@@ -270,6 +278,7 @@ the <em></em>&mdash; Select &mdash;</em> default value.','weaverx-theme-support'
 		wvrx_ts_page_checkbox('_pp_raw_html',__('Allow Raw HTML and scripts. Disables auto paragraph, texturize, and other processing.','weaverx-theme-support' /*adm*/),90,1);
 	}
 
+	if (!$raw_template) {
 ?>
 	<p><strong><?php _e('Sidebars &amp; Widgets','weaverx-theme-support' /*adm*/); ?></strong></p>
 
@@ -341,7 +350,9 @@ To add areas to the widget area lists below, you <strong>must</strong> first def
 	<br />
 </p>
 <p>
-	<?php _e('<strong>Settings for "Page with Posts" Template</strong>','weaverx-theme-support' /*adm*/);
+<?php
+
+	_e('<strong>Settings for "Page with Posts" Template</strong>','weaverx-theme-support' /*adm*/);
 	weaverx_help_link('help.html#PerPostTemplate',__('Help for Page with Posts Template','weaverx-theme-support' /*adm*/) );
 
 	$template = !empty($post->page_template) ? $post->page_template : "Default Template";
@@ -417,6 +428,15 @@ settings for "Page with Posts" will be displayed here. Current page template:','
 <?php echo $template; ?>
 	</p>
 <?php
+	}
+	} else { // raw page template handling
+		echo '<p>';
+		_e('<strong>You are using the RAW page template.</strong><br /><ol>
+<li>Check the "Allow Raw HTML" option above to prevent WP processing of your content for this page. If you leave it
+unchecked, you will get the WP paragraph and texturize processing.</li>
+<li>You can add custom HTML code to include in the &lt;head&gt; block by defining a Custom Field named <em>page-head-code</em>
+and including that HTML code in the Value for that field.</li></ol>', 'weaverx-theme-support');
+		echo '<p>';
 	}
 		do_action('weaverxplus_add_per_page');
 ?>

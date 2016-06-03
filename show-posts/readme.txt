@@ -7,9 +7,9 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: weaver theme, settings, save, subthemes
 Text Domain: show-posts
-Requires at least: 3.6
-Tested up to: 4.3
-Stable tag: 1.3.4
+Requires at least: 4.2
+Tested up to: 4.4
+Stable tag: 1.3.6
 
 == Description ==
 
@@ -59,9 +59,14 @@ Please use the WordPress Plugins:Install page to install this plugin.
 
 
 == Changelog ==
+= 1.3.6 =
+* Fix: Show Posts Help document had missing information on posts_per_page
+* Fix: changed styling from .content-2-col to .atw-content-2-col
+* New: "Menu/Custom Post Order" sorting
+
 = 1.3.5 =
-* Fix issue with no_top_clear show_posts arg
-* Tweak - removed overflow:hidden to .atw-show-posts - compatibility issues
+* Fix: issue with no_top_clear show_posts arg
+* Tweak: removed overflow:hidden to .atw-show-posts - compatibility issues
 
 = 1.3.4 =
 * New - added don't clear:both option for start of list

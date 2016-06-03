@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: weaverx-theme-support
 Requires at least: 4.3
 Tested up to: 4.5
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -75,8 +75,11 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog ==
+= 2.1.2 -
+* Change: The Per Page options for the RAW page template now show only those options related to the RAW template.
+
 = 2.1.1 =
-* Fix: currenet user in login widget
+* Fix: current user in login widget
 
 = 2.1 =
 * Update: wp_get_current_user() deprecated call

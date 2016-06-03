@@ -402,6 +402,7 @@ class my_calendar_upcoming_widget extends WP_Widget {
 function my_calendar_upcoming_events( $before = 'default', $after = 'default', $type = 'default', $category = 'default', $template = 'default', $substitute = '', $order = 'asc', $skip = 0, $show_today = 'yes', $author = 'default', $host = 'default', $ltype = '', $lvalue = '', $from = '', $to = '' ) {
 	global $default_template;
 	$args                  = array( 'before'=>$before, 'after'=>$after, 'type'=>$type, 'category'=>$category, 'template'=>$template, 'fallback'=> $substitute, 'order' => $order, 'skip' => $skip, 'show_today'=> $show_today, 'author'=> $author, 'host'=>$host, 'ltype'=>$ltype, 'lvalue'=>$lvalue, 'from'=>$from, 'to'=>$to );
+	$hash                  = md5( implode( ',', $args ) );
 	$output                = '';
 	$widget_defaults       = ( array ) get_option( 'mc_widget_defaults' );
 	$display_upcoming_type = ( $type == 'default' ) ? $widget_defaults['upcoming']['type'] : $type;
@@ -420,6 +421,7 @@ function my_calendar_upcoming_events( $before = 'default', $after = 'default', $
 	$template      = ( $template == 'default' ) ? $widget_defaults['upcoming']['template'] : $template;
 	$template      = ( $template == '' ) ? $default_template : $template;
 	$no_event_text = ( $substitute == '' ) ? $widget_defaults['upcoming']['text'] : $substitute;
+//	$header        = "<ul id='upcoming-events-$hash' class='upcoming-events'>";
 	$header        = "<ul id='upcoming-events' class='upcoming-events'>";
 	$footer        = "</ul>";
 	$display_events = ( $display_upcoming_type == 'events' || $display_upcoming_type == 'event' ) ? true : false;
@@ -702,7 +704,6 @@ function mc_produce_upcoming_events( $events, $template, $type = 'list', $order 
 	if ( is_array( $events ) ) {
 		foreach ( array_keys( $events ) as $key ) {
 			$event =& $events[ $key ];
-			//echo $event->event_title . " " . $event->event_group_id."<br />";
 			$event_details = mc_create_tags( $event, $context );
 			if ( get_option( 'mc_event_approve' ) == 'true' ) {
 				if ( $event->event_approved != 0 ) {
@@ -728,8 +729,8 @@ function mc_produce_upcoming_events( $events, $template, $type = 'list', $order 
 					$class = "multiday";
 				}
 				if ( $type == 'list' ) {
-					$prepend = "\n<li class=\"$class $category\">";
-					$append  = "</li>\n";
+					$prepend = apply_filters( 'mc_event_upcoming_before', "\n<li class=\"$class $category\">", $class, $category );
+					$append  = apply_filters( 'mc_event_upcoming_after', "</li>\n" );
 				} else {
 					$prepend = $append = '';
 				}
@@ -770,6 +771,8 @@ function my_calendar_todays_events( $category = 'default', $template = 'default'
 	if ( $caching && is_array( $todays_cache ) && @$todays_cache[ $category ] ) {
 		return @$todays_cache[ $category ];
 	}
+	$args = array( 'category'=>$category, 'template'=>$template, 'substitute'=>$substitute, 'author'=>$author, 'host'=>$host, 'date'=>$date );
+	$hash = md5( implode( ',', $args ) );
 	global $default_template;
 	$output = '';
 
@@ -789,7 +792,8 @@ function my_calendar_todays_events( $category = 'default', $template = 'default'
 	}
 	$events = my_calendar_events( $from, $to, $category, '', '', 'upcoming', $author, $host );
 	$today  = ( isset( $events[ $from ] ) ) ? $events[ $from ] : false;
-	$header = "<ul id='todays-events'>";
+//	$header = "<ul id='todays-events-$hash' class='todays-events'>";
+	$header = "<ul id='todays-events' class='todays-events'>";
 	$footer = "</ul>";
 	$groups = $todays_events = array();
 	// quick loop through all events today to check for holidays
@@ -810,12 +814,14 @@ function my_calendar_todays_events( $category = 'default', $template = 'default'
 					} else if ( $now > $ts ) {
 						$class = 'past-event';
 					}
+					$prepend = apply_filters( 'mc_todays_events_before', "<li class='$class $category'>", $class, $category );
+					$append  = apply_filters( 'mc_todays_events_after', "</li>" );
 					if ( get_option( 'mc_event_approve' ) == 'true' ) {
 						if ( $e->event_approved != 0 ) {
-							$todays_events[ $ts ][] = "<li class='$class $category'>" . jd_draw_template( $event_details, $template ) . "</li>";
+							$todays_events[ $ts ][] = $prepend . jd_draw_template( $event_details, $template ) . $append;
 						}
 					} else {
-						$todays_events[ $ts ][] = "<li class='$class $category'>" . jd_draw_template( $event_details, $template ) . "</li>";
+						$todays_events[ $ts ][] = $prepend . jd_draw_template( $event_details, $template ) . $append;
 					}
 				}
 			}
@@ -827,7 +833,7 @@ function my_calendar_todays_events( $category = 'default', $template = 'default'
 			}
 		}
 		if ( count( $events ) != 0 ) {
-			$return = $header . $output . $footer;
+			$return = apply_filters( 'mc_todays_events_header', $header ) . $output . apply_filters( 'mc_todays_events_footer', $footer );
 		} else {
 			$return = stripcslashes( $no_event_text );
 		}

@@ -800,6 +800,7 @@ function mc_category_select( $data = false, $option = true ) {
 		$cats = $mcdb->get_results( $sql );
 	}
 	if ( ! empty( $cats ) ) {
+		$cats = apply_filters( 'mc_category_list', $cats, $data, $option );
 		foreach ( $cats as $cat ) {
 			$c = '<option value="' . $cat->category_id . '"';
 			if ( ! empty( $data ) ) {
@@ -812,7 +813,7 @@ function mc_category_select( $data = false, $option = true ) {
 					$c .= ' selected="selected"';
 				}
 			}
-			$c .= '>' . stripslashes( $cat->category_name ) . '</option>';
+			$c .= '>' . wp_kses_post( stripslashes( $cat->category_name ) ) . '</option>';
 			if ( $cat->category_id != get_option( 'mc_default_category' ) ) {
 				$list .= $c;
 			} else {
@@ -850,7 +851,7 @@ function mc_location_select( $location = false ) {
 				$l .= ' selected="selected"';
 			}
 		}
-		$l .= '>' . stripslashes( $loc->location_label ) . '</option>';
+		$l .= '>' . wp_kses_post( stripslashes( $loc->location_label ) ) . '</option>';
 		$list .= $l;
 	}
 
@@ -991,21 +992,30 @@ function my_calendar_is_odd( $int ) {
 }
 
 /* Unless an admin, authors can only edit their own events if they don't have mc_manage_events capabilities. */
-function mc_can_edit_event( $author_id ) {
+function mc_can_edit_event( $event_id = false ) {
 	if ( ! is_user_logged_in() ) {
 		return false;
 	}
-	global $user_ID;
-
+	
+	$current_user = wp_get_current_user();
+	$user = $current_user->ID;
+	
+	if ( $event_id  && is_numeric( $event_id ) ) {
+		$event = mc_get_event_core( $event_id );
+		$event_author = $event->event_author;
+	} else {
+		return false;
+	}
+	
 	if ( current_user_can( 'mc_manage_events' ) ) {
 		$return = true;
-	} elseif ( $user_ID == $author_id ) {
+	} else if ( $user == $event_author ) {
 		$return = true;
 	} else {
 		$return = false;
 	}
 
-	return apply_filters( 'mc_can_edit_event', $return, $author_id );
+	return apply_filters( 'mc_can_edit_event', $return, $event_id );
 }
 
 function jd_option_selected( $field, $value, $type = 'checkbox' ) {

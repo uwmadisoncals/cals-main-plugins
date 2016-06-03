@@ -1,5 +1,4 @@
 <div id="form_global_settings" class="wrap">
-    <div class="frmicon icon32"><br/></div>
     <h1><?php _e( 'Global Settings', 'formidable' ); ?></h1>
 
 	<?php require( FrmAppHelper::plugin_path() . '/classes/views/shared/errors.php' ); ?>
@@ -40,11 +39,11 @@
 
             <h3><?php _e( 'Styling & Scripts', 'formidable' ); ?></h3>
 
-            <p><label class="frm_left_label"><?php _e( 'Load Formidable styling', 'formidable' ) ?></label>
+            <p><label class="frm_left_label"><?php _e( 'Load form styling', 'formidable' ) ?></label>
                 <select id="frm_load_style" name="frm_load_style">
                 <option value="all" <?php selected($frm_settings->load_style, 'all') ?>><?php _e( 'on every page of your site', 'formidable' ) ?></option>
                 <option value="dynamic" <?php selected($frm_settings->load_style, 'dynamic') ?>><?php _e( 'only on applicable pages', 'formidable' ) ?></option>
-                <option value="none" <?php selected($frm_settings->load_style, 'none') ?>><?php _e( 'Don\'t use Formidable styling on any page', 'formidable' ) ?></option>
+                <option value="none" <?php selected($frm_settings->load_style, 'none') ?>><?php _e( 'Don\'t use form styling on any page', 'formidable' ) ?></option>
                 </select>
             </p>
 
@@ -61,10 +60,11 @@
 				<span class="frm_help frm_icon_font frm_tooltip_icon" title="<?php esc_attr_e( 'Select users that are allowed access to Formidable. Without access to View Forms, users will be unable to see the Formidable menu.', 'formidable' ) ?>"></span>
 			</h3>
             <table class="form-table">
-				<?php foreach ( $frm_roles as $frm_role => $frm_role_description ) { ?>
+				<?php foreach ( $frm_roles as $frm_role => $frm_role_description ) {
+					$role_field_name = $frm_role . '[]'; ?>
                 <tr>
                     <td class="frm_left_label"><label><?php echo esc_html( $frm_role_description ) ?></label></td>
-                    <td><?php FrmAppHelper::wp_roles_dropdown( $frm_role, $frm_settings->$frm_role, 'multiple' ) ?></td>
+                    <td><?php FrmAppHelper::wp_roles_dropdown( $role_field_name, $frm_settings->$frm_role, 'multiple' ) ?></td>
                 </tr>
                 <?php } ?>
             </table>

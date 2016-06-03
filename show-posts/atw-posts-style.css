@@ -32,39 +32,76 @@ Custom CSS features of on the Show Posts admin page
 .atw-cf:after { clear: both; }
 .atw-cf { zoom: 1; }
 
-.atw-content-2-col {
-	float: left;
-	width: 48%;
-	overflow:hidden;
-	padding-right: 2%;
-}
 
+
+.atw-content-2-col,
 .atw-content-3-col {
-	float: left;
-	width: 31%;
-	overflow:hidden;
-	padding-right: 2%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing:    border-box;
+	box-sizing:			border-box;
+	height:				auto;
+	max-width:			100%;    /* Adhere to container width. */
 }
 
-@media (min-width:581px) and (max-width:767px) {
-.content-2-col,
-.content-3-col {
-	float:          left;
-	width:          49.8%;
-	overflow:       hidden;
+
+.atw-content-2-col {
+	float:			left;
+	width:			50%;
+	overflow:		hidden;
 	padding-right:  2%;
 	padding-left:   2%;
 }
+
+.atw-content-3-col {
+	float:			left;
+	width:			33.3%;
+	overflow:		hidden;
+	padding-right:  1%;
+	padding-left:   1%;
 }
 
-@media (max-width:580px) {
+.atw-content-2-col:nth-of-type(2n+1),
+.atw-content-3-col:nth-of-type(3n+1)
+{
+	clear:			left;
+}
+
+@media (min-width:581px) and (max-width:767px) { /* small tablet */
+.atw-content-3-col {
+	float:			left;
+	width:			50%;
+	overflow:		hidden;
+	padding-right:  2%;
+	padding-left:   2%;
+}
+.atw-content-3-col:nth-of-type(3n+1) {
+	clear:			none;
+}
+
+.atw-content-3-col:nth-of-type(2n+1) {
+	clear:			left !important;
+}
+
+}
+
+@media (max-width:580px) {	 /* phone */
 .atw-content-2-col,
-.atw-content-3col {
-	width:          100%;
+.atw-content-3-col {
+	width:			100%;
 	padding-right:  0;
 	padding-left:   0;
 }
+.atw-content-3-col:nth-of-type(3n+1) {
+	clear:			none;
 }
+
+.atw-content-3-col:nth-of-type(2n+1) {
+	clear:			left !important;
+}
+
+}
+
+
 
 .atw-entry-title {
 	clear: both;

@@ -281,7 +281,7 @@ h1 {
 <h4>Table of Contents</h4>
     <ul style="line-height:1.7em;">
       <li><a href="#summary"><strong>Plugin Summary</strong></a></li>
-<li><strong><a href="#admin_page">Aspen Posts and Slider Admin Page</a></strong></li>
+<li><strong><a href="#admin_page">Weaver Posts and Slider Admin Page</a></strong></li>
 
   <li><strong><a href="#showposts">[show_posts] Shortcode</a></strong></li>
 
@@ -291,8 +291,8 @@ h1 {
     <p>The <em>Weaver Show Posts</em> plugin allows you to show posts and posts with a custom post type anywhere your theme supports shortcodes. You can specify which posts will be displayed using an interactive filter design page.</p>
     <p><em>Weaver Show Posts</em> has a companion plugin. The <em>Weaver Show Sliders</em> plugin allows you to create sliders and slide shows to display images and posts using a shortcode. You can use the Show Posts filter options to specify which posts or posts with images will be used by the slider. Can also specify an images show using the standard WordPress Media Library Create Gallery interface.</p>
     <p>The <em>Show Posts</em> plugin is a stand-alone plugin, and can be installed and used independently of the <em>Show Sliders</em> plugin. The <em>Show Sliders</em> Plugin <em>requires</em> the <em>Show Posts</em> plugin to work.</p>
-    <h2><a name="admin_page" id="admin_page"></a>Aspen Posts and Slider Admin Page</h2>
-<p>The administrative interfaces for <em>Weaver Show Posts</em> and its companion, <em>Weaver Show Sliders</em> will be added as a menu item on the Dashboard Menu. If you have just the Show Posts plugin installed, then the menu will be called <em>Weaver Show Posts</em> with an Aspen icon to the left. If you have both plugins, the menu is called <em>Weaver Posts/Slider</em>, with an additional Dashboard menu called <em>Slider Posts</em> used to define custom pages for your sliders.</p>
+    <h2><a name="admin_page" id="admin_page"></a>Weaver Posts and Slider Admin Page</h2>
+<p>The administrative interfaces for <em>Weaver Show Posts</em> and its companion, <em>Weaver Show Sliders</em> will be added as a menu item on the Dashboard Menu. If you have just the Show Posts plugin installed, then the menu will be called <em>Weaver Show Posts</em>. If you have both plugins, the menu is called <em>Weaver Posts/Slider</em>, with an additional Dashboard menu called <em>Slider Posts</em> used to define custom pages for your sliders.</p>
 <h4>Using Shortcodes</h4>
 <p>Shortcodes are an important part of WordPress. They allow you to insert a shortcode - a named entity surrounded by [square brackets] anywhere into your pages and posts. The [show_posts] shortcodes makes it easy by adding an &quot;Add [show_posts]&quot; button above the icon bar in the Page and Post editor.</p>
 <p>You can also insert the shortcode anywhere else that a theme, plugin, or widget area supports shortcodes. Note that by default, the standard Text Widget does not support shortcodes. Some themes and plugins extend the Text Widget so it supports shortcodes. If your theme doesn't do that, you can check the option at the bottom of the<em> Weaver Show Posts</em> admin tab to add shortcode support to the standard Text Widget.</p>
@@ -340,6 +340,10 @@ h1 {
   <tr>
     <td>excerpt_length=''</td>
     <td>Specify the length of automatic post excerpts in words</td>
+  </tr>
+  <tr>
+    <td>posts_per_page=''</td>
+    <td>Number of Posts to Show (Use -1 for all. Default: Settings->Reading value)</td>
   </tr>
   <tr>
   <tr>
@@ -405,7 +409,7 @@ h1 {
 <p>Both Weaver Show Posts and Weaver Show Sliders work through the standard WordPress Shortcode feature. To add a Show Post to your content, insert <strong>[show_posts filter=filter-name]</strong> into a page or post. To insert a slide show, add <strong>[show_slider name=slider-name]</strong>. To make this easier, there are<em> Add [show_posts]</em> and <em>Add [show_slider]</em> buttons above the Page/Post editor icon bar.</p>
 <p>You can also add these shortcodes to a sidebar using a standard Text Widget. Simply add the shortcode (you can copy the current settings for the shortcode from the version displayed near the top of either the &quot;Show Posts&quot; tab or the &quot;Sliders&quot; tab, then paste them into a Text Widget. Many themes an plugins already add the ability to include shortcodes in the Text Widget, but if you just see the shortcode displayed in the Text Widget when you view your site, open the &quot;Show Posts&quot; tab, and click the option at the bottom to allow the Text Widget to include shortcodes.</p>
 <p>&nbsp;</p>
-<p>The Aspen  Themeworks Show Posts Plugin and this document are &copy; 2014, Bruce E. Wampler. <a ref="http://aspenthemeworks.com">Web Site - AspenThemeworks.com</a></p>
+<p>The Weaver Show Posts Plugin and this document are &copy; 2014-2016, Bruce E. Wampler. <a ref="http://weavertheme.com">Web Site - WeaverTheme.com</a></p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 

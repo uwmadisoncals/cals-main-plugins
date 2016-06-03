@@ -575,7 +575,15 @@ function edit_my_calendar_config() {
 						<ul>
 							<?php $guess = mc_guess_calendar(); ?>
 							<li><?php mc_settings_field( 'mc_uri', __( 'Where is your main calendar page?', 'my-calendar' ), '', "$guess[message]", array( 'size' => '60' ), 'url' ); ?></li>
-							<li><?php mc_settings_field( 'mc_use_permalinks', __( 'Use Pretty Permalinks for Events','my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+							<?php 
+							if ( isset( $_POST['mc_use_permalinks'] ) && $note != '' ) {
+								$url = admin_url( 'options-permalink.php#mc_cpt_base' );
+								$note = ' <span class="mc-notice">' . sprintf( __( 'Go to <a href="%s">permalink settings</a> to set the base URL for events.', 'my-calendar' ) . '</span>', $url );
+							} else {
+								$note = '';
+							}
+							?>
+							<li><?php mc_settings_field( 'mc_use_permalinks', __( 'Use Pretty Permalinks for Events','my-calendar' ), '', $note, array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_open_uri', __( 'Open calendar links to event details URL', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_mini_uri', __( 'Target <abbr title="Uniform resource locator">URL</abbr> for mini calendar date links:', 'my-calendar' ), '', '', array( 'size' => '60' ), 'url' ); ?></li>							
 							<?php

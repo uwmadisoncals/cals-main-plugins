@@ -135,7 +135,7 @@ function my_calendar_save_group( $action, $output, $event_id = false ) {
 	$message = '';
 	if ( $action == 'edit' && $proceed == true ) {
 		$event_author = (int) ( $_POST['event_author'] );
-		if ( mc_can_edit_event( $event_author ) ) {
+		if ( mc_can_edit_event( $event_id ) ) {
 			$update  = $output[2];
 			$update  = apply_filters( 'mc_update_group_data', $update, $event_author, $action, $event_id );
 			$formats = array(
@@ -316,10 +316,10 @@ function my_calendar_print_group_fields( $data, $mode, $event_id, $group_id = ''
 		} else {
 			echo mc_group_id();
 		} ?>"/>
-		<input type="hidden" name="event_action" value="<?php esc_attr_e( $mode ); ?>"/>
-		<input type="hidden" name="event_id" value="<?php esc_attr_e( $event_id ); ?>"/>
-		<input type="hidden" name="event_author" value="<?php esc_attr_e( $user_ID ); ?>"/>
-		<input type="hidden" name="event_post" value="<?php esc_attr_e( $data->event_post ); ?>"/>
+		<input type="hidden" name="event_action" value="<?php echo esc_attr( $mode ); ?>"/>
+		<input type="hidden" name="event_id" value="<?php echo esc_attr( $event_id ); ?>"/>
+		<input type="hidden" name="event_author" value="<?php echo esc_attr( $user_ID ); ?>"/>
+		<input type="hidden" name="event_post" value="<?php echo esc_attr( $data->event_post ); ?>"/>
 		<input type="hidden" name="event_nonce_name" value="<?php echo wp_create_nonce( 'event_nonce' ); ?>"/>
 	</div>
 	<div class="ui-sortable meta-box-sortables">
@@ -839,6 +839,9 @@ function mc_check_group_data( $action, $post ) {
 			'event_longitude'    => $event_longitude,
 			'event_latitude'     => $event_latitude
 		);
+		
+		$submit = array_map( 'wp_kses_post', $submit );
+		
 		if ( $action == 'edit' ) {
 			unset( $submit['event_author'] );
 		}
@@ -882,6 +885,9 @@ function mc_check_group_data( $action, $post ) {
 function mc_list_groups() {
 	global $wpdb;
 	$mcdb   = $wpdb;
+	$current_user = wp_get_current_user();
+	$user = $current_user->ID;
+
 	$sortby = ( isset( $_GET['sort'] ) ) ? (int) $_GET['sort'] : get_option( 'mc_default_sort' );
 	if ( isset( $_GET['order'] ) ) {
 		$sortdir = ( isset( $_GET['order'] ) && $_GET['order'] == 'ASC' ) ? 'ASC' : 'default';
@@ -924,7 +930,6 @@ function mc_list_groups() {
 	$sorting         = ( $sortbydirection == 'DESC' ) ? "&amp;order=ASC" : '';
 
 	$current        = empty( $_GET['paged'] ) ? 1 : intval( $_GET['paged'] );
-	$user           = get_current_user_id();
 	$screen         = get_current_screen();
 	$option         = $screen->get_option( 'per_page', 'option' );
 	$items_per_page = get_user_meta( $user, $option, true );
@@ -1031,7 +1036,7 @@ function mc_list_groups() {
 			$spam_label = ( $event->event_flagged == 1 ) ? '<strong>Possible spam:</strong> ' : '';
 			$author     = ( $event->event_author != 0 ) ? get_userdata( $event->event_author ) : 'Public Submitter';
 			if ( $event->event_link != '' ) {
-				$title = "<a href='" . esc_attr( $event->event_link ) . "'>$event->event_title</a>";
+				$title = "<a href='" . esc_attr( $event->event_link ) . "'>" . wp_kses_post( $event->event_title ) . "</a>";
 			} else {
 				$title = $event->event_title;
 			} ?>
@@ -1042,19 +1047,19 @@ function mc_list_groups() {
 				<label for="mc<?php echo $event->event_id; ?>"><?php echo $event->event_id; ?></label></th>
 			<th scope="row"><?php echo ( $event->event_group_id == 0 ) ? '-' : $event->event_group_id; ?></th>
 			<td title="<?php echo esc_attr( substr( strip_tags( stripslashes( $event->event_desc ) ), 0, 240 ) ); ?>">
-				<strong><?php if (mc_can_edit_event( $event->event_author )) { ?>
+				<strong><?php if ( mc_can_edit_event( $event->event_id ) ) { ?>
 					<a href="<?php echo admin_url( "admin.php?page=my-calendar&amp;mode=edit&amp;event_id=$event->event_id" ); ?>"
 					   class='edit'>
 						<?php
 						}
 						echo $spam_label;
-						echo stripslashes( $title ); ?>
-					<?php if ( mc_can_edit_event( $event->event_author ) ) {
+						echo strip_tags( stripslashes( $title ) ); ?>
+					<?php if ( mc_can_edit_event( $event->event_id ) ) {
 						echo "</a>";
 					} ?></strong>
 
 				<div class='row-actions' style="visibility:visible;">
-					<?php if ( mc_can_edit_event( $event->event_author ) ) { ?>
+					<?php if ( mc_can_edit_event( $event->event_id ) ) { ?>
 						<a href="<?php echo admin_url( "admin.php?page=my-calendar&amp;mode=edit&amp;event_id=$event->event_id" ); ?>"
 						   class='edit'><?php _e( 'Edit Event', 'my-calendar' ); ?></a> |
 						<?php if ( mc_event_is_grouped( $event->event_group_id ) ) { ?>
@@ -1069,7 +1074,7 @@ function mc_list_groups() {
 					} ?>
 				</div>
 			</td>
-			<td><?php echo stripslashes( $event->event_label ); ?></td>
+			<td><?php echo strip_tags( stripslashes( $event->event_label ) ); ?></td>
 			<?php if ( $event->event_time != "00:00:00" ) {
 				$eventTime = date_i18n( get_option( 'mc_time_format' ), strtotime( $event->event_time ) );
 			} else {
@@ -1119,8 +1124,8 @@ function mc_list_groups() {
 			?>
 			<td>
 				<div class="category-color"
-				     style="background-color:<?php echo ( strpos( $this_cat->category_color, '#' ) !== 0 ) ? '#' : '';
-				     echo $this_cat->category_color; ?>;"></div> <?php echo stripslashes( $this_cat->category_name ); ?>
+				     style="background-color:<?php echo strip_tags( ( strpos( $this_cat->category_color, '#' ) !== 0 ) ? '#' : '' );
+				     echo $this_cat->category_color; ?>;"></div> <?php echo wp_kses_post( stripslashes( $this_cat->category_name ) ); ?>
 			</td>
 			<?php unset( $this_cat ); ?>
 			</tr><?php
