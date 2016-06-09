@@ -1,10 +1,10 @@
 === Connections Business Directory ===
 Contributors: shazahm1@hotmail.com
 Donate link: http://connections-pro.com/
-Tags: address book, business directory, chamber of commerce business directory, church directory, company business directory, contact directory, custom business directory, directory, listings directory, local business directory, link directory, member directory, staff directory
-Requires at least: 4.1
+Tags: address book, business directory, chamber of commerce business directory, church directory, company business directory, contact directory, custom business directory, directory, directory plugin, listings directory, local business directory, link directory, member directory, staff directory
+Requires at least: 4.2
 Tested up to: 4.5
-Stable tag: 8.5.15
+Stable tag: 8.5.16
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,7 +14,7 @@ An easy to use directory plugin to create an addressbook, business directory, me
 
 [Homepage](http://connections-pro.com/) | [Showcase](http://connections-pro.com/showcase/) | [Documentation](http://connections-pro.com/documentation/contents/) | [Support](http://connections-pro.com/support/) | [Templates](http://connections-pro.com/templates/) | [Extensions](http://connections-pro.com/extensions/)
 
-Quite simply, Connections Business Directory is the [best directory plugin available](https://wordpress.org/support/view/plugin-reviews/connections?filter=5) for WordPress. Its simplicity in design and function, vast array of unique features and versatility are the reasons more and more people are turning to Connections Business Directory for their directory needs. You can use Connections to create a simple address book, maintain a staff or member directory and run a business directory or link directory. Connections Business Directory was built bottom up to be as configurable as possible while providing the features you need. Read on to learn about some of the best features Connections Business Directory has to offer...
+Quite simply, Connections Business Directory is one of the [best business directory plugins available](https://wordpress.org/support/view/plugin-reviews/connections?filter=5) for WordPress. Its simplicity in design and function, vast array of unique features and versatility are the reasons more and more people are turning to Connections Business Directory for their directory needs. You can use Connections to create a simple address book, maintain a staff or member directory and run a business directory or link directory. Connections Business Directory was built bottom up to be as configurable as possible while providing the features you need. Read on to learn about some of the best features Connections Business Directory has to offer...
 
 = Features =
 
@@ -32,7 +32,7 @@ Quite simply, Connections Business Directory is the [best directory plugin avail
 * **[CSV Export](http://connections-pro.com/documentation/tools/#Export)** of addresses, phone numbers, email addresses and dates.
 * **[CSV Import](http://connections-pro.com/documentation/tools/#Categories-2)** of **nested** categories.
 * **[Role capability support](http://connections-pro.com/documentation/roles/)**.
-* Displaying your business directory on the frontend is as simple as putting a shortcode on a page. Don't let this simplicity fool you. The shortcode provides a large array of options that are just too numerous to list. To learn more, [go here](http://connections-pro.com/documentation/plugin/shortcodes/).
+* [Displaying your business directory on the frontend is as simple as putting a shortcode on a page.](http://connections-pro.com/documentation/install/#Step_4_Displaying_your_Directory) Don't let this simplicity fool you. The shortcode provides a large array of options that are just too numerous to list. To learn more, [go here](http://connections-pro.com/documentation/plugin/shortcodes/).
 * **SEO.** Every entry in your business directory outputs following the [hCard](http://microformats.org/wiki/hcard) spec. Soon to be updated to following Schema.org.
 * **[Extensible](http://connections-pro.com/extensions/)** and developer friendly.
 * Robust **templating support** with the [Template Customizer](http://connections-pro.com/2015/07/27/feature-preview-template-customizer/). Several basic templates are provided to get you started with you business directory with many more [premium templates available](http://connections-pro.com/templates/) to really make your business directory shine.
@@ -43,7 +43,7 @@ Here are some great **free extensions** (with more on the way) that enhance your
 
 **Utility**
 
-* [Toolbar](http://wordpress.org/plugins/connections-toolbar/) :: Provide quick links to the admin pages from the admin bar.
+* [Toolbar](http://wordpress.org/plugins/connections-toolbar/) :: Provides quick links to the admin pages from the admin bar.
 * [Login](http://wordpress.org/plugins/connections-business-directory-login/) :: Provides a simple to use login shortcode and widget.
 
 **Custom Fields**
@@ -58,17 +58,29 @@ Here are some great **free extensions** (with more on the way) that enhance your
 
 * [Face Detect](https://wordpress.org/plugins/connections-business-directory-face-detect/) :: Applies face detection before cropping an image.
 
-**Premium Extensions**
+**[Premium Extensions](http://connections-pro.com/extensions/)**
 
 * [Authored](http://connections-pro.com/add-on/authored/) :: Displays a list of blog posts written by the entry on their profile page.
 * [Contact](http://connections-pro.com/add-on/contact/) :: Displays a contact form on the entry's profile page to allow your visitors to contact the entry without revealing their email address.
 * [CSV Import](http://connections-pro.com/add-on/csv-import/) :: Bulk import your data in to your directory.
 * [Custom Category Order](http://connections-pro.com/add-on/custom-category-order/) :: Order your categories exactly as you need them.
+* [Custom Entry Order](http://connections-pro.com/add-on/custom-entry-order/) :: Allows you to easily define the order that your business directory entries should be displayed.
 * [Form](http://connections-pro.com/add-on/form/) :: Allow site visitor to submit entries to your directory. Also provides frontend editing support.
 * [Link](http://connections-pro.com/add-on/link/) :: Links a WordPress user to an entry so that user can maintain their entry with or without moderation.
 * [ROT13 Encryption](http://connections-pro.com/add-on/rot13-email-encryption/) :: Protect email addresses from being harvested from your business directory by spam bots.
 * [SiteShot](http://connections-pro.com/add-on/siteshot/) :: Show a screen capture of the entry's website.
 * [Widget Pack](http://connections-pro.com/add-on/widget-pack/) :: A set of feature rich, versatile and highly configurable widgets that can be used to enhance your directory.
+
+**[Premium Templates](http://connections-pro.com/templates/)**
+
+Connections Business Directory comes with a couple templates to get you started which fully support the [Template Customizer](http://connections-pro.com/2015/07/27/feature-preview-template-customizer/). In addition to these free templates there are many premium templates available to take your business directory the level visually.
+
+* [Circled](http://connections-pro.com/add-on/circled/) :: A simple but bold template specifically designed for displaying small team or staff directory.
+* [cMap](http://connections-pro.com/add-on/cmap/) :: Our most popular go to template for a business directory and chamber of commerce business directory, featuring full Template Customizer support.
+* [Excerpt Plus](http://connections-pro.com/add-on/excerpt-plus/) :: Simple design which features a directory entry name, photo thumbnail and excerpt.
+* [Gridder](http://connections-pro.com/add-on/gridder/) :: Another simple but bold template which displays the directory in a grid layout. Perfect for displaying a small team or staff directory
+* [Slim Plus](http://connections-pro.com/add-on/slim-plus/) :: Specifically designed to take up as little space on the page as possible.
+* [Tile Plus](http://connections-pro.com/add-on/tile-plus/) :: This template was purposely designed to display the directory in a grid or column layout.
 
 = Developer Friendly =
 
@@ -214,6 +226,18 @@ Yes this is possible but there is a special setup required to do so. It is recom
 
 
 == Changelog ==
+
+= 8.5.16 06/03/2016 =
+* NEW: Introduce the `cn_entry_action_back_atts` filter.
+* TWEAK: Remove the on_click event handler attached to the back to directory link.
+* TWEAK: Pass the `home_id` and `force_home` shortcode options when creating the back to directory link.
+* TWEAK: Refactor cnTemplateParts::entryAction_Back method to introduce the `cn_entry_action_back_atts` filter.
+* TWEAK: Override the parseCSV core class to implement BOM stripping in the load_data() method.
+* TWEAK: Remove PHP4 style constructor in the Browser library.
+* BUG: Correct query bug in cnRetrieve::entries when querying entries by radius.
+* BUG: Add missing EOL when CN_MULTISITE_ENABLED is TRUE.
+* OTHER: Remove stray extra spaces.
+* DEV: phpDoc fixes.
 
 = 8.5.15 05/13/2016 =
 * NEW: Introduce the `cn_page_meta_title`, `cn_page_title_separator` and `cn_page_title` filters in cnSEO.
@@ -638,87 +662,9 @@ Yes this is possible but there is a special setup required to do so. It is recom
 * DEV: Add @link to phpDoc for cnSettingsAPI::addSettingsField().
 * DEV: Correct param type in phpDoc for cnHTML::attribute().
 
-= 8.3.3 07/17/2015 =
-* FEATURE: The default category "Uncategorized" can now be renamed.
-* FEATURE: The default category can now be changed to any category.
-* NEW: Add support for a category field type in the Settings API.
-* NEW: Introduce cnSettingsAPI::set().
-* NEW: Introduce cnOptions::getDefaultCategoryID().
-* BUG: Correct the label for attribute for the search input on the Connections : Manage admin page.
-* BUG: Remove unused param when using delete_option().
-* TWEAK: Remove dead code, cnRegisterSettings::getPage().
-* TWEAK: Remove use of deprecated use of get_screen_icon() on the Connections : Manage admin page.
-* OTHER: Correct a few more misspellings in inline code comments.
-* I18N: Update the POT file.
-* I18N: Update the MO files.
-* DEV: Correct code spacing in cnRegisterSettings::registerSettingsFields() to bring it up to coding standards.
-* DEV: Add a couple more properties to the connectionsLoad class that are being set by cnRetrieve::entries() so they are documented.
-* DEV: Add phpDoc for the global $connections var in cnScript::registerScripts().
-* DEV: Correct code spacing in cnSettingsAPI::get() to bring it up to coding standards.
-* DEV: Correct code spacing in cnSettingsAPI::registerFields() to bring it up to coding standards.
-
-= 8.3.2 07/14/2015 =
-* BUG: Fix PHP ternary to be compatible with older version of PHP. This could cause the Connections : Tools admin page to not display.
-* BUG: Correct anchor target when a link is linked to the image or logo.
-* BUG: Correct CN_Email_Log_List_Table::column_default() to be compatible with parent::column_default().
-* BUG: Remove indentation comment from displaying in the System Information.
-* TWEAK: Ensure data for registering a log type is valid before attempting to register it.
-* TWEAK: Ensure data for registering an email log type is valid before attempting to register it.
-* DEV: Prettify class cnImage() to better meet coding standards.
-
-= 8.3.1 07/10/2015 =
-* BUG: Fix PHP error `Parse error: syntax error, unexpected T_STATIC in ../wp-content/plugins/connections/includes/class.utility.php on line 1866` on older versions of PHP.
-
-= 8.3 07/09/2015 =
-* FEATURE: Add the Tools admin page with the System Info tab with the ability to email and/or share a secret URL to share the system info.
-* FEATURE: Introduce the ability to export/import the settings.
-* FEATURE: Introduce the ability for an admin to view and manage the email logs.
-* NEW: Introduce cnString::quickRandom().
-* NEW: Introduce cnString::random().
-* NEW: Introduce cnFunction::decodeJSON().
-* NEW: Introduce cnSettingsAPI::getAll(), cnSettingsAPI::download() and cnSettingsAPI::import().
-* NEW: Introduce cnLog::delete().
-* NEW: Introduce cnLog::views().
-* COMPATIBILITY: Include theme compatibility file with a filter to make images and logos compatible in the ProPhoto theme.
-* BUG: Fix bug in cnOutput::getContentBlock() that prevented the use of the content block name if the content block was registered as a single entry view content block.
-* BUG: Fix bug throughout cnEmail referring to a nonexistent charSet var.
-* BUG: Correct param default in cnAdminActions::setEntryStatus().
-* BUG: Fix reference bug in cnLog::deleteConnected().
-* TWEAK: Change cnFormatting::toYesNo() to a static method.
-* TWEAK: Do not create the .htaccess file in the TimThumb folder since it is no longer needed.
-* TWEAK: Move the vCard download template_redirect action callback function to static method cnvCard::download().
-* TWEAK: Remove the dead code in the deactivation callback.
-* TWEAK: Remove the Dashboard System widget.
-* TWEAK: Remove use of the cnvCard class on the Manage admin page since it is no longer needed.
-* TWEAK: Refactor cnOutput::getPhoneNumberBlock() to cleanup code and added a couple new filters.
-* TWEAK: Update cnLog::getConnected() to support getting logs of multiple types.
-* TWEAK: Update cnLog::getCount() to support getting log count of multiple types.
-* TWEAK: Make cnLog::types() a public method.
-* OTHER: Correct misspellings in inline code comments.
-* I18N: Update the POT file.
-* I18N: Update all MO files.
-* DEV: Include the Browser class by Chris Schuld.
-* DEV: phpDoc fixes.
-* DEV: Add phpDoc for the vars being extracted in cnAdminMenu::menu().
-* DEV: Use Yoda conditions.
-* DEV: Prettify cnvCard() to better meet coding standards.
-* DEV: Stub phpDoc for cnAdminAction class.
-
 [Complete Changelog can be found here.](http://connections-pro.com/changelog/)
 
 == Upgrade Notice ==
-
-= 8.3 =
-It is recommended to backup before updating. Requires WordPress >= 4.0.
-
-= 8.3.1 =
-It is recommended to backup before updating. Requires WordPress >= 4.0.
-
-= 8.3.2 =
-It is recommended to backup before updating. Requires WordPress >= 4.0.
-
-= 8.3.3 =
-It is recommended to backup before updating. Requires WordPress >= 4.0.
 
 = 8.4 =
 It is recommended to backup before updating. Requires WordPress >= 4.0.
@@ -785,3 +731,6 @@ It is recommended to backup before updating. Requires WordPress >= 4.1.
 
 = 8.5.15 =
 It is recommended to backup before updating. Requires WordPress >= 4.1.
+
+= 8.5.16 =
+It is recommended to backup before updating. Requires WordPress >= 4.2.
