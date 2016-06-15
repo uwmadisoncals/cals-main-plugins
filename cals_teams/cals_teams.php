@@ -30,13 +30,24 @@ if(!defined('CT_PLUGIN_URL')){
   define('CT_PLUGIN_URL', plugin_dir_url(__FILE__));
 }
 
+/**
+ * Summary.
+ *
+ * Description.
+ *
+ * @since 0.1.0
+ */
 Class Cals_Teams{
-
   
-    public function __construct(){
-        //global $mbox;
+    public function __construct(array $metaBoxArgs = null ){
+        global $mbox;
+    
+        if(is_null($metaBoxArgs)){
+          $metaBoxArgs = $mbox;
+        }
+        
         $this->register_callbacks();
-        $this->init_properties();
+        $this->init_properties($metaBoxArgs);
         //$this->color = 'red';
         //$this->fields = $mbox['fields'];
 
@@ -51,25 +62,133 @@ Class Cals_Teams{
         //add_action( 'theme_bar', array( $this, 'bar' ) );
     }
 
-    protected function init_properties(){
-        global $mbox;
+    protected function init_properties($metaBoxArgs){
+       /*global $mbox;
         $mboxfields = $mbox['fields'];
 
-        $this->field_name_prefix_value = get_post_meta(get_the_ID(),'calsteams_name_prefix')[0];
+        $this->mboxfields = $mbox['fields'];*/
 
-        $this->color = 'red';
+        //$this->field_name_prefix_value = get_post_meta(get_the_ID(),'calsteams_name_prefix')[0];
+
+        //$this->color = 'red';
+
+        $this->meta_box = new CTMetaBox($metaBoxArgs);
+
+        $this->data = $this->calsteams_get_post_meta();
     }
 
     public function calsteams_get_post_meta(){
 
       $meta = get_post_custom(get_the_ID());
-      //$meta_keys = array_keys($pre_meta);
-      //$pattern= "#^calsteams#";
-      //$calsteams_keys = preg_grep($pattern,$meta_keys);
-      return $meta;
-      //return $calsteams_keys;
+      //logit($meta, '$meta: ');
+      
+      $myObject = new stdClass();
+
+      foreach ($meta as $key => $value){
+
+        $myObject->$key = (object)$value;
+
+        //logit($key,'$key: ');
+        //logit($value,'$value: ');
+        
+        foreach($value as $k => $v){
+          $valType = gettype($v);
+          //logit($k,'$k: ');
+          //logit($v, '$v: ');
+          //logit($valType,'$valType: ');
+
+          $myObject->$key = $v;
+        }
+      }
+
+      //logit($myObject,'$myObject: ');
+
+      return $myObject;
     }
 }
+
+/**
+ * Summary.
+ *
+ * Description.
+ *
+ * @since 0.1.0
+ */
+Class CTMetaBox{
+
+  public function __construct($metaBoxArgs){
+    $this->init_properties($metaBoxArgs);
+
+  }
+
+  protected function init_properties($metaBoxArgs){
+    
+    if( is_array($metaBoxArgs) ){
+
+      $this->id = isset($metaBoxArgs['id']) ? $metaBoxArgs['id'] : NULL;
+      $this->title = isset($metaBoxArgs['title']) ? $metaBoxArgs['title'] : NULL;
+      $this->screen = isset($metaBoxArgs['screen']) ? $metaBoxArgs['screen'] : NULL;
+      $this->context = isset($metaBoxArgs['context']) ? $metaBoxArgs['context'] : NULL;
+      $this->priority = isset($metaBoxArgs['priority']) ? $metaBoxArgs['priority'] : NULL;
+
+      $this->fields = new CTFields($metaBoxArgs['fields']);
+    }
+
+  }
+
+}
+
+/**
+ * Summary.
+ *
+ * Description.
+ *
+ * @since 0.1.0
+ */
+Class CTFields{
+
+  public function __construct($fields){
+
+    $this->arrayToObject($fields);
+
+  }
+
+  public function arrayToObject($fields){
+
+    foreach( $fields as $key=>$value){//CTFields depth: 1 (outer)
+
+      $this->$value['id'] = (object)$value;//property name is 'id'; cast array value to object
+
+      if(is_array($value)){
+
+        foreach($value as $k=>$v){//CTFields depth:2
+
+
+          if(is_array($v)){
+
+            $this->$value['id']->$k = (object)$v ;//property name is $k, cast $v to object
+
+          }
+
+
+          foreach( $v as $_k => $_v ){//CTFields depth:3
+
+            if(is_array($_v)){
+              $this->$value['id']->$k->$_k = (object)$_v ;//cast $_v to object
+
+            }
+          }
+        }  
+      }
+    }
+
+  }
+
+}
+
+
+
+
 
 function create_cals_teams_post_type() {
 
@@ -130,6 +249,7 @@ add_action( 'init', 'create_cals_teams_taxonomies',10);
 function add_meta_boxes_team($post){
 
   global $mbox;
+  //logit($mbox,'$mbox: ');
 
   add_meta_box($mbox['id'],$mbox['title'], 'calsteams_buildform_cb',$mbox['screen'],$mbox['context']);
 }
@@ -151,6 +271,10 @@ function calsteams_buildform_cb($post){
   echo '<table class="form-table">';
 
   foreach ($mbox['fields'] as $field) {
+
+    //logit($field['id'],'$field_id: ');
+    //logit($field,'$field: ');
+
 
     $meta = get_post_meta($post->ID,$field['id'],true); //get meta-box data for current field
 
@@ -207,7 +331,7 @@ function calsteams_buildform_cb($post){
 function calsteams_mbox_save($post_id){
   // Checks save status
   global $mbox;
-
+  
   $is_autosave = wp_is_post_autosave( $post_id );
   $is_revision = wp_is_post_revision( $post_id );
   $is_valid_nonce = ( isset( $_POST['calsteams_nonce'] ) ) && wp_verify_nonce($_POST['calsteams_nonce'],'calsteams_update_field') ? 'true' : 'false';
@@ -219,6 +343,8 @@ function calsteams_mbox_save($post_id){
 
   //Real foreach, temporarily commented out
   foreach ($mbox['fields'] as $field) {
+
+
 
       $input_id = $field['id'];//get the current item's input id property
 
@@ -241,12 +367,21 @@ function calsteams_mbox_save($post_id){
           case 'wysiwyg':
             update_post_meta( $post_id, $input_id, esc_textarea( $_POST[ $input_id ] ) );
             break;
+
           default:
             update_post_meta( $post_id, $input_id, sanitize_text_field( $_POST[ $input_id ] ) );
 
         }
-        //update_post_meta( $post_id, $input_id, sanitize_text_field( $_POST[ $input_id ] ) );
 
+      
+
+      }else{
+        //save post data for checkbox
+        if(!isset($_POST['calsteams_checkbox'])){
+          update_post_meta( $post_id, 'calsteams_checkbox', '');
+        }else{
+          update_post_meta( $post_id, 'calsteams_checkbox', sanitize_text_field( $_POST[ $input_id ] ) );
+        }
       }
   }
 }
@@ -402,24 +537,37 @@ function get_current_template( $echo = false ) {
     else
         return $GLOBALS['current_theme_template'];
 }
+
 //add css class '.cals_team-archive-team' to <body> if current template is from cals_teams plugin
 function ct_body_classes( $classes ) {
 
     $template_dir = get_current_template();
 
-    $stripped_val = strpos($template_dir, 'cals_teams/includes/templates/archive-team.php');
+    $archive_team_str = strpos($template_dir, 'cals_teams/includes/templates/archive-team.php');
 
-    if($stripped_val !== false){
+    $single_team_str = strpos($template_dir, 'cals_teams/includes/templates/single-team.php');
+
+    //if current template is archive-team from plugin add class to body
+    if($archive_team_str !== false){
 
       $fileName = rtrim(basename($template_dir),'.php');
 
       $classes[] = 'cals_team-' . $fileName;
       return $classes;
 
-    }
-    else{
+    //if current template is single-team from plugin add class to body
+    }else if( $single_team_str !== false){
+
+      $fileName = rtrim(basename($template_dir),'.php');
+
+      $classes[] = 'cals_team-' . $fileName;
+      return $classes;
+
+    //default case
+    }else{
     //$classes[] = 'class-name';
     return $classes;
     }
 }
 add_filter( 'body_class','ct_body_classes' );
+

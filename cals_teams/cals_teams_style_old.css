@@ -68,9 +68,6 @@ main.cals_teams.archive_team header{
 	
 }
 
-/**************************************************** */
-
-
 /* Member Grouping */
 main.cals_teams.archive_team .member-grouping{
 /*display: flex;
@@ -81,16 +78,26 @@ align-content:space-around;*/
 margin: 20px 0 20px 0;
 }
 
+/* Member Wrapper */
+main.cals_teams.archive_team .member-wrapper{
+background-color: #E5E5E5;
+overflow: hidden;
+/*width:300px;*/
 
+/*padding:0 12px 12px 12px;*/
+padding:20px;
+margin-top:10px;
+max-width:280px;
+}
 
 /* Member Heading Wrapper*/
-main.cals_teams.archive_team .member_info_wrapper .member-heading-wrapper{
+main.cals_teams.archive_team .member-heading-wrapper{
 
 }
 
 /* Member */
-main.cals_teams.archive_team .member-heading-wrapper a.member{
-font-size:18px;
+main.cals_teams.archive_team a.member{
+
 }
 
 /* Member Professional Title */
@@ -98,9 +105,11 @@ main.cals_teams.archive_team span.protitle{
 font-size:18px;
 }
 
+
+
 /* Member Body */
 main.cals_teams.archive_team .member-body{
-margin-top:10px;
+
 }
 
 /* Member Image Wrapper */
@@ -112,6 +121,7 @@ main.cals_teams.archive_team .member-image-wrapper{
 main.cals_teams.archive_team img.member-thumbnail{
 
 }
+
 
 /* Member Data Wrapper */
 main.cals_teams.archive_team .member-data-wrapper{
@@ -159,8 +169,14 @@ white-space: nowrap;
 font-size:16px;
 }
 
+.bricklayer-column div.member-wrapper:first-of-type{
+  background-color: #E5E5E5;
+  margin-top:0px;
+}
 
-
+.member-grouping .bricklayer .bricklayer-column-sizer{
+  width:100px;
+}
 /************************
   --- single-team.php ---
 *************************/
@@ -209,41 +225,5 @@ body.single-team article.team .upper-container .short-vals-container{
 order:0;
 }
 
-/**************************************************** */
 
 
-/* Member Wrapper */
-main.cals_teams.archive_team .member_info_wrapper{
-background-color: #E5E5E5;
-padding: 0 20px 20px 20px;
-}
-
-
-
-/* Member Wrapper */
-main.cals_teams.archive_team .member_wrapper{
-background-color: #E5E5E5;
-overflow: hidden;
-/*width:300px;*/
-
-margin-top:10px;
-max-width:280px;
-}
-
-.bricklayer-column div.member_wrapper:first-of-type{
-  background-color: #E5E5E5;
-  margin-top:0px;
-}
-
-.member-grouping .bricklayer .bricklayer-column-sizer{
-/*  width:100px;*/
-}
-
-
-main.cals_teams.archive_team .member_wrapper .newImg{
-width:280px;
-height:300px;
-box-sizing: border-box;
-width:auto;
-
-}

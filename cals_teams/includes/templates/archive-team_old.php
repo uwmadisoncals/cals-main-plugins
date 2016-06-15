@@ -51,7 +51,6 @@ get_header(); ?>
 			</header><!-- .page-header -->
 
 			<div class="member-grouping bricklayer">
-			
 			<?php
 			// Start the Loop.
 			while ( have_posts() ) : the_post();
@@ -68,28 +67,10 @@ get_header(); ?>
 				$first_name = get_post_meta($id, 'calsteams_first_name')[0];
 				$last_name = get_post_meta($id, 'calsteams_last_name')[0];
 				$pro_title = get_post_meta($id, 'calsteams_professional_title')[0];
-				$image_url = wp_get_attachment_url( get_post_thumbnail_id( $post->ID ) );
-				//logit($image_url);
 
 			?>
-				<div class="member_wrapper">
 
-				<?php if($image_url){ ?>
-
-					<a href="<?php esc_url( the_permalink() ); ?>">
-					<div class="newImg" style="background: url(<?php echo $image_url ?>) no-repeat center center; background-size: cover;"></div>
-					</a>
-
-				<?php }else{ ?>
-					<a href="<?php esc_url( the_permalink() ); ?>">
-					<div class="newImg" style="background: url('<?php echo plugins_url() . '/cals_teams/includes/images/calsteams_placeholder.png' ?>') no-repeat center center; background-size: cover;"></div>
-					</a>
-					
-				<?php } ?>
-
-				
-
-				<div class="member_info_wrapper">
+				<div class="member-wrapper">
 
 					<div class="member-heading-wrapper">
 						<a class ="member" href="<?php esc_url(the_permalink()) ?>"><?php echo $name_prefix . ' ' . $first_name . ' ' . $last_name;  ?></a><br/>
@@ -100,23 +81,20 @@ get_header(); ?>
 					<?php 
 						if(has_post_thumbnail()) : ?>
 
-
-
-
-<!-- 							<div class="member-image-wrapper" style="padding-top:20px;">
+							<div class="member-image-wrapper" style="padding-top:20px;">
 								<a href="<?php esc_url(the_permalink()) ?>">
 									<?php the_post_thumbnail('medium',array('class'=>'member-thumbnail')); ?>
 								</a>
-							</div> -->
+							</div>
 
 						<?php else : ?>
 
-<!-- 							<div class="member-image-wrapper" style="padding-top:20px;">
+							<div class="member-image-wrapper" style="padding-top:20px;">
 								<a href="<?php esc_url(the_permalink()) ?>">
 									<img class="member-thumbnail" alt="person placeholder image" src="<?php echo plugins_url() . '/cals_teams/includes/images/calsteams_placeholder.png'  ?>" width="150" height="150" />
 								</a>
 							</div>
- -->							
+							
 						<?php endif; ?>
 
 						<div class="member-data-wrapper">
@@ -146,16 +124,12 @@ get_header(); ?>
 
 					</div><!--END .member-body -->
 
-				</div><!-- END .member_info_wrapper  -->
-
-			</div><!-- END .member_wrapper -->
-				
+				</div><!-- END .member-wrapper  -->
 
 				<?php
 
 			// End the loop.
 			endwhile; ?>
-
 			</div><!-- END .member-grouping -->
 
 			<?php
