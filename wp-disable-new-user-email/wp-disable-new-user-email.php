@@ -7,9 +7,9 @@
 Plugin Name: Disable new user mail
 Plugin URI: 
 Description: Prevents sending a username and password email out when adding a new user.
-Author: David J. Lee
+Author: Al Nemec
 Version: 1.0
-Author URI: http://lee.dj/
+Author URI: http://alnemec.com
 */
 
 if ( !function_exists('wp_new_user_notification') ) {
