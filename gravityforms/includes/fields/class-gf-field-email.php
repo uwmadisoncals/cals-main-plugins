@@ -33,7 +33,7 @@ class GF_Field_Email extends GF_Field {
 		);
 	}
 
-	public function is_conditional_logic_supported(){
+	public function is_conditional_logic_supported() {
 		return true;
 	}
 
@@ -83,13 +83,16 @@ class GF_Field_Email extends GF_Field {
 
 		$html_input_type = RGFormsModel::is_html5_enabled() ? 'email' : 'text';
 
+		$required_attribute    = $this->isRequired ? 'aria-required="true"' : '';
+		$invalid_attribute     = $this->failed_validation ? 'aria-invalid="true"' : 'aria-invalid="false"';
+
 		$enter_email_field_input = GFFormsModel::get_input( $this, $this->id . '' );
 		$confirm_field_input     = GFFormsModel::get_input( $this, $this->id . '.2' );
 
 		$enter_email_label   = rgar( $enter_email_field_input, 'customLabel' ) != '' ? $enter_email_field_input['customLabel'] : esc_html__( 'Enter Email', 'gravityforms' );
-		$enter_email_label   = gf_apply_filters( 'gform_email', $form_id, $enter_email_label, $form_id );
+		$enter_email_label   = gf_apply_filters( array( 'gform_email', $form_id ), $enter_email_label, $form_id );
 		$confirm_email_label = rgar( $confirm_field_input, 'customLabel' ) != '' ? $confirm_field_input['customLabel'] : esc_html__( 'Confirm Email', 'gravityforms' );
-		$confirm_email_label = gf_apply_filters( 'gform_email_confirm', $form_id, $confirm_email_label, $form_id );
+		$confirm_email_label = gf_apply_filters( array( 'gform_email_confirm', $form_id ), $confirm_email_label, $form_id );
 
 		$single_placeholder_attribute        = $this->get_field_placeholder_attribute();
 		$enter_email_placeholder_attribute   = $this->get_input_placeholder_attribute( $enter_email_field_input );
@@ -100,33 +103,33 @@ class GF_Field_Email extends GF_Field {
 			$confirm_style = $this->emailConfirmEnabled ? '' : "style='display:none;'";
 
 			if ( $is_sub_label_above ) {
-				return "<div class='ginput_container ginput_single_email' {$single_style}>
-                            <input name='input_{$id}' type='{$html_input_type}' class='" . esc_attr( $class ) . "' disabled='disabled' {$single_placeholder_attribute} />
+				return "<div class='ginput_container ginput_container_email ginput_single_email' {$single_style}>
+                            <input name='input_{$id}' type='{$html_input_type}' class='" . esc_attr( $class ) . "' disabled='disabled' {$single_placeholder_attribute} {$required_attribute} {$invalid_attribute} />
                             <div class='gf_clear gf_clear_complex'></div>
                         </div>
-                        <div class='ginput_complex ginput_container ginput_confirm_email' {$confirm_style} id='{$field_id}_container'>
+                        <div class='ginput_complex ginput_container ginput_container_email ginput_confirm_email' {$confirm_style} id='{$field_id}_container'>
                             <span id='{$field_id}_1_container' class='ginput_left'>
                                 <label for='{$field_id}' {$sub_label_class_attribute}>{$enter_email_label}</label>
-                                <input class='{$class}' type='text' name='input_{$id}' id='{$field_id}' disabled='disabled' {$enter_email_placeholder_attribute}/>
+                                <input class='{$class}' type='text' name='input_{$id}' id='{$field_id}' disabled='disabled' {$enter_email_placeholder_attribute} {$required_attribute} {$invalid_attribute} />
                             </span>
                             <span id='{$field_id}_2_container' class='ginput_right'>
                                 <label for='{$field_id}_2' {$sub_label_class_attribute}>{$confirm_email_label}</label>
-                                <input class='{$class}' type='text' name='input_{$id}_2' id='{$field_id}_2' disabled='disabled' {$confirm_email_placeholder_attribute}/>
+                                <input class='{$class}' type='text' name='input_{$id}_2' id='{$field_id}_2' disabled='disabled' {$confirm_email_placeholder_attribute} {$required_attribute} {$invalid_attribute} />
                             </span>
                             <div class='gf_clear gf_clear_complex'></div>
                         </div>";
 			} else {
-				return "<div class='ginput_container ginput_single_email' {$single_style}>
-                            <input class='{$class}' name='input_{$id}' type='{$html_input_type}' class='" . esc_attr( $class ) . "' disabled='disabled' {$single_placeholder_attribute}/>
+				return "<div class='ginput_container ginput_container_email ginput_single_email' {$single_style}>
+                            <input class='{$class}' name='input_{$id}' type='{$html_input_type}' class='" . esc_attr( $class ) . "' disabled='disabled' {$single_placeholder_attribute} {$required_attribute} {$invalid_attribute} />
                             <div class='gf_clear gf_clear_complex'></div>
                         </div>
-                        <div class='ginput_complex ginput_container ginput_confirm_email' {$confirm_style} id='{$field_id}_container'>
+                        <div class='ginput_complex ginput_container ginput_container_email ginput_confirm_email' {$confirm_style} id='{$field_id}_container'>
                             <span id='{$field_id}_1_container' class='ginput_left'>
-                                <input class='{$class}' type='text' name='input_{$id}' id='{$field_id}' disabled='disabled' {$enter_email_placeholder_attribute}/>
+                                <input class='{$class}' type='text' name='input_{$id}' id='{$field_id}' disabled='disabled' {$enter_email_placeholder_attribute} {$required_attribute} {$invalid_attribute} />
                                 <label for='{$field_id}' {$sub_label_class_attribute}>{$enter_email_label}</label>
                             </span>
                             <span id='{$field_id}_2_container' class='ginput_right'>
-                                <input class='{$class}' type='text' name='input_{$id}_2' id='{$field_id}_2' disabled='disabled' {$confirm_email_placeholder_attribute}/>
+                                <input class='{$class}' type='text' name='input_{$id}_2' id='{$field_id}_2' disabled='disabled' {$confirm_email_placeholder_attribute} {$required_attribute} {$invalid_attribute} />
                                 <label for='{$field_id}_2' {$sub_label_class_attribute}>{$confirm_email_label}</label>
                             </span>
                             <div class='gf_clear gf_clear_complex'></div>
@@ -144,25 +147,25 @@ class GF_Field_Email extends GF_Field {
 				$confirmation_value = esc_attr( $confirmation_value );
 				$confirmation_disabled = $is_entry_detail ? "disabled='disabled'" : $disabled_text;
 				if ( $is_sub_label_above ) {
-					return "<div class='ginput_complex ginput_container' id='{$field_id}_container'>
+					return "<div class='ginput_complex ginput_container ginput_container_email' id='{$field_id}_container'>
                                 <span id='{$field_id}_1_container' class='ginput_left'>
                                     <label for='{$field_id}'>" . $enter_email_label . "</label>
-                                    <input class='{$class}' type='{$html_input_type}' name='input_{$id}' id='{$field_id}' value='{$email_value}' {$first_tabindex} {$logic_event} {$disabled_text} {$enter_email_placeholder_attribute}/>
+                                    <input class='{$class}' type='{$html_input_type}' name='input_{$id}' id='{$field_id}' value='{$email_value}' {$first_tabindex} {$logic_event} {$disabled_text} {$enter_email_placeholder_attribute} {$required_attribute} {$invalid_attribute}/>
                                 </span>
                                 <span id='{$field_id}_2_container' class='ginput_right'>
                                     <label for='{$field_id}_2' {$sub_label_class_attribute}>{$confirm_email_label}</label>
-                                    <input class='{$class}' type='{$html_input_type}' name='input_{$id}_2' id='{$field_id}_2' value='{$confirmation_value}' {$last_tabindex} {$confirmation_disabled} {$confirm_email_placeholder_attribute}/>
+                                    <input class='{$class}' type='{$html_input_type}' name='input_{$id}_2' id='{$field_id}_2' value='{$confirmation_value}' {$last_tabindex} {$confirmation_disabled} {$confirm_email_placeholder_attribute} {$required_attribute} {$invalid_attribute}/>
                                 </span>
                                 <div class='gf_clear gf_clear_complex'></div>
                             </div>";
 				} else {
-					return "<div class='ginput_complex ginput_container' id='{$field_id}_container'>
+					return "<div class='ginput_complex ginput_container ginput_container_email' id='{$field_id}_container'>
                                 <span id='{$field_id}_1_container' class='ginput_left'>
-                                    <input class='{$class}' type='{$html_input_type}' name='input_{$id}' id='{$field_id}' value='{$email_value}' {$first_tabindex} {$logic_event} {$disabled_text} {$enter_email_placeholder_attribute}/>
+                                    <input class='{$class}' type='{$html_input_type}' name='input_{$id}' id='{$field_id}' value='{$email_value}' {$first_tabindex} {$logic_event} {$disabled_text} {$enter_email_placeholder_attribute} {$required_attribute} {$invalid_attribute}/>
                                     <label for='{$field_id}' {$sub_label_class_attribute}>{$enter_email_label}</label>
                                 </span>
                                 <span id='{$field_id}_2_container' class='ginput_right'>
-                                    <input class='{$class}' type='{$html_input_type}' name='input_{$id}_2' id='{$field_id}_2' value='{$confirmation_value}' {$last_tabindex} {$confirmation_disabled} {$confirm_email_placeholder_attribute}/>
+                                    <input class='{$class}' type='{$html_input_type}' name='input_{$id}_2' id='{$field_id}_2' value='{$confirmation_value}' {$last_tabindex} {$confirmation_disabled} {$confirm_email_placeholder_attribute} {$required_attribute} {$invalid_attribute}/>
                                     <label for='{$field_id}_2' {$sub_label_class_attribute}>{$confirm_email_label}</label>
                                 </span>
                                 <div class='gf_clear gf_clear_complex'></div>
@@ -173,11 +176,15 @@ class GF_Field_Email extends GF_Field {
 				$value    = esc_attr( $value );
 				$class    = esc_attr( $class );
 
-				return "<div class='ginput_container'>
+				return "<div class='ginput_container ginput_container_email'>
                             <input name='input_{$id}' id='{$field_id}' type='{$html_input_type}' value='$value' class='{$class}' {$tabindex} {$logic_event} {$disabled_text} {$single_placeholder_attribute}/>
                         </div>";
 			}
 		}
+	}
+
+	public function get_field_label_class(){
+		return $this->emailConfirmEnabled ? 'gfield_label gfield_label_before_complex' : 'gfield_label';
 	}
 
 	public function get_value_entry_detail( $value, $currency = '', $use_text = false, $format = 'html', $media = 'screen' ) {
@@ -187,7 +194,7 @@ class GF_Field_Email extends GF_Field {
 
 	public function get_value_submission( $field_values, $get_from_post_global_var = true ) {
 
-		if ( $this->emailConfirmEnabled && ! $this->is_entry_detail() && is_array($this->inputs)) {
+		if ( $this->emailConfirmEnabled && ! $this->is_entry_detail() && is_array( $this->inputs ) ) {
 			$value[0] = $this->get_input_value_submission( 'input_' . $this->id, $this->inputName, $field_values, $get_from_post_global_var );
 			$value[1] = $this->get_input_value_submission( 'input_' . $this->id . '_2', $this->inputName, $field_values, $get_from_post_global_var );
 		} else {
@@ -196,8 +203,6 @@ class GF_Field_Email extends GF_Field {
 
 		return $value;
 	}
-
-
 }
 
 GF_Fields::register( new GF_Field_Email() );

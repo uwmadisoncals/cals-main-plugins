@@ -60,7 +60,7 @@ class GF_Field_Radio extends GF_Field {
 		$field_id      = $is_entry_detail || $is_form_editor || $form_id == 0 ? "input_$id" : 'input_' . $form_id . "_$id";
 		$disabled_text = $is_form_editor ? 'disabled="disabled"' : '';
 
-		return sprintf( "<div class='ginput_container'><ul class='gfield_radio' id='%s'>%s</ul></div>", $field_id, $this->get_radio_choices( $value, $disabled_text, $form_id ) );
+		return sprintf( "<div class='ginput_container ginput_container_radio'><ul class='gfield_radio' id='%s'>%s</ul></div>", $field_id, $this->get_radio_choices( $value, $disabled_text, $form_id ) );
 
 	}
 
@@ -134,7 +134,8 @@ class GF_Field_Radio extends GF_Field {
 
 				$choice_markup = sprintf( "<li class='gchoice_$id'><input name='input_%d' type='radio' value='%s' %s id='choice_%s' $tabindex %s $logic_event %s />%s</li>", $this->id, esc_attr( $field_value ), $checked, $id, $disabled_text, $input_focus, $label );
 
-				$choices .= gf_apply_filters( 'gform_field_choice_markup_pre_render', array(
+				$choices .= gf_apply_filters( array(
+					'gform_field_choice_markup_pre_render',
 					$this->formId,
 					$this->id
 				), $choice_markup, $choice, $this, $value );
@@ -152,7 +153,7 @@ class GF_Field_Radio extends GF_Field {
 			}
 		}
 
-		return gf_apply_filters( 'gform_field_choices', $this->formId, $choices, $this );
+		return gf_apply_filters( array( 'gform_field_choices', $this->formId ), $choices, $this );
 	}
 
 	public function get_value_default() {
@@ -240,6 +241,34 @@ class GF_Field_Radio extends GF_Field {
 		$value = rgar( $entry, $input_id );
 
 		return $is_csv ? $value : GFCommon::selection_display( $value, $this, rgar( $entry, 'currency' ), $use_text );
+	}
+
+	/**
+	 * Strip scripts and some HTML tags.
+	 *
+	 * @param string $value The field value to be processed.
+	 * @param int $form_id The ID of the form currently being processed.
+	 *
+	 * @return string
+	 */
+	public function sanitize_entry_value( $value, $form_id ) {
+
+		if ( is_array( $value ) ) {
+			return '';
+		}
+
+		$allowable_tags = $this->get_allowable_tags( $form_id );
+
+		if ( $allowable_tags !== true ) {
+			$value = strip_tags( $value, $allowable_tags );
+		}
+
+		$allowed_protocols = wp_allowed_protocols();
+		$value             = wp_kses_no_null( $value, array( 'slash_zero' => 'keep' ) );
+		$value             = wp_kses_hook( $value, 'post', $allowed_protocols );
+		$value             = wp_kses_split( $value, 'post', $allowed_protocols );
+
+		return $value;
 	}
 }
 

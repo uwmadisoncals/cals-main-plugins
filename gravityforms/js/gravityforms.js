@@ -135,7 +135,7 @@ function gformCleanNumber(text, symbol_right, symbol_left, decimal_separator){
     text = text + " ";
 
     //Removing symbol in unicode format (i.e. &#4444;)
-    text = text.replace(/&.*?;/, "");
+    text = text.replace(/&.*?;/g, "");
 
     //Removing symbol from text
     text = text.replace(symbol_right, "");
@@ -287,14 +287,16 @@ function gformCalculateTotalPrice(formId){
     var totalElement = jQuery(".ginput_total_" + formId);
     if( totalElement.length > 0 ) {
 
-        var currentTotal = totalElement.next().val();
+        var currentTotal = totalElement.next().val(),
+            formattedTotal = gformFormatMoney(price);
 
-        if( currentTotal == price ) {
-            return;
+        if (currentTotal != price) {
+            totalElement.next().val(price).change();
         }
 
-        totalElement.next().val( price ).change();
-        totalElement.html( gformFormatMoney( price ) );
+        if (formattedTotal != totalElement.first().text()) {
+            totalElement.html(formattedTotal);
+        }
 
     }
 }
@@ -325,16 +327,16 @@ function gformGetFieldId(element){
 
 function gformCalculateProductPrice(form_id, productFieldId){
 
-    var suffix = "_" + form_id + "_" + productFieldId;
+    var suffix = '_' + form_id + '_' + productFieldId;
 
 
     //Drop down auto-calculating labels
-    jQuery(".gfield_option" + suffix + ", .gfield_shipping_" + form_id).find("select").each(function(){
+    jQuery('.gfield_option' + suffix + ', .gfield_shipping_' + form_id).find('select').each(function(){
 
         var dropdown_field = jQuery(this);
         var selected_price = gformGetPrice(dropdown_field.val());
-        var field_id = dropdown_field.attr("id").split("_")[2];
-        dropdown_field.children("option").each(function(){
+        var field_id = dropdown_field.attr('id').split('_')[2];
+        dropdown_field.children('option').each(function(){
             var choice_element = jQuery(this);
             var label = gformGetOptionLabel(choice_element, choice_element.val(), selected_price, form_id, field_id);
             choice_element.html(label);
@@ -344,11 +346,11 @@ function gformCalculateProductPrice(form_id, productFieldId){
 
 
     //Checkboxes labels with prices
-    jQuery(".gfield_option" + suffix).find(".gfield_checkbox").find("input").each(function(){
+    jQuery('.gfield_option' + suffix).find('.gfield_checkbox').find('input:checkbox').each(function(){
         var checkbox_item = jQuery(this);
-        var id = checkbox_item.attr("id");
-        var field_id = id.split("_")[3];
-        var label_id = id.replace("choice_", "#label_");
+        var id = checkbox_item.attr('id');
+        var field_id = id.split('_')[2];
+        var label_id = id.replace('choice_', '#label_');
         var label_element = jQuery(label_id);
         var label = gformGetOptionLabel(label_element, checkbox_item.val(), 0, form_id, field_id);
         label_element.html(label);
@@ -356,22 +358,24 @@ function gformCalculateProductPrice(form_id, productFieldId){
 
 
     //Radio button auto-calculating lables
-    jQuery(".gfield_option" + suffix + ", .gfield_shipping_" + form_id).find(".gfield_radio").each(function(){
+    jQuery('.gfield_option' + suffix + ', .gfield_shipping_' + form_id).find('.gfield_radio').each(function(){
         var selected_price = 0;
         var radio_field = jQuery(this);
-        var id = radio_field.attr("id");
-        var fieldId = id.split("_")[3];
-        var selected_value = radio_field.find("input:checked").val();
+        var id = radio_field.attr('id');
+        var fieldId = id.split('_')[2];
+        var selected_value = radio_field.find('input:radio:checked').val();
 
         if(selected_value)
             selected_price = gformGetPrice(selected_value);
 
-        jQuery(this).find("input").each(function(){
+        radio_field.find('input:radio').each(function(){
             var radio_item = jQuery(this);
-            var label_id = radio_item.attr("id").replace("choice_", "#label_");
+            var label_id = radio_item.attr('id').replace('choice_', '#label_');
             var label_element = jQuery(label_id);
-            var label = gformGetOptionLabel(label_element, radio_item.val(), selected_price, form_id, fieldId);
-            label_element.html(label);
+            if ( label_element ) {
+                var label = gformGetOptionLabel(label_element, radio_item.val(), selected_price, form_id, fieldId);
+                label_element.html(label);
+            }
         });
     });
 
@@ -381,7 +385,7 @@ function gformCalculateProductPrice(form_id, productFieldId){
 	//calculating options if quantity is more than 0 (a product was selected).
 	if( quantity > 0 ) {
 
-		jQuery(".gfield_option" + suffix).find("input:checked, select").each(function(){
+		jQuery('.gfield_option' + suffix).find('input:checked, select').each(function(){
 			if(!gformIsHidden(jQuery(this)))
 				price += gformGetPrice(jQuery(this).val());
 		});
@@ -396,37 +400,45 @@ function gformCalculateProductPrice(form_id, productFieldId){
     return price;
 }
 
-function gformGetProductQuantity( formId, productFieldId ) {
+function gformGetProductQuantity(formId, productFieldId) {
 
-	//If product is not selected
-	if ( ! gformIsProductSelected( formId, productFieldId )){
-		return 0;
-	}
+    //If product is not selected
+    if (!gformIsProductSelected(formId, productFieldId)) {
+        return 0;
+    }
 
     var quantity,
-        quantityInput = jQuery( '#ginput_quantity_' + formId + '_' + productFieldId);
+        quantityInput = jQuery('#ginput_quantity_' + formId + '_' + productFieldId),
+        numberFormat;
 
-    if( quantityInput.length > 0 ) {
+    if (quantityInput.length > 0) {
 
-        quantity = ! gformIsNumber( quantityInput.val() ) ? 0 : quantityInput.val();
+        quantity = quantityInput.val();
 
     } else {
 
-        quantityElement = jQuery( '.gfield_quantity_' + formId + '_' + productFieldId);
+        quantityInput = jQuery('.gfield_quantity_' + formId + '_' + productFieldId + ' :input');
         quantity = 1;
 
-        if( quantityElement.find( 'select' ).length > 0 ) {
-            quantity = quantityElement.find( 'select' ).val();
-        } else if( quantityElement.find( 'input' ).length > 0 ) {
-            quantity = quantityElement.find( 'input' ).val();
-        }
+        if (quantityInput.length > 0) {
+            quantity = quantityInput.val();
 
-        if( ! gformIsNumber( quantity ) )
-            quantity = 0;
+            var htmlId = quantityInput.attr('id'),
+                fieldId = gf_get_input_id_by_html_id(htmlId);
+
+            numberFormat = gf_global.number_formats[formId][fieldId];
+        }
 
     }
 
-    quantity = parseFloat( quantity );
+    if (!numberFormat)
+        numberFormat = 'currency';
+
+    var decimalSeparator = gformGetDecimalSeparator(numberFormat);
+
+    quantity = gformCleanNumber(quantity, '', '', decimalSeparator);
+    if (!quantity)
+        quantity = 0;
 
     return quantity;
 }
@@ -663,64 +675,92 @@ function gformPasswordStrength(password1, password2) {
 
 }
 
+
+
 //----------------------------
 //------ LIST FIELD ----------
 //----------------------------
-var gfield_original_title = "";
-function gformAddListItem(element, max){
 
-    if(jQuery(element).hasClass("gfield_icon_disabled"))
+function gformAddListItem( addButton, max ) {
+
+    var $addButton = jQuery( addButton );
+
+    if( $addButton.hasClass( 'gfield_icon_disabled' ) ) {
         return;
+    }
 
-    var tr = jQuery(element).closest('tr');
-    var clone = tr.clone();
-    var tabindex = clone.find(":input:last").attr("tabindex");
+    var $group     = $addButton.parents( '.gfield_list_group' ),
+        $clone     = $group.clone(),
+        $container = $group.parents( '.gfield_list_container' ),
+        tabindex   = $clone.find( ':input:last' ).attr( 'tabindex' );
 
-    clone.find("input, select").attr("tabindex", tabindex).not(":checkbox, :radio").val("");
-    clone.find(":checkbox, :radio").prop("checked", false);
-    clone = gform.applyFilters( 'gform_list_item_pre_add', clone );
+    // reset all inputs to empty state
+    $clone
+        .find( 'input, select' ).attr( 'tabindex', tabindex )
+        .not( ':checkbox, :radio' ).val( '' );
+    $clone.find( ':checkbox, :radio' ).prop( 'checked', false );
 
-    tr.after(clone);
-    gformToggleIcons(tr.parent(), max);
-    gformAdjustClasses(tr.parent());
+    $clone = gform.applyFilters( 'gform_list_item_pre_add', $clone, $group );
+
+    $group.after( $clone );
+
+    gformToggleIcons( $container, max );
+    gformAdjustClasses( $container );
+
 }
 
-function gformDeleteListItem(element, max){
-    var tr = jQuery(element).parent().parent();
-    var parent = tr.parent();
-    tr.remove();
-    gformToggleIcons(parent, max);
-    gformAdjustClasses(parent);
+function gformDeleteListItem( deleteButton, max ) {
+
+    var $deleteButton = jQuery( deleteButton ),
+        $group        = $deleteButton.parents( '.gfield_list_group' ),
+        $container    = $group.parents( '.gfield_list_container' );
+
+    $group.remove();
+
+    gformToggleIcons( $container, max );
+    gformAdjustClasses( $container );
+
 }
 
-function gformAdjustClasses(table){
-    var rows = table.children();
-    for(var i=0; i<rows.length; i++){
-        var odd_even_class = (i+1) % 2 == 0 ? "gfield_list_row_even" : "gfield_list_row_odd";
-        jQuery(rows[i]).removeClass("gfield_list_row_odd").removeClass("gfield_list_row_even").addClass(odd_even_class);
+function gformAdjustClasses( $container ) {
+
+    var $groups = $container.find( '.gfield_list_group' );
+
+    $groups.each( function( i ) {
+
+        var $group       = jQuery( this ),
+            oddEvenClass = ( i + 1 ) % 2 == 0 ? 'gfield_list_row_even' : 'gfield_list_row_odd';
+
+        $group.removeClass( 'gfield_list_row_odd gfield_list_row_even' ).addClass( oddEvenClass );
+
+    } );
+
+}
+
+function gformToggleIcons( $container, max ) {
+
+    var groupCount  = $container.find( '.gfield_list_group' ).length,
+        $addButtons = $container.find( '.add_list_item' );
+
+    $container.find( '.delete_list_item' ).css( 'visibility', groupCount == 1 ? 'hidden' : 'visible' );
+
+    if ( max > 0 && groupCount >= max ) {
+
+        // store original title in the add button
+        $addButtons.data( 'title', $container.find( '.add_list_item' ).attr( 'title' ) );
+        $addButtons.addClass( 'gfield_icon_disabled' ).attr( 'title', '' );
+
+    } else if( max > 0 ) {
+
+        $addButtons.removeClass( 'gfield_icon_disabled' );
+
+        if( $addButtons.data( 'title' ) )   {
+            $addButtons.attr( 'title', $addButtons.data( 'title' ) );
+        }
+
     }
 }
 
-function gformToggleIcons(table, max){
-    var rowCount = table.children().length;
-    if(rowCount == 1){
-        table.find(".delete_list_item").css("visibility", "hidden");
-    }
-    else{
-        table.find(".delete_list_item").css("visibility", "visible");
-    }
-
-    if(max > 0 && rowCount >= max){
-        gfield_original_title = table.find(".add_list_item:first").attr("title");
-        table.find(".add_list_item").addClass("gfield_icon_disabled").attr("title", "");
-    }
-    else{
-        var addIcons = table.find(".add_list_item");
-        addIcons.removeClass("gfield_icon_disabled");
-        if(gfield_original_title)
-            addIcons.attr("title", gfield_original_title);
-    }
-}
 
 
 //-----------------------------------
@@ -1157,6 +1197,38 @@ var gform = {
 };
 
 
+
+//----------------------------------------
+//------ reCAPTCHA FUNCTIONS -------------
+//----------------------------------------
+
+/**
+ * Callback function on the reCAPTCAH API script.
+ *
+ * @see GF_Field_CAPTCHA::get_field_input() in /includes/fields/class-gf-field-catpcha.php
+ */
+function renderRecaptcha() {
+
+    jQuery( '.ginput_recaptcha' ).each( function() {
+
+        var $elem      = jQuery( this ),
+            parameters = {
+                'sitekey': $elem.data( 'sitekey' ),
+                'theme':   $elem.data( 'theme' )
+            };
+
+        if( $elem.data( 'stoken' ) ) {
+            parameters.stoken = $elem.data( 'stoken' );
+        }
+
+        grecaptcha.render( this.id, parameters );
+
+    } );
+
+}
+
+
+
 //----------------------------------------
 //------ MULTIFILE UPLOAD FUNCTIONS ------
 //----------------------------------------
@@ -1283,7 +1355,7 @@ var gform = {
                     + '" class="ginput_preview">'
                     + file.name
                     + ' (' + size + ') <b></b> '
-                    + '<a href="javascript:void(0)" title="' + strings.cancel_upload + '" onclick=\'$this=jQuery(this); var uploader = gfMultiFileUploader.uploaders.' + up.settings.container + ';uploader.stop();uploader.removeFile(uploader.getFile("' + file.id +'"));$this.after("' + strings.cancelled + '"); uploader.start();$this.remove();\'>' + strings.cancel + '</a>'
+                    + '<a href="javascript:void(0)" title="' + strings.cancel_upload + '" onclick=\'$this=jQuery(this); var uploader = gfMultiFileUploader.uploaders.' + up.settings.container + ';uploader.stop();uploader.removeFile(uploader.getFile("' + file.id +'"));$this.after("' + strings.cancelled + '"); uploader.start();$this.remove();\' onkeypress=\'$this=jQuery(this); var uploader = gfMultiFileUploader.uploaders.' + up.settings.container + ';uploader.stop();uploader.removeFile(uploader.getFile("' + file.id +'"));$this.after("' + strings.cancelled + '"); uploader.start();$this.remove();\'>' + strings.cancel + '</a>'
                     + '</div>';
 
                 $('#' + up.settings.filelist).prepend(status);
@@ -1358,6 +1430,7 @@ var gform = {
                 + "class='gform_delete' "
                 + "src='" + imagesUrl + "/delete.png' "
                 + "onclick='gformDeleteUploadedFile(" + formId + "," + fieldId + ", this);' "
+                + "onkeypress='gformDeleteUploadedFile(" + formId + "," + fieldId + ", this);' "
                 + "alt='"+ strings.delete_file + "' "
                 + "title='" + strings.delete_file
                 + "' /> "
@@ -1455,14 +1528,140 @@ var gform = {
 
 function gformInitSpinner( formId, spinnerUrl ) {
 
-    if( typeof spinnerUrl == 'undefined' || ! spinnerUrl )
+    if( typeof spinnerUrl == 'undefined' || ! spinnerUrl ) {
         spinnerUrl = gform.applyFilters( "gform_spinner_url", gf_global.spinnerUrl, formId );
+    }
 
-	jQuery('#gform_' + formId).submit(function () {
-		if (jQuery('#gform_ajax_spinner_' + formId).length == 0) {
-			jQuery('#gform_submit_button_' + formId + ', #gform_wrapper_' + formId + ' .gform_next_button, #gform_send_resume_link_button_' + formId)
-				.after('<img id="gform_ajax_spinner_' + formId + '"  class="gform_ajax_spinner" src="' + spinnerUrl + '" alt="" />');
+	jQuery('#gform_' + formId).submit( function () {
+		if ( jQuery('#gform_ajax_spinner_' + formId).length == 0 ) {
+            /**
+             * Filter the element after which the AJAX spinner will be inserted.
+             *
+             * @since 2.0
+             *
+             * @param object $targetElem jQuery object containing all of the elements after which the AJAX spinner will be inserted.
+             * @param int    formId      ID of the current form.
+             */
+            var $spinnerTarget = gform.applyFilters( 'gform_spinner_target_elem', jQuery('#gform_submit_button_' + formId + ', #gform_wrapper_' + formId + ' .gform_next_button, #gform_send_resume_link_button_' + formId ), formId );
+            $spinnerTarget.after( '<img id="gform_ajax_spinner_' + formId + '"  class="gform_ajax_spinner" src="' + spinnerUrl + '" alt="" />' );
 		}
-	});
+	} );
 
 }
+
+
+
+//----------------------------------------
+//------ EVENT FUNCTIONS -----------------
+//----------------------------------------
+
+var __gf_keyup_timeout;
+
+jQuery( document ).on( 'change keyup', '.gfield_trigger_change input, .gfield_trigger_change select, .gfield_trigger_change textarea', function( event ) {
+    gf_raw_input_change( event, this );
+} );
+
+function gf_raw_input_change( event, elem ) {
+
+    // clear regardless of event type for maximum efficiency ;)
+    clearTimeout( __gf_keyup_timeout );
+
+    var $input  = jQuery( elem ),
+        htmlId  = $input.attr( 'id' ),
+        fieldId = gf_get_input_id_by_html_id( htmlId ),
+        formId  = gf_get_form_id_by_html_id( htmlId );
+
+    if( ! fieldId ) {
+        return;
+    }
+
+    var isChangeElem = $input.is( ':checkbox' ) || $input.is( ':radio' ) || $input.is( 'select' ),
+        isKeyupElem  = ! isChangeElem || $input.is( 'textarea' );
+
+    if( event.type == 'keyup' && ! isKeyupElem ) {
+        return;
+    } else if( event.type == 'change' && ! isChangeElem && ! isKeyupElem ) {
+        return;
+    }
+
+    if( event.type == 'keyup' ) {
+        __gf_keyup_timeout = setTimeout( function() {
+            gf_input_change( this, formId, fieldId );
+        }, 300 );
+    } else {
+        gf_input_change( this, formId, fieldId );
+    }
+
+}
+
+function gf_get_input_id_by_html_id( htmlId ) {
+
+    var ids = gf_get_ids_by_html_id( htmlId ),
+        id  = ids[2];
+
+    if( ids[3] ) {
+        id += '.' + ids[3];
+    }
+
+    return id;
+}
+
+function gf_get_form_id_by_html_id( htmlId ) {
+    var ids = gf_get_ids_by_html_id( htmlId ),
+        id  = ids[1];
+    return id;
+}
+
+function gf_get_ids_by_html_id( htmlId ) {
+    var ids = htmlId ? htmlId.split( '_' ) : false;
+    return ids;
+}
+
+function gf_input_change( elem, formId, fieldId ) {
+    gform.doAction( 'gform_input_change', elem, formId, fieldId );
+}
+
+function gformExtractFieldId( inputId ) {
+    var fieldId = parseInt( inputId.toString().split( '.' )[0] );
+    return ! fieldId ? inputId : fieldId;
+}
+
+function gformExtractInputIndex( inputId ) {
+    var inputIndex = parseInt( inputId.toString().split( '.' )[1] );
+    return ! inputIndex ? false : inputIndex;
+}
+
+
+//----------------------------------------
+//------ HELPER FUNCTIONS ----------------
+//----------------------------------------
+
+if( ! window['rgars'] ) {
+    function rgars( array, prop ) {
+
+        var props = prop.split( '/' ),
+            value = array;
+
+        for( var i = 0; i < props.length; i++ ) {
+            value = rgar( value, props[ i ] );
+        }
+
+        return value;
+    }
+}
+
+if( ! window['rgar'] ) {
+    function rgar( array, prop ) {
+        if ( typeof array[ prop ] != 'undefined' ) {
+            return array[ prop ];
+        }
+        return '';
+    }
+}
+
+String.prototype.format = function () {
+    var args = arguments;
+    return this.replace(/{(\d+)}/g, function (match, number) {
+        return typeof args[number] != 'undefined' ? args[number] : match;
+    });
+};
