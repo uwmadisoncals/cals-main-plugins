@@ -120,6 +120,7 @@ function mc_clean_location( $event, $source = 'event' ) {
 	return $event;
 }
 
+
 // set up link to Google Maps
 function mc_maplink( $event, $request = 'map', $source = 'event' ) {
 	$map_string = mc_map_string( $event, $source );
@@ -132,7 +133,11 @@ function mc_maplink( $event, $request = 'map', $source = 'event' ) {
 		$map_label = wp_kses_post( stripslashes( ( $event->event_label != "" ) ? $event->event_label : $event->event_title ) );		
 		$map_string = str_replace( " ", "+", $map_string );
 		if ( $event->event_longitude != '0.000000' && $event->event_latitude != '0.000000' ) {
-			$map_string = "$event->event_latitude,$event->event_longitude";
+			$dir_lat = ( $event->event_latitude > 0 ) ? 'N' : 'S';
+			$latitude = abs( $event->event_latitude );
+			$dir_long = ( $event->event_longitude > 0 ) ? 'E' : 'W';
+			$longitude = abs( $event->event_longitude );			
+			$map_string = $latitude . $dir_lat . ',' . $longitude . $dir_long;
 		}
 	} else {
 		$url        = $event->location_url;
@@ -140,7 +145,11 @@ function mc_maplink( $event, $request = 'map', $source = 'event' ) {
 		$zoom       = ( $event->location_zoom != 0 ) ? $event->location_zoom : '15';
 		$map_string = str_replace( " ", "+", $map_string );
 		if ( $event->location_longitude != '0.000000' && $event->location_latitude != '0.000000' ) {
-			$map_string = "$event->location_latitude,$event->location_longitude";
+			$dir_lat = ( $event->location_latitude > 0 ) ? 'N' : 'S';
+			$latitude = abs( $event->location_latitude );
+			$dir_long = ( $event->location_longitude > 0 ) ? 'W' : 'E';
+			$longitude = abs( $event->location_longitude );			
+			$map_string = $latitude . $dir_lat . ',' . $longitude . $dir_long;
 		}
 	}
 	if ( strlen( trim( $map_string ) ) > 6 ) {
@@ -633,12 +642,14 @@ add_filter( 'mc_filter_shortcodes', 'mc_auto_excerpt', 10, 2 );
 function mc_auto_excerpt( $e, $event ) {
 	$description  = $e['description'];
 	$shortdesc    = $e['shortdesc'];
-	if ( $description != '' ) { // if description is empty, this won't work, so skip it.
+	$excerpt      = '';
+	if ( $description != '' && $shortdesc == '' ) { // if description is empty, this won't work, so skip it.
 		$num_words    = apply_filters( 'mc_excerpt_length', 55 );
 		$excerpt      = wp_trim_words( $description, $num_words );
 	} else {
 		$excerpt = $shortdesc;
 	}
+
 	$e['excerpt'] = $excerpt;
 
 	return $e;

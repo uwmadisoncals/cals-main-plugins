@@ -4,7 +4,7 @@ Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, conference, meeting, venue, location, box office, tickets, registration
 Requires at least: 4.0
 Tested up to: 4.5
-Stable tag: 2.4.19
+Stable tag: 2.4.20
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -107,6 +107,11 @@ Breaking Changes:
 
 * Breaking change: upcoming events widget no longer uses ID 'upcoming-events'; use class '.upcoming-events'
 * Breaking change: today's events widget no longer uses ID 'todays-events'; use class '.todays-events'
+
+= 2.4.21 =
+
+* Bug fix: Google Maps format change to latitude/longitude links
+* Bug fix: Use short description directly as {excerpt} if provided.
 
 = 2.4.20 =
 

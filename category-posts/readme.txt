@@ -1,10 +1,10 @@
 === Category Posts Widget ===
 Contributors: mkrdip, mark-k, kometschuh
 Donate link: http://mkrdip.me/donate
-Tags: category, posts, widget, single category widget, posts widget, category recent posts
+Tags: category, posts, widget, posts widget, recent posts, category recent posts
 Requires at least: 2.8
 Tested up to: 4.5.2
-Stable tag: 4.1.9
+Stable tag: 4.6.1
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,19 +14,27 @@ Adds a widget that shows the most recent posts from a single category.
 Category Posts Widget is a light widget designed to do one thing and do it well: display the most recent posts from a certain category.
 
 = Term and Category based Posts Widget =
-It's the pro version and available at on <a target="_blank" href="http://tiptoppress.com/">Tip Top Press</a> created for big Wordpress sites.
+It's the pro version and available on <a target="_blank" href="http://tiptoppress.com/">Tip Top Press</a> created for big Wordpress sites.
+
+= Shortcode =
+* Use [catposts] [in the content and edit options in the customizer](http://tiptoppress.com/use-shortcode-to-add-category-posts-widget-to-the-content)
 
 = Pro features =
-* Custom Post Types, Terms and Custom Taxonomies
+* Custom Post Types, Terms and Custom Taxonomies (e.g. WooCommerce)
 * Multi selection
-* Different styles, like vertical scrolling ticker
+* Vertical Scrolling News Ticker
+* <a target="_blank" href="http://demo.tiptoppress.com/masonry/">Masonry</a> (with up-coming version 4.6)
+* Grid and Columns, Alignment (with up-coming version 4.6)
+* More [examples on the demo page](http://demo.tiptoppress.com/)
 
 = Features =
+* Shortcode
 * Option to change ordering of posts.
 * Option to show post thumbnail & set dimension by width & height.
 * Option to crop thumbnails with CSS. <a target="_blank" href="http://tiptoppress.com/css-image-crop/">What is 'CSS Image Crop'?</a>
 * Option to set mouse hover effects for post thumbnail.
-* Jetpack 'Sharing - Show buttons on posts' support
+* Jetpack 'Social buttons on posts' support
+* Option to hide social buttons on output
 * Option to put thumbnail on top
 * Option to hide posts which have no thumbnail.
 * Option to disable widget CSS.
@@ -48,6 +56,8 @@ It's the pro version and available at on <a target="_blank" href="http://tiptopp
 * Localization support.
 
 = Documentation =
+Full documentation on [Tiptoppress](http://tiptoppress.com/category-posts-widget/documentation/)
+
 Formatting date and time: See <a target="_blank" href="https://codex.wordpress.org/Formatting_Date_and_Time">Formatting Date and Time</a>.
 
 = Contribute =
@@ -94,6 +104,11 @@ We know there are peopel how use PHP 5.2 [wordpress.org/about/stats](https://wor
 
 == Changelog ==
 [Read more on our blog ...](http://tiptoppress.com/category/category-posts-widget/)
+
+= 4.6.1 - June 5th 2016 =
+* Add shortcode [catposts] edit options only in the customizer
+* Keep panels open after save.
+* Option to hide social buttons on output.
 
 = 4.1.9 - May 5th 2016 =
 * Fixed undefined constant.
