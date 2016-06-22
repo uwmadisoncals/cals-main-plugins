@@ -1,8 +1,35 @@
-Plugin Name: Custom Sidebars Free
+Plugin Name: Custom Sidebars Pro
 Author: Javier Marquez (Incsub), Philipp Stracker (Incsub)
 
 Change Log:
 ----------------------------------------------------------------------
+
+2.1.0.8
+----------------------------------------------------------------------
+- Minor improvements in the admin UI: Better scrolling, fix JS errors and PHP notices.
+- Fix a bug that prevented Widget-Visibility options to work.
+- Update third party libraries.
+
+2.1.0.7
+----------------------------------------------------------------------
+- Fix PHP warning about "Missing argument 2 for apply_filters()"
+
+2.1.0.6
+----------------------------------------------------------------------
+- Fix a bug introduced in last update that prevented creation of custom sidebars
+
+2.1.0.5
+----------------------------------------------------------------------
+- Add integration for Membership2
+
+2.1.0.4
+----------------------------------------------------------------------
+- Fix php notices/error in the Sidebar-Cloning module
+- Fix missing text-domain in translation
+
+2.1.0.3
+----------------------------------------------------------------------
+- Add new Widget-Visibility option: Guests only
 
 2.1.0.2
 ----------------------------------------------------------------------
@@ -18,22 +45,37 @@ Change Log:
 
 2.0.9.9
 ----------------------------------------------------------------------
+- Fixed: Plugin will install to the correct folder.
 - Fixed: Minified CSS files included now.
 
 2.0.9.8
 ----------------------------------------------------------------------
+- Fix: Membership levels are recognized correctly by Visibility module.
+- Fix: Export function now works in all browsers.
 - Better: Add context-guide how to changes settings for static front-page.
+- Better: Improve layout of Custom Sidebars column in posts-list on small screens.
 
 2.0.9.7
 ----------------------------------------------------------------------
+- New: WPML support to translate name/description of custom- and theme-sidebars!
+- New: A column in the post-list shows the assigned custom sidebars.
+- New: Assign Custom Sidebars to a post via the Quick-Edit form.
+- New: Assign a Sidebar to a specific Author via the Sidebar Location dialog.
 - New: Assign a Sidebar to 404 pages via the Sidebar Location dialog.
+- New: Sidebars can be sorted and filtered by title.
+- Improved loading performance of the Widgets screen.
 
 2.0.9.6
 ----------------------------------------------------------------------
+- Fix: When adding new widgets they are not linked anymore (not "clones")
 - Fix: In some browsers the "Add sidebar" popup was partially hidden.
 - Fix: Sometimes the dropdown list of a multiselect list stayed open.
 - Fix: Plugin now correctly loads the .po files to translate to other languages.
 - Some other small improvements.
+
+2.0.9.5
+----------------------------------------------------------------------
+- Fix: PHP error "WDev" undefined that appeared in 2.0.9.4
 
 2.0.9.4
 ----------------------------------------------------------------------
@@ -75,10 +117,20 @@ Change Log:
 - Minor fix: Use WordPress core functions to get URL to javascript files.
 - Minor fix: Refactor function name to avoid misunderstandings.
 
+2.0.6
+----------------------------------------------------------------------
+- Fixed: Widgets that are registered via old API no longer break the page (again).
+- Fixed: After importing data the widgets page is reloaded to show new sidebars.
+- Fixed: Warnings by BuddyPress about using bp_current_user too early.
+
 2.0.5
 ----------------------------------------------------------------------
 - Fixed: Meta box in post editor did show missing sidebars (e.g. after switching the theme)
 - Fixed: PHP warning about strict standards.
+
+2.0.4
+----------------------------------------------------------------------
+- Fixed: Widgets that are registered via old API no longer break the page.
 
 2.0.3
 ----------------------------------------------------------------------
@@ -95,6 +147,10 @@ Change Log:
 2.0
 ----------------------------------------------------------------------
 - Complete UI redesign.
+- Update to Pro version.
+- Pro: Import/export sidebars and widgets.
+- Pro: Define widget visibility options.
+- Pro: Widget cloning.
 - Many small bugfixes.
 
 1.5
