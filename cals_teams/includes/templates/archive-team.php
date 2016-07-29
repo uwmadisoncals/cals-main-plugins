@@ -30,7 +30,9 @@ get_header(); ?>
 		//logit($mbox_fields,'$mbox_fields');
 		
 
-		$args = array('post_type'=>'team');//WP Query Args
+		$args = array('post_type'=>'team',
+					  'orderby'=>'menu_order',
+					  'order'=>'ASC');//WP Query Args
 
 		$cals_teams_query = new WP_Query($args);//Instantiate New WP Query Object
 		//logit($cals_teams_query,'$cals_teams_query');
@@ -41,7 +43,7 @@ get_header(); ?>
 
 		 ?>
 
-		<?php if ( have_posts() ) : ?>
+		<?php if ( $cals_teams_query->have_posts() ) : ?>
 
 			<header>
 				<?php
@@ -55,7 +57,7 @@ get_header(); ?>
 			
 			<?php
 			// Start the Loop.
-			while ( have_posts() ) : the_post();
+			while ( $cals_teams_query->have_posts() ) : $cals_teams_query->the_post();
 
 			$id = get_the_id();
 
