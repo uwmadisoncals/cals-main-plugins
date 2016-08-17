@@ -30,7 +30,7 @@
 class Visualizer_Plugin {
 
 	const NAME    = 'visualizer';
-	const VERSION = '1.5.5';
+	const VERSION = '1.5.6';
 
 	// custom post types
 	const CPT_VISUALIZER = 'visualizer';
@@ -166,7 +166,9 @@ class Visualizer_Plugin {
 	 * @return array
 	 */
 	public static function getChartTypes() {
-		return array( 'line', 'area', 'bar', 'column', 'pie', 'geo', 'scatter', 'candlestick', 'gauge' );
+        $array  = array_keys(Visualizer_Module_Admin::_getChartTypesLocalized());
+        unset($array[0]); // all
+        return $array;
 	}
 
 }

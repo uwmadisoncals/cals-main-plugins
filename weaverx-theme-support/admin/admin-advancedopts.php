@@ -244,6 +244,11 @@ By default, Weaverx Xtreme Plus will use the style-weaverxt.css file. &diams;', 
 	}
 ?>
 
+<h3><?php _e('Include Widget Areas in Print', 'weaver-xtreme' /*adm*/);?></h3>
+
+	<label><input type="checkbox" name="<?php weaverx_sapi_main_name('_inline_style'); ?>" id="_inline_style" <?php checked(weaverx_getopt_checked( '_print_show_widgets' )); ?> />
+<?php _e('Include all widget areas and full Footer content on browser Print page operation. &diams;', 'weaver-xtreme' /*adm*/);?>
+	</label><br /><br />
 
 	<br />
 	<div class="atw-option-subheader"><span style="color:black; padding:.2em;" class="dashicons dashicons-format-image"></span><span style="color:blue;font-size:larger;">

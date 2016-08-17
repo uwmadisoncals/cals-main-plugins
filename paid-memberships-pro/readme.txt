@@ -2,8 +2,8 @@
 Contributors: strangerstudios
 Tags: memberships, membership, authorize.net, ecommerce, paypal, stripe, braintree, restrict access, restrict content, directory site, payflow
 Requires at least: 3.5
-Tested up to: 4.5.2
-Stable tag: 1.8.9.3
+Tested up to: 4.5.3
+Stable tag: 1.8.10.4
 
 A revenue-generating machine for membership sites. Unlimited levels with recurring payment, protected content and member management.
 
@@ -115,7 +115,43 @@ Not sure? You can find out by doing a bit a research.
 [View All Screenshots](http://www.paidmembershipspro.com/features/screenshots/)
 
 == Changelog ==
-=======
+= 1.8.10.4 =
+* BUG: Fixed issue where non-decimal currencies (e.g. Japanese Yen) were sending invalid amounts to the Stripe gateway.
+* BUG/ENHANCEMENT: If an invalid discount code is applied at checkout, we now set the code_level JS var to false. Along with updates to the Pay by Check addon, this fixes issues with the Pay by Check addon where users could not checkout when using a discount code that reduced the price to free.
+* BUG/ENHANCEMENT: Fixed HTML validation issue in CVV field of the checkout page.
+* BUG/ENHANCEMENT: Now using the current_time function in profile.php to avoid off-by-one errors when changing members' expiration dates.
+
+= 1.8.10.3 =
+* BUG: Fixed bug where users could not confirm PayPal Express payments if the main gateway was Stripe or Braintree.
+* BUG: Fixed issue where the billing address and/or credit card fields were not showing up on the Update Billing page.
+
+= 1.8.10.2 =
+* BUG: Fixed bug in invoices query in the pmpro_account shortcode.
+* BUG: Fixed issue where the orders table was not being created on brand new installs.
+* BUG: Fixed responsive styling of ReCaptcha.
+* ENHANCEMENT: Added Hebrew language support. Thanks, Nadav Waisbrod.
+* ENHANCEMENT: Update to Italian translation. (Thanks again, Angelo Giammarresi)
+* ENHANCEMENT: Added a text domain and path to the plugin header.
+
+= 1.8.10.1 =
+* BUG: Fixed bugs in pmpro_hasMembershipLevel that caused shortcodes like [membership levels="0"] and [membership levels="-1"] to stop working.
+
+= 1.8.10 =
+* SECURITY: Patched a cross site scripting (XSS) vulnerability on the Memberships -> Addons page in the dashboard. Thanks to Burak Kelebek for the discovery and responsible disclosure of this vulnerability.
+* BUG: Added pmpro_btn-submit-checkout class to the PayPal checkout buttons.
+* BUG: Updated Stripe and Braintree gateways to load billing fields and JavaScript when it's the default gateway (if not the current gateway specified).
+* BUG: Fixed bug where cancelation emails weren't being sent to users if they originated from PayPal.
+* BUG: Fixed bug where unsucessful invoices were shown on the Membership Account page. We aren't showing refunded invoices here now either, but plan to in the future.
+* BUG: The update billing page now uses the pmpro_include_billing_address_fields filter so gateways and addons can properly override the payment fields when needed.
+* BUG: The update billing page now uses the validatecreditcard.js script to set the Card Type in the background, just like checkout. Fixes some issues with updating credit cards on certain gateways.
+* BUG: Reintroduced the pmpro_members_list_sql filter.
+* BUG/ENHANCEMENT: Switched the Japanese Yen and South Korean Won to not use decimals by default. (Thanks, flatworld21 on wp.org)
+* ENHANCEMENT: Added an option to skip the confirmation step with PayPal Express.
+* ENHANCEMENT: Added the pmpro_membership_levels_table filter on the membership levels page of the dashboard to allow addons (like the upcoming MMPU addon) to override the HTML for the table shown.
+* ENHANCEMENT: Added the checkout_id column to the pmpro_membership_orders table. This will be used by addons and possible core in the future to track multiple orders that happen during the same checkout process.
+* ENHANCEMENT: Added support for the Serian language. (Thanks, Sasa Trifkovic)
+* NOTE: We are planning to remove the certificate_id and certificate_amount columns from the pmpro_membership_orders table. Please contact us if you are using this column for something to come up with a work around.
+
 = 1.8.9.3 =
 * BUG: Fixed bug introduced in 1.8.9.2 where member start and end dates weren't being set correctly. Includes an update script to fix past users affected by this.
 * BUG: Fixed warnings on new order page in the dashboard.

@@ -4,7 +4,7 @@ Donate link:
 Tags: aggregate, aggregation, aggregator, atom, attribution, circulate, collect, community, content curation, curate, curation, curation tool, discuss, distribute, editorial, feed, network, news, opml, OPML, read, reader, reblog, reblogging, republish, review, RSS, rss, share, syndicate, syndication, workflow
 Requires at least: 3.0.1
 Tested up to: 4.5.3
-Stable tag: 3.9.1
+Stable tag: 4.0.2
 License: GPL2
 License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
@@ -81,6 +81,24 @@ A list of [FAQs](https://github.com/PressForward/pressforward/wiki/FAQ) can be f
 9. Send items to introduce, format, and publish in the WordPress Posts panel.
 
 == Changelog ==
+
+= 4.0.2 =
+
+* Removed forwarding alert.
+
+= 4.0.0 =
+
+* Added support for YouTube RSS Feeds
+* Nominate This now pulls in existing tags and allows users to create new tags.
+* Enhanced the identification of featured images in posts
+* Added support for YouTube oEmbeds
+* Increased database efficiency.
+* Moved all meta value management to internal library.
+* Fixed bug that caused item_author to default to first user in site if no author was identified in the post. If no author is found, the author will now default to the title of the source feed.
+* Resolved issue that caused nominate this button to disappear
+* Resolved issue where posts with URLs whose length exceeded the GUID field maximum in the WordPress post table could not be processed.
+* Fixed issue where canonical URLs were not respected by Nominate This.
+* Removed potential excess extra post entries created by Nominate This.
 
 = 3.9.1 =
 

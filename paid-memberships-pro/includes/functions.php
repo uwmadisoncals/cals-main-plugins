@@ -644,14 +644,12 @@ function pmpro_hasMembershipLevel($levels = NULL, $user_id = NULL)
 	if(empty($user_id)) //no user_id passed, check the current user
 	{
 		$user_id = $current_user->ID;
-		$membership_levels = $current_user->membership_levels;
 	}
-	elseif(is_numeric($user_id)) //get membership levels for given user
-	{
+	
+	if(!empty($user_id) && is_numeric($user_id)) //get membership levels for given user
 		$membership_levels = pmpro_getMembershipLevelsForUser($user_id);
-	}
 	else
-		return false;	//invalid user_id
+		$membership_levels = NULL; //non-users don't have levels
 
 	if($levels === "0" || $levels === 0) //if 0 was passed, return true if they have no level and false if they have any
 	{
@@ -668,18 +666,29 @@ function pmpro_hasMembershipLevel($levels = NULL, $user_id = NULL)
 			$levels = array($levels);
 		}
 
-		if(empty($membership_levels))
+		if(empty($membership_levels))	//user has no levels just check if 0, L, -1, or e was sent in one of the levels
 		{
-			//user has no levels just check if 0, L, -1, or e was sent in one of the levels
-			if(in_array(0, $levels, true) || in_array("0", $levels))
-				$return = true;
+			//check for negative level
+			$negative_level = false;
+			foreach($levels as $level) {
+				if(intval($level) < 0) {
+					$negative_level = true;
+					break;
+				}
+			}
+
+			//are we looking for non-members or not?
+			if($negative_level)
+				return true;														//-1/etc, negative level
+			elseif(in_array(0, $levels, true) || in_array("0", $levels))
+				$return = true;														//0 level
 			elseif(in_array("L", $levels) || in_array("l", $levels))
-				$return = (!empty($user_id) && $user_id == $current_user->ID);
+				$return = (!empty($user_id) && $user_id == $current_user->ID);		//L, logged in users
 			elseif(in_array("-L", $levels) || in_array("-l", $levels))
-				$return = (empty($user_id) || $user_id != $current_user->ID);
+				$return = (empty($user_id) || $user_id != $current_user->ID);		//-L, not logged in users
 			elseif(in_array("E", $levels) || in_array("e", $levels)) {
 				$sql = "SELECT id FROM $wpdb->pmpro_memberships_users WHERE user_id=$user_id AND status='expired' LIMIT 1";
-				$expired = $wpdb->get_var($sql);
+				$expired = $wpdb->get_var($sql);									//E, expired members
 				$return = !empty($expired);
 			}
 		}
@@ -699,7 +708,7 @@ function pmpro_hasMembershipLevel($levels = NULL, $user_id = NULL)
 					if(empty($user_id) || $user_id != $current_user->ID)
 						$return = true;
 				}
-				elseif($level == "0" || strtoupper($level) == "E")
+				elseif($level === "0" || $level === 0 || strtoupper($level) === "E")
 				{
 					continue;	//user with levels so not a "non-member" or expired
 				}
@@ -709,6 +718,7 @@ function pmpro_hasMembershipLevel($levels = NULL, $user_id = NULL)
 					$level_obj = pmpro_getLevel(is_numeric($level) ? abs(intval($level)) : $level); //make sure our level is in a proper format
 					if(empty($level_obj)){continue;} //invalid level
 					$found_level = false;
+					
 					foreach($membership_levels as $membership_level)
 					{
 						if($membership_level->id == $level_obj->id) //found a match
@@ -823,8 +833,9 @@ function pmpro_changeMembershipLevel($level, $user_id = NULL, $old_level_status 
 	 *
 	 * @param int $level_id ID of the level changed to.
 	 * @param int $user_id ID of the user changed.
+	 * @param array $old_levels array of prior levels the user belonged to.
 	 */
-	do_action("pmpro_before_change_membership_level", $level_id, $user_id);
+	do_action("pmpro_before_change_membership_level", $level_id, $user_id, $old_levels);
 
 	//should we cancel their gateway subscriptions?
 	$pmpro_cancel_previous_subscriptions = true;
@@ -1411,8 +1422,19 @@ function pmpro_checkDiscountCode($code, $level_id = NULL, $return_errors = false
 		}
 	}
 
-	//allow filter
-	$pmpro_check_discount_code = apply_filters("pmpro_check_discount_code", !$error, $dbcode, $level_id, $code);
+	/**
+	 * Filter the results of the discount code check.	 
+	 * @since 1.7.13.1
+	 *
+	 * @param bool $okay true if code check is okay or false if there was an error
+	 * @param object $dbcode Object containing code data from the database row
+	 * @param int $level_id ID of the level the user is checking out for.
+	 * @param string $code Discount code string.
+	 * 
+	 * @return mixed $okay true if okay, false or error message string if not okay
+	 */
+	$okay = !$error;
+	$pmpro_check_discount_code = apply_filters("pmpro_check_discount_code", $okay, $dbcode, $level_id, $code);
 	if(is_string($pmpro_check_discount_code))
 		$error = $pmpro_check_discount_code;	//string returned, this is an error
 	elseif(!$pmpro_check_discount_code && !$error)
@@ -2096,7 +2118,7 @@ function pmpro_formatPrice($price)
 	global $pmpro_currency, $pmpro_currency_symbol, $pmpro_currencies;
 
 	//start with the price formatted with two decimals
-	$formatted = number_format($price, 2);
+	$formatted = number_format((double)$price, 2);
 
 	//settings stored in array?
 	if(!empty($pmpro_currencies[$pmpro_currency]) && is_array($pmpro_currencies[$pmpro_currency]))

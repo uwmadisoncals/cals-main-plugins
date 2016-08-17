@@ -2,10 +2,10 @@
 /*
 Plugin Name: Weaver Xtreme Theme Support
 Plugin URI: http://weavertheme.com/plugins
-Description: Weaver X Theme Support - a package of useful shortcodes and widgets that integrates closely with the Weaver X theme. This plugin Will also allow you to switch from Weaver X to any other theme and still be able to use the shortcodes and widgets from Weaver X with minimal effort.
+Description: Weaver Xtreme Theme Support - a package of useful shortcodes and widgets that integrates closely with the Weaver Xtreme and Weaver Foundation themes.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 2.1.2
+Version: 2.1.3
 License: GPL V3
 
 Weaver Xtreme Theme Support
@@ -31,9 +31,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 $theme = get_template_directory();
 
-if ( strpos( $theme, '/weaver-xtreme') !== false ) {		// only load if Weaver Xtreme is the theme
+if ( strpos( $theme, '/weaver-xtreme') !== false || strpos( $theme, '/weaver-foundation') !== false) {		// only load if Weaver Xtreme is the theme
 
-define ('WVRX_TS_VERSION','2.1.2');
+define ('WVRX_TS_VERSION','2.1.3');
 define ('WVRX_TS_MINIFY','.min');		// '' for dev, '.min' for production
 define ('WVRX_TS_APPEARANCE_PAGE', false );
 
@@ -50,13 +50,6 @@ function wvrx_ts_enqueue_scripts() {	// action definition
 
     if (function_exists('wvrx_ts_slider_header')) wvrx_ts_slider_header();
 
-    //-- Weaver X PLus js lib - requires jQuery...
-
-    // put the enqueue script in the tabs shortcode where it belongs
-
-    //wp_enqueue_script('wvrxtsJSLib', wvrx_ts_plugins_url('/js/wvrx-ts-jslib', WVRX_TS_MINIFY . '.js'),array('jquery'),WVRX_TS_VERSION);
-
-
     // add plugin CSS here, too.
 
     wp_register_style('wvrx-ts-style-sheet',wvrx_ts_plugins_url('weaverx-ts-style', WVRX_TS_MINIFY.'.css'),null,WVRX_TS_VERSION,'all');
@@ -68,9 +61,11 @@ add_action('wp_enqueue_scripts', 'wvrx_ts_enqueue_scripts' );
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-runtime-lib.php'); // NOW - load the basic library
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-widgets.php'); 		// widgets runtime library
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-shortcodes.php'); // load the shortcode definitions
-require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-per-page-customizer.php');
+// future development: require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-per-page-customizer.php');
 
 // load traditional Weaver Xtreme Options
+
+if ( strpos( $theme, '/weaver-xtreme') !== false ) { //   Weaver Xtreme only
 
 function weaver_xtreme_load_admin_action() {
 	require_once(dirname( __FILE__ ) . '/admin/add-weaverx-sapi-options.php'); // NOW - load the traditional opions admin
@@ -108,7 +103,8 @@ function wvrx_ts_page_extras_load() {
 function wvrx_ts_post_extras_load() {
 	wvrx_ts_post_extras();
 }
-}
+
+} // x-plus installed
 
 // ======================================== subthemes ========================================
 add_action('weaverx_child_show_extrathemes','wvrx_ts_child_show_extrathemes_action');
@@ -218,6 +214,8 @@ function wvrx_ts_scan_section($what) {
 	}
 	echo '</ul>';
 }
-}	// end only load if Weaver Xtreme installed
+
+} // end of load for Weaver Xtreme only - not Weaver Foundation
+} // end only load if Weaver Xtreme installed
 
 ?>

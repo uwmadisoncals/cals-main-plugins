@@ -38,6 +38,19 @@
     'linkColorHover' => '#335980',
     'monthViewDateBackground' => '#eaf4ff',
     'placeholderText' => '#999999',
+    'saasThemeActionColor' => '#ffffff',
+    'saasThemeActionMenuBackgroundColor' => '#67b128',
+    'saasThemeDateBlockBackgroundColor' => '#539a00',
+    'saasThemeDateBlockColor' => '#fff',
+    'saasThemePagePanelBackgroundColor' => '#eeeeee',
+    'saasThemePagePanelBorderColor' => '#dddddd',
+    'saasThemePagePanelLinksColor' => '#3d6b99',
+    'saasThemePageTextColor' => '#333333',
+    'saasThemePageTitleFontColor' => '#000',
+    'saasThemePageTitleFontFamily' => '"Helvetica Neue", Helvetica, Arial, sans-serif',
+    'saasThemePageTitleFontSize' => '68px',
+    'saasThemeTaxonomiesBackgroundColor' => '#272727',
+    'saasThemeTaxonomiesColor' => '#ffffff',
     'tableBackground' => '#ffffff',
     'tableLabelBackground' => '#f5f5f5',
     'tableLabelText' => '#9e9e9e',
@@ -332,10 +345,10 @@
       'size' => 10665,
       'sha1' => '8d7d0d81e445093ecc58577605c36320d2741ba7',
     ),
-    'less\\override.less' => 
+    'less\\font-league-gothic.less' => 
     array (
-      'size' => 2253,
-      'sha1' => 'ddb7ed1009cc727e25ce76179f201f79eed3a205',
+      'size' => 677,
+      'sha1' => 'fad7c34931c2a1d45a19d882391210f61f966002',
     ),
     'less\\plugins\\datepicker3.less' => 
     array (
@@ -356,6 +369,11 @@
     array (
       'size' => 3946,
       'sha1' => 'b20c2d939abce946e6456845df993a8043e9e1ae',
+    ),
+    'less\\saas-theme.less' => 
+    array (
+      'size' => 13108,
+      'sha1' => '7a63c0b53c21c4a6364bd1f12de1bbaaf1bdfb38',
     ),
     'less\\style.less' => 
     array (
@@ -382,6 +400,11 @@
       'size' => 7322,
       'sha1' => '8a2e190b67e93b8ca39382552fbda0deb19baf72',
     ),
+    'less\\user_variables_st.php' => 
+    array (
+      'size' => 3833,
+      'sha1' => '35291b881a946836c7ee20c2a8152ade1ff8f659',
+    ),
     'less\\variables.less' => 
     array (
       'size' => 1248,
@@ -389,8 +412,8 @@
     ),
     'style.css' => 
     array (
-      'size' => 239,
-      'sha1' => 'e5a4811541dd9db692d29acbef6ae3ce8b553199',
+      'size' => 213,
+      'sha1' => 'd2d11e0f5366362d3c0cc77b0b36915841f2988d',
     ),
   ),
 );

@@ -38,6 +38,19 @@
     'linkColorHover' => '#94b2d1',
     'monthViewDateBackground' => '#001829',
     'placeholderText' => '#555',
+    'saasThemeActionColor' => '#ffffff',
+    'saasThemeActionMenuBackgroundColor' => '#67b128',
+    'saasThemeDateBlockBackgroundColor' => '#539a00',
+    'saasThemeDateBlockColor' => '#fff',
+    'saasThemePagePanelBackgroundColor' => '#eeeeee',
+    'saasThemePagePanelBorderColor' => '#dddddd',
+    'saasThemePagePanelLinksColor' => '#3d6b99',
+    'saasThemePageTextColor' => '#333333',
+    'saasThemePageTitleFontColor' => '#000',
+    'saasThemePageTitleFontFamily' => '"Helvetica Neue", Helvetica, Arial, sans-serif',
+    'saasThemePageTitleFontSize' => '68px',
+    'saasThemeTaxonomiesBackgroundColor' => '#272727',
+    'saasThemeTaxonomiesColor' => '#ffffff',
     'tableBackground' => '#000000',
     'tableLabelBackground' => '#303030',
     'tableLabelText' => '#6a6a6a',
@@ -332,10 +345,10 @@
       'size' => 10665,
       'sha1' => '8d7d0d81e445093ecc58577605c36320d2741ba7',
     ),
-    'less\\override.less' => 
+    'less\\font-league-gothic.less' => 
     array (
-      'size' => 252,
-      'sha1' => '3a6f13f271b446835de767a40915ba0d3e682a8a',
+      'size' => 677,
+      'sha1' => 'fad7c34931c2a1d45a19d882391210f61f966002',
     ),
     'less\\plugins\\datepicker3.less' => 
     array (
@@ -356,6 +369,11 @@
     array (
       'size' => 3946,
       'sha1' => 'b20c2d939abce946e6456845df993a8043e9e1ae',
+    ),
+    'less\\saas-theme.less' => 
+    array (
+      'size' => 13108,
+      'sha1' => '7a63c0b53c21c4a6364bd1f12de1bbaaf1bdfb38',
     ),
     'less\\style.less' => 
     array (
@@ -379,18 +397,23 @@
     ),
     'less\\user_variables.php' => 
     array (
-      'size' => 7337,
-      'sha1' => '93bca68cc6169b6e211c4220ff65e34c7a140b10',
+      'size' => 7322,
+      'sha1' => '8a2e190b67e93b8ca39382552fbda0deb19baf72',
+    ),
+    'less\\user_variables_st.php' => 
+    array (
+      'size' => 3833,
+      'sha1' => '35291b881a946836c7ee20c2a8152ade1ff8f659',
     ),
     'less\\variables.less' => 
     array (
-      'size' => 1424,
-      'sha1' => '1d1791f4334d063971673c2b55227d4655077d83',
+      'size' => 1248,
+      'sha1' => '1d7fcb0178ffdf8a57e8e9c4f2fb2c0dc70e3c7f',
     ),
     'style.css' => 
     array (
-      'size' => 267,
-      'sha1' => '860be5e3b568d69d4f6134425bada531b7314acf',
+      'size' => 213,
+      'sha1' => 'd2d11e0f5366362d3c0cc77b0b36915841f2988d',
     ),
   ),
 );

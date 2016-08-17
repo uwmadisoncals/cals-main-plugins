@@ -8,9 +8,9 @@ Author: wpweaver
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: weaverx-theme-support
-Requires at least: 4.3
+Requires at least: 4.5
 Tested up to: 4.5
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -75,6 +75,11 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog ==
+= 2.1.3 =
+* New: Weaver Xtreme now requires WP 4.5 - seriously, you should not run old versions of WP!
+* Fix: show per post options for custom post types now works correctly
+* New: support for showing widget areas on browser Print operation
+
 = 2.1.2 -
 * Change: The Per Page options for the RAW page template now show only those options related to the RAW template.
 

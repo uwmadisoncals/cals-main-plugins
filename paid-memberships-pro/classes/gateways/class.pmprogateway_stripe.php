@@ -33,7 +33,7 @@
 			$this->loadStripeLibrary();
 			Stripe::setApiKey(pmpro_getOption("stripe_secretkey"));
 			Stripe::setAPIVersion("2015-07-13");
-
+			
 			return $this->gateway;
 		}
 
@@ -106,8 +106,9 @@
 			//add_filter('pmpro_next_payment', array('PMProGateway_stripe', 'pmpro_next_payment'), 10, 3);
 			
 			//code to add at checkout if Stripe is the current gateway
-			$gateway = pmpro_getGateway();
-			if($gateway == "stripe")
+			$default_gateway = pmpro_getOption('gateway');
+			$current_gateway = pmpro_getGateway();			
+			if(($default_gateway == "stripe" || $current_gateway == "stripe") && empty($_REQUEST['review']))	//$_REQUEST['review'] means the PayPal Express review page
 			{
 				add_action('pmpro_checkout_preheader', array('PMProGateway_stripe', 'pmpro_checkout_preheader'));
 				add_filter('pmpro_checkout_order', array('PMProGateway_stripe', 'pmpro_checkout_order'));
@@ -231,7 +232,9 @@
 		{
 			global $gateway, $pmpro_level;
 
-			if($gateway == "stripe" && !pmpro_isLevelFree($pmpro_level))
+			$default_gateway = pmpro_getOption("gateway");
+			
+			if(($gateway == "stripe" || $default_gateway == "stripe") && !pmpro_isLevelFree($pmpro_level))
 			{
 				//stripe js library
 				wp_enqueue_script("stripe", "https://js.stripe.com/v2/", array(), NULL);
@@ -246,7 +249,7 @@
 					// this identifies your website in the createToken call below
 					Stripe.setPublishableKey('<?php echo pmpro_getOption("stripe_publishablekey"); ?>');
 
-					var pmpro_require_billing = true;
+					pmpro_require_billing = true;
 
 					jQuery(document).ready(function() {
 						jQuery("#pmpro_form, .pmpro_form").submit(function(event) {
@@ -1083,8 +1086,13 @@
 		 */
 		function charge(&$order)
 		{
-			global $pmpro_currency;
-
+			global $pmpro_currency, $pmpro_currencies;
+			$currency_unit_multiplier = 100; //ie 100 cents per USD
+			
+			//account for zero-decimal currencies like the Japanese Yen
+			if(is_array($pmpro_currencies[$pmpro_currency]) && isset($pmpro_currencies[$pmpro_currency]['decimals']) && $pmpro_currencies[$pmpro_currency]['decimals'] == 0)
+				$currency_unit_multiplier = 1;
+			
 			//create a code for the order
 			if(empty($order->code))
 				$order->code = $order->getRandomCode();
@@ -1110,7 +1118,7 @@
 			try
 			{
 				$response = Stripe_Charge::create(array(
-				  "amount" => $amount * 100, # amount in cents, again
+				  "amount" => $amount * $currency_unit_multiplier, # amount in cents, again
 				  "currency" => strtolower($pmpro_currency),
 				  "customer" => $this->customer->id,
 				  "description" => "Order #" . $order->code . ", " . trim($order->FirstName . " " . $order->LastName) . " (" . $order->Email . ")"
@@ -1198,8 +1206,8 @@
 					else
 					{
 						//find the user's last stripe order
-						$last_order = new MemberOrder();
-						$last_order->getLastMemberOrder($user_id, array('success', 'cancelled'), NULL, 'stripe', $order->gateway_environment);
+						$last_order = new MemberOrder();						
+						$last_order->getLastMemberOrder($user_id, array('success', 'cancelled'), NULL, 'stripe', $order->Gateway->gateway_environment);
 						if(!empty($last_order->payment_transaction_id))
 							$payment_transaction_id = $last_order->payment_transaction_id;
 					}
@@ -1396,7 +1404,13 @@
 		 */
 		function subscribe(&$order, $checkout = true)
 		{
-			global $pmpro_currency;
+			global $pmpro_currency, $pmpro_currencies;
+			
+			$currency_unit_multiplier = 100; //ie 100 cents per USD
+			
+			//account for zero-decimal currencies like the Japanese Yen
+			if(is_array($pmpro_currencies[$pmpro_currency]) && isset($pmpro_currencies[$pmpro_currency]['decimals']) && $pmpro_currencies[$pmpro_currency]['decimals'] == 0)
+				$currency_unit_multiplier = 1;
 
 			//create a code for the order
 			if(empty($order->code))
@@ -1491,7 +1505,7 @@
 			try
 			{
                 $plan = array(
-                    "amount" => $amount * 100,
+                    "amount" => $amount * $currency_unit_multiplier,
                     "interval_count" => $order->BillingFrequency,
                     "interval" => strtolower($order->BillingPeriod),
                     "trial_period_days" => $trial_period_days,

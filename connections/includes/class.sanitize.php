@@ -186,6 +186,8 @@ class cnSanitize {
 
 					case 'name':
 					case 'street':
+					case 'district':
+					case 'county':
 					case 'locality':
 					case 'region':
 					case 'postal-code':
@@ -216,7 +218,6 @@ class cnSanitize {
 						 * Match the post content sanitation before being inserted in the db.
 						 * See the `content_save_pre` filters.
 						 */
-
 						if ( FALSE == current_user_can( 'unfiltered_html' ) ) {
 
 							$value = wp_filter_post_kses( $value );
@@ -226,6 +227,8 @@ class cnSanitize {
 
 					case 'name';
 					case 'street':
+					case 'district':
+					case 'county':
 					case 'locality':
 					case 'region':
 					case 'postal-code':
@@ -240,6 +243,10 @@ class cnSanitize {
 					case 'url';
 
 						return esc_url_raw( $value );
+
+					case 'attribute':
+
+						return esc_attr( $value );
 				}
 
 				break;
@@ -259,6 +266,8 @@ class cnSanitize {
 
 					case 'name':
 					case 'street':
+					case 'district':
+					case 'county':
 					case 'locality':
 					case 'region':
 					case 'postal-code':
@@ -536,4 +545,32 @@ class cnSanitize {
 		return self::hexColor( '#' . $color ) ? $color : '';
 	}
 
+	/**
+	 * Sanitize HTML class name or array of class names.
+	 *
+	 * @access public
+	 * @since  8.5.18
+	 * @static
+	 *
+	 * @param array|string $name
+	 *
+	 * @return array|string
+	 */
+	public static function htmlClass( $name ) {
+
+		if ( is_array( $name ) ) {
+
+			// Ensure all IDs are positive integers.
+			$name = array_map( 'sanitize_html_class', $name );
+
+			// Remove any empty array values.
+			$name = array_filter( $name );
+
+		} else {
+
+			$name = sanitize_html_class( $name );
+		}
+
+		return $name;
+	}
 }

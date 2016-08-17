@@ -340,7 +340,7 @@ To add areas to the widget area lists below, you <strong>must</strong> first def
 <br />
 <input type="text" size="30" id='_pp_fi_link' name='_pp_fi_link'
 	value="<?php echo esc_textarea(get_post_meta($post->ID, '_pp_fi_link', true)); ?>" />
-<?php _e('<em>Featured Image Link</em> - Full URL for link from FI','weaverx-theme-support' /*adm*/); ?>
+<?php _e('<em>Featured Image Link</em> - Full URL to override default link target from FI','weaverx-theme-support' /*adm*/); ?>
 	<br style="clear:both;" />
 	<hr />
 	<input type="text" size="15" id="bodyclass" name="_pp_bodyclass"
@@ -447,6 +447,7 @@ and including that HTML code in the Value for that field.</li></ol>', 'weaverx-t
 
 function wvrx_ts_post_extras_pt() {
 	// special handling for non-Weaver Custom Post Types
+	$opts = get_option( apply_filters('weaverx_options','weaverx_settings') , array());
 	if ((isset($opts['_show_per_post_all']) && $opts['_show_per_post_all']) || function_exists('atw_slider_plugins_loaded') )
 		wvrx_ts_post_extras();
 	else {
@@ -559,7 +560,7 @@ To add areas to the widget area lists below, you <strong>must</strong> first def
 <br />
 <input type="text" size="30" id='_pp_fi_link' name='_pp_fi_link'
 	value="<?php echo esc_textarea(get_post_meta($post->ID, '_pp_fi_link', true)); ?>" />
-	<?php _e("<em>Featured Image Link</em> - Full URL for link from FI",'weaverx-theme-support' /*adm*/); ?>
+	<?php _e("<em>Featured Image Link</em> - Full URL to override default link target from FI",'weaverx-theme-support' /*adm*/); ?>
 	<br style="clear:both;" />
 	</p><p>
 	<strong><?php _e('Post Editor Options','weaverx-theme-support' /*adm*/); ?></strong>

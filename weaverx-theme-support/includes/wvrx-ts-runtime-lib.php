@@ -31,11 +31,18 @@ function wvrx_ts_fix_short($prefix, $msg ) {
 
 add_action('weaverx_theme_support_addon','wvrx_ts_theme_support_addon');
 function wvrx_ts_theme_support_addon() {
+
+	$theme = get_template_directory();
+
+	$is_xtreme = strpos( $theme, '/weaver-xtreme') !== false;
+
 ?>
 <div class="a-plus">
-	<p><strong style="font-size:110%;"><?php _e('You have Weaver Xtreme Theme Support installed.','weaverx-theme-support' /*adm*/);
+	<p><strong style="font-size:110%;"><?php
+	if ($is_xtreme) _e('You have Weaver Xtreme Theme Support installed.','weaverx-theme-support' /*adm*/);
+	else  _e('You have Weaver Xtreme (Foundation) Theme Support installed.','weaverx-theme-support' /*adm*/);
 	echo ' (V ' . WVRX_TS_VERSION . ')'; ?></strong><br />
-	<?php _e('This section shows the shortcodes and widgets available with Weaver X Theme Support.
+	<?php _e('This section shows the shortcodes and widgets available with Weaver Xtreme (and Foundation) Theme Support.
 Click the<span style="color:red; vertical-align: middle; margin-left:.25em;" class="dashicons dashicons-editor-help"></span> button to open help entry.','weaverx-theme-support' /*adm*/); ?></p>
 
 <?php
@@ -112,16 +119,18 @@ Click the<span style="color:red; vertical-align: middle; margin-left:.25em;" cla
 	    <form enctype="multipart/form-data" name='toggle_shortcode' action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method='post'>
 
 <?php
-	if ( $prefix )
-		$button = __("Remove 'wvrx_' prefix from shortcode names: [ bloginfo ], etc.", 'weaverx-theme-support');
-	else
-		$button = __("Add 'wvrx_' to shortcode names: [ wvrx_bloginfo ], etc.", 'weaverx-theme-support');
-?>
-	<div style="clear:both;"></div>
-        <span class='submit'><input name="toggle_shortcode_prefix" type="submit" value="<?php echo $button; ?>" /></span>
-		<br /><small> <?php _e("To avoid conflicts with other plugins, you can add a 'wvrx_' prefix to these shortcodes.", 'weaver-xtreme /*adm*/'); ?> </small>
-        <?php weaverx_nonce_field('toggle_shortcode_prefix'); ?>
-		</form>
+	if ( $is_xtreme ) {
+		if ( $prefix )
+			$button = __("Remove 'wvrx_' prefix from shortcode names: [ bloginfo ], etc.", 'weaverx-theme-support');
+		else
+			$button = __("Add 'wvrx_' to shortcode names: [ wvrx_bloginfo ], etc.", 'weaverx-theme-support');
+	?>
+		<div style="clear:both;"></div>
+			<span class='submit'><input name="toggle_shortcode_prefix" type="submit" value="<?php echo $button; ?>" /></span>
+			<br /><small> <?php _e("To avoid conflicts with other plugins, you can add a 'wvrx_' prefix to these shortcodes.", 'weaver-xtreme /*adm*/'); ?> </small>
+			<?php weaverx_nonce_field('toggle_shortcode_prefix'); ?>
+			</form>
+<?php	} ?>
 		<br />
 
     <h3><?php _e('Widgets','weaverx-theme-support' /*adm*/); ?></h3>
@@ -139,7 +148,7 @@ Click the<span style="color:red; vertical-align: middle; margin-left:.25em;" cla
     </li>
     </ul>
 
-
+<?php if ( $is_xtreme ) { ?>
 	<h3><?php _e('Per Page/Post Settings','weaverx-theme-support' /*adm*/); ?></h3>
 	<p> <?php _e("Click the following button to produce a list of links to all pages and posts that have Per Page or Per Post settings.", 'weaver-xtreme /*adm*/'); ?></p>
 	<div style="clear:both;"></div>
@@ -147,6 +156,7 @@ Click the<span style="color:red; vertical-align: middle; margin-left:.25em;" cla
         <span class='submit'><input name="show_per_page_report" type="submit" value="<?php _e('Show Pages and Posts with Per Page/Post Settings', 'weaver-xtreme /*adm*/'); ?>" /></span>
         <?php weaverx_nonce_field('show_per_page_report'); ?>
 		</form><br /><br />
+<?php } ?>
 </div>
 
 <?php

@@ -8,6 +8,7 @@ if (!defined('WFWAF_AUTO_PREPEND')) {
 	define('WFWAF_AUTO_PREPEND', true);
 }
 
+require_once dirname(__FILE__) . '/wfWAFUserIPRange.php';
 require_once dirname(__FILE__) . '/../vendor/wordfence/wf-waf/src/init.php';
 
 class wfWAFWordPressRequest extends wfWAFRequest {
@@ -65,7 +66,6 @@ class wfWAFWordPressObserver extends wfWAFBaseObserver {
 		// Whitelisted IPs (Wordfence config)
 		$whitelistedIPs = wfWAF::getInstance()->getStorageEngine()->getConfig('whitelistedIPs');
 		if ($whitelistedIPs) {
-			require_once dirname(__FILE__) . '/wfWAFUserIPRange.php';
 			if (!is_array($whitelistedIPs)) {
 				$whitelistedIPs = explode(',', $whitelistedIPs);
 			}
@@ -73,6 +73,23 @@ class wfWAFWordPressObserver extends wfWAFBaseObserver {
 				$ipRange = new wfWAFUserIPRange($whitelistedIP);
 				if ($ipRange->isIPInRange(wfWAF::getInstance()->getRequest()->getIP())) {
 					throw new wfWAFAllowException('Wordfence whitelisted IP.');
+				}
+			}
+		}
+	}
+	
+	public function afterRunRules()
+	{
+		//wfWAFLogException
+		$watchedIPs = wfWAF::getInstance()->getStorageEngine()->getConfig('watchedIPs');
+		if ($watchedIPs) {
+			if (!is_array($watchedIPs)) {
+				$watchedIPs = explode(',', $watchedIPs);
+			}
+			foreach ($watchedIPs as $watchedIP) {
+				$ipRange = new wfWAFUserIPRange($watchedIP);
+				if ($ipRange->isIPInRange(wfWAF::getInstance()->getRequest()->getIP())) {
+					throw new wfWAFLogException('Wordfence watched IP.');
 				}
 			}
 		}
@@ -187,7 +204,8 @@ if (!defined('WFWAF_LOG_PATH')) {
 	define('WFWAF_LOG_PATH', WP_CONTENT_DIR . '/wflogs/');
 }
 if (!is_dir(WFWAF_LOG_PATH)) {
-	@mkdir(WFWAF_LOG_PATH, 0755);
+	@mkdir(WFWAF_LOG_PATH, 0775);
+	@chmod(WFWAF_LOG_PATH, 0775);
 	@file_put_contents(rtrim(WFWAF_LOG_PATH . '/') . '/.htaccess', <<<APACHE
 <IfModule mod_authz_core.c>
 	Require all denied
@@ -198,6 +216,7 @@ if (!is_dir(WFWAF_LOG_PATH)) {
 </IfModule>
 APACHE
 	);
+	@chmod(rtrim(WFWAF_LOG_PATH . '/') . '/.htaccess', 0664);
 }
 
 
@@ -216,6 +235,7 @@ try {
 		if (!file_exists($rulesFile)) {
 			@touch($rulesFile);
 		}
+		@chmod($rulesFile, 0664);
 		if (is_writable($rulesFile)) {
 			wfWAF::getInstance()->setCompiledRulesFile($rulesFile);
 			break;

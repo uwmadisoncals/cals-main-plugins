@@ -271,6 +271,33 @@ class cnFormatting {
 
 		return implode( ', ', $placeholders );
 	}
+
+	/**
+	 * Convert supplied string to camelCase.
+	 *
+	 * @access public
+	 * @since  8.5.19
+	 * @static
+	 *
+	 * @link http://stackoverflow.com/a/2792045/5351316
+	 *
+	 * @param string $string
+	 * @param bool   $capitaliseInitial
+	 *
+	 * @return string
+	 */
+	public static function toCamelCase( $string, $capitaliseInitial = FALSE ) {
+
+		$string = self::sanitizeStringStrong( $string );
+		$string = str_replace( ' ', '', ucwords( str_replace( array( '_', '-' ), ' ', $string ) ) );
+
+		if ( ! $capitaliseInitial ) {
+
+			$string[0] = strtolower( $string[0] );
+		}
+
+		return $string;
+	}
 }
 
 class cnValidate {
@@ -687,6 +714,8 @@ class cnURL {
 	 * Take a URL and see if it's prefixed with a protocol, if it's not then it will add the default prefix to the
 	 * start of the string.
 	 *
+	 * @todo Refactor to use @see set_url_scheme()
+	 *
 	 * @access public
 	 * @since  0.8
 	 * @static
@@ -1013,6 +1042,26 @@ class cnURL {
 					$permalink = trailingslashit( $permalink . $base['category_base'] . '/' . $atts['slug'] );
 				} else {
 					$permalink = add_query_arg( 'cn-cat-slug', $atts['slug'] , $permalink );
+				}
+
+				break;
+
+			case 'district':
+
+				if ( $wp_rewrite->using_permalinks() ) {
+					$permalink = trailingslashit( $permalink . $base['district_base'] . '/' . urlencode( $atts['slug'] ) );
+				} else {
+					$permalink = add_query_arg( 'cn-district', urlencode( $atts['slug'] ) , $permalink );
+				}
+
+				break;
+
+			case 'county':
+
+				if ( $wp_rewrite->using_permalinks() ) {
+					$permalink = trailingslashit( $permalink . $base['county_base'] . '/' . urlencode( $atts['slug'] ) );
+				} else {
+					$permalink = add_query_arg( 'cn-county', urlencode( $atts['slug'] ) , $permalink );
 				}
 
 				break;
@@ -1792,6 +1841,7 @@ class cnString {
 				'cn_excerpt_allowed_tags',
 				array(
 					'style',
+					'span',
 					'br',
 					'em',
 					'strong',
@@ -1803,9 +1853,9 @@ class cnString {
 					'p',
 					'img',
 					'video',
-					'audio'
+					'audio',
 				)
-			)
+			),
 		);
 
 		$atts = wp_parse_args( $atts, $defaults );
@@ -1829,7 +1879,7 @@ class cnString {
 
 		} else {
 
-			$string  = strip_tags( $string, '<' . implode( '><', $atts['allowed_tags'] ) . '>' );
+			$string  = self::stripTags( $string, FALSE, '<' . implode( '><', $atts['allowed_tags'] ) . '>' );
 			$tokens  = array();
 			$excerpt = '';
 			$count   = 0;
@@ -1839,9 +1889,9 @@ class cnString {
 
 			foreach ( $tokens[0] as $token ) {
 
-				if ( $count >= $atts['length'] && preg_match( '/[\,\;\?\.\!]\s*$/uS', $token ) ) {
+				if ( $count >= $atts['length'] && preg_match( '/[\?\.\!]\s*$/uS', $token ) ) {
 
-					// Limit reached, continue until , ; ? . or ! occur at the end
+					// Limit reached, continue until ? . or ! occur at the end
 					$excerpt .= trim( $token );
 
 					// If the length limit was reached, append the more string.
@@ -1864,8 +1914,9 @@ class cnString {
 		$lastCloseTag = strrpos( $excerpt, '</' );
 		$lastSpace    = strrpos( $excerpt, ' ' );
 
-		// Determine if the string ends with and HTML tag or word.
-		if ( FALSE !== $lastCloseTag && ( FALSE !== $lastSpace && $lastCloseTag > $lastSpace ) ) {
+		// Determine if the string ends with a HTML tag or word.
+		if ( ( ! preg_match( '/[\s\?\.\!]$/', $excerpt ) ) &&
+		     ( FALSE !== $lastCloseTag && ( FALSE !== $lastSpace && $lastCloseTag > $lastSpace ) ) ) {
 
 			// Inside last HTML tag
 			if ( $appendMore ) {
@@ -1881,6 +1932,40 @@ class cnString {
 		}
 
 		return apply_filters( 'cn_excerpt', $excerpt, $raw, $atts );
+	}
+
+	/**
+	 * Properly strip all HTML tags including script and style.
+	 *
+	 * This differs from strip_tags() because it removes the contents of
+	 * the `<script>` and `<style>` tags. E.g. `strip_tags( '<script>something</script>' )`
+	 * will return 'something'. wp_strip_all_tags will return ''
+	 *
+	 * NOTE: This is the Connections equivalent of @see wp_strip_all_tags() in WordPress core ../wp-includes/formatting.php
+	 *
+	 * This differs from @see wp_strip_all_tags() in that is adds the `$allowed_tags` param to be passed to `strip_tags()`.
+	 *
+	 * @access public
+	 * @since  8.5.22
+	 * @static
+	 *
+	 * @param string $string        String containing HTML tags
+	 * @param bool   $remove_breaks Optional. Whether to remove left over line breaks and white space chars
+	 * @param string  $allowed_tags Optional. String of tags which will not be stripped.
+	 *
+	 * @return string The processed string.
+	 */
+	public static function stripTags( $string, $remove_breaks = FALSE, $allowed_tags = '' ) {
+
+		$string = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $string );
+		$string = strip_tags( $string, $allowed_tags );
+
+		if ( $remove_breaks ) {
+
+			$string = preg_replace( '/[\r\n\t ]+/', ' ', $string );
+		}
+
+		return trim( $string );
 	}
 
 	/**
@@ -2175,6 +2260,22 @@ class cnString {
 class cnFunction {
 
 	/**
+	 * Determine if supplied array is a multidimensional array or not.
+	 *
+	 * @access public
+	 * @since  8.5.19
+	 * @static
+	 *
+	 * @param array $value
+	 *
+	 * @return bool
+	 */
+	public static function isDimensionalArray( array $value ) {
+
+		return ! ( count( $value ) === count( $value, COUNT_RECURSIVE ) );
+	}
+
+	/**
 	 * Recursively implode a multi-dimensional array.
 	 *
 	 * @access public
@@ -2294,6 +2395,39 @@ class cnFunction {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Escapes HTML attribute value or array of attribute values.
+	 *
+	 * @access public
+	 * @since  8.5.18
+	 * @static
+	 *
+	 * @param array|string $attr
+	 *
+	 * @param string $glue
+	 *
+	 * @return array|string
+	 */
+	public static function escAttributeDeep( $attr, $glue = ' ' ) {
+
+		if ( is_array( $attr ) ) {
+
+			// Ensure all IDs are positive integers.
+			$attr = array_map( 'esc_attr', $attr );
+
+			// Remove any empty array values.
+			$attr = array_filter( $attr );
+
+			$attr = implode( $glue, $attr );
+
+		} else {
+
+			$attr = esc_attr( $attr );
+		}
+
+		return $attr;
 	}
 }
 
