@@ -257,6 +257,12 @@ width:auto;
 
 }
 
+  body.post-type-archive-team #content main#main h1.page-title{
+  margin-left:5%;
+
+  }
+
+
 /* Minimum width of 1199 pixels. */
 @media screen and ( max-width: 1199px ) {
 
