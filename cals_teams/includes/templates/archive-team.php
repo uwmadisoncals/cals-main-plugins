@@ -50,7 +50,10 @@ get_header(); ?>
 					//the_archive_title( '<h1 class="page-title">', '</h1>' );
 					the_archive_description( '<div class="taxonomy-description">', '</div>' );
 				?>
-				<h1 class="page-title" >Lab Members</h1>
+				<!--<h1 class="page-title" >Lab Members</h1>-->
+
+				<h1 class="page-title"><?php echo ct_settings_options_get(); ?></h1>
+
 			</header><!-- .page-header -->
 
 			<div class="member-grouping bricklayer">

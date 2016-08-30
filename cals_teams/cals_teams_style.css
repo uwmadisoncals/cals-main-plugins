@@ -71,7 +71,7 @@ main.cals_teams.archive_team header{
 /**************************************************** */
 
 
-/* Member Grouping */
+/* Member Grouping  */
 main.cals_teams.archive_team .member-grouping{
 /*display: flex;
 flex-direction:row;
@@ -212,6 +212,9 @@ order:0;
 
 /**************************************************** */
 
+body.post-type-archive-team #content{
+  margin-top:0;
+}
 
 /* Member Wrapper */
 main.cals_teams.archive_team .member_info_wrapper{
@@ -227,8 +230,13 @@ background-color: #E5E5E5;
 overflow: hidden;
 /*width:300px;*/
 
-margin-top:10px;
+
 max-width:280px;
+
+margin:0 auto;
+margin-top:10px;
+
+
 }
 
 .bricklayer-column div.member_wrapper:first-of-type{
@@ -246,5 +254,24 @@ width:280px;
 height:300px;
 box-sizing: border-box;
 width:auto;
+
+}
+
+/* Minimum width of 1199 pixels. */
+@media screen and ( max-width: 1199px ) {
+
+  body.post-type-archive-team #content main#main h1.page-title{
+  margin-left:5%;
+
+  }
+}
+
+/* Minimum width of 1199 pixels. */
+@media screen and ( max-width: 640px ) {
+
+    body.post-type-archive-team #content{
+      padding-top:0;
+
+    }
 
 }

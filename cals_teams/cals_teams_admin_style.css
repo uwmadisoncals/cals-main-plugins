@@ -1,0 +1,14 @@
+/* Settings Page */
+body.wp-admin.team_page_cals_teams #wpbody input[type=submit]{
+   padding:5px 15px; background:#ccc; border:0 none;
+   cursor:pointer;
+   -webkit-border-radius: 5px;
+   border-radius: 5px;
+   height: 27px;
+}
+
+/* Edit Post Page */
+body.wp-admin .showCheckTh{
+	width: 0;
+}
+

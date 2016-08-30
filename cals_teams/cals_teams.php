@@ -186,10 +186,6 @@ Class CTFields{
 
 }
 
-
-
-
-
 function create_cals_teams_post_type() {
 
   register_post_type( 'team',
@@ -281,6 +277,7 @@ function calsteams_buildform_cb($post){
     //logit($meta,'$meta: ');
 
     echo '<tr>',
+                '<th class="showCheckTh" ><input type="checkbox" name="" id="" ></th>',
                 '<th style="width:20%"><label for="', $field['id'], '">', $field['name'], '</label></th>',
                 '<td>';
 
@@ -501,11 +498,32 @@ add_filter( 'template_include', 'template_chooser' );
 //Register and Enqueue Plugin Stylesheet
 function calsteams_add_stylesheets(){
   wp_register_style('bricklayer_style', plugins_url('cals_teams/bricklayer.min.css'));
+
   wp_register_style( 'cals_teams_style', plugins_url('cals_teams/cals_teams_style.css') );
+
   wp_enqueue_style( 'cals_teams_style' );
+
   wp_enqueue_style( 'bricklayer_style' );
+
 }
 add_action('wp_enqueue_scripts','calsteams_add_stylesheets');
+
+//
+function calsteams_add_stylesheets_admin(){
+
+  wp_register_style('cals_teams_admin_style', plugins_url('cals_teams/cals_teams_admin_style.css'));
+
+  wp_enqueue_style( 'cals_teams_admin_style' );
+}
+add_action('admin_enqueue_scripts','calsteams_add_stylesheets_admin');
+
+function calsteams_add_script_admin(){
+
+  wp_register_script('cals_teams_admin_script', plugins_url('cals_teams/scripts/admin_cals_teams.js'),'',null);
+
+  wp_enqueue_script('cals_teams_admin_script');
+}
+add_action('admin_enqueue_scripts','calsteams_add_script_admin');
 
 //Register and Enqueue Scripts
 function calsteams_add_scripts(){
@@ -575,3 +593,46 @@ add_filter( 'body_class','ct_body_classes' );
 add_filter('get_the_archive_title', function ($title) {
     return preg_replace('/^\w+: /', '', $title);
 });
+
+/**
+ * Setup cals_teams Settings Submenu
+ */
+function ct_settings_submenu(){
+
+add_submenu_page( 'edit.php?post_type=team', 'Team Members Settings', 'Settings', 'manage_options', 'cals_teams.php', 'ct_settings_cb');
+}
+
+add_action('admin_menu', 'ct_settings_submenu');
+
+//Display callback for the settings page.
+function ct_settings_cb() { 
+  //fetch markup from ct_settings.php
+  include( plugin_dir_path(__FILE__) .'includes/ct_settings.php' );
+}
+
+//Executed upon plugin activation
+function ct_settings_activate(){
+  ct_settings_options_init();
+}
+//register plugin activation hook
+register_activation_hook( __FILE__, 'ct_settings_activate' );
+
+//create options into wp_options table
+function ct_settings_options_init(){
+
+  //display title on archive-team.php
+  add_option('ct_setting_archiveteam_title', '');
+}
+
+//update option to wp_options table
+function ct_settings_options_update($archiveteam_title = "Lab Members"){
+
+  //update archive-team.php title
+  update_option('ct_setting_archiveteam_title', $archiveteam_title);
+}
+
+//get option into wp_options table
+function ct_settings_options_get(){
+    return get_option('ct_setting_archiveteam_title');
+}
+
