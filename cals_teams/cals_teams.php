@@ -353,7 +353,7 @@ function calsteams_mbox_save($post_id){
         //validate email
         if($input_id === 'calsteams_email' ){
           if(!is_email($_POST[ $input_id ])){
-            $_POST[ $input_id ] = 'invalid email';
+            $_POST[ $input_id ] = '';
           } 
         }
 
