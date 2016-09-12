@@ -660,7 +660,7 @@ class CustomSidebarsEditor extends CustomSidebars {
 		 * 'inline-save' .. Saved via the quick-edit form.
 		 * We do not (yet) offer a bulk-editing option for custom sidebars.
 		 */
-		if ( 'editpost' != $action && 'inline-save' != @$_POST['action'] ) {
+		if ( ( isset( $_POST['action'] ) && 'inline-save' == $_POST['action'] ) || 'editpost' != $action  ) {
 			return $post_id;
 		}
 

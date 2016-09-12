@@ -3,8 +3,8 @@ Contributors: mkrdip, mark-k, kometschuh
 Donate link: http://mkrdip.me/donate
 Tags: category, posts, widget, posts widget, recent posts, category recent posts
 Requires at least: 2.8
-Tested up to: 4.5.2
-Stable tag: 4.6.1
+Tested up to: 4.6
+Stable tag: 4.6.2
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,19 +16,15 @@ Category Posts Widget is a light widget designed to do one thing and do it well:
 = Term and Category based Posts Widget =
 It's the pro version and available on <a target="_blank" href="http://tiptoppress.com/">Tip Top Press</a> created for big Wordpress sites.
 
-= Shortcode =
-* Use [catposts] [in the content and edit options in the customizer](http://tiptoppress.com/use-shortcode-to-add-category-posts-widget-to-the-content)
-
 = Pro features =
-* Custom Post Types, Terms and Custom Taxonomies (e.g. WooCommerce)
+* Custom Post Types, Terms and Custom Taxonomies
 * Multi selection
 * Vertical Scrolling News Ticker
-* <a target="_blank" href="http://demo.tiptoppress.com/masonry/">Masonry</a> (with up-coming version 4.6)
-* Grid and Columns, Alignment (with up-coming version 4.6)
 * More [examples on the demo page](http://demo.tiptoppress.com/)
 
 = Features =
-* Shortcode
+* Shortcode (Edit in the customizer)
+* For editing shortcode adds a customizer link to the admin-bar if page/post is in edit mode
 * Option to change ordering of posts.
 * Option to show post thumbnail & set dimension by width & height.
 * Option to crop thumbnails with CSS. <a target="_blank" href="http://tiptoppress.com/css-image-crop/">What is 'CSS Image Crop'?</a>
@@ -56,9 +52,9 @@ It's the pro version and available on <a target="_blank" href="http://tiptoppres
 * Localization support.
 
 = Documentation =
-Full documentation on [Tiptoppress](http://tiptoppress.com/category-posts-widget/documentation/)
-
-Formatting date and time: See <a target="_blank" href="https://codex.wordpress.org/Formatting_Date_and_Time">Formatting Date and Time</a>.
+* Shortcode: Use [catposts] [in the content and edit options in the customizer](http://tiptoppress.com/use-shortcode-to-add-category-posts-widget-to-the-content)
+* Formatting date and time: See <a target="_blank" href="https://codex.wordpress.org/Formatting_Date_and_Time">Formatting Date and Time</a>.
+* Full documentation on [Tiptoppress](http://tiptoppress.com/category-posts-widget/documentation/)
 
 = Contribute =
 While using this plugin if you find any bug or any conflict, please submit an issue at 
@@ -101,9 +97,14 @@ We know there are peopel how use PHP 5.2 [wordpress.org/about/stats](https://wor
 == Screenshots ==
 1. The widget configuration dialog.
 2. Front end of the widget using a default WordPress Theme.
+3. Use shortcode [catposts] in the content and edit options in the customizer.
 
 == Changelog ==
 [Read more on our blog ...](http://tiptoppress.com/category/category-posts-widget/)
+
+= 4.6.2 - August 28th 2016 =
+* Fixed only five widget instances can be costumized with shortcodes.
+* For editing shortcode adds a customizer link to the admin-bar if page/post is in edit mode.
 
 = 4.6.1 - June 5th 2016 =
 * Add shortcode [catposts] edit options only in the customizer

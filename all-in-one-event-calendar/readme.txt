@@ -4,8 +4,8 @@ Tags: calendar, events, ics, ics feed, wordpress ical importer, google
 calendar, ical, iCalendar, all-in-one, events sync, events widget,
 calendar widget
 Requires WordPress at least: 3.5
-Tested up to: 4.6
-Stable tag: 2.5.10
+Tested up to: 4.6.1
+Stable tag: 2.5.11
 License: GNU General Public License, version 3 (GPL-3.0)
 
 A calendar system with many views, upcoming events widget, color-coded
@@ -148,6 +148,10 @@ https://vimeo.com/135004810
 **[ai1ec exact_date="5-10-2015"]**
 
 == Changelog ==
+
+= Version 2.5.11 =
+* Fixed: Duplication of recurrent events for events imported from Google Calendar.
+* Fixed: Choosing a date using calendar button will move user to top of the page instead of bottom of the page in the Posterboard view.
 
 = Version 2.5.10 =
 * Fixed: The timezone will only show in the event if the "Display events in calendar time zone" option is checked in the Settings page.

@@ -53,6 +53,11 @@
 						}
 					}
 				}
+
+                if (settings.series && settings.legend && settings.legend.position == "left")
+                {
+                    settings.targetAxisIndex = 1;
+                }
 				break;
 			case 'geo':
 				if (settings.region != undefined && settings.region.replace(/^\s+|\s+$/g, '') == '') {
@@ -87,6 +92,11 @@
 						}
 					}
 				}
+
+                if (settings.series && settings.legend && settings.legend.position == "left")
+                {
+                    settings.targetAxisIndex = 1;
+                }
 				break;
 			default:
 				return;
@@ -121,6 +131,18 @@
 				}
 			}
 		}
+
+        if(settings.hAxis){
+            if(settings.hAxis.textStyle && settings.hAxis.textStyle != ''){
+                settings.hAxis.textStyle = {color: settings.hAxis.textStyle};
+            }
+        }
+
+        if(settings.vAxis){
+            if(settings.vAxis.textStyle && settings.vAxis.textStyle != ''){
+                settings.vAxis.textStyle = {color: settings.vAxis.textStyle};
+            }
+        }
 
         for (i = 0; i < data.length; i++) {
 			row = [];
@@ -188,5 +210,31 @@
 			clearTimeout(resizeTimeout);
 			resizeTimeout = setTimeout(v.render, 100);
 		});
-	});
+
+        resizeHiddenContainers();
+    });
+
+    function resizeHiddenContainers(){
+        $(".visualizer-front").parents().each(function(){
+            if(!$(this).is(":visible")){
+                $(this).addClass("visualizer-hidden-container");
+            }
+        });
+
+        var mutateObserver = new MutationObserver(function(records) {
+            records.forEach(function(record) {
+                if(record.attributeName == "style"){
+                    var element         = $(record.target);
+                    var displayStyle    = window.getComputedStyle(element[0]).getPropertyValue("display");
+                    if(element.hasClass("visualizer-hidden-container-resized") || displayStyle == "none") return;
+                    element.addClass("visualizer-hidden-container-resized").find(".visualizer-front").resize();
+                }
+            });
+        });
+
+        $('.visualizer-hidden-container').each(function(){
+            mutateObserver.observe($(this)[0], {attributes: true});
+        });
+	}
+
 })(jQuery, visualizer);

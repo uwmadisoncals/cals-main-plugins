@@ -3,7 +3,7 @@
 
 	function maintenance_admin_setup() {
 		global	$maintenance_variable;
-				$maintenance_variable->options_page = add_menu_page('Maintenance', 'Maintenance', 'manage_options', 'maintenance', 'manage_options',  MAINTENANCE_URI . '/images/icon-small.png');
+				$maintenance_variable->options_page = add_menu_page( __( 'Maintenance', 'maintenance' ), __( 'Maintenance', 'maintenance' ), 'manage_options', 'maintenance', 'manage_options',  MAINTENANCE_URI . '/images/icon-small.png');
 		add_action( "admin_init", 'mt_register_settings');
 		add_action( "admin_head-{$maintenance_variable->options_page}", 'maintenance_metaboxes_scripts' );
 		add_action( "admin_print_styles-{$maintenance_variable->options_page}",  'admin_print_custom_styles');
@@ -28,7 +28,7 @@
 
 			if (isset($_POST['lib_options'])) {
 			    update_option( 'maintenance_options',  $_POST['lib_options']);
-				$maintenance->mt_clear_cache();
+				maintenance::mt_clear_cache();
 			}
 		}
 	}
@@ -72,7 +72,6 @@
 				<?php wp_nonce_field('maintenance_edit_post','maintenance_nonce'); ?>
 				<?php wp_nonce_field('meta-box-order',  'meta-box-order-nonce', false ); ?>
 				<?php wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false ); ?>
-				<?php screen_icon(); ?>
 				<div class="postbox-container header-container column-1 normal">
 				<h1><?php _e('Maintenance', 'maintenance'); ?><input type="checkbox" id="state" name="lib_options[state]" <?php checked($mt_option['state'], 1); ?> /> <?php submit_button(__('Save changes', 'maintenance'), 'primary'); ?></h1>
 

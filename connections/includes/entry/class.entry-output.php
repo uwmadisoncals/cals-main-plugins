@@ -2749,15 +2749,19 @@ class cnOutput extends cnEntry {
 
 			if ( $atts['parents'] ) {
 
-				$text .= cnTemplatePart::getCategoryParents(
-					$category->parent,
-					array(
-						'link'       => $atts['link'],
-						'separator'  => $atts['parent_separator'],
-						'force_home' => $this->directoryHome['force_home'],
-						'home_id'    => $this->directoryHome['page_id'],
-					)
-				);
+				// If the term is a root parent, skip.
+				if ( 0 !== $category->parent ) {
+
+					$text .= cnTemplatePart::getCategoryParents(
+						$category->parent,
+						array(
+							'link'       => $atts['link'],
+							'separator'  => $atts['parent_separator'],
+							'force_home' => $this->directoryHome['force_home'],
+							'home_id'    => $this->directoryHome['page_id'],
+						)
+					);
+				}
 			}
 
 			if ( $atts['link'] ) {
@@ -2798,6 +2802,13 @@ class cnOutput extends cnEntry {
 
 			$i++; // Increment here so the correct value is passed to the filter.
 		}
+
+		/*
+		 * Remove NULL, FALSE and empty strings (""), but leave values of 0 (zero).
+		 * Filter our these in case someone hooks into the `cn_entry_output_category_item` filter and removes a category
+		 * by returning an empty value.
+		 */
+		$items = array_filter( $items, 'strlen' );
 
 		if ( 'list' == $atts['type'] ) {
 
@@ -3059,15 +3070,7 @@ class cnOutput extends cnEntry {
 
 		} elseif ( ! empty( $atts['order'] ) ) {
 
-			// If `order` was supplied as a comma delimited string, convert it to an array.
-			if ( is_string( $atts['order'] ) ) {
-
-				$blocks = stripos( $atts['order'], ',' ) !== FALSE ? explode( ',', $atts['order'] ) : array( $atts['order'] );
-
-			} else {
-
-				$blocks = $atts['order'];
-			}
+			$blocks = cnFunction::parseStringList( $atts['order'], ',' );
 		}
 
 		// Nothing to render, exit.

@@ -40,8 +40,14 @@ function get_custom_login_code() {
 			  $class_login 		= 'error';
 			  $class_password 	= 'error';
 		} else {
-
-			$user_connect = wp_signon( $access, false);
+			
+			if ( is_ssl() ) {
+				$ssl = true;
+			} else {
+				$ssl = false;
+			}
+			
+			$user_connect = wp_signon( $access, $ssl );
 			if ( is_wp_error($user_connect) )  {
 				if ($user_connect->get_error_code() == 'invalid_username') {
 					$error_message  =  __('You entered your login are incorrect!', 'maintenance');;
@@ -102,6 +108,20 @@ function get_custom_login_code() {
 		if(class_exists('WPCF7')) {
 			wp_register_script( '_cf7form',		MAINTENANCE_URI  .'../contact-form-7/includes/js/jquery.form.min.js', 'jquery');
 			wp_register_script( '_cf7scripts',	MAINTENANCE_URI  .'../contact-form-7/includes/js/scripts.js', 'jquery');
+			$_wpcf7 = array(
+				'loaderUrl' => wpcf7_ajax_loader(),
+				'recaptcha' => array(
+					'messages' => array(
+						'empty' => __( 'Please verify that you are not a robot.',
+							'contact-form-7' ) ) ),
+				'sending' => __( 'Sending ...', 'contact-form-7' ) );
+			if ( defined( 'WP_CACHE' ) && WP_CACHE ) {
+				$_wpcf7['cached'] = 1;
+			}
+			if ( wpcf7_support_html5_fallback() ) {
+				$_wpcf7['jqueryUi'] = 1;
+			}
+			wp_localize_script( '_cf7scripts', '_wpcf7', $_wpcf7 );
 		}
 
 
@@ -255,9 +275,7 @@ function get_custom_login_code() {
 		$out_ftext   = null;
 
 		if (isset($mt_options['footer_text']) && !empty($mt_options['footer_text'])) {
-			$out_ftext .= '<a class="company-name" rel="footer" href="'.esc_url(site_url('')) .'">';
 				$out_ftext .= wp_kses_post(stripslashes($mt_options['footer_text']));
-			$out_ftext .= '</a>';
 		}
 		echo $out_ftext;
 	}
