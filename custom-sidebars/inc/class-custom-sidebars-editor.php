@@ -607,11 +607,8 @@ class CustomSidebarsEditor extends CustomSidebars {
 	 */
 	protected function print_sidebars_form( $post_id, $type = 'metabox' ) {
 		global $wp_registered_sidebars;
-
+		$available = CustomSidebars::sort_sidebars_by_name( $wp_registered_sidebars );
 		$replacements = self::get_replacements( $post_id );
-
-		$available = $wp_registered_sidebars;
-		ksort( $available );
 		$sidebars = self::get_options( 'modifiable' );
 		$selected = array();
 		if ( ! empty( $sidebars ) ) {

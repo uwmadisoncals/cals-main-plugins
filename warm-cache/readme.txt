@@ -1,11 +1,11 @@
 === Warm Cache ===
 Contributors: ramon fincken
-Tags: cache, warm, keep, xml, sitemap, load, speed, quick, tag, w3tc, optimize, page cache, preload, google, pagespeed, webmaster, generator, warmup, cold, expire, expired, google, seo, caching, refresh, varnish, nginx, fresh, preload, preloader
-Requires at least: 3.0
-Tested up to: 4.4.2
-Stable tag: 1.9.4
+Tags: cache, warm, keep, xml, sitemap, load, speed, quick, tag, w3tc, optimize, page cache, preload, google, pagespeed, webmaster, sitemap, generator, warmup, cold, expire, expired, nginx, varnish, microcaching, microcache
+Requires at least: 3.5
+Tested up to: 4.6.1
+Stable tag: 2.0.1
 
-Crawls your website-pages based on your google XML sitemap. If you have a caching plugin or Varnish/nginx caching this will keep your cache warm. Speeds up your site.
+Crawls your website-pages based on google XML sitemap. If you have a caching plugin this will keep your cache warm. Speeds up your site.
 
 == Description ==
 
@@ -15,11 +15,10 @@ Compatible with following elements: < sitemap > < url ><br>
 All urls in your sitemap will be visited by the plugin to keep the cache up to date.<br>
 Will show average page load times and pages visited.<br>
 
-Needs google XML sitemap, Yoast SEO or any decent XML sitemap generator to create the sitemap XML file.<br>
-Needs a cronjob (wget or curl) to call the plugin. You need to setup the cronjob yourself! Ask your sysadmin to help you or buy a lifetime subscription at <a href="http://webshop.mijnpress.nl/shop/cronjob-for-warm-cache">our cronjob service</a>.<br>
+Needs google XML sitemap to read the generated XML file.<br>
+Needs a cronjob (wget or curl) to call the plugin. You need to setup the cronjob yourself! (Or ask your sysadmin to help you).<br>
 * Coding by <a href="http://www.mijnpress.nl" title="MijnPress.nl WordPress ontwikkelaars">MijnPress.nl</a><br>
-* Crawl script idea by <a href="http://blogs.tech-recipes.com/johnny/2006/09/17/handling-the-digg-effect-with-wordpress-caching/">http://blogs.tech-recipes.com/johnny/2006/09/17/handling-the-digg-effect-with-wordpress-caching/</a><br>
-<a href="https://www.managedwphosting.nl/contact/offerte-op-maat/">I offer paid WordPress speed-optimisation consultancy and high-speed Varnish & memcached WordPress webhosting.</a>
+* Crawl script idea by <a href="http://blogs.tech-recipes.com/johnny/2006/09/17/handling-the-digg-effect-with-wordpress-caching/">http://blogs.tech-recipes.com/johnny/2006/09/17/handling-the-digg-effect-with-wordpress-caching/</a>
 
 == Installation ==
 
@@ -31,21 +30,27 @@ Needs a cronjob (wget or curl) to call the plugin. You need to setup the cronjob
 
 = How to run a cronjob? =
 > Ask your webhost how to set up a get call using wget or curl
-<a href="http://webshop.mijnpress.nl/shop/cronjob-for-warm-cache">Or use our cronjob service</a>
 
 = I have set up the cronjob but the stats table on the plugin page remains empty. =
 > If you have object caching such as W3 total cache, the statistics cannot be read.<br>
 A help topic about this is placed <a href="http://wordpress.org/support/topic/plugin-w3-total-cache-strange-transient-problem?replies=1">on the support forums</a>.
 Note that the script is crawling your XML file (check your webhosts access log), but you cannot see the statistics.
 
-= I have a loadbalancer or .. the plugin keeps telling me it crawled 0 pages =
-> I you have a correct XML sitemap, please toggle the Flush settings
-
 = I have a lot of questions and I want support where can I go? =
-> The support forums over here, drop me a tweet to notify me of your support topic over here.<br>
+
+The support forums over here, drop me a tweet to notify me of your support topic over here.<br>
 I always check my tweets, so mention my name with @ramonfincken and your problem.
 
 == Changelog ==
+= 2.0.1 =
+Bugfix: The crawl key was re-set on every view of the admin page<br>
+Changed: Caching of results of XML sitemap check is now active
+
+
+= 2.0 =
+Added: Staggered crawl, so if you have thousands of posts, the crawl will walk/slide over those posts in groups of 20 each<br>
+Changed: Deleted all transient options, in favour of custom post type warmcache storage
+
 = 1.9.4 =
 Added: Debug notices when a sitemap is incorrect
 
@@ -56,8 +61,8 @@ Needs re-work: Bugfix: Transients without expiration (if you have no external no
 Added: Toggle flush settings
 
 = 1.9.1 =
-Added: Transient check for correct syntax of sitemap<br>
-Added: Admin notices when sitemap is not present or currupt<br>
+Added: Transient check for correct syntax of sitemap
+Added: Admin notices when sitemap is not present or currupt
 
 = 1.9 =
 Changed: Better handling of pre-checks<br>

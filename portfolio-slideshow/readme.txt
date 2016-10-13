@@ -1,29 +1,23 @@
 === Portfolio Slideshow ===
 Contributors: ggwicz, daltonrooney 
 Tags: slideshow, slider, slides, gallery, portfolio, shortcodes, responsive, images, photos, photographs, jquery, cycle, mobile, iphone
-Requires at least: 4.1
-Tested up to: 4.3.1
-Stable tag: 1.11.1
+Requires at least: 4.3
+Tested up to: 4.6
+Stable tag: 1.12.0
 
 Add a clean, responsive JavaScript slideshow to your site.
 
 == Description ==
 
-><strong>Support:</strong> at this time there is no free support for this plugin. Support services are available at http://portfolioslideshow.com
-
 = Simple, Responsive Slideshows In Seconds =
 
-Portfolio Slideshow adds a simple slideshow builder to posts and pages on your site. Its drag-and-drop interface lets you upload, reorder, edit, delete, or add more images "on the fly" right on the page; it's almost *fun* just to play around with.
+Portfolio Slideshow adds a simple slideshow builder to posts and pages on your site. Its drag-and-drop interface lets you upload, reorder, edit, delete, or add more images "on the fly" right on the page; it makes it almost *fun* just to play around with.
 
 Once you've arranged your images as you see fit, simply drop the `[portfolio_slideshow]` shortcode anywhere in that post or page, and voila – an elegant, customizable, responsive slideshow will appear on your site.
 
 = Clean and Intuitive UI =
 
 Nobody likes a cluttered admin, or gaudily-designed plugins. Portfolio Slideshow blends seamlessly into the default design of the WordPress admin. You might forget that you're using a plugin in the first place, and not something built into WordPress by default!
-
-= Actively Developed and Supported =
-
-Get access to professional customer support at http://portfolioslideshow.com, as well as documentation for the plugin and handy User Guides. Portfolio Slideshow is actively developed and maintained; we listen closely to user feedback, and strive to publish an update monthly.
 
 == Installation ==
 
@@ -40,7 +34,7 @@ Installing the plugin is easy. Just follow these steps:
 = Requirements =
 
 * PHP 5.2.4 or greater (recommended: PHP 5.4 or greater)
-* WordPress 4.1 or above
+* WordPress 4.3 or above
 * jQuery 1.11.x
 
 == Frequently Asked Questions ==
@@ -75,9 +69,9 @@ If you would like to change the size of the images system-wide (for example, you
 
 == Upgrade Notice ==
 
-= 1.11.0 =
+= 1.12.0 =
 
-Version 1.11.0 reintroduces support for PHP 5.2, but it also includes some major file restructuring. Be sure to let the update run completely!
+Version 1.12.0 is the first update of Portfolio Slideshow in almost a year—it only introduces minor tweaks and fixes, with larger updates to come.
 
 == Screenshots ==
 
@@ -95,6 +89,13 @@ Version 1.11.0 reintroduces support for PHP 5.2, but it also includes some major
 
 == Changelog ==
 
+= 1.12.0 =
+* FIX: Make the "help" icon link in slides meta box go to a new page instead of leaving the current one.
+* TWEAK: Temporarily remove the "updated URL with Slide IDs" option.
+* TWEAK: Remove references to some pager features that don't yet exist.
+* TWEAK: Remove references to some lightbox features that don't yet exist.
+* TWEAK: Remove some internal references to the old Portfolio Slideshow website.
+
 = 1.11.1 =
 
 * TWEAK: Safer translatable strings.
@@ -109,7 +110,7 @@ Version 1.11.0 reintroduces support for PHP 5.2, but it also includes some major
 * NEW: Added more documentation links for faster/more specific navigation.
 * TWEAK: Some JS cleanup to being laying the groundwork for the few releases of improvements.
 * TWEAK: added "support" and "settings" quick links to Plugins page.
-* TWEAK: Moved screenshots and some other assets to wp.org repo /assets folder – makes for a smaller plugin file and thus, hopefully, faster updates.
+* TWEAK: Moved screenshots and some other assets to wp.org repo /assets folder â€“Â makes for a smaller plugin file and thus, hopefully, faster updates.
 * TWEAK: Reduced number of variables created in view includes.
 * TWEAK: Code cleanup in some of the views. 
 * FIX: Fixed the "Slide URL" attachment field to ensure it saves.
@@ -137,5 +138,3 @@ Version 1.11.0 reintroduces support for PHP 5.2, but it also includes some major
 = 1.9.9 =
 
 * Ported the existing plugin to PHP 5.3-compatible code and laid the foundation for some major changes in the next few versions: 1.10.x, and then  2.0.0
-
-For the archived changelog for versions 1.5.1 and below, please see http://portfolioslideshow.com/changelog.

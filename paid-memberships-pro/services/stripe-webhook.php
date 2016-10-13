@@ -134,6 +134,8 @@
 					$morder->Zip = $old_order->billing->zip;
 					$morder->PhoneNumber = $old_order->billing->phone;
 
+					$morder->billing = new stdClass();
+					
 					$morder->billing->name = $morder->FirstName . " " . $morder->LastName;
 					$morder->billing->street = $old_order->billing->street;
 					$morder->billing->city = $old_order->billing->city;
@@ -259,6 +261,9 @@
 				//prep this order for the failure emails
 				$morder = new MemberOrder();
 				$morder->user_id = $user_id;
+				
+				$morder->billing = new stdClass();
+				
 				$morder->billing->name = $old_order->billing->name;
 				$morder->billing->street = $old_order->billing->street;
 				$morder->billing->city = $old_order->billing->city;
@@ -460,7 +465,7 @@
 				fwrite($loghandle, $logstr);
 				fclose($loghandle);
 			}
-			elseif(defined('PMPRO_STRIPE_WEBHOOK_DEBUG'))
+			elseif(defined('PMPRO_STRIPE_WEBHOOK_DEBUG') && false !== PMPRO_STRIPE_WEBHOOK_DEBUG )
 			{
 				//email
 				if(strpos(PMPRO_STRIPE_WEBHOOK_DEBUG, "@"))

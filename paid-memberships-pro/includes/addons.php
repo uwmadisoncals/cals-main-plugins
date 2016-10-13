@@ -41,7 +41,7 @@ function pmpro_getAddons()
         $timeout = apply_filters("pmpro_get_addons_timeout", 5);
 
         //get em
-		$remote_addons = wp_remote_get(PMPRO_LICENSE_SERVER . "/addons/", $timeout);
+		$remote_addons = wp_remote_get(PMPRO_LICENSE_SERVER . "addons/", $timeout);
 
         //make sure we have at least an array to pass back
         if(empty($addons))
@@ -121,7 +121,7 @@ function pmpro_update_plugins_filter( $value ) {
 			
 		//get data for plugin
 		$plugin_file = $addon['Slug'] . '/' . $addon['Slug'] . '.php';
-		$plugin_file_abs = ABSPATH . 'wp-content/plugins/' . $plugin_file;				
+		$plugin_file_abs = WP_PLUGIN_DIR . "/" . $plugin_file;				
 		
 		//couldn't find plugin, skip
 		if(!file_exists($plugin_file_abs))

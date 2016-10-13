@@ -4,7 +4,7 @@ defined( 'WPINC' ) or die;
 
 class Portfolio_Slideshow_Plugin {
 
-	const VERSION = '1.11.1';
+	const VERSION = '3.0.0';
 
 	static $defaults;
 	static $dot_min;
@@ -348,7 +348,7 @@ class Portfolio_Slideshow_Plugin {
 	function plugin_row_meta( $plugin_meta, $plugin_file, $plugin_data, $status ) {
 
 		if ( isset( $plugin_data['slug'] ) && 'portfolio-slideshow' == $plugin_data['slug'] && is_array( $plugin_meta ) )
-			$plugin_meta[] = sprintf( '<a href="%s" target="_blank">%s</a>', 'http://portfolioslideshow.com/support', esc_html__( 'Support', 'portfolio-slideshow' ) );
+			$plugin_meta[] = sprintf( '<a href="%s" target="_blank">%s</a>', 'http://wordpress.org/support/plugin/portfolio-slideshow/', esc_html__( 'Support', 'portfolio-slideshow' ) );
 
 		return $plugin_meta;
 	}

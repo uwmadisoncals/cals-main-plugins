@@ -4,10 +4,8 @@
 	$mess_arr = get_custom_login_code(); 
 	if (!empty($mess_arr[0])) $ebody_class = 'error';
 	$mt_options = mt_get_plugin_options(true);
-	$page_title = wp_kses_post($mt_options['page_title']);
-	$description = wp_kses_post($mt_options['description']);
-	if (empty($page_title)) $page_title = get_bloginfo('title');
-	if (empty($description)) $description = get_bloginfo('description');
+	$page_title = get_bloginfo('title');
+	$description = get_bloginfo('description');
 ?>
 <!DOCTYPE html>
 <!--[if IE 7]>

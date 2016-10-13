@@ -65,5 +65,5 @@ wp_nonce_field( 'portfolio_slideshow_save_metabox_slides', 'portfolio_slideshow_
 
 <div id="portfolio-slideshow-add-slides" class="clearfix">	
 	<button class="button button-primary button-large" id="portfolio-slideshow-add-slides-new"><?php esc_html_e( 'Add Slides', 'portfolio-slideshow' ); ?></button>
-	<a href="<?php echo admin_url( 'options-general.php?page=portfolio_slideshow&tab=documentation' ); ?>" title="<?php esc_attr_e( 'Need help? Click here learn more about creating Portfolio Slideshows.', 'portfolio-slideshow' ); ?>" class="alignright portfolio-slideshow-metabox-help"><span class="dashicons dashicons-editor-help"></span></a>
+	<a target="_blank" href="<?php echo admin_url( 'options-general.php?page=portfolio_slideshow&tab=documentation' ); ?>" title="<?php esc_attr_e( 'Need help? Click here learn more about creating Portfolio Slideshows.', 'portfolio-slideshow' ); ?>" class="alignright portfolio-slideshow-metabox-help"><span class="dashicons dashicons-editor-help"></span></a>
 </div>

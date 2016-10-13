@@ -203,14 +203,17 @@ function wpgmaps_b_admin_add_poly_javascript($mapid) {
             $start_zoom = 5;
         }
 
+
+        if (isset($res->kml)) { $kml = $res->kml; } else { $kml = false; }
+
         
         $wpgmza_settings = get_option("WPGMZA_OTHER_SETTINGS");
-        $api_version = $wpgmza_settings['wpgmza_api_version'];
-        if (isset($api_version) && $api_version != "") {
-            $api_version_string = "v=$api_version&";
+        if (isset($wpgmza_settings['wpgmza_api_version']) && $wpgmza_settings['wpgmza_api_version'] != "") {
+            $api_version_string = "v=".$wpgmza_settings['wpgmza_api_version']."&";
         } else {
             $api_version_string = "v=3.exp&";
         }
+
 
         ?>
         <?php if( get_option( 'wpgmza_google_maps_api_key' ) ){ ?>
@@ -337,6 +340,19 @@ function wpgmaps_b_admin_add_poly_javascript($mapid) {
 
                 <?php } ?>
 
+                
+                <?php if ($kml != false) { ?>
+                var temp = '<?php echo $kml; ?>';
+                arr = temp.split(',');
+                arr.forEach(function(entry) {
+                    var georssLayer = new google.maps.KmlLayer(entry+'?tstamp=<?php echo time(); ?>',{suppressInfoWindows: true, zindex: 0, clickable : false});
+                    georssLayer.setMap(MYMAP.map);
+
+                });
+                <?php } ?>
+
+
+
             }
             function addPoint(event) {
                 
@@ -411,12 +427,11 @@ function wpgmaps_b_admin_edit_poly_javascript($mapid,$polyid) {
         if ($start_zoom < 1 || !$start_zoom) {
             $start_zoom = 5;
         }
-
+        if (isset($res->kml)) { $kml = $res->kml; } else { $kml = false; }
         
         $wpgmza_settings = get_option("WPGMZA_OTHER_SETTINGS");
-        $api_version = $wpgmza_settings['wpgmza_api_version'];
-        if (isset($api_version) && $api_version != "") {
-            $api_version_string = "v=$api_version&";
+        if (isset($wpgmza_settings['wpgmza_api_version']) && $wpgmza_settings['wpgmza_api_version'] != "") {
+            $api_version_string = "v=".$wpgmza_settings['wpgmza_api_version']."&";
         } else {
             $api_version_string = "v=3.exp&";
         }
@@ -543,6 +558,17 @@ function wpgmaps_b_admin_edit_poly_javascript($mapid,$polyid) {
                 WPGM_Path_<?php echo $poly_id; ?>.setMap(this.map);
                 <?php } } } ?>
 
+                <?php } ?>
+
+
+                <?php if ($kml != false) { ?>
+                var temp = '<?php echo $kml; ?>';
+                arr = temp.split(',');
+                arr.forEach(function(entry) {
+                    var georssLayer = new google.maps.KmlLayer(entry+'?tstamp=<?php echo time(); ?>',{suppressInfoWindows: true, zindex: 0, clickable : false});
+                    georssLayer.setMap(MYMAP.map);
+
+                });
                 <?php } ?>
 
 

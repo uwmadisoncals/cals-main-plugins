@@ -393,13 +393,13 @@ class Portfolio_Slideshow_Settings {
 				)
 			),
 
-			'showhash' => array( // checkbox - default False
-				'id'   => 'showhash',
-				'name' => __( 'Update URL with slide IDs', 'portfolio-slideshow' ),
-				'desc' => __( 'You can enable this feature to udpate the URL of the page with the slide ID number, e.g: http://example.com/slideshow/#3 will link directly to the third slide in the slideshow.', 'portfolio-slideshow' ),
-				'type' => 'checkbox',
-				'std'  => false
-			)
+			// 'showhash' => array( // checkbox - default False
+			// 	'id'   => 'showhash',
+			// 	'name' => __( 'Update URL with slide IDs', 'portfolio-slideshow' ),
+			// 	'desc' => __( 'You can enable this feature to udpate the URL of the page with the slide ID number, e.g: http://example.com/slideshow/#3 will link directly to the third slide in the slideshow.', 'portfolio-slideshow' ),
+			// 	'type' => 'checkbox',
+			// 	'std'  => false
+			// )
 
 		);
 
@@ -514,32 +514,32 @@ class Portfolio_Slideshow_Settings {
 				'std'  => false
 			),
 
-			'carouselsize' => array( // text, default 7
-				'id'   => 'carouselsize',
-				'name' => __( 'Carousel size', 'portfolio-slideshow' ),
-				'desc' => __( 'Number of thumbnails to display per carousel row.', 'portfolio-slideshow' ),
-				'type' => 'text',
-				'size' => 'small',
-				'std'  => '7'
-			),
+			// 'carouselsize' => array( // text, default 7
+			// 	'id'   => 'carouselsize',
+			// 	'name' => __( 'Carousel size', 'portfolio-slideshow' ),
+			// 	'desc' => __( 'Number of thumbnails to display per carousel row.', 'portfolio-slideshow' ),
+			// 	'type' => 'text',
+			// 	'size' => 'small',
+			// 	'std'  => '7'
+			// ),
 
-			'carousel_thumbsize' => array( // text, default 75
-				'id'   => 'carousel_thumbsize',
-				'name' => __( 'Carousel thumbnail size', 'portfolio-slideshow' ),
-				'desc' => __( 'What size should we display the image thumbnails in the carousel?', 'portfolio-slideshow' ),
-				'type' => 'text',
-				'size' => 'small',
-				'std'  => '75'
-			),
+			// 'carousel_thumbsize' => array( // text, default 75
+			// 	'id'   => 'carousel_thumbsize',
+			// 	'name' => __( 'Carousel thumbnail size', 'portfolio-slideshow' ),
+			// 	'desc' => __( 'What size should we display the image thumbnails in the carousel?', 'portfolio-slideshow' ),
+			// 	'type' => 'text',
+			// 	'size' => 'small',
+			// 	'std'  => '75'
+			// ),
 
-			'carousel_thumbnailmargin' => array( // text, default 8,
-				'id'   => 'thumbsize',
-				'name' => __( 'Carousel thumbnail margin', 'portfolio-slideshow' ),
-				'desc' => __( 'How much space between each carousel thumbnail? (px)', 'portfolio-slideshow' ),
-				'type' => 'text',
-				'size' => 'small',
-				'std'  => '8'
-			),
+			// 'carousel_thumbnailmargin' => array( // text, default 8,
+			// 	'id'   => 'thumbsize',
+			// 	'name' => __( 'Carousel thumbnail margin', 'portfolio-slideshow' ),
+			// 	'desc' => __( 'How much space between each carousel thumbnail? (px)', 'portfolio-slideshow' ),
+			// 	'type' => 'text',
+			// 	'size' => 'small',
+			// 	'std'  => '8'
+			// ),
 
 			'togglethumbs' => array( // checkbox, default FALSE
 				'id'   => 'togglethumbs',
@@ -574,21 +574,21 @@ class Portfolio_Slideshow_Settings {
 				)
 			),
 
-			'fancygrid' => array( // checkbox, default False
-				'id'   => 'fancygrid',
-				'name' => __( 'Enable Fancy Grid', 'portfolio-slideshow' ),
-				'desc' => __( 'The fancy grid toggles between a thumbnail view and a slideshow view.', 'portfolio-slideshow' ),
-				'type' => 'checkbox',
-				'std'  => false
-			),
+			// 'fancygrid' => array( // checkbox, default False
+			// 	'id'   => 'fancygrid',
+			// 	'name' => __( 'Enable Fancy Grid', 'portfolio-slideshow' ),
+			// 	'desc' => __( 'The fancy grid toggles between a thumbnail view and a slideshow view.', 'portfolio-slideshow' ),
+			// 	'type' => 'checkbox',
+			// 	'std'  => false
+			// ),
 
-			'fullscreen' => array( // checkbox, default False
-				'id'   => 'fullscreen',
-				'name' => __( 'Enable fullscreen slideshows', 'portfolio-slideshow' ),
-				'desc' => __( 'Adds an icon to launch a full-screen, mobile friendly slideshow, even if the "click" option for slides is set to something other than the "Open in fullscreen".', 'portfolio-slideshow' ),
-				'type' => 'checkbox',
-				'std'  => false
-			)
+			// 'fullscreen' => array( // checkbox, default False
+			// 	'id'   => 'fullscreen',
+			// 	'name' => __( 'Enable fullscreen slideshows', 'portfolio-slideshow' ),
+			// 	'desc' => __( 'Adds an icon to launch a full-screen, mobile friendly slideshow, even if the "click" option for slides is set to something other than the "Open in fullscreen".', 'portfolio-slideshow' ),
+			// 	'type' => 'checkbox',
+			// 	'std'  => false
+			// )
 		);
 
 		return apply_filters( 'portfolio_slideshow_get_registered_settings', self::$settings );

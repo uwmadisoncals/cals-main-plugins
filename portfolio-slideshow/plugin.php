@@ -4,12 +4,12 @@
  * Plugin URI: http://wordpress.org/plugins/portfolio-slideshow
  * Description: Build elegant, responsive slideshows in seconds.
  * Author: George Gecewicz
- * Version: 1.11.1
- * Author URI: http://twitter.com/ggwicz
+ * Version: 1.12.0
+ * Author URI: http://ggwi.cz
  * License: GPLv2 or later
  * Text Domain: portfolio-slideshow
  *
- * Copyright 2015 George Gecewicz
+ * Copyright 2016 George Gecewicz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

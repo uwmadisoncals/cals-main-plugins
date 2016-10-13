@@ -2,8 +2,8 @@
 Contributors: strangerstudios
 Tags: memberships, membership, authorize.net, ecommerce, paypal, stripe, braintree, restrict access, restrict content, directory site, payflow
 Requires at least: 3.5
-Tested up to: 4.5.3
-Stable tag: 1.8.10.4
+Tested up to: 4.6.1
+Stable tag: 1.8.11.2
 
 A revenue-generating machine for membership sites. Unlimited levels with recurring payment, protected content and member management.
 
@@ -115,6 +115,40 @@ Not sure? You can find out by doing a bit a research.
 [View All Screenshots](http://www.paidmembershipspro.com/features/screenshots/)
 
 == Changelog ==
+= 1.8.11.2 =
+* BUG: Fixed a bug introduced in 1.8.11 that kept PMPro from tracking coupon code uses. Any checkout with a discount code while running 1.8.11 won't have properly tracked the discount code use. You may want to adjust your "uses" numbers for your codes, and hand check any reporting/etc that relied on discount codes. Users of the Sponsored Members addon will have been affected too. Discount codes will need to be made manually for any sponsor who checked out.
+* BUG: Fix to the expiration warnings code. Making sure it finds all members who are expiring soon while also keeping track of when emails are sent so users don't get too many emails.
+* BUG: Fixed issue where pmpro_before_change_membership_level was running after levels had been changed.
+* BUG: Fixed some warnings.
+* ENHANCEMENT: Updated Italian translations. (Thanks, Angelo)
+
+= 1.8.11.1 =
+* BUG: Fixed issue introduced in 1.8.11 where the pmpro_default_level custom field was being ignored at checkout.
+* BUG: Fixed bugs in DB calls made for the compatibility checks for various gateways.
+* BUG: Now sending a FREQUENCY parameter for PayPal Payflow orders.
+
+= 1.8.11 =
+* BUG: Fixed URL used when checking for addon updates.
+* BUG: Now enqueueing the jquery.creditCardValidator.js file in Billing preheader.
+* BUG: Fixed issues where PayPal IPN updates would sometimes log $0 instead of the actual billing amount.
+* BUG: Fixed warnings in the PayPal IPN handler.
+* BUG/ENHANCEMENT: Added pmpro_checkout_level filter and now using that filter to apply the_content filters to the level description at checkout. This allows you to turn off the the_content filters (e.g. processing shortcodes) by using remove_filter('pmpro_checkout_level', 'pmpro_pmpro_checkout_level'); in a custom plugin.
+* BUG/ENHANCEMENT: Using the pmpro_confirmation_message filter on the confirmation page whether there is an invoice or not. Now also adding the the_content filters to the confirmation message. You can disable this by using remove_filter('pmpro_confirmation_message', 'pmpro_pmpro_confirmation_message'); in a custom plugin.
+* ENHANCEMENT: Now tracking IPN event ids in order notes for recurring orders.
+* ENHANCEMENT: Added pmpro_subscription_ipn_event_processed hook to IPN handler.
+* ENHANCEMENT: Added pmpro_set_message filter to edit PMPro error messages. Passes the message and type.
+* ENHANCEMENT: Now listing categories in hierarchical format in the Content Settings section of Membership Levels.
+* ENHANCEMENT: Added pmpro_areLevelsFree() function to check if all levels in an array of levels are free.
+* ENHANCEMENT: Added pmpro_getLevelsCost() - with an s - function to get the combined cost of multiple levels in an array.
+* ENHANCEMENT: Added pmpro_getLevelsExpiration() - with an s - function to get the combined expiration text for multiple levels in array.
+* ENHANCEMENT: Created the pmpro_getLevelAtCheckout function that modularizes some of the logic of creating the pmpro_level global at checkout.
+* ENHANCEMENT: Added pmpro_members_list_user filter used on the admin members list and members list CSV export.
+* ENHANCEMENT: Added a 4th parameter $cancel_level to pmpro_changeMembershipLevel(). If set, that level will definitely be cancelled locally and at the gateway. This parameter is also passed to the pmpro_before_change_membership_level and pmpro_after_change_membership_level hook.
+* ENHANCEMENT: Added a new function pmpro_cancelMembershipLevel($level_id, $user_id, $old_level_status) that acts as a wrapper to pass the $cancel_level param to pmpro_changeMembershipLevel().
+* ENHANCEMENT: Updated the cancel page on the frontend to support the Multiple Memberships per User addon. All memberships are shown. You can cancel individual memberships separately. The language of the confirm button mentions memberships vs account.
+* ENHANCEMENT: Added pmpro_getMemberOrdersByCheckoutID($checkout_id) function to support Multiple Memberships per User and others using the checkout_id.
+* ENHANCEMENT: Added a refund($order, $transaction_id) method to the PMPro_stripe class. This will be used by the Multiple Memberships per User addon and eventually used in other areas by the core pluginn.
+
 = 1.8.10.4 =
 * BUG: Fixed issue where non-decimal currencies (e.g. Japanese Yen) were sending invalid amounts to the Stripe gateway.
 * BUG/ENHANCEMENT: If an invalid discount code is applied at checkout, we now set the code_level JS var to false. Along with updates to the Pay by Check addon, this fixes issues with the Pay by Check addon where users could not checkout when using a discount code that reduced the price to free.

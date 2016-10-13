@@ -1,14 +1,14 @@
 <?php
 /**
  * License handler for Connections Extensions, Templates and Themes.
- * NOTE: This class depends on the EDD SL Updater class.
  *
- * CREDIT: This class was based on "class-edd-license-handler.php" from
- * 		Easy Digital Downloads.
+ * NOTE: This class depends on the cnPlugin_Updater class.
+ *
+ * CREDIT: This was based on "class-edd-license-handler.php" from Easy Digital Downloads.
  *
  * @package     Connections
  * @subpackage  License
- * @copyright   Copyright (c) 2015, Steven A. Zahm
+ * @copyright   Copyright (c) 2016, Steven A. Zahm
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       0.8
  */
@@ -63,7 +63,7 @@ class cnLicense {
 	}
 
 	/**
-	 * Include the EDD SL Updater class.
+	 * Include the Plugin Updater..
 	 *
 	 * @access private
 	 * @since  0.8
@@ -72,7 +72,7 @@ class cnLicense {
 	 */
 	private function includes() {
 
-		if ( ! class_exists( 'EDD_SL_Plugin_Updater' ) ) require_once CN_PATH . 'vendor/edd-sl/EDD_SL_Plugin_Updater.php';
+		if ( ! class_exists( 'cnPlugin_Updater' ) ) require_once CN_PATH . 'includes/admin/class.plugin-updater.php';
 	}
 
 	/**
@@ -110,7 +110,7 @@ class cnLicense {
 		 * If it were not limited to register only once, the field would render for each time
 		 * a new instance of this class initiated.
 		 */
-		if ( ! has_action( 'cn_settings_field-license' ) ) add_action( 'cn_settings_field-license', array( $this, 'field' ), 10, 3 );
+		add_action( "cn_settings_field-license_{$this->slug}", array( $this, 'field' ), 10, 3 );
 
 		$file = plugin_basename( $this->file );
 		add_action( "in_plugin_update_message-{$file}", array( __CLASS__, 'changelog'), 10, 2 );
@@ -210,24 +210,20 @@ HERERDOC;
 	}
 
 	/**
-	 * Register the extension, template or theme with EDD SL.
+	 * Register the add-on, template or extension, with the Plugin Updater.
 	 *
 	 * @access private
 	 * @since  0.8
-	 * @see    EDD_SL_Plugin_Updater
-	 *
-	 * @return void
 	 */
 	private function updater() {
 
-		new EDD_SL_Plugin_Updater(
-			$this->updateURL,
+		cnPlugin_Updater::register(
 			$this->file,
 			array(
+				'item_name' => $this->name,
+				'author'    => $this->author,
 				'version'   => $this->version,
 				'license'   => $this->key,
-				'item_name' => $this->name,
-				'author'    => $this->author
 			)
 		);
 	}
@@ -308,7 +304,6 @@ HERERDOC;
 	 * @param $fields
 	 *
 	 * @return array The field settings array.
-	 * @internal param array $settings
 	 */
 	public function registerSettingsFields( $fields ) {
 
@@ -322,7 +317,7 @@ HERERDOC;
 			'title'             => $this->name,
 			'desc'              => '',
 			'help'              => '',
-			'type'              => 'license',
+			'type'              => "license_{$this->slug}",
 			'default'           => '',
 			'sanitize_callback' => array( $this, 'sanitize' ),
 		);
@@ -399,59 +394,64 @@ HERERDOC;
 		echo '</p>'; // Required to close the open <p> tag that exists when this action is run.
 
 		// Show the upgrade notice if it exists.
-		if ( isset( $info->upgrade_notice ) && isset( $info->upgrade_notice->{ $info->new_version } ) ) {
+		if ( isset( $info->upgrade_notice ) && ! empty( $info->upgrade_notice ) ) {
 
 			echo '<p class="cn-update-message-p-clear-before"><strong>' . sprintf( esc_html__( 'Upgrade notice for version: %s', 'connections' ), $info->new_version ) . '</strong></p>';
-			echo '<ul><li>' . $info->upgrade_notice->{ $info->new_version } . '</li></ul>';
+			echo '<ul><li>' . $info->upgrade_notice . '</li></ul>';
 		}
 
-		// Create the regex that'll parse the changelog for the latest version.
-		// NOTE: regex to support readme.txt parsing support in EDD-SL.
-		$regex = '~<h([1-6])>' . preg_quote( $info->new_version ) . '.+?</h\1>(.+?)<h[1-6]>~is';
-
-		preg_match( $regex, $info->sections['changelog'], $matches );
-		//echo '<p>' . print_r( $matches, TRUE ) .  '</p>';
-
-		// NOTE: If readme.txt support was not enabled for plugin, parse the changelog meta added by EDD-SL.
-		if ( ! isset( $matches[2] ) ||  empty( $matches[2] ) ) {
+		//--> START Changelog
+		if ( isset( $info->sections['changelog'] ) && ! empty( $info->sections['changelog'] ) ) {
 
 			// Create the regex that'll parse the changelog for the latest version.
-			$regex = '~<(p)><strong>=\s' . preg_quote( $info->new_version ) . '.+?</strong></\1>(.+?)<p>~is';
+			// NOTE: regex to support readme.txt parsing support in EDD-SL.
+			$regex = '~<h([1-6])>' . preg_quote( $info->new_version ) . '.+?</h\1>(.+?)<h[1-6]>~is';
 
 			preg_match( $regex, $info->sections['changelog'], $matches );
 			//echo '<p>' . print_r( $matches, TRUE ) .  '</p>';
-		}
 
-		// Check if If changelog is found for the current version.
-		if ( isset( $matches[2] ) && ! empty( $matches[2] ) ) {
+			// NOTE: If readme.txt support was not enabled for plugin, parse the changelog meta added by EDD-SL.
+			if ( ! isset( $matches[2] ) || empty( $matches[2] ) ) {
 
-			preg_match_all( '~<li>(.+?)</li>~', $matches[2], $matches );
-			// echo '<p>' . print_r( $matches, TRUE ) .  '</p>';
+				// Create the regex that'll parse the changelog for the latest version.
+				$regex = '~<(p)><strong>=\s' . preg_quote( $info->new_version ) . '.+?</strong></\1>(.+?)<p>~is';
 
-			// Make sure the change items were found and not empty before proceeding.
-			if ( isset( $matches[1] ) && ! empty( $matches[1] ) ) {
+				preg_match( $regex, $info->sections['changelog'], $matches );
+				//echo '<p>' . print_r( $matches, TRUE ) .  '</p>';
+			}
 
-				$ul = FALSE;
+			// Check if If changelog is found for the current version.
+			if ( isset( $matches[2] ) && ! empty( $matches[2] ) ) {
 
-				// Finally, lets render the changelog list.
-				foreach ( $matches[1] as $key => $line ) {
+				preg_match_all( '~<li>(.+?)</li>~', $matches[2], $matches );
+				// echo '<p>' . print_r( $matches, TRUE ) .  '</p>';
 
-					if ( ! $ul ) {
+				// Make sure the change items were found and not empty before proceeding.
+				if ( isset( $matches[1] ) && ! empty( $matches[1] ) ) {
 
-						echo '<p class="cn-update-message-p-clear-before"><strong>' . esc_html__( 'Take a minute to update, here\'s why:', 'connections' ) . '</strong></p>';
-						echo '<ul class="cn-changelog">';
-						$ul = TRUE;
+					$ul = FALSE;
+
+					// Finally, lets render the changelog list.
+					foreach ( $matches[1] as $key => $line ) {
+
+						if ( ! $ul ) {
+
+							echo '<p class="cn-update-message-p-clear-before"><strong>' . esc_html__( 'Take a minute to update, here\'s why:', 'connections' ) . '</strong></p>';
+							echo '<ul class="cn-changelog">';
+							$ul = TRUE;
+						}
+
+						echo '<li style="' . ( $key % 2 == 0 ? ' clear: left;' : '' ) . '">' . $line . '</li>';
 					}
 
-					echo '<li style="' . ( $key % 2 == 0 ? ' clear: left;' : '' ) . '">' . $line . '</li>';
-				}
+					if ( $ul ) {
 
-				if ( $ul ) {
-
-					echo '</ul><div style="clear: left;"></div>';
+						echo '</ul><div style="clear: left;"></div>';
+					}
 				}
 			}
 		}
+		//--> END Changelog
 
 		echo '<p class="cn-update-message-p-clear-before">'; // Required to open a </p> tag that exists when this action is run.
 	}
@@ -477,6 +477,7 @@ HERERDOC;
 		if ( 0 == strlen( $license->key ) ) {
 
 			$status['type'] = 'warning';
+			$status['code'] = 'no_key';
 
 			$message = esc_html__( 'License has not been activated.', 'connections' );
 
@@ -501,6 +502,7 @@ HERERDOC;
 			if ( is_wp_error( $data ) ) {
 
 				$status['type']    = 'error';
+				$status['code']    = $data->get_error_code();
 				$status['message'] = $data->get_error_message();
 				return $status;
 			}
@@ -517,6 +519,7 @@ HERERDOC;
 				case 'expired':
 
 					$status['type'] = 'error';
+					$status['code'] = 'expired';
 
 					$message = esc_html__( 'Support license key has expired. Your are no longer receiving support and in admin updates.', 'connections' );
 
@@ -537,42 +540,49 @@ HERERDOC;
 				case 'item_name_mismatch':
 
 					$status['type']    = 'error';
+					$status['code']    = 'item_name_mismatch';
 					$status['message'] = esc_html__( 'License entered is not for this item.', 'connections' );
 					break;
 
 				case 'missing':
 
 					$status['type']    = 'error';
+					$status['code']    = 'missing';
 					$status['message'] = esc_html__( 'Invalid license.', 'connections' );
 					break;
 
 				case 'revoked':
 
 					$status['type']    = 'error';
+					$status['code']    = 'revoked';
 					$status['message'] = esc_html__( 'License has been revoked.', 'connections' );
 					break;
 
 				case 'no_activations_left':
 
 					$status['type']    = 'warning';
+					$status['code']    = 'no_activations_left';
 					$status['message'] = esc_html__( 'License activation limit has been reached.', 'connections' );
 					break;
 
 				case 'key_mismatch':
 
 					$status['type']    = 'error';
+					$status['code']    = 'key_mismatch';
 					$status['message'] = esc_html__( 'License key mismatch.', 'connections' );
 					break;
 
 				case 'license_not_activable':
 
 					$status['type']    = 'error';
+					$status['code']    = 'license_not_activable';
 					$status['message'] = esc_html__( 'Bundle license keys can not be activated. Use item license key instead.', 'connections' );
 					break;
 
 				default:
 
 					$status['type']    = 'error';
+					$status['code']    = 'unknown_error';
 					$status['message'] = esc_html__( 'An unknown error has occurred.', 'connections' );
 					break;
 			}
@@ -588,12 +598,14 @@ HERERDOC;
 				case 'invalid':
 
 					$status['type']    = 'error';
+					$status['code']    = 'invalid';
 					$status['message'] = esc_html__( 'License key invalid.', 'connections' );
 					break;
 
 				case 'expired':
 
 					$status['type'] = 'error';
+					$status['code'] = 'expired';
 
 					$message = esc_html__( 'Support license key has expired. Your are no longer receiving support and in admin updates.', 'connections' );
 
@@ -614,30 +626,35 @@ HERERDOC;
 				case 'inactive':
 
 					$status['type']    = 'warning';
+					$status['code']    = 'inactive';
 					$status['message'] = esc_html__( 'License is not active.', 'connections' );
 					break;
 
 				case 'disabled':
 
 					$status['type']    = 'error';
+					$status['code']    = 'disabled';
 					$status['message'] = esc_html__( 'License has been disabled.', 'connections' );
 					break;
 
 				case 'site_inactive':
 
 					$status['type']    = 'warning';
+					$status['code']    = 'site_inactive';
 					$status['message'] = esc_html__( 'License is not active on this site.', 'connections' );
 					break;
 
 				case 'item_name_mismatch':
 
 					$status['type']    = 'error';
+					$status['code']    = 'item_name_mismatch';
 					$status['message'] = esc_html__( 'License entered is not for this item.', 'connections' );
 					break;
 
 				case 'valid':
 
 					$status['type'] = 'success';
+					$status['code'] = 'valid';
 
 					$expiryDate = strtotime( $data->expires );
 
@@ -661,24 +678,28 @@ HERERDOC;
 				case 'deactivated':
 
 					$status['type']    = 'warning';
+					$status['code']    = 'deactivated';
 					$status['message'] = esc_html__( 'License is deactivated.', 'connections' );
 					break;
 
 				case 'failed':
 
 					$status['type']    = 'error';
+					$status['code']    = 'failed';
 					$status['message'] = esc_html__( 'License validation failed.' , 'connections' );
 					break;
 
 				default:
 
 					$status['type']    = 'error';
+					$status['code']    = 'unknown_error';
 					$status['message'] = esc_html__( 'An unknown error has occurred.', 'connections' );
 			}
 
 		} else {
 
 			$status['type']    = 'error';
+			$status['code']    = 'unknown_error';
 			$status['message'] = esc_html__( 'An unknown error has occurred.', 'connections' );
 		}
 
@@ -700,158 +721,8 @@ HERERDOC;
 		$size   = isset( $field['size'] ) && ! empty( $field['size'] ) ? $field['size'] : 'regular';
 
 		// Get the status if the item's license key.
-		$status = self::status( $field['title'], $value );
-
-		// Retrieve the items license data.
-		$data   = get_option( 'connections_license_data' );
-		// var_dump( $data );
-
-		if ( $data !== FALSE ) {
-
-			// If there was an error message in the EDD SL API response, set the description to the error message.
-			if ( isset( $data[ $field['id'] ]->success ) && $data[ $field['id'] ]->success === FALSE ) {
-
-				// $status = isset( $data[ $field['id'] ] ) && isset( $data[ $field['id'] ]->license ) ? $data[ $field['id'] ]->license : 'unknown';
-				$error  = isset( $data[ $field['id'] ] ) && isset( $data[ $field['id'] ]->error ) ? $data[ $field['id'] ]->error : 'unknown';
-
-				switch ( $error ) {
-
-					case 'expired':
-
-						$field['desc'] = __( 'License has expired.', 'connections' );
-
-						if ( isset( $data[ $field['id'] ]->renewal_url ) ) {
-
-							$field['desc'] .= sprintf( ' <a href="%1$s" title="%2$s">%2$s</a>',
-								esc_url( $data[ $field['id'] ]->renewal_url ),
-								__( 'Renew license.', 'connections' )
-							);
-
-						}
-
-						break;
-
-					case 'item_name_mismatch':
-
-						$field['desc'] = __( 'License entered is not for this item.', 'connections' );
-						break;
-
-					case 'missing':
-
-						$field['desc'] = __( 'Invalid license.', 'connections' );
-						break;
-
-					case 'revoked':
-
-						$field['desc'] = __( 'License has been revoked.', 'connections' );
-						break;
-
-					case 'no_activations_left':
-
-						$field['desc'] = __( 'License activation limit has been reached.', 'connections' );
-						break;
-
-					case 'key_mismatch':
-
-						$field['desc'] = __( 'License key mismatch.', 'connections' );
-						break;
-
-					case 'license_not_activable':
-
-						$field['desc'] = __( 'Bundle license keys can not be activated. Use item license key instead.', 'connections' );
-						break;
-
-					default:
-
-						$field['desc'] = __( 'An unknown error has occurred.', 'connections' );
-						break;
-				}
-
-			} else {
-
-				if ( is_wp_error( $status ) ) {
-
-					$field['desc'] = $status->get_error_message();
-
-				} else {
-
-					// If there was no error message, display the current license status.
-					switch ( $status ) {
-
-						case 'invalid':
-
-							$field['desc'] = __( 'License key invalid.', 'connections' );
-							break;
-
-						case 'expired':
-
-							$field['desc'] = __( 'License has expired.', 'connections' );
-
-							if ( isset( $data[ $field['id'] ]->renewal_url ) ) {
-
-								$field['desc'] .= sprintf( ' <a href="%1$s" title="%2$s">%2$s</a>', esc_url( $data[ $field['id'] ]->renewal_url ), __( 'Renew license.', 'connections' ) );
-
-							}
-
-							break;
-
-						case 'inactive':
-
-							$field['desc'] = __( 'License is not active.', 'connections' );
-							break;
-
-						case 'disabled':
-
-							$field['desc'] = __( 'License has been disabled.', 'connections' );
-							break;
-
-						case 'site_inactive':
-
-							$field['desc'] = __( 'License is not active on this site.', 'connections' );
-							break;
-
-						case 'item_name_mismatch':
-
-							$field['desc'] = __( 'License entered is not for this item.', 'connections' );
-							break;
-
-						case 'valid':
-
-							$expiryDate = strtotime( $data[ $field['id'] ]->expires );
-
-							if ( FALSE !== $expiryDate ) {
-
-								$field['desc'] = sprintf( __( 'License is valid and you are receiving updates. Your support license key will expire on %s.', 'connections' ), date( 'F jS Y', $expiryDate ) );
-
-							} elseif ( 'lifetime' == $data[ $field['id'] ]->expires ) {
-
-								$field['desc'] = __( 'Lifetime license is valid and you are receiving updates.', 'connections' );
-
-							} else {
-
-								$field['desc'] = __( 'License is valid', 'connections' );
-							}
-
-							break;
-
-						case 'deactivated':
-
-							$field['desc'] = __( 'License is deactivated.', 'connections' );
-							break;
-
-						case 'failed':
-
-							$field['desc'] = __( 'License validation failed.', 'connections' );
-							break;
-
-						default:
-							// $field['desc'] = __( 'License status in unknown.', 'connections' );
-							break;
-					}
-				}
-			}
-
-		}
+		//$status = self::status( $field['title'], $value );
+		$status = self::statusMessage( $this );
 
 		// Render the text input.
 		printf( '<input type="text" class="%1$s-text" id="%2$s" name="%2$s" value="%3$s"/>',
@@ -861,31 +732,36 @@ HERERDOC;
 		);
 
 		// Render either the "Activate" or "Deactivate" button base on the current license status.
-		switch ( $status ) {
+		switch ( $status['code'] ) {
 
 			case 'valid':
 
-				printf( '<input type="submit" class="button-secondary" name="%1$s-deactivate_license" value="%2$s">',
+				printf(
+					'<input type="submit" class="button-secondary" name="%1$s-deactivate_license" value="%2$s">',
 					$field['id'],
-					__( 'Deactivate', 'connections' )
+					esc_html__( 'Deactivate', 'connections' )
 				);
 
 				break;
 
 			default:
 
-				printf( '<input type="submit" class="button-secondary" name="%1$s-activate_license" value="%2$s">',
+				printf(
+					'<input type="submit" class="button-secondary" name="%1$s-activate_license" value="%2$s">',
 					$field['id'],
-					__( 'Activate', 'connections' )
+					esc_html__( 'Activate', 'connections' )
 				);
-
-				break;
 		}
 
 		// Render the current license status.
-		if ( isset( $field['desc'] ) && ! empty( $field['desc'] ) )
-			printf( '<span  class="description"> %1$s</span>', $field['desc'] );
+		if ( 'no_key' != $status['code'] ) {
 
+			printf(
+				'<span class="description update-message notice inline notice-%1$s">%2$s</span>',
+				sanitize_html_class( $status['type'] ),
+				$status['message']
+			);
+		}
 	}
 
 	/**
@@ -1026,6 +902,8 @@ HERERDOC;
 		// Run on activate button press
 		if ( isset( $_POST[ $this->slug . '-activate_license' ] ) ) {
 
+			delete_transient( 'connections_license-' . $this->slug );
+
 			// Retrieve license keys and data.
 			$keys = get_option( 'connections_licenses' );
 			$data = get_option( 'connections_license_data' );
@@ -1069,6 +947,8 @@ HERERDOC;
 		// Run on deactivate button press
 		if ( isset( $_POST[ $this->slug . '-deactivate_license' ] ) ) {
 
+			delete_transient( 'connections_license-' . $this->slug );
+
 			// Retrieve license keys and data.
 			//$keys = get_option( 'connections_licenses' );
 			$data = get_option( 'connections_license_data' );
@@ -1099,7 +979,7 @@ HERERDOC;
 	 * @param  string $license The item license key.
 	 * @param  string $url     The EDD SL Updater URL.
 	 *
-	 * @return mixed           object|WP_Error The EDD SL response for the item on success or WP_Error on fail.
+	 * @return object|WP_Error The EDD SL response for the item on success or WP_Error on fail.
 	 */
 	public static function license( $action, $name, $license, $url = NULL ) {
 
@@ -1138,7 +1018,7 @@ HERERDOC;
 
 		// Call the API
 		$response = wp_remote_get(
-			add_query_arg( $query, $url ),
+			add_query_arg( $query, trailingslashit( $url ) ),
 			array(
 				'timeout'   => 15,
 				'sslverify' => FALSE
@@ -1168,8 +1048,6 @@ HERERDOC;
 
 				return $data;
 
-				break;
-
 			case 'deactivate':
 
 				// EDD SL reports either 'deactivated' or 'failed' as the license status.
@@ -1195,16 +1073,12 @@ HERERDOC;
 
 				return $data;
 
-				break;
-
 			case 'status':
 
 				// Save license data in transient.
 				set_transient( 'connections_license-' . $slug, $data, DAY_IN_SECONDS );
 
 				return $data;
-
-				break;
 		}
 
 		return new WP_Error(

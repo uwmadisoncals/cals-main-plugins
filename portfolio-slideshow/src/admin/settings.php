@@ -98,7 +98,7 @@ $active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'display_and_behavior';
 						<h3><?php esc_html_e( 'Support', 'portfolio-slideshow' ); ?></h3>
 
 						<div class="inside">
-							<p><?php echo wp_kses_post( sprintf( __( 'Need help? The <a href="%s" target="_blank">free Portfolio Slideshow support forums</a> are checked a few times per month. More timely and in-depth support is also offered for subscribers <a href="%s">on the Portfolio Slideshow website</a>.', 'portfolio-slideshow' ), 'http://wordpress.org/support/plugin/portfolio-slideshow', 'http://portfolioslideshow.com/support' ) ); ?></p>
+							<p><?php echo wp_kses_post( sprintf( __( 'Need help? The <a href="%s" target="_blank">free Portfolio Slideshow support forums</a> are checked a few times per week.', 'portfolio-slideshow' ), 'http://wordpress.org/support/plugin/portfolio-slideshow' ) ); ?></p>
 						</div>
 					</div>
 
