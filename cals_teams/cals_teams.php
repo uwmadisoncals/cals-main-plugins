@@ -170,14 +170,18 @@ Class CTFields{
 
           }
 
+          if( is_array($v) ){
 
-          foreach( $v as $_k => $_v ){//CTFields depth:3
+            foreach( $v as $_k => $_v ){//CTFields depth:3
 
-            if(is_array($_v)){
-              $this->$value['id']->$k->$_k = (object)$_v ;//cast $_v to object
+              if(is_array($_v)){
+                $this->$value['id']->$k->$_k = (object)$_v ;//cast $_v to object
 
+              }
             }
           }
+
+
         }  
       }
     }
@@ -353,7 +357,7 @@ function calsteams_mbox_save($post_id){
         //validate email
         if($input_id === 'calsteams_email' ){
           if(!is_email($_POST[ $input_id ])){
-            $_POST[ $input_id ] = '';
+            $_POST[ $input_id ] = 'invalid email';
           } 
         }
 
