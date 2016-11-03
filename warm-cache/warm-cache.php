@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Warm cache
-Plugin URI: http://www.mijnpress.nl
+Plugin URI: https://www.mijnpress.nl
 Description: Crawls your website-pages based on any XML sitemap plugin. If you have a caching plugin this wil keep your cache warm. Speeds up your site.
-Version: 2.0.1
+Version: 2.1
 Author: Ramon Fincken
-Author URI: http://www.mijnpress.nl
+Author URI: https://www.mijnpress.nl
 */
 if (!defined('ABSPATH')) 
 {
@@ -250,7 +250,7 @@ class warm_cache extends mijnpress_plugin_framework
 			// Number of pages
 			$table_string .= '<td>'.$mypages.'</td>';
 			// Average load time per page
-			$table_string .= '<td>'.($mytime/$mypages).'</td>';
+			$table_string .= '<td>'.((intval($mypages) > 0) ? ($mytime/$mypages) : '0').'</td>';
 			// Pages
 			$table_string .= '<td><a href="'.admin_url('post.php?post='.$post->ID.'&action=edit').'">View</a></td>';
 			$table_string .= '</td></tr>';

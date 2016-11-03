@@ -20,4 +20,14 @@ jQuery(document).ready(function ($) {
 			});
 		}
 	});
+	
+	$( '#mc-generator .custom' ).hide();
+	$( '#mc-generator select[name=type]' ).on( 'change', function () {
+		var selected = $( this ).val();
+		if ( selected == 'custom' ) {
+			$( '#mc-generator .custom' ).show();
+		} else {
+			$( '#mc-generator .custom' ).hide();
+		}
+	});
 });

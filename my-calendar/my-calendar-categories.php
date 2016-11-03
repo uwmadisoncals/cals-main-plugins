@@ -3,6 +3,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
 
+
+function mc_update_category( $field, $data, $category ) {
+	global $wpdb;
+	$field  = sanitize_key( $field );
+	$result = $wpdb->query( $wpdb->prepare( "UPDATE " . my_calendar_categories_table() . " SET $field = %d WHERE category_id=%d", $data, $category ) );
+
+	return $result;
+}
+
 // Function to handle the management of categories
 
 // This is a hack for people who don't have PHP installed with exif_imagetype
@@ -89,7 +98,7 @@ function my_calendar_manage_categories() {
 		}
 
 		if ( isset( $_POST['mode'] ) && $_POST['mode'] == 'add' ) {
-			$term = wp_insert_term( wp_kses_post( $_POST['category_name'] ), 'mc-event-category' );
+			$term = wp_insert_term( strip_tags( $_POST['category_name'] ), 'mc-event-category' );
 			if ( ! is_wp_error( $term ) ) {
 				$term = $term['term_id'];
 			} else {
@@ -103,7 +112,7 @@ function my_calendar_manage_categories() {
 				'category_term'    => $term
 			);
 			
-			$add   = array_map( 'wp_kses_post', $add );		
+			$add   = array_map( 'mc_kses_post', $add );		
 			
 			
 			// actions and filters
@@ -249,12 +258,7 @@ function mc_edit_category_form( $view = 'edit', $catID = '' ) {
 									       } ?>"/>
 								</div>
 							<?php } ?>
-							<fieldset>
-								<legend><?php if ( $view == 'add' ) {
-										_e( 'Add Category', 'my-calendar' );
-									} else {
-										_e( 'Edit Category', 'my-calendar' );
-									} ?></legend><?php
+							<?php
 								if ( ! empty( $cur_cat ) && is_object( $cur_cat ) ) {
 									$color = ( strpos( $cur_cat->category_color, '#' ) !== 0 ) ? '#' : '';
 									$color .= $cur_cat->category_color;
@@ -277,7 +281,7 @@ function mc_edit_category_form( $view = 'edit', $catID = '' ) {
 									class="mc-color-input"
 									size="10"
 									maxlength="7"
-									value="<?php echo esc_attr( $color ); ?>"/>
+									value="<?php echo ( $color != '#' ) ? esc_attr( $color ) : ''; ?>"/>
 								</li>
 								<li>
 								<label for="cat_icon"><?php _e( 'Category Icon', 'my-calendar' ); ?></label> <select
@@ -302,19 +306,21 @@ function mc_edit_category_form( $view = 'edit', $catID = '' ) {
 									} ?>
 									<?php $checked = ( $view == 'add' ) ? '' : mc_is_checked( 'mc_default_category', $cur_cat->category_id, '', true ); ?>
 									<?php $holiday_checked = ( $view == 'add' ) ? '' : mc_is_checked( 'mc_skip_holidays_category', $cur_cat->category_id, '', true ); ?>
+									<ul class='checkboxes'>
+									<li>
 									<input type="checkbox" value="on" name="category_private"
 									       id="cat_private"<?php echo $private_checked; ?> /> <label
-										for="cat_private"><?php _e( 'Private category (logged-in users only)', 'my-calendar' ); ?></label>
-									<input type="checkbox" value="on" name="mc_default_category"
+										for="cat_private"><?php _e( 'Private category (logged-in users only)', 'my-calendar' ); ?></label></li>
+									<li><input type="checkbox" value="on" name="mc_default_category"
 									       id="mc_default_category"<?php echo $checked; ?> /> <label
-										for="mc_default_category"><?php _e( 'Default category', 'my-calendar' ); ?></label>
-									<input type="checkbox" value="on" name="mc_skip_holidays_category"
+										for="mc_default_category"><?php _e( 'Default category', 'my-calendar' ); ?></label></li>
+									<li><input type="checkbox" value="on" name="mc_skip_holidays_category"
 									       id="mc_shc"<?php echo $holiday_checked; ?> /> <label
-										for="mc_shc"><?php _e( 'Holiday Category', 'my-calendar' ); ?></label>
+										for="mc_shc"><?php _e( 'Holiday Category', 'my-calendar' ); ?></label></li>
+									</ul>
 								</li>
 								<?php echo apply_filters( 'mc_category_fields', '', $cur_cat ); ?>
 							</ul>
-							</fieldset>
 							<p>
 								<input type="submit" name="save" class="button-primary"
 								       value="<?php if ( $view == 'add' ) {
@@ -400,18 +406,18 @@ function mc_manage_categories() {
 			?>
 		<tr class="<?php echo $class; ?>">
 			<th scope="row"><?php echo $cat->category_id; ?></th>
-			<td><?php echo stripslashes( wp_kses_post( $cat->category_name ) );
+			<td><?php echo stripslashes( mc_kses_post( $cat->category_name ) );
 				if ( $cat->category_id == get_option( 'mc_default_category' ) ) {
-					echo ' ' . __( '(Default)' );
+					echo ' <strong>' . __( '(Default)' ) . '</strong>';
 				}
 				if ( $cat->category_id == get_option( 'mc_skip_holidays_category' ) ) {
-					echo ' ' . __( '(Holiday)' );
+					echo ' <strong>' . __( '(Holiday)' ) . '</strong>';
 				} ?></td>
-			<td style="background-color:<?php echo $background; ?>;color: <?php echo $foreground; ?>"><?php echo ( $icon_src ) ? "<img src='$icon_src' alt='' />" : ''; ?> <?php echo $background; ?></td>
+			<td style="background-color:<?php echo $background; ?>;color: <?php echo $foreground; ?>"><?php echo ( $icon_src ) ? "<img src='$icon_src' alt='' />" : ''; ?> <?php echo ( $background != '#' ) ? $background : ''; ?></td>
 			<td><?php echo ( $cat->category_private == 1 ) ? __( 'Yes', 'my-calendar' ) : __( 'No', 'my-calendar' ); ?></td>
 			<td><a
 				href="<?php echo admin_url( "admin.php?page=my-calendar-categories&amp;mode=edit&amp;category_id=$cat->category_id" ); ?>"
-				class='edit'><?php _e( 'Edit', 'my-calendar' ); ?></a></td><?php
+				class='edit'><?php printf( __( 'Edit %s', 'my-calendar' ), '<span class="screen-reader-text">' . stripslashes( mc_kses_post( $cat->category_name ) ) . '</span>' ); ?></a></td><?php
 			if ( $cat->category_id == 1 ) {
 				echo '<td>' . __( 'N/A', 'my-calendar' ) . '</td>';
 			} else {
@@ -419,7 +425,7 @@ function mc_manage_categories() {
 				<td><a
 					href="<?php echo admin_url( "admin.php?page=my-calendar-categories&amp;mode=delete&amp;category_id=$cat->category_id" ); ?>"
 					class="delete"
-					onclick="return confirm('<?php _e( 'Are you sure you want to delete this category?', 'my-calendar' ); ?>')"><?php _e( 'Delete', 'my-calendar' ); ?></a>
+					onclick="return confirm('<?php _e( 'Are you sure you want to delete this category?', 'my-calendar' ); ?>')"><?php printf( __( 'Delete %s', 'my-calendar' ), '<span class="screen-reader-text">' . stripslashes( mc_kses_post( $cat->category_name ) ) . '</span>' ); ?></a>
 				</td><?php
 			}  ?>
 			</tr><?php
@@ -428,4 +434,60 @@ function mc_manage_categories() {
 	} else {
 		echo '<p>' . __( 'There are no categories in the database - or something has gone wrong!', 'my-calendar' ) . '</p>';
 	}
+}
+
+
+add_action( 'show_user_profile', 'mc_profile' );
+add_action( 'edit_user_profile', 'mc_profile' );
+add_action( 'profile_update', 'mc_save_profile' );
+/**
+ * Show user profile data on Edit User pages.
+ * 
+ * return @string Configuration forms for My Calendar user-specific settings.
+ */
+function mc_profile() {
+	global $user_ID;
+	$current_user = wp_get_current_user();
+	$user_edit = ( isset( $_GET['user_id'] ) ) ? (int) $_GET['user_id'] : $user_ID;
+
+	if ( user_can( $user_edit, 'mc_manage_events' ) && current_user_can( 'manage_options' ) ) {
+		$permissions = (array) get_user_meta( $user_edit, 'mc_user_permissions', true );
+		$selected    = ( empty( $permissions ) || in_array( 'all', $permissions ) ) ? ' selected="selected"' : '';
+		?>
+		<h3><?php _e( 'My Calendar Editor Permissions', 'my-calendar' ); ?></h3>
+		<table class="form-table">
+			<tr>
+				<th scope="row">
+					<label for="mc_user_permissions"><?php _e( "Allowed Categories", 'my-calendar' ); ?></label>
+				</th>
+				<td>
+					<select name="mc_user_permissions[]" id="mc_user_permissions" multiple>
+						<option value='all'<?php echo $selected; ?>><?php _e( 'All', 'my-calendar' ); ?></option>
+						<?php echo mc_category_select( $permissions, true, 'multiple' ); ?>
+					</select>
+				</td>
+			</tr>
+			<?php echo apply_filters( 'mc_user_fields', '', $user_edit ); ?>
+		</table>
+		<?php
+	} 
+}
+
+/** 
+ * Save user profile data 
+ */
+function mc_save_profile() {	
+	global $user_ID;
+	$current_user = wp_get_current_user();
+	if ( isset( $_POST['user_id'] ) ) {
+		$edit_id = (int) $_POST['user_id'];
+	} else {
+		$edit_id = $user_ID;
+	}
+	if ( current_user_can( 'manage_options' ) ) {
+		$mc_user_permission = $_POST['mc_user_permissions'];
+		update_user_meta( $edit_id, 'mc_user_permissions', $mc_user_permission );
+	}
+	
+	apply_filters( 'mc_save_user', $edit_id, $_POST );
 }

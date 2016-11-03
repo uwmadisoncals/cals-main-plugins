@@ -429,7 +429,7 @@ function my_calendar_print_group_fields( $data, $mode, $event_id, $group_id = ''
 						<select id="e_host" name="event_host">
 							<?php
 							// Grab all the categories and list them
-							$userList = my_calendar_getUsers();
+							$userList = mc_get_users();
 							foreach ( $userList as $u ) {
 								echo '<option value="' . $u->ID . '"';
 								if ( is_object( $data ) && $data->event_host == $u->ID ) {
@@ -840,7 +840,7 @@ function mc_check_group_data( $action, $post ) {
 			'event_latitude'     => $event_latitude
 		);
 		
-		$submit = array_map( 'wp_kses_post', $submit );
+		$submit = array_map( 'mc_kses_post', $submit );
 		
 		if ( $action == 'edit' ) {
 			unset( $submit['event_author'] );
@@ -1014,9 +1014,8 @@ function mc_list_groups() {
 					href="<?php echo admin_url( "admin.php?page=my-calendar-groups&amp;sort=7$sorting" ); ?>"><?php _e( 'Where', 'my-calendar' ) ?></a>
 			</th>
 			<th scope="col"><a
-					href="<?php echo admin_url( "admin.php?page=my-calendar-groups&amp;sort=4$sorting" ); ?>"><?php _e( 'Starts', 'my-calendar' ) ?></a>
+					href="<?php echo admin_url( "admin.php?page=my-calendar-groups&amp;sort=4$sorting" ); ?>"><?php _e( 'Date/Time', 'my-calendar' ) ?></a>
 			</th>
-			<th scope="col"><?php _e( 'Recurs', 'my-calendar' ) ?></th>
 			<th scope="col"><a
 					href="<?php echo admin_url( "admin.php?page=my-calendar-groups&amp;sort=5$sorting" ); ?>"><?php _e( 'Author', 'my-calendar' ) ?></a>
 			</th>
@@ -1036,7 +1035,7 @@ function mc_list_groups() {
 			$spam_label = ( $event->event_flagged == 1 ) ? '<strong>Possible spam:</strong> ' : '';
 			$author     = ( $event->event_author != 0 ) ? get_userdata( $event->event_author ) : 'Public Submitter';
 			if ( $event->event_link != '' ) {
-				$title = "<a href='" . esc_attr( $event->event_link ) . "'>" . wp_kses_post( $event->event_title ) . "</a>";
+				$title = "<a href='" . esc_attr( $event->event_link ) . "'>" . mc_kses_post( $event->event_title ) . "</a>";
 			} else {
 				$title = $event->event_title;
 			} ?>
@@ -1075,43 +1074,58 @@ function mc_list_groups() {
 				</div>
 			</td>
 			<td><?php echo strip_tags( stripslashes( $event->event_label ) ); ?></td>
-			<?php if ( $event->event_time != "00:00:00" ) {
+			<?php if ( $event->event_endtime != "23:59:59" ) {
 				$eventTime = date_i18n( get_option( 'mc_time_format' ), strtotime( $event->event_time ) );
 			} else {
 				$eventTime = mc_notime_label( $event );
 			} ?>
-			<td><?php echo "$event->event_begin<br />$eventTime"; ?></td>
-			<td>
-				<?php
-				$recurs = str_split( $event->event_recur, 1 );
-				$recur  = $recurs[0];
-				// Interpret the DB values into something human readable
-				if ( $recur == 'S' ) {
-					_e( 'Never', 'my-calendar' );
-				} else if ( $recur == 'D' ) {
-					_e( 'Daily', 'my-calendar' );
-				} else if ( $recur == 'E' ) {
-					_e( 'Weekdays', 'my-calendar' );
-				} else if ( $recur == 'W' ) {
-					_e( 'Weekly', 'my-calendar' );
-				} else if ( $recur == 'B' ) {
-					_e( 'Bi-Weekly', 'my-calendar' );
-				} else if ( $recur == 'M' ) {
-					_e( 'Monthly (by date)', 'my-calendar' );
-				} else if ( $recur == 'U' ) {
-					_e( 'Monthly (by day)', 'my-calendar' );
-				} else if ( $recur == 'Y' ) {
-					_e( 'Yearly', 'my-calendar' );
-				}
-				?>&ndash;<?php
-				if ( $recur == 'S' ) {
-					_e( 'N/A', 'my-calendar' );
-				} else if ( mc_event_repeats_forever( $recur, $event->event_repeats ) ) {
-					_e( 'Forever', 'my-calendar' );
-				} else if ( $event->event_repeats > 0 ) {
-					printf( __( '%d Times', 'my-calendar' ), $event->event_repeats );
-				}
-				?>
+			<td><?php
+				$date_format = ( get_option( 'mc_date_format' ) == '' ) ? get_option( 'date_format' ) : get_option( 'mc_date_format' );
+				$begin       = date_i18n( $date_format, strtotime( $event->event_begin ) );
+				echo "$begin, $eventTime"; ?>
+				<div class="recurs">
+					<strong><?php _e( 'Recurs', 'my-calendar' ); ?></strong>
+					<?php
+					$recurs = str_split( $event->event_recur, 1 );
+					$recur  = $recurs[0];
+					$every  = ( isset( $recurs[1] ) ) ? $recurs[1] : 1;
+
+					// Interpret the DB values into something human readable
+					switch ( $recur ) {
+						case 'S':
+							_e( 'Never', 'my-calendar' );
+							break;
+						case 'D':
+							( $every == 1 ) ? _e( 'Daily', 'my-calendar' ) : printf( __( 'Every %d days', 'my-calendar' ), $every );
+							break;
+						case 'E':
+							( $every == 1 ) ? _e( 'Weekdays', 'my-calendar' ) : printf( __( 'Every %d weekdays', 'my-calendar' ), $every );
+							break;
+						case 'W':
+							( $every == 1 ) ? _e( 'Weekly', 'my-calendar' ) : printf( __( 'Every %d weeks', 'my-calendar' ), $every );
+							break;
+						case 'B':
+							_e( 'Bi-Weekly', 'my-calendar' );
+							break;
+						case 'M':
+							( $every == 1 ) ? _e( 'Monthly (by date)', 'my-calendar' ) : printf( __( 'Every %d months (by date)', 'my-calendar' ), $every );
+							break;
+						case 'U':
+							_e( 'Monthly (by day)', 'my-calendar' );
+							break;
+						case 'Y':
+							( $every == 1 ) ? _e( 'Yearly', 'my-calendar' ) : printf( __( 'Every %d years', 'my-calendar' ), $every );
+							break;
+					}
+					$eternity = _mc_increment_values( $recur );
+					if ( $recur == 'S' ) {
+					} else if ( $event->event_repeats > 0 ) {
+						printf( __( '&ndash; %d Times', 'my-calendar' ), $event->event_repeats );
+					} else if ( $eternity ) {
+						printf( __( '&ndash; %d Times', 'my-calendar' ), $eternity );
+					}
+					?>
+				</div>
 			</td>
 			<td><?php echo ( is_object( $author ) ) ? $author->display_name : $author; ?></td>
 			<?php
@@ -1125,7 +1139,7 @@ function mc_list_groups() {
 			<td>
 				<div class="category-color"
 				     style="background-color:<?php echo strip_tags( ( strpos( $this_cat->category_color, '#' ) !== 0 ) ? '#' : '' );
-				     echo $this_cat->category_color; ?>;"></div> <?php echo wp_kses_post( stripslashes( $this_cat->category_name ) ); ?>
+				     echo $this_cat->category_color; ?>;"></div> <?php echo mc_kses_post( stripslashes( $this_cat->category_name ) ); ?>
 			</td>
 			<?php unset( $this_cat ); ?>
 			</tr><?php

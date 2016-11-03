@@ -356,14 +356,3 @@ function mc_generate_alert_ical( $alarm ) {
 	
 	return $alert;
 }
-
-function mc_flatten_event_array( $events ) {
-	$flat = array();
-	foreach( $events as $event ) {
-		foreach( $event as $e ) {
-			$flat[] = $e;
-		}
-	}
-	
-	return $flat;
-}

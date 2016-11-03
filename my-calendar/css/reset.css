@@ -85,6 +85,48 @@ button.mc-text-button:hover, button .mc-text-button:focus {
 	text-decoration: underline;
 	background-color: transparent;
 }
+.mc-main .mc-loading {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  margin: -20px 0 0 -20px;
+  height: 40px;
+  width: 40px;
+  border: 2px solid rgba(0,0,0,0.3);
+  border-left-color: rgba(0,0,0,0.7);
+  background-color: rgba(0,0,0,0.05);
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  border-radius: 50px;
+  -webkit-animation: animation-rotate 1250ms linear infinite;
+  -moz-animation: animation-rotate 1250ms linear infinite;
+  -o-animation: animation-rotate 1250ms linear infinite;
+  animation: animation-rotate 1250ms linear infinite;
+}
+
+@-webkit-keyframes animation-rotate {
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@-moz-keyframes animation-rotate {
+  100% {
+    -moz-transform: rotate(360deg);
+  }
+}
+
+@-o-keyframes animation-rotate {
+  100% {
+    -o-transform: rotate(360deg);
+  }
+}
+
+@keyframes animation-rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
 /**
  * This is focus passed to a div for the purpose of navigation; visible focus not required.

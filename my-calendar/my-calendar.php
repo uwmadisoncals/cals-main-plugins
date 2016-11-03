@@ -7,7 +7,7 @@ Author: Joseph C Dolson
 Author URI: http://www.joedolson.com
 Text Domain: my-calendar
 Domain Path: lang
-Version: 2.4.21
+Version: 2.5.1
 */
 /*  Copyright 2009-2016  Joe Dolson (email : joe@joedolson.com)
 
@@ -30,28 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 } // Exit if accessed directly
 
 global $mc_version, $wpdb;
-$mc_version = '2.4.21';
-
-// Define the tables used in My Calendar
-if ( is_multisite() && get_site_option( 'mc_multisite_show' ) == 1 ) {
-	define( 'MY_CALENDAR_TABLE', $wpdb->base_prefix . 'my_calendar' );
-	define( 'MY_CALENDAR_EVENTS_TABLE', $wpdb->base_prefix . 'my_calendar_events' );
-	define( 'MY_CALENDAR_CATEGORIES_TABLE', $wpdb->base_prefix . 'my_calendar_categories' );
-	define( 'MY_CALENDAR_LOCATIONS_TABLE', $wpdb->base_prefix . 'my_calendar_locations' );
-} else {
-	define( 'MY_CALENDAR_TABLE', $wpdb->prefix . 'my_calendar' );
-	define( 'MY_CALENDAR_EVENTS_TABLE', $wpdb->prefix . 'my_calendar_events' );
-	define( 'MY_CALENDAR_CATEGORIES_TABLE', $wpdb->prefix . 'my_calendar_categories' );
-	define( 'MY_CALENDAR_LOCATIONS_TABLE', $wpdb->prefix . 'my_calendar_locations' );
-}
-
-if ( is_multisite() ) {
-	// Define the tables used in My Calendar
-	define( 'MY_CALENDAR_GLOBAL_TABLE', $wpdb->base_prefix . 'my_calendar' );
-	define( 'MY_CALENDAR_GLOBAL_EVENT_TABLE', $wpdb->base_prefix . 'my_calendar_events' );
-	define( 'MY_CALENDAR_GLOBAL_CATEGORIES_TABLE', $wpdb->base_prefix . 'my_calendar_categories' );
-	define( 'MY_CALENDAR_GLOBAL_LOCATIONS_TABLE', $wpdb->base_prefix . 'my_calendar_locations' );
-}
+$mc_version = '2.5.1';
 
 register_activation_hook( __FILE__, 'mc_plugin_activated' );
 register_deactivation_hook( __FILE__, 'mc_plugin_deactivated' );
@@ -68,7 +47,10 @@ function mc_plugin_deactivated() {
 }
 
 include( dirname( __FILE__ ) . '/includes/date-utilities.php' );
+include( dirname( __FILE__ ) . '/includes/general-utilities.php' );
+include( dirname( __FILE__ ) . '/includes/kses.php' );
 include( dirname( __FILE__ ) . '/my-calendar-core.php' );
+include( dirname( __FILE__ ) . '/my-calendar-db.php' );
 include( dirname( __FILE__ ) . '/my-calendar-install.php' );
 include( dirname( __FILE__ ) . '/my-calendar-settings.php' );
 include( dirname( __FILE__ ) . '/my-calendar-categories.php' );
@@ -176,7 +158,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 			<?php if ( ! function_exists( 'mcs_submit_exists' ) ) { ?>
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox sell support">
-						<h2 class='sales'><strong><?php _e( 'My Calendar Pro', 'my-calendar' ); ?></strong></h2>
+						<h2 class='sales hndle'><strong><?php _e( 'My Calendar Pro', 'my-calendar' ); ?></strong></h2>
 
 						<div class="inside resources">
 							<p class="mcbuy"><?php _e( "Buy <a href='https://www.joedolson.com/my-calendar/pro/' rel='external'>My Calendar Pro</a> &mdash; a more powerful calendar for your site.", 'my-calendar' ); ?></p>
@@ -190,13 +172,13 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 			<?php if ( ! function_exists( 'mt_valid' ) ) { ?>
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox sell my-tickets">
-						<h2 class='sales'><strong><?php _e( 'My Tickets', 'my-calendar' ); ?></strong></h2>
+						<h2 class='sales hndle'><strong><?php _e( 'My Tickets', 'my-calendar' ); ?></strong></h2>
 
 						<div class="inside resources">
 							<p class="mcbuy"><?php _e( "Do you sell tickets to your events? <a href='https://wordpress.org/plugins/my-tickets/' rel='external'>Use My Tickets</a> and sell directly from My Calendar.", 'my-calendar' ); ?></p>
 							<p><?php _e( 'My Tickets integrates with My Calendar or sells tickets independently through posts and pages.', 'my-tickets' ); ?></p>
 
-							<p class="mc-button"><a href="https://wordpress.org/plugins/my-tickets/" rel="external"><?php _e( 'Download My Tickets', 'my-calendar' ); ?></a>
+							<p class="mc-button"><a href="http://dev.josephdolson.com/wp-admin/plugin-install.php?tab=plugin-information&plugin=my-tickets&TB_iframe=true&width=600&height=550" class="thickbox open-plugin-details-modal" rel="external"><?php _e( 'Try My Tickets', 'my-calendar' ); ?></a>
 							</p>
 						</div>
 					</div>
@@ -204,7 +186,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 			<?php } ?>	
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox support">
-					<h2><strong><?php _e( 'Support This Plug-in', 'my-calendar' ); ?></strong></h2>
+					<h2 class='hndle'><strong><?php _e( 'Support This Plug-in', 'my-calendar' ); ?></strong></h2>
 
 					<div class="inside resources">
 						<p>
@@ -226,8 +208,6 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 								rel="external"><?php _e( "Buy the My Calendar User's Guide", 'my-calendar' ); ?></a>
 						</p>
 
-						<p><strong><?php _e( 'Make a donation today!', 'my-calendar' ); ?></strong></p>
-
 						<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 							<p class="mcd">
 								<input type="hidden" name="cmd" value="_s-xclick" />
@@ -241,7 +221,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 		<?php } ?>
 		<div class="ui-sortable meta-box-sortables">
 			<div class="postbox">
-				<h2><?php _e( 'Get Help', 'my-calendar' ); ?></h2>
+				<h2 class='hndle'><?php _e( 'Get Help', 'my-calendar' ); ?></h2>
 
 				<div class="inside">
 					<ul>
@@ -279,7 +259,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 				?>
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox">
-						<h2><?php echo $key; ?></h2>
+						<h2 class='hndle'><?php echo $key; ?></h2>
 
 						<div class='<?php echo sanitize_title( $key ); ?> inside'>
 							<?php echo $value; ?>
@@ -289,116 +269,6 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 			<?php
 			}
 		} ?>
-		<?php if ( $show == 'templates' ) { ?>
-			<div class="ui-sortable meta-box-sortables">
-				<div class="postbox">
-					<h2><?php _e( 'Event Template Tags', 'my-calendar' ); ?></h2>
-
-					<div class='mc_template_tags inside'>
-						<dl>
-							<dt><code>{title}</code></dt>
-							<dd><?php _e( 'Title of the event.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{link_title}</code></dt>
-							<dd><?php _e( 'Title of the event as a link if a URL is present, or the title alone if not.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{time}</code></dt>
-							<dd><?php _e( 'Start time for the event.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{date}</code></dt>
-							<dd><?php _e( 'Date on which the event begins.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{daterange}</code></dt>
-							<dd><?php _e( 'Beginning date to end date; excludes end date if same as beginning.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{multidate}</code></dt>
-							<dd><?php _e( 'Multi-day events: an unordered list of dates/times. Otherwise, beginning date/time.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{author}</code></dt>
-							<dd><?php _e( 'Author who posted the event.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{host}</code></dt>
-							<dd><?php _e( 'Name of the assigned host for the event.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{shortdesc}</code></dt>
-							<dd><?php _e( 'Short event description.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{description}</code></dt>
-							<dd><?php _e( 'Description of the event.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{image}</code></dt>
-							<dd><?php _e( 'Image associated with the event.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{link}</code></dt>
-							<dd><?php _e( 'URL provided for the event.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{details}</code></dt>
-							<dd><?php _e( 'Link to an auto-generated page containing information about the event.', 'my-calendar' ); ?>
-
-							<dt><code>{event_open}</code></dt>
-							<dd><?php _e( 'Whether event is currently open for registration.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{event_status}</code></dt>
-							<dd><?php _e( 'Current status of event: either "Published" or "Reserved."', 'my-calendar' ); ?></dd>
-						</dl>
-
-						<h3><?php _e( 'Location Template Tags', 'my-calendar' ); ?></h3>
-						<dl>
-							<dt><code>{location}</code></dt>
-							<dd><?php _e( 'Name of the location of the event.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{street}</code></dt>
-							<dd><?php _e( 'First line of the site address.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{street2}</code></dt>
-							<dd><?php _e( 'Second line of the site address.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{city}</code></dt>
-							<dd><?php _e( 'City', 'my-calendar' ); ?></dd>
-
-							<dt><code>{state}</code></dt>
-							<dd><?php _e( 'State', 'my-calendar' ); ?></dd>
-
-							<dt><code>{postcode}</code></dt>
-							<dd><?php _e( 'Postal Code', 'my-calendar' ); ?></dd>
-
-							<dt><code>{region}</code></dt>
-							<dd><?php _e( 'Custom region.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{country}</code></dt>
-							<dd><?php _e( 'Country for the event location.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{sitelink}</code></dt>
-							<dd><?php _e( 'Output the URL for the location.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{hcard}</code></dt>
-							<dd><?php _e( 'Event address in <a href="http://microformats.org/wiki/hcard">hcard</a> format.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{link_map}</code></dt>
-							<dd><?php _e( 'Link to Google Map to the event, if address information is available.', 'my-calendar' ); ?></dd>
-						</dl>
-						<h3><?php _e( 'Category Template Tags', 'my-calendar' ); ?></h3>
-
-						<dl>
-							<dt><code>{category}</code></dt>
-							<dd><?php _e( 'Name of the category of the event.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{icon}</code></dt>
-							<dd><?php _e( 'URL for the event\'s category icon.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{color}</code></dt>
-							<dd><?php _e( 'Hex code for the event\'s category color.', 'my-calendar' ); ?></dd>
-
-							<dt><code>{cat_id}</code></dt>
-							<dd><?php _e( 'ID of the category of the event.', 'my-calendar' ); ?></dd>
-						</dl>
-						<p>
-							<a href="<?php echo admin_url( 'admin.php?page=my-calendar-help#templates' ); ?>"><?php _e( 'All Template Tags &raquo;', 'my-calendar' ); ?></a>
-						</p>
-					</div>
-				</div>
-			</div>
-		<?php } ?>
 		</div>
 		</div>
 	<?php

@@ -8,10 +8,10 @@ function atw_posts_slider_admin() {
         return;
     }
 ?>
-   <h2 style="color:blue;">Aspen Theme Works Show Sliders Plugin</h2>
+   <h2 style="color:blue;">Weaver Show Sliders Plugin</h2>
 
 <p>
-    The Aspen Themworks <em>Show Sliders</em> plugin is an optional companion to <em>Weaver Show Posts</em> that
+    The Weaver <em>Show Sliders</em> plugin is an optional companion to <em>Weaver Show Posts</em> that
     can display Posts and Images in a great looking responsive sliders that automatically resize to fit
     the screen of any browser, tablet, or phone.
     Unlike many other sliders, <em>Weaver Show Sliders</em> will display either Posts or Images. It uses the Filters tab to

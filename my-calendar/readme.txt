@@ -1,10 +1,10 @@
 === My Calendar ===
 Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
-Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, conference, meeting, venue, location, box office, tickets, registration
-Requires at least: 4.0
-Tested up to: 4.5
-Stable tag: 2.4.20
+Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
+Requires at least: 4.4
+Tested up to: 4.6
+Stable tag: 2.5.0
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -22,24 +22,24 @@ Easy to use for anybody, My Calendar provides enormous flexibility for designers
 
 = Features: =
 
-*	Standard calendar grid and list views of events
-* 	Show events in monthly, weekly, or daily view.
-* 	Mini-calendar view for compact displays (as widget or as shortcode)
+*	Calendar grid and list views of events
+* 	Monthly, weekly, or daily view.
+* 	Mini-calendar for compact displays (as widget or as shortcode)
 *	Widgets: today's events, upcoming events, compact calendar, event search
 *	Custom templates for event output
 *	Limit views by categories, location, author, or host
 *	Disable default CSS and default JavaScript or display only on specific Pages/Posts
 *	Editable CSS styles and JavaScript behaviors
-*	Schedule a wide variety of recurring events.
-*	Edit individual occurrences of recurring events
+*	Schedule a variety of recurring events.
+*	Edit occurrences of recurring events
 * 	Rich permissions handling to restrict access to parts of My Calendar
 * 	Email notification to administrator when events are scheduled or reserved
 * 	Post to Twitter when events are created. (with [WP to Twitter](http://wordpress.org/extend/plugins/wp-to-twitter/))
 *	Location Manager for frequently used venues
-*   Fetch events from a remote MySQL database. (Sharing events in a network of sites.)
+*   Fetch events from a remote database. (Sharing events in a network of sites.)
 *   Import events from [Kieran O'Shea's Calendar plugin](http://wordpress.org/extend/plugins/calendar/)
-* 	Integrated Help page to guide in use of shortcodes and template tags
-* 	Shortcode Generator to help create customized views of My Calendar
+* 	Integrated Help to guide in use of shortcodes and template tags
+* 	Shortcode Generator to create customized views of My Calendar
 *   [Developer Documentation](http://www.joedolson.com/doc-category/my-calendar-3/)
 
 = What's in My Calendar Pro? =
@@ -50,12 +50,13 @@ Easy to use for anybody, My Calendar provides enormous flexibility for designers
 * Publish a blog post when you create an event
 * Advanced search features
 * Responsive mode
+* Import events from .ics or .csv formats via file or URL.
 
 = Translations =
 
-Visit [Wordpress Translations](https://translate.wordpress.org/projects/wp-plugins/my-calendar) to check the progress of your translation.
+Visit [Wordpress Translations](https://translate.wordpress.org/projects/wp-plugins/my-calendar) to check progress or contribute to your language.
 
-Translating my plug-ins is always appreciated. Visit <a href="https://translate.wordpress.org/projects/wp-plugins/my-calendar">WordPress translations</a> to start getting your language into shape! Translations will only be published when they reach 100% completion.
+Translating my plug-ins is always appreciated. Visit <a href="https://translate.wordpress.org/projects/wp-plugins/my-calendar">WordPress translations</a> to help get your language to 100%! 
 
 == Installation ==
 
@@ -65,8 +66,8 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 
 3. Configure My Calendar using the settings pages in the admin panel:
 
-   My Calendar -> Manage Events
    My Calendar -> Add New Event
+   My Calendar -> Manage Events
    My Calendar -> Manage Categories
    My Calendar -> Manage Locations
    My Calendar -> Manage Event Groups
@@ -82,29 +83,50 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 
 == Changelog ==
 
-= Future Changes =
+= 2.5.1 =
 
-* Make annual view in list mode configurable on a calendar-specific basis rather than globally; effect date switcher; see https://www.joedolson.com/forums/topic/annual-calendar/#post-5427
-* Refactor options storage
-* Update event taxonomies if category changed/source event taxonomy data from post
-* Custom link targets using mc_customize_details_link & template_redirect filter as pointer.
-* Handle stylesheet editing as additive (child styles), rather than editing the original stylesheet.
-* Update pickadate to version 3.6, when it's out. 3.5.6 has a regression that makes it useless for me.
-* Send admin notice when recurring event is about to end
-* Change all shortcode 'template' attributes to reference stored templates in settings by name or ID.
-* Feature Request: make unqualified event permalinks display next occurrence rather than first (last?) (show list of occurrences?)
-* Create mechanism to get & display all events in a group (see group-manager.php line 253)
-* Add option to insert new occurrences into an existing event. (Make single event recurring, add arbitrary date into group, etc.)
-* Add option to insert events to both global & local calendar in multisite networks
-* Revise month by day input & calculation methods
+* Bug fix: Multi-word category titles not hyphenated in event classes
+* Bug fix: Add `{related}` template tag to documentation
+* Bug fix: Today's events template broken
+* Add 'past-event' and 'future-event' classes to related event list & main events lists
+
+= 2.5.0 =
+
 * Update hcalendar structures
-* When month starts on Sunday, shows full previous month's week?
-* Make iCal timezone configurable via URL params & eliminate that setting.
-
-= 2.5.0 = (Unreleased)
+* Better handling when updating event taxonomies
+* Options to restrict management of events by category / user
+* UI Clean up
+* Don't display format toggle on mobile if automatic format switching enabled
+* Add custom date option to upcoming events shortcode builder
+* Improved error message if user creates event with an invalid recurring cycle
+* Updated template editor; ability to create custom templates.
+* Add option to add new dates for an existing event. 
+* For single event, show closest available date if no/invalid date ID provided.
+* Added first occurrence data to core event object
+* New template tag: {related} to list other events in the same group
+* New loading indicator for AJAX navigation
+* New filter to modify event classes
+* New function to generate event classes
+* Reduce number of strings in plug-in to reduce burden on translators
+* Multisite: ability to display calendar for any site on any other site
+* in my_calendar_draw_event(), add filter to hide additional days of events
+* Improved HTML filtering to allow input elements and schema.org attributes.
+* Add support for Google Maps API key field, now required for use of Google Maps on new sites
+* Add 'today' keyword for the upcoming events 'to' attribute
+* Updates to Help documentation
+* Bug fix: auto assign events with no category to 'General'
+* Bug fix: some user select lists overwrote select list options
+* Bug fix: new events with no times entered need to be created as all day events
+* Bug fix: wrong number of arguments passed to mass delete events hook
+* Bug fix: Custom JS incorrectly escaped in Script manager
+* Bug fix: removed numerous notices
+* Bug fix: improved handling of missing event posts
+* Bug fix: allow more HTML elements & attributes
+* Bug fix: misc. notices 
 
 Breaking Changes:
 
+* Breaking change: minor changes to classes to improve structured data in microformats
 * Breaking change: upcoming events widget no longer uses ID 'upcoming-events'; use class '.upcoming-events'
 * Breaking change: today's events widget no longer uses ID 'todays-events'; use class '.todays-events'
 
@@ -699,6 +721,20 @@ This is a major revision.
 * {map} template tag to display a Google Map using the Google Maps API. (Not available in pop-up displays.)
 * Scheduled removal of showkey, shownav, toggle, and showjump shortcode attributes.
 * Removed upgrade support for 1.6.x & 1.7.x series of My Calendar.
+
+= Future Changes =
+
+* Make annual view in list mode configurable on a calendar-specific basis rather than globally; effect date switcher; see https://www.joedolson.com/forums/topic/annual-calendar/#post-5427
+* Refactor options storage
+* Handle stylesheet editing as additive (child styles), rather than editing the original stylesheet.
+* Send admin notice when recurring event is about to end
+	- Instead: create plug-in extension that hooks into an appropriate action and adds new occurrences
+* Revise month by day input & calculation methods
+* When month starts on Sunday, shows full previous month's week?
+* Bug: if save generates error, creates ton of notices. [eliminate $users_entries object and use single object model]
+* Add ability to limit by multiple locations (e.g., view all events in Location 1 & Location 2; only on lvalue)
+* Event occurrence IDs can change when events dates are changed
+* Add option to insert events simultaneously to both global & local calendar in multisite networks [todo]
 
 == Frequently Asked Questions ==
 

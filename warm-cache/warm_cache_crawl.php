@@ -5,22 +5,41 @@
 */
 if(defined('PLUGIN_WARM_CACHE_CALLED'))
 {	
-	
+
 	// Prevent any reverse proxy caching / browser caching
 	header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 	header("Cache-Control: post-check=0, pre-check=0", false);
 	header("Pragma: no-cache");
+
+	$pid_lock = 'mp_warm_cache_pid_lock';
+	$is_locked = get_transient( $pid_lock );
+
+	if($is_locked) {
+		echo 'Lock active, stopped processing. Wait 60 seconds';
+		//die();
+	}
 	
+
+	function mp_warm_cache_limit_filter( $limit ) {
+		if(defined('MP_WARM_CACHE_FILTER_LIMIT')) {
+			$newlimit = intval(MP_WARM_CACHE_FILTER_LIMIT);
+			if($newlimit > 0) {
+				return $newlimit;
+			}
+		}	    
+		return $limit;
+	}
+	add_filter( 'mp_warm_cache_limit_filters', 'mp_warm_cache_limit_filter', 10, 1 );
+
 	$warm_cache = new warm_cache();
 	$warm_cache->google_sitemap_generator_options = get_option("sm_options");
 	
 	$useflush = get_option("plugin_warm_cache_lb_flush");
 
-	$limit = get_option('plugin_warm_cache_limit', 20);
+	$limit = apply_filters('mp_warm_cache_limit_filters', get_option('plugin_warm_cache_limit', 20));
 	$start = get_option('plugin_warm_cache_start', 0);
 
-	echo "Start at item $start ";
-	
+	echo "Start at item $start $limit";
 	$mtime = microtime();
 	$mtime = explode(' ', $mtime);
 	$mtime = $mtime[1] + $mtime[0];
@@ -28,13 +47,7 @@ if(defined('PLUGIN_WARM_CACHE_CALLED'))
 	
 	@set_time_limit(0);
 	
-	if (extension_loaded('zlib')) {
-		$z = strtolower(ini_get('zlib.output_compression'));
-		if ($z == false || $z == 'off')
-		{
-			ob_start('ob_gzhandler');
-		}
-	}
+	ob_start();
 
 	if (file_exists('./wp-load.php')) 
 	{
@@ -62,7 +75,7 @@ if(defined('PLUGIN_WARM_CACHE_CALLED'))
 	
 	function mp_process_sitemap($sitemap_url)
 	{
-		global $newvalue, $totalcount, $limit, $start, $hits, $useflush;
+		global $newvalue, $totalcount, $limit, $start, $hits, $useflush, $pid_lock;
 
 		if(substr_count($sitemap_url, 'warmcache-sitemap.xml') > 0 || substr_count($sitemap_url, 'warmcache') > 0) {
 			// No need to crawl our own post type .. bail
@@ -84,6 +97,9 @@ if(defined('PLUGIN_WARM_CACHE_CALLED'))
 					$hits++;
 					$page = (string)$xml->url[$i]->loc;
 					echo '<br/>Busy with: '.$page;
+
+					set_transient($pid_lock, 'Busy', MINUTE_IN_SECONDS );
+
 					$newvalue['pages'][] = $page;
 					$tmp = wp_remote_get($page);
 					// 	https://wordpress.org/support/topic/needs-flush-to-write-buffers-to-prevent-timeouts
@@ -112,11 +128,14 @@ if(defined('PLUGIN_WARM_CACHE_CALLED'))
 	// GOGOGO!
 	mp_process_sitemap($sitemap_url);
 	
+	// Give it some time to post-process
+	set_transient($pid_lock, 'Busy', 10 );
+
 	// Increase counter
 	$newstart = $start+$limit;
 	if($hits == 0) {
 		// None found, we crossed the border, reset to zero
-		echo 'no hits';
+		echo 'no hits, resetting the start to zero for next time';
 		$newstart = 0;
 	}
 	echo "<br/>Updating to start (next time) at : $newstart";
@@ -155,7 +174,7 @@ if(defined('PLUGIN_WARM_CACHE_CALLED'))
 	
 	// Cleanup, delete old data
 	$period_php = '180 minutes';
-	$myposts = get_posts('post_type=warmcache&numberposts=75&order=ASC&orderby=post_date');
+	$myposts = get_posts('post_type=warmcache&numberposts=100&order=ASC&orderby=post_date');
 	
 	$now = strtotime("now");
 	foreach ($myposts AS $post) {

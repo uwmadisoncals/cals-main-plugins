@@ -134,7 +134,7 @@ function atw_posts_submitted($submit_name) {
 	if (isset($_POST[$nonce_name]) && wp_verify_nonce($_POST[$nonce_name],$nonce_act)) {
 	    return true;
 	} else {
-	    die("WARNING: invalid form submit detected ($submit_name). Probably caused by session time-out, or, rarely, a failed security check. Please contact AspenThemeWorks.com if you continue to receive this message.");
+	    die("WARNING: invalid form submit detected ($submit_name). Probably caused by session time-out, or, rarely, a failed security check. Please contact WeaverTheme.com if you continue to receive this message.");
 	}
     } else {
 	return false;

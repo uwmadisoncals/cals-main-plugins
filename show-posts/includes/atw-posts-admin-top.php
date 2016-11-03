@@ -1,8 +1,7 @@
 <?php
 /*
-Aspen SW - admin code
 
-This code is Copyright 2011 by Bruce E. Wampler, all rights reserved.
+This code is Copyright 2011-2016 by Bruce E. Wampler, all rights reserved.
 This code is licensed under the terms of the accompanying license file: license.txt.
 
 This program is distributed in the hope that it will be useful,

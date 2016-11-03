@@ -138,7 +138,7 @@ function atw_posts_select_filter() {
 <?php
         $native = false;
         if ( !atw_posts_is_generic() ) {
-            atw_posts_form_checkbox('ignore_aspen_weaver','Disable automatic post display integration with Weaver II/Aspen/Weaver Xtreme Themes.');
+            atw_posts_form_checkbox('ignore_aspen_weaver','Disable automatic post display integration with Weaver II/Weaver Xtreme Themes.');
             $native = true;
         }
         $has_templates = atw_posts_theme_has_templates();
@@ -224,7 +224,7 @@ function atw_posts_define_display() {
 	<option value="title" <?php selected( $cur_show == 'title');?>>Title + Top Meta Line</option>
     <option value="titlelist" <?php selected( $cur_show == 'titlelist');?>>Title only as list</option>
     <option value="title_featured" <?php selected( $cur_show == 'title_featured');?>>Title + Featured Image</option>
-	</select> &nbsp;How to display posts - (Default: full post; Weaver/Aspen: theme settings)
+	</select> &nbsp;How to display posts - (Default: full post; Weaver theme settings)
     </div>
 
 
@@ -238,7 +238,7 @@ function atw_posts_define_display() {
         <div class="filter-description">
     <p>
         Use this section to define how each post is to be displayed - title, excerpted, etc. These options apply to how each post is displayed when
-        using the plugin's built-in post layout, or when used with native Weaver Xtreme, Weaver II, or Aspen Theme layout. Use the Content Selection Filter to define which posts
+        using the plugin's built-in post layout, or when used with native Weaver Xtreme or Weaver II layout. Use the Content Selection Filter to define which posts
         will be displayed. The Slider Image Show options can be used to define how images are used in a image only slide show. (Note: when using the
         Weaver Slider plugin to display an image slider, these Post Display options do not apply.)
     </p>
@@ -533,7 +533,7 @@ function atw_posts_set_by_posts() {
     Specify a comma separated list of <em>Post IDs</em> to display posts in that list, in the order specified. This option will override
     other selection options (e.g., Tags, Date, etc.). You can find a post's ID in your browser's URL address field when editing the
     post with the Post editor. It is the number right after the <em>?post=</em>. Sorry this can't be easier, but the only way
-    WordPress supports showing a specific set of posts is by ID.
+    WordPress supports showing a specific set of posts is by ID. You may also find it helpful to set the "Number of Posts to Show" option above to -1.
 </div>
 <div style="clear:both;"></div>
 </div>

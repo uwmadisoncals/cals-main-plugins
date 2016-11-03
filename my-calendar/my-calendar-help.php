@@ -17,14 +17,18 @@ function my_calendar_help() {
 			<h2 id="help"><?php _e( 'Getting Started', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
-				<ul>
+				<div class='mc-support-me'>
+					<p>
+						<?php printf(
+							__( 'Please, consider a <a href="%s">donation</a> or a <a href="%s">purchase</a> to support My Calendar!', 'my-calendar' )
+						, "https://www.joedolson.com/donate/", "https://www.joedolson.com/my-calendar/pro/" ); ?>
+					</p>
+				</div>				
+				<ul class="list">
 					<li><?php _e( 'Add the My Calendar shortcode (<code>[my_calendar]</code>) to a page.', 'my-calendar' ); ?></li>
 					<li><?php _e( 'Add events by clicking on the Add/Edit Events link in the admin or on "Add Events" in the toolbar.', 'my-calendar' ); ?></li>
 					<li><?php _e( 'Select your preferred stylesheet in the Styles Editor', 'my-calendar' ); ?></li>
 				</ul>
-				<p>
-					<?php printf( __( 'Read more help documentation below or <a href="%s">purchase the My Calendar User\'s Guide</a> to learn more -- but the above is all that you need to do to begin using the calendar.', 'my-calendar' ), 'https://www.joedolson.com/my-calendar/users-guide/' ); ?>
-				</p>
 				<?php do_action( 'mc_before_help' ); ?>
 				<ul class="mc-settings checkboxes">
 					<li><a href="#mc-generator"><?php _e( 'Shortcode Generator', 'my-calendar' ); ?></a></li>
@@ -32,8 +36,7 @@ function my_calendar_help() {
 					<li><a href="#icons"><?php _e( 'Icons', 'my-calendar' ); ?></a></li>
 					<li><a href="#mc-styles"><?php _e( 'Styles', 'my-calendar' ); ?></a></li>
 					<li><a href="#templates"><?php _e( 'Templating', 'my-calendar' ); ?></a></li>
-					<li><a href="#get-support"><?php _e( 'Support Form', 'my-calendar' ); ?></a></li>
-					<li><a href="#notes"><?php _e( 'Helpful Information', 'my-calendar' ); ?></a></li>
+					<li><a href="#get-support"><?php _e( 'Get Support', 'my-calendar' ); ?></a></li>
 				</ul>				
 			</div>
 		</div>
@@ -119,15 +122,13 @@ function my_calendar_help() {
 				</li>				
 				<li><code>id</code>: <?php _e( 'String to give shortcode a unique ID.', 'my-calendar' ); ?></li>
 			</ul>
-			<p>
-				<em><?php _e( 'The main My Calendar shortcode can be generated from a button in your post and page editor. The mini calendar can also be accessed and configured as a widget.', 'my-calendar' ); ?></em>
-			</p>
+
 			<h4><?php _e( 'Additional Views (Upcoming events, today\'s events)', 'my-calendar' ); ?></h4>
 
 			<textarea readonly='readonly' class="large-text readonly">[my_calendar_upcoming before="3" after="3" type="event" fallback="No events coming up!" category="General" author="1" host="1" template="{title} {date}" order="asc" show_today="yes" skip="0" ltype="" lvalue="" from="" to=""]</textarea>
 
 			<p>
-				<?php _e( 'Displays the output of the Upcoming Events widget. <code>before</code> and <code>after</code> are numbers; <code>type</code> is either "event" or "days", and <code>category</code> and <code>author</code> work the same as in the main calendar shortcode. Templates use the template codes listed below. <code>fallback</code> provides text if no events meet your criteria. Order sets sort order for the list &ndash; ascending (<code>asc</code>) or descending (<code>desc</code>). <code>show_today</code> indicates whether to include today\'s events in the list. <code>Skip</code> is how many events to skip in the list.', 'my-calendar' ); ?> <?php _e( 'Use <code>from</code> and <code>to</code> to display events between two specific dates', 'my-calendar' ); ?>
+				<?php _e( 'Displays the output of the Upcoming Events widget. <code>before</code> and <code>after</code> are numbers; <code>type</code> is either "event", "days", or "custom" and <code>category</code> and <code>author</code> work the same as in the main calendar shortcode. Templates use the template codes listed below. <code>fallback</code> provides text if no events meet your criteria. Order sets sort order for the list &ndash; ascending (<code>asc</code>) or descending (<code>desc</code>). <code>show_today</code> indicates whether to include today\'s events in the list. <code>Skip</code> is how many events to skip in the list.', 'my-calendar' ); ?> <?php _e( 'Use <code>from</code> and <code>to</code> with type="custom" to display events between two specific dates', 'my-calendar' ); ?> <?php _e( 'The keyword "today" in the <code>to</code> attribute will give you all events between the from date and the current date.', 'my-calendar' ); ?>
 			</p>
 
 			<textarea readonly='readonly' class="large-text readonly">[my_calendar_today category="" author="1" host="1" fallback="Nothing today!" template="{title} {date}" date=""]</textarea>
@@ -201,11 +202,7 @@ function my_calendar_help() {
 			<h2><?php _e( 'Category Icons', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
-				<p>
-					<?php _e( 'My Calendar is designed to manage multiple calendars. The basis for these calendars are categories; you can setup a calendar page which includes all categories, or you can dedicate separate pages to calendars in each category. For an example, this might be useful for you in managing the tour calendars for multiple bands; event calendars for a variety of locations, etc.', 'my-calendar' ); ?>
-				</p>
-
-				<p>
+					<p>
 					<?php _e( 'The pre-installed category icons may not be what you need. I assume that you\'ll upload your own icons -- place your custom icons in a folder at "my-calendar-custom" to avoid having them overwritten by upgrades.', 'my-calendar' ); ?> <?php _e( 'You can alternately place icons in:', 'my-calendar' ); ?>
 					<code><?php echo str_replace( '/my-calendar', '', plugin_dir_path( __FILE__ ) ) . 'my-calendar-custom/'; ?></code>
 				</p>
@@ -294,6 +291,9 @@ function my_calendar_help() {
 		<dt><code>{multidate}</code></dt>
 		<dd><?php _e( 'For multi-day events displays an unordered list of dates and times for events in this group. Otherwise, beginning date/time.', 'my-calendar' ); ?></dd>
 
+		<dt><code>{related}</code></dt>
+		<dd><?php _e( 'List of other events in the same event group. (Only on single event views.)', 'my-calendar' ); ?></dd>
+		
 		<dt><code>{author}</code></dt>
 		<dd><?php _e( 'Displays the WordPress author who posted the event.', 'my-calendar' ); ?></dd>
 
@@ -502,32 +502,6 @@ function my_calendar_help() {
 				<?php } else { ?>
 					<?php _e( 'My Calendar support requests can only be sent by administrators.', 'my-calendar' ); ?>
 				<?php } ?>
-			</div>
-		</div>
-
-		<div class="ui-sortable meta-box-sortables" id="notes">
-			<div class="postbox">
-				<h2 id="info"><?php _e( 'Helpful Information', 'my-calendar' ); ?></h2>
-
-				<div class="inside">
-					<p>
-						<?php _e( '<strong>Uninstalling the plugin</strong>: Although the WordPress standard and expectation is for plug-ins to delete any custom database tables when they\'re uninstalled, My Calendar <em>does not do this</em>. This was a conscious decision on my part -- the data stored in your My Calendar tables is yours; with the sole exception of the "General" category, you added every piece of it yourself. As such, I feel it would be a major disservice to you to delete this information if you uninstall the plug-in. As a result, if you wish to get rid of the plug-in completely, you\'ll need to remove those tables yourself. All your My Calendar settings will be deleted, however.', 'my-calendar' ); ?>
-					</p>
-
-					<p>
-						<?php printf( __( '<strong>Donations</strong>: I appreciate anything you can give. %s may not seem like much, but it can really add up when thousands of people are using the software. Please note that I am not a non-profit organization, and your gifts are not tax deductible. Thank you!', 'my-calendar' ), '$5' ); ?>
-					</p>
-					<p>
-						<?php _e( '<strong>How to upgrade from My Calendar: Submissions to My Calendar Pro</strong>', 'my-calendar' ); ?>
-					</p>
-					<ol>
-						<li><?php _e( 'Update to My Calendar: Submissions version 1.2.9', 'my-calendar' ); ?></li>
-						<li><?php _e( 'Deactivate and delete My Calendar: Submissions', 'my-calendar' ); ?></li>
-						<li><?php printf( __( 'Log-in to your account at <a href="%s">Joe Dolson Accessible Web Design</a> and download My Calendar Pro', 'my-calendar' ), 'https://www.joedolson.com/account/' ); ?></li>
-						<li><?php _e( 'Upload My Calendar Pro and activate.', 'my-calendar' ); ?></li>
-						<li><?php _e( 'Input your My Calendar: Submissions license key into My Calendar Pro', 'my-calendar' ); ?></li>
-					</ol>
-				</div>
 			</div>
 		</div>
 

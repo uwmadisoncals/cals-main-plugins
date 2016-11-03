@@ -1,6 +1,6 @@
 <?php
 
-// # Aspen SW Globals ==============================================================
+// # Weaver SW Globals ==============================================================
 $atw_posts_opts_cache = false;	// internal cache for all settings
 
 function atw_posts_get_filter_params( $filter = '') {

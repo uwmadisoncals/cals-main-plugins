@@ -5,7 +5,7 @@ Plugin URI: http://WeaverTheme.com
 Description: Weaver Show Posts - Show  posts or custom posts within your Theme's pages or posts using a shortcode and a form-based interface.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 1.3.6
+Version: 1.3.9
 
 License: GPL
 
@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* CORE FUNCTIONS
 */
 
-define ( 'WEAVER_SHOWPOSTS_VERSION','1.3.6');
+define ( 'WEAVER_SHOWPOSTS_VERSION','1.3.9');
 define ( 'WEAVER_SHOWPOSTS_MINIFY','.min');		// '' for dev, '.min' for production
 define ( 'WEAVER_SHOWPOSTS_TEMPLATE', false);      // future feature
 
@@ -156,7 +156,7 @@ function atw_posts_admin_menu() {
 	}
 
     $menu = $show_slider ? 'Weaver Posts &amp; Slider Options' : 'Weaver Show Posts Options';
-    $full = $show_slider ? 'Weaver Show Posts and Show Sliders' : 'Weaver Show Posts by Aspen ThemeWorks';
+    $full = $show_slider ? 'Weaver Show Posts and Show Sliders' : 'Weaver Show Posts by WeaverTheme.com';
 
     $page = add_menu_page(
 	  'Weaver Show Posts', $menu, 'switch_themes',
@@ -276,4 +276,5 @@ function atw_show_posts_sc($args = '') {
 // ############
 
 require_once(dirname( __FILE__ ) . '/includes/atw-runtime-lib.php'); // NOW - load the basic library
+require_once(dirname( __FILE__ ) . '/includes/posts-widgets.php'); // NOW - load the basic library
 ?>

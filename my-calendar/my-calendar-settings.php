@@ -190,6 +190,7 @@ function edit_my_calendar_config() {
 			mc_delete_cache();
 			$clear = __( 'My Calendar Cache cleared', 'my-calendar' );
 		}
+		update_option( 'mc_uri', $_POST['mc_uri'] );		
 		update_option( 'mc_event_approve', $mc_event_approve );
 		update_option( 'mc_api_enabled', $mc_api_enabled );
 		update_option( 'mc_remote', $mc_remote );
@@ -267,6 +268,7 @@ function edit_my_calendar_config() {
 		update_option( 'mc_topnav', $top );
 		update_option( 'mc_show_map', ( ! empty( $_POST['mc_show_map'] ) && $_POST['mc_show_map'] == 'on' ) ? 'true' : 'false' );
 		update_option( 'mc_gmap', ( ! empty( $_POST['mc_gmap'] ) && $_POST['mc_gmap'] == 'on' ) ? 'true' : 'false' );
+		update_option( 'mc_gmap_api_key', ( ! empty( $_POST['mc_gmap_api_key'] ) ) ? strip_tags( $_POST['mc_gmap_api_key'] ) : '' );
 		update_option( 'mc_show_address', ( ! empty( $_POST['mc_show_address'] ) && $_POST['mc_show_address'] == 'on' ) ? 'true' : 'false' );
 		update_option( 'mc_display_more', ( ! empty( $_POST['mc_display_more'] ) && $_POST['mc_display_more'] == 'on' ) ? 'true' : 'false' );
 		update_option( 'mc_hide_icons', ( ! empty( $_POST['mc_hide_icons'] ) && $_POST['mc_hide_icons'] == 'on' ) ? 'true' : 'false' );
@@ -453,6 +455,8 @@ function edit_my_calendar_config() {
 						<fieldset>
 							<legend class="screen-reader-text"><?php _e( 'Management', 'my-calendar' ); ?></legend>
 							<ul>
+								<?php $guess = mc_guess_calendar(); ?>
+								<li><?php mc_settings_field( 'mc_uri', __( 'Where is your main calendar page?', 'my-calendar' ), '', "$guess[message]", array( 'size' => '60' ), 'url' ); ?></li>							
 								<li><?php mc_settings_field( 'mc_remote', __( 'Get data (events, categories and locations) from a remote database.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 								<?php if ( get_option( 'mc_remote' ) == 'true' ) { ?>
 									<li><?php _e( 'Add this code to your theme\'s <code>functions.php</code> file:', 'my-calendar' ); ?>
@@ -484,7 +488,7 @@ function edit_my_calendar_config() {
 											'DESC' => __( 'Descending', 'my-calendar' )
 										), '', array(), 'select' ); ?></li>										
 								<?php
-								if ( get_site_option( 'mc_multisite' ) == 2 && MY_CALENDAR_TABLE != MY_CALENDAR_GLOBAL_TABLE ) {
+								if ( get_site_option( 'mc_multisite' ) == 2 && my_calendar_table() != my_calendar_table( 'global' ) ) {
 									mc_settings_field( 'mc_current_table', array(
 											'0' => __( 'Currently editing my local calendar', 'my-calendar' ),
 											'1' => __( 'Currently editing the network calendar', 'my-calendar' )
@@ -600,24 +604,6 @@ function edit_my_calendar_config() {
 					</fieldset>
 
 					<fieldset>
-						<legend><?php _e( 'Grid Options', 'my-calendar' ); ?></legend>
-						<ul>
-							<li><?php mc_settings_field( 'mc_show_weekends', __( 'Show Weekends on Calendar', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-							<li><?php mc_settings_field( 'mc_convert', array(
-											'true' => __( 'Switch to list view on mobile devices', 'my-calendar' ),
-											'mini' => __( 'Switch to mini calendar on mobile devices', 'my-calendar' ),
-											'none' => __( 'Do not switch calendar mode', 'my-calendar' )
-										), 'false', '', array(), 'radio' ); ?></li>
-						</ul>
-					</fieldset>
-					<fieldset>
-						<legend><?php _e( 'List Options', 'my-calendar' ); ?></legend>
-						<ul>
-							<li><?php mc_settings_field( 'mc_show_months', __( 'How many months of events to show at a time:', 'my-calendar' ), '', '', array( 'size' => '3' ), 'text' ); ?></li>
-							<li><?php mc_settings_field( 'mc_show_list_info', __( 'Show the first event\'s title and the number of events that day next to the date.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-						</ul>
-					</fieldset>
-					<fieldset>
 						<legend><?php _e( 'Re-order calendar layout', 'my-calendar' ); ?></legend>
 						<?php
 						$topnav       = explode( ',', get_option( 'mc_topnav' ) );
@@ -653,12 +639,12 @@ function edit_my_calendar_config() {
 								}
 								
 								if ( $i == 1 ) {
-									$buttons = "<button class='down'><i class='dashicons dashicons-arrow-down'></i><span class='screen-reader-text'>Down</span></button>";
+									$buttons = "<button class='down' type='button'><i class='dashicons dashicons-arrow-down'></i><span class='screen-reader-text'>Down</span></button>";
 								} else {
 									if ( $i == $count ) {
-										$buttons = "<button class='up'><i class='dashicons dashicons-arrow-up'></i><span class='screen-reader-text'>Up</span></button>";
+										$buttons = "<button class='up' type='button'><i class='dashicons dashicons-arrow-up'></i><span class='screen-reader-text'>Up</span></button>";
 									} else {
-										$buttons = "<button class='up'><i class='dashicons dashicons-arrow-up'></i><span class='screen-reader-text'>Up</span></button> <button class='down'><i class='dashicons dashicons-arrow-down'></i><span class='screen-reader-text'>Down</span></button>";
+										$buttons = "<button class='up' type='button'><i class='dashicons dashicons-arrow-up'></i><span class='screen-reader-text'>Up</span></button> <button class='down'><i class='dashicons dashicons-arrow-down'></i><span class='screen-reader-text'>Down</span></button>";
 									}
 								}
 								$buttons = "<div class='mc-buttons'>$buttons</div>";								
@@ -693,6 +679,7 @@ function edit_my_calendar_config() {
 							<li><?php mc_settings_field( 'mc_show_gcal', __( 'Link to submit event to Google Calendar', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_show_map', __( 'Link to Google Map', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_gmap', __( 'Google Map (single event view only)', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+							<li><?php mc_settings_field( 'mc_gmap_api_key', __( 'Google Maps API Key', 'my-calendar' ) ); ?></li>
 							<li><?php mc_settings_field( 'mc_show_address', __( 'Event Address', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_short', __( 'Short description', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_desc', __( 'Full description', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
@@ -702,6 +689,26 @@ function edit_my_calendar_config() {
 							<li><?php mc_settings_field( 'mc_event_registration', __( 'Registration info', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 						</ul>
 					</fieldset>
+
+					<fieldset>
+						<legend><?php _e( 'Grid Options', 'my-calendar' ); ?></legend>
+						<ul>
+							<li><?php mc_settings_field( 'mc_show_weekends', __( 'Show Weekends on Calendar', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+							<li><?php mc_settings_field( 'mc_convert', array(
+											'true' => __( 'Switch to list view on mobile devices', 'my-calendar' ),
+											'mini' => __( 'Switch to mini calendar on mobile devices', 'my-calendar' ),
+											'none' => __( 'Do not switch calendar mode', 'my-calendar' )
+										), 'false', '', array(), 'radio' ); ?></li>
+						</ul>
+					</fieldset>
+					<fieldset>
+						<legend><?php _e( 'List Options', 'my-calendar' ); ?></legend>
+						<ul>
+							<li><?php mc_settings_field( 'mc_show_months', __( 'How many months of events to show at a time:', 'my-calendar' ), '', '', array( 'size' => '3' ), 'text' ); ?></li>
+							<li><?php mc_settings_field( 'mc_show_list_info', __( 'Show the first event\'s title and the number of events that day next to the date.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+						</ul>
+					</fieldset>					
+					
 					<fieldset>
 						<legend><?php _e( 'Category Colors', 'my-calendar' ); ?></legend>
 						<ul class='checkboxes'>
@@ -807,7 +814,7 @@ function edit_my_calendar_config() {
 							<input type='hidden' name='mc_network' value='true'/>
 						</div>
 						<fieldset>
-							<legend><?php _e( 'WP MultiSite configurations', 'my-calendar' ); ?></legend>
+							<legend><?php _e( 'Multisite configuration - input', 'my-calendar' ); ?></legend>
 							<ul>
 								<li>
 									<input type="radio" value="0" id="ms0" name="mc_multisite"<?php echo jd_option_selected( get_site_option( 'mc_multisite' ), '0' ); ?> /> <label for="ms0"><?php _e( 'Site owners may only post to their local calendar', 'my-calendar' ); ?></label>
@@ -819,9 +826,12 @@ function edit_my_calendar_config() {
 									<input type="radio" value="2" id="ms2" name="mc_multisite"<?php echo jd_option_selected( get_site_option( 'mc_multisite' ), 2 ); ?> /> <label for="ms2"><?php _e( 'Site owners may manage either calendar', 'my-calendar' ); ?></label>
 								</li>
 							</ul>
-							<p class="notice">
-								<strong>*</strong> <?php _e( 'Changes only effect input permissions. Public-facing calendars will be unchanged.', 'my-calendar' ); ?>
+							<p>
+								<em><?php _e( 'Changes only effect input permissions. Public-facing calendars will be unchanged.', 'my-calendar' ); ?></em>
 							</p>
+						</fieldset>
+						<fieldset>
+							<legend><?php _e( 'Multisite configuration - output', 'my-calendar' ); ?></legend>							
 							<ul>
 								<li><input type="radio" value="0" id="mss0"
 								           name="mc_multisite_show"<?php echo jd_option_selected( get_site_option( 'mc_multisite_show' ), '0' ); ?> />
@@ -922,8 +932,7 @@ function edit_my_calendar_config() {
 						</ul>
 					</fieldset>
 					<p>
-						<input type="submit" name="save" class="button-primary"
-						       value="<?php _e( 'Save Email Settings', 'my-calendar' ); ?>"/>
+						<input type="submit" name="save" class="button-primary" value="<?php _e( 'Save Email Settings', 'my-calendar' ); ?>"/>
 					</p>
 				</form>
 			</div>

@@ -8,8 +8,8 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: weaver theme, settings, save, subthemes
 Text Domain: show-posts
 Requires at least: 4.2
-Tested up to: 4.4
-Stable tag: 1.3.6
+Tested up to: 4.6
+Stable tag: 1.3.9
 
 == Description ==
 
@@ -30,7 +30,7 @@ Weaver Show Posts will normally display posts using its own basic display functi
 of your site by defining Custom CSS rules in the Custom CSS option.
 
 But Weaver Show Posts can go way beyond that. For many Themes, you can elect to use the native Theme Post formatting function.
-The posts displayed by Show Posts will match other posts displayed by your theme. If you are using the Aspen, Weaver Xtreme, or Weaver II
+The posts displayed by Show Posts will match other posts displayed by your theme. If you are using the Weaver Xtreme or Weaver II
 themes, there is even more integrated display of posts.
 
 = Show Posts in a Text Widget =
@@ -59,6 +59,16 @@ Please use the WordPress Plugins:Install page to install this plugin.
 
 
 == Changelog ==
+= 1.3.9 =
+* Fix: Version number problems
+
+= 1.3.8 =
+* Fix: was using Weaver Xtreme Plus library. Caused issue with customizer.
+
+= 1.3.7 =
+* Update: compatibility version for WP 4.6
+* New: Show Posts Widget - use with page builders!
+
 = 1.3.6 =
 * Fix: Show Posts Help document had missing information on posts_per_page
 * Fix: changed styling from .content-2-col to .atw-content-2-col
@@ -121,7 +131,7 @@ layout should now work for both standard and n-th child styling.
 * Added support for sliding pagers for [ show_sliders ] Posts sliders
 
 = 1.0.3 =
-* Fixed show='' (blank) to work with Weaver/Aspen correctly
+* Fixed show='' (blank) to work with Weaver correctly
 * Fixed wording on the "By Post Slug" option
 * Fixed "Enter/Submit" on "text" input
 

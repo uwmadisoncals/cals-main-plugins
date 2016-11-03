@@ -251,14 +251,15 @@ span.mc-notice {
     float: right
 }
 
-input[id=e_label], input[id=e_title], input[id=location_label], input[id=mc_twitter] {
+input[id=e_label], input[id=e_title], input[id=location_label], textarea[id=mc_twitter] {
     font-size: 1.4em;
-    padding: 5px;
-    width: 100%
+    padding: 9px;
+    width: 100%;
+	margin-bottom: .5em;
 }
 
 label[for=mc_twitter] {
-    background: url(../images/twitter.png) no-repeat;
+    background: url(../images/twitter.png) left 50% no-repeat;
     padding-left: 20px;
 }
 
@@ -353,10 +354,9 @@ strong.label {
 }
 
 .jd-my-calendar .ui-accordion-header, .mc-settings-page #mc-sortable li {
-    border: 1px solid #ccc;
-    border-radius: 2px;
-    background: rgba(0, 0, 0, .05);
-    padding: 1px 1em;
+    border: 1px solid #ddd;
+    background: rgba(0, 0, 0, .10);
+    padding: .5em 1em;
     margin: 1px 0;
 }
 
@@ -378,8 +378,27 @@ strong.label {
     cursor: move;
 }
 
+input[name="mc_uri"] {
+	width: 100%;
+	padding: 5px;
+	font-size: 1.4em;
+}
+
+#mc-generator .custom {
+	background: #f6f6f6;
+	padding: 1em;
+}
+
 .jd-my-calendar .ui-accordion-header-active {
-    background: #fff;
+    background: rgba(0, 0, 0, .05);
+}
+
+.jd-my-calendar .ui-accordion-header .dashicons:before {
+	content: "\f132";
+}
+
+.jd-my-calendar .ui-accordion-header-active .dashicons:before {
+	content: "\f460";
 }
 
 #mc-sortable .mc-calendar {
@@ -420,11 +439,17 @@ strong.label {
 }
 
 .mc_permissions {
-	padding: .5em;
+	float: left;
+	width: 33%;
+	margin-bottom: 1em;
 }
 
-.mc_permissions:nth-of-type(odd) {
-	background: rgba( 0,0,0, .05 );
+.jd-my-calendar .mc_permissions .checkboxes li {
+	display: block;
+}
+
+.mc_permissions fieldset {
+	padding: 1em;
 }
 
 .jd-my-calendar .checkboxes li {
@@ -432,10 +457,6 @@ strong.label {
     padding: 5px;
     background: rgba(0, 0, 0, .05);
     margin: 2px;
-}
-
-.jd-my-calendar .mc_permissions:nth-of-type(odd) .checkboxes li {
-	background: transparent;
 }
 
 .jd-my-calendar .checkboxes li:hover {
@@ -545,6 +566,49 @@ strong.label {
     float: right;
 }
 
+.mc_add_new {
+	position: relative;
+	z-index: 200;
+	padding: 1em;
+	background: #fff;
+	box-shadow: 0 0 3px #777;
+}
+
+.mc_add_new .clonedInput {
+	border-bottom: none;
+	margin-bottom: 0;
+}
+
+.mc-twitter {
+	padding: .5em 1em;
+	background: #213e7f;
+	color: #fff;
+	font-size: 1.1em;
+}
+
+.add-occurrence .dashicons:before {
+	content: "\f132";
+}
+
+.jd-my-calendar .postbox .hndle {
+	cursor: auto;
+}
+
+.save-occurrence {
+	position: absolute;
+	right: 1em;
+	bottom: 1em;
+}
+
+.add-occurrence[aria-expanded^="true"] .dashicons:before {
+	content: "\f460";
+}
+
+.template-description {
+	font-weight: 700;
+	font-size: 1.1em;
+}
+
 .postbox.sell {
 	background: #fff;
 	color: #000;
@@ -604,11 +668,17 @@ tr.problem .error {
 }
 
 .mc-support-me p, .mc-support-me a {
-    color: #fff;
+    color: #f3f3f3;
+}
+
+.wrap ul.list {
+	list-style-type: disc;
+	margin-left: 1.5em;
 }
 
 .mc-support-me a:hover, .mc-support-me a:focus {
-    text-decoration: none;
+    text-decoration: none !important;
+	color: #fff !important;
 }
 
 .jd-my-calendar .mc-none {
@@ -625,6 +695,10 @@ tr.problem .error {
     .jd-my-calendar .tablenav {
         float: none;
     }
+	
+	.mc_permissions {
+		width: 50%;
+	}
 
     .jcd-narrow {
         width: 100%;

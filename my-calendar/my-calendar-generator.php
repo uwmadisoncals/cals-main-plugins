@@ -81,10 +81,10 @@ function mc_generator( $type ) {
 			</p>
 			<?php
 			// Grab users and list them
-			$users   = my_calendar_getUsers();
+			$users   = mc_get_users();
 			$options = '';
 			foreach ( $users as $u ) {
-				$options = '<option value="' . $u->ID . '">' . esc_html( $u->display_name ) . "</option>\n";
+				$options .= '<option value="' . $u->ID . '">' . esc_html( $u->display_name ) . "</option>\n";
 			} ?>
 			<p>
 				<label for="author"><?php _e( 'Limit by Author', 'my-calendar' ); ?></label>
@@ -130,7 +130,7 @@ function mc_generator( $type ) {
 						<?php
 						global $wpdb;
 						$mcdb = $wpdb;
-						$query  = "SELECT event_begin FROM " . MY_CALENDAR_TABLE . " WHERE event_approved = 1 AND event_flagged <> 1 ORDER BY event_begin ASC LIMIT 0 , 1";
+						$query  = "SELECT event_begin FROM " . my_calendar_table() . " WHERE event_approved = 1 AND event_flagged <> 1 ORDER BY event_begin ASC LIMIT 0 , 1";
 						$year1  = date( 'Y', strtotime( $mcdb->get_var( $query ) ) );
 						$diff1  = date( 'Y' ) - $year1;
 						$past   = $diff1;
@@ -184,7 +184,7 @@ function mc_generator( $type ) {
 					</select>
 				</p>				
 				<p id='navigation-info'>
-					<?php _e( "For navigational fields above and below the calendar: the defaults specified in your settings will be used if the attribute is left blank. Use <code>none</code> to hide all navigation elements.", 'my-calendar' ); ?>
+					<?php printf( __( "Navigation above and below the calendar: your <a href='%s'>settings</a> if this is left blank. Use <code>none</code> to hide all navigation.", 'my-calendar' ), admin_url( 'admin.php?page=my-calendar-config#mc-output' ) ); ?>
 				</p>
 				<p>
 					<label for="above" id='labove'><?php _e( 'Navigation above calendar', 'my-calendar' ); ?></label>
@@ -228,13 +228,16 @@ function mc_generator( $type ) {
 					<input type="number" name="skip" id="skip" value="" />
 				</p>
 				<p>
-					<label for="show_today"><?php _e( 'Fallback', 'my-calendar' ); ?></label>
+					<label for="show_today"><?php _e( "Show Today's Events", 'my-calendar' ); ?></label>
 					<input type="checkbox" name="show_today" id="show_today" value="yes"/>
 				</p>
 				<p>
 					<label for="type"><?php _e( 'Type of Upcoming Events List', 'my-calendar' ); ?></label>
 					<select name="type" id="type">
 						<option value="event" selected="selected"><?php _e( 'Events', 'my-calendar' ); ?></option>
+						<option value="year"><?php _e( 'Current Year', 'my-calendar' ); ?></option>
+						<option value="days"><?php _e( 'Days', 'my-calendar' ); ?></option>
+						<option value="custom"><?php _e( 'Custom Dates', 'my-calendar' ); ?></option>
 						<option value="month"><?php _e( 'Current Month', 'my-calendar' ); ?></option>
 						<option value="month+1"><?php _e( 'Next Month', 'my-calendar' ); ?></option>
 						<option value="month+2"><?php _e( '2nd Month Out', 'my-calendar' ); ?></option>
@@ -247,11 +250,17 @@ function mc_generator( $type ) {
 						<option value="month+9"><?php _e( '9th Month Out', 'my-calendar' ); ?></option>
 						<option value="month+10"><?php _e( '10th Month Out', 'my-calendar' ); ?></option>
 						<option value="month+11"><?php _e( '11th Month Out', 'my-calendar' ); ?></option>
-						<option value="month+12"><?php _e( '12th Month Out', 'my-calendar' ); ?></option>						
-						<option value="year"><?php _e( 'Current Year', 'my-calendar' ); ?></option>
-						<option value="days"><?php _e( 'Days', 'my-calendar' ); ?></option>
+						<option value="month+12"><?php _e( '12th Month Out', 'my-calendar' ); ?></option>
 					</select>
 				</p>
+				<div class='custom'>
+					<p>
+						<label for='from'><?php _e( 'Starting Date', 'my-calendar' ); ?></label> <input type='text' name='from' id='from' />
+					</p>
+					<p>
+						<label for='to'><?php _e( 'End Date', 'my-calendar' ); ?></label> <input type='text' name='to' id='to' />
+					</p>
+				</div>
 				<p>
 					<label for="order"><?php _e( 'Event Order', 'my-calendar' ); ?></label>
 					<select name="order" id="order">
