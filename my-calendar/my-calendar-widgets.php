@@ -559,10 +559,17 @@ function my_calendar_upcoming_events( $before = 'default', $after = 'default', $
 			if ( $i < $skip && $skip != 0 ) {
 				$i ++;
 			} else {
+				$today    = date( 'Y-m-d H:i', current_time( 'timestamp' ) );
+				$date     = date( 'Y-m-d H:i', strtotime( $details['ts_occur_begin'] ) );
+				$class    = ( my_calendar_date_comp( $date, $today ) === true ) ? "past-event" : "future-event";
+				$category = 'mc_' . sanitize_title( $details['category_name'] );
+				
+				$prepend = apply_filters( 'mc_event_upcoming_before', '<li>', $class, $category );
+				$append  = apply_filters( 'mc_event_upcoming_after', '</li>', $class, $category );				
 				// if same group, and same date, use it.
 				if ( ( $details['group'] !== $last_id || $details['date'] == $last_date ) || $details['group'] == '0' ) {
 					if ( ! in_array( $details['dateid'], $skips ) ) {
-						$output .= ( $item == $last_item ) ? '' : "<li>$item</li>";
+						$output .= ( $item == $last_item ) ? '' : $prepend . $item . $append;
 					}
 				}
 			}
@@ -776,11 +783,14 @@ function mc_produce_upcoming_events( $events, $template, $type = 'list', $order 
 					$class = "multiday";
 				}
 				if ( $type == 'list' ) {
-					$prepend = apply_filters( 'mc_event_upcoming_before', "\n<li class=\"$class $category\">", $class, $category );
-					$append  = apply_filters( 'mc_event_upcoming_after', "</li>\n" );
+					$prepend = "\n<li class=\"$class $category\">";
+					$append  = "</li>\n";
 				} else {
 					$prepend = $append = '';
 				}
+				$prepend = apply_filters( 'mc_event_upcoming_before', $prepend, $class, $category );
+				$append  = apply_filters( 'mc_event_upcoming_after', $append, $class, $category );
+				
 				if ( $i < $skip && $skip != 0 ) {
 					$i ++;
 				} else {

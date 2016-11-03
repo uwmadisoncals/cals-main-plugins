@@ -48,11 +48,13 @@ function mc_allowed_tags( $tags, $context ) {
 			'itemprop' => true,
 			'itemscope' => true,
 			'itemtype' => true,
+			'class' => true,
 		);
 		$tags['button'] = array(
 			'name' => true,
 			'type' => true,
 			'disabled' => true,
+			'class' => true,
 		);
 		$tags['form'] = array( 
 			'action' => true,

@@ -4,7 +4,7 @@ Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
 Tested up to: 4.6
-Stable tag: 2.5.0
+Stable tag: 2.5.1
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -82,6 +82,12 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
    with shortcode options or widget configuration.
 
 == Changelog ==
+
+= 2.5.2 =
+
+* Bug fix: Make sure that upcoming events element filters operate in all cases
+* Bug fix: Permit {register} template tag to pass additional attributes
+* Bug fix: Add class to permitted attributes on span tag
 
 = 2.5.1 =
 
@@ -769,4 +775,4 @@ The search feature in My Calendar is pretty basic; but buying My Calendar Pro gi
 
 == Upgrade Notice ==
 
-* 2.4.19: CRITICAL SECURITY UPDATE. UPDATE IMMEDIATELY. 
+* 2.5.0 Major update! New features, many bug fixes and improvements.

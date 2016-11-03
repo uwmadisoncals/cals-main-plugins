@@ -9,7 +9,7 @@ function jd_draw_template( $array, $template, $type = 'list' ) {
 	foreach ( $array as $key => $value ) {
 		// disallow anything not allowed in posts
 		// fields where mc_kses_posts shouldn't run
-		$retain = array( 'map', 'map_url', 'sitelink', 'icon', 'link', 'details_link', 'linking', 'gcal', 'ical_link', 'edit_link' );
+		$retain = array( 'map', 'map_url', 'sitelink', 'icon', 'link', 'details_link', 'linking', 'gcal', 'ical_link', 'edit_link', 'register' );
 		$value = !( in_array( $key, $retain ) ) ? mc_kses_post( $value ) : $value;
 	
 		if ( is_object( $value ) && ! empty( $value ) ) {
