@@ -378,7 +378,7 @@ function shibboleth_get_user_role() {
 
 		if ( empty($role_header) || empty($role_value) ) continue;
 
-		$values = split(';', $_SERVER[$role_header]);
+		$values = explode(';', $_SERVER[$role_header]); # changed from split to explore for php7 compatibility
 		if ( in_array($role_value, $values) ) {
 			$user_role = $key;
 			break;
