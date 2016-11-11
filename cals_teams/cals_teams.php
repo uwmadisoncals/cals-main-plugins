@@ -155,9 +155,11 @@ Class CTFields{
 
   public function arrayToObject($fields){
 
-    foreach( $fields as $key=>$value){//CTFields depth: 1 (outer)
+    foreach( $fields as $key=>$value){//CTFields depth: 1 (outer) 
 
-      $this->$value['id'] = (object)$value;//property name is 'id'; cast array value to object
+      $val_id = $value['id'];
+
+      $this->{$val_id} = (object)$value;//property name is 'id'; cast array value to object
 
       if(is_array($value)){
 
@@ -166,7 +168,7 @@ Class CTFields{
 
           if(is_array($v)){
 
-            $this->$value['id']->$k = (object)$v ;//property name is $k, cast $v to object
+            $this->{$val_id}->$k = (object)$v ;//property name is $k, cast $v to object
 
           }
 
@@ -175,7 +177,7 @@ Class CTFields{
             foreach( $v as $_k => $_v ){//CTFields depth:3
 
               if(is_array($_v)){
-                $this->$value['id']->$k->$_k = (object)$_v ;//cast $_v to object
+                $this->{$val_id}->$k->$_k = (object)$_v ;//cast $_v to object
 
               }
             }

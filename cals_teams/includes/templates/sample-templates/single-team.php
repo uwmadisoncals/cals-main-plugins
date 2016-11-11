@@ -10,44 +10,49 @@ get_header(); ?>
 
 		<?php
 
-		$args = array('post_type'=>'team');
-		$cals_teams_query = new WP_Query($args);
+		include( WP_PLUGIN_DIR . '/cals_teams/includes/data/cals_teams_fields.php' ); //include Metabox and Metabox field group data
+
+		
+		$mbox_fields = $mbox['fields'];//Meta data for field groups
+		//logit($mbox_fields,'$mbox_fields');
+		//logit($mbox,'$mbox: ');
+
+
+		$args = array('post_type'=>'team');//WP Query Args
+
+		$cals_teams_query = new WP_Query($args);//Instantiate New WP Query Object
+		//logit($cals_teams_query,'$cals_teams_query');
+		//logit($cals_teams_query->post->ID,'$cals_teams_query id: ');
+
 		// Start the loop.
 		while ( have_posts() ) : the_post();
 
-		//Uncomment to debug template origin
-		//echo 'THIS IS TEMPLATE FROM THEME';
+		$plugin_template_obj = new Cals_Teams(); //Instantiate Cals_Teams object
+		//logit($plugin_template_obj,'$plugin_template_obj: ');
 
-		$myObj = new Cals_Teams;
+/*		$radio = $plugin_template_obj->meta_box->fields->calsteams_radio;
+		//logit($radio,'$radio: ');*/
 
-		//invoke the callback functions of the filter hook
-		$meta = apply_filters( 'theme_calsteams_get_post_meta', FALSE );
-		//$preg = preg_grep("^calsteams",$meta);
-		//logit($meta,'$meta: ');
-		//logit($preg,'$preg: ');
-		$mbox_fields = $mbox['fields'];
-		//logit($mbox_fields,'$mbox_fields');
+		$meta = $plugin_template_obj->calsteams_get_post_meta(); // Filter out unwanted elements from get_post_custom
 
-			/*
-			 * Include the post format-specific template for the content. If you want to
-			 * use this in a child theme, then include a file called called content-___.php
-			 * (where ___ is the post format) and that will be used instead.
-			 */
-			//get_template_part( 'content', get_post_format() );
-			//
-			//////////////////////////
+		//logit($meta,'$get_post_meta: ');
+		//$myctfields = new CTFields($mbox_fields);
+
+		//$myctmetabox = new CTMetaBox($mbox);
+
+		//logit($myctmetabox, '$myctmetabox: ');
+		//logit($myctfields, '$myctfields: ');
+
+		//$prfx = $myctmetabox->fields->calsteams_name_prefix->name;
+		//logit($prfx,'$prfx');
+
+
+		//logit($cals_teams_query, '$cals_teams_query');
+
+			//////////////////////// INNER CONTENT ////////////////////////////////
 			?>
-
+			
 			<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-			<?php
-				// Post thumbnail.
-
-				if(has_post_thumbnail()){
-					echo '<div class="image-wrapper" style="padding-top:10px;">';
-					the_post_thumbnail('full',array('class'=>'aligncenter'));
-					echo '</div>';
-				}
-			?>
 
 			<header class="entry-header">
 				<?php
@@ -61,32 +66,94 @@ get_header(); ?>
 
 			<div class="entry-content">
 				<?php
+					echo '<div class="upper-container">';
 
-				foreach ($mbox_fields as $key => $value) {
-					$id = $value['id'];
-					if(array_key_exists($id,$meta)){
-						if($meta[$id][0]){
+					if(has_post_thumbnail()){
+					echo '<div class="image-wrapper";">';
+					the_post_thumbnail('full',array('class'=>'aligncenter'));
+					echo '</div>';
+				}else{
 
-						echo '<div class="team-item" style="margin-bottom:20px;"><span class="team-item-label" style="font-weight:bold;">';
-						echo $value['name'] . ': ';
-						echo '</span>';
+					echo '<div class="image-wrapper";">';
+					the_post_thumbnail('full',array('class'=>'aligncenter')); ?>
 
-						echo '<span class="team-item-value">';
-						
-						echo $meta[$id][0];
-						
-						echo '</span></div>';
-
-						}
-					}
+					<img class="member-thumbnail" alt="person placeholder image" src="<?php echo plugins_url() . '/cals_teams/includes/images/calsteams_placeholder.png'  ?>" width="150" height="150" />
+					
+					<?php
+					echo '</div>';
 				}
 
 
+					echo '<div class="short-vals-container">';
+
+					foreach($plugin_template_obj->data as $_key_ => $_value_){
+
+							if(!empty($_value_)){
+
+								$id = $_key_ ;
+								$the_fields = $plugin_template_obj->meta_box->fields;
+
+								if( property_exists($plugin_template_obj->meta_box->fields, $id) ){
+
+										if( $the_fields->$id->type == 'text' || $the_fields->$id->type == 'select' ){
+
+										echo '<div class="team-item" style="margin-bottom:20px;"><span class="team-item-label" style="font-weight:bold;">';
+
+										echo $plugin_template_obj->meta_box->fields->$id->name . ': ';
+
+										echo '</span>';
+
+										echo '<span class="team-item-value">';
+
+										echo $_value_;
+
+										echo '</span></div>';
+
+									}
+									
+								}
+							}
+					}
+					echo '</div></div>';
+
+					foreach($plugin_template_obj->data as $_key_ => $_value_){
+
+							if(!empty($_value_)){
+
+								$id = $_key_ ;
+								$the_fields = $plugin_template_obj->meta_box->fields;
+
+								if( property_exists($plugin_template_obj->meta_box->fields, $id) ){
+
+										if( !($the_fields->$id->type == 'text' || $the_fields->$id->type == 'select')  ){
+
+										echo '<div class="team-item" style="margin-bottom:20px;"><span class="team-item-label" style="font-weight:bold;">';
+
+										echo $plugin_template_obj->meta_box->fields->$id->name . ': ';
+
+										echo '</span>';
+
+										echo '<span class="team-item-value">';
+
+										echo $_value_;
+
+										echo '</span></div>';
+
+									}
+									
+								}
+							}
+					}
+
+
+
+
+
 					/* translators: %s: Name of current post */
-					the_content( sprintf(
+/*					the_content( sprintf(
 						__( 'Continue reading %s', 'twentyfifteen' ),
 						the_title( '<span class="screen-reader-text">', '</span>', false )
-					) );
+					) );*/
 
 					wp_link_pages( array(
 						'before'      => '<div class="page-links"><span class="page-links-title">' . __( 'Pages:', 'twentyfifteen' ) . '</span>',
@@ -106,24 +173,22 @@ get_header(); ?>
 				endif;
 			?>
 
-			<footer class="entry-footer">
-				<?php if(function_exists('twentyfifteen_entry_meta')){
-				twentyfifteen_entry_meta();
-				} ?>
+			<div class="entry-footer">
+
 				<?php edit_post_link( __( 'Edit', 'twentyfifteen' ), '<span class="edit-link">', '</span>' ); ?>
-			</footer><!-- .entry-footer -->
+			</div><!-- .entry-footer -->
 
 		</article><!-- #post-## -->
 		<?php 
 			
+			/////////////////////////// END INNER CONTENT /////////////////////////////////
 
-			////////////////////////////
 			// If comments are open or we have at least one comment, load up the comment template.
 			if ( comments_open() || get_comments_number() ) :
 				comments_template();
 			endif;
 
-			// Previous/next post navigation.
+/*			// Previous/next post navigation.
 			the_post_navigation( array(
 				'next_text' => '<span class="meta-nav" aria-hidden="true">' . __( 'Next', 'twentyfifteen' ) . '</span> ' .
 					'<span class="screen-reader-text">' . __( 'Next post:', 'twentyfifteen' ) . '</span> ' .
@@ -131,7 +196,7 @@ get_header(); ?>
 				'prev_text' => '<span class="meta-nav" aria-hidden="true">' . __( 'Previous', 'twentyfifteen' ) . '</span> ' .
 					'<span class="screen-reader-text">' . __( 'Previous post:', 'twentyfifteen' ) . '</span> ' .
 					'<span class="post-title">%title</span>',
-			) );
+			) );*/
 
 		// End the loop.
 		endwhile;
