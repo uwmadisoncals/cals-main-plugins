@@ -2,7 +2,7 @@
 /*
    Plugin Name: cals_teams
    Plugin URI: http://wordpress.org/extend/plugins/cals_teams/
-   Version: 0.1
+   Version: 1.0
    Author: Daniel Dropik & Al Nemec
    Description: calsmain
    Text Domain: cals_teams
