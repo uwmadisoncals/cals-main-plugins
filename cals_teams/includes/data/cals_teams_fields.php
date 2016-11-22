@@ -10,14 +10,6 @@ $prefix = 'calsteams_';
 
 ///////////// TEXT Fields //////////////////////////////
 
-$field_office_location = array(
-  'name'=>'Office Location',
-  'desc'=>'',
-  'id'=>$prefix . 'office_location', //corresponds to input field name & id
-  'type'=>'text',
-  'std'=>'',//default value
-  );
-
 $field_first_name = array(
   'name'=>'First Name',
   'desc'=>'',
@@ -105,6 +97,13 @@ $field_checkbox = array(
 
 ///////////// WYSIWYG Fields //////////////////////////////
 
+$field_office_location = array(
+  'name'=>'Office Location',
+  'desc'=>'',
+  'id'=>'calsteamswysiwygol', //corresponds to input field name & id
+  'type'=>'wysiwyg',
+  'std'=>'',//default value
+  );
 
 $field_wsyiwyg_description = array(
   'name'=>'Description',

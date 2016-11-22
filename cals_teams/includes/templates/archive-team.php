@@ -19,6 +19,8 @@
 
 get_header(); ?>
 
+
+<div class="site-content-inner">
 	<section id="primary" class="content-area">
 		<main id="main" class="site-main cals_teams archive_team" role="main">
 		<?php
@@ -182,5 +184,6 @@ get_header(); ?>
 
 		</main><!-- .site-main -->
 	</section><!-- .content-area -->
+	</div><!-- .site-content-inner -->
 
 <?php get_footer(); ?>

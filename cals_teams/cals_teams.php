@@ -315,7 +315,7 @@ function calsteams_buildform_cb($post){
                     break;
 
                   case 'wysiwyg':
-                    $args = array('textarea_rows'=>1);
+                    $args = array('textarea_rows'=>1, 'wpautop'=>'false');
                     wp_editor(($meta ? $meta : $field['std']),$field['id'],$args);
                     echo $field['desc'];
                     break;
