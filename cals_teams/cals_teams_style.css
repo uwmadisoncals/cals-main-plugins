@@ -205,8 +205,10 @@ body.single-team article.team .upper-container{
   justify-content: space-between;
 }
 
-body.single-team article.team div.entry-content .team-item .team-item-value{
-  white-space:pre-wrap;
+/* wysiwg value styles */
+body.single-team article.team div.entry-content .team-item.wysiwyg > div.team-item-value{
+white-space:pre-wrap;
+line-height: .7; 
 }
 
 /*  */

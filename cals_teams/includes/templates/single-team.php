@@ -94,7 +94,7 @@
 
 										if( $the_fields->$id->type == 'text' || $the_fields->$id->type == 'select' ){
 
-										echo '<div class="team-item" style="margin-bottom:20px;"><span class="team-item-label" style="font-weight:bold;">';
+										echo '<div class="team-item ' . $the_fields->$id->type . '" style="margin-bottom:20px;"><span class="team-item-label" style="font-weight:bold;">';
 
 										echo $plugin_template_obj->meta_box->fields->$id->name . ': ';
 
@@ -124,17 +124,17 @@
 
 										if( !($the_fields->$id->type == 'text' || $the_fields->$id->type == 'select')  ){
 
-										echo '<div class="team-item" style="margin-bottom:20px;"><span class="team-item-label" style="font-weight:bold;">';
+										echo '<div class="team-item ' . $the_fields->$id->type . '" style="margin-bottom:20px;"><span class="team-item-label" style="font-weight:bold;">';
 
 										echo $plugin_template_obj->meta_box->fields->$id->name . ': ';
 
 										echo '</span>';
 
-										echo '<span class="team-item-value">';
+										echo '<div class="team-item-value">';
 
 										echo $_value_;
 
-										echo '</span></div>';
+										echo '</div></div>';
 
 									}
 									
