@@ -189,6 +189,7 @@ body.single-team article.team .image-wrapper{
 
 body.single-team article.team .image-wrapper img{
 margin:0;
+max-width:400px;
 }
 
 
@@ -208,7 +209,7 @@ body.single-team article.team .upper-container{
 /* wysiwg value styles */
 body.single-team article.team div.entry-content .team-item.wysiwyg > div.team-item-value{
 white-space:pre-wrap;
-line-height: .7; 
+line-height: 1.4; 
 }
 
 /*  */
