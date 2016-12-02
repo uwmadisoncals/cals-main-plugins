@@ -2,8 +2,8 @@
 Contributors: webbistro
 Tags: media library, media category, media categories, media gallery, gallery shortcode, media tag, media tags, media taxonomy, media taxonomies, media uploader, mime type, mime, mime types, file types, media types, media filter, attachment, gallery, image, images, media, ux, user experience, wp-admin, admin, taxonomy, taxonomies
 Requires at least: 4.5
-Tested up to: 4.6
-Stable tag: 2.3.1
+Tested up to: 4.6.1
+Stable tag: 2.3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,7 +73,7 @@ You can see available translations and their progress here: https://translate.wo
 Assistance with translating is highly appreciated! If you'd like to be a translation editor of the PRO version please contact us on [wpuxsolutions.com](https://www.wpuxsolutions.com/support/create-new-ticket/)
 
 
-= Compatibility with Other Plugins =
+= Compatible with the Plugins: =
 
 * Advanced Custom Fields
 * WooCommerce
@@ -85,6 +85,8 @@ Assistance with translating is highly appreciated! If you'd like to be a transla
 * Jetpack Tiled Galleries
 * Simple Lightbox
 * Responsive Lightbox by dFactory
+* Justified Gallery
+* Compress JPEG & PNG Images (TinyPNG)
 
 
 Please let us know if you find any issue with the plugins from the list above or others.
@@ -161,6 +163,51 @@ Please notice that you use the Enhanced Media Library with other plugins that ad
 
 == Changelog ==
 
+= 2.3.5 =
+*Release Date - November 29, 2016*
+
+= Improvements =
+* Better grid mode layout, including small mobile screens (PRO only)
+
+= Compatibility =
+* Compatibility with 'Compress JPEG & PNG images' ensured
+
+= Bugfixes =
+* Few minor bugs fixed
+
+
+&nbsp;
+= 2.3.4 =
+*Release Date - November 19, 2016*
+
+= Bugfixes =
+* A bug of v2.3.2 and v2.3.3 with incorrect media filtering fixed
+
+
+&nbsp;
+= 2.3.3 =
+*Release Date - November 13, 2016*
+
+= Bugfixes =
+* A bug of v2.3.2 causing issues to some third-party plugins and Customizer fixed
+
+
+&nbsp;
+= 2.3.2 =
+*Release Date - November 11, 2016*
+
+= Improvements =
+* Tag names are being used instead of slugs for non-hierarchical taxonomies to assign to media items
+
+= Bugfixes =
+* The bug preventing taxonomy filters to switch correctly on upload fixed
+* A few minor bugs fixed
+
+= Compatibility =
+* Compatibility with the Jetpack Slideshow added
+
+
+&nbsp;
 = 2.3.1 =
 *Release Date - August 9, 2016*
 
@@ -177,7 +224,7 @@ Please notice that you use the Enhanced Media Library with other plugins that ad
 *Release Date - June 27, 2016*
 
 = Improvements =
-* All bulk operations are now dramatically (!) faster: save order, bulk assign terms (PRO only), bulk trash / restore / delete (PRO only). It actually takes seconds now to assign hundreds of media items in bulk.
+* All bulk operations are now dramatically (!) faster: save order, bulk assign terms (PRO only), bulk trash / restore / delete (PRO only). It actually takes seconds now to assign hundreds of media items in bulk
 * Bulk Trash / Restore added (PRO only)
 * "Show Count" option added to Media Taxonomies tab
 * Term count is now being calculated correctly and separately for different post types when they share a taxonomy with media library

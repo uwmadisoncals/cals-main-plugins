@@ -1,3 +1,17 @@
+Common 2.2.5 (November 5, 2016)
+  - Thorough check for security vulnerabilities.
+
+Common 2.2.4 (November 2, 2016)
+  - Fixed a problem with some assets management by definind better rules on constant definitions.
+
+-------------------------------------------------------------------------------------------------------------------
+
+Common 2.2.3 (October 10, 2016)
+  - Fixed select2 edge cases when methods are called on non-select2 initialised element
+  - Refined special handling of old inputs by making sure target is only a select and not the hidden relative element
+
+-------------------------------------------------------------------------------------------------------------------
+
 Common 2.2.2 (September 26, 2016)
   - Updated the bundled select2 script to version 4.0.3
   - Fixed a problem with some assets URLs lacking a backslash

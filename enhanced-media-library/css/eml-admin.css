@@ -138,14 +138,12 @@ body.eml-media-css .media-sidebar ul.eml-filter-based {
 
 
 
-
 /* == Filters == */
 
 body.eml-media-css .attachments-browser .media-toolbar-secondary select.attachment-filters {
     margin-right: 4px;
+    width: auto;
 }
-
-
 
 
 
@@ -155,7 +153,6 @@ body.eml-media-css .attachments-browser .media-toolbar-secondary select.attachme
 body.eml-media-css .media-modal.acf-expanded .attachments-browser .media-toolbar {
     margin-right: 700px;
 }
-
 
 
 
@@ -335,6 +332,7 @@ body.rtl .wpuxss-eml-non-media-taxonomy-list .wpuxss-eml-taxonomy-edit label {
     font-size: 23px;
     font-weight: 400;
 }
+
 
 
 

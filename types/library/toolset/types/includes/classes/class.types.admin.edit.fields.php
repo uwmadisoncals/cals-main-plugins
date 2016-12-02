@@ -599,7 +599,7 @@ abstract class Types_Admin_Edit_Fields extends Types_Admin_Page
                     'data-wpcf-nonce' => wp_create_nonce('wpcf-edit-'.$this->ct['id']),
 	                // This can be wpcf-postmeta, wpcf-usermeta or wpcf-termmeta.
                     'data-wpcf-type' => $this->type,
-	                'data-wpcf-page' => wpcf_getget( 'page' )
+	                'data-wpcf-page' => esc_attr( wpcf_getget( 'page' ) )
                 ),
                 '_builtin' => true,
                 '#name' => 'fields-button-add',

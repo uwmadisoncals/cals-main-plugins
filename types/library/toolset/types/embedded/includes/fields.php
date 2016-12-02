@@ -253,6 +253,64 @@ function wpcf_admin_fields_get_fields( $only_active = false,
     return $cache[$cache_key];
 }
 
+
+add_filter( 'types_fields', 'wpcf_add_mandatory_validation_rules' );
+
+
+/**
+ * Modify field definitions when they are being loaded from the database.
+ *
+ * Hooked into types_fields. Not to be used elsewhere.
+ *
+ * Add mandatory validation rules that have not been stored in the database but are needed by Types and toolset-forms
+ * to work properly. Namely it's the URL validation for file fields. CRED handles these fields in its own way (front-end
+ * file upload), so this is a Types-specific problem.
+ *
+ * @param array $field_definitions An associative array of field definition arrays with field slugs as keys.
+ * @return array
+ * @since 2.2.4
+ */
+function wpcf_add_mandatory_validation_rules( $field_definitions ) {
+
+	if( is_array( $field_definitions ) ) {
+		foreach( $field_definitions as $field_slug => $field_definition ) {
+
+			// Add URL validation to file fields (containing URLs).
+			//
+			// This doesn't include embed files because they are more variable and the URL validation can be
+			// configured on the Edit Field Group page.
+			$file_fields = array( 'file', 'image', 'audio', 'video' );
+
+			$field_type = toolset_getarr( $field_definition, 'type' );
+			$is_file_field = in_array( $field_type, $file_fields );
+			$validation_rules = wpcf_ensarr( wpcf_getnest( $field_definition, array( 'data', 'validate' ) ) );
+			$has_url_validation = array_key_exists( 'url', $validation_rules );
+
+			if( $is_file_field && ! $has_url_validation ) {
+
+				$default_validation_error_message = __( 'Please enter a valid URL address pointing to the file.', 'wpcf' );
+				$validation_error_messages = array(
+					'file' => $default_validation_error_message,
+					'audio' => __( 'Please enter a valid URL address pointing to the audio file.', 'wpcf' ),
+					'image' => __( 'Please enter a valid URL address pointing to the image file.', 'wpcf' ),
+					'video' => __( 'Please enter a valid URL address pointing to the video file.', 'wpcf' )
+				);
+
+				$validation_rules['url'] = array(
+					'active' => '1',
+					'message' => toolset_getarr( $validation_error_messages, $field_type, $default_validation_error_message )
+				);
+
+				$field_definitions[ $field_slug ]['data']['validate'] = $validation_rules;
+			}
+		}
+	}
+
+	return $field_definitions;
+}
+
+
+
 function wpcf_admin_fields_get_field_by_meta_key( $meta_key )
 {
     $fields = wpcf_admin_fields_get_fields();
@@ -940,7 +998,7 @@ function wpcf_get_all_field_slugs_except_current_group( $current_group = false )
         }
     }
     if( !$current_group && isset( $_REQUEST['group_id'] ) )
-        $current_group = $_REQUEST['group_id'];
+        $current_group = (int) $_REQUEST['group_id'];
 
     // if no new group
     if( $current_group && !empty( $all_fields ) ) {

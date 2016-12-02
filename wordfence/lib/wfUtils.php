@@ -570,6 +570,7 @@ class wfUtils {
 				if(strpos($item, $char) !== false){
 					$sp = explode($char, $item);
 					foreach($sp as $j){
+						$j = trim($j);
 						if (!self::isValidIP($j)) {
 							$j = preg_replace('/:\d+$/', '', $j); //Strip off port
 						}
@@ -629,6 +630,10 @@ class wfUtils {
 		}
 	}
 	public static function getIP(){
+		static $theIP = null;
+		if (isset($theIP)) {
+			return $theIP;
+		}
 		//For debugging. 
 		//return '54.232.205.132';
 		//return self::makeRandomIP();
@@ -637,6 +642,7 @@ class wfUtils {
 		$ip = self::getIPAndServerVarible();
 		if (is_array($ip)) {
 			list($IP, $variable) = $ip;
+			$theIP = $IP;
 			return $IP;
 		}
 		return false;
@@ -657,9 +663,15 @@ class wfUtils {
 				return self::getCleanIPAndServerVar($ipsToCheck);
 			}
 		} else {
-			$ipsToCheck = array(
-				$connectionIP,
-			);
+			$ipsToCheck = array();
+			
+			$recommendedField = wfConfig::get('detectProxyRecommendation', ''); //Prioritize the result from our proxy check if done
+			if (!empty($recommendedField) && $recommendedField != 'UNKNOWN') {
+				if (isset($_SERVER[$recommendedField])) {
+					$ipsToCheck[] = array($_SERVER[$recommendedField], $recommendedField);
+				}
+			}
+			$ipsToCheck[] = $connectionIP;
 			if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
 				$ipsToCheck[] = array($_SERVER['HTTP_X_FORWARDED_FOR'], 'HTTP_X_FORWARDED_FOR');
 			}
@@ -845,7 +857,7 @@ class wfUtils {
 	public static function getScanLock(){
 		//Windows does not support non-blocking flock, so we use time.
 		$scanRunning = wfConfig::get('wf_scanRunning');
-		if($scanRunning && time() - $scanRunning < WORDFENCE_MAX_SCAN_TIME){
+		if($scanRunning && time() - $scanRunning < WORDFENCE_MAX_SCAN_LOCK_TIME){
 			return false;
 		}
 		wfConfig::set('wf_scanRunning', time());
@@ -860,7 +872,7 @@ class wfUtils {
 	}
 	public static function isScanRunning(){
 		$scanRunning = wfConfig::get('wf_scanRunning');
-		if($scanRunning && time() - $scanRunning < WORDFENCE_MAX_SCAN_TIME){
+		if($scanRunning && time() - $scanRunning < WORDFENCE_MAX_SCAN_LOCK_TIME){
 			return true;
 		} else {
 			return false;
@@ -1093,7 +1105,8 @@ class wfUtils {
 		}
 	}
 	public static function doNotCache(){
-		header("Cache-Control: no-cache, must-revalidate");
+		header("Pragma: no-cache");
+		header("Cache-Control: no-cache, must-revalidate, private");
 		header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); //In the past
 		if(! defined('DONOTCACHEPAGE')){ define('DONOTCACHEPAGE', true); }
 		if(! defined('DONOTCACHEDB')){ define('DONOTCACHEDB', true); }
@@ -1333,6 +1346,162 @@ class wfUtils {
 		}
 		$keys[$index] = $newKey;
 		return array_combine($keys, array_values($array));
+	}
+	
+	/**
+	 * Takes a string that may have characters that will be interpreted as invalid UTF-8 byte sequences and translates them into a string of the equivalent hex sequence.
+	 * 
+	 * @param $string
+	 * @param bool $inline
+	 * @return string
+	 */
+	public static function potentialBinaryStringToHTML($string, $inline = false) {
+		$output = '';
+		
+		if (!defined('ENT_SUBSTITUTE')) {
+			define('ENT_SUBSTITUTE', 0);
+		}
+		
+		$span = '<span class="wf-hex-sequence">';
+		if ($inline) {
+			$span = '<span style="color:#587ECB">';
+		}
+		
+		for ($i = 0; $i < strlen($string); $i++) {
+			$c = $string[$i];
+			$b = ord($c);
+			if ($b < 0x20) {
+				$output .= $span . '\x' . str_pad(dechex($b), 2, '0', STR_PAD_LEFT) . '</span>';
+			}
+			else if ($b < 0x80) {
+				$output .= htmlspecialchars($c, ENT_QUOTES, 'UTF-8');
+			}
+			else { //Assume multi-byte UTF-8
+				$bytes = 0;
+				$test = $b;
+				
+				while (($test & 0x80) > 0) {
+					$bytes++;
+					$test = (($test << 1) & 0xff);
+				}
+				
+				$brokenUTF8 = ($i + $bytes > strlen($string) || $bytes == 1);
+				if (!$brokenUTF8) { //Make sure we have all the bytes
+					for ($n = 1; $n < $bytes; $n++) {
+						$c2 = $string[$i + $n];
+						$b2 = ord($c2);
+						if (($b2 & 0xc0) != 0x80) {
+							$brokenUTF8 = true;
+							$bytes = $n;
+							break;
+						}
+					}
+				}
+				
+				if ($brokenUTF8) {
+					$bytes = min($bytes, strlen($string) - $i);
+					for ($n = 0; $n < $bytes; $n++) {
+						$c2 = $string[$i + $n];
+						$b2 = ord($c2);
+						$output .= $span . '\x' . str_pad(dechex($b2), 2, '0', STR_PAD_LEFT) . '</span>';
+					}
+					$i += ($bytes - 1);
+				}
+				else {
+					$output .= htmlspecialchars(substr($string, $i, $bytes), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+					$i += ($bytes - 1);
+				}
+			}
+		}
+		return $output;
+	}
+	
+	public static function requestDetectProxyCallback($timeout = 0.01, $blocking = false) {
+		$nonce = bin2hex(wfWAFUtils::random_bytes(32));
+		$callback = self::getSiteBaseURL() . '?_wfsf=detectProxy';
+		
+		wfConfig::set('detectProxyNonce', $nonce, wfConfig::DONT_AUTOLOAD);
+		wfConfig::set('detectProxyRecommendation', '', wfConfig::DONT_AUTOLOAD);
+		
+		$payload = array(
+			'nonce' => $nonce,
+			'callback' => $callback,
+		);
+		
+		$siteurl = '';
+		if (function_exists('get_bloginfo')) {
+			if (is_multisite()) {
+				$siteurl = network_home_url();
+				$siteurl = rtrim($siteurl, '/'); //Because previously we used get_bloginfo and it returns http://example.com without a '/' char.
+			} else {
+				$siteurl = home_url();
+			}
+		}
+		
+		wp_remote_post(WFWAF_API_URL_SEC . "?" . http_build_query(array(
+				'action' => 'detect_proxy',
+				'k'      => wfConfig::get('apiKey'),
+				's'      => $siteurl,
+				't'		 => microtime(true),
+			), null, '&'),
+			array(
+				'body'    => json_encode($payload),
+				'headers' => array(
+					'Content-Type' => 'application/json',
+				),
+				'timeout' => $timeout,
+				'blocking' => $blocking,
+			));
+		
+		//Asynchronous so we don't care about a response at this point.
+	}
+	
+	/**
+	 * @return bool Returns false if the payload is invalid, true if it processed the callback (even if the IP wasn't found).
+	 */
+	public static function processDetectProxyCallback() {
+		$nonce = wfConfig::get('detectProxyNonce', '');
+		$testNonce = (isset($_POST['nonce']) ? $_POST['nonce'] : '');
+		if (empty($nonce) || empty($testNonce)) {
+			return false;
+		}
+		
+		if (!hash_equals($nonce, $testNonce)) {
+			return false;
+		}
+		
+		$ips = (isset($_POST['ips']) ? $_POST['ips'] : array());
+		if (empty($ips)) {
+			return false;
+		}
+		
+		$expandedIPs = array();
+		foreach ($ips as $ip) {
+			$expandedIPs[] = self::inet_pton($ip);
+		}
+		
+		$checks = array('HTTP_CF_CONNECTING_IP', 'HTTP_X_REAL_IP', 'REMOTE_ADDR', 'HTTP_X_FORWARDED_FOR');
+		foreach ($checks as $key) {
+			if (!isset($_SERVER[$key])) {
+				continue;
+			}
+			
+			$testIP = self::getCleanIPAndServerVar(array(array($_SERVER[$key], $key)));
+			if ($testIP === false) {
+				continue;
+			}
+			
+			$testIP = self::inet_pton($testIP[0]);
+			if (in_array($testIP, $expandedIPs)) {
+				wfConfig::set('detectProxyRecommendation', $key, wfConfig::DONT_AUTOLOAD);
+				wfConfig::set('detectProxyNonce', '', wfConfig::DONT_AUTOLOAD);
+				return true;
+			}
+		}
+		
+		wfConfig::set('detectProxyRecommendation', 'UNKNOWN', wfConfig::DONT_AUTOLOAD);
+		wfConfig::set('detectProxyNonce', '', wfConfig::DONT_AUTOLOAD);
+		return true;
 	}
 }
 

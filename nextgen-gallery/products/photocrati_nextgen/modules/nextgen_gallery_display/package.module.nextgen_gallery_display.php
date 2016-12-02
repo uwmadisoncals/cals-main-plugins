@@ -1523,7 +1523,7 @@ class Mixin_Displayed_Gallery_Renderer extends Mixin
         // Get the NextGEN settings to provide some defaults
         $settings = C_NextGen_Settings::get_instance();
         // Configure the arguments
-        $defaults = array('id' => NULL, 'source' => '', 'container_ids' => array(), 'gallery_ids' => array(), 'album_ids' => array(), 'tag_ids' => array(), 'display_type' => '', 'exclusions' => array(), 'order_by' => $settings->galSort, 'order_direction' => $settings->galSortOrder, 'image_ids' => array(), 'entity_ids' => array(), 'tagcloud' => FALSE, 'returns' => 'included', 'slug' => NULL);
+        $defaults = array('id' => NULL, 'source' => '', 'container_ids' => array(), 'gallery_ids' => array(), 'album_ids' => array(), 'tag_ids' => array(), 'display_type' => '', 'exclusions' => array(), 'order_by' => $settings->galSort, 'order_direction' => $settings->galSortOrder, 'image_ids' => array(), 'entity_ids' => array(), 'tagcloud' => FALSE, 'returns' => 'included', 'slug' => NULL, 'sortorder' => array());
         $args = shortcode_atts($defaults, $params);
         // Are we loading a specific displayed gallery that's persisted?
         $mapper = C_Displayed_Gallery_Mapper::get_instance();
@@ -1569,6 +1569,9 @@ class Mixin_Displayed_Gallery_Renderer extends Mixin
             }
             if (!is_array($args['entity_ids'])) {
                 $args['entity_ids'] = preg_split("/,|\\|/", $args['entity_ids']);
+            }
+            if (!is_array($args['sortorder'])) {
+                $args['sortorder'] = preg_split("/,|\\|/", $args['sortorder']);
             }
             // Get the display settings
             foreach (array_keys($defaults) as $key) {

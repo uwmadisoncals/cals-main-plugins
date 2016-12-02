@@ -11,7 +11,7 @@ ToolsetCommon.initSelect2Compatibility = function( $ ){
 	jQuery.fn.toolset_select2_original = jQuery.fn.toolset_select2;
 	//backwards compatible object
 	jQuery.fn.toolset_select2  = function(options, param){
-		if(typeof options == "string"){
+		if( typeof options == "string" ){
 			ToolsetCommon.toolset_select2ExecMethods(this, options, param)
 		}else if (typeof options == "object"){
 			if(jQuery(this)){
@@ -64,45 +64,61 @@ ToolsetCommon.toolset_select2ConvertInputToSelect = function(el, options){
 			jQuery(hiddenInput).insertAfter("."+dynamicClass);
 		}
 		//initialize toolset_select2
-		convertedEl = jQuery("."+dynamicClass).toolset_select2_original(options);
+		try{
+			convertedEl = jQuery("."+dynamicClass).toolset_select2_original(options);
+		}catch(err){
+			console.log(err.message);
+		}
 
 		//Add event listener on tags fields to update hidden inputs on change
 		if(options && options.hasOwnProperty("tags")){
-			jQuery(convertedEl).on("change", function(){
-				var actualValue = jQuery(convertedEl).val();
-
+			jQuery("."+dynamicClass).on("change", function(event){
+				var actualValue = jQuery(event.target).val();
 				if(actualValue && actualValue.length > 0 && hiddenInput){
 					jQuery("."+hiddenDynamicClass).attr("value", actualValue.join(","));
 				}
 			});
-			jQuery("."+dynamicClass).trigger("change");
 		}
 		return convertedEl;
 	}else{
-		var dynamicClass = ToolsetCommon.addSelect2RandomClassName(el);
-		return jQuery("."+dynamicClass).toolset_select2_original(options);
+		if(!jQuery(el).data("toolset_select2")){
+			var dynamicClass = ToolsetCommon.addSelect2RandomClassName(el);
+			var convertedEl = null;
+
+			try{
+				convertedEl = jQuery("."+dynamicClass).toolset_select2_original(options);
+			}catch(err){
+				console.log(err.message);
+			}
+
+			return convertedEl;
+		}else{
+			return el;
+		}
 	}
 };
 /*
  * @description checks if input needs to be converted to a select element.
  */
 ToolsetCommon.toolset_select2ConversionRequired = function(el, options){
-	if(options && options.hasOwnProperty("tags")){
-		jQuery(el).prop("multiple", "multiple");
-		options.multiple = true;
-		if(options.tags instanceof Array && options.tags.length > 0){
-			options.data = [];
-			options.tags.forEach(function(item){
-				options.data.push({
-					id: item,
-					text: item
+	if(!jQuery(el).hasClass("toolset_select2_converted")){
+		if(options && options.hasOwnProperty("tags")){
+			jQuery(el).prop("multiple", "multiple");
+			options.multiple = true;
+			if(options.tags instanceof Array && options.tags.length > 0){
+				options.data = [];
+				options.tags.forEach(function(item){
+					options.data.push({
+						id: item,
+						text: item
+					});
 				});
-			});
-			options.tags = true;
+				options.tags = true;
+			}
+			return true;
+		}else{
+			return (jQuery(el).prop("tagName") !== "SELECT");
 		}
-		return true;
-	}else{
-		return (jQuery(el).prop("tagName") !== "SELECT");
 	}
 };
 
@@ -113,27 +129,36 @@ ToolsetCommon.toolset_select2ConversionRequired = function(el, options){
 ToolsetCommon.toolset_select2ExecMethods = function(el, method, param){
 	if(jQuery(el).data("toolset_select2")){
 		var elm_id = jQuery(el).attr("id");
+		try{
+			switch(method){
+				case "val":
+					if(param !== undefined && param !== null){
+						jQuery(el).val(param).trigger("change");
+					}else{
+						return jQuery(el).val();
+					}
+					break;
+				case "enable":
+					jQuery(el).prop("disabled", !param);
+					break;
+				case "data":
+					jQuery(el).val(param.ID).trigger("change").trigger("toolset_select2:selecting");
+					break;
+				case "close":
+					if(jQuery(el).data("toolset_select2") != null && jQuery(el).data("toolset_select2") != undefined){
+						jQuery(el).toolset_select2_original("close");
+					}
+					break;
+				case "destory":
+					jQuery(el).removeClass("toolset_select2_converted");
+					jQuery(el).toolset_select2_original("destroy");
+					break;
+				default:
+					jQuery("#"+elm_id).toolset_select2_original(method, param);
+					break;
+			}
+		}catch(err){
 
-		switch(method){
-			case "val":
-				if(param !== undefined && param !== null){
-					jQuery(el).val(param).trigger("change");
-				}else{
-					return jQuery(el).val();
-				}
-			break;
-			case "enable":
-				jQuery(el).prop("disabled", !param);
-			break;
-			case "data":
-				jQuery(el).val(param.ID).trigger("change").trigger("toolset_select2:selecting");
-			break;
-			case "close":
-				jQuery(el).toolset_select2_original("close");
-				break;
-			default:
-				jQuery("#"+elm_id).toolset_select2_original(method, param);
-			break;
 		}
 	}
 };
@@ -144,6 +169,7 @@ ToolsetCommon.toolset_select2ExecMethods = function(el, method, param){
 ToolsetCommon.addSelect2RandomClassName = function(el) {
     var className = ("toolset_select2_prefix_" + (Math.round(Math.random() * (100000 - 99) + 99)).toString()); 
     jQuery(el).addClass(className);
+    jQuery(el).addClass("toolset_select2_converted");
     return className;
 };
 

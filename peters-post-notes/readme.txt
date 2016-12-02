@@ -3,7 +3,7 @@ Contributors: pkthree
 Donate link: http://www.theblog.ca
 Tags: post, notification, admin, collaboration, workflow, posts
 Requires at least: 3.2
-Tested up to: 4.4
+Tested up to: 4.7
 Stable tag: trunk
 
 Add notes to the "edit post" and "edit page" sidebars. Collaborators can also share notes on the WordPress dashboard.
@@ -51,6 +51,12 @@ Unzip the peters\_post\_notes folder to your WordPress plugins folder. It should
 Please visit the plugin page at http://www.theblog.ca/wordpress-post-notes with any questions.
 
 == Changelog ==
+
+= 1.6.3 =
+* 2016-11-19: Bug fixes: do not show private notes in "Latest notes" column; fix capability check when showing "Edit" links. (Thanks Alex!)
+
+= 1.6.2 =
+* 2016-11-06: Fix query bug for users with no associated posts. (Thanks Alex!) Also remove code warning when displaying an unlimited number of notes.
 
 = 1.6.1 =
 * 2016-02-13: Improve UX by wrapping checkboxes inside labels. (Thanks Hrohh!)

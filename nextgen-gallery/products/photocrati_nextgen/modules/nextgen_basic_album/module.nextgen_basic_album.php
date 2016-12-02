@@ -18,7 +18,7 @@ class M_NextGen_Basic_Album extends C_Base_Module
             'photocrati-nextgen_basic_album',
             'NextGEN Basic Album',
             "Provides support for NextGEN's Basic Album",
-            '0.16',
+            '0.17',
             'https://www.imagely.com/wordpress-gallery-plugin/nextgen-gallery/',
             'Photocrati Media',
             'https://www.imagely.com'

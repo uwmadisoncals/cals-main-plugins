@@ -3,7 +3,7 @@
   Plugin Name: Our Team Showcase
   Plugin URI: https://smartcatdesign.net/downloads/our-team-showcase/
   Description: Display your team members in a very attractive way as a widget or page with the shortcode [our-team]
-  Version: 2.41
+  Version: 3.0.0
   Author: SmartCat
   Author URI: https://smartcatdesign.net
   License: GPL v2
@@ -33,7 +33,7 @@ SmartcatTeamPlugin::instance();
 
 require_once SC_TEAM_PATH . 'admin/class/class-tgm-plugin-activation.php';
 
-add_action('tgmpa_register', 'sc_team_register_required_plugin');
+//add_action('tgmpa_register', 'sc_team_register_required_plugin');
 
 
 function sc_team_register_required_plugin() {

@@ -79,7 +79,7 @@ class A_NextGen_Basic_Gallery_Mapper extends Mixin
         $this->object->_set_default_value($entity, 'settings', 'thumbnail_width', $settings->thumbwidth);
         $this->object->_set_default_value($entity, 'settings', 'thumbnail_height', $settings->thumbheight);
         $this->object->_set_default_value($entity, 'settings', 'cycle_interval', $settings->irRotatetime);
-        $this->object->_set_default_value($entity, 'settings', 'cycle_effect', $settings->slideFx);
+        $this->object->_set_default_value($entity, 'settings', 'cycle_effect', $settings->slideFX);
         $this->object->_set_default_value($entity, 'settings', 'effect_code', $settings->thumbCode);
         $this->object->_set_default_value($entity, 'settings', 'show_thumbnail_link', $settings->galShowSlide ? 1 : 0);
         $this->object->_set_default_value($entity, 'settings', 'thumbnail_link_text', $settings->galTextGallery);
@@ -244,6 +244,11 @@ class A_NextGen_Basic_Slideshow_Controller extends Mixin
             $gallery_height = $displayed_gallery->display_settings['gallery_height'];
             $params['aspect_ratio'] = $gallery_width / $gallery_height;
             $params['placeholder'] = $this->object->get_static_url('photocrati-nextgen_basic_gallery#slideshow/placeholder.gif');
+            // There was a problem with the slideFX/cycle_effect parameter not getting set
+            // correctly in previous versions
+            if (!isset($params['display_settings']['cycle_effect']) or !$params['cycle_effect']) {
+                $params['cycle_effect'] = 'fade';
+            }
             // Are we to generate a thumbnail link?
             if ($displayed_gallery->display_settings['show_thumbnail_link']) {
                 $params['thumbnail_link'] = $this->object->get_url_for_alternate_display_type($displayed_gallery, NGG_BASIC_THUMBNAILS);

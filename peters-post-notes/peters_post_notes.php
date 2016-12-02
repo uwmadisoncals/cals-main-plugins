@@ -4,8 +4,10 @@ Plugin Name: Peter's Post Notes
 Plugin URI: http://www.theblog.ca/wordpress-post-notes
 Description: Add notes on the "edit post" and "edit page" screens' sidebars, as well as general notes on the dashboard, in WordPress 2.8 and up. When used with Peter's Collaboration E-mails 1.2 and up, the notes are sent along with the e-mails in the collaboration workflow.
 Author: Peter Keung
-Version: 1.6.1
+Version: 1.6.3
 Change Log:
+2016-11-19  1.6.3: Bug fixes: do not show private notes in "Latest notes" column; fix capability check when showing "Edit" links. (Thanks Alex!)
+2016-11-06  1.6.2: Fix query bug for users with no associated posts. (Thanks Alex!) Also remove code warning when displaying an unlimited number of notes.
 2016-02-13  1.6.1: Improve UX by wrapping checkboxes inside labels. (Thanks Hrohh!)
 2016-02-12  1.6.0: Support private notes on posts.
 2016-01-06  1.5.4: Make all strings translatable and put translation files in their own folder. (Thanks Luis González Jaime!)
@@ -53,7 +55,7 @@ global $ppn_version;
 // Name of the database table that will hold the post-specific notes
 $ppn_db_notes = $wpdb->prefix . 'collabnotes';
 $ppn_db_generalnotes = $wpdb->prefix . 'generalnotes';
-$ppn_version = '1.6.1';
+$ppn_version = '1.6.3';
 
 /* --------------------------------------------
 Helper functions
@@ -73,7 +75,7 @@ class ppnFunctionCollection
         if( !$is_super )
         {
             foreach( $super_caps as $super_cap ) {
-                if( in_array( $super_cap, $user->allcaps ) )
+                if( array_key_exists( $super_cap, $user->allcaps ) && $user->allcaps[$super_cap] )
                 {
                     $is_super = true;
                     break;
@@ -151,7 +153,7 @@ class ppnFunctionCollection
         switch( $name )
         {
             case 'ppn_notes':
-                $latest_note = $wpdb->get_row( 'SELECT noteid, notecontent, author, notetime FROM ' . $ppn_db_notes . ' WHERE postid = ' . $post->ID . ' ORDER BY notetime DESC LIMIT 1', OBJECT );
+                $latest_note = $wpdb->get_row( 'SELECT noteid, notecontent, author, notetime FROM ' . $ppn_db_notes . ' WHERE postid = ' . $post->ID . ' AND personal = 0 ORDER BY notetime DESC LIMIT 1', OBJECT );
                 if( $latest_note )
                 {
                     $author_name = ppnFunctionCollection::get_author_name( $latest_note->author );
@@ -555,8 +557,17 @@ function ppn_dashboard() {
         else {
             $ppn_num_notes = ' LIMIT ' . $ppn_num_notes_limit;
         }
-        
-        $ppn_newest_posts = $wpdb->get_results( 'SELECT postid, author, notetime, notecontent, personal FROM ' . $ppn_db_notes . $ppn_query_options . ' AND ( personal = 0 OR author = ' . $current_user->ID . ' ) ORDER BY notetime DESC' . $ppn_num_notes, OBJECT );
+        $ppn_newest_posts_query = 'SELECT postid, author, notetime, notecontent, personal FROM ' . $ppn_db_notes . $ppn_query_options;
+        if( $ppn_query_options )
+        {
+            $ppn_newest_posts_query .= ' AND ';
+        }
+        else
+        {
+            $ppn_newest_posts_query .= ' WHERE ';
+        }
+        $ppn_newest_posts_query .= '( personal = 0 OR author = ' . $current_user->ID . ' ) ORDER BY notetime DESC' . $ppn_num_notes;
+        $ppn_newest_posts = $wpdb->get_results( $ppn_newest_posts_query, OBJECT );
     }
 
     if( $ppn_newest_posts ) {
@@ -684,8 +695,8 @@ function ppn_dashboard_general_newest($ppn_page=0, $ppn_personal=0) {
 
     if( !$ppn_num_notes_limit ) {
         $ppn_num_notes = '';
+        $ppn_start_at = 0;
     }
-    
     else {
         $ppn_start_at = $ppn_page * $ppn_num_notes_limit;
         $ppn_num_notes = ' LIMIT ' . $ppn_start_at . ', ' . $ppn_num_notes_limit;
@@ -698,7 +709,14 @@ function ppn_dashboard_general_newest($ppn_page=0, $ppn_personal=0) {
     }
     
     // How many pages of content are there?
-    $ppn_total_pages = ceil($ppn_num_newest_posts / $ppn_num_notes_limit);
+    if( $ppn_num_notes_limit == 0 )
+    {
+        $ppn_total_pages = 1;
+    }
+    else
+    {
+        $ppn_total_pages = ceil( $ppn_num_newest_posts / $ppn_num_notes_limit );
+    }
 
     
     if( $ppn_num_newest_posts ) {

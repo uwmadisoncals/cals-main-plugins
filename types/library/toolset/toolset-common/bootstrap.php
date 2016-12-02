@@ -19,9 +19,10 @@
 * 	TOOLSET_COMMON_PATH					The path to the active Toolset Common directory
 * 	TOOLSET_COMMON_DIR					The name of the directory of the active Toolset Common
 * 	TOOLSET_COMMON_URL					The URL to the root of Toolset Common, to be used in backend - adjusted as per SSL settings
-* 	TOOLSET_COMMON_PROTOCOL				The protocol of TOOLSET_COMMON_URL - http | https
 * 	TOOLSET_COMMON_FRONTEND_URL			The URL to the root of Toolset Common, to be used in frontend - adjusted as per SSL settings
-* 	TOOLSET_COMMON_FRONTEND_PROTOCOL	The protocol of TOOLSET_COMMON_FRONTEND_URL - http | https
+*
+* 	TOOLSET_COMMON_PROTOCOL				Deprecated - To be removed - The protocol of TOOLSET_COMMON_URL - http | https
+* 	TOOLSET_COMMON_FRONTEND_PROTOCOL	Deprecated - To be removed - The protocol of TOOLSET_COMMON_FRONTEND_URL - http | https
 *
 * @todo create an admin page with Common info: path, bundled libraries versions, etc
 */

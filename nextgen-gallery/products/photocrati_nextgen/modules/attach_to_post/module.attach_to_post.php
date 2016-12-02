@@ -18,7 +18,7 @@ class M_Attach_To_Post extends C_Base_Module
 			'photocrati-attach_to_post',
 			'Attach To Post',
 			'Provides the "Attach to Post" interface for displaying galleries and albums',
-			'0.16',
+			'0.17',
 			'https://www.imagely.com/wordpress-gallery-plugin/nextgen-gallery/',
 			'Photocrati Media',
 			'https://www.imagely.com',
@@ -109,8 +109,10 @@ class M_Attach_To_Post extends C_Base_Module
         add_action('admin_init',                array(&$this, 'fix_ie11'), PHP_INT_MAX-1);
         add_action('admin_enqueue_scripts',     array(&$this, 'fix_ie11'), 1);
         add_action('admin_enqueue_scripts',     array(&$this, 'fix_ie11'), PHP_INT_MAX-1);
-		add_filter('wpseo_pre_analysis_post_content', array(&$this, 'remove_preview_images_from_yoast_opengraph'));
-		add_filter('wpseo_sitemap_urlimages', 	array(&$this, 'remove_preview_images_from_yoast_sitemap'), NULL, 2);
+
+        if (defined('WPSEO_VERSION') && version_compare(WPSEO_VERSION, '3.0', '>='))
+            add_filter('wpseo_pre_analysis_post_content', array(&$this, 'remove_preview_images_from_yoast_opengraph'));
+        add_filter('wpseo_sitemap_urlimages', array(&$this, 'remove_preview_images_from_yoast_sitemap'), NULL, 2);
 
         // Emit frame communication events
 		if ($this->does_request_require_frame_communication()) {
@@ -147,7 +149,11 @@ class M_Attach_To_Post extends C_Base_Module
 	 */
 	function print_tinymce_placeholder_template()
 	{
-		include_once('templates/tinymce_placeholder.php');
+		readfile(C_Fs::get_instance()->join_paths(
+			$this->get_registry()->get_module_dir('photocrati-attach_to_post'),
+			'templates',
+			'tinymce_placeholder.php'
+		));
 	}
 
 	/**

@@ -14,7 +14,7 @@ add_action('wp_ajax_sc_team_update_order', 'sc_team_update_order');
 
 class SmartcatTeamPlugin {
 
-    const VERSION = '2.41';
+    const VERSION = '2.5.0';
     const NAME = 'Our Team Showcase';
 
     private static $instance;
@@ -45,7 +45,8 @@ class SmartcatTeamPlugin {
             'single_image_style'    => 'square',
             'social_link'           =>  'new',
             'card_margin'           =>  100,
-            'single_template'       =>  'standard'
+            'single_template'       =>  'standard',
+            'slug'                  => 'team_member'
         );
 
         if ( !get_option( 'smartcat_team_options' ) ) :
@@ -90,6 +91,7 @@ class SmartcatTeamPlugin {
         add_action( 'widgets_init', array( $this, 'wpb_load_widget' ) );
         add_action( 'wp_ajax_smartcat_team_update_pm', array( $this, 'smartcat_team_update_order' ) );
         add_action( 'wp_head', array( $this, 'sc_custom_styles' ) );
+        add_action( 'admin_head', array( $this, 'sc_custom_admin_styles' ) );
         add_filter( 'the_content', array( $this, 'smartcat_set_single_content' ) );
         add_filter( 'single_template', array( $this, 'smartcat_team_get_single_template' ) );
         add_action( 'after_setup_theme', array( $this, 'add_featured_image_support' ) );
@@ -150,11 +152,18 @@ class SmartcatTeamPlugin {
         add_submenu_page( 'edit.php?post_type=team_member', 'Settings', 'Settings', 'administrator', 'smartcat_team_settings', array( $this, 'smartcat_team_settings' ) );
         add_submenu_page( 'edit.php?post_type=team_member', 'Re-Order Members', 'Re-Order Members', 'administrator', 'smartcat_team_reorder', array( $this, 'smartcat_team_reorder' ) );
         add_submenu_page( 'edit.php?post_type=team_member', 'Documentation', 'Documentation', 'administrator', 'smartcat_team_documentation', array( $this, 'smartcat_team_documentation' ) );
+        add_submenu_page( 'edit.php?post_type=team_member', 'Add-ons', 'Add-ons', 'administrator', 'smartcat_team_addons', array( $this, 'smartcat_team_addons' ) );
     }
 
     public function smartcat_team_documentation(){
         
         include_once SC_TEAM_PATH . 'admin/documentation.php';
+        
+    }
+
+    public function smartcat_team_addons(){
+        
+        include_once SC_TEAM_PATH . 'admin/addons.php';
         
     }
 
@@ -321,16 +330,139 @@ class SmartcatTeamPlugin {
         echo '<tr><td><lablel for="team_member_phone"><img src="' . SC_TEAM_URL . 'inc/img/phone.png" width="20px"/></label></td>';
         echo '<td><input type="text" value="' . get_post_meta( $post->ID, 'team_member_phone', true ) . '" id="team_member_phone" name="team_member_phone" placeholder="Enter Phone Number"/></td></tr>';
 
+        echo '<tr><td><lablel for="team_member_instagram"><img src="' . SC_TEAM_URL . 'inc/img/instagram.png" width="20px"/></label></td>';
+        echo '<td><input type="text" value="' . get_post_meta($post->ID, 'team_member_instagram', true) . '" id="team_member_instagram" name="team_member_instagram" placeholder="Enter Instagram URL"/></td></tr>';
 
-        echo '<tr><th><lablel for="team_member_qoute">Personal Quote </lablel></th>';
-        echo '<td><em style="color: red; font-size: 10px">pro version</em></td></tr>';        
+        echo '<tr><td><lablel for="team_member_pinterest"><img src="' . SC_TEAM_URL . 'inc/img/pinterest.png" width="20px"/></label></td>';
+        echo '<td><input type="text" value="' . get_post_meta($post->ID, 'team_member_pinterest', true) . '" id="team_member_pinterest" name="team_member_pinterest" placeholder="Enter pinterest URL"/></td></tr>';
+
+        echo '<tr><td><lablel for="team_member_website"><img src="' . SC_TEAM_URL . 'inc/img/website.png" width="20px"/></label></td>';
+        echo '<td><input type="text" value="' . get_post_meta($post->ID, 'team_member_website', true) . '" id="team_member_website" name="team_member_website" placeholder="Enter Personal Website URL"/></td></tr>';
+
+//
+//        echo '<tr><th><lablel for="team_member_qoute">Personal Quote </lablel></th>';
+//        echo '<td><em style="color: red; font-size: 10px">pro version</em></td></tr>';        
         
 
-        echo '<tr><th><lablel for="team_member_qoute">Attributes / Skills / Ratings</lablel></th>';
-        echo '<td><em style="color: red; font-size: 10px">pro version</em></td></tr>';        
+//        echo '<tr><th><lablel for="team_member_qoute">Attributes / Skills / Ratings</lablel></th>';
+//        echo '<td><em style="color: red; font-size: 10px">pro version</em></td></tr>';        
         
         echo '</table>';
-        echo '</div>';
+        echo '</div><hr>'; 
+        
+    $posts = get_posts(array(
+            'posts_per_page' => -1,
+            'post_type' => 'post',
+                ));
+
+        echo '<div class="sc_options_table">'
+        . '<h4>Authored / Favorite Articles</h4>'
+        . '<table class="widefat"><tr>'
+        . '<td colspan="2">Show <input type="radio" name="team_member_article_bool" value="on" ' . checked(get_post_meta($post->ID, 'team_member_article_bool', true), 'on', false) . '/> '
+        . 'Hide <input type="radio" name="team_member_article_bool" value="off" ' . checked(get_post_meta($post->ID, 'team_member_article_bool', true), 'off', false) . ' />'
+        . '</td>'
+        . '</tr><tr><td>Title</td>'
+        . '<td><input type="text" name="team_member_article_title" placeholder="Enter the title" value="' . get_post_meta($post->ID, 'team_member_article_title', true) . '"/></td></tr>';
+
+        echo '<tr><td>Article 1</td>'
+        . '<td><select name="team_member_article1">'
+        . '<option value="">Select Article</option>';
+
+        foreach ($posts as $the_post) :
+
+            echo '<option value="' . $the_post->ID . '" ' . selected($the_post->ID, get_post_meta($post->ID, 'team_member_article1', true), true) . '>' . $the_post->post_title . '</option>';
+
+        endforeach;
+
+        echo '</select></td>'
+        . '</tr>';
+
+
+        echo '<tr><td>Article 2</td>'
+        . '<td><select name="team_member_article2">'
+        . '<option value="">Select Article</option>';
+
+        foreach ($posts as $the_post) :
+
+            echo '<option value="' . $the_post->ID . '" ' . selected($the_post->ID, get_post_meta($post->ID, 'team_member_article2', true), true) . '>' . $the_post->post_title . '</option>';
+
+        endforeach;
+
+        echo '</select></td>'
+        . '</tr>';
+
+        echo '<tr><td>Article 3</td>'
+        . '<td><select name="team_member_article3">'
+        . '<option value="">Select Article</option>';
+
+        foreach ($posts as $the_post) :
+
+            echo '<option value="' . $the_post->ID . '" ' . selected($the_post->ID, get_post_meta($post->ID, 'team_member_article3', true), true) . '>' . $the_post->post_title . '</option>';
+
+        endforeach;
+
+        echo '</select></td>'
+        . '</tr>';
+
+
+        echo '</table>'
+        . ''
+        . ''
+        . '</div><hr>';
+        
+        echo '<div class="sc_options_table">'
+        . '<h4>Attributes / Skills / Ratings <em style="font-size: 11px; color: #CC0000"> -  Pro version</em></h4>'
+        . '<table class="widefat"><tr>'
+        . '<td colspan="2">Show <input type="radio" name="team_member_skill_bool" value="on" disabled/> '
+        . 'Hide <input type="radio" name="team_member_skill_bool" value="off" disabled/>'
+        . '</td></tr><tr>'
+        . '<td>Title</td><td colspan="2">'
+        . '<input type="text" name="team_member_skill_title" value="" disabled/>'
+        . '</td></tr><tr>'
+        . '<td>Attribute/Skill #1</td>'
+        . '<td><input type="text" name="team_member_skill1" placeholder="Title" value="" disabled/></td>'
+        . '<td><input type="text" name="team_member_skill_value1" placeholder="Skill rating( 1 to 10 )" value="" disabled/></td></tr>'
+        . '<td>Attribute/Skill #2</td>'
+        . '<td><input type="text" name="team_member_skill2" placeholder="Title" value="" disabled/></td>'
+        . '<td><input type="text" name="team_member_skill_value2" placeholder="Skill rating( 1 to 10 )" value="" disabled/></td></tr>'
+        . '<td>Attribute/Skill #3</td>'
+        . '<td><input type="text" name="team_member_skill3" placeholder="Title" value="" disabled/></td>'
+        . '<td><input type="text" name="team_member_skill_value3" placeholder="Skill rating( 1 to 10 )" value="" disabled/</td></tr>'
+        . '<td>Attribute/Skill #4</td>'
+        . '<td><input type="text" name="team_member_skill4" placeholder="Title" value="" disabled/></td>'
+        . '<td><input type="text" name="team_member_skill_value4" placeholder="Skill rating( 1 to 10 )" value="" disabled/></td></tr>';
+
+        echo '</table></div>'
+        . '<div class="clear"></div><hr>';
+        
+        ?>
+
+        <div class="sc_options_table">
+
+            <h4>Interests / Tags / Additional Skills <em style="font-size: 11px; color: #CC0000"> -  Pro version</em></h4>
+            <table class="widefat">
+                <tr>
+                    <td colspan="2">
+                        Show <input disabled type="radio" name="team_member_tags_bool" value="on" <?php checked('on', get_post_meta($post->ID, 'team_member_tags_bool', true)); ?>/> Hide <input type="radio" name="team_member_tags_bool" value="off" <?php checked('off', get_post_meta($post->ID, 'team_member_tags_bool', true)); ?>/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Title</td>
+                    <td><input disabled type="text" name="team_member_tags_title" placeholder="Enter the label for the tags" value="<?php echo get_post_meta($post->ID, 'team_member_tags_title', true) ?>"/></td>
+                </tr>
+                <tr>
+                    <td>Attributes</td>
+                    <td><textarea disabled name="team_member_tags" placeholder="Enter attributes, comma separated" style="width: 100%"><?php echo get_post_meta($post->ID, 'team_member_tags', true) ?></textarea></td>
+                </tr>
+
+
+            </table>
+
+        </div>
+        
+
+
+    <?php
 
         
     }
@@ -382,6 +514,36 @@ class SmartcatTeamPlugin {
 
         }
         
+        if (isset($_REQUEST['team_member_instagram'])) {
+            $instagram_url = $_POST['team_member_instagram'];
+            update_post_meta($post_id, 'team_member_instagram', $instagram_url);
+        }
+
+        if (isset($_REQUEST['team_member_pinterest'])) {
+            $pinterest_url = $_POST['team_member_pinterest'];
+            update_post_meta($post_id, 'team_member_pinterest', $pinterest_url);
+        }
+
+        if (isset($_REQUEST['team_member_website'])) {
+            $website_url = $_POST['team_member_website'];
+            update_post_meta($post_id, 'team_member_website', $website_url);
+        }
+        
+        if (isset($_REQUEST['team_member_tags_bool'])) {
+            $tags_bool = $_POST['team_member_tags_bool'];
+            update_post_meta($post_id, 'team_member_tags_bool', $tags_bool);
+        }
+
+        if (isset($_REQUEST['team_member_tags_title'])) {
+            $tags_title = $_POST['team_member_tags_title'];
+            update_post_meta($post_id, 'team_member_tags_title', $tags_title);
+        }
+
+        if (isset($_REQUEST['team_member_tags'])) {
+            $tags = $_POST['team_member_tags'];
+            update_post_meta($post_id, 'team_member_tags', $tags);
+        }
+        
         if ( isset( $_REQUEST[ 'team_member_phone' ] ) ) {
             update_post_meta( $post_id, 'team_member_phone', $_POST[ 'team_member_phone' ] );
         }
@@ -430,6 +592,31 @@ class SmartcatTeamPlugin {
             $value = $_POST[ 'team_member_qoute' ];
             update_post_meta( $post_id, 'team_member_qoute', $value );
         }
+        
+        if (isset($_REQUEST['team_member_article_bool'])) {
+            $article_bool = $_POST['team_member_article_bool'];
+            update_post_meta($post_id, 'team_member_article_bool', $article_bool);
+        }
+        
+        if (isset($_REQUEST['team_member_article_title'])) {
+            $value = $_POST['team_member_article_title'];
+            update_post_meta($post_id, 'team_member_article_title', $value);
+        }
+
+        if (isset($_REQUEST['team_member_article1'])) {
+            $value = $_POST['team_member_article1'];
+            update_post_meta($post_id, 'team_member_article1', $value);
+        }
+
+        if (isset($_REQUEST['team_member_article2'])) {
+            $value = $_POST['team_member_article2'];
+            update_post_meta($post_id, 'team_member_article2', $value);
+        }
+
+        if (isset($_REQUEST['team_member_article3'])) {
+            $value = $_POST['team_member_article3'];
+            update_post_meta($post_id, 'team_member_article3', $value);
+        }
 
         
     }
@@ -447,9 +634,16 @@ class SmartcatTeamPlugin {
         update_post_meta( $post_id, 'sc_member_order', $sc_member_order );
     }
 
+    public function sc_custom_admin_styles() { ?>
+        
+        <style>
+            #menu-posts-team_member ul li:last-child a{ color: #A2CB86 !important; }
+        </style>
+    <?php }
     public function sc_custom_styles() {
         ?>
         <style>
+            
             #sc_our_team a,
             .sc_our_team_lightbox .name,
             .sc_personal_quote span.sc_team_icon-quote-left{ color: #<?php echo $this->options['text_color']; ?>; }
@@ -472,30 +666,86 @@ class SmartcatTeamPlugin {
         <?php
     }
 
-    public function smartcat_set_single_content( $content ) {
+    public function smartcat_set_single_content($content) {
         global $post;
 
-        if( is_single() ) :
-            if ( $post->post_type == 'team_member' && 
-                    $this->options['single_template'] == 'standard' && 
-                    $this->options['single_social']  == 'yes' 
+        if (is_single()) :
+            if ($post->post_type == 'team_member' &&
+                    $this->options['single_template'] == 'standard' &&
+                    $this->options['single_social'] == 'yes'
             ) :
-                $facebook = get_post_meta( get_the_ID(), 'team_member_facebook', true );
-                $twitter = get_post_meta( get_the_ID(), 'team_member_twitter', true );
-                $linkedin = get_post_meta( get_the_ID(), 'team_member_linkedin', true );
-                $gplus = get_post_meta( get_the_ID(), 'team_member_gplus', true );
-                $email = get_post_meta( get_the_ID(), 'team_member_email', true );
-                $phone = get_post_meta( get_the_ID(), 'team_member_phone', true );
+                $facebook = get_post_meta(get_the_ID(), 'team_member_facebook', true);
+                $twitter = get_post_meta(get_the_ID(), 'team_member_twitter', true);
+                $linkedin = get_post_meta(get_the_ID(), 'team_member_linkedin', true);
+                $gplus = get_post_meta(get_the_ID(), 'team_member_gplus', true);
+                $email = get_post_meta(get_the_ID(), 'team_member_email', true);
+                $phone = get_post_meta(get_the_ID(), 'team_member_phone', true);
+                $instagram = get_post_meta(get_the_ID(), 'team_member_instagram', true);
+                $pinterest = get_post_meta(get_the_ID(), 'team_member_pinterest', true);
+                $website = get_post_meta(get_the_ID(), 'team_member_website', true);
 
-                $content .= '<div class="clear"></div>'
-                        . '<div class="smartcat_team_single_icons">';
-                $content .= $this->smartcat_get_social_content( $facebook, $twitter, $linkedin, $gplus, $email, $phone );
-                $content .= '</div>';
+
+                $content .= '<div class="smartcat_team_single_icons">';
+                $content .= $this->smartcat_get_social_content($facebook, $twitter, $linkedin, $gplus, $email, $phone, $instagram, $pinterest, $website);
+                $content .= '</div><hr>';
+
+                if (null !== get_post_meta(get_the_ID(), 'team_member_article_bool', true) && get_post_meta(get_the_ID(), 'team_member_article_bool', true) == 'on') :
+
+                    $content .= '<div class="sc_team_posts sc_team_post">
+                    <h3 class="skills-title">' . get_post_meta(get_the_ID(), 'team_member_article_title', true) . '</h3>';
+
+                    $post1 = get_post_meta(get_the_ID(), 'team_member_article1', true) > 0 ? get_post(get_post_meta(get_the_ID(), 'team_member_article1', true)) : null;
+                    $post2 = get_post_meta(get_the_ID(), 'team_member_article2', true) > 0 ? get_post(get_post_meta(get_the_ID(), 'team_member_article2', true)) : null;
+                    $post3 = get_post_meta(get_the_ID(), 'team_member_article3', true) > 0 ? get_post(get_post_meta(get_the_ID(), 'team_member_article3', true)) : null;
+
+                    $content .= '<div class="sc-team-member-posts">
+
+                        <div>';
+                    
+                    if( $post1 ) :
+                        if (get_the_post_thumbnail($post1->ID, 'medium')) :
+                            $content .= '<div class="width25 left">' . get_the_post_thumbnail($post1->ID, 'medium') . '</div>';
+                        endif;
+
+                        $content .= '<div class="width75 left">
+                                    <a href="' . get_the_permalink($post1->ID) . '">' . get_the_title($post1->ID) . '</a>
+                                </div>
+                            </div>
+                            <div>';
+                    endif;
+                    
+                    if( $post2 ) :
+                        if (get_the_post_thumbnail($post2->ID, 'medium')) :
+                            $content .= '<div class="width25 left">' . get_the_post_thumbnail($post2->ID, 'medium') . '</div>';
+                        endif;
+
+                        $content .= '<div class="width75 left">
+                                <a href="' . get_the_permalink($post2->ID) . '">' . get_the_title($post2->ID) . '</a>
+                            </div>
+                            </div>
+                            <div>';
+                    endif;
+
+                    if( $post3 ) :
+                        if (get_the_post_thumbnail($post3->ID, 'medium')) :
+                            $content .= '<div class="width25 left">' . get_the_post_thumbnail($post3->ID, 'medium') . '</div>';
+                        endif;
+
+                        $content .= '<div class="width75 left">
+                                    <a href="' . get_the_permalink($post3->ID) . '">' . get_the_title($post3->ID) . '</a>
+                                </div>
+                            </div>
+                        </div>';
+                    endif;
+                    
+                    echo '</div>';
+                endif;
+
             endif;
         else :
-            
+
         endif;
-        
+
         return $content;
     }
     
@@ -510,59 +760,80 @@ class SmartcatTeamPlugin {
         
     }
     
-    public function set_social( $id ) {
+    public function set_social($id) {
 
-        $facebook = get_post_meta( $id, 'team_member_facebook', true );
-        $twitter = get_post_meta( $id, 'team_member_twitter', true );
-        $linkedin = get_post_meta( $id, 'team_member_linkedin', true );
-        $gplus = get_post_meta( $id, 'team_member_gplus', true );
-        $email = get_post_meta( $id, 'team_member_email', true );
-        $phone = get_post_meta( $id, 'team_member_phone', true );
-        
-            
-        $this->get_social($facebook, $twitter, $linkedin, $gplus, $email, $phone);
-        
+        $facebook = get_post_meta($id, 'team_member_facebook', true);
+        $twitter = get_post_meta($id, 'team_member_twitter', true);
+        $linkedin = get_post_meta($id, 'team_member_linkedin', true);
+        $gplus = get_post_meta($id, 'team_member_gplus', true);
+        $email = get_post_meta($id, 'team_member_email', true);
+        $phone = get_post_meta($id, 'team_member_phone', true);
+        $pinterest = get_post_meta($id, 'team_member_pinterest', true);
+        $instagram = get_post_meta($id, 'team_member_instagram', true);
+        $website = get_post_meta($id, 'team_member_website', true);
+
+
+        $this->get_social($facebook, $twitter, $linkedin, $gplus, $email, $phone, $pinterest, $instagram, $website);
+
     }
 
-    public function get_social( $facebook, $twitter, $linkedin, $gplus, $email, $phone ) {
-        
-        if ( $facebook != '' )
+    public function get_social($facebook, $twitter, $linkedin, $gplus, $email, $phone, $pinterest, $instagram, $website) {
+
+        if ($facebook != '')
             echo '<a ' . $this->add_target() . ' href="' . $facebook . '"><img src="' . SC_TEAM_URL . 'inc/img/fb.png" class="sc-social"/></a>';
-        if ( $twitter != '' )
+        if ($twitter != '')
             echo '<a ' . $this->add_target() . ' href="' . $twitter . '"><img src="' . SC_TEAM_URL . 'inc/img/twitter.png" class="sc-social"/></a>';
-        if ( $linkedin != '' )
-            echo '<a ' . $this->add_target() . ' href="' . $linkedin . '"><img src="' . SC_TEAM_URL . 'inc/img/linkedin.png" class="sc-social"/></a>';
-        if ( $gplus != '' )
+        if ($gplus != '')
             echo '<a ' . $this->add_target() . ' href="' . $gplus . '"><img src="' . SC_TEAM_URL . 'inc/img/google.png" class="sc-social"/></a>';
-        if ( $email != '' )
+        if ($linkedin != '')
+            echo '<a ' . $this->add_target() . ' href="' . $linkedin . '"><img src="' . SC_TEAM_URL . 'inc/img/linkedin.png" class="sc-social"/></a>';
+
+        if ($pinterest != '')
+            echo '<a ' . $this->add_target() . ' href="' . $pinterest . '"><img src="' . SC_TEAM_URL . 'inc/img/pinterest.png" class="sc-social"/></a>';
+        if ($instagram != '')
+            echo '<a ' . $this->add_target() . ' href="' . $instagram . '"><img src="' . SC_TEAM_URL . 'inc/img/instagram.png" class="sc-social"/></a>';
+        if ($website != '')
+            echo '<a ' . $this->add_target() . ' href="' . $website . '"><img src="' . SC_TEAM_URL . 'inc/img/website.png" class="sc-social"/></a>';
+        if ($email != '')
             echo '<a href=mailto:' . $email . '><img src="' . SC_TEAM_URL . 'inc/img/email.png" class="sc-social"/></a>';
-        if ( $phone != '' )
+        if ($phone != '')
             echo '<a href=tel:' . $phone . '><img src="' . SC_TEAM_URL . 'inc/img/phone.png" class="sc-social"/></a>';
-        
     }
 
     
-    public function smartcat_get_social_content( $facebook, $twitter, $linkedin, $gplus, $email, $phone ){
-        
+    public function smartcat_get_social_content($facebook, $twitter, $linkedin, $gplus, $email, $phone, $pinterest, $instagram, $website) {
+
         $content = null;
-        
-        if ( 'yes' == $this->options[ 'social' ] ) {
-            if ( $facebook != '' )
+
+        if ('yes' == $this->options['social']) {
+            if ($facebook != '')
                 $content .= '<a ' . $this->add_target() . ' href="' . $facebook . '"><img src="' . SC_TEAM_URL . 'inc/img/fb.png" class="sc-social"/></a>';
-            if ( $twitter != '' )
+
+            if ($twitter != '')
                 $content .= '<a ' . $this->add_target() . ' href="' . $twitter . '"><img src="' . SC_TEAM_URL . 'inc/img/twitter.png" class="sc-social"/></a>';
-            if ( $linkedin != '' )
-                $content .= '<a ' . $this->add_target() . ' href="' . $linkedin . '"><img src="' . SC_TEAM_URL . 'inc/img/linkedin.png" class="sc-social"/></a>';
-            if ( $gplus != '' )
+
+            if ($gplus != '')
                 $content .= '<a ' . $this->add_target() . ' href="' . $gplus . '"><img src="' . SC_TEAM_URL . 'inc/img/google.png" class="sc-social"/></a>';
-            if ( $email != '' )
+
+            if ($linkedin != '')
+                $content .= '<a ' . $this->add_target() . ' href="' . $linkedin . '"><img src="' . SC_TEAM_URL . 'inc/img/linkedin.png" class="sc-social"/></a>';
+
+            if ($pinterest != '')
+                $content .= '<a ' . $this->add_target() . ' href="' . $pinterest . '"><img src="' . SC_TEAM_URL . 'inc/img/pinterest.png" class="sc-social"/></a>';
+
+            if ($instagram != '')
+                $content .= '<a ' . $this->add_target() . ' href="' . $instagram . '"><img src="' . SC_TEAM_URL . 'inc/img/instagram.png" class="sc-social"/></a>';
+
+            if ($email != '')
                 $content .= '<a href=mailto:' . $email . '><img src="' . SC_TEAM_URL . 'inc/img/email.png" class="sc-social"/></a>';
-            if ( $phone != '' )
-                $content .= '<a href=mailto:' . $phone . '><img src="' . SC_TEAM_URL . 'inc/img/phone.png" class="sc-social"/></a>';
-        }  
-        
+
+            if ($phone != '')
+                $content .= '<a href=tel:' . $phone . '><img src="' . SC_TEAM_URL . 'inc/img/phone.png" class="sc-social"/></a>';
+
+            if ($website != '')
+                $content .= '<a href=' . $website . '><img src="' . SC_TEAM_URL . 'inc/img/website.png" class="sc-social"/></a>';
+        }
         return $content;
-        
     }
 
     public function get_single_social( $social ) {
@@ -612,7 +883,14 @@ class SmartcatTeamPlugin {
     
     public function check_clicker( $single_template ){
         
-        return false;
+        if ($single_template == 'disable') :
+            return 'sc_team_single_disabled';
+
+        endif;
+        
+        if ($this->options['single_template'] == 'disable') :
+            return 'sc_team_single_disabled';
+        endif;
         
     }
 

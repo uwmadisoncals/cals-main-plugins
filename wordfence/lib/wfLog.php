@@ -285,15 +285,23 @@ class wfLog {
 
 	/**
 	 * @param string $IP Should be in dot or colon notation (127.0.0.1 or ::1)
+	 * @param bool $forcedWhitelistEntry If provided, returns whether or not the IP is on a forced whitelist.
 	 * @return bool
 	 */
-	public function isWhitelisted($IP) {
+	public function isWhitelisted($IP, &$forcedWhitelistEntry = null) {
+		if ($forcedWhitelistEntry !== null) {
+			$forcedWhitelistEntry = false;
+		}
+		
 		foreach (wfUtils::getIPWhitelist() as $subnet) {
 			if ($subnet instanceof wfUserIPRange) {
 				if ($subnet->isIPInRange($IP)) {
 					return true;
 				}
 			} elseif (wfUtils::subnetContainsIP($subnet, $IP)) {
+				if ($forcedWhitelistEntry !== null) {
+					$forcedWhitelistEntry = true;
+				}
 				return true;
 			}
 		}
@@ -1177,6 +1185,7 @@ class wfLog {
 		exit();
 	}
 	private function redirect($URL){
+		wfUtils::doNotCache();
 		wp_redirect($URL, 302);
 		exit();
 	}
@@ -1850,7 +1859,7 @@ class wfLiveTrafficQuery {
 		$limit = absint($this->getLimit());
 		$offset = absint($this->getOffset());
 
-		$wheres = array("h.action != 'logged:waf'");
+		$wheres = array("h.action != 'logged:waf'", "h.action != 'scan:detectproxy'");
 		if ($startDate) {
 			$wheres[] = $wpdb->prepare('h.ctime > %f', $startDate);
 		}

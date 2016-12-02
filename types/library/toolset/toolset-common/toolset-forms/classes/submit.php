@@ -54,7 +54,7 @@ $data = array();
 if (isset($_REQUEST['nonce']) && check_ajax_referer('ajax_nonce', 'nonce', false)) {
 
     if (isset($_POST['action']) && $_POST['action'] == 'delete' && isset($_POST['file'])) {
-        $file = $_POST['file'];
+        $file = esc_url_raw( $_POST['file'] );
         $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
 
         $data = array('result' => true);

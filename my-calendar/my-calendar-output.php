@@ -158,7 +158,7 @@ function mc_category_icon_title( $title, $post_id = null ) {
 			$event_id = ( isset( $_GET['mc_id'] ) && is_numeric( $_GET['mc_id'] ) ) ? $_GET['mc_id'] : get_post_meta( $post_id, '_mc_event_id', true );
 			if ( is_numeric( $event_id ) ) {
 				$event    = mc_get_event_core( $event_id );
-				if ( is_object( $event ) && method_exists( $event, 'category_icon' ) ) {
+				if ( is_object( $event ) && property_exists( $event, 'category_icon' ) ) {
 					$icon     = mc_category_icon( $event );
 				} else {
 					$icon = '';
@@ -1629,11 +1629,16 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 				$end = ( $table == 'table' ) ? "\n</tbody>\n</table>" : "</div></$table>";
 				$my_calendar_body .= ( $format == "list" ) ? "\n</ul>" : $end;
 			} else {
-				if ( ! in_array( $format, array( 'list', 'calendar', 'mini' ) ) ) {
-					$my_calendar_body .= "<p class='mc-error-format'>" . __( "Unrecognized calendar format. Please use one of 'list', 'calendar', or 'mini'.", 'my-calendar' ) . "</p>";
-				}
-				if ( ! in_array( $time, array( 'day', 'week', 'month', 'month+1' ) ) ) {
-					$my_calendar_body .= "<p class='mc-error-time'>" . __( "Unrecognized calendar time period. Please use one of 'day', 'week', or 'month'.", 'my-calendar' ) . "</p>";
+				// only show error message if user has permissions
+				if ( current_user_can( 'manage_options' ) ) {
+					if ( ! in_array( $format, array( 'list', 'calendar', 'mini' ) ) ) {
+						$yours = sprintf( esc_html__( "Your format: %s", 'my-calendar' ), $format );
+						$my_calendar_body .= "<p class='mc-error-format'>" . __( "Unrecognized calendar format. Please use one of 'list', 'calendar', or 'mini'.", 'my-calendar' ) . "$yours</p>";
+					}
+					if ( ! in_array( $time, array( 'day', 'week', 'month', 'month+1' ) ) ) {
+						$yours = sprintf( esc_html__( "Your time period: %s", 'my-calendar' ), $time );						
+						$my_calendar_body .= "<p class='mc-error-time'>" . __( "Unrecognized calendar time period. Please use one of 'day', 'week', or 'month'.", 'my-calendar' ) . "$yours</p>";
+					}
 				}
 			}
 			$my_calendar_body .= $mc_bottomnav;

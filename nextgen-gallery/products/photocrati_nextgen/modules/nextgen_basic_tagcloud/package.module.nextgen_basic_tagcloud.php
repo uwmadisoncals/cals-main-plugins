@@ -9,7 +9,11 @@ class A_NextGen_Basic_Tagcloud extends Mixin
     function validation()
     {
         if ($this->object->name == NGG_BASIC_TAGCLOUD) {
-            $this->object->validates_presence_of('display_type');
+            $this->object->validates_presence_of('gallery_display_type');
+        }
+        // If we have a "gallery_display_type", we don't need a "display_type" setting
+        if (isset($this->object->settings['display_type']) && isset($this->object->settings['gallery_display_type'])) {
+            unset($this->object->settings['display_type']);
         }
         return $this->call_parent('validation');
     }
@@ -31,9 +35,14 @@ class A_NextGen_Basic_Tagcloud_Controller extends Mixin
         $display_settings = $displayed_gallery->display_settings;
         $application = C_Router::get_instance()->get_routed_app();
         $tag = urldecode($this->param('gallerytag'));
+        // The display setting 'display_type' has been removed to 'gallery_display_type'
+        if (isset($display_settings['display_type'])) {
+            $display_settings['gallery_display_type'] = $display_settings['display_type'];
+            unset($display_settings['display_type']);
+        }
         // we're looking at a tag, so show images w/that tag as a thumbnail gallery
         if (!is_home() && !empty($tag)) {
-            return C_Displayed_Gallery_Renderer::get_instance()->display_images(array('source' => 'tags', 'container_ids' => array(esc_attr($tag)), 'display_type' => $display_settings['display_type'], 'original_display_type' => $displayed_gallery->display_type, 'original_settings' => $display_settings));
+            return C_Displayed_Gallery_Renderer::get_instance()->display_images(array('source' => 'tags', 'container_ids' => array(esc_attr($tag)), 'display_type' => $display_settings['gallery_display_type'], 'original_display_type' => $displayed_gallery->display_type, 'original_settings' => $display_settings));
         }
         $defaults = array('exclude' => '', 'format' => 'list', 'include' => $displayed_gallery->get_term_ids_for_tags(), 'largest' => 22, 'link' => 'view', 'number' => $display_settings['number'], 'order' => 'ASC', 'orderby' => 'name', 'smallest' => 8, 'taxonomy' => 'ngg_tag', 'unit' => 'pt');
         $args = wp_parse_args('', $defaults);
@@ -95,6 +104,9 @@ class A_NextGen_Basic_Tagcloud_Form extends Mixin_Display_Type_Form
     {
         $types = array();
         $skip_types = array(NGG_BASIC_TAGCLOUD, NGG_BASIC_SINGLEPIC, NGG_BASIC_COMPACT_ALBUM, NGG_BASIC_EXTENDED_ALBUM);
+        if (!isset($display_type->settings['gallery_type'])) {
+            $display_type->settings['gallery_display_type'] = isset($display_type->settings['display_type']) ? $display_type->settings['display_type'] : '';
+        }
         $skip_types = apply_filters('ngg_basic_tagcloud_excluded_display_types', $skip_types);
         $mapper = C_Display_Type_Mapper::get_instance();
         $display_types = $mapper->find_all();
@@ -104,7 +116,7 @@ class A_NextGen_Basic_Tagcloud_Form extends Mixin_Display_Type_Form
             }
             $types[$dt->name] = $dt->title;
         }
-        return $this->_render_select_field($display_type, 'display_type', __('Display type', 'nggallery'), $types, $display_type->settings['display_type'], __('The display type that the tagcloud will point its results to', 'nggallery'));
+        return $this->_render_select_field($display_type, 'gallery_display_type', __('Display type', 'nggallery'), $types, $display_type->settings['gallery_display_type'], __('The display type that the tagcloud will point its results to', 'nggallery'));
     }
 }
 /**
@@ -119,7 +131,13 @@ class A_NextGen_Basic_TagCloud_Mapper extends Mixin
     {
         $this->call_parent('set_defaults', $entity);
         if (isset($entity->name) && $entity->name == NGG_BASIC_TAGCLOUD) {
-            $this->object->_set_default_value($entity, 'settings', 'display_type', NGG_BASIC_THUMBNAILS);
+            if (isset($entity->display_settings) && is_array($entity->display_settings) && isset($entity->display_settings['display_type'])) {
+                if (!isset($entity->display_settings['gallery_display_type'])) {
+                    $entity->display_settings['gallery_display_type'] = $entity->display_settings['display_type'];
+                }
+                unset($entity->display_settings['display_type']);
+            }
+            $this->object->_set_default_value($entity, 'settings', 'gallery_display_type', NGG_BASIC_THUMBNAILS);
             $this->object->_set_default_value($entity, 'settings', 'number', 45);
             $this->object->_set_default_value($entity, 'settings', 'ngg_triggers_display', 'never');
         }
@@ -207,7 +225,7 @@ class C_Taxonomy_Controller extends C_MVC_Controller
         $mapper = C_Display_Type_Mapper::get_instance();
         // Respect the global display type setting
         $display_type = $mapper->find_by_name(NGG_BASIC_TAGCLOUD, TRUE);
-        $display_type = !empty($display_type->settings['display_type']) ? $display_type->settings['display_type'] : NGG_BASIC_THUMBNAILS;
+        $display_type = !empty($display_type->settings['gallery_display_type']) ? $display_type->settings['gallery_display_type'] : NGG_BASIC_THUMBNAILS;
         return "[ngg_images source='tags' container_ids='{$tag}' slug='{$tag}' display_type='{$display_type}']";
     }
     /**

@@ -564,7 +564,7 @@ function my_calendar_upcoming_events( $before = 'default', $after = 'default', $
 				$class    = ( my_calendar_date_comp( $date, $today ) === true ) ? "past-event" : "future-event";
 				$category = 'mc_' . sanitize_title( $details['category_name'] );
 				
-				$prepend = apply_filters( 'mc_event_upcoming_before', '<li>', $class, $category );
+				$prepend = apply_filters( 'mc_event_upcoming_before', "<li class='$class $category'>", $class, $category );
 				$append  = apply_filters( 'mc_event_upcoming_after', '</li>', $class, $category );				
 				// if same group, and same date, use it.
 				if ( ( $details['group'] !== $last_id || $details['date'] == $last_date ) || $details['group'] == '0' ) {

@@ -229,8 +229,12 @@ function mc_edit_category_form( $view = 'edit', $catID = '' ) {
 		?>
 		<h1><?php _e( 'Add Category', 'my-calendar' ); ?></h1>
 	<?php } else { ?>
-		<h1><?php _e( 'Edit Category', 'my-calendar' ); ?></h1>
+		<h1 class="wp-heading-inline"><?php _e( 'Edit Category', 'my-calendar' ); ?></h1>
+		<a href="<?php echo admin_url( "admin.php?page=my-calendar-categories" ); ?>" class="page-title-action"><?php _e( 'Add New', 'my-calendar' ); ?></a> 
+		<hr class="wp-header-end">		
 	<?php } ?>
+	
+	
 
 	<div class="postbox-container jcd-wide">
 		<div class="metabox-holder">

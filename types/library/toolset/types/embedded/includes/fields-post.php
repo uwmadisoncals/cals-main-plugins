@@ -217,18 +217,20 @@ function wpcf_add_meta_boxes( $post_type, $post )
 
         // Check if hidden
         if ( !isset( $group['__show_meta_box'] ) || $group['__show_meta_box'] != false ) {
+            
+            $group_wpml = new Types_Wpml_Field_Group( Types_Field_Group_Post_Factory::load( $group['slug'] ) );
+
             // Add meta boxes
             if ( empty( $only_preview ) ) {
                 add_meta_box( "wpcf-group-{$group['slug']}",
-                        wpcf_translate( 'group ' . $group['id'] . ' name',
-                                $group['name'] ), 'wpcf_admin_post_meta_box',
-                        $post_type, $group['meta_box_context'], 'high', $group );
+                    $group_wpml->translate_name(),
+                    'wpcf_admin_post_meta_box',
+                    $post_type, $group['meta_box_context'], 'high', $group );
             } else {
                 add_meta_box( "wpcf-group-{$group['slug']}",
-                        wpcf_translate( 'group ' . $group['id'] . ' name',
-                                $group['name'] ),
-                        'wpcf_admin_post_meta_box_preview', $post_type,
-                        $group['meta_box_context'], 'high', $group );
+                    $group_wpml->translate_name(),
+                    'wpcf_admin_post_meta_box_preview', $post_type,
+                    $group['meta_box_context'], 'high', $group );
             }
         }
     }
@@ -407,6 +409,7 @@ function wpcf_admin_post_meta_box_preview( $post, $group, $echo = '' ){
  */
 function wpcf_admin_post_meta_box( $post, $group, $echo = '', $open_style_editor = false )
 {
+    $group_wpml = new Types_Wpml_Field_Group( Types_Field_Group_Post_Factory::load( $group['args']['slug'] ) );
 
     if (
         false === $open_style_editor
@@ -418,7 +421,7 @@ function wpcf_admin_post_meta_box( $post, $group, $echo = '', $open_style_editor
              */
             if ( array_key_exists('description', $group['args'] ) && !empty($group['args']['description'])) {
                 echo '<div class="wpcf-meta-box-description">';
-                echo wpautop( wpcf_translate( 'group ' . $group['args']['id'] . ' description', $group['args']['description'] ) );
+                echo wpautop( $group_wpml->translate_description() );
                 echo '</div>';
             }
             foreach ( $group['args']['html'] as $field ) {
@@ -487,8 +490,7 @@ function wpcf_admin_post_meta_box( $post, $group, $echo = '', $open_style_editor
         // Display description
         if ( !empty( $group['args']['description'] ) ) {
             $group_output .= '<div class="wpcf-meta-box-description">'
-                . wpautop( wpcf_translate( 'group ' . $group['args']['id'] . ' description',
-                    $group['args']['description'] ) ) . '</div>';
+                . wpautop( $group_wpml->translate_description() ) . '</div>';
         }
         foreach ( $group['args']['fields'] as $field_slug => $field ) {
             if ( empty( $field ) || !is_array( $field ) ) {
@@ -1586,7 +1588,7 @@ function wpcf_admin_post_get_post_groups_fields( $post = false, $context = 'grou
         if ( !isset( $_GET['post_type'] ) ) {
             $post_type = 'post';
         } else if ( in_array( $_GET['post_type'], get_post_types( array('show_ui' => true) ) ) ) {
-            $post_type = $_GET['post_type'];
+            $post_type = sanitize_text_field( $_GET['post_type'] );
         } else {
             $post_type = 'post';
         }

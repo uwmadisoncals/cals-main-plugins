@@ -84,12 +84,28 @@
     .larger{ font-size: larger;}
     .bold{ font-weight: bold;}
     .editcursor{ cursor: text}
+    .demo-table{
+        
+        
+        
+        overflow: hidden;
+        
+    }
+    .demo-table .width50{
+        width: 44%;
+        padding: 20px;
+        margin-right: 2%;
+        background: #fff;
+    }
+    .demo-table img{
+        width: 100%;
+    }
 </style>
 
 <div id="wrapper">
     <div id="gopro">
         <div class="left">
-            <h1><b>Our Team Settings</b></h1>
+            <h1><b style="color: #37BDF7">Our Team Settings</b></h1>
             <div><em>Why go pro?</em> 4 More templates including a uniue Honeycomb and Carouse. More features, and more control! <br>Professional, sleek and easily customizable Team page & widget with extra options!</div>
         </div>
         <div class="right">
@@ -125,7 +141,7 @@
         </table>        
         
         <?php if( ! is_plugin_active( 'testimonials-reviews-showcase/our_testimonials_showcase.php') ) : ?>
-        <table class="widefat">
+<!--        <table class="widefat">
             <thead>
                 <tr>
                     <th><b>Testimonials Showcase</b> </th>
@@ -151,7 +167,7 @@
                 </td>
             </tr>
             
-        </table>
+        </table>-->
         <?php endif; ?>
         
         <table class="widefat">

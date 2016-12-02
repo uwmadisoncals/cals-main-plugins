@@ -508,7 +508,7 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 			
 			$current_page = '';
 			if ( isset( $_GET['page'] ) ) {
-				$current_page = $_GET['page'];
+				$current_page = sanitize_text_field( $_GET['page'] );
 			}
 			
 			if ( ! $current_page == 'wpcf-edit' ) {

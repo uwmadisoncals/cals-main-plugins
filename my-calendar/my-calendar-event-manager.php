@@ -356,8 +356,10 @@ function manage_my_calendar() {
 	}	
 	?>
 	<div class='wrap jd-my-calendar'>
-		<h1 id='mc-manage'><?php _e( 'Manage Events', 'my-calendar' ); ?></h1>
-
+		<h1 id="mc-manage" class="wp-heading-inline"><?php _e( 'Manage Events', 'my-calendar' ); ?></h1>
+		<a href="<?php echo admin_url( "admin.php?page=my-calendar" ); ?>" class="page-title-action"><?php _e( 'Add New', 'my-calendar' ); ?></a> 
+		<hr class="wp-header-end">
+		
 		<div class="postbox-container jcd-wide">
 			<div class="metabox-holder">
 				<div class="ui-sortable meta-box-sortables">
@@ -883,14 +885,16 @@ function mc_show_block( $field, $has_data, $data, $echo = true, $default = '' ) 
 			break;
 		case 'event_image' :
 			if ( $show_block ) {
-				if ( $has_data && method_exists( $data, 'event_post' ) ) {
-					$image = ( has_post_thumbnail( $data->event_post ) ) ? get_the_post_thumbnail_url( $data->event_post ) : $data->event_image; 
+				if ( $has_data && property_exists( $data, 'event_post' ) ) {
+					$image = ( has_post_thumbnail( $data->event_post ) ) ? get_the_post_thumbnail_url( $data->event_post ) : $data->event_image;
+					$image_id = ( has_post_thumbnail( $data->event_post ) ) ? get_post_thumbnail_id( $data->event_post ) : '';
 				} else {
 					$image = '';
+					$image_id = '';
 				}
 				$return = '
 				<div class="mc-image-upload field-holder">
-					<input type="hidden" name="event_image_id" value="" class="textfield" id="e_image_id" />
+					<input type="hidden" name="event_image_id" value="' . esc_attr( $image_id ) . '" class="textfield" id="e_image_id" />
 					<label for="e_image">' . __( "Add an image:", 'my-calendar' ) . '</label><br /><input type="text" name="event_image" id="e_image" size="60" value="' . esc_attr( $image ) . '" placeholder="http://yourdomain.com/image.jpg" /> <button type="button" class="button textfield-field">' . __( "Upload", 'my-calendar' ) . '</button>';
 				if ( $image != '' ) {
 					$image = ( has_post_thumbnail( $data->event_post ) ) ? get_the_post_thumbnail_url( $data->event_post ) : $data->event_image; 
@@ -959,7 +963,7 @@ function mc_show_block( $field, $has_data, $data, $echo = true, $default = '' ) 
 		<legend class="screen-reader-text">' . __( 'Recurring Events', 'my-calendar' ) . '</legend>
 			<p>
 				<label for="e_repeats">' . __( 'Repeats', 'my-calendar' ) . ' <input type="text" name="event_repeats" aria-labelledby="e_repeats_label" id="e_repeats" size="1" value="' . esc_attr( $repeats ) . '" /> <span id="e_repeats_label">' . __( 'times', 'my-calendar' ) . '</span>, </label>
-				<label for="e_every">' . __( 'every', 'my-calendar' ) . '</label> <input type="number" name="event_every" id="e_every" size="1" min="1" max="99" maxlength="1" value="' . esc_attr( $every ) . '" /> 
+				<label for="e_every">' . __( 'every', 'my-calendar' ) . '</label> <input type="number" name="event_every" id="e_every" size="1" min="1" max="99" maxlength="2" value="' . esc_attr( $every ) . '" /> 
 				<label for="e_recur" class="screen-reader-text">' . __( 'Units', 'my-calendar' ) . '</label> 
 				<select name="event_recur" id="e_recur">
 					' . mc_recur_options( $recur ) . '
@@ -1655,7 +1659,7 @@ function mc_list_events() {
 			$limit .= mc_prepare_search_query( $query );			
 		}
 		$limit .= ( $restrict != 'archived' ) ? " AND event_status = 1" : ' AND event_status = 0';
-		$events     = $mcdb->get_results( "SELECT SQL_CALC_FOUND_ROWS * FROM " . my_calendar_table() . " $limit ORDER BY $sortbyvalue $sortbydirection LIMIT " . ( ( $current - 1 ) * $items_per_page ) . ", " . $items_per_page );
+		$events     = $mcdb->get_results( "SELECT SQL_CALC_FOUND_ROWS event_id FROM " . my_calendar_table() . " $limit ORDER BY $sortbyvalue $sortbydirection LIMIT " . ( ( $current - 1 ) * $items_per_page ) . ", " . $items_per_page );
 		$found_rows = $wpdb->get_col( "SELECT FOUND_ROWS();" );
 		$items      = $found_rows[0];
 		if ( ( function_exists( 'akismet_http_post' ) || function_exists( 'bs_checker' ) ) && $allow_filters ) {
@@ -1771,6 +1775,10 @@ function mc_list_events() {
 
 				foreach ( array_keys( $events ) as $key ) {
 					$event   =& $events[ $key ];
+					$event   = mc_get_event_core( $event->event_id );
+					if ( !is_object( $event ) ) {
+						continue;
+					}
 					$class   = ( $class == 'alternate' ) ? 'even' : 'alternate';
 					$pending = ( $event->event_approved == 0 ) ? 'pending' : '';
 					$author  = ( $event->event_author != 0 ) ? get_userdata( $event->event_author ) : 'Public Submitter';
@@ -1783,8 +1791,9 @@ function mc_list_events() {
 						$spam       = '';
 						$spam_label = '';
 					}
-					$edit_url = admin_url( "admin.php?page=my-calendar&amp;mode=edit&amp;event_id=$event->event_id" );
-					$copy_url = admin_url( "admin.php?page=my-calendar&amp;mode=copy&amp;event_id=$event->event_id" );
+					$edit_url  = admin_url( "admin.php?page=my-calendar&amp;mode=edit&amp;event_id=$event->event_id" );
+					$copy_url  = admin_url( "admin.php?page=my-calendar&amp;mode=copy&amp;event_id=$event->event_id" );
+					$view_url  = mc_get_details_link( $event );
 					$group_url = admin_url( "admin.php?page=my-calendar-groups&amp;mode=edit&amp;event_id=$event->event_id&amp;group_id=$event->event_group_id" );
 					$delete_url = admin_url( "admin.php?page=my-calendar-manage&amp;mode=delete&amp;event_id=$event->event_id" );
 					$check = mc_test_occurrence_overlap( $event, true );
@@ -1809,6 +1818,10 @@ function mc_list_events() {
 									} ?></strong>
 
 								<div class='row-actions' style="visibility:visible;">
+									<?php if ( mc_event_published( $event ) ) { ?>
+										<a href="<?php echo $view_url; ?>"
+									   class='view'><?php _e( 'View', 'my-calendar' ); ?></a> |
+									<?php } ?>
 									<a href="<?php echo $copy_url; ?>"
 									   class='copy'><?php _e( 'Copy', 'my-calendar' ); ?></a> |
 									<?php if ( mc_can_edit_event( $event->event_id ) ) { ?>
@@ -2430,7 +2443,6 @@ function mc_instance_list( $id, $occur = false, $template = '<h3>{title}</h3>{de
 				} else if ( mc_key_exists( $template ) ) {
 					$template = mc_get_custom_template( $template );
 				} else {
-					$template = false;
 					$details  = my_calendar_draw_event( $event, $type = "single", $event->event_begin, $event->event_time, '' );
 				}
 			}
@@ -2439,8 +2451,12 @@ function mc_instance_list( $id, $occur = false, $template = '<h3>{title}</h3>{de
 				$details = ( $template != '' ) ? jd_draw_template( $array, $template ) : '';
 			}
 			$output .= $item;
+			if ( $list == '' ) { 
+				break;
+			}			
 		}
 		$output = $details . $before . $output . $after;
+
 	}
 
 	return ( get_option( 'mc_process_shortcodes' ) == 'true' ) ? do_shortcode( $output ) : $output;

@@ -22,7 +22,7 @@ if( !class_exists('Toolset_HelpVideo') ) {
 
             if (empty($arguments)) return;
 
-            self::$current = isset($_REQUEST[self::KEY]) ? $_REQUEST[self::KEY] : null;
+            self::$current = isset($_REQUEST[self::KEY]) ? sanitize_text_field( $_REQUEST[self::KEY] ) : null;
 
             if (self::$current === null) return;
 

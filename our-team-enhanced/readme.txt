@@ -1,10 +1,10 @@
 === Our Team Showcase ===
 Contributors: smartcat
 Donate link: http://smartcatdesign.net
-Tags: team, staff, directory, employees, widget, shortcode, members, carousel, honeycomb, stack, grid, custom, template, social, profile, custom post type, portfolio, profile,meet team, skills, cv,v-card
-Requires at least: 3.2
-Tested up to: 4.3.1
-Stable tag: 2.4
+Tags: team, staff, directory, employees, widget, shortcode, members, carousel, honeycomb, stack, grid, custom, template, social, profile, custom post type, portfolio, profile,meet team, skills, cv,v-card, portal
+Requires at least: 4.0
+Tested up to: 4.4.1
+Stable tag: 2.42
 License: GPLv2 or later
 
 The best way to display your employees, team members, or any type of list. Multiple appealing templates,SEO friendly, re-order functionality.
@@ -16,12 +16,15 @@ The best way to display your employees, team members, or any type of list. Multi
 Our Team Showcase allows you to easily create and display your team members & staff and show them on your site with ease. Your visitors will see a beautiful & animated
 list of your team, with their pictures, links to social icons, and link to each member page. 
 
+Each member can be edited. When you create or edit a team member, you will be able to add links to contact email, phone number, links to social media( facebook, linkedin, twitter, google plus, instagram & linkedin ), as well as a personal website.
+You can also link in your posts to a user. This way, you can keep the viewer on your site, and recommend content to them.
+
 First, install and activate the plugin. You will be automatically re-directed to the plugin settongs page. Select your preferred settings and colors, Add your staff, upload pictures and finally
 add the shortcode [our-team] to the page, post or widget where you want to display them. You can also set the order that the members appear in with a user-friendly drag & drop interface.
 
 If your theme has a sidebar, you can use the extra custom sidebar widget to display the team members in the sidebar.
 
-The pro version provides you with 4 additional and very unique templates. Impress your site visitors by using the pro version which includes a Honeycomb layout, Scrolling Carousel, Stacked
+The pro version provides you with 4 additional and very unique Team templates and 3 Single Member templates. Impress your site visitors by using the pro version which includes a Honeycomb layout, Scrolling Carousel, Stacked
 list and an additional circular template.
 
 Pro version available here: [Pro Version](https://smartcatdesign.net/downloads/our-team-showcase/)
@@ -38,11 +41,10 @@ Available Customizations:
 * Single member page social icons
 * Add/Edit/Search/Display your staff or team members
 * Display members by group/deparment (category)
-* It comes with different styles to choose from: boxes or circles
 * Boosts SEO with schema.org markup
-* output your team members anywhere with the shortcode [our-team]
-* 3 additional templates with the Pro version
-* Honeycomb, Stacked and Carousel templates with Pro version
+* Output your team members anywhere with the shortcode [our-team]
+* Team Member contact info & links to social sites
+* Favorite/Recommended content for each Team Member
 * Easy to setup
 
 Pro Version Features:
@@ -54,8 +56,23 @@ Pro Version Features:
 * Team member personal quote
 * Search & Sort employee directory
 * Looks great on desktop & mobile
+* Team Member Skills, Hobbies, Tags
 
-[Quick Demo](http://youtu.be/upV_fevCh_s] "Our Team Showcase")
+Team Member Details & Icons:
+
+* Name
+* Group/Department
+* Job Title
+* Email Address
+* Facebook
+* Twitter
+* Google Plus
+* Telephone Number
+* Instagram
+* Pinterest
+* Website/URL
+* Links to up to 3 Articles
+
 
 == Screenshots ==
 1. Plugin includes Grid boxes, Grid Circular and sidebar templates
@@ -70,6 +87,13 @@ Pro Version Features:
 2. OR - Upload the unpacked folder folder via FTP into /wp-content/plugins
 
 == Changelog == 
+
+= 3.0.0
+1. Added new social icons ( pinterest, instagram )
+2. Added Recommended Articles section in Single Member. You can now toggle a section for each member that outputs up to 3 articles from your blog.
+3. Updated Documentation
+4. Fixed issue causing the PHP notice regarding the team_member slug 
+
 
 = 2.41 =
 1. minor change

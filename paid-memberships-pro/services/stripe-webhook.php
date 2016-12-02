@@ -178,19 +178,26 @@
 								$last_order->getLastMemberOrder($user_id);
 								$last_order->setGateway('stripe');
 								$last_order->Gateway->getCustomer();
+								$old_subscription = $last_order->Gateway->getSubscription($last_order);
 
-								if(!empty($last_order->Gateway->customer))
+								//cancel old subscription and figure out end date for the new one
+								if(!empty($old_subscription))
 								{
-									//find the first subscription
-									if(!empty($last_order->Gateway->customer->subscriptions['data'][0]))
+									$end_timestamp = $old_subscription->current_period_end;
+
+									//cancel the old subscription
+									if(!$last_order->Gateway->cancelSubscriptionAtGateway($old_subscription))
 									{
-										$first_sub = $last_order->Gateway->customer->subscriptions['data'][0]->__toArray();
-										$end_timestamp = $first_sub['current_period_end'];
+										//email admin that the old subscription could not be canceled
+										$pmproemail = new PMProEmail();
+										$pmproemail->data = array("body"=>"<p>" . sprintf(__("While processing an update to the subscription for %s, we failed to cancel their old subscription in Stripe. Please check that this user's original subscription (%s) is cancelled in the Stripe dashboard.", "pmpro"), $user->display_name . " (" . $user->user_login . ", " . $user->user_email . ")", $old_subscription->id) . "</p>");
+										$pmproemail->sendEmail(get_bloginfo("admin_email"));
 									}
 								}
 
 								//if we didn't get an end date, let's set one one cycle out
-								$end_timestamp = strtotime("+" . $update['cycle_number'] . " " . $update['cycle_period']);
+								if(empty($end_timestamp))
+									$end_timestamp = strtotime("+" . $update['cycle_number'] . " " . $update['cycle_period']);
 
 								//build order object
 								$update_order = new MemberOrder();
@@ -200,11 +207,11 @@
 								$update_order->membership_name = $user->membership_level->name;
 								$update_order->InitialPayment = 0;
 								$update_order->PaymentAmount = $update['billing_amount'];
-								$update_order->ProfileStartDate = date("Y-m-d", $end_timestamp);
+								$update_order->ProfileStartDate = date_i18n("Y-m-d", $end_timestamp);
 								$update_order->BillingPeriod = $update['cycle_period'];
 								$update_order->BillingFrequency = $update['cycle_number'];
 
-								//update subscription
+								//create new subscription
 								$update_order->Gateway->subscribe($update_order);
 
 								//update membership
@@ -218,6 +225,10 @@
 												LIMIT 1";
 
 								$wpdb->query($sqlQuery);
+
+								//save order so we know which plan to look for at stripe (order code = plan id)
+								$update_order->status = "success";
+								$update_order->saveOrder();
 
 								//remove this update
 								unset($user_updates[$key]);
@@ -453,7 +464,7 @@
 		//for log
 		if($logstr)
 		{
-			$logstr = "Logged On: " . date("m/d/Y H:i:s") . "\n" . $logstr . "\n-------------\n";
+			$logstr = "Logged On: " . date_i18n("m/d/Y H:i:s") . "\n" . $logstr . "\n-------------\n";
 
 			echo $logstr;
 

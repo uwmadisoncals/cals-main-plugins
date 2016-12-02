@@ -158,28 +158,31 @@
 		 * @param string $gateway Name/label for the gateway to set.
 		 *
 		 */
-		function setGateway($gateway = NULL)
-		{
+		function setGateway($gateway = NULL) {
 			//set the gateway property
-			if(isset($gateway))
-			{
+			if(isset($gateway)) {
 				$this->gateway = $gateway;
 			}
 
 			//which one to load?
 			$classname = "PMProGateway";	//default test gateway
-			if(!empty($this->gateway) && $this->gateway != "free")
+			if(!empty($this->gateway) && $this->gateway != "free") {
 				$classname .= "_" . $this->gateway;	//adding the gateway suffix
-
-			if(class_exists($classname))
-				$this->Gateway = new $classname($this->gateway);
-			else
-			{
-				$error = new WP_Error("PMPro1001", "Could not locate the gateway class file with class name = " . $classname . ".");
-				//die("Could not locate the gateway class file with class name = " . $classname . ".");
 			}
 
-			return $this->Gateway;
+			if(class_exists($classname) && isset($this->gateway)) {
+				$this->Gateway = new $classname($this->gateway);
+			} else {
+				$this->Gateway = null;	//null out any current gateway
+				$error = new WP_Error("PMPro1001", "Could not locate the gateway class file with class name = " . $classname . ".");
+			}
+
+			if(!empty($this->Gateway)) {
+				return $this->Gateway;
+			} else {
+				//gateway wasn't setup
+				return false;
+			}
 		}
 
 		/**
@@ -515,9 +518,9 @@
 				$this->gateway_environment = pmpro_getOption("gateway_environment");
 
 			if(empty($this->datetime) && empty($this->timestamp))
-				$this->datetime = date("Y-m-d H:i:s", current_time("timestamp"));		//use current time
+				$this->datetime = date_i18n("Y-m-d H:i:s", current_time("timestamp"));		//use current time
 			elseif(empty($this->datetime) && !empty($this->timestamp) && is_numeric($this->timestamp))
-				$this->datetime = date("Y-m-d H:i:s", $this->timestamp);	//get datetime from timestamp
+				$this->datetime = date_i18n("Y-m-d H:i:s", $this->timestamp);	//get datetime from timestamp
 			elseif(empty($this->datetime) && !empty($this->timestamp))
 				$this->datetime = $this->timestamp;		//must have a datetime in it
 

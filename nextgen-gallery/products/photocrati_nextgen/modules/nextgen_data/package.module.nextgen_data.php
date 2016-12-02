@@ -3720,8 +3720,11 @@ class Mixin_NggLegacy_GalleryStorage_Driver extends Mixin
                 echo sprintf(__('Failed to copy database row for picture %s', 'nggallery'), $old_pid) . '<br />';
                 continue;
             }
+            // 'backup' is not included in get_image_sizes()
+            $sizes = $this->object->get_image_sizes();
+            $sizes[] = 'backup';
             // Copy each image size
-            foreach ($this->object->get_image_sizes() as $size) {
+            foreach ($sizes as $size) {
                 // if backups are off there's no backup file to copy
                 if (!C_NextGen_Settings::get_instance()->imgBackup && $size == 'backup') {
                     continue;

@@ -29,8 +29,16 @@ window.eml = window.eml || { l10n: {} };
 
             original.controllerLibrary.activate.apply( this, arguments );
 
+            wp.Uploader.queue.on( 'add', this.beforeUpload, this );
             wp.Uploader.queue.on( 'reset', this.afterUpload, this );
     	},
+
+        beforeUpload: function() {
+
+            if ( wp.Uploader.queue.length == 1 ) {
+                $('.attachment-filters:has(option[value!="all"]:selected)').val( 'all' ).change();
+            }
+        },
 
         afterUpload: function() {
 
@@ -42,8 +50,6 @@ window.eml = window.eml || { l10n: {} };
             if ( 'menuOrder' === orderby ) {
                 library.saveMenuOrder();
             }
-
-            $('.attachment-filters:has(option[value!="all"]:selected)').val( 'all' ).change();
 
             library.reset( library.models );
 
@@ -429,6 +435,8 @@ window.eml = window.eml || { l10n: {} };
             original.AttachmentsBrowser.initialize.apply( this, arguments );
 
             this.on( 'ready', this.fixLayout, this );
+            this.$window = $( window );
+            this.$window.on( 'resize', _.debounce( _.bind( this.fixLayout, this ), 15 ) );
         },
 
         fixLayout: function() {
@@ -465,11 +473,11 @@ window.eml = window.eml || { l10n: {} };
                         messagesOuterHeight += $(this).outerHeight( true );
                     });
 
-                    messagesOuterHeight = messagesOuterHeight ? messagesOuterHeight - 20 : 0;
+                    messagesOuterHeight = messagesOuterHeight ? messagesOuterHeight - 15 : 0;
                 }
 
-                $browser.css( 'top', $toolbar.outerHeight() + messagesOuterHeight + 20 + 'px' );
-                $toolbar.css( 'top', - $toolbar.outerHeight() - 30 + 'px' );
+                $browser.css( 'top', $toolbar.outerHeight() + messagesOuterHeight + 15 + 'px' );
+                $toolbar.css( 'top', - $toolbar.outerHeight() - 25 + 'px' );
             }
         },
 

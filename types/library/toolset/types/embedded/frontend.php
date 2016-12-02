@@ -68,7 +68,7 @@ function wpcf_shortcode( $atts, $content = null, $code = '' ) {
     );
 	
     if ( $atts['field'] ) {
-        return types_render_field( $atts['field'], $atts, $content, $code );
+        return types_render_field( $atts['field'], $atts, $content, $code, false );
     }
 	if ( $atts['termmeta'] ) {
         return types_render_termmeta( $atts['termmeta'], $atts, $content, $code );
@@ -83,11 +83,15 @@ function wpcf_shortcode( $atts, $content = null, $code = '' ) {
 /**
  * Calls view function for specific field type.
  *
- * @param type $field
- * @param type $atts
- * @return type
+ * @param null|integer $field_id
+ * @param array $params
+ * @param null|string $content
+ * @param string $code
+ * @param bool $block_parent Used by the shortcode [types] which already change the global post before calling this
+ *
+ * @return string
  */
-function types_render_field( $field_id = null, $params = array(), $content = null, $code = '' )
+function types_render_field( $field_id = null, $params = array(), $content = null, $code = '', $allow_parent = true )
 {
     if ( empty($field_id) ) {
         return '';
@@ -101,9 +105,13 @@ function types_render_field( $field_id = null, $params = array(), $content = nul
     // Set post ID to global
     $post_id = get_the_ID();
 
+    // check if "$parent" for "id" is allowed
+    // OR if "id" does not contain a "$parent" selection
+    $parent_check = isset( $params['id'] ) && ( $allow_parent || substr( $params['id'], 0, 1) !== '$' );
+
     // support also 'id' like our shortcode [types] does
     // @since 2.1
-    if( ! isset( $params['post_id'] ) && isset( $params['id'] ) && substr( $params['id'], 0, 1) !== '$' )
+    if( ! isset( $params['post_id'] ) && isset( $params['id'] ) && $parent_check )
         $params['post_id'] = $params['id'];
 
     // Check if other post required
@@ -367,17 +375,18 @@ function types_render_termmeta( $field_id, $params, $content = null, $code = '' 
 /**
  * Calls view function for specific usermeta field type.
  *
- * @global object $wpdb
+ * @param $field_id
+ * @param array $params (additional attributes: user_id, user_name, user_is_author, user_current)
+ * @param null $content
+ * @param string $code
  *
- * @param type $field
- * @param type $atts (additional attributes: user_id, user_name, user_is_author, user_current)
- * @return type
+ * @return string|void
+ * @since unknown
  */
 function types_render_usermeta( $field_id, $params, $content = null, $code = '' ) {
 
     global $wpcf, $post, $wpdb, $WP_Views;
-    // HTML var holds actual output
-    $html = '';
+
 	$current_user = wp_get_current_user();
     $current_user_id = $current_user->ID;
 
@@ -392,14 +401,14 @@ function types_render_usermeta( $field_id, $params, $content = null, $code = '' 
         $post_id = $params['post_id'];
     }
 
-    //Get User id from views loop
+    // Get User id from views loop
     if ( 
 		isset( $WP_Views->users_data['term']->ID ) 
 		&& ! empty( $WP_Views->users_data['term']->ID ) 
 	) {
         $params['user_id'] = $WP_Views->users_data['term']->ID;
     }
-    //print_r($params);exit;
+
     //Get user By ID
     if ( isset( $params['user_id'] ) ) {
         $user_id = $params['user_id'];
@@ -418,13 +427,14 @@ function types_render_usermeta( $field_id, $params, $content = null, $code = '' 
         if ( !empty( $post_id ) ) {
             $user_id = $post->post_author;
         } else {
-            return;
+            return '';
         }
     }
 
     if ( empty( $user_id ) ) {
-        return;
+        return '';
     }
+
     // Get field
     $field = types_get_field( $field_id, 'usermeta' );
 
@@ -442,27 +452,18 @@ function types_render_usermeta( $field_id, $params, $content = null, $code = '' 
         return '';
     }
 
-    // See if repetitive
-    if ( wpcf_admin_is_repetitive( $field ) ) {
+    if ( types_is_repetitive( $field ) ) {
 
         $wpcf->usermeta_repeater->set( $user_id, $field );
         $_meta = $wpcf->usermeta_repeater->_get_meta();
-        $meta = '';
-        if ( isset( $_meta['custom_order'] ) ) {
-            $meta = $_meta['custom_order'];
-        }
+        $meta = toolset_getarr( $_meta, 'custom_order', '' );
 
-        if ( (count( $meta ) == 1 ) ) {
-            $meta_id = key( $meta );
-            $_temp = array_shift( $meta );
-            if ( strval( $_temp ) == '' ) {
-                return '';
-            } else {
-                $params['field_value'] = $_temp;
-                return types_render_field_single( $field, $params, $content,
-                                $code, $meta_id );
-            }
-        } else if ( !empty( $meta ) ) {
+	    // Sometimes if meta is empty - array(0 => '') is returned
+	    if ( count( $meta ) == 1 && reset( $meta ) == '' ) {
+		    return '';
+	    }
+
+	    if ( !empty( $meta ) ) {
             $output = '';
 
             if ( isset( $params['index'] ) ) {
@@ -524,9 +525,13 @@ function types_render_usermeta( $field_id, $params, $content = null, $code = '' 
 /**
  * Calls view function for specific field type by single field.
  *
- * @param type $field
- * @param type $atts
- * @return type
+ * @param array $field
+ * @param array $params
+ * @param mixed $content
+ * @param string $code
+ * @param null|int $meta_id
+ *
+ * @return string
  */
 function types_render_field_single( $field, $params, $content = null, $code = '', $meta_id = null )
 {

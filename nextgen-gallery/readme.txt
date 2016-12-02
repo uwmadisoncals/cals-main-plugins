@@ -1,12 +1,12 @@
-=== NextGEN Gallery ===
+=== NextGEN Gallery - WordPress Gallery Plugin ===
 Contributors: photocrati, imagely
-Tags: nextgen, nextgen gallery, gallery, galleries, image, images, image gallery, photo, photos, photo gallery, picture, pictures, picture gallery, album, albums, photo albums, image album, media, media gallery, thumbnails, thumbnail gallery, thumbnail galleries, slideshow, slideshows, slideshow gallery, slideshow galleries, fancybox, lightbox, responsive, responsive gallery, responsive galleries, wordpress responsive gallery, nextcellent, wordpress gallery plugin, wordpress photo gallery plugin, wp gallery, wp gallery plugins, best gallery plugin, free photo gallery, singlepic, image captions imagebrowser, watermarks, watermarking, photography, photographer
+Tags: gallery, wordpress gallery plugin, nextgen, nextgen gallery, photo gallery, photo album, photos, image gallery, image, images, photography, photographer, watermarking, responsive gallery, slideshow, thumbnail gallery, watermarking, watermark
 Requires at least: 4.0.0
-Stable tag: 2.1.56
-Tested up to: 4.6.1
+Stable tag: 2.1.60
+Tested up to: 4.7.0
 License: GPLv2
 
-The most popular WordPress gallery plugin and one of the most popular plugins of all time with over 15 million downloads.
+The most popular WordPress gallery plugin and one of the most popular plugins of all time with over 16 million downloads.
 
 == Description ==
 
@@ -186,6 +186,33 @@ For more information, feel free to visit the official website for the NextGEN Ga
 
 
 == Changelog ==
+
+= V2.1.60 - 11.22.2016 =
+* Secured: Ensure that only .css files can be edited using Styles tab
+
+= V2.1.59 - 11.22.2016 =
+* Secured: Ability to customize CSS Styles
+* Changed: readme.txt improvements
+* Fixed:   Compatibility with WordPress 4.7.0
+* Fixed:   IGW-inserted tagclouds are incorrect
+
+= V2.1.57 - 11.14.2016 =
+* Secured: Custom Styles may only be written to specific directories
+* Secured: SQL injection vulnerability for gallery names
+* Changed: Display type icons are now clickable in the Insert Gallery Window
+* Changed: Include backup image files when coping/moving a gallery
+* Changed: Show gallery name in upload notification
+* Changed: Added placeholder text to gallery name field on Add Gallery / Upload Images page
+* Fixed:   Custom sortorder not preserved in shortcode
+* Fixed:   Shortcodes added via Insert Gallery Window displayed as []
+* Fixed:   Uncaught TypeError: Cannot read property 'replace' of undefined
+* Fixed:   Use of deprecated Yoast SEO (aka WPSEO) filter
+* Fixed:   Conflict with Easy Digital Downloads
+* Fixed:   Misc invalid HTML tags in admin pages (thanks to kniebremser)
+* Fixed:   Change display:hidden to visibility:hidden in various places
+* Fixed:   Escaping of quotes in gallery titles and urls
+* Fixed:   Untranslatable strings
+
 
 = V2.1.56 - 10.27.2016 =
 * Fixed:   Shortcode parsing was affecting third-party shortcodes

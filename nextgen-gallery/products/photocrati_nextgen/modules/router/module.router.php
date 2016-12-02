@@ -8,7 +8,7 @@ class M_Router extends C_Base_Module
 			'photocrati-router',
 			'Router for Pope',
 			'Provides routing capabilities for Pope modules',
-			'0.8',
+			'0.9',
 			'https://www.imagely.com',
 			'Photocrati Media',
 			'https://www.imagely.com'

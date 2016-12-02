@@ -422,7 +422,7 @@ $w = new wfConfig();
 				</tr>
 				<?php if ( wfConfig::get( 'isPaid' ) ) { ?>
 					<tr>
-						<th>Scan public facing site for vulnerabilities?<a
+						<th>Scan public facing site for vulnerabilities<a
 								href="http://docs.wordfence.com/en/Wordfence_options#Scan_public_facing_site"
 								target="_blank" class="wfhelp"></a></th>
 						<td><input type="checkbox" id="scansEnabled_public" class="wfConfigElem"
@@ -430,7 +430,7 @@ $w = new wfConfig();
 					</tr>
 				<?php } else { ?>
 					<tr>
-						<th style="color: #F00;">Scan public facing site for vulnerabilities?<a
+						<th style="color: #F00;">Scan public facing site for vulnerabilities<a
 								href="http://docs.wordfence.com/en/Wordfence_options#Scan_public_facing_site"
 								target="_blank" class="wfhelp"></a>(<a
 								href="https://www.wordfence.com/gnl1optPdOnly1/wordfence-signup/" target="_blank">Paid members only</a>)
@@ -440,7 +440,15 @@ $w = new wfConfig();
 					</tr>
 				<?php } ?>
 				<tr>
-					<th>Scan for the HeartBleed vulnerability?<a
+					<th>Scan for misconfigured How does Wordfence get IPs<a
+							href="http://docs.wordfence.com/en/Wordfence_options#Scan_for_misconfigured_How_does_Wordfence_get_IPs"
+							target="_blank" class="wfhelp"></a></th>
+					<td><input type="checkbox" id="scansEnabled_checkHowGetIPs" class="wfConfigElem"
+							   name="scansEnabled_checkHowGetIPs" value="1" <?php $w->cb( 'scansEnabled_checkHowGetIPs' ); ?> />
+					</td>
+				</tr>
+				<tr>
+					<th>Scan for the HeartBleed vulnerability<a
 							href="http://docs.wordfence.com/en/Wordfence_options#Scan_for_the_HeartBleed_vulnerability"
 							target="_blank" class="wfhelp"></a></th>
 					<td><input type="checkbox" id="scansEnabled_heartbleed" class="wfConfigElem"
@@ -625,11 +633,22 @@ $w = new wfConfig();
 					</td>
 				</tr>
 				<tr>
-					<th>Limit the number of issues sent in the scan results email.</th>
+					<th>Limit the number of issues sent in the scan results email.<a
+							href="https://docs.wordfence.com/en/Wordfence_options#Limit_the_number_of_issues_sent_in_the_scan_results_email"
+							target="_blank" class="wfhelp"></a></th>
 					<td>
 						<input type="text" name="scan_maxIssues" id="scan_maxIssues"
 					           value="<?php $w->f( 'scan_maxIssues' ); ?>"/> 0 or empty means unlimited
 						issues will be sent.
+					</td>
+				</tr>
+				<tr>
+					<th>Time limit that a scan can run in seconds.<a
+							href="http://docs.wordfence.com/en/Wordfence_options#Time_limit_that_a_scan_can_run_in_seconds"
+							target="_blank" class="wfhelp"></a></th></th>
+					<td>
+						<input type="text" name="scan_maxDuration" id="scan_maxDuration"
+							   value="<?php $w->f( 'scan_maxDuration' ); ?>"/> 0 or empty means the default of <?php echo wfUtils::makeDuration(WORDFENCE_DEFAULT_MAX_SCAN_TIME); ?> will be used.
 					</td>
 				</tr>
 				<tr>

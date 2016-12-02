@@ -56,7 +56,8 @@ function mc_get_all_events( $category, $before, $after, $today, $author, $host, 
 		JOIN " . my_calendar_table( $site ) . " 
 		ON (event_id=occur_event_id) 
 		JOIN " . my_calendar_categories_table( $site ) . " 
-		ON (event_category=category_id) WHERE $select_category $select_author $select_host $limit_string event_approved = 1 
+		ON (event_category=category_id) 		
+		WHERE $select_category $select_author $select_host $limit_string event_approved = 1 
 		AND event_flagged <> 1 
 		AND DATE(occur_begin) < '$date' 
 		$exclude_categories 
@@ -68,7 +69,8 @@ function mc_get_all_events( $category, $before, $after, $today, $author, $host, 
 		JOIN " . my_calendar_table( $site ) . " 
 		ON (event_id=occur_event_id) 
 		JOIN " . my_calendar_categories_table( $site ) . " 
-		ON (event_category=category_id) WHERE $select_category $select_author $select_host $limit_string event_approved = 1 
+		ON (event_category=category_id) 	
+		WHERE $select_category $select_author $select_host $limit_string event_approved = 1 
 		AND event_flagged <> 1 
 		$exclude_categories 
 		AND ( ( DATE(occur_begin) < '$date' AND DATE(occur_end) > '$date' ) OR DATE(occur_begin) = '$date' )" );    // event crosses or equals
@@ -80,7 +82,8 @@ function mc_get_all_events( $category, $before, $after, $today, $author, $host, 
 		JOIN " . my_calendar_table( $site ) . " 
 		ON (event_id=occur_event_id) 
 		JOIN " . my_calendar_categories_table( $site ) . " 
-		ON (event_category=category_id) WHERE $select_category $select_author $select_host $limit_string event_approved = 1 
+		ON (event_category=category_id) 		
+		WHERE $select_category $select_author $select_host $limit_string event_approved = 1 
 		AND event_flagged <> 1 
 		$exclude_categories 		
 		AND DATE(occur_begin) > '$date' ORDER BY occur_begin ASC LIMIT 0,$after" );
@@ -89,7 +92,7 @@ function mc_get_all_events( $category, $before, $after, $today, $author, $host, 
 	if ( ! empty( $events1 ) || ! empty( $events2 ) || ! empty( $events3 ) ) {
 		$arr_events = array_merge( $events1, $events3, $events2 );
 	}
-
+	
 	return $arr_events;
 }
 
@@ -342,6 +345,13 @@ function mc_list_related( $id, $this_id, $template = '{date}, {time}' ) {
 	$sql     = "SELECT event_id FROM " . my_calendar_table() . " WHERE event_group_id=$id";
 	$results = $wpdb->get_results( $sql );
 	
+	$count = count( $results );
+	// If a large number of events, skip this; 
+	if ( $count > apply_filters( 'mc_related_event_limit', 50 ) ) {
+		// filter to return an subset of related events.
+		return apply_filters( 'mc_related_events', '', $results );
+	}
+	
 	if ( is_array( $results ) && ! empty( $results ) ) {
 		foreach ( $results as $result ) {
 			$event_id = $result->event_id;
@@ -579,6 +589,15 @@ function my_calendar_grab_events( $from, $to, $category = null, $ltype = '', $lv
 	} else {
 		return $arr_events;
 	}
+}
+
+// My Calendar does not currently have a draft status
+function mc_event_published( $event ) {
+	if ( $event->event_approved == 1 ) {
+		return true;
+	}
+	
+	return false;
 }
 
 function mc_get_db_type() {

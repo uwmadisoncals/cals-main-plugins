@@ -238,7 +238,9 @@ class nggManageGallery {
 
 	function render_image_column_6($output='', $picture=array())
 	{
-		$tags = wp_get_object_terms($picture->pid, 'ngg_tag', 'fields=names');
+        global $wp_version;
+        $fields = version_compare($wp_version, '4.6', '<=') ? 'fields=names' : array('fields' => 'names');
+        $tags = wp_get_object_terms($picture->pid, 'ngg_tag', $fields);
 		if (is_array($tags)) $tags = implode(', ', $tags);
 		$tags = esc_html($tags);
 

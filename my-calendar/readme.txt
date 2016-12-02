@@ -4,7 +4,7 @@ Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
 Tested up to: 4.6
-Stable tag: 2.5.1
+Stable tag: 2.5.3
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -82,6 +82,23 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
    with shortcode options or widget configuration.
 
 == Changelog ==
+
+= 2.5.4 =
+
+* Add New link on Manage Events screen
+* Add new link on Edit categories screen
+* Add new link on Edit locations screen
+* Changed maxlength on recurrence unit field to 2
+* Eliminate two notices generate on manage events screen
+* Two incorrect method_exists checks; should be property_exists
+
+= 2.5.3 =
+
+* Bug fix: prevent non-object warning in check for notime text
+* Bug fix: missing classes from some instances of upcoming events list
+* Bug fix: Only show invalid format/time errors if user with permissions.
+* Enhancement: Include invalid format/time in error message.
+* Performance: In single event shortcode, break out of foreach if list of related events not being produced.
 
 = 2.5.2 =
 

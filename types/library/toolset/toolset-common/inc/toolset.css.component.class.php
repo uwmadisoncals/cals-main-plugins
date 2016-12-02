@@ -59,7 +59,7 @@ if ( ! class_exists( 'Toolset_CssComponent' ) ) {
         public function toolset_bs_update_option(){
             if($_POST['option'] && isset($_POST['option']) && $_POST['value'] && isset($_POST['value'])){
                 
-                $option_name = 'toolset_bs_component_'.$_POST['option'];
+                $option_name = 'toolset_bs_component_'.sanitize_text_field( $_POST['option'] );
                 $value = ($_POST['value'] === "true") ? "yes" : "no";
                 
                 update_option( $option_name, $value);
@@ -132,8 +132,8 @@ if ( ! class_exists( 'Toolset_CssComponent' ) ) {
             if(defined('LAYOUTS_PLUGIN_NAME')){
                 $bootstrap_available = true;
             }
-            
-            $get_page = (isset($_GET['page']) && $_GET['page']) ? $_GET['page'] : null;
+
+            $get_page = (isset($_GET['page']) && $_GET['page']) ? sanitize_text_field( $_GET['page'] ) : null;
             
             if(!in_array($get_page, $this->allowed_pages()) || $bootstrap_available === false){
                 return false;

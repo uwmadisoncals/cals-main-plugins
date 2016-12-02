@@ -356,7 +356,7 @@ jQuery(function($){
                     'id_field'
                 ];
 
-                if (skipped.includes(key)) continue;
+                if (skipped.indexOf(key) > -1) continue;
                 else if (key == 'display_settings') {
                     for (var display_key in obj[key]) {
                         if ((val = get_shortcode_attr(obj[key], display_key))) snippet += ' ' + val;
@@ -405,7 +405,7 @@ jQuery(function($){
 
         find_by_name_or_alias: function(name) {
             return this.find(function(source) {
-                return source.get('name') == name || (_.isArray(source.get('aliases')) && source.get('aliases').includes(name));
+                return source.get('name') == name || (_.isArray(source.get('aliases')) && source.get('aliases').indexOf(name) > -1);
             });
         }
     });
@@ -533,7 +533,7 @@ jQuery(function($){
 
         find_by_name_or_alias: function(name){
             return this.find(function(display_type){
-                return display_type.get('name') == name || (_.isArray(display_type.get('aliases')) && display_type.get('aliases').includes(name));
+                return display_type.get('name') == name || (_.isArray(display_type.get('aliases')) && display_type.get('aliases').indexOf(name) > -1);
             });
         }
     });
@@ -837,7 +837,7 @@ jQuery(function($){
 
             render: function() {
                 // Create all elements
-                var image_container = $('<div/>').addClass('image_container');
+                var image_container = $('<label style="display: block; cursor: pointer;"/>').addClass('image_container');
 
                 // 2.0.66 did not support plugins_url, 2.0.66.3+ does
                 var installed_at_version = this.model.get('installed_at_version');

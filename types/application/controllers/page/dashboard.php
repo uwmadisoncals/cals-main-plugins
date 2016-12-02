@@ -420,7 +420,17 @@ final class Types_Page_Dashboard extends Types_Page_Abstract {
 
 	public function screen_settings_save($status, $option, $value) {
 		if ( 'toolset_dashboard_screen_post_types' == $option ) {
-			$value = $_POST['toolset_dashboard_screen_post_types'];
+			if ( is_array( $_POST['toolset_dashboard_screen_post_types'] ) ) {
+				$toolset_dashboard_screen_post_types = array();
+				foreach( $_POST['toolset_dashboard_screen_post_types'] as $tdspt_key => $tdspt_value ) {
+					$tdspt_key = sanitize_text_field( $tdspt_key );
+					$tdspt_value = sanitize_text_field( $tdspt_value );
+					$toolset_dashboard_screen_post_types[ $tdspt_key ] = $tdspt_value;
+				}
+			} else {
+				$toolset_dashboard_screen_post_types = sanitize_text_field( $_POST['toolset_dashboard_screen_post_types'] );
+			}
+			$value = $toolset_dashboard_screen_post_types;
 		}
 		return $value;
 	}

@@ -731,7 +731,7 @@ class Mixin_Routing_App extends Mixin
                 if ($segment) {
                     $retval = array('segment' => $matches[0], 'source' => $source_name);
                 } else {
-                    $retval = $matches['value'];
+                    $retval = $this->object->recursive_stripslashes($matches['value']);
                 }
                 $found = TRUE;
                 break;

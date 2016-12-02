@@ -253,7 +253,7 @@ function mc_create_tags( $event, $context = 'filters' ) {
 	$real_begin_date   = ( isset( $event->occur_begin ) ) ? $event->occur_begin : $event->event_begin . ' ' . $event->event_time;
 	$dtstart           = mc_format_timestamp( strtotime( $real_begin_date ) );
 	$dtend             = mc_format_timestamp( strtotime( $real_end_date ) );
-
+	
 	$e['date_utc']     = date_i18n( apply_filters( 'mc_date_format', $date_format, 'template_begin_ts' ), $event->ts_occur_begin );
 	$e['date_end_utc'] = date_i18n( apply_filters( 'mc_date_format', $date_format, 'template_end_ts' ), $event->ts_occur_end );
 		$notime = mc_notime_label( $event );
@@ -403,7 +403,7 @@ function mc_create_tags( $event, $context = 'filters' ) {
 }
 
 function mc_notime_label( $event ) {
-	if ( property_exists( $event, 'event_post' ) ) {
+	if ( is_object( $event ) && property_exists( $event, 'event_post' ) ) {
 		$notime = get_post_meta( $event->event_post, '_event_time_label', true );
 	} else {
 		$notime = '';

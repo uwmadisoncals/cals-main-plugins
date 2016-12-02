@@ -28,19 +28,6 @@
                 };
             };
 
-
-            window.fix_tb_dimensions = function(){
-                var $button     = $('.ngg-add-gallery');
-                var href        = $button.attr('href');
-                var dimensions  = get_igw_dimensions();
-                href = href.replace(/width=\d+/, 'width='+dimensions.width.toString());
-                href = href.replace(/height=\d+/, 'height='+dimensions.height.toString());
-
-                $button.attr('href', href);
-            };
-            fix_tb_dimensions();
-
-
             // Restore Thickbox functionality
             window.wp_tb_position = window.tb_position;
             window.tb_position = function(){

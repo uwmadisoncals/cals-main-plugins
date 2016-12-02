@@ -385,7 +385,7 @@ class A_Upload_Images_Form extends Mixin
     }
     function get_i18n_strings()
     {
-        return array('no_image_uploaded' => __('No images were uploaded successfully.', 'nggallery'), 'one_image_uploaded' => __('1 image was uploaded successfully.', 'nggallery'), 'x_images_uploaded' => __('{count} images were uploaded successfully.', 'nggallery'), 'image_errors' => __('The following errors occured:', 'nggallery'), 'manage_gallery' => __('Manage gallery', 'nggallery'));
+        return array('no_image_uploaded' => __('No images were uploaded successfully.', 'nggallery'), 'one_image_uploaded' => __('1 image was uploaded successfully.', 'nggallery'), 'x_images_uploaded' => __('{count} images were uploaded successfully.', 'nggallery'), 'image_errors' => __('The following errors occured:', 'nggallery'), 'manage_gallery' => __('Manage gallery {name}', 'nggallery'));
     }
     /**
      * Plupload stores its i18n JS *mostly* as "en.js" or "ar.js" - but some as zh_CN.js so we must check both if the

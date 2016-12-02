@@ -5671,15 +5671,16 @@ Toolset_S2.define('jquery.toolset_select2',[
       } else if (typeof options === 'string') {
         var ret;
         var args = Array.prototype.slice.call(arguments, 1);
-
+        //TODO: the return statement and console.log instead of console error is our code
         this.each(function () {
           var instance = $(this).data('toolset_select2');
 
           if (instance == null && window.console && console.error) {
-            console.error(
+            console.log(
               'The toolset_select2(\'' + options + '\') method was called on an ' +
               'element that is not using Select2.'
             );
+            return;
           }
 
           ret = instance[options].apply(instance, args);

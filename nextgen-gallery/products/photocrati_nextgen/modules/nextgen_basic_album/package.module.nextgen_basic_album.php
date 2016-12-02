@@ -152,8 +152,10 @@ class A_NextGen_Album_Breadcrumbs extends Mixin
             }
             if (!$gallery_found) {
                 $gallery = C_Gallery_Mapper::get_instance()->find($gallery_id);
-                $found[] = $gallery;
-                $this->breadcrumb_cache[$gallery->{$gallery->id_field}] = $gallery;
+                if ($gallery != null) {
+                    $found[] = $gallery;
+                    $this->breadcrumb_cache[$gallery->{$gallery->id_field}] = $gallery;
+                }
             }
         }
         $crumbs = array();
