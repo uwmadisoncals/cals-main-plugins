@@ -164,6 +164,7 @@ function weaverx_form_link($value) {
 	$id_strong = $id . '_strong';
 	$id_em = $id . '_em';
 	$id_u = $id . '_u';
+	$id_uh = $id. '_u_h';
 ?>
 	<tr><td><small style="float:right;"><?php _e('Link Attributes:', 'weaver-xtreme' /*adm*/); ?></small></td><td colspan="2">
 
@@ -174,16 +175,31 @@ function weaverx_form_link($value) {
 	&nbsp;<small><em><?php _e('Italic', 'weaver-xtreme' /*adm*/); ?></em></small>
 <?php weaverx_form_font_bold_italic(array('id' => $id_em)); ?>
 
-	&nbsp;<small><u><?php _e('Underline', 'weaver-xtreme' /*adm*/); ?></u></small>
+	&nbsp;<small><u><?php _e('Link Underline', 'weaver-xtreme' /*adm*/); ?></u></small>
 	<input type="checkbox" name="<?php weaverx_sapi_main_name($id_u); ?>" id="<?php echo $id_u; ?>"
 <?php checked(weaverx_getopt_checked( $id_u )); ?> >
 
-<?php
+&nbsp;|&nbsp;&nbsp;<small><u><?php _e('Hover Underline', 'weaver-xtreme' /*adm*/); ?></u></small>
+	<input type="checkbox" name="<?php weaverx_sapi_main_name($id_uh); ?>" id="<?php echo $id_uh; ?>"
+<?php checked(weaverx_getopt_checked( $id_uh )); ?> >
 
+<?php
 	weaverx_form_ctext($hover, true);
+?>
+
+<?php
 	echo '</td></tr>';
 }
 
+
+function weaverx_form_break($value) {
+	$lim = isset( $value['value'] ) ? $value['value'] : 1 ;
+	$label = isset( $value['name'] ) ? "<em style='color:blue;'><strong>{$value['name']}</strong></em>" : '&nbsp;' ;
+	for ( $n = 1 ; $n <= $lim ; ++$n ) {
+		echo "<tr><td style='text-align:right;'>{$label}</td></tr>";
+		$label = '&nbsp;';
+	}
+}
 
 function weaverx_form_note($value) {
 ?>
@@ -200,6 +216,7 @@ function weaverx_form_note($value) {
 	</tr>
 <?php
 }
+
 
 function weaverx_form_info($value) {
 	if ($value['info'] != '') {
@@ -219,7 +236,7 @@ function weaverx_form_widget_area( $value, $submit = false ) {
 
 	// defaults - these are determined by the =Padding section of style-weaverx.css
 	$default_tb = array(
-		'infobar' => '5px', 'content' => 'T:4px, B:8px', 'post' => '0', 'footer' => '8px',
+		'infobar' => '5px', 'content' => 'T:4px, B:8px', 'footer' => '8px',
 		'footer_sb' => '8px', 'primary' => '8px',
 		'secondary' => '8px', 'extra' => '8px', 'top' => '8px', 'bottom' => '8px'
 	);
@@ -234,7 +251,7 @@ function weaverx_form_widget_area( $value, $submit = false ) {
 		'infobar' => '5px', 'content' => 'T:0, B:0', 'footer' => 'T:0, B:0',
 		'footer_sb' => 'T:0, B:10',  'primary' => 'T:0, B:10', 'widget' => '0, Auto - First: T:0, Last: B:0',
 		'secondary' => 'T:0, B:10', 'extra' => 'T:0, B:10', 'top' => 'T:10, B:10', 'bottom' => 'T:10, B:10',
-		'wrapper' => 'T:0, B:0'
+		'wrapper' => 'T:0, B:0', 'post' => 'T:0, B:15',
 	);
 
 	$id = $value['id'];
@@ -343,7 +360,7 @@ function weaverx_form_widget_area( $value, $submit = false ) {
 
 	if ( $id == 'wrapper' ) {       // setting #wrapper sets theme width.
 
-		$info = __('<em>Change Theme Width.</em> Standard width is 940px. Use 9999 for full screen width. Widths less than 768px may give unexpected results on mobile devices. Weaver Xtreme can not create a fixed-width site.', 'weaver-xtreme' /*adm*/);
+		$info = __('<em>Change Theme Width.</em> Standard width is 1100px. Use the options on the "Full Width" tab for full width designs, but leave this value set. Widths less than 768px may give unexpected results on mobile devices. Weaver Xtreme can not create a fixed-width site.', 'weaver-xtreme' /*adm*/);
 
 		weaverx_form_val( array(
 			'name' => '<span class="i-left" style="font-size:150%;">&harr;</span><em style="color:red;">' . __('Theme Width', 'weaver-xtreme' /*adm*/) . '</em>',
@@ -359,16 +376,6 @@ function weaverx_form_widget_area( $value, $submit = false ) {
 			'id' => $id . '_max_width_int', 'type' => '+val_px',
 			'info' => '<em>' . $name . '</em>' . __(': Set Max Width of Area for Desktop View. Advanced Option. (&starf;Plus)', 'weaver-xtreme' /*adm*/),
 			'value' => array() ),
-		   array(
-			'name' => '<small>' . __('Full-width BG', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => $id . '_extend_bgcolor', 'type' => '+color',
-			'info' => '<em>' . $name . '</em>' . __(': Extend BG color to full theme width on Desktop View (&starf;Plus)', 'weaver-xtreme' /*adm*/),
-			'value' => array() ),
-
-		   array(
-			'name' => '<span class="i-left" style="font-size:150%;">&harr;</span><small>' . __('Extend BG Attributes', 'weaver-xtreme' /*adm*/) . '</small>',
-			'id' => $id . '_extend_width', 'type' => 'checkbox',
-			'info' => '<em>' . $name . '</em>' . __(': Extend all BG Attributes to full width. Overrides Full-width BG color.', 'weaver-xtreme' /*adm*/)),
-
 		);
 
 		weaverx_form_show_options($opts_max, false, false);
@@ -461,16 +468,84 @@ function weaverx_form_widget_area( $value, $submit = false ) {
 
 
 function weaverx_form_menu_opts( $value, $submit = false ) {
-	// build the rows for area settings
+	// build the rows for area
+	$wp_logo = weaverx_get_wp_custom_logo_url();
+
+
+	if ($wp_logo)
+		$wp_logo_html = "<img src='{$wp_logo}' style='max-height:16px;margin-left:10px;' />";
+	else
+		$wp_logo_html = __('Not set', 'weaver-xtreme');
 
 	//echo '<table><tr><td>';
 	$name = $value['name'];
 	$id = $value['id'];
 
-	$opts = array(
 
+
+	$opts = array (
 		array( 'name' => $name,  'id' => '-menu', 'type' => 'header_area',
 			  'info' => $value['info']),
+		array( 'name' => __('Menu Bar Layout', 'weaver-xtreme'), 'type' => 'break'),
+
+		array ('name' => '<span class="i-left dashicons dashicons-editor-alignleft"></span>' . __('Align Menu', 'weaver-xtreme' /*adm*/),
+			'id' => $id . '_align', 'type' => 'select_id',
+			'info' => __('Align this menu on desktop view. Mobile, accordion, and vertical menus always left aligned.', 'weaver-xtreme' /*adm*/),
+			'value' => array(
+				array('val' => 'left', 'desc' => 'Left'),
+				array('val' => 'center', 'desc' => 'Center'),
+				array('val' => 'right', 'desc' => 'Right')
+		)),
+
+		array( 'name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide Menu', 'weaver-xtreme' /*adm*/) . '</small>',
+			'id' => $id .'_hide', 'type' => 'select_hide',
+			'info' => '<em>' . $name . '</em>' . __(': Hide menu on different display devices', 'weaver-xtreme' /*adm*/) ),
+
+	);
+
+	if ( $id != 'm_extra' ) {
+		$opts[] = array( 'name' => '<span class="i-left dashicons dashicons-editor-kitchensink"></span>' . __('Fixed-Top Menu', 'weaver-xtreme' /*adm*/),
+			'id' => $id . '_fixedtop', 'type' => 'fixedtop',
+			'info' => '<em>' . $name . '</em>' . __(': Fix menu to top of page. Note: the "Fix to Top on Scroll" does not play well with other "Fixed-Top" areas. Use the <em>Expand/Extend BG Attributes</em> on the Full Width tab to make a full width menu.', 'weaver-xtreme' /*adm*/));
+
+	}
+
+	if ( $id == 'm_primary' ) {
+		$opts[] = array(
+		'name' => '<small>' . __('Move Primary Menu to Top', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => $id . '_move', 'type' => 'checkbox',
+		'info' => '<em>' . $name . '</em>' . __(': Move Primary Menu at Top of Header Area (Default: Bottom)', 'weaver-xtreme' /*adm*/),
+		'value' => '' );
+
+
+		$opts[] = array('name' => '<span class="i-left dashicons dashicons-heart"></span><small>' . __('Add Site Logo to Left', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'm_primary_logo_left', 'type' => 'checkbox',
+		'info' => __('Add the Site Logo to the primary menu. Add custom CSS for <em>.custom-logo-on-menu</em> to style. (Use Customize : Site Identity to set Site Logo.) Logo: ', 'weaver-xtreme' /*adm*/) . $wp_logo_html);
+
+		$opts[] = array( 'name' => '<span class="i-left dashicons dashicons-align-none"></span><small>' . __('Height of Logo on Menu', 'weaver-xtreme' /*adm*/) . '</small>',
+			'id' => 'm_primary_logo_height_dec', 'type' => 'val_em',
+			'info' =>  __('Set height of Logo on Menu. Will interact with padding. (Default: 2.0em, the standard Menu Bar height.)', 'weaver-xtreme' /*adm*/) );
+
+
+		$opts[] = array('name' => '<small>' . __('No Home Menu Item', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'menu_nohome', 'type' => 'checkbox',
+		'info' => __('Don\'t automatically add Home menu item for home page (as defined in Settings->Reading)', 'weaver-xtreme' /*adm*/));
+
+
+	} elseif ( $id == 'm_secondary' ) {
+		$opts[] = array(
+		'name' => '<small>' . __('Move Secondary Menu to Bottom', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => $id . '_move', 'type' => 'checkbox',
+		'info' => '<em>' . $name . '</em>' . __(': Move Secondary Menu at Bottom of Header Area (Default: Top)', 'weaver-xtreme' /*adm*/),
+		'value' => '' );
+	}
+
+	weaverx_form_show_options($opts, false, false);
+
+
+
+
+	$opts = array(
+
+		array( 'name' => __('Menu Bar Colors', 'weaver-xtreme'), 'type' => 'break','value' => 1),
 
 		array( 'name' => __('Menu Bar', 'weaver-xtreme' /*adm*/),
 			'id' => $id, 'type' => 'titles_menu',    // includes color, font size, font family
@@ -512,26 +587,7 @@ function weaverx_form_menu_opts( $value, $submit = false ) {
 			'id' => $id . '_sub_hover_color', 'type' => 'color',
 			'info' => '<em>' . $name . '</em>' . __(': Submenu Hover Text Color (Default: Inherit Top Level)', 'weaver-xtreme' /*adm*/) ),
 
-		// can't get to font properties for the submenus because no way to add the classes
-
-		array(
-			'name' => '<small>' . __('Full-width BG', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => $id . '_extend_bgcolor', 'type' => '+color',
-			'info' => '<em>' . $name . '</em>' . __(': Extend BG color to full theme width on Desktop View (&starf;Plus)', 'weaver-xtreme' /*adm*/),
-			'value' => array() ),
-		array(
-			'name' => '<span class="i-left" style="font-size:150%;">&harr;</span><small>' . __('Extend BG Attributes', 'weaver-xtreme' /*adm*/) . '</small>',
-			'id' => $id . '_extend_width', 'type' => 'checkbox',
-			'info' => '<em>' . $name . '</em>' . __(': Extend all BG Attributes to full width. Overrides Full-width BG color.', 'weaver-xtreme' /*adm*/)),
-
-
-		array ('name' => '<span class="i-left dashicons dashicons-editor-alignleft"></span>' . __('Align Menu', 'weaver-xtreme' /*adm*/),
-			'id' => $id . '_align', 'type' => 'select_id',
-			'info' => __('Align this menu on desktop view. Mobile, accordion, and vertical menus always left aligned.', 'weaver-xtreme' /*adm*/),
-			'value' => array(
-				array('val' => 'left', 'desc' => 'Left'),
-				array('val' => 'center', 'desc' => 'Center'),
-				array('val' => 'right', 'desc' => 'Right')
-		)),
+		array( 'name' => __('Menu Bar Style', 'weaver-xtreme'), 'type' => 'break'),
 
 		array( 'name' => '<span class="i-left" style="font-size:200%;margin-left:4px;">&#x25a1;</span><small>' . __('Add Border', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id . '_border', 'type' => 'checkbox',
@@ -541,47 +597,42 @@ function weaverx_form_menu_opts( $value, $submit = false ) {
 			'id' => $id . '_sub_border', 'type' => 'checkbox',
 			'info' => '<em>' . $name . '</em>' . ': Add the "standard" border to Submenus' ),
 
-		array( 'name' => '<span class="i-left dashicons dashicons-marker"></span><small>' . __('Rounded Submenu Corners', 'weaver-xtreme' /*adm*/) . '</small>',
-			'id' => $id . '_sub_rounded', 'type' => 'checkbox',
-			'info' => '<em>' . $name . '</em>' . ': Add rounded corners to Submenus' ),
-
 		array( 'name' => '<span class="i-left dashicons dashicons-admin-page"></span><small>' . __('Shadow', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id .'_shadow', 'type' => 'shadows',
 			'info' => '<em>' . $name . '</em>' . __(': Wrap Menu Bar with Shadow.', 'weaver-xtreme' /*adm*/) ),
 		array( 'name' => '<span class="i-left dashicons dashicons-marker"></span><small>' . __('Rounded Corners', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id .'_rounded', 'type' => 'rounded',
 			'info' => '<em>' . $name . '</em>' . __(': Add rounded corners to menu. <em>You might need to set overlapping corners Header/Wrapper areas also!</em>', 'weaver-xtreme' /*adm*/) ),
+		array( 'name' => '<span class="i-left dashicons dashicons-marker"></span><small>' . __('Rounded Submenu Corners', 'weaver-xtreme' /*adm*/) . '</small>',
+			'id' => $id . '_sub_rounded', 'type' => 'checkbox',
+			'info' => '<em>' . $name . '</em>' . ': Add rounded corners to Submenus' ),
 
 	);
 
 	weaverx_form_show_options($opts, false, false);
 
 
+
 	if ( $id == 'm_primary' ) {
-	   weaverx_form_checkbox(array(
-		'name' => '<small>' . __('Move Primary Menu to Top', 'weaver-xtreme' /*adm*/) . '</small>',
-		'id' => $id . '_move',
-		'info' => '<em>' . $name . '</em>' . __(': Move Primary Menu at Top of Header Area (Default: Bottom)', 'weaver-xtreme' /*adm*/),
-		'value' => '' ) );
-	} elseif ( $id == 'm_secondary' ){
-		weaverx_form_checkbox(array(
-		'name' => '<small>' . __('Move Secondary Menu to Bottom', 'weaver-xtreme' /*adm*/) . '</small>',
-		'id' => $id . '_move',
-		'info' => '<em>' . $name . '</em>' . __(': Move Secondary Menu at Bottom of Header Area (Default: Top)', 'weaver-xtreme' /*adm*/),
-		'value' => '' ) );
+		$right_plus = '';
+		$right_text = 'textarea';
+		$right_hide = 'select_hide';
+	} else {
+		$right_plus = '(&starf;Plus)';
+		$right_text = '+textarea';
+		$right_hide = '+select_hide';
 	}
 
 	$opts2 = array(
-		array( 'name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide Area', 'weaver-xtreme' /*adm*/) . '</small>',
-			'id' => $id .'_hide', 'type' => 'select_hide',
-			'info' => '<em>' . $name . '</em>' . __(': Hide menu on different display devices', 'weaver-xtreme' /*adm*/) ),
+
 		array( 'name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide Arrows', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id . '_hide_arrows', 'type' => 'checkbox',
 			'info' => '<em>' . $name . '</em>' . __(': Hide Arrows on Desktop Menu', 'weaver-xtreme' /*adm*/)),
+		array( 'name' => '<span class="i-left">{ }</span> <small>' . __('Add Classes','weaver-xtreme' /*adm*/) . '</small>',
+			'id' => $id . '_add_class', 'type' => '+widetext',
+			'info' => '<em>' . $name . '</em>' . __(': Space separated class names to add to this area (<em>Advanced option</em>) (&starf;Plus)', 'weaver-xtreme' /*adm*/) ),
 
-		array( 'name' => '<span class="i-left dashicons dashicons-align-none"></span><small>' . __('Desktop Menu Vertical Padding', 'weaver-xtreme' /*adm*/) . '</small>',
-			'id' => $id .'_menu_pad_dec', 'type' => 'val_em',
-			'info' => '<em>' . $name . '</em>' . __(': Add vertical padding to Desktop menu bar and submenus (Default: 0.6em)', 'weaver-xtreme' /*adm*/) ),
+		array( 'name' => __('Menu Bar Spacing', 'weaver-xtreme'), 'type' => 'break'),
 
 		array( 'name' => '<span class="i-left dashicons dashicons-align-none"></span><small>' . __('Menu Top Margin', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id .'_top_margin_dec', 'type' => 'val_px',
@@ -590,14 +641,23 @@ function weaverx_form_menu_opts( $value, $submit = false ) {
 			'id' => $id .'_bottom_margin_dec', 'type' => 'val_px',
 			'info' => '<em>' . $name . '</em>' . __(': Bottom margin for menu bar.', 'weaver-xtreme' /*adm*/) ),
 
+		array( 'name' => '<span class="i-left dashicons dashicons-align-none"></span><small>' . __('Desktop Item Vertical Padding', 'weaver-xtreme' /*adm*/) . '</small>',
+			'id' => $id .'_menu_pad_dec', 'type' => 'val_em',
+			'info' => '<em>' . $name . '</em>' . __(': Add vertical padding to Desktop menu bar items and submenus. This option is NOT RECOMMENDED as it does not work with Left and Right HTML areas. (Default: 0.6em)', 'weaver-xtreme' /*adm*/) ),
+
+		array( 'name' => '<span class="i-left dashicons dashicons-align-none"></span><small>' . __('Desktop Menu Bar Padding', 'weaver-xtreme' /*adm*/) . '</small>',
+			'id' => $id .'_menu_bar_pad_dec', 'type' => 'val_em',
+			'info' => '<em>' . $name . '</em>' . __(': Add padding to menu bar top and bottom for Desktop devices. (Default: 0 em)', 'weaver-xtreme' /*adm*/) ),
+
+
 
 		array( 'name' => '<span class="i-left" style="font-size:150%;">&harr;</span><small>' . __('Desktop Menu Spacing. (not on Smart Menus)', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id .'_right_padding_dec' , 'type' => 'val_em',
 			'info' => '<em>' . $name . '</em>' . __(': Add space between desktop menu bar items (Use value &gt; 1.0)', 'weaver-xtreme' /*adm*/) ),
 
-		array( 'name' => '<span class="i-left">{ }</span> <small>' . __('Add Classes','weaver-xtreme' /*adm*/) . '</small>',
-			'id' => $id . '_add_class', 'type' => '+widetext',
-			'info' => '<em>' . $name . '</em>' . __(': Space separated class names to add to this area (<em>Advanced option</em>) (&starf;Plus)', 'weaver-xtreme' /*adm*/) ),
+		array( 'name' => __('Menu Bar Left/Right HTML', 'weaver-xtreme'), 'type' => 'break'),
+
+
 		array('name' => '<span class="i-left dashicons dashicons-editor-code"></span><small>' . __('Left HTML', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id . '_html_left', 'type' => '+textarea',
 			'placeholder' => __('Any HTML, including shortcodes.', 'weaver-xtreme' /*adm*/),
@@ -605,19 +665,27 @@ function weaverx_form_menu_opts( $value, $submit = false ) {
 		array( 'name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide Area', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id .'_hide_left', 'type' => '+select_hide',
 			'info' => '<em>' . $name . '</em>' . __(': Hide Left HTML', 'weaver-xtreme' /*adm*/) ),
+
+
 		array('name' => '<span class="i-left dashicons dashicons-editor-code"></span><small>' . __('Right HTML', 'weaver-xtreme' /*adm*/) . '</small>',
-			'id' => $id . '_html_right', 'type' => '+textarea',
+			'id' => $id . '_html_right', 'type' => $right_text,
 			'placeholder' => __('Any HTML, including shortcodes.', 'weaver-xtreme' /*adm*/),
-			'info' => __('Add HTML to Menu on Right (Works best with Centered Menu) (&diams;)(&starf;Plus)', 'weaver-xtreme' /*adm*/)),
+			'info' => __('Add HTML to Menu on Right (Works best with Centered Menu) (&diams;)', 'weaver-xtreme' /*adm*/) . $right_plus),
+
+
 		array( 'name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide Area', 'weaver-xtreme' /*adm*/) . '</small>',
-			'id' => $id .'_hide_right', 'type' => '+select_hide',
+			'id' => $id .'_hide_right', 'type' => $right_hide,
 			'info' => '<em>' . $name . '</em>' . __(': Hide Right HTML', 'weaver-xtreme' /*adm*/) ),
+
+
 		array( 'name' => '<small>' . __('HTML: Text Color', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id .'_html_color', 'type' => 'ctext',
 			'info' => '<em>' . $name . '</em>' . __(': Text Color for Left/Right Menu Bar HTML', 'weaver-xtreme' /*adm*/) ),
 		array( 'name' => '<span class="i-left dashicons dashicons-align-none"></span><small>' . __('HTML: Top Margin', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id .'_html_margin_dec', 'type' => 'val_em',
-			'info' => '<em>' . $name . '</em>' . __(': Margin above Added Menu HTML (Used to adjust for Desktop menu. Negative values can help.)', 'weaver-xtreme' /*adm*/) ),
+			'info' => '<em>' . $name . '</em>' . __(': Margin above Added Menu HTML (Used to adjust for Desktop menu. Negative values can help.)', 'weaver-xtreme' /*adm*/) )
+
+
 
 	);
 
@@ -657,10 +725,13 @@ for most other areas, including Header, Container, Content, Widgets, and more.',
 		echo "</p></td></tr>\n";
 	}
 
+	//echo "\n<!-- *************************** weaverx_form_text_props ID: {$id} ***************************** -->\n";
+
 	weaverx_form_ctext( array(
 		'name' => $name . ' BG',
 		'id' => $id_colorbg,
 		'info' => '<em>' . $info . __(':</em> Background Color (use CSS+ to specify custom CSS for area)', 'weaver-xtreme' /*adm*/)));
+
 
 	if ( $type == 'menu' || $id == 'post_title' )
 		weaverx_form_ctext( array(
@@ -726,11 +797,15 @@ function weaverx_from_fi_location( $value, $is_post = false ) {
 		array('val' => 'content-top', 'desc' => __('With Content - top', 'weaver-xtreme' /*adm*/) ),
 		array('val' => 'content-bottom', 'desc' => __('With Content - bottom', 'weaver-xtreme' /*adm*/) ),
 		array('val' => 'title-before', 'desc' => __('With Title', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'title-banner' , 'desc' =>  __('Banner above Title', 'weaver-xtreme') ),
 		array('val' => 'header-image', 'desc' => $is_post ? __('Hide on Blog View', 'weaver-xtreme' /*adm*/) :
 			  __('Header Image Replacement', 'weaver-xtreme' /*adm*/) ),
-		array('val' => 'post-before', 'desc' => __('Outside of Page/Post', 'weaver-xtreme' /*adm*/) )
-	);
+		array('val' => 'post-before', 'desc' => __('Beside Page/Post, no wrap', 'weaver-xtreme' /*adm*/) ),
 
+		array('val' => 'post-bg', 'desc' => __('As BG Image, Tile', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'post-bg-cover', 'desc' => __('As BG Image, Cover', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'post-bg-parallax', 'desc' => __('As BG Image, Parallax', 'weaver-xtreme' /*adm*/) ),
+	);
 
 	weaverx_form_select_id($value);
 }
@@ -746,6 +821,15 @@ function weaverx_form_align( $value ) {
 	weaverx_form_select_id($value);
 }
 
+function weaverx_form_fixedtop( $value ) {
+	$value['value'] = array(
+		array('val' => 'none', 'desc' => __('Standard Position : Not Fixed', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'fixed-top', 'desc' => __('Fixed to Top', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'scroll-fix', 'desc' => __('Fix to Top on Scroll', 'weaver-xtreme' /*adm*/) )
+	);
+
+	weaverx_form_select_id($value);
+}
 
 function weaverx_form_fi_align( $value ) {
 	$value['value'] = array(
@@ -893,7 +977,8 @@ to create rules for specific devices.
 <em>!important</em> with your rules to force the style override.
 It is possible that other plugins might generate CSS that comes after these rules.', 'weaver-xtreme' /*adm*/); ?>
 </p>
-<?php weaverx_textarea(weaverx_getopt('add_css'), 'add_css', 12, ' ', 'width:95%;'); ?>
+<?php weaverx_textarea(weaverx_getopt('add_css'), 'add_css', 12, '' , 'width:95%;', 'wvrx-edit wvrx-edit-dir'); ?>
+
 </td></tr>
 <?php
 }

@@ -6,9 +6,11 @@ if ( !defined('ABSPATH')) exit; // Exit if accessed directly
  * This function will start the main sapi form, which will be closed in admin-adminopts
  */
 
-
 // ======================== Main Options > Top Level ========================
 function weaverx_admin_mainopts() {
+	if (!function_exists('weaverx_get_wp_custom_logo_url')) {
+		weaverx_alert(__('    ****  WARNING!  ****\r\n\r\nYou are using a new Version 3 of the Weaver Xtreme Theme Support Plugin with an older version of the Weaver Xtreme Theme. Please update to the latest Version 3 of the Weaver Xtreme Theme.\r\n\r\nTHIS VERSION DOES NOT WORK WITH OLD VERSIONS OF WEAVER XTREME!'));
+	}
 ?>
 <div id="tabwrap_main" style="padding-left:4px;">
 
@@ -17,6 +19,7 @@ function weaverx_admin_mainopts() {
 	<?php
 	weaverx_elink('#asp_genappear' , __('Wrapping background colors, rounded corners, borders, fade, shadow', 'weaver-xtreme' /*adm*/), __('Wrapping Areas', 'weaver-xtreme' /*adm*/),'<li>','</li>');
 	weaverx_elink('#asp_widgets' , __('Settings for Sidebars and Sidebar Layout', 'weaver-xtreme' /*adm*/), __('Sidebars &amp; Layout', 'weaver-xtreme' /*adm*/),'<li>', '</li>');
+	weaverx_elink('#asp_full' , __('Settings to create full width sites', 'weaver-xtreme' /*adm*/), __('Full Width', 'weaver-xtreme' /*adm*/),'<li>', '</li>');
 	weaverx_elink('#asp_headeropts' , __('Site Title/Tagline properties, Header Image', 'weaver-xtreme' /*adm*/), __('Header', 'weaver-xtreme' /*adm*/),'<li>', '</li>');
 	weaverx_elink('#asp_menus' , __('Menu text and bg colors and other properties; Info Bar properties', 'weaver-xtreme' /*adm*/), __('Menus','weaver-xtreme'  /*adm*/),'<li>', '</li>');
 	weaverx_elink('#asp_content' , __('Text colors and bg, image borders, featured image, other properties related to all content', 'weaver-xtreme' /*adm*/), __('Content Areas', 'weaver-xtreme' /*adm*/),'<li>', '</li>');
@@ -37,6 +40,12 @@ function weaverx_admin_mainopts() {
 		weaverx_mainopts_layout();
 		weaverx_mainopts_widgets();
 		?>
+	</div>
+
+	<div id="asp_full" class="tab_mainopt" >
+		<?php
+		weaverx_mainopts_fullwidth();
+	?>
 	</div>
 
 	<div id="asp_headeropts" class="tab_mainopt" >
@@ -132,7 +141,12 @@ With <em>Weaver Xtreme Plus</em>, you can also specify background images for var
 	do_action('weaverxplus_admin','general_appearance');
 }
 
-
+function wvrx_ts_new_xp_opt($opt) {
+	// don't support new xp opts in old xp
+	if ( !function_exists('weaverxplus_plugin_installed') || version_compare( WEAVER_XPLUS_VERSION, '2.90', '>=') )
+		return $opt;
+	return array('name' => $opt['name'], 'info' => __('This option requires X-Plus Version 3.0','weaver-xtreme'), 'type' => 'note' );
+}
 
 // ======================== Main Options > Custom ========================
 
@@ -229,9 +243,121 @@ function weaverx_mainopts_custom() {
 	do_action('weaverxplus_admin','fonts');
 }
 
+// ======================== Main Options > Full Width ========================
+
+function weaverx_mainopts_fullwidth() {
+
+	$opts = array(
+	array( 'type' => 'submit'),
+	array('name' => __('Full Width Site', 'weaver-xtreme' /*adm*/), 'id' => '-editor-justify', 'type' => 'header',
+		'info' => __('Options to easily create full width site designs', 'weaver-xtreme' /*adm*/),
+		'help' => 'help.html#FullWidth'),
+
+	array('name' => __('Expand Areas', 'weaver-xtreme' /*adm*/), 'id' => '-editor-expand', 'type' => 'header_area',
+		'info' => __('This section has options that let you expand selected content areas of your site to the full browser width. The content will be responsively displayed - and fully occupy the browser window.', 'weaver-xtreme' /*adm*/)),
+	array('name' => '<span class="i-left dashicons dashicons-editor-expand"></span>' . __('Entire Site Full Width', 'weaver-xtreme' /*adm*/), 'id' => 'wrapper_fullwidth', 'type' => 'checkbox',
+		'info' => __('Checking this option will display the <strong>ENTIRE SITE</strong> in the full width of the browser. This option overrides the <em>Theme Width</em> option on the <em>Wrapping Areas : Wrapper Area</em> menu.', 'weaver-xtreme' /*adm*/)),
+	);
+
+	$expand = array (
+		'header' => array( __('Header Area Expand', 'weaver-xtreme'), __('Expand Header Area to full width. This will include all other Header Area sub-areas as well.','weaver-xtreme' )),
+		'header-image' => array( __('Header Image Expand', 'weaver-xtreme'), __('Expand Header Image to full width.','weaver-xtreme' )),
+		'site_title' => array( __('Site Title/Tagline Expand', 'weaver-xtreme'), __('This option includes the Site Title, Tagline, Search Button, and MiniMenu.','weaver-xtreme' )),
+		'header-widget-area' => array( __('Header Widget Area Expand', 'weaver-xtreme'), __('Expand Header Widget Area to full width.','weaver-xtreme' )),
+		'header-html' => array( __('Header HTML Area Expand', 'weaver-xtreme'), __('Expand Header HTML Area to full width.','weaver-xtreme' )),
+		'm_primary' => array( __('Primary Menu Expand', 'weaver-xtreme'), __('Expand Primary Menu to full width.','weaver-xtreme' )),
+		'm_secondary' => array( __('Secondary Menu Expand', 'weaver-xtreme'), __('Expand Secondary Menu to full width.','weaver-xtreme' )),
+		'container' => array( __('Container Area Expand', 'weaver-xtreme'), __('Expand Container Area to full width.','weaver-xtreme' )),
+		'infobar' => array( __('Info Bar Expand', 'weaver-xtreme'), __('Expand Info Bar to full width.','weaver-xtreme' )),
+		'post' => array( __('Post Area Expand', 'weaver-xtreme'), __('Expand Info Bar to full width.','weaver-xtreme' )),
+		'footer' => array( __('Footer Area Expand', 'weaver-xtreme'), __('Checking this option will automatically include the other Footer Area Expand options as well.','weaver-xtreme' )),
+		'footer_sb' => array( __('Footer Widget Area Expand', 'weaver-xtreme'), __('Expand Footer Widget Area to full width.','weaver-xtreme' )),
+		'footer_html' => array( __('Footer HTML Area Expand', 'weaver-xtreme'), __('Expand Footer HTML Area to full width.','weaver-xtreme' )),
+		'site-ig-wrap' => array( __('Footer Copyright Area Expand', 'weaver-xtreme'), __('Expand Footer Copyright Area to full width.','weaver-xtreme' )),
+
+	);
+
+	foreach ($expand as $id => $vals) {
+		$opts[] = array('name' => '<span class="i-left dashicons dashicons-editor-expand"></span>' . $vals[0], 'id' => 'expand_' . $id, 'type' => 'checkbox',
+		'info' => $vals[1]);
+	}
+
+
+
+	$opts[] = array('name' => __('Extend BG Attributes', 'weaver-xtreme' /*adm*/), 'id' => '-editor-code', 'type' => 'header_area',
+		'info' => __('The Extend BG Attributes options in this section allow you to retain the original content width, while extending its Background attributes to full width. These includes BG color, BG image, and borders, for example.', 'weaver-xtreme' /*adm*/));
+
+	$extend = array (
+		'container' => array( __('Container Area Extend BG', 'weaver-xtreme'), __('Extend Container Area BG Attributes to full width.','weaver-xtreme' )),
+		'header' => array( __('Header Area Extend BG', 'weaver-xtreme'), __('Extend Header Area BG Attributes to full width.','weaver-xtreme' )),
+		'header_sb' => array( __('Header Widget Area Extend BG', 'weaver-xtreme'), __('Extend Header Widget Area BG Attributes to full width.','weaver-xtreme' )),
+		'header_html' => array( __('Header HTML Area Extend BG', 'weaver-xtreme'), __('Extend Header HTML Area BG Attributes to full width.','weaver-xtreme' )),
+		'm_primary' => array( __('Primary Menu Extend BG', 'weaver-xtreme'), __('Extend Primary Menu BG Attributes to full width.','weaver-xtreme' )),
+		'm_secondary' => array( __('Secondary Menu Extend BG', 'weaver-xtreme'), __('Extend Secondary Menu BG Attributes to full width.','weaver-xtreme' )),
+		'infobar' => array( __('Info Bar Extend BG', 'weaver-xtreme'), __('Extend Info Bar BG Attributes to full width.','weaver-xtreme' )),
+		//'content' => array( __('Content Area Extend BG', 'weaver-xtreme'), __('Extend Content Area BG Attributes to full width.','weaver-xtreme' )),
+		'post' => array( __('Post Area Extend BG', 'weaver-xtreme'), __('Extend each Post Area BG Attributes to full width.','weaver-xtreme' )),
+		'footer' => array( __('Footer Area Extend BG', 'weaver-xtreme'), __('Extend Footer Area BG Attributes to full width.','weaver-xtreme' )),
+		'footer_sb' => array( __('Footer Widget Area Extend BG', 'weaver-xtreme'), __('Extend Footer Widget Area BG Attributes to full width.','weaver-xtreme' )),
+		'footer_html' => array( __('Footer HTML Area Extend BG', 'weaver-xtreme'), __('Extend Footer HTML Area BG Attributes to full width.','weaver-xtreme' )),
+
+	);
+
+	foreach ($extend as $id => $vals) {
+		$type = 'checkbox';
+		if ($id == 'm_extra')
+			$type = '+checkbox';
+		$opts[] = array('name' => '<span class="i-left" style="font-size:150%;">&harr;</span><small>' . $vals[0], 'id' => $id . '_extend_width', 'type' => $type,
+		'info' => $vals[1]);
+	}
+
+
+
+
+	$opts[] = array('name' => __('Extend BG Color', 'weaver-xtreme' /*adm*/), 'id' => '-admin-appearance', 'type' => 'header_area',
+		'info' => __('These options, available with Weaver Xtreme Plus, allow you to stretch the BG color of various area to full width. This is different than the Extend BG Attributes in that only the color is extended, and that color can be different than the content. (&starf;Plus)', 'weaver-xtreme' /*adm*/));
+
+
+
+$extend = array (
+
+		'header' => array( __('Header Area Extend BG Color', 'weaver-xtreme'), __('Extend Header Area BG Color to full width.','weaver-xtreme' )),
+		'm_primary' => array( __('Primary Menu Extend BG', 'weaver-xtreme'), __('Extend Primary Menu BG Color to full width.','weaver-xtreme' )),
+		'm_secondary' => array( __('Secondary Menu Extend BG', 'weaver-xtreme'), __('Extend Secondary Menu BG Color to full width.','weaver-xtreme' )),
+		'm_extra' => array( __('Secondary Menu Extend BG', 'weaver-xtreme'), __('Extend Secondary Menu BG Color to full width.','weaver-xtreme' )),
+		'container' => array( __('Container Extend BG', 'weaver-xtreme'), __('Extend Container Area BG Color to full width.','weaver-xtreme' )),
+		'content' => array( __('Content Extend BG', 'weaver-xtreme'), __('Extend Content Area BG Color to full width.','weaver-xtreme' )),
+		'footer' => array( __('Footer Extend BG', 'weaver-xtreme'), __('Extend Footer Area BG Color to full width.','weaver-xtreme' )),
+	);
+
+	foreach ($extend as $id => $vals) {
+		$opts[] = array('name' =>  $vals[0], 'id' => $id . '_extend_bgcolor', 'type' => '+color',
+		'info' => $vals[1] . ' (&starf;Plus)');
+	}
+
+
+?>
+<div class="options-intro">
+<?php _e('<strong>Full Width:</strong> Options to create full width sites.', 'weaver-xtreme' /*adm*/); ?><p>
+<?php _e('','weaver-xtreme'); ?>
+</p></div>
+<?php
+	weaverx_form_show_options($opts);
+
+
+}
 
 // ======================== Main Options > Header ========================
 function weaverx_mainopts_header() {
+
+	$wp_logo = weaverx_get_wp_custom_logo_url();
+
+	if ($wp_logo)
+		$wp_logo_html = "<img src='{$wp_logo}' style='max-height:16px;margin-left:10px;' />";
+	else
+		$wp_logo_html = __('Not set', 'weaver-xtreme');
+
+
 	$opts = array(
 	array( 'type' => 'submit'),
 	array('name' => __('Header Options', 'weaver-xtreme' /*adm*/), 'id' => '-admin-generic', 'type' => 'header',
@@ -240,7 +366,9 @@ function weaverx_mainopts_header() {
 
 
 	array('name' => __('Header Area', 'weaver-xtreme' /*adm*/), 'id' => 'header', 'type' => 'widget_area',
-		'info' => __('Wraps the Header Area: menu bars, standard header image, title, tagline, header widget area', 'weaver-xtreme' /*adm*/)),
+		'info' => __('The Header Area includes: menu bars, standard header image, title, tagline, header widget area, header HTML area', 'weaver-xtreme' /*adm*/)),
+
+array( 'name' => __('Header Other options', 'weaver-xtreme'), 'type' => 'break'),
 
 	array('name' => '<span class="i-left dashicons dashicons-visibility"></span>' . __('Hide Search on Header', 'weaver-xtreme' /*adm*/),
 		'id' => 'header_search_hide', 'type' => 'select_hide',
@@ -259,7 +387,19 @@ function weaverx_mainopts_header() {
 
 	array('name' => '<small>' . __('Suggested Header Image Height', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'header_image_height_int', 'type' => 'val_px',
-		'info' => __('Change the suggested height of the Header Image. Standard size is 188. This only affects the clipping window on the Appearance:Header page. Header images will be responsively sized. (Default header image width: theme width)', 'weaver-xtreme' /*adm*/)),
+		'info' => __('Change the suggested height of the Header Image. This only affects the clipping window on the Appearance:Header page. Header images will be responsively sized. If used with <em>Header Image Rendering</em>, this value will be used to set the minimum height of the BG image. (Default: 188px)', 'weaver-xtreme' /*adm*/)),
+
+		wvrx_ts_new_xp_opt(
+		array('name' => __('Header Image Rendering', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'header_image_render', 'type' => '+select_id',	//code
+		'info' => __('How to render header image: as img in header or as header area bg image. When rendered as a BG image, other options such as moving Title/Tagline or having image link to home page are not meaningful. (Default: &lt;img&gt; in header div) (&starf;Plus)', 'weaver-xtreme' /*adm*/),
+		'value' => array(
+			array('val' => 'header-as-img', 'desc' => __('As img in header', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'header-as-bg', 'desc' => __('As static BG image', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'header-as-bg-responsive', 'desc' => __('As responsive BG image', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'header-as-bg-parallax', 'desc' => __('As parallax BG image', 'weaver-xtreme' /*adm*/))
+
+			)) ),
 
 	array('name' => '<span class="i-left" style="font-size:120%;">&harr;</span><small>' . __('Maximum Image Width', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'header_image_max_width_dec', 'type' => '+val_percent',
@@ -287,6 +427,34 @@ function weaverx_mainopts_header() {
 	array('name' => '<small>' . __('Alternate Header Images:', 'weaver-xtreme' /*adm*/) . '</small>', 'type' => 'note',
 		'info' => __('Specify alternate header images using the <em>Featured Image Location</em> options on the <em>Content Areas</em> tab for pages, or the <em>Post Specifics</em> tab for single post views.', 'weaver-xtreme' /*adm*/)),
 
+	array('name' => '<span class="i-left dashicons dashicons-editor-code"></span>' . __('Image HTML Replacement', 'weaver-xtreme' /*adm*/),
+		'id' => 'header_image_html_text', 'type' => 'textarea',
+		'placeholder' => __('Any HTML, including shortcodes', 'weaver-xtreme' /*adm*/),
+		'info' => __('Replace Header image with arbitrary HTML. Useful for slider shortcodes in place of image. FI as Header Image has priority over HTML replacement. Extreme Plus also supports this option on a Per Page/Post basis.', 'weaver-xtreme' /*adm*/), 'val' => 1 ),
+
+	array('name' => '<small>' . __('Show On Home Page Only', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'header_image_html_home_only', 'type' => 'checkbox',
+		'info' => __('Check to use the Image HTML Replacement only on your Front/Home page.', 'weaver-xtreme' /*adm*/)),
+
+		wvrx_ts_new_xp_opt(
+	array('name' => '<small>' . __('Also show BG Header Image', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'header_image_html_plus_bg', 'type' => '+checkbox',
+		'info' => __('If you have Image HTML Replacement defined - including Per Page/Post - and also have have set the standard Header Image to display as a BG image, then show <em>both</em> the BG image and the replacement HTML. (&starf;Plus)', 'weaver-xtreme' /*adm*/)) ),
+
+
+
+	array('name' => __('Custom Logo', 'weaver-xtreme' /*adm*/), 'id' => '-menu', 'type' =>'subheader',
+		'info' => __('The native WP Custom Logo, set on the Site Identity Customizer menu.', 'weaver-xtreme' /*adm*/)),
+
+	array('name' => '<small>' . __('Replace Title with Site Logo', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'wplogo_for_title', 'type' => 'checkbox',
+		'info' => __('Replace the Site Title text with the WP Custom Logo Image. Logo: ', 'weaver-xtreme' /*adm*/) . $wp_logo_html),
+
+	array('name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide WP Custom Logo', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'hide_wp_site_logo', 'type' => 'select_hide',
+		'info' => __('Hide native WP Custom Site Logo in Header, by device. (This is not the Weaver Logo/HTML!)', 'weaver-xtreme' /*adm*/)),
+
+	array( 'name' => '<span class="i-left dashicons dashicons-align-none"></span><small>' . __('Logo for Title Height', 'weaver-xtreme' /*adm*/) . '</small>',
+			'id' => 'header_logo_height_dec', 'type' => 'val_px',
+			'info' =>  __('Set maximum height of Logo when used to replace Site Title. Default 0 uses the actual image size. This is the maximum height. If the actual image height is smaller, the smaller value is used.', 'weaver-xtreme' /*adm*/) ),
+
 
 	array( 'type' => 'submit'),
 
@@ -309,6 +477,9 @@ function weaverx_mainopts_header() {
 		'id' => 'hide_site_title', 'type' => 'select_hide',
 		'info' => __('Hide Site Title (Uses "display:none;" : SEO friendly.)', 'weaver-xtreme' /*adm*/)),
 
+	array('name' => __('Move Title/Tagline over Image', 'weaver-xtreme' /*adm*/), 'id' => 'title_over_image', 'type' => 'checkbox',
+		'info' => __('Move the Title, Tagline, Search, Logo/HTML and Mini-Menu over the Header Image. This can make a very attractive header,', 'weaver-xtreme' /*adm*/)),
+
 	array('name' => __('Site Tagline', 'weaver-xtreme' /*adm*/), 'id' => 'tagline', 'type' => 'titles',
 		'info' => __("The site's tagline (blog description)", 'weaver-xtreme' /*adm*/)),
 
@@ -327,20 +498,28 @@ function weaverx_mainopts_header() {
 	array('name' => __('Title/Tagline Area BG', 'weaver-xtreme' /*adm*/), 'id' => 'title_tagline_bgcolor', 'type' => 'ctext',
 		'info' => __('BG Color for the Title, Tagline, Search, Logo/HTML and Mini-Menu area.', 'weaver-xtreme' /*adm*/)),
 
-	array('name' => '<span class="i-left dashicons dashicons-editor-code"></span><small>' . __('Site Logo/HTML', 'weaver-xtreme' /*adm*/) . '</small>',
+
+	array('name' => '<span class="i-left font-bold" style="font-size:120%;">&#x21cc;</span><small>' . __('Title/Tagline Padding', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'title_tagline_xy', 'type' => 'text_tb',
+		'info' => __('Add Top/Bottom Padding to the Site Title/Tagline block. This option is especially useful if the Header Image is a BG image. (Default: 0,0)', 'weaver-xtreme' /*adm*/)),
+
+
+
+	array('name' => '<span class="i-left" style="font-size:150%;">&harr;</span><small>' . __('Tagline Max Width', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'tagline_max_w', 'type' => 'val_percent',
+		'info' => __("Maximum width of Tagline in header area (Default: 90%)", 'weaver-xtreme' /*adm*/)),
+
+	array('name' => '<span class="i-left dashicons dashicons-editor-code"></span><small>' . __('Weaver Site Logo/HTML', 'weaver-xtreme' /*adm*/) . '</small>',
 				'id' => '_site_logo', 'type' => '+textarea',
-				'info' => __('HTML for Site Title area. (example: &lt;img src="url" style="position:absolute;top:20px;left:20px;"&nbsp;/&gt; + Custom CSS: #site-logo{min-height:123px;} (&starf;Plus) (&diams;)', 'weaver-xtreme' /*adm*/)),
+				'info' => __('HTML for Site Title area. (example: &lt;img src="url" style="position:absolute;top:20px;left:20px;"&nbsp;/&gt; + Custom CSS: #site-logo{min-height:123px;} (This is not the WP Custom Logo!) (&starf;Plus) (&diams;)', 'weaver-xtreme' /*adm*/)),
+
 	array('name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide Site Logo/HTML', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => '_hide_site_logo', 'type' => '+select_hide',
-		'info' => __('Hide Site Logo/HTML by device (&starf;Plus) (&diams;)', 'weaver-xtreme' /*adm*/)),
+		'info' => __('Hide Weaver Site Logo/HTML by device. (This is not the WP Custom Logo!) (&starf;Plus) (&diams;)', 'weaver-xtreme' /*adm*/)),
 
 	array( 'name' => '<span class="i-left">{ }</span> <small>' . __('Add Classes', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => 'site_title_add_class',  'type' => '+widetext',
 			'info' => '<em>' . __('Title/Tagline', 'weaver-xtreme' /*adm*/) . '</em>' . __(': Space separated class names to add to this area (<em>Advanced option</em>) (&starf;Plus)', 'weaver-xtreme' /*adm*/) ),
-
-
-	array('name' => '<small>' . __('Move Title/Tagline over Image', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'title_over_image', 'type' => 'checkbox',
-		'info' => __('Move the Title, Tagline, Search, Logo/HTML and Mini-Menu over the Header Image.', 'weaver-xtreme' /*adm*/)),
 
 
 
@@ -354,6 +533,9 @@ function weaverx_mainopts_header() {
 
 	array('name' => __('Header Widget Area', 'weaver-xtreme' /*adm*/), 'id' => 'header_sb', 'type' => 'widget_area',
 		'info' => __('Horizontal Header Widget Area', 'weaver-xtreme' /*adm*/)),
+
+	array( 'name' => __('Other Widget Area Options', 'weaver-xtreme'), 'type' => 'break'),
+
 	array('name' => '<small>' . __('Header Widget Area Position', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'header_sb_position', 'type' => '+select_id',	//code
 		'info' => __('Change where Header Widget Area is displayed. (Default: Top) (&starf;Plus)', 'weaver-xtreme' /*adm*/),
@@ -366,6 +548,10 @@ function weaverx_mainopts_header() {
 			array('val' => 'pre_header', 'desc' => __('Pre-#header &lt;div&gt;', 'weaver-xtreme' /*adm*/)),
 			array('val' => 'post_header', 'desc' => __('Post-#header &lt;div&gt;', 'weaver-xtreme' /*adm*/)),
 			)),
+
+	array('name' => '<span class="i-left dashicons dashicons-editor-kitchensink"></span>' . __('Fixed-Top Header Widget Area', 'weaver-xtreme' /*adm*/) ,
+			'id' => 'header_sb_fixedtop', 'type' => 'checkbox',
+			'info' => __('Fix the Header Widget Area to top of page. Use the <em>Expand/Extend BG Attributes</em> on the "Full Width" tab to make a full width Header Widget Area.', 'weaver-xtreme' /*adm*/)),
 
 	array( 'type' => 'submit'),
 
@@ -403,6 +589,8 @@ function weaverx_mainopts_header() {
 
 // ======================== Main Options > Menus ========================
 function weaverx_mainopts_menus() {
+
+
 	$opts = array(
 	array( 'type' => 'submit'),
 	array('name' => __('Menu &amp; Info Bars', 'weaver-xtreme' /*adm*/), 'id' => '-menu', 'type' => 'header',
@@ -423,12 +611,8 @@ function weaverx_mainopts_menus() {
 		'info' => __('Weaver Xtreme Plus allows you to define Mega Menu style dropdown menu items with arbitrary HTML content. (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
 
 
-
 	array('name' => __('Primary Menu Bar', 'weaver-xtreme' /*adm*/), 'id' => 'm_primary', 'type' => 'menu_opts',
 		'info' => __('Attributes for the Primary Menu Bar (Default Location: Bottom of Header)', 'weaver-xtreme' /*adm*/)),
-
-	array('name' => '<small>' . __('No Home Menu Item', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'menu_nohome', 'type' => 'checkbox',
-		'info' => __('Don\'t automatically add Home menu item for home page (as defined in Settings->Reading)', 'weaver-xtreme' /*adm*/)),
 
 
 //	array('name' => '<span class="i-left" style="font-size:150%;">&harr;</span><small> ' . __('Mobile Menu Trigger', 'weaver-xtreme' /*adm*/). '</small>',
@@ -471,11 +655,22 @@ function weaverx_mainopts_menus() {
 		'info' => __('Retain the menu bar hover BG color when sub-menus are opened.', 'weaver-xtreme' /*adm*/)),
 
 
+	array('name' => '<small>' . __('Placeholder Hover Cursor', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'placeholder_cursor', 'type' => 'select_id',	//code
+		'info' => __('CSS cursor :hover attribute for placeholder menus (e.g., Custom Menus with URL==#). (Default: pointer)', 'weaver-xtreme' /*adm*/),
+		'value' => array(
+			array('val' => 'pointer', 'desc' => __('Pointer (indicates link)', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'context-menu', 'desc' => __('Context Menu available', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'text', 'desc' => __('Text', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'none', 'desc' => __('No pointer', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'not-allowed', 'desc' => __('Action not allowed', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'default', 'desc' => __('The default cursor', 'weaver-xtreme' /*adm*/))
+			)),
 
-	array( 'name' => '<small>' . __('Placeholder Hover Cursor', 'weaver-xtreme' /*adm*/) . '</small>',
-			'id' => 'placeholder_cursor',  'type' => 'widetext',
-		'info' => __('CSS cursor :hover attribute for placeholder menus (e.g., Custom Menus with URL==#).
-(Default: pointer. Suggested: context-menu or text.)', 'weaver-xtreme' /*adm*/)),
+
+	array( 'name' => '<small>' . __('Mobile Menu "Hamburger" Label', 'weaver-xtreme' /*adm*/) . '</small>',
+			'id' => 'mobile_alt_label',  'type' => 'widetext',
+		'info' => __('Alternative label for the default mobile "Hamburger" icon. HTML allowed: &lt;span&gt; or &lt;img&gt; suggested.', 'weaver-xtreme' /*adm*/)),
 
 
 	array( 'type' => 'submit'),
@@ -652,6 +847,9 @@ function weaverx_mainopts_content() {
 	array('name' => '<span class="i-left" style=font-size:120%;">&nbsp;&#10538;</span>' . __('Featured Image Location', 'weaver-xtreme' /*adm*/),
 		'id' => 'page_fi_location', 'type' => 'fi_location',
 		'info' => __('Where to display Featured Image for Pages','weaver-xtreme' /*adm*/)),
+	array('name' => __('Full Width FI BG Image:', 'weaver-xtreme' /*adm*/),
+		'info' => __('To create full width Page BG images from the FI, check the <em>Container Area Extend BG Attributes</em> box on the <em>Full Width</em> tab.', 'weaver-xtreme' /*adm*/),
+		'type' => 'note'), // ,'help' => 'help.html#PhotoBlog'),
 	array('name' => '<span class="i-left dashicons dashicons-editor-alignleft"></span><small>' . __('Featured Image Alignment<small>', 'weaver-xtreme' /*adm*/), 'id' => 'page_fi_align', 'type' => 'fi_align',
 		'info' => __('How to align the Featured Image', 'weaver-xtreme' /*adm*/)),
 
@@ -806,7 +1004,7 @@ function weaverx_mainopts_posts() {
 		'info' => __('Layout of Posts', 'weaver-xtreme' /*adm*/)),
 
 	array('name' => '<span class="i-left" style=font-size:120%;">&nbsp;&#9783;</span>' . __('Post Content Columns', 'weaver-xtreme' /*adm*/), 'id' => 'post_cols', 'type' => 'select_id',	//code
-		'info' => __('Automatically split all post content into columns for both blog and single page views. <em>This is post content only.</em> This is not the same as "Columns of Posts". (Always 1 column on IE&lt;=9.)', 'weaver-xtreme' /*adm*/),
+		'info' => __('Automatically split all post content into columns for both blog and single page views. <em>This is post content only.</em> This is not the same as "Columns of Posts". (IE&lt;=9 will display 1 col.)', 'weaver-xtreme' /*adm*/),
 		'value' => array(
 			array('val' => '1', 'desc' => __('1 Column', 'weaver-xtreme' /*adm*/)),
 			array('val' => '2', 'desc' => __('2 Columns', 'weaver-xtreme' /*adm*/)),
@@ -832,7 +1030,7 @@ function weaverx_mainopts_posts() {
 		'info' => __("Display opening Sticky Posts in one column. If First Post One Column also checked, then first non-sticky post will be one column.", 'weaver-xtreme' /*adm*/)),
 	array('name' => '<span class="i-left" style=font-size:120%;">&nbsp;&#9783;</span><small>' . __('Use <em>Masonry</em> for Posts', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'masonry_cols', 'type' => 'select_id',	//code
-		'info' => __('Use the <em>Masonry</em> blog layout option to show dynamically packed posts on blog and archive-like pages. Overrides "Columns of Posts" setting.', 'weaver-xtreme' /*adm*/),
+		'info' => __('Use the <em>Masonry</em> blog layout option to show dynamically packed posts on blog and archive-like pages. Overrides "Columns of Posts" setting. <em>Not compatible with full width FI BG images.</em>', 'weaver-xtreme' /*adm*/),
 		'value' => array(
 			array('val' => '0', 'desc' => ''),
 			array('val' => '2', 'desc' => __('2 Columns', 'weaver-xtreme' /*adm*/)),
@@ -980,6 +1178,9 @@ function weaverx_mainopts_posts() {
 
 	array('name' => __('Featured Image - Posts', 'weaver-xtreme' /*adm*/), 'id' => '-id', 'type' => 'subheader_alt',
 		'info' => __('Display of Post Featured Images', 'weaver-xtreme' /*adm*/)),
+
+	array('name' => __('Full Width FI BG Image:', 'weaver-xtreme' /*adm*/), 'type' => 'note',
+		'info' => __('To create full width Post BG images from the FI, check the <em>Post Area Extend BG Attributes</em> box at <em>Full Width</em> tab.', 'weaver-xtreme' /*adm*/)),
 
 	array('name' => '<span class="i-left" style=font-size:120%;">&nbsp;&#10538;</span>' . __('FI Location - Full Post', 'weaver-xtreme' /*adm*/),
 		'id' => 'post_full_fi_location', 'type' => 'fi_location_post',

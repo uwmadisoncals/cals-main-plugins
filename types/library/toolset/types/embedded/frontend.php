@@ -91,147 +91,154 @@ function wpcf_shortcode( $atts, $content = null, $code = '' ) {
  *
  * @return string
  */
-function types_render_field( $field_id = null, $params = array(), $content = null, $code = '', $allow_parent = true )
-{
-    if ( empty($field_id) ) {
-        return '';
-    }
+function types_render_field( $field_id = null, $params = array(), $content = null, $code = '', $allow_parent = true ) {
+	if ( empty( $field_id ) ) {
+		return '';
+	}
 
-    global $wpcf;
+	global $wpcf;
 
-    // HTML var holds actual output
-    $html = '';
+	// HTML var holds actual output
+	$html = '';
 
-    // Set post ID to global
-    $post_id = get_the_ID();
+	// Set post ID to global
+	$post_id = get_the_ID();
 
-    // check if "$parent" for "id" is allowed
-    // OR if "id" does not contain a "$parent" selection
-    $parent_check = isset( $params['id'] ) && ( $allow_parent || substr( $params['id'], 0, 1) !== '$' );
+	// check if "$parent" for "id" is allowed
+	// OR if "id" does not contain a "$parent" selection
+	$parent_check = isset( $params['id'] ) && ( $allow_parent || substr( $params['id'], 0, 1 ) !== '$' );
 
-    // support also 'id' like our shortcode [types] does
-    // @since 2.1
-    if( ! isset( $params['post_id'] ) && isset( $params['id'] ) && $parent_check )
-        $params['post_id'] = $params['id'];
+	// support also 'id' like our shortcode [types] does
+	// @since 2.1
+	if ( ! isset( $params['post_id'] ) && isset( $params['id'] ) && $parent_check ) {
+		$params['post_id'] = $params['id'];
+	}
 
-    // Check if other post required
-    if ( isset( $params['post_id'] ) ) {
-        // If numeric value
-        if ( is_numeric( $params['post_id'] ) ) {
-            $post_id = intval( $params['post_id'] );
+	// Check if other post required
+	if ( isset( $params['post_id'] ) ) {
+		// If numeric value
+		if ( is_numeric( $params['post_id'] ) ) {
+			$post_id = intval( $params['post_id'] );
 
-            // WP parent
-        } else if ( $params['post_id'] == '$parent' ) {
-            $current_post = get_post( $post_id );
-            if ( empty( $current_post->post_parent ) ) {
-                return '';
-            }
-            $post_id = $current_post->post_parent;
+			// WP parent
+		} else if ( $params['post_id'] == '$parent' ) {
+			$current_post = get_post( $post_id );
+			if ( empty( $current_post->post_parent ) ) {
+				return '';
+			}
+			$post_id = $current_post->post_parent;
 
-            // Types parent
-        } else if ( strpos( $params['post_id'], '$' ) === 0 ) {
-            $post_id = intval( WPCF_Relationship::get_parent( $post_id, trim( $params['post_id'], '$' ) ) );
-        }
-    }
+			// Types parent
+		} else if ( strpos( $params['post_id'], '$' ) === 0 ) {
+			$post_id = intval( WPCF_Relationship::get_parent( $post_id, trim( $params['post_id'], '$' ) ) );
+		}
+	}
 
-    if ( empty( $post_id ) ) {
-        return '';
-    }
+	if ( empty( $post_id ) ) {
+		return '';
+	}
 
-    // Set post
-    $post = get_post( $post_id );
+	// Set post
+	$post = get_post( $post_id );
 
-    if ( empty( $post ) ) {
-        return '';
-    }
+	if ( empty( $post ) ) {
+		return '';
+	}
 
-    // Get field
-    $field = types_get_field( $field_id );
-	
-    // If field not found return empty string
-    if ( empty( $field ) ) {
+	// Get field
+	$field = types_get_field( $field_id );
 
-        // Log
-        if ( !function_exists( 'wplogger' ) ) {
-            require_once WPCF_EMBEDDED_TOOLSET_ABSPATH . '/toolset-common/wplogger.php';
-        }
-        global $wplogger;
-        $wplogger->log( 'types_render_field call for missing field \'' . $field_id . '\'', WPLOG_DEBUG );
+	// If field not found return empty string
+	if ( empty( $field ) ) {
 
-        return '';
-    }
+		// Log
+		if ( ! function_exists( 'wplogger' ) ) {
+			require_once WPCF_EMBEDDED_TOOLSET_ABSPATH . '/toolset-common/wplogger.php';
+		}
+		global $wplogger;
+		$wplogger->log( 'types_render_field call for missing field \'' . $field_id . '\'', WPLOG_DEBUG );
 
-    // Set field
-    $wpcf->field->set( $post, $field );
+		return '';
+	}
 
-    // See if repetitive
-    if ( types_is_repetitive( $field ) ) {
-        $wpcf->repeater->set( $post_id, $field );
-        $_meta = $wpcf->repeater->_get_meta();
-        $meta = $_meta['custom_order'];
+	// Set field
+	$wpcf->field->set( $post, $field );
 
-        // Sometimes if meta is empty - array(0 => '') is returned
-        if ( count( $meta ) == 1 && reset( $meta ) == '' ) {
-            return '';
-        }
-        if ( !empty( $meta ) ) {
-            $output = '';
+	// See if repetitive
+	if ( types_is_repetitive( $field ) ) {
+		$wpcf->repeater->set( $post_id, $field );
+		$_meta = $wpcf->repeater->_get_meta();
+		$meta = $_meta['custom_order'];
 
-            if ( isset( $params['index'] ) ) {
-                $index = $params['index'];
-            } else {
-                $index = '';
-            }
+		// Sometimes if meta is empty - array(0 => '') is returned
+		if ( count( $meta ) == 1 && reset( $meta ) == '' ) {
+			return '';
+		}
+		if ( ! empty( $meta ) ) {
+			$output = '';
 
-            // Allow wpv-for-each shortcode to set the index
-            $index = apply_filters( 'wpv-for-each-index', $index );
+			if ( isset( $params['index'] ) ) {
+				$index = $params['index'];
+			} else {
+				$index = '';
+			}
 
-            if ( $index === '' ) {
-                $output = array();
-                foreach ( $meta as $temp_key => $temp_value ) {
-                    $params['field_value'] = $temp_value;
-                    $temp_output = types_render_field_single( $field, $params, $content, $code, $temp_key );
-                    if ( !empty( $temp_output ) ) {
-                        $output[] = $temp_output;
-                    }
-                }
-                if ( !empty( $output ) && isset( $params['separator'] )
-                        && $params['separator'] !== '' ) {
-                    $output = implode( html_entity_decode( $params['separator'] ),
-                            $output );
-                } else if ( !empty( $output ) ) {
-                    $output = implode( ' ', $output );
-                } else {
-                    return '';
-                }
-            } else {
-                // Make sure indexed right
-                $_index = 0;
-                foreach ( $meta as $temp_key => $temp_value ) {
-                    if ( $_index == $index ) {
-                        $params['field_value'] = $temp_value;
-                        return types_render_field_single( $field, $params, $content, $code, $temp_key );
-                    }
-                    $_index++;
-                }
-                // If missed index
-                return '';
-            }
-            $html = $output;
-        } else {
-            return '';
-        }
-    } else {
+			// Allow wpv-for-each shortcode to set the index
+			$index = apply_filters( 'wpv-for-each-index', $index );
 
-        // Non-repetitive field
-        $params['field_value'] = wpcf_get_post_meta( $post_id,
-                wpcf_types_get_meta_prefix( $field ) . $field['slug'], true );
-        if ( $params['field_value'] == '' && $field['type'] != 'checkbox' ) {
-            return '';
-        }
-        $html = types_render_field_single( $field, $params, $content, $code, $wpcf->field->meta_object->meta_id );
-    }
-    return $wpcf->field->html( $html, $params );
+			if ( $index === '' ) {
+				$output = array();
+				foreach ( $meta as $temp_key => $temp_value ) {
+					$params['field_value'] = $temp_value;
+					$temp_output = types_render_field_single( $field, $params, $content, $code, $temp_key );
+					if ( ! Toolset_Utils::is_field_value_truly_empty( $temp_output ) ) {
+						$output[] = $temp_output;
+					}
+				}
+
+				if ( ! empty( $output ) && isset( $params['separator'] )
+					&& $params['separator'] !== ''
+				) {
+					$output = implode( html_entity_decode( $params['separator'] ), $output );
+				} else if ( ! empty( $output ) ) {
+					$output = implode( ' ', $output );
+				} else {
+					return '';
+				}
+
+			} else {
+				// Make sure indexed right
+				$_index = 0;
+				foreach ( $meta as $temp_key => $temp_value ) {
+					if ( $_index == $index ) {
+						$params['field_value'] = $temp_value;
+
+						return types_render_field_single( $field, $params, $content, $code, $temp_key );
+					}
+					$_index ++;
+				}
+
+				// If missed index
+				return '';
+			}
+			$html = $output;
+		} else {
+			return '';
+		}
+	} else {
+
+		// Non-repetitive field
+		$meta_key = wpcf_types_get_meta_prefix( $field ) . $field['slug'];
+		$params['field_value'] = wpcf_get_post_meta( $post_id, $meta_key, true );
+
+		if ( $params['field_value'] == '' && $field['type'] != 'checkbox' ) {
+			return '';
+		}
+
+		$html = types_render_field_single( $field, $params, $content, $code, $wpcf->field->meta_object->meta_id );
+	}
+
+	return $wpcf->field->html( $html, $params );
 }
 
 function types_render_termmeta( $field_id, $params, $content = null, $code = '' ) {
@@ -250,18 +257,11 @@ function types_render_termmeta( $field_id, $params, $content = null, $code = '' 
 	
 	if ( 
 		! isset( $params['term_id'] ) 
-		&& (
-			is_tax() 
-			|| is_category() 
-			|| is_tag() 
-		)
+		&& ( is_tax() || is_category() || is_tag() )
 	) {
 		global $wp_query;
 		$term = $wp_query->get_queried_object();
-		if ( 
-			$term 
-			&& isset( $term->term_id )
-		) {
+		if ( $term && isset( $term->term_id ) ) {
 			$params['term_id'] = $term->term_id;
 		}
 	}
@@ -310,8 +310,7 @@ function types_render_termmeta( $field_id, $params, $content = null, $code = '' 
                 return '';
             } else {
                 $params['field_value'] = $_temp;
-                return types_render_field_single( $field, $params, $content,
-                                $code, $meta_id );
+                return types_render_field_single( $field, $params, $content, $code, $meta_id );
             }
         } else if ( !empty( $meta ) ) {
             $output = '';
@@ -331,13 +330,12 @@ function types_render_termmeta( $field_id, $params, $content = null, $code = '' 
                     $params['field_value'] = $temp_value;
                     $temp_output = types_render_field_single( $field, $params,
                             $content, $code, $temp_key );
-                    if ( !empty( $temp_output ) ) {
+                    if ( ! Toolset_Utils::is_field_value_truly_empty( $temp_output ) ) {
                         $output[] = $temp_output;
                     }
                 }
                 if ( !empty( $output ) && isset( $params['separator'] ) ) {
-                    $output = implode( html_entity_decode( $params['separator'] ),
-                            $output );
+                    $output = implode( html_entity_decode( $params['separator'] ), $output );
                 } else if ( !empty( $output ) ) {
                     $output = implode( '', $output );
                 } else {
@@ -349,8 +347,7 @@ function types_render_termmeta( $field_id, $params, $content = null, $code = '' 
                 foreach ( $meta as $temp_key => $temp_value ) {
                     if ( $_index == $index ) {
                         $params['field_value'] = $temp_value;
-                        $output = types_render_field_single( $field, $params,
-                                $content, $code, $temp_key );
+                        $output = types_render_field_single( $field, $params, $content, $code, $temp_key );
                     }
                     $_index++;
                 }
@@ -481,7 +478,7 @@ function types_render_usermeta( $field_id, $params, $content = null, $code = '' 
                     $params['field_value'] = $temp_value;
                     $temp_output = types_render_field_single( $field, $params,
                             $content, $code, $temp_key );
-                    if ( !empty( $temp_output ) ) {
+                    if ( ! Toolset_Utils::is_field_value_truly_empty( $temp_output ) ) {
                         $output[] = $temp_output;
                     }
                 }
@@ -598,8 +595,7 @@ function types_render_field_single( $field, $params, $content = null, $code = ''
                 $output = strval( call_user_func( $_view_func, $params ) );
             }
 
-            // If no output
-            if ( empty( $output ) && isset( $params['field_value'] )
+	    if ( Toolset_Utils::is_field_value_truly_empty( $output ) && isset( $params['field_value'] )
                 && $params['field_value'] !== "" ) {
                     $output = $params['field_value'];
                 } else if ( $output == '__wpcf_skip_empty' ) {
@@ -610,7 +606,7 @@ function types_render_field_single( $field, $params, $content = null, $code = ''
                 $output = wpcf_frontend_compat_html_output( $output, $field, $content, $params );
             } else {
                 // Prepend name if needed
-                if ( !empty( $output ) && isset( $params['show_name'] )
+                if ( ! Toolset_Utils::is_field_value_truly_empty( $output ) && isset( $params['show_name'] )
                     && $params['show_name'] == 'true' ) {
                         $output = $params['field']['name'] . ': ' . $output;
                     }

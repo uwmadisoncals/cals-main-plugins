@@ -164,6 +164,9 @@ function weaverx_form_show_options($weaverx_olist, $begin_table = true, $end_tab
 			case 'align':
 				weaverx_form_align($value);
 				break;
+			case 'break':
+				weaverx_form_break($value);
+				break;
 			case 'checkbox':
 				weaverx_form_checkbox($value);
 				break;
@@ -187,6 +190,9 @@ function weaverx_form_show_options($weaverx_olist, $begin_table = true, $end_tab
 				break;
 			case 'fi_location_post':
 				weaverx_from_fi_location($value, true);
+				break;
+			case 'fixedtop':
+				weaverx_form_fixedtop($value);
 				break;
 			case 'header':
 				weaverx_form_header($value);

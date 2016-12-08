@@ -5,7 +5,7 @@ Plugin URI: http://weavertheme.com/plugins
 Description: Weaver Xtreme Theme Support - a package of useful shortcodes and widgets that integrates closely with the Weaver Xtreme and Weaver Foundation themes.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 2.1.3
+Version: 3.0
 License: GPL V3
 
 Weaver Xtreme Theme Support
@@ -31,11 +31,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 $theme = get_template_directory();
 
-if ( strpos( $theme, '/weaver-xtreme') !== false || strpos( $theme, '/weaver-foundation') !== false) {		// only load if Weaver Xtreme is the theme
+function wvrx_ts_alert($msg) {
+	echo "<script> alert('" . esc_html($msg) . "'); </script>";
+}
 
-define ('WVRX_TS_VERSION','2.1.3');
+function wvrx_is_user_logged_in() {
+	$user = wp_get_current_user();
+
+	return $user->exists();
+}
+
+if ( strpos( $theme, '/weaver-xtreme') !== false ) {		// only load if Weaver Xtreme is the theme
+
+define ('WVRX_TS_VERSION','3.0');
 define ('WVRX_TS_MINIFY','.min');		// '' for dev, '.min' for production
 define ('WVRX_TS_APPEARANCE_PAGE', false );
+
 
 function wvrx_ts_installed() {
     return true;
@@ -58,14 +69,19 @@ function wvrx_ts_enqueue_scripts() {	// action definition
 
 add_action('wp_enqueue_scripts', 'wvrx_ts_enqueue_scripts' );
 
+/* not compatible with pre 2.2 XPlus
+function wvrx_ts_admin_enqueue_scripts() {
+	wp_enqueue_script('wvrxtsJSLib', wvrx_ts_plugins_url('/admin/assets/js/jscolor/jscolor','.js'),array('jquery'),WVRX_TS_VERSION,true);
+}
+
+add_action( 'admin_enqueue_scripts', 'wvrx_ts_admin_enqueue_scripts' ); */
+
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-runtime-lib.php'); // NOW - load the basic library
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-widgets.php'); 		// widgets runtime library
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-shortcodes.php'); // load the shortcode definitions
 // future development: require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-per-page-customizer.php');
 
 // load traditional Weaver Xtreme Options
-
-if ( strpos( $theme, '/weaver-xtreme') !== false ) { //   Weaver Xtreme only
 
 function weaver_xtreme_load_admin_action() {
 	require_once(dirname( __FILE__ ) . '/admin/add-weaverx-sapi-options.php'); // NOW - load the traditional opions admin
@@ -74,13 +90,19 @@ function weaver_xtreme_load_admin_action() {
 
 add_action('weaver_xtreme_load_admin','weaver_xtreme_load_admin_action');
 
-if ( ! function_exists( 'weaverxplus_plugin_installed' ) ) {
+
+
+//if (!defined('WEAVER_XPLUS_VERSION') || version_compare( WEAVER_XPLUS_VERSION, '2.90', '>=') ) {
+
 
 add_action('admin_menu', 'wvrx_ts_add_page_fields',11);	// allow X-Plus to override us
 
 function wvrx_ts_add_page_fields() {
-	add_meta_box('page-box', __('Weaver Xtreme Options For This Page (Theme Support Per Page Options)','weaverx-theme-support'), 'wvrx_ts_page_extras_load', 'page', 'normal', 'high');
-	add_meta_box('post-box', __('Weaver Xtreme Options For This Post (Theme Support Per Post Options)','weaverx-theme-support'), 'wvrx_ts_post_extras_load', 'post', 'normal', 'high');
+	$per_post_label = defined('WEAVER_XPLUS_VERSION') ? __(' (with Weaver Xtreme Plus Options)','weaverx-theme-support') : '';
+	add_meta_box('page-box', __('Weaver Xtreme Options For This Page','weaverx-theme-support') . $per_post_label ,
+				 'wvrx_ts_page_extras_load', 'page', 'normal', 'high');
+	add_meta_box('post-box', __('Weaver Xtreme Options For This Post' . $per_post_label,
+								'weaverx-theme-support'), 'wvrx_ts_post_extras_load', 'post', 'normal', 'high');
 	global $post;
 	$opts = get_option( apply_filters('weaverx_options','weaverx_settings') , array());	// need to fetch Weaver Xtreme options
 
@@ -88,7 +110,8 @@ function wvrx_ts_add_page_fields() {
 	$args=array( 'public'   => true, '_builtin' => false );
 	$post_types = get_post_types($args,'names','and');
 	foreach ($post_types  as $post_type ) {
-		add_meta_box('post-box' . $i, __('Weaver Xtreme Options For This Post Type (Theme Support Per Post Options)','weaverx-theme-support'), 'wvrx_ts_post_extras_pt', $post_type, 'normal', 'high');
+		add_meta_box('post-box' . $i, __('Weaver Xtreme Options For This Post Type','weaverx-theme-support') . $per_post_label,
+					 'wvrx_ts_post_extras_pt', $post_type, 'normal', 'high');
 		$i++;
 	}
 
@@ -104,7 +127,7 @@ function wvrx_ts_post_extras_load() {
 	wvrx_ts_post_extras();
 }
 
-} // x-plus installed
+//} // x-plus installed - as of V3, this is no longer needed
 
 // ======================================== subthemes ========================================
 add_action('weaverx_child_show_extrathemes','wvrx_ts_child_show_extrathemes_action');
@@ -215,7 +238,6 @@ function wvrx_ts_scan_section($what) {
 	echo '</ul>';
 }
 
-} // end of load for Weaver Xtreme only - not Weaver Foundation
 } // end only load if Weaver Xtreme installed
 
 ?>

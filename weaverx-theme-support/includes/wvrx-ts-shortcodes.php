@@ -198,7 +198,7 @@ function wvrx_ts_sc_header_image($args = '') {
 		return '';
 	$hdr = str_replace(array('http://', 'https://'),'//', $hdr);
 
-	$width = weaverx_getopt_default('theme_width_int',940);
+	$width = weaverx_getopt_default('theme_width_int',1100);
 	$custom_header_sizes = apply_filters( 'weaverx_custom_header_sizes', "(max-width: {$width}px) 100vw, 1920px" );
 
     $width = $w ?  $w  : get_custom_header()->width;
@@ -297,9 +297,13 @@ function wvrx_ts_sc_iframe($args = '') {
 // ===============  [iframe src='address' height=nnn] ======================
 function wvrx_ts_sc_login($args = '') {
     extract(shortcode_atts(array(
+		'style' => ''
     ), $args));
 
-    return '<span class="wvrx-loginout">' . wp_loginout( '', false ) . '</span>';
+	if ($style != '')
+		return '<span class="wvrx-loginout" style="' . esc_attr($style) . '">' . wp_loginout( '', false ) . '</span>';
+	else
+		return '<span class="wvrx-loginout">' . wp_loginout( '', false ) . '</span>';
 }
 
 // ===============  [tab_group ] ======================

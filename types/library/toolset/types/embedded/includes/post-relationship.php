@@ -261,11 +261,14 @@ function wpcf_admin_notice_post_locked_no_parent() {
 </div>
 <?php
 }
+
 /**
  * Meta boxes contents output.
  *
- * @param type $post
- * @param type $args
+ * @param WP_Post $post
+ * @param array $args
+ *
+ * @return string
  */
 function wpcf_pr_admin_post_meta_box_output( $post, $args )
 {

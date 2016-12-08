@@ -90,12 +90,15 @@ function get_custom_login_code() {
 			}
 		}
 
-		wp_register_style('_iconstyle', MAINTENANCE_URI .'load/images/fonts-icon/icons.style.css');
-		wp_register_style('_style', 	MAINTENANCE_URI .'load/style.css');
-		$wp_styles->do_items('_iconstyle');
+		wp_register_style('_iconstyle_fa', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+		wp_register_style('_iconstyle_fi', 'https://cdn.jsdelivr.net/foundation-icons/3.0/foundation-icons.min.css');
+		wp_register_style('_style', 		MAINTENANCE_URI .'load/style.css');
+		
 
 		/*Add inline custom style*/
 		get_options_style();
+		$wp_styles->do_items('_iconstyle_fa');
+		$wp_styles->do_items('_iconstyle_fi');
 		$wp_styles->do_items('_style');
 	}
 
@@ -109,12 +112,10 @@ function get_custom_login_code() {
 			wp_register_script( '_cf7form',		MAINTENANCE_URI  .'../contact-form-7/includes/js/jquery.form.min.js', 'jquery');
 			wp_register_script( '_cf7scripts',	MAINTENANCE_URI  .'../contact-form-7/includes/js/scripts.js', 'jquery');
 			$_wpcf7 = array(
-				'loaderUrl' => wpcf7_ajax_loader(),
-				'recaptcha' => array(
-					'messages' => array(
-						'empty' => __( 'Please verify that you are not a robot.',
-							'contact-form-7' ) ) ),
-				'sending' => __( 'Sending ...', 'contact-form-7' ) );
+			'recaptcha' => array(
+				'messages' => array(
+					'empty' => __( 'Please verify that you are not a robot.',
+						'contact-form-7' ) ) ) );
 			if ( defined( 'WP_CACHE' ) && WP_CACHE ) {
 				$_wpcf7['cached'] = 1;
 			}
@@ -229,7 +230,8 @@ function get_custom_login_code() {
 		}
 
 		if (!empty($mt_options['description'])) {
-			$out_content .= '<h3 class="description font-center">' . wp_kses_post(stripslashes($mt_options['description'])) .'</h3>';
+			$description_content = apply_filters( 'the_content', $mt_options['description'] );
+			$out_content .= '<h3 class="description font-center">' . $description_content .'</h3>';
 		}
 
 		echo $out_content;
@@ -284,7 +286,7 @@ function get_custom_login_code() {
 	function do_button_login_form($error = -1) {
 		?>
 			<div id="btn-open-login-form" class="btn-open-login-form">
-				<i class="foundicon-lock"></i>
+				<i class="fi-lock"></i>
 			</div>
 		<?php
 
@@ -319,8 +321,7 @@ function get_custom_login_code() {
     add_filter( 'lostpassword_url',  'reset_pass_url', 999, 0 );
 
 	function get_preloader_element() {
-		$out = '';
-		$out = '<div class="preloader"><i></i></div>';
+		$out = '<div class="preloader"><i class="fi-widget" aria-hidden="true"></i></div>';
 		echo $out;
 	}
 	add_action('before_content_section', 'get_preloader_element', 5);
@@ -330,16 +331,18 @@ function get_custom_login_code() {
 			if (!isset($mt_options['503_enabled']) && (isset($mt_options['gg_analytics_id']))) {
 		?>
 		<script type="text/javascript">
-			var _gaq = _gaq || [];
-				_gaq.push(['_setAccount', '<?php echo esc_attr($mt_options['gg_analytics_id']); ?>']);
-				_gaq.push(['_trackPageview']);
-			(function() {
-				var ga = document.createElement('script');
-					ga.type = 'text/javascript';
-					ga.async = true;
-					ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-					var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-			})();
+			(function(i,s,o,g,r,a,m){
+				i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ 
+			   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];
+				a.async=1;
+				a.src=g;
+				m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', '<?php echo esc_attr($mt_options['gg_analytics_id']); ?>', 'auto');
+			ga('send', 'pageview');
+
 		</script>
 		<?php
 		}

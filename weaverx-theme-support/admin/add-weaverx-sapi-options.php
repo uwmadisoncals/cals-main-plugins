@@ -23,7 +23,7 @@ function weaverx_admin_ts_head() {	// action definition
 
 
 }
-// admin actions function definitons
+// admin actions function definitions
 
 function weaverx_ts_weaverx_admin_subthemes() {
 	require_once( dirname(__FILE__ ) . '/admin-subthemes.php');

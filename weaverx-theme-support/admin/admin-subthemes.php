@@ -57,7 +57,7 @@ function weaverx_st_pick_theme($list_in) {
 	$cur_theme = weaverx_getopt('theme_filename');
 	if ( !$cur_theme ) $cur_theme = WEAVERX_DEFAULT_THEME;	// the default theme
 ?>
-<form enctype="multipart/form-data" name='pick_theme' method='post'>
+<form enctype="multipart/form-data" name='pick_theme' method='post' onSubmit="return confirm('<?php _e('Are you sure you want select a new theme?\r\n\r\nSelecting a new subtheme will overwrite your existing theme settings. You should save your existing settings on the Save/Restore menu if you have made changes.', 'weaver-xtreme'); ?>');" >
 	&nbsp;&nbsp;<strong><?php _e('Click a Radio Button below to select a subtheme:', 'weaver-xtreme' /*adm*/);?> &nbsp;</strong>
 	<span style="padding-left:100px;"><?php _e('Current theme:', 'weaver-xtreme' /*adm*/);?> <strong>
 <?php
@@ -71,13 +71,17 @@ function weaverx_st_pick_theme($list_in) {
 ?>
 	</strong></span>
 
-	<br /><br /><span class='submit'><input name="set_subtheme" type="submit" value="<?php _e('Set to Selected Subtheme', 'weaver-xtreme' /*adm*/);?>" /></span>
-	<small style="color:#b00;"><br /><?php _e('<strong>Note:</strong> Selecting a <em>non-Demo</em> subtheme will change only theme related settings.
-	Options labelled with (&diams;) will be retained. You can use the Save/Restore tab to save a copy of all your current settings first.', 'weaver-xtreme' /*adm*/);?></small><br /><br />
+	<br /><br />
+<?php
+	//weaverx_confirm_select_theme();
+	?>
+	<input class="button-primary" name="set_subtheme" type="submit" value="<?php _e('Set to Selected Subtheme', 'weaver-xtreme' );?>" />
+
+	<p style="color:#b00;font-weight:bold;font-size:120%"><br /><?php _e('<em>Note:</em> Before switching to any subtheme, you must Save and download a copy of your settings using the Save / Restore page, in order to be able to go back to them if required.', 'weaver-xtreme' /*adm*/);?></p>
 <?php
 	weaverx_nonce_field('set_subtheme');
 
-	$thumbs = weaverx_relative_url('/subthemes/');
+	$thumbs = weaverx_relative_url('subthemes/');
 
 	foreach ($list as $addon) {
 	$name = ucwords(str_replace('-',' ',$addon));
@@ -96,7 +100,7 @@ function weaverx_st_pick_theme($list_in) {
 	if (! weaverx_getopt_checked('_hide_theme_thumbs')) {
 		weaverx_clear_both();
 ?>
-	<span class='submit' style='padding-top:6px;'><input name="set_subtheme" type="submit" value="<?php _e('Set to Selected Subtheme', 'weaver-xtreme' /*adm*/);?>" /></span>
+	<span class='submit' style='padding-top:6px;'><input class="button-primary" name="set_subtheme" type="submit" value="<?php _e('Set to Selected Subtheme', 'weaver-xtreme' /*adm*/);?>" /></span>
 <?php
 	}
 ?>
@@ -109,7 +113,7 @@ function weaverx_st_pick_theme($list_in) {
 	$hide_msg =  (weaverx_getopt('_hide_theme_thumbs')) ? __('Show Subtheme Thumbnails', 'weaver-xtreme' /*adm*/) :
 	__('Hide Subtheme Thumbnails', 'weaver-xtreme' /*adm*/);
 ?>
-	<input name="hide_thumbs" type="submit" value="<?php echo $hide_msg; ?>" />
+	<input class="button-primary" name="hide_thumbs" type="submit" value="<?php echo $hide_msg; ?>" />
 <?php	weaverx_nonce_field('hide_thumbs'); ?>
 	</form>
 	<div style="clear:both;"></div>
@@ -117,6 +121,14 @@ function weaverx_st_pick_theme($list_in) {
 <?php
 	do_action('weaverx_child_show_extrathemes');
 	do_action('weaverxplus_admin','show_subthemes');
+}
+
+function weaverx_confirm_select_theme() {
+?>
+
+<br />
+<input class="button-primary" type="submit" onSubmit="return confirm('<?php _e('Are you sure you want select a new theme? This will overwrite you existing theme settings.', 'weaver-xtreme'); ?>');" name="set_subtheme" value="<?php _e('Set to Selected Subtheme', 'weaver-xtreme' /*adm*/); ?>" />
+<?php weaverx_nonce_field('set_subtheme');
 }
 
 ?>

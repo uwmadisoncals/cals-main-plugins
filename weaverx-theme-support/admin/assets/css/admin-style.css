@@ -1,6 +1,8 @@
 /* Weaver Xtreme admin style */
 .hide_me {display:none;}
 
+textarea.wvrx-edit-dir {background-color:yellow !important; direction: rtl !important;}
+
 .wvr-green {font-weight:bold;color:green;}
 .wvr-yellow {font-weight:bold;color:orange;}
 .wvr-red {font-weight:bold;color:red;}

@@ -238,7 +238,7 @@ Technically, these features	are not part of the theme styling, but cover other a
 
 	<label><input type="checkbox" name="<?php weaverx_sapi_main_name('_inline_style'); ?>" id="_inline_style" <?php checked(weaverx_getopt_checked( '_inline_style' )); ?> />
 <?php _e('Generate inline CSS code rather than using style-weaverxt.css file.
-By default, Weaverx Xtreme Plus will use the style-weaverxt.css file. &diams;', 'weaver-xtreme' /*adm*/);?>
+By default, Weaver Xtreme Plus will use the style-weaverxt.css file. &diams;', 'weaver-xtreme' /*adm*/);?>
 	</label><br /><br />
 <?php
 	}
@@ -246,7 +246,7 @@ By default, Weaverx Xtreme Plus will use the style-weaverxt.css file. &diams;', 
 
 <h3><?php _e('Include Widget Areas in Print', 'weaver-xtreme' /*adm*/);?></h3>
 
-	<label><input type="checkbox" name="<?php weaverx_sapi_main_name('_inline_style'); ?>" id="_inline_style" <?php checked(weaverx_getopt_checked( '_print_show_widgets' )); ?> />
+	<label><input type="checkbox" name="<?php weaverx_sapi_main_name('_print_show_widgets'); ?>" id="_inline_style" <?php checked(weaverx_getopt_checked( '_print_show_widgets' )); ?> />
 <?php _e('Include all widget areas and full Footer content on browser Print page operation. &diams;', 'weaver-xtreme' /*adm*/);?>
 	</label><br /><br />
 
@@ -351,6 +351,10 @@ function weaverx_admin_admin_ts() {
 
 <label><input type="checkbox" name="<?php weaverx_sapi_main_name('_disable_customizer'); ?>" id="disable_customizer" <?php checked(weaverx_getopt_checked( '_disable_customizer' )); ?> />
 	<?php _e('<strong>Disable Weaver Xtreme Customizer Interface</strong> - If you have a slow host or slow computer, checking this option will disable loading the Weaver Xtreme Customizer interface. &diams;', 'weaver-xtreme' /*adm*/); ?>
+	</label><br /><br />
+
+<label><input type="checkbox" name="<?php weaverx_sapi_main_name('_ignore_PHP_memory'); ?>" id="disable_customizer" <?php checked(weaverx_getopt_checked( '_ignore_PHP_memory' )); ?> />
+	<?php _e('<strong>Ignore Customizer PHP Minimum Memory</strong> - If your host PHP memory is too low, it will cause an error message for using the Customizer. If your configuration still works properly with low PHP memory, check this option to disable the error messages. &diams;', 'weaver-xtreme' /*adm*/); ?>
 	</label><br /><br />
 
 	<label><input type="checkbox" name="<?php weaverx_sapi_main_name('_hide_donate'); ?>" id="hide_donate" <?php checked(weaverx_getopt_checked( '_hide_donate' )); ?> />

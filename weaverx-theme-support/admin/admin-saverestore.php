@@ -24,11 +24,11 @@ function weaverx_ts_admin_saverestore() {
 <?php _e('<p>This option allows you to save and restore all current theme settings using your host\'s WordPress database. Your options will be preserved across Weaver Xtreme theme upgrades, as well when you change to different themes. There is only one saved backup available. You can also download your setting to your computer with the options below.</p>
 <p>Note: This save option saves <strong>all</strong> settings, including those marked with &diams;.</p>', 'weaver-xtreme' /*adm*/);?>
 <form name="save_mysave_form" method="post">
-	<span class="submit"><input type="submit" name="save_mytheme" value="<?php _e('Save Current Theme Settings', 'weaver-xtreme' /*adm*/);?>"/></span>
+	<input class="button-primary" type="submit" name="save_mytheme" value="<?php _e('Save Current Theme Settings', 'weaver-xtreme' /*adm*/);?>"/>
 	<strong><?php _e('Backup all current theme settings using the WordPress database.', 'weaver-xtreme' /*adm*/);?></strong>
 <?php	 weaverx_nonce_field('save_mytheme'); ?>
 	<br /><br />
-	<span class="submit"><input type="submit" name="restore_mytheme" value="<?php _e('Restore Settings', 'weaver-xtreme' /*adm*/);?>"/></span>
+	<input class="button-primary" type="submit" name="restore_mytheme" value="<?php _e('Restore Settings', 'weaver-xtreme' /*adm*/);?>"/>
 	<strong><?php _e('Restore from saved settings.', 'weaver-xtreme' /*adm*/);?></strong> <em><?php _e('Last save date:', 'weaver-xtreme' /*adm*/);?> <?php echo $style_date; ?></em>
 <?php
 	weaverx_nonce_field('restore_mytheme');
@@ -51,8 +51,10 @@ function weaverx_ts_admin_saverestore() {
 <?php _e('You should use the "Download Current Settings To Your Computer" option above to save a copy of your current settings before clearing!
 If you have Weaver Xtreme Plus installed, you should also save shortcode settings from the Xtreme Plus Save/Restore tab.', 'weaver-xtreme' /*adm*/); ?>
 <br />
-<span class="submit"><input type="submit" name="reset_weaverx" value="<?php _e('Clear All Weaver Xtreme Settings', 'weaver-xtreme' /*adm*/); ?>"/></span>
-<?php weaverx_nonce_field('reset_weaverx'); ?>
+<input class="button-primary" type="submit" name="reset_weaverx" value="<?php _e('Clear All Weaver Xtreme Settings', 'weaver-xtreme' /*adm*/); ?>"/>&nbsp;&nbsp
+<?php
+	_e('Note: after clearing, settings will be reset to the default subtheme. This is required by WordPress.org standards.', 'weaver-xtreme');
+	 weaverx_nonce_field('reset_weaverx'); ?>
 	</form> <!-- resetweaverx_form -->
 	<br /><hr />
 
@@ -73,11 +75,14 @@ function weaverx_process_options_admin_standard( $processed ) {
 		global $weaverx_opts_cache;
 		$weaverx_opts_cache = false;	// clear the cache
 		weaverx_init_opts('reset_weaverx');
+		set_theme_mod('_options_level',0);
 		delete_option( apply_filters('weaverx_options','weaverx_settings_backup') );
 
 		do_action('weaverxplus_admin','reset_weaverxplus');
 
 		update_user_meta( get_current_user_id(), 'tgmpa_dismissed_notice', 0 );     // reset the dismiss on the plugin loader
+
+
 		return true;
 	}
 
@@ -138,7 +143,7 @@ Setting files from Weaver Xtreme Plus can be uploaded to the Free Weaver Xtreme 
 		</tr>
 
 		<tr><td><span class='submit'>
-		<input name="uploadtheme" type="submit" value="<?php _e('Upload theme/backup', 'weaver-xtreme' /*adm*/); ?>" /></span>
+		<input class="button-primary" name="uploadtheme" type="submit" value="<?php _e('Upload theme/backup', 'weaver-xtreme' /*adm*/); ?>" /></span>
 		&nbsp;<small><?php _e('<strong>Upload and Restore</strong> a theme/backup from file on your computer. Will become current settings.', 'weaver-xtreme' /*adm*/); ?>
 		</small></td></tr>
 

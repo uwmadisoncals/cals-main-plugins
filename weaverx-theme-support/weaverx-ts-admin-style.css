@@ -1,5 +1,8 @@
 /* Weaver admin style */
+
 .hide_me {display:none;}
+
+textarea.wvrx-edit-dir {direction: ltr !important;}
 
 .wvrx_ts_green {font-weight:bold;color:green;}
 .wvrx_ts_yellow {font-weight:bold;color:orange;}

@@ -7,7 +7,7 @@ Domain Path: /embedded/locale
 License: GPLv2
 Requires at least: 3.7
 Tested up to: 4.7
-Stable tag: 2.2.4
+Stable tag: 2.2.5
 
 The complete and reliable plugin for managing custom post types, custom taxonomies and custom fields.
 
@@ -18,7 +18,7 @@ The complete and reliable plugin for managing custom post types, custom taxonomi
 [vimeo https://vimeo.com/176428571]
 
 = COMPLETE DOCUMENTATION, POWERFUL API, SIMPLE GUI FOR NON-CODERS =
-If you're an experienced PHP developer, you'll appreciate Types comprehensive [fields API](http://wp-types.com/documentation/functions/).
+If you're an experienced PHP developer, you'll appreciate Types comprehensive [fields API](https://wp-types.com/documentation/customizing-sites-using-php/functions/).
 
 You will find detailed guides on [adding custom post types, fields and taxonomy to the front-end](https://wp-types.com/documentation/customizing-sites-using-php/), including:
 
@@ -160,6 +160,13 @@ Additionally, Types is the only plugin that lets you define parent/child relatio
 
 == Changelog ==
 
+= 2.2.5 =
+
+* Use a different validation rule for file fields that also allows domains without TLD.
+* Fix a CRED issue with added validation rules.
+* Handle several issues related to using "0" as a default field value and saving it to the database.
+* Fix an edge-case bug when loading field groups on the Edit Post page.
+
 = 2.2.4 =
 
 * Fix an issue with registering custom taxonomies in WordPress 4.7.
@@ -176,6 +183,7 @@ Additionally, Types is the only plugin that lets you define parent/child relatio
 * Fix an issue with Types export and non-latin characters in a field group slug.
 
 = 2.2.3 =
+
 * Fixed several security issues.
 
 = 2.2.2 =

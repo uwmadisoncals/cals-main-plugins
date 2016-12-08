@@ -9,8 +9,8 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: weaverx-theme-support
 Requires at least: 4.5
-Tested up to: 4.5
-Stable tag: 2.1.3
+Tested up to: 4.7
+Stable tag: 3.0
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -75,6 +75,13 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog ==
+= 3.0 =
+* New: Weaver Xtreme 3.0 compatibility
+* New: Added style= to [login]
+* Tweak: Minor changes to option order in some tabs
+* Update: update for WP 4.6 compatibility check
+* Fix: PHP 7 compatibility tweaks
+
 = 2.1.3 =
 * New: Weaver Xtreme now requires WP 4.5 - seriously, you should not run old versions of WP!
 * Fix: show per post options for custom post types now works correctly
