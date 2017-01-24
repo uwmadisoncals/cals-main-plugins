@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version 6.6.05
+* Version 6.6.10
 *
 */
 
@@ -663,6 +663,7 @@ global $wpdb;
 				if ( wppa_may_user_fe_delete( $id ) ) {
 					$result .=
 					'<a' .
+						' id="wppa-delete-' . wppa_encrypt_photo( $id ) . '"' .
 						' style="color:red;cursor:pointer;"' .
 						' onclick="'.esc_attr( 'if ( confirm( "'.__( 'Are you sure you want to remove this photo?' , 'wp-photo-album-plus').'" ) ) wppaAjaxRemovePhoto( '.wppa( 'mocc' ).', \''.$xid.'\', false ); return false;' ).'"' .
 						' >' .
@@ -694,6 +695,15 @@ global $wpdb;
 				$desc .= wppa_moderate_links( 'thumb', $id );
 			}
 			$desc .= wppa_get_photo_desc( $id, wppa_switch( 'allow_foreign_shortcodes_thumbs' ) );
+
+			// Run wpautop on description?
+			if ( wppa_opt( 'wpautop_on_thumb_desc' ) == 'wpautop' ) {
+				$desc = wpautop( $desc );
+			}
+			elseif ( wppa_opt( 'wpautop_on_thumb_desc' ) == 'nl2br' ) {
+				$desc = nl2br( $desc );
+			}
+
 			$result .= 	'<div' .
 							' class="wppa-thumb-text"' .
 							' style="'.__wcs( 'wppa-thumb-text' ).'"' .
@@ -845,6 +855,15 @@ global $thlinkmsggiven;
 
 			$desc =  wppa_get_photo_desc( $id );
 			if ( in_array( $thumb['status'], array( 'pending', 'scheduled' ) ) ) $desc .= wppa_moderate_links( 'thumb', $id );
+
+			// Run wpautop on description?
+			if ( wppa_opt( 'wpautop_on_thumb_desc' ) == 'wpautop' ) {
+				$desc = wpautop( $desc );
+			}
+			elseif ( wppa_opt( 'wpautop_on_thumb_desc' ) == 'nl2br' ) {
+				$desc = nl2br( $desc );
+			}
+
 
 			$result .= 	'<p' .
 							' class="wppa-box-text wppa-black"' .

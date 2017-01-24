@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 6.6.03
+* Version 6.6.09
 *
 */
 
@@ -362,7 +362,8 @@ global $wpdb;
 					'views' 			=> '0',
 					'cats'				=> '',
 					'scheduledtm' 		=> '',
-					'crypt' 			=> wppa_get_unique_album_crypt()
+					'crypt' 			=> wppa_get_unique_album_crypt(),
+					'treecounts' 		=> serialize( array( 1,0,0,0,0,0,0,0,0,0,0 ) )
 					) );
 
 	if ( ! wppa_is_id_free( WPPA_ALBUMS, $args['id'] ) ) $args['id'] = wppa_nextkey( WPPA_ALBUMS );
@@ -387,9 +388,10 @@ global $wpdb;
 																	`views`,
 																	`cats`,
 																	`scheduledtm`,
-																	`crypt`
+																	`crypt`,
+																	`treecounts`
 																	)
-														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
+														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
 																$args['id'],
 																trim( $args['name'] ),
 																trim( $args['description'] ),
@@ -410,12 +412,17 @@ global $wpdb;
 																$args['views'],
 																$args['cats'],
 																$args['scheduledtm'],
-																$args['crypt']
+																$args['crypt'],
+																$args['treecounts']
 														);
-	$iret = $wpdb->query($query);
+	$iret = $wpdb->query( $query );
 
-	if ( $iret ) return $args['id'];
-	else return false;
+	if ( $iret ) {
+		wppa_invalidate_treecounts( $args['id'] );
+		return $args['id'];
+	}
+
+	return false;
 }
 
 // Find the next available id in a table
@@ -424,19 +431,21 @@ global $wpdb;
 // and thereby making it impossible to add a next record.
 // This happens when a time-out occurs during an insert query.
 // This is not theoretical, i have seen it happen two times on different installations.
-// This routine will find a free keyvalue larger than any key used, ignoring the fact that the MAXINT key may be used.
+// This routine will find a free positive keyvalue larger than any key used, ignoring the fact that the MAXINT key may be used.
 function wppa_nextkey( $table ) {
 global $wpdb;
 
-	$name = 'wppa_'.$table.'_lastkey';
+	$name = 'wppa_' . $table . '_lastkey';
 	$lastkey = get_option( $name, 'nil' );
 
 	if ( $lastkey == 'nil' ) {	// Init option
 		$lastkey = $wpdb->get_var( "SELECT `id` FROM `".$table."` WHERE `id` < '9223372036854775806' ORDER BY `id` DESC LIMIT 1" );
-		if ( ! is_numeric( $lastkey ) ) $lastkey = '0';
-		add_option( $name, $lastkey, '', 'no');
+		if ( ! is_numeric( $lastkey ) || $lastkey <= '0' ) {
+			$lastkey = '0';
+		}
+		update_option( $name, $lastkey );
 	}
-	wppa_dbg_msg('Lastkey in '.$table.' = '.$lastkey);
+//	wppa_dbg_msg( 'Lastkey in ' . $table . ' = ' . $lastkey );
 
 	$result = $lastkey + '1';
 	while ( ! wppa_is_id_free( $table, $result ) ) {
@@ -447,23 +456,19 @@ global $wpdb;
 }
 
 // Check whether a given id value is not used
-function wppa_is_id_free( $type, $id ) {
+function wppa_is_id_free( $table, $id ) {
 global $wpdb;
 
-	if ( ! is_numeric($id) ) return false;
-	if ( $id == '0' ) return false;
+	if ( ! is_numeric( $id ) ) return false;
+	if ( ! wppa_is_int( $id ) ) return false;
+	if ( $id <= '0' ) return false;
 
-	$table = '';
-	if ( $type == 'album' ) $table = WPPA_ALBUMS;
-	elseif ( $type == 'photo' ) $table = WPPA_PHOTOS;
-	else $table = $type;	// $type may be the tablename itsself
-
-	if ( $table == '' ) {
+	if ( ! in_array( $table, array( WPPA_ALBUMS, WPPA_PHOTOS, WPPA_COMMENTS, WPPA_RATING, WPPA_EXIF, WPPA_IPTC, WPPA_INDEX, WPPA_SESSION ) ) ) {
 		echo 'Unexpected error in wppa_is_id_free()';
-		return false;
+		exit();
 	}
 
-	$exists = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `".$table."` WHERE `id` = %s", $id ), ARRAY_A );
+	$exists = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `$table` WHERE `id` = %s", $id ), ARRAY_A );
 	if ( $exists ) return false;
 	return true;
 }

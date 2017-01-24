@@ -35,5 +35,16 @@
                 $('#' + ref).attr('tabindex', '-1').focus();
             });
         });
+        $(document).on('click', '.calendar .my-calendar-header a', function (e) {
+            e.preventDefault();
+            var link = $(this).attr('href');
+			var height = $('.mc-main.calendar' ).height();
+            var ref = $(this).attr('data-rel');
+            $('#' + ref).html('<div class=\"mc-loading\"></div><div class=\"loading\" style=\"height:' + height + 'px\"><span class="screen-reader-text">Loading...</span></div>');
+            $('#' + ref).load(link + ' #' + ref + ' > *', function () {
+                $('.calendar-event').children().not('.event-title').hide();
+                $('#' + ref).attr('tabindex', '-1').focus();
+            });
+        });		
     });
 }(jQuery));	

@@ -185,6 +185,11 @@ diagnose the problem, but you can delete it from your forum post right after you
 <?php
 }
 
+add_action('weaverx_ts_show_version','weaverx_ts_show_version_action');
+function weaverx_ts_show_version_action() {
+	echo "<!-- Weaver Xtreme Theme Support " . WVRX_TS_VERSION . " --> ";
+}
+
 function weaverx_ts_get_sysinfo() {
 
 		global $wpdb;
@@ -276,5 +281,5 @@ function weaverx_ts_get_sysinfo() {
 
 		$return .= "\n" . '### End System Info ###' . "\n";
 		return $return;
-	}
+}
 ?>

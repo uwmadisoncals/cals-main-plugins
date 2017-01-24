@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.6.07
+* Version 6.6.11
 *
 */
 
@@ -379,7 +379,6 @@ global $wppa_session;
 					wppa( 'is_related', $type );
 
 					$data = wppa_get_related_data();
-
 					if ( $type == 'tags' ) {
 						wppa( 'is_tag', $data );
 					}
@@ -623,6 +622,11 @@ global $wppa_session;
 			wppa_reset_occurrance();
 			return;	// Forget this occurrance
 		}
+	}
+
+	// If single album, test if it is a granted parent
+	if ( wppa_is_int( wppa( 'start_album' ) ) && wppa( 'start_album' ) > '0' ) {
+		wppa_grant_albums( wppa( 'start_album' ) );
 	}
 
 	// See if the photo id is a keyword and convert it if possible
@@ -1096,9 +1100,6 @@ global $wppa_session;
 				$q = $wpdb->prepare( 'SELECT * FROM ' . WPPA_ALBUMS . ' WHERE `a_parent` = %s '. wppa_get_album_order( $id ), $id );
 			}
 			$albums = $wpdb->get_results( $q, ARRAY_A );
-			if ( ! wppa( 'is_cover' ) ) {
-				wppa_verify_treecounts( $id, 'albums', count( $albums ) );
-			}
 		}
 		elseif ( strpos( $id, '.' ) !== false ) {	// Album enum
 			$ids = wppa_series_to_array( $id );
@@ -1120,8 +1121,8 @@ global $wppa_session;
 		if ( is_array( $albums ) ) foreach ( array_keys( $albums ) as $albumkey ) {
 			$albumid 	= $albums[$albumkey]['id'];
 			$albumowner = $albums[$albumkey]['owner'];
-			$treecount 	= wppa_treecount_a( $albums[$albumkey]['id'] );
-			$photocount = $treecount['photos'];
+			$treecount 	= wppa_get_treecounts_a( $albums[$albumkey]['id'] );
+			$photocount = $treecount['treephotos'];
 			if ( ! $photocount && ! wppa_user_is( 'administrator' ) && $user != $albumowner ) unset( $albums[$albumkey] );
 		}
 	}
@@ -1662,6 +1663,9 @@ global $wppa_session;
 		// remove dups from $final_array
 		$final_array = array_unique( $final_array );
 
+		// Remove empty element from array
+		$final_array = array_diff( $final_array, array( '' ) );
+
 		// Make album clause
 		$alb_clause = '';
 
@@ -1703,8 +1707,16 @@ global $wppa_session;
 			$selection = " `id` = '0' ";
 		}
 
+		// If Related, add related count max
+		$limit = '';
+		if ( wppa( 'is_related' ) ) {
+			if ( wppa( 'related_count' ) ) {
+				$limit = " LIMIT " . strval( intval( wppa( 'related_count' ) ) );
+			}
+		}
+
 		// Construct the query
-		$query = "SELECT * FROM `" . WPPA_PHOTOS . "` WHERE " . $selection . $alb_clause . wppa_get_photo_order( '0' );
+		$query = "SELECT * FROM `" . WPPA_PHOTOS . "` WHERE " . $selection . $alb_clause . wppa_get_photo_order( '0' ) . $limit;
 	}
 
 	// Calendar?
@@ -2127,6 +2139,7 @@ static $user;
 		if ( wppa_may_user_fe_delete( $id ) ) {
 			$dellink = '
 				<input' .
+					' id="wppa-delete-' . wppa_encrypt_photo($thumb['id']) . '"' .
 					' type="button"' .
 					' style="float:right; margin-right:6px;"' .
 					' onclick="' .
@@ -2583,6 +2596,15 @@ global $wpdb;
 
 					$desc = wppa_switch( 'popup_text_desc' ) ? wppa_get_photo_desc( $id ) : '';
 					if ( wppa_switch( 'popup_text_desc_strip' ) ) $desc = wppa_strip_tags( $desc );
+
+					// Run wpautop on description?
+					if ( wppa_opt( 'wpautop_on_thumb_desc' ) == 'wpautop' ) {
+						$desc = wpautop( $desc );
+					}
+					elseif ( wppa_opt( 'wpautop_on_thumb_desc' ) == 'nl2br' ) {
+						$desc = nl2br( $desc );
+					}
+
 					$desc = esc_js( $desc );
 
 					$rating = wppa_switch( 'popup_text_rating' ) ? wppa_get_rating_by_id( $id ) : '';
@@ -3176,6 +3198,7 @@ global $blog_id;
 			if ( wppa( 'src_script' ) ) {
 				wppa_add_js_page_data( "\n" . wppa( 'src_script' ) );
 			}
+			wppa_add_js_page_data( "\n" . ( wppa_switch( 'coverphoto_responsive' ) ? 'wppaCoverImageResponsive['.wppa( 'mocc' ).'] = true;' : 'wppaCoverImageResponsive['.wppa( 'mocc' ).'] = false;' ) );
 
 			// Aspect ratio and fullsize
 			if ( wppa_in_widget() == 'ss' && is_numeric( wppa( 'in_widget_frame_width' ) ) && wppa( 'in_widget_frame_width' ) > '0' ) {
@@ -3645,31 +3668,43 @@ function wppa_get_text_frame_style( $photo_left, $type ) {
 		elseif ( $type == 'cover' ) {
 			$width = wppa_get_cover_width( $type, true );
 			$photo_pos = $photo_left;
-			switch ( $photo_pos ) {
-				case 'left':
-					$width -= wppa_get_textframe_delta();
-				//	$width -= 13;	// margin
-				//	$width -= 2; 	// border
-				//	$width -= wppa_opt( 'smallsize' );
-					$result = 'style="width:'.$width.'px; float:right;'.__wcs( 'wppa-cover-text-frame' ).'"';
-					break;
-				case 'right':
-					$width -= wppa_get_textframe_delta();
-				//	$width -= 13;	// margin
-				//	$width -= 2; 	// border
-				//	$width -= wppa_opt( 'smallsize' );
-					$result = 'style="width:'.$width.'px; float:left;'.__wcs( 'wppa-cover-text-frame' ).'"';
-					break;
-				case 'top':
-//					$width -= 13;
-					$result = 'style="'.__wcs( 'wppa-cover-text-frame' ).'"';//'style="width:'.$width.'px;"';
-					break;
-				case 'bottom':
-//					$width -= 13;
-					$result = 'style="'.__wcs( 'wppa-cover-text-frame' ).'"';//'style="width:'.$width.'px;"';
-					break;
-				default:
-					wppa_dbg_msg( 'Illegal $photo_pos in wppa_get_text_frame_style', 'red' );
+			if ( wppa_switch( 'coverphoto_responsive' ) ) {
+				$width = 100 - wppa_opt( 'smallsize_percentage' );
+				if ( $width > 2 ) {
+					$width -= 2;
+				}
+				switch ( $photo_pos ) {
+					case 'left':
+						$result = 'style="width:'.$width.'%;float:right;'.__wcs( 'wppa-cover-text-frame' ).'"';
+						break;
+					case 'right':
+						$result = 'style="width:'.$width.'%;float:left;'.__wcs( 'wppa-cover-text-frame' ).'"';
+						break;
+					case 'top':
+					case 'bottom':
+						$result = 'style="'.__wcs( 'wppa-cover-text-frame' ).'"';
+						break;
+					default:
+						wppa_dbg_msg( 'Illegal $photo_pos in wppa_get_text_frame_style', 'red' );
+				}
+			}
+			else {
+				switch ( $photo_pos ) {
+					case 'left':
+						$width -= wppa_get_textframe_delta();
+						$result = 'style="width:'.$width.'px; float:right;'.__wcs( 'wppa-cover-text-frame' ).'"';
+						break;
+					case 'right':
+						$width -= wppa_get_textframe_delta();
+						$result = 'style="width:'.$width.'px; float:left;'.__wcs( 'wppa-cover-text-frame' ).'"';
+						break;
+					case 'top':
+					case 'bottom':
+						$result = 'style="'.__wcs( 'wppa-cover-text-frame' ).'"';
+						break;
+					default:
+						wppa_dbg_msg( 'Illegal $photo_pos in wppa_get_text_frame_style', 'red' );
+				}
 			}
 		}
 		else wppa_dbg_msg( 'Illegal $type in wppa_get_text_frame_style', 'red' );
@@ -4049,11 +4084,13 @@ global $allalbums;
 function wppa_user_upload() {
 global $wpdb;
 static $done;
+global $wppa_alert;
 
 	wppa_dbg_msg( 'Usr_upl entered' );
 
 	if ( $done ) return;					// Already done
 	$done = true;							// Mark as done
+	$wppa_alert = '';
 
 	// Upload possible?
 	$may_upload = wppa_switch( 'user_upload_on' );
@@ -4104,10 +4141,10 @@ static $done;
 														'owner' 		=> wppa_switch( 'frontend_album_public' ) ? '--- public ---' : wppa_get_user()
 														 ) );
 			if ( $album ) {
-				if ( wppa_switch( 'fe_alert' ) ) {
+				if ( wppa_opt( 'fe_alert' ) == 'upcre' || wppa_opt( 'fe_alert' ) == 'all' ) {
 					wppa_alert( sprintf( __( 'Album #%s created' , 'wp-photo-album-plus'), $album ) );
 				}
-				wppa_flush_treecounts( $parent );
+				wppa_invalidate_treecounts( $parent );
 				wppa_create_pl_htaccess();
 			}
 			else {
@@ -4129,7 +4166,7 @@ static $done;
 			$alb = wppa_get_post( 'wppa-upload-album' );
 			$alb = strval( intval( $alb ) ); // Force numeric
 			if ( ! wppa_album_exists( $alb ) ) {
-				$alert = sprintf( __( 'Album %s does not exist', 'wp-photo-album-plus' ), $alb );
+				$alert = esc_js( sprintf( __( 'Album %s does not exist', 'wp-photo-album-plus' ), $alb ) );
 				wppa_alert( $alert );
 				return;
 			}
@@ -4172,8 +4209,10 @@ static $done;
 					}
 				}
 				$points = '0';
-				$alert = '';
 				$reload = wppa_switch( 'home_after_upload' ) && $done ? 'home' : false;
+
+				// Init alert text with possible results from wppa_do_frontend_file_upload()
+				$alert = $wppa_alert;
 
 				if ( $done ) {
 
@@ -4197,41 +4236,62 @@ static $done;
 						$post = array( 'post_title' => $title, 'post_content' => $post_content, 'post_status' => $status );
 						$post = sanitize_post( $post, 'db' );
 
-						$iret = wp_insert_post( $post );
-						$blogged = true;
+						$post_id = wp_insert_post( $post );
+						if ( $post_id > 0 ) {
+							$blogged = true;
+						}
+					}
+
+					// Alert text for upload
+					if ( wppa_opt( 'fe_alert' ) == 'upcre' || wppa_opt( 'fe_alert' ) == 'all' ) {
+						$alert .= ' ' . esc_js( sprintf( _n( '%d photo successfully uploaded', '%d photos successfully uploaded', $done, 'wp-photo-album-plus' ), $done ) ) . '.';
 					}
 
 					// ADD POINTS
 					$points = wppa_opt( 'cp_points_upload' ) * $done;
 					$bret = wppa_add_credit_points( $points, __( 'Photo upload' ,'wp-photo-album-plus' ) );
-					$alert .= sprintf( _n( '%d photo successfully uploaded', '%d photos successfully uploaded', $done, 'wp-photo-album-plus' ), $done );
-					if ( $bret ) $alert .= ' ' . sprintf( __( '%s points added' ,'wp-photo-album-plus'), $points );
-					if ( wppa_switch( 'fe_alert' ) ) {
-						wppa_alert( $alert, $reload );
-					}
-					else {
-						wppa_alert( '', $reload );
+
+					// Alert text for points
+					if ( $bret && wppa_opt( 'fe_alert' ) != '-none-' ) {
+						$alert .= ' ' . esc_js( sprintf( __( '%s points added' ,'wp-photo-album-plus' ), $points ) ) . '.';
 					}
 
-					// Blogged?
-					if ( $blogged ) {
-						if ( wppa_switch( 'fe_alert' ) ) {
-							if ( $status == 'pending' ) {
-								wppa_alert( __( 'Your post is awaiting moderation.', 'wp-photo-album-plus' ) );
-							}
+					// Alert text for blogged
+					if ( $blogged && ( wppa_opt( 'fe_alert' ) == 'blog' || wppa_opt( 'fe_alert' ) == 'all' ) ) {
+						if ( $status == 'pending' ) {
+							$alert .= ' ' . esc_js( __( 'Your post is awaiting moderation.', 'wp-photo-album-plus' ) );
 						}
-						echo '<script type="text/javascript" >document.location.href=\'' . home_url() . '\';</script>';
-						wppa_exit();
+						else {
+							$alert .= ' ' . esc_js( __( 'Your post is published.', 'wp-photo-album-plus' ) );
+						}
 					}
 				}
+
+				// Alert text for failed upload
 				if ( $fail ) {
 					if ( ! $done ) {
-						$alert .= __( 'Upload failed' , 'wp-photo-album-plus');
+						$alert .= ' ' . __( 'Upload failed', 'wp-photo-album-plus' ) . '.';
 					}
 					else {
-						$alert .= sprintf( _n( '%d upload failed', '%d uploads failed', $fail, 'wp-photo-album-plus' ), $fail );
+						$alert .= ' ' . sprintf( _n( '%d upload failed', '%d uploads failed', $fail, 'wp-photo-album-plus' ), $fail ) . '.';
 					}
+
+				}
+
+				// Clean alert text
+				$alert = trim( $alert );
+
+				// Alert only when requested or fail
+				if ( wppa_opt( 'fe_alert' ) != '-none-' || $fail ) {
 					wppa_alert( $alert, $reload );
+				}
+				elseif( ! $blogged ) {
+					wppa_alert( '', $reload );
+				}
+
+				// Redirect to blogpost
+				if ( $blogged ) {
+					wppa_out( '<script type="text/javascript" >setTimeout( function() { document.location.href=\'' . get_permalink( $post_id ) . '\'; }, 2000 )</script>' );
 				}
 			}
 		}
@@ -4243,7 +4303,7 @@ static $done;
 		if ( wppa_get_post( 'wppa-albumeditsubmit' ) ) {
 
 			// Get album id
-			$alb 			= wppa_get_post( 'wppa-albumeditid' );
+			$alb = wppa_get_post( 'wppa-albumeditid' );
 			if ( ! $alb || ! wppa_album_exists( $alb ) ) {
 				die( 'Security check failure' );
 			}
@@ -4296,21 +4356,22 @@ function wppa_do_frontend_file_upload( $file, $alb ) {
 global $wpdb;
 global $wppa_supported_video_extensions;
 global $wppa_supported_audio_extensions;
+global $wppa_alert;
 
 	// Log upload attempt
-	wppa_log( 'Upl', 'FE Upload attempt of file '.$file['name'].', size='.filesize($file['tmp_name']) );
+	wppa_log( 'Upl', 'FE Upload attempt of file ' . $file['name'] . ', size=' . filesize( $file['tmp_name'] ) );
 
 	$album = wppa_cache_album( $alb );
 
 	// Legal here?
 	if ( ! wppa_allow_uploads( $alb ) || ! wppa_allow_user_uploads() ) {
-		wppa_alert( __( 'Max uploads reached' , 'wp-photo-album-plus') );
+		$wppa_alert .= esc_js( __( 'Max uploads reached' , 'wp-photo-album-plus') ) . '.';
 		return false;
 	}
 
 	// No error during upload?
 	if ( $file['error'] != '0' ) {
-		wppa_alert( __( 'Error during upload' , 'wp-photo-album-plus') );
+		$wppa_alert .= esc_js( __( 'Error during upload' , 'wp-photo-album-plus') ) . '.';
 		return false;
 	}
 
@@ -4366,14 +4427,14 @@ global $wppa_supported_audio_extensions;
 												) );
 
 			if ( ! $id ) {
-				wppa_alert( __( 'Could not insert media into db.' , 'wp-photo-album-plus') );
+				$wppa_alert .= esc_js( __( 'Could not insert media into db.', 'wp-photo-album-plus' ) );
 				return false;
 			}
 		}
 
 		// Housekeeping
 		wppa_update_album( array( 'id' => $alb, 'modified' => time() ) );
-		wppa_flush_treecounts( $alb );
+		wppa_invalidate_treecounts( $alb );
 		wppa_flush_upldr_cache( 'photoid', $id );
 
 		// Add video filetype
@@ -4406,13 +4467,13 @@ global $wppa_supported_audio_extensions;
 	// Is it an image?
 	$imgsize = getimagesize( $file['tmp_name'] );
 	if ( !is_array( $imgsize ) ) {
-		wppa_alert( __( 'Uploaded file is not an image' , 'wp-photo-album-plus') );
+		$wppa_alert .= esc_js( __( 'Uploaded file is not an image' , 'wp-photo-album-plus') ) . '.';
 		return false;
 	}
 
 	// Is it a supported image filetype?
 	if ( $imgsize[2] != IMAGETYPE_GIF && $imgsize[2] != IMAGETYPE_JPEG && $imgsize[2] != IMAGETYPE_PNG ) {
-		wppa_alert( sprintf( __( 'Only gif, jpg and png image files are supported. Returned info = %s.' , 'wp-photo-album-plus'), wppa_serialize( $imgsize ) ), false, false );
+		$wppa_alert .= esc_js( sprintf( __( 'Only gif, jpg and png image files are supported. Returned info = %s.' , 'wp-photo-album-plus'), wppa_serialize( $imgsize ) ), false, false );
 		return false;
 	}
 
@@ -4420,7 +4481,7 @@ global $wppa_supported_audio_extensions;
 	$ms = wppa_opt( 'upload_fronend_maxsize' );
 	if ( $ms ) {	// Max size configured
 		if ( $imgsize[0] > $ms || $imgsize[1] > $ms ) {
-			wppa_alert( sprintf( __( 'Uploaded file is larger than the allowed maximum of %d x %d pixels.' , 'wp-photo-album-plus'), $ms, $ms ) );
+			$wppa_alert .= esc_js( sprintf( __( 'Uploaded file is larger than the allowed maximum of %d x %d pixels.' , 'wp-photo-album-plus'), $ms, $ms ) );
 			return false;
 		}
 	}
@@ -4428,7 +4489,7 @@ global $wppa_supported_audio_extensions;
 	// Check for already exists
 	if ( wppa_switch( 'void_dups' ) ) {
 		if ( wppa_file_is_in_album( wppa_sanitize_file_name( $file['name'] ), $alb ) ) {
-			wppa_alert( sprintf( __( 'Uploaded file %s already exists in this album.' , 'wp-photo-album-plus'), wppa_sanitize_file_name( $file['name'] ) ) );
+			$wppa_alert .= esc_js( sprintf( __( 'Uploaded file %s already exists in this album.' , 'wp-photo-album-plus'), wppa_sanitize_file_name( $file['name'] ) ) );
 			return false;
 		}
 	}
@@ -4438,7 +4499,7 @@ global $wppa_supported_audio_extensions;
 	if ( $mayupload === false ) {
 		$maxsize = wppa_check_memory_limit( false );
 		if ( is_array( $maxsize ) ) {
-			wppa_alert( sprintf( __( 'The image is too big. Max photo size: %d x %d (%2.1f MegaPixel)' , 'wp-photo-album-plus'), $maxsize['maxx'], $maxsize['maxy'], $maxsize['maxp']/( 1024*1024 ) ) );
+			$wppa_alert .= esc_js( sprintf( __( 'The image is too big. Max photo size: %d x %d (%2.1f MegaPixel)' , 'wp-photo-album-plus'), $maxsize['maxx'], $maxsize['maxy'], $maxsize['maxp']/( 1024*1024 ) ) );
 			return false;
 		}
 	}
@@ -4481,14 +4542,14 @@ global $wppa_supported_audio_extensions;
 	}
 
 	if ( ! $id ) {
-		wppa_alert( __( 'Could not insert photo into db.' , 'wp-photo-album-plus') );
+		$wppa_alert .= esc_js( __( 'Could not insert photo into db.' , 'wp-photo-album-plus') );
 		return false;
 	}
 	else {
 		wppa_save_source( $file['tmp_name'], $filename, $alb );
 		wppa_make_o1_source( $id );
 		wppa_update_album( array( 'id' => $alb, 'modified' => time() ) );
-		wppa_flush_treecounts( $alb );
+		wppa_invalidate_treecounts( $alb );
 		wppa_flush_upldr_cache( 'photoid', $id );
 	}
 	if ( wppa_make_the_photo_files( $file['tmp_name'], $id, $ext ) ) {

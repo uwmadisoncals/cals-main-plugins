@@ -3,7 +3,7 @@
 /* Package: wp-photo-album-plus
 /*
 /* Various style computation routines
-/* Version 6.6.00
+/* Version 6.6.10
 /*
 */
 
@@ -254,10 +254,12 @@ global $wppa_dynamic_css_data;
 	' . ( wppa_opt( 'bcolor_adminschoice' ) ? 'border-color:' . wppa_opt( 'bcolor_adminschoice' ) . '; ' : '' ) . '
 }';
 
+/*
 	$content .= '
 .wppa-arrow {
 	' . ( wppa_opt( 'arrow_color' ) ? 'color:' . wppa_opt( 'arrow_color' ) . '; ' : '' ) . '
 }';
+*/
 
 	// Add miscellaneous styles
 	if ( ! wppa_switch( 'ovl_fs_icons' ) ) {
@@ -454,7 +456,19 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 			else {											// No border color: no border
 				$result['style'] .= ' border-width: 0px;';
 			}
-			$result['style'] .= ' width:' . $width . 'px; height:' . $height . 'px;';
+			if ( wppa_switch( 'coverphoto_responsive' ) ) {
+
+				// Landscape
+				if ( $width >= $height ) {
+					$result['style'] .= 'max-width:100%;';
+				}
+				else {
+					$result['style'] .= 'max-width:'.(100*$width/$height).'%;';
+				}
+			}
+			else {
+				$result['style'] .= ' width:' . $width . 'px; height:' . $height . 'px;';
+			}
 			if ( wppa_switch( 'use_cover_opacity' ) && ! is_feed() ) {
 				$opac = wppa_opt( 'cover_opacity' );
 				$result['style'] .= ' opacity:' . $opac/100 .
@@ -475,8 +489,8 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 		case 'twthumb':		// Thumbnail widget
 		case 'ltthumb':		// Lasten widget
 		case 'albthumb':	// Album widget
-			if ( $type == 'thumb' && wppa_get_get( 'hilite' ) == $id ) {
-				$result['style'] .= ' border:2px solid blue;box-sizing:border-box;';
+			if ( $type == 'thumb' && wppa_get_get( 'hilite' ) && wppa_decrypt_photo( wppa_get_get( 'hilite' ) ) == $id ) {
+				$result['style'] .= ' border:3px solid orange;box-sizing:border-box;';
 			}
 			else {
 				$result['style'] .= ' border-width: 0px;';
@@ -923,8 +937,8 @@ function __wcs( $class ) {
 //			break;
 			break;
 		case 'wppa-arrow':
-			$opt = wppa_opt( 'arrow_color' );
-			if ( $opt ) $result .= 'color:' . $opt . '; ';
+//			$opt = wppa_opt( 'arrow_color' );
+//			if ( $opt ) $result .= 'color:' . $opt . '; ';
 			break;
 		case 'wppa-td';
 			$result .= 'padding: 3px 2px 3px 0; border: 0';

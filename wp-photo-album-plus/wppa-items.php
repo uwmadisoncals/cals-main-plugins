@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version 6.6.07
+* Version 6.6.09
 *
 */
 
@@ -15,6 +15,10 @@ function wppa_cache_album( $id, $data = '' ) {
 global $wpdb;
 static $album;
 static $album_cache_2;
+
+	if ( $id == '-9' ) {
+		return false;
+	}
 
 	// Init. If there are less than 1000 albums, cache them all on beforehand.
 	// This reduces the number of queries for albums to two.
@@ -105,7 +109,7 @@ static $album_cache_2;
 	}
 	else {
 		wppa_dbg_msg( 'Album '.$id.' does not exist (cache album)', 'red' );
-		wppa_log( 'dbg', 'Album '.$id.' does not exist (cache album)', true );
+		wppa_log( 'dbg', 'Album '.$id.' does not exist (cache album)' );
 		return false;
 	}
 }
@@ -607,7 +611,7 @@ function wppa_get_album_item( $id, $item ) {
 		}
 	}
 	else {
-		wppa_log( 'Err', 'Album ' . $id . ' does not exist. ( get_album_item )', true );
+//		wppa_log( 'Dbg', 'Album ' . $id . ' does not exist. ( get_album_item )' );
 	}
 	return false;
 }
@@ -626,7 +630,7 @@ function wppa_get_photo_item( $id, $item ) {
 		}
 	}
 	else {
-		wppa_log( 'Err', 'Photo ' . $id . ' does not exist. ( get_photo_item )', true );
+//		wppa_log( 'Dbg', 'Photo ' . $id . ' does not exist. ( get_photo_item )' );
 	}
 	return false;
 }

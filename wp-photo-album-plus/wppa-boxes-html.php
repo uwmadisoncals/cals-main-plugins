@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.6.07
+* Version 6.6.11
 *
 */
 
@@ -296,8 +296,8 @@ global $wppa_session;
 		if ( is_array( $albums ) ) foreach ( array_keys( $albums ) as $albumkey ) {
 			$albumid 	= $albums[$albumkey]['id'];
 			$albumowner = $albums[$albumkey]['owner'];
-			$treecount 	= wppa_treecount_a( $albums[$albumkey]['id'] );
-			$photocount = $treecount['photos'];
+			$treecount 	= wppa_get_treecounts_a( $albums[$albumkey]['id'] );
+			$photocount = $treecount['treephotos'];
 			if ( ! $photocount && ! wppa_user_is( 'administrator' ) && $user != $albumowner ) {
 				unset( $albums[$albumkey] );
 			}
@@ -1374,7 +1374,6 @@ $tweet = urlencode( $share_url );
 					'<a' .
 						' title="' . sprintf( __( 'Share %s on Google+', 'wp-photo-album-plus' ), esc_attr( $photo_name ) ) . '"' .
 						' href="https://plus.google.com/share?url=' . urlencode( $share_url ) . '"' .
-						' onclick="javascript:window.open( this.href, \"\", \"menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600\" );return false;"' .
 						' target="_blank"' .
 						' >' .
 						'<img' .
@@ -2506,7 +2505,7 @@ static $albums_granted;
 								' name="wppa-watermark-file"' .
 								' id="wppa-watermark-file"' .
 								' >' .
-								wppa_watermark_file_select() .
+								wppa_watermark_file_select( 'user' ) .
 							'</select>' .
 						'</td>' .
 					'</tr>' .
@@ -2527,7 +2526,7 @@ static $albums_granted;
 								' name="wppa-watermark-pos"' .
 								' id="wppa-watermark-pos"' .
 								' >' .
-								wppa_watermark_pos_select() .
+								wppa_watermark_pos_select( 'user' ) .
 							'</select>' .
 						'</td>' .
 					'</tr>' .
@@ -2686,31 +2685,51 @@ static $albums_granted;
 
 /* The Blogit section */
 
-	if ( ( $where == 'widget' || $where == 'uploadbox' ) && current_user_can( 'edit_posts' ) && wppa_switch( 'blog_it' ) ) {
+	if ( ( $where == 'widget' || $where == 'uploadbox' ) && current_user_can( 'edit_posts' ) && wppa_opt( 'blog_it' ) != '-none-' ) {
 		$result .=
-		'<div style="margin-top:6px;" >' .
-			'<input' .
-				' type="button"' .
-				' value="' . esc_attr( __( 'Blog it?', 'wp-photo-album-plus' ) ) . '"' .
-				' onclick="jQuery(\'#wppa-blogit-'.$yalb.'-'.$mocc.'\').trigger(\'click\')"' .
-			' />' .
-			' <input' .
-				' type="checkbox"' .
-				' id="wppa-blogit-'.$yalb.'-'.$mocc.'"' .
-				' name="wppa-blogit"' .
-				' style="display:none;"' .
-				' onchange="if ( jQuery(this).attr(\'checked\') ) { ' .
-								'jQuery(\'#blog-div-'.$yalb.'-'.$mocc.'\').css(\'display\',\'block\'); ' .
-								'jQuery(\'#wppa-user-submit-' . $yalb . '-' . $mocc . '\').attr(\'value\', \'' . esc_js(__( 'Upload and blog', 'wp-photo-album-plus' )) . '\'); ' .
-							'} ' .
-							'else { ' .
-								'jQuery(\'#blog-div-'.$yalb.'-'.$mocc.'\').css(\'display\',\'none\'); ' .
-								'jQuery(\'#wppa-user-submit-' . $yalb . '-' . $mocc . '\').attr(\'value\', \'' . esc_js(__( 'Upload photo', 'wp-photo-album-plus' )) . '\'); ' .
-							'} "' .
-			' />' .
+		'<div style="margin-top:6px;" >';
+
+			// Use can choose to blog it
+			if ( wppa_opt( 'blog_it' ) == 'optional' ) {
+				$result .=
+				'<input' .
+					' type="button"' .
+					' value="' . esc_attr( __( 'Blog it?', 'wp-photo-album-plus' ) ) . '"' .
+					' onclick="jQuery(\'#wppa-blogit-'.$yalb.'-'.$mocc.'\').trigger(\'click\')"' .
+				' />' .
+				' <input' .
+					' type="checkbox"' .
+					' id="wppa-blogit-'.$yalb.'-'.$mocc.'"' .
+					' name="wppa-blogit"' .
+					' style="display:none;"' .
+					' onchange="if ( jQuery(this).attr(\'checked\') ) { ' .
+									'jQuery(\'#blog-div-'.$yalb.'-'.$mocc.'\').css(\'display\',\'block\'); ' .
+									'jQuery(\'#wppa-user-submit-' . $yalb . '-' . $mocc . '\').attr(\'value\', \'' . esc_js(__( 'Upload and blog', 'wp-photo-album-plus' )) . '\'); ' .
+								'} ' .
+								'else { ' .
+									'jQuery(\'#blog-div-'.$yalb.'-'.$mocc.'\').css(\'display\',\'none\'); ' .
+									'jQuery(\'#wppa-user-submit-' . $yalb . '-' . $mocc . '\').attr(\'value\', \'' . esc_js(__( 'Upload photo', 'wp-photo-album-plus' )) . '\'); ' .
+								'} "' .
+				' />' ;
+			}
+
+			// Always blog
+			else {
+				$result .=
+				'<input' .
+					' type="checkbox"' .
+					' id="wppa-blogit-'.$yalb.'-'.$mocc.'"' .
+					' name="wppa-blogit"' .
+					' style="display:none;"' .
+					' checked="checked"' .
+				' />';
+
+			}
+
+			$result .=
 			'<div' .
 				' id="blog-div-'.$yalb.'-'.$mocc.'"' .
-				' style="display:none;"' .
+				( wppa_opt( 'blog_it' ) == 'optional' ? ' style="display:none;"' : '' ) .
 				' />' .
 				'<h6>' .
 					__( 'Post title:', 'wp-photo-album-plus' ) .
@@ -2760,6 +2779,7 @@ static $albums_granted;
 	}
 
 	// The submit button
+	$value = wppa_opt( 'blog_it' ) == 'always' ? esc_attr( __( 'Upload and blog', 'wp-photo-album-plus' ) ) : esc_attr( __( 'Upload photo', 'wp-photo-album-plus' ) );
 	$result .=
 		'<div style="height:6px;;clear:both;" ></div>' .
 		'<input' .
@@ -2768,7 +2788,7 @@ static $albums_granted;
 			$onclick .
 			' style="display:none; margin: 6px 0; float:right;"' .
 			' class="wppa-user-submit"' .
-			' name="wppa-user-submit-'.$yalb.'-'.$mocc.'" value="' . esc_attr( __( 'Upload photo', 'wp-photo-album-plus' ) ) . '"' .
+			' name="wppa-user-submit-'.$yalb.'-'.$mocc.'" value="' . $value . '"' .
 		' />' .
 		'<div style="height:6px;clear:both;"></div>';
 
@@ -4114,7 +4134,9 @@ global $wpdb;
 			break;
 
 		default:
-			wppa_log( 'err', 'Unexpected calender type: ' . $calendar_type . ' found in wppa_get_calendar_html()', true );
+			if ( $calendar_type ) {
+				wppa_log( 'err', 'Unexpected calender type: ' . $calendar_type . ' found in wppa_get_calendar_html()', true );
+			}
 	}
 
 	// Display minicovers

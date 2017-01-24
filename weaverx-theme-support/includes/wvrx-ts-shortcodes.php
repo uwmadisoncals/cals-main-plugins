@@ -403,6 +403,7 @@ function wvrx_ts_sc_youtube($args = '') {
     if ( isset ( $args[0] ) )
 	$share = trim($args[0]);
 
+
     // http://code.google.com/apis/youtube/player_parameters.html
     // not including: enablejsapi, fs,playerapiid,
 
@@ -626,7 +627,7 @@ function wvrx_ts_sc_span($vals = '',$text) {     // [span] - all ===============
 }
 
 function wvrx_ts_weaverx_sc_info() {           // [info]  ======================
-    global $current_user;
+    //global $current_user;
     $out = __('<strong>Theme/User Info</strong><hr />','weaverx-theme-support' /*adm*/);
 
     $current_user = wp_get_current_user();

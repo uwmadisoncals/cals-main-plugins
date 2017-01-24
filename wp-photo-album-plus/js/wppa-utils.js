@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsUtilsVersion = '6.6.06';
+var wppaJsUtilsVersion = '6.6.09';
 var wppaDebug;
 
 // Trim
@@ -331,12 +331,15 @@ function wppaSvgHtml( image, height, isLightbox, border, none, light, medium, he
 						' onload="wppaReplaceSvg()"' +
 					' />';
 
+	// For systems that do not execute onload:
+	setTimeout( function() { wppaReplaceSvg(); }, 100 );
+
 	return result;
 }
 
 // Replace all SVG images with inline SVG tag
 function wppaReplaceSvg() {
-
+wppaConsoleLog('Doing ReplaceSvg', 'force');
 	jQuery('img.wppa-svg').each(function(){
 		var $img = jQuery(this);
 		var imgID = $img.attr('id');

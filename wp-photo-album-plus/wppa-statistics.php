@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version 6.6.07
+* Version 6.6.09
 *
 */
 
@@ -43,9 +43,9 @@ function wppa_get_photo_count( $id = '0', $use_treecounts = false ) {
 global $wpdb;
 
 	if ( $use_treecounts && $id ) {
-		$treecounts = wppa_treecount_a( $id );
+		$treecounts = wppa_get_treecounts_a( $id );
 		if ( current_user_can('wppa_moderate') ) {
-			$count = $treecounts['selfphotos'] + $treecounts['pendphotos'] + $treecounts['scheduledphotos'];
+			$count = $treecounts['selfphotos'] + $treecounts['pendselfphotos'] + $treecounts['scheduledselfphotos'];
 		}
 		else {
 			$count = $treecounts['selfphotos'];
@@ -84,7 +84,7 @@ function wppa_get_album_count( $id, $use_treecounts = false ) {
 global $wpdb;
 
 	if ( $use_treecounts && $id ) {
-		$treecounts = wppa_treecount_a( $id );
+		$treecounts = wppa_get_treecounts_a( $id );
 		$count = $treecounts['selfalbums'];
 	}
 	else {
@@ -225,7 +225,7 @@ global $wppa_session;
 }
 
 // Bump Viewcount
-function wppa_bump_viewcount($type, $id) {
+function wppa_bump_viewcount( $type, $id ) {
 global $wpdb;
 global $wppa_session;
 
@@ -262,6 +262,12 @@ global $wppa_session;
 		// If 'wppa_owner_to_name'
 		if ( $type == 'photo' ) {
 			wppa_set_owner_to_name( $id );
+		}
+
+		// Mark Treecounts need update
+		if ( $type == 'photo' ) {
+			$alb = wppa_get_photo_item( $id, 'album' );
+			wppa_mark_treecounts( $alb );
 		}
 	}
 
@@ -332,5 +338,294 @@ global $wpdb;
 		$idx++;
 	}
 
+	return $result;
+}
+
+// Mark treecounts of album $alb as being update required, default: clear all
+function wppa_invalidate_treecounts( $alb = '' ) {
+global $wpdb;
+
+	// Sanitize arg
+	if ( $alb ) {
+		$alb = strval( intval( $alb ) );
+	}
+
+	// Album id given
+	if ( $alb ) {
+
+		// Flush this albums treecounts
+		wppa_mark_treecounts( $alb );
+	}
+
+	// No album id, flush them all
+	else {
+		$iret = $wpdb->query( "UPDATE `" . WPPA_ALBUMS . "` SET `treecounts` = ''" );
+		if ( ! $iret ) {
+			wppa_log( 'Dbg', 'Unable to clear all treecounts' );
+		}
+	}
+}
+
+// Get and verify correctness of treecount values. Fix if needs update
+// Essentially the same as wppa_get_treecounts_a(), but updates if needed
+function wppa_verify_treecounts_a( $alb ) {
+global $wpdb;
+
+	// Sanitize arg
+	if ( $alb ) {
+		$alb = strval( intval( $alb ) );
+	}
+
+	// Anything to do here?
+	if ( ! $alb ) {
+		return false;
+	}
+
+	// Get data
+	$treecounts = wppa_get_treecounts_a( $alb );
+	if ( ! $treecounts['needupdate'] ) {
+		return $treecounts;
+	}
+
+	// Get the ids of the child albums
+	$child_ids 	= $wpdb->get_col( 	"SELECT `id` " .
+									"FROM `" . WPPA_ALBUMS . "` " .
+									"WHERE `a_parent` = $alb"
+								);
+
+
+	// Items to compute
+	/*
+	'needupdate',
+	'selfalbums',
+	'treealbums',
+	'selfphotos',
+	'treephotos',
+	'pendselfphotos',
+	'pendtreephotos',
+	'scheduledselfphotos',
+	'scheduledtreephotos',
+	'selfphotoviews',
+	'treephotoviews'
+	*/
+
+	// Do the dirty work
+	$result = array();
+
+	// Need Update
+	$result['needupdate'] 			= '0';
+
+	// Self albums
+	$result['selfalbums'] 			= $wpdb->get_var( 	"SELECT COUNT(*) " .
+														"FROM `" . WPPA_ALBUMS . "` " .
+														"WHERE `a_parent` = $alb "
+													);
+
+	// Tree albums
+	$result['treealbums'] 			= $result['selfalbums'];
+	foreach( $child_ids as $child ) {
+
+		// Recursively get childrens tree album count and add it
+		$child_treecounts = wppa_verify_treecounts_a( $child );
+		$result['treealbums'] += $child_treecounts['treealbums'];
+	}
+
+	// Self photos
+	$result['selfphotos'] 			= $wpdb->get_var( 	"SELECT COUNT(*) " .
+														"FROM `" . WPPA_PHOTOS . "` " .
+														"WHERE `album` = $alb " .
+														"AND `status` <> 'pending' " .
+														"AND `status` <> 'scheduled'"
+													);
+
+	// Tree photos
+	$result['treephotos'] 			= $result['selfphotos'];
+	foreach( $child_ids as $child ) {
+
+		// Recursively get childrens tree photo count and add it
+		$child_treecounts = wppa_verify_treecounts_a( $child );
+		$result['treephotos'] += $child_treecounts['treephotos'];
+	}
+
+	// Pending self photos
+	$result['pendselfphotos'] 		= $wpdb->get_var( 	"SELECT COUNT(*) " .
+														"FROM `" . WPPA_PHOTOS . "` " .
+														"WHERE `album` = $alb " .
+														"AND `status` = 'pending'"
+													);
+
+	// Pending tree photos
+	$result['pendtreephotos'] 		= $result['pendselfphotos'];
+	foreach( $child_ids as $child ) {
+
+		// Recursively get childrens pend tree photo count and add it
+		$child_treecounts = wppa_verify_treecounts_a( $child );
+		$result['pendtreephotos'] += $child_treecounts['pendtreephotos'];
+	}
+
+	// Scheduled self photos
+	$result['scheduledselfphotos'] 	= $wpdb->get_var( 	"SELECT COUNT(*) " .
+														"FROM `" . WPPA_PHOTOS . "` " .
+														"WHERE `album` = $alb " .
+														"AND `status` = 'scheduled'"
+													);
+
+	// Scheduled tree photos
+	$result['scheduledtreephotos'] 	= $result['scheduledselfphotos'];
+	foreach( $child_ids as $child ) {
+
+		// Recursively get childrens scheduled tree photo views and add it
+		$child_treecounts = wppa_verify_treecounts_a( $child );
+		$result['scheduledtreephotos'] += $child_treecounts['scheduledtreephotos'];
+	}
+
+	// Self photo views
+	$views = $wpdb->get_col( "SELECT `views` FROM `" . WPPA_PHOTOS . "` WHERE `album` = $alb" );
+	$result['selfphotoviews'] 		= array_sum( $views );
+
+	// Tree photo views
+	$result['treephotoviews'] 		= $result['selfphotoviews'];
+	foreach( $child_ids as $child ) {
+
+		// Recursively get childrens pend tree photo views and add it
+		$child_treecounts = wppa_verify_treecounts_a( $child );
+		$result['treephotoviews'] += $child_treecounts['treephotoviews'];
+	}
+
+	// Save result
+	wppa_save_treecount_a( $alb, $result );
+
+	// Done
+	return $result;
+
+}
+
+// Set treecounts to need update
+function wppa_mark_treecounts( $alb ) {
+
+	// Sanitize arg
+	if ( $alb ) {
+		$alb = strval( intval( $alb ) );
+	}
+
+	// Do it
+	if ( $alb ) {
+		$treecounts = wppa_get_treecounts_a( $alb );
+		if ( is_array( $treecounts ) ) {
+			$treecounts['needupdate'] = '1';
+			wppa_save_treecount_a( $alb, $treecounts );
+			$parent = wppa_get_album_item( $alb, 'a_parent' );
+
+			// Bubble up
+			if ( $parent > '0' ) {
+				wppa_mark_treecounts( $parent );
+			}
+		}
+	}
+
+	// Schedule cron to fix it up
+	wppa_schedule_treecount_update();
+}
+
+// Save update treecount array
+function wppa_save_treecount_a( $alb, $treecounts ) {
+global $wpdb;
+
+	// Sanitize arg
+	if ( $alb ) {
+		$alb = strval( intval( $alb ) );
+	}
+	if ( is_array( $treecounts ) ) {
+		foreach( array_keys( $treecounts ) as $key ) {
+			$treecounts[$key] = strval( intval( $treecounts[$key] ) );
+		}
+	}
+
+	// Do it
+	if ( $alb && is_array( $treecounts ) ) {
+
+		$keys 	= array( '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10' );
+		$result = array_combine( $keys, $treecounts );
+		$result = serialize( $result );
+
+		$iret = $wpdb->query( "UPDATE `" . WPPA_ALBUMS . "` SET `treecounts` = '$result' WHERE `id` = $alb" );
+		wppa_cache_album( 'invalidate', $alb );
+	}
+}
+
+// Get the treecounts for album $alb
+function wppa_get_treecounts_a( $alb, $update = false ) {
+global $wpdb;
+
+	// Array index defintions
+	$needupdate 			= '0';
+	$selfalbums 			= '1';
+	$treealbums 			= '2';
+	$selfphotos 			= '3';
+	$treephotos 			= '4';
+	$pendselfphotos 		= '5';
+	$pendtreephotos 		= '6';
+	$scheduledselfphotos 	= '7';
+	$scheduledtreephotos 	= '8';
+	$selfphotoviews 		= '9';
+	$treephotoviews 		= '10';
+
+	// Sanitize arg
+	if ( $alb ) {
+		$alb = strval( intval( $alb ) );
+	}
+
+	// If album id given
+	if ( $alb ) {
+
+		// Get db data field
+		$treecount_string = wppa_get_album_item( $alb, 'treecounts' );
+
+		// Convert to array
+		if ( $treecount_string ) {
+			$treecount_array = unserialize( $treecount_string );
+		}
+		else {
+			$treecount_array = array();
+		}
+
+		// Fill in missing elements
+		$defaults = array( 1,0,0,0,0,0,0,0,0,0,0 );
+		$i = 0;
+		$n = count( $defaults );
+		while ( $i < $n ) {
+			if ( ! isset( $treecount_array[$i] ) ) {
+				$treecount_array[$i] = $defaults[$i];
+			}
+			$i++;
+		}
+
+		// Convert numeric keys to alphabetic keys
+		$keys = array( 	'needupdate',
+						'selfalbums',
+						'treealbums',
+						'selfphotos',
+						'treephotos',
+						'pendselfphotos',
+						'pendtreephotos',
+						'scheduledselfphotos',
+						'scheduledtreephotos',
+						'selfphotoviews',
+						'treephotoviews'
+						);
+
+		$result = array_combine( $keys, $treecount_array );
+
+		if ( $result['needupdate'] && $update ) {
+			return wppa_verify_treecounts_a( $alb );
+		}
+	}
+
+	// No album given
+	else {
+		$result = false;
+	}
+
+	// Done
 	return $result;
 }

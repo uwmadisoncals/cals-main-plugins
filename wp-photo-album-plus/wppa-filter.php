@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.6.00
+* Version 6.6.11
 *
 */
 
@@ -55,9 +55,11 @@ global $wppa_revno;
 		'landing' 	=> '',
 		'admin' 	=> '',
 		'parent' 	=> '',
-		'pcount' 	=> '',
-		'acount' 	=> '',
+		'alt' 		=> '',
 	), $xatts );
+
+	// Init
+	wppa_reset_occurrance();
 
 	// Find occur
 	if ( get_the_ID() != $wppa_postid ) {		// New post
@@ -66,33 +68,14 @@ global $wppa_revno;
 		$wppa_postid = get_the_ID();			// Remember the post id
 	}
 
-	// Set internal defaults
-	$wppa['start_album'] 		= '';
-	$wppa['is_cover'] 			= '0';
-	$wppa['is_slide'] 			= '0';
-	$wppa['is_slideonly'] 		= '0';
-	$wppa['is_filmonly'] 		= '0';
-	$wppa['single_photo'] 		= '';
-	$wppa['is_mphoto'] 			= '0';
-	$wppa['film_on'] 			= '0';
-	$wppa['is_landing'] 		= '0';
-	$wppa['start_photo'] 		= '0';			// Start a slideshow here
-	$wppa['is_single'] 			= false;		// Is a one image slideshow
-	$wppa['is_upload'] 			= false;
-	$wppa['is_multitagbox'] 	= false;
-	$wppa['is_tagcloudbox'] 	= false;
-	$wppa['taglist'] 			= '';
-	$wppa['tagcols']			= '2';
-	$wppa['is_autopage']		= false;
-	$wppa['portrait_only'] 		= false;
+	// Whatever is entered between [wppa ...] and [/wppa]
 	$wppa['shortcode_content'] 	= $content;
-	$wppa['is_url'] 			= false;
-	$wppa['forceroot'] 			= '';
-	$wppa['landingpage'] 		= '';
-	$wppa['is_admins_choice'] 	= false;
-	$wppa['admins_choice_users'] = '';
-	$wppa['albums_only'] 		= false;
-	$wppa['max_width'] 			= false;
+
+	// Check for inconsistency
+	if ( $atts['alt'] && wppa_switch( 'render_shortcode_always' ) ) {
+		wppa_dbg_msg( 'ERROR! Either untick Table IV-A8: Render shortcode always, or remove the alt="'.$atts['alt'].'" attribute from the shortcode on this page/post', 'red', 'force' );
+		return '';
+	}
 
 	// Find type
 	switch ( $atts['type'] ) {
@@ -247,7 +230,7 @@ global $wppa_revno;
 			$t = $atts['type'];
 			if ( $a xor $p ) {
 				$alb = $a ? $a : $p;
-				$tc = wppa_treecount_a( $alb );
+				$tc = wppa_get_treecounts_a( $alb );
 
 				// Album based count requested
 				if ( $a ) {
@@ -262,10 +245,10 @@ global $wppa_revno;
 				// Parent based count requested
 				else {
 					if ( $t == 'acount' ) {
-						return $tc['albums'];
+						return $tc['selfalbums'];
 					}
 					else {
-						return $tc['photos'];
+						return $tc['selfphotos'];
 					}
 
 				}
@@ -322,7 +305,20 @@ global $wppa_revno;
 		$result =  wppa_albums();						// Get the HTML
 	}
 	else {
-		$result = '<span style="color:blue; font-weight:bold; ">[WPPA+ Photo display (fsh)]</span>';	// Or an indicator
+		if ( $atts['alt'] ) {
+			if ( wppa_is_int( $atts['alt'] ) && wppa_photo_exists( $atts['alt'] ) ) {
+				$result = '<img src="' . wppa_get_photo_url( $atts['alt'] ) . '" alt="Photo ' . $atts['alt'] . '" />';
+			}
+			elseif ( $atts['alt'] == 'none' ) {
+				$result = '';
+			}
+			else {
+				$result = '<span style="color:red; font-weight:bold; ">[WPPA+ Invalid alt attribute in shortcode: ' . $atts['alt'] . ' (fsh)]</span>';
+			}
+		}
+		else {
+			$result = '<span style="color:blue; font-weight:bold; ">[WPPA+ Photo display (fsh)]</span>';	// Or an indicator
+		}
 	}
 
 	// Reset
@@ -426,7 +422,8 @@ global $wppa_opt;
 
 	// Reset?
 	elseif ( ! $atts['name'] ) {
-		$wppa_opt = get_option( 'wppa_cached_options', false );
+		$wppa_opt = false;
+		wppa_initialize_runtime();
 		wppa_reset_occurrance();
 	}
 

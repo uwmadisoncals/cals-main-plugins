@@ -12,20 +12,6 @@
     line-height: 1.5
 }
 
-.mc-button {
-    text-align: center;
-    font-size: 1.4em;
-    padding: 10px 0 0
-}
-
-.mc-button a {
-    padding: 3px 8px;
-    border: 1px outset;
-    border-radius: 7px;
-    background: #fff;
-	font-weight: 700;
-}
-
 .mcd {
     text-align: center;
     margin: 0;

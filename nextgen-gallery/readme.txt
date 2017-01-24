@@ -2,8 +2,8 @@
 Contributors: photocrati, imagely
 Tags: gallery, wordpress gallery plugin, nextgen, nextgen gallery, photo gallery, photo album, photos, image gallery, image, images, photography, photographer, watermarking, responsive gallery, slideshow, thumbnail gallery, watermarking, watermark
 Requires at least: 4.0.0
-Stable tag: 2.1.60
-Tested up to: 4.7.0
+Stable tag: 2.1.69
+Tested up to: 4.7.1
 License: GPLv2
 
 The most popular WordPress gallery plugin and one of the most popular plugins of all time with over 16 million downloads.
@@ -186,6 +186,23 @@ For more information, feel free to visit the official website for the NextGEN Ga
 
 
 == Changelog ==
+
+= V2.1.69 - 01.18.2016 =
+* Fixed:    Ensured compatibility with WordPress 4.7.1
+* Fixed:    Missing option names on setting pages when Wizard active
+* Fixed:    Ensure that NextGEN Gallery is always loaded after it's extension plugins in WP 4.7
+* Fixed:    Pope product uninstaller not running during activation
+
+= V2.1.62 - 12.15.2016 =
+* Fixed:   Typo in notice for launching the gallery wizard
+* Fixed:   The ability to dismiss the gallery wizard notice
+
+= V2.1.61 - 12.14.2016 =
+* NEW:     Gallery creation wizard for new users
+* Fixed:   Shortcodes in widgets not getting substituted in Divi
+* Fixed:   Ensure that NGG placeholder text doesn't get styled incorrectly by other themes
+* Fixed:   Various thickbox issues on custom post type pages
+* Fixed:   Hide IGW placeholder images in Yoast feed
 
 = V2.1.60 - 11.22.2016 =
 * Secured: Ensure that only .css files can be edited using Styles tab

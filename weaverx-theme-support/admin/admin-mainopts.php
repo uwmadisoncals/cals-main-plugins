@@ -324,7 +324,7 @@ $extend = array (
 		'header' => array( __('Header Area Extend BG Color', 'weaver-xtreme'), __('Extend Header Area BG Color to full width.','weaver-xtreme' )),
 		'm_primary' => array( __('Primary Menu Extend BG', 'weaver-xtreme'), __('Extend Primary Menu BG Color to full width.','weaver-xtreme' )),
 		'm_secondary' => array( __('Secondary Menu Extend BG', 'weaver-xtreme'), __('Extend Secondary Menu BG Color to full width.','weaver-xtreme' )),
-		'm_extra' => array( __('Secondary Menu Extend BG', 'weaver-xtreme'), __('Extend Secondary Menu BG Color to full width.','weaver-xtreme' )),
+		'm_extra' => array( __('Extra Menu Extend BG', 'weaver-xtreme'), __('Extend Extra Menu BG Color to full width.','weaver-xtreme' )),
 		'container' => array( __('Container Extend BG', 'weaver-xtreme'), __('Extend Container Area BG Color to full width.','weaver-xtreme' )),
 		'content' => array( __('Content Extend BG', 'weaver-xtreme'), __('Extend Content Area BG Color to full width.','weaver-xtreme' )),
 		'footer' => array( __('Footer Extend BG', 'weaver-xtreme'), __('Extend Footer Area BG Color to full width.','weaver-xtreme' )),
@@ -441,6 +441,34 @@ array( 'name' => __('Header Other options', 'weaver-xtreme'), 'type' => 'break')
 
 
 
+	array('name' => __('Header Video', 'weaver-xtreme' /*adm*/), 'id' => '-format-video', 'type' =>'subheader',
+		  'info' => __('Settings related to Header Video (Set on Appearance&rarr;Header or on the Customize&rarr;Images&rarr;Header Media menu.)', 'weaver-xtreme' /*adm*/)),
+
+	array('name' => __('Header Video Rendering', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'header_video_render', 'type' => 'select_id',	//code
+		'info' => __('How to render Header Video: as image substitute in header or as full browser background cover image will parallax effect. <em style="color:red;">Note that the Header Image options above do not apply to the Header Video media.</em>', 'weaver-xtreme' /*adm*/),
+		'value' => array(
+			array('val' => 'has-header-video', 'desc' => __('As video in header only', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'has-header-video-cover', 'desc' => __('As full cover Parallax BG Video', 'weaver-xtreme' /*adm*/)),
+			array('val' => 'has-header-video-none', 'desc' => __('Disable Header Video', 'weaver-xtreme' /*adm*/))
+		)),
+
+		array('name' => __('Header Video Aspect Ratio', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'header_video_aspect', 'type' => 'select_id',	//code
+		'info' => __('It is critical to select aspect ratio of your video. If you see letterboxing black bars, you have the wrong aspect ratio selected.' , 'weaver-xtreme' /*adm*/),
+		'value' => array(
+			array('val' => '16:9', 'desc' => __('16:9 HDTV', 'weaver-xtreme' /*adm*/)),
+			array('val' => '4:3', 'desc' => __('4:3 Std TV', 'weaver-xtreme' /*adm*/)),
+			array('val' => '3:2', 'desc' => __('3:2 35mm Photo', 'weaver-xtreme' /*adm*/)),
+			array('val' => '5:3', 'desc' => __('5:3 Alternate Photo', 'weaver-xtreme' /*adm*/)),
+			array('val' => '64:27', 'desc' => __('2.37:1 Cinemascope', 'weaver-xtreme' /*adm*/)),
+			array('val' => '37:20', 'desc' => __('1.85:1 VistaVision', 'weaver-xtreme' /*adm*/)),
+			array('val' => '3:1', 'desc' => __('3:1 Banner', 'weaver-xtreme' /*adm*/)),
+			array('val' => '4:1', 'desc' => __('4:1 Banner', 'weaver-xtreme' /*adm*/)),
+			array('val' => '9:16', 'desc' => __('9:16 Vertical HD (Please avoid!)', 'weaver-xtreme' /*adm*/))
+		)),
+
+
 	array('name' => __('Custom Logo', 'weaver-xtreme' /*adm*/), 'id' => '-menu', 'type' =>'subheader',
 		'info' => __('The native WP Custom Logo, set on the Site Identity Customizer menu.', 'weaver-xtreme' /*adm*/)),
 
@@ -504,10 +532,6 @@ array( 'name' => __('Header Other options', 'weaver-xtreme'), 'type' => 'break')
 		'info' => __('Add Top/Bottom Padding to the Site Title/Tagline block. This option is especially useful if the Header Image is a BG image. (Default: 0,0)', 'weaver-xtreme' /*adm*/)),
 
 
-
-	array('name' => '<span class="i-left" style="font-size:150%;">&harr;</span><small>' . __('Tagline Max Width', 'weaver-xtreme' /*adm*/) . '</small>',
-		'id' => 'tagline_max_w', 'type' => 'val_percent',
-		'info' => __("Maximum width of Tagline in header area (Default: 90%)", 'weaver-xtreme' /*adm*/)),
 
 	array('name' => '<span class="i-left dashicons dashicons-editor-code"></span><small>' . __('Weaver Site Logo/HTML', 'weaver-xtreme' /*adm*/) . '</small>',
 				'id' => '_site_logo', 'type' => '+textarea',
@@ -576,6 +600,7 @@ array( 'name' => __('Header Other options', 'weaver-xtreme'), 'type' => 'break')
 <br />
 <div class="options-intro-menu"> <a href="#header-area"><?php _e('Header Area', 'weaver-xtreme' /*adm*/); ?></a> |
 <a href="#header-image"><?php _e('Header Image', 'weaver-xtreme' /*adm*/); ?></a> |
+<a href="#header-video"><?php _e('Header Video', 'weaver-xtreme' /*adm*/); ?></a> |
 <a href="#site-titletagline"><?php _e('Site Title/Tagline', 'weaver-xtreme' /*adm*/); ?></a> |
 <a href="#header-widget-area"><?php _e('Header Widget Area', 'weaver-xtreme' /*adm*/); ?></a>|
 <a href="#header-html"><?php _e('Header HTML', 'weaver-xtreme' /*adm*/); ?></a>

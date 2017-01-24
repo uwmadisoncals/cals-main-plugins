@@ -2,12 +2,12 @@
 # This file is distributed under the same license as the 2.3 package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2016-07-13 21:38:19+0000\n"
+"PO-Revision-Date: 2017-01-17 15:01:25+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: GlotPress/1.0-alpha-1000\n"
+"X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: 2.3\n"
 
 #: app/model/settings.php:559
@@ -16,10 +16,13 @@ msgid ""
 "\t\t\t\t\t\t\t\t\tdata-original-title=\"Google may request for an API key in order to show the map\">\n"
 "\t\t\t\t\t\t\t\t\tGoogle Maps API Key</span> (<a target=\"_blank\" href=\"https://developers.google.com/maps/documentation/javascript/get-api-key#get-an-api-key\">Get an API key</a>)"
 msgstr ""
+"<span class=\"ai1ec-tooltip-toggle\"\n"
+"→\t→\t→\t→\t→\t→\t→\t→\t→\tdata-original-title=\"K zobrazení mapy může Google vyžadovat API key\">\n"
+"→\t→\t→\t→\t→\t→\t→\t→\t→\tGoogle Maps API Key</span> (<a target=\"_blank\" href=\"https://developers.google.com/maps/documentation/javascript/get-api-key#get-an-api-key\">Get an API key</a>)"
 
 #: public/admin/feed_row.php:93 public/admin/plugins/ics/import_feed.php:92
 msgid "Convert event's date/time to calendar's timezone"
-msgstr ""
+msgstr "Převést čas a datum události do časového pásma kalendáře"
 
 #: public/admin/box_event_cost.php:303
 msgid "Report:"
@@ -31,40 +34,40 @@ msgstr "Prodáno: %d, Zbývá: %s, Rezervováno: %d"
 
 #: public/admin/box_event_cost.php:335
 msgid "Add Tax &amp; Invoice Options (required)"
-msgstr ""
+msgstr "Přidat daň &amp; nastavení faktury (vyžadováno)"
 
 #: public/admin/box_event_cost.php:341
 msgid "Update Tax &amp; Invoice Options"
-msgstr ""
+msgstr "Aktualizovat daň &amp; nastavení faktury"
 
 #: public/admin/box_event_cost.php:349
 msgid "I read and accept the <a href=\"https://time.ly/tos\" target=\"_blank\">terms of service</a>."
-msgstr ""
+msgstr "Přečetl jsem a akceptuji <a href=\"https://time.ly/tos\" target=\"_blank\">smluvní podmínky</a>."
 
 #: public/admin/feed_row.php:16 public/admin/plugins/ics/import_feed.php:41
 msgid "Feed URL:"
-msgstr ""
+msgstr "URL feedu:"
 
 #: public/admin/feed_row.php:106
 msgid "List of imported events:"
-msgstr ""
+msgstr "Seznam importovaných událostí:"
 
 #: public/admin/feed_row.php:117
 #: public/admin/plugins/suggested/event_actions.php:13
 msgid "Removing"
-msgstr ""
+msgstr "Odstraňuji"
 
 #: public/admin/plugins/ics/display_feeds.php:6
 #: public/admin/plugins/ics/import_feed.php:6
 #: public/admin/plugins/suggested/display_feeds.php:6
 msgid "Please, Sign In to <b>Timely Network</b> to manage your feeds."
-msgstr ""
+msgstr "Pro správu svých feedů se prosím přihlašte do sítě <b>Timely Network.</b> "
 
 #: public/admin/plugins/ics/display_feeds.php:10
 #: public/admin/plugins/ics/import_feed.php:10
 #: public/admin/plugins/suggested/display_feeds.php:10
 msgid "Sign In to Timely Network"
-msgstr ""
+msgstr "Přihlásit k Timely Network"
 
 #: public/admin/plugins/ics/display_feeds.php:22
 msgid ""
@@ -72,14 +75,17 @@ msgid ""
 "\t\tYou can't edit or remove them at the moment.\n"
 "\t\tPlease, visit this page later to manage your feeds."
 msgstr ""
+"<b>Váš feed bude přemigrován během následující naplánované obnovy (to může trvat až jednu hodinu).</b><br />\n"
+"→\t→\tV tuto chvíli je nemůžete upravovat ani odstranit.\n"
+"→\t→\tPro správu svého feedu se vraťte na tuto stránku později."
 
 #: public/admin/plugins/ics/display_feeds.php:33
 msgid "My imported Feeds:"
-msgstr ""
+msgstr "Moje importované feedy:"
 
 #: public/admin/plugins/ics/display_feeds.php:43
 msgid "My imported Events (click on the feed to see the individually imported events):"
-msgstr ""
+msgstr "Mé importované Události (pokud chcete vidět jednotlivě naimportované události, klikněte na feed):"
 
 #: public/admin/plugins/ics/import_feed.php:17
 msgid ""
@@ -87,6 +93,9 @@ msgid ""
 "\t\tPlease <a href=\"https://time.ly/pricing\">upgrade here</a> to a plan that\n"
 "\t\tsupports \"Import Feeds\"."
 msgstr ""
+"<b>Pro tuto službu nemáte sjednané předplatné-</b><br>\n"
+"→\t→\tProsíme <a href=\"https://time.ly/pricing\">upgradujte zde</a> na službu, která zahrnuje\n"
+"→\t→\tpodporu \"Import Feeds\"."
 
 #: public/admin/plugins/ics/import_feed.php:27
 msgid ""
@@ -94,22 +103,25 @@ msgid ""
 "\t\tPlease <a href=\"https://time.ly/pricing\">upgrade here</a> to a plan that\n"
 "\t\tsupports more feeds."
 msgstr ""
+"<b>Dosáhli jste limitu, kolik feedů můžete importovat.</b><br>\n"
+"→\t→\tProsíme <a href=\"https://time.ly/pricing\">upgradujte zde</a> na službu, která zahrnuje\n"
+" → → podporu více feedů."
 
 #: public/admin/plugins/ics/import_feed.php:110
 msgid "Import feed"
-msgstr ""
+msgstr "Importovat feed"
 
 #: public/admin/plugins/ics/import_feed.php:113
 msgid "Update feed"
-msgstr ""
+msgstr "Aktualizovat feed"
 
 #: public/admin/plugins/suggested/display_feeds.php:17
 msgid "Find events matching:"
-msgstr ""
+msgstr "Vyhledat shodné Událostí:"
 
 #: public/admin/plugins/suggested/display_feeds.php:22
 msgid "Located in:"
-msgstr ""
+msgstr "Nacházející se v:"
 
 #: public/admin/plugins/suggested/display_feeds.php:29
 msgid "Search"
@@ -121,7 +133,7 @@ msgstr "událostí nalezeno."
 
 #: public/admin/plugins/suggested/display_feeds.php:42
 msgid "Update settings for the imported events in “My feeds” tab."
-msgstr ""
+msgstr "Obnovte nastavení pro importované události v záložce \"Mé feedy\"."
 
 #: public/admin/plugins/suggested/display_feeds.php:47
 msgid "Map"
@@ -129,7 +141,7 @@ msgstr "Mapa"
 
 #: public/admin/plugins/suggested/display_feeds.php:50
 msgid "Both"
-msgstr ""
+msgstr "Obojí"
 
 #: public/admin/plugins/suggested/display_feeds.php:53
 msgid "List"
@@ -142,7 +154,7 @@ msgstr "Nenalezeny žádné události."
 
 #: public/admin/plugins/suggested/display_feeds.php:75
 msgid "Please, modify your search criteria and try again."
-msgstr ""
+msgstr "Upravte svá vyhledávací kritéria a zkuste to, prosím, znovu."
 
 #: public/admin/plugins/suggested/event_actions.php:5
 msgid "Import"
@@ -154,43 +166,43 @@ msgstr "Importuji"
 
 #: app/model/api/api-ticketing.php:468
 msgid "We were unable to get the Event Details from Time.ly Ticketing"
-msgstr ""
+msgstr "Nepodařilo se získat Detaily Události ze služby Time.ly Ticketing"
 
 #: app/view/admin/add-new-event.php:307
 msgid "Ticketing<sup>beta</sup> is currently not available for this website. Please, try again later."
-msgstr ""
+msgstr "Ticketing<sup>beta</sup> není aktuálně dostupná pro tuto webovou stránku. Prosíme, zkuste to později znovu."
 
 #: app/view/admin/settings.php:173
 msgid "Please, Sign In to Timely Network."
-msgstr ""
+msgstr "Prosíme, přihlašte se k Timely Network."
 
 #: app/view/admin/settings.php:199
 msgid "I confirm that I have read, understand and agree with the <a href=\"https://time.ly/tos\">terms of service</a>."
-msgstr ""
+msgstr "Potvrzuji, že jsem četl, porozuměl a souhlasím s <a href=\"https://time.ly/tos\"> podmínkami služby</a>."
 
 #: app/view/admin/settings.php:202
 msgid "<h4>Attention Required:</h4>If you choose to sign-out of the API Timely Network this will close all the created tickets and remove user access to them. In this case, on the event page, users will see the status “Event closed”."
-msgstr ""
+msgstr "<h4>Věnujte pozornost:</h4>Pokud zvolíte odhlášení odAPI Timely Network, budou uzavřeny všechny vytvořené lístky (tickety) a všechny uživatelské přístupy k nim. Pokud se tak stane, uvidí uživatelé na stránce s událostmi oznámení \"Událost ukončena\" (“Event closed”)."
 
 #: app/view/admin/tickets.php:74
 msgid "You need to sign up for a Timely Network account in order to use Ticketing<sup>beta</sup> <br /><br />"
-msgstr ""
+msgstr "Pokud chcete používat Ticketing<sup>beta</sup>, je třeba se přihlásit k Timely Network  <br /><br />"
 
 #: app/view/admin/tickets.php:77
 msgid "<a href=\"edit.php?post_type=ai1ec_event&page=all-in-one-event-calendar-settings\" class=\"ai1ec-btn ai1ec-btn-primary ai1ec-btn-lg\">Sign In to Timely Network</a>"
-msgstr ""
+msgstr "<a href=\"edit.php?post_type=ai1ec_event&page=all-in-one-event-calendar-settings\" class=\"ai1ec-btn ai1ec-btn-primary ai1ec-btn-lg\">Přihlásit do Timely Network</a>"
 
 #: app/view/admin/tickets.php:78
 msgid "<b>Signing up for a Timely Network account is currently unavailable. Please, try again later.</b>"
-msgstr ""
+msgstr "<b>Přihlašování k účtu na Timely Network je aktuálně nedostupné. Prosíme, zkuste to později.</b>"
 
 #: app/view/admin/tickets.php:100
 msgid "Please consider Ticketing is in beta. If you encounter any bugs please raise the at <a href=\"mailto:labs@time.ly\">labs@time.ly</a>. Any enhancements requests please raise them on <a href=\"http://ideas.time.ly\">ideas.time.ly</a> under \"Ticketing\"."
-msgstr ""
+msgstr "Mějte na paměti, že Ticketing funguje beta režimu. Pokud zaznamenáte libovolnou chybu, prosíme, nahlašte ji na <a href=\"mailto:labs@time.ly\">labs@time.ly</a>. Zde hlašte i případné požadavky na vylepšení <a href=\"http://ideas.time.ly\">ideas.time.ly</a> v sekci \"Ticketing\"."
 
 #: lib/calendar-feed/ics.php:40
 msgid "My Feeds"
-msgstr ""
+msgstr "Mé Feedy"
 
 #: lib/calendar-feed/ics.php:889
 msgid "Event imported"
@@ -210,60 +222,60 @@ msgstr "&raquo;"
 
 #: lib/environment/check.php:107
 msgid "<b>ACTION REQUIRED!</b> Please, <a href=\"edit.php?post_type=ai1ec_event&page=all-in-one-event-calendar-settings\">sign</a> into Timely Network to continue syncing your imported events."
-msgstr ""
+msgstr "<b>POŽADAVEK!</b> Prosíme, <a href=\"edit.php?post_type=ai1ec_event&page=all-in-one-event-calendar-settings\">přihlašte se</a> do Timely Network, aby synchronizace importu události mohla pokračovat."
 
 #: app/controller/javascript.php:508
 msgid "Event was imported successfully."
-msgstr ""
+msgstr "Událost byla úspěšně importována."
 
 #: app/controller/javascript.php:511
 msgid "An error occurred when importing event. Please, try later."
-msgstr ""
+msgstr "Při importu se vyskytla chyba. Zkuste to, prosím, později."
 
 #: app/controller/javascript.php:553
 msgid "Information"
-msgstr ""
+msgstr "Informace"
 
 #: app/controller/javascript.php:574 app/model/api/api-ticketing.php:401
 #: public/admin/box_event_cost.php:280
 msgid "Open for sale"
-msgstr ""
+msgstr "Zahájit prodej"
 
 #: app/controller/javascript.php:575
 msgid "You have sold tickets for this ticket type. Please change it's status to \"Canceled\" and make refunds to all users that purchased tickets."
-msgstr ""
+msgstr "Vypordali jste lístky pro tento typ lístků (ticket type). Změňte, prosím, jeho status na \"Zrušen\" (Canceled) a proveďte vrácení platby všem uživatelům, kteří si zakoupili lístek."
 
 #: app/controller/javascript.php:576
 msgid "You have sold tickets for this ticket type. Please make refunds to all users that purchased tickets"
-msgstr ""
+msgstr "Vyprodali jste lístky pro tento typ lístků (ticket type). Proveďte vrácení platby všem uživatelům, kteří si zakoupili lístek. "
 
 #: app/model/api/api-feeds.php:131
 msgid "We were unable to import feed"
-msgstr ""
+msgstr "Feed se nepodařilo naimportovat."
 
 #: app/model/api/api-feeds.php:154
 msgid "We were unable to get feed data"
-msgstr ""
+msgstr "Nepodařilo se získat data feedu."
 
 #: app/model/api/api-feeds.php:286
 msgid "We were unable to subscribe feed"
-msgstr ""
+msgstr "Nepodařilo se feed přihlásit."
 
 #: app/model/api/api-feeds.php:316
 msgid "We were unable to unsubscribe feed"
-msgstr ""
+msgstr "Feed nebylo možné odhlásit."
 
 #: app/model/api/api-ticketing.php:120
 msgid "Tax and Invoice options are required."
-msgstr ""
+msgstr "Daňová a fakturační nastavení jsou vyžadována."
 
 #: app/model/api/api-ticketing.php:403 public/admin/box_event_cost.php:285
 msgid "Sale ended"
-msgstr ""
+msgstr "Prodej ukončen"
 
 #: app/model/api/api-ticketing.php:405 public/admin/box_event_cost.php:289
 msgid "Canceled"
-msgstr ""
+msgstr "Zrušeno"
 
 #: app/model/settings.php:918
 msgid "Use this option if calendar is unresponsive. <a target=\"_blank\" href=\"http://time.ly/document/user-guide/troubleshooting/disable-gzip-compression/\">Read more</a> about the issue. (From version 2.1 onwards, gzip is disabled by default for maximum compatibility.)"

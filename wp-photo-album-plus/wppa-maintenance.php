@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.6.04
+* Version 6.6.11
 *
 */
 
@@ -49,6 +49,7 @@ global $wppa_supported_audio_extensions;
 							'wppa_delete_all_autopages',
 							'wppa_leading_zeros',
 							'wppa_add_gpx_tag',
+							'wppa_add_hd_tag',
 							'wppa_optimize_ewww',
 							'wppa_comp_sizes',
 							'wppa_edit_tag',
@@ -243,7 +244,7 @@ global $wppa_supported_audio_extensions;
 						if ( ! $a && ! $p ) {
 							$wpdb->query( $wpdb->prepare( "DELETE FROM `".WPPA_ALBUMS."` WHERE `id` = %s", $id ) );
 							wppa_delete_album_source( $id );
-							wppa_flush_treecounts( $id );
+							wppa_invalidate_treecounts( $id );
 							wppa_index_remove( 'album', $id );
 						}
 						break;
@@ -289,6 +290,7 @@ global $wppa_supported_audio_extensions;
 		case 'wppa_delete_all_autopages':
 		case 'wppa_leading_zeros':
 		case 'wppa_add_gpx_tag':
+		case 'wppa_add_hd_tag':
 		case 'wppa_optimize_ewww':
 		case 'wppa_comp_sizes':
 		case 'wppa_edit_tag':
@@ -579,7 +581,7 @@ global $wppa_supported_audio_extensions;
 						break;
 
 					case 'wppa_add_gpx_tag':
-						$tags 	= $photo['tags'];
+						$tags 	= wppa_sanitize_tags( $photo['tags'] );
 						$temp 	= explode( '/', $photo['location'] );
 						if ( ! isset( $temp['2'] ) ) $temp['2'] = false;
 						if ( ! isset( $temp['3'] ) ) $temp['3'] = false;
@@ -589,14 +591,19 @@ global $wppa_supported_audio_extensions;
 							$lat = false;
 							$lon = false;
 						}
-						if ( $photo['location'] && strpos( $tags, 'Gpx' ) === false && $lat && $lon ) {	// Add it
-							$tags = wppa_sanitize_tags( $tags . ',Gpx' );
+						if ( $photo['location'] && $lat && $lon ) {	// Add it
+							$tags = wppa_sanitize_tags( $tags . ',GPX' );
 							wppa_update_photo( array( 'id' => $photo['id'], 'tags' => $tags ) );
 							wppa_index_update( 'photo', $photo['id'] );
 							wppa_clear_taglist();
 						}
-						elseif ( strpos( $tags, 'Gpx' ) !== false && ! $lat && ! $lon ) { 	// Remove it
-							$tags = wppa_sanitize_tags( str_replace( 'Gpx', '', $tags ) );
+						break;
+
+					case 'wppa_add_hd_tag':
+						$tags 	= wppa_sanitize_tags( $photo['tags'] );
+						$size 	= wppa_get_artmonkey_size_a( $photo['id'] );
+						if ( is_array( $size ) && $size['x'] >= 1920 && $size['y'] >= 1080 ) {
+							$tags = wppa_sanitize_tags( $tags . ',HD' );
 							wppa_update_photo( array( 'id' => $photo['id'], 'tags' => $tags ) );
 							wppa_index_update( 'photo', $photo['id'] );
 							wppa_clear_taglist();
@@ -678,9 +685,10 @@ global $wppa_supported_audio_extensions;
 						break;
 
 					case 'wppa_sanitize_tags':
-						$tags = $photo['tags'];
-						if ( $tags ) {
-							wppa_update_photo( array( 'id' => $photo['id'], 'tags' => wppa_sanitize_tags( $tags ) ) );
+						$tags = wppa_sanitize_tags( $photo['tags'] );
+						// If raw data exists, update with sanitized data
+						if ( $photo['tags'] ) {
+							wppa_update_photo( array( 'id' => $photo['id'], 'tags' => $tags ) );
 						}
 						break;
 
@@ -709,30 +717,70 @@ global $wppa_supported_audio_extensions;
 						if ( $alb == $fromalb ) {
 							wppa_update_photo( array( 'id' => $id, 'album' => $toalb ) );
 							wppa_move_source( wppa_get_photo_item( $id, 'filename' ), $fromalb, $toalb );
-							wppa_flush_treecounts( $fromalb );
-							wppa_flush_treecounts( $toalb );
+							wppa_invalidate_treecounts( $fromalb );
+							wppa_invalidate_treecounts( $toalb );
 							$wppa_session[$slug.'_fixed']++;
 						}
 						break;
 
 					case 'wppa_test_proc':
+						$old_tags = $photo['tags'];
 						$tags 	= '';
+						// Location
+						$temp 	= explode( '/', $photo['location'] );
+						if ( ! isset( $temp['2'] ) ) $temp['2'] = false;
+						if ( ! isset( $temp['3'] ) ) $temp['3'] = false;
+						$lat 	= $temp['2'];
+						$lon 	= $temp['3'];
+						if ( $lat < 0.01 && $lat > -0.01 &&  $lon < 0.01 && $lon > -0.01 ) {
+							$lat = false;
+							$lon = false;
+						}
+						if ( $photo['location'] && $lat && $lon ) {
+							$tags .= ',GPX';
+						}
+						// HD?
+						$size 	= wppa_get_artmonkey_size_a( $photo['id'] );
+						if ( is_array( $size ) && $size['x'] >= 1920 && $size['y'] >= 1080 ) {
+							$tags .= ',HD';
+						}
+						// Album names
 						$albid 	= $photo['album'];
 						$albnam = wppa_get_album_item( $albid, 'name' );
-						$tags .= $albnam;
+						$tags .= ',' . $albnam;
 						while ( $albid > '0' ) {
 							$albid = wppa_get_album_item( $albid, 'a_parent' );
 							if ( $albid > '0' ) {
 								$tags .= ',' . wppa_get_album_item( $albid, 'name' );
 							}
 						}
-						wppa_update_photo( array( 'id' => $photo['id'], 'tags' => wppa_sanitize_tags( $tags ) ) );
+						$tags = wppa_sanitize_tags( $tags );
+
+						// Update only if new data differs from existing data
+						if ( $old_tags != $tags ) {
+							wppa_update_photo( array( 'id' => $photo['id'], 'tags' => $tags ) );
+							wppa_index_update( 'photo', $photo['id'] );
+							wppa_clear_taglist();
+						}
+
 						break;
 
 				}
 				// Test for timeout / ready
 				$lastid = $id;
 				update_option( $slug.'_last', $lastid );
+				if ( wppa_is_cron() ) {
+					$togo 	= $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_PHOTOS . "` WHERE `id` > %s ", $lastid ) );
+					if ( $togo ) {
+						update_option( $slug.'_togo', $togo );
+					}
+					if ( time() > $endtime ) {
+						update_option( $slug.'_status', __('Scheduled cron job', 'wp-photo-album-plus'));
+					}
+					else {
+						update_option( $slug.'_status', __('Running cron job', 'wp-photo-album-plus'));
+					}
+				}
 				if ( time() > $endtime ) break; 	// Time out
 			}
 			else {	// Nothing to do, Done anyway
@@ -890,6 +938,9 @@ global $wppa_supported_audio_extensions;
 
 	if ( wppa_is_cron() ) {
 		wppa_log( 'obs', $errtxt.'||'.$slug.'||'.$status.'||'.$togo.'||'.$reload );
+		if ( get_option( $slug . '_ad_inf' ) == 'yes' ) {
+			wppa_schedule_maintenance_proc( $slug );
+		}
 	}
 	return $errtxt.'||'.$slug.'||'.$status.'||'.$togo.'||'.$reload;
 

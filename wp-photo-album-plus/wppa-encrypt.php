@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 6.4.18
+* Version 6.6.09
 *
 */
 
@@ -125,7 +125,7 @@ function wppa_encrypt_album( $album ) {
 }
 
 // Convert photo crypt to id
-function wppa_decrypt_photo( $photo ) {
+function wppa_decrypt_photo( $photo, $report_error = true ) {
 global $wpdb;
 
 	// Feature enabled?
@@ -136,7 +136,7 @@ global $wpdb;
 	// Already decrypted?
 	if ( strlen( $photo ) < 12 ) {
 		if ( wppa_switch( 'refuse_unencrypted' ) ) {
-			wppa_dbg_msg( __( 'Invalid photo identifier:', 'wp-photo-album-plus') . ' ' . $photo, 'red', 'force' );
+			wppa_dbg_msg( __( 'Invalid photo identifier:', 'wp-photo-album-plus' ) . ' ' . $photo, 'red', 'force' );
 			return false;
 		}
 		return $photo;
@@ -145,7 +145,9 @@ global $wpdb;
 	// Just do it
 	$id = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM `" . WPPA_PHOTOS . "` WHERE `crypt` = %s", substr( $photo, 0, 12 ) ) );
 	if ( ! $id ) {
-		wppa_dbg_msg( 'Invalid photo identifier: ' . $photo, 'red', 'force' );
+		if ( $report_error ) {
+			wppa_dbg_msg( 'Invalid photo identifier: ' . $photo, 'red', 'force' );
+		}
 	}
 
 	return $id;

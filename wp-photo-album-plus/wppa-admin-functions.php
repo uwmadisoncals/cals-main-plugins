@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.6.07
+* Version 6.6.09
 *
 */
 
@@ -299,7 +299,7 @@ global $wpdb;
 										 )
 								 );
 	if ( ! $id ) return $err;
-	wppa_flush_treecounts( $album );
+	wppa_invalidate_treecounts( $album );
 	wppa_index_add( 'photo', $id );
 
 	$err = '4';
@@ -956,7 +956,7 @@ global $warning_given_small;
 		else {	// Save the source
 			wppa_save_source( $file, $filename, $alb );
 			wppa_make_o1_source( $id );
-			wppa_flush_treecounts( $alb );
+			wppa_invalidate_treecounts( $alb );
 			wppa_update_album( array( 'id' => $alb, 'modified' => time() ) );
 			wppa_flush_upldr_cache( 'photoid', $id );
 		}

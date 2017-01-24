@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.6.07
+* Version 6.6.11
 *
 */
 
@@ -714,13 +714,13 @@ function wppa_update_option( $option, $value ) {
 global $wppa_opt;
 
 	// Update the option
-	update_option( $option, $value, false );
+	update_option( $option, $value );
 
 	// Update the local cache
 	$wppa_opt[$option] = $value;
 
 	// Delete the cached options
-	delete_option( 'wppa_cached_options' );
+//	delete_option( 'wppa_cached_options' );
 
 	// Remove init.js files, they will be auto re-created
 	$files = glob( WPPA_PATH.'/wppa-init.*.js' );
@@ -1006,148 +1006,6 @@ function wppa_get_imgalt( $id, $lb = false ) {
 	return $result;
 }
 
-// Flush treecounts of album $alb, default: clear all
-function wppa_flush_treecounts( $alb = '' ) {
-global $wppa;
-
-	if ( $alb ) {
-		$wppa['counts'] 	= WPPA_MULTISITE_GLOBAL ? get_site_option( 'wppa_counts', array() ) : get_option( 'wppa_counts', array() );
-		$wppa['treecounts'] = WPPA_MULTISITE_GLOBAL ? get_site_option( 'wppa_counts_tree', array() ) : get_option( 'wppa_counts_tree', array() );
-		if ( isset($wppa['counts'][$alb]) ) {
-			unset($wppa['counts'][$alb]);
-			$iret = WPPA_MULTISITE_GLOBAL ? update_site_option('wppa_counts', $wppa['counts']) : update_option('wppa_counts', $wppa['counts']);
-		}
-		if ( isset($wppa['treecounts'][$alb]) ) {
-			unset($wppa['treecounts'][$alb]);
-			$uret = WPPA_MULTISITE_GLOBAL ? update_site_option('wppa_counts_tree', $wppa['treecounts']) : update_option('wppa_counts_tree', $wppa['treecounts']);
-		}
-		$parent = wppa_get_parentalbumid($alb);
-		if ( $parent > '0' ) wppa_flush_treecounts($parent);
-	}
-	else {
-		$bret = WPPA_MULTISITE_GLOBAL ? delete_site_option( 'wppa_counts' ) : delete_option( 'wppa_counts' );
-		$bret = WPPA_MULTISITE_GLOBAL ? delete_site_option( 'wppa_counts_tree' ) : delete_option( 'wppa_counts_tree' );
-	}
-}
-
-// Verify correctness of treecount value
-function wppa_verify_treecounts( $alb, $key, $count ) {
-
-	$treecounts = wppa_treecount_a( $alb );
-	$need_a = false;
-	$need_p = false;
-
-	// Number of albums ( $count ) equal to subalbums ( 'selfalbums' ) ?
-	if ( 'albums' == $key ) {
-		if ( $treecounts['selfalbums'] != $count ) {	// Faulty data
-			$need_a = true;
-		}
-	}
-
-	// Number of photos ( $count ) equal to photos in this album ( 'selfphotos' ( + opts ) )?
-	if ( 'photos' == $key ) {
-		if ( current_user_can( 'wppa_moderate' ) ) {
-			if ( ( $treecounts['selfphotos'] + $treecounts['pendphotos'] + $treecounts['scheduledphotos'] ) != $count ) {	// Faulty data
-				$need_p = true;
-			}
-		}
-		else {
-			if ( $treecounts['selfphotos'] != $count ) {	// Faulty data
-				$need_p = true;
-			}
-		}
-	}
-
-	// If no sub-albums, total number of photos should be equal to photos in this album ( 'selfphotos' )
-	if ( ! $treecounts['selfalbums'] && $treecounts['photos'] != $treecounts['selfphotos'] ) {
-		$need_p = true;
-	}
-
-	// Need recalc for reason albums fault?
-	if ( $need_a ) {
-		wppa_flush_treecounts( $alb );
-		wppa_log( 'Fix', 'Treecounts albums for album #'.$alb.' ('.wppa_get_album_name( $alb ).')' );
-	}
-
-	// Need recalc for reason photos fault?
-	if ( $need_p ) {
-		wppa_flush_treecounts( $albumid );
-		wppa_log( 'Fix', 'Treecounts photos for album #'.$alb.' ('.wppa_get_album_name( $alb ).')' );
-	}
-}
-
-// Get the treecounts for album $alb
-function wppa_treecount_a( $alb ) {
-global $wpdb;
-global $wppa;
-
-	$albums = '0';
-	$photos = '1';
-	$selfalbums = '3';
-	$selfphotos = '4';
-	$pendphotos = '5';
-	$scheduledphotos = '6';
-
-	// Initial fetch
-	if ( ! isset($wppa['counts']) ) {
-		$wppa['counts'] = WPPA_MULTISITE_GLOBAL ? get_site_option( 'wppa_counts', array() ) : get_option( 'wppa_counts', array() );
-	}
-	if ( ! isset($wppa['treecounts']) ) {
-		$wppa['treecounts'] = WPPA_MULTISITE_GLOBAL ? get_site_option( 'wppa_counts_tree', array() ) : get_option( 'wppa_counts_tree', array() );
-	}
-
-	// See if we have this in cache
-	if ( isset( $wppa['counts'][$alb] ) && isset( $wppa['treecounts'][$alb] ) ) {	// Album found
-		$result['albums'] = $wppa['treecounts'][$alb][$albums];			// Use data
-		$result['photos'] = $wppa['treecounts'][$alb][$photos];
-		$result['selfalbums'] = $wppa['counts'][$alb][$selfalbums];
-		$result['selfphotos'] = $wppa['counts'][$alb][$selfphotos];
-		$result['pendphotos'] = $wppa['counts'][$alb][$pendphotos];
-		$result['scheduledphotos'] = $wppa['counts'][$alb][$scheduledphotos];
-
-		return $result;													// And return
-	}
-
-	// Not in cache
-	else {
-		$albs	 	 = $wpdb->get_results( $wpdb->prepare( "SELECT `id` FROM `".WPPA_ALBUMS."` WHERE `a_parent` = %s", $alb ), ARRAY_A );
-		$album_count = empty($albs) ? '0' : count($albs);
-		$photo_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `album` = %s AND `status` <> 'pending' AND `status` <> 'scheduled'", $alb ) );
-		$pend_count  = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `album` = %s AND `status` = 'pending'", $alb ) );
-		$sched_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `album` = %s AND `status` = 'scheduled'", $alb ) );
-
-		// Result this level
-		$result = array(	'albums' => $album_count,
-							'photos' => $photo_count,
-							'selfalbums' => $album_count,
-							'selfphotos' => $photo_count,
-							'pendphotos' => $pend_count,
-							'scheduledphotos' => $sched_count,
-							);
-
-		// Subalbums to process?
-		if ( empty($albs) ) {}
-		else {
-			foreach ( $albs as $albm ) {
-				$subcount = wppa_treecount_a($albm['id']);
-				$result['albums'] += $subcount['albums'];
-				$result['photos'] += $subcount['photos'];
-			}
-		}
-
-		// Save to cache
-		$wppa['treecounts'][$alb][$albums] = $result['albums'];
-		$wppa['treecounts'][$alb][$photos] = $result['photos'];
-		$wppa['counts'][$alb][$selfalbums] = $result['selfalbums'];
-		$wppa['counts'][$alb][$selfphotos] = $result['selfphotos'];
-		$wppa['counts'][$alb][$pendphotos] = $result['pendphotos'];
-		$wppa['counts'][$alb][$scheduledphotos] = $result['scheduledphotos'];
-		$bret = WPPA_MULTISITE_GLOBAL ? update_site_option( 'wppa_counts', $wppa['counts'] ) : update_option( 'wppa_counts', $wppa['counts'] );
-		$bret = WPPA_MULTISITE_GLOBAL ? update_site_option( 'wppa_counts_tree', $wppa['treecounts'] ) : update_option( 'wppa_counts_tree', $wppa['treecounts'] );
-
-		return $result;
-	}
-}
 
 function wppa_is_time_up($count = '') {
 global $wppa_starttime;
@@ -1362,7 +1220,31 @@ global $wppa_supported_audio_extensions;
 global $wppa_supported_video_extensions;
 global $wpdb;
 
+	// Sanitize arg
+	$photo = strval( intval( $photo ) );
 	$photoinfo = $wpdb->get_row($wpdb->prepare('SELECT * FROM `'.WPPA_PHOTOS.'` WHERE `id` = %s', $photo), ARRAY_A);
+
+	// If still in use, refuse deletion
+	$in_use = $wpdb->get_row( "SELECT `ID`, `post_title` FROM `" . $wpdb->posts . "` WHERE `post_content` LIKE '%photo=\"$photo\"%' AND `post_status` = 'publish' LIMIT 1", ARRAY_A );
+
+	if ( is_array( $in_use ) ) {
+		if ( defined( 'DOING_AJAX' ) ) {
+			echo
+			'ER||0||' .
+			'<span style="color:#ff0000;" >' .
+				__( 'Could not delete photo', 'wp-photo-album-plus' ) .
+			'</span>||' .
+			__( 'Photo is still in use in post/page', 'wp-photo-album-plus' ) .
+				' ' .
+			$in_use['post_title'] .
+			' (' . $in_use['ID'] . ')';
+			wppa_exit();
+		}
+		else {
+			wppa_error_message( __( 'Photo is still in use in post/page', 'wp-photo-album-plus' ) . ' ' . $in_use['post_title'] . ' (' . $in_use['ID'] . ')' );
+			return false;
+		}
+	}
 
 	// Get album
 	$album = $photoinfo['album'];
@@ -1403,7 +1285,7 @@ global $wpdb;
 	$wpdb->query($wpdb->prepare('DELETE FROM `'.WPPA_COMMENTS.'` WHERE `photo` = %s', $photo));
 	$wpdb->query($wpdb->prepare('DELETE FROM `'.WPPA_IPTC.'` WHERE `photo` = %s', $photo));
 	$wpdb->query($wpdb->prepare('DELETE FROM `'.WPPA_EXIF.'` WHERE `photo` = %s', $photo));
-	wppa_flush_treecounts($album);
+	wppa_invalidate_treecounts($album);
 	wppa_flush_upldr_cache('photoid', $photo);
 
 	// Delete from cloud
@@ -1491,8 +1373,15 @@ function wppa_sanitize_tags($value, $keepsemi = false, $keephash = false ) {
 			}
 		}
 
+		// Capitalize GPX and HD tags
+		foreach ( array_keys( $temp ) as $idx ) {
+			if ( in_array( $temp[$idx], array( 'Gpx', 'Hd' ) ) ) {
+				$temp[$idx] = strtoupper( $temp[$idx] );
+			}
+		}
+
 		// Sort
-		asort($temp);
+		asort( $temp );
 
 		// Remove dups and recombine
 		$value = '';
@@ -3002,8 +2891,13 @@ function wppa_in_widget() {
 	if ( wppa( 'in_widget' ) ) {
 		return wppa( 'in_widget' );
 	}
-	$stack = serialize( debug_backtrace() );
-	return ( strpos( $stack, '"WP_Widget"' ) !== false );
+	$stack = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS );
+	if ( is_array( $stack ) ) foreach( $stack as $item ) {
+		if ( isset( $item['class'] ) && $item['class'] == 'WP_Widget' ) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function wppa_bump_mocc() {

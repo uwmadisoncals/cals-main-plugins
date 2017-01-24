@@ -1,15 +1,15 @@
 <?php
 /*
-Plugin Name: Formidable
+Plugin Name: Formidable Forms
 Description: Quickly and easily create drag-and-drop forms
-Version: 2.02.10
-Plugin URI: http://formidablepro.com/
+Version: 2.03
+Plugin URI: https://formidableforms.com/
 Author URI: http://strategy11.com
 Author: Strategy11
 Text Domain: formidable
 */
 
-/*  Copyright 2010  Strategy11  (email : support@strategy11.com)
+/*  Copyright 2010  Formidable Forms
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as
@@ -35,7 +35,7 @@ function frm_forms_autoloader( $class_name ) {
     }
 
     $filepath = dirname(__FILE__);
-	if ( preg_match( '/^FrmPro.+$/', $class_name ) || 'FrmUpdatesController' == $class_name ) {
+	if ( preg_match( '/^FrmPro.+$/', $class_name ) ) {
         $filepath .= '/pro';
     }
     $filepath .= '/classes';

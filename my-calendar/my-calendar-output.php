@@ -562,66 +562,17 @@ function mc_build_date_switcher( $type = 'calendar', $cid = 'all', $time = 'mont
 	return $date_switcher;
 }
 
-function my_calendar_print() {
-	$url      = plugin_dir_url( __FILE__ );
-	$time     = ( isset( $_GET['time'] ) ) ? $_GET['time'] : 'month';
-	$category = ( isset( $_GET['mcat'] ) ) ? $_GET['mcat'] : ''; // these are sanitized elsewhere
-	$ltype    = ( isset( $_GET['ltype'] ) ) ? $_GET['ltype'] : '';
-	$lvalue   = ( isset( $_GET['lvalue'] ) ) ? $_GET['lvalue'] : '';
-	header( 'Content-Type: ' . get_bloginfo( 'html_type' ) . '; charset=' . get_bloginfo( 'charset' ) );
-	if ( mc_file_exists( 'css/mc-print.css' ) ) {
-		$stylesheet = mc_get_file( 'css/mc-print.css', 'url' );
-	} else {
-		$stylesheet = $url . "css/mc-print.css";
-	}	
-	$rtl = ( is_rtl() ) ? 'rtl' : 'ltr';
-	$head = '<!DOCTYPE html>
-<html dir="' . $rtl . '" lang="' . get_bloginfo( 'language' ) . '">
-<!--<![endif]-->
-<head>
-<meta charset="' . get_bloginfo( 'charset' ) . '" />
-<meta name="viewport" content="width=device-width" />
-<title>' . get_bloginfo( 'name' ) . ' - ' . __( 'Calendar: Print View', 'my-calendar' ) . '</title>
-<meta name="generator" content="My Calendar for WordPress" />
-<meta name="robots" content="noindex,nofollow" />
-<!-- Copy mc-print.css to your theme directory if you wish to replace the default print styles -->
-<link rel="stylesheet" href="' . $stylesheet. '" type="text/css" media="screen,print" />
-</head>
-<body>';
-echo $head;
-	echo my_calendar( 'print', 'calendar', $category, $time, $ltype, $lvalue, 'mc-print-view', '', '', null, null, 'none', 'none' );
-	$return_url = ( get_option( 'mc_uri' ) != '' && ! is_numeric( get_option( 'mc_uri' ) ) ) ? get_option( 'mc_uri' ) : home_url();
-	$return_url = apply_filters( 'mc_print_return_url', $return_url, $category, $time, $ltype, $lvalue );
-	
-	if ( isset( $_GET['href'] ) ) {
-		$ref_url = esc_url( urldecode( $_GET['href'] ) );
-		if ( $ref_url ) {
-			$return_url = $ref_url;
-		}
-	}
-	
-	$add        = array_map( 'esc_sql', $_GET );
-	unset( $add['cid'] );
-	unset( $add['feed'] );
-	unset( $add['href'] );
-	$return_url = mc_build_url( $add, array( 'feed', 'cid', 'href' ), $return_url );
-	echo "<p class='return'><a href='$return_url'>" . __( 'Return to calendar', 'my-calendar' ) . "</a></p>";
-	echo '
-</body>
-</html>';
-}
-
-function mc_format_toggle( $format, $toggle, $time ) {
+function mc_format_toggle( $format, $toggle, $time, $id ) {
 	if ( $format != 'mini' && $toggle == 'yes' && $time != 'day' ) {
 		$toggle = "<div class='mc-format'>";
 		switch ( $format ) {
 			case 'list':
 				$url = mc_build_url( array( 'format' => 'calendar' ), array() );
-				$toggle .= "<a href='$url' class='grid'>" . __( '<span class="maybe-hide">View as </span>Grid', 'my-calendar' ) . "</a>";
+				$toggle .= "<a href='$url' class='grid' data-rel='$id'>" . __( '<span class="maybe-hide">View as </span>Grid', 'my-calendar' ) . "</a>";
 				break;
 			default:
 				$url = mc_build_url( array( 'format' => 'list' ), array() );
-				$toggle .= "<a href='$url' class='list'>" . __( '<span class="maybe-hide">View as </span>List', 'my-calendar' ) . "</a>";
+				$toggle .= "<a href='$url' class='list' data-rel='$id'>" . __( '<span class="maybe-hide">View as </span>List', 'my-calendar' ) . "</a>";
 				break;
 		}
 		$toggle .= "</div>";
@@ -636,28 +587,28 @@ function mc_format_toggle( $format, $toggle, $time ) {
 	return apply_filters( 'mc_format_toggle_html', $toggle, $format, $time );
 }
 
-function mc_time_toggle( $format, $time, $toggle, $day, $month, $year ) {
+function mc_time_toggle( $format, $time, $toggle, $day, $month, $year, $id ) {
 	if ( $format != 'mini' && $toggle == 'yes' ) {
 		$toggle      = "<div class='mc-time'>";
 		$current_url = mc_get_current_url();
 		switch ( $time ) {
 			case 'week':
 				$url = mc_build_url( array( 'time' => 'month' ), array( 'mc_id' ) );
-				$toggle .= "<a href='$url'>" . __( 'Month', 'my-calendar' ) . "</a> ";
+				$toggle .= "<a href='$url' data-rel='$id'>" . __( 'Month', 'my-calendar' ) . "</a> ";
 				$toggle .= "<span class='mc-active'>" . __( 'Week', 'my-calendar' ) . "</span>";
 				$url = mc_build_url( array( 'time' => 'day', 'dy' => $day ), array( 'dy', 'mc_id' ) );
-				$toggle .= " <a href='$url'>" . __( 'Day', 'my-calendar' ) . "</a>";
+				$toggle .= " <a href='$url' data-rel='$id'>" . __( 'Day', 'my-calendar' ) . "</a>";
 				break;
 			case 'day':
 				$url = mc_build_url( array( 'time' => 'month' ), array() );
-				$toggle .= "<a href='$url'>" . __( 'Month', 'my-calendar' ) . "</a>";
+				$toggle .= "<a href='$url' data-rel='$id'>" . __( 'Month', 'my-calendar' ) . "</a>";
 				$url = mc_build_url( array(
 						'time'  => 'week',
 						'dy'    => $day,
 						'month' => $month,
 						'yr'    => $year
 					), array( 'dy', 'month', 'mc_id' ) );
-				$toggle .= " <a href='$url'>" . __( 'Week', 'my-calendar' ) . "</a> ";
+				$toggle .= " <a href='$url' data-rel='$id'>" . __( 'Week', 'my-calendar' ) . "</a> ";
 				$toggle .= "<span class='mc-active'>" . __( 'Day', 'my-calendar' ) . "</span>";
 				break;
 			default:
@@ -667,9 +618,9 @@ function mc_time_toggle( $format, $time, $toggle, $day, $month, $year ) {
 						'month',
 						'mc_id'
 					) );
-				$toggle .= " <a href='$url'>" . __( 'Week', 'my-calendar' ) . "</a> ";
+				$toggle .= " <a href='$url' data-rel='$id'>" . __( 'Week', 'my-calendar' ) . "</a> ";
 				$url = mc_build_url( array( 'time' => 'day' ), array() );
-				$toggle .= "<a href='$url'>" . __( 'Day', 'my-calendar' ) . "</a>";
+				$toggle .= "<a href='$url' data-rel='$id'>" . __( 'Day', 'my-calendar' ) . "</a>";
 				break;
 		}
 		$toggle .= "</div>";
@@ -958,7 +909,7 @@ function mc_hidden_event() {
 add_filter( 'the_content', 'mc_show_event_template', 100, 1 );
 function mc_show_event_template( $content ) {
 	global $post;
-	if ( is_object( $post ) && in_the_loop() ) {
+	if ( is_single() && in_the_loop() && is_main_query() ) {
 		// some early versions of this placed the shortcode into the post content. Strip that out.
 		$new_content = $content;
 		if ( $post->post_type == 'mc-events' ) {
@@ -1007,7 +958,8 @@ function mc_event_is_hidden( $event ) {
 	}
 	$category = $event->event_category;
 	$private = mc_get_private_categories();
-	if ( in_array( $category, $private ) && !is_user_logged_in() ) {
+	$can_see_private_events = apply_filters( 'mc_user_can_see_private_events', is_user_logged_in(), $event );
+	if ( in_array( $category, $private ) && !$can_see_private_events ) {
 		return true;
 	}
 	
@@ -1283,7 +1235,7 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 		$mc_print_url = mc_build_url( $print_add, $subtract, home_url() );
 		$print        = "<div class='mc-print'><a href='$mc_print_url'>" . __( 'Print<span class="maybe-hide"> View</span>', 'my-calendar' ) . "</a></div>";
 		// set up format toggle
-		$toggle = ( in_array( 'toggle', $used ) ) ? mc_format_toggle( $format, 'yes', $time ) : '';
+		$toggle = ( in_array( 'toggle', $used ) ) ? mc_format_toggle( $format, 'yes', $time, $id ) : '';
 		// set up time toggle
 		if ( in_array( 'timeframe', $used ) ) {
 			// if dy parameter not set, use today's date instead of first day of month.
@@ -1306,7 +1258,7 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 					$day = date( 'j', strtotime( "$from + 1 week" ) );
 				}
 			}
-			$timeframe = mc_time_toggle( $format, $time, 'yes', $day, $c_month, $c_year );
+			$timeframe = mc_time_toggle( $format, $time, 'yes', $day, $c_month, $c_year, $id );
 		}
 		// set up category key
 		$key = ( in_array( 'key', $used ) ) ? my_category_key( $original_category ) : '';

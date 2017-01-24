@@ -4,13 +4,13 @@ if ( ! defined('ABSPATH') ) {
 }
 
 class FrmAppHelper {
-	public static $db_version = 35; //version of the database we are moving to
-	public static $pro_db_version = 37;
+	public static $db_version = 41; //version of the database we are moving to
+	public static $pro_db_version = 37; //deprecated
 
 	/**
 	 * @since 2.0
 	 */
-	public static $plug_version = '2.02.10';
+	public static $plug_version = '2.03';
 
     /**
      * @since 1.07.02
@@ -238,7 +238,7 @@ class FrmAppHelper {
 		if ( $src == 'get' ) {
             $value = isset( $_POST[ $param ] ) ? stripslashes_deep( $_POST[ $param ] ) : ( isset( $_GET[ $param ] ) ? stripslashes_deep( $_GET[ $param ] ) : $default );
             if ( ! isset( $_POST[ $param ] ) && isset( $_GET[ $param ] ) && ! is_array( $value ) ) {
-                $value = stripslashes_deep( htmlspecialchars_decode( urldecode( $_GET[ $param ] ) ) );
+                $value = stripslashes_deep( htmlspecialchars_decode( $_GET[ $param ] ) );
             }
 			self::sanitize_value( $sanitize, $value );
 		} else {
@@ -473,7 +473,7 @@ class FrmAppHelper {
 
 	public static function get_group_cached_keys( $group ) {
 		$cached = wp_cache_get( 'cached_keys', $group );
-		if ( ! $cached ) {
+		if ( ! $cached || ! is_array( $cached ) ) {
 			$cached = array();
 		}
 
@@ -864,7 +864,7 @@ class FrmAppHelper {
      * @return string The base Google APIS url for the current version of jQuery UI
      */
     public static function jquery_ui_base_url() {
-		$url = 'http' . ( is_ssl() ? 's' : '' ) . '://ajax.googleapis.com/ajax/libs/jqueryui/' . self::script_version('jquery-ui-core');
+		$url = 'http' . ( is_ssl() ? 's' : '' ) . '://ajax.googleapis.com/ajax/libs/jqueryui/' . self::script_version( 'jquery-ui-core', '1.11.4' );
         $url = apply_filters('frm_jquery_ui_base_url', $url);
         return $url;
     }
@@ -872,25 +872,24 @@ class FrmAppHelper {
     /**
      * @param string $handle
      */
-	public static function script_version( $handle ) {
-        global $wp_scripts;
-    	if ( ! $wp_scripts ) {
-    	    return false;
-    	}
+	public static function script_version( $handle, $default = 0 ) {
+		global $wp_scripts;
+		if ( ! $wp_scripts ) {
+			return $default;
+		}
 
-        $ver = 0;
+		$ver = $default;
+		if ( ! isset( $wp_scripts->registered[ $handle ] ) ) {
+			return $ver;
+		}
 
-        if ( ! isset( $wp_scripts->registered[ $handle ] ) ) {
-            return $ver;
-        }
+		$query = $wp_scripts->registered[ $handle ];
+		if ( is_object( $query ) ) {
+			$ver = $query->ver;
+		}
 
-        $query = $wp_scripts->registered[ $handle ];
-    	if ( is_object( $query ) ) {
-    	    $ver = $query->ver;
-    	}
-
-    	return $ver;
-    }
+		return $ver;
+	}
 
 	public static function js_redirect( $url ) {
 		return '<script type="text/javascript">window.location="' . esc_url_raw( $url ) . '"</script>';
@@ -963,7 +962,7 @@ class FrmAppHelper {
 				$alt_post_name = substr( $key, 0, 200 - ( strlen( $suffix ) + 1 ) ) . $suffix;
 				$key_check = FrmDb::get_var( $table_name, array( $column => $alt_post_name, 'ID !' => $id ), $column );
 				$suffix++;
-			} while ($key_check || is_numeric($key_check));
+			} while ( $key_check || is_numeric( $key_check ) );
 			$key = $alt_post_name;
         }
         return $key;
@@ -1148,7 +1147,7 @@ class FrmAppHelper {
 	 * @return boolean|int
 	 */
 	public static function custom_style_value( $post_values ) {
-		if ( $post_values && isset( $post_values['options']['custom_style'] ) ) {
+		if ( ! empty( $post_values ) && isset( $post_values['options']['custom_style'] ) ) {
 			$custom_style = absint( $post_values['options']['custom_style'] );
 		} else {
 			$frm_settings = FrmAppHelper::get_settings();
@@ -1279,7 +1278,7 @@ class FrmAppHelper {
 	 * @param int|string $to in seconds
 	 * @return string $time_ago
 	 */
-	public static function human_time_diff( $from, $to = '' ) {
+	public static function human_time_diff( $from, $to = '', $levels = 1 ) {
 		if ( empty( $to ) ) {
 			$now = new DateTime;
 		} else {
@@ -1305,7 +1304,7 @@ class FrmAppHelper {
 			}
 		}
 
-		$levels_deep = apply_filters( 'frm_time_ago_levels', 1, compact( 'time_strings', 'from', 'to' ) );
+		$levels_deep = apply_filters( 'frm_time_ago_levels', $levels, compact( 'time_strings', 'from', 'to' ) );
 		$time_strings = array_slice( $time_strings, 0, $levels_deep );
 		$time_ago_string = $time_strings ? implode( ' ', $time_strings ) : '0 ' . __( 'seconds', 'formidable' );
 

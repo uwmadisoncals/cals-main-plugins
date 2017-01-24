@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.6.07
+* Version 6.6.10
 *
 */
 
@@ -539,7 +539,7 @@ global $wppa_session;
 
 	// The photo views cache
 	echo '
-	<script type="text/javascript">';
+	<script type="text/javascript" >';
 		if ( isset( $wppa_session['photo'] ) ) {
 			foreach ( array_keys( $wppa_session['photo'] ) as $p ) {
 				echo '
@@ -547,7 +547,9 @@ global $wppa_session;
 			}
 		}
 	echo '
-	</script>
+	</script>';
+
+	echo '
 <!-- end WPPA+ Footer data -->
 ';
 
@@ -656,7 +658,7 @@ add_action( 'wp_head', 'wppa_add_page_specific_urls', '99' );
 function wppa_add_page_specific_urls() {
 
 	$result = '
-<!-- WPPA+ BEGIN Page specific urls -->
+<!-- WPPA+ BEGIN Page specific urls and device specific data -->
 <script type="text/javascript">
 	wppaImageDirectory = "'.wppa_get_imgdir().'";
 	wppaWppaUrl = "'.wppa_get_wppa_url().'";
@@ -664,6 +666,7 @@ function wppa_add_page_specific_urls() {
 	wppaAjaxUrl = "'.( wppa_switch( 'ajax_non_admin' ) ? wppa_url( 'wppa-ajax-front.php' ) : admin_url( 'admin-ajax.php' ) ).'";
 	wppaUploadUrl = "'.WPPA_UPLOAD_URL.'";
 	wppaIsIe = '.( wppa_is_ie() ? 'true' : 'false' ).';
+	wppaSlideshowNavigationType = "' . wppa_get_navigation_type() . '";
 </script>
 <!-- WPPA+ END Page specific urls -->';
 
@@ -846,6 +849,7 @@ global $wppa_init_js_data;
 	wppaAutoOpenComments = '.( wppa_switch( 'auto_open_comments') ? 'true' : 'false' ).';
 	wppaUpdateAddressLine = '.( wppa_switch( 'update_addressline') ? 'true' : 'false' ).';
 	wppaFilmThumbTitle = "'.( wppa_opt( 'film_linktype' ) == 'lightbox' ? wppa_zoom_in( false ) : __('Double click to start/stop slideshow running', 'wp-photo-album-plus') ).'";
+	wppaClickToView = "'.( wppa_opt( 'film_linktype' ) == 'lightbox' ? wppa_zoom_in( false ) : __('Click to view', 'wp-photo-album-plus') ).'";
 	wppaVoteForMe = "'.__(wppa_opt( 'vote_button_text' ), 'wp-photo-album-plus').'";
 	wppaVotedForMe = "'.__(wppa_opt( 'voted_button_text' ), 'wp-photo-album-plus').'";
 	wppaSlideSwipe = '.( wppa_switch( 'slide_swipe') ? 'true' : 'false' ).';

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP Photo Album Plus\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-09 09:24+0100\n"
-"PO-Revision-Date: 2016-12-09 09:34+0100\n"
+"POT-Creation-Date: 2016-12-14 11:26+0100\n"
+"PO-Revision-Date: 2016-12-14 11:29+0100\n"
 "Last-Translator: J.N. Breetvelt <OpaJaap@OpaJaap.nl>\n"
 "Language-Team: French <kde-i18n-doc@kde.org>\n"
 "Language: fr_FR\n"
@@ -24,11 +24,11 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: theme/photo-album-page-2010.php:30 theme/photo-album-search-page.php:52
+#: theme/photo-album-page-2010.php:33 theme/photo-album-search-page.php:52
 msgid "Pages:"
 msgstr "Pages:"
 
-#: theme/photo-album-page-2010.php:31 theme/photo-album-search-page.php:53
+#: theme/photo-album-page-2010.php:34 theme/photo-album-search-page.php:53
 #: wppa-album-admin-autosave.php:1393 wppa-album-admin-autosave.php:1431
 #: wppa-album-admin-autosave.php:1530 wppa-album-admin-autosave.php:1765
 #: wppa-album-admin-autosave.php:1860 wppa-album-admin-autosave.php:1934
@@ -315,7 +315,7 @@ msgid "Photo of the day Widget"
 msgstr "Widget \"Photo du jour\""
 
 #: wppa-admin.php:69 wppa-adminbar.php:89 wppa-potd-widget.php:60
-#: wppa-settings-autosave.php:6080 wppa-setup.php:1635
+#: wppa-settings-autosave.php:6080 wppa-setup.php:1634
 msgid "Photo of the day"
 msgstr "Photo du jour"
 
@@ -353,7 +353,7 @@ msgstr "L’importation est désactivé temporaire pour vous"
 msgid "Import"
 msgstr "Importer"
 
-#: wppa-admin.php:128 wppa-settings-autosave.php:9933
+#: wppa-admin.php:128 wppa-settings-autosave.php:9924
 msgid "Update"
 msgstr "Mettre à jour"
 
@@ -639,8 +639,8 @@ msgstr "Le nom de l'album ne doit pas être vide.<br />Réglé à %s"
 #: wppa-album-admin-autosave.php:486 wppa-album-admin-autosave.php:1340
 #: wppa-album-admin-autosave.php:1477 wppa-album-admin-autosave.php:1712
 #: wppa-album-admin-autosave.php:1807 wppa-boxes-html.php:415
-#: wppa-boxes-html.php:529 wppa-photo-admin-autosave.php:1966
-#: wppa-photo-admin-autosave.php:2088 wppa-photo-admin-autosave.php:2505
+#: wppa-boxes-html.php:529 wppa-photo-admin-autosave.php:1991
+#: wppa-photo-admin-autosave.php:2156 wppa-photo-admin-autosave.php:2573
 #: wppa-potd-admin.php:71 wppa-potd-admin.php:358 wppa-settings-autosave.php:505
 #: wppa-settings-autosave.php:667 wppa-settings-autosave.php:689
 #: wppa-settings-autosave.php:1437 wppa-settings-autosave.php:1458
@@ -652,16 +652,16 @@ msgstr "Le nom de l'album ne doit pas être vide.<br />Réglé à %s"
 #: wppa-settings-autosave.php:6040 wppa-settings-autosave.php:6485
 #: wppa-settings-autosave.php:6735 wppa-settings-autosave.php:6757
 #: wppa-settings-autosave.php:7541 wppa-settings-autosave.php:7565
-#: wppa-settings-autosave.php:8728 wppa-settings-autosave.php:9370
-#: wppa-settings-autosave.php:9526 wppa-thumbnail-widget.php:202
+#: wppa-settings-autosave.php:8728 wppa-settings-autosave.php:9361
+#: wppa-settings-autosave.php:9517 wppa-thumbnail-widget.php:202
 #: wppa-upload.php:266
 msgid "Name"
 msgstr "Nom"
 
 #: wppa-ajax.php:1108 wppa-ajax.php:1568 wppa-album-admin-autosave.php:1350
 #: wppa-album-admin-autosave.php:1487 wppa-album-admin-autosave.php:1722
-#: wppa-album-admin-autosave.php:1817 wppa-photo-admin-autosave.php:1967
-#: wppa-photo-admin-autosave.php:2089 wppa-photo-admin-autosave.php:2506
+#: wppa-album-admin-autosave.php:1817 wppa-photo-admin-autosave.php:1992
+#: wppa-photo-admin-autosave.php:2157 wppa-photo-admin-autosave.php:2574
 #: wppa-potd-admin.php:72 wppa-potd-admin.php:138 wppa-potd-admin.php:359
 #: wppa-settings-autosave.php:506 wppa-settings-autosave.php:668
 #: wppa-settings-autosave.php:690 wppa-settings-autosave.php:1438
@@ -672,10 +672,10 @@ msgstr "Nom"
 #: wppa-settings-autosave.php:4983 wppa-settings-autosave.php:6041
 #: wppa-settings-autosave.php:6486 wppa-settings-autosave.php:6736
 #: wppa-settings-autosave.php:6758 wppa-settings-autosave.php:7542
-#: wppa-settings-autosave.php:7566 wppa-settings-autosave.php:9371
-#: wppa-settings-autosave.php:9393 wppa-settings-autosave.php:9433
-#: wppa-settings-autosave.php:9455 wppa-settings-autosave.php:9501
-#: wppa-settings-autosave.php:9527
+#: wppa-settings-autosave.php:7566 wppa-settings-autosave.php:9362
+#: wppa-settings-autosave.php:9384 wppa-settings-autosave.php:9424
+#: wppa-settings-autosave.php:9446 wppa-settings-autosave.php:9492
+#: wppa-settings-autosave.php:9518
 msgid "Description"
 msgstr "Description"
 
@@ -719,7 +719,7 @@ msgstr "Lien vers"
 #: wppa-ajax.php:1145 wppa-ajax.php:1589 wppa-album-admin-autosave.php:1361
 #: wppa-album-admin-autosave.php:1498 wppa-album-admin-autosave.php:1733
 #: wppa-album-admin-autosave.php:1828 wppa-boxes-html.php:537
-#: wppa-photo-admin-autosave.php:1969 wppa-photo-admin-autosave.php:2091
+#: wppa-photo-admin-autosave.php:1994 wppa-photo-admin-autosave.php:2159
 #: wppa-potd-admin.php:139
 msgid "Owner"
 msgstr "Propriétaire"
@@ -952,10 +952,10 @@ msgid "Photo Tags"
 msgstr "Tags de la photo"
 
 #: wppa-ajax.php:1609 wppa-comment-admin.php:317 wppa-comment-admin.php:404
-#: wppa-photo-admin-autosave.php:1968 wppa-photo-admin-autosave.php:2090
+#: wppa-photo-admin-autosave.php:1993 wppa-photo-admin-autosave.php:2158
 #: wppa-settings-autosave.php:6761 wppa-settings-autosave.php:7545
-#: wppa-settings-autosave.php:9394 wppa-settings-autosave.php:9434
-#: wppa-settings-autosave.php:9456 wppa-settings-autosave.php:9502
+#: wppa-settings-autosave.php:9385 wppa-settings-autosave.php:9425
+#: wppa-settings-autosave.php:9447 wppa-settings-autosave.php:9493
 msgid "Status"
 msgstr "Statut"
 
@@ -1532,7 +1532,7 @@ msgid "Modified:"
 msgstr "Modifié:"
 
 #: wppa-album-admin-autosave.php:326 wppa-photo-admin-autosave.php:583
-#: wppa-photo-admin-autosave.php:2078
+#: wppa-photo-admin-autosave.php:2146
 msgid "Not modified"
 msgstr "Non modifié"
 
@@ -1869,8 +1869,8 @@ msgstr ""
 msgid "Link to:"
 msgstr "Lien vers:"
 
-#: wppa-album-admin-autosave.php:834 wppa-settings-autosave.php:10059
-#: wppa-settings-autosave.php:10101 wppa-settings-autosave.php:10153
+#: wppa-album-admin-autosave.php:834 wppa-settings-autosave.php:10050
+#: wppa-settings-autosave.php:10092 wppa-settings-autosave.php:10144
 msgid "There are no pages (yet) to link to."
 msgstr "Il n'y a pas (encore) de pages à lier"
 
@@ -1982,8 +1982,8 @@ msgstr "Modérer la photo"
 msgid "Edit photo"
 msgstr "Modifier photo"
 
-#: wppa-album-admin-autosave.php:1076 wppa-boxes-html.php:1855
-#: wppa-boxes-html.php:1858
+#: wppa-album-admin-autosave.php:1076 wppa-boxes-html.php:1854
+#: wppa-boxes-html.php:1857
 msgid "Delete Album"
 msgstr "Supprimer l'album"
 
@@ -2017,8 +2017,8 @@ msgstr ""
 #: wppa-album-admin-autosave.php:1864 wppa-album-admin-autosave.php:2082
 #: wppa-boxes-html.php:935 wppa-comment-admin.php:319 wppa-comment-admin.php:388
 #: wppa-comment-admin.php:406 wppa-functions.php:2137 wppa-links.php:789
-#: wppa-links.php:807 wppa-photo-admin-autosave.php:1905
-#: wppa-photo-admin-autosave.php:1985 wppa-thumbnails.php:669
+#: wppa-links.php:807 wppa-photo-admin-autosave.php:1925
+#: wppa-photo-admin-autosave.php:2011 wppa-thumbnails.php:669
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -2026,7 +2026,7 @@ msgstr "Supprimer"
 msgid "Move to:"
 msgstr "Déplacer vers:"
 
-#: wppa-album-admin-autosave.php:1094 wppa-photo-admin-autosave.php:2636
+#: wppa-album-admin-autosave.php:1094 wppa-photo-admin-autosave.php:2704
 #: wppa-settings-autosave.php:2892
 msgid "Cancel"
 msgstr "Annuler"
@@ -2065,7 +2065,7 @@ msgstr "Fermer tous"
 
 #: wppa-album-admin-autosave.php:1330 wppa-album-admin-autosave.php:1467
 #: wppa-album-admin-autosave.php:1701 wppa-album-admin-autosave.php:1796
-#: wppa-photo-admin-autosave.php:1964 wppa-photo-admin-autosave.php:2086
+#: wppa-photo-admin-autosave.php:1989 wppa-photo-admin-autosave.php:2154
 msgid "ID"
 msgstr "ID"
 
@@ -2336,7 +2336,7 @@ msgid_plural "%d photos"
 msgstr[0] "%d photo"
 msgstr[1] "%d photos"
 
-#: wppa-album-covers.php:1448 wppa-boxes-html.php:1282 wppa-boxes-html.php:1596
+#: wppa-album-covers.php:1448 wppa-boxes-html.php:1282 wppa-boxes-html.php:1595
 #: wppa-breadcrumb.php:175 wppa-breadcrumb.php:181 wppa-breadcrumb.php:188
 #: wppa-breadcrumb.php:412 wppa-breadcrumb.php:414 wppa-breadcrumb.php:420
 #: wppa-breadcrumb.php:422 wppa-breadcrumb.php:430 wppa-breadcrumb.php:446
@@ -2533,7 +2533,7 @@ msgstr "Nombre de notes:"
 #: wppa-settings-autosave.php:4182 wppa-settings-autosave.php:5689
 #: wppa-settings-autosave.php:6446 wppa-settings-autosave.php:7921
 #: wppa-settings-autosave.php:8140 wppa-settings-autosave.php:8216
-#: wppa-settings-autosave.php:9130 wppa-settings-autosave.php:9287
+#: wppa-settings-autosave.php:9121 wppa-settings-autosave.php:9278
 #: wppa-thumbnail-widget.php:200 wppa-tinymce-shortcodes.php:626
 #: wppa-watermark.php:533
 msgid "--- none ---"
@@ -2590,9 +2590,9 @@ msgstr "CTRL+Clic pour ajouter/supprimer des options."
 msgid "Items must meet all selected options."
 msgstr "Les entités doivent répondre à toutes les options sélectionnées."
 
-#: wppa-boxes-html.php:546 wppa-settings-autosave.php:9391
-#: wppa-settings-autosave.php:9431 wppa-settings-autosave.php:9453
-#: wppa-settings-autosave.php:9499
+#: wppa-boxes-html.php:546 wppa-settings-autosave.php:9382
+#: wppa-settings-autosave.php:9422 wppa-settings-autosave.php:9444
+#: wppa-settings-autosave.php:9490
 msgid "Tag"
 msgstr "Tag"
 
@@ -2671,119 +2671,119 @@ msgstr "Social media landing page"
 msgid "See this image on %s"
 msgstr "Voir cette image sur %s"
 
-#: wppa-boxes-html.php:1310 wppa-boxes-html.php:1614 wppa-qr-widget.php:39
+#: wppa-boxes-html.php:1310 wppa-boxes-html.php:1613 wppa-qr-widget.php:39
 msgid "QR code"
 msgstr "QR code"
 
-#: wppa-boxes-html.php:1355 wppa-boxes-html.php:1646
+#: wppa-boxes-html.php:1355 wppa-boxes-html.php:1645
 #, php-format
 msgid "Tweet %s on Twitter"
 msgstr "Tweeter %s sur Twitter"
 
-#: wppa-boxes-html.php:1362 wppa-boxes-html.php:1653
+#: wppa-boxes-html.php:1362 wppa-boxes-html.php:1652
 msgid "Share on Twitter"
 msgstr "Partager sur Pinterest"
 
-#: wppa-boxes-html.php:1375 wppa-boxes-html.php:1666
+#: wppa-boxes-html.php:1375 wppa-boxes-html.php:1665
 #, php-format
 msgid "Share %s on Google+"
 msgstr "Partager %s sur Google+"
 
-#: wppa-boxes-html.php:1383 wppa-boxes-html.php:1674
+#: wppa-boxes-html.php:1382 wppa-boxes-html.php:1673
 msgid "Share on Google+"
 msgstr "Partager sur Google+"
 
-#: wppa-boxes-html.php:1398
+#: wppa-boxes-html.php:1397
 #, php-format
 msgid "Share %s on Pinterest"
 msgstr "Partager %s sur Pinterest"
 
-#: wppa-boxes-html.php:1408
+#: wppa-boxes-html.php:1407
 msgid "Share on Pinterest"
 msgstr "Partager sur Pinterest"
 
-#: wppa-boxes-html.php:1553 wppa-boxes-html.php:1750
+#: wppa-boxes-html.php:1552 wppa-boxes-html.php:1749
 msgid "Comment on Facebook:"
 msgstr "Commenter sur Facebook:"
 
-#: wppa-boxes-html.php:1597
+#: wppa-boxes-html.php:1596
 #, php-format
 msgid "See this article on %s"
 msgstr "Voir cet article sur %s"
 
-#: wppa-boxes-html.php:1853 wppa-import.php:1305
+#: wppa-boxes-html.php:1852 wppa-import.php:1305
 msgid "Working..."
 msgstr "Traitement en cours..."
 
-#: wppa-boxes-html.php:1950
+#: wppa-boxes-html.php:1949
 msgid "Create Sub Album"
 msgstr "Créer un sub-album"
 
-#: wppa-boxes-html.php:1950
+#: wppa-boxes-html.php:1949
 msgid "Create Album"
 msgstr "Créer un album"
 
-#: wppa-boxes-html.php:1998
+#: wppa-boxes-html.php:1997
 msgid "Enter album name."
 msgstr "Entrer un nom d'album."
 
-#: wppa-boxes-html.php:2000 wppa-boxes-html.php:2942
+#: wppa-boxes-html.php:1999 wppa-boxes-html.php:2941
 msgid "Don't leave this blank!"
 msgstr "Ne laissez pas ceci vide !"
 
-#: wppa-boxes-html.php:2021
+#: wppa-boxes-html.php:2020
 msgid "Enter album description"
 msgstr "Entrez la description de l'album"
 
-#: wppa-boxes-html.php:2049
+#: wppa-boxes-html.php:2048
 msgid "Create album"
 msgstr "Créer un album"
 
-#: wppa-boxes-html.php:2207 wppa-boxes-html.php:2221 wppa-functions.php:4307
+#: wppa-boxes-html.php:2206 wppa-boxes-html.php:2220 wppa-functions.php:4307
 msgid "Max uploads reached"
 msgstr "Ajout maximum ateind"
 
-#: wppa-boxes-html.php:2286 wppa-upload.php:188
+#: wppa-boxes-html.php:2285 wppa-upload.php:188
 msgid "Upload Photo"
 msgstr "Uploader une photo"
 
-#: wppa-boxes-html.php:2361
+#: wppa-boxes-html.php:2360
 msgid "Enter album id"
 msgstr "Entrez album id"
 
-#: wppa-boxes-html.php:2387
+#: wppa-boxes-html.php:2386
 msgid "Select Photo / Video / Camera"
 msgstr "Sélectionnez Photo / Vidéo / Camera"
 
-#: wppa-boxes-html.php:2390
+#: wppa-boxes-html.php:2389
 msgid "Select Photo / Camera"
 msgstr "Sélectionnez Photo / Caméra"
 
-#: wppa-boxes-html.php:2395
+#: wppa-boxes-html.php:2394
 msgid "Select Photo / Video"
 msgstr "Sélectionnez Photo / Vidéo"
 
-#: wppa-boxes-html.php:2398
+#: wppa-boxes-html.php:2397
 msgid "Select Photo"
 msgstr "Sélectionnez photo"
 
-#: wppa-boxes-html.php:2405
+#: wppa-boxes-html.php:2404
 msgid "Select Photos / Video / Camera"
 msgstr "Sélectionnez Photos / Vidéo / Caméra"
 
-#: wppa-boxes-html.php:2408
+#: wppa-boxes-html.php:2407
 msgid "Select Photos / Camera"
 msgstr "Sélectionnez Photos / Caméra"
 
-#: wppa-boxes-html.php:2413
+#: wppa-boxes-html.php:2412
 msgid "Select Photos / Video"
 msgstr "Sélectionnez Photos / Vidéo"
 
-#: wppa-boxes-html.php:2416
+#: wppa-boxes-html.php:2415
 msgid "Select Photos"
 msgstr "Sélectionnez Photos"
 
-#: wppa-boxes-html.php:2459
+#: wppa-boxes-html.php:2458
 #, php-format
 msgid "You may upload %d photo"
 msgid_plural ""
@@ -2794,22 +2794,22 @@ msgstr[1] ""
 "Vous pouvez charger jusqu'à %d photos à la fois si votre navigateur supporte "
 "la fonction HTML-5 multiple file upload"
 
-#: wppa-boxes-html.php:2467
+#: wppa-boxes-html.php:2466
 #, php-format
 msgid "Max photo size: %d x %d (%2.1f MegaPixel)"
 msgstr "Taille photo max: %d x %d (%2.1f MegaPixel)"
 
-#: wppa-boxes-html.php:2496 wppa-import.php:561 wppa-upload.php:174
+#: wppa-boxes-html.php:2495 wppa-import.php:561 wppa-upload.php:174
 #: wppa-upload.php:316 wppa-upload.php:390
 msgid "Apply watermark file:"
 msgstr "Appliquer le filigrane:"
 
-#: wppa-boxes-html.php:2518 wppa-import.php:565 wppa-upload.php:178
+#: wppa-boxes-html.php:2517 wppa-import.php:565 wppa-upload.php:178
 #: wppa-upload.php:320 wppa-upload.php:394
 msgid "Position:"
 msgstr "Position:"
 
-#: wppa-boxes-html.php:2546
+#: wppa-boxes-html.php:2545
 msgid ""
 "If you leave this blank, iptc tag 005 (Graphic name) will be used as photoname "
 "if available, else the original filename will be used as photo name."
@@ -2818,7 +2818,7 @@ msgstr ""
 "de photo si disponible sinon le nom original du fichier sera utilisé comme nom "
 "de photo. "
 
-#: wppa-boxes-html.php:2551
+#: wppa-boxes-html.php:2550
 msgid ""
 "If you leave this blank, iptc tag 120 (Caption) will be used as photoname if "
 "available, else the original filename will be used as photo name."
@@ -2827,190 +2827,190 @@ msgstr ""
 "photo si disponible sinon le nom de fichier original sera utilisé comme nom de "
 "photo."
 
-#: wppa-boxes-html.php:2556
+#: wppa-boxes-html.php:2555
 msgid ""
 "If you leave this blank, the original filename will be used as photo name."
 msgstr ""
 "Si vous laisser cela vide, le nom de fichier original sera utilisé comme nom "
 "de photo."
 
-#: wppa-boxes-html.php:2561 wppa-settings-autosave.php:1671
+#: wppa-boxes-html.php:2560 wppa-settings-autosave.php:1671
 msgid "Photo name"
 msgstr "Nom de la photo"
 
-#: wppa-boxes-html.php:2579
+#: wppa-boxes-html.php:2578
 msgid "Photo description"
 msgstr "Description de la photo"
 
-#: wppa-boxes-html.php:2607
+#: wppa-boxes-html.php:2606
 msgid "hidden"
 msgstr "caché"
 
-#: wppa-boxes-html.php:2677
+#: wppa-boxes-html.php:2676
 msgid "Preview tags:"
 msgstr "Aperçu tags:"
 
-#: wppa-boxes-html.php:2694
+#: wppa-boxes-html.php:2693
 msgid "Blog it?"
 msgstr "Blog it?"
 
-#: wppa-boxes-html.php:2704
+#: wppa-boxes-html.php:2703
 msgid "Upload and blog"
 msgstr "Upload et blog"
 
-#: wppa-boxes-html.php:2708 wppa-boxes-html.php:2771
+#: wppa-boxes-html.php:2707 wppa-boxes-html.php:2770
 msgid "Upload photo"
 msgstr "Uploader une photo"
 
-#: wppa-boxes-html.php:2716
+#: wppa-boxes-html.php:2715
 msgid "Post title:"
 msgstr "Titre du post:"
 
-#: wppa-boxes-html.php:2726
+#: wppa-boxes-html.php:2725
 msgid "Text BEFORE the image:"
 msgstr "Texte AVANT l'image:"
 
-#: wppa-boxes-html.php:2736
+#: wppa-boxes-html.php:2735
 msgid "Text AFTER the image:"
 msgstr "Texte APRÈS l'image:"
 
-#: wppa-boxes-html.php:2756
+#: wppa-boxes-html.php:2755
 msgid "Please select an album and try again"
 msgstr "Veuillez sélectionner un album et recommencer"
 
-#: wppa-boxes-html.php:2827
+#: wppa-boxes-html.php:2826
 msgid "ERROR: unable to upload files."
 msgstr "Erreur: impossible de télécharger des fichiers."
 
-#: wppa-boxes-html.php:2881
+#: wppa-boxes-html.php:2880
 msgid "Edit Album Info"
 msgstr "Modifier l’album"
 
-#: wppa-boxes-html.php:2940
+#: wppa-boxes-html.php:2939
 msgid "Enter album name"
 msgstr "Entrer un nom d'album"
 
-#: wppa-boxes-html.php:2962
+#: wppa-boxes-html.php:2961
 msgid "Album description:"
 msgstr "Description de l'album:"
 
-#: wppa-boxes-html.php:3016
+#: wppa-boxes-html.php:3015
 msgid "Update album"
 msgstr "Update album"
 
-#: wppa-boxes-html.php:3085
+#: wppa-boxes-html.php:3084
 msgid "wrote:"
 msgstr "a écrit:"
 
-#: wppa-boxes-html.php:3147
+#: wppa-boxes-html.php:3146
 msgid "Avatar"
 msgstr "Avatar"
 
-#: wppa-boxes-html.php:3190 wppa-links.php:833
+#: wppa-boxes-html.php:3189 wppa-links.php:833
 msgid "Awaiting moderation"
 msgstr "En attente de modération"
 
-#: wppa-boxes-html.php:3193
+#: wppa-boxes-html.php:3192
 msgid "Marked as spam"
 msgstr "Marqué comme indésirable"
 
-#: wppa-boxes-html.php:3217
+#: wppa-boxes-html.php:3216
 msgid "Edit!"
 msgstr "Éditer !"
 
-#: wppa-boxes-html.php:3221
+#: wppa-boxes-html.php:3220
 msgid "Send!"
 msgstr "Transmettre !"
 
-#: wppa-boxes-html.php:3282
+#: wppa-boxes-html.php:3281
 msgid "Your name:"
 msgstr "Votre nom:"
 
-#: wppa-boxes-html.php:3297
+#: wppa-boxes-html.php:3296
 msgid "Your email:"
 msgstr "Votre email:"
 
-#: wppa-boxes-html.php:3313
+#: wppa-boxes-html.php:3312
 msgid "Your comment:"
 msgstr "Votre commentaire:"
 
-#: wppa-boxes-html.php:3357
+#: wppa-boxes-html.php:3356
 #, php-format
 msgid "You must <a href=\"%s\">login</a> to enter a comment"
 msgstr "Vous devez vous<a href=\"%s\">connecter</a> pour entrer un commentaire"
 
-#: wppa-boxes-html.php:3360
+#: wppa-boxes-html.php:3359
 msgid "You must login to enter a comment"
 msgstr "Vous devez vous connecter pour entrer un commentaire"
 
-#: wppa-boxes-html.php:3372 wppa-functions.php:2597 wppa-thumbnails.php:722
+#: wppa-boxes-html.php:3371 wppa-functions.php:2597 wppa-thumbnails.php:722
 #, php-format
 msgid "%d comment"
 msgid_plural "%d comments"
 msgstr[0] "%d commentaire"
 msgstr[1] "%d commentaires"
 
-#: wppa-boxes-html.php:3376
+#: wppa-boxes-html.php:3375
 msgid "Leave a comment"
 msgstr "Laisser un commentaire"
 
-#: wppa-boxes-html.php:3473
+#: wppa-boxes-html.php:3472
 msgid "Show IPTC data"
 msgstr "Afficher les données IPTC"
 
-#: wppa-boxes-html.php:3484
+#: wppa-boxes-html.php:3483
 msgid "Hide IPTC data"
 msgstr "Cacher les données IPTC"
 
-#: wppa-boxes-html.php:3532
+#: wppa-boxes-html.php:3531
 msgid "No IPTC data"
 msgstr "Pas de données IPTC"
 
-#: wppa-boxes-html.php:3584
+#: wppa-boxes-html.php:3583
 msgid "Show EXIF data"
 msgstr "Afficher les données EXIF"
 
-#: wppa-boxes-html.php:3595
+#: wppa-boxes-html.php:3594
 msgid "Hide EXIF data"
 msgstr "Cacher les données EXIF"
 
-#: wppa-boxes-html.php:3647
+#: wppa-boxes-html.php:3646
 msgid "No EXIF data"
 msgstr "Pas de données EXIF"
 
-#: wppa-boxes-html.php:3761 wppa-boxes-html.php:3766
+#: wppa-boxes-html.php:3760 wppa-boxes-html.php:3765
 msgid "< Previous"
 msgstr "< Préc."
 
-#: wppa-boxes-html.php:3772 wppa-boxes-html.php:3777
+#: wppa-boxes-html.php:3771 wppa-boxes-html.php:3776
 msgid "Next >"
 msgstr "Suiv. >"
 
-#: wppa-boxes-html.php:3879 wppa-boxes-html.php:3958
+#: wppa-boxes-html.php:3878 wppa-boxes-html.php:3957
 msgid "See the authors albums"
 msgstr "Voir les albums des auteurs"
 
-#: wppa-boxes-html.php:3883 wppa-boxes-html.php:3891 wppa-boxes-html.php:3962
+#: wppa-boxes-html.php:3882 wppa-boxes-html.php:3890 wppa-boxes-html.php:3961
 msgid "See the authors photos"
 msgstr "Voir les photos des auteurs"
 
-#: wppa-boxes-html.php:3887 wppa-boxes-html.php:3895 wppa-boxes-html.php:3966
+#: wppa-boxes-html.php:3886 wppa-boxes-html.php:3894 wppa-boxes-html.php:3965
 msgid "See all the authors photos"
 msgstr "Voir toutes les photos des auteurs"
 
-#: wppa-boxes-html.php:3921
+#: wppa-boxes-html.php:3920
 #, php-format
 msgid "Photo by: %s"
 msgstr "Photo par: %s"
 
-#: wppa-boxes-html.php:3924 wppa-boxes-html.php:3987
+#: wppa-boxes-html.php:3923 wppa-boxes-html.php:3986
 #, php-format
 msgid "%d max rating"
 msgid_plural "%d max ratings"
 msgstr[0] "%d max note"
 msgstr[1] "%d max notes"
 
-#: wppa-boxes-html.php:3928 wppa-boxes-html.php:3991 wppa-non-admin.php:958
+#: wppa-boxes-html.php:3927 wppa-boxes-html.php:3990 wppa-non-admin.php:959
 #: wppa-topten-widget.php:206 wppa-topten-widget.php:223
 #: wppa-topten-widget.php:259
 #, php-format
@@ -3019,22 +3019,22 @@ msgid_plural "%d votes"
 msgstr[0] "%d vote"
 msgstr[1] "%d votes"
 
-#: wppa-boxes-html.php:3932
+#: wppa-boxes-html.php:3931
 #, php-format
 msgid "Rating: %4.2f."
 msgstr "Vote: %4.2f."
 
-#: wppa-boxes-html.php:3940
+#: wppa-boxes-html.php:3939
 #, php-format
 msgid "Photo %s not found."
 msgstr "Photo %s non trouvée."
 
-#: wppa-boxes-html.php:3995
+#: wppa-boxes-html.php:3994
 #, php-format
 msgid "Mean value: %4.2f."
 msgstr "Valeur moyenne: %4.2f."
 
-#: wppa-boxes-html.php:4347
+#: wppa-boxes-html.php:4346
 msgid "Refresh"
 msgstr "Rafraichir"
 
@@ -3337,7 +3337,7 @@ msgstr "timestamp"
 msgid "photo"
 msgstr "photo"
 
-#: wppa-comment-admin.php:263 wppa-photo-admin-autosave.php:1902
+#: wppa-comment-admin.php:263 wppa-photo-admin-autosave.php:1922
 msgid "Bulk action:"
 msgstr "Action groupée:"
 
@@ -3375,9 +3375,9 @@ msgstr "(Album)"
 #: wppa-settings-autosave.php:4957 wppa-settings-autosave.php:4981
 #: wppa-settings-autosave.php:6039 wppa-settings-autosave.php:6734
 #: wppa-settings-autosave.php:6756 wppa-settings-autosave.php:7540
-#: wppa-settings-autosave.php:7564 wppa-settings-autosave.php:9369
-#: wppa-settings-autosave.php:9390 wppa-settings-autosave.php:9430
-#: wppa-settings-autosave.php:9452 wppa-settings-autosave.php:9498
+#: wppa-settings-autosave.php:7564 wppa-settings-autosave.php:9360
+#: wppa-settings-autosave.php:9381 wppa-settings-autosave.php:9421
+#: wppa-settings-autosave.php:9443 wppa-settings-autosave.php:9489
 msgid "#"
 msgstr "#"
 
@@ -3416,8 +3416,8 @@ msgstr "Répondre"
 
 #: wppa-comment-admin.php:377 wppa-photo-admin-autosave.php:727
 #: wppa-photo-admin-autosave.php:760 wppa-photo-admin-autosave.php:1612
-#: wppa-photo-admin-autosave.php:1621 wppa-photo-admin-autosave.php:1920
-#: wppa-photo-admin-autosave.php:2050 wppa-photo-admin-autosave.php:2062
+#: wppa-photo-admin-autosave.php:1621 wppa-photo-admin-autosave.php:1940
+#: wppa-photo-admin-autosave.php:2118 wppa-photo-admin-autosave.php:2130
 msgid "Pending"
 msgstr "en attente"
 
@@ -3447,19 +3447,19 @@ msgstr "WPPA+ Commentaires sur les photos"
 msgid "Comments on Photos"
 msgstr "Commentaires sur les photos"
 
-#: wppa-comment-widget.php:73 wppa-non-admin.php:928 wppa-thumbnails.php:500
+#: wppa-comment-widget.php:73 wppa-non-admin.php:929 wppa-thumbnails.php:500
 msgid "wrote"
 msgstr "a écrit"
 
 #: wppa-comment-widget.php:87 wppa-featen-widget.php:137
-#: wppa-lasten-widget.php:148 wppa-non-admin.php:929 wppa-non-admin.php:934
-#: wppa-non-admin.php:939 wppa-non-admin.php:943 wppa-non-admin.php:950
-#: wppa-non-admin.php:960 wppa-potd-widget.php:159 wppa-thumbnail-widget.php:114
+#: wppa-lasten-widget.php:148 wppa-non-admin.php:930 wppa-non-admin.php:935
+#: wppa-non-admin.php:940 wppa-non-admin.php:944 wppa-non-admin.php:951
+#: wppa-non-admin.php:961 wppa-potd-widget.php:159 wppa-thumbnail-widget.php:114
 #: wppa-topten-widget.php:267
 msgid "Photo not found"
 msgstr "Photo non trouvée"
 
-#: wppa-comment-widget.php:93 wppa-non-admin.php:930
+#: wppa-comment-widget.php:93 wppa-non-admin.php:931
 msgid "There are no commented photos (yet)"
 msgstr "Il n'y pas encore de photos commentariés"
 
@@ -3492,7 +3492,7 @@ msgstr[1] "%d heures"
 #: wppa-settings-autosave.php:7935 wppa-settings-autosave.php:7936
 #: wppa-settings-autosave.php:7937 wppa-settings-autosave.php:7939
 #: wppa-settings-autosave.php:7940 wppa-settings-autosave.php:7941
-#: wppa-settings-autosave.php:9190
+#: wppa-settings-autosave.php:9181
 #, php-format
 msgid "%d day"
 msgid_plural "%d days"
@@ -3502,7 +3502,7 @@ msgstr[1] "%d jours"
 #: wppa-common-functions.php:670 wppa-functions.php:4712
 #: wppa-settings-autosave.php:6583 wppa-settings-autosave.php:7938
 #: wppa-settings-autosave.php:7942 wppa-settings-autosave.php:7943
-#: wppa-settings-autosave.php:7944 wppa-settings-autosave.php:9191
+#: wppa-settings-autosave.php:7944 wppa-settings-autosave.php:9182
 #, php-format
 msgid "%d week"
 msgid_plural "%d weeks"
@@ -3510,17 +3510,17 @@ msgstr[0] "%d semaine"
 msgstr[1] "%d semaines"
 
 #: wppa-common-functions.php:674 wppa-settings-autosave.php:7945
-#: wppa-settings-autosave.php:9192 wppa-settings-autosave.php:9193
-#: wppa-settings-autosave.php:9194 wppa-settings-autosave.php:9195
-#: wppa-settings-autosave.php:9196 wppa-settings-autosave.php:9198
+#: wppa-settings-autosave.php:9183 wppa-settings-autosave.php:9184
+#: wppa-settings-autosave.php:9185 wppa-settings-autosave.php:9186
+#: wppa-settings-autosave.php:9187 wppa-settings-autosave.php:9189
 #, php-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d mois"
 msgstr[1] "%d mois"
 
-#: wppa-common-functions.php:677 wppa-settings-autosave.php:9197
-#: wppa-settings-autosave.php:9199
+#: wppa-common-functions.php:677 wppa-settings-autosave.php:9188
+#: wppa-settings-autosave.php:9190
 #, php-format
 msgid "%d year"
 msgid_plural "%d years"
@@ -3919,11 +3919,11 @@ msgstr "WPPA+ Photos recommandées"
 msgid "Featured Photos"
 msgstr "Photos recommandées"
 
-#: wppa-featen-widget.php:115 wppa-non-admin.php:933
+#: wppa-featen-widget.php:115 wppa-non-admin.php:934
 msgid "View the featured photos"
 msgstr "Voir les photos recommandées"
 
-#: wppa-featen-widget.php:146 wppa-non-admin.php:935
+#: wppa-featen-widget.php:146 wppa-non-admin.php:936
 msgid "There are no featured photos (yet)"
 msgstr "Il n'y pas (encore) de photos recommandées"
 
@@ -4155,11 +4155,11 @@ msgid "You can upload after"
 msgstr "Vous pouvez charger après"
 
 #: wppa-functions.php:4753 wppa-functions.php:4757 wppa-functions.php:4764
-#: wppa-functions.php:4768 wppa-links.php:1174 wppa-non-admin.php:853
-#: wppa-settings-autosave.php:9538 wppa-settings-autosave.php:9550
-#: wppa-settings-autosave.php:9562 wppa-settings-autosave.php:9574
-#: wppa-settings-autosave.php:9586 wppa-settings-autosave.php:9598
-#: wppa-settings-autosave.php:9610 wppa-settings-autosave.php:9622
+#: wppa-functions.php:4768 wppa-links.php:1174 wppa-non-admin.php:854
+#: wppa-settings-autosave.php:9529 wppa-settings-autosave.php:9541
+#: wppa-settings-autosave.php:9553 wppa-settings-autosave.php:9565
+#: wppa-settings-autosave.php:9577 wppa-settings-autosave.php:9589
+#: wppa-settings-autosave.php:9601 wppa-settings-autosave.php:9613
 msgid "Download"
 msgstr "Télécharger"
 
@@ -4926,8 +4926,8 @@ msgid "Gold medal"
 msgstr "Médaille d'or"
 
 #: wppa-items.php:264 wppa-photo-admin-autosave.php:736
-#: wppa-photo-admin-autosave.php:763 wppa-photo-admin-autosave.php:1924
-#: wppa-photo-admin-autosave.php:2054 wppa-photo-admin-autosave.php:2065
+#: wppa-photo-admin-autosave.php:763 wppa-photo-admin-autosave.php:1944
+#: wppa-photo-admin-autosave.php:2122 wppa-photo-admin-autosave.php:2133
 #: wppa-potd-admin.php:228
 msgid "Gold"
 msgstr "Or"
@@ -4937,8 +4937,8 @@ msgid "Silver medal"
 msgstr "Médaille d'argent"
 
 #: wppa-items.php:265 wppa-photo-admin-autosave.php:739
-#: wppa-photo-admin-autosave.php:764 wppa-photo-admin-autosave.php:1925
-#: wppa-photo-admin-autosave.php:2055 wppa-photo-admin-autosave.php:2066
+#: wppa-photo-admin-autosave.php:764 wppa-photo-admin-autosave.php:1945
+#: wppa-photo-admin-autosave.php:2123 wppa-photo-admin-autosave.php:2134
 #: wppa-potd-admin.php:229
 msgid "Silver"
 msgstr "Argent"
@@ -4948,8 +4948,8 @@ msgid "Bronze medal"
 msgstr "Médaille de bronze"
 
 #: wppa-items.php:266 wppa-photo-admin-autosave.php:742
-#: wppa-photo-admin-autosave.php:765 wppa-photo-admin-autosave.php:1926
-#: wppa-photo-admin-autosave.php:2056 wppa-photo-admin-autosave.php:2067
+#: wppa-photo-admin-autosave.php:765 wppa-photo-admin-autosave.php:1946
+#: wppa-photo-admin-autosave.php:2124 wppa-photo-admin-autosave.php:2135
 #: wppa-potd-admin.php:230
 msgid "Bronze"
 msgstr "Bronze"
@@ -4996,11 +4996,11 @@ msgstr "Dix dernières photos chargées"
 msgid "Last Ten Uploaded Photos"
 msgstr "Dix dernières photos chargées"
 
-#: wppa-lasten-widget.php:131 wppa-non-admin.php:938
+#: wppa-lasten-widget.php:131 wppa-non-admin.php:939
 msgid "View the most recent uploaded photos"
 msgstr "Voir les photos chargées les plus récentes"
 
-#: wppa-lasten-widget.php:155 wppa-non-admin.php:940
+#: wppa-lasten-widget.php:155 wppa-non-admin.php:941
 msgid "There are no uploaded photos (yet)"
 msgstr "Il n'y a pas de (encore) de photo chargées"
 
@@ -5124,7 +5124,7 @@ msgid "From and To albums are identical"
 msgstr "Les albums de source et de destination sont identiques"
 
 #: wppa-maintenance.php:851 wppa-maintenance.php:867
-#: wppa-photo-admin-autosave.php:2368 wppa-photo-admin-autosave.php:2389
+#: wppa-photo-admin-autosave.php:2436 wppa-photo-admin-autosave.php:2457
 #: wppa-settings-autosave.php:4487 wppa-setup.php:352
 msgid "Required"
 msgstr "requis"
@@ -5284,28 +5284,32 @@ msgstr "Entrer un commentaire"
 msgid "Double click to start/stop slideshow running"
 msgstr "Double-cliquez pour lancer/arrêter le diaporama"
 
-#: wppa-non-admin.php:944 wppa-photo-admin-autosave.php:558
+#: wppa-non-admin.php:849
+msgid "Click to view"
+msgstr "Cliquez pour afficher"
+
+#: wppa-non-admin.php:945 wppa-photo-admin-autosave.php:558
 #: wppa-potd-widget.php:178
 msgid "By:"
 msgstr "Par:"
 
-#: wppa-non-admin.php:947 wppa-slideshow-widget.php:124
+#: wppa-non-admin.php:948 wppa-slideshow-widget.php:124
 msgid "No album defined (yet)"
 msgstr "Pas encore d'album défini"
 
-#: wppa-non-admin.php:951 wppa-thumbnail-widget.php:121
+#: wppa-non-admin.php:952 wppa-thumbnail-widget.php:121
 msgid "There are no photos (yet)"
 msgstr "Il n'y pas encore de photos"
 
-#: wppa-non-admin.php:954 wppa-upldr-widget.php:99
+#: wppa-non-admin.php:955 wppa-upldr-widget.php:99
 msgid "There are too many registered users in the system for this widget"
 msgstr "Il y a trop d'utilisateurs enregistrés dans le système pour ce widget"
 
-#: wppa-non-admin.php:955 wppa-upldr-widget.php:141 wppa-upldr-widget.php:148
+#: wppa-non-admin.php:956 wppa-upldr-widget.php:141 wppa-upldr-widget.php:148
 msgid "Photos uploaded by"
 msgstr "Photos chargées par"
 
-#: wppa-non-admin.php:959 wppa-thumbnails.php:732 wppa-thumbnails.php:1520
+#: wppa-non-admin.php:960 wppa-thumbnails.php:732 wppa-thumbnails.php:1520
 #: wppa-topten-widget.php:213 wppa-topten-widget.php:236
 #: wppa-topten-widget.php:246
 #, php-format
@@ -5314,7 +5318,7 @@ msgid_plural "%d views"
 msgstr[0] "%d vu"
 msgstr[1] "%d vus"
 
-#: wppa-non-admin.php:961 wppa-topten-widget.php:271
+#: wppa-non-admin.php:962 wppa-topten-widget.php:271
 msgid "There are no rated photos (yet)"
 msgstr "Il n'y a pas (encore) de photos évaluées"
 
@@ -5347,23 +5351,23 @@ msgstr "Gérer toutes les photo par timestamp"
 msgid "Photo %s has been removed."
 msgstr "La photo %s a été retirée."
 
-#: wppa-photo-admin-autosave.php:267 wppa-photo-admin-autosave.php:2102
+#: wppa-photo-admin-autosave.php:267 wppa-photo-admin-autosave.php:2170
 msgid "No photos matching your search criteria."
 msgstr "Aucune photo correspondant à vos critères de recherche n'a été trouvée."
 
-#: wppa-photo-admin-autosave.php:275 wppa-photo-admin-autosave.php:2105
+#: wppa-photo-admin-autosave.php:275 wppa-photo-admin-autosave.php:2173
 msgid "No photos yet in this album."
 msgstr "Pas encore de photo dans cet album"
 
-#: wppa-photo-admin-autosave.php:294
+#: wppa-photo-admin-autosave.php:294 wppa-photo-admin-autosave.php:1902
 msgid "Please select an album to move to first."
 msgstr "Veuillez d'abord sélectionner un album où déplacer la photo"
 
-#: wppa-photo-admin-autosave.php:299
+#: wppa-photo-admin-autosave.php:299 wppa-photo-admin-autosave.php:1907
 msgid "Are you sure you want to move this video?"
 msgstr "Etes-vous sûr que vous voulez déplacer cette vidéo?"
 
-#: wppa-photo-admin-autosave.php:302
+#: wppa-photo-admin-autosave.php:302 wppa-photo-admin-autosave.php:1910
 msgid "Are you sure you want to move this photo?"
 msgstr "Êtes-vous sûr de vouloir déplacer cette photo?"
 
@@ -5383,7 +5387,7 @@ msgstr "Êtes-vous sûr de vouloir copier cette photo ?"
 msgid "Are you sure you want to delete this video?"
 msgstr "Êtes-vous sûr de vouloir supprimer cette video?"
 
-#: wppa-photo-admin-autosave.php:339 wppa-photo-admin-autosave.php:1984
+#: wppa-photo-admin-autosave.php:339 wppa-photo-admin-autosave.php:2010
 msgid "Are you sure you want to delete this photo?"
 msgstr "Êtes-vous sûr de vouloir supprimer cette photo ?"
 
@@ -5551,26 +5555,26 @@ msgid "Status:"
 msgstr "Statut:"
 
 #: wppa-photo-admin-autosave.php:730 wppa-photo-admin-autosave.php:761
-#: wppa-photo-admin-autosave.php:1921 wppa-photo-admin-autosave.php:2051
-#: wppa-photo-admin-autosave.php:2063 wppa-potd-admin.php:226
+#: wppa-photo-admin-autosave.php:1941 wppa-photo-admin-autosave.php:2119
+#: wppa-photo-admin-autosave.php:2131 wppa-potd-admin.php:226
 msgid "Publish"
 msgstr "Publier"
 
 #: wppa-photo-admin-autosave.php:733 wppa-photo-admin-autosave.php:762
-#: wppa-photo-admin-autosave.php:1923 wppa-photo-admin-autosave.php:2053
+#: wppa-photo-admin-autosave.php:1943 wppa-photo-admin-autosave.php:2121
 #: wppa-potd-admin.php:227
 msgid "Featured"
 msgstr "Recommandé"
 
 #: wppa-photo-admin-autosave.php:745 wppa-photo-admin-autosave.php:766
-#: wppa-photo-admin-autosave.php:1927 wppa-photo-admin-autosave.php:2057
-#: wppa-photo-admin-autosave.php:2068
+#: wppa-photo-admin-autosave.php:1947 wppa-photo-admin-autosave.php:2125
+#: wppa-photo-admin-autosave.php:2136
 msgid "Scheduled"
 msgstr "Planifié"
 
 #: wppa-photo-admin-autosave.php:748 wppa-photo-admin-autosave.php:767
-#: wppa-photo-admin-autosave.php:1928 wppa-photo-admin-autosave.php:2058
-#: wppa-photo-admin-autosave.php:2069
+#: wppa-photo-admin-autosave.php:1948 wppa-photo-admin-autosave.php:2126
+#: wppa-photo-admin-autosave.php:2137
 msgid "Private"
 msgstr "Privé"
 
@@ -5860,74 +5864,82 @@ msgstr "Propriétaire changé pour %1$s sur %2$s photos."
 msgid "%d photos processed."
 msgstr "%d photos traitées."
 
-#: wppa-photo-admin-autosave.php:1906
+#: wppa-photo-admin-autosave.php:1926
 msgid "Move to"
 msgstr "Déplacer vers"
 
-#: wppa-photo-admin-autosave.php:1907
+#: wppa-photo-admin-autosave.php:1927
 msgid "Copy to"
 msgstr "Copier vers"
 
-#: wppa-photo-admin-autosave.php:1909
+#: wppa-photo-admin-autosave.php:1929
 msgid "Set status to"
 msgstr "Régler le statut à"
 
-#: wppa-photo-admin-autosave.php:1912
+#: wppa-photo-admin-autosave.php:1932
 msgid "Set owner to"
 msgstr "Régler le propriétaire à"
 
-#: wppa-photo-admin-autosave.php:1919
+#: wppa-photo-admin-autosave.php:1939
 msgid "- select a status -"
 msgstr "- Choisir un statut -"
 
-#: wppa-photo-admin-autosave.php:1934
+#: wppa-photo-admin-autosave.php:1954
 msgid "- select an owner -"
 msgstr "- Choisir un propriétaire -"
 
-#: wppa-photo-admin-autosave.php:1946
+#: wppa-photo-admin-autosave.php:1966
 msgid "Doit!"
 msgstr "Le faire!"
 
-#: wppa-photo-admin-autosave.php:1949
+#: wppa-photo-admin-autosave.php:1969
 msgid "the previous page"
 msgstr "la page précédente"
 
-#: wppa-photo-admin-autosave.php:1950
+#: wppa-photo-admin-autosave.php:1970
 msgid "the same page"
 msgstr "la même page"
 
-#: wppa-photo-admin-autosave.php:1951
+#: wppa-photo-admin-autosave.php:1971
 msgid "the next page"
 msgstr "la page suivante"
 
-#: wppa-photo-admin-autosave.php:1953
+#: wppa-photo-admin-autosave.php:1973
 #, php-format
 msgid "Go to %s after Doit!."
 msgstr "Aller vers %s après Le faire!."
 
-#: wppa-photo-admin-autosave.php:1958
+#: wppa-photo-admin-autosave.php:1978
 msgid "Confirm delete"
 msgstr "Confirmer Suppression"
 
-#: wppa-photo-admin-autosave.php:1965 wppa-photo-admin-autosave.php:2087
+#: wppa-photo-admin-autosave.php:1981
+msgid "Confirm move"
+msgstr "Confirmer le déplacement"
+
+#: wppa-photo-admin-autosave.php:1990 wppa-photo-admin-autosave.php:2155
 #: wppa-potd-admin.php:321 wppa-settings-autosave.php:8699
 msgid "Preview"
 msgstr "Prévisualiser"
 
-#: wppa-photo-admin-autosave.php:1970 wppa-photo-admin-autosave.php:2092
+#: wppa-photo-admin-autosave.php:1995 wppa-photo-admin-autosave.php:2160
 msgid "Remark"
 msgstr "Remarque"
 
-#: wppa-photo-admin-autosave.php:1984
+#: wppa-photo-admin-autosave.php:2010
 msgid "Deleting..."
 msgstr "Suppression..."
 
-#: wppa-photo-admin-autosave.php:2110
+#: wppa-photo-admin-autosave.php:2099
+msgid "Target album for move to:"
+msgstr "Album d'objet pour déplacer:"
+
+#: wppa-photo-admin-autosave.php:2178
 #, php-format
 msgid "Page %d is empty, try <a href=\"%s\" >page %d</a>."
 msgstr "La page  %d est vide, essayez <a href=\"%s\" >la page %d</a>."
 
-#: wppa-photo-admin-autosave.php:2235
+#: wppa-photo-admin-autosave.php:2303
 msgid ""
 "Setting photo sequence order has only effect if the photo order method is set "
 "to <b>Order#</b>"
@@ -5935,43 +5947,43 @@ msgstr ""
 "Régler l'ordre des photos a seulement un effet si la méthode d'ordonnancement "
 "est réglée à <b>Order#</b>"
 
-#: wppa-photo-admin-autosave.php:2294
+#: wppa-photo-admin-autosave.php:2362
 msgid "Id: "
 msgstr "ID:"
 
-#: wppa-photo-admin-autosave.php:2295 wppa-settings-autosave.php:379
+#: wppa-photo-admin-autosave.php:2363 wppa-settings-autosave.php:379
 msgid "Video"
 msgstr "Vidéo"
 
-#: wppa-photo-admin-autosave.php:2296 wppa-settings-autosave.php:360
+#: wppa-photo-admin-autosave.php:2364 wppa-settings-autosave.php:360
 msgid "Audio"
 msgstr "Audio"
 
-#: wppa-photo-admin-autosave.php:2297
+#: wppa-photo-admin-autosave.php:2365
 msgid "Ord: "
 msgstr "Ord:"
 
-#: wppa-photo-admin-autosave.php:2310
+#: wppa-photo-admin-autosave.php:2378
 msgid "The album is empty."
 msgstr "Cet album est vide."
 
-#: wppa-photo-admin-autosave.php:2415
+#: wppa-photo-admin-autosave.php:2483
 msgid "Combined"
 msgstr "Combiné"
 
-#: wppa-photo-admin-autosave.php:2452
+#: wppa-photo-admin-autosave.php:2520
 msgid "Word"
 msgstr "Mot"
 
-#: wppa-photo-admin-autosave.php:2455
+#: wppa-photo-admin-autosave.php:2523
 msgid "Count"
 msgstr "Compteur"
 
-#: wppa-photo-admin-autosave.php:2507 wppa-settings-autosave.php:6487
+#: wppa-photo-admin-autosave.php:2575 wppa-settings-autosave.php:6487
 msgid "Tags"
 msgstr "Tags"
 
-#: wppa-photo-admin-autosave.php:2627
+#: wppa-photo-admin-autosave.php:2695
 msgid "Send"
 msgstr "Envoyer"
 
@@ -5999,7 +6011,7 @@ msgstr ""
 #: wppa-settings-autosave.php:1439 wppa-settings-autosave.php:1460
 #: wppa-settings-autosave.php:2998 wppa-settings-autosave.php:3402
 #: wppa-settings-autosave.php:4763 wppa-settings-autosave.php:6737
-#: wppa-settings-autosave.php:7567 wppa-settings-autosave.php:9372
+#: wppa-settings-autosave.php:7567 wppa-settings-autosave.php:9363
 msgid "Setting"
 msgstr "Réglages"
 
@@ -6012,9 +6024,9 @@ msgstr "Réglages"
 #: wppa-settings-autosave.php:4964 wppa-settings-autosave.php:4988
 #: wppa-settings-autosave.php:6046 wppa-settings-autosave.php:6739
 #: wppa-settings-autosave.php:6763 wppa-settings-autosave.php:7547
-#: wppa-settings-autosave.php:7568 wppa-settings-autosave.php:9373
-#: wppa-settings-autosave.php:9395 wppa-settings-autosave.php:9435
-#: wppa-settings-autosave.php:9457 wppa-settings-autosave.php:9503
+#: wppa-settings-autosave.php:7568 wppa-settings-autosave.php:9364
+#: wppa-settings-autosave.php:9386 wppa-settings-autosave.php:9426
+#: wppa-settings-autosave.php:9448 wppa-settings-autosave.php:9494
 msgid "Help"
 msgstr "Aide"
 
@@ -6039,7 +6051,6 @@ msgid "Widget Photo Width:"
 msgstr "Largeur du widget photo:"
 
 #: wppa-potd-admin.php:90
-#, fuzzy
 msgid "Enter the desired display width of the photo in the sidebar."
 msgstr ""
 "Saisissez la largeur d'affichage souhaitée de la photo dans la barre latérale."
@@ -6055,7 +6066,6 @@ msgid "Horizontal alignment:"
 msgstr "Alignement horizontal:"
 
 #: wppa-potd-admin.php:97
-#, fuzzy
 msgid "Enter the desired display alignment of the photo in the sidebar."
 msgstr ""
 "Entrez l'alignement d'affichage souhaité de la photo dans la barre latérale."
@@ -6067,16 +6077,14 @@ msgid "center"
 msgstr "Centre"
 
 #: wppa-potd-admin.php:109
-#, fuzzy
 msgid "Enter the url. Do'nt forget the HTTP://"
-msgstr "Entrez l'url. Do'nt oublier le HTTP: //"
+msgstr "Entrez l'url. N'oubliez pas le HTTP: //"
 
 #: wppa-potd-admin.php:115
 msgid "Link Title:"
 msgstr "Titre du lien:"
 
 #: wppa-potd-admin.php:116
-#, fuzzy
 msgid "The balloon text when hovering over the photo."
 msgstr "Le texte du ballon lors du survol de la photo."
 
@@ -6152,12 +6160,12 @@ msgstr "Sélectionnez les albums à utiliser pour la photo du jour."
 #: wppa-potd-admin.php:707 wppa-settings-autosave.php:343
 #: wppa-settings-autosave.php:7410 wppa-settings-autosave.php:7437
 #: wppa-settings-autosave.php:8568 wppa-settings-autosave.php:8570
-#: wppa-settings-autosave.php:9880 wppa-settings-autosave.php:9900
-#: wppa-settings-autosave.php:9917 wppa-settings-autosave.php:9946
-#: wppa-settings-autosave.php:9964 wppa-settings-autosave.php:9988
-#: wppa-settings-autosave.php:10009 wppa-settings-autosave.php:10029
-#: wppa-settings-autosave.php:10046 wppa-settings-autosave.php:10090
-#: wppa-settings-autosave.php:10143 wppa-settings-autosave.php:10175
+#: wppa-settings-autosave.php:9871 wppa-settings-autosave.php:9891
+#: wppa-settings-autosave.php:9908 wppa-settings-autosave.php:9937
+#: wppa-settings-autosave.php:9955 wppa-settings-autosave.php:9979
+#: wppa-settings-autosave.php:10000 wppa-settings-autosave.php:10020
+#: wppa-settings-autosave.php:10037 wppa-settings-autosave.php:10081
+#: wppa-settings-autosave.php:10134 wppa-settings-autosave.php:10166
 msgid "Setting unmodified"
 msgstr "Configuration inchangée"
 
@@ -6344,19 +6352,19 @@ msgstr ""
 "Il y a trop de photos dans la sélection pour pouvoir afficher une "
 "prévisualisation ( %d )"
 
-#: wppa-potd-admin.php:573 wppa-settings-autosave.php:9808
+#: wppa-potd-admin.php:573 wppa-settings-autosave.php:9799
 msgid "The default for this setting is:"
 msgstr "Le réglage par défaut pour cette option est:"
 
-#: wppa-potd-admin.php:590 wppa-settings-autosave.php:9825
+#: wppa-potd-admin.php:590 wppa-settings-autosave.php:9816
 msgid "Click for help"
 msgstr "Cliquer pour l'aide"
 
-#: wppa-potd-admin.php:614 wppa-settings-autosave.php:10191
+#: wppa-potd-admin.php:614 wppa-settings-autosave.php:10182
 msgid "Checked"
 msgstr "Coché"
 
-#: wppa-potd-admin.php:615 wppa-settings-autosave.php:10192
+#: wppa-potd-admin.php:615 wppa-settings-autosave.php:10183
 msgid "Unchecked"
 msgstr "Décoché"
 
@@ -6367,7 +6375,7 @@ msgstr "Décoché"
 #: wppa-settings-autosave.php:5412 wppa-settings-autosave.php:5450
 #: wppa-settings-autosave.php:5502 wppa-settings-autosave.php:5544
 #: wppa-settings-autosave.php:5586 wppa-settings-autosave.php:5627
-#: wppa-settings-autosave.php:10193
+#: wppa-settings-autosave.php:10184
 msgid "no link at all."
 msgstr "pas de lien du tout."
 
@@ -6378,7 +6386,7 @@ msgstr "pas de lien du tout."
 #: wppa-settings-autosave.php:5413 wppa-settings-autosave.php:5451
 #: wppa-settings-autosave.php:5503 wppa-settings-autosave.php:5545
 #: wppa-settings-autosave.php:5587 wppa-settings-autosave.php:5628
-#: wppa-settings-autosave.php:10194
+#: wppa-settings-autosave.php:10185
 msgid "the plain photo (file)."
 msgstr "la photo originale (fichier)."
 
@@ -6388,7 +6396,7 @@ msgstr "la photo originale (fichier)."
 #: wppa-settings-autosave.php:5313 wppa-settings-autosave.php:5362
 #: wppa-settings-autosave.php:5452 wppa-settings-autosave.php:5505
 #: wppa-settings-autosave.php:5547 wppa-settings-autosave.php:5589
-#: wppa-settings-autosave.php:10195
+#: wppa-settings-autosave.php:10186
 msgid "the full size photo in a slideshow."
 msgstr "la photo pleine grandeur dans un diaporama."
 
@@ -6398,52 +6406,52 @@ msgstr "la photo pleine grandeur dans un diaporama."
 #: wppa-settings-autosave.php:5315 wppa-settings-autosave.php:5364
 #: wppa-settings-autosave.php:5454 wppa-settings-autosave.php:5506
 #: wppa-settings-autosave.php:5548 wppa-settings-autosave.php:5590
-#: wppa-settings-autosave.php:5629 wppa-settings-autosave.php:10196
+#: wppa-settings-autosave.php:5629 wppa-settings-autosave.php:10187
 msgid "the fullsize photo on its own."
 msgstr "la photo pleine grandeur à lui seul."
 
-#: wppa-potd-admin.php:620 wppa-settings-autosave.php:10197
+#: wppa-potd-admin.php:620 wppa-settings-autosave.php:10188
 msgid "the photo specific link."
 msgstr "le lien spécifique de la photo."
 
 #: wppa-potd-admin.php:621 wppa-settings-autosave.php:5049
 #: wppa-settings-autosave.php:5092 wppa-settings-autosave.php:5504
 #: wppa-settings-autosave.php:5546 wppa-settings-autosave.php:5588
-#: wppa-settings-autosave.php:10198
+#: wppa-settings-autosave.php:10189
 msgid "the content of the album."
 msgstr "le contenu de l'album."
 
 #: wppa-potd-admin.php:622 wppa-settings-autosave.php:5091
-#: wppa-settings-autosave.php:10199
+#: wppa-settings-autosave.php:10190
 msgid "defined at widget activation."
 msgstr "défini à l'activation du widget."
 
 #: wppa-potd-admin.php:623 wppa-settings-autosave.php:5048
-#: wppa-settings-autosave.php:10200
+#: wppa-settings-autosave.php:10191
 msgid "defined on widget admin page."
 msgstr "réglages sur la page d'admin des widgets."
 
 #: wppa-potd-admin.php:624 wppa-settings-autosave.php:5414
-#: wppa-settings-autosave.php:10201
+#: wppa-settings-autosave.php:10192
 msgid "same as title."
 msgstr "identique au titre."
 
 #: wppa-potd-admin.php:636 wppa-potd-admin.php:659 wppa-potd-admin.php:680
-#: wppa-settings-autosave.php:9870 wppa-settings-autosave.php:9890
-#: wppa-settings-autosave.php:9909 wppa-settings-autosave.php:9939
-#: wppa-settings-autosave.php:9956 wppa-settings-autosave.php:9980
-#: wppa-settings-autosave.php:10001 wppa-settings-autosave.php:10021
-#: wppa-settings-autosave.php:10063
+#: wppa-settings-autosave.php:9861 wppa-settings-autosave.php:9881
+#: wppa-settings-autosave.php:9900 wppa-settings-autosave.php:9930
+#: wppa-settings-autosave.php:9947 wppa-settings-autosave.php:9971
+#: wppa-settings-autosave.php:9992 wppa-settings-autosave.php:10012
+#: wppa-settings-autosave.php:10054
 msgid "Slug ="
 msgstr "Slug ="
 
-#: wppa-potd-admin.php:636 wppa-settings-autosave.php:9956
-#: wppa-settings-autosave.php:9980 wppa-settings-autosave.php:10001
-#: wppa-settings-autosave.php:10021
+#: wppa-potd-admin.php:636 wppa-settings-autosave.php:9947
+#: wppa-settings-autosave.php:9971 wppa-settings-autosave.php:9992
+#: wppa-settings-autosave.php:10012
 msgid "Values = yes, no"
 msgstr "Valeurs=oui,non"
 
-#: wppa-potd-admin.php:680 wppa-settings-autosave.php:10063
+#: wppa-potd-admin.php:680 wppa-settings-autosave.php:10054
 msgid "Values = "
 msgstr "Values = "
 
@@ -6740,8 +6748,8 @@ msgstr "Bouton"
 msgid "action that causes page reload."
 msgstr "action qui provoque le rechargement de la page."
 
-#: wppa-settings-autosave.php:340 wppa-settings-autosave.php:10224
-#: wppa-settings-autosave.php:10243
+#: wppa-settings-autosave.php:340 wppa-settings-autosave.php:10215
+#: wppa-settings-autosave.php:10234
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr ?"
 
@@ -7277,9 +7285,9 @@ msgstr ""
 #: wppa-settings-autosave.php:4860 wppa-settings-autosave.php:4877
 #: wppa-settings-autosave.php:4894 wppa-settings-autosave.php:4911
 #: wppa-settings-autosave.php:4928 wppa-settings-autosave.php:4945
-#: wppa-settings-autosave.php:6285 wppa-settings-autosave.php:9103
-#: wppa-settings-autosave.php:9299 wppa-settings-autosave.php:9341
-#: wppa-settings-autosave.php:9359
+#: wppa-settings-autosave.php:6285 wppa-settings-autosave.php:9094
+#: wppa-settings-autosave.php:9290 wppa-settings-autosave.php:9332
+#: wppa-settings-autosave.php:9350
 msgid "pixels"
 msgstr "pixels"
 
@@ -8958,7 +8966,7 @@ msgstr "Montrer la boîte de partage"
 msgid "Display the share social media buttons box."
 msgstr "Afficher la boîte de boutons réseau sociaux."
 
-#: wppa-settings-autosave.php:1881 wppa-settings-autosave.php:9346
+#: wppa-settings-autosave.php:1881 wppa-settings-autosave.php:9337
 msgid "Hide when running"
 msgstr "Cacher lorsqu'en fonctionnement"
 
@@ -12361,8 +12369,8 @@ msgstr "Comment email required"
 msgid "Commenting users must enter their email addresses."
 msgstr "Les auteurs de commentaires doivent entrer leur email."
 
-#: wppa-settings-autosave.php:4486 wppa-settings-autosave.php:9414
-#: wppa-settings-autosave.php:9482
+#: wppa-settings-autosave.php:4486 wppa-settings-autosave.php:9405
+#: wppa-settings-autosave.php:9473
 msgid "Optional"
 msgstr "Optionnel"
 
@@ -14071,7 +14079,7 @@ msgstr "--- choisir un utilisateur à bannir ---"
 #: wppa-settings-autosave.php:6632 wppa-settings-autosave.php:6637
 #: wppa-settings-autosave.php:6658 wppa-settings-autosave.php:6696
 #: wppa-settings-autosave.php:6701 wppa-settings-autosave.php:6722
-#: wppa-settings-autosave.php:9289 wppa-settings-autosave.php:9331
+#: wppa-settings-autosave.php:9280 wppa-settings-autosave.php:9322
 #, fuzzy
 msgid "The page will be reloaded after the action has taken place."
 msgstr "La page sera rechargée après que l'action a eu lieu."
@@ -14160,7 +14168,7 @@ msgid "Specification"
 msgstr "Spécification"
 
 #: wppa-settings-autosave.php:6760 wppa-settings-autosave.php:7544
-#: wppa-settings-autosave.php:10217 wppa-settings-autosave.php:10239
+#: wppa-settings-autosave.php:10208 wppa-settings-autosave.php:10230
 msgid "Do it!"
 msgstr "Faites-le!"
 
@@ -16712,51 +16720,39 @@ msgstr ""
 "du niveau supérieur."
 
 #: wppa-settings-autosave.php:8975
-msgid "IPTC need utf8 conversion"
-msgstr "IPTC a besoin d'une conversion UTF8"
-
-#: wppa-settings-autosave.php:8976
-msgid "This setting converts iso to utf8 in iptc text."
-msgstr "Ce réglage converti ISO vers UTF8 dans le texte IPTC."
-
-#: wppa-settings-autosave.php:8977
-msgid "Untick if you have funny characters in iptc data"
-msgstr "Décocher si vous avez des caractères bizarres dans les données IPTC"
-
-#: wppa-settings-autosave.php:8984
 msgid "Keep dir to album files"
 msgstr "Garder les fichiers de dir aux l’album"
 
-#: wppa-settings-autosave.php:8985
+#: wppa-settings-autosave.php:8976
 #, fuzzy
 msgid "Keep imported files after dir to album import"
 msgstr "Conserver les fichiers importés après dir à l'album import"
 
-#: wppa-settings-autosave.php:8994
+#: wppa-settings-autosave.php:8985
 msgid "Other plugins related settings"
 msgstr "Paramètres liés d'autres plugins"
 
-#: wppa-settings-autosave.php:8996
+#: wppa-settings-autosave.php:8987
 msgid "Foreign shortcodes general"
 msgstr "Généraux étrangers shortcodes"
 
-#: wppa-settings-autosave.php:8997
+#: wppa-settings-autosave.php:8988
 msgid "Enable foreign shortcodes in album names, albums desc and photo names"
 msgstr ""
 "Activez les shortcodes étrangers au nom de l’album, au description de l'album "
 "et au nom de photo"
 
-#: wppa-settings-autosave.php:9005
+#: wppa-settings-autosave.php:8996
 msgid "Foreign shortcodes fullsize"
 msgstr "Shortcodes étrangers fullsize"
 
-#: wppa-settings-autosave.php:9006
+#: wppa-settings-autosave.php:8997
 msgid "Enable the use of non-wppa+ shortcodes in fullsize photo descriptions."
 msgstr ""
 "Activer l’utilisation de non-wppa+ shortcodes dans les descriptions de photo "
 "pleine grandeur."
 
-#: wppa-settings-autosave.php:9007 wppa-settings-autosave.php:9018
+#: wppa-settings-autosave.php:8998 wppa-settings-autosave.php:9009
 #, fuzzy
 msgid ""
 "When checked, you can use shortcodes from other plugins in the description of "
@@ -16765,39 +16761,39 @@ msgstr ""
 "Lorsqu'elle est cochée, vous pouvez utiliser shortcodes d'autres plugins dans "
 "la description de photos."
 
-#: wppa-settings-autosave.php:9008
+#: wppa-settings-autosave.php:8999
 #, fuzzy
 msgid "The shortcodes will be expanded in the descriptions of fullsize images."
 msgstr "Les shortcodes seront étendus dans les descriptions des images fullsize."
 
-#: wppa-settings-autosave.php:9009 wppa-settings-autosave.php:9020
+#: wppa-settings-autosave.php:9000 wppa-settings-autosave.php:9011
 msgid "You will most likely need also to check Table IX-A1 (Allow HTML)."
 msgstr ""
 "Vous devrez probablement aussi cocher le Table IX-A1 (Permettre le HTML)."
 
-#: wppa-settings-autosave.php:9016
+#: wppa-settings-autosave.php:9007
 msgid "Foreign shortcodes thumbnails"
 msgstr "Foreign shortcodes thumbnails"
 
-#: wppa-settings-autosave.php:9017
+#: wppa-settings-autosave.php:9008
 msgid "Enable the use of non-wppa+ shortcodes in thumbnail photo descriptions."
 msgstr ""
 "Activer l’utilisation de non-wppa+ shortcodes dans les descriptions de photo "
 "miniature."
 
-#: wppa-settings-autosave.php:9019
+#: wppa-settings-autosave.php:9010
 msgid "The shortcodes will be expanded in the descriptions of thumbnail images."
 msgstr "Les shortcodes sera élargis dans les descriptions d’images miniatures."
 
-#: wppa-settings-autosave.php:9027
+#: wppa-settings-autosave.php:9018
 msgid "Lightbox keyname"
 msgstr "Nom-clé Lightbox"
 
-#: wppa-settings-autosave.php:9028
+#: wppa-settings-autosave.php:9019
 msgid "The identifier of lightbox."
 msgstr "L'identifiant Lightbox."
 
-#: wppa-settings-autosave.php:9029
+#: wppa-settings-autosave.php:9020
 msgid ""
 "If you use a lightbox plugin that uses rel=\"lbox-id\" you can enter the lbox-"
 "id here."
@@ -16805,64 +16801,64 @@ msgstr ""
 "Si vous utilisez un plugin lightbox qui utilise rel=\"lbox-id\" vous pouvez "
 "entrer l’id lbox ici."
 
-#: wppa-settings-autosave.php:9036
+#: wppa-settings-autosave.php:9027
 msgid "myCRED / Cube Points: Comment"
 msgstr "myCRED / Cube Points: commentaire"
 
-#: wppa-settings-autosave.php:9037
+#: wppa-settings-autosave.php:9028
 msgid "Number of points for giving a comment"
 msgstr "Nombre de points pour mettre un commentaire"
 
-#: wppa-settings-autosave.php:9038 wppa-settings-autosave.php:9047
-#: wppa-settings-autosave.php:9056 wppa-settings-autosave.php:9065
+#: wppa-settings-autosave.php:9029 wppa-settings-autosave.php:9038
+#: wppa-settings-autosave.php:9047 wppa-settings-autosave.php:9056
 msgid "This setting requires the plugin myCRED or Cube Points"
 msgstr "Ce paramètre nécessite le plugin myCRED ou Cube Points"
 
-#: wppa-settings-autosave.php:9040 wppa-settings-autosave.php:9049
+#: wppa-settings-autosave.php:9031 wppa-settings-autosave.php:9040
 msgid "points per comment"
 msgstr "points par commentaire"
 
-#: wppa-settings-autosave.php:9045
+#: wppa-settings-autosave.php:9036
 msgid "myCRED / Cube Points: Appr Comment"
 msgstr "myCRED / Cube Points: Appr commentaire"
 
-#: wppa-settings-autosave.php:9046
+#: wppa-settings-autosave.php:9037
 msgid "Number of points for receiving an approved comment"
 msgstr "Nombre de points pour recevoir un commentaire approuvé"
 
-#: wppa-settings-autosave.php:9054
+#: wppa-settings-autosave.php:9045
 msgid "myCRED / Cube Points: Rating"
 msgstr "myCRED / Cube Points: notation"
 
-#: wppa-settings-autosave.php:9055
+#: wppa-settings-autosave.php:9046
 msgid "Number of points for a rating vote"
 msgstr "Nombre de points pour un vote de cote"
 
-#: wppa-settings-autosave.php:9058
+#: wppa-settings-autosave.php:9049
 msgid "points per vote"
 msgstr "points par vote"
 
-#: wppa-settings-autosave.php:9063
+#: wppa-settings-autosave.php:9054
 msgid "myCRED / Cube Points: Upload"
 msgstr "myCRED / Cube Points : Télécharger"
 
-#: wppa-settings-autosave.php:9064
+#: wppa-settings-autosave.php:9055
 msgid "Number of points for a successfull frontend upload"
 msgstr "Nombre de points pour un téléchargement réussi frontend"
 
-#: wppa-settings-autosave.php:9067
+#: wppa-settings-autosave.php:9058
 msgid "points per upload"
 msgstr "points par chargement"
 
-#: wppa-settings-autosave.php:9072
+#: wppa-settings-autosave.php:9063
 msgid "Use SCABN"
 msgstr "Utiliser SCABN"
 
-#: wppa-settings-autosave.php:9073
+#: wppa-settings-autosave.php:9064
 msgid "Use the wppa interface to Simple Cart & Buy Now plugin."
 msgstr "Utiliser l'interface WPPA avec le greffon Simple Cart & Buy Now (SCABN)."
 
-#: wppa-settings-autosave.php:9074
+#: wppa-settings-autosave.php:9065
 msgid ""
 "If checked, the shortcode to use for the \"add to cart\" button in photo "
 "descriptions is [cart ...]"
@@ -16870,23 +16866,23 @@ msgstr ""
 "Si coché, le shortcode à utiliser pour le bouton \"Ajouter au panier\" dans "
 "les descriptions photo est [cart ...]"
 
-#: wppa-settings-autosave.php:9075
+#: wppa-settings-autosave.php:9066
 msgid "as opposed to [scabn ...] for the original scabn \"add to cart\" button."
 msgstr ""
 "au lieu de [scabn ...] pour le bouton original \"Ajouter au panier\" de SCABN."
 
-#: wppa-settings-autosave.php:9076
+#: wppa-settings-autosave.php:9067
 msgid "The shortcode for the check-out page is still [scabn]"
 msgstr "Le shortcode pour la page de paiement final reste [scabn]"
 
-#: wppa-settings-autosave.php:9077
+#: wppa-settings-autosave.php:9068
 msgid ""
 "The arguments are the same, the defaults are: name = photoname, price = 0.01."
 msgstr ""
 "Les arguments sont les mêmes, les réglages par défaut sont: name = photoname, "
 "price = 0.01."
 
-#: wppa-settings-autosave.php:9078
+#: wppa-settings-autosave.php:9069
 msgid ""
 "Supplying the price should be sufficient; supply a name only when it differs "
 "from the photo name."
@@ -16894,11 +16890,11 @@ msgstr ""
 "Définir le prix devrait être suffisant; définissez un nom seulement s'il "
 "diffère de celui de la photo."
 
-#: wppa-settings-autosave.php:9079
+#: wppa-settings-autosave.php:9070
 msgid "This shortcode handler will also work with Ajax enabled."
 msgstr "Le shortcode fonctionnera même lorsque Ajax est activé."
 
-#: wppa-settings-autosave.php:9080
+#: wppa-settings-autosave.php:9071
 msgid ""
 "Using this interface makes sure that the item urls and callback action urls "
 "are correct."
@@ -16906,17 +16902,17 @@ msgstr ""
 "Si vous utilisez cette interface, s'assurer que les items URLs et URLs de "
 "callback sont correctes."
 
-#: wppa-settings-autosave.php:9087
+#: wppa-settings-autosave.php:9078
 msgid "Use CM Tooltip Glossary"
 msgstr "Utiliser CM Tooltip Glossary"
 
-#: wppa-settings-autosave.php:9088
+#: wppa-settings-autosave.php:9079
 msgid "Use plugin CM Tooltip Glossary on photo and album descriptions."
 msgstr ""
 "Utiliser le greffon CM Tooltip Glossary sur les descriptions d'albums et de "
 "photos."
 
-#: wppa-settings-autosave.php:9089
+#: wppa-settings-autosave.php:9080
 msgid ""
 "You MUST set Table IV-A13: Defer javascript, also if you do not want this "
 "plugin to act on album and photo descriptions!"
@@ -16924,137 +16920,137 @@ msgstr ""
 "Vous DEVEZ régler table IV-A13: Report JavaScript, si vous ne voulez pas que "
 "ce greffon affecte les descriptions d'albums et de photos!"
 
-#: wppa-settings-autosave.php:9097
+#: wppa-settings-autosave.php:9088
 msgid "External services related settings and actions."
 msgstr "Réglages et actions pour les services extérieurs."
 
-#: wppa-settings-autosave.php:9099
+#: wppa-settings-autosave.php:9090
 msgid "QR Code widget size"
 msgstr "Taille du widget QR Code"
 
-#: wppa-settings-autosave.php:9100
+#: wppa-settings-autosave.php:9091
 msgid "The size of the QR code display."
 msgstr "La taille de l'affichage du QR code."
 
-#: wppa-settings-autosave.php:9108
+#: wppa-settings-autosave.php:9099
 msgid "QR color"
 msgstr "Couleur QR code"
 
-#: wppa-settings-autosave.php:9109
+#: wppa-settings-autosave.php:9100
 msgid "The display color of the qr code (dark)"
 msgstr "La couleur d'arrière plan du QR code (sombre)"
 
-#: wppa-settings-autosave.php:9110
+#: wppa-settings-autosave.php:9101
 msgid "This color MUST be given in hexadecimal format!"
 msgstr "La couleur DOIT être donnée au format hexadecimal!"
 
-#: wppa-settings-autosave.php:9117
+#: wppa-settings-autosave.php:9108
 msgid "QR background color"
 msgstr "Couleur de fond de QR Code"
 
-#: wppa-settings-autosave.php:9118
+#: wppa-settings-autosave.php:9109
 msgid "The background color of the qr code (light)"
 msgstr "La couleur d'arrière plan du QR code (clair)"
 
-#: wppa-settings-autosave.php:9126
+#: wppa-settings-autosave.php:9117
 msgid "CDN Service"
 msgstr "Service CDN"
 
-#: wppa-settings-autosave.php:9127
+#: wppa-settings-autosave.php:9118
 msgid "Select a CDN Service you want to use."
 msgstr "Choisir le service CDN que vous voulez utiliser."
 
-#: wppa-settings-autosave.php:9130
+#: wppa-settings-autosave.php:9121
 msgid "Cloudinary in maintenance mode"
 msgstr "Cloudinary en mode maintenance"
 
-#: wppa-settings-autosave.php:9140
+#: wppa-settings-autosave.php:9131
 msgid "Cloud name"
 msgstr "Nom du nuage"
 
-#: wppa-settings-autosave.php:9149
+#: wppa-settings-autosave.php:9140
 msgid "API key"
 msgstr "Clé API"
 
-#: wppa-settings-autosave.php:9158
+#: wppa-settings-autosave.php:9149
 msgid "API secret"
 msgstr "Secret API"
 
-#: wppa-settings-autosave.php:9167
+#: wppa-settings-autosave.php:9158
 msgid "Delete all"
 msgstr "Tout effacer"
 
-#: wppa-settings-autosave.php:9168
+#: wppa-settings-autosave.php:9159
 msgid "Deletes them all !!!"
 msgstr "Cela les efface tous !!!"
 
-#: wppa-settings-autosave.php:9176
+#: wppa-settings-autosave.php:9167
 msgid "Delete derived images"
 msgstr "Effacer les images dérivées"
 
-#: wppa-settings-autosave.php:9177
+#: wppa-settings-autosave.php:9168
 msgid "Deletes all derived images !!!"
 msgstr "Efface toutes les images dérivées !!!"
 
-#: wppa-settings-autosave.php:9185
+#: wppa-settings-autosave.php:9176
 msgid "Max lifetime"
 msgstr "Temps de vie maximum"
 
-#: wppa-settings-autosave.php:9186
+#: wppa-settings-autosave.php:9177
 msgid "Old images from local server, new images from Cloudinary."
 msgstr "Anciennes images du serveur local, nouvelles images de Cloudinary."
 
-#: wppa-settings-autosave.php:9187
+#: wppa-settings-autosave.php:9178
 msgid "If NOT set to Forever: You need to run Table VIII-B15 on a regular basis."
 msgstr ""
 "Si NON réglé à Infini: Vous devrez exécuter table VIII-B15 de façon régulière."
 
-#: wppa-settings-autosave.php:9189
+#: wppa-settings-autosave.php:9180
 msgid "Forever"
 msgstr "Infini"
 
-#: wppa-settings-autosave.php:9220
+#: wppa-settings-autosave.php:9211
 msgid "Cloudinary usage"
 msgstr "Utilisation de Cloudinary"
 
-#: wppa-settings-autosave.php:9256
+#: wppa-settings-autosave.php:9247
 msgid "Cloudinary usage data not available"
 msgstr "Données d'utilisation Cloudinary non disponibles"
 
-#: wppa-settings-autosave.php:9260
+#: wppa-settings-autosave.php:9251
 msgid "Cloudinary routines not installed."
 msgstr "Routines Cloudinary pas installées."
 
-#: wppa-settings-autosave.php:9271
+#: wppa-settings-autosave.php:9262
 msgid "Cloudinary"
 msgstr "Cloudinary"
 
-#: wppa-settings-autosave.php:9272
+#: wppa-settings-autosave.php:9263
 msgid "<span style=\"color:red;\">Requires at least PHP version 5.3</span>"
 msgstr ""
 "<span style=\"color:red;\">Nécessite une version de PHP supérieure ou égale à "
 "5.3</span>"
 
-#: wppa-settings-autosave.php:9281
+#: wppa-settings-autosave.php:9272
 msgid "GPX Implementation"
 msgstr "Implémentation GPX"
 
-#: wppa-settings-autosave.php:9282
+#: wppa-settings-autosave.php:9273
 msgid "The way the maps are produced."
 msgstr "La méthode de production des cartes."
 
-#: wppa-settings-autosave.php:9283
+#: wppa-settings-autosave.php:9274
 msgid "Select the way the maps are produced."
 msgstr "Choisir la façon dont les cartes sont prosuites."
 
-#: wppa-settings-autosave.php:9284
+#: wppa-settings-autosave.php:9275
 msgid ""
 "When using Google maps GPX viewer plugin, you can not use Ajax (Table IV-A1)"
 msgstr ""
 "Quand vous utilisez le plugin Google maps de visualisation GPX, vous ne pouvez "
 "utiliser Ajax (table IV-A1)"
 
-#: wppa-settings-autosave.php:9285
+#: wppa-settings-autosave.php:9276
 msgid ""
 "When using WPPA+ Embedded code, you can use Ajax, but there are less display "
 "options."
@@ -17062,39 +17058,39 @@ msgstr ""
 "Quand vous utilisez la code embarqué WPPA+, vous pouvez utiliser Ajax mais il "
 "y aura alors moins d'options d'affichage."
 
-#: wppa-settings-autosave.php:9287
+#: wppa-settings-autosave.php:9278
 msgid "WPPA+ Embedded code"
 msgstr "Code embarqué WPPA+"
 
-#: wppa-settings-autosave.php:9287
+#: wppa-settings-autosave.php:9278
 msgid "Google maps GPX viewer plugin"
 msgstr "Plugin Google maps de visualisation GPX"
 
-#: wppa-settings-autosave.php:9295
+#: wppa-settings-autosave.php:9286
 msgid "Map height"
 msgstr "Hauteur de la carte"
 
-#: wppa-settings-autosave.php:9296
+#: wppa-settings-autosave.php:9287
 msgid "The height of the map display."
 msgstr "La hauteur de l’affichage de la carte."
 
-#: wppa-settings-autosave.php:9304
+#: wppa-settings-autosave.php:9295
 msgid "Google maps API key"
 msgstr "Clé API Google maps"
 
-#: wppa-settings-autosave.php:9305
+#: wppa-settings-autosave.php:9296
 msgid "Enter your Google maps api key here if you have one."
 msgstr "Entrer votre clé API Google Maps ici si vous en avez une."
 
-#: wppa-settings-autosave.php:9313
+#: wppa-settings-autosave.php:9304
 msgid "GPX Shortcode"
 msgstr "Shortcode GPX"
 
-#: wppa-settings-autosave.php:9314
+#: wppa-settings-autosave.php:9305
 msgid "The shortcode to be used for the gpx feature."
 msgstr "Le shortcode à utiliser pour la fonctionnalité GPX."
 
-#: wppa-settings-autosave.php:9315
+#: wppa-settings-autosave.php:9306
 msgid ""
 "Enter / modify the shortcode to be generated for the gpx plugin. It must "
 "contain w#lat and w#lon as placeholders for the lattitude and longitude."
@@ -17103,28 +17099,28 @@ msgstr ""
 "absolument contenir w#lat et w#lon comme paramètre pour la latitude et la "
 "longitude."
 
-#: wppa-settings-autosave.php:9316
+#: wppa-settings-autosave.php:9307
 msgid "This item is required for using Google maps GPX viewer plugin only"
 msgstr ""
 "Cet item n'est requis que pour le plugin Google maps de visualisation GPX"
 
-#: wppa-settings-autosave.php:9323
+#: wppa-settings-autosave.php:9314
 msgid "Fotomoto"
 msgstr "Fotomoto"
 
-#: wppa-settings-autosave.php:9324
+#: wppa-settings-autosave.php:9315
 msgid "Yes, we use Fotomoto on this site. Read the help text!"
 msgstr "Oui, nous utilisons Fotomoto sur ce site. Jetez un œil au texte d'aide!"
 
-#: wppa-settings-autosave.php:9325
+#: wppa-settings-autosave.php:9316
 msgid "In order to function properly:"
 msgstr "Pour fonctionner correctement:"
 
-#: wppa-settings-autosave.php:9326
+#: wppa-settings-autosave.php:9317
 msgid "1. Get yourself a Fotomoto account."
 msgstr "1. Créez-vous un compte Fotomoto."
 
-#: wppa-settings-autosave.php:9327
+#: wppa-settings-autosave.php:9318
 msgid ""
 "2. Install the Fotomoto plugin, enter the \"Fotomoto Site Key:\" and check the "
 "\"Use API Mode:\" checkbox."
@@ -17132,24 +17128,24 @@ msgstr ""
 "2. Installez le plugin Fotomoto, entrez la \"Fotomoto Site Key:\" et vérifiez "
 "la case à cocher \"Use API Mode:\"."
 
-#: wppa-settings-autosave.php:9328
+#: wppa-settings-autosave.php:9319
 msgid "Note: Do NOT Disable the Custom box in Table II-B14."
 msgstr "Note: Ne désactivez PAS la boîte personnalisée dans la table II-B14."
 
-#: wppa-settings-autosave.php:9329
+#: wppa-settings-autosave.php:9320
 msgid "Do NOT remove the text w#fotomoto from the Custombox ( Table II-B15 )."
 msgstr ""
 "Ne PAS enlever le texte w#fotomoto de la boîte personnalisée ( table II-B15 )."
 
-#: wppa-settings-autosave.php:9337
+#: wppa-settings-autosave.php:9328
 msgid "Fotomoto fontsize"
 msgstr "Taille de la police de caractère Fotomoto"
 
-#: wppa-settings-autosave.php:9338
+#: wppa-settings-autosave.php:9329
 msgid "Fontsize for the Fotomoto toolbar."
 msgstr "Taille de police pour la barre d'outils Fotomoto."
 
-#: wppa-settings-autosave.php:9339
+#: wppa-settings-autosave.php:9330
 msgid ""
 "If you set it here, it overrules a possible setting for font-size in ."
 "FotomotoToolbarClass on the Fotomoto dashboard."
@@ -17157,61 +17153,61 @@ msgstr ""
 "Si vous le réglez ici, cela contourne un réglage possible de la taille de "
 "police dans .FotomotoToolbarClass dans le panneau de contrôle Fotomoto."
 
-#: wppa-settings-autosave.php:9347
+#: wppa-settings-autosave.php:9338
 msgid "Hide toolbar on running slideshows"
 msgstr "Cacher la barre d'outils sur les diaporamas actifs"
 
-#: wppa-settings-autosave.php:9348
+#: wppa-settings-autosave.php:9339
 msgid "The Fotomoto toolbar will re-appear when the slidshow stops."
 msgstr "La barre Fotomoto réapparaîtra quand le diaporama s'arrêtera."
 
-#: wppa-settings-autosave.php:9355
+#: wppa-settings-autosave.php:9346
 msgid "Fotomoto minwidth"
 msgstr "Largeur mini de Fotomoto"
 
-#: wppa-settings-autosave.php:9356
+#: wppa-settings-autosave.php:9347
 msgid "Minimum width to display Fotomoto toolbar."
 msgstr "Largeur d’affichage minimum de la barre Fotomoto."
 
-#: wppa-settings-autosave.php:9357
+#: wppa-settings-autosave.php:9348
 msgid ""
 "The display of the Fotomoto Toolbar will be suppressed on smaller slideshows."
 msgstr ""
 "L’affichage de la barre Fotomoto sera supprimé sur les diaporamas plus petits."
 
-#: wppa-settings-autosave.php:9382
+#: wppa-settings-autosave.php:9373
 msgid "Table X:"
 msgstr "Table X:"
 
-#: wppa-settings-autosave.php:9382
+#: wppa-settings-autosave.php:9373
 msgid "IPTC Configuration:"
 msgstr "Configuration IPTC:"
 
-#: wppa-settings-autosave.php:9383
+#: wppa-settings-autosave.php:9374
 msgid "This table defines the IPTC configuration"
 msgstr "Cette table règle la configuration de IPTC"
 
-#: wppa-settings-autosave.php:9414 wppa-settings-autosave.php:9482
+#: wppa-settings-autosave.php:9405 wppa-settings-autosave.php:9473
 msgid "Display"
 msgstr "Afficher"
 
-#: wppa-settings-autosave.php:9414 wppa-settings-autosave.php:9482
+#: wppa-settings-autosave.php:9405 wppa-settings-autosave.php:9473
 msgid "Hide"
 msgstr "Cacher"
 
-#: wppa-settings-autosave.php:9444
+#: wppa-settings-autosave.php:9435
 msgid "Table XI:"
 msgstr "Table XI:"
 
-#: wppa-settings-autosave.php:9444
+#: wppa-settings-autosave.php:9435
 msgid "EXIF Configuration:"
 msgstr "Configuration EXIF:"
 
-#: wppa-settings-autosave.php:9445
+#: wppa-settings-autosave.php:9436
 msgid "This table defines the EXIF configuration"
 msgstr "Cette table règle la configuration d'EXIF"
 
-#: wppa-settings-autosave.php:9468
+#: wppa-settings-autosave.php:9459
 msgid ""
 "Function exif_read_data() does not exist. This means that <b>EXIF</b> is not "
 "enabled. If you want to use <b>EXIF</b> data, ask your hosting provider to add "
@@ -17222,15 +17218,15 @@ msgstr ""
 "hébergeur d'ajouter <b>'--enable-exif'</b> à la <b>commande de configuration</"
 "b> de PHP."
 
-#: wppa-settings-autosave.php:9512
+#: wppa-settings-autosave.php:9503
 msgid "Table XII:"
 msgstr "Table XII:"
 
-#: wppa-settings-autosave.php:9512
+#: wppa-settings-autosave.php:9503
 msgid "WPPA+ and PHP Configuration:"
 msgstr "Configuration WPPA+ et PHP:"
 
-#: wppa-settings-autosave.php:9513
+#: wppa-settings-autosave.php:9504
 msgid ""
 "This table lists all WPPA+ constants and PHP server configuration parameters "
 "and is read only"
@@ -17238,142 +17234,142 @@ msgstr ""
 "Cette table (qui est en lecture seule) liste toutes les constantes WPPA+ et "
 "les paramètres de configuration du serveur PHP"
 
-#: wppa-settings-autosave.php:9528
+#: wppa-settings-autosave.php:9519
 msgid "Value"
 msgstr "Valeur"
 
-#: wppa-settings-autosave.php:9534
+#: wppa-settings-autosave.php:9525
 msgid "Albums db table name."
 msgstr "Nom de la table albums dans la base de données."
 
-#: wppa-settings-autosave.php:9546
+#: wppa-settings-autosave.php:9537
 msgid "Photos db table name."
 msgstr "Nom de la table photos dans la base de données."
 
-#: wppa-settings-autosave.php:9558
+#: wppa-settings-autosave.php:9549
 msgid "Rating db table name."
 msgstr "Nom de la table votes dans la base de données."
 
-#: wppa-settings-autosave.php:9570
+#: wppa-settings-autosave.php:9561
 msgid "Comments db table name."
 msgstr "Nom de la table commentaires dans la base de données."
 
-#: wppa-settings-autosave.php:9582
+#: wppa-settings-autosave.php:9573
 msgid "IPTC db table name."
 msgstr "Nom de la table IPTC dans la base de donnée."
 
-#: wppa-settings-autosave.php:9594
+#: wppa-settings-autosave.php:9585
 msgid "EXIF db table name."
 msgstr "Nom de la table EXIF dans la base de donnée."
 
-#: wppa-settings-autosave.php:9606 wppa-settings-autosave.php:9618
+#: wppa-settings-autosave.php:9597 wppa-settings-autosave.php:9609
 msgid "Index db table name."
 msgstr "Nom de la table Index dans la base de donnée."
 
-#: wppa-settings-autosave.php:9630
+#: wppa-settings-autosave.php:9621
 msgid "Plugins main file name."
 msgstr "Nom du fichier principal des greffons (plugins)."
 
-#: wppa-settings-autosave.php:9636
+#: wppa-settings-autosave.php:9627
 msgid "ABSPATH windows proof"
 msgstr "ABSPATH windows proof"
 
-#: wppa-settings-autosave.php:9642
+#: wppa-settings-autosave.php:9633
 msgid "Path to plugins directory."
 msgstr "Chemin du répertoire des greffons (plugins)."
 
-#: wppa-settings-autosave.php:9648
+#: wppa-settings-autosave.php:9639
 msgid "Plugins directory name."
 msgstr "Nom du répertoire des greffons (plugins)."
 
-#: wppa-settings-autosave.php:9654
+#: wppa-settings-autosave.php:9645
 msgid "Plugins directory url."
 msgstr "URL du répertoire des greffons (plugins)."
 
-#: wppa-settings-autosave.php:9660
+#: wppa-settings-autosave.php:9651
 msgid "The relative upload directory."
 msgstr "Chemin relatif du répertoire de chargement (upload)."
 
-#: wppa-settings-autosave.php:9666
+#: wppa-settings-autosave.php:9657
 msgid "The upload directory path."
 msgstr "Chemin du répertoire de chargement (upload)."
 
-#: wppa-settings-autosave.php:9672
+#: wppa-settings-autosave.php:9663
 msgid "The upload directory url."
 msgstr "URL du répertoire de chargement (upload)."
 
-#: wppa-settings-autosave.php:9678
+#: wppa-settings-autosave.php:9669
 msgid "The relative depot directory."
 msgstr "Chemin relatif du répertoire de dépôt."
 
-#: wppa-settings-autosave.php:9684
+#: wppa-settings-autosave.php:9675
 msgid "The depot directory path."
 msgstr "Chemin du répertoire de dépôt."
 
-#: wppa-settings-autosave.php:9690
+#: wppa-settings-autosave.php:9681
 msgid "The depot directory url."
 msgstr "URL du répertoire de dépôt."
 
-#: wppa-settings-autosave.php:9696
+#: wppa-settings-autosave.php:9687
 msgid "The path to wp-content."
 msgstr "Chemin vers wp-content."
 
-#: wppa-settings-autosave.php:9702
+#: wppa-settings-autosave.php:9693
 msgid "WP Content url."
 msgstr "URL de contenu WP."
 
-#: wppa-settings-autosave.php:9708
+#: wppa-settings-autosave.php:9699
 msgid "WP Base upload dir."
 msgstr "Répertoire de chargement de WP."
 
-#: wppa-settings-autosave.php:9728
+#: wppa-settings-autosave.php:9719
 #, php-format
 msgid "<br />Memory used on this page: %6.2f Mb."
 msgstr "<br />Mémoire utilisée sur cette page: %6.2f Mb."
 
-#: wppa-settings-autosave.php:9729
+#: wppa-settings-autosave.php:9720
 #, php-format
 msgid "<br />There are %d settings and %d runtime parameters."
 msgstr "<br />Il y a %d régalges et %d paramètres de runtime."
 
-#: wppa-settings-autosave.php:9979 wppa-settings-autosave.php:9999
-#: wppa-settings-autosave.php:10020
+#: wppa-settings-autosave.php:9970 wppa-settings-autosave.php:9990
+#: wppa-settings-autosave.php:10011
 msgid "Warning!"
 msgstr "Attention!"
 
-#: wppa-settings-autosave.php:10000 wppa-settings-autosave.php:10020
+#: wppa-settings-autosave.php:9991 wppa-settings-autosave.php:10011
 msgid "Please read the help"
 msgstr "Veuillez consulter l'aide"
 
-#: wppa-settings-autosave.php:10231
+#: wppa-settings-autosave.php:10222
 msgid "Show!"
 msgstr "Montrer!"
 
-#: wppa-settings-autosave.php:10251
+#: wppa-settings-autosave.php:10242
 msgid "Not done yet"
 msgstr "Pas encore fait"
 
-#: wppa-settings-autosave.php:10258
+#: wppa-settings-autosave.php:10249
 msgid "Start as cron job"
 msgstr "Commencez comme tâche cron"
 
-#: wppa-settings-autosave.php:10263 wppa-settings-autosave.php:10305
+#: wppa-settings-autosave.php:10254 wppa-settings-autosave.php:10296
 msgid "Locked!"
 msgstr "Verrouillé!"
 
-#: wppa-settings-autosave.php:10273
+#: wppa-settings-autosave.php:10264
 msgid "Crashed!"
 msgstr "Écrasé!"
 
-#: wppa-settings-autosave.php:10291
+#: wppa-settings-autosave.php:10282
 msgid "Click me to resume"
 msgstr "Cliquez-moi pour reprendre"
 
-#: wppa-settings-autosave.php:10300
+#: wppa-settings-autosave.php:10291
 msgid "Start!"
 msgstr "Démarrer!"
 
-#: wppa-settings-autosave.php:10336
+#: wppa-settings-autosave.php:10327
 msgid ""
 "You can not have popup and lightbox on thumbnails at the same time. Uncheck "
 "either Table IV-C8 or choose a different linktype in Table VI-2."
@@ -17382,7 +17378,7 @@ msgstr ""
 "Décochez soit table IV-C8 ou choisissez un type de lien différent dans table "
 "VI-2."
 
-#: wppa-settings-autosave.php:10339
+#: wppa-settings-autosave.php:10330
 #, fuzzy
 msgid ""
 "It is important that you select a page that contains at least [wppa][/wppa]."
@@ -17390,7 +17386,7 @@ msgstr ""
 "Il est important que vous sélectionnez une page qui contient au moins [LPPT] "
 "[/ LPPT]."
 
-#: wppa-settings-autosave.php:10340
+#: wppa-settings-autosave.php:10331
 msgid ""
 "If you ommit this, the link will not work at all or simply refresh the "
 "(home)page."
@@ -17482,95 +17478,95 @@ msgstr "Rechercher dans la section courante"
 msgid "Search in current results"
 msgstr "Rechercher dans les résultats courants"
 
-#: wppa-setup.php:1638
+#: wppa-setup.php:1637
 msgid "Type your custom url here"
 msgstr "Tapez votre URL personnalisée ici"
 
-#: wppa-setup.php:1639
+#: wppa-setup.php:1638
 msgid "Type the title here"
 msgstr "Entrez ici le titre de la page"
 
-#: wppa-setup.php:1658 wppa-topten-widget.php:13 wppa-topten-widget.php:48
+#: wppa-setup.php:1657 wppa-topten-widget.php:13 wppa-topten-widget.php:48
 #: wppa-topten-widget.php:308
 msgid "Top Ten Photos"
 msgstr "Meilleures photos"
 
-#: wppa-setup.php:1661 wppa-thumbnail-widget.php:13 wppa-thumbnail-widget.php:166
+#: wppa-setup.php:1660 wppa-thumbnail-widget.php:13 wppa-thumbnail-widget.php:166
 msgid "Thumbnail Photos"
 msgstr "Vignettes"
 
-#: wppa-setup.php:1664
+#: wppa-setup.php:1663
 msgid "Search photos"
 msgstr "Rechercher dans les photos"
 
-#: wppa-setup.php:1709
+#: wppa-setup.php:1708
 msgid ""
 "The uploads directory does not exist, please do a regular WP upload first."
 msgstr ""
 "Le répertoire de chargement (uploads) n'existe pas, veuillez d'abord faire un "
 "chargement basique via WordPress."
 
-#: wppa-setup.php:1713
+#: wppa-setup.php:1712
 msgid "Successfully created uploads directory."
 msgstr "Répertoire de chargement (uploads) créé avec succès."
 
-#: wppa-setup.php:1724
+#: wppa-setup.php:1723
 msgid "Could not create the wppa directory."
 msgstr "Impossible de créer le répertoire WPPA."
 
-#: wppa-setup.php:1728
+#: wppa-setup.php:1727
 msgid "Successfully created wppa directory."
 msgstr "Répertoire WPPA créé avec succès."
 
-#: wppa-setup.php:1738
+#: wppa-setup.php:1737
 msgid "Could not create the wppa thumbs directory."
 msgstr "Impossible de créer le répertoire de vignettes WPPA."
 
-#: wppa-setup.php:1742
+#: wppa-setup.php:1741
 msgid "Successfully created wppa thumbs directory."
 msgstr "Répertoire des vignettes WPPA créé avec succès."
 
-#: wppa-setup.php:1752
+#: wppa-setup.php:1751
 msgid "Could not create the wppa watermarks directory."
 msgstr "Impossible de créer le répertoire des filigranes WPPA."
 
-#: wppa-setup.php:1756
+#: wppa-setup.php:1755
 msgid "Successfully created wppa watermarks directory."
 msgstr "Répertoire des filigranes WPPA créé avec succès."
 
-#: wppa-setup.php:1766
+#: wppa-setup.php:1765
 msgid "Could not create the wppa fonts directory."
 msgstr "Impossible de créer le répertoire de fontes WPPA."
 
-#: wppa-setup.php:1770
+#: wppa-setup.php:1769
 msgid "Successfully created wppa fonts directory."
 msgstr "Répertoire de fontes WPPA créé avec succès."
 
-#: wppa-setup.php:1782
+#: wppa-setup.php:1781
 msgid "Unable to create depot directory."
 msgstr "Impossible de créer le répertoire de dépôt WPPA."
 
-#: wppa-setup.php:1786
+#: wppa-setup.php:1785
 msgid "Successfully created wppa depot directory."
 msgstr "Répertoire de dépôt WPPA créé avec succès."
 
-#: wppa-setup.php:1797
+#: wppa-setup.php:1796
 msgid "Unable to create user depot directory"
 msgstr "Impossible de créer le répertoire de dépôt utilisateur"
 
-#: wppa-setup.php:1801
+#: wppa-setup.php:1800
 msgid "Successfully created wppa user depot directory."
 msgstr "Répertoire de dépôt utilisateur WPPA créé avec succès."
 
-#: wppa-setup.php:1811
+#: wppa-setup.php:1810
 msgid "Unable to create temp directory"
 msgstr "Impossible de créer le répertoire temporaire"
 
-#: wppa-setup.php:1815
+#: wppa-setup.php:1814
 msgid "Successfully created temp directory."
 msgstr "Répertoire temporaire créé avec succès."
 
-#: wppa-setup.php:1823
+#: wppa-setup.php:1822
 #, php-format
 msgid ""
 "Ask your administrator to give you more rights, or create <b>%s</b> manually "
@@ -17579,7 +17575,7 @@ msgstr ""
 "Demander à votre administrateur de vous donner plus de droits, ou créer <b>%s</"
 "b> manuellement en utilisant un logiciel FTP."
 
-#: wppa-setup.php:1925
+#: wppa-setup.php:1924
 msgid "Default photo album for"
 msgstr "Album par défaut pour"
 
@@ -18734,33 +18730,33 @@ msgstr "Time out après traitement de %s objets. Recommencer l'opération"
 msgid "There are no ratings between"
 msgstr "Il n’y a aucune cote entre"
 
-#: wppa-utils.php:3403
+#: wppa-utils.php:3408
 #, php-format
 msgid "You and %d other person like this"
 msgid_plural "You and %d other people like this"
 msgstr[0] "Vous et %d total autre personne aiment cela."
 msgstr[1] "Vous et %d total autre personnes aiment cela."
 
-#: wppa-utils.php:3406
+#: wppa-utils.php:3411
 msgid "You are the first one who likes this"
 msgstr "Vous êtes la première personne qui aime ça"
 
-#: wppa-utils.php:3409
+#: wppa-utils.php:3414
 msgid "Click again if you do no longer like this"
 msgstr "Cliquez à nouveau si vous aime plus comme ceci"
 
-#: wppa-utils.php:3413
+#: wppa-utils.php:3418
 #, php-format
 msgid "%d person likes this"
 msgid_plural "%d people like this"
 msgstr[0] "%d personne aime ça"
 msgstr[1] "%d personnes aime ça"
 
-#: wppa-utils.php:3416
+#: wppa-utils.php:3421
 msgid "Be the first one to like this"
 msgstr "Soyez le premier à aimer!"
 
-#: wppa-utils.php:3422
+#: wppa-utils.php:3427
 #, php-format
 msgid "%d like"
 msgid_plural "%d likes"
@@ -18814,6 +18810,15 @@ msgstr "J.N. Breetvelt a.k.a. OpaJaap"
 #. Author URI of the plugin/theme
 msgid "http://wppa.opajaap.nl/"
 msgstr "http://wppa.opajaap.nl/"
+
+#~ msgid "IPTC need utf8 conversion"
+#~ msgstr "IPTC a besoin d'une conversion UTF8"
+
+#~ msgid "This setting converts iso to utf8 in iptc text."
+#~ msgstr "Ce réglage converti ISO vers UTF8 dans le texte IPTC."
+
+#~ msgid "Untick if you have funny characters in iptc data"
+#~ msgstr "Décocher si vous avez des caractères bizarres dans les données IPTC"
 
 #~ msgid ""
 #~ "Only gif, jpg and png image files are supported. Returned filetype = %d."

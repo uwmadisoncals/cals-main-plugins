@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.6.05
+* Version 6.6.11
 *
 */
 
@@ -49,6 +49,14 @@ global $wppa_log_file;
 	$wppa_action = $_REQUEST['wppa-action'];
 
 	switch ( $wppa_action ) {
+		case 'gettogo':
+			$slug 	= 	strip_tags( $_REQUEST['slug'] );
+			$result = 	get_option( $slug . '_togo', '' ) .
+						'|' .
+						get_option( $slug . '_status', '' );
+			echo $result;
+			wppa_exit();
+			break;
 		case 'getssiptclist':
 			$tag 		= str_replace( 'H', '#', $_REQUEST['tag'] );
 			$mocc 		= $_REQUEST['moccur'];
@@ -290,7 +298,7 @@ global $wppa_log_file;
 				wppa_flush_upldr_cache( 'photoid', $_REQUEST['photo-id'] );
 				$alb = $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $_REQUEST['photo-id'] ) );
 				wppa_clear_taglist();
-				wppa_flush_treecounts( $alb );
+				wppa_invalidate_treecounts( $alb );
 			}
 			if ( isset( $_REQUEST['comment-id'] ) ) {
 				$iret = $wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_COMMENTS."` SET `status` = 'approved' WHERE `id` = %s", $_REQUEST['comment-id'] ) );
@@ -753,10 +761,10 @@ global $wppa_log_file;
 					wppa_create_rating_entry( array( 'photo' => $photo, 'value' => '1', 'user' => $user ) );
 					$myavgrat = '1';
 				}
-				
+
 				// Update photo data
 				wppa_rate_photo( $photo );
-				
+
 				// Get callback data
 				$lt = wppa_get_like_title_a( $photo );
 				$allavgratcombi = $lt['title'] . '|' . $lt['display'];
@@ -1123,8 +1131,8 @@ global $wppa_log_file;
 					break;
 				case 'a_parent':
 					$itemname = __( 'Parent album' , 'wp-photo-album-plus');
-					wppa_flush_treecounts( $album );	// Myself and my parents
-					wppa_flush_treecounts( $value );	// My new parent
+					wppa_invalidate_treecounts( $album );	// Myself and my parents
+					wppa_invalidate_treecounts( $value );	// My new parent
 					break;
 				case 'p_order_by':
 					$itemname = __( 'Photo order' , 'wp-photo-album-plus');
@@ -1505,8 +1513,8 @@ global $wppa_log_file;
 						wppa_exit();
 						break;
 					}
-					wppa_flush_treecounts( $photodata['album'] );	// Current album
-					wppa_flush_treecounts( $value );				// New album
+					wppa_invalidate_treecounts( $photodata['album'] );	// Current album
+					wppa_invalidate_treecounts( $value );				// New album
 					$iret = $wpdb->query( $wpdb->prepare( 'UPDATE '.WPPA_PHOTOS.' SET `album` = %s WHERE `id` = %s', $value, $photo ) );
 					if ( $iret !== false ) {
 						wppa_move_source( $photodata['filename'], $photodata['album'], $value );
@@ -1534,7 +1542,7 @@ global $wppa_log_file;
 						break;
 					}
 					wppa( 'error', wppa_copy_photo( $photo, $value ) );
-					wppa_flush_treecounts( $value );				// New album
+					wppa_invalidate_treecounts( $value );				// New album
 					if ( ! wppa( 'error' ) ) {
 						echo '||0||'.sprintf( __( 'Photo %s copied to album %s (%s)' , 'wp-photo-album-plus'), $photo, wppa_get_album_name( $value ), $value );
 					}
@@ -1547,7 +1555,7 @@ global $wppa_log_file;
 
 				case 'status':
 				if ( ! current_user_can( 'wppa_moderate' ) && ! current_user_can( 'wppa_admin' ) ) die( 'Security check failure #78' );
-					wppa_flush_treecounts( wppa_get_photo_item( $photo, 'album' ) ); // $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ) ) );
+					wppa_invalidate_treecounts( wppa_get_photo_item( $photo, 'album' ) ); // $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ) ) );
 				case 'owner':
 				case 'name':
 				case 'description':
@@ -1634,7 +1642,7 @@ global $wppa_log_file;
 					$iret = $wpdb->query( $wpdb->prepare( 'UPDATE '.WPPA_PHOTOS.' SET `'.$item.'` = %s WHERE `id` = %s', $value, $photo ) );
 					if ( $item == 'name' || $item == 'description' || $item == 'tags' )  wppa_index_update( 'photo', $photo );
 					if ( $item == 'status' && $value != 'scheduled' ) wppa_update_photo( array( 'id' => $photo, 'scheduledtm' => '' ) );
-					if ( $item == 'status' ) wppa_flush_treecounts( wppa_get_photo_item( $photo, 'album' ) );
+					if ( $item == 'status' ) wppa_invalidate_treecounts( wppa_get_photo_item( $photo, 'album' ) );
 					if ( $iret !== false ) {
 						wppa_update_modified( $photo );
 						if ( wppa_is_video( $photo ) ) {
@@ -1668,7 +1676,7 @@ global $wppa_log_file;
 					if ( $item == 'min' ) 	$temp[4] = $value;
 					$scheduledtm = implode( ',', $temp );
 					wppa_update_photo( array( 'id' => $photo, 'scheduledtm' => $scheduledtm, 'status' => 'scheduled' ) );
-					wppa_flush_treecounts( $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ) ) );
+					wppa_invalidate_treecounts( $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ) ) );
 					wppa_flush_upldr_cache( 'photoid', $photo );
 					if ( wppa_is_video( $photo ) ) {
 						echo '||0||'.sprintf( __( '%s of video %s updated' , 'wp-photo-album-plus'), $itemname, $photo );
@@ -1959,6 +1967,9 @@ global $wppa_log_file;
 					break;
 				case 'wppa_smallsize':
 					wppa_ajax_check_range( $value, false, '50', false, __( 'Cover photo size.' , 'wp-photo-album-plus') );
+					break;
+				case 'wppa_smallsize_percentage':
+					wppa_ajax_check_range( $value, false, '10', '100', __( 'Cover photo size.' , 'wp-photo-album-plus') );
 					break;
 				case 'wppa_album_page_size':
 					wppa_ajax_check_range( $value, false, '0', false, __( 'Album page size.' , 'wp-photo-album-plus') );

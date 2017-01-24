@@ -140,8 +140,8 @@ if ( ! function_exists( 'wpuxss_eml_admin_menu' ) ) {
         );
 
 
-
         add_action( 'load-' . $eml_media_options_page, 'wpuxss_eml_load_media_options_page' );
+        add_action( $eml_media_options_page, 'wpuxss_eml_media_options_page' );
 
         add_action('admin_print_scripts-' . $eml_medialibrary_options_page, 'wpuxss_eml_medialibrary_options_page_scripts');
         add_action('admin_print_scripts-' . $eml_taxonomies_options_page, 'wpuxss_eml_taxonomies_options_page_scripts');
@@ -166,7 +166,81 @@ if ( ! function_exists( 'wpuxss_eml_load_media_options_page' ) ) {
 
     function wpuxss_eml_load_media_options_page() {
 
-        do_action( 'load-options-media.php' );
+        global $pagenow;
+
+        $hook_suffix = $pagenow = 'options-media.php';
+
+        do_action( "load-{$hook_suffix}" );
+        do_action( 'admin_enqueue_scripts', $hook_suffix );
+        do_action( "admin_print_styles-{$hook_suffix}" );
+        do_action( "admin_print_scripts-{$hook_suffix}" );
+        do_action( "admin_head-{$hook_suffix}" );
+
+        add_filter( 'admin_body_class', 'wpuxss_eml_admin_body_class_for_media_options_page' );
+        add_filter( 'admin_title', 'wpuxss_eml_admin_title_for_media_options_page', 10, 2 );
+    }
+}
+
+
+
+/**
+ *  wpuxss_eml_admin_body_class_for_media_options_page
+ *
+ *  Ensure compatibility with default options-media.php for third-parties
+ *
+ *  @since    2.3.6
+ *  @created  16/12/16
+ */
+
+if ( ! function_exists( 'wpuxss_eml_admin_body_class_for_media_options_page' ) ) {
+
+    function wpuxss_eml_admin_body_class_for_media_options_page( $admin_body_class ) {
+
+        $hook_suffix = 'options-media.php';
+
+        $admin_body_class .= preg_replace('/[^a-z0-9_-]+/i', '-', $hook_suffix);
+
+        return $admin_body_class;
+    }
+}
+
+
+
+/**
+ *  wpuxss_eml_admin_title_for_media_options_page
+ *
+ *  @since    2.3.6
+ *  @created  16/12/16
+ */
+
+if ( ! function_exists( 'wpuxss_eml_admin_title_for_media_options_page' ) ) {
+
+    function wpuxss_eml_admin_title_for_media_options_page( $admin_title, $title ) {
+
+        $admin_title = __('Media Settings','enhanced-media-library') . $admin_title;
+
+        return $admin_title;
+    }
+}
+
+
+
+/**
+ *  wpuxss_eml_media_options_page
+ *
+ *  Ensure compatibility with default options-media.php for third-parties
+ *
+ *  @since    2.3.6
+ *  @created  16/12/16
+ */
+
+if ( ! function_exists( 'wpuxss_eml_media_options_page' ) ) {
+
+    function wpuxss_eml_media_options_page() {
+
+        $hook_suffix = 'options-media.php';
+
+        do_action( $hook_suffix );
     }
 }
 
@@ -944,6 +1018,8 @@ if ( ! function_exists( 'wpuxss_eml_settings_cleanup' ) ) {
         foreach ( $options as $option ) {
             delete_option( $option );
         }
+
+        delete_site_transient( 'eml_license_active' );
 
 
         deactivate_plugins( wpuxss_get_eml_basename() );

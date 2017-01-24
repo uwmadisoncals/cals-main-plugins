@@ -3,13 +3,13 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsAjaxVersion = '6.6.06';
+var wppaJsAjaxVersion = '6.6.10';
 
 var wppaRenderAdd = false;
 var wppaWaitForCounter = 0;
 
 // The new AJAX rendering routine Async
-function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor ) {
+function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor, addHilite ) {
 
 	if ( parseInt(waitfor) > 0 && waitfor != wppaWaitForCounter ) {
 		setTimeout( 'wppaDoAjaxRender( '+mocc+', \''+ajaxurl+'\', \''+newurl+'\', \''+add+'\', '+waitfor+' )', 100 );
@@ -21,6 +21,7 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor ) {
 	// Fix the url
 	if ( wppaLang != '' ) ajaxurl += '&lang='+wppaLang;
 	if ( wppaAutoColumnWidth[mocc] ) ajaxurl += '&resp=1';
+	if ( addHilite && _wppaCurIdx[mocc] && _wppaId[mocc][_wppaCurIdx[mocc]] ) ajaxurl += '&wppa-hilite=' + _wppaId[mocc][_wppaCurIdx[mocc]];
 
 	// Ajax possible ?
 	if ( wppaCanAjaxRender ) {
@@ -155,6 +156,10 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor ) {
 									},
 						complete: 	function( xhr, status, newurl ) {
 										wppaWaitForCounter++;
+
+										// In case onload is not executed
+										wppaReplaceSvg();
+
 										if ( ! wppaRenderModal ) {
 											jQuery('html, body').animate({ scrollTop: jQuery("#wppa-container-"+mocc).offset().top - 32 - wppaStickyHeaderHeight }, 1000);
 										}
@@ -230,7 +235,13 @@ function wppaAjaxRemovePhoto( mocc, photo, isslide ) {
 
 									// Remove failed
 									else {
-										alert( result );
+										if ( rtxt[3] ) {
+											alert( rtxt[3] );
+											jQuery( '#wppa-delete-'+photo ).css('text-decoration', 'line-through' );
+										}
+										else {
+											alert( result );
+										}
 									}
 								},
 					error: 		function( xhr, status, error ) {

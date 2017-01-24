@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.6.00
+/* Version 6.6.11
 /* Various js routines used in admin pages
 */
 
@@ -170,6 +170,7 @@ function wppaInitSettings() {
 	wppaCheckCheck( 'enable_video', 'wppa-video' );
 	wppaCheckCheck( 'custom_fields', 'custfields' );
 	wppaCheckCheck( 'new_mod_label_is_text', 'nmtxt' );
+	wppaCheckCheck( 'coverphoto_responsive', 'cvpr' );
 	wppaCheckSmWidgetLink();
 
 	var tab = new Array('O','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII');
@@ -1041,9 +1042,14 @@ function wppaAjaxDeletePhoto(photo, bef, aft) {
 			break;
 		case 4:
 			if ( xmlhttp.status == 200 ) {
+
 				var str = wppaTrim(xmlhttp.responseText);
 				var ArrValues = str.split("||");
-				if (ArrValues[0] != '') {
+				if ( ArrValues[0] == 'ER' ) {
+					alert(ArrValues[3]);
+					jQuery('#wppa-delete-'+photo).css('text-decoration','line-through');
+				}
+				else if (ArrValues[0] != '') {
 					alert('The server returned unexpected output:\n'+ArrValues[0]);
 				}
 
@@ -1207,7 +1213,10 @@ function wppaAjaxUpdatePhotoMonitor() {
 }
 
 // Do the actual ajax update request
-function _wppaAjaxUpdatePhoto( photo, actionslug, value, refresh ) {
+function _wppaAjaxUpdatePhoto( photo, actionslug, value, refresh, bef, aft ) {
+
+	if ( ! bef ) bef = '';
+	if ( ! aft ) aft = '';
 
 	// Indexes in update matrix
 	var phoidx = 0; // photo id
@@ -1274,7 +1283,7 @@ function _wppaAjaxUpdatePhoto( photo, actionslug, value, refresh ) {
 											}
 											break;
 										case '99':	// Photo is gone
-											jQuery( '#photoitem-' + photo ).html( '<span style="color:red">' + ArrValues[2] + '</span>' );
+											jQuery( '#photoitem-' + photo ).html( bef+'<span style="color:red">' + ArrValues[2] + '</span>'+aft );
 											break;
 										default:	// Any error
 											jQuery( '#photostatus-' + photo ).html( '<span style="color:red">' + ArrValues[2] + ' (' + ArrValues[1] + ')</span>' );
@@ -1961,6 +1970,7 @@ function wppaAjaxUpdateOptionValue(slug, elem, multisel) {
 }
 
 function wppaEncode(xtext) {
+
 	var text, result;
 
 	if (typeof(xtext)=='undefined') return;
@@ -2300,4 +2310,27 @@ function wppaDismissAdminNotice(notice, elm) {
 	wppaAjaxUpdateOptionCheckBox(notice, elm);
 	jQuery('#wppa-wr-').css('display','none');
 
+}
+
+function wppaAjaxUpdateTogo(slug) {
+	jQuery.ajax( { 	url:		wppaAjaxUrl,
+					data: 		'action=wppa' +
+								'&wppa-action=gettogo' +
+								'&slug=' + slug,
+					async: 		true,
+					type: 		'GET',
+					timeout: 	100000,
+					beforesend: function( xhr ) {
+								},
+					success: 	function( result, status, xhr ) {
+									var data = result.split('|');
+									jQuery( '#' + slug + '_togo' ).html( data[0] );
+									jQuery( '#' + slug + '_status' ).html( data[1] );
+									setTimeout( function() {wppaAjaxUpdateTogo(slug);}, 5000 );
+								},
+					error: 		function( xhr ) {
+								},
+					complete: 	function( xhr ) {
+								}
+				} );
 }

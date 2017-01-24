@@ -28,16 +28,16 @@ function jd_draw_template( $array, $template, $type = 'list' ) {
 					preg_match_all( '/{' . $key . '\b(?>\s+(?:before="([^"]*)"|after="([^"]*)"|format="([^"]*)")|[^\s]+|\s+){0,3}}/', $template, $matches, PREG_PATTERN_ORDER );
 					if ( $matches ) {
 						$number = count( $matches[0] );
-						for ( $i=0; $i<=$number; $i++ ) {
+						for ( $i=0; $i<$number; $i++ ) {
 							$orig   = $value;
-							$before = @$matches[1][$i];
-							$after  = @$matches[2][$i];
-							$format = @$matches[3][$i];								
+							$before = $matches[1][$i];
+							$after  = $matches[2][$i];
+							$format = $matches[3][$i];								
 							if ( $format != '' ) {
 								$value = date_i18n( stripslashes( $format ), strtotime( stripslashes( $value ) ) );
 							}
 							$value    = ( $value == '' ) ? '' : $before . $value . $after;
-							$search   = @$matches[0][$i];
+							$search   = $matches[0][$i];
 							$template = str_replace( $search, $value, $template );
 							$value    = $orig;
 						}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the slideshow high level functions
-* Version 6.6.06
+* Version 6.6.10
 *
 */
 
@@ -200,7 +200,33 @@ global $thumbs;
 
 }
 
+function wppa_get_navigation_type() {
+	switch( wppa_opt( 'navigation_type' ) ) {
+		case 'icons':
+			return 'icons';
+			break;
+		case 'iconsmobile':
+			if ( wppa_is_mobile() ) {
+				return 'icons';
+			}
+			else {
+				return 'text';
+			}
+		case 'text':
+			return 'text';
+		default:
+			return 'icons';
+	}
+}
 function wppa_start_stop( $opt = '' ) {
+	if ( wppa_get_navigation_type() == 'icons' ) {
+		wppa_start_stop_icons( $opt );
+	}
+	else {
+		wppa_start_stop_text( $opt );
+	}
+}
+function wppa_start_stop_icons( $opt = '' ) {
 
 	if ( is_feed() ) return;	// Not in a feed
 
@@ -255,6 +281,60 @@ function wppa_start_stop( $opt = '' ) {
 							' onclick="wppaSpeed('.wppa( 'mocc' ).', true); return false;">' .
 							wppa_get_svghtml( 'Eagle-1', '1.5em' ) .
 						'</span>' .
+					'</div>' );
+	}
+}
+function wppa_start_stop_text( $opt = '' ) {
+
+	if ( is_feed() ) return;	// Not in a feed
+
+	// A single image slideshow needs no navigation
+	if ( wppa( 'is_single' ) ) return;
+	if ( wppa( 'is_filmonly' ) ) return;
+
+	// we always need the js part for the functionality (through filmstrip etc).
+	// so if not wanted: hide it
+	$hide = 'display:none; '; // assume hide
+	if ( $opt != 'optional' ) $hide = '';														// not optional: show
+	if ( wppa_switch( 'show_startstop_navigation' ) && ! wppa( 'is_slideonly' ) ) $hide = '';	// we want it
+
+	if ( wppa_opt( 'start_slide' ) || wppa_in_widget() ) {
+		wppa_add_js_page_data( "\n" . '<script type="text/javascript">' );
+		wppa_add_js_page_data( "\n" . 'wppaSlideInitRunning['.wppa( 'mocc' ).'] = true;' );
+		wppa_add_js_page_data( "\n" . 'wppaMaxOccur = '.wppa( 'mocc' ).';' );
+		wppa_add_js_page_data( "\n" . '</script>' );
+	}
+
+	if ( ! $hide ) {
+		wppa_out( 	'<div' .
+						' id="prevnext1-'.wppa( 'mocc' ).'"' .
+						' class="wppa-box wppa-nav wppa-nav-text"' .
+						' style="text-align:center;'.__wcs('wppa-box').__wcs('wppa-nav').__wcs('wppa-nav-text').$hide.'"' .
+						' >' .
+						'<a' .
+							' id="speed0-'.wppa( 'mocc' ).'"' .
+							' class="wppa-nav-text speed0"' .
+							' style="'.__wcs('wppa-nav-text').'"' .
+							' onclick="wppaSpeed('.wppa( 'mocc' ).', false); return false;"' .
+							' >' .
+							__('Slower', 'wp-photo-album-plus') .
+						'</a>' .
+						' | ' .
+						'<a' .
+							' id="startstop-'.wppa( 'mocc' ).'"' .
+							' class="wppa-nav-text startstop"' .
+							' style="'.__wcs('wppa-nav-text').'"' .
+							' onclick="wppaStartStop('.wppa( 'mocc' ).', -1); return false;">' .
+							__('Start', 'wp-photo-album-plus') .
+						'</a>' .
+						' | ' .
+						'<a' .
+							' id="speed1-'.wppa( 'mocc' ).'"' .
+							' class="wppa-nav-text speed1"' .
+							' style="'.__wcs('wppa-nav-text').'"' .
+							' onclick="wppaSpeed('.wppa( 'mocc' ).', true); return false;">' .
+							__('Faster', 'wp-photo-album-plus') .
+						'</a>' .
 					'</div>' );
 	}
 }
@@ -1169,9 +1249,9 @@ function wppa_slide_filmstrip( $opt = '' ) {
 						' style="float:left; text-align:left; cursor:pointer; margin-top:'.$topmarg.'px; width: '.$fw.'px; font-size: '.$fs.'px;"' .
 						' >' .
 						'<span' .
-							' class="wppa-prev-'.wppa( 'mocc' ).' wppa-arrow"' .
+							' class="wppa-first-'.wppa( 'mocc' ).' wppa-arrow"' .
 							' style="'.__wcs('wppa-arrow').'"' .
-							' id="prev-film-arrow-'.wppa( 'mocc' ).'"' .
+							' id="first-film-arrow-'.wppa( 'mocc' ).'"' .
 							' onclick="wppaFirst('.wppa( 'mocc' ).');"' .
 							' title="'.__('First', 'wp-photo-album-plus').'"' .
 							' >' .
@@ -1183,9 +1263,9 @@ function wppa_slide_filmstrip( $opt = '' ) {
 						' style="float:right; text-align:right; cursor:pointer; margin-top:'.$topmarg.'px; width: '.$fw.'px; font-size: '.$fs.'px;"' .
 						' >' .
 						'<span' .
-							' class="wppa-next-'.wppa( 'mocc' ).' wppa-arrow"' .
+							' class="wppa-last-'.wppa( 'mocc' ).' wppa-arrow"' .
 							' style="'.__wcs('wppa-arrow').'"' .
-							' id="next-film-arrow-'.wppa( 'mocc' ).'"' .
+							' id="last-film-arrow-'.wppa( 'mocc' ).'"' .
 							' onclick="wppaLast('.wppa( 'mocc' ).');"' .
 							' title="'.__('Last', 'wp-photo-album-plus').'"' .
 							' >' .
@@ -1381,6 +1461,14 @@ function wppa_numberbar( $opt = '' ) {
 }
 
 function wppa_browsebar( $opt = '' ) {
+	if ( wppa_get_navigation_type() == 'icons' ) {
+		wppa_browsebar_icons( $opt );
+	}
+	else {
+		wppa_browsebar_text( $opt );
+	}
+}
+function wppa_browsebar_icons( $opt = '' ) {
 
 	// A single image slideshow needs no navigation
 	if ( wppa( 'is_single' ) ) return;
@@ -1416,6 +1504,49 @@ function wppa_browsebar( $opt = '' ) {
 							' >' .
 							wppa_get_svghtml( 'Next-Button', '1.5em' ) .
 						'</span>' .
+						'<span' .
+							' id="counter-'.wppa( 'mocc' ).'"' .
+							' class="wppa-nav-text wppa-black"' .
+							' style="text-align:center; '.__wcs('wppa-nav-text').'; cursor:pointer;"' .
+							' onclick="wppaStartStop('.wppa( 'mocc' ).', -1);"' .
+							' title="'.__('Click to start/stop', 'wp-photo-album-plus').'"' .
+							' >' .
+						'</span>' .
+					'</div>'
+				);
+	}
+}
+function wppa_browsebar_text( $opt = '' ) {
+
+	// A single image slideshow needs no navigation
+	if ( wppa( 'is_single' ) ) return;
+
+	if ( is_feed() ) return;
+
+	$do_it = false;
+	if ( $opt != 'optional' ) $do_it = true;
+	if ( ! wppa( 'is_slideonly' ) && wppa_switch( 'show_browse_navigation' ) ) $do_it = true;
+	if ( wppa( 'is_slideonly' ) && wppa( 'browse_on' ) ) $do_it = true;
+
+	if ( $do_it ) {
+		wppa_out( 	'<div' .
+						' id="prevnext2-'.wppa( 'mocc' ).'"' .
+						' class="wppa-box wppa-nav wppa-nav-text"' .
+						' style="text-align: center; '.__wcs('wppa-box').__wcs('wppa-nav').__wcs('wppa-nav-text').'"' .
+						' >' .
+						'<a' .
+							' id="prev-arrow-'.wppa( 'mocc' ).'"' .
+							' class="wppa-prev-'.wppa( 'mocc' ).' wppa-nav-text arrow-'.wppa( 'mocc' ).'"' .
+							' style="float:left; text-align:left; cursor:pointer; '.__wcs('wppa-nav-text').'" onclick="wppaPrev('.wppa( 'mocc' ).')"' .
+							' >' .
+						'</a>' .
+						'<a' .
+							' id="next-arrow-'.wppa( 'mocc' ).'"' .
+							' class="wppa-next-'.wppa( 'mocc' ).' wppa-nav-text arrow-'.wppa( 'mocc' ).'"' .
+							' style="float:right; text-align:right; cursor:pointer; '.__wcs('wppa-nav-text').'"' .
+							' onclick="wppaNext('.wppa( 'mocc' ).')"' .
+							' >' .
+						'</a>' .
 						'<span' .
 							' id="counter-'.wppa( 'mocc' ).'"' .
 							' class="wppa-nav-text wppa-black"' .

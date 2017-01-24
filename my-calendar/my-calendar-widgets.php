@@ -555,14 +555,17 @@ function my_calendar_upcoming_events( $before = 'default', $after = 'default', $
 		$last_item = $last_id = $last_date = '';
 		$skips     = array();
 		foreach ( reverse_array( $temp_array, true, $order ) as $details ) {
-			$item = jd_draw_template( $details, $template );
+			$item = apply_filters( 'mc_draw_upcoming_event', '', $details, $template, $args );
+			if ( $item == '' ) {
+				$item = jd_draw_template( $details, $template );
+			}
 			if ( $i < $skip && $skip != 0 ) {
 				$i ++;
 			} else {
 				$today    = date( 'Y-m-d H:i', current_time( 'timestamp' ) );
-				$date     = date( 'Y-m-d H:i', strtotime( $details['ts_occur_begin'] ) );
+				$date     = date( 'Y-m-d H:i', strtotime( $details['date'] . ' ' . $details['time'] ) );
 				$class    = ( my_calendar_date_comp( $date, $today ) === true ) ? "past-event" : "future-event";
-				$category = 'mc_' . sanitize_title( $details['category_name'] );
+				$category = 'mc_' . sanitize_title( $details['category'] );
 				
 				$prepend = apply_filters( 'mc_event_upcoming_before', "<li class='$class $category'>", $class, $category );
 				$append  = apply_filters( 'mc_event_upcoming_after', '</li>', $class, $category );				
@@ -759,13 +762,8 @@ function mc_produce_upcoming_events( $events, $template, $type = 'list', $order 
 		foreach ( array_keys( $events ) as $key ) {
 			$event =& $events[ $key ];
 			$event_details = mc_create_tags( $event, $context );
-			if ( get_option( 'mc_event_approve' ) == 'true' ) {
-				if ( $event->event_approved != 0 ) {
-					$temp_array[] = $event_details;
-				}
-			} else {
-				$temp_array[] = $event_details;
-			}
+			$temp_array[] = $event_details;
+
 		}
 		$i      = 0;
 		$groups = array();
@@ -795,7 +793,13 @@ function mc_produce_upcoming_events( $events, $template, $type = 'list', $order 
 					$i ++;
 				} else {
 					if ( ! in_array( $details['dateid'], $skips ) ) {
-						$output[] = apply_filters( 'mc_event_upcoming', "$prepend" . jd_draw_template( $details, $template, $type ) . "$append", $event );
+						
+						$item = apply_filters( 'mc_draw_upcoming_event', '', $details, $template, $type );
+						if ( $item == '' ) {
+							$item = jd_draw_template( $details, $template, $type );
+						}
+						
+						$output[] = apply_filters( 'mc_event_upcoming', $prepend . $item . $append, $event );
 						$skips[]  = $details['dateid'];
 					}
 				}
@@ -881,15 +885,15 @@ function my_calendar_todays_events( $category = 'default', $template = 'default'
 					} else if ( $now > $ts ) {
 						$class = 'past-event';
 					}
+					
 					$prepend = apply_filters( 'mc_todays_events_before', "<li class='$class $category'>", $class, $category );
 					$append  = apply_filters( 'mc_todays_events_after', "</li>" );
-					if ( get_option( 'mc_event_approve' ) == 'true' ) {
-						if ( $e->event_approved != 0 ) {
-							$todays_events[ $ts ][] = $prepend . jd_draw_template( $event_details, $template ) . $append;
-						}
-					} else {
-						$todays_events[ $ts ][] = $prepend . jd_draw_template( $event_details, $template ) . $append;
+										
+					$item = apply_filters( 'mc_draw_todays_event', '', $event_details, $template );
+					if ( $item == '' ) {
+						$item = jd_draw_template( $event_details, $template );
 					}
+					$todays_events[ $ts ][] = $prepend . $item . $append;
 				}
 			}
 		}
@@ -906,8 +910,8 @@ function my_calendar_todays_events( $category = 'default', $template = 'default'
 		}
 		$time                      = strtotime( date( 'Y-m-d H:m:s', current_time( 'timestamp' ) ) ) - strtotime( date( 'Y-m-d', current_time( 'timestamp' ) ) );
 		$time_remaining            = 24 * 60 * 60 - $time;
-		$todays_cache[ $category ] = ( $caching ) ? $return : '';
 		if ( $caching ) {
+			$todays_cache[ $category ] = ( $caching ) ? $return : '';
 			set_transient( 'mc_todays_cache', $todays_cache, $time_remaining );
 		}
 	} else {

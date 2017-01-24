@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.6.04
+* Version 6.6.11
 *
 */
 
@@ -23,10 +23,10 @@ global $wppa_defaults;
 	if ( $force ) {
 		$wppa = false; 					// destroy existing arrays
 		$wppa_opt = false;
-		delete_option( 'wppa_cached_options' );
+//		delete_option( 'wppa_cached_options' );
 	}
 
-	if ( is_array( $wppa ) && ! $force ) {
+	if ( is_array( $wppa ) && is_array( $wppa_opt ) && ! $force ) {
 		return; 	// Done already
 	}
 
@@ -34,6 +34,7 @@ global $wppa_defaults;
 		wppa_reset_occurrance();
 	}
 
+	/* Caching disabled due to MySql versions that do not allow fields > 64 kB
 	// Get the cache version of all settings
 	$wppa_opt = get_option( 'wppa_cached_options', false );
 
@@ -63,6 +64,7 @@ global $wppa_defaults;
 			$wppa_opt = false;
 		}
 	}
+	*/
 
 	// Rebuild cached options if required, i.e. when not yet existing or deleted.
 	if ( ! is_array( $wppa_opt ) ) {
@@ -70,10 +72,15 @@ global $wppa_defaults;
 		$wppa_opt = $wppa_defaults;
 		foreach ( array_keys( $wppa_opt ) as $option ) {
 			$optval = get_option( $option, 'nil' );
-			if ( $optval !== 'nil' ) {
+			if ( $optval == 'nil' ) {
+				update_option( $option, $wppa_defaults[$option] );
+			}
+			else {
 				$wppa_opt[$option] = $optval;
 			}
 		}
+
+		/*
 		update_option( 'wppa_cached_options', $wppa_opt, true );
 		update_option( 'wppa_md5_options', md5( serialize( $wppa_opt ) ), true );
 
@@ -83,6 +90,7 @@ global $wppa_defaults;
 		if ( md5( serialize( $temp ) ) != $hash ) {
 			wppa_log( 'Err', 'Discrepancy found. Count='.count($temp) );
 		}
+		*/
 	}
 
 	if ( isset( $_GET['debug'] ) && wppa_switch( 'allow_debug' ) ) {
@@ -777,14 +785,26 @@ function wppa_get_minisize() {
 						'album_widget_size',
 						'featen_size',
 						'popupsize',
-						'smallsize',
 						'film_thumbsize',
 						 );
 
 	// Find the max
 	foreach ( $things as $thing ) {
 		$tmp = wppa_opt( $thing );
-		if ( is_numeric( $tmp ) && $tmp > $result ) $result = $tmp;
+		if ( is_numeric( $tmp ) && $tmp > $result ) {
+			$result = $tmp;
+		}
+	}
+
+	// Cover image size
+	if ( wppa_switch( 'coverphoto_responsive' ) ) {
+		$tmp = wppa_opt( 'smallsize_percentage' ) * wppa_opt( 'initial_colwidth' ) / 100;
+	}
+	else {
+		$tmp = wppa_opt( 'smallsize' );
+	}
+	if ( is_numeric( $tmp ) && $tmp > $result ) {
+		$result = $tmp;
 	}
 
 	// Optionally correct for 'size=height' for album cover images
@@ -984,7 +1004,7 @@ static $labels;
 				$photo 	= $id;
 				$tag 	= $s;
 				$desc 	= $iptc[$s][$i];
-				if ( wppa_switch( 'iptc_need_utf8' ) ) {
+				if ( ! seems_utf8( $desc ) ) {
 					$desc 	= utf8_encode( $desc );
 				}
 				$status = 'default';
@@ -1199,6 +1219,12 @@ global $cache_path;
 		$GLOBALS['quick_cache']->clear_cache();
 	}
 
+	// Comet cache
+	if ( class_exists( 'comet_cache' ) ) {
+		comet_cache::clear();
+		wppa_log('dbg', 'comet_cache cleared');
+	}
+
 	// At a setup or update operation
 	// Manually remove the content of wp-content/cache/
 	if ( $force ) {
@@ -1216,7 +1242,7 @@ function wppa_tree_empty( $dir ) {
 		if ( $name == '.' || $name == '..' ) {}
 		elseif ( is_dir( $file ) ) {
 			wppa_tree_empty( $file );
-			@ unlink( $file );
+//			@ unlink( $file );
 		}
 		else @ unlink( $file );
 	}
@@ -1836,12 +1862,12 @@ global $wpdb;
 		if ( $to_publish ) foreach ( $to_publish as $photo ) {
 			wppa_update_photo( array( 'id' => $photo['id'], 'scheduledtm' => '', 'status' => 'publish', 'timestamp' => time() ) );
 			wppa_update_album( array( 'id' => $photo['album'], 'modified' => time() ) );	// For New indicator on album
-			wppa_flush_treecounts( $photo['album'] );
+			wppa_invalidate_treecounts( $photo['album'] );
 		}
 		$to_publish = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM`".WPPA_ALBUMS."` WHERE `scheduledtm` <> '' AND `scheduledtm` < %s", wppa_get_default_scheduledtm() ), ARRAY_A );
 		if ( $to_publish ) foreach ( $to_publish as $album ) {
 			wppa_update_album( array( 'id' => $album['id'], 'scheduledtm' => '' ) );
-			wppa_flush_treecounts( $album['id'] );
+			wppa_invalidate_treecounts( $album['id'] );
 		}
 		update_option( 'wppa_last_schedule_check', time() );
 	}

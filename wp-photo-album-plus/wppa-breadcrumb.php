@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 6.6.07
+* Version 6.6.08
 *
 */
 
@@ -534,7 +534,7 @@ global $wppa_session;
 				}
 				else {
 					$s = wppa( 'src' ) ? '&wppa-searchstring='.urlencode( wppa( 'searchstring' ) ) : '';
-					$onclick = "wppaDoAjaxRender( ".wppa( 'mocc' ).", '".wppa_encrypt_url(wppa_get_album_url_ajax( wppa( 'start_album' ), '0' )."&amp;wppa-photos-only=1".$s)."'+wppaPageArg, '".wppa_convert_to_pretty( wppa_encrypt_url( wppa_get_album_url( wppa( 'start_album' ), '0' ).'&wppa-photos-only=1'.$s.$pg ) )."' )";
+					$onclick = "wppaDoAjaxRender( ".wppa( 'mocc' ).", '".wppa_encrypt_url(wppa_get_album_url_ajax( wppa( 'start_album' ), '0' )."&amp;wppa-photos-only=1".$s)."'+wppaPageArg, '".wppa_convert_to_pretty( wppa_encrypt_url( wppa_get_album_url( wppa( 'start_album' ), '0' ).'&wppa-photos-only=1'.$s.$pg ) )."', '', '', true )";
 					$fs = wppa_opt( 'fontsize_nav' );
 					if ( $fs != '' ) $fs += 3; else $fs = '15';	// iconsize = fontsize+3, Default to 15
 					$imgs = 'height: '.$fs.'px; margin:0 0 -3px 0; padding:0; box-shadow:none;';

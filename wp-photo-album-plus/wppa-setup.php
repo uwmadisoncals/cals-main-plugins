@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.6.07
+* Version 6.6.11
 *
 */
 
@@ -71,6 +71,9 @@ global $silent;
 					scheduledtm tinytext NOT NULL,
 					custom longtext NOT NULL,
 					crypt tinytext NOT NULL,
+					treecounts text NOT NULL,
+					wmfile tinytext NOT NULL,
+					wmpos tinytext NOT NULL,
 					PRIMARY KEY  (id)
 					) DEFAULT CHARACTER SET utf8;";
 
@@ -200,8 +203,8 @@ global $silent;
 	}
 
 	// Clear Session
-	$wpdb->query( "TRUNCATE TABLE `".WPPA_SESSION."`" );
-	wppa_session_start();
+//	$wpdb->query( "TRUNCATE TABLE `".WPPA_SESSION."`" );
+//	wppa_session_start();
 
 	// Convert any changed and remove obsolete setting options
 	if ( $old_rev > '100' ) {	// On update only
@@ -337,7 +340,7 @@ global $silent;
 		}
 
 		if ( $old_rev <= '5308' ) {
-			wppa_flush_treecounts();
+			wppa_invalidate_treecounts();
 		}
 
 		if ( $old_rev <= '5410' ) {
@@ -415,7 +418,7 @@ global $silent;
 		}
 
 		if ( $old_rev <= '6410' ) {
-			@ $wpdb->query( "UPDATE `wp_options` SET `autoload` = 'no' WHERE `option_name` LIKE 'wppa_%'");
+//			@ $wpdb->query( "UPDATE `wp_options` SET `autoload` = 'no' WHERE `option_name` LIKE 'wppa_%'");
 		}
 
 		if ( $old_rev <= '6411' ) {
@@ -492,6 +495,31 @@ global $silent;
 		if ( $old_rev <= '6606' ) {
 			if ( get_option( 'wppa_rating_dayly' ) == 'no' ) {
 				wppa_update_option( 'wppa_rating_dayly', '0' );
+			}
+		}
+
+		if ( $old_rev <= '6609' ) {
+			wppa_schedule_treecount_update();
+		}
+
+		if ( $old_rev <= '6610' ) {
+			if ( get_option( 'wppa_blog_it' ) == 'yes' ) {
+				wppa_update_option( 'wppa_blog_it', 'optional' );
+			}
+			if ( get_option( 'wppa_blog_it' ) == 'no' ) {
+				wppa_update_option( 'wppa_blog_it', '-none-' );
+			}
+		}
+
+		if ( $old_rev <= '6611' ) {
+			delete_option( 'wppa_cached_options' );
+			delete_option( 'wppa_md5_options' );
+			@ $wpdb->query( "UPDATE `" . $wpdb->options . "` SET `autoload` = 'yes' WHERE `option_name` LIKE 'wppa_%'");
+			if ( get_option( 'wppa_fe_alert' ) == 'no' ) {
+				update_option( 'wppa_fe_alert', '-none-' );
+			}
+			if ( get_option( 'wppa_fe_alert' ) == 'yes' ) {
+				update_option( 'wppa_fe_alert', 'all' );
 			}
 		}
 
@@ -623,7 +651,7 @@ function wppa_revalue_setting($oldname, $oldvalue, $newvalue) {
 }
 
 // Set default option values in global $wppa_defaults
-// With $force = true, all non default options will be deleted, so everything is set to the default except: revision, rating_max and filesystem
+// With $force = true, all non default options will be reset to default, so everything is set to the default except: revision, rating_max and filesystem
 function wppa_set_defaults($force = false) {
 global $wppa_defaults;
 
@@ -718,8 +746,11 @@ Hide Camera info
 						'wppa_cover_minheight' 				=> '0',		// 2
 						'wppa_head_and_text_frame_height' 	=> '0', 	// 3
 						'wppa_text_frame_height'			=> '54',	// 4
+						'wppa_coverphoto_responsive' 		=> 'no',
 						'wppa_smallsize' 					=> '150',	// 5
+						'wppa_smallsize_percentage' 		=> '30',
 						'wppa_smallsize_multi'				=> '100',	// 6
+						'wppa_smallsize_multi_percentage' 	=> '20',
 						'wppa_coversize_is_height'			=> 'no',	// 7
 						'wppa_album_page_size' 				=> '0',		// 8
 
@@ -777,6 +808,7 @@ Hide Camera info
 						'wppa_bc_slide_thumblink'			=> 'no',
 
 						// B Slideshow
+						'wppa_navigation_type' 				=> 'icons', 	// 0
 						'wppa_show_startstop_navigation' 	=> 'yes',		// 1
 						'wppa_show_browse_navigation' 		=> 'yes',		// 2
 						'wppa_filmstrip' 					=> 'yes',		// 3
@@ -862,6 +894,7 @@ Hide Camera info
 						'wppa_show_cats' 					=> 'no',
 						'wppa_skip_empty_albums'			=> 'yes',
 						'wppa_count_on_title' 				=> '-none-',
+						'wppa_viewcount_on_cover' 			=> '-none-',
 
 
 						// E Widgets
@@ -927,7 +960,7 @@ Hide Camera info
 						'wppa_up_tag_input_title' 		=> __( 'Enter new tags:' , 'wp-photo-album-plus'),
 						'wppa_up_tag_preview' 			=> 'yes',
 						'wppa_camera_connect' 			=> 'yes',
-						'wppa_blog_it' 					=> 'no',
+						'wppa_blog_it' 					=> '-none-',
 						'wppa_blog_it_moderate' 		=> 'yes',
 						'wppa_blog_it_shortcode' 		=> '[wppa type="mphoto" photo="#id"][/wppa]',
 
@@ -999,7 +1032,7 @@ Hide Camera info
 
 						'wppa_close_text' 				=> 'Close',	// frontend upload/edit etc
 
-						'wppa_icon_corner_style' 		=> 'light',
+						'wppa_icon_corner_style' 		=> 'medium',
 
 
 						// Table III: Backgrounds
@@ -1124,6 +1157,8 @@ Hide Camera info
 						'wppa_thumb_opacity' 			=> '95',
 						'wppa_use_thumb_popup' 			=> 'yes',
 						'wppa_align_thumbtext' 			=> 'no',
+						'wppa_wpautop_on_thumb_desc' 	=> 'nil',
+
 						// D Albums and covers
 						'wppa_list_albums_by' 			=> '0',
 						'wppa_main_photo' 				=> '0',
@@ -1368,7 +1403,7 @@ Hide Camera info
 						'wppa_upload_fronend_maxsize' 	=> '0',
 						'wppa_void_dups' 				=> 'no',
 						'wppa_home_after_upload'		=> 'no',
-						'wppa_fe_alert' 				=> 'yes',
+						'wppa_fe_alert' 				=> 'all',
 						'wppa_fe_upload_max_albums' 	=> '200', 	// VII-B13
 
 						'wppa_editor_upload_limit_count'		=> '0',
@@ -1444,6 +1479,7 @@ Hide Camera info
 						'wppa_sanitize_tags' 		=> '',
 						'wppa_sanitize_cats' 		=> '',
 						'wppa_test_proc' 			=> '',
+						'wppa_test_proc_ad_inf' 	=> 'no',
 						'wppa_move_all_photos' 		=> '',
 						'wppa_move_all_photos_from' => '',
 						'wppa_move_all_photos_to' 	=> '',
@@ -1466,7 +1502,7 @@ Hide Camera info
 						'wppa_allow_foreign_shortcodes_general' => 'no',
 						'wppa_allow_foreign_shortcodes' 		=> 'no',		// 7
 						'wppa_allow_foreign_shortcodes_thumbs' 	=> 'no',
-						'wppa_arrow_color' 				=> 'black',
+//						'wppa_arrow_color' 				=> 'black',
 						'wppa_meta_page'				=> 'yes',		// 9
 						'wppa_meta_all'					=> 'yes',		// 10
 						'wppa_use_wp_editor'			=> 'no',
@@ -1496,6 +1532,7 @@ Hide Camera info
 						'wppa_confirm_create' 			=> 'yes',
 						'wppa_import_root' 				=> ABSPATH . 'wp-content',
 						'wppa_allow_import_source' 		=> 'no',
+						'wppa_enable_generator' 		=> 'yes',
 
 
 						// IX D New
@@ -1602,8 +1639,7 @@ Hide Camera info
 						'wppa_newpag_status'			=> 'publish',
 						'wppa_pl_dirname' 				=> 'wppa-pl',
 						'wppa_import_parent_check' 		=> 'yes',
-						'wppa_iptc_need_utf8' 			=> 'yes',
-						'wppa_keep_import_files' 			=> 'no',
+						'wppa_keep_import_files' 		=> 'no',
 
 						// J Other plugins
 						'wppa_cp_points_comment'		=> '0',
@@ -1672,28 +1708,24 @@ Hide Camera info
 						'wppa_qr_color'				=> '#000000',
 						'wppa_qr_bgcolor'			=> '#FFFFFF',
 
-
 						'wppa_dismiss_admin_notice_scripts_are_obsolete' => 'no',
 
 						);
 
-	array_walk( $wppa_defaults, 'wppa_set_default', $force );
+	if ( $force ) {
+		array_walk( $wppa_defaults, 'wppa_set_default' );
+	}
 
 	return true;
 }
-function wppa_set_default($value, $key, $force) {
+function wppa_set_default( $value, $key ) {
 	$void_these = array(
 		'wppa_revision',
 		'wppa_rating_max',
 		'wppa_file_system'
 		);
 
-	if ( $force ) {
-		if ( ! in_array($key, $void_these) ) wppa_update_option($key, $value);
-	}
-	else {
-		if ( get_option($key, 'nil') == 'nil' ) wppa_update_option($key, $value);
-	}
+	if ( ! in_array($key, $void_these) ) wppa_update_option($key, $value);
 }
 
 // Check if the required directories exist, if not, try to create them and optionally report it
@@ -1943,7 +1975,7 @@ static $user;
 				else {
 					wppa_log( 'Err', 'Could not create subalbum of ' . $parent . ' for ' . $user );
 				}
-				wppa_flush_treecounts( $parent );
+				wppa_invalidate_treecounts( $parent );
 				wppa_index_add( 'album', $id );
 
 			}

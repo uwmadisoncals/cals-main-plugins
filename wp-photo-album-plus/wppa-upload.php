@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 6.5.03
+* Version 6.6.11
 *
 */
 
@@ -138,16 +138,31 @@ global $upload_album;
 
 		// check if albums exist before allowing upload
 		if ( ! wppa_has_albums() ) {
-			$url = wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu' );
-			echo
-			'<p>' .
-				__( 'No albums exist. You must' , 'wp-photo-album-plus') .
-				' <a href="' . $url . '" >' .
-					__( 'create one' , 'wp-photo-album-plus') .
-				'</a> ' .
-				__( 'before you can upload your photos.', 'wp-photo-album-plus' ) .
-			'</p>' . '</div>';
-			return;
+
+			// User can create
+			if ( current_user_can( 'wppa_admin' ) ) {
+				$url = wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu' );
+				echo
+				'<p>' .
+					__( 'No albums exist. You must' , 'wp-photo-album-plus') .
+					' <a href="' . $url . '" >' .
+						__( 'create one' , 'wp-photo-album-plus') .
+					'</a> ' .
+					__( 'before you can upload your photos.', 'wp-photo-album-plus' ) .
+				'</p>' . '</div>';
+				return;
+			}
+
+			// User can not create
+			else {
+				echo
+				'<p>' .
+					__( 'There are no albums where you are allowed to upload photos to.', 'wp-photo-album-plus' ) .
+					'<br />' .
+					__( 'Ask your administrator to create at least one album that is accessable for you to upload to, or ask him to give you album admin rights.', 'wp-photo-album-plus' ) .
+				'</p>';
+				return;
+			}
 		}
 
 		// Upload One only configured and not administrator or super user?
@@ -173,11 +188,11 @@ global $upload_album;
 						'<p>' .
 							__( 'Apply watermark file:' , 'wp-photo-album-plus' ) .
 							'<select name="wppa-watermark-file" id="wppa-watermark-file" >' .
-								wppa_watermark_file_select() .
+								wppa_watermark_file_select( 'user' ) .
 							'</select>' .
 							__( 'Position:' , 'wp-photo-album-plus' ) .
 							'<select name="wppa-watermark-pos" id="wppa-watermark-pos" >' .
-								wppa_watermark_pos_select() .
+								wppa_watermark_pos_select( 'user' ) .
 							'</select>' .
 						'</p>';
 					}
@@ -315,11 +330,11 @@ global $upload_album;
 						'<p>' .
 							__( 'Apply watermark file:' , 'wp-photo-album-plus' ) .
 							'<select name="wppa-watermark-file" id="wppa-watermark-file" >' .
-								wppa_watermark_file_select() .
+								wppa_watermark_file_select( 'user' ) .
 							'</select>' .
 							__( 'Position:' , 'wp-photo-album-plus' ) .
 							'<select name="wppa-watermark-pos" id="wppa-watermark-pos" >' .
-								wppa_watermark_pos_select() .
+								wppa_watermark_pos_select( 'user' ) .
 							'</select>' .
 						'</p>';
 					}
@@ -389,11 +404,11 @@ global $upload_album;
 						'<p>' .
 							__( 'Apply watermark file:' , 'wp-photo-album-plus' ) .
 							'<select name="wppa-watermark-file" id="wppa-watermark-file" >' .
-								wppa_watermark_file_select() .
+								wppa_watermark_file_select( 'user' ) .
 							'</select>' .
 							__( 'Position:' , 'wp-photo-album-plus' ) .
 							'<select name="wppa-watermark-pos" id="wppa-watermark-pos" >' .
-								wppa_watermark_pos_select() .
+								wppa_watermark_pos_select( 'user' ) .
 							'</select>' .
 						'</p>';
 					}

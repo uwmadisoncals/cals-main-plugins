@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.6.04
+* Version 6.6.11
 *
 */
 
@@ -560,11 +560,11 @@ global $wppa_session;
 						'<p>' .
 							__( 'Apply watermark file:', 'wp-photo-album-plus') .
 							'<select name="wppa-watermark-file" id="wppa-watermark-file" >' .
-								wppa_watermark_file_select() .
+								wppa_watermark_file_select( 'user' ) .
 							'</select>' .
 							__( 'Position:', 'wp-photo-album-plus') .
 							'<select name="wppa-watermark-pos" id="wppa-watermark-pos" >' .
-								wppa_watermark_pos_select() .
+								wppa_watermark_pos_select( 'user' ) .
 							'</select>' .
 						'</p>';
 					}
@@ -1661,7 +1661,7 @@ global $wppa_supported_audio_extensions;
 							if ( $dela ) unlink( $album );
 							$acount++;
 							wppa_clear_cache();
-							wppa_flush_treecounts( $id );
+							wppa_invalidate_treecounts( $id );
 						} // album added
 					} // album did not exist
 				} // if handle ( file open )
@@ -1833,7 +1833,7 @@ global $wppa_supported_audio_extensions;
 						}
 						else {
 							$id = substr( $id, 0, strpos( $id, '.' ) );
-							if ( !is_numeric( $id ) || ! wppa_is_id_free( 'photo', $id ) ) $id = 0;
+							if ( ! is_numeric( $id ) || ! wppa_is_id_free( WPPA_PHOTOS, $id ) ) $id = 0;
 							if ( wppa_insert_photo( $unsanitized_path_name, $alb, stripslashes( $name ), stripslashes( $desc ), $porder, $id, stripslashes( $linkurl ), stripslashes( $linktitle ) ) ) {
 								if ( wppa( 'ajax' ) ) {
 									wppa( 'ajax_import_files_done', true );
@@ -1928,7 +1928,7 @@ global $wppa_supported_audio_extensions;
 					// Add new entry
 					if ( ! $id ) {
 						$id = wppa_create_photo_entry( array( 'album' => $alb, 'filename' => $filename, 'ext' => 'xxx', 'name' => wppa_strip_ext( $filename ) ) );
-						wppa_flush_treecounts( $alb );
+						wppa_invalidate_treecounts( $alb );
 					}
 
 					// Add video filetype
@@ -2000,7 +2000,7 @@ global $wppa_supported_audio_extensions;
 					// Add new entry
 					if ( ! $id ) {
 						$id = wppa_create_photo_entry( array( 'album' => $alb, 'filename' => $filename, 'ext' => 'xxx', 'name' => wppa_strip_ext( $filename ) ) );
-						wppa_flush_treecounts( $alb );
+						wppa_invalidate_treecounts( $alb );
 					}
 
 					// Add audio filetype
@@ -2615,7 +2615,7 @@ global $wppa_session;
 			}
 			else {
 				wppa_set_last_album( $alb );
-				wppa_flush_treecounts( $alb );
+				wppa_invalidate_treecounts( $alb );
 				wppa_index_add( 'album', $alb );
 				wppa_create_pl_htaccess();
 				wppa_ok_message( __( 'Album #', 'wp-photo-album-plus') . ' ' . $alb . ' ( '.$name.' ) ' . __( 'Added.', 'wp-photo-album-plus') );

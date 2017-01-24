@@ -31,7 +31,7 @@ window.eml = window.eml || { l10n: {} };
 
             wp.Uploader.queue.on( 'add', this.beforeUpload, this );
             wp.Uploader.queue.on( 'reset', this.afterUpload, this );
-    	},
+        },
 
         beforeUpload: function() {
 
@@ -130,7 +130,8 @@ window.eml = window.eml || { l10n: {} };
 
 
             // TODO: find a better solution
-            if ( this.controller.isModeActive( 'select' ) && 'edit-attachment' != this.controller.state().get('id') ) {
+            if ( this.controller.isModeActive( 'select' ) &&
+                'edit-attachment' != this.controller.state().get('id') ) {
 
                 $.each( eml.l10n.compat_taxonomies_to_hide, function( id, taxonomy ) {
                     $compat_el.find( '.compat-field-'+taxonomy ).remove();
@@ -182,7 +183,7 @@ window.eml = window.eml || { l10n: {} };
             }
 
 
-            if ( filter && media.view.settings.mediaTrash ) {
+            if ( filter && media.view.settings.mediaTrash && ! _.isUndefined( this.controller.toolbar ) ) {
                 this.controller.toolbar.get().$('.media-selection').toggleClass( 'trash', 'trash' === filter.props.status );
             }
 
@@ -196,28 +197,28 @@ window.eml = window.eml || { l10n: {} };
 
         select: function() {
 
-    		var model = this.model,
-    			value = 'all',
-    			props = model.toJSON();
+            var model = this.model,
+                value = 'all',
+                props = model.toJSON();
 
 
             props = _.omit( props, 'orderby', 'order' );
 
-    		_.find( this.filters, function( filter, id ) {
+            _.find( this.filters, function( filter, id ) {
 
                 var filterProps = _.omit( filter.props, 'orderby', 'order' );
 
-    			var equal = _.all( filterProps, function( prop, key ) {
-    				return prop === ( _.isUndefined( props[ key ] ) ? null : props[ key ] );
-    			});
+                var equal = _.all( filterProps, function( prop, key ) {
+                    return prop === ( _.isUndefined( props[ key ] ) ? null : props[ key ] );
+                });
 
-    			if ( equal ) {
-    				return value = id;
-    			}
-    		});
+                if ( equal ) {
+                    return value = id;
+                }
+            });
 
-    		this.$el.val( value );
-    	}
+            this.$el.val( value );
+        }
     });
 
 
@@ -279,6 +280,24 @@ window.eml = window.eml || { l10n: {} };
             _.each( taxonomies, function( taxonomy ) {
                 uncategorizedProps[taxonomy] = null;
             });
+
+
+            if ( media.view.settings.mediaTrash &&
+                ( this.controller.isModeActive( 'grid' ) ||
+                this.controller.isModeActive( 'eml-grid' ) ) ) {
+
+                this.filters.trash = {
+                    text:  l10n.trash,
+                    props: {
+                        uploadedTo : null,
+                        status     : 'trash',
+                        type       : null,
+                        orderby    : 'date',
+                        order      : 'DESC'
+                    },
+                    priority: 70
+                };
+            }
         }
     });
 
@@ -403,16 +422,172 @@ window.eml = window.eml || { l10n: {} };
         click: function( event ) {
 
             if ( '#' === this.attributes.href ) {
-				event.preventDefault();
-			}
+                event.preventDefault();
+            }
 
             $('.attachment-filters:has(option[value!="all"]:selected)').each( function( index ) {
                 $(this).val( 'all' ).change();
             });
-		},
+        },
 
         toogleResetFilters: function() {
             this.$el.toggleClass( 'hidden' );
+        }
+    });
+
+
+
+    media.view.Button.DeleteSelected = media.view.Button.extend({
+
+        initialize: function() {
+
+            media.view.Button.prototype.initialize.apply( this, arguments );
+            if ( this.options.filters ) {
+                this.options.filters.model.on( 'change', this.filterChange, this );
+            }
+            this.controller.state().get( 'selection' ).on( 'add remove reset', this.toggleDisabled, this );
+        },
+
+        filterChange: function( model ) {
+            if ( 'trash' === model.get( 'status' ) ) {
+                this.model.set( 'text', l10n.untrashSelected );
+            } else if ( wp.media.view.settings.mediaTrash ) {
+                this.model.set( 'text', l10n.trashSelected );
+            } else {
+                this.model.set( 'text', l10n.deleteSelected );
+            }
+        },
+
+        toggleDisabled: function() {
+            this.model.set( 'disabled', ! this.controller.state().get( 'selection' ).length );
+        },
+
+        render: function() {
+            media.view.Button.prototype.render.apply( this, arguments );
+            this.toggleDisabled();
+            return this;
+        },
+
+        click: function() {
+
+            var changed = [], removed = [],
+                selection = this.controller.state().get( 'selection' ),
+                library = this.controller.state().get( 'library' );
+
+            if ( ! selection.length ) {
+                return;
+            }
+
+            if ( ! media.view.settings.mediaTrash && ! window.confirm( l10n.warnBulkDelete ) ) {
+                return;
+            }
+
+            if ( media.view.settings.mediaTrash &&
+                'trash' !== selection.at( 0 ).get( 'status' ) &&
+                ! window.confirm( l10n.warnBulkTrash ) ) {
+
+                return;
+            }
+
+            selection.each( function( model ) {
+                if ( ! model.get( 'nonces' )['delete'] ) {
+                    removed.push( model );
+                    return;
+                }
+
+                if ( media.view.settings.mediaTrash && 'trash' === model.get( 'status' ) ) {
+                    model.set( 'status', 'inherit' );
+                    changed.push( model.save() );
+                    removed.push( model );
+                } else if ( media.view.settings.mediaTrash ) {
+                    model.set( 'status', 'trash' );
+                    changed.push( model.save() );
+                    removed.push( model );
+                } else {
+                    model.destroy({wait: true});
+                }
+            } );
+
+            if ( changed.length ) {
+                selection.remove( removed );
+
+                $.when.apply( null, changed ).then( _.bind( function() {
+                    library._requery( true );
+                    this.controller.trigger( 'selection:action:done' );
+                }, this ) );
+            } else {
+                this.controller.trigger( 'selection:action:done' );
+            }
+        }
+    });
+
+
+
+    media.view.Button.DeleteSelectedPermanently = media.view.Button.DeleteSelected.extend({
+
+        filterChange: function( model ) {
+
+            this.canShow = ( 'trash' === model.get( 'status' ) );
+            this.$el.toggleClass( 'hidden', ! this.canShow );
+            this.controller.browserView.fixLayout();
+        },
+
+        render: function() {
+
+            media.view.Button.prototype.render.apply( this, arguments );
+            this.$el.toggleClass( 'hidden', ! this.canShow );
+            return this;
+        },
+
+        click: function() {
+
+            var removed = [], selection = this.controller.state().get( 'selection' ),
+                library = this.controller.state().get( 'library' );
+
+            if ( ! selection.length || ! window.confirm( l10n.warnBulkDelete ) ) {
+                return;
+            }
+
+            selection.each( function( model ) {
+
+                if ( ! model.get( 'nonces' )['delete'] ) {
+                    removed.push( model );
+                    return;
+                }
+
+                model.destroy({wait: true});
+            } );
+
+            this.controller.trigger( 'selection:action:done' );
+        }
+    });
+
+
+
+    media.view.Button.Deselect = media.view.Button.extend({
+
+        initialize: function() {
+
+            media.view.Button.prototype.initialize.apply( this, arguments );
+            this.controller.state().get( 'selection' ).on( 'add remove reset', this.toggleDisabled, this );
+        },
+
+        toggleDisabled: function() {
+            this.model.set( 'disabled', ! this.controller.state().get( 'selection' ).length );
+        },
+
+        click: function( event ) {
+
+            event.preventDefault();
+
+            var selection = this.controller.state().get( 'selection' );
+
+            selection.reset();
+
+            // Keep focus inside media modal
+            if ( this.controller.modal ) {
+                this.controller.modal.focusManager.focus();
+            }
         }
     });
 
@@ -483,21 +658,52 @@ window.eml = window.eml || { l10n: {} };
 
         createToolbar: function() {
 
-            var filters = this.options.filters,
+            var LibraryViewSwitcher, Filters, toolbarOptions,
                 self = this,
                 i = 1;
 
+            toolbarOptions = {
+                controller: this.controller
+            };
 
-            original.AttachmentsBrowser.createToolbar.apply( this, arguments );
+            if ( this.controller.isModeActive( 'grid' ) ||
+                this.controller.isModeActive( 'eml-grid' ) ) {
+
+                toolbarOptions.className = 'media-toolbar wp-filter';
+            }
+
+            /**
+            * @member {wp.media.view.Toolbar}
+            */
+            this.toolbar = new media.view.Toolbar( toolbarOptions );
+
+            this.views.add( this.toolbar );
+
+            this.toolbar.set( 'spinner', new media.view.Spinner({
+                priority: -40
+            }) );
 
 
             if ( -1 !== $.inArray( this.options.filters, [ 'uploaded', 'all' ] ) ||
-               ( parseInt( eml.l10n.force_filters ) &&
-               'gallery-edit' !== this.controller._state &&
-               'playlist-edit' !== this.controller._state &&
-               'video-playlist-edit' !== this.controller._state ) ||
-               'customize' === eml.l10n.current_screen ) {
+                ( parseInt( eml.l10n.force_filters ) &&
+                'gallery-edit' !== this.controller._state &&
+                'playlist-edit' !== this.controller._state &&
+                'video-playlist-edit' !== this.controller._state ) ||
+                'customize' === eml.l10n.current_screen ) {
 
+                if ( this.controller.isModeActive( 'grid' ) ||
+                    this.controller.isModeActive( 'eml-grid' ) ) {
+
+                    LibraryViewSwitcher = media.View.extend({
+                        className: 'view-switch media-grid-view-switch',
+                        template: media.template( 'media-library-view-switcher')
+                    });
+
+                    this.toolbar.set( 'libraryViewSwitcher', new LibraryViewSwitcher({
+                        controller: this.controller,
+                        priority: -90
+                    }).render() );
+                }
 
                 this.toolbar.set( 'filtersLabel', new media.view.Label({
                     value: l10n.filterByType,
@@ -523,8 +729,8 @@ window.eml = window.eml || { l10n: {} };
                     this.toolbar.set( 'filters', Filters.render() );
                 }
 
-                if ( eml.l10n.wp_version >= '4.0' )
-                {
+                if ( eml.l10n.wp_version >= '4.0' ) {
+
                     this.toolbar.set( 'dateFilterLabel', new media.view.Label({
                         value: l10n.filterByDate,
                         attributes: {
@@ -563,15 +769,250 @@ window.eml = window.eml || { l10n: {} };
                     }
                 });
 
-
                 this.toolbar.set( 'resetFilterButton', new media.view.Button.resetFilters({
                     controller: this.controller,
                     text: eml.l10n.reset_filters,
                     disabled: true,
-                    priority: -70 + i
+                    priority: -70 + i++
                 }).render() );
 
+                if ( this.controller.isModeActive( 'eml-grid' ) ) {
+
+                    this.toolbar.set( 'deselectButton', new media.view.Button.Deselect ({
+                        controller: this.controller,
+                        text: l10n.cancelSelection,
+                        disabled: true,
+                        priority: -70 + i++
+                    }).render() );
+
+                    this.toolbar.set( 'emlDeleteSelectedButton', new media.view.Button.DeleteSelected({
+                        filters: Filters,
+                        style: 'primary',
+                        // className: 'delete-selected-button',
+                        disabled: true,
+                        text: media.view.settings.mediaTrash ? l10n.trashSelected : l10n.deleteSelected,
+                        controller: this.controller,
+                        priority: -70 + i++
+                    }).render() );
+
+                    if ( media.view.settings.mediaTrash ) {
+                        this.toolbar.set( 'emlDeleteSelectedPermanentlyButton', new media.view.Button.DeleteSelectedPermanently({
+                            filters: Filters,
+                            style: 'primary',
+                            disabled: true,
+                            text: l10n.deleteSelected,
+                            controller: this.controller,
+                            priority: -55
+                        }).render() );
+                    }
+                }
+
             } // endif
+
+
+            // in case it is not eml-grid but the original grid somewhere
+            if ( this.controller.isModeActive( 'grid' ) ) {
+
+                // BulkSelection is a <div> with subviews, including screen reader text
+                this.toolbar.set( 'selectModeToggleButton', new media.view.SelectModeToggleButton({
+                    text: l10n.bulkSelect,
+                    controller: this.controller,
+                    priority: -70
+                }).render() );
+
+                this.toolbar.set( 'deleteSelectedButton', new media.view.DeleteSelectedButton({
+                    filters: Filters,
+                    style: 'primary',
+                    disabled: true,
+                    text: media.view.settings.mediaTrash ? l10n.trashSelected : l10n.deleteSelected,
+                    controller: this.controller,
+                    priority: -60,
+                    click: function() {
+                        var changed = [], removed = [],
+                            selection = this.controller.state().get( 'selection' ),
+                            library = this.controller.state().get( 'library' );
+
+                        if ( ! selection.length ) {
+                            return;
+                        }
+
+                        if ( ! mediaTrash && ! window.confirm( l10n.warnBulkDelete ) ) {
+                            return;
+                        }
+
+                        if ( mediaTrash &&
+                            'trash' !== selection.at( 0 ).get( 'status' ) &&
+                            ! window.confirm( l10n.warnBulkTrash ) ) {
+
+                            return;
+                        }
+
+                        selection.each( function( model ) {
+                            if ( ! model.get( 'nonces' )['delete'] ) {
+                                removed.push( model );
+                                return;
+                            }
+
+                            if ( mediaTrash && 'trash' === model.get( 'status' ) ) {
+                                model.set( 'status', 'inherit' );
+                                changed.push( model.save() );
+                                removed.push( model );
+                            } else if ( mediaTrash ) {
+                                model.set( 'status', 'trash' );
+                                changed.push( model.save() );
+                                removed.push( model );
+                            } else {
+                                model.destroy({wait: true});
+                            }
+                        } );
+
+                        if ( changed.length ) {
+                            selection.remove( removed );
+
+                            $.when.apply( null, changed ).then( _.bind( function() {
+                                library._requery( true );
+                                this.controller.trigger( 'selection:action:done' );
+                            }, this ) );
+                        } else {
+                            this.controller.trigger( 'selection:action:done' );
+                        }
+                    }
+                }).render() );
+
+                if ( media.view.settings.mediaTrash ) {
+                    this.toolbar.set( 'deleteSelectedPermanentlyButton', new wp.media.view.DeleteSelectedPermanentlyButton({
+                        filters: Filters,
+                        style: 'primary',
+                        disabled: true,
+                        text: l10n.deleteSelected,
+                        controller: this.controller,
+                        priority: -55,
+                        click: function() {
+                            var removed = [], selection = this.controller.state().get( 'selection' );
+
+                            if ( ! selection.length || ! window.confirm( l10n.warnBulkDelete ) ) {
+                                return;
+                            }
+
+                            selection.each( function( model ) {
+                                if ( ! model.get( 'nonces' )['delete'] ) {
+                                    removed.push( model );
+                                    return;
+                                }
+
+                                model.destroy({wait: true});
+                            } );
+
+                            this.controller.trigger( 'selection:action:done' );
+                        }
+                    }).render() );
+                }
+            }
+
+            if ( this.options.search ) {
+
+                this.toolbar.set( 'searchLabel', new media.view.Label({
+                    value: l10n.searchMediaLabel,
+                    attributes: {
+                        'for': 'media-search-input'
+                    },
+                    priority:   -50
+                }).render() );
+                this.toolbar.set( 'search', new media.view.Search({
+                    controller: this.controller,
+                    model:      this.collection.props,
+                    priority:   -50
+                }).render() );
+            }
+
+            if ( this.options.dragInfo ) {
+                this.toolbar.set( 'dragInfo', new media.View({
+                    el: $( '<div class="instructions">' + l10n.dragInfo + '</div>' )[0],
+                    priority: -40
+                }) );
+            }
+        },
+
+        updateContent: function() {
+
+            var view = this,
+                noItemsView;
+
+            if ( this.controller.isModeActive( 'grid' ) ||
+                 this.controller.isModeActive( 'eml-grid' ) ) {
+                noItemsView = view.attachmentsNoResults;
+            } else {
+                noItemsView = view.uploader;
+            }
+
+            if ( ! this.collection.length ) {
+
+                this.toolbar.get( 'spinner' ).show();
+
+                this.dfd = this.collection.more().done( function() {
+
+                    if ( ! view.collection.length ) {
+                        noItemsView.$el.removeClass( 'hidden' );
+                    } else {
+                        noItemsView.$el.addClass( 'hidden' );
+                    }
+                    view.toolbar.get( 'spinner' ).hide();
+                } );
+
+            } else {
+
+                noItemsView.$el.addClass( 'hidden' );
+                view.toolbar.get( 'spinner' ).hide();
+            }
+        },
+
+        createUploader: function() {
+
+            this.uploader = new media.view.UploaderInline({
+                controller: this.controller,
+                status:     false,
+                message:    this.controller.isModeActive( 'grid' ) || this.controller.isModeActive( 'eml-grid' ) ? '' : l10n.noItemsFound,
+                canClose:   this.controller.isModeActive( 'grid' ) || this.controller.isModeActive( 'eml-grid' )
+            });
+
+            this.uploader.hide();
+            this.views.add( this.uploader );
+        },
+
+        createAttachments: function() {
+            this.attachments = new media.view.Attachments({
+                controller:           this.controller,
+                collection:           this.collection,
+                selection:            this.options.selection,
+                model:                this.model,
+                sortable:             this.options.sortable,
+                scrollElement:        this.options.scrollElement,
+                idealColumnWidth:     this.options.idealColumnWidth,
+
+                // The single `Attachment` view to be used in the `Attachments` view.
+                AttachmentView: this.options.AttachmentView
+            });
+
+            // Add keydown listener to the instance of the Attachments view
+            this.attachments.listenTo( this.controller, 'attachment:keydown:arrow',     this.attachments.arrowEvent );
+            this.attachments.listenTo( this.controller, 'attachment:details:shift-tab', this.attachments.restoreFocus );
+
+            this.views.add( this.attachments );
+
+
+            if ( this.controller.isModeActive( 'grid' ) ||
+                this.controller.isModeActive( 'eml-grid' ) ) {
+
+                this.attachmentsNoResults = new media.View({
+                    controller: this.controller,
+                    tagName: 'p'
+                });
+
+                this.attachmentsNoResults.$el.addClass( 'hidden no-media' );
+                this.attachmentsNoResults.$el.html( l10n.noItemsFound );
+
+                this.views.add( this.attachmentsNoResults );
+            }
         }
     });
 
@@ -634,7 +1075,23 @@ window.eml = window.eml || { l10n: {} };
             original.MediaFrame.Post.activate.apply( this, arguments );
 
             this.on( 'open', content.fixLayout, content );
+            if ( typeof acf != 'undefined' ) {
+                $( document ).on( 'click', '.acf-expand-details', _.debounce( _.bind( content.fixLayout, content ), 250 ) );
+            }
         }
+    });
+
+
+
+    $( document ).ready( function() {
+
+        // TODO: find a better place for this
+        $( document ).on( 'mousedown', '.media-frame .attachments-browser .attachments li', function ( event ) {
+
+            if ( event.ctrlKey || event.shiftKey ) {
+                event.preventDefault();
+            }
+        });
     });
 
 

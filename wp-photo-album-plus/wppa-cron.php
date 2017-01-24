@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
-* Version 6.6.00
+* Version 6.6.11
 *
 *
 */
@@ -21,7 +21,7 @@ add_action( 'wppa_cron_event', 'wppa_do_maintenance_proc', 10, 1 );
 function wppa_schedule_maintenance_proc( $slug, $first = false ) {
 
 	// Schedule cron job
-	wp_schedule_single_event( time() + ( $first ? 10 : 120 ), 'wppa_cron_event', array( $slug ) );
+	wp_schedule_single_event( time() + ( $first ? 10 : 30 ), 'wppa_cron_event', array( $slug ) );
 
 	// Update appropriate options
 	update_option( $slug . '_status', 'Scheduled cron job' );
@@ -59,4 +59,35 @@ global $wpdb;
 	// Re-create permalink htaccess file
 	wppa_create_pl_htaccess();
 
+}
+
+// Activate treecount update proc
+add_action( 'wppa_update_treecounts', 'wppa_do_update_treecounts' );
+
+function wppa_schedule_treecount_update() {
+
+	// Schedule cron job
+	if ( ! wp_next_scheduled( 'wppa_update_treecounts' ) ) {
+		wp_schedule_single_event( time() + 30, 'wppa_update_treecounts' );
+	}
+}
+
+function wppa_do_update_treecounts() {
+global $wpdb;
+
+	$start = time();
+
+	$albs = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_ALBUMS . "` WHERE `a_parent` < '1' ORDER BY `id`" );
+
+	foreach( $albs as $alb ) {
+		$treecounts = wppa_get_treecounts_a( $alb );
+		if ( $treecounts['needupdate'] ) {
+			wppa_verify_treecounts_a( $alb );
+//			wppa_log( 'Dbg', 'Cron fixed treecounts for ' . $alb );
+		}
+		if ( time() > $start + 30 ) {
+			wppa_schedule_treecount_update();
+			exit();
+		}
+	}
 }

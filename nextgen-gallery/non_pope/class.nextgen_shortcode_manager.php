@@ -231,9 +231,11 @@ class C_NextGen_Shortcode_Manager
 		$inner_content = array_shift($args);
 		$parts = explode('____', $method);
 		$shortcode = array_shift($parts);
-		if (doing_filter('the_content')) {
+		if (doing_filter('the_content') && !doing_filter('widget_text')) {
 			return $this->replace_with_placeholder($shortcode, $params, $inner_content);
 		}
+
+		// For widgets, don't use placeholders
 		else {
 			$callback = $this->_shortcodes[$shortcode];
 			return call_user_func($callback, $params, $inner_content);

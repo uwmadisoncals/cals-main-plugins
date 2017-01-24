@@ -883,10 +883,15 @@ if ( ! function_exists( 'wpuxss_eml_save_attachment_compat' ) ) {
 
                 $term_ids = array_map( 'trim', preg_split( '/,+/', $attachment_data[ $taxonomy ] ) );
             }
-            elseif ( isset( $_REQUEST['tax_input'] ) && isset( $_REQUEST['tax_input'][ $taxonomy ] ) ) {
+            elseif ( isset( $_REQUEST['tax_input'] ) ) {
 
-                $term_ids = array_keys( $_REQUEST['tax_input'][ $taxonomy ], 1 );
-                $term_ids = array_map( 'intval', $term_ids );
+                if ( ! isset( $_REQUEST['tax_input'][ $taxonomy ] ) ) {
+                    continue;
+                }
+                else {
+                    $term_ids = array_keys( $_REQUEST['tax_input'][ $taxonomy ], 1 );
+                    $term_ids = array_map( 'intval', $term_ids );
+                }
             }
 
             wp_set_object_terms( $id, $term_ids, $taxonomy, false );
@@ -1258,6 +1263,97 @@ if ( ! function_exists('wpuxss_eml_pre_get_posts') ) {
             }
         }
     }
+}
+
+
+
+/**
+ *  wpuxss_eml_print_media_templates
+ *
+ *  @since    2.4
+ *  @created  07/01/17
+ */
+
+add_action( 'print_media_templates', 'wpuxss_eml_print_media_templates' );
+
+if ( ! function_exists( 'wpuxss_eml_print_media_templates' ) ) {
+
+    function wpuxss_eml_print_media_templates() {
+
+        global $wp_version;
+
+
+        if ( version_compare( $wp_version, '4.3', '<' ) ) {
+
+            $remove_button = '<a class="close media-modal-icon" href="#" title="' . esc_attr__('Remove') . '"></a>';
+
+            $deselect_button = '<a class="check" href="#" title="' . esc_attr__('Deselect') . '" tabindex="-1"><div class="media-modal-icon"></div></a>';
+
+        }
+        else {
+
+            $remove_button = '<button type="button" class="button-link attachment-close media-modal-icon"><span class="screen-reader-text">' . __( 'Remove' ) . '</span></button>';
+
+            $deselect_button = '<button type="button" class="button-link check" tabindex="-1"><span class="media-modal-icon"></span><span class="screen-reader-text">' . __( 'Deselect' ) . '</span></button>';
+
+        } ?>
+
+
+        <script type="text/html" id="tmpl-attachment-grid-view">
+
+            <div class="attachment-preview js--select-attachment type-{{ data.type }} subtype-{{ data.subtype }} {{ data.orientation }}">
+                <div class="eml-attacment-inline-toolbar">
+                    <# if ( data.can.save && data.buttons.edit ) { #>
+                        <i class="eml-icon dashicons dashicons-edit edit" data-name="edit"></i>
+                    <# } #>
+                </div>
+                <div class="thumbnail">
+                    <# if ( data.uploading ) { #>
+                        <div class="media-progress-bar"><div style="width: {{ data.percent }}%"></div></div>
+                    <# } else if ( 'image' === data.type && data.sizes ) { #>
+                        <div class="centered">
+                            <img src="{{ data.size.url }}" draggable="false" alt="" />
+                        </div>
+                    <# } else { #>
+                        <div class="centered">
+                            <# if ( data.image && data.image.src && data.image.src !== data.icon ) { #>
+                                <img src="{{ data.image.src }}" class="thumbnail" draggable="false" />
+                            <# } else { #>
+                                <img src="{{ data.icon }}" class="icon" draggable="false" />
+                            <# } #>
+                        </div>
+                        <div class="filename">
+                            <div>{{ data.filename }}</div>
+                        </div>
+                    <# } #>
+                </div>
+                <# if ( data.buttons.close ) { #>
+                    <?php echo $remove_button; ?>
+                <# } #>
+            </div>
+            <# if ( data.buttons.check ) { #>
+                <?php echo $deselect_button; ?>
+            <# } #>
+            <#
+            var maybeReadOnly = data.can.save || data.allowLocalEdits ? '' : 'readonly';
+            if ( data.describe ) {
+                if ( 'image' === data.type ) { #>
+                    <input type="text" value="{{ data.caption }}" class="describe" data-setting="caption"
+                        placeholder="<?php esc_attr_e('Caption this image&hellip;'); ?>" {{ maybeReadOnly }} />
+                <# } else { #>
+                    <input type="text" value="{{ data.title }}" class="describe" data-setting="title"
+                        <# if ( 'video' === data.type ) { #>
+                            placeholder="<?php esc_attr_e('Describe this video&hellip;'); ?>"
+                        <# } else if ( 'audio' === data.type ) { #>
+                            placeholder="<?php esc_attr_e('Describe this audio file&hellip;'); ?>"
+                        <# } else { #>
+                            placeholder="<?php esc_attr_e('Describe this media file&hellip;'); ?>"
+                        <# } #> {{ maybeReadOnly }} />
+                <# }
+            } #>
+        </script>
+
+    <?php }
 }
 
 ?>

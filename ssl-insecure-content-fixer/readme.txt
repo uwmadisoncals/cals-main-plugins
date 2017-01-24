@@ -6,8 +6,8 @@ Author URI: https://shop.webaware.com.au/
 Donate link: https://shop.webaware.com.au/donations/?donation_for=SSL+Insecure+Content+Fixer
 Tags: ssl, https, insecure content, partially encrypted, mixed content
 Requires at least: 4.0
-Tested up to: 4.7
-Stable tag: 2.2.1
+Tested up to: 4.7.1
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,10 +30,12 @@ Many thanks to the generous efforts of our translators:
 * Bulgarian (bg_BG) -- [the Bulgarian translation team](https://translate.wordpress.org/locale/bg/default/wp-plugins/ssl-insecure-content-fixer)
 * Chinese simplified (zh_CN) -- [the Chinese translation team](https://translate.wordpress.org/locale/zh-cn/default/wp-plugins/ssl-insecure-content-fixer)
 * English (en_CA) -- [the English (Canadian) translation team](https://translate.wordpress.org/locale/en-ca/default/wp-plugins/ssl-insecure-content-fixer)
+* English (en_GB) -- [the English (British) translation team](https://translate.wordpress.org/locale/en-gb/default/wp-plugins/ssl-insecure-content-fixer)
 * German (de_DE) -- [the German translation team](https://translate.wordpress.org/locale/de/default/wp-plugins/ssl-insecure-content-fixer)
 * French (fr_FR) -- [the French translation team](https://translate.wordpress.org/locale/fr/default/wp-plugins/ssl-insecure-content-fixer)
 * Italian (it_IT) -- [the Italian translation team](https://translate.wordpress.org/locale/it/default/wp-plugins/ssl-insecure-content-fixer)
 * Russian (ru_RU) -- [the Russian translation team](https://translate.wordpress.org/locale/ru/default/wp-plugins/ssl-insecure-content-fixer)
+* Spanish (es_ES) -- [the Spanish translation team](https://translate.wordpress.org/locale/es/default/wp-plugins/ssl-insecure-content-fixer)
 
 If you'd like to help out by translating this plugin, please [sign up for an account and dig in](https://translate.wordpress.org/projects/wp-plugins/ssl-insecure-content-fixer).
 
@@ -61,7 +63,7 @@ NB: after you open your browser's console, refresh your page so that it tries to
 
 = I get "insecure content" warnings from some of my content =
 
-You are probably loading content (such as images) with a URL that starts with "http:". Take that bit away, but leave the slashes, e.g. `https://www.example.com/image.png`; your browser will load the content, using HTTPS when your page uses it. Better still, replace "http:" with "https:" so that it always uses https to load images.
+You are probably loading content (such as images) with a URL that starts with "http:". Take that bit away, but leave the slashes, e.g. `//www.example.com/image.png`; your browser will load the content, using HTTPS when your page uses it. Better still, replace "http:" with "https:" so that it always uses https to load images, e.g. `https://www.example.com/image.png`.
 
 If your page can be used outside a web browser, e.g. in emails or other non-web documents, then you should always use a protocol and it should probably be "https:" (since you have an SSL certificate). See [Cleaning up content](https://ssl.webaware.net.au/cleaning-up-content/) for more details.
 
@@ -94,15 +96,16 @@ Great! Tell me which plugin is yours and how to check for your new version, and 
 
 == Upgrade Notice ==
 
-= 2.2.1 =
+= 2.2.2 =
 
-improve accessibility of admin pages
+case-insensitive protocol header tests; support Amazon CloudFront `CloudFront-Forwarded-Proto` header; clean up responsive image srcset links to external images
 
 == Changelog ==
 
 The full changelog can be found [on GitHub](https://github.com/webaware/ssl-insecure-content-fixer/blob/master/changelog.md). Recent entries:
 
-### 2.2.1, 2016-11-19
+### 2.2.2, 2017-01-21
 
-* fixed: improve accessibility of admin pages
-* removed: update message display forced on multisite; just leave that for WordPress to handle (it does it so well)
+* fixed: make protocol header tests case-insensitive (thanks, [waja](https://github.com/waja)!)
+* added: support for Amazon CloudFront `CloudFront-Forwarded-Proto` header (thanks, [gmazovec](https://github.com/gmazovec)!)
+* added: clean up responsive image srcset links to external images (WordPress already handles local images)

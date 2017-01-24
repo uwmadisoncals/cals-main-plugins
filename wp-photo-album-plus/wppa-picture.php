@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 6.5.07
+* Version 6.6.08
 *
 */
 
@@ -122,8 +122,9 @@ function wppa_get_picture_html( $args ) {
 		$title = wppa_zoom_in( $id );
 	}
 
-	// Create the html
-	$result = '';
+	// Create the html. To prevent mis-alignment of the audio control bar
+	// on theme Twenty Seventeen, we wrap it in a div with zero fontsize.
+	$result = '<div style="font-size:0;" >';
 
 	// The link
 	if ( $link ) {
@@ -155,13 +156,14 @@ function wppa_get_picture_html( $args ) {
 		else {
 			$result .=
 			'<a' .
-				( wppa_is_mobile() ? 
-					' ontouchstart="wppaStartTime();" ontouchend="wppaTapLink(\'' . $id . '\',\'' . $link['url'] . '\');" ' : 
-					' onclick="_bumpClickCount( \'' . $id . '\' );window.open(\'' . $link['url'] . '\', \'' . $link['target'] . '\' )"' 
+				( wppa_is_mobile() ?
+					' ontouchstart="wppaStartTime();" ontouchend="wppaTapLink(\'' . $id . '\',\'' . $link['url'] . '\');" ' :
+					' onclick="_bumpClickCount( \'' . $id . '\' );window.open(\'' . $link['url'] . '\', \'' . $link['target'] . '\' )"'
 				) .
 				' title="' . $link['title'] . '"' .
 				' class="thumb-img"' .
 				' id="a-' . $id . '-' . wppa( 'mocc' ) . '"' .
+				' style="cursor:pointer;"' .
 				' >';
 		}
 	}
@@ -205,8 +207,8 @@ function wppa_get_picture_html( $args ) {
 		// Find style for audio controls
 		switch ( $type ) {
 			case 'sphoto':
-				$pad = ( wppa_opt( 'fullimage_border_width' ) === '' ) ? 0 : wppa_opt( 'fullimage_border_width' ) + 1;
-				$bot = ( wppa_opt( 'fullimage_border_width' ) === '' ) ? 0 : wppa_opt( 'fullimage_border_width' ) - 1;
+				$pad = ( wppa_opt( 'fullimage_border_width' ) === '' ) ? 0 : wppa_opt( 'fullimage_border_width' );
+				$bot = ( wppa_opt( 'fullimage_border_width' ) === '' ) ? 0 : wppa_opt( 'fullimage_border_width' );
 
 				$style = 	'margin:0;' .
 							'padding:0 ' . $pad . 'px;' .
@@ -243,6 +245,8 @@ function wppa_get_picture_html( $args ) {
 									);
 		$result .= '</div>';
 	}
+
+	$result .= '</div>';
 
 	// Update statistics
 	if ( ! wppa_in_widget() ) {

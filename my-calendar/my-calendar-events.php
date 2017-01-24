@@ -31,7 +31,7 @@ function mc_get_private_categories() {
 		$categories[] = $result->category_id;
 	}
 	
-	return $categories;
+	return apply_filters( 'mc_private_categories', $categories );
 }
 
 // used to generate upcoming events lists
@@ -162,7 +162,16 @@ function mc_get_rss_events( $cat_id = false ) {
 	} else {
 		$cat = 'WHERE event_approved = 1';
 	}
-	$events = $mcdb->get_results( "SELECT *, UNIX_TIMESTAMP(occur_begin) AS ts_occur_begin, UNIX_TIMESTAMP(occur_end) AS ts_occur_end FROM " . my_calendar_event_table() . " JOIN " . my_calendar_table() . " ON (event_id=occur_event_id) JOIN " . my_calendar_categories_table() . " ON (event_category=category_id) $cat ORDER BY event_added DESC LIMIT 0,30" );
+	$exclude_categories = mc_private_categories();
+	$limit = apply_filters( 'mc_rss_feed_size', 30 );
+	
+	$events = $mcdb->get_results( 
+		"SELECT *, UNIX_TIMESTAMP(occur_begin) AS ts_occur_begin, UNIX_TIMESTAMP(occur_end) AS ts_occur_end 
+		FROM " . my_calendar_event_table() . " 
+		JOIN " . my_calendar_table() . " ON (event_id=occur_event_id) 
+		JOIN " . my_calendar_categories_table() . " ON (event_category=category_id) $cat 
+		$exclude_categories
+		ORDER BY event_added DESC LIMIT 0,$limit" );
 	$groups = $output = array();
 	foreach ( array_keys( $events ) as $key ) {
 		$event =& $events[ $key ];
@@ -424,6 +433,8 @@ function my_calendar_events_now( $category = 'default', $template = '<strong>{li
 	$arr_events = array();
 	$limit_string = "event_flagged <> 1 AND event_approved = 1";
 	$select_category = ( $category != 'default' ) ? mc_select_category( $category ) : '';
+	$exclude_categories = mc_private_categories();
+	
 	// may add support for location/author/host later.
 	$select_location = $select_author = $select_host = '';
 	$now = date( 'Y-m-d H:i:s', current_time( 'timestamp' ) );
@@ -434,6 +445,7 @@ function my_calendar_events_now( $category = 'default', $template = '<strong>{li
 					JOIN " . my_calendar_categories_table( $site ) . " AS c 
 					ON (event_category=category_id) 
 					WHERE $select_category $select_location $select_author $select_host $limit_string  
+					$exclude_categories
 					AND ( CAST('$now' AS DATETIME) BETWEEN occur_begin AND occur_end ) 
 						ORDER BY " . apply_filters( 'mc_primary_sort', 'occur_begin' ) . ", " . apply_filters( 'mc_secondary_sort', 'event_title ASC' );
 	$events      = $mcdb->get_results( $event_query );
@@ -461,6 +473,23 @@ function my_calendar_events_now( $category = 'default', $template = '<strong>{li
 	}	
 	
 	return $return;
+}
+
+/**
+ * Get post associated with a given My Calendar event
+ *
+ * @param int $event_id
+ *
+ * @return mixed int/boolean post ID if found; else false
+ */
+function mc_get_event_post( $event_id ) {
+	$event = mc_get_event_core( $event_id );
+	if ( is_object( $event ) ) {
+		if ( property_exists( $event, 'event_post' ) && get_post_status( $event->event_post ) ) {
+			return $event->event_post;
+		}
+	}
+	return false;
 }
 
 // Grab all events for the requested date from calendar
@@ -537,10 +566,12 @@ function my_calendar_grab_events( $from, $to, $category = null, $ltype = '', $lv
 		}
 	}
 
-	$select_category = ( $ccategory != 'all' ) ? mc_select_category( $ccategory ) : '';
-	$select_author   = ( $clauth != 'all' ) ? mc_select_author( $clauth ) : '';
-	$select_host     = ( $clhost != 'all' ) ? mc_select_host( $clhost ) : '';
-	$select_location = mc_limit_string( 'grab', $cltype, $clvalue );
+	$select_category    = ( $ccategory != 'all' ) ? mc_select_category( $ccategory ) : '';
+	$select_author      = ( $clauth != 'all' ) ? mc_select_author( $clauth ) : '';
+	$select_host        = ( $clhost != 'all' ) ? mc_select_host( $clhost ) : '';
+	$select_location    = mc_limit_string( 'grab', $cltype, $clvalue );
+	$exclude_categories = mc_private_categories();
+	
 	
 	if ( $caching && $source != 'upcoming' ) {
 		$select_category = '';
@@ -565,6 +596,7 @@ function my_calendar_grab_events( $from, $to, $category = null, $ltype = '', $lv
 						OR DATE(occur_end) BETWEEN '$from 00:00:00' AND '$to 23:59:59' 
 						OR ( DATE('$from') BETWEEN DATE(occur_begin) AND DATE(occur_end) ) 
 						OR ( DATE('$to') BETWEEN DATE(occur_begin) AND DATE(occur_end) ) ) 
+					$exclude_categories
 					ORDER BY " . apply_filters( 'mc_primary_sort', 'occur_begin' ) . ", " . apply_filters( 'mc_secondary_sort', 'event_title ASC' );
 	$events      = $mcdb->get_results( $event_query );
 			

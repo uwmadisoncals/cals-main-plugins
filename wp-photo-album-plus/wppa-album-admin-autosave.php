@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.6.00
+* Version 6.6.11
 *
 */
 
@@ -88,7 +88,7 @@ function _wppa_admin() {
 					if ( isset($_REQUEST['bulk']) ) wppa_album_photos_bulk($ei);
 					else wppa_album_photos($ei);
 				?>
-				<br /><a href="#manage-photos"><?php _e('Top of page', 'wp-photo-album-plus') ?></a>
+				<div style="position:fixed;right:30px;bottom:30px;background-color:lightblue;" >&nbsp;<a href="#manage-photos"><?php _e('Top of page', 'wp-photo-album-plus') ?></a>&nbsp;</div>
 				<br /><a href="<?php echo $back_url ?>"><?php _e('Back to album table', 'wp-photo-album-plus') ?></a>
 <?php
 				return;
@@ -126,7 +126,7 @@ function _wppa_admin() {
 				else {
 					$edit_id = $id;
 					wppa_set_last_album($edit_id);
-					wppa_flush_treecounts($edit_id);
+					wppa_invalidate_treecounts($edit_id);
 					wppa_index_add('album', $id);
 					wppa_update_message(__('Album #', 'wp-photo-album-plus') . ' ' . $edit_id . ' ' . __('Added.', 'wp-photo-album-plus'));
 					wppa_create_pl_htaccess();
@@ -191,6 +191,11 @@ function _wppa_admin() {
 			$cats 			= stripslashes( trim( $albuminfo['cats'], ',' ) );
 			$default_tags 	= trim( $albuminfo['default_tags'], ',' );
 			$cover_linktype = $albuminfo['cover_linktype'];
+
+			$treecounts 	= wppa_get_treecounts_a( $id, true );
+			$pviews 		= $treecounts['selfphotoviews'];
+			$tpviews 		= $treecounts['treephotoviews'];
+			$nsub 			= $treecounts['selfalbums'];
 
 			// Open the photo album admin page
 			echo
@@ -329,15 +334,24 @@ function wppaTryScheduleAll( id ) {
 									// Views
 									if ( wppa_switch( 'track_viewcounts' ) ) {
 										echo
-										__( 'Views:', 'wp-photo-album-plus' ) . ' ' . $views . '. ';
+										__( 'Album Views:', 'wp-photo-album-plus' ) . ' ' . $views . ', ';
+										echo
+										__( 'Photo views:', 'wp-photo-album-plus' ) . ' ' . $pviews . '. ';
+										if ( $nsub ) {
+											echo
+											__( 'Photo views inc sub albums:', 'wp-photo-album-plus' ) . ' ' . $tpviews . '. ';
+										}
 									}
-									
+
 									// Clicks
 									if ( wppa_switch( 'track_clickcounts' ) ) {
 										$click_arr = $wpdb->get_col( "SELECT `clicks` FROM `" . WPPA_PHOTOS . "` WHERE `album` = $id" );
 										echo
 										__( 'Clicks:', 'wp-photo-album-plus' ) . ' ' . array_sum( $click_arr ) . '. ';
 									}
+
+									// Newline
+									echo '<br />';
 
 									// Owner
 									echo
@@ -585,8 +599,30 @@ function wppaTryScheduleAll( id ) {
 										echo '. ';
 									}
 
+									// Watermark
+									if ( wppa_switch( 'watermark_on' ) ) {
+
+										// Newline
+										echo '<br />';
+
+										echo
+										__( 'Watermark file:', 'wp-photo-album-plus' ) .
+										'<select' .
+											' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'wmfile\', this )"' .
+											' >' .
+											wppa_watermark_file_select( 'album', $id ) .
+										'</select>' .
+										' ' .
+										__( 'Watermark pos:', 'wp-photo-album-plus' ) .
+										'<select' .
+											' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'wmpos\', this )"' .
+											' >' .
+											wppa_watermark_pos_select( 'album', $id ) .
+										'</select>';
+									}
+
 									// Status
-									echo
+									echo '<br />' .
 									__( 'Remark:', 'wp-photo-album-plus' ) . ' ' .
 									'<span' .
 										' id="albumstatus-' . $id . '"' .
@@ -1024,7 +1060,7 @@ function wppaTryScheduleAll( id ) {
 					elseif ( isset($_REQUEST['seq']) ) wppa_album_photos_sequence($edit_id);
 					else wppa_album_photos($edit_id)
 				?>
-				<br /><a href="#manage-photos"><?php _e('Top of page', 'wp-photo-album-plus') ?></a>
+				<div style="position:fixed;right:30px;bottom:30px;background-color:lightblue;" >&nbsp;<a href="#manage-photos"><?php _e('Top of page', 'wp-photo-album-plus') ?></a>&nbsp;</div>
 			</div>
 <?php 	}
 
@@ -1407,8 +1443,8 @@ global $wpdb;
 				foreach (array_keys($seq) as $s) {
 					$album = $albums[$s];
 					if (wppa_have_access($album)) {
-						$counts = wppa_treecount_a($album['id']);
-						$pendcount = $counts['pendphotos'];
+						$counts = wppa_get_treecounts_a($album['id'], true);
+						$pendcount = $counts['pendselfphotos'];
 //						$pendcount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE album=%s AND status=%s", $album['id'], 'pending'));
 						?>
 						<tr <?php echo($alt); if ($pendcount) echo 'style="background-color:#ffdddd"' ?>>
@@ -1423,8 +1459,8 @@ global $wpdb;
 							<?php $url = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id='.$album['id']); ?>
 							<?php $na = $counts['selfalbums']; ?>
 							<?php $np = $counts['selfphotos']; ?>
-							<?php $nm = $counts['pendphotos']; ?>
-							<?php $ns = $counts['scheduledphotos']; ?>
+							<?php $nm = $counts['pendselfphotos']; ?>
+							<?php $ns = $counts['scheduledselfphotos']; ?>
 							<td><?php echo $na.'/'.$np.'/'.$nm.'/'.$ns; ?></td>
 							<?php if ( $album['owner'] != '--- public ---' || wppa_user_is('administrator') ) { ?>
 								<?php $url = wppa_ea_url($album['id']) ?>
@@ -2012,9 +2048,9 @@ global $wpdb;
 			$album = $albums[$s];
 			if ( $album['a_parent'] == $parent ) {
 				if (wppa_have_access($album)) {
-					$counts = wppa_treecount_a($album['id']);
-					$pendcount = $counts['pendphotos'];
-					$schedulecount = $counts['scheduledphotos'];
+					$counts = wppa_get_treecounts_a($album['id'], true);
+					$pendcount = $counts['pendselfphotos'];
+					$schedulecount = $counts['scheduledselfphotos'];
 					$haschildren = wppa_have_accessable_children($album);
 					{
 						$class = '';
@@ -2068,8 +2104,8 @@ global $wpdb;
 							<?php $url = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id='.$album['id']); ?>
 							<?php $na = $counts['selfalbums']; ?>
 							<?php $np = $counts['selfphotos']; ?>
-							<?php $nm = $counts['pendphotos']; ?>
-							<?php $ns = $counts['scheduledphotos']; ?>
+							<?php $nm = $counts['pendselfphotos']; ?>
+							<?php $ns = $counts['scheduledselfphotos']; ?>
 							<td><?php echo $na.'/'.$np.'/'.$nm.'/'.$ns; ?></td>
 							<?php if ( $album['owner'] != '--- public ---' || wppa_user_is('administrator') ) { ?>
 								<?php $url = wppa_ea_url($album['id']) ?>
@@ -2141,7 +2177,7 @@ global $wpdb;
 //				wppa_dbg_msg('Del photo took :'.$t, 'red', 'force');
 				// Time up?
 				if ( wppa_is_time_up() ) {
-					wppa_flush_treecounts( $id );
+					wppa_invalidate_treecounts( $id );
 					$msg = sprintf( __( 'Time is out after %d photo deletes. Please redo this operation' , 'wp-photo-album-plus'), $cnt );
 					if ( wppa( 'ajax' ) ) {
 						echo $msg;
@@ -2166,11 +2202,11 @@ global $wpdb;
 				}
 			}
 		}
-		wppa_flush_treecounts($move);
+		wppa_invalidate_treecounts($move);
 	}
 
 	// First flush treecounts, otherwise we do not know the parent if any
-	wppa_flush_treecounts($id);
+	wppa_invalidate_treecounts($id);
 
 	// Now delete the album
 	$wpdb->query($wpdb->prepare('DELETE FROM `' . WPPA_ALBUMS . '` WHERE `id` = %s LIMIT 1', $id));

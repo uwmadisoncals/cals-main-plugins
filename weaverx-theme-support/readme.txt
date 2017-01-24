@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: weaverx-theme-support
 Requires at least: 4.5
 Tested up to: 4.7
-Stable tag: 3.0
+Stable tag: 3.1
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -75,6 +75,13 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog ==
+
+= 3.1 =
+New: Support for WordPress Custom Header Video
+Tweak: show version in output
+Tweak: updated per page / per post option scan
+Fix: removed duplicated tagline width option
+
 = 3.0 =
 * New: Weaver Xtreme 3.0 compatibility
 * New: Added style= to [login]

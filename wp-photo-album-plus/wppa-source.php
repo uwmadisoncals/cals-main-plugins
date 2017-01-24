@@ -58,12 +58,15 @@ function wppa_delete_source( $name, $alb ) {
 		$path = wppa_get_source_album_dir( $alb ).'/'.$name;
 		$path = wppa_strip_ext( $path );
 
-		$paths = glob( $path . '.*' );
+		$all_paths = glob( $path . '.*' );
 		$o1paths = glob( $path . '-o1.*' );
-		$all_paths = array_merge( $paths, $o1paths );
+		
+		if ( is_array( $all_paths ) && is_array( $o1paths ) ) {
+			$all_paths = array_merge( $all_paths, $o1paths );
+		}
 
 		// Delete all possible file-extensions
-		foreach( $all_paths as $p ) if ( is_file( $p ) ) {
+		if ( is_array( $all_paths ) ) foreach( $all_paths as $p ) if ( is_file( $p ) ) {
 			unlink( $p );								// Ignore error
 		}
 

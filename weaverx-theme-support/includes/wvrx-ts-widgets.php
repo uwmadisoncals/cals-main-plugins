@@ -3,6 +3,7 @@
  *  Weaver X Widgets and shortcodes - widgets
  */
 
+
 class WeaverX_Widget_Text extends WP_Widget {
 
 	function __construct() {
@@ -161,9 +162,9 @@ add_filter('weaverx_text', 'do_shortcode');
 add_filter('widget_text', 'do_shortcode');		// add to standard text widget, too.
 
 function wvrx_ts_load_widgets() {
-	register_widget("WeaverX_Widget_Text");
-	register_widget("WeaverX_Widget_PPText");
-	register_widget("WeaverX_Widget_Login");
+	register_widget('WeaverX_Widget_Text');
+	register_widget('WeaverX_Widget_PPText');
+	register_widget('WeaverX_Widget_Login');
 }
 
 ?>

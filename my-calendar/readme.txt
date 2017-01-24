@@ -3,8 +3,8 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
-Tested up to: 4.6
-Stable tag: 2.5.3
+Tested up to: 4.7
+Stable tag: 2.5.5
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -82,6 +82,27 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
    with shortcode options or widget configuration.
 
 == Changelog ==
+
+= 2.5.6 =
+
+* New filter: mc_user_can_see_private_events to change criteria for visibility of private events
+* New filter: mc_private_categories to tweak which categories are considered private
+* Bug fix: PHP warning due to cache query occurring when caching is not enabled
+* Bug fix: images entered only as URLs deleted on edit
+* Accessibility: aria-expanded attached to wrong element in list view
+* Accessibility: ornamental icon fonts exposed to screen readers
+
+= 2.5.5 =
+
+* Bug fix: notices when generating classes for upcoming events
+* Bug fix: RSS feed should respect private categories
+* Bug fix: Events happening now shortcode should respect private categories
+* Bug fix: iCal output should respect private categories
+* Bug fix: @ suppressed notices in template tag parsing. props @uscore713
+* Bug fix: eliminate two notices in upcoming events class parsing
+* New filter: mc_draw_upcoming_event
+* New filter: mc_draw_todays_event
+* Marked as compatible with 4.7
 
 = 2.5.4 =
 

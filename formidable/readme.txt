@@ -1,52 +1,65 @@
 === Formidable Forms ===
 Contributors: sswells, srwells, jamie.wahlin
-Tags: contact form, contact, custom form, database, email, feedback, form, forms, poll, Post, captcha, spam, survey, template, widget, multisite, form builder, form creator, form manager,
+Tags: form, contact form, form builder, custom form, forms, form maker, form creator
 Requires at least: 3.8
-Tested up to: 4.6.1
-Stable tag: 2.02.10
+Tested up to: 4.7
+Stable tag: 2.03
 
-Beautiful forms in 60 seconds. The WordPress form builder that enables you to create forms with a simple drag-and-drop interface and in-place editing.
+The best WordPress form plugin. Simple drag & drop form building, visual form styling, and unlimited email notifications. 
 
 == Description ==
-Build WordPress forms the fast and simple way with a simple drag-and-drop interface (and a visual form styler in version 2.0). Create custom Formidable forms or generate them from a template with this stunning WordPress form plugin.
+= WordPress Form Builder Plugin =
+Formidable Forms is a flexible and free WordPress form plugin. Easily create contact forms, polls and surveys, or lead generation forms. Start with pre-built form templates or create totally custom forms. From the smallest sidebar opt-in form to large job application forms, Formidable is built to do it all.
 
-[View Documentation](http://formidablepro.com/knowledgebase/ "View Documentation")
-[Contribute on Github](https://github.com/Strategy11/formidable-forms "Contribute on Github")
+Create professional contact forms without any code. Use the built-in visual styler to instantly customize the look and feel of your forms. Additionally,  changing the form layout is simple with included layout classes. If you need more advanced customizations, you have complete access to edit the form HTML and CSS.
+
+[View form builder Documentation](https://formidableforms.com/knowledgebase/ "View form builder Documentation")
 
 = Features =
-* Create forms with 7 field types: text, email, url, paragraph text, radio, checkbox, and dropdown
-* Create forms from existing templates or add your own. A contact form template is included.
-* Send unlimited email notifications
-* Create a single styling template using our visual form styler
-* View form submissions from the back-end
-* Import and export forms with XML
-* Send forms to the trash
-* Generate shortcodes with an advanced shortcode UI
-* Customize the HTML in your form for any layout you would like, or use our CSS classes to arrange your fields
-* Integrate with the one-click reCAPTCHA and Akismet for Spam control
-* Use placeholder default values in form fields that clear when clicked
-* Direct links available for previews and emailing surveys with and without integration with your theme
-* Change the name on the Formidable menu to anything you would like
-* Insert your forms on a page, post, or widget using a shortcode [formidable id=x]
-* Support for bugs. We want it to be perfect!
+* Create unlimited forms with all the essential field types: single line text, email, URL, paragraph text, radio, checkbox, dropdown, and reCaptcha.
+* Create forms from pre-built templates or add your own. A free contact form template is included.
+* Send unlimited email notifications.
+* Create a single styling template using the visual form styler.
+* View form submissions from the back-end.
+* Import and export Formidable forms and templates.
+* Send forms to the trash.
+* Publish forms with an easy-to-use shortcode UI.
+* Customize the form’s success message and submit button text.
+* Use our ready-made CSS classes (or your own custom CSS classes) to arrange your fields.
+* Create multi-column forms easily.
+* Integrate with the one-click reCAPTCHA and Akismet for Spam control.
+* Use placeholder default values in form fields that clear when clicked.
+* Direct links available for previews and emailing surveys with and without integration with your theme.
+* Change the name on the ‘Forms’ admin menu to anything you would like for white labeling.
+* Every submission is saved to your database. Even if an email fails, you won’t lose anything.
+
+Formidable Forms Pro is a premium upgrade that adds multi-page forms, conditional logic, payment integrations and data management. Not only can you collect data, but you can also display it on the front-end of your site. Add the ability to input, display, edit and filter data on the front end without any additional plugins. Formidable Forms is a powerful solution for purchase forms, member directories, user registration, and more.
 
 = Pro Features =
-* Access even more field types: Section headings (repeatable in 2.0), page breaks, file upload, rich text, number, phone number, date, time, scale, dynamic fields populated from other forms, hidden field, user ID field, password, HTML, and tags
-* Conditionally send your email notifications based on values in your form
-* Create multiple styling templates and assign them to any of your forms, and add instant Bootstrap styling
-* Flexibly and powerfully view, edit, and delete entries from anywhere on your site, and specify who has permission to do so
-* Generate graphs and stats based on your submitted data
-* Create and edit WordPress posts from the front-end
-* Use our add-ons for user registration, payment, and integration with other services like MailChimp, Aweber, Highrise, Twilio for SMS, WPML, and Zapier
-* Logged-in users can save drafts and return later
-* Integrate the Math Captcha plugin for alternative spam protection
-* Generate custom calculations
-* Hide and show fields conditionally based on other fields or the user's role
-* Export and import entries with CSV
-* Import our pre-built form/view demo templates as a starting point or a final product
-* Support for all Formidable features. If you have questions or need guidance on how to set up your application, we are happy to help. We want to make you look fabulous for your clients, and allow you to take on big jobs.
+* Over 30 field types: page breaks, section headings, repeating field groups, file uploads, rich text, number, phone number, date, time, scale, dynamic fields populated from other forms, hidden fields, user ID fields, password, HTML, tags, address, and more.
+* Multi-Page forms: Create beautiful paged forms with rootline and progress indicators. Use conditional logic on page breaks for branching forms.
+* Conditional logic: show or hide fields in your form based on user selections or the role of the user.
+* Email routing: conditionally send multiple email notifications based on values in your form.
+* Calculations: create basic and complex calculations, even combine text from multiple fields.
+* Styling Templates: Create multiple styling templates and assign them to any of your forms. Need Bootstrap form styling? We’ve got you covered.
+* Entry management: Flexibly and powerfully display, edit, and delete entries from anywhere on your site, and specify who has permission to do so.
+* Views: unique to Formidable Forms is the core ability to display data in custom format.
+* Graphs and stats based on your submitted data.
+* Create and edit WordPress posts, pages, and even custom post types from front-end forms.
+* Front-end editing: allow users to edit their entries and posts from the front-end of your site.
+* Saved Drafts: logged-in users can save form progress and return later.
+* Vast add-on library: user registration, form action automation, signature, a form API, and integration with other services like PayPal, Stripe, Authorize.net, MailChimp, Aweber, Highrise, Twilio for SMS, WPML, Polylang, Bootstrap, and Zapier.
+* Form permission settings: limit form visibility based on user role.
+* Conditionally redirect after submission.
+* Prefill or prepopulate forms with user meta.
+* Export and import entries with CSV.
+* Limit number of entries per user, IP, or cookie.
+* Import our pre-built form/view demo templates as a starting point or a final product.
+* World Class Support: if you have questions or need guidance on how to set up your application, we are happy to help. Our goal with Formidable Forms is to help you take on bigger projects, earn more clients, and grow your business.
 
-Learn more at: http://formidablepro.com
+Learn more at [Formidable Forms](https://formidableforms.com/ "Formidable Forms")
+
+[Contribute on Github](https://github.com/Strategy11/formidable-forms "Contribute on Github")
 
 == Installation ==
 1. Go to your Plugins -> Add New page in your WordPress admin
@@ -55,18 +68,18 @@ Learn more at: http://formidablepro.com
 4. Activate the plugin through the 'Plugins' menu
 5. Go to the Formidable menu
 6. Click the 'Add New' button to create a new form
-7. Insert your form with the shortcode [formidable id=x] in pages, posts, or text widgets. Alternatively use `<?php echo FrmFormsController::show_form(2, $key = '', $title=true, $description=true); ?>` in your template
+7. Insert your forms on a page, post, or widget using a shortcode [formidable id=x], Alternatively use `<?php echo FrmFormsController::show_form(2, $key = '', $title=true, $description=true); ?>` in your template
 
 == Screenshots ==
-1. Create beautiful WordPress forms without any code.
-2. Form creation page
+1. Build professional WordPress forms without any code.
+2. Form builder page
 3. Field Options and CSS Layout Classes
 4. Field Options for checkbox fields
 5. Entry Management page
 6. Form Widget
 
 == Frequently Asked Questions ==
-= Q. Why aren't I getting any emails? =
+= Q. Why am I not I getting any emails? =
 
 A. Try the following steps:
 
@@ -81,13 +94,120 @@ A. Try the following steps:
 
 A. The field and form names and descriptions are all changed with in-place edit. Just click on the text you would like to change, and it will turn into a text field.
 
-= Q. Why isn't the form builder page working after I updated? =
-
-A. Try clearing your browser cache. As plugin modifications are made, frequent javascript and stylesheet changes are also made. However, the previous versions may be cached so you aren't using the modified files. After clearing your cache and you're still having issues, please let us know.
-
-[See more FAQs](http://formidablepro.com/formidable-faqs/ "Formidable Form FAQs")
+[See more FAQs](https://formidableforms.com/formidable-faqs/ "Formidable Form FAQs")
 
 == Changelog ==
+= 2.03 =
+* New: Add a combined list of all entries on the Formidable -> Entries page instead of defaulting to the first form
+* New: Replace submit input with button for new forms. This allows us to show the loading indicator on top of the button instead of outside. This applies to new forms only. Existing forms will need the submit button HTML adjusted to see this new styling. But we decided it was best for reverse compatability if we don't change it automatically
+* New: Add frm_after_title hook for inserting content between the title and form fields
+* Enhancement: Speed up adding and editing field options and conditional logic in the form builder
+* Enhancement: Don't save the field options until the whole form is saved
+* Tweak: Pass error array in frm_get_paged_fields instead of true/false. If you are using the frm_get_paged_fields hook, it's possible your code may need to be adjusted.
+* Fix: styling issue when select field moves when changing between a blank and not blank option
+* Fix: Make sure "Activate" button for add-ons is specific to subsite in multisite network
+* Removed: pro fields and styling options from the visual styler, extra pro version css, and registering pro scripts. We don't need unused options.
+* **Pro Version** *
+* New: Add multi page progress bars and rootline to jump to different pages
+* New: Add a page number parameter to the url when the form page changes
+* New: Auto-save drafts on page turn when drafts are enabled
+* New: Add save button to back-end entries. This allows an entry to be saved from any page when editing.
+* New: Break out repeating sections in the email and frm-single-entry shortcode. Now they repeat instead of separate with commas.
+* New: Add options for email content/single entry shortcode: include_extras="section,page,html", include_fields="10,15", exclude_fields="10,15"
+* New: Change the time field to multiple dropdowns that always save in hh:mm format. This allows for secondary sorting by time fields in views. Using h:i A for the time format in a shortcode will be forced to g:i A.
+* Enhancement: Switch the unique time functionality from front-end disabling to back-end validation
+* Enhancement: Hide form on page load and fade it in to prevent conditional fields flashing
+* Enhancement: Order the post type dropdown by post key instead of defaulting to the order of post type creation
+* Enhancement: Make the custom field options more helpful by including custom fields only for the selected post type
+* Enhancement: Add .frm_loading_form class on the form tag while the form is processing
+* Enhancement: Show the dropzone error message all the time instead of only on hover
+* Tweak: Use css to make the conditional logic field options shorter instead of truncating in the form builder
+* Tweak: Use function to convert field object to array during in_section migration.
+* Tweak: Avoid errors after Lookup field is deleted and other fields watched that Lookup field.
+* Fix: Do not delete values in frm_item_metas table for all fields selected in Create Post action (such as the conditional logic).
+* Fix: Show the correct option label for a blank value. Previously option label for "0" saved value was displaying.
+* Fix: Compact file upload field wasn't aligned with other fields in the row
+* Fix: Evaluate date strings the same way in view filters and inline conditions for date fields
+
+= 2.02.13 =
+* New: Add frm_send_separate_emails filter. If there are multiple emails in the "to" box, this hook will send one email per address.
+* Fixed: Prevent field option reset when a style is included with the imported form
+* **Pro Version** *
+* New: Add dynamic Lookup population options to paragraph fields
+* New: Allow no_link=1 for [25 truncate=20 no_link=1]. By default, when a value is truncated in a view, it shows a link to show more content. This shortcode option can remove the link.
+* New: Add does_not_contain filter to stats shortcode
+* New: Add frm_filter_view hook for modifying View object
+* New: Add frm_graph_default_colors hook
+* Tweak: Replace all formidablepro.com links with formidableforms.com
+* Improved: Remove arrows on read-only HTML5 number field
+* Improved: Apply Formidable styling to Dynamic List fields
+* Improved: Allow Lookup fields with repeating section values to filter based on parent value
+* Improved: Arrows on read-only number field removed from Firefox
+* Fixed: Do not enable read-only dependent Lookup fields
+* Fixed: Form scrolls correctly on page turn
+* Fixed: JavaScript errors caused by file upload field in Woocommerce form
+* Fixed: Allow ajax submit if there are no file fields on the page with a value
+* Fixed: Correctly import address values into Address field
+* Fixed: [created_at] conditionals take timezone into account
+* Fixed: Do not urlencode GET variables that are set in form shortcode
+* Fixed: Prevent WordPress auto paragraphs from adding unwanted paragraph tags in calendar View headings
+* Fixed: Removed repeating fields from non-repeating field logic
+
+= 2.02.12 =
+* Fixed: PHP 7.1 illegal string offset warnings addressed.
+* **Pro Version** *
+* New: Add frm_order_lookup_options hook to adjust the order of options in a Lookup field.
+* Fixed: JavaScript errors were occurring when illegal file type was uploaded and Woocommerce was active.
+* Fixed: Make sure PDF files display correctly with show_image=1 in WP 4.7.
+* Fixed: Scroll error when switching pages with Ajax submit.
+* Fixed: Make sure dependent autocomplete Lookup fields aren't disabled permanently.
+* Fixed: Make sure GET variables set in View shortcodes work correctly.
+
+= 2.02.11 =
+* New: Added frm_create_default_email_action hook to prevent default email action creation.
+* New: Added frm_inline_submit CSS Layout Class.
+* Improved: Include IP for checking comment blacklist.
+* Improved: Load minified themepicker js and placeholder js when possible.
+* Improved: Better spam checking with Akismet.
+* Improved: Update placeholder JS for old browsers to v2.3.1.
+* Fixed: Don’t force fields created by a add-on to a text field when Pro is not installed.
+* Fixed: Style success message text color now applies to nested paragraph tags.
+* Fixed: Prevent PHP warning messages some sites are seeing during cache key retrieval.
+* Fixed: -1 offset in frm_scroll_offset hook now stops auto-scrolling.
+* Fixed: Invalid Portuguese translation for field is invalid message.
+* Fixed: A few HTML errors on form Settings page are resolved.
+* Fixed: Set default margin on checkbox and radio divs. This resolves conflicts with Bootstrap styling and frm_two_col and frm_three_col classes.
+* Fixed: If same form is published multiple times on the same page, make sure success message shows with the right occurrence of the form. Auto-scroll to the correct form as well.
+* **Pro Version** *
+* New: Add time_ago=2 and time_ago=3 to created_at shortcode options. The number used here will determine how many time levels are shown, e.g. time_ago=1 will show “2 years”, time_ago=2 will show “2 years 3 months”, time_ago=3 will show "2 years 3 months 15 days”.
+* New: Allow time comparisons with NOW, e.g. [if x less_than="NOW"]Show this content[/if x]
+* New: Added author_link parameter to userID shortcode options. [25 show=author_link] will include a link to the WordPress author page.
+* New: Added frm_allow_date_mismatch hook to improve validation for certain date formats. This may be needed if you are using a custom format in your date fields that include non-English text.
+* New: Added greater than or equal to and less than or equal to filter to stats and graphs.
+* Improved: Added comma between values in text calculation when multiple values come from the same field.
+* Improved: RTL indented sub-category styling for checkboxes and radio buttons.
+* Improved: Include the hidden Dropzone field inside the form instead of in the footer.
+* Improved: Remove entry div from the page after fadeout when deleting an entry.
+* Improved: Order post type dropdown in Create Post action by post key.
+* Improved: Allow repeating fields to be selected in a field's Lookup population options.
+* Improved: Repeating entry keys are now randomly generated.
+* Improved: Allow dynamic default value shortcodes in calculation box.
+* Fixed: Do not filter shortcodes submitted in entry when editing the entry. Process external shortcodes before replacing [input].
+* Fixed: The default value is now set correctly in dependent Lookup radio and checkbox fields.
+* Fixed: Style font now applies to section headings.
+* Fixed: Unnecessary urlencode removed from $_GET variable. Allows searching with + symbol in query string now.
+* Fixed: Endless loop prevented when new child form is given same ID as parent from XML.
+* Fixed: Allow updating of read-only dropdown in back-end Entries.
+* Fixed: Lookup field options wouldn't update while dropdown was open in Chrome on Windows. Dropdown is now disabled until options are completely loaded.
+* Fixed: Ensure that autocomplete text shows in dropdown when theme styling is overridden in Style.
+* Fixed: UserID field now autopopulates correctly when creating an entry in the WordPress dashboard.
+* Fixed: Errors on entries page when file didn't exist.
+* Fixed: The include_zero parameter in graphs caused errors with certain WordPress date formats. This now works with any date format.
+* Fixed: Using "hours" in a Creation Date View filter would result in erroneous results.
+* Fixed: Data was duplicated in the frm_item_metas and post meta or taxonomies table. It is now only present in the post meta or taxonomies table.
+* Fixed: Do not force html=1 on file upload field in frm-field-value shortcode.
+* Fixed: Prevent errors when a hidden field or text field is used for post status.
+
 = 2.02.10 =
 * Add frm_form_error_class hook
 * Fix db error when updating title in some forms
@@ -578,7 +698,7 @@ A. Try clearing your browser cache. As plugin modifications are made, frequent j
 * Show a message if no license has been entered for an add-on
 
 = 2.0.15 =
-* Send plugin updates through formidablepro.com
+* Send plugin updates through formidableforms.com
 * Update Swedish translation
 * Use media_buttons hook instead of deprecated media_buttons_context hook
 * Unit test updates
@@ -603,7 +723,7 @@ A. Try clearing your browser cache. As plugin modifications are made, frequent j
 * Fix error with no posted values in embedded forms
 * Escape CSV cells with ' if they start with = (this is to prevent a vulnerability in Excel)
 * Prevent array keys from being appended to user meta vals
-* Switch autoupdating to EDD at formidablepro.com
+* Switch autoupdating to EDD at formidableforms.com
 * Prevent frm_display_id from switching when View is updated
 * Fix multi-file upload display for embedded forms
 * Allow text value to autopopulate dynamic fields
@@ -1518,7 +1638,7 @@ A. Try clearing your browser cache. As plugin modifications are made, frequent j
 * PRO: Added entry key and entry ID to the where options in custom displays
 * PRO: Added HTML classes on the search form, so if themes include styling for the WP search form, it will be applied to the [frm-search] as well
 * PRO: Allow multiple data from entries fields to be searched using the frm-search shortcode instead of only one
-* PRO: Fixed update checking to not cause a slow down if the formidablepro.com server is down
+* PRO: Fixed update checking to not cause a slow down if the formidableforms.com server is down
 * PRO: Updated the user_id parameter for the display-frm-data shortcode to be used even if there's no user ID field selected in the where options for that custom display
 * PRO: Added DOING_AJAX flags for WPML compatibility
 * PRO: Added time_ago=1 option for displaying dates. Ex: [created-at time_ago=1] or [25 time_ago=1]

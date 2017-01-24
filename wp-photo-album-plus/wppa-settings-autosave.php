@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.6.07
+* Version 6.6.11
 *
 */
 
@@ -1134,15 +1134,36 @@ global $wp_version;
 							$tags = 'cover,album,size,layout';
 							wppa_setting($slug, '4', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Coverphoto responsive', 'wp-photo-album-plus');
+							$desc = __('Check this box if you want a responsive coverphoto.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_coverphoto_responsive';
+							$clas = 'cvpr';
+							$onch = 'wppaCheckCheck(\'coverphoto_responsive\',\''.$clas.'\')';
+							$html = wppa_checkbox($slug, $onch);
+							$clas = '';
+							$tags = 'cover,album,thumb,size';
+							wppa_setting($slug, '5.0', $name, $desc, $html, $help, $clas, $tags);
+
 							$name = __('Coverphoto size', 'wp-photo-album-plus');
 							$desc = __('The size of the coverphoto.', 'wp-photo-album-plus');
 							$help = esc_js(__('This size applies to the width or height, whichever is the largest.', 'wp-photo-album-plus'));
 							$help .= '\n'.esc_js(__('Changing the coverphoto size may result in all thumbnails being regenerated. this may take a while.', 'wp-photo-album-plus'));
 							$slug = 'wppa_smallsize';
 							$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus'));
-							$clas = '';
+							$clas = '-cvpr';
 							$tags = 'cover,album,thumb,size';
-							wppa_setting($slug, '5', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting($slug, '5.1a', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Coverphoto size', 'wp-photo-album-plus');
+							$desc = __('The size of the coverphoto.', 'wp-photo-album-plus');
+							$help = esc_js(__('This size applies to the width or height, whichever is the largest.', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('Changing the coverphoto size may result in all thumbnails being regenerated. this may take a while.', 'wp-photo-album-plus'));
+							$slug = 'wppa_smallsize_percentage';
+							$html = wppa_input($slug, '40px', '', __('percent', 'wp-photo-album-plus'));
+							$clas = 'cvpr';
+							$tags = 'cover,album,thumb,size';
+							wppa_setting($slug, '5.1b', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Coverphoto size multi', 'wp-photo-album-plus');
 							$desc = __('The size of coverphotos if more than one.', 'wp-photo-album-plus');
@@ -1150,9 +1171,19 @@ global $wp_version;
 							$help .= '\n'.esc_js(__('Changing the coverphoto size may result in all thumbnails being regenerated. this may take a while.', 'wp-photo-album-plus'));
 							$slug = 'wppa_smallsize_multi';
 							$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus'));
-							$clas = '';
+							$clas = '-cvpr';
 							$tags = 'cover,album,thumb,size';
-							wppa_setting($slug, '6', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting($slug, '6.1a', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Coverphoto size multi', 'wp-photo-album-plus');
+							$desc = __('The size of coverphotos if more than one.', 'wp-photo-album-plus');
+							$help = esc_js(__('This size applies to the width or height, whichever is the largest.', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('Changing the coverphoto size may result in all thumbnails being regenerated. this may take a while.', 'wp-photo-album-plus'));
+							$slug = 'wppa_smallsize_multi_percentage';
+							$html = wppa_input($slug, '40px', '', __('percent', 'wp-photo-album-plus'));
+							$clas = 'cvpr';
+							$tags = 'cover,album,thumb,size';
+							wppa_setting($slug, '6.1b', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Size is height', 'wp-photo-album-plus');
 							$desc = __('The size of the coverphoto is the height of it.', 'wp-photo-album-plus');
@@ -1632,6 +1663,22 @@ global $wp_version;
 							}
 						wppa_setting_subheader( 'B', '1', __( 'Slideshow related visibility settings' , 'wp-photo-album-plus') );
 							{
+							$name = __('Navigation type', 'wp-photo-album-plus');
+							$desc = __('Select the type of navigation you want.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_navigation_type';
+							$opts = array( 	__('Icons', 'wp-photo-album-plus'),
+											__('Icons on mobile, text on pc', 'wp-photo-album-plus'),
+											__('Text', 'wp-photo-album-plus'),
+										);
+							$vals = array( 	'icons',
+											'iconsmobile',
+											'text',
+										);
+							$html = wppa_select($slug, $opts, $vals);
+							$tags = 'slide,navi';
+							wppa_setting($slug, '0', $name, $desc, $html, $help, $clas, $tags);
+
 							$name = __('Start/stop', 'wp-photo-album-plus');
 							$desc = __('Show the Start/Stop slideshow bar.', 'wp-photo-album-plus');
 							$help = esc_js(__('If checked: display the start/stop slideshow navigation bar above the full-size images and slideshow', 'wp-photo-album-plus'));
@@ -2349,6 +2396,17 @@ global $wp_version;
 							$tags = 'cover,album,layout';
 							wppa_setting($slug, '8', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Viewcount on cover', 'wp-photo-album-plus');
+							$desc = __('Show total photo viewcount on album covers.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_viewcount_on_cover';
+							$opts = array( __('none', 'wp-photo-album-plus'), __('top album only', 'wp-photo-album-plus'), __('total tree', 'wp-photo-album-plus'));
+							$vals = array( '-none-', 'self', 'total' );
+							$html = wppa_select($slug, $opts, $vals);
+							$clas = '';
+							$tags = 'cover,album,layout';
+							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
+
 							}
 						wppa_setting_subheader( 'F', '1', __( 'Widget related visibility settings' , 'wp-photo-album-plus') );
 							{
@@ -2859,7 +2917,15 @@ global $wp_version;
 							$desc = __('Enable blogging photos.', 'wp-photo-album-plus');
 							$help = esc_js( __('Users need the capability edit_posts to directly blog photos.', 'wp-photo-album-plus'));
 							$slug = 'wppa_blog_it';
-							$html = wppa_checkbox($slug);
+							$opts = array( 	__('disabled', 'wp-photo-album-plus'),
+											__('optional', 'wp-photo-album-plus'),
+											__('always', 'wp-photo-album-plus'),
+										);
+							$vals = array( 	'-none-',
+											'optional',
+											'always',
+										);
+							$html = wppa_select($slug, $opts, $vals);
 							$clas = 'wppa_feup';
 							$tags = 'upload';
 							wppa_setting($slug, '16', $name, $desc, $html, $help, $clas, $tags);
@@ -2905,15 +2971,6 @@ global $wp_version;
 							$clas = '';
 							$tags = 'thumb,widget,size,layout';
 							wppa_setting($slug, '3', $name, $desc, $html, $help, $clas, $tags);
-
-							$name = __('Arrow color', 'wp-photo-album-plus');
-							$desc = __('Left/right browsing arrow color.', 'wp-photo-album-plus');
-							$help = esc_js(__('Enter the color of the filmstrip navigation arrows.', 'wp-photo-album-plus'));
-							$slug = 'wppa_arrow_color';
-							$html = wppa_input($slug, '70px', '', '');
-							$clas = '';
-							$tags = 'slide,layout';
-							wppa_setting($slug, '4', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Owner on new line', 'wp-photo-album-plus');
 							$desc = __('Place the (owner) text on a new line.', 'wp-photo-album-plus');
@@ -2985,7 +3042,7 @@ global $wp_version;
 							$vals = array('none', 'light', 'medium', 'heavy');
 							$html = wppa_select($slug, $opts, $vals);
 							$clas = '';
-							$tags = 'layout';
+							$tags = 'layout,navi';
 							wppa_setting($slug, '11', $name, $desc, $html, $help, $clas, $tags);
 
 							?>
@@ -3039,7 +3096,7 @@ global $wp_version;
 							$html2 = wppa_input($slug2, '100px', '', '', "checkColor('".$slug2."')") . '</td><td>' . wppa_color_box($slug2);
 							$html = array($html1, $html2);
 							$clas = '';
-							$tags = 'slide,layout';
+							$tags = 'slide,layout,navi';
 							wppa_setting($slug, '1', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('SlideImg', 'wp-photo-album-plus');
@@ -3161,7 +3218,7 @@ global $wp_version;
 							$tags = 'slide,layout';
 							wppa_setting($slug, '10', $name, $desc, $html, $help, $clas, $tags);
 							}
-						wppa_setting_subheader( 'B', '4', __('Other backgrounds' , 'wp-photo-album-plus') );
+						wppa_setting_subheader( 'B', '4', __('Other backgrounds and colors' , 'wp-photo-album-plus') );
 							{
 							$name = __('Even', 'wp-photo-album-plus');
 							$desc = __('Even background.', 'wp-photo-album-plus');
@@ -3337,6 +3394,7 @@ global $wp_version;
 							$help = esc_js(__('Recommended color: your theme background color.', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_bgcolor_modal';
 							$slug2 = 'wppa_bcolor_modal';
+							$slug = array($slug1, $slug2);
 							$html1 = wppa_input($slug1, '100px', '', '', "checkColor('".$slug1."')") . '</td><td>' . wppa_color_box($slug1);
 							$html2 = '</td><td>'; // wppa_input($slug2, '100px', '', '', "checkColor('".$slug2."')") . '</td><td>' . wppa_color_box($slug2);
 							$html = array($html1, $html2);
@@ -3349,11 +3407,12 @@ global $wp_version;
 							$help = '';
 							$slug1 = 'wppa_svg_bg_color';
 							$slug2 = 'wppa_svg_color';
+							$slug = array($slug1, $slug2);
 							$html1 = wppa_input($slug1, '100px', '', '', "checkColor('".$slug1."')") . '</td><td>' . wppa_color_box($slug1);
 							$html2 = wppa_input($slug2, '100px', '', '', "checkColor('".$slug2."')") . '</td><td>' . wppa_color_box($slug2);
 							$html = array($html1, $html2);
-							$clas = '';
-							$tags = 'layout';
+							$clas = 'svg';
+							$tags = 'layout,navi';
 							wppa_setting($slug, '14', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Navigation symbols Lightbox', 'wp-photo-album-plus');
@@ -3361,12 +3420,27 @@ global $wp_version;
 							$help = '';
 							$slug1 = 'wppa_ovl_svg_bg_color';
 							$slug2 = 'wppa_ovl_svg_color';
+							$slug = array($slug1, $slug2);
 							$html1 = wppa_input($slug1, '100px', '', '', "checkColor('".$slug1."')") . '</td><td>' . wppa_color_box($slug1);
 							$html2 = wppa_input($slug2, '100px', '', '', "checkColor('".$slug2."')") . '</td><td>' . wppa_color_box($slug2);
 							$html = array($html1, $html2);
-							$clas = '';
-							$tags = 'layout';
+							$clas = 'svg';
+							$tags = 'layout,navi';
 							wppa_setting($slug, '15', $name, $desc, $html, $help, $clas, $tags);
+/*
+							$name = __('Arrow color', 'wp-photo-album-plus');
+							$desc = __('Left/right browsing arrow color.', 'wp-photo-album-plus');
+							$help = esc_js(__('Enter the color of the filmstrip navigation arrows.', 'wp-photo-album-plus'));
+							$slug1 = 'wppa_arrow_color';
+							$slug2 = '';
+							$slug = array($slug1, $slug2);
+							$html1 = wppa_input($slug1, '70px', '', '');
+							$html2 = '';
+							$html = array($html1, $html2);
+							$clas = '-svg';
+							$tags = 'layout,navi';
+							wppa_setting($slug, '15.2', $name, $desc, $html, $help, $clas, $tags);
+*/
 							}
 							?>
 						</tbody>
@@ -4059,6 +4133,21 @@ global $wp_version;
 							$clas = 'tt_normal';
 							$tags = 'thumb,layout';
 							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Run nl2br or wpautop on description', 'wp-photo-album-plus');
+							$desc = __('Adds &lt;br> or &lt;p> and &lt;br> tags in thumbnail descriptions.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_wpautop_on_thumb_desc';
+							$opts = array(	__('--- none ---', 'wp-photo-album-plus'),
+											__('Linebreaks only', 'wp-photo-album-plus'),
+											__('Linebreaks and paragraphs', 'wp-photo-album-plus'),
+										);
+							$vals = array('nil', 'nl2br', 'wpautop');
+							$html = wppa_select($slug, $opts, $vals);
+							$clas = '';
+							$tags = 'thumb,layout';
+							wppa_setting($slug, '10', $name, $desc, $html, $help, $clas, $tags);
+
 							}
 						wppa_setting_subheader( 'D', '1', __( 'Album and covers related settings' , 'wp-photo-album-plus') );
 							{
@@ -4913,7 +5002,7 @@ global $wp_version;
 							$html4 = wppa_select($slug4, $options, $values);
 							$html = array($html1, $html2, $html3, $html4);
 							$clas = '';
-							$tags = 'layout,slide';
+							$tags = 'layout,slide,navi';
 							wppa_setting($slug, '7a,b,c,d', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Numbar Active', 'wp-photo-album-plus');
@@ -4930,7 +5019,7 @@ global $wp_version;
 							$html4 = wppa_select($slug4, $options, $values);
 							$html = array($html1, $html2, $html3, $html4);
 							$clas = '';
-							$tags = 'layout,slide';
+							$tags = 'layout,slide,navi';
 							wppa_setting($slug, '8a,b,c,d', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Lightbox', 'wp-photo-album-plus');
@@ -6301,10 +6390,20 @@ global $wp_version;
 							wppa_setting($slug, '11', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Fe alert', 'wp-photo-album-plus');
-							$desc = __('Show alertbox on successful front-end upload/create.', 'wp-photo-album-plus');
-							$help = '';
+							$desc = __('Show alertbox on front-end.', 'wp-photo-album-plus');
+							$help = esc_js(__('Errors are always reported, credit points only when --- none --- is not selected', 'wp-photo-album-plus'));
 							$slug = 'wppa_fe_alert';
-							$html1 = wppa_checkbox($slug);
+							$opts = array(	__('--- none ---', 'wp-photo-album-plus'),
+											__('uploads and create albums', 'wp-photo-album-plus'),
+											__('blog it', 'wp-photo-album-plus'),
+											__('all', 'wp-photo-album-plus'),
+											);
+							$vals = array(	'-none-',
+											'upcre',
+											'blog',
+											'all',
+											);
+							$html1 = wppa_select($slug, $opts, $vals);
 							$html2 = '';
 							$html = array( $html1, $html2 );
 							$clas = '';
@@ -7257,7 +7356,20 @@ global $wp_version;
 							$html = array($html1, $html2, $html3, $html4);
 							$clas = '';
 							$tags = 'system,meta';
-							wppa_setting(false, '12', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting(false, '12.1', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Add HD tag', 'wp-photo-album-plus');
+							$desc = __('Make sure photos >= 1920 x 1080 have a HD tag', 'wp-photo-album-plus');
+							$help = '';
+							$slug2 = 'wppa_add_hd_tag';
+							$html1 = wppa_cronjob_button( $slug2 );
+							$html2 = wppa_maintenance_button( $slug2 );
+							$html3 = wppa_status_field( $slug2 );
+							$html4 = wppa_togo_field( $slug2 );
+							$html = array($html1, $html2, $html3, $html4);
+							$clas = '';
+							$tags = 'system,meta';
+							wppa_setting(false, '12.2', $name, $desc, $html, $help, $clas, $tags);
 
 							if ( function_exists( 'ewww_image_optimizer') ) {
 								$name = __('Optimize files', 'wp-photo-album-plus');
@@ -7448,7 +7560,7 @@ global $wp_version;
 							$desc = __('For OpaJaap only');
 							$help = '';
 							$slug2 = 'wppa_test_proc';
-							$html1 = '';
+							$html1 = wppa_cronjob_button( $slug2 ) . __('ad inf', 'wp-photo-album-plus') . wppa_checkbox( 'wppa_test_proc_ad_inf' );
 							$html2 = wppa_maintenance_button( $slug2 );
 							$html3 = wppa_status_field( $slug2 );
 							$html4 = wppa_togo_field( $slug2 );
@@ -7882,6 +7994,14 @@ global $wp_version;
 							$tags = 'system,upload';
 							wppa_setting($slug, '18', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Enable shortcode generator', 'wp-photo-album-plus');
+							$desc = __('Show album icon above page/post edit window', 'wp-photo-album-plus');
+							$help = esc_js(__('Administrators and wppa super users will always have the shortcode generator available.', 'wp-photo-album-plus'));
+							$slug = 'wppa_enable_generator';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '19', $name, $desc, $html, $help, $clas, $tags);
 							}
 						wppa_setting_subheader( 'C', '1', __( 'SEO related settings' , 'wp-photo-album-plus') );
 							{
@@ -8139,7 +8259,7 @@ global $wp_version;
 							$slug = 'wppa_default_parent';
 							$opts = array( __('--- none ---', 'wp-photo-album-plus'), __('--- separate ---', 'wp-photo-album-plus') );
 							$vals = array( '0', '-1');
-							$albs = $wpdb->get_results( "SELECT `id`, `name` FROM`" . WPPA_ALBUMS . "` ORDER BY `name`", ARRAY_A );
+							$albs = $wpdb->get_results( "SELECT `id`, `name` FROM `" . WPPA_ALBUMS . "` ORDER BY `name`", ARRAY_A );
 							if ( $albs ) {
 								foreach ( $albs as $alb ) {
 									$opts[] = __(stripslashes($alb['name']), 'wp-photo-album-plus');
@@ -8564,9 +8684,9 @@ global $wp_version;
 							$help .= '\n'.esc_js(__(sprintf('The watermark image will be overlaying the photo with %s%% transparency.', (100-wppa_opt( 'watermark_opacity' ))), 'wp-photo-album-plus'));
 							$help .= '\n\n'.esc_js(__('You may also select one of the textual watermark types at the bottom of the selection list.', 'wp-photo-album-plus'));
 							$slug = 'wppa_watermark_file';
-							$html = '<select style="float:left; font-size:11px; height:20px; margin:0 4px 0 0; padding:0; " id="wppa_watermark_file" onchange="wppaAjaxUpdateOptionValue(\'watermark_file\', this)" >' . wppa_watermark_file_select('default') . '</select>';
+							$html = '<select style="float:left; font-size:11px; height:20px; margin:0 4px 0 0; padding:0; " id="wppa_watermark_file" onchange="wppaAjaxUpdateOptionValue(\'watermark_file\', this)" >' . wppa_watermark_file_select( 'system' ) . '</select>';
 							$html .= '<img id="img_watermark_file" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus').'" style="padding-left:4px; float:left; height:16px; width:16px;" />';
-							$html .= '<span style="float:left; margin-left:12px;" >'.__('position:', 'wp-photo-album-plus').'</span><select style="float:left; font-size:11px; height:20px; margin:0 0 0 20px; padding:0; "  id="wppa_watermark_pos" onchange="wppaAjaxUpdateOptionValue(\'watermark_pos\', this)" >' . wppa_watermark_pos_select('default') . '</select>';
+							$html .= '<span style="float:left; margin-left:12px;" >'.__('position:', 'wp-photo-album-plus').'</span><select style="float:left; font-size:11px; height:20px; margin:0 0 0 20px; padding:0; "  id="wppa_watermark_pos" onchange="wppaAjaxUpdateOptionValue(\'watermark_pos\', this)" >' . wppa_watermark_pos_select( 'system' ) . '</select>';
 							$html .= '<img id="img_watermark_pos" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus').'" style="padding-left:4px; float:left; height:16px; width:16px;" />';
 							$clas = 'wppa_watermark';
 							$tags = 'water';
@@ -8971,15 +9091,6 @@ global $wp_version;
 							$clas = '';
 							$tags = 'system,upload';
 							wppa_setting($slug, '15', $name, $desc, $html, $help, $clas, $tags);
-
-							$name = __('IPTC need utf8 conversion', 'wp-photo-album-plus');
-							$desc = __('This setting converts iso to utf8 in iptc text.', 'wp-photo-album-plus');
-							$help = esc_js(__('Untick if you have funny characters in iptc data', 'wp-photo-album-plus') );
-							$slug = 'wppa_iptc_need_utf8';
-							$html = wppa_checkbox($slug);
-							$clas = '';
-							$tags = 'system,upload,meta';
-							wppa_setting($slug, '16', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Keep dir to album files', 'wp-photo-album-plus');
 							$desc = __('Keep imported files after dir to album import', 'wp-photo-album-plus');
@@ -10325,7 +10436,11 @@ function wppa_status_field( $slug ) {
 	return $result;
 }
 function wppa_togo_field( $slug ) {
-	$result = '<span id="'.$slug.'_togo" >'.get_option($slug.'_togo', '' ).'</span>';
+	$togo  = get_option($slug.'_togo', '' );
+	$result = '<span id="'.$slug.'_togo" >' . $togo . '</span>';
+	if ( $togo ) {
+		$result .= '<script>wppaAjaxUpdateTogo(\'' . $slug . '\');</script>';
+	}
 	return $result;
 }
 

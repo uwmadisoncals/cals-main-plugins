@@ -5,7 +5,7 @@ Plugin URI: http://weavertheme.com/plugins
 Description: Weaver Xtreme Theme Support - a package of useful shortcodes and widgets that integrates closely with the Weaver Xtreme and Weaver Foundation themes.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 3.0
+Version: 3.1
 License: GPL V3
 
 Weaver Xtreme Theme Support
@@ -43,7 +43,7 @@ function wvrx_is_user_logged_in() {
 
 if ( strpos( $theme, '/weaver-xtreme') !== false ) {		// only load if Weaver Xtreme is the theme
 
-define ('WVRX_TS_VERSION','3.0');
+define ('WVRX_TS_VERSION','3.1');
 define ('WVRX_TS_MINIFY','.min');		// '' for dev, '.min' for production
 define ('WVRX_TS_APPEARANCE_PAGE', false );
 
@@ -89,7 +89,6 @@ function weaver_xtreme_load_admin_action() {
 }
 
 add_action('weaver_xtreme_load_admin','weaver_xtreme_load_admin_action');
-
 
 
 //if (!defined('WEAVER_XPLUS_VERSION') || version_compare( WEAVER_XPLUS_VERSION, '2.90', '>=') ) {
@@ -198,14 +197,21 @@ function wvrx_ts_scan_section($what) {
 	'_pp_top-widget-area','_pp_bottom-widget-area','_pp_sitewide-top-widget-area', '_pp_sitewide-bottom-widget-area',
 	'_pp_post_type', '_pp_hide_page_title','_pp_hide_site_title','_pp_hide_menus','_pp_hide_header_image',
 	'_pp_hide_footer','_pp_hide_header','_pp_hide_sticky', '_pp_force_post_full','_pp_force_post_excerpt',
-	'_pp_show_post_avatar', '_pp_bodyclass', '_pp_fi_link', '_pp_fi_location', '_pp_post_styles',
+	'_pp_show_post_avatar', '_pp_bodyclass', '_pp_fi_link', '_pp_fi_location', '_pp_post_fi_location', '_pp_post_styles',
 	'_pp_hide_top_post_meta','_pp_hide_bottom_post_meta', '_pp_stay_on_page', '_pp_hide_on_menu', '_pp_show_featured_img',
 	'_pp_hide_infotop','_pp_hide_infobottom', '_pp_hide_visual_editor', '_pp_masonry_span2', '_show_post_bubble',
 	'_pp_hide_post_title', '_pp_post_add_link', '_pp_hide_post_format_label', '_pp_page_layout', '_pp_wvrx_pwp_type',
 	'_pp_wvrx_pwp_cols', '_pp_post_filter', '_pp_header-widget-area' ,'_pp_footer-widget-area',
 	'_pp_hide_page_infobar', '_pp_hide_n_posts','_pp_fullposts', '_pp_pwp_masonry','_pp_pwp_compact','_pp_pwp_compact_posts',
 	'_primary-widget-area', '_secondary-widget-area', '_header-widget-area', '_footer-widget-area', '_sitewide-top-widget-area',
-	'_sitewide-bottom-widget-area', '_page-top-widget-area', '_page-bottom-widget-area'
+	'_sitewide-bottom-widget-area', '_page-top-widget-area', '_page-bottom-widget-area', '_pp_full_browser_height',
+	'_pp_page_cols',
+	// Plus options
+	'_pp_bgcolor','_pp_color','_pp_bg_fullwidth', '_pp_lr_padding', '_pp_tb_padding', '_pp_margin', '_pp_post_class',
+	'_pp_bgimg', '_pp_mobile_bgimg', '_pp_parallax_height', '_pp_use_parallax', '_pp_parallax_not_wide',
+	'_pp_footer_add_class', '_pp_container_add_class', '_pp_content_add_class', '_pp_post_add_class',
+	'_pp_infobar_add_class', '_pp_wrapper_add_class', '_pp_header_add_class', '_pp_header_image_html_text',
+	'_pp_alt_primary_menu', '_pp_alt_secondary_menu', '_pp_alt_mini_menu'
 	);
 
 	$args = array('posts_per_page' => -1, 'post_type' => $what, 'post_status' => 'any' );

@@ -683,6 +683,9 @@ __('Weaver Xtreme Plus supports optional per post CSS style rules.','weaverx-the
 
 
 function wvrx_ts_save_post_fields($post_id) {
+
+	// NOTE - Update weaverx-ts.php when this changes...
+
 	$default_post_fields = array('_pp_category', '_pp_tag', '_pp_onepost', '_pp_orderby', '_pp_sort_order',
 	'_pp_author', '_pp_posts_per_page', '_pp_primary-widget-area', '_pp_secondary-widget-area', '_pp_sidebar_width',
 	'_pp_top-widget-area','_pp_bottom-widget-area','_pp_sitewide-top-widget-area', '_pp_sitewide-bottom-widget-area',
@@ -701,7 +704,9 @@ function wvrx_ts_save_post_fields($post_id) {
 	'_pp_bgcolor','_pp_color','_pp_bg_fullwidth', '_pp_lr_padding', '_pp_tb_padding', '_pp_margin', '_pp_post_class',
 	'_pp_bgimg', '_pp_mobile_bgimg', '_pp_parallax_height', '_pp_use_parallax', '_pp_parallax_not_wide',
 	'_pp_footer_add_class', '_pp_container_add_class', '_pp_content_add_class', '_pp_post_add_class',
-	'_pp_infobar_add_class', '_pp_wrapper_add_class', '_pp_header_add_class', '_pp_header_image_html_text'
+	'_pp_infobar_add_class', '_pp_wrapper_add_class', '_pp_header_add_class', '_pp_header_image_html_text',
+	'_pp_alt_primary_menu', '_pp_alt_secondary_menu', '_pp_alt_mini_menu', '_pp_video_active', '_pp_video_url',
+	'_pp_video_aspect', '_pp_video_render'
 	);
 
 if (weaverx_allow_multisite()) {
@@ -750,7 +755,7 @@ function wvrx_ts_xp_perpage_style_action($raw_template) {
 
 	weaverx_help_link('help.html#perpoststyle', __('Help for Per Page Style','weaver-xtreme-plus' /*adm*/ ));
 	if (!$raw_template) {
-	echo '<p><br /><small>' .
+	echo '<p><small>' .
 __('Enter optional per page CSS style rules. <strong>Do not</strong> include the &lt;style> and &lt;/style> tags.
 Include the complete "selector {}" for each rule you define.
 Custom styles will not be displayed by the Page Editor.
@@ -796,9 +801,57 @@ Custom styles will not be displayed by the Page Editor.'
 	// Weaver X Plus options for making horizontal bar layouts
 	wvrx_ts_page_color('_pp_bgcolor',__('Page BG Color','weaver-xtreme-plus'));
 
-	echo '<hr /><br style="clear:both;"/><strong>' . __('Header Image Replacement HTML','weaver-xtreme-plus') . '</strong> (&starf;Plus)' /*a*/ ;
+
+	$menus = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
+
+	// If no menus exists, direct the user to go and create some.
+	if ( !$menus ) {
+		echo '<p>'. sprintf( 'No menus have been created yet. <a href="%s">Create some</a>.', admin_url('nav-menus.php') ) .'</p>';
+	} else {
+	?>
+	<hr /><p>
+	You may replace one of the standard Header Menus (Primary, Secondary, or Header Mini) on this page. If there the menu hasn't been
+	set in the Menus options, then you can set that menu for just this page.
+	<br /><br />
+	<label for="_pp_alt_primary_menu"><strong><?php echo('Alternate Primary Menu' /*a*/ ); ?></strong></label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<select id="_pp_alt_primary_menu" name="_pp_alt_primary_menu">
+		<option value=''> </option>
+<?php
+		foreach ( $menus as $menu ) {
+			$selected = get_post_meta($post->ID, "_pp_alt_primary_menu", true) == $menu->term_id ? ' selected="selected"' : '';
+			echo '<option'. $selected .' value="'. $menu->term_id .'">'. $menu->name .'</option>';
+		}
 ?>
-	</p><p>
+	</select>
+
+	<br /><label for="_pp_alt_secondary_menu"><strong><?php echo('Alternate Secondary Menu' /*a*/ ); ?></strong></label> &nbsp;&nbsp;&nbsp;
+	<select id="_pp_alt_secondary_menu" name="_pp_alt_secondary_menu">
+		<option value=''> </option>
+<?php
+		foreach ( $menus as $menu ) {
+			$selected = get_post_meta($post->ID, "_pp_alt_secondary_menu", true) == $menu->term_id ? ' selected="selected"' : '';
+			echo '<option'. $selected .' value="'. $menu->term_id .'">'. $menu->name .'</option>';
+		}
+?>
+	</select>
+	<br /><label for="_pp_alt_mini_menu"><strong><?php echo('Alternate Header Mini Menu' /*a*/ ); ?></strong></label> &nbsp;
+	<select id="_pp_alt_mini_menu" name="_pp_alt_mini_menu">
+		<option value=''> </option>
+<?php
+		foreach ( $menus as $menu ) {
+			$selected = get_post_meta($post->ID, "_pp_alt_mini_menu", true) == $menu->term_id ? ' selected="selected"' : '';
+			echo '<option'. $selected .' value="'. $menu->term_id .'">'. $menu->name .'</option>';
+		}
+?>
+	</select>
+	</p>
+<?php
+	}
+
+	echo '<hr /><span style="clear:both;"/></span><strong>' . __('Header Image Replacement HTML','weaver-xtreme-plus') . '</strong> (&starf;Plus)' ;
+?>
+	</p>
+	<p>
 <?php
 if (version_compare( WEAVER_XPLUS_VERSION, '2.90', '>=')) :
 	_e('Replace Header image with arbitrary HTML for this page only. Useful for slider shortcodes in place of image. FI as Header Image has priority over HTML replacement. This will work with [show_slider] or almost any other slider that supports a shortcode.', 'weaver-xtreme' /*adm*/)
@@ -806,8 +859,75 @@ if (version_compare( WEAVER_XPLUS_VERSION, '2.90', '>=')) :
 	<textarea class="wvrx-edit" placeholder=" " name="_pp_header_image_html_text" rows=1 style="width: 95%"><?php echo(get_post_meta($post->ID, '_pp_header_image_html_text', true)); ?></textarea>
 <?php endif; // new version ?>
 </p>
-<hr />
+<?php
+	echo '<span style="clear:both;"/></span><strong>' . __('Header Video Options','weaver-xtreme-plus') . '</strong> (&starf;Plus)';
 
+	$showopts = array(
+		array('val' => '', 'desc' => __('Default: only if this page is the front page','weaver-xtreme-plus')),
+		array('val' => 'yes', 'desc' => __('Yes','weaver-xtreme-plus')),
+		array('val'=> 'no', 'desc' => __('Never','weaver-xtreme-plus')));
+	$aspectopts = array(
+		array('val' => '', 'desc' => __('Global Aspect Ratio', 'weaver-xtreme')),
+		array('val' => '16:9', 'desc' => __('16:9 HDTV', 'weaver-xtreme')),
+		array('val' => '4:3', 'desc' => __('4:3 Std TV', 'weaver-xtreme')),
+		array('val' => '3:2', 'desc' => __('3:2 35mm Photo', 'weaver-xtreme')),
+		array('val' => '5:3', 'desc' => __('5:3 Alternate Photo', 'weaver-xtreme')),
+		array('val' => '64:27', 'desc' => __('2.37:1 Cinemascope', 'weaver-xtreme')),
+		array('val' => '37:20', 'desc' => __('1.85:1 VistaVision', 'weaver-xtreme')),
+		array('val' => '3:1', 'desc' => __('3:1 Banner', 'weaver-xtreme')),
+		array('val' => '4:1', 'desc' => __('4:1 Banner', 'weaver-xtreme')),
+		array('val' => '9:16', 'desc' => __('9:16 Vertical HD (Please avoid!)', 'weaver-xtreme')));
+	$renderopts = array(
+		array('val' => '', 'desc' => __('Global Rendering Setting', 'weaver-xtreme')),
+		array('val' => 'has-header-video', 'desc' => __('As video in header only', 'weaver-xtreme')),
+		array('val' => 'has-header-video-cover', 'desc' => __('As full cover Parallax BG Video', 'weaver-xtreme')),
+		array('val' => 'has-header-video-none', 'desc' => __('Disable Header Video', 'weaver-xtreme' /*adm*/))
+
+	);
+?>
+	<p><label for='_pp_video_active'><strong><?php echo('Display Video on This Page:' /*a*/ ); ?></strong></label> &nbsp;
+	<select id='_pp_video_active' name='_pp_video_active'>
+<?php
+		foreach ( $showopts as $opt ) {
+			$selected = get_post_meta($post->ID, '_pp_video_active', true) == $opt['val'] ? ' selected="selected"' : '';
+			echo '<option'. $selected .' value="'. $opt['val'] .'">'. $opt['desc'] .'</option>';
+		}
+?>
+	</select>
+	</p>
+	<p><label for='_pp_video_url'><strong><?php echo('Video URL for This Page:' /*a*/ ); ?></strong></label> &nbsp;
+	<textarea class="wvrx-edit" placeholder=" " name='_pp_video_url' rows=1 style="width: 45%"><?php echo(get_post_meta($post->ID, '_pp_video_url', true)); ?></textarea>
+<?php
+	if (!has_header_video() && get_post_meta($post->ID, '_pp_video_url', true)) { ?>
+	<br /><strong>
+	<em style="color:red;">
+		IMPORTANT: There is NO Header Video set on the <u>Customizer : Images : Header Media (Content)</u> menu. Please set one.</em>
+	Due to current restrictions with the WordPress Header Media video implementation,
+	you MUST always define some Header Video selection in that menu, even if you are specifying an alternative Per Page Video URL here.
+	We think this is a flaw in the WP core, and have requested that the restriction be removed in the future.</strong>
+<?php	} ?>
+	</p>
+	<p>
+	<label for='_pp_video_aspect'><strong><?php echo('Aspect Ratio:' /*a*/ ); ?></strong></label> &nbsp;
+	<select id='_pp_video_aspect' name='_pp_video_aspect'>
+<?php
+		foreach ( $aspectopts as $opt ) {
+			$selected = get_post_meta($post->ID, '_pp_video_aspect', true) == $opt['val'] ? ' selected="selected"' : '';
+			echo '<option'. $selected .' value="'. $opt['val'] .'">'. $opt['desc'] .'</option>';
+		}
+?>
+	</select> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+	<label for='_pp_video_render'><strong><?php echo('Header Video Rendering:' /*a*/ ); ?></strong></label> &nbsp;
+	<select id='_pp_video_render' name='_pp_video_render'>
+<?php
+		foreach ( $renderopts as $opt ) {
+			$selected = get_post_meta($post->ID, '_pp_video_render', true) == $opt['val'] ? ' selected="selected"' : '';
+			echo '<option'. $selected .' value="'. $opt['val'] .'">'. $opt['desc'] .'</option>';
+		}
+?>
+	</select>
+	</p>
 <div style="clear:both"></div>
 <hr />
 <p style="line-height:1.3em;">

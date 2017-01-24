@@ -1,4 +1,4 @@
-# Translation of 2.3 in German (Switzerland)
+# Translation of 2.3 in Swiss German
 # This file is distributed under the same license as the 2.3 package.
 msgid ""
 msgstr ""
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: GlotPress/1.0-alpha-1000\n"
+"X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: 2.3\n"
 
 #: app/model/settings.php:559

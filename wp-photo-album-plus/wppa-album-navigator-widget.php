@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display album names linking to content
-* Version 6.4.17
+* Version 6.6.09
 */
 
 class AlbumNavigatorWidget extends WP_Widget {
@@ -160,8 +160,8 @@ class AlbumNavigatorWidget extends WP_Widget {
 			$result .= '<ul>';
 			foreach ( $albums as $album ) {
 				$a = $album['id'];
-				$treecount = wppa_treecount_a( $a );
-				if ( $treecount['albums'] || $treecount['photos'] > wppa_opt( 'min_thumbs' ) || $skip == 'no' ) {
+				$treecount = wppa_get_treecounts_a( $a );
+				if ( $treecount['treealbums'] || $treecount['selfphotos'] > wppa_opt( 'min_thumbs' ) || $skip == 'no' ) {
 					$result .= '
 						<li class="anw-'.$w.'-'.$p.$propclass.'" style="list-style:none; display:'.( $level == '1' ? '' : 'none' ).';">';
 						if ( wppa_has_children($a) ) $result .= '

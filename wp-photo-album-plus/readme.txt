@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto
-Version: 6.6.07
-Stable tag: 6.6.07
+Version: 6.6.11
+Stable tag: 6.6.11
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -161,7 +161,7 @@ If you use indexed search, the tokens must be at least 3 characters in length.
 
 = What to do if i get errors during upload or import photos? =
 
-* It is always the best to downsize your photos to the Full Size before uploading. It is the fastest and safest way to add photos tou your photo albums.
+* It is always the best to downsize your photos to the Full Size before uploading. It is the fastest and safest way to add photos to your photo albums.
 Photos that are way too large take unnessesary long time to download, so your visitors will expierience a slow website.
 Therefor the photos should not be larger (in terms of pixelsizes) than the largest size you are going to display them on the screen.
 WP-photo-album-plus is capable to downsize the photos for you, but very often this fails because of configuration problems.
@@ -179,6 +179,96 @@ Oh, just Google on 'picture resizer' and you will find a bunch of free programs 
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.6.11 =
+
+= Bug Fixes =
+
+* Adjusted the calculation for the size of the thumbnail image files to take into account when responsive cover images are used.
+* Responsive cover images not always worked. Fixed.
+* When VII-B-12 (Fe alert) was unchecked and the fe upload is blogged, the redirect to the blog post failed. Fixed.
+* Max one alertbox on fe upload/blog. Select when in Table VII-B12.
+* Fixed a possible errormessage on fe delete photo.
+
+= New Features =
+
+* Table VIII-B12.2 Add HD tags. All photoa that are available in resolution >= 1920 x 1080 px get tag HD.
+* Albums can have their own watermark settings. New uploaded photos will have that watermark in stead of the system default as specified in Table IX-F.
+
+= Other Changes =
+
+* You can disable the shortcode generator in Table IX-B19 for users who are neither administrator nor wppa superuser.
+* Tags GPX and HD will always be in capital letters. Existing tags can be fixed using Table VIII-B16 Fix Tags.
+* The caching of wppa options has been removed to avoid problems on systems that do not allow db fields > 64kB.
+* The togo-field of running cron jobs (Table VIII) is now being updated every 5 seconds.
+
+= 6.6.10 =
+
+= Bug Fixes =
+
+* Under certain circumstances the granted album was not created. Fixed: It is no longer required to have an upload widget on the members page.
+
+= New Features =
+
+* New shortcode attribute: alt="...". The alt attrinute may conatin an existing photo id number.
+In case the shortcode can not be rendered, you used to see the 'placeholder' [WPPA+ Photo display (fsh)].
+In some circumstances this is not due to a configuration issue, but you can e.g. have plugin AMP installed and AMP applies to the content.
+When the alt attribute is added to the shortcode, a plain photo will be displayed. If you do not want anything to be displayed (no photo and no errormessage)
+set the alt attrinbute to none: alt="none". Full shortcode example: [wppa type="slide" album="255" alt="4187"]Any comment[/wppa]
+
+= Other Changes =
+
+* It is no longer possible to delete a photo that is explicitly used as a single image in a post or page.
+* After Blog it! (front-end upload) You will now be redirected to the post you blogged.
+* Table II-B0: Navigation type. Can be set to one out of: 'Icons', 'Icons on mobile, text on pc' or 'Text'.
+This makes the old text style coming back for those who really want it.
+* Table II-H16: Blog it! is now a selectionbox. You can select one out of: disabled, optional and always.
+This makes it possible to force users to blog their uploads.
+* You can now have responsive album cover images. Table I-D5.x and I-D6.x
+
+= 6.6.09 =
+
+= Bug Fixes =
+
+* Fixed a spurious db error on certain search ops resulting in erroneously nothing found.
+* Related count was not obeyed. Fixed.
+
+= New Features =
+
+* Photo viewcounts can now be displayed under the album cover photo. Table II-E9: Viewcount on cover.
+* Table IV-C10: Run nl2br or wpautop on description. For thumbnail text.
+
+= Other Changes =
+
+* The treecounts system (number of sub-albums, photos, pending and scheduled as well as photo viewcounts)
+has been re-implemented; data is now stored in the albums table.
+Viewing admin pages cause immediate recalculation, so admin pages always show correct numbers.
+On the foreground - to reduce overhead actions that may slow down pageloads for visitors -
+the updates are done in a background process (cron job) and may result in max 30 seconds delay after upload,
+create sub album or viewing fs images.
+* On some systems it has been shown that the eventhandler for onload is not executed on svg images.
+To avoid svg navigation icons from not getting the right colors and showing up,
+the function wppaReplaceSvg() is now called at various smart moments.
+* The album cover text is now wrapped in a div rather than a p to avoid layout problems when Table IV-D8 is set to 'Linebreaks and paragraphs'.
+
+= 6.6.08 =
+
+= Bug Fixes =
+
+* Fixed an error in the html for google+ share code.
+* A running slideshow no longer interrupts running audio.
+* Fixed an alignment problem of the audio bar on theme Twenty Seventeen.
+* Fixed cursor (is now a pointer) in case a single image has a link to it.
+* Fixed a spurious php error in wppa_in_widget().
+* Hilite is working again. (Indication on thumbnail when linked from slideshow to thumbnails).
+
+= Other Changes =
+
+* The first/last arrow icons on the filmstrip do no longer show up if the first/last image is displayed.
+* Cosmetic changes to filmstrip tooltips (titles).
+* Functional enhancements in bulk edit photos i.c. immediate move por photo.
+* Table IX-H16 ( iptc needs utf8 conversion ) has been removed. This is now autodetected.
+* It is no longer possible to generate negative photo or album or any other db table ids.
 
 = 6.6.07 =
 
@@ -202,7 +292,7 @@ See for additional information: <a href="http://www.wppa.nl/changelog/" >The doc
 
 * Table IV-A9.2: Track clickcounts. Counts the clicks on single images and slideshow images when there is a link url. Totals per album show up on the album admin page.
 * Table VI-B2: Thumbnail linktype: added option: 'the thumbnails album in a slideshow'. Shows the slideshow of the album where the thumbnail belongs. Starting at the pointed image.
-This always shows the physical album where the thumbnail belongs to as a slideshow, even when the collection of thumbnails is the content of a virtual album; 
+This always shows the physical album where the thumbnail belongs to as a slideshow, even when the collection of thumbnails is the content of a virtual album;
 as opposed to 'the fullsize photo in a slidshow' (the default) that always shows the slideshow of the selection where the thumbnail belongs to.
 
 = 6.6.05 =
@@ -227,8 +317,8 @@ as opposed to 'the fullsize photo in a slidshow' (the default) that always shows
 * The administrator can now use the downloaded db table .csv-files from Table XII for import on the Photo Albums -> Import screen. For backup and for moving to another website/host.
 See http://wppa.nl/changelog/installation-notes/#moving
 * Max number of albums to show up in a selectionbox on the photo admin screen is now settable in Table IX-B6.2. If this max is exceeded, a number input field is displayed.
-* Maintenance proc Table VIII-B8.2 All to lower. Convert file-extensions to lower case. To fix very old systems. 
-Recommended before moving the site, especially when you use a windows pc to copy the photofiles. 
+* Maintenance proc Table VIII-B8.2 All to lower. Convert file-extensions to lower case. To fix very old systems.
+Recommended before moving the site, especially when you use a windows pc to copy the photofiles.
 Window does not accept two files with the same name with different case in file extension. It simply overwrites the files.
 
 = Other Changes =
@@ -248,7 +338,7 @@ Window does not accept two files with the same name with different case in file 
 
 = Other Changes =
 
-* Table VII-B7 has been renamed Table VII-B7.0. Table VII-B7.1 added: Front-end uploads get status private. 
+* Table VII-B7 has been renamed Table VII-B7.0. Table VII-B7.1 added: Front-end uploads get status private.
 This overrules the setting of VII-B7.0, but modaretion emails will still be sent if VII-B7.0 is ticked.
 
 = 6.6.02 =

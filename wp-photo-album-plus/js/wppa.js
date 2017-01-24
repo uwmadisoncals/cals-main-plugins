@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.6.07';
+var wppaJsVersion = '6.6.10';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -91,6 +91,7 @@ var wppaArtMonkyLink = 'none';
 var wppaAutoOpenComments = false;
 var wppaUpdateAddressLine = false;
 var wppaFilmThumbTitle = '';
+var wppaClickToView = '';
 var wppaUploadUrl = '';
 var wppaVoteForMe = '';
 var wppaVotedForMe = '';
@@ -145,6 +146,8 @@ var wppaBoxRadius = 0;
 var wppaModalQuitImg;
 var wppaUploadEdit = 'none';
 var wppaPageArg = '';
+var wppaSlideshowNavigationType = 'icons';
+var wppaCoverImageResponsive = [];
 
 // 'Internal' variables ( private )
 var _wppaId = [];
@@ -282,8 +285,11 @@ function wppaDoInit( autoOnly ) {
 			});
 		}
 	}
-	// Replave .svg images with svg html
-//	wppaReplaceSvg();
+
+	// Replave .svg images with svg html.
+	// Looks redundant, but some installations do not execute
+	// onload="wppaReplaceSvg()" for unknown reasons
+	wppaReplaceSvg();
 }
 
 // Initialize Ajax render partial page content with history update
@@ -356,18 +362,29 @@ function wppaStopVideo( mocc ) {
 	}
 }
 
-// Stop all audio
-function wppaStopAudio() {
+// Stop audio
+function wppaStopAudio( mocc ) {
 
-	var items = jQuery( 'audio' );
+	// This mocc only?
+	if ( typeof( mocc ) == 'number' ) {
+		if ( jQuery( '#audio-' + mocc ).pause ) {
+			jQuery( '#audio-' + mocc ).pause();
+		}
+	}
 
-	if ( items.length > 0 ) {
-		var i = 0;
-		while ( i < items.length ) {
-			if ( jQuery( items[i] ).attr( 'data-from' ) == 'wppa' ) {
-				items[i].pause();
+	// All audio
+	else {
+
+		var items = jQuery( 'audio' );
+
+		if ( items.length > 0 ) {
+			var i = 0;
+			while ( i < items.length ) {
+				if ( jQuery( items[i] ).attr( 'data-from' ) == 'wppa' ) {
+					items[i].pause();
+				}
+				i++;
 			}
-			i++;
 		}
 	}
 }
@@ -436,8 +453,12 @@ function _wppaDoAutocol( mocc ) {
 	}
 
 	// Covers
-	jQuery( ".wppa-asym-text-frame-"+mocc ).css( 'width',w - wppaTextFrameDelta );
-	jQuery( ".wppa-cover-box-"+mocc ).css( 'width',w );
+	if ( wppaCoverImageResponsive[mocc] ) {
+	}
+	else {
+		jQuery( ".wppa-asym-text-frame-"+mocc ).css( 'width',w - wppaTextFrameDelta );
+		jQuery( ".wppa-cover-box-"+mocc ).css( 'width',w );
+	}
 
 	// Multi Column Responsive covers
 	var exists = jQuery( ".wppa-cover-box-mcr-"+mocc );
@@ -461,18 +482,27 @@ function _wppaDoAutocol( mocc ) {
 			}
 			idx++;
 		}
-		jQuery( ".wppa-asym-text-frame-mcr-"+mocc ).css( 'width',MCRWidth - wppaTextFrameDelta );
+		
+		if ( wppaCoverImageResponsive[mocc] ) {
+		}
+		else {
+			jQuery( ".wppa-asym-text-frame-mcr-"+mocc ).css( 'width',MCRWidth - wppaTextFrameDelta );
+		}
 		jQuery( ".wppa-cover-box-mcr-"+mocc ).css( 'width',MCRWidth );
 	}
 	else {	// One cover: full width, 0 covers don't care
-		jQuery( ".wppa-asym-text-frame-mcr-"+mocc ).css( 'width',w - wppaTextFrameDelta );
-		var myCss = {
-//			'width'		: w,
-//			'maxWidth'	: w,
-			'marginLeft': '0px',
-			'float'		: 'left'
+		if ( wppaCoverImageResponsive[mocc] ) {
 		}
-		jQuery( ".wppa-cover-box-mcr-"+mocc ).css( myCss );
+		else {
+			jQuery( ".wppa-asym-text-frame-mcr-"+mocc ).css( 'width',w - wppaTextFrameDelta );
+			var myCss = {
+	//			'width'		: w,
+	//			'maxWidth'	: w,
+				'marginLeft': '0px',
+				'float'		: 'left'
+			}
+			jQuery( ".wppa-cover-box-mcr-"+mocc ).css( myCss );
+		}
 	}
 
 	// Thumbframes default

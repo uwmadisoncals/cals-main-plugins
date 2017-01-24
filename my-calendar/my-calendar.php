@@ -7,9 +7,9 @@ Author: Joseph C Dolson
 Author URI: http://www.joedolson.com
 Text Domain: my-calendar
 Domain Path: lang
-Version: 2.5.4
+Version: 2.5.6
 */
-/*  Copyright 2009-2016  Joe Dolson (email : joe@joedolson.com)
+/*  Copyright 2009-2017  Joe Dolson (email : joe@joedolson.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 } // Exit if accessed directly
 
 global $mc_version, $wpdb;
-$mc_version = '2.5.4';
+$mc_version = '2.5.6';
 
 register_activation_hook( __FILE__, 'mc_plugin_activated' );
 register_deactivation_hook( __FILE__, 'mc_plugin_deactivated' );
@@ -63,6 +63,7 @@ include( dirname( __FILE__ ) . '/my-calendar-events.php' );
 include( dirname( __FILE__ ) . '/my-calendar-widgets.php' );
 include( dirname( __FILE__ ) . '/my-calendar-upgrade-db.php' );
 include( dirname( __FILE__ ) . '/my-calendar-output.php' );
+include( dirname( __FILE__ ) . '/my-calendar-print.php' );
 include( dirname( __FILE__ ) . '/my-calendar-templates.php' );
 include( dirname( __FILE__ ) . '/my-calendar-limits.php' );
 include( dirname( __FILE__ ) . '/my-calendar-shortcodes.php' );
@@ -161,10 +162,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 						<h2 class='sales hndle'><strong><?php _e( 'My Calendar Pro', 'my-calendar' ); ?></strong></h2>
 
 						<div class="inside resources">
-							<p class="mcbuy"><?php _e( "Buy <a href='https://www.joedolson.com/my-calendar/pro/' rel='external'>My Calendar Pro</a> &mdash; a more powerful calendar for your site.", 'my-calendar' ); ?></p>
-
-							<p class="mc-button"><a href="http://www.joedolson.com/my-calendar/pro/" rel="external"><?php _e( 'Learn more!', 'my-calendar' ); ?></a>
-							</p>
+							<p class="mcbuy"><?php printf( __( "Buy <a href='%s' rel='external'>My Calendar Pro</a> &mdash; a more powerful calendar for your site.", 'my-calendar' ), 'https://www.joedolson.com/my-calendar/pro/' ); ?></p>
 						</div>
 					</div>
 				</div>
@@ -175,11 +173,8 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 						<h2 class='sales hndle'><strong><?php _e( 'My Tickets', 'my-calendar' ); ?></strong></h2>
 
 						<div class="inside resources">
-							<p class="mcbuy"><?php _e( "Do you sell tickets to your events? <a href='https://wordpress.org/plugins/my-tickets/' rel='external'>Use My Tickets</a> and sell directly from My Calendar.", 'my-calendar' ); ?></p>
+							<p class="mcbuy"><?php printf( __( 'Do you sell tickets to your events? <a href="%s" class="thickbox open-plugin-details-modal" rel="external">Use My Tickets</a> and sell directly from My Calendar.', 'my-calendar' ), 'http://dev.josephdolson.com/wp-admin/plugin-install.php?tab=plugin-information&plugin=my-tickets&TB_iframe=true&width=600&height=550' ); ?></p>
 							<p><?php _e( 'My Tickets integrates with My Calendar or sells tickets independently through posts and pages.', 'my-tickets' ); ?></p>
-
-							<p class="mc-button"><a href="http://dev.josephdolson.com/wp-admin/plugin-install.php?tab=plugin-information&plugin=my-tickets&TB_iframe=true&width=600&height=550" class="thickbox open-plugin-details-modal" rel="external"><?php _e( 'Try My Tickets', 'my-calendar' ); ?></a>
-							</p>
 						</div>
 					</div>
 				</div>
@@ -235,19 +230,19 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 							<a href="<?php echo admin_url( "admin.php?page=my-calendar-help" ); ?>#get-support"><?php _e( "Get Support", 'my-calendar' ); ?></a>
 						</li>
 						<li>
-							<div class="dashicons dashicons-editor-help"></div>
+							<div class="dashicons dashicons-editor-help" aria-hidden='true'></div>
 							<a href="<?php echo admin_url( "admin.php?page=my-calendar-help" ); ?>"><?php _e( "My Calendar Help", 'my-calendar' ); ?></a>
 						</li>
 						<li>
-							<div class="dashicons dashicons-yes"></div>
+							<div class="dashicons dashicons-yes" aria-hidden='true'></div>
 							<a href="http://profiles.wordpress.org/users/joedolson/"><?php _e( 'Check out my other plug-ins', 'my-calendar' ); ?></a>
 						</li>
 						<li>
-							<div class="dashicons dashicons-star-filled"></div>
-							<a href="http://wordpress.org/support/view/plugin-reviews/my-calendar"><?php _e( 'Rate this plug-in 5 stars!', 'my-calendar' ); ?></a>
+							<div class="dashicons dashicons-star-filled" aria-hidden='true'></div>
+							<a href="http://wordpress.org/support/plugin/my-calendar/reviews/?filter=5"><?php _e( 'Rate this plug-in 5 stars!', 'my-calendar' ); ?></a>
 						</li>
 						<li>
-							<div class="dashicons dashicons-translation"></div>
+							<div class="dashicons dashicons-translation" aria-hidden='true'></div>
 							<a href="http://translate.joedolson.com/projects/my-calendar"><?php _e( 'Help translate this plug-in!', 'my-calendar' ); ?></a>
 						</li>
 					</ul>

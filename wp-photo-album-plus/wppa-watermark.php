@@ -2,7 +2,7 @@
 /* wppa-watermark.php
 *
 * Functions used for the application of watermarks
-* Version 6.6.05
+* Version 6.6.11
 *
 */
 
@@ -81,6 +81,7 @@ function wppa_create_textual_watermark_file( $args ) {
 				$text = str_replace( 'w#site', get_bloginfo( 'url' ), $text );
 				$usr = get_user_by( 'login', wppa_get_photo_item( $id, 'owner' ) );
 				$text = wppa_translate_photo_keywords( $id, $text );
+				$text = wppa_translate_album_keywords( wppa_get_photo_item( $id, 'album' ), $text );
 				$text = wppa_filter_iptc( $text, $id );	// Render IPTC tags
 				$text = wppa_filter_exif( $text, $id );	// Render EXIF tags
 
@@ -316,12 +317,26 @@ function wppa_array_max( $array ) {
 
 function wppa_get_water_file_and_pos( $id ) {
 
+	// System defaults
 	$result['file'] = wppa_opt( 'watermark_file' );	// default
-	$result['pos'] = wppa_opt( 'watermark_pos' );	// default
+	$result['pos'] 	= wppa_opt( 'watermark_pos' );	// default
 
-	$user = wppa_get_user();
+	// Album specific overrule?
+	if ( $id ) {
+		$alb 		= wppa_get_photo_item( $id, 'album' );
+		$albfile 	= wppa_get_album_item( $alb, 'wmfile' );
+		if ( $albfile ) {
+			$result['file'] = $albfile;
+		}
+		$albpos 	= wppa_get_album_item( $alb, 'wmpos' );
+		if ( $albpos ) {
+			$result['pos'] = $albpos;
+		}
+	}
 
-	if ( wppa_switch( 'watermark_user' ) || current_user_can( 'wppa_settings' ) ) {									// user overrule?
+	// User overrule?
+	if ( wppa_switch( 'watermark_user' ) || isset( $_POST['wppa-watermark-file'] ) ) {
+		$user = wppa_get_user();
 		if ( isset( $_POST['wppa-watermark-file'] ) ) {
 			$result['file'] = $_POST['wppa-watermark-file'];
 			update_option( 'wppa_watermark_file_' . $user, $_POST['wppa-watermark-file'] );
@@ -513,7 +528,7 @@ function wppa_imagecopymerge_alpha( $dst_im, $src_im, $dst_x, $dst_y, $src_x, $s
     imagecopy( $dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h );
 }
 
-function wppa_watermark_file_select( $default = false ) {
+function wppa_watermark_file_select( $key, $album = '0' ) {
 
 	// Init
 	$result = '';
@@ -523,14 +538,40 @@ function wppa_watermark_file_select( $default = false ) {
 	$paths = WPPA_UPLOAD_PATH . '/watermarks/*.png';
 	$files = glob( $paths );
 
-	// Find current selection
-	$select = wppa_opt( 'watermark_file' );	// default
-	if ( ! $default && ( wppa_switch( 'watermark_user' ) || current_user_can( 'wppa_settings' ) ) && get_option( 'wppa_watermark_file_' . $user, 'nil' ) !== 'nil' ) {
-		$select = get_option( 'wppa_watermark_file_' . $user );
+	/* Find current selection */
+	// System default
+	$select = wppa_opt( 'watermark_file' );
+	$default = $select;
+
+	// Selection for album default requested?
+	if ( $album ) {
+		$temp = wppa_get_album_item( $album, 'wmfile' );
+		if ( $temp || $key == 'album' ) {
+			$select = $temp;
+		}
 	}
 
-	// Produce the html
-	$result .= '<option value="--- none ---">'.__( '--- none ---' , 'wp-photo-album-plus' ).'</option>';
+	// User specific overruleable?
+	elseif ( $key == 'user' ) {
+		$default = $select;
+		if ( wppa_switch( 'watermark_user' ) ) {
+			$temp = get_option( 'wppa_watermark_file_' . $user );
+			if ( $temp ) {
+				$select = $temp;
+			}
+		}
+	}
+	/* $select now contains appropriate current selection */
+
+	/* Produce the html */
+	// If not system, allow blank entry for system/album default
+	if ( $key != 'system' ) {
+		$result .= '<option value="" >' . __( '--- default ---', 'wp-photo-album-plus' ) . '</option>';
+	}
+	// None
+	$result .= '<option value="--- none ---" >'.__( '--- none ---' , 'wp-photo-album-plus' ).'</option>';
+
+	// Picture based watermarks
 	if ( $files ) foreach ( $files as $file ) {
 		$sel = $select == basename( $file ) ? 'selected="selected"' : '';
 		$result .= '<option value="'.basename( $file ).'" '.$sel.'>'.basename( $file ).'</option>';
@@ -538,18 +579,18 @@ function wppa_watermark_file_select( $default = false ) {
 
 	// Text based watermarks
 	$sel = $select == '---name---' ? 'selected="selected"' : '';
-	$result .= '<option value="---name---" '.$sel.'>'.__( '--- text: name ---' , 'wp-photo-album-plus' ).'</option>';
+	$result .= '<option value="---name---" '.$sel.' >'.__( '--- text: name ---' , 'wp-photo-album-plus' ).'</option>';
 	$sel = $select == '---filename---' ? 'selected="selected"' : '';
-	$result .= '<option value="---filename---" '.$sel.'>'.__( '--- text: filename ---' , 'wp-photo-album-plus' ).'</option>';
+	$result .= '<option value="---filename---" '.$sel.' >'.__( '--- text: filename ---' , 'wp-photo-album-plus' ).'</option>';
 	$sel = $select == '---description---' ? 'selected="selected"' : '';
-	$result .= '<option value="---description---" '.$sel.'>'.__( '--- text: description ---' , 'wp-photo-album-plus' ).'</option>';
+	$result .= '<option value="---description---" '.$sel.' >'.__( '--- text: description ---' , 'wp-photo-album-plus' ).'</option>';
 	$sel = $select == '---predef---' ? 'selected="selected"' : '';
-	$result .= '<option value="---predef---" '.$sel.'>'.__( '--- text: pre-defined ---' , 'wp-photo-album-plus' ).'</option>';
+	$result .= '<option value="---predef---" '.$sel.' >'.__( '--- text: pre-defined ---' , 'wp-photo-album-plus' ).'</option>';
 
 	return $result;
 }
 
-function wppa_watermark_pos_select( $default = false ) {
+function wppa_watermark_pos_select( $key, $album = '0' ) {
 
 	// Init
 	$user = wppa_get_user();
@@ -562,13 +603,37 @@ function wppa_watermark_pos_select( $default = false ) {
 					'botlft', 'botcen', 'botrht', );
 	$idx = 0;
 
-	// Find current selection
-	$select = wppa_opt( 'watermark_pos' );	// default
-	if ( ! $default && ( wppa_switch( 'watermark_user' ) || current_user_can( 'wppa_settings' ) ) && get_option( 'wppa_watermark_pos_' . $user, 'nil' ) !== 'nil' ) {
-		$select = get_option( 'wppa_watermark_pos_' . $user );
+	/* Find current selection */
+	// System default
+	$select = wppa_opt( 'watermark_pos' );
+	$default = $select;
+
+	// Selection for album default requested?
+	if ( $album ) {
+		$temp = wppa_get_album_item( $album, 'wmpos' );
+		if ( $temp || $key == 'album' ) {
+			$select = $temp;
+		}
 	}
 
-	// Produce the html
+	// User specific overruleable?
+	elseif ( $key == 'user'  ) {
+		$default = $select;
+		if ( wppa_switch( 'watermark_user' ) ) {
+			$temp = get_option( 'wppa_watermark_pos_' . $user );
+			if ( $temp ) {
+				$select = $temp;
+			}
+		}
+	}
+	/* $select now contains appropriate current selection */
+
+	/* Produce the html */
+	// If not system, allow blank entry for system/album default
+	if ( $key != 'system' ) {
+		$result .= '<option value="" >' . __( '--- default ---', 'wp-photo-album-plus' ) . '</option>';
+	}
+
 	while ( $idx < 9 ) {
 		$sel = $select == $val[$idx] ? 'selected="selected"' : '';
 		$result .= '<option value="'.$val[$idx].'" '.$sel.'>'.$opt[$idx].'</option>';

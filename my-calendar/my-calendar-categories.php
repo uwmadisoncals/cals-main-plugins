@@ -495,3 +495,47 @@ function mc_save_profile() {
 	
 	apply_filters( 'mc_save_user', $edit_id, $_POST );
 }
+
+
+function mc_inverse_color( $color ) {
+	$color = str_replace( '#', '', $color );
+	if ( strlen( $color ) != 6 ) {
+		return '#000000';
+	}
+	$rgb       = '';
+	$total     = 0;
+	$red       = 0.299 * ( 255 - hexdec( substr( $color, 0, 2 ) ) );
+	$green     = 0.587 * ( 255 - hexdec( substr( $color, 2, 2 ) ) );
+	$blue      = 0.114 * ( 255 - hexdec( substr( $color, 4, 2 ) ) );
+	$luminance = 1 - ( ( $red + $green + $blue ) / 255 );
+	if ( $luminance < 0.5 ) {
+		return '#ffffff';
+	} else {
+		return '#000000';
+	}
+}
+
+function mc_shift_color( $color ) {
+	$color   = str_replace( '#', '', $color );
+	$rgb     = ''; // Empty variable
+	$percent = ( mc_inverse_color( $color ) == '#ffffff' ) ? - 20 : 20;
+	$per     = $percent / 100 * 255; // Creates a percentage to work with. Change the middle figure to control colour temperature
+	if ( $per < 0 ) {
+		// DARKER
+		$per = abs( $per ); // Turns Neg Number to Pos Number
+		for ( $x = 0; $x < 3; $x ++ ) {
+			$c = hexdec( substr( $color, ( 2 * $x ), 2 ) ) - $per;
+			$c = ( $c < 0 ) ? 0 : dechex( $c );
+			$rgb .= ( strlen( $c ) < 2 ) ? '0' . $c : $c;
+		}
+	} else {
+		// LIGHTER        
+		for ( $x = 0; $x < 3; $x ++ ) {
+			$c = hexdec( substr( $color, ( 2 * $x ), 2 ) ) + $per;
+			$c = ( $c > 255 ) ? 'ff' : dechex( $c );
+			$rgb .= ( strlen( $c ) < 2 ) ? '0' . $c : $c;
+		}
+	}
+
+	return '#' . $rgb;
+}

@@ -206,8 +206,8 @@ function wppa_verify_multisite_config() {
 
 function wppa_admin_bar_init() {
 
-	if ( ( is_admin() && wppa_switch( 'adminbarmenu_admin') ) ||
-		( ! is_admin() && wppa_switch( 'adminbarmenu_frontend') ) ) {
+	if ( ( is_admin() && get_option( 'wppa_adminbarmenu_admin' ) == 'yes' ) ||
+		( ! is_admin() && get_option( 'wppa_adminbarmenu_frontend' ) == 'yes' ) ) {
 
 		if ( current_user_can('wppa_admin') ||
 			 current_user_can('wppa_upload') ||

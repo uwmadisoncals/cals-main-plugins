@@ -18,7 +18,7 @@ class M_Attach_To_Post extends C_Base_Module
 			'photocrati-attach_to_post',
 			'Attach To Post',
 			'Provides the "Attach to Post" interface for displaying galleries and albums',
-			'0.17',
+			'0.18',
 			'https://www.imagely.com/wordpress-gallery-plugin/nextgen-gallery/',
 			'Photocrati Media',
 			'https://www.imagely.com',
@@ -105,14 +105,14 @@ class M_Attach_To_Post extends C_Base_Module
 
         // We use two hooks here because we need it to execute for both the post-new.php
         // page and ATP interface
-        add_action('plugins_loaded',            array(&$this, 'fix_ie11'), 1);
-        add_action('admin_init',                array(&$this, 'fix_ie11'), PHP_INT_MAX-1);
-        add_action('admin_enqueue_scripts',     array(&$this, 'fix_ie11'), 1);
-        add_action('admin_enqueue_scripts',     array(&$this, 'fix_ie11'), PHP_INT_MAX-1);
+        add_action('plugins_loaded',        array($this, 'fix_ie11'), 1);
+        add_action('admin_init',            array($this, 'fix_ie11'), PHP_INT_MAX-1);
+        add_action('admin_enqueue_scripts', array($this, 'fix_ie11'), 1);
+        add_action('admin_enqueue_scripts', array($this, 'fix_ie11'), PHP_INT_MAX-1);
 
-        if (defined('WPSEO_VERSION') && version_compare(WPSEO_VERSION, '3.0', '>='))
-            add_filter('wpseo_pre_analysis_post_content', array(&$this, 'remove_preview_images_from_yoast_opengraph'));
-        add_filter('wpseo_sitemap_urlimages', array(&$this, 'remove_preview_images_from_yoast_sitemap'), NULL, 2);
+        add_filter('wpseo_opengraph_image',   array($this, 'hide_preview_image_from_yoast'));
+        add_filter('wpseo_twitter_image',     array($this, 'hide_preview_image_from_yoast'));
+        add_filter('wpseo_sitemap_urlimages', array($this, 'remove_preview_images_from_yoast_sitemap'), NULL, 2);
 
         // Emit frame communication events
 		if ($this->does_request_require_frame_communication()) {
@@ -166,18 +166,18 @@ class M_Attach_To_Post extends C_Base_Module
 		add_editor_style(C_Router::get_instance()->get_static_url('photocrati-attach_to_post#ngg_attach_to_post_tinymce_plugin.css'));
 	}
 
-	/**
-	 * Removes IGW preview/placeholder images from Yoast OpenGraph analysis
-	 * @param $content
-	 * @return mixed
-	 */
-	function remove_preview_images_from_yoast_opengraph($content)
-	{
-		$content = $this->fix_preview_images($content);
-		$content = preg_replace('/http(s)?:\/\/(.*?)'.NGG_ATTACH_TO_POST_SLUG.'\/preview\/id--\d+/', "", $content);
-		$content = preg_replace('/http(s)?:\/\/(.*?)'.NGG_ATTACH_TO_POST_SLUG.'\/preview\/id\/\d+/', "", $content);
-		return $content;
-	}
+    /**
+     * Prevents ATP preview image placeholders from being used as opengraph / twitter metadata
+     *
+     * @param string $image
+     * @return null
+     */
+	function hide_preview_image_from_yoast($image)
+    {
+        if (strpos($image, NGG_ATTACH_TO_POST_SLUG) !== FALSE)
+            return null;
+        return $image;
+    }
 
 	/**
 	 * Removes IGW preview/placeholder images from Yoast's sitemap

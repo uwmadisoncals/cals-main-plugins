@@ -3,7 +3,7 @@
 Plugin Name: Enhanced Media Library
 Plugin URI: http://wpUXsolutions.com
 Description: This plugin will be handy for those who need to manage a lot of media files.
-Version: 2.3.5
+Version: 2.4.2
 Author: wpUXsolutions
 Author URI: http://wpUXsolutions.com
 Text Domain: enhanced-media-library
@@ -27,7 +27,7 @@ global $wp_version,
 
 
 
-$wpuxss_eml_version = '2.3.5';
+$wpuxss_eml_version = '2.4.2';
 
 
 
@@ -310,6 +310,7 @@ if ( ! function_exists( 'wpuxss_eml_admin_enqueue_scripts' ) ) {
             $wpuxss_eml_version,
             'all'
         );
+        wp_style_add_data( 'wpuxss-eml-admin-custom-style', 'rtl', 'replace' );
 
         wp_enqueue_style ( 'wp-jquery-ui-dialog' );
 
@@ -346,6 +347,20 @@ if ( ! function_exists( 'wpuxss_eml_admin_enqueue_scripts' ) ) {
                 'wpuxss-eml-media-list-script',
                 'wpuxss_eml_media_list_l10n',
                 $media_list_l10n
+            );
+        }
+
+
+        // scripts for grid view :: /wp-admin/upload.php
+        if ( isset( $current_screen ) && 'upload' === $current_screen->base && 'grid' === $media_library_mode ) {
+
+            wp_dequeue_script( 'media' );
+            wp_enqueue_script(
+                'wpuxss-eml-media-grid-script',
+                $wpuxss_eml_dir . 'js/eml-media-grid.js',
+                array( 'wpuxss-eml-media-models-script', 'wpuxss-eml-media-views-script' ),
+                $wpuxss_eml_version,
+                true
             );
         }
     }
@@ -531,19 +546,6 @@ if ( ! function_exists( 'wpuxss_eml_enqueue_media' ) ) {
                 'wpuxss-eml-enhanced-medialist-script',
                 'wpuxss_eml_enhanced_medialist_l10n',
                 $enhanced_medialist_l10n
-            );
-        }
-
-
-        // scripts for grid view :: /wp-admin/upload.php
-        if ( isset( $current_screen ) && 'upload' === $current_screen->base && 'grid' === $media_library_mode ) {
-
-            wp_enqueue_script(
-                'wpuxss-eml-media-grid-script',
-                $wpuxss_eml_dir . 'js/eml-media-grid.js',
-                array('media'),
-                $wpuxss_eml_version,
-                true
             );
         }
     }

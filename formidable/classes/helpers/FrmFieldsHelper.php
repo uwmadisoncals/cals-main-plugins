@@ -183,11 +183,11 @@ class FrmFieldsHelper {
 		return $msg;
 	}
 
-    public static function get_form_fields( $form_id, $error = false ) {
-        $fields = FrmField::get_all_for_form($form_id);
-        $fields = apply_filters('frm_get_paged_fields', $fields, $form_id, $error);
-        return $fields;
-    }
+	public static function get_form_fields( $form_id, $error = array() ) {
+		$fields = FrmField::get_all_for_form( $form_id );
+		$fields = apply_filters( 'frm_get_paged_fields', $fields, $form_id, $error );
+		return $fields;
+	}
 
 	public static function get_default_html( $type = 'text' ) {
 		if ( apply_filters( 'frm_normal_field_type_html', true, $type ) ) {
@@ -284,13 +284,25 @@ DEFAULT_HTML;
         $entry_key = FrmAppHelper::simple_get( 'entry', 'sanitize_title' );
         $html = str_replace('[entry_key]', $entry_key, $html);
 
+		if ( $form ) {
+			$form = (array) $form;
+
+			//replace [form_key]
+			$html = str_replace('[form_key]', $form['form_key'], $html);
+
+			//replace [form_name]
+			$html = str_replace('[form_name]', $form['name'], $html);
+		}
+
+		self::process_wp_shortcodes( $html );
+
         //replace [input]
         preg_match_all("/\[(input|deletelink)\b(.*?)(?:(\/))?\]/s", $html, $shortcodes, PREG_PATTERN_ORDER);
         global $frm_vars;
         $frm_settings = FrmAppHelper::get_settings();
 
         foreach ( $shortcodes[0] as $short_key => $tag ) {
-            $atts = shortcode_parse_atts( $shortcodes[2][ $short_key ] );
+            $atts = FrmShortcodeHelper::get_shortcode_attribute_array( $shortcodes[2][ $short_key ] );
 			$tag = self::get_shortcode_tag( $shortcodes, $short_key, array( 'conditional' => false, 'conditional_check' => false ) );
 
             $replace_with = '';
@@ -317,15 +329,6 @@ DEFAULT_HTML;
             $html = str_replace( $shortcodes[0][ $short_key ], $replace_with, $html );
         }
 
-		if ( $form ) {
-            $form = (array) $form;
-
-            //replace [form_key]
-            $html = str_replace('[form_key]', $form['form_key'], $html);
-
-            //replace [form_name]
-            $html = str_replace('[form_name]', $form['name'], $html);
-        }
         $html .= "\n";
 
         //Return html if conf_field to prevent loop
@@ -342,12 +345,19 @@ DEFAULT_HTML;
 
 		self::remove_collapse_shortcode( $html );
 
+        return $html;
+    }
+
+	/**
+	 * This filters shortcodes in the field HTML
+	 *
+	 * @since 2.02.11
+	 */
+	private static function process_wp_shortcodes( &$html ) {
 		if ( apply_filters( 'frm_do_html_shortcodes', true ) ) {
 			$html = do_shortcode( $html );
 		}
-
-        return $html;
-    }
+	}
 
 	/**
 	 * Add classes to a field div
@@ -645,7 +655,7 @@ DEFAULT_HTML;
         );
 
         foreach ( $shortcodes[0] as $short_key => $tag ) {
-            $atts = shortcode_parse_atts( $shortcodes[3][ $short_key ] );
+            $atts = FrmShortcodeHelper::get_shortcode_attribute_array( $shortcodes[3][ $short_key ] );
 
             if ( ! empty( $shortcodes[3][ $short_key ] ) ) {
 				$tag = str_replace( array( '[', ']' ), '', $shortcodes[0][ $short_key ] );
@@ -1018,7 +1028,8 @@ DEFAULT_HTML;
 	 * @since 2.0.6
 	 */
 	private static function set_other_value( $args, &$other_args ) {
-		$parent = $pointer = '';
+		$parent = '';
+		$pointer = '';
 
 		// Check for parent ID and pointer
 		$temp_array = explode( '[', $args['field_name'] );

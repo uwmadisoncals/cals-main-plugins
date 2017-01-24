@@ -296,6 +296,10 @@
                     uploader.refresh();
                     window.Frame_Event_Publisher.broadcast();
 
+										var evtJq = $;
+										if (window.top.jQuery)
+											evtJq = window.top.jQuery;
+										evtJq(window.top.document).find('body').trigger('nextgen_event', [ 'plupload_init' ]);
                 };
 
                 window.init_plupload();
