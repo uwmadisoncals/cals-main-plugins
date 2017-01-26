@@ -7,7 +7,7 @@ Domain Path: /embedded/locale
 License: GPLv2
 Requires at least: 3.7
 Tested up to: 4.7.1
-Stable tag: 2.2.6
+Stable tag: 2.2.7
 
 The complete and reliable plugin for managing custom post types, custom taxonomies and custom fields.
 
@@ -160,7 +160,19 @@ Additionally, Types is the only plugin that lets you define parent/child relatio
 
 == Changelog ==
 
+= 2.2.7 =
+
+* Fixed a JavaScript error when using a flat taxonomy in the relationship post table.
+* Fixed an issue where no value was stored for checkboxes when option to save 0 was selected.
+* Fixed a validation issue for file, audio, video and embed fields affecting Types. Allowing URLs with non-latin characters, but only for URLs that point to attachments from the Media Library (validated by WordPress media upload mechanism).
+* Removed the "Types Migration" page which was broken and not maintained.
+* Fixed an incompatibility issue with Divi caused by double enqueuing of the jQuery UI Validation plugin.
+* When inserting the types shortcode for an image field, we will always use placeholders for the title and alt text.
+* Fixed an issue in the relationship post table where it wasn't possible to repeatedly set and remove a child post's featured image.
+* Improved how the Types meta fields are registered in the Fields and Views dialog.
+
 = 2.2.6 =
+
 * Updated Installer to 1.7.15.
 * Fix several issues with the Styling editor.
 * Fixed a compatibility with Layouts, child themes of Layouts-integrated themes haven't been recognized as such.

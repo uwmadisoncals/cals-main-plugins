@@ -358,23 +358,6 @@ function wpcf_admin_toolset_register_menu_pages( $pages ) {
 	}
 	
 
-	if (
-        (class_exists( 'Acf') && !class_exists('acf_pro'))
-        || defined( 'CPT_VERSION' ) 
-    ) {
-		$pages['wpcf-migration'] = array(
-			'slug'				=> 'wpcf-migration',
-			'menu_title'		=> __( 'Types Migration', 'wpcf' ),
-			'page_title'		=> __( 'Types Migration', 'wpcf' ),
-			'callback'			=> 'wpcf_admin_menu_migration',
-			'capability'		=> 'manage_options',
-		);
-		$pages['wpcf-migration']['capability'] = wpcf_admin_calculate_menu_page_capability( $pages['wpcf-migration'] );
-		$pages['wpcf-migration']['load_hook'] = wpcf_admin_calculate_menu_page_load_hook( $pages['wpcf-migration'] );
-		$pages['wpcf-migration']['contextual_help_legacy'] = wpcf_admin_help( 'wpcf-migration' );
-		$pages['wpcf-migration']['contextual_help_hook'] = 'wpcf_admin_help_add_tabs_load_hook';
-    }
-	
 	if ( 'installer' == $current_page ) {
 		// @todo Having a page with a slug "installer" is a direct path to a third-party plugin conflict. Just saying. Not to mention the callback funciton "installer_content", for god's sake
 		$pages['installer'] = array(
@@ -446,6 +429,8 @@ function wpcf_admin_menu_summary()
 function wpcf_admin_enqueue_group_edit_page_assets() {
 	do_action( 'wpcf_admin_page_init' );
 
+	$asset_manager = Types_Asset_Manager::get_instance();
+
 	/*
 	 * Enqueue scripts
 	 */
@@ -453,15 +438,15 @@ function wpcf_admin_enqueue_group_edit_page_assets() {
 	wp_enqueue_script( 'wpcf-filter-js',
 		WPCF_EMBEDDED_RES_RELPATH
 		. '/js/custom-fields-form-filter.js', array('jquery'), WPCF_VERSION );
-	// Form
-	wp_enqueue_script( 'wpcf-form-validation',
-		WPCF_EMBEDDED_RES_RELPATH . '/js/'
-		. 'jquery-form-validation/jquery.validate.min.js', array('jquery'),
-		WPCF_VERSION );
-	wp_enqueue_script( 'wpcf-form-validation-additional',
-		WPCF_EMBEDDED_RES_RELPATH . '/js/'
-		. 'jquery-form-validation/additional-methods.min.js',
-		array('jquery'), WPCF_VERSION );
+
+
+	$asset_manager->enqueue_scripts(
+		array(
+			Types_Asset_Manager::SCRIPT_JQUERY_UI_VALIDATION,
+			Types_Asset_Manager::SCRIPT_ADDITIONAL_VALIDATION_RULES,
+		)
+	);
+
 	// Scroll
 	wp_enqueue_script( 'wpcf-scrollbar',
 		WPCF_EMBEDDED_TOOLSET_RELPATH . '/toolset-common/visual-editor/res/js/scrollbar.js',
@@ -640,20 +625,21 @@ function wpcf_admin_menu_edit_type_hook()
     wp_enqueue_script( 'wpcf-custom-types-form',
             WPCF_RES_RELPATH . '/js/'
             . 'custom-types-form.js', array('jquery', 'jquery-ui-dialog', 'jquery-masonry'), WPCF_VERSION );
-    wp_enqueue_script( 'wpcf-form-validation',
-            WPCF_RES_RELPATH . '/js/'
-            . 'jquery-form-validation/jquery.validate.min.js', array('jquery'),
-            WPCF_VERSION );
-    wp_enqueue_script( 'wpcf-form-validation-additional',
-            WPCF_RES_RELPATH . '/js/'
-            . 'jquery-form-validation/additional-methods.min.js',
-            array('jquery'), WPCF_VERSION );
+
     wp_enqueue_style('wp-jquery-ui-dialog');
-    add_action( 'admin_footer', 'wpcf_admin_types_form_js_validation' );
+
+	$asset_manager = Types_Asset_Manager::get_instance();
+	$asset_manager->enqueue_scripts(
+		array(
+			Types_Asset_Manager::SCRIPT_JQUERY_UI_VALIDATION,
+			Types_Asset_Manager::SCRIPT_ADDITIONAL_VALIDATION_RULES,
+        )
+    );
+
+			add_action( 'admin_footer', 'wpcf_admin_types_form_js_validation' );
     wpcf_post_relationship_init();
 
 	// New page controller script.
-	$asset_manager = Types_Asset_Manager::get_instance();
 	$asset_manager->enqueue_scripts( Types_Asset_Manager::SCRIPT_PAGE_EDIT_POST_TYPE );
 
     /**
@@ -704,21 +690,22 @@ function wpcf_admin_menu_edit_type()
 function wpcf_admin_menu_edit_tax_hook()
 {
     do_action( 'wpcf_admin_page_init' );
-    wp_enqueue_script( 'wpcf-form-validation',
-            WPCF_RES_RELPATH . '/js/'
-            . 'jquery-form-validation/jquery.validate.min.js', array('jquery'),
-            WPCF_VERSION );
-    wp_enqueue_script( 'wpcf-form-validation-additional',
-            WPCF_RES_RELPATH . '/js/'
-            . 'jquery-form-validation/additional-methods.min.js',
-            array('jquery'), WPCF_VERSION );
+
     wp_enqueue_script( 'wpcf-taxonomy-form',
         WPCF_RES_RELPATH . '/js/'
         . 'taxonomy-form.js', array( 'jquery' ), WPCF_VERSION );
 
-	// New page controller script.
+
 	$asset_manager = Types_Asset_Manager::get_instance();
-	$asset_manager->enqueue_scripts( Types_Asset_Manager::SCRIPT_PAGE_EDIT_TAXONOMY );
+	$asset_manager->enqueue_scripts(
+		array(
+			Types_Asset_Manager::SCRIPT_JQUERY_UI_VALIDATION,
+			Types_Asset_Manager::SCRIPT_ADDITIONAL_VALIDATION_RULES,
+
+			// New page controller script.
+			Types_Asset_Manager::SCRIPT_PAGE_EDIT_TAXONOMY
+		)
+	);
 
     add_action( 'admin_footer', 'wpcf_admin_tax_form_js_validation' );
     require_once WPCF_EMBEDDED_INC_ABSPATH . '/custom-taxonomies.php';
@@ -895,35 +882,6 @@ function wpcf_render_import_form() {
     echo '</form>';
 }
 
-
-
-/**
- * Menu page hook.
- */
-function wpcf_admin_menu_migration_hook()
-{
-    do_action( 'wpcf_admin_page_init' );
-    require_once WPCF_INC_ABSPATH . '/fields.php';
-    require_once WPCF_INC_ABSPATH . '/custom-types.php';
-    require_once WPCF_INC_ABSPATH . '/custom-taxonomies.php';
-    require_once WPCF_INC_ABSPATH . '/migration.php';
-    $form = wpcf_admin_migration_form();
-    wpcf_form( 'wpcf_form_migration', $form );
-}
-
-/**
- * Menu page display.
- */
-function wpcf_admin_menu_migration()
-{
-    wpcf_add_admin_header( __( 'Migration', 'wpcf' ) );
-    echo '<form method="post" action="" id="wpcf-migration-form" class="wpcf-migration-form '
-    . 'wpcf-form-validate" enctype="multipart/form-data">';
-    $form = wpcf_form( 'wpcf_form_migration' );
-    echo $form->renderForm();
-    echo '</form>';
-    wpcf_add_admin_footer();
-}
 
 add_filter( 'toolset_filter_toolset_register_settings_section', 'wpcf_register_settings_custom_content_section', 20 );
 

@@ -183,6 +183,7 @@ final class Types_Utils {
 	 * @param string $url URL of the file.
 	 * @return int|null Attachment ID if it exists.
 	 * @since 1.9.1
+	 * @deprecated Since 2.2.7. Use Toolset_Utils::get_attachment_id_by_url() instead. To be removed in 2.3 or later.
 	 */
 	public static function get_attachment_id_by_url( $url ) {
 

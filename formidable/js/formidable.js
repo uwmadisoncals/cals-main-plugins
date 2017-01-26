@@ -673,10 +673,31 @@ function frmFrontFormJS(){
 
 		var logicFieldInput = document.getElementById( fieldCall );
 
-		if ( logicFieldInput !== null ) {
+		if ( logicFieldInput === null ) {
+			logicFieldValue = parseTimeValue( logicFieldArgs, fieldCall );
+		} else {
 			logicFieldValue = logicFieldInput.value;
 		}
 
+		return logicFieldValue;
+	}
+
+	function parseTimeValue( logicFieldArgs, fieldCall ) {
+		var logicFieldValue = '';
+		if ( logicFieldArgs.fieldType == 'time' ) {
+			var hour = document.getElementById( fieldCall +'_H' );
+			if ( hour !== null ) {
+				var minute = document.getElementById( fieldCall +'_m' );
+				logicFieldValue = hour.value + ':' + minute.value;
+
+				var pm = document.getElementById( fieldCall +'_A' );
+				if ( logicFieldValue == ':' ) {
+					logicFieldValue = '';
+				} else if ( pm !== null ) {
+					logicFieldValue += ' ' + pm.value;
+				}
+			}
+		}
 		return logicFieldValue;
 	}
 
@@ -1458,6 +1479,13 @@ function frmFrontFormJS(){
 		}
 	}
 
+	/**
+	 * Update a Lookup field's options
+	 *
+	 * @param {Object} childFieldArgs
+	 * @param {Object} parentRepeatArgs
+	 * @param {String} parentRepeatArgs.repeatRow
+     */
 	function updateLookupFieldOptions( childFieldArgs, parentRepeatArgs ) {
 		var childFieldElements = [];
 		if ( parentRepeatArgs.repeatRow !== '' ) {
@@ -1845,6 +1873,7 @@ function frmFrontFormJS(){
 				parent_fields:childFieldArgs.parents,
 				parent_vals:childFieldArgs.parentVals,
 				field_id:childFieldArgs.fieldId,
+				container_field_id:getContainerFieldID( childFieldArgs ),
 				row_index:childFieldArgs.repeatRow,
 				current_value:currentValue,
 				default_value:defaultValue,
@@ -1865,6 +1894,29 @@ function frmFrontFormJS(){
 				triggerChange( jQuery( inputs[0] ), childFieldArgs.fieldKey );
 			}
 		});
+	}
+
+	/**
+	 * Get the ID of the container field, if there is one
+	 *
+	 * @since 2.03.01
+	 *
+	 * @param {Object} childFieldArgs
+	 * @param {string} childFieldArgs.inSection
+	 * @param {string} childFieldArgs.inEmbedForm
+	 *
+	 * @returns {string}
+     */
+	function getContainerFieldID( childFieldArgs ) {
+		var sectionFieldID = '';
+
+		if ( childFieldArgs.inSection !== '0' ) {
+			sectionFieldID = childFieldArgs.inSection;
+		} else if ( childFieldArgs.inEmbedForm !== '0' ) {
+			sectionFieldID = childFieldArgs.inEmbedForm;
+		}
+
+		return sectionFieldID;
 	}
 
 	/**
@@ -3149,12 +3201,8 @@ function frmFrontFormJS(){
 						frmFrontForm.scrollMsg( jQuery(object), false );
 					}
 					var formID = jQuery(object).find('input[name="form_id"]').val();
-					jQuery(object).find('.frm_form_field').fadeOut('slow', function(){
-						response.content = response.content.replace(/ class="frm_form_field /g, ' class="frm_hidden frm_form_field ');
-						response.content = response.content.replace(/ frm_pro_form /g, ' frm_pro_form frm_no_hide ');
-						jQuery(object).closest( '.frm_forms' ).replaceWith( response.content );
-						jQuery('#frm_form_'+ formID +'_container .frm_form_field').fadeIn('slow');
-					});
+					response.content = response.content.replace(/ frm_pro_form /g, ' frm_pro_form frm_no_hide ');
+					jQuery(object).closest( '.frm_forms' ).replaceWith( response.content );
 
 					addUrlParam(response);
 
@@ -4098,7 +4146,7 @@ function frmFrontFormJS(){
 		},
 
 		validateFormSubmit: function( object ){
-			if ( typeof tinyMCE != 'undefined' && jQuery(this).find('.wp-editor-wrap').length ) {
+			if ( typeof tinyMCE != 'undefined' && jQuery(object).find('.wp-editor-wrap').length ) {
 				tinyMCE.triggerSave();
 			}
 
@@ -4292,6 +4340,8 @@ var frmFrontForm = frmFrontFormJS();
 jQuery(document).ready(function($){
 	frmFrontForm.init();
 });
+
+document.documentElement.className += ' js';
 
 function frmRecaptcha() {
 	var captchas = jQuery('.frm-g-recaptcha');

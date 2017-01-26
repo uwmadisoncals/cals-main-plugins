@@ -130,6 +130,8 @@ final class Types_Main {
 		}
 
 		Types_Api::initialize();
+
+		Types_Interop_Mediator::initialize();
 	}
 
 

@@ -1,7 +1,8 @@
 <?php
 /**
  * Register data (called automatically).
- * @return type
+ *
+ * @return array
  */
 function wpcf_fields_image() {
     return array(
@@ -18,16 +19,13 @@ function wpcf_fields_image() {
     );
 }
 
-/**
- *
- *
- */
 
 add_filter( 'wpcf_fields_type_image_value_get', 'wpcf_fields_image_value_filter' );
 add_filter( 'wpcf_fields_type_image_value_save', 'wpcf_fields_image_value_filter' );
 
 // Do not wrap if 'url' is TRUE
 add_filter( 'types_view', 'wpcf_fields_image_view_filter', 10, 6 );
+
 
 /**
  * return array of valid extensions
@@ -53,10 +51,16 @@ function wpcf_fields_image_valid_extension()
 /**
  * Editor callback form.
  *
- * @global object $wpdb
+ * @param $field
+ * @param $data
+ * @param $context
+ * @param $post
  *
+ * @return array
  */
-function wpcf_fields_image_editor_callback( $field, $data, $context, $post ) {
+function wpcf_fields_image_editor_callback(
+	$field, $data, /** @noinspection PhpUnusedParameterInspection */ $context, $post
+) {
 
     // Get post_ID
     $post_ID = !empty( $post->ID ) ? $post->ID : false;
@@ -107,26 +111,9 @@ function wpcf_fields_image_editor_callback( $field, $data, $context, $post ) {
     $data['preview'] = $attachment_id ? wp_get_attachment_image( $attachment_id,
                     'thumbnail' ) : '';
 
-    // Title and Alt
-    if ( $attachment_id ) {
-        $alt = trim( strip_tags( get_post_meta( $attachment_id,
-                                '_wp_attachment_image_alt', true ) ) );
-        $attachment_post = get_post( $attachment_id );
-        if ( !empty( $attachment_post ) ) {
-            $title = trim( strip_tags( $attachment_post->post_title ) );
-        } else if ( !empty( $alt ) ) {
-            $title = $alt;
-        }
-        if ( empty( $alt ) ) {
-            $alt = $title;
-        }
-        if ( !isset( $data['title'] ) ) {
-            $data['title'] = $title;
-        }
-        if ( !isset( $data['alt'] ) ) {
-            $data['alt'] = $alt;
-        }
-    }
+    // Use the title/alt placeholders for all images instead of "hardcoding" specific values.
+	$data['title'] = '%%TITLE%%';
+	$data['alt'] = '%%ALT%%';
 
     // Align options
     $data['alignment_options'] = array(
