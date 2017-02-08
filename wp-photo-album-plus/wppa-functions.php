@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -1601,12 +1601,12 @@ global $wppa_session;
 
 		// all chunks
 		foreach ( $chunks as $chunk ) if ( strlen( trim( $chunk ) ) ) {
-			$words = wppa_index_raw_to_words( $chunk );
+			$words = wppa_index_raw_to_words( $chunk, false, wppa_opt( 'search_min_length' ) );
 			$photo_array = array();
 			// all words in the searchstring
 			foreach ( $words as $word ) {
 				$word = trim( $word );
-				if ( strlen( $word ) > 1 ) {
+				if ( strlen( $word ) >= wppa_opt( 'search_min_length' ) ) {
 					if ( strlen( $word ) > 20 ) $word = substr( $word, 0, 20 );
 					if ( wppa_switch( 'wild_front' ) ) {
 						$pidxs = $wpdb->get_results( "SELECT `slug`, `photos` FROM `".WPPA_INDEX."` WHERE `slug` LIKE '%".$word."%'", ARRAY_A );
@@ -2426,7 +2426,7 @@ global $wppa_done;
 					}
 					if ( wppa_opt( 'comment_notify' ) == 'admin' || wppa_opt( 'comment_notify' ) == 'both' || wppa_opt( 'comment_notify' ) == 'upadmin' ) {
 						// Mail admin
-						$moduser   = get_user_by( 'id', '1' );
+						$moduser   = wppa_get_user_by( 'id', '1' );
 						if ( ! in_array( $moduser->user_login, $sentto ) ) {	// Already sent him?
 							$to        = get_bloginfo( 'admin_email' );
 							$cont['3'] = $cont2;
@@ -2440,7 +2440,7 @@ global $wppa_done;
 					if ( wppa_opt( 'comment_notify' ) == 'upload' || wppa_opt( 'comment_notify' ) == 'upadmin' || wppa_opt( 'comment_notify' ) == 'upowner' ) {
 						// Mail uploader
 						$uploader = $wpdb->get_var( $wpdb->prepare( "SELECT `owner` FROM `".WPPA_PHOTOS."` WHERE `id` = %d", $id ) );
-						$moduser = get_user_by( 'login', $uploader );
+						$moduser = wppa_get_user_by( 'login', $uploader );
 						if ( $moduser ) {	// else it's an ip address ( anonymus uploader )
 							if ( ! in_array( $moduser->user_login, $sentto ) ) {	// Already sent him?
 								$to = $moduser->user_email;
@@ -2460,7 +2460,7 @@ global $wppa_done;
 						$alb     = $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM `".WPPA_PHOTOS."` WHERE `id` = %d", $id ) );
 						$owner   = $wpdb->get_var( $wpdb->prepare( "SELECT `owner` FROM `".WPPA_ALBUMS."` WHERE `id` = %d", $alb ) );
 						if ( $owner == '--- public ---' ) $owner = 'admin';
-						$moduser = get_user_by( 'login', $owner );
+						$moduser = wppa_get_user_by( 'login', $owner );
 						if ( ! in_array( $moduser->user_login, $sentto ) ) {	// Already sent him?
 							$to = $moduser->user_email;
 							if ( user_can( $moduser, 'wppa_comments' ) ) $cont['3'] = $cont2; else $cont['3'] = '';
@@ -2477,7 +2477,7 @@ global $wppa_done;
 						if ( $cmnts ) foreach( $cmnts as $cmnt ) {
 							$user = $cmnt['user'];
 							if ( ! in_array( $user, $sentto ) ) {
-								$cmuser = get_user_by( 'login', $user );
+								$cmuser = wppa_get_user_by( 'login', $user );
 								if ( $cmuser ) {	// Not to an ip
 									$to = $cmuser->user_email;
 									$cont['3'] = '';
@@ -2846,9 +2846,16 @@ function wppa_get_thumb_frame_style( $glue = false, $film = '' ) {
 
 function wppa_get_thumb_frame_style_a( $glue = false, $film = '' ) {
 static $wppaerrmsgxxx;
+global $wppa;
 
 	// Init
-	$album = wppa( 'current_album' ) ? wppa_cache_album( wppa( 'current_album' ) ) : false;
+	if ( isset( $wppa['current_album'] ) && wppa( 'current_album' ) > '0' ) {
+		$album = wppa_cache_album( wppa( 'current_album' ) );
+	}
+	else {
+		$album = false;
+	}
+
 	$result = array( 'style'=> '', 'width' => '', 'height' => '' );
 
 	// Comten alt display?

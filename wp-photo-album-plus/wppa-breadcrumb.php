@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 6.6.08
+* Version 6.6.12
 *
 */
 
@@ -280,7 +280,7 @@ global $wppa_session;
 			wppa_bcitem( $value, $href, $title, 'b9' );
 		}
 		elseif ( wppa( 'is_upldr' ) ) {
-			$usr = get_user_by( 'login', wppa( 'is_upldr' ) );
+			$usr = wppa_get_user_by( 'login', wppa( 'is_upldr' ) );
 			if ( $usr ) $user = $usr->display_name; else $user = wppa( 'is_upldr' );
 			if ( wppa( 'is_slide' ) ) {
 				$value 	= sprintf( __( 'Photos by %s' , 'wp-photo-album-plus'), $user );
@@ -490,7 +490,7 @@ global $wppa_session;
 		}
 		else { 			// Maybe a simple normal standard album???
 			if ( wppa( 'is_owner' ) ) {
-				$usr = get_user_by( 'login', wppa( 'is_owner' ) );
+				$usr = wppa_get_user_by( 'login', wppa( 'is_owner' ) );
 				if ( $usr ) $dispname = $usr->display_name;
 				else $dispname = wppa( 'is_owner' );	// User deleted
 				$various = sprintf( __( 'Various albums by %s' , 'wp-photo-album-plus'), $dispname );

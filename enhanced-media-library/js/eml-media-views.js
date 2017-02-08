@@ -612,6 +612,10 @@ window.eml = window.eml || { l10n: {} };
             this.on( 'ready', this.fixLayout, this );
             this.$window = $( window );
             this.$window.on( 'resize', _.debounce( _.bind( this.fixLayout, this ), 15 ) );
+
+            if ( $('.notice-dismiss').length ) {
+                $( document ).on( 'click', '.notice-dismiss', _.debounce( _.bind( this.fixLayout, this), 250 ) );
+            }
         },
 
         fixLayout: function() {
@@ -1075,7 +1079,7 @@ window.eml = window.eml || { l10n: {} };
             original.MediaFrame.Post.activate.apply( this, arguments );
 
             this.on( 'open', content.fixLayout, content );
-            if ( typeof acf != 'undefined' ) {
+            if ( typeof acf !== 'undefined' && $('.acf-expand-details').length ) {
                 $( document ).on( 'click', '.acf-expand-details', _.debounce( _.bind( content.fixLayout, content ), 250 ) );
             }
         }

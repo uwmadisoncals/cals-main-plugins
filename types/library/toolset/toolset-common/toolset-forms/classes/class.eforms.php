@@ -982,7 +982,11 @@ class Enlimbo_Forms {
         //$element['_render']['element'] .= sprintf( ' data-wpt-type="%s" ', __FUNCTION__ );
         $element['_render']['element'] .= sprintf(' id="%s"', $element['#id']);
         $element['_render']['element'] .= sprintf(' name="%s"', $element['#name']);
-        $element['_render']['element'] .= sprintf(' value="%s"', isset($element['#value']) ? esc_attr($element['#value']) : '' );
+
+        $value = toolset_getarr( $element, '#value' );
+        $value = ( is_string( $value ) ? esc_attr( $value ) : '' );
+        $element['_render']['element'] .= sprintf(' value="%s"', $value );
+
         $element['_render']['element'] .= $element['_attributes_string'];
         if (isset($element['#disable']) && $element['#disable']) {
             $element['_render']['element'] .= ' disabled="disabled"';

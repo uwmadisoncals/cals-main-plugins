@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -1151,7 +1151,7 @@ global $wppa_log_file;
 					break;
 				case 'owner':
 					$itemname = __( 'Owner' , 'wp-photo-album-plus');
-					if ( $value != '--- public ---' && ! get_user_by( 'login', $value ) ) {
+					if ( $value != '--- public ---' && ! wppa_get_user_by( 'login', $value ) ) {
 						echo '||4||'.sprintf( __( 'User %s does not exist' , 'wp-photo-album-plus'), $value );
 						wppa_exit();
 					}
@@ -1586,7 +1586,7 @@ global $wppa_log_file;
 							$itemname = __( 'Photo order #' , 'wp-photo-album-plus');
 							break;
 						case 'owner':
-							$usr = get_user_by( 'login', $value );
+							$usr = wppa_get_user_by( 'login', $value );
 							if ( ! $usr ) {
 								echo '||4||' . sprintf( __( 'User %s does not exists' , 'wp-photo-album-plus'), $value );
 								wppa_exit();
@@ -2456,7 +2456,7 @@ global $wppa_log_file;
 				case 'wppa_blacklist_user':
 					// Does user exist?
 					$value = trim ( $value );
-					$user = get_user_by ( 'login', $value );	// seems to be case insensitive
+					$user = wppa_get_user_by ( 'login', $value );	// seems to be case insensitive
 					if ( $user && $user->user_login === $value ) {
 						$wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_PHOTOS."` SET `status` = 'pending' WHERE `owner` = %s", $value ) );
 						$black_listed_users = get_option( 'wppa_black_listed_users', array() );
@@ -2487,7 +2487,7 @@ global $wppa_log_file;
 				case 'wppa_superuser_user':
 					// Does user exist?
 					$value = trim ( $value );
-					$user = get_user_by ( 'login', $value );	// seems to be case insensitive
+					$user = wppa_get_user_by ( 'login', $value );	// seems to be case insensitive
 					if ( $user && $user->user_login === $value ) {
 						$super_users = get_option( 'wppa_super_users', array() );
 						if ( ! in_array( $value, $super_users ) ) {
@@ -2648,6 +2648,25 @@ global $wppa_log_file;
 					}
 					break;
 
+				case 'wppa_cre_uploads_htaccess':
+					wppa_create_wppa_htaccess();
+					break;
+
+				case 'wppa_search_numbers_void':
+				case 'wppa_index_ignore_slash':
+					ob_start();
+					if ( $value == 'yes' ) {
+						// Cleanup index
+						wppa_schedule_maintenance_proc( 'wppa_cleanup_index' );
+					}
+					else {
+						// Remake index
+						wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
+						wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+					}
+					ob_end_clean();
+					break;
+
 				default:
 
 					wppa( 'error', '0' );
@@ -2670,7 +2689,7 @@ global $wppa_log_file;
 			wppa_initialize_runtime( true );	// force reload new values
 
 			// .htaccess
-			wppa_create_wppa_htaccess();
+//			wppa_create_wppa_htaccess();
 
 			// Thumbsize
 			$new_minisize = wppa_get_minisize();
@@ -2703,7 +2722,7 @@ global $wppa_log_file;
 
 			// If cron request, schedule
 			if ( $cron ) {
-				echo wppa_schedule_maintenance_proc( $slug, 'first' );
+				echo wppa_schedule_maintenance_proc( $slug, 10 );
 
 				// Remove in case this is a re-start of a crashed cron job
 				delete_option( $slug . '_lasttimestamp' );

@@ -2,7 +2,7 @@
 /* wppa-watermark.php
 *
 * Functions used for the application of watermarks
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -79,7 +79,7 @@ function wppa_create_textual_watermark_file( $args ) {
 				}
 				$text = html_entity_decode( $text );
 				$text = str_replace( 'w#site', get_bloginfo( 'url' ), $text );
-				$usr = get_user_by( 'login', wppa_get_photo_item( $id, 'owner' ) );
+				$usr = wppa_get_user_by( 'login', wppa_get_photo_item( $id, 'owner' ) );
 				$text = wppa_translate_photo_keywords( $id, $text );
 				$text = wppa_translate_album_keywords( wppa_get_photo_item( $id, 'album' ), $text );
 				$text = wppa_filter_iptc( $text, $id );	// Render IPTC tags

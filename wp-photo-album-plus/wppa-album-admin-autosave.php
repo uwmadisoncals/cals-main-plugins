@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -88,7 +88,9 @@ function _wppa_admin() {
 					if ( isset($_REQUEST['bulk']) ) wppa_album_photos_bulk($ei);
 					else wppa_album_photos($ei);
 				?>
-				<div style="position:fixed;right:30px;bottom:30px;background-color:lightblue;" >&nbsp;<a href="#manage-photos"><?php _e('Top of page', 'wp-photo-album-plus') ?></a>&nbsp;</div>
+				<a href="#manage-photos">
+					<div style="position:fixed;right:30px;bottom:30px;background-color:lightblue;" >&nbsp;<?php _e('Top of page', 'wp-photo-album-plus') ?>&nbsp;</div>
+				</a>
 				<br /><a href="<?php echo $back_url ?>"><?php _e('Back to album table', 'wp-photo-album-plus') ?></a>
 <?php
 				return;
@@ -1060,7 +1062,9 @@ function wppaTryScheduleAll( id ) {
 					elseif ( isset($_REQUEST['seq']) ) wppa_album_photos_sequence($edit_id);
 					else wppa_album_photos($edit_id)
 				?>
-				<div style="position:fixed;right:30px;bottom:30px;background-color:lightblue;" >&nbsp;<a href="#manage-photos"><?php _e('Top of page', 'wp-photo-album-plus') ?></a>&nbsp;</div>
+				<a href="#manage-photos">
+					<div style="position:fixed;right:30px;bottom:30px;background-color:lightblue;" >&nbsp;<?php _e('Top of page', 'wp-photo-album-plus') ?>&nbsp;</div>
+				</a>
 			</div>
 <?php 	}
 

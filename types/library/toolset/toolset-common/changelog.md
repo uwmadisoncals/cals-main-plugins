@@ -7,6 +7,10 @@
 - Include the user editors in the common bootstrap class.
 - Include knockout.js (toolsetcommon-127)
 
+## 2.2.10
+
+- types-1045: Do not assume field value type in Enlimbo_Form::textfield().
+
 ## 2.2.9
 
 - Fix a validation issue for file, audio, video and embed fields affecting Types. 

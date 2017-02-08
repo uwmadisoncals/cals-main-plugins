@@ -1,9 +1,9 @@
 === Paid Memberships Pro ===
 Contributors: strangerstudios
 Tags: memberships, membership, authorize.net, ecommerce, paypal, stripe, braintree, restrict access, restrict content, directory site, payflow
-Requires at least: 3.5
-Tested up to: 4.7.1
-Stable tag: 1.8.13.3
+Requires at least: 4
+Tested up to: 4.7.2
+Stable tag: 1.8.13.6
 
 A revenue-generating machine for membership sites. Unlimited levels with recurring payment, protected content and member management.
 
@@ -115,8 +115,20 @@ Not sure? You can find out by doing a bit a research.
 [View All Screenshots](http://www.paidmembershipspro.com/features/screenshots/)
 
 == Changelog ==
+= 1.8.13.6 =
+* BUG: Fixed bug where credit card expiration emails would be sent to users with PayPal Express orders.
+* BUG: Fixed bug when updating billing with Stripe.
+* BUG: Fixed bug where the archive/search filter was not running for logged out users.
+* ENHANCEMENT: Updated Finnish translations. (Thanks, JP Jakonen)
+* ENHANCEMENT: Added filter for modifying the order description in Stripe. (Thanks, Rafe Colton)
 
-= 1.8.13.2 =
+= 1.8.13.5 =
+* BUG: Fixed notifications.php to make sure it really only checks once per day. Also updated the URL checked to notifications.paidmembershipspro.com, which runs on its own server.
+
+= 1.8.13.4 =
+* BUG/ENHANCEMENT: Changed the pmpro_button shortcode to pmpro_checkout_button. (The old pmpro_button will also still work. checkout_button works if you have Register Helper installed.)
+
+= 1.8.13.3 =
 * BUG: Fixed bug when using a secondary gateway (e.g. PayPal Express) with Stripe as your primary gateway.
 
 = 1.8.13.2 =

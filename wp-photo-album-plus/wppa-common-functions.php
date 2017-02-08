@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -23,7 +23,6 @@ global $wppa_defaults;
 	if ( $force ) {
 		$wppa = false; 					// destroy existing arrays
 		$wppa_opt = false;
-//		delete_option( 'wppa_cached_options' );
 	}
 
 	if ( is_array( $wppa ) && is_array( $wppa_opt ) && ! $force ) {
@@ -34,39 +33,7 @@ global $wppa_defaults;
 		wppa_reset_occurrance();
 	}
 
-	/* Caching disabled due to MySql versions that do not allow fields > 64 kB
-	// Get the cache version of all settings
-	$wppa_opt = get_option( 'wppa_cached_options', false );
-
-	// Check for validity, only on admin pages (due to qTranslate behaviour), non ajax (to keep performance at front-end ajax).
-	if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
-		if ( is_array( $wppa_opt ) && ( md5( serialize( $wppa_opt ) ) != get_option( 'wppa_md5_options', 'nil' ) ) ) {
-
-			// Log hash error
-			wppa_log('Obs', 'Read hash:'.get_option( 'wppa_md5_options', 'nil' ).', computed hash:'. md5( serialize( $wppa_opt )));
-
-			// Something wrong. Let us see what, if not intentional!
-			if ( ! $force ) {
-				foreach( array_keys( $wppa_opt ) as $key ) {
-					if ( $wppa_opt[$key] != get_option( $key ) ) {
-						wppa_log( 'dbg', 'Corrupted setting found. Cached value=' . $wppa_opt[$key] . ', option value=' . get_option( $key ) );
-					}
-				}
-			}
-			$count = count( $wppa_opt );
-
-			// Report fix only if not intentional, with stacktrace
-			if ( ! $force ) {
-				wppa_log( 'Fix', 'Option cache. Count=' . $count );
-			}
-
-			// Clear cached options to force rebuild
-			$wppa_opt = false;
-		}
-	}
-	*/
-
-	// Rebuild cached options if required, i.e. when not yet existing or deleted.
+	// Rebuild options array if required, i.e. when not yet existing or deleted.
 	if ( ! is_array( $wppa_opt ) ) {
 		wppa_set_defaults();
 		$wppa_opt = $wppa_defaults;
@@ -79,32 +46,11 @@ global $wppa_defaults;
 				$wppa_opt[$option] = $optval;
 			}
 		}
-
-		/*
-		update_option( 'wppa_cached_options', $wppa_opt, true );
-		update_option( 'wppa_md5_options', md5( serialize( $wppa_opt ) ), true );
-
-		// Verify success
-		$temp = get_option( 'wppa_cached_options' );
-		$hash = get_option( 'wppa_md5_options' );
-		if ( md5( serialize( $temp ) ) != $hash ) {
-			wppa_log( 'Err', 'Discrepancy found. Count='.count($temp) );
-		}
-		*/
 	}
 
 	if ( isset( $_GET['debug'] ) && wppa_switch( 'allow_debug' ) ) {
 		$key = $_GET['debug'] ? $_GET['debug'] : E_ALL;
 		wppa( 'debug', $key );
-	}
-
-	// Delete obsolete spam
-	$spammaxage = wppa_opt( 'spam_maxage' );
-	if ( $spammaxage != 'none' ) {
-		$time = time();
-		$obsolete = $time - $spammaxage;
-		$iret = $wpdb->query( $wpdb->prepare( "DELETE FROM `".WPPA_COMMENTS."` WHERE `status` = 'spam' AND `timestamp` < %s", $obsolete ) );
-		if ( $iret ) wppa_update_option( 'wppa_spam_auto_delcount', get_option( 'wppa_spam_auto_delcount', '0' ) + $iret );
 	}
 
 	$wppa_initruntimetime += microtime( true );
@@ -1913,7 +1859,7 @@ function wppa_add_credit_points( $amount, $reason = '', $id = '', $value = '', $
 	// Initialize
 	$bret = false;
 	if ( $user ) {
-		$usr = get_user_by( 'login', $user );
+		$usr = wppa_get_user_by( 'login', $user );
 	}
 	else {
 		$usr = wp_get_current_user();

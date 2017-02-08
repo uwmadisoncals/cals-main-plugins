@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the widget
-* Version 6.5.04
+* Version 6.6.12
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -173,7 +173,7 @@ class PhotoOfTheDay extends WP_Widget {
 					break;
 				case 'owner':
 					$owner = $image['owner'];
-					$user = get_user_by('login', $owner);
+					$user = wppa_get_user_by('login', $owner);
 					$owner = $user->display_name;
 					$widget_content .= "\n".'<div class="wppa-widget-text wppa-potd-text" style="'.$align.'">'.__('By:', 'wp-photo-album-plus').' ' . $owner . '</div>';
 					break;

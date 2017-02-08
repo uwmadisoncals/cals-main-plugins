@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -6750,7 +6750,7 @@ global $wp_version;
 							$options = array( __('--- select a user to unblacklist ---', 'wp-photo-album-plus') );
 							$values = array( '0' );
 							foreach ( $blacklist as $usr ) {
-								$u = get_user_by( 'login', $usr );
+								$u = wppa_get_user_by( 'login', $usr );
 								$options[] = $u->display_name.' ('.$u->user_login.')';
 								$values[]  = $u->user_login;
 							}
@@ -6814,7 +6814,7 @@ global $wp_version;
 							$options = array( __('--- select a user to unmake superuser ---', 'wp-photo-album-plus') );
 							$values = array( '0' );
 							foreach ( $superlist as $usr ) {
-								$u = get_user_by( 'login', $usr );
+								$u = wppa_get_user_by( 'login', $usr );
 								$options[] = $u->display_name.' ('.$u->user_login.')';
 								$values[]  = $u->user_login;
 							}
@@ -6999,27 +6999,40 @@ global $wp_version;
 							$desc = __('Remakes the index database table for albums.', 'wp-photo-album-plus');
 							$help = '';
 							$slug2 = 'wppa_remake_index_albums';
-							$html1 = wppa_cronjob_button( $slug2 );
+							$html1 = wppa_cronjob_button( $slug2 );// . __('ad inf', 'wp-photo-album-plus') . wppa_checkbox( $slug2.'_ad_inf' );
 							$html2 = wppa_maintenance_button( $slug2 );
 							$html3 = wppa_status_field( $slug2 );
 							$html4 = wppa_togo_field( $slug2 );
 							$html = array($html1, $html2, $html3, $html4);
 							$clas = '';
 							$tags = 'system,search';
-							wppa_setting(false, '8', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting(false, '8.1', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Remake Index Photos', 'wp-photo-album-plus');
 							$desc = __('Remakes the index database table for photos.', 'wp-photo-album-plus');
 							$help = '';
 							$slug2 = 'wppa_remake_index_photos';
-							$html1 = wppa_cronjob_button( $slug2 );
+							$html1 = wppa_cronjob_button( $slug2 );// . __('ad inf', 'wp-photo-album-plus') . wppa_checkbox( $slug2.'_ad_inf' );
 							$html2 = wppa_maintenance_button( $slug2 );
 							$html3 = wppa_status_field( $slug2 );
 							$html4 = wppa_togo_field( $slug2 );
 							$html = array($html1, $html2, $html3, $html4);
 							$clas = '';
 							$tags = 'system,search';
-							wppa_setting(false, '9', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting(false, '8.2', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Clean Index', 'wp-photo-album-plus');
+							$desc = __('Remove obsolete entries from index db table.', 'wp-photo-album-plus');
+							$help = '';
+							$slug2 = 'wppa_cleanup_index';
+							$html1 = wppa_cronjob_button( $slug2 );// . __('ad inf', 'wp-photo-album-plus') . wppa_checkbox( $slug2.'_ad_inf' );
+							$html2 = wppa_maintenance_button( $slug2 );
+							$html3 = wppa_status_field( $slug2 );
+							$html4 = wppa_togo_field( $slug2 );
+							$html = array($html1, $html2, $html3, $html4);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting(false, '8.3', $name, $desc, $html, $help, $clas, $tags);
 
 							$fs = get_option('wppa_file_system');
 							if ( ! $fs ) {	// Fix for wp delete_option bug
@@ -7555,12 +7568,14 @@ global $wp_version;
 								wppa_setting(false, '19.2', $name, $desc, $html, $help, $clas, $tags);
 
 							}
-/*
+if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
+
+
 							$name = __('Test proc');
 							$desc = __('For OpaJaap only');
 							$help = '';
 							$slug2 = 'wppa_test_proc';
-							$html1 = wppa_cronjob_button( $slug2 ) . __('ad inf', 'wp-photo-album-plus') . wppa_checkbox( 'wppa_test_proc_ad_inf' );
+							$html1 = wppa_cronjob_button( $slug2 );// . __('ad inf', 'wp-photo-album-plus') . wppa_checkbox( $slug2.'_ad_inf' );
 							$html2 = wppa_maintenance_button( $slug2 );
 							$html3 = wppa_status_field( $slug2 );
 							$html4 = wppa_togo_field( $slug2 );
@@ -7569,7 +7584,7 @@ global $wp_version;
 							$tags = 'system';
 							wppa_setting(false, '99', $name, $desc, $html, $help, $clas, $tags);
 
-/**/
+}
 						wppa_setting_subheader('C', '4', __('Listings', 'wp-photo-album-plus'));
 
 							$name = __('List Logfile', 'wp-photo-album-plus');
@@ -7791,6 +7806,15 @@ global $wp_version;
 							$clas = '';
 							$tags = 'system';
 							wppa_setting($slug, '8', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Log Cron', 'wp-photo-album-plus');
+							$desc = __('Keep track of cron activity in the wppa logfile.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_log_cron';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
 
 							}
 						wppa_setting_subheader( 'B', '1', __( 'WPPA+ Admin related miscellaneous settings' , 'wp-photo-album-plus') );
@@ -8663,6 +8687,41 @@ global $wp_version;
 							$tags = 'system,search';
 							wppa_setting($slug, '17', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Minimum search token length', 'wp-photo-album-plus');
+							$desc = __('The minmum number of chars in a search request.', 'wp-admin');
+							$help = '';
+							$slug = 'wppa_search_min_length';
+							$html = wppa_number($slug, '1', '6');
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '18.1', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Exclude from search', 'wp-photo-album-plus');
+							$desc = __('Exclude these words from search index.', 'wp-photo-album-plus');
+							$help = esc_js(__('Enter words separated by commas (,)', 'wp-photo-album-plus'));
+							$slug = 'wppa_search_user_void';
+							$html = wppa_input($slug, '90%;');
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '18.2', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Exclude numbers', 'wp-photo-album-plus');
+							$desc = __('Exclude numbers from search index.', 'wp-photo-album-plus');
+							$help = esc_js(__('If ticked, photos and albums are not searcheable by numbers.', 'wp-photo-album-plus'));
+							$slug = 'wppa_search_numbers_void';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '18.3', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Ignore slash', 'wp-photo-album-plus');
+							$desc = __('Ignore slash chracter (/).', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_index_ignore_slash';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '18.4', $name, $desc, $html, $help, $clas, $tags);
 							}
 						wppa_setting_subheader( 'F', '1', __( 'Watermark related settings' , 'wp-photo-album-plus') );
 							{
@@ -9994,6 +10053,24 @@ global $wppa_opt;
 	return $html;
 }
 
+function wppa_number($xslug, $min, $max, $text = '', $onchange = '') {
+	global $wppa_opt;
+
+	$slug = substr( $xslug, 5 );
+	$tit = __('Slug =', 'wp-photo-album-plus').' '.$xslug;
+	$title = wppa_switch( 'enable_shortcode_wppa_set' ) ? ' title="'.esc_attr( $tit ).'"' : '';
+	$val = isset ( $wppa_opt[ $xslug ] ) ? esc_attr( $wppa_opt[ $xslug ] ) : get_option( $xslug, '' );
+	$html = '<input'.$title.' style="float:left; height:20px; width:50px;';
+	$html .= ' font-size: 11px; margin: 0px; padding: 0px;" type="number" id="'.$slug.'"';
+	if ($onchange != '') $html .= ' onchange="'.$onchange.';wppaAjaxUpdateOptionValue(\''.$slug.'\', this)"';
+	else $html .= ' onchange="wppaAjaxUpdateOptionValue(\''.$slug.'\', this)"';
+	$html .= ' value="'.$val.'" min="'.$min.'" max="'.$max.'" />';
+	$html .= '<img id="img_'.$slug.'" src="'.wppa_get_imgdir().'star.ico" title="'.__('Setting unmodified', 'wp-photo-album-plus').'" style="padding:0 4px; float:left; height:16px; width:16px;" />';
+	$html .= '<span style="float:left">'.$text.'</span>';
+
+	return $html;
+}
+
 function wppa_input_color($xslug, $width, $minwidth = '', $text = '', $onchange = '', $placeholder = '') {
 global $wppa_opt;
 
@@ -10379,15 +10456,12 @@ function wppa_cronjob_button( $slug ) {
 	}
 
 	// Check for apparently crashed cron job
-	$last = get_option( $slug.'_lasttimestamp', '0' );
-	if ( $last && $last < ( time() - 1800 ) ) {
+	$crashed = wppa_is_maintenance_cron_job_crashed( $slug );
+	if ( $crashed ) {
 		$label = __( 'Crashed!', 'wp-photo-album-plus' );
-		$crashed = true;
-	}
-	else {
-		$crashed = false;
 	}
 
+	// Make the html
 	$result = 	'<input' .
 					' id="' . $slug . '_cron_button"' .
 					' type="button"' .
@@ -10437,8 +10511,9 @@ function wppa_status_field( $slug ) {
 }
 function wppa_togo_field( $slug ) {
 	$togo  = get_option($slug.'_togo', '' );
+	$is_cron = get_option($slug.'_user', '' ) == 'cron-job';
 	$result = '<span id="'.$slug.'_togo" >' . $togo . '</span>';
-	if ( $togo ) {
+	if ( $togo || $is_cron ) {
 		$result .= '<script>wppaAjaxUpdateTogo(\'' . $slug . '\');</script>';
 	}
 	return $result;

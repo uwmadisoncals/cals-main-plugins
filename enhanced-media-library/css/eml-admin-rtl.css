@@ -159,6 +159,12 @@ body.upload-php.eml-grid #wpbody-content > .wrap {
     border-left: 0;
     background: #fff;
     overflow: visible;
+
+    -webkit-transition: all 0.2s;
+    -moz-transition: all 0.2s;
+    -o-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+    transition: all 0.2s;
 }
 .media-frame.mode-eml-grid .attachments-browser .media-toolbar {
     right: -1px;

@@ -286,6 +286,8 @@ function wpcf_reserved_names()
         'category__not_in',
         'comments_per_page',
         'comments_popup',
+        'custom_css',
+        'customize_changeset',
         'cpage',
         'day',
         'debug',
@@ -628,7 +630,7 @@ function types_ask_for_feedback_on_deactivation() {
                href="https://www.surveymonkey.com/r/types-uninstall">
                 <?php _e( 'Leave feedback', 'wpcf' ); ?>
             </a>
-            <a id="types-leave-feedback-dialog-survey-link-cancel" class="button-secondary" target="_blank"
+            <a id="types-leave-feedback-dialog-survey-link-cancel" class="button-secondary"
                href="javascript:void(0);">
                 <?php _e( 'Skip feedback', 'wpcf' ); ?>
             </a>

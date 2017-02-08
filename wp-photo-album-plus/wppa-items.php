@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version 6.6.09
+* Version 6.6.12
 *
 */
 
@@ -109,7 +109,7 @@ static $album_cache_2;
 	}
 	else {
 		wppa_dbg_msg( 'Album '.$id.' does not exist (cache album)', 'red' );
-		wppa_log( 'dbg', 'Album '.$id.' does not exist (cache album)' );
+		wppa_log( 'dbg', 'Album '.$id.' does not exist (cache album)', true );
 		return false;
 	}
 }
@@ -236,7 +236,7 @@ function wppa_get_photo_name( $id, $add_owner = false, $add_medal = false, $esc_
 
 	// Add owner?
 	if ( $add_owner ) {
-		$user = get_user_by( 'login', $thumb['owner'] );
+		$user = wppa_get_user_by( 'login', $thumb['owner'] );
 		if ( $user ) {
 			if ( $show_name ) {
 				if ( wppa_switch( 'owner_on_new_line' ) ) {
@@ -351,7 +351,7 @@ function wppa_translate_photo_keywords( $id, $text ) {
 		$result = str_replace( 'w#pl', wppa_get_source_pl( $id ), $result );
 		$result = str_replace( 'w#rating', wppa_get_rating_by_id( $id, 'nolabel' ), $result );
 
-		$user = get_user_by( 'login', $thumb['owner'] );
+		$user = wppa_get_user_by( 'login', $thumb['owner'] );
 		if ( $user ) {
 			$result = str_replace( 'w#displayname', $user->display_name, $result );
 		}

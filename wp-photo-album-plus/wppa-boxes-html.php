@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -1172,7 +1172,7 @@ function wppa_get_multitag_html( $nperline = '2', $seltags = '' ) {
 									'</td>' .
 								'</tr>';
 							}
-//			$result .= 	'</table><hr style="margin: 3px 0;" />';
+			$result .= 	'</table>';//<hr style="margin: 3px 0;" />';
 		}
 
 		$count 		= '0';
@@ -3127,12 +3127,12 @@ global $wpdb;
 
 									// First try to find the user by email address ( works only if email required on comments )
 									if ( $comment['email'] ) {
-										$usr = get_user_by( 'email', $comment['email'] );
+										$usr = wppa_get_user_by( 'email', $comment['email'] );
 									}
 
 									// If not found, try to find the user by login name ( works only if login name is equal to display name )
 									if ( ! $usr ) {
-										$usr = get_user_by( 'login', $comment['user'] );
+										$usr = wppa_get_user_by( 'login', $comment['user'] );
 									}
 
 									// Still no user, try to find him by display name

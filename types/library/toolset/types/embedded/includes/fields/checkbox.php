@@ -431,6 +431,7 @@ function wpcf_fields_checkbox_update_one($post_id, $slug, $array_to_check) {
  * WPCF_Field::save().
  *
  * It (finally) respects the "save_empty" field option properly.
+ * If a non-checkboxes field is passed, nothing happens.
  *
  * @param array $field_definition_array Checkboxes field definition array, basic keys are assumed.
  * @param string $meta_type 'post'|'user'|'term'
@@ -442,6 +443,10 @@ function wpcf_fields_checkbox_update_one($post_id, $slug, $array_to_check) {
 function wpcf_update_checkboxes_field( $field_definition_array, $meta_type, $object_id, $wpcf_form_data ) {
 
 	if( ! in_array( $meta_type, array( 'post', 'user', 'term ') ) ) {
+		return;
+	}
+
+	if( 'checkboxes' != wpcf_getarr( $field_definition_array, 'type' ) ) {
 		return;
 	}
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -697,6 +697,7 @@ Hide Camera info
 						'wppa_i_gpx'					=> '',
 						'wppa_i_fotomoto'				=> '',
 						'wppa_i_video' 					=> '',
+						'wppa_i_audio' 					=> '',
 						'wppa_i_stereo' 				=> '',
 						'wppa_i_done'					=> '',
 
@@ -1425,7 +1426,8 @@ Hide Camera info
 
 						// Table VIII: Actions
 						// A Harmless
-						'wppa_setup' 				=> '',
+						'wppa_maint_ignore_concurrency_error' 	=> 'no', 	// 0
+						'wppa_setup' 							=> '', 		// 1
 						'wppa_backup' 				=> '',
 						'wppa_load_skin' 			=> '',
 						'wppa_skinfile' 			=> 'default',
@@ -1453,8 +1455,12 @@ Hide Camera info
 						'wppa_iptc_clear'			=> '',
 						'wppa_exif_clear'			=> '',
 						'wppa_apply_new_photodesc_all'	=> '',
-						'wppa_remake_index'			=> '',
-						'wppa_extend_index' 		=> '',
+						'wppa_remake_index_albums'			=> '',		// 8.1
+						'wppa_remake_index_albums_ad_inf' 	=> 'no',	// 8.1
+						'wppa_remake_index_photos'			=> '',		// 8.2
+						'wppa_remake_index_photos_ad_inf' 	=> 'no',	// 8.2
+						'wppa_cleanup_index' 				=> '',		// 8.3
+						'wppa_cleanup_index_ad_inf'			=> 'no', 	// 8.3
 						'wppa_list_index'			=> '',
 						'wppa_list_index_display_start' 	=> '',
 						'wppa_list_comments_by' 	=> 'name',
@@ -1478,13 +1484,13 @@ Hide Camera info
 						'wppa_sync_cloud' 			=> '',
 						'wppa_sanitize_tags' 		=> '',
 						'wppa_sanitize_cats' 		=> '',
-						'wppa_test_proc' 			=> '',
-						'wppa_test_proc_ad_inf' 	=> 'no',
 						'wppa_move_all_photos' 		=> '',
 						'wppa_move_all_photos_from' => '',
 						'wppa_move_all_photos_to' 	=> '',
 
-						'wppa_maint_ignore_concurrency_error' 	=> 'no',
+
+						'wppa_test_proc' 					=> '',		// 99
+						'wppa_test_proc_ad_inf' 			=> 'no',	// 99
 
 
 						// Table IX: Miscellaneous
@@ -1533,6 +1539,7 @@ Hide Camera info
 						'wppa_import_root' 				=> ABSPATH . 'wp-content',
 						'wppa_allow_import_source' 		=> 'no',
 						'wppa_enable_generator' 		=> 'yes',
+						'wppa_log_cron' 				=> 'no',	// A9
 
 
 						// IX D New
@@ -1598,6 +1605,11 @@ Hide Camera info
 						'wppa_search_toptext' 			=> '',
 						'wppa_search_in_section' 		=> __( 'Search in current section' , 'wp-photo-album-plus'),
 						'wppa_search_in_results' 		=> __( 'Search in current results' , 'wp-photo-album-plus'),
+						'wppa_search_min_length' 		=> '2', 	// 18
+						'wppa_search_user_void' 		=> '',
+						'wppa_search_numbers_void' 		=> 'no',
+						'wppa_index_ignore_slash' 		=> 'no',
+//						'wppa_index_skips' 				=> '',	// Do not add, this is an array
 
 						// F Watermark
 						'wppa_watermark_on'				=> 'no',

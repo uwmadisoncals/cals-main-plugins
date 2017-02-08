@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -166,7 +166,15 @@ global $wppa_revno;
 		case 'multitag':
 			$wppa['taglist'] = wppa_sanitize_tags($atts['taglist']);
 			$wppa['is_multitagbox'] = true;
-			if ( $atts['cols'] ) $wppa['tagcols'] = $atts['cols'];
+			if ( $atts['cols'] ) {
+				$cols = explode( ',', $atts['cols'] );
+				$col = $cols[0];
+				if ( isset( $cols[1] ) && wppa_is_mobile() ) {
+					$col = $cols[1];
+				}
+				if ( ! wppa_is_int( $col ) || $col < '1' ) $col = '2'; // On error use default
+				$wppa['tagcols'] = $col;
+			}
 			break;
 		case 'tagcloud':
 			$wppa['taglist'] = wppa_sanitize_tags($atts['taglist']);

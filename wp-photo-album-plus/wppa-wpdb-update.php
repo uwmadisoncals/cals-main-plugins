@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version 6.5.00
+* Version 6.6.12
 *
 */
 
@@ -169,7 +169,8 @@ global $wpdb;
 				$doit = true;
 				break;
 			case 'album':
-				if ( wppa_is_int($itemvalue) && $itemvalue > 0 ) {
+				// Album id is > 0. -9 means: marked for deletion
+				if ( ( wppa_is_int($itemvalue) && $itemvalue > 0 ) || $itemvalue = '-9' ) {
 					$doit = true;
 				}
 				else wppa_log('err', 'Invalid album id found in wppa_update_album(): '.$itemvalue);

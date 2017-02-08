@@ -803,13 +803,13 @@ function wpcf_admin_fields_form_js_validation() {
 /**
  * Saves open fieldsets.
  *
- * @param type $action
- * @param type $fieldset
- * @param type $group_id
+ * @param $action
+ * @param $fieldset
+ * @param bool $group_id
  */
-function wpcf_admin_fields_form_save_open_fieldset( $action, $fieldset,
-        $group_id = false ) {
-    $data = get_user_meta( get_current_user_id(), 'wpcf-group-form-toggle', true );
+function wpcf_admin_fields_form_save_open_fieldset( $action, $fieldset, $group_id = false ) {
+    $data = wpcf_ensarr( get_user_meta( get_current_user_id(), 'wpcf-group-form-toggle', true ) );
+
     if ( $group_id && $action == 'open' ) {
         $data[intval( $group_id )][$fieldset] = 1;
     } else if ( $group_id && $action == 'close' ) {

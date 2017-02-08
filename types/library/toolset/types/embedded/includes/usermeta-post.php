@@ -367,8 +367,7 @@ function wpcf_admin_userprofilesave_init( $user_id ) {
         $config = wptoolset_form_filter_types_field( $field_definition_array, $user_id );
         foreach ( $_field_value as $_k => $_val ) {
             // Check if valid
-            $valid = wptoolset_form_validate_field( 'your-profile', $config,
-                    $_val );
+            $valid = wptoolset_form_validate_field( 'your-profile', $config, $_val );
             if ( is_wp_error( $valid ) ) {
                 $has_errors = true;
                 $_errors = $valid->get_error_data();
@@ -396,7 +395,9 @@ function wpcf_admin_userprofilesave_init( $user_id ) {
 
 	    // Note: Checkboxes fields used to be handled as a special case here, that was now moved
 	    // to wpcf_update_checkboxes_field(). Unlike for posts, we need to call this funcion manually from here.
-	    wpcf_update_checkboxes_field( $field_definition_array, 'user', $user_id, $wpcf_form_data );
+	    if( 'checkboxes' == wpcf_getarr( $field_definition_array, 'type' ) ) {
+		    wpcf_update_checkboxes_field( $field_definition_array, 'user', $user_id, $wpcf_form_data );
+	    }
     }
 
     if ( $has_errors ) {

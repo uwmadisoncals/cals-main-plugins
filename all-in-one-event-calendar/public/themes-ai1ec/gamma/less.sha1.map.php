@@ -38,26 +38,11 @@
     'linkColorHover' => '#335980',
     'monthViewDateBackground' => '#eaf4ff',
     'placeholderText' => '#999999',
-    'posterboardDateTitleText' => '#ffffff',
-    'posterboardFooterBg' => '#f6f1ea',
-    'posterboardImageBorder' => 'rgba(0,0,0,0)',
-    'posterboardImagePadding' => '#fff',
-    'posterboardImagePaddingWidth' => '8px',
-    'posterboardMainBg' => 'rgba(255, 255, 255, 0)',
-    'posterboardTileBg' => '#fff9f0',
-    'posterboardTileBorder' => '#fff9f0',
-    'posterboardTileShadow' => 'rgba(0,0,0,0.4)',
-    'streamDateTitleBackground' => '#c4c4c4',
-    'streamDateTitleText' => '#ffffff',
-    'streamEventBackground' => '#ffffff',
-    'streamEventBorder' => '#cccccc',
     'tableBackground' => '#ffffff',
     'tableLabelBackground' => '#f5f5f5',
     'tableLabelText' => '#9e9e9e',
     'textColor' => '#333333',
     'textEmboss' => '#ffffff',
-    'titleFontFamily' => '"League Gothic", Impact, "Arial Black", Arial, sans-serif',
-    'titleFontSize' => '30px',
     'todayColor' => '#ffffdd',
   ),
   'files' => 
@@ -287,11 +272,6 @@
       'size' => 3741,
       'sha1' => 'cbbce626a293594f13974628b2be746d837898ba',
     ),
-    'less\\extended_views.less' => 
-    array (
-      'size' => 12941,
-      'sha1' => 'b79a01945d130051db8a8c3a24b80856b7164395',
-    ),
     'less\\font-awesome\\bordered-pulled.less' => 
     array (
       'size' => 330,
@@ -357,11 +337,6 @@
       'size' => 10665,
       'sha1' => '8d7d0d81e445093ecc58577605c36320d2741ba7',
     ),
-    'less\\fonts\\font-league-gothic.less' => 
-    array (
-      'size' => 483,
-      'sha1' => 'ade2834177d0a2a466c2dbd08a5d4a0c348b059b',
-    ),
     'less\\plugins\\datepicker3.less' => 
     array (
       'size' => 5690,
@@ -406,11 +381,6 @@
     array (
       'size' => 7322,
       'sha1' => '8a2e190b67e93b8ca39382552fbda0deb19baf72',
-    ),
-    'less\\user_variables_ev.php' => 
-    array (
-      'size' => 2875,
-      'sha1' => 'edf0e9b240b3cda3b30b6b835bf6dfedb1047edf',
     ),
     'less\\variables.less' => 
     array (

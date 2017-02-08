@@ -585,14 +585,19 @@ function types_render_field_single( $field, $params, $content = null, $code = ''
                 $output = $params['field_value'];
             }
         } else {
-            /*
-             * This is place where view function is called.
-             * Returned data should be string.
-             */
+            // This is place where view function is called.
+	        // Returned data should be string.
             $output = '';
             $_view_func = 'wpcf_fields_' . strtolower( $field['type'] ) . '_view';
             if ( is_callable( $_view_func ) ) {
-                $output = strval( call_user_func( $_view_func, $params ) );
+            	$output = call_user_func( $_view_func, $params );
+
+            	if( is_array( $output ) ) {
+		            // Something went wrong.
+		            $output = '';
+	            }
+
+                $output = strval( $output );
             }
 
 	    if ( Toolset_Utils::is_field_value_truly_empty( $output ) && isset( $params['field_value'] )
@@ -614,9 +619,20 @@ function types_render_field_single( $field, $params, $content = null, $code = ''
         }
 
     // Apply filters
-    $output = strval( apply_filters( 'types_view', $output,
-        $params['field_value'], $field['type'], $field['slug'],
-        $field['name'], $params ) );
+    $output = apply_filters(
+    	'types_view',
+	    $output,
+        $params['field_value'],
+	    $field['type'],
+	    $field['slug'],
+        $field['name'],
+	    $params
+    );
+
+    if( is_array( $output ) ) {
+    	// Something went wrong.
+	    $output = '';
+    }
 
 	return stripslashes( strval( $output ) );
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains user and capabilities related routines
-* Version 6.6.00
+* Version 6.6.12
 *
 */
 
@@ -38,12 +38,21 @@ static $users;
 	return $users;
 }
 
+// Wrapper for get_user_by()
+function wppa_get_user_by( $key, $user ) {
+//	wppa_log( 'Obs', 'wppa_get_user_by called with args ' . $key . ', ' . $user, true );
+	return get_user_by( $key, $user );
+}
+
 // Get user
 // If logged in, return userdata as specified in $type
 // If logged out, return IP
 function wppa_get_user( $type = 'login' ) {
 static $current_user;
 
+	if ( wppa_is_cron() ) {
+		return 'cron-job';
+	}
 	if ( ! $current_user ) {
 		$current_user = wp_get_current_user();
 	}

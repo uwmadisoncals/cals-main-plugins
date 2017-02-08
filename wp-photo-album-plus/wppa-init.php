@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version 6.6.04
+* Version 6.6.12
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -230,6 +230,7 @@ global $pagenow;
 		return;
 	}
 
+	/*
 	// Regen cron job crashed?
 	if ( get_option( 'wppa_regen_thumbs_lasttimestamp' ) ) {
 		if ( get_option( 'wppa_regen_thumbs_lasttimestamp' ) < ( time() - 900 ) ) {
@@ -257,11 +258,11 @@ global $pagenow;
 			wppa_error_message( __( 'Please restart cron job: Remake index albums in Table VIII-A8', 'wp-photo-album-plus' ) );
 		}
 	}
-
+*/
 	// Remake photo index required?
 	if ( get_option( 'wppa_remake_index_photos_status' ) || get_option( 'wppa_index_need_remake', 'no') == 'yes' ) {
 		if ( strpos( get_option( 'wppa_remake_index_photos_status' ), 'cron' ) === false ) {
-			wppa_error_message( __('The photo index table needs to be rebuilt. Please run <i>Photo Albums -> Settings</i> admin page <i>Table VIII-A9</i>' , 'wp-photo-album-plus') );
+			wppa_error_message( __('The photo index table needs to be rebuilt. Please run <i>Photo Albums -> Settings</i> admin page <i>Table VIII-A8.2</i>' , 'wp-photo-album-plus') );
 			update_option( 'wppa_remake_index_photos_status', 'required' );
 		}
 	}
@@ -269,7 +270,7 @@ global $pagenow;
 	// Remake album index required?
 	if ( get_option( 'wppa_remake_index_albums_status' ) || get_option( 'wppa_index_need_remake', 'no') == 'yes' ) {
 		if ( strpos( get_option( 'wppa_remake_index_albums_status' ), 'cron' ) === false ) {
-			wppa_error_message( __('The album index table needs to be rebuilt. Please run <i>Photo Albums -> Settings</i> admin page <i>Table VIII-A8</i>' , 'wp-photo-album-plus') );
+			wppa_error_message( __('The album index table needs to be rebuilt. Please run <i>Photo Albums -> Settings</i> admin page <i>Table VIII-A8.1</i>' , 'wp-photo-album-plus') );
 			update_option( 'wppa_remake_index_albums_status', 'required' );
 		}
 	}

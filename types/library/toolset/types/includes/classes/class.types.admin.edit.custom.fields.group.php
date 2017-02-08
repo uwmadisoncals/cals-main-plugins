@@ -657,7 +657,7 @@ class Types_Admin_Edit_Custom_Fields_Group extends Types_Admin_Edit_Fields {
 		if( isset( $this->update['admin_styles'] ) ) {
 			$admin_styles_value = $this->update['admin_styles'];
 		}
-		$temp = '';
+		$temp = array();
 
 		if( $this->update ) {
 			require_once WPCF_EMBEDDED_INC_ABSPATH . '/fields.php';

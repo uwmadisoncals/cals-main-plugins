@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -12,17 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 // For cron:
 require_once 'wppa-admin-functions.php';
 
-// Main maintenace module
-// Must return a string like: errormesssage||$slug||status||togo
-function wppa_do_maintenance_proc( $slug ) {
-global $wpdb;
-global $wppa_session;
-global $wppa_supported_video_extensions;
-global $wppa_supported_audio_extensions;
-
-	// Check for multiple maintenance procs
-	if ( ! wppa_switch( 'maint_ignore_concurrency_error' ) && ! wppa_is_cron() ) {
-		$all_slugs = array( 'wppa_remake_index_albums',
+global $wppa_all_maintenance_slugs;
+$wppa_all_maintenance_slugs = array( 'wppa_remake_index_albums',
 							'wppa_remove_empty_albums',
 							'wppa_remake_index_photos',
 							'wppa_apply_new_photodesc_all',
@@ -62,12 +53,24 @@ global $wppa_supported_audio_extensions;
 							'wppa_create_o1_files',
 							'wppa_owner_to_name_proc',
 							'wppa_move_all_photos',
-
-
+							'wppa_cleanup_index',
 						);
-		foreach ( array_keys( $all_slugs ) as $key ) {
-			if ( $all_slugs[$key] != $slug ) {
-				if ( get_option( $all_slugs[$key].'_togo', '0') ) { 	// Process running
+
+// Main maintenace module
+// Must return a string like: errormesssage||$slug||status||togo
+function wppa_do_maintenance_proc( $slug ) {
+global $wpdb;
+global $wppa_session;
+global $wppa_supported_video_extensions;
+global $wppa_supported_audio_extensions;
+global $wppa_all_maintenance_slugs;
+
+	// Check for multiple maintenance procs
+	if ( ! wppa_switch( 'maint_ignore_concurrency_error' ) && ! wppa_is_cron() ) {
+
+		foreach ( array_keys( $wppa_all_maintenance_slugs ) as $key ) {
+			if ( $wppa_all_maintenance_slugs[$key] != $slug ) {
+				if ( get_option( $wppa_all_maintenance_slugs[$key].'_togo', '0') ) { 	// Process running
 					return __('You can run only one maintenance procedure at a time', 'wp-photo-album-plus').'||'.$slug.'||'.__('Error', 'wp-photo-album-plus').'||'.''.'||'.'';
 				}
 			}
@@ -87,8 +90,9 @@ global $wppa_supported_audio_extensions;
 	wppa_extend_session();
 
 	// Initialize
-	// Cron job: 30 sec, realtime: 5 sec
-	$endtime 	= ( wppa_is_cron() ? time() + '30' : time() + '5' );
+	// Cron job: limit-30 sec, realtime: 5 sec
+	$limit 		= min( 60, max( 30, ini_get( 'max_execution_time' ) ) );
+	$endtime 	= ( wppa_is_cron() ? time() + $limit - '30' : time() + '5' );
 	$chunksize 	= '1000';
 	$lastid 	= strval( intval ( get_option( $slug.'_last', '0' ) ) );
 	$errtxt 	= '';
@@ -114,7 +118,7 @@ global $wppa_supported_audio_extensions;
 	// Pre-processing needed?
 	if ( $lastid == '0' ) {
 		if (  wppa_is_cron() ) {
-			wppa_log( 'Obs', 'Cron job ' . $slug . ' started.' );
+			wppa_log( 'Cron', 'Cron job ' . $slug . ' started.' );
 		}
 		else {
 			wppa_log( 'Obs', 'Maintenance proc ' . $slug . ' started.' );
@@ -127,6 +131,7 @@ global $wppa_supported_audio_extensions;
 				if ( ! wppa_is_cron() ) {
 					$wpdb->query( "UPDATE `" . WPPA_INDEX . "` SET `albums` = ''" );
 				}
+				wppa_index_compute_skips();
 				break;
 
 			case 'wppa_remake_index_photos':
@@ -135,6 +140,10 @@ global $wppa_supported_audio_extensions;
 				if ( ! wppa_is_cron() ) {
 					$wpdb->query( "UPDATE `" . WPPA_INDEX . "` SET `photos` = ''" );
 				}
+				wppa_index_compute_skips();
+				break;
+
+			case 'wppa_cleanup_index':
 				wppa_index_compute_skips();
 				break;
 
@@ -231,10 +240,6 @@ global $wppa_supported_audio_extensions;
 
 					case 'wppa_remake_index_albums':
 
-						// If done as cron job, no initial clear has been done
-						if ( wppa_is_cron() ) {
-							wppa_index_remove( 'album', $id );
-						}
 						wppa_index_add( 'album', $id );
 						break;
 
@@ -344,10 +349,6 @@ global $wppa_supported_audio_extensions;
 
 					case 'wppa_remake_index_photos':
 
-						// If done as cron job, no initial clear has been done
-						if ( wppa_is_cron() ) {
-							wppa_index_remove( 'photo', $id );
-						}
 						wppa_index_add( 'photo', $id );
 						break;
 
@@ -789,34 +790,133 @@ global $wppa_supported_audio_extensions;
 			}
 			break;	// End process photos
 
-		// Single action maintenance modules
+		case 'wppa_cleanup_index':
+		case 'wppa_something_else_for_index':
 
-//		case 'wppa_list_index':
-//			break;
+			// Process index
+			$table 		= WPPA_INDEX;
 
-//		case 'wppa_blacklist_user':
-//			break;
+			$topid 		= $wpdb->get_var( "SELECT `id` FROM `".WPPA_INDEX."` ORDER BY `id` DESC LIMIT 1" );
+			$indexes 	= $wpdb->get_results( "SELECT * FROM `".WPPA_INDEX."` WHERE `id` > ".$lastid." ORDER BY `id` LIMIT ".$chunksize, ARRAY_A );
 
-//		case 'wppa_un_blacklist_user':
-//			break;
+			if ( $indexes ) foreach ( array_keys( $indexes ) as $idx ) {
 
-//		case 'wppa_rating_clear':
-//			break;
+				switch ( $slug ) {
 
-//		case 'wppa_viewcount_clear':
-//			break;
+					case 'wppa_cleanup_index':
 
-//		case 'wppa_iptc_clear':
-//			break;
+						$aborted = false;
 
-//		case 'wppa_exif_clear':
-//			break;
+						$albums = wppa_index_string_to_array( $indexes[$idx]['albums'] );
+
+						if ( is_array( $albums ) ) foreach( array_keys( $albums ) as $aidx ) {
+
+							if ( time() < ( $endtime + 2 ) ) {
+								$alb 	= $albums[$aidx];
+
+								// If album gone, remove it from index
+								if ( ! wppa_album_exists( $alb ) ) {
+									unset( $albums[$aidx] );
+								}
+
+								// Check if keyword appears in album data
+								else {
+									$words 	= wppa_index_raw_to_words( wppa_index_get_raw_album( $alb ) );
+									if ( ! in_array( $indexes[$idx]['slug'], $words ) ) {
+										wppa_log( 'Cron', 'Removed index entry album {b}' . $albums[$aidx] . '{/b} from keyword {b}' . $indexes[$idx]['slug'] . '{/b}' );
+
+										unset( $albums[$aidx] );
+									}
+									wppa_cache_album( 'invalidate', $alb );	// Prevent cache overflow
+								}
+							}
+							else break;
+						}
+
+
+						$photos = wppa_index_string_to_array( $indexes[$idx]['photos'] );
+						$cp 	= is_array( $photos ) ? count( $photos ) : 0;
+						$pidx 	= 0;
+						$last 	= get_option( $slug.'_last_photo', 0 );
+						delete_option( $slug.'_last_photo' );
+
+						if ( is_array( $photos ) ) foreach( array_keys( $photos ) as $pidx ) {
+
+							if ( $pidx < $last ) continue;
+							if ( $last && $pidx == $last ) {
+								wppa_log('Cron', 'Continuing cleanup index at slug = {b}' . $indexes[$idx]['slug'] . '{/b}, element # = {b}' . $last . '{/b}' );
+							}
+
+							if ( time() < ( $endtime + 2 ) ) {
+								$pho 	= $photos[$pidx];
+
+								// If photo gone, remove it from index
+								if ( ! wppa_photo_exists( $pho ) ) {
+									unset( $photos[$pidx] );
+								}
+
+								// Check if keyword appears in photo data
+								else {
+									$words = wppa_index_raw_to_words( wppa_index_get_raw_photo( $pho ) );
+									if ( ! in_array( $indexes[$idx]['slug'], $words ) ) {
+									wppa_log( 'Cron', 'Removed index entry photo {b}' . $pho . '{/b} from slug {b}' . $indexes[$idx]['slug'] . '{/b}' );
+										unset( $photos[$pidx] );
+									}
+									wppa_cache_thumb( 'invalidate', $pho );	// Prevent cache overflow
+								}
+							}
+							else break;
+						}
+						if ( $cp && $pidx != ( $cp - 1 ) ) {
+							wppa_log( 'Cron', 	'Could not complete scan of index item # {b}' . $indexes[$idx]['id'] . '{/b},' .
+												' slug = {b}' . $indexes[$idx]['slug'] . '{/b},' .
+												' count = {b}' . $cp . '{/b},' .
+												' photo id = {b}' . $pho .'{/b},' .
+												' next element # = {b}' . $pidx . '{/b},'
+									);
+							$aborted = true;
+						}
+
+						$lastid = $indexes[$idx]['id'];
+						if ( $aborted ) {
+							$lastid--;
+							update_option( $slug.'_last_photo', $pidx );
+						}
+						update_option( $slug.'_last', $lastid );
+						$albums = wppa_index_array_to_string( $albums );
+						$photos = wppa_index_array_to_string( $photos );
+						if ( $albums != $indexes[$idx]['albums'] || $photos != $indexes[$idx]['photos'] ) {
+							$query = $wpdb->prepare( "UPDATE `".WPPA_INDEX."` SET `albums` = %s, `photos` = %s WHERE `id` = %s", $albums, $photos, $indexes[$idx]['id'] );
+							$wpdb->query( $query );
+						}
+						break;
+
+					case 'wppa_something_else_for_index':
+						// Just example to make extensions easy
+						// So you know here to out the code
+						break;
+				}
+
+				// Test for timeout / ready
+				if ( wppa_is_cron() ) {
+					if ( time() > $endtime ) {
+						update_option( $slug.'_status', __('Scheduled cron job', 'wp-photo-album-plus'));
+					}
+					else {
+						update_option( $slug.'_status', __('Running cron job', 'wp-photo-album-plus'));
+					}
+				}
+
+				if ( time() > $endtime ) break; 	// Time out
+			}
+
+			break; 	// End process index
 
 		default:
 			$errtxt = 'Unimplemented maintenance slug: '.strip_tags( $slug );
 	}
 
-	// either $albums / $photos has been exhousted ( for this try ) or time is up
+	// either $albums / $photos / $indexes has been exhousted ( for this try ) or time is up
 
 	// Post proc this try:
 	switch ( $slug ) {
@@ -827,6 +927,9 @@ global $wppa_supported_audio_extensions;
 			}
 			break;
 	}
+
+	// Register lastid
+	update_option( $slug.'_last', $lastid );
 
 	// Find togo
 	if ( $slug == 'wppa_cleanup' ) {
@@ -890,6 +993,7 @@ global $wppa_supported_audio_extensions;
 		switch ( $slug ) {
 			case 'wppa_remake_index_albums':
 			case 'wppa_remake_index_photos':
+			case 'wppa_cleanup_index':
 				$wpdb->query( "DELETE FROM `".WPPA_INDEX."` WHERE `albums` = '' AND `photos` = ''" );	// Remove empty entries
 				delete_option( 'wppa_index_need_remake' );
 				break;
@@ -930,16 +1034,28 @@ global $wppa_supported_audio_extensions;
 				break;
 		}
 
-		wppa_log( 'Obs', 'Maintenance proc '.$slug.' completed' );
+		if ( wppa_is_cron() ) {
+			wppa_log( 'Cron', 'Cron job ' . $slug . ' completed' );
+		}
+		else {
+			wppa_log( 'Obs', 'Maintenance proc ' . $slug . ' completed' );
+		}
 
 	}
 
 	wppa_save_session();
 
 	if ( wppa_is_cron() ) {
-		wppa_log( 'obs', $errtxt.'||'.$slug.'||'.$status.'||'.$togo.'||'.$reload );
+//		wppa_log( 'obs', $errtxt.'||'.$slug.'||'.$status.'||'.$togo.'||'.$reload );
 		if ( get_option( $slug . '_ad_inf' ) == 'yes' ) {
-			wppa_schedule_maintenance_proc( $slug );
+			switch ( $slug ) {
+				case 'wppa_remake_index_albums':
+					$delay = 900;	// 15 minutes
+					break;
+				default:
+					$delay = 300; 	// 5 minutes
+			}
+			wppa_schedule_maintenance_proc( $slug, $delay );
 		}
 	}
 	return $errtxt.'||'.$slug.'||'.$status.'||'.$togo.'||'.$reload;
@@ -1027,7 +1143,7 @@ global $wppa_log_file;
 			'<div style="float:left; clear:both; width:100%; overflow:auto; word-wrap:none;" >';
 
 			if ( ! $file = @ fopen( $wppa_log_file, 'r' ) ) {
-				$result .= __( 'There are no error log messages', 'wp-photo-album-plus' );
+				$result .= __( 'There are no log messages', 'wp-photo-album-plus' );
 			}
 			else {
 				$size 	= filesize( $wppa_log_file );

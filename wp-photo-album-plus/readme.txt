@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto
-Version: 6.6.11
-Stable tag: 6.6.11
+Version: 6.6.12
+Stable tag: 6.6.12
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -179,6 +179,26 @@ Oh, just Google on 'picture resizer' and you will find a bunch of free programs 
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.6.12 =
+
+= Bug Fixes =
+
+* Under certain circumstances the close button of the new style frontend edit photo modal dialog box did not work. Fixed.
+* Fixed the incorrectly working link 'Top of page' on the album admin screen.
+* Fixed a missing '&lt;/table>' in wppa_get_multitag_html();
+* Fixed a layout issue of the album multi selection box on the photo of the day admin page.
+
+= New Features =
+
+* Shortcode attribute cols="...", used with shortcode type="multitag" can now have two numbers; one for pc (1st) and one for mobile (2nd). Example: [wppa type="multitag" cols="6,2"]
+* The maintenance of the search index db table as well as the actual deletion of photos is now performed at the background. To monitor this activity: Tick the box in Table IX-A9: Log Cron.
+* Table IX-E18.x: Additional search engine settings.
+
+= Other Changes =
+
+* Crashed cron jobs are now automaticly re-animated. There is a check every hour.
+* Significant performance enhancements, especially in editing album/photo info and photo deletion.
 
 = 6.6.11 =
 

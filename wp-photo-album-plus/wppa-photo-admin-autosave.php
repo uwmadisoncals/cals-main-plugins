@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -2718,7 +2718,8 @@ function wppa_fe_edit_new_style( $photo ) {
 			' type="button"' .
 			' style="margin-top:8px;"' .
 			' value="' . esc_attr( __( 'Cancel', 'wp-photo-album-plus' ) ) . '"' .
-			' onclick="jQuery( \'.ui-button\' ).trigger(\'click\')"' .
+//			' onclick="jQuery( \'.ui-button\' ).trigger(\'click\')"' .
+			' onclick="jQuery( \'#wppa-modal-container-' . strval( intval( $_REQUEST['moccur'] ) ) . '\').dialog(\'close\')"' .
 			' />';
 
 	// Close form

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various funcions
-* Version 6.6.01
+* Version 6.6.12
 *
 */
 
@@ -96,40 +96,24 @@ global $wpdb;
 		return false;
 	}
 
-	// If there are more than 200 albums, we do this as a cron job
-	$n_albs = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "`" );
+	// We do this as a cron job
 
-	// Big site?
-	if ( $n_albs > 200 ) {
+	// Are we a cron job?
+	if ( wppa_is_cron() ) {
 
-		// Are we a cron job?
-		if ( wppa_is_cron() ) {
-
-			// Remake required?
-			if ( ! get_option( 'wppa_pl_htaccess_required' ) ) {
-				return false;
-			}
-		}
-
-		// Real time request
-		else {
-
-			// Tell cron it must be done
-			update_option( 'wppa_pl_htaccess_required', true );
+		// Remake required?
+		if ( ! get_option( 'wppa_pl_htaccess_required' ) ) {
 			return false;
 		}
 	}
 
-	// Small
+	// Real time request
 	else {
 
-		// In cron?
-		if ( wppa_is_cron() ) {
-			return false;
-		}
+		// Tell cron it must be done
+		update_option( 'wppa_pl_htaccess_required', true );
+		return false;
 	}
-
-	// Either big in cron and required, or small and realtime
 
 	// Where are the photo source files?
 	$source_root = str_replace( ABSPATH, '', wppa_opt( 'source_dir' ) );
@@ -179,7 +163,7 @@ global $wpdb;
 	// Remove required flag
 	delete_option( 'wppa_pl_htaccess_required' );
 
-	wppa_log( 'Dbg', 'Create pl_htaccess took '.( time() - $tim ) . ' seconds.' );
+	wppa_log( 'Cron', 'Create pl_htaccess took '.( time() - $tim ) . ' seconds.' );
 	return true;
 }
 

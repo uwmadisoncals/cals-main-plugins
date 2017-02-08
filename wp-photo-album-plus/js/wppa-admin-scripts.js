@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.6.11
+/* Version 6.6.12
 /* Various js routines used in admin pages
 */
 
@@ -1842,7 +1842,7 @@ function wppaAjaxPopupWindow( slug ) {
 			break;
 	}
 	var desc = '';
-	var width = 960;
+	var width = 1024;
 	var height = 512;
 
 	if ( screen.availWidth < width ) width = screen.availWidth;

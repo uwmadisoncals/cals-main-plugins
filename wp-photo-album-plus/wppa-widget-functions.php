@@ -2,7 +2,7 @@
 /* wppa-widget-functions.php
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.5.04
+/* Version 6.6.12
 /*
 */
 
@@ -172,6 +172,10 @@ global $wpdb;
 // get the photo of the day
 function wppa_get_potd() {
 global $wpdb;
+static $potd;
+
+	// Been here before?
+	if ( $potd ) return $potd;
 
 	$id = 0;
 	switch ( wppa_opt( 'potd_method' ) ) {
@@ -313,5 +317,7 @@ global $wpdb;
 	else {
 		$result = false;
 	}
+
+	$potd = $result;
 	return $result;
 }

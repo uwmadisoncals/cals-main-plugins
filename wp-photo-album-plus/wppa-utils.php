@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.6.11
+* Version 6.6.12
 *
 */
 
@@ -740,6 +740,10 @@ function wppa_album_exists( $id ) {
 global $wpdb;
 static $existing_albums;
 
+	if ( ! wppa_is_int( $id ) ) {
+		return false;
+	}
+
 	// If existing albums cache not filled yet, fill it.
 	if ( ! $existing_albums ) {
 		$existing_albums = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_ALBUMS . "`" );
@@ -750,6 +754,10 @@ static $existing_albums;
 
 function wppa_photo_exists( $id ) {
 global $wpdb;
+
+	if ( ! wppa_is_int( $id ) ) {
+		return false;
+	}
 	return $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $id ) );
 }
 
@@ -844,7 +852,7 @@ global $wpdb;
 	if ( ! $owner ) return;
 
 	// Get email
-	$user = get_user_by( 'login', $owner );
+	$user = wppa_get_user_by( 'login', $owner );
 	if ( ! $user ) return;
 
 	// Custom content?
@@ -1249,6 +1257,13 @@ global $wpdb;
 	// Get album
 	$album = $photoinfo['album'];
 
+	// Really delete only as cron job
+	if ( ! wppa_is_cron() ) {
+		wppa_update_photo( array( 'id' => $photo, 'album' => '-9' ) );
+		wppa_schedule_cleanup( 'now' );
+		return;
+	}
+
 	// Get filename
 	$filename = $photoinfo['filename'];
 
@@ -1292,6 +1307,9 @@ global $wpdb;
 	if ( wppa_cdn( 'admin' ) == 'cloudinary' ) {
 		wppa_delete_from_cloudinary( $photo );
 	}
+
+	// Report
+	wppa_log('Cron', 'Photo # {b}'.$photo.'{/b} removed from system');
 }
 
 function wppa_microtime($txt = '') {
@@ -1506,6 +1524,12 @@ global $wppa_log_file;
 	// Sanitize type
 	$t = strtolower( substr( $xtype, 0, 1 ) );
 	switch ( $t ) {
+		case 'c':
+			$type = 'Cron';
+			if ( ! wppa_switch( 'log_cron' ) ) {
+				return;
+			}
+			break;
 		case 'd':
 			$type = 'Dbg';
 			break;
@@ -1557,7 +1581,9 @@ global $wppa_log_file;
 	if ( ! $file = fopen( $wppa_log_file, 'ab' ) ) return;	// Unable to open log file
 
 	// Write log message
-	@ fwrite( $file, '{b}'.$type.'{/b}: on:'.wppa_local_date(get_option('date_format', "F j, Y,").' '.get_option('time_format', "g:i a"), time()).': '.wppa_get_user().': '.strip_tags($msg)."\n" );
+	$msg = strip_tags( $msg );
+
+	@ fwrite( $file, '{b}'.$type.'{/b}: on:'.wppa_local_date(get_option('date_format', "F j, Y,").' '.get_option('time_format', "g:i a"), time()).': '.wppa_get_user().': '.$msg."\n" );
 
 	// Log current url and stacktrace 12 levels if trace requested
 	if ( $trace || $type == 'Dbg' ) {
@@ -2077,7 +2103,7 @@ global $wpdb;
 	foreach ( array_keys( $data ) as $key ) {
 		$thumb = wppa_cache_thumb( $key );
 		$data[$key]['meanrating'] = $data[$key]['totvalue'] / $data[$key]['ratingcount'];
-		$user = get_user_by( 'login', $thumb['owner'] );
+		$user = wppa_get_user_by( 'login', $thumb['owner'] );
 		if ( $user ) {
 			$data[$key]['user'] = $user->display_name;
 		}

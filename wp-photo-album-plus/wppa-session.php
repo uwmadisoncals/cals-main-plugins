@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 6.6.04
+* Version 6.6.12
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -28,7 +28,7 @@ global $wpdb;
 global $wppa_session;
 
 	// If the session table does not yet exist on activation
-	if ( ! wppa_table_exists( WPPA_SESSION ) ) {
+	if ( is_admin() && ! wppa_table_exists( WPPA_SESSION ) ) {
 		$wppa_session['id'] = '0';
 		return false;
 	}

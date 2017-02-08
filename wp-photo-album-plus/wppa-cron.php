@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
-* Version 6.6.11
+* Version 6.6.12
 *
 *
 */
@@ -18,26 +18,59 @@ function wppa_is_cron() {
 add_action( 'wppa_cron_event', 'wppa_do_maintenance_proc', 10, 1 );
 
 // Schedule maintenance proc
-function wppa_schedule_maintenance_proc( $slug, $first = false ) {
+function wppa_schedule_maintenance_proc( $slug, $delay = 10 ) {
 
 	// Schedule cron job
-	wp_schedule_single_event( time() + ( $first ? 10 : 30 ), 'wppa_cron_event', array( $slug ) );
+	if ( ! wp_next_scheduled( 'wppa_cron_event', array( $slug ) ) ) {
+		wp_schedule_single_event( time() + $delay, 'wppa_cron_event', array( $slug ) );
+	}
 
 	// Update appropriate options
 	update_option( $slug . '_status', 'Scheduled cron job' );
 	update_option( $slug . '_user', 'cron-job' );
 
 	// Inform calling Ajax proc about the results
-	echo '||' . $slug . '||' . __( 'Scheduled cron job', 'wp-photo-album-plus' ) . '||0||reload';
+	if ( is_admin() && defined( 'DOING_AJAX' ) ) {
+		echo '||' . $slug . '||' . __( 'Scheduled cron job', 'wp-photo-album-plus' ) . '||0||reload';
+	}
 
+}
+
+// Is cronjob crashed?
+function wppa_is_maintenance_cron_job_crashed( $slug ) {
+
+	// Asume not
+	$result = false;
+
+	// If there is a last timestamp longer than 15 minutes ago...
+	$last = get_option( $slug.'_lasttimestamp', '0' );
+	if ( $last && $last < ( time() - 900 ) ) {
+
+		// And the user is cron
+		if ( get_option( $slug . '_user' ) == 'cron-job' ){
+
+			// And proc is not scheduled
+			if ( ! wp_next_scheduled( 'wppa_cron_event', array( $slug ) ) ) {
+
+				// It is crashed
+				$result = true;
+			}
+		}
+	}
+
+	return $result;
 }
 
 // Activate our cleanup session hook
 add_action( 'wppa_cleanup', 'wppa_do_cleanup' );
 
 // Schedule cleanup session database table
-function wppa_schedule_cleanup() {
+function wppa_schedule_cleanup( $now = false ) {
 
+	// Immediate action requested?
+	if ( $now ) {
+		wp_schedule_single_event( time() + 1, 'wppa_cleanup' );
+	}
 	// Schedule cron job
 	if ( ! wp_next_scheduled( 'wppa_cleanup' ) ) {
 		wp_schedule_event( time(), 'hourly', 'wppa_cleanup' );
@@ -47,6 +80,7 @@ function wppa_schedule_cleanup() {
 // The actual cleaner
 function wppa_do_cleanup() {
 global $wpdb;
+global $wppa_all_maintenance_slugs;
 
 	// Cleanup session db table
 	$lifetime 	= 3600;			// Sessions expire after one hour
@@ -56,8 +90,36 @@ global $wpdb;
 	$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_SESSION . "` SET `status` = 'expired' WHERE `timestamp` < %s", $expire ) );
 	$wpdb->query( $wpdb->prepare( "DELETE FROM `" . WPPA_SESSION ."` WHERE `timestamp` < %s", $purge ) );
 
+	// Delete obsolete spam
+	$spammaxage = wppa_opt( 'spam_maxage' );
+	if ( $spammaxage != 'none' ) {
+		$time = time();
+		$obsolete = $time - $spammaxage;
+		$iret = $wpdb->query( $wpdb->prepare( "DELETE FROM `".WPPA_COMMENTS."` WHERE `status` = 'spam' AND `timestamp` < %s", $obsolete ) );
+		if ( $iret ) wppa_update_option( 'wppa_spam_auto_delcount', get_option( 'wppa_spam_auto_delcount', '0' ) + $iret );
+	}
+
+	// Re-animate crashed cronjobs
+	foreach ( $wppa_all_maintenance_slugs as $slug ) {
+		if ( wppa_is_maintenance_cron_job_crashed( $slug ) ) {
+			$last = get_option( $slug . '_last' );
+			update_option( $slug . '_last', $last + 1 );
+			wppa_schedule_maintenance_proc( $slug );
+			wppa_log( 'Cron', 'Crashed cron job {b}' . $slug . '{/b} re-animated at item {b}#' . $last . '{/b}' );
+		}
+	}
+
+	// Remove 'deleted' photos from system
+	$dels = $wpdb->get_col( "SELECT `id` FROM `".WPPA_PHOTOS."` WHERE `album` = '-9'" );
+	foreach( $dels as $del ) {
+		wppa_delete_photo( $del );
+	}
+
 	// Re-create permalink htaccess file
 	wppa_create_pl_htaccess();
+
+	// Cleanup index
+	wppa_schedule_maintenance_proc( 'wppa_cleanup_index' );
 
 }
 
@@ -68,7 +130,7 @@ function wppa_schedule_treecount_update() {
 
 	// Schedule cron job
 	if ( ! wp_next_scheduled( 'wppa_update_treecounts' ) ) {
-		wp_schedule_single_event( time() + 30, 'wppa_update_treecounts' );
+		wp_schedule_single_event( time() + 10, 'wppa_update_treecounts' );
 	}
 }
 
@@ -83,7 +145,7 @@ global $wpdb;
 		$treecounts = wppa_get_treecounts_a( $alb );
 		if ( $treecounts['needupdate'] ) {
 			wppa_verify_treecounts_a( $alb );
-//			wppa_log( 'Dbg', 'Cron fixed treecounts for ' . $alb );
+			wppa_log( 'Cron', 'Cron fixed treecounts for ' . $alb );
 		}
 		if ( time() > $start + 30 ) {
 			wppa_schedule_treecount_update();

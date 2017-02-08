@@ -332,6 +332,8 @@ function wpcf_embedded_init() {
     $wpcf->excluded_post_types = array(
         'cred-form',
         'cred-user-form',
+	    'custom_css',
+	    'customize_changeset',
         'dd_layouts',
         'deprecated_log',
         'mediapage',
