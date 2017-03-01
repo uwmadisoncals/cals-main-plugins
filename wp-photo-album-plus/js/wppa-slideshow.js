@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsSlideshowVersion = '6.6.10';
+var wppaJsSlideshowVersion = '6.6.13';
 
 // This is an entrypoint to load the slide data
 function wppaStoreSlideInfo(
@@ -994,7 +994,14 @@ var result = '';
 		if ( wppaArtMonkeyButton ) {
 			if ( _wppaFullNames[mocc][_wppaCurIdx[mocc]] ) {
 				var label = _wppaFullNames[mocc][_wppaCurIdx[mocc]].split( '<img' );
-				result = '<input type="button" title="Download" style="cursor:pointer; margin-bottom:0px; max-width:'+( wppaGetContainerWidth( mocc )-24 )+'px;" class="wppa-download-button" onclick="wppaAjaxMakeOrigName( '+mocc+', \''+_wppaId[mocc][_wppaCurIdx[mocc]]+'\' );" ontouchstart="wppaAjaxMakeOrigName( '+mocc+', \''+_wppaId[mocc][_wppaCurIdx[mocc]]+'\' );" value="'+wppaDownLoad+': '+label[0]+'" />';
+				result = '<input' +
+							' type="button"' +
+							' title="Download"' +
+							' style="cursor:pointer;margin-bottom:0px;max-width:' + ( wppaGetContainerWidth( mocc ) - 24 ) + 'px;"' +
+							' class="wppa-download-button"' +
+							' onclick="' + ( wppaIsSafari && wppaArtMonkyLink == 'file' ? 'wppaWindowReference = window.open();' : '' ) + 'wppaAjaxMakeOrigName( '+mocc+', \''+_wppaId[mocc][_wppaCurIdx[mocc]]+'\' );"' +
+							' value="' + wppaDownLoad + ': ' + label[0] + '"' +
+						' />';
 				if ( label[1] ) result += '<img'+label[1];
 			}
 			else {
@@ -1002,7 +1009,13 @@ var result = '';
 			}
 		}
 		else {
-			result = '<a title="Download" style="cursor:pointer;" onclick="wppaAjaxMakeOrigName( '+mocc+', \''+_wppaId[mocc][_wppaCurIdx[mocc]]+'\' );" ontouchstart="wppaAjaxMakeOrigName( '+mocc+', \''+_wppaId[mocc][_wppaCurIdx[mocc]]+'\' );">'+wppaDownLoad+': '+_wppaFullNames[mocc][_wppaCurIdx[mocc]]+'</a>';
+			result = 	'<a' +
+							' title="Download"' +
+							' style="cursor:pointer;"' +
+							' onclick="' + ( wppaIsSafari && wppaArtMonkyLink == 'file' ? 'wppaWindowReference = window.open();' : '' ) + 'wppaAjaxMakeOrigName( '+mocc+', \''+_wppaId[mocc][_wppaCurIdx[mocc]]+'\' );"' +
+							' >' +
+							wppaDownLoad + ': ' + _wppaFullNames[mocc][_wppaCurIdx[mocc]] +
+						'</a>';
 		}
 		break;
 	case 'none':
@@ -1674,9 +1687,9 @@ function _wppaSetRd( mocc, avg, where ) {
 	var ihigh = wppaRatingMax;
 
 	for ( idx=ilow;idx<=ihigh;idx++ ) {
-		if ( where == '#wppa-rate-' || where == '.wppa-rate-' ) {
-			jQuery( where+mocc+'-'+idx ).attr( 'src', wppaImageDirectory+'star.ico' );
-		}
+//		if ( where == '#wppa-rate-' || where == '.wppa-rate-' ) {
+//			jQuery( where+mocc+'-'+idx ).attr( 'src', wppaImageDirectory+'star.ico' );
+//		}
 		if ( idx <= idx1 ) {
 			jQuery( where+mocc+'-'+idx ).stop().fadeTo( 100, 1.0 );
 		}

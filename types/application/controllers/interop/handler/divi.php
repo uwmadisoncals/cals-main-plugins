@@ -7,7 +7,6 @@
  */
 class Types_Interop_Handler_Divi implements Types_Interop_Handler_Interface {
 
-
 	private static $instance;
 
 	public static function initialize() {
@@ -21,8 +20,7 @@ class Types_Interop_Handler_Divi implements Types_Interop_Handler_Interface {
 	}
 
 
-	private function __clone() {
-	}
+	private function __clone() { }
 
 
 	private function __construct() {

@@ -53,6 +53,10 @@ class Types_Interop_Mediator {
 			array(
 				'is_needed' => array( $this, 'is_divi_active'),
 				'class_name' => 'Divi'
+			),
+			array(
+				'is_needed' => array( $this, 'is_use_any_font_active' ),
+				'class_name' => 'Use_Any_Font'
 			)
 		);
 
@@ -106,6 +110,11 @@ class Types_Interop_Mediator {
 	 */
 	protected function is_divi_active() {
 		return function_exists( 'et_setup_theme' );
+	}
+
+
+	protected function is_use_any_font_active() {
+		return function_exists( 'uaf_activate' );
 	}
 
 }

@@ -508,6 +508,7 @@ function types_render_usermeta( $field_id, $params, $content = null, $code = '' 
         }
     } else {
         $params['field_value'] = get_user_meta( $user_id, wpcf_types_get_meta_prefix( $field ) . $field['slug'], true );
+
         if ( $params['field_value'] == '' && $field['type'] != 'checkbox' ) {
             return '';
         }
@@ -548,7 +549,7 @@ function types_render_field_single( $field, $params, $content = null, $code = ''
 
     $params['field_value'] = apply_filters( 'wpcf_fields_value_display', $params['field_value'], $params, $post->ID, $field['id'], $meta_id );
 
-    $params['field_value'] = apply_filters( 'wpcf_fields_slug_' . $field['slug'] . '_value_display', $params['field_value'], $params, $post->ID, $field['id'], $meta_id );
+	$params['field_value'] = apply_filters( 'wpcf_fields_slug_' . $field['slug'] . '_value_display', $params['field_value'], $params, $post->ID, $field['id'], $meta_id );
 
     $params['field_value'] = apply_filters( 'wpcf_fields_type_' . $field['type'] . '_value_display', $params['field_value'], $params, $post->ID, $field['id'], $meta_id );
     // To make sure

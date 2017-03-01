@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * enhances the admin bar with wppa+ menu
-* version 6.3.9
+* version 6.6.13
 *
 */
 
@@ -128,6 +128,18 @@ function wppa_admin_bar_menu() {
 			$menu_item['meta']['class'] .= 'wppa-' . 'new-tab';
 		}
 
+		// Add item
+		$wp_admin_bar->add_menu( $menu_item );
+	}
+
+	// Add New -> Photo Album
+	if ( current_user_can( 'wppa_admin' ) ) {
+
+		$menu_item = array( 'id' 		=> 'wppa-album-new',
+							'parent' 	=> 'new-content-default',
+							'title' 	=> __( 'Album', 'wp-photo-album-plus' ),
+							'href' 		=> admin_url( 'admin.php?page=wppa_admin_menu&tab=edit&edit_id=new' ),
+							);
 		// Add item
 		$wp_admin_bar->add_menu( $menu_item );
 	}

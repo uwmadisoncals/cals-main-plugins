@@ -23,7 +23,7 @@ class Ga_Admin {
 	const NOTICE_ERROR									 = 'error';
 	const GA_SHARETHIS_API_ALIAS							 = 'sharethis';
 	const GA_DISABLE_ALL_FEATURES							 = 'googleanalytics_disable_all_features';
-	const GA_HEARTBEAT_API_CACHE_UPDATE					 = true;
+	const GA_HEARTBEAT_API_CACHE_UPDATE					 = false;
 
 	/**
 	 * Instantiate API client.

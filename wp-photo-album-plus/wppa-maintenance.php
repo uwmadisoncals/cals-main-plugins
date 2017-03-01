@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.6.12
+* Version 6.6.15
 *
 */
 
@@ -16,6 +16,7 @@ global $wppa_all_maintenance_slugs;
 $wppa_all_maintenance_slugs = array( 'wppa_remake_index_albums',
 							'wppa_remove_empty_albums',
 							'wppa_remake_index_photos',
+							'wppa_apply_default_photoname_all',
 							'wppa_apply_new_photodesc_all',
 							'wppa_append_to_photodesc',
 							'wppa_remove_from_photodesc',
@@ -118,10 +119,10 @@ global $wppa_all_maintenance_slugs;
 	// Pre-processing needed?
 	if ( $lastid == '0' ) {
 		if (  wppa_is_cron() ) {
-			wppa_log( 'Cron', 'Cron job ' . $slug . ' started.' );
+			wppa_log( 'Cron', 'Cron job {b}' . $slug . '{/b} started.' );
 		}
 		else {
-			wppa_log( 'Obs', 'Maintenance proc ' . $slug . ' started.' );
+			wppa_log( 'Obs', 'Maintenance proc {b}' . $slug . '{/b} started.' );
 		}
 		switch ( $slug ) {
 
@@ -278,6 +279,7 @@ global $wppa_all_maintenance_slugs;
 			break;	// End process albums
 
 		case 'wppa_remake_index_photos':
+		case 'wppa_apply_default_photoname_all':
 		case 'wppa_apply_new_photodesc_all':
 		case 'wppa_append_to_photodesc':
 		case 'wppa_remove_from_photodesc':
@@ -350,6 +352,11 @@ global $wppa_all_maintenance_slugs;
 					case 'wppa_remake_index_photos':
 
 						wppa_index_add( 'photo', $id );
+						break;
+
+					case 'wppa_apply_default_photoname_all':
+						$filename 	= wppa_get_photo_item( $id, 'filename' );
+						wppa_set_default_name( $id, $filename );
 						break;
 
 					case 'wppa_apply_new_photodesc_all':
@@ -786,7 +793,7 @@ global $wppa_all_maintenance_slugs;
 			}
 			else {	// Nothing to do, Done anyway
 				$lastid = $topid;
-				wppa_log( 'Debug', 'Maintenance proc '.$slug.': Done!');
+				wppa_log( 'Debug', 'Maintenance proc {b}'.$slug.'{/b} Done!');
 			}
 			break;	// End process photos
 
@@ -983,11 +990,11 @@ global $wppa_all_maintenance_slugs;
 		}
 
 		// Re-Init options
-		update_option( $slug.'_togo', '' );
-		update_option( $slug.'_status', '' );
-		update_option( $slug.'_last', '0' );
-		update_option( $slug.'_user', '' );
-		update_option( $slug.'_lasttimestamp', '0' );
+		delete_option( $slug.'_togo', '' );
+		delete_option( $slug.'_status', '' );
+		delete_option( $slug.'_last', '0' );
+		delete_option( $slug.'_user', '' );
+		delete_option( $slug.'_lasttimestamp', '0' );
 
 		// Post-processing needed?
 		switch ( $slug ) {
@@ -997,10 +1004,12 @@ global $wppa_all_maintenance_slugs;
 				$wpdb->query( "DELETE FROM `".WPPA_INDEX."` WHERE `albums` = '' AND `photos` = ''" );	// Remove empty entries
 				delete_option( 'wppa_index_need_remake' );
 				break;
+			case 'wppa_apply_default_photoname_all':
 			case 'wppa_apply_new_photodesc_all':
 			case 'wppa_append_to_photodesc':
 			case 'wppa_remove_from_photodesc':
-				update_option( 'wppa_remake_index_photos_status', __('Required', 'wp-photo-album-plus') );
+				wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+//				update_option( 'wppa_remake_index_photos_status', __('Required', 'wp-photo-album-plus') );
 				break;
 			case 'wppa_regen_thumbs':
 				wppa_bump_thumb_rev();
@@ -1016,7 +1025,8 @@ global $wppa_all_maintenance_slugs;
 			case 'wppa_edit_tag':
 				wppa_clear_taglist();
 				if ( wppa_switch( 'search_tags' ) ) {
-					update_option( 'wppa_remake_index_photos_status', __('Required', 'wp-photo-album-plus') );
+				wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+//					update_option( 'wppa_remake_index_photos_status', __('Required', 'wp-photo-album-plus') );
 				}
 				$reload = 'reload';
 				break;
@@ -1035,10 +1045,10 @@ global $wppa_all_maintenance_slugs;
 		}
 
 		if ( wppa_is_cron() ) {
-			wppa_log( 'Cron', 'Cron job ' . $slug . ' completed' );
+			wppa_log( 'Cron', 'Cron job {b}' . $slug . '{/b} completed' );
 		}
 		else {
-			wppa_log( 'Obs', 'Maintenance proc ' . $slug . ' completed' );
+			wppa_log( 'Obs', 'Maintenance proc {b}' . $slug . '{/b} completed' );
 		}
 
 	}
@@ -1046,19 +1056,14 @@ global $wppa_all_maintenance_slugs;
 	wppa_save_session();
 
 	if ( wppa_is_cron() ) {
-//		wppa_log( 'obs', $errtxt.'||'.$slug.'||'.$status.'||'.$togo.'||'.$reload );
 		if ( get_option( $slug . '_ad_inf' ) == 'yes' ) {
-			switch ( $slug ) {
-				case 'wppa_remake_index_albums':
-					$delay = 900;	// 15 minutes
-					break;
-				default:
-					$delay = 300; 	// 5 minutes
-			}
-			wppa_schedule_maintenance_proc( $slug, $delay );
+			wppa_schedule_maintenance_proc( $slug );
 		}
+		return;
 	}
-	return $errtxt.'||'.$slug.'||'.$status.'||'.$togo.'||'.$reload;
+	else {
+		return $errtxt.'||'.$slug.'||'.$status.'||'.$togo.'||'.$reload;
+	}
 
 }
 

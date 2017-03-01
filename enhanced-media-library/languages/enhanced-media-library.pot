@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Enhanced Media Library\n"
-"POT-Creation-Date: 2017-01-19 22:54+0200\n"
+"POT-Creation-Date: 2017-02-11 15:12+0200\n"
 "PO-Revision-Date: 2016-04-14 21:02+0300\n"
 "Last-Translator: wpUXsolutions <wpUXsolutions@gmail.com>\n"
 "Language-Team: wpUXsolutions <wpUXsolutions@gmail.com>\n"
@@ -54,7 +54,6 @@ msgstr ""
 msgid "MIME Types"
 msgstr ""
 
-#. Plugin Name of the plugin/theme
 #: core/options-pages.php:135 core/options-pages.php:136
 msgid "Enhanced Media Library"
 msgstr ""
@@ -186,7 +185,7 @@ msgstr ""
 
 #: core/options-pages.php:482 core/options-pages.php:718
 #: core/options-pages.php:1265 core/options-pages.php:1328
-#: core/taxonomies.php:340 enhanced-media-library.php:509
+#: core/taxonomies.php:340 enhanced-media-library.php:518
 msgid "All"
 msgstr ""
 
@@ -760,11 +759,11 @@ msgid "Media Library settings saved."
 msgstr ""
 
 #: core/taxonomies.php:333 core/taxonomies.php:339
-#: enhanced-media-library.php:508
+#: enhanced-media-library.php:517
 msgid "Filter by"
 msgstr ""
 
-#: core/taxonomies.php:341 enhanced-media-library.php:510
+#: core/taxonomies.php:341 enhanced-media-library.php:519
 msgid "Not in a"
 msgstr ""
 
@@ -792,64 +791,68 @@ msgstr ""
 msgid "Describe this media file&hellip;"
 msgstr ""
 
-#: enhanced-media-library.php:342 enhanced-media-library.php:507
+#: enhanced-media-library.php:351 enhanced-media-library.php:516
 msgid "All Uncategorized"
 msgstr ""
 
-#: enhanced-media-library.php:343 enhanced-media-library.php:511
+#: enhanced-media-library.php:352 enhanced-media-library.php:520
 msgid "Reset All Filters"
 msgstr ""
 
-#: enhanced-media-library.php:541
+#: enhanced-media-library.php:550
 msgid "Uploaded to post #"
 msgstr ""
 
-#: enhanced-media-library.php:542
+#: enhanced-media-library.php:551
 msgid "Based On"
 msgstr ""
 
-#: enhanced-media-library.php:574 enhanced-media-library.php:576
+#: enhanced-media-library.php:583 enhanced-media-library.php:585
 msgid "Media Categories"
 msgstr ""
 
-#: enhanced-media-library.php:575
+#: enhanced-media-library.php:584
 msgid "Media Category"
 msgstr ""
 
-#: enhanced-media-library.php:577
+#: enhanced-media-library.php:586
 msgid "All Media Categories"
 msgstr ""
 
-#: enhanced-media-library.php:578
+#: enhanced-media-library.php:587
 msgid "Edit Media Category"
 msgstr ""
 
-#: enhanced-media-library.php:579
+#: enhanced-media-library.php:588
 msgid "View Media Category"
 msgstr ""
 
-#: enhanced-media-library.php:580
+#: enhanced-media-library.php:589
 msgid "Update Media Category"
 msgstr ""
 
-#: enhanced-media-library.php:581
+#: enhanced-media-library.php:590
 msgid "Add New Media Category"
 msgstr ""
 
-#: enhanced-media-library.php:582
+#: enhanced-media-library.php:591
 msgid "New Media Category Name"
 msgstr ""
 
-#: enhanced-media-library.php:583
+#: enhanced-media-library.php:592
 msgid "Parent Media Category"
 msgstr ""
 
-#: enhanced-media-library.php:584
+#: enhanced-media-library.php:593
 msgid "Parent Media Category:"
 msgstr ""
 
-#: enhanced-media-library.php:585
+#: enhanced-media-library.php:594
 msgid "Search Media Categories"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Enhanced Media Library PRO"
 msgstr ""
 
 #. Plugin URI of the plugin/theme

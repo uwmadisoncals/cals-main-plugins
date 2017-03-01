@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
-* Version 6.6.12
+* Version 6.6.15
 *
 *
 */
@@ -18,11 +18,14 @@ function wppa_is_cron() {
 add_action( 'wppa_cron_event', 'wppa_do_maintenance_proc', 10, 1 );
 
 // Schedule maintenance proc
-function wppa_schedule_maintenance_proc( $slug, $delay = 10 ) {
+function wppa_schedule_maintenance_proc( $slug, $from_settings_page = false ) {
 
 	// Schedule cron job
 	if ( ! wp_next_scheduled( 'wppa_cron_event', array( $slug ) ) ) {
-		wp_schedule_single_event( time() + $delay, 'wppa_cron_event', array( $slug ) );
+		wp_schedule_single_event( time() + 30, 'wppa_cron_event', array( $slug ) );
+		$backtrace = debug_backtrace();
+		$args = is_array( $backtrace[1]['args'] ) ? implode( ', ', $backtrace[1]['args'] ) : '';
+		wppa_log( 'Cron', '{b}' . $slug . '{/b} scheduled by {b}' . $backtrace[1]['function'] . '(' . $args . '){/b} on line {b}' . $backtrace[0]['line'] . '{/b} of ' . basename( $backtrace[0]['file'] ) );
 	}
 
 	// Update appropriate options
@@ -30,7 +33,7 @@ function wppa_schedule_maintenance_proc( $slug, $delay = 10 ) {
 	update_option( $slug . '_user', 'cron-job' );
 
 	// Inform calling Ajax proc about the results
-	if ( is_admin() && defined( 'DOING_AJAX' ) ) {
+	if ( $from_settings_page ) {
 		echo '||' . $slug . '||' . __( 'Scheduled cron job', 'wp-photo-album-plus' ) . '||0||reload';
 	}
 
@@ -113,6 +116,7 @@ global $wppa_all_maintenance_slugs;
 	$dels = $wpdb->get_col( "SELECT `id` FROM `".WPPA_PHOTOS."` WHERE `album` = '-9'" );
 	foreach( $dels as $del ) {
 		wppa_delete_photo( $del );
+		wppa_log( 'Cron', 'Removed photo {b}' . $del . '{/b} from system' );
 	}
 
 	// Re-create permalink htaccess file

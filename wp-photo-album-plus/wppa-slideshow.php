@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the slideshow high level functions
-* Version 6.6.10
+* Version 6.6.14
 *
 */
 
@@ -903,7 +903,7 @@ global $wpdb;
 	$fs = wppa_opt( 'fontsize_nav' );
 	if ( $fs ) $fs += 3; else $fs = '15';	// iconsize = fontsize+3, Default to 15
 	$dh = $fs + '6';
-	$size = 'font-size:'.$fs.'px;';
+	$size = 'font-size:'.($fs-3).'px;';
 
 	// Open the rating box
 	$result .= 	'<div' .
@@ -929,6 +929,9 @@ global $wpdb;
 		$style = 'height:'.$fs.'px; margin:0 0 -3px 0; padding:0; box-shadow:none; display:inline;background-color:transparent;';
 		$icon = 'star.ico';
 
+		$avgrat_label = ( wppa_opt( 'initial_colwidth' ) < wppa_opt( 'mini_treshold' ) ? __( 'Avg.', 'wp-photo-album-plus' ) : __( 'Average&nbsp;rating', 'wp-photo-album-plus' ) );
+		$myrat_label  = ( wppa_opt( 'initial_colwidth' ) < wppa_opt( 'mini_treshold' ) ? __( 'Mine', 'wp-photo-album-plus' ) :  __( 'My&nbsp;rating', 'wp-photo-album-plus' ) );
+
 		// Display avg rating
 		if ( wppa_switch( 'show_avg_rating' ) ) {
 
@@ -953,14 +956,14 @@ global $wpdb;
 							' id="wppa-avg-rat-' . wppa( 'mocc' ) . '"' .
 							' class="wppa-rating-label"' .
 							' >' .
-							__( 'Average&nbsp;rating', 'wp-photo-album-plus' ) .
+							$avgrat_label .
 						'</span>&nbsp;';
 
 			$i = '1';
 			while ( $i <= wppa_opt( 'rating_max' ) ) {
 				$result .= 	'<img' .
 								' id="wppa-avg-' . wppa( 'mocc' ) . '-' . $i . '"' .
-								' class="wppa-avg-' . wppa( 'mocc' ) . '-' . $i . ' wppa-avg-'.wppa( 'mocc' ).' no-shadow"' .
+								' class="wppa-rating-star wppa-avg-' . wppa( 'mocc' ) . '-' . $i . ' wppa-avg-'.wppa( 'mocc' ).' no-shadow"' .
 								' style="' .
 									$style .
 									( $id ? $opac[$i] : '' ) .
@@ -996,7 +999,7 @@ global $wpdb;
 								' src="'.wppa_get_imgdir().'thumbdown.png"' .
 								' alt="d"' .
 								' style="height:'.$fs.'px; margin:0 0 -3px 0; padding:0 '.$pad.'px; box-shadow:none; display:inline;"' .
-								' class="no-shadow"' .
+								' class="wppa-rating-thumb  no-shadow"' .
 								' onmouseover="jQuery(this).stop().fadeTo(100, 1.0)"' .
 								' onmouseout="jQuery(this).stop().fadeTo(100, wppaStarOpacity)"' .
 								' onclick="';
@@ -1032,7 +1035,7 @@ global $wpdb;
 
 			// Text left if no avg rating
 			if ( ! wppa_switch( 'show_avg_rating') ) {
-				$result .= __('My&nbsp;rating', 'wp-photo-album-plus').':&nbsp;';
+				$result .= $myrat_label . ':&nbsp;';
 			}
 
 			// Display the my rating stars
@@ -1058,7 +1061,7 @@ global $wpdb;
 			while ( $i <= wppa_opt( 'rating_max' ) ) {
 				$result .= 	'<img' .
 								' id="wppa-rate-' . wppa( 'mocc' ) . '-' . $i . '"' .
-								' class="wppa-rate-' . wppa( 'mocc' ) . '-' . $i . ' wppa-rate-'.wppa( 'mocc' ).' no-shadow"' .
+								' class="wppa-rating-star  wppa-rate-' . wppa( 'mocc' ) . '-' . $i . ' wppa-rate-'.wppa( 'mocc' ).' no-shadow"' .
 								' style="' .
 									$style .
 									( $id ? $opac[$i] : '' ) .
@@ -1087,7 +1090,7 @@ global $wpdb;
 									' id="wppa-my-rat-'.wppa( 'mocc' ).'" ' .
 									' class="wppa-rating-label"' .
 									'>' .
-									__('My&nbsp;rating', 'wp-photo-album-plus') .
+									$myrat_label .
 								'</span>';
 			}
 		}

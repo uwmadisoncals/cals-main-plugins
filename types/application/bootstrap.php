@@ -7,14 +7,6 @@ require_once( TYPES_ABSPATH . '/library/toolset/autoloader/autoloader.php' );
 
 $autoloader = Toolset_Autoloader::get_instance();
 
-$autoloader->add_paths(
-	'Types',
-	array(
-		TYPES_ABSPATH . '/application/controllers',
-		TYPES_ABSPATH . '/application/models',
-	)
-);
-
 $autoloader->add_path( 'Toolset', TYPES_ABSPATH . '/library/toolset' );
 
 
@@ -65,10 +57,7 @@ require_once( dirname( __FILE__ ) . '/functions.php' );
 require_once( dirname( __FILE__ ) . '/../library/toolset/types/wpcf.php' );
 
 // Public API
-require_once( dirname( __FILE__ ) . '/api.php' );
-
-// Handle embedded plugin mode
-Types_Embedded::initialize();
+require_once( dirname( __FILE__ ) . '/controllers/main.php' );
 
 // Jumpstart new Types
 Types_Main::initialize();

@@ -1,9 +1,9 @@
 <?php
-/* wppa-upload.php
+/* wppa-import.php
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.6.11
+* Version 6.6.15
 *
 */
 
@@ -554,20 +554,38 @@ global $wppa_session;
 						__( 'Photos that have (<em>name</em>)[<em>album</em>] will be imported by that <em>name</em> in that <em>album</em>.', 'wp-photo-album-plus') .
 					'</p>';
 
+					echo '<p>';
+
 					// Watermark
 					if ( wppa_switch( 'watermark_on' ) && ( wppa_switch( 'watermark_user' ) || current_user_can( 'wppa_settings' ) ) ) {
 						echo
-						'<p>' .
-							__( 'Apply watermark file:', 'wp-photo-album-plus') .
-							'<select name="wppa-watermark-file" id="wppa-watermark-file" >' .
-								wppa_watermark_file_select( 'user' ) .
-							'</select>' .
-							__( 'Position:', 'wp-photo-album-plus') .
-							'<select name="wppa-watermark-pos" id="wppa-watermark-pos" >' .
-								wppa_watermark_pos_select( 'user' ) .
-							'</select>' .
-						'</p>';
+						__( 'Apply watermark file:', 'wp-photo-album-plus') .
+						'<select name="wppa-watermark-file" id="wppa-watermark-file" >' .
+							wppa_watermark_file_select( 'user' ) .
+						'</select>' .
+						__( 'Position:', 'wp-photo-album-plus') .
+						'<select name="wppa-watermark-pos" id="wppa-watermark-pos" >' .
+							wppa_watermark_pos_select( 'user' ) .
+						'</select>';
 					}
+
+					// Delay
+					$delays = array( '1', '2', '5', '10', '20', '50', '100' );
+					echo
+					__( 'Delay', 'wp-photo-album-plus' ) .
+					'<select id="wppa-delay" >';
+					foreach ( $delays as $d ) {
+						echo '<option value="' . ( $d * 1000 ) . '" >' . $d . '</option>';
+					}
+					echo
+					'</select> s. ' .
+					'<img' .
+						' id="wppa-spinner"' .
+						' src="' . wppa_get_imgdir( 'spinner.gif' ) . '"' .
+						' style="vertical-align:middle;display:none;"' .
+					' />';
+
+					echo '</p>';
 
 					// Header of photo list
 					echo
@@ -1226,8 +1244,10 @@ global $wppa_session;
 				<input type="submit" onclick="return wppaCheckInputVars()" class="button-primary" id="submit" name="wppa-import-submit" value="<?php _e( 'Import', 'wp-photo-album-plus' ); ?>" />
 				<script type="text/javascript" >
 					var wppaImportRuns = false;
+					var wppaTimer;
 					function wppaDoAjaxImport() {
-						wppaImportRuns = true;
+						jQuery( '#wppa-spinner' ).css( 'display', 'none' );
+//						wppaImportRuns = true;
 						var data = '';
 						data += 'wppa-update-check='+jQuery( '#wppa-update-check' ).attr( 'value' );
 						data += '&wppa-photo-album='+jQuery( '#wppa-photo-album' ).attr( 'value' );
@@ -1290,7 +1310,8 @@ global $wppa_session;
 										elm.title = '';
 									}
 									if ( wppaImportRuns ) {
-										setTimeout( 'wppaDoAjaxImport()', 100 );
+										wppaTimer = setTimeout( 'wppaDoAjaxImport()', jQuery( '#wppa-delay' ).val() );	// was 100
+										jQuery( '#wppa-spinner' ).css( 'display', 'inline' );
 									}
 								}
 								else {
@@ -1303,17 +1324,21 @@ global $wppa_session;
 						xmlhttp.setRequestHeader( "Content-type","application/x-www-form-urlencoded" );
 						xmlhttp.send( fulldata );
 						jQuery( '#name-'+elm.id ).html( '&nbsp;&nbsp;<b style="color:blue" >' + '<?php _e( 'Working...', 'wp-photo-album-plus' ) ?>' + '</b>' );
-						jQuery( '#wppa-start-ajax' ).css( 'display', 'none' );
-						jQuery( '#wppa-stop-ajax' ).css( 'display', 'inline' );
+						if ( wppaImportRuns ) {
+							jQuery( '#wppa-start-ajax' ).css( 'display', 'none' );
+							jQuery( '#wppa-stop-ajax' ).css( 'display', 'inline' );
+						}
 					}
 					function wppaStopAjaxImport() {
 						wppaImportRuns = false;
+						clearTimeout( wppaTimer );
 						jQuery( '#wppa-start-ajax' ).css( 'display', 'inline' );
 						jQuery( '#wppa-stop-ajax' ).css( 'display', 'none' );
+						jQuery( '#wppa-spinner' ).css( 'display', 'none' );
 					}
 				</script>
 				<?php if ( ( $photocount || $videocount || $audiocount ) && ! $albumcount && ! $dircount && ! $zipcount ) { ?>
-				<input id="wppa-start-ajax" type="button" onclick="if ( wppaVfyAlbum() ) { wppaDoAjaxImport() }" class="button-secundary" value="<?php esc_attr( _e( 'Start Ajax Import', 'wp-photo-album-plus' ) ) ?>" />
+				<input id="wppa-start-ajax" type="button" onclick="if ( wppaVfyAlbum() ) { wppaImportRuns = true;wppaDoAjaxImport() }" class="button-secundary" value="<?php esc_attr( _e( 'Start Ajax Import', 'wp-photo-album-plus' ) ) ?>" />
 				<input id="wppa-stop-ajax" style="display:none;" type="button" onclick="wppaStopAjaxImport()" class="button-secundary" value="<?php esc_attr( _e( 'Stop Ajax Import', 'wp-photo-album-plus' ) ) ?>" />
 				<?php } ?>
 			</p>
@@ -2043,6 +2068,43 @@ global $wppa_supported_audio_extensions;
 					$cust_labels[$i] = wppa_opt( 'custom_caption_' . $i );
 				}
 
+				// Get the system datafields tha may be filled using .csv import
+				$syst_lables = array(
+									// id bigint(20) NOT NULL,
+					'album',		// bigint(20) NOT NULL,
+									// ext tinytext NOT NULL,
+					'name',			// text NOT NULL,
+					'description',	// longtext NOT NULL,
+					'p_order',		// smallint(5) NOT NULL,
+									// mean_rating tinytext NOT NULL,
+					'linkurl',		// text NOT NULL,
+					'linktitle',	// text NOT NULL,
+					'linktarget', 	// tinytext NOT NULL,
+					'owner', 		// text NOT NULL,
+					'timestamp', 	// tinytext NOT NULL,
+					'status', 		// tinytext NOT NULL,
+									// rating_count bigint(20) NOT NULL default '0',
+					'tags',			// text NOT NULL,
+					'alt',			// tinytext NOT NULL,
+									// filename tinytext NOT NULL,
+					'modified',		// tinytext NOT NULL,
+					'location',		// tinytext NOT NULL,
+					'views',		// bigint(20) NOT NULL default '0',
+					'clicks',		// bigint(20) NOT NULL default '0',
+									// page_id bigint(20) NOT NULL default '0',
+					'exifdtm', 		// tinytext NOT NULL,
+									// videox smallint(5) NOT NULL default '0',
+									// videoy smallint(5) NOT NULL default '0',
+									// thumbx smallint(5) NOT NULL default '0',
+									// thumby smallint(5) NOT NULL default '0',
+									// photox smallint(5) NOT NULL default '0',
+									// photoy smallint(5) NOT NULL default '0',
+									// scheduledtm tinytext NOT NULL,
+									// custom longtext NOT NULL,
+									// stereo smallint NOT NULL default '0',
+									// crypt tinytext NOT NULL,
+					);
+
 				// Process the files
 				$photos_processed_csv 	= '0';
 				$photos_skipped_csv 	= '0';
@@ -2230,17 +2292,26 @@ global $wppa_supported_audio_extensions;
 									fclose( $handle );
 									return;
 								}
-								foreach ( array_keys( $captions ) as $key ) {
-									if ( $key == '0' ) {
+
+								// Verify or add cutom fields
+								foreach ( array_keys( $captions ) as $captidx ) {
+									if ( $captidx == '0' ) {
 										if ( ! in_array( strtolower( trim( $captions['0'] ) ), array( 'name', 'photoname', 'filename' ) ) ) {
 											wppa_error_message( __( 'Invalid header. First item must be \'name\', \'photoname\' or \'filename\'', 'wp-photo-album-plus') );
 											fclose( $handle );
 											return;
 										}
 									}
-									elseif ( ! in_array( $captions[$key], $cust_labels ) ) {
+									elseif ( in_array( $captions[$captidx], $syst_lables ) ) {
+										if ( $captions['0'] != 'filename' ) {
+											wppa_error_message( __( 'Invalid header. First item must be \'filename\' when importing system data fields', 'wp-photo-album-plus' ) );
+											fclose( $handle );
+											return;
+										}
+									}
+									elseif ( ! in_array( $captions[$captidx], $cust_labels ) ) {
 										if ( ! in_array( '', $cust_labels ) ) {
-											wppa_error_message( __( 'All available custom data fields are in use. There is no space for', 'wp-photo-album-plus') . ' ' . $captions[$key] );
+											wppa_error_message( __( 'All available custom data fields are in use. There is no space for', 'wp-photo-album-plus') . ' ' . $captions[$captidx] );
 											fclose( $handle );
 											return;
 										}
@@ -2248,7 +2319,7 @@ global $wppa_supported_audio_extensions;
 										// Add a new caption
 										$i = '0';
 										while ( $cust_labels[$i] ) $i++;
-										$cust_labels[$i] = $captions[$key];
+										$cust_labels[$i] = $captions[$captidx];
 										wppa_update_option( 'wppa_custom_caption_' . $i, $cust_labels[$i] );
 										wppa_update_option( 'wppa_custom_visible_' . $i, 'yes' );
 										wppa_log( 'dbg', sprintf( __( 'New caption %s added.', 'wp-photo-album-plus'), $cust_labels[$i] ) );
@@ -2256,15 +2327,26 @@ global $wppa_supported_audio_extensions;
 								}
 
 								// Find the correlation between caption index and custom data index.
-								$pointers = array();
-								for ( $i = '1'; $i < count( $captions ); $i++ ) {
-									for ( $j = '0'; $j < '10'; $j++ ) {
-										if ( $captions[$i] == $cust_labels[$j] ) {
-											$pointers[$j] = $i;
+								// $custptrs is an array of custom data field numbers
+								$custptrs = array();
+								for ( $captidx = '1'; $captidx < count( $captions ); $captidx++ ) {
+									if ( ! in_array( $captions[$captidx], $syst_lables ) ) {
+										for ( $custidx = '0'; $custidx < '10'; $custidx++ ) {
+											if ( $captions[$captidx] == $cust_labels[$custidx] ) {
+												$custptrs[$custidx] = $captidx;
+											}
 										}
 									}
 								}
 
+								// Find the correlation betwwn caption index and system data field names.
+								// $systptrs is an array of system data field names. Key is data filed number, value is system field name
+								$systptrs = array();
+								for ( $captidx = '1'; $captidx < count( $captions ); $captidx++ ) {
+									if ( in_array( $captions[$captidx], $syst_lables ) ) {
+										$systptrs[$captidx] = $captions[$captidx];
+									}
+								}
 
 								// Now process the lines
 								while ( ! feof( $handle ) ) {
@@ -2292,10 +2374,116 @@ global $wppa_supported_audio_extensions;
 										if ( $photos ) {
 											foreach( $photos as $photo ) {
 												$cust_data = $photo['custom'] ? unserialize( $photo['custom'] ) : array( '', '', '', '', '', '', '', '', '', '' );
-												foreach( array_keys( $pointers ) as $p ) {
-													$cust_data[$p] = wppa_sanitize_custom_field( $data_arr[$pointers[$p]] );
+
+												// Update custom fields
+												foreach( array_keys( $custptrs ) as $idx ) {
+													$cust_data[$idx] = wppa_sanitize_custom_field( $data_arr[$custptrs[$idx]] );
 												}
 												wppa_update_photo( array( 'id' => $photo['id'], 'custom' => serialize( $cust_data ) ) );
+
+												// Update system fields
+												foreach( array_keys( $systptrs ) as $idx ) {
+													$field = $systptrs[$idx];
+													$value = stripslashes( $data_arr[$idx] );
+													if ( ! seems_utf8( $value ) ) {
+														$value = utf8_encode( $value );
+													}
+													if ( $value ) {
+														switch ( $field ) {
+															case 'album':
+																if ( wppa_is_int( $value ) && wppa_album_exists( $value ) ) {
+																	wppa_update_photo( array( 'id' => $photo['id'], $p => $value ) );
+																}
+																else {
+																	wppa_wrong_value( $value, $field, __('Album does not exist', 'wp-photo-album-plus') );
+																}
+																break;
+															case 'name':
+																$value = sanitize_text_field( $value );
+																wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																break;
+															case 'description':
+																wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																break;
+															case 'linkurl':
+																$url = esc_url_raw( $value );
+																if ( $url ) {
+																	$value = $url;
+																	wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																}
+																else {
+																	wppa_wrong_value( $value, $field );
+																}
+																break;
+															case 'linktitle':
+																$value = sanitize_text_field( $value );
+																wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																break;
+															case 'linktarget':
+																if ( $value == '_self' || $value == '_blank' ) {
+																	wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																}
+																else {
+																	wppa_wrong_value( $value, $field );
+																}
+																break;
+															case 'owner':
+																$value = sanitize_user( $value );
+																wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																break;
+															case 'timestamp':
+															case 'modified':
+																if ( wppa_is_int( $value ) ) {
+																	if ( $value > '0' && $value < time() ) {
+																		wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																	}
+																	else {
+																		wppa_wrong_value( $value, $field, __( 'Timestamp out of range', 'wp-photo-album-plus' ) );
+																	}
+																}
+																else {
+																	wppa_wrong_value( $value, $field );
+																}
+																break;
+															case 'status':
+																if ( in_array( $value, array( 'pending', 'publish', 'featured', 'gold', 'silver', 'bronze', 'scheduled', 'private' ) ) ) {
+																	wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																}
+																else {
+																	wppa_wrong_value( $value, $field );
+																}
+																break;
+															case 'tags':
+																$value = wppa_sanitize_tags( $value );
+																wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																break;
+															case 'alt':
+																$value = sanitize_text_field( $value );
+																wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																break;
+															case 'location':
+																break;
+															case 'p_order':
+															case 'views':
+															case 'clicks':
+																If ( wppa_is_int( $value ) && $value > 0 ) {
+																	wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																}
+																else {
+																	wppa_wrong_value( $value, $field );
+																}
+																break;
+															case 'exifdtm':
+																if ( wppa_is_exif_date( $value ) ) {
+																	wppa_update_photo( array( 'id' => $photo['id'], $field => $value ) );
+																}
+																else {
+																	wppa_wrong_value( $value, $field );
+																}
+																break;
+														}
+													}
+												}
 												$photos_processed_csv ++;
 											}
 											wppa_log( 'dbg', 'Processed: ' . $data_arr[0] );
@@ -2381,6 +2569,15 @@ global $wppa_supported_audio_extensions;
 		wppa_ok_message( $msg );
 		wppa_set_last_album( $album );
 	}
+}
+
+function wppa_wrong_value( $value, $field, $extra = '' ) {
+	$message = sprintf( __( 'Value %s is not valid for %s.', 'wp-photo-album-plus' ), $value, $field );
+	if ( $extra ) {
+		$message .= '<br />' . $extra;
+	}
+	$message .= '<br />' . __( 'This value is ignored.', 'wp-photo-album-plus' );
+	wppa_error_message( $message );
 }
 
 function wppa_get_zipcount( $files ) {

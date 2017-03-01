@@ -3,7 +3,7 @@ Contributors: WPGMaps, NickDuncan, CodeCabin_, Jarryd Long, DylanAuty
 Donate link: http://www.wpgmaps.com
 Tags: google maps, maps, map, map markers, google map, google maps plugin, wp google maps, wp google map, map plugin, directions, google map plugin, map widget
 Requires at least: 3.5
-Tested up to: 4.6.1
+Tested up to: 4.7
 Stable tag: trunk
 License: GPLv2
 
@@ -213,6 +213,11 @@ We no longer support timthumb and we have opted to remove it from WP Google Maps
 Please upgrade your version of WP Google Maps to version 6.0.27 as it includes multiple security improvements.
 
 == Changelog ==
+
+= 6.4.03 - 2017-02-17 - Low priority =
+* Added the ability for affiliates to make use of their affiliate IDs in the pro links
+* Added better SSL support
+* Added shortcode support for XML marker files
 
 = 6.4.02 - 2017-01-20 - Low priority =
 * Removed an echo that was incorrectly placed

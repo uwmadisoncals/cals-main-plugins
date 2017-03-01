@@ -10,7 +10,7 @@
  */
 
 
-if( !class_exists( 'Editor_addon_generic' ) )
+if( !class_exists( 'Editor_addon_generic', false ) )
 {
 
     define( 'EDITOR_ADDON_ABSPATH', dirname( __FILE__ ) );
@@ -57,7 +57,7 @@ if( !class_exists( 'Editor_addon_generic' ) )
 	        ) {
 	            wp_enqueue_style( 'editor_addon_menu' );
 	            wp_enqueue_style( 'editor_addon_menu_scroll' );
-                    wp_enqueue_style( 'toolset-dialogs-overrides-css' );
+                wp_enqueue_style( 'toolset-dialogs-overrides-css' );
 	        }
 	    }
 	}

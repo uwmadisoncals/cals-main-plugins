@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.6.10
+* Version 6.6.15
 *
 */
 
@@ -660,12 +660,13 @@ function wppa_add_page_specific_urls() {
 	$result = '
 <!-- WPPA+ BEGIN Page specific urls and device specific data -->
 <script type="text/javascript">
-	wppaImageDirectory = "'.wppa_get_imgdir().'";
-	wppaWppaUrl = "'.wppa_get_wppa_url().'";
-	wppaIncludeUrl = "'.trim( includes_url(), '/' ).'";
-	wppaAjaxUrl = "'.( wppa_switch( 'ajax_non_admin' ) ? wppa_url( 'wppa-ajax-front.php' ) : admin_url( 'admin-ajax.php' ) ).'";
-	wppaUploadUrl = "'.WPPA_UPLOAD_URL.'";
-	wppaIsIe = '.( wppa_is_ie() ? 'true' : 'false' ).';
+	wppaImageDirectory = "' . wppa_get_imgdir() . '";
+	wppaWppaUrl = "' . wppa_get_wppa_url() . '";
+	wppaIncludeUrl = "' . trim( includes_url(), '/' ) . '";
+	wppaAjaxUrl = "' . ( wppa_switch( 'ajax_non_admin' ) ? wppa_url( 'wppa-ajax-front.php' ) : admin_url( 'admin-ajax.php' ) ) . '";
+	wppaUploadUrl = "' . WPPA_UPLOAD_URL . '";
+	wppaIsIe = ' . ( wppa_is_ie() ? 'true' : 'false' ) . ';
+	wppaIsSafari = ' . ( wppa_is_safari() ? 'true' : 'false' ) . ';
 	wppaSlideshowNavigationType = "' . wppa_get_navigation_type() . '";
 </script>
 <!-- WPPA+ END Page specific urls -->';

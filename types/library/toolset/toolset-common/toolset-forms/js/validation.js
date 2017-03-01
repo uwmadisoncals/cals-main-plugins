@@ -9,8 +9,6 @@
  *
  *
  */
-//var wptValidationData = {};
-
 var wptValidationForms = [];
 var wptValidationDebug = false;
 var wptValidation = (function ($) {
@@ -57,10 +55,10 @@ var wptValidation = (function ($) {
                 case 'input':
                     if (jQuery(element).hasClass("wpt-form-radio")) {
                         var val = jQuery('input[name="' + _name + '"]:checked').val();
-                        
-                        if (wptValidationDebug)                                                    
+
+                        if (wptValidationDebug)
                             console.log("radio " + (typeof val != 'undefined' && val && $.trim(val).length > 0));
-                        
+
                         return typeof val != 'undefined' && val && $.trim(val).length > 0;
                     }
 
@@ -72,10 +70,10 @@ var wptValidation = (function ($) {
                                     jQuery(element[0]).attr('data-wpt-type') == 'image'
                                     )) {
                         var val = jQuery(element[0]).val();
-                        
+
                         if (wptValidationDebug)
                             console.log("hidden " + (val && $.trim(val).length > 0));
-                        
+
                         return val && $.trim(val).length > 0;
                     }
 
@@ -179,14 +177,14 @@ var wptValidation = (function ($) {
 
         // On some pages the form may not be ready yet at this point (e.g. Edit Term page).
         jQuery(document).ready(function () {
-            //var formclone = $form.clone();
             if (wptValidationDebug)
                 console.log($form.selector);
 
             jQuery(document).off('submit', $form.selector, null);
             jQuery(document).on('submit', $form.selector, function () {
-                if (wptValidationDebug)
+                if (wptValidationDebug) {
                     console.log("submit " + $form.selector);
+                }
 
                 var myformid = formID.replace('#', '');
                 myformid = myformid.replace('-', '_');
@@ -194,15 +192,7 @@ var wptValidation = (function ($) {
 
                 if (typeof grecaptcha !== 'undefined') {
                     var $error_selector = jQuery(formID).find('div.recaptcha_error');
-                    if (_recaptcha_id == -1) {
-                        if (grecaptcha.getResponse() == '') {
-                            $error_selector.show();
-                            setTimeout(function () {
-                                $error_selector.hide();
-                            }, 5000);
-                            return false;
-                        }
-                    } else {
+                    if (_recaptcha_id != -1) {
                         if (grecaptcha.getResponse(_recaptcha_id) == '') {
                             $error_selector.show();
                             setTimeout(function () {
@@ -214,8 +204,9 @@ var wptValidation = (function ($) {
                     $error_selector.hide();
                 }
 
-                if (wptValidationDebug)
+                if (wptValidationDebug) {
                     console.log("validation...");
+                }
 
                 if ($form.valid()) {
                     if (wptValidationDebug)
@@ -241,42 +232,38 @@ var wptValidation = (function ($) {
                             success: function (data) {
                                 $body.removeClass("wpt-loading");
                                 if (data) {
-                                    //console.log(data);
                                     $(formID).replaceWith(data.output);
                                     reload_tinyMCE(formID);
 
                                     if (data.formtype == 'new') {
-                                        if (data.result == 'ok') {
-//                                            $(':input', formID)
-//                                                    .not(':button, :submit, :reset, :hidden')
-//                                                    .val('')
-//                                                    .removeAttr('checked')
-//                                                    .removeAttr('selected');
-
-                                        }
+//                                        if (data.result == 'ok') {                                        
+//                                        }
 
                                         if (data.result != 'redirect') {
-                                            check_current_cred_post_id();
+                                            credFrontEndViewModel.updateFormsPostID();
                                         }
                                     }
 
                                     if (data.result == 'ok') {
                                         alert(cred_settings.operation_ok);
-                                    } else {
-                                        if (data.result != 'redirect')
-                                            alert(cred_settings.operation_ko);
                                     }
+
                                     try_to_reload_reCAPTCHA(formID);
                                 }
+                            },
+                            error: function(xhr, ajaxOptions, thrownError) {
+                                alert(cred_settings.operation_ko);
                             }
                         });
                     }
                 } else {
-                    if (wptValidationDebug)
+                    if (wptValidationDebug) {
                         console.log("form not valid!");
+                    }
                 }
-                if (cred_settings.use_ajax && cred_settings.use_ajax == 1)
+                if (cred_settings.use_ajax && cred_settings.use_ajax == 1) {
                     return false;
+                }
             });
         });
     }
@@ -294,7 +281,8 @@ var wptValidation = (function ($) {
             var $area = jQuery(this),
                     area_id = $area.prop('id');
             if (typeof area_id !== 'undefined') {
-                tinyMCE.remove();
+                if (typeof tinyMCE !== 'undefined')
+                    tinyMCE.remove();
                 tinyMCE.init(tinyMCEPreInit.mceInit[area_id]);
                 var quick = quicktags(tinyMCEPreInit.qtInit[area_id]);
                 Toolset.add_qt_editor_buttons(quick, area_id);
@@ -305,7 +293,8 @@ var wptValidation = (function ($) {
             var $area = jQuery('textarea[name="post_content"]'),
                     area_id = $area.prop('id');
             if (typeof area_id !== 'undefined') {
-                tinyMCE.remove();
+                if (typeof tinyMCE !== 'undefined')
+                    tinyMCE.remove();
                 tinyMCE.init(tinyMCEPreInit.mceInit[area_id]);
                 var quick = quicktags(tinyMCEPreInit.qtInit[area_id]);
                 Toolset.add_qt_editor_buttons(quick, area_id);

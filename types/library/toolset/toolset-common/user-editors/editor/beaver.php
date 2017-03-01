@@ -26,7 +26,7 @@ class Toolset_User_Editors_Editor_Beaver
 
 	public function run() {
 		// register medium slug
-		add_filter( 'fl_builder_post_types', array( $this, '_filterSupportMedium' ) );
+		add_filter( 'fl_builder_post_types', array( $this, 'support_medium' ) );
 	}
 
 	/**
@@ -36,7 +36,7 @@ class Toolset_User_Editors_Editor_Beaver
 	 * @param $allowed_types
 	 * @return array
 	 */
-	public function _filterSupportMedium( $allowed_types ) {
+	public function support_medium( $allowed_types ) {
 		if( ! is_array( $allowed_types ) )
 			return array( $this->medium->getSlug() );
 

@@ -2,23 +2,18 @@
 $medium_allowed_frontend_templates = $this->medium->getFrontendTemplates();
 ?>
 
-<div id="anchor-usage-section" class="toolset-user-editors-beaver-backend">
-	<h3><?php echo sprintf( __( '%1$s is active.', 'wpv-views' ), $this->editor->getName() ); ?></h3>
+<div id="anchor-usage-section" class="toolset-user-editors-beaver-backend js-toolset-user-editors-beaver-backend">
 
+	<h3><?php echo sprintf( __( '%1$s frontend editor', 'wpv-views' ), $this->editor->getName() ); ?></h3>
 	<?php
 	/*
 	 * NO allowed frontend template
 	 * happens e.g. for Content Templates when no item under 'Usage' is selected
 	 */
-	if( empty( $medium_allowed_frontend_templates ) ): ?>
+	if( empty( $medium_allowed_frontend_templates ) ) { ?>
 
 		<p>
-			<?php
-				echo sprintf( 
-					__( 'Before you can edit with %1$s, you need to <a href="#anchor-usage-section">choose what type this Content Template will display</a>.', 'wpv-views' ),
-					$this->editor->getName()
-				);
-			?>
+			<?php _e( 'Usage of this Content Template is not specified, so the editor will not preview any specific post.', 'wpv-views' ); ?>
 		</p>
 
 	<?php
@@ -27,33 +22,36 @@ $medium_allowed_frontend_templates = $this->medium->getFrontendTemplates();
 	 * in this case we don't create a selection
 	 * and place the single template in a hidden input
 	 */
-	elseif( count( $medium_allowed_frontend_templates ) == 1 ):
+	} elseif( count( $medium_allowed_frontend_templates ) == 1 ) {
 		$template = array_pop( $medium_allowed_frontend_templates ); ?>
+		
+		<p>
+			<?php
+				echo sprintf(
+					__( 'This Content Template is used in %1$s, '
+					. 'so you will be able to preview one of them.', 'wpv-views' ),
+					'<strong>' . $template['form-option-label'] . '</strong>'
+				);
+			?>
+		</p>
 
 		<input id="toolset-beaver-builder-single-template"
 		       type="hidden" value="<?php echo $template['path']; ?>"
 		       data-preview-domain="<?php echo $template['domain']; ?>"
 		       data-preview-slug="<?php echo $template['slug']; ?>" />
 
-		<div class="toolset-user-editors-beaver-spinner">
-			<img src="<?php echo site_url(); ?>/wp-admin/images/spinner.gif" />
-		</div>
-
-		<?php // Button "Start Beaver Frontend Editor"
-		FLBuilderAdminPosts::render(); ?>
-
 	<?php
 	/*
 	 * MULTIPLE allowed frontend templates
 	 * user gets an select of all available templates
 	 */
-	else:
+	} else {
 		$stored_template_path = get_post_meta( $this->medium->getId(), $this->editor->getOptionName(), true ); ?>
 
 		<p>
 			<?php
-				_e( 'This Content Template is used for several types. '
-				. 'Choose which type you want to see in the editor:', 'wpv-views' );
+				_e( 'This Content Template has several usages. '
+				. 'Choose the one you want to see in the frontend editor:', 'wpv-views' );
 			?>
 		</p>
 
@@ -74,13 +72,11 @@ $medium_allowed_frontend_templates = $this->medium->getFrontendTemplates();
 			</select>
 		</p>
 
-		<div class="toolset-user-editors-beaver-spinner">
-			<img src="<?php echo site_url(); ?>/wp-admin/images/spinner.gif" />
-		</div>
+		<?php
 
-		<?php // Button "Start Beaver Frontend Editor"
-		FLBuilderAdminPosts::render();
-
-	endif; ?>
+	} ?>
+	
+	<?php // Button "Start Beaver Frontend Editor"
+	FLBuilderAdminPosts::render(); ?>
 
 </div>

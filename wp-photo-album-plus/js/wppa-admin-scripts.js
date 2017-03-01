@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.6.12
+/* Version 6.6.15
 /* Various js routines used in admin pages
 */
 
@@ -169,12 +169,13 @@ function wppaInitSettings() {
 	wppaCheckFontPreview();
 	wppaCheckCheck( 'enable_video', 'wppa-video' );
 	wppaCheckCheck( 'custom_fields', 'custfields' );
+	wppaCheckCheck( 'album_custom_fields', 'albumcustfields' );
 	wppaCheckCheck( 'new_mod_label_is_text', 'nmtxt' );
 	wppaCheckCheck( 'coverphoto_responsive', 'cvpr' );
 	wppaCheckSmWidgetLink();
 
 	var tab = new Array('O','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII');
-	var sub = new Array('A','B','C','D','E','F','G','H','I','J','K');
+	var sub = new Array('A','B','C','D','E','F','G','H','I','J','K','L');
 
 	for (table=1; table<13; table++) {
 		var cookie = wppa_getCookie('table_'+table);
@@ -184,7 +185,7 @@ function wppaInitSettings() {
 		else {
 			wppaHideTable(table);	// Refreshes cookie, so it 'never' forgets
 		}
-		for (subtab=0; subtab<11; subtab++) {
+		for (subtab=0; subtab<12; subtab++) {
 			cookie = wppa_getCookie('table_'+tab[table-1]+'-'+sub[subtab]);
 			if (cookie == 'on') {
 				wppaToggleSubTable(tab[table-1],sub[subtab]);
@@ -1306,10 +1307,12 @@ function _wppaAjaxUpdatePhoto( photo, actionslug, value, refresh, bef, aft ) {
 										i++;
 									}
 
-									// Update matrix
-									wppaPhotoUpdateMatrix[index][2] = ( value ? value : 0 );
-									wppaPhotoUpdateMatrix[index][4] = false;	// no more busy
-									wppaPhotoUpdateMatrix[index][5] = false;	// reset refresh
+									// Update matrix if not from bulk edit
+									if ( wppaPhotoUpdateMatrix[index] ) {
+										wppaPhotoUpdateMatrix[index][2] = ( value ? value : 0 );
+										wppaPhotoUpdateMatrix[index][4] = false;	// no more busy
+										wppaPhotoUpdateMatrix[index][5] = false;	// reset refresh
+									}
 
 									// Front-end button
 									wppaFeAjaxLog('out');

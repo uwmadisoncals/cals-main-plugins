@@ -8,7 +8,7 @@
 /*
 /* You may always look into a newer version of this file to see what new classes and id's come with an upgrade
 /*
-/* This is version 6.6.12
+/* This is version 6.6.15
 */
 
 .wppa-container, .wppa-cover-box, .wppa-thumb-area {
@@ -121,7 +121,7 @@
 
 /* Wrapper for thumbnail area */
 .wppa-thumb-area {
-/*	padding: 7px 0 7px 7px; experimental */
+	padding-right: 0px !important; /* experimental */
 	position: relative;
 	clear: both;
 }
@@ -476,3 +476,4 @@ display:none;
 .wppa-minicover {
 	box-sizing:content-box !important;
 }
+

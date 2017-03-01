@@ -3,7 +3,7 @@
 Plugin Name: WP Google Maps
 Plugin URI: https://www.wpgmaps.com
 Description: The easiest to use Google Maps plugin! Create custom Google Maps with high quality markers containing locations, descriptions, images and links. Add your customized map to your WordPress posts and/or pages quickly and easily with the supplied shortcode. No fuss.
-Version: 6.4.02
+Version: 6.4.03
 Author: WP Google Maps
 Author URI: https://www.wpgmaps.com
 Text Domain: wp-google-maps
@@ -11,6 +11,12 @@ Domain Path: /languages
 */
 
 /* 
+ * 
+ * 6.4.03 - 2017-02-17 - Low priority
+ * Added the ability for affiliates to make use of their affiliate IDs in the pro links
+ * Added better SSL support
+ * Added shortcode support for XML marker files
+ * 
  * 6.4.02 - 2017-01-20 - Low priority
  * Removed an echo that was incorrectly placed
  * 
@@ -275,6 +281,7 @@ Domain Path: /languages
  */
 
 
+
 global $wpgmza_version;
 global $wpgmza_p_version;
 global $wpgmza_t;
@@ -311,7 +318,7 @@ $wpgmza_tblname_poly = $wpdb->prefix . "wpgmza_polygon";
 $wpgmza_tblname_polylines = $wpdb->prefix . "wpgmza_polylines";
 $wpgmza_tblname_categories = $wpdb->prefix. "wpgmza_categories";
 $wpgmza_tblname_category_maps = $wpdb->prefix. "wpgmza_category_maps";
-$wpgmza_version = "6.4.02";
+$wpgmza_version = "6.4.03";
 $wpgmza_p_version = "6.11";
 $wpgmza_t = "basic";
 define("WPGMAPS", $wpgmza_version);
@@ -634,7 +641,7 @@ function wpgmza_plugin_action_links( $links ) {
     array_unshift( $links,
         '<a class="edit" href="' . admin_url('admin.php?page=wp-google-maps-menu-settings') . '">' . __( 'Settings', 'wp-google-maps' ) . '</a>' );
     array_unshift( $links,
-        '<a class="" target="_BLANK" href="https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=plugin_link_upgrade">' . __( 'Get Pro Version', 'wp-google-maps' ) . '</a>' );
+        '<a class="" target="_BLANK" href="'.wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=plugin_link_upgrade").'">' . __( 'Get Pro Version', 'wp-google-maps' ) . '</a>' );
 
 
     return $links;
@@ -1804,7 +1811,7 @@ function wpgmaps_update_xml_file($mapid = false) {
         
         $id = $result->id;
         $address = stripslashes($result->address);
-        $description = stripslashes($result->description);
+        $description = do_shortcode(stripslashes($result->description));
         $pic = $result->pic;
         if (!$pic) { $pic = ""; }
         $icon = $result->icon;
@@ -3902,7 +3909,7 @@ function wpgmaps_settings_page_basic() {
             $ret .= "        <h3>".__("Marker Listing Settings","wp-google-maps")."</h3>";
             $ret .= "       <p>".__("Changing these settings will alter the way the marker list appears on your website.","wp-google-maps")."</p>";
             $ret .= "                 <div class=\"update-nag update-att\">";
-            $ret .= "                             <i class=\"fa fa-arrow-circle-right\"> </i> <a target='_blank' href=\"http://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=mlisting_settings\">Add Beautiful Marker Listings</a> to your maps with the Pro version for only $39.99 once off. Support and updates included forever.";
+            $ret .= "                             <i class=\"fa fa-arrow-circle-right\"> </i> <a target='_blank' href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=mlisting_settings")."\">Add Beautiful Marker Listings</a> to your maps with the Pro version for only $39.99 once off. Support and updates included forever.";
             $ret .= "                 </div>";
             $ret .= "       <hr />";
             
@@ -4114,7 +4121,7 @@ function wpgmza_map_page() {
     else {
         wpgmza_stats("list_maps_basic");
         echo"<div class=\"wrap\"><div id=\"icon-edit\" class=\"icon32 icon32-posts-post\"><br></div><h2>".__("My Maps","wp-google-maps")."</h2>";
-        echo"<p class='wpgmza_upgrade_nag'><i><a href='http://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=mappage_1' target=\"_BLANK\" title='".__("Pro Version","wp-google-maps")."'>".__("Create unlimited maps","wp-google-maps")."</a> ".__("with the","wp-google-maps")." <a href='http://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=mappage_2' title='Pro Version'  target=\"_BLANK\">".__("Pro Version","wp-google-maps")."</a> ".__("of WP Google Maps for only","wp-google-maps")." <strong>$39.99!</strong></i></p>";
+        echo"<p class='wpgmza_upgrade_nag'><i><a href='".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=mappage_1")."' target=\"_BLANK\" title='".__("Pro Version","wp-google-maps")."'>".__("Create unlimited maps","wp-google-maps")."</a> ".__("with the","wp-google-maps")." <a href='".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=mappage_2")."' title='Pro Version'  target=\"_BLANK\">".__("Pro Version","wp-google-maps")."</a> ".__("of WP Google Maps for only","wp-google-maps")." <strong>$39.99!</strong></i></p>";
 
         $my_theme = wp_get_theme();
 
@@ -4352,8 +4359,8 @@ function wpgmza_basic_menu() {
         }
 
         $wpgmza_act = "disabled readonly";
-        $wpgmza_act_msg = "<div class=\"update-nag update-att\" style=\"padding:5px; \">".__("Add custom icons, titles, descriptions, pictures and links to your markers with the","wp-google-maps")." \"<a href=\"http://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=below_marker\" title=\"".__("Pro Edition","wp-google-maps")."\" target=\"_BLANK\">".__("Pro Edition","wp-google-maps")."</a>\" ".__("of this plugin for just","wp-google-maps")." <strong>$39.99</strong></div>";
-        $wpgmza_csv = "<p><a href=\"http://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=csv_link\" target=\"_BLANK\" title=\"".__("Pro Edition","wp-google-maps")."\">".__("Purchase the Pro Edition","wp-google-maps")."</a> ".__("of WP Google Maps and save your markers to a CSV file!","wp-google-maps")."</p>";
+        $wpgmza_act_msg = "<div class=\"update-nag update-att\" style=\"padding:5px; \">".__("Add custom icons, titles, descriptions, pictures and links to your markers with the","wp-google-maps")." \"<a href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=below_marker")."\" title=\"".__("Pro Edition","wp-google-maps")."\" target=\"_BLANK\">".__("Pro Edition","wp-google-maps")."</a>\" ".__("of this plugin for just","wp-google-maps")." <strong>$39.99</strong></div>";
+        $wpgmza_csv = "<p><a href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=csv_link")."\" target=\"_BLANK\" title=\"".__("Pro Edition","wp-google-maps")."\">".__("Purchase the Pro Edition","wp-google-maps")."</a> ".__("of WP Google Maps and save your markers to a CSV file!","wp-google-maps")."</p>";
     }
     
 
@@ -4567,7 +4574,7 @@ function wpgmza_basic_menu() {
                         <div id=\"tabs-2\">
                             <div class=\"update-nag update-att\">
                                 
-                                        <i class=\"fa fa-arrow-circle-right\"> </i> <a target='_BLANK' href=\"http://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=directions\">Enable directions</a> with the Pro version for only $39.99 once off. Support and updates included forever.
+                                        <i class=\"fa fa-arrow-circle-right\"> </i> <a target='_BLANK' href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=directions")."\">Enable directions</a> with the Pro version for only $39.99 once off. Support and updates included forever.
 
                             </div>
                                         
@@ -4741,7 +4748,7 @@ function wpgmza_basic_menu() {
 
                             <div class=\"update-nag update-att\">
                                 
-                                        <i class=\"fa fa-arrow-circle-right\"> </i> ".__("Get the rest of these advanced features with the Pro version for only <a href=\"http://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=advanced\">$39.99 once off</a>. Support and updates included forever.","wp-google-maps")."
+                                        <i class=\"fa fa-arrow-circle-right\"> </i> ".__("Get the rest of these advanced features with the Pro version for only <a href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=advanced")."\" target=\"_BLANK\">$39.99 once off</a>. Support and updates included forever.","wp-google-maps")."
                                     
                             </div>
 
@@ -4787,7 +4794,7 @@ function wpgmza_basic_menu() {
                         <div id=\"tabs-5\" style=\"font-family:sans-serif;\">
                             <div class=\"update-nag update-att\">
                                 
-                                        <i class=\"fa fa-arrow-circle-right\"> </i> ".__("Enable Marker Listing with the <a href=\"http://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=marker_listing\">Pro version for only $39.99 once off</a>. Support and updates included forever.","wp-google-maps")."
+                                        <i class=\"fa fa-arrow-circle-right\"> </i> ".__("Enable Marker Listing with the <a href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=marker_listing")."\" target=\"_BLANK\">Pro version for only $39.99 once off</a>. Support and updates included forever.","wp-google-maps")."
                                     
                             </div>
                             <br>
@@ -4987,9 +4994,9 @@ function wpgmza_basic_menu() {
                                 </div>              
                                 
                                 <br /><p>Get all of this and more for only $39.99 once off</p>                                
-                                <br /><a href=\"http://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=upgradenow\" target=\"_BLANK\" title=\"Upgrade now for only $39.99 once off\" class=\"button-primary\" style=\"font-size:20px; display:block; width:220px; text-align:center; height:42px; line-height:41px;\">Upgrade Now</a>
+                                <br /><a href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=upgradenow")."\" target=\"_BLANK\" title=\"Upgrade now for only $39.99 once off\" class=\"button-primary\" style=\"font-size:20px; display:block; width:220px; text-align:center; height:42px; line-height:41px;\">Upgrade Now</a>
                                 <br /><br />
-                                <a href=\"http://www.wpgmaps.com/demo/\" target=\"_BLANK\">View the demos</a>.<br /><br />
+                                <a href=\"".wpgm_pro_link("https://www.wpgmaps.com/demo/")."\" target=\"_BLANK\">View the demos</a>.<br /><br />
                                 Have a sales question? Contact either Nick or Jarryd on <a href=\"mailto:nick@wpgmaps.com\">nick@wpgmaps.com</a> or use our <a href=\"http://www.wpgmaps.com/contact-us/\" target=\"_BLANK\">contact form</a>. <br /><br />
                                 Need help? <a href=\"http://www.wpgmaps.com/forums/forum/support-forum/\" target=\"_BLANK\">Ask a question on our support forum</a>.       
                                 
@@ -5078,7 +5085,7 @@ function wpgmza_basic_menu() {
                                     <div id=\"tabs-m-2\">
                                         <h2 style=\"padding-top:0; margin-top:0;\">".__("Advanced markers","wp-google-maps")."</h2>
                                         <div class=\"update-nag update-att\">
-                                                    <i class=\"fa fa-arrow-circle-right\"> </i> <a target=\"_BLANK\" href=\"http://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=advanced_markers\">".__("Add advanced markers","wp-google-maps")."</a> ".__("with the Pro version","wp-google-maps")."
+                                                    <i class=\"fa fa-arrow-circle-right\"> </i> <a target=\"_BLANK\" href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=advanced_markers")."\">".__("Add advanced markers","wp-google-maps")."</a> ".__("with the Pro version","wp-google-maps")."
                                         </div><br>
                                         <table>
                                         <tr>
@@ -5152,7 +5159,7 @@ function wpgmza_basic_menu() {
                                     </div>
                                     <div id=\"tabs-m-5\">
                                         <h2 style=\"padding-top:0; margin-top:0;\"> ".__("Heatmaps","wp-google-maps")."</h2>
-                                        <a target=\"_BLANK\" href=\"http://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=heatmaps\">".__("Add dynamic heatmap data","wp-google-maps")."</a> ".__("with the Pro version.","wp-google-maps")."
+                                        <a target=\"_BLANK\" href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=heatmaps")."\">".__("Add dynamic heatmap data","wp-google-maps")."</a> ".__("with the Pro version.","wp-google-maps")."
                                         <a target=\"_BLANK\" href=\"https://www.wpgmaps.com/demo/heatmaps-demo/?utm_source=plugin&utm_medium=link&utm_campaign=heatmap_demo\">".__("View a demo.","wp-google-maps")."</a>
                                     </div>
                                 </div>
@@ -5190,15 +5197,15 @@ function wpgmza_basic_menu() {
                             <table style='clear:both;'>
                                 <tr>
                                     <td><img src=\"".wpgmaps_get_plugin_url()."images/custom_markers.jpg\" width=\"260\" class='wpgmza-promo' title=\"".__("Add detailed information to your markers!")."\" alt=\"".__("Add custom markers to your map!","wp-google-maps")."\" /><br /><br /></td>
-                                    <td valign=\"middle\"><span style=\"font-size:18px; color:#666; margin-left: 15px;\">".__("Add detailed information to your markers for only","wp-google-maps")." <strong>$39.99</strong>. ".__("Click","wp-google-maps")." <a href=\"https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=image1\" title=\"Pro Edition\" target=\"_BLANK\">".__("here","wp-google-maps")."</a></span></td>
+                                    <td valign=\"middle\"><span style=\"font-size:18px; color:#666; margin-left: 15px;\">".__("Add detailed information to your markers for only","wp-google-maps")." <strong>$39.99</strong>. ".__("Click","wp-google-maps")." <a href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=image1")."\" title=\"Pro Edition\" target=\"_BLANK\">".__("here","wp-google-maps")."</a></span></td>
                                 </tr>
                                 <tr>
                                     <td><img src=\"".wpgmaps_get_plugin_url()."images/custom_marker_icons.jpg\" width=\"260\" class='wpgmza-promo' title=\"".__("Add custom markers to your map!","wp-google-maps")."\" alt=\"".__("Add custom markers to your map!","wp-google-maps")."\" /><br /><br /></td>
-                                    <td valign=\"middle\"><span style=\"font-size:18px; color:#666; margin-left: 15px;\">".__("Add different marker icons, or your own icons to make your map really stand out!","wp-google-maps")." ".__("Click","wp-google-maps")." <a href=\"https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=image3\" title=\"".__("Pro Edition","wp-google-maps")."\" target=\"_BLANK\">".__("here","wp-google-maps")."</a></span></td>
+                                    <td valign=\"middle\"><span style=\"font-size:18px; color:#666; margin-left: 15px;\">".__("Add different marker icons, or your own icons to make your map really stand out!","wp-google-maps")." ".__("Click","wp-google-maps")." <a href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=image3")."\" title=\"".__("Pro Edition","wp-google-maps")."\" target=\"_BLANK\">".__("here","wp-google-maps")."</a></span></td>
                                 </tr>
                                 <tr>
                                     <td><img src=\"".wpgmaps_get_plugin_url()."images/get_directions.jpg\" width=\"260\" class='wpgmza-promo' title=\"".__("Add custom markers to your map!","wp-google-maps")."\" alt=\"".__("Add custom markers to your map!","wp-google-maps")."\" /><br /><br /></td>
-                                    <td valign=\"middle\"><span style=\"font-size:18px; color:#666; margin-left: 15px;\">".__("Allow your visitors to get directions to your markers!","wp-google-maps")." ".__("Click","wp-google-maps")." <a href=\"https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=image2\" title=\"".__("Pro Edition","wp-google-maps")."\" target=\"_BLANK\">".__("here","wp-google-maps")."</a></span></td>
+                                    <td valign=\"middle\"><span style=\"font-size:18px; color:#666; margin-left: 15px;\">".__("Allow your visitors to get directions to your markers!","wp-google-maps")." ".__("Click","wp-google-maps")." <a href=\"".wpgm_pro_link("https://www.wpgmaps.com/purchase-professional-version/?utm_source=plugin&utm_medium=link&utm_campaign=image2")."\" title=\"".__("Pro Edition","wp-google-maps")."\" target=\"_BLANK\">".__("here","wp-google-maps")."</a></span></td>
                                 </tr>
 
                             </table>
@@ -6382,6 +6389,20 @@ function wpgmza_caching_notice_changes($markers = false, $return = false){
 
     }
 
+}
+
+function wpgm_pro_link($link) {
+    if (defined('wpgm_aff')) {
+        $id = sanitize_text_field(wpgm_aff);
+        if ($id && $id !== "") {
+            return "http://affiliatetracker.io/?aff=".$id."&affuri=".base64_encode($link);    
+        } else {
+            return $link;
+        }
+        
+    } else {
+        return $link;
+    }
 }
 
 function wpgmza_track_usage( $map_id ){

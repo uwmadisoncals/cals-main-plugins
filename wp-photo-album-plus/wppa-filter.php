@@ -480,3 +480,84 @@ function wppa_lightbox_global( $content ) {
 	}
 	return $content;
 }
+
+// Declare the simple photo shortcode handler optionally
+add_action( 'init', 'wppa_add_photo_shortcode' );
+
+function wppa_add_photo_shortcode() {
+	if ( wppa_switch( 'photo_shortcode_enabled' ) ) {
+		add_shortcode( 'photo', 'wppa_photo_shortcodes' );
+	}
+}
+
+function wppa_photo_shortcodes( $xatts ) {
+global $wppa;
+global $wppa_postid;
+
+	// Init
+	wppa_reset_occurrance();
+
+	// Get and validate photo id
+	if ( is_numeric( $xatts[0] ) ) {
+		$photo = $xatts[0];
+		if ( ! wppa_photo_exists( $photo ) ) {
+			return sprintf( __( 'Photo %d does not exist', 'wp-photo-album-plus' ), $photo );
+		}
+	}
+	else {
+		return __( 'Missing photo id', 'wp-photo-album-plus' );
+	}
+
+	// Find occur
+	if ( get_the_ID() != $wppa_postid ) {		// New post
+		$wppa['occur'] = '0';					// Init this occurance
+		$wppa['fullsize'] = '';					// Reset at each post
+		$wppa_postid = get_the_ID();			// Remember the post id
+	}
+
+	// Get configuration settings
+	$type 	= wppa_opt( 'photo_shortcode_type' ); // 'xphoto';
+	$size 	= wppa_opt( 'photo_shortcode_size' ); // '350';
+	$align 	= wppa_opt( 'photo_shortcode_align' ); //'left';
+
+	switch ( $type ) {
+		case 'photo':
+		case 'sphoto':
+			$wppa['single_photo'] 	= $photo;
+			break;
+		case 'mphoto':
+			$wppa['single_photo'] 	= $photo;
+			$wppa['is_mphoto'] 		= '1';
+			break;
+		case 'xphoto':
+			$wppa['single_photo'] 	= $photo;
+			$wppa['is_xphoto'] 		= '1';
+			break;
+		case 'slphoto':
+			$wppa['is_slide'] 		= '1';
+			$wppa['single_photo'] 	= $photo;
+			$wppa['start_photo'] 	= $photo;
+			$wppa['is_single'] 		= '1';
+			break;
+	}
+
+	// Process size
+	if ( $size && is_numeric( $size ) && $size < 1.0 ) {
+		$wppa['auto_colwidth'] 		= true;
+		$wppa['fullsize'] 			= $size;
+	}
+	elseif ( substr( $size, 0, 4 ) == 'auto' ) {
+		$wppa['auto_colwidth'] 		= true;
+		$wppa['fullsize'] 			= '';
+		$wppa['max_width'] 			= substr( $size, 5 );
+	}
+	else {
+		$wppa['auto_colwidth'] 		= false;
+		$wppa['fullsize'] 			= $size;
+	}
+
+	// Find align
+	$wppa['align'] = $align;
+
+	return wppa_albums();
+}

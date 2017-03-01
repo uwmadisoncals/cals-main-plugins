@@ -1,11 +1,28 @@
 # Toolset Common Library
 
+# 2.3
+
+ - Various fixes and adjustments for CRED 1.8.6
+
+## 2.3-Beta3
+
+ - Adds callback methods for wpPointer object onOpen and onClose
+
+## 2.3-Beta2
+
+- Allows user to ask Toolset to load Bootstrap library for them, or alternatively set the Bootstrap version they are using on their own
+
 ## 2.3.0
 
+- layouts-1239: Added Toolset_Admin_Notice_Layouts_Help
 - Extend the post objects relationships management with two actions to gather data on demand.
 - Only include the jQuery datepicker stylesheet on demand when the current page contains a datepicker from Toolset.
 - Include the user editors in the common bootstrap class.
-- Include knockout.js (toolsetcommon-127)
+- toolsetcommon-127: Include knockout.js
+- toolsetcommon-139: Clean up Toolset_Assets_Manager and define constants for asset handles 
+- toolsetcommon-144: Added Toolset_Admin_Notices_Manager
+- toolsetcommon-137: Make the toolset-forms classes autoloaded.
+- toolsetcommon-140: Improve a way to detect the status of WPML.
 
 ## 2.2.10
 

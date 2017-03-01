@@ -17,7 +17,7 @@ class Toolset_User_Editors_Medium_Content_Template
 		if( $this->id && array_key_exists( 'ct_editor_choice', $_REQUEST ) )
 			update_post_meta( $this->id, $this->option_name_editor_choice, sanitize_text_field( $_REQUEST['ct_editor_choice'] ) );
 
-		add_filter( 'toolset_user_editors_backend_html_editor_select', array( $this, '_filterEditorSelection' ) );
+		add_filter( 'toolset_user_editors_backend_html_editor_select', array( $this, 'editor_selection' ) );
 	}
 
 	public function userEditorChoice() {
@@ -46,6 +46,12 @@ class Toolset_User_Editors_Medium_Content_Template
 		return false;
 	}
 
+	/**
+	 * Register the list of allowed theme PHP templates based on the usage of the current Content Template.
+	 *
+	 * @since unknown
+	 * @since 2.3.0 Covers the frontend PHP templates for Content Templates assigned to single pages.
+	 */
 	public function getFrontendTemplates() {
 		
 		if( $this->allowed_templates !== null )
@@ -56,7 +62,7 @@ class Toolset_User_Editors_Medium_Content_Template
 
 		$wpv_options_patterns = array(
 			'views_template_for_'         => array(
-				'label'              => __( 'Single page', 'wpv-views' ),
+				'label'              => __( 'Single', 'wpv-views' ),
 				'domain'             => 'post',
 				'template_hierarchy' => array(
 					'single-%NAME%.php',
@@ -66,7 +72,7 @@ class Toolset_User_Editors_Medium_Content_Template
 				)
 			),
 			'views_template_archive_for_' => array(
-				'label'              => __( 'Post archive', 'wpv-views' ),
+				'label'              => __( 'Posts archive', 'wpv-views' ),
 				'domain'             => 'post',
 				'template_hierarchy' => array(
 					'archive-%NAME%.php',
@@ -118,23 +124,50 @@ class Toolset_User_Editors_Medium_Content_Template
 		$this->allowed_templates = array();
 
 		foreach( $content_template_usages as $usage => $ct_id ) {
-			foreach( $wpv_options_patterns as $pattern => $settings ) {
-				if( strpos( $usage, $pattern ) !== false ) {
-					$type_name   = str_replace( $pattern, '', $usage );
-					$type_object = $settings['domain'] == 'post'
-						? get_post_type_object( $type_name )
-						: get_taxonomy( $type_name );
-
-					foreach( $settings['template_hierarchy'] as $template_file ) {
-						$template_file = str_replace( '%NAME%', $type_object->name, $template_file );
+			if ( 'views_template_for_page' == $usage ) {
+				// Content Templates assigned to single pages demand a speial management,
+				// since they are indeed single posts but with special templates in the 
+				// native WordPress PHP templates hierarchy.
+				// Note that there is no CT for the non-existing pages archive loop at all.
+				$single_page_template_hierarchy = array(
+					'page.php',
+					'singular.php',
+					'index.php'
+				);
+				$single_page_post_type_object = get_post_type_object( 'page' );
+				if ( is_object( $single_page_post_type_object ) ) {
+					foreach( $single_page_template_hierarchy as $template_file ) {
 						if( array_key_exists( $template_file, $theme_template_files ) ) {
 							$this->allowed_templates[] = array(
-								'slug'              => $type_object->name,
-								'domain'            => $settings['domain'],
-								'form-option-label' => $settings['label'] . ' ' . $type_object->labels->name,
+								'slug'              => 'page',
+								'domain'            => 'post',
+								'form-option-label' => $single_page_post_type_object->labels->name . ' [' . __( 'Single', 'wpv-views' ) . ']',
 								'path'              => $theme_template_files[ $template_file ]
 							);
 							break;
+						}
+					}
+				}
+			} else {
+				foreach( $wpv_options_patterns as $pattern => $settings ) {
+					if( strpos( $usage, $pattern ) !== false ) {
+						$type_name   = str_replace( $pattern, '', $usage );
+						$type_object = $settings['domain'] == 'post'
+							? get_post_type_object( $type_name )
+							: get_taxonomy( $type_name );
+						if ( is_object( $type_object ) ) {
+							foreach( $settings['template_hierarchy'] as $template_file ) {
+								$template_file = str_replace( '%NAME%', $type_object->name, $template_file );
+								if( array_key_exists( $template_file, $theme_template_files ) ) {
+									$this->allowed_templates[] = array(
+										'slug'              => $type_object->name,
+										'domain'            => $settings['domain'],
+										'form-option-label' => $type_object->labels->name . ' [' . $settings['label'] . ']',
+										'path'              => $theme_template_files[ $template_file ]
+									);
+									break;
+								}
+							}
 						}
 					}
 				}
@@ -145,24 +178,32 @@ class Toolset_User_Editors_Medium_Content_Template
 		$allowed_paths = wp_list_pluck( $this->allowed_templates, 'path' );
 		$current_template = get_post_meta( (int) $_GET['ct_id'], $this->manager->getActiveEditor()->getOptionName(), true );
 		
-		if ( 
-			isset( $_GET['ct_id'] ) 
-			&& ! empty( $allowed_paths ) 
-			&& (
-				! isset( $current_template['template_path'] ) 
-				|| ! in_array( $current_template['template_path'], $allowed_paths ) 
-			)
-		) {
-			$slide_allowed_template = array_slice( $this->allowed_templates, 0, 1 );
-			$first_allowed_template = array_shift( $slide_allowed_template );
-			$settings_to_store = array(
-				'template_path' => wp_slash( $first_allowed_template['path'] ),
-				'preview_domain' => $first_allowed_template['domain'],
-				'preview_slug' => $first_allowed_template['slug']
-			);
+		if ( isset( $_GET['ct_id'] ) ) {
+			if ( empty( $allowed_paths ) ) {
+				$settings_to_store = array(
+					'template_path' => false,
+					'preview_domain' => 'post',
+					'preview_slug' => ''
+				);
 
-			update_post_meta( (int) $_GET['ct_id'], $this->manager->getActiveEditor()->getOptionName(), $settings_to_store );
-			$stored = get_post_meta( (int) $_GET['ct_id'], $this->manager->getActiveEditor()->getOptionName(), true );
+				update_post_meta( (int) $_GET['ct_id'], $this->manager->getActiveEditor()->getOptionName(), $settings_to_store );
+			} else {
+				if (
+					! isset( $current_template['template_path'] ) 
+					|| ! in_array( $current_template['template_path'], $allowed_paths ) 
+				) {
+					$slide_allowed_template = array_slice( $this->allowed_templates, 0, 1 );
+					$first_allowed_template = array_shift( $slide_allowed_template );
+					$settings_to_store = array(
+						'template_path' => wp_slash( $first_allowed_template['path'] ),
+						'preview_domain' => $first_allowed_template['domain'],
+						'preview_slug' => $first_allowed_template['slug']
+					);
+
+				update_post_meta( (int) $_GET['ct_id'], $this->manager->getActiveEditor()->getOptionName(), $settings_to_store );
+				}
+			}
+		
 		}
 
 		return $this->allowed_templates;
@@ -171,7 +212,7 @@ class Toolset_User_Editors_Medium_Content_Template
 	private function getUsages() {
 		$views_settings	= WPV_Settings::get_instance();
 		$views_options	= $views_settings->get();
-		$views_options	= array_filter( $views_options, array( $this, 'filterTemplatesByTemplateId' ) );
+		$views_options	= array_filter( $views_options, array( $this, 'filter_templates_by_template_id' ) );
 		
 		if ( isset( $_GET['ct_id'] ) ) {
 			
@@ -215,11 +256,11 @@ class Toolset_User_Editors_Medium_Content_Template
 		return $views_options;
 	}
 
-	private function filterTemplatesByTemplateId( $stored_value ) {
+	private function filter_templates_by_template_id( $stored_value ) {
 		if( ! isset( $_GET['ct_id'] ) )
 			return false;
 
-		return( $stored_value == $_GET['ct_id'] );
+		return( (int) $stored_value == (int) $_GET['ct_id'] );
 	}
 
 	/**
@@ -230,30 +271,24 @@ class Toolset_User_Editors_Medium_Content_Template
 	}
 
 
-	public function _filterEditorSelection() {
+	public function editor_selection() {
 		$control_editor_select = '';
 		$editors = $this->manager->getEditors();
 
 		if( count( $editors ) > 1 ) {
 			$admin_url = admin_url( 'admin.php?page=ct-editor&ct_id='. (int) $_GET['ct_id'] );
 
-			$editor_current = '';
 			$editor_switch_buttons = array();
 
 			foreach( $editors as $editor ) {
-				if ( $editor->getId() == $this->manager->getActiveEditor()->getId() ) {
-					if ( 'basic' != $editor->getId() ) {
-						$editor_current = sprintf( __( 'Using %1$s ', 'wpv-views' ), '<strong>' . $editor->getName() . '</strong>' );
-					}
-				} else {
-					$editor_switch_buttons[] = '<a class="button" href="'.$admin_url.'&ct_editor_choice='.$editor->getId().'">'.sprintf( __( 'Design with %1$s', 'wpv-views' ), $editor->getName() ).'</a>';
+				if ( $editor->getId() != $this->manager->getActiveEditor()->getId() ) {
+					$editor_switch_buttons[] = '<a class="button button-secondary js-wpv-ct-apply-user-editor" href="'.$admin_url.'&ct_editor_choice='.$editor->getId().'">'.sprintf( __( 'Edit with %1$s', 'wpv-views' ), $editor->getName() ).'</a>';
 				}
 			}
 
 			$control_editor_select .= '<div class="wpv-ct-control-switch-editor">';
-			$control_editor_select .= $editor_current;
 			//$control_editor_select .= __( 'Select Editor: ', 'wpv-views' );
-			$control_editor_select .= join( ' ', array_reverse( $editor_switch_buttons ) );
+			$control_editor_select .= '<span class="wpv-content-template-user-editor-buttons js-wpv-content-template-user-editor-buttons" style="display:none">' . join( '', array_reverse( $editor_switch_buttons ) ) . '</span>';
 			$control_editor_select .= '</div>';
 		}
 
@@ -263,6 +298,11 @@ class Toolset_User_Editors_Medium_Content_Template
 	public function pageReloadAfterBackendSave() {
 		add_action( 'admin_print_footer_scripts', array( $this, '_actionPageReloadAfterBackendSave' ) );
 	}
+	
+	/**
+	* @todo refactor this, it should not happen this way. If after saving a section we need to reload, we set it on a caninical way.
+	* ALso, this should NOT happen any time a CT setting is saved, just when a CT usage chnage is...
+	*/
 	
 	public function _actionPageReloadAfterBackendSave() {
 		echo "<script>jQuery( document ).on('ct_saved', function() { location.reload(); });</script>";

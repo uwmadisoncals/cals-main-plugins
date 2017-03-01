@@ -3,7 +3,7 @@ Contributors: webbistro
 Tags: media library, media category, media categories, media gallery, gallery shortcode, media tag, media tags, media taxonomy, media taxonomies, media uploader, mime type, mime, mime types, file types, media types, media filter, attachment, gallery, image, images, media, ux, user experience, wp-admin, admin, taxonomy, taxonomies
 Requires at least: 4.5
 Tested up to: 4.7.2
-Stable tag: 2.4.3
+Stable tag: 2.4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -86,6 +86,8 @@ Assistance with translating is highly appreciated! If you'd like to be a transla
 * Simple Lightbox
 * Responsive Lightbox by dFactory
 * Justified Gallery
+* Meow Gallery
+* Meow Lightbox
 * Compress JPEG & PNG Images (TinyPNG)
 
 
@@ -166,6 +168,16 @@ Please notice that you use Enhanced Media Library with other plugins which add m
 
 == Changelog ==
 
+= 2.4.4 =
+*Release Date - February 16, 2017*
+
+= Bugfixes =
+* Update mechanism improved to avoid issue on some installations (PRO only)
+* The issue causing an error when editing in bulk (in some cases) is fixed (PRO only)
+* Minor bugs fixed
+
+
+&nbsp;
 = 2.4.3 =
 *Release Date - January 28, 2017*
 

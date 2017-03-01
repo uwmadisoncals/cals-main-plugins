@@ -1,13 +1,13 @@
 {
   "checksum": {
-    "previous": "91cc76c6ec19609541b007a2169151af12744e59994efb1ea941131d51975f81",
-    "current": "91cc76c6ec19609541b007a2169151af12744e59994efb1ea941131d51975f81"
+    "previous": "c2bf5434fb5ba6db313a98fb4e1bf3479154a52d11ff65763e7707dfe4069a7b",
+    "current": "c2bf5434fb5ba6db313a98fb4e1bf3479154a52d11ff65763e7707dfe4069a7b"
   },
   "fonts": [
-    "fonts/onthegosystems-icons_91cc76c6ec19609541b007a2169151af.ttf",
-    "fonts/onthegosystems-icons_91cc76c6ec19609541b007a2169151af.svg",
-    "fonts/onthegosystems-icons_91cc76c6ec19609541b007a2169151af.woff",
-    "fonts/onthegosystems-icons_91cc76c6ec19609541b007a2169151af.eot"
+    "fonts/onthegosystems-icons_c2bf5434fb5ba6db313a98fb4e1bf347.ttf",
+    "fonts/onthegosystems-icons_c2bf5434fb5ba6db313a98fb4e1bf347.svg",
+    "fonts/onthegosystems-icons_c2bf5434fb5ba6db313a98fb4e1bf347.woff",
+    "fonts/onthegosystems-icons_c2bf5434fb5ba6db313a98fb4e1bf347.eot"
   ],
   "glyphs": {
     "access": {
@@ -117,6 +117,10 @@
     "toolset": {
       "codepoint": 61738,
       "source": "vectors/toolset.svg"
+    },
+    "toolset-export": {
+      "codepoint": 61751,
+      "source": "vectors/toolset-export.svg"
     },
     "toolset-genesis-logo": {
       "codepoint": 61736,

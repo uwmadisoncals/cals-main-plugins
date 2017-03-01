@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version 6.6.12
+* Version 6.6.13
 *
 */
 
@@ -597,12 +597,11 @@ global $wpdb;
 							' class="wppa-thumb-text"' .
 							' style="'.__wcs( 'wppa-thumb-text' ).'"' .
 							' >' .
-							wppa_get_photo_name( $id, wppa_switch( 'thumb_text_owner' ), false, false, wppa_switch( 'thumb_text_name' ) ) .
+							wppa_get_photo_name( $id, array( 'addowner' => wppa_switch( 'thumb_text_owner' ), 'showname' => wppa_switch( 'thumb_text_name' ) ) ) .
 						'</div>';
 		}
 
 		// searching, link to album
-//		if ( wppa( 'src' ) || wppa( 'supersearch' ) || ( ( wppa( 'is_comten') || wppa( 'is_topten' ) || wppa( 'is_lasten' ) || wppa( 'is_featen') ) && wppa( 'start_album' ) != $thumb['album'] ) ) {
 		if ( wppa_switch( 'thumb_text_virt_album' ) && wppa_is_virtual() && wppa( 'start_album' ) != $thumb['album'] ) {
 			$result .= 	'<div' .
 							' class="wppa-thumb-text"' .
@@ -698,7 +697,7 @@ global $wpdb;
 			if ( $thumb['status'] == 'pending' || $thumb['status'] == 'scheduled' ) {
 				$desc .= wppa_moderate_links( 'thumb', $id );
 			}
-			$desc .= wppa_get_photo_desc( $id, wppa_switch( 'allow_foreign_shortcodes_thumbs' ) );
+			$desc .= wppa_get_photo_desc( $id, array( 'doshortcodes' => wppa_switch( 'allow_foreign_shortcodes_thumbs' ) ) );
 
 			// Run wpautop on description?
 			if ( wppa_opt( 'wpautop_on_thumb_desc' ) == 'wpautop' ) {
@@ -1522,12 +1521,12 @@ function wppa_get_masonry_title( $id ) {
 
 	// Name
 	if ( wppa_switch( 'thumb_text_name' ) || wppa_switch( 'thumb_text_owner' ) ) {
-		$result .= wppa_get_photo_name( $id, wppa_switch( 'thumb_text_owner' ), false, false, wppa_switch( 'thumb_text_name' ) ) . "\n";
+		$result .= wppa_get_photo_name( $id, array( 'addowner' => wppa_switch( 'thumb_text_owner' ), 'showname' => wppa_switch( 'thumb_text_name' ) ) ) . "\n";
 	}
 
 	// Description
 	if ( wppa_switch( 'thumb_text_desc' ) || $thumb['status'] == 'pending' || $thumb['status'] == 'scheduled' ) {
-		$result .= wppa_get_photo_desc( $id, wppa_switch( 'allow_foreign_shortcodes_thumbs' ) ) . "\n";
+		$result .= wppa_get_photo_desc( $id, array( 'doshortcodes' => wppa_switch( 'allow_foreign_shortcodes_thumbs' ) ) ) . "\n";
 	}
 
 	// Rating

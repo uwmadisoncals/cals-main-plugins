@@ -16,11 +16,19 @@ class Toolset_User_Editors_Medium_Screen_Content_Template_Backend
 	}
 
 	public function equivalentEditorScreenIsActive() {
-		add_action( 'admin_enqueue_scripts', array( $this , '_actionScripts' ) ) ;
+		add_filter( 'wpv_ct_editor_localize_script', array( $this, 'set_user_editor_choice' ) );
 	}
-
-	public function _actionScripts(){
-		wp_localize_script( 'views-ct-editor-js', 'toolset_user_editor_choice', $this->manager->getActiveEditor()->getId() );
+	
+	/**
+	* @todo refactor this, it should not happen this way.
+	* The user editor choice can be added to the native localization 
+	* with a filter defaulting to basic on each of the integrations backend screens,
+	* we might not need this at all.
+	*/
+	
+	public function set_user_editor_choice( $l10n_data ) {
+		$l10n_data['user_editor'] = $this->manager->getActiveEditor()->getId();
+		return $l10n_data;
 	}
 
 }

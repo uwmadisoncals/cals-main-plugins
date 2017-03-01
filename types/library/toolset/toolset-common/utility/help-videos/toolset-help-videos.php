@@ -1,6 +1,6 @@
 <?php
 
-if( !class_exists('Toolset_HelpVideo') ) {
+if( ! class_exists( 'Toolset_HelpVideo', false ) ) {
 
     class Toolset_HelpVideo extends stdClass
     {

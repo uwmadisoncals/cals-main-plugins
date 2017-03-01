@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto
-Version: 6.6.12
-Stable tag: 6.6.12
+Version: 6.6.15
+Stable tag: 6.6.15
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -179,6 +179,62 @@ Oh, just Google on 'picture resizer' and you will find a bunch of free programs 
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.6.15 =
+
+= Bug Fixes =
+
+* Lightbox exit button did not work when the background click action was set to Browse. Fixed.
+* After entering a comment, sometimes a statusmessage was displayed. Fixed.
+* Fixed an intermittant css issue on masonry horizontal thumbnail display.
+* When Table II-D5.1: <i>Thumbnail virt album</i> was ticked, only the first page of thumbnails had the subtext. Fixed.
+
+= New Features =
+
+* ImageMagic phase I. Command interface. See Table IX-K7. Implemented: rotation of non-standard orientation, rotate and flip on the photo admin page.
+This feature is still under development. If you see unexpected behaviour, please report it here: https://wordpress.org/support/plugin/wp-photo-album-plus
+
+= Other Changes =
+
+* Removed russian language files. They are now covered by the Polyglots system.
+* Album order in album selection lists is now in accordance with the album sequence order settings.
+
+= 6.6.14 =
+
+= Bug Fixes =
+
+* Single quotes in photo names crashed the slideshow. Fixed.
+* Removed/fixed various minor cosmetic diagnostic and warning messages.
+
+= Other Changes =
+
+* If the initial column width (Table I-A1.1) is less than the Mini Treshold (Table I-B7) the short texts for 'Avarage' and 'My' rating is used under single photos with extended caption.
+* The size of rating stars is the navigation fontsize plus 3 pixels. The text was also 3 px larger. This is corrected to the navigation text fontsize.
+* Processing... and Done! in the upload progression bar are now translatable.
+* Photos marked for deletion are no longer found in search operations when they are not yet physically removed by cron.
+
+= 6.6.13 =
+
+= Bug Fixes =
+
+* Indexing of qTranslate-able phrases in all available langages in photo and album names and descriptions now works as designed.
+* Rating stars in Chrome had an opacity problem. Fixed.
+
+= New Features =
+
+* New album description keyword w#fsviews used to display the total number of fullsize views of photos in the album.
+* New shortcode [photo xx] where xx is an existing photo number, to display a single photo. Related settings in Table IX-L.
+* During import .csv file (for custom data) also the following fields can be modified:
+album, name, description, p_order, linkurl, linktitle, linktarget, owner, timestamp, status, tags, alt, modified, location, views, clicks, exifdtm.
+The first header item must be <b>filename</b> in this case.
+* Photo name can now contain keyword w#id. 'Photo w#id' has beed added to the selections in <b>Table IX-D10</b>: <i>Default photo name</i>
+* Added 'Album' in the admin bar 'New' menu for users with the rights to add top-level albums.
+
+= Other Changes =
+
+* Provided a workaround for a bug in Safari browser resulting in not working of the download links of image files.
+* Added class wppa-rating-star to rating stars and wppa-rating-thumb to the dislike thumb down.
+* Right mouse button on lightbox image is now disabled.
 
 = 6.6.12 =
 
@@ -629,7 +685,7 @@ Bots and crawlers are not logged in, so they can not find the photos to share.
 = Other Changes =
 
 * Improved behaviour of ugly browse buttons, both on pc and mobile.
-* Lighbox on mobile now always runs in (padded) fullscreen mode. There is only a quit icon in the upper right corner. You can swipe left/right to browse through the images.
+* Lightbox on mobile now always runs in (padded) fullscreen mode. There is only a quit icon in the upper right corner. You can swipe left/right to browse through the images.
 * You can enter *all* in Table IX-A8 to make all settings runtime modifyable.
 
 = 6.4.18 =

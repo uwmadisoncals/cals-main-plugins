@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the export functions
-* Version 6.6.00
+* Version 6.6.13
 *
 */
 
@@ -164,7 +164,7 @@ global $wppa_temp_idx;
 			if (fwrite($file, "name=".$album['name']."\n") !== FALSE) {
 				if (fwrite($file, "desc=".wppa_nl_to_txt($album['description'])."\n") !== FALSE) {
 					if (fwrite($file, "aord=".$album['a_order']."\n") !== FALSE) {
-						if (fwrite($file, "prnt=".wppa_get_album_name($album['a_parent'], 'raw')."\n") !== FALSE) {
+						if (fwrite($file, "prnt=".wppa_get_album_name( $album['a_parent'], array( 'raw' => true ) ) . "\n") !== FALSE) {
 							if (fwrite($file, "pord=".$album['p_order_by']."\n") !== FALSE) {
 								if (fwrite($file, "ownr=".$album['owner']."\n") !== FALSE) {
 
@@ -230,7 +230,7 @@ global $wppa_temp_idx;
 			if (fwrite($file, "name=".$photo['name']."\n") !== FALSE) {
 				if (fwrite($file, "desc=".wppa_nl_to_txt($photo['description'])."\n") !== FALSE) {
 					if (fwrite($file, "pord=".$photo['p_order']."\n") !== FALSE) {
-						if (fwrite($file, "albm=".wppa_get_album_name($photo['album'], 'raw')."\n") !== FALSE) {
+						if (fwrite($file, "albm=".wppa_get_album_name($photo['album'], array( 'raw' => true ) )."\n") !== FALSE) {
 							if (fwrite($file, "lnku=".$photo['linkurl']."\n") !== FALSE) {
 								if (fwrite($file, "lnkt=".$photo['linktitle']."\n") !== FALSE) {
 

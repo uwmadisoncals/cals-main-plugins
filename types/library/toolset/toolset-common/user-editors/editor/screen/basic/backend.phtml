@@ -2,24 +2,15 @@
 	<div class="code-editor-toolbar js-code-editor-toolbar">
 		<ul>
 			<?php
-			$menus_to_add = array(
-				'post',						// wpv-post shortcodes plus non-Types fields under their own section
-				'post-extended',			// generic shortcodes extended in the Basic section
-				'post-fields-placeholder',	// non-Types fields on demand
-				'user',						// basic user data
-				'body-view-templates',		// Content Templates
-				'post-view',				// Views listing posts
-				'taxonomy-view',			// all available Views listing terms
-				'user-view'					// all available Views listing users
-			);
-			do_action( 'wpv_views_fields_button', 'wpv_content', $menus_to_add );
+			do_action( 'wpv_views_fields_button', 'wpv_content' );
+			// Action to add Toolset buttons to the Content Template editor
+			do_action( 'toolset_action_toolset_editor_toolbar_add_buttons', 'wpv_content', 'views' );
 
 			// Needed so CRED displays a button instead of a fake anchor tag
 			if( wpv_ct_editor_is_cred_button_supported() ) {
 				define("CT_INLINE", "1");
 				do_action('wpv_cred_forms_button', 'wpv_content');
 			}
-
 			wpv_ct_editor_content_add_media_button( $this->medium->getId(), 'wpv_content' );
 			?>
 		</ul>

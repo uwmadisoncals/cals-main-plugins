@@ -431,9 +431,6 @@ function wpcf_admin_enqueue_group_edit_page_assets() {
 
 	$asset_manager = Types_Asset_Manager::get_instance();
 
-	/*
-	 * Enqueue scripts
-	 */
 	// Group filter
 	wp_enqueue_script( 'wpcf-filter-js',
 		WPCF_EMBEDDED_RES_RELPATH
@@ -444,16 +441,17 @@ function wpcf_admin_enqueue_group_edit_page_assets() {
 		array(
 			Types_Asset_Manager::SCRIPT_JQUERY_UI_VALIDATION,
 			Types_Asset_Manager::SCRIPT_ADDITIONAL_VALIDATION_RULES,
+
+            // These scripts are needed only for the Styling editor
+            Types_Asset_Manager::SCRIPT_CODEMIRROR,
+            Types_Asset_Manager::SCRIPT_CODEMIRROR_CSS,
+            Types_Asset_Manager::SCRIPT_CODEMIRROR_XML,
+            Types_Asset_Manager::SCRIPT_CODEMIRROR_HTMLMIXED,
+            Types_Asset_Manager::SCRIPT_JSCROLLPANE,
+            Types_Asset_Manager::SCRIPT_MOUSEWHEEL
 		)
 	);
 
-	// Scroll
-	wp_enqueue_script( 'wpcf-scrollbar',
-		WPCF_EMBEDDED_TOOLSET_RELPATH . '/toolset-common/visual-editor/res/js/scrollbar.js',
-		array('jquery') );
-	wp_enqueue_script( 'wpcf-mousewheel',
-		WPCF_EMBEDDED_TOOLSET_RELPATH . '/toolset-common/visual-editor/res/js/mousewheel.js',
-		array('wpcf-scrollbar') );
 	// MAIN
 	wp_enqueue_script(
 		'wpcf-fields-form',
@@ -468,30 +466,18 @@ function wpcf_admin_enqueue_group_edit_page_assets() {
 		WPCF_VERSION
 	);
 
-	/*
-	 * Enqueue styles
-	 */
-	wp_enqueue_style( 'wpcf-scroll',
-		WPCF_EMBEDDED_TOOLSET_RELPATH . '/toolset-common/visual-editor/res/css/scroll.css' );
+	$asset_manager->enqueue_styles(
+	    array(
+		    // These styles are needed only for the Styling editor
+	        Types_Asset_Manager::STYLE_CODEMIRROR,
+            Types_Asset_Manager::STYLE_EDITOR_ADDON_MENU_SCROLL
+        )
+    );
 
-	//Css editor
-	wp_enqueue_script( 'wpcf-form-codemirror' ,
-		WPCF_RELPATH . '/resources/js/codemirror234/lib/codemirror.js', array('wpcf-js'));
-	wp_enqueue_script( 'wpcf-form-codemirror-css-editor' ,
-		WPCF_RELPATH . '/resources/js/codemirror234/mode/css/css.js', array('wpcf-js'));
-	wp_enqueue_script( 'wpcf-form-codemirror-html-editor' ,
-		WPCF_RELPATH . '/resources/js/codemirror234/mode/xml/xml.js', array('wpcf-js'));
-	wp_enqueue_script( 'wpcf-form-codemirror-html-editor2' ,
-		WPCF_RELPATH . '/resources/js/codemirror234/mode/htmlmixed/htmlmixed.js', array('wpcf-js'));
 	wp_enqueue_script( 'wpcf-form-codemirror-editor-resize' ,
 		WPCF_RELPATH . '/resources/js/jquery_ui/jquery.ui.resizable.min.js', array('wpcf-js'));
 
-	wp_enqueue_style( 'wpcf-css-editor',
-		WPCF_RELPATH . '/resources/js/codemirror234/lib/codemirror.css' );
-	//wp_enqueue_style( 'wpcf-css-editor-resize',
-	//        WPCF_RELPATH . '/resources/js/jquery_ui/jquery.ui.theme.min.css' );
-	wp_enqueue_style( 'wpcf-usermeta',
-		WPCF_EMBEDDED_RES_RELPATH . '/css/usermeta.css' );
+	wp_enqueue_style( 'wpcf-usermeta', WPCF_EMBEDDED_RES_RELPATH . '/css/usermeta.css' );
 
 	wp_enqueue_style( 'font-awesome' );
 
@@ -503,18 +489,17 @@ function wpcf_admin_enqueue_group_edit_page_assets() {
 /**
  * Menu page hook.
  */
-function wpcf_admin_menu_edit_fields_hook()
-{
+function wpcf_admin_menu_edit_fields_hook() {
 	wpcf_admin_enqueue_group_edit_page_assets();
 
-    require_once WPCF_INC_ABSPATH . '/fields.php';
-    require_once WPCF_INC_ABSPATH . '/fields-form.php';
-//    $form = wpcf_admin_fields_form();
-    //require_once WPCF_INC_ABSPATH.'/classes/class.types.admin.edit.custom.fields.group.php';
-    $wpcf_admin = new Types_Admin_Edit_Custom_Fields_Group();
-    $wpcf_admin->init_admin();
-    $form = $wpcf_admin->form();
-    wpcf_form( 'wpcf_form_fields', $form );
+	require_once WPCF_INC_ABSPATH . '/fields.php';
+	require_once WPCF_INC_ABSPATH . '/fields-form.php';
+	//    $form = wpcf_admin_fields_form();
+
+	$wpcf_admin = new Types_Admin_Edit_Custom_Fields_Group();
+	$wpcf_admin->init_admin();
+	$form = $wpcf_admin->form();
+	wpcf_form( 'wpcf_form_fields', $form );
 }
 
 /**
@@ -544,6 +529,7 @@ function wpcf_admin_menu_edit_fields()
     wpcf_add_admin_footer();
 }
 
+
 function wpcf_admin_page_add_options( $name, $label)
 {
     $option = 'per_page';
@@ -554,6 +540,7 @@ function wpcf_admin_page_add_options( $name, $label)
     );
     add_screen_option( $option, $args );
 }
+
 
 function wpcf_admin_menu_summary_cpt_ctt_hook()
 {
@@ -1288,7 +1275,7 @@ function wpcf_register_settings_wpml_section( $sections ) {
 	if ( $wpml_installed ) {
 		$sections['wpml'] = array(
 			'slug'	=> 'wpml',
-			'title'	=> __( 'WPML integration', 'wpv-views' )
+			'title'	=> __( 'WPML integration', 'wpcf' )
 		);
 	}
 	return $sections;

@@ -4,7 +4,7 @@
 * Curently used by Views for rendering parametric search items and some backend elements
 */
 
-if ( ! class_exists('Toolset_Enlimbo_Forms' ) ) {
+if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
     
     class Toolset_Enlimbo_Forms
     {
@@ -974,7 +974,7 @@ if ( ! class_exists('Toolset_Enlimbo_Forms' ) ) {
 * Curently used by Views for rendering parametric search items and some backend elements
 */
 
-if ( ! class_exists('Toolset_Enlimbo_Forms_Control' ) ) {
+if ( ! class_exists( 'Toolset_Enlimbo_Forms_Control', false ) ) {
 
 	class Toolset_Enlimbo_Forms_Control extends Toolset_Enlimbo_Forms {
 		

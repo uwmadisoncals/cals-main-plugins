@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version 6.6.02
+* Version 6.6.15
 *
 */
 
@@ -34,14 +34,24 @@ function wppa_make_o1_source( $id ) {
 	// Make destination path
 	$dst_path = wppa_get_o1_source_path( $id );
 
-	// Copy source to destination
-	copy( $src_path, $dst_path );
-
-	// Correct orientation
-	if ( ! wppa_orientate_image_file( $dst_path, $orient ) ) {
-		unlink( $dst_path );
-		return false;
+	// Imagic
+	if ( wppa_opt( 'image_magic' ) ) {
+		wppa_image_magic( 'convert ' . $src_path . ' -auto-orient ' . $dst_path );
 	}
+
+	// Classic
+	else {
+
+		// Copy source to destination
+		copy( $src_path, $dst_path );
+
+		// Correct orientation
+		if ( ! wppa_orientate_image_file( $dst_path, $orient ) ) {
+			unlink( $dst_path );
+			return false;
+		}
+	}
+
 
 	// Done
 	return true;
@@ -584,4 +594,22 @@ function wppa_imagecreatefromjpeg( $file ) {
 	ini_set( 'gd.jpeg_ignore_warning', true );
 	$img = imagecreatefromjpeg( $file );
 	return $img;
+}
+
+// Process ImageMagic command
+function wppa_image_magic( $command ) {
+
+	// Image magic enabled?
+	if ( ! wppa_opt( 'image_magic' ) ) {
+		return '-9';
+	}
+
+	$path = rtrim( wppa_opt( 'image_magic' ), '/' ) . '/';
+	$out  = array();
+	$err  = 0;
+	$run  = exec( $path . $command, $out, $err );
+	if ( $err ) {
+		wppa_log( 'Err', 'Exec ' . $path . $command . ' returned ' . $err );
+	}
+	return $err;
 }

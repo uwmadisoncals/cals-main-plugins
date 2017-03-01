@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Frontend links
-* Version 6.6.10
+* Version 6.6.15
 *
 */
 
@@ -90,7 +90,12 @@ global $wppa_lang;
 		else $pl .= 'rootsearch=1&amp;';
 	}
 
-	if ( wppa( 'debug' ) ) {
+	if ( wppa_is_virtual() ) {
+		if ( $key == 'js' ) $pl .= 'vt=1&';
+		else $pl .= 'vt=1&amp;';
+	}
+
+ 	if ( wppa( 'debug' ) ) {
 		if ( $key == 'js' ) $pl .= 'debug='.wppa( 'debug' ).'&';
 		else $pl .= 'debug='.wppa( 'debug' ).'&amp;';
 	}
@@ -147,6 +152,11 @@ global $wppa_lang;
 	if ( wppa( 'is_rootsearch' ) ) {
 		if ( $key == 'js' ) $al .= '&rootsearch=1';
 		else $al .= '&amp;rootsearch=1';
+	}
+
+	if ( wppa_is_virtual() ) {
+		if ( $key == 'js' ) $al .= '&vt=1';
+		else $al .= '&amp;vt=1';
 	}
 
 	if ( wppa( 'debug' ) ) {
@@ -397,6 +407,9 @@ function wppa_convert_from_pretty( $uri ) {
 				case 'in':
 					$deltauri = 'wppa-inv=';
 					break;
+				case 'vt':
+					$deltauri = 'wppa-vt=';
+					break;
 
 				default:
 					$deltauri = '';
@@ -497,6 +510,7 @@ function wppa_convert_to_pretty( $xuri, $no_names = false ) {
 					'calendar', 'caldate',
 					'debug',
 					'inv',
+					'vt',
 					);
 
 	$uri = $parts[0] . '?';
@@ -613,6 +627,7 @@ function wppa_convert_to_pretty( $xuri, $no_names = false ) {
 						'calendar',
 						'caldate',
 						'inv',
+						'vt',
 					);
 	if ( count($args) > 0 ) {
 		foreach ( $args as $arg ) {
@@ -708,6 +723,9 @@ function wppa_convert_to_pretty( $xuri, $no_names = false ) {
 						break;
 					case 'inv':
 						$newuri .= 'in';
+						break;
+					case 'vt':
+						$newuri .= 'vt';
 						break;
 				}
 				if ( $val !== false ) {

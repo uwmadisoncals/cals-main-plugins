@@ -3,7 +3,7 @@
 // Conatins lightbox modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaLightboxVersion = '6.6.06';
+var wppaLightboxVersion = '6.6.15';
 
 // Global inits
 var wppaNormsBtnOpac 		= 0.75;
@@ -500,6 +500,11 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 			jQuery( '#wppa-overlay-ic' ).html( html );
 		}
 
+		// Disable right mouse button
+		jQuery( '#wppa-overlay-img' ).bind( 'contextmenu', function(e) {
+			return false;
+		});
+
 		// Replace svg img src to html
 //		wppaReplaceSvg();
 
@@ -757,6 +762,11 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 
 		// Restore opacity of fs and exit buttons
 //		wppaShowFsButtons();
+
+		// Disable right mouse button
+		jQuery( '#wppa-overlay-img' ).bind( 'contextmenu', function(e) {
+			return false;
+		});
 
 		// Size
 		wppaOvlResize();
@@ -1194,8 +1204,11 @@ wppaConsoleLog( 'wppaOvlOnClick' );
 			break;
 		case 'browse':
 			var x = event.screenX - window.screenX;
-			if ( x < jQuery( window ).width() / 2 ) wppaOvlShowPrev();
-			else wppaOvlShowNext();
+			var y = event.clientY;
+			if ( y > 48 ) {
+				if ( x < jQuery( window ).width() / 2 ) wppaOvlShowPrev();
+				else wppaOvlShowNext();
+			}
 			break;
 		default:
 			alert( 'Unimplemented action: '+wppaOvlOnclickType );

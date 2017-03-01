@@ -17,6 +17,10 @@ class FrmEntriesListHelper extends FrmListHelper {
 
 		if ( $form_id ) {
 			$s_query['it.form_id'] = $form_id;
+			$join_form_in_query = false;
+		} else {
+			$s_query['fr.parent_form_id'] = 0;
+			$join_form_in_query = true;
 		}
 
 		$s = isset( $_REQUEST['s'] ) ? stripslashes($_REQUEST['s']) : '';
@@ -38,7 +42,7 @@ class FrmEntriesListHelper extends FrmListHelper {
         $page = $this->get_pagenum();
 		$start = (int) isset( $_REQUEST['start'] ) ? absint( $_REQUEST['start'] ) : ( ( $page - 1 ) * $per_page );
 
-		$this->items = FrmEntry::getAll( $s_query, $order, ' LIMIT ' . $start . ',' . $per_page, true, false );
+		$this->items = FrmEntry::getAll( $s_query, $order, ' LIMIT ' . $start . ',' . $per_page, true, $join_form_in_query );
         $total_items = FrmEntry::getRecordCount($s_query);
 
 		$this->set_pagination_args( array(
@@ -139,6 +143,7 @@ class FrmEntriesListHelper extends FrmListHelper {
 			$form_id = $this->params['form'] ? $this->params['form'] : 0;
 			$col_name = preg_replace( '/^(' . $form_id . '_)/', '', $column_name );
 			$this->column_name = $col_name;
+			$val = '';
 
 			switch ( $col_name ) {
 				case 'cb':
@@ -169,7 +174,7 @@ class FrmEntriesListHelper extends FrmListHelper {
 				    break;
 				case 'user_id':
 				    $user = get_userdata($item->user_id);
-				    $val = $user->user_login;
+				    $val = $user ? $user->user_login : '';
 				    break;
 				default:
 					$val = apply_filters( 'frm_entries_' . $col_name . '_column', false, compact( 'item' ) );
@@ -179,7 +184,7 @@ class FrmEntriesListHelper extends FrmListHelper {
 				break;
 			}
 
-			if ( isset( $val ) ) {
+			if ( $col_name != 'cb' ) {
 			    $r .= "<td $attributes>";
 				if ( $column_name == $action_col ) {
 					$edit_link = '?page=formidable-entries&frm_action=edit&id=' . $item->id;

@@ -15,7 +15,7 @@ class Toolset_User_Editors_Editor_Screen_Beaver_Frontend
 		
 		// Pre-process Views shortcodes in the frontend editor and its AJAX update, as well as in the frontend rendering
 		// Make sure the $authordata global is correctly set
-		add_filter( 'fl_builder_before_render_shortcodes',		array( $this, 'beforeRenderShortcodes' ) );
+		add_filter( 'fl_builder_before_render_shortcodes',		array( $this, 'before_render_shortcodes' ) );
 		
 		// Do nothing else in an admin, frontend editing and frontend editing AJAX refresh
 		if ( 
@@ -28,18 +28,18 @@ class Toolset_User_Editors_Editor_Screen_Beaver_Frontend
 
 		/*
 		// Those actions are not needed anymore
-		add_action( 'wpv_before_shortcode_post_body', array( $this, '_actionSetPostIdForViewsBodyShortcode' ) );
-		add_action( 'wpv_after_shortcode_post_body',  array( $this, '_actionSetMediumIdAfterViewsBodyShortcode' ) );
-		add_action( 'wp', array( $this, '_actionGlobalizeMediumId' ) );
+		add_action( 'wpv_before_shortcode_post_body', array( $this, 'action_set_post_id_for_views_body_shortcode' ) );
+		add_action( 'wpv_after_shortcode_post_body',  array( $this, 'action_set_medium_id_after_views_body_shortcode' ) );
+		add_action( 'wp', array( $this, 'action_globalize_medium_id' ) );
 
-		add_filter( 'wpv_filter_content_template_output', array( $this, '_filterArchiveContent' ), 10, 4 );
+		add_filter( 'wpv_filter_content_template_output', array( $this, 'filter_archive_content' ), 10, 4 );
 		*/
-		add_filter( 'fl_builder_post_types',					array( $this, '_filterSupportMedium' ) );
+		add_filter( 'fl_builder_post_types',					array( $this, 'filter_support_medium' ) );
 		
-		add_filter( 'body_class',								array( $this, 'bodyClass' ) );
+		add_filter( 'body_class',								array( $this, 'body_class' ) );
 		
-		add_filter( 'wpv_filter_content_template_output',		array( $this, 'filterContentTemplateOutput' ), 10, 4 );
-		add_filter( 'the_content',								array( $this, 'restoreBeaverFilter' ), 9999 );
+		add_filter( 'wpv_filter_content_template_output',		array( $this, 'filter_content_template_output' ), 10, 4 );
+		add_filter( 'the_content',								array( $this, 'restore_beaver_filter' ), 9999 );
 		
 		$this->beaver_filter_enabled = true;
 		$this->beaver_post_id_stack = array();
@@ -54,7 +54,7 @@ class Toolset_User_Editors_Editor_Screen_Beaver_Frontend
 	// @todo we need to set the $authordata global, but we need to use it on do_shortcode
 	// which happens after this filter callback, and as we need to restore after rendering
 	// we can not do it here
-	public function beforeRenderShortcodes( $content ) {
+	public function before_render_shortcodes( $content ) {
 		/*
 		global $authordata;
 		$authordata_old = $authordata;
@@ -71,7 +71,7 @@ class Toolset_User_Editors_Editor_Screen_Beaver_Frontend
 		return $content;
 	}
 	
-	public function _filterSupportMedium( $allowed_types ) {
+	public function filter_support_medium( $allowed_types ) {
 		if( ! is_array( $allowed_types ) ) {
 			return array( $this->medium->getSlug() );
 		}
@@ -82,7 +82,7 @@ class Toolset_User_Editors_Editor_Screen_Beaver_Frontend
 		return $allowed_types;
 	}
 	
-	public function bodyClass( $classes ) {
+	public function body_class( $classes ) {
 		if ( ! is_archive() ) {
 			$current_post = get_post( FLBuilderModel::get_post_id() );
 			if ( $current_post ) {
@@ -98,7 +98,7 @@ class Toolset_User_Editors_Editor_Screen_Beaver_Frontend
 		return $classes;
 	}
 	
-	public function filterContentTemplateOutput( $content, $template_selected, $id, $kind ) {
+	public function filter_content_template_output( $content, $template_selected, $id, $kind ) {
 		
 		if (
 			$template_selected 
@@ -169,17 +169,17 @@ class Toolset_User_Editors_Editor_Screen_Beaver_Frontend
 		return $content;
 	}
 	
-	public function restoreBeaverFilter( $content ) {
+	public function restore_beaver_filter( $content ) {
 		if ( ! $this->beaver_filter_enabled ) {
 			add_filter( 'the_content', 'FLBuilder::render_content' );
 		}
 		return $content;
 	}
 
-	public function _filterArchiveContent( $content, $template_selected, $id, $kind ) {
+	public function filter_archive_content( $content, $template_selected, $id, $kind ) {
 
-		if( $this->getActiveMediumId() && $this->getActiveMediumId() == $template_selected ) {
-			FLBuilderModel::update_post_data( 'post_id', $this->getActiveMediumId() );
+		if( $this->get_active_medium_id() && $this->get_active_medium_id() == $template_selected ) {
+			FLBuilderModel::update_post_data( 'post_id', $this->get_active_medium_id() );
 			$content = FLBuilder::render_content( $content );
 		}
 
@@ -191,19 +191,19 @@ class Toolset_User_Editors_Editor_Screen_Beaver_Frontend
 	 * Beaver is looking for $_POST['post_id'] first, to select content
 	 * we use that to get beaver content of our medium id
 	 */
-	public function _actionGlobalizeMediumId() {
-		if( $this->getActiveMediumId() )
-			FLBuilderModel::update_post_data( 'post_id', $this->getActiveMediumId() );
+	public function action_globalize_medium_id() {
+		if( $this->get_active_medium_id() )
+			FLBuilderModel::update_post_data( 'post_id', $this->get_active_medium_id() );
 	}
 
-	private function getActiveMediumId() {
+	private function get_active_medium_id() {
 		if( $this->active_medium_id === null )
-			$this->active_medium_id = $this->fetchActiveMediumId();
+			$this->active_medium_id = $this->fetch_active_medium_id();
 
 		return $this->active_medium_id;
 	}
 
-	private function fetchActiveMediumId() {
+	private function fetch_active_medium_id() {
 		$medium_id = $this->medium->getId();
 
 		$editor_choice = get_post_meta( $medium_id, $this->medium->getOptionNameEditorChoice(), true );
@@ -219,18 +219,18 @@ class Toolset_User_Editors_Editor_Screen_Beaver_Frontend
 		return false;
 	}
 
-	public function _actionSetPostIdForViewsBodyShortcode() {
+	public function action_set_post_id_for_views_body_shortcode() {
 		add_filter( 'the_content', 'FLBuilder::render_content' );
 		FLBuilderModel::update_post_data( 'post_id', get_the_ID() );
 
 		add_filter( 'wpv_filter_content_template_output', 'FLBuilder::render_content' );
 	}
 
-	public function _actionSetMediumIdAfterViewsBodyShortcode() {
+	public function action_set_medium_id_after_views_body_shortcode() {
 		remove_filter( 'the_content', 'FLBuilder::render_content' );
 
-		if( $this->getActiveMediumId() )
-			FLBuilderModel::update_post_data( 'post_id', $this->getActiveMediumId() );
+		if( $this->get_active_medium_id() )
+			FLBuilderModel::update_post_data( 'post_id', $this->get_active_medium_id() );
 	}
 
 

@@ -382,13 +382,7 @@ i.load-posts-spinner:hover{color:white;}
 /* OVERRIDES */
 fieldset.ddl-dialog-fieldset{margin:0px 0px 0px;padding:10px 0px 0px;}
 fieldset.ddl-dialog-fieldset span{padding-right:6px;}
-
-body.post-type-cred-form #poststuff #post-body.columns-2{margin-right:0px;}
-body.post-type-cred-form #postbox-container-1{display:none;}
 i.ddl-wpml-flag{float:left;width:20px;height:20px;padding-right:4px;}
-
-body.post-type-cred-user-form #poststuff #post-body.columns-2{margin-right:0px;}
-body.post-type-cred-user-form #postbox-container-1{display:none;}
 
 /* //////// MARKUP CONTROLS IN CELL DIALOG START/////////*/
 .css-styling-controls{padding-top:12px;border-top:1px solid #ededed;margin-top:20px;}

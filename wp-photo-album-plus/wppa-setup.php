@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.6.12
+* Version 6.6.13
 *
 */
 
@@ -1450,11 +1450,12 @@ Hide Camera info
 						'wppa_owner_to_name_proc' 			=> '',
 
 						// B Irreversable
-						'wppa_rating_clear' 		=> 'no',
-						'wppa_viewcount_clear' 		=> 'no',
-						'wppa_iptc_clear'			=> '',
-						'wppa_exif_clear'			=> '',
-						'wppa_apply_new_photodesc_all'	=> '',
+						'wppa_rating_clear' 				=> 'no',
+						'wppa_viewcount_clear' 				=> 'no',
+						'wppa_iptc_clear'					=> '',
+						'wppa_exif_clear'					=> '',
+						'wppa_apply_default_photoname_all' 	=> '',
+						'wppa_apply_new_photodesc_all'		=> '',
 						'wppa_remake_index_albums'			=> '',		// 8.1
 						'wppa_remake_index_albums_ad_inf' 	=> 'no',	// 8.1
 						'wppa_remake_index_photos'			=> '',		// 8.2
@@ -1606,7 +1607,7 @@ Hide Camera info
 						'wppa_search_in_section' 		=> __( 'Search in current section' , 'wp-photo-album-plus'),
 						'wppa_search_in_results' 		=> __( 'Search in current results' , 'wp-photo-album-plus'),
 						'wppa_search_min_length' 		=> '2', 	// 18
-						'wppa_search_user_void' 		=> '',
+						'wppa_search_user_void' 		=> 'times,views,wp-content,wp,content,wppa-pl,wppa,pl',
 						'wppa_search_numbers_void' 		=> 'no',
 						'wppa_index_ignore_slash' 		=> 'no',
 //						'wppa_index_skips' 				=> '',	// Do not add, this is an array
@@ -1678,13 +1679,20 @@ Hide Camera info
 						'wppa_fotomoto_fontsize'				=> '',
 						'wppa_fotomoto_hide_when_running'		=> 'no',
 						'wppa_fotomoto_min_width' 				=> '400',
+						'wppa_image_magic' 						=> '',
+
+						// L photo shortcode
+						'wppa_photo_shortcode_enabled' 			=> 'yes',
+						'wppa_photo_shortcode_type' 			=> 'mphoto',
+						'wppa_photo_shortcode_size' 			=> '350',
+						'wppa_photo_shortcode_align' 			=> 'center',
 
 						// Photo of the day widget
 						'wppa_potd_title'			=> __('Photo of the day', 'wp-photo-album-plus'),
 						'wppa_potd_widget_width' 	=> '200',
 						'wppa_potd_align' 			=> 'center',
-						'wppa_potd_linkurl'		=> __('Type your custom url here', 'wp-photo-album-plus'),
-						'wppa_potd_linktitle' 	=> __('Type the title here', 'wp-photo-album-plus'),
+						'wppa_potd_linkurl'			=> __('Type your custom url here', 'wp-photo-album-plus'),
+						'wppa_potd_linktitle' 		=> __('Type the title here', 'wp-photo-album-plus'),
 						'wppa_potd_subtitle'		=> 'none',
 						'wppa_potd_counter' 		=> 'no',
 						'wppa_potd_counter_link' 	=> 'thumbs',

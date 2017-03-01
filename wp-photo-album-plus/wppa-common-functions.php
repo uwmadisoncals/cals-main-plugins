@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.6.12
+* Version 6.6.15
 *
 */
 
@@ -1588,7 +1588,7 @@ global $wpdb;
 											'path' 				=> false,
 											'root' 				=> false,
 											'content'			=> false,
-											'sort'				=> true,
+											'sort'				=> false,
 											'checkarray' 		=> false,
 											'array' 			=> array(),
 											'optionclass' 		=> '',
@@ -1609,13 +1609,26 @@ global $wpdb;
 
 	// Get roughly the albums that might be in the selection
 	if ( $args['checkarray'] && ! empty( $args['array'] ) ) {
-		$albums = $wpdb->get_results( 	"SELECT `id`, `name` " .
+
+		// $albums = $args['array'];
+		$albums = array();
+
+		$temp = $wpdb->get_results( 	"SELECT `id`, `name` " .
 										"FROM `" . WPPA_ALBUMS . "` " .
 										"WHERE `id` IN (" . implode( ',', $args['array'] ) . ") " .
 										( $args['checkowner'] && wppa_switch( 'upload_owner_only' ) && ! wppa_user_is( 'administrator' ) ? "AND `owner` IN ( '--- public ---', '" . wppa_get_user() . "' ) " : "" ) .
 										wppa_get_album_order( $args['root'] ),
 										ARRAY_A
 									);
+
+		// To keep the preciously created sequence intact when an array is given, copy the data from $temp in the sequence of $args['array']
+		foreach( $args['array'] as $id ) {
+			foreach( $temp as $item ) {
+				if ( $item['id'] == $id ) {
+					$albums[] = $item;
+				}
+			}
+		}
 	}
 	else {
 		$albums = $wpdb->get_results( 	"SELECT `id`, `name` " .
@@ -1624,6 +1637,9 @@ global $wpdb;
 										wppa_get_album_order( $args['root'] ),
 										ARRAY_A
 									);
+
+		// Must be sorted now...
+		$args['sort'] = true;
 	}
 
 	/* Can not add to cache because only "SELECT * " can be added

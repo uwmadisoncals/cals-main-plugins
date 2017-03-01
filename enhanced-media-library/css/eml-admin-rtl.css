@@ -137,7 +137,8 @@ body.upload-php.eml-grid #wpbody-content > .wrap {
     z-index: 10;
 }
 .media-frame.mode-eml-grid .media-frame-title,
-.media-frame.mode-eml-grid .media-frame-menu {
+.media-frame.mode-eml-grid .media-frame-menu,
+.media-frame.mode-eml-grid .media-frame-toolbar {
     display: none;
 }
 .media-frame.mode-eml-grid .media-frame-content {

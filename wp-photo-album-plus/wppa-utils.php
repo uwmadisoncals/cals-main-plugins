@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.6.12
+* Version 6.6.15
 *
 */
 
@@ -461,7 +461,7 @@ function wppa_add_paths( $albums ) {
 
 	if ( is_array( $albums ) ) foreach ( array_keys( $albums ) as $index ) {
 		$tempid = $albums[$index]['id'];
-		$albums[$index]['name'] = __(stripslashes($albums[$index]['name']), 'wp-photo-album-plus');	// Translate name
+		$albums[$index]['name'] = __( stripslashes( $albums[$index]['name'] ) );	// Translate name
 		while ( $tempid > '0' ) {
 			$tempid = wppa_get_parentalbumid($tempid);
 			if ( $tempid > '0' ) {
@@ -1990,6 +1990,9 @@ global $wpdb;
 			$tag = '2#120';
 			$name = $wpdb->get_var( $wpdb->prepare( "SELECT `description` FROM `".WPPA_IPTC."` WHERE `photo` = %s AND `tag` = %s", $id, $tag ) );
 			break;
+		case 'Photo w#id':
+			$name = __( 'Photo w#id', 'wp-photo-album-plus' );
+			break;
 	}
 	if ( ( $name && $name != $filename ) || $method == 'none' ) {	// Update name
 		$wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_PHOTOS."` SET `name` = %s WHERE `id` = %s", $name, $id ) );
@@ -2219,7 +2222,7 @@ function wppa_alb_to_enum_children( $xalb ) {
 		$result = trim( $result, '.' ).'.';
 	}
 	$result = trim( $result, '.' );
-	$result = wppa_compress_enum( $result );
+//	$result = wppa_compress_enum( $result );
 	return $result;
 }
 
@@ -2234,7 +2237,7 @@ static $child_cache;
 
 	// Get the data
 	$result = $alb;
-	$children = $wpdb->get_results( $wpdb->prepare( "SELECT `id` FROM `".WPPA_ALBUMS."` WHERE `a_parent` = %s", $alb ), ARRAY_A );
+	$children = $wpdb->get_results( $wpdb->prepare( "SELECT `id` FROM `".WPPA_ALBUMS."` WHERE `a_parent` = %s " . wppa_get_album_order( $alb ), $alb ), ARRAY_A );
 	if ( $children ) foreach ( $children as $child ) {
 		$result .= '.' . _wppa_alb_to_enum_children( $child['id'] );
 		$result = trim( $result, '.' );
@@ -2561,8 +2564,7 @@ function wppa_browser_can_html5() {
 	if ( $is_ie ) {
 		$tri_pos = strpos( $_SERVER["HTTP_USER_AGENT"], 'Trident/' );
 		$tri_ver = substr( $_SERVER["HTTP_USER_AGENT"], $tri_pos+8, 3 );
-		if ( $tri_pos >= 6.0 ) return true; // IE 10 or later
-// echo $tri_ver;
+		if ( $tri_ver >= 6.0 ) return true; // IE 10 or later
 	}
 
 	return false;
@@ -2896,6 +2898,7 @@ function wppa_is_virtual() {
 	if ( wppa( 'supersearch' ) ) return true;
 	if ( wppa( 'searchstring' ) ) return true;
 	if ( wppa( 'calendar' ) ) return true;
+	if ( wppa_get_get( 'vt' ) ) return true;
 
 	return false;
 }
@@ -3261,6 +3264,18 @@ function wppa_is_ie() {
 	return $result;
 }
 
+function wppa_is_safari() {
+
+	$result = false;
+	if ( isset ( $_SERVER["HTTP_USER_AGENT"] ) ) {
+		if ( strpos( $_SERVER["HTTP_USER_AGENT"], 'Safari' ) !== false ) {
+			$result = true;
+		}
+	}
+
+	return $result;
+}
+
 function wppa_chmod( $fso ) {
 
 	if ( is_dir( $fso ) ) {
@@ -3276,21 +3291,58 @@ function wppa_chmod( $fso ) {
 // Test if a given url is to a photo file
 function wppa_is_url_a_photo( $url ) {
 
-	if ( function_exists( 'curl_init' ) ) {
+global $wppa_supported_photo_extensions;
 
-		// Get page content
-		$curl = curl_init();
-		curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
-		curl_setopt( $curl, CURLOPT_URL, $url );
-		$contents = curl_exec( $curl );
-		curl_close( $curl );
+	// Init
+	$result = true;
+	$ext 	= wppa_get_ext( $url );
 
-		if ( strpos( $contents,'404' ) !== false ) {
-			return false;
-		}
+	// If the url does not have a valid photo extension, its not a photo file
+	if ( ! in_array( $ext, $wppa_supported_photo_extensions ) ) {
+		return false;
 	}
 
-	return is_array( getimagesize( $url ) );
+	/*
+	// If importing from wppa tree filesystem...
+	if ( wppa( 'is_wppa_tree' ) ) {
+
+		// To prvent fatal double expansion, first compress, double comprees is not fatal
+		$url = wppa_expand_tree_path( wppa_compress_tree_path( $url ) );
+	}
+	*/
+
+	// Using curl may be protected/limited
+	// Use curl to see if the url is found to prevent a php warning
+	/* experimental */
+	if ( function_exists( 'curl_init' ) && false ) {
+
+		// Create a curl handle to the expected photofile
+		$ch = curl_init( $url );
+
+		// Execute
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $ch, CURLOPT_FAILONERROR, true );
+		curl_exec( $ch );
+
+		// Check if HTTP code > 400 i.e. error 22 occurred
+		if( curl_errno( $ch ) == 22 ) {
+			$result = false;
+		}
+
+		// Close handle
+		curl_close($ch);
+
+	}
+
+	// No curl on system, or do not use curl
+	else {
+
+		// getimagesize on a non imagefile produces a php warning
+		$result = is_array( getimagesize( $url ) );
+	}
+
+	// Done
+	return $result;
 }
 
 // Convert array into readable text
@@ -3342,4 +3394,16 @@ global $wpdb;
 	$result['display'] 	= sprintf( _n( '%d like', '%d likes', $likes ), $likes );
 
 	return $result;
+}
+
+function wppa_print_tree( $path ) {
+	$path = rtrim( $path, '/' );
+	echo $path . '<br />';
+	$files = glob( $path . '/*' );
+	foreach( $files as $file ) {
+		echo $file . '<br />';
+		if ( is_dir( $file ) ) {
+			wppa_print_tree( $file );
+		}
+	}
 }

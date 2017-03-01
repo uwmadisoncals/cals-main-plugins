@@ -12,7 +12,7 @@ if ( ! defined( 'WPT_PROMOTION' ) ) {
 * @since unknown
 */
 
-if ( ! class_exists( 'Toolset_Promotion' ) ) {
+if ( ! class_exists( 'Toolset_Promotion', false ) ) {
 
     /**
      * Class to show promotion message.

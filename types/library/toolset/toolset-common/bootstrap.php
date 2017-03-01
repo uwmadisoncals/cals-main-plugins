@@ -14,6 +14,7 @@
 *
 * New sections can be added here, following the same structure.
 *
+*
 * Note that you have available the following constants:
 * 	TOOLSET_COMMON_VERSION				The Toolset Common version
 * 	TOOLSET_COMMON_PATH					The path to the active Toolset Common directory
@@ -48,6 +49,8 @@ class Toolset_Common_Bootstrap {
 	const TOOLSET_FORMS = 'toolset_forms';
 	const TOOLSET_VISUAL_EDITOR = 'toolset_visual_editor';
 	const TOOLSET_PARSER = 'toolset_parser';
+    const TOOLSET_USER_EDITOR = 'toolset_user_editor';
+    const TOOLSET_SHORTCODE_GENERATOR = 'toolset_shortcode_generator';
 	const TOOLSET_RESOURCES = 'toolset_res';
 	const TOOLSET_LIBRARIES = 'toolset_lib';
 	const TOOLSET_INCLUDES = 'toolset_inc';
@@ -86,10 +89,12 @@ class Toolset_Common_Bootstrap {
 
         /**
          * Action when the Toolset Common Library is completely loaded.
+		 *
+		 * @param Toolset_Common_Bootstrap instance
          *
-         * @since m2m
+         * @since 2.3.0
          */
-        do_action( 'toolset_common_loaded' );
+        do_action( 'toolset_common_loaded', $this );
     }
 
 	/**
@@ -115,7 +120,7 @@ class Toolset_Common_Bootstrap {
 
 	/**
 	 * Determine if a given section is already loaded.
-	 * 
+	 *
 	 * @param string $section_name
 	 * @return bool
 	 * @since 2.1
@@ -127,7 +132,7 @@ class Toolset_Common_Bootstrap {
 	
 	/**
 	 * Add a section name to the list of the loaded ones.
-	 * 
+	 *
 	 * @param string $section_name
 	 * @since 2.1
 	 */
@@ -138,8 +143,8 @@ class Toolset_Common_Bootstrap {
 
 	/**
 	 * Decide whether a particular section needs to be loaded.
-	 * 
-	 * @param string[] $sections_to_load Array of sections that should be loaded, or empty array to load all of them. 
+	 *
+	 * @param string[] $sections_to_load Array of sections that should be loaded, or empty array to load all of them.
 	 * @param string $section_name Name of a section.
 	 * @return bool
 	 * @since 2.1
@@ -151,7 +156,7 @@ class Toolset_Common_Bootstrap {
 
 	/**
 	 * Apply a filter on the array of names loaded sections.
-	 * 
+	 *
 	 * @param string $filter_name Name of the filter.
 	 * @since 2.1
 	 */
@@ -159,7 +164,7 @@ class Toolset_Common_Bootstrap {
 		self::$sections_loaded = apply_filters( $filter_name, self::$sections_loaded );
 	}
 
-	
+
 	/**
 	 * Load sections on demand
 	 *
@@ -190,6 +195,16 @@ class Toolset_Common_Bootstrap {
 			$this->register_parser();
 		}
 
+		// Maybe register the editor addon
+		if ( $this->should_load_section( $load, self::TOOLSET_USER_EDITOR ) ) {
+			$this->register_user_editor();
+		}
+		
+		// Maybe register the editor addon
+		if ( $this->should_load_section( $load, self::TOOLSET_SHORTCODE_GENERATOR ) ) {
+			$this->register_shortcode_generator();
+		}
+
 	}
 	
 	public function register_res() {
@@ -209,22 +224,22 @@ class Toolset_Common_Bootstrap {
 
 			$this->add_section_loaded( self::TOOLSET_LIBRARIES );
 
-			if ( ! class_exists( 'ICL_Array2XML' ) ) {
+			if ( ! class_exists( 'ICL_Array2XML', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/lib/array2xml.php' );
 			}
-			if ( ! class_exists( 'Zip' ) ) {
+			if ( ! class_exists( 'Zip', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/lib/Zip.php' );
 			}
 			if ( ! function_exists( 'adodb_date' ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/lib/adodb-time.inc.php' );
 			}
-			if ( ! class_exists( 'Toolset_CakePHP_Validation' ) ) {
+			if ( ! class_exists( 'Toolset_CakePHP_Validation', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/lib/cakephp.validation.class.php' );
 			}
-			if ( ! class_exists( 'Toolset_Validate' ) ) {
+			if ( ! class_exists( 'Toolset_Validate', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/lib/validate.class.php' );
 			}
-			if ( ! class_exists( 'Toolset_Enlimbo_Forms' ) ) {
+			if ( ! class_exists( 'Toolset_Enlimbo_Forms', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/lib/enlimbo.forms.class.php' );
 			}
 
@@ -238,59 +253,82 @@ class Toolset_Common_Bootstrap {
 
 			$this->add_section_loaded( self::TOOLSET_INCLUDES );
 
-			if ( ! class_exists( 'Toolset_Settings' ) ) {
+			$this->register_autoloaded_classes();
+
+			if ( ! class_exists( 'Toolset_Settings', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.settings.class.php' );
 				$this->settings = Toolset_Settings::get_instance();
 			}
-			if ( ! class_exists( 'Toolset_Localization' ) ) {
+			if ( ! class_exists( 'Toolset_Localization', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.localization.class.php' );
 				$this->localization = new Toolset_Localization();
 			}
-			if ( ! class_exists( 'Toolset_WPLogger' ) ) {
+			if ( ! class_exists( 'Toolset_WPLogger', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.wplogger.class.php' );
 			}
-			if ( ! class_exists( 'Toolset_Object_Relationship' ) ) {
+			if ( ! class_exists( 'Toolset_Object_Relationship', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.object.relationship.class.php' );
 				$this->object_relationship = Toolset_Object_Relationship::get_instance();
 			}
-			if ( ! class_exists( 'Toolset_Settings_Screen' ) ) {
+			if ( ! class_exists( 'Toolset_Settings_Screen', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.settings.screen.class.php' );
 				$this->settings_screen = new Toolset_Settings_Screen();
 			}
-			if ( ! class_exists( 'Toolset_Export_Import_Screen' ) ) {
+			if ( ! class_exists( 'Toolset_Export_Import_Screen', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.export.import.screen.class.php' );
 				$this->export_import_screen = new Toolset_Export_Import_Screen();
 			}
-			if ( ! class_exists( 'Toolset_Menu' ) ) {
+			if ( ! class_exists( 'Toolset_Menu', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.menu.class.php' );
 				$this->menu = new Toolset_Menu();
 			}
-			if ( ! class_exists( 'Toolset_Promotion' ) ) {
+			if ( ! class_exists( 'Toolset_Promotion', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.promotion.class.php' );
 				$this->promotion = new Toolset_Promotion();
 			}
-			if ( ! class_exists( 'Toolset_Admin_Bar_Menu' ) ) {
+			if ( ! class_exists( 'Toolset_Admin_Bar_Menu', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.admin.bar.menu.class.php' );
+				/**
+				 * @var Toolset_Admin_Bar_Menu $toolset_admin_bar_menu
+				 * @deprecated Please use Toolset_Admin_Bar_Menu::get_instance() instead of this global variable.
+				 */
 				global $toolset_admin_bar_menu;
 				$toolset_admin_bar_menu = Toolset_Admin_Bar_Menu::get_instance();
 			}
-			if ( ! class_exists( 'Toolset_Internal_Compatibility' ) ) {
+			if ( ! class_exists( 'Toolset_Internal_Compatibility', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.internal.compatibility.class.php' );
 				$this->internal_compatibility = new Toolset_Internal_Compatibility();
 			}
-			if ( ! class_exists( 'Toolset_WPML_Compatibility' ) ) {
+			if ( ! class_exists( 'Toolset_WPML_Compatibility', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.wpml.compatibility.class.php' );
-				$this->wpml_compatibility = new Toolset_WPML_Compatibility();
+				Toolset_WPML_Compatibility::initialize();
 			}
-			if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
+			if ( ! class_exists( 'Toolset_Relevanssi_Compatibility', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.relevanssi.compatibility.class.php' );
 				$this->relevanssi_compatibility = new Toolset_Relevanssi_Compatibility();
 			}
 
-            if ( ! class_exists( 'Toolset_CssComponent' ) ) {
+            if ( ! class_exists( 'Toolset_CssComponent', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.css.component.class.php' );
 				$toolset_bs_component = Toolset_CssComponent::getInstance();
 			}
+
+			if ( ! class_exists( 'Toolset_Bootstrap_Loader', false ) ) {
+                require_once( TOOLSET_COMMON_PATH . '/inc/toolset.bootstrap.loader.class.php' );
+                $toolset_load_bootstrap = Toolset_Bootstrap_Loader::getInstance();
+            }
+
+			// Load Admin Notices Manager
+			if( ! class_exists( 'Toolset_Admin_Notices_Manager', false ) ) {
+				require_once( TOOLSET_COMMON_PATH . '/utility/admin/notices/manager.php' );
+				Toolset_Admin_Notices_Manager::init();
+			}
+
+            // Load Admin Notices Controller (user of our Toolset_Admin_Notices_Manager)
+            if( ! class_exists( 'Toolset_Controller_Admin_Notices', false ) ) {
+				require_once( TOOLSET_COMMON_PATH . '/inc/controller/admin/notices.php' );
+				new Toolset_Controller_Admin_Notices();
+            }
 
 			require_once( TOOLSET_COMMON_PATH . '/inc/toolset.compatibility.php' );
 			require_once( TOOLSET_COMMON_PATH . '/inc/toolset.function.helpers.php' );
@@ -340,18 +378,26 @@ class Toolset_Common_Bootstrap {
 	}
 	
 	public function register_toolset_forms() {
-		
+
 		if ( ! $this->is_section_loaded( self::TOOLSET_FORMS ) ) {
 			$this->add_section_loaded( self::TOOLSET_FORMS );
-			if ( ! class_exists( 'WPToolset_Forms_Bootstrap' ) ) {
+			if ( ! class_exists( 'WPToolset_Forms_Bootstrap', false ) ) {
 				require_once TOOLSET_COMMON_PATH . '/toolset-forms/bootstrap.php';
 			}
+
+			// It is possible to regenerate the classmap with Zend framework.
+			//
+			// cd toolset-forms
+			// /.../ZendFramework/bin/classmap_generator.php --overwrite
+			$classmap = include( TOOLSET_COMMON_PATH . '/toolset-forms/autoload_classmap.php' );
+			do_action( 'toolset_register_classmap', $classmap );
+
 			$this->apply_filters_on_sections_loaded( 'toolset_register_forms_section' );
 		}
 	}
 	
 	public function register_visual_editor() {
-		
+
 		if ( ! $this->is_section_loaded( self::TOOLSET_VISUAL_EDITOR ) ) {
 			$this->add_section_loaded( self::TOOLSET_VISUAL_EDITOR );
 			require_once( TOOLSET_COMMON_PATH . '/visual-editor/editor-addon-generic.class.php' );
@@ -362,15 +408,58 @@ class Toolset_Common_Bootstrap {
 	}
 	
 	public function register_parser() {
-		
+
 		if ( ! $this->is_section_loaded( self::TOOLSET_PARSER ) ) {
 			$this->add_section_loaded( self::TOOLSET_PARSER );
-			if ( ! class_exists( 'Toolset_Regex' ) ) {
+			if ( ! class_exists( 'Toolset_Regex', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/expression-parser/parser.php' );
 			}
 			$this->apply_filters_on_sections_loaded( 'toolset_register_parsers_section' );
 		}
 	}
+
+
+	public function register_user_editor() {
+
+		if ( ! $this->is_section_loaded( self::TOOLSET_USER_EDITOR ) ) {
+			$this->add_section_loaded( self::TOOLSET_USER_EDITOR );
+			require_once( TOOLSET_COMMON_PATH . '/user-editors/beta.php' );
+			$this->apply_filters_on_sections_loaded( 'toolset_register_user_editor_section' );
+		}
+	}
+	
+	public function register_shortcode_generator() {
+
+		if ( ! $this->is_section_loaded( self::TOOLSET_SHORTCODE_GENERATOR ) ) {
+			$this->add_section_loaded( self::TOOLSET_SHORTCODE_GENERATOR );
+			require_once( TOOLSET_COMMON_PATH . '/inc/toolset.shortcode.generator.class.php' );
+			$this->apply_filters_on_sections_loaded( 'toolset_register_shortcode_generator_section' );
+		}
+	}
+
+
+	/**
+	 * Add classes from the inc/autoloaded directory to the autoloader classmap.
+	 *
+	 * @since 2.3
+	 */
+	private function register_autoloaded_classes() {
+		$autoload_classmap_file = TOOLSET_COMMON_PATH . '/autoload_classmap.php';
+
+		if( ! is_file( $autoload_classmap_file ) ) {
+			// abort if file does not exist
+			return;
+		}
+
+		$autoload_classmap = include( $autoload_classmap_file );
+
+		if( is_array( $autoload_classmap ) ) {
+			// Register autoloaded classes.
+			$autoloader = Toolset_Common_Autoloader::get_instance();
+			$autoloader->register_classmap( $autoload_classmap );
+		}
+	}
+
 
 	public function clear_settings_instance() {
 		Toolset_Settings::clear_instance();

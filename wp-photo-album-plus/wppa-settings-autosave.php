@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.6.12
+* Version 6.6.15
 *
 */
 
@@ -5868,7 +5868,7 @@ global $wp_version;
 							{
 							$name = __('Tagcloud Link', 'wp-photo-album-plus');
 							$desc = __('Configure the link from the tags in the tag cloud.', 'wp-photo-album-plus');
-							$help = esc_js(__('Link the tag words to ether the thumbnails or the slideshow.', 'wp-photo-album-plus'));
+							$help = esc_js(__('Link the tag words to either the thumbnails or the slideshow.', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_tagcloud_linktype';
 							$slug2 = 'wppa_tagcloud_linkpage';
 							wppa_verify_page($slug2);
@@ -5901,7 +5901,7 @@ global $wp_version;
 							{
 							$name = __('Multitag Link', 'wp-photo-album-plus');
 							$desc = __('Configure the link from the multitag selection.', 'wp-photo-album-plus');
-							$help = esc_js(__('Link to ether the thumbnails or the slideshow.', 'wp-photo-album-plus'));
+							$help = esc_js(__('Link to either the thumbnails or the slideshow.', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_multitag_linktype';
 							$slug2 = 'wppa_multitag_linkpage';
 							wppa_verify_page($slug2);
@@ -6253,7 +6253,7 @@ global $wp_version;
 							wppa_setting($slug, '2', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('User create Albums Captcha', 'wp-photo-album-plus');
-							$desc = __('Uer must answer security question.', 'wp-photo-album-plus');
+							$desc = __('User must answer security question.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_user_create_captcha';
 							$html1 = wppa_checkbox($slug);
@@ -7207,6 +7207,19 @@ global $wp_version;
 							$tags = 'system,meta';
 							wppa_setting(false, '3', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Apply Default Photoname', 'wp-photo-album-plus');
+							$desc = __('Apply Default photo name on all photos in the system.', 'wp-photo-album-plus');
+							$help = esc_js('Puts the content of Table IX-D13 in all photo name.');
+							$slug2 = 'wppa_apply_default_photoname_all';
+							$html1 = '';
+							$html2 = wppa_maintenance_button( $slug2 );
+							$html3 = wppa_status_field( $slug2 );
+							$html4 = wppa_togo_field( $slug2 );
+							$html = array($html1, $html2, $html3, $html4);
+							$clas = '';
+							$tags = 'system,meta';
+							wppa_setting(false, '4.1', $name, $desc, $html, $help, $clas, $tags);
+
 							$name = __('Apply New Photodesc', 'wp-photo-album-plus');
 							$desc = __('Apply New photo description on all photos in the system.', 'wp-photo-album-plus');
 							$help = esc_js('Puts the content of Table IX-D5 in all photo descriptions.');
@@ -7218,7 +7231,7 @@ global $wp_version;
 							$html = array($html1, $html2, $html3, $html4);
 							$clas = '';
 							$tags = 'system,meta';
-							wppa_setting(false, '4', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting(false, '4.2', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Append to photodesc', 'wp-photo-album-plus');
 							$desc = __('Append this text to all photo descriptions.', 'wp-photo-album-plus');
@@ -8419,9 +8432,10 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 											__('Filename without extension', 'wp-photo-album-plus'),
 											__('IPTC Tag 2#005 (Graphic name)', 'wp-photo-album-plus'),
 											__('IPTC Tag 2#120 (Caption)', 'wp-photo-album-plus'),
-											__('No name at all', 'wp-photo-album-plus')
+											__('No name at all', 'wp-photo-album-plus'),
+											__('Photo w#id (literally)', 'wp-photo-album-plus'),
 										);
-							$vals = array( 'filename', 'noext', '2#005', '2#120', 'none' );
+							$vals = array( 'filename', 'noext', '2#005', '2#120', 'none', 'Photo w#id' );
 							$html = wppa_select($slug, $opts, $vals);
 							$clas = '';
 							$tags = 'system,meta,album';
@@ -9530,8 +9544,80 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 							$clas = 'wppa_fotomoto';
 							$tags = 'system';
 							wppa_setting($slug, '6.3', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Image Magick', 'wp-photo-album-plus');
+							$desc = __('Absulute path to the ImageMagick commands', 'wp-photo-album-plus') . ' <span style="color:red;" >' . __('experimental', 'wp-photo-album-plus') . '</span>';
+							$help = esc_js(__('If you want to use ImageMagick, enter the absolute path to the ImageMagick commands', 'wp-photo-album-plus'));
+							$slug = 'wppa_image_magic';
+							$html = wppa_input($slug, '300px');
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '7', $name, $desc, $html, $help, $clas, $tags);
+							}
+						wppa_setting_subheader( 'L', '1', __( 'Photo shortcode related settings' , 'wp-photo-album-plus') );
+							{
+							$name = __('Enable shortcode [photo ..]', 'wp-photo-album-plus');
+							$desc = __('Make the use of shortcode [photo ..] possible', 'wp-photo-album-plus');
+							$help = esc_js(__('Only disbale this when there is a conflict with another plugin', 'wp-photo-album-plus'));
+							$slug = 'wppa_photo_shortcode_enabled';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '1', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Single image type', 'wp-photo-album-plus');
+							$desc = __('Specify the single image type the shortcode [photo ..] should show.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_photo_shortcode_type';
+							$opts = array( 	__('A plain single photo', 'wp-photo-album-plus'),
+											__('A single photo with caption', 'wp-photo-album-plus'),
+											__('A single photo with extended caption', 'wp-photo-album-plus'),
+											__('A single photo in the style of a slideshow', 'wp-photo-album-plus'),
+											);
+							$vals = array( 	'photo',
+											'mphoto',
+											'xphoto',
+											'slphoto',
+											);
+							$html = wppa_select($slug, $opts, $vals);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '2', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Size', 'wp-photo-album-plus');
+							$desc = __('Specify the size (width) of the image.', 'wp-photo-album-plus');
+							$help = esc_js(__('Use the same syntax as in the [wppa size=".."] shortcode', 'wp-photo-album-plus'));
+							$help .= '\n\n'.esc_js(__('Examples: 350 for a fixed width of 350 pixels, or: 0.75 for a responsive display of 75% width, or: auto,350 for responsive with a maximum of 350 pixels.', 'wp-photo-album-plus'));
+							$slug = 'wppa_photo_shortcode_size';
+							$html = wppa_input($slug, '300px');
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '3', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Align', 'wp-photo-album-plus');
+							$desc = __('Specify the alignment of the image.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_photo_shortcode_align';
+							$opts = array( 	__('--- none ---', 'wp-photo-album-plus'),
+											__('left', 'wp-photo-album-plus'),
+											__('center', 'wp-photo-album-plus'),
+											__('right', 'wp-photo-album-plus'),
+											);
+							$vals = array( 	'',
+											'left',
+											'center',
+											'right',
+											);
+							$html = wppa_select($slug, $opts, $vals);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '4', $name, $desc, $html, $help, $clas, $tags);
+
+
 							}
 							?>
+
+
 
 						</tbody>
 						<tfoot style="font-weight: bold;" class="wppa_table_9">
@@ -9799,6 +9885,13 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 									<td>WPPA_FILE</td>
 									<td><small><?php _e('Plugins main file name.', 'wp-photo-album-plus') ?></small></td>
 									<td><?php echo(WPPA_FILE) ?></td>
+									<td></td>
+								</tr>
+								<tr>
+								<tr style="color:#333;">
+									<td>ABSPATH</td>
+									<td><small><?php _e('WP absolute path.', 'wp-photo-album-plus') ?></small></td>
+									<td><?php echo(ABSPATH) ?></td>
 									<td></td>
 								</tr>
 								<tr style="color:#333;">

@@ -13,8 +13,6 @@ final class Types_Asset_Manager extends Toolset_Assets_Manager {
 	//
 	// NEVER EVER use handles defined here as hardcoded strings, they may change at any time.
 
-	const SCRIPT_KNOCKOUT = 'knockout';
-
 	const SCRIPT_ADJUST_MENU_LINK = 'types-adjust-menu-link';
 	const SCRIPT_SLUG_CONFLICT_CHECKER = 'types-slug-conflict-checker';
 
@@ -25,16 +23,6 @@ final class Types_Asset_Manager extends Toolset_Assets_Manager {
 
 	const SCRIPT_JQUERY_UI_VALIDATION = 'wpcf-form-validation';
 	const SCRIPT_ADDITIONAL_VALIDATION_RULES = 'wpcf-form-validation-additional';
-
-	// Registered in Toolset common
-	
-	const SCRIPT_DIALOG_BOXES = 'ddl-dialog-boxes';
-	const SCRIPT_UTILS = 'toolset-utils';
-	const SCRIPT_HEADJS = 'headjs';
-	
-	// WordPress Core handles
-	
-	const STYLE_JQUERY_UI_DIALOG = 'wp-jquery-ui-dialog';
 
 
 	/**

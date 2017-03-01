@@ -322,9 +322,10 @@ function wpcf_fields_insert_existing_ajax() {
 /**
  * Returns HTML formatted field form (draggable).
  *
- * @param type $type
- * @param type $form_data
- * @return type
+ * @param $type
+ * @param array $form_data
+ *
+ * @return string
  */
 function wpcf_fields_get_field_form( $type, $form_data = array() ) {
     $form = wpcf_fields_get_field_form_data( $type, $form_data );

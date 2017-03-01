@@ -83,5 +83,7 @@ if( $editor_setup->addEditor( $editor_basic ) ) {
 	$editor_basic->addScreen( 'backend', new Toolset_User_Editors_Editor_Screen_Basic_Backend() );
 }
 
-
-$editor_setup->run();
+/**
+* The editor setup is run early on init because it depends on the user capabilities
+*/
+add_action( 'init', array( $editor_setup, 'run' ), -1000  );

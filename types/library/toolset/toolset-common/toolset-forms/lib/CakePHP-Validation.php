@@ -927,26 +927,26 @@ class WPToolset_Cake_Validation {
         return $_this->_check();
     }
 
-	/**
-	 * Checks that a value is a valid URL according to http://www.w3.org/Addressing/URL/url-spec.txt
-	 *
-	 * The regex checks for the following component parts:
-	 *
-	 * - a valid, optional, scheme
-	 * - a valid ip address OR
-	 *   a valid domain name as defined by section 2.3.1 of http://www.ietf.org/rfc/rfc1035.txt
-	 *   with an optional port number
-	 * - an optional valid path
-	 * - an optional query string (get parameters)
-	 * - an optional fragment (anchor tag)
-	 *
-	 * @param string $check Value to check
-	 * @param boolean $strict Require URL to be prefixed by a valid scheme (one of http(s)/ftp(s)/file/news/gopher)
-	 * @param bool $require_tld Require the hostname to contain TLD. True by default.
-	 *
-	 * @return bool Success
-	 */
-    function url( $check, $strict = false, $require_tld = true ) {
+    /**
+     * Checks that a value is a valid URL according to http://www.w3.org/Addressing/URL/url-spec.txt
+     *
+     * The regex checks for the following component parts:
+     *
+     * - a valid, optional, scheme
+     * - a valid ip address OR
+     *   a valid domain name as defined by section 2.3.1 of http://www.ietf.org/rfc/rfc1035.txt
+     *   with an optional port number
+     * - an optional valid path
+     * - an optional query string (get parameters)
+     * - an optional fragment (anchor tag)
+     *
+     * @param string $check Value to check
+     * @param boolean $strict Require URL to be prefixed by a valid scheme (one of http(s)/ftp(s)/file/news/gopher)
+     * @param bool $require_tld Require the hostname to contain TLD. True by default.
+     *
+     * @return bool Success
+     */
+    function url($check, $strict = false, $require_tld = true) {
         $_this = &WPToolset_Cake_Validation::getInstance();
         $_this->__populateIp();
         $_this->check = $check;
@@ -977,19 +977,17 @@ class WPToolset_Cake_Validation {
 	 * This method isn't bulletproof, though, and if it doesn't work in some special scenario,
 	 * it is possible to make use of the toolset_validate_file_url filter to override the validation result.
 	 *
-	 * @param string $value_to_check Value to check.
+	 *@param string $value_to_check Value to check.
 	 * @param bool $strict
 	 *
 	 * @return bool Validation result.
 	 * @since 2.2.6
 	 */
 	function url2( $value_to_check, $strict = false ) {
-
-		if( $this->is_attachment_url( $value_to_check ) ) {
+    	if( $this->is_attachment_url( $value_to_check ) ) {
 			$is_valid_url = true;
 		} else {
-			$is_valid_url = $this->url( $value_to_check, $strict, false );
-		}
+			$is_valid_url = $this->url( $value_to_check, $strict, false );}
 
 		/**
 		 * toolset_validate_file_url

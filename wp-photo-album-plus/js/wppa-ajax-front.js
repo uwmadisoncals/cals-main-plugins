@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsAjaxVersion = '6.6.10';
+var wppaJsAjaxVersion = '6.6.13';
 
 var wppaRenderAdd = false;
 var wppaWaitForCounter = 0;
@@ -601,6 +601,7 @@ function wppaVoteThumb( mocc, photo ) {
 								'&wppa-rating=1' +
 								'&wppa-rating-id=' + photo +
 								'&wppa-occur=' + mocc +
+								'&wppa-index=0' +
 								'&wppa-nonce=' + jQuery( '#wppa-nonce' ).val(),
 					async: 		true,
 					type: 		'GET',
@@ -857,10 +858,20 @@ function wppaAjaxMakeOrigName( mocc, photo ) {
 									if ( ArrValues[1] == '0' ) {	// Ok, no error
 
 										// Publish result
-										if ( wppaArtMonkyLink == 'file' ) window.open( ArrValues[2] );
-										if ( wppaArtMonkyLink == 'zip' ) document.location = ArrValues[2];
+										if ( wppaIsSafari ) {
+											if ( wppaArtMonkyLink == 'file' ) wppaWindowReference.location = ArrValues[2];
+											if ( wppaArtMonkyLink == 'zip' ) document.location = ArrValues[2];
+										}
+										else {
+											if ( wppaArtMonkyLink == 'file' ) window.open( ArrValues[2] );
+											if ( wppaArtMonkyLink == 'zip' ) document.location = ArrValues[2];
+										}
+
 									}
 									else {
+
+										// Close pre-opened window
+										if ( wppaIsSafari && wppaArtMonkyLink == 'file' ) wppaWindowReference.close();
 
 										// Show error
 										alert( 'Error: '+ArrValues[1]+'\n\n'+ArrValues[2] );

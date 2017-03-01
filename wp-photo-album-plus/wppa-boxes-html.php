@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.6.12
+* Version 6.6.15
 *
 */
 
@@ -2159,35 +2159,37 @@ static $albums_granted;
 				return '';
 			}
 		}
+		$albarr = array( $alb );
 	}
 
-	// Case 2. No alb given, treat as all albums. Make enumeration of all albums and process as enumeration.
+	// Case 2. No alb given, treat as all albums. Make array
 	elseif ( ! $alb ) {
 		$alb = trim( wppa_alb_to_enum_children( '0' ) . '.' . wppa_alb_to_enum_children( '-1' ), '.' );
+		$albarr = explode( '.', $alb );
 	}
 
-	// Case 3. An enumeration. Test for all albums in the enumeration, and remove the albums that he has no access to.
-	// In this event, if a single album remains, there will not be a selectionbox, but its treated as if a single album was supplied.
+	// Case 3. An enumeration. Make it an array.
 	if ( wppa_is_enum( $alb ) ) {
-
 		$albarr = explode( '.', wppa_expand_enum( $alb ) );
+	}
 
-		foreach( array_keys( $albarr ) as $key ) {
-			if ( ! wppa_have_access( $albarr[$key] ) ) {
-				if ( wppa_switch( 'upload_owner_only' ) ) {
-					unset( $albarr[$key] );
-				}
+	// Test for all albums in the array, and remove the albums that he has no access to.
+	// In this event, if a single album remains, there will not be a selectionbox, but its treated as if a single album was supplied.
+	foreach( array_keys( $albarr ) as $key ) {
+		if ( ! wppa_have_access( $albarr[$key] ) ) {
+			if ( wppa_switch( 'upload_owner_only' ) ) {
+				unset( $albarr[$key] );
 			}
 		}
-		if ( empty( $albarr ) ) {
-			$alb = '';
-		}
-		if ( count( $albarr ) == 1 ) {
-			$alb = reset( $albarr );
-		}
-		else {
-			$alb = $albarr;
-		}
+	}
+	if ( empty( $albarr ) ) {
+		$alb = '';
+	}
+	if ( count( $albarr ) == 1 ) {
+		$alb = reset( $albarr );
+	}
+	else {
+		$alb = $albarr;
 	}
 
 	// If no more albums left, no access, quit this proc.
@@ -2550,6 +2552,12 @@ static $albums_granted;
 				__( 'If you leave this blank, iptc tag 120 (Caption) will be used as photoname if available, else the original filename will be used as photo name.',
 				'wp-photo-album-plus' );
 				break;
+			case 'Photo w#id':
+				$expl =
+				__( 'If you leave this blank, "Photo photoid" will be used as photo name.',
+				'wp-photo-album-plus' );
+				break;
+
 			default:
 				$expl =
 				__( 'If you leave this blank, the original filename will be used as photo name.',
@@ -2832,12 +2840,12 @@ static $albums_granted;
 								jQuery("#percent-'.$yalb.'-'.$mocc.'").html(percentComplete+\'%\');
 							}
 							else {
-								jQuery("#percent-'.$yalb.'-'.$mocc.'").html(\'Processing...\');
+								jQuery("#percent-'.$yalb.'-'.$mocc.'").html(\'' . __( 'Processing...', 'wp-photo-album-plus' ) . '\');
 							}
 						},
 						success: function() {
 							jQuery("#bar-'.$yalb.'-'.$mocc.'").width(\'100%\');
-							jQuery("#percent-'.$yalb.'-'.$mocc.'").html(\'Done!\');
+							jQuery("#percent-'.$yalb.'-'.$mocc.'").html(\'' . __( 'Done!', 'wp-photo-album-plus' ) . '\');
 						},
 						complete: function(response) {
 							jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="font-size: 10px;" >\'+response.responseText+\'</span>\' );'.

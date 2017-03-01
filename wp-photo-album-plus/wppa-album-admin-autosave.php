@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.6.12
+* Version 6.6.13
 *
 */
 
@@ -1330,7 +1330,7 @@ global $wpdb;
 					$num = true;
 					break;
 				case 'a_parent':
-					$seq[] = strtolower(wppa_get_album_name($album['a_parent'], 'extended'));
+					$seq[] = strtolower(wppa_get_album_name($album['a_parent'], array( 'extended' => true )));
 					break;
 				default:
 					$seq[] = $album['id'];
@@ -1459,7 +1459,7 @@ global $wpdb;
 								<td><?php echo($album['owner']); ?></td>
 							<?php } ?>
 							<td><?php echo($album['a_order']) ?></td>
-							<td><?php echo wppa_get_album_name($album['a_parent'], 'extended') ?></td>
+							<td><?php echo wppa_get_album_name($album['a_parent'], array( 'extended' => true )) ?></td>
 							<?php $url = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id='.$album['id']); ?>
 							<?php $na = $counts['selfalbums']; ?>
 							<?php $np = $counts['selfphotos']; ?>
@@ -1698,7 +1698,7 @@ global $wpdb;
 					$num = true;
 					break;
 				case 'a_parent':
-					$seq[] = strtolower(wppa_get_album_name($album['a_parent']), 'extended');
+					$seq[] = strtolower(wppa_get_album_name($album['a_parent']), array( 'extended' => true ));
 					break;
 				default:
 					$seq[] = $album['id'];
@@ -2104,7 +2104,7 @@ global $wpdb;
 								<td><?php echo($album['owner']); ?></td>
 							<?php } ?>
 							<td><?php echo($album['a_order']) ?></td>
-							<td><?php echo wppa_get_album_name($album['a_parent'], 'extended') ?></td>
+							<td><?php echo wppa_get_album_name($album['a_parent'], array( 'extended' => true )) ?></td>
 							<?php $url = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id='.$album['id']); ?>
 							<?php $na = $counts['selfalbums']; ?>
 							<?php $np = $counts['selfphotos']; ?>

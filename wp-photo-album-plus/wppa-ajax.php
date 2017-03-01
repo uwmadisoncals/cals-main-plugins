@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.6.12
+* Version 6.6.15
 *
 */
 
@@ -551,7 +551,7 @@ global $wppa_log_file;
 					$name = $data['filename'];
 				}
 				else {
-					$name = __( $data['name'] , 'wp-photo-album-plus');
+					$name = __( $data['name'] );
 				}
 				$name = wppa_sanitize_file_name( $name ); 				// Remove illegal chars
 				$name = preg_replace( '/\.[^.]*$/', '', $name );	// Remove file extension
@@ -1462,30 +1462,31 @@ global $wppa_log_file;
 				case 'rot180':
 				case 'rotleft':
 				case 'flip':
+				case 'flop':
 					switch ( $item ) {
 						case 'rotleft':
-							$angle = '90';
 							$dir = __( 'left' , 'wp-photo-album-plus');
 							break;
 						case 'rot180':
-							$angle = '180';
 							$dir = __( '180&deg;' , 'wp-photo-album-plus');
 							break;
 						case 'rotright':
-							$angle = '270';
 							$dir = __( 'right' , 'wp-photo-album-plus');
 							break;
 						case 'flip':
-							$angle = '360';
+						case 'flop':
 							$dir = '';
 							break;
 					}
-					wppa( 'error', wppa_rotate( $photo, $angle ) );
+					wppa( 'error', wppa_rotate( $photo, $item ) );
 					if ( ! wppa( 'error' ) ) {
 						wppa_update_modified( $photo );
 						wppa_bump_photo_rev();
 						wppa_bump_thumb_rev();
-						if ( $angle == '360' ) {
+						if ( $item == 'flip' ) {
+							echo '||0||'.sprintf( __( 'Photo flipped' , 'wp-photo-album-plus'), $photo );
+						}
+						elseif ( $item == 'flop' ) {
 							echo '||0||'.sprintf( __( 'Photo flipped' , 'wp-photo-album-plus'), $photo );
 						}
 						else {
@@ -1638,7 +1639,7 @@ global $wppa_log_file;
 						default:
 							$itemname = $item;
 					}
-	//				if ( $item == 'name' || $item == 'description' || $item == 'tags' ) wppa_index_quick_remove( 'photo', $photo );
+
 					$iret = $wpdb->query( $wpdb->prepare( 'UPDATE '.WPPA_PHOTOS.' SET `'.$item.'` = %s WHERE `id` = %s', $value, $photo ) );
 					if ( $item == 'name' || $item == 'description' || $item == 'tags' )  wppa_index_update( 'photo', $photo );
 					if ( $item == 'status' && $value != 'scheduled' ) wppa_update_photo( array( 'id' => $photo, 'scheduledtm' => '' ) );
@@ -2657,14 +2658,40 @@ global $wppa_log_file;
 					ob_start();
 					if ( $value == 'yes' ) {
 						// Cleanup index
-						wppa_schedule_maintenance_proc( 'wppa_cleanup_index' );
+						wppa_schedule_maintenance_proc( 'wppa_cleanup_index', true );
 					}
 					else {
 						// Remake index
-						wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
-						wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+						wppa_schedule_maintenance_proc( 'wppa_remake_index_albums', true );
+						wppa_schedule_maintenance_proc( 'wppa_remake_index_photos', true );
 					}
 					ob_end_clean();
+					break;
+				case 'wppa_search_user_void':
+					ob_start();
+					wppa_schedule_maintenance_proc( 'wppa_remake_index_albums', true );
+					wppa_schedule_maintenance_proc( 'wppa_remake_index_photos', true );
+					wppa_schedule_maintenance_proc( 'wppa_cleanup_index', true );
+					ob_end_clean();
+					break;
+				case 'wppa_image_magic':
+					$value = rtrim( $value, '/' );
+					$ok = true;
+					if ( $value ) {
+						$ok = false;
+						$files = glob( $value . '/*' );
+						if ( is_array( $files ) ) {
+							foreach ( $files as $file ) {
+								if ( basename( $file ) == 'convert' ) {
+									$ok = true;
+								}
+							}
+						}
+					}
+					if ( ! $ok ) {
+						wppa( 'error', '4713' );
+						$alert .= __( 'This path does not contain ImageMagic commands', 'wp-photo-album-plus' );
+					}
 					break;
 
 				default:
@@ -2722,7 +2749,7 @@ global $wppa_log_file;
 
 			// If cron request, schedule
 			if ( $cron ) {
-				echo wppa_schedule_maintenance_proc( $slug, 10 );
+				wppa_schedule_maintenance_proc( $slug, true );
 
 				// Remove in case this is a re-start of a crashed cron job
 				delete_option( $slug . '_lasttimestamp' );

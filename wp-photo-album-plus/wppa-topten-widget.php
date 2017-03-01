@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the top rated photos
-* Version 6.6.05
+* Version 6.6.13
 */
 
 class TopTenWidget extends WP_Widget {
@@ -128,11 +128,13 @@ class TopTenWidget extends WP_Widget {
 			if ( $medalsonly ) {
 				$thumbs = $wpdb->get_results( 	"SELECT * FROM `".WPPA_PHOTOS."` " .
 												"WHERE `status` IN ( 'gold', 'silver', 'bronze' ) " .
+												"AND `album` <> '-9' " .
 												"ORDER BY " . $sortby . " " .
 												"LIMIT " . $max, ARRAY_A );
 			}
 			else {
 				$thumbs = $wpdb->get_results( 	"SELECT * FROM `".WPPA_PHOTOS."` " .
+												"WHERE `album` <> '-9' " .
 												"ORDER BY " . $sortby . " " .
 												"LIMIT " . $max, ARRAY_A );
 			}

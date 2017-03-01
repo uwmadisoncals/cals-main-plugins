@@ -24,35 +24,22 @@ function wpcf_admin_menu_edit_user_fields_hook() {
 		array(
 			Types_Asset_Manager::SCRIPT_JQUERY_UI_VALIDATION,
 			Types_Asset_Manager::SCRIPT_ADDITIONAL_VALIDATION_RULES,
+
+			// These scripts are needed only for the Styling editor
+			Types_Asset_Manager::SCRIPT_CODEMIRROR,
+			Types_Asset_Manager::SCRIPT_CODEMIRROR_CSS,
+			Types_Asset_Manager::SCRIPT_CODEMIRROR_XML,
+			Types_Asset_Manager::SCRIPT_CODEMIRROR_HTMLMIXED,
+			Types_Asset_Manager::SCRIPT_JSCROLLPANE,
+			Types_Asset_Manager::SCRIPT_MOUSEWHEEL
 		)
 	);
 
-	// Scroll
-	wp_enqueue_script( 'wpcf-scrollbar',
-		WPCF_EMBEDDED_TOOLSET_RELPATH . '/toolset-common/visual-editor/res/js/scrollbar.js',
-		array( 'jquery' ) );
-	wp_enqueue_script( 'wpcf-mousewheel',
-		WPCF_EMBEDDED_TOOLSET_RELPATH . '/toolset-common/visual-editor/res/js/mousewheel.js',
-		array( 'wpcf-scrollbar' ) );
-	//Css editor
-	wp_enqueue_script( 'wpcf-form-codemirror',
-		WPCF_RELPATH . '/resources/js/codemirror234/lib/codemirror.js',
-		array( 'wpcf-js' ) );
-	wp_enqueue_script( 'wpcf-form-codemirror-css-editor',
-		WPCF_RELPATH . '/resources/js/codemirror234/mode/css/css.js',
-		array( 'wpcf-js' ) );
-	wp_enqueue_script( 'wpcf-form-codemirror-html-editor',
-		WPCF_RELPATH . '/resources/js/codemirror234/mode/xml/xml.js',
-		array( 'wpcf-js' ) );
-	wp_enqueue_script( 'wpcf-form-codemirror-html-editor2',
-		WPCF_RELPATH . '/resources/js/codemirror234/mode/htmlmixed/htmlmixed.js',
-		array( 'wpcf-js' ) );
 	wp_enqueue_script( 'wpcf-form-codemirror-editor-resize',
 		WPCF_RELPATH . '/resources/js/jquery_ui/jquery.ui.resizable.min.js',
 		array( 'wpcf-js' ) );
 
-	wp_enqueue_style( 'wpcf-css-editor',
-		WPCF_RELPATH . '/resources/js/codemirror234/lib/codemirror.css' );
+
 	wp_enqueue_style( 'wpcf-usermeta',
 		WPCF_EMBEDDED_RES_RELPATH . '/css/usermeta.css' );
 
@@ -71,10 +58,17 @@ function wpcf_admin_menu_edit_user_fields_hook() {
 		WPCF_VERSION
 	);
 
-	/*
-	 * Enqueue styles
-	 */
-	wp_enqueue_style( 'wpcf-scroll', WPCF_EMBEDDED_TOOLSET_RELPATH . '/toolset-common/visual-editor/res/css/scroll.css' );
+	// Enqueue styles
+
+	$asset_manager->enqueue_styles(
+		array(
+			// These styles are needed only for the Styling editor
+			Types_Asset_Manager::STYLE_CODEMIRROR,
+			Types_Asset_Manager::STYLE_EDITOR_ADDON_MENU_SCROLL
+		)
+	);
+
+
 	wp_enqueue_style( 'font-awesome' );
 
 	add_action( 'admin_footer', 'wpcf_admin_fields_form_js_validation' );
@@ -87,11 +81,6 @@ function wpcf_admin_menu_edit_user_fields_hook() {
 	$wpcf_admin = new Types_Admin_Edit_Meta_Fields_Group();
 	$wpcf_admin->init_admin();
 	$form = $wpcf_admin->form();
-	wpcf_form( 'wpcf_form_fields', $form );
-
-	return;
-
-	$form = wpcf_admin_usermeta_form();
 	wpcf_form( 'wpcf_form_fields', $form );
 }
 

@@ -114,25 +114,6 @@ wpcf_embedded_after_setup_theme_hook();
 $GLOBALS['wpcf'] = new stdClass();
 
 
-
-/**
- * Initialize the autoloader (for newer parts of code).
- */
-function wpcf_initialize_autoloader_embedded() {
-	require_once WPCF_EMBEDDED_INC_ABSPATH . '/autoloader.php';
-	$autoloader = WPCF_Autoloader::get_instance();
-	$autoloader->add_prefix( 'WPCF' );
-
-	// This will trigger the loading mechanism for legacy classes.
-	$autoloader->add_prefix( 'Types' );
-	$autoloader->add_prefix( 'WPToolset' );
-
-	$autoloader->add_path( WPCF_EMBEDDED_ABSPATH . '/classes' );
-}
-
-wpcf_initialize_autoloader_embedded();
-
-
 /**
  * Main init hook.
  *

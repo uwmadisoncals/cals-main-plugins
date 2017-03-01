@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version 6.6.12
+* Version 6.6.13
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -258,7 +258,7 @@ global $pagenow;
 			wppa_error_message( __( 'Please restart cron job: Remake index albums in Table VIII-A8', 'wp-photo-album-plus' ) );
 		}
 	}
-*/
+
 	// Remake photo index required?
 	if ( get_option( 'wppa_remake_index_photos_status' ) || get_option( 'wppa_index_need_remake', 'no') == 'yes' ) {
 		if ( strpos( get_option( 'wppa_remake_index_photos_status' ), 'cron' ) === false ) {
@@ -274,7 +274,7 @@ global $pagenow;
 			update_option( 'wppa_remake_index_albums_status', 'required' );
 		}
 	}
-
+*/
 	// Rerate required?
 	if ( get_option( 'wppa_rating_on' ) == 'yes' && get_option( 'wppa_rerate_status' ) ) {
 		if ( strpos( get_option( 'wppa_rerate_status' ), 'cron' ) === false ) {

@@ -8,6 +8,18 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 
 	private $post;
 	public $editor;
+	
+	public function __construct() {		
+		add_action( 'init',												array( $this, 'register_assets' ), 50 );
+		add_action( 'admin_enqueue_scripts',							array( $this, 'admin_enqueue_assets' ), 50 );
+		
+		add_filter( 'toolset_filter_toolset_registered_user_editors',	array( $this, 'register_user_editor' ) );
+		add_filter( 'wpv_filter_wpv_layout_template_extra_attributes',	array( $this, 'layout_template_attribute' ), 10, 3 );
+		add_action( 'wpv_action_wpv_ct_inline_user_editor_buttons',		array( $this, 'register_inline_editor_action_buttons' ) );
+		
+		// Post edit page integration
+		//add_action( 'edit_form_after_title',				array( $this, 'preventNested' ) );
+	}
 
 	public function isActive() {
 		if( ! $this->setMediumAsPost() )
@@ -22,28 +34,29 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 			return false;
 
 		// don't show VC if user role is not allowed to use the backend editor
-		if( ! vc_user_access()->part( 'backend_editor' )->can()->get() )
+		if( ! vc_user_access()->part( 'backend_editor' )->can()->get() ) {
 			return false;
+		}
 
 		$this->action();
 		return true;
 	}
 
 	private function action() {
-		add_action( 'admin_init', array( $this, '_actionSetup' ) );
+		add_action( 'admin_init', array( $this, 'setup' ) );
 
 		add_action( 'admin_print_scripts', array( &$this->editor, 'enqueueEditorScripts' ) );
 		add_action( 'admin_print_scripts', array( $this, 'print_scripts' ) );
 		add_action( 'admin_print_scripts', array( Vc_Shortcodes_Manager::getInstance(), 'buildShortcodesAssets' ), 1 );
 
-		$this->medium->setHtmlEditorBackend( array( $this, 'htmlOutput' ) );
+		$this->medium->setHtmlEditorBackend( array( $this, 'html_output' ) );
 	}
 
 	/**
 	 * Setup the editor
 	 * called on action 'admin_init'
 	 */
-	public function _actionSetup() {
+	public function setup() {
 		// Disable Visual Composers Frontend Editor
 		vc_disable_frontend();
 
@@ -71,8 +84,52 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 
 		return true;
 	}
+	
+	public function register_assets() {
+		
+		$toolset_assets_manager = Toolset_Assets_Manager::getInstance();
+		
+		// Content Template as inline object assets
+		
+		$toolset_assets_manager->register_script(
+			'toolset-user-editors-vc-layout-template-script',
+			TOOLSET_COMMON_URL . '/user-editors/editor/screen/visual-composer/backend_layout_template.js',
+			array( 'jquery', 'views-layout-template-js', 'underscore' ),
+			TOOLSET_COMMON_VERSION,
+			true
+		);
+		
+		$vc_layout_template_i18n = array(
+            'template_editor_url'	=> admin_url( 'admin.php?page=ct-editor' ),
+			'template_overlay'		=> array(
+										'title'		=> sprintf( __( 'This Content Template uses %1$s', 'wpv-views' ), $this->editor->getName() ),
+										'text'		=> sprintf( __( 'To modify this Content Template, go to edit it and launch the %1$s.', 'wpv-views' ), $this->editor->getName() ),
+										'button'	=> sprintf( __( 'Edit with %1$s', 'wpv-views' ), $this->editor->getName() ),
+										'discard'	=> sprintf( __( 'Stop using %1$s for this Content Template', 'wpv-views' ), $this->editor->getName() )
+									),
+		);
+		$toolset_assets_manager->localize_script( 
+			'toolset-user-editors-vc-layout-template-script', 
+			'toolset_user_editors_vc_layout_template_i18n', 
+			$vc_layout_template_i18n 
+		);
+		
+	}
+	
+	public function admin_enqueue_assets() {
+		$page = toolset_getget( 'page' );
+		if ( 
+			'views-editor' == $page 
+			|| 'view-archives-editor' == $page 
+		) {
+			
+			do_action( 'toolset_enqueue_scripts', array( 'toolset-user-editors-vc-layout-template-script' ) );
+			
+		}
+	}
 
-	public function htmlOutput() {
+	public function html_output() {
+		
 		ob_start(); ?>
 		<div style="display: none;">
 			<input type="hidden" id="post_ID" name="post_ID" value="<?php echo $this->post->ID; ?>">
@@ -108,6 +165,16 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 		echo preg_replace('/\v(?:[\v\h]+)/', '', $script);
 		$output = ob_get_contents();
 		ob_end_clean();
+		
+		$admin_url = admin_url( 'admin.php?page=ct-editor&ct_id=' . esc_attr( $_GET['ct_id'] ) );
+		$output .= '<p>' 
+			. sprintf( 
+				__( '%1$sStop using %2$s for this Content Template%3$s', 'wpv-views' ), 
+				'<a href="' . esc_url( $admin_url ) . '&ct_editor_choice=basic">',
+				'Visual Composer',
+				'</a>'
+			) 
+			. '</p>';
 
 		return $output;
 	}
@@ -165,5 +232,40 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 		// disable our backbone extension due to conflicts with vc (see util.js)
 		$output .= "<script>var ToolsetDisableBackboneExtension = '1';</script>";
 		echo preg_replace('/\v(?:[\v\h]+)/', '', $output );
+	}
+	
+	public function register_user_editor( $editors ) {
+		$editors[ $this->editor->getId() ] = $this->editor->getName();
+		return $editors;
+	}
+	
+	/**
+	* Set the builder used by a Content Template, if any.
+	*
+	* On a Content Template used inside a View or WPA loop output, we set which builder it is using
+	* so we can link to the CT edit page with the right builder instantiated.
+	*
+	* @since 2.3.0
+	*/
+	
+	public function layout_template_attribute( $attributes, $content_template, $view_id ) {
+		$content_template_has_vc = ( get_post_meta( $content_template->ID, '_toolset_user_editors_editor_choice', true ) == 'vc' );
+		if ( $content_template_has_vc ) {
+			$attributes['builder'] = $this->editor->getId();
+		}
+		return $attributes;
+	}
+	
+	public function register_inline_editor_action_buttons( $content_template ) {
+		$content_template_has_vc = ( get_post_meta( $content_template->ID, '_toolset_user_editors_editor_choice', true ) == 'vc' );
+		?>
+		<button 
+			class="button button-secondary js-wpv-ct-apply-user-editor js-wpv-ct-apply-user-editor-<?php echo esc_attr( $this->editor->getId() ); ?>" 
+			data-editor="<?php echo esc_attr( $this->editor->getId() ); ?>" 
+			<?php disabled( $content_template_has_vc );?>
+		>
+			<?php echo $this->editor->getName(); ?>
+		</button>
+		<?php
 	}
 }

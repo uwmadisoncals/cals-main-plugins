@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.6.12
+* Version 6.6.15
 *
 */
 
@@ -377,6 +377,15 @@ function wppaTryFlip( id ) {
 
 	if ( confirm( query ) ) {
 		wppaAjaxUpdatePhoto( id, 'flip', 0, <?php echo ( wppa( 'front_edit' ) ? 'false' : 'true' ) ?> );
+	}
+}
+
+function wppaTryFlop( id ) {
+
+	var query = '<?php echo esc_js( __( 'Are you sure you want to flip this photo?', 'wp-photo-album-plus' ) ) ?>';
+
+	if ( confirm( query ) ) {
+		wppaAjaxUpdatePhoto( id, 'flop', 0, <?php echo ( wppa( 'front_edit' ) ? 'false' : 'true' ) ?> );
 	}
 }
 
@@ -1059,7 +1068,13 @@ function wppaTryWatermark( id ) {
 									'<input' .
 										' type="button"' .
 										' onclick="wppaTryFlip( ' . $id . ' )"' .
-										' value="' . esc_attr( __( 'Flip', 'wp-photo-album-plus') ) . '"' .
+										' value="' . esc_attr( __( 'Flip', 'wp-photo-album-plus') ) . '&thinsp;&#8212;"' .
+									' />' .
+									' ' .
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryFlop( ' . $id . ' )"' .
+										' value="' . esc_attr( __( 'Flip', 'wp-photo-album-plus') ) . ' |"' .
 									' />' .
 									' ';
 								}
@@ -1969,6 +1984,11 @@ function wppaTryMove( id, video ) {
 				<?php } ?>
 				<!-- Submit -->
 				<input type="submit" onclick="return wppaBulkDoitOnClick()" class="button-primary" value="<?php _e( 'Doit!' , 'wp-photo-album-plus') ?>" />
+				<?php
+					if ( wppa_is_mobile() ) {
+						echo '<br />';
+					}
+				?>
 				<?php $nextafterselhtml =
 					'<select name="next-after" >' .
 						'<option value="-1" ' . ( $next_after == '-1' ? 'selected="selected"' : '' ) . ' >' . __( 'the previous page', 'wp-photo-album-plus' ) . '</option>' .
@@ -1976,6 +1996,9 @@ function wppaTryMove( id, video ) {
 						'<option value="1" ' . ( $next_after == '1' ? 'selected="selected"' : '' ) . ' >' . __( 'the next page', 'wp-photo-album-plus' ) . '</option>' .
 					'</select>';
 					echo sprintf( __( 'Go to %s after Doit!.', 'wp-photo-album-plus'), $nextafterselhtml );
+					if ( wppa_is_mobile() ) {
+						echo '<br />';
+					}
 				?>
 
 				<input type="checkbox" id="no-confirm-delete" name="no-confirm-delete"<?php if ( $no_confirm_delete ) echo ' checked="checked"' ?> style="display:none;" />

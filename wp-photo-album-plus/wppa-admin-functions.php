@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.6.09
+* Version 6.6.15
 *
 */
 
@@ -365,7 +365,7 @@ global $wpdb;
 
 	// Check args
 	$err = '1';
-	if ( !is_numeric( $id ) || !is_numeric( $ang ) ) return $err;
+	if ( ! is_numeric( $id ) || ( ! in_array( $ang, array( 'rotright', 'rot180', 'rotleft', 'flip', 'flop' ) ) ) ) return $err;
 
 	// Get the ext
 	$err = '2';
@@ -382,66 +382,116 @@ global $wpdb;
 	$img = getimagesize( $file );
 	if ( ! $img ) return $err;
 
-	// Get the image
-	switch ( $img[2] ) {
-		case 1:	// gif
-			$err = '5';
-			$source = imagecreatefromgif( $file );
-			break;
-		case 2: // jpg
-			$err = '6';
-			$source = wppa_imagecreatefromjpeg( $file );
-			break;
-		case 3: // png
-			$err = '7';
-			$source = imagecreatefrompng( $file );
-			break;
-		default: // unsupported mimetype
-			$err = '10';
-			$source = false;
-	}
-	if ( ! $source ) return $err;
+	// Imagick
+	if ( wppa_opt( 'image_magic' ) ) {
 
-	// Rotate the image
-	$err = '11';
-	if ( $ang == '360' ) {
-		if ( ! imageflip( $source, IMG_FLIP_HORIZONTAL ) ) {
-			return $err;;
+		// Rotate the image
+		$err = '11';
+
+		switch( $ang ) {
+			case 'rotright':
+				wppa_image_magic( 'convert ' . $file . ' -rotate 90 ' . $file );
+				break;
+			case 'rot180':
+				wppa_image_magic( 'convert ' . $file . ' -rotate 180 ' . $file );
+				break;
+			case 'rotleft':
+				wppa_image_magic( 'convert ' . $file . ' -rotate -90 ' . $file );
+				break;
+			case 'flip':
+				wppa_image_magic( 'convert ' . $file . ' -flip ' . $file );
+				break;
+			case 'flop':
+				wppa_image_magic( 'convert ' . $file . ' -flop ' . $file );
+				break;
 		}
-		$rotate = $source;
 	}
+
+	// Classic
 	else {
-		$rotate = imagerotate( $source, $ang, 0 );
-		if ( ! $rotate ) {
-			return $err;
+
+		// Get the image
+		switch ( $img[2] ) {
+			case 1:	// gif
+				$err = '5';
+				$source = imagecreatefromgif( $file );
+				break;
+			case 2: // jpg
+				$err = '6';
+				$source = wppa_imagecreatefromjpeg( $file );
+				break;
+			case 3: // png
+				$err = '7';
+				$source = imagecreatefrompng( $file );
+				break;
+			default: // unsupported mimetype
+				$err = '10';
+				$source = false;
 		}
+		if ( ! $source ) return $err;
+
+		// Rotate the image
+		$err = '11';
+		switch( $ang ) {
+
+			case 'rotright':
+				$rotate = imagerotate( $source, -90, 0 );
+				if ( ! $rotate ) {
+					return $err;
+				}
+				break;
+			case 'rot180':
+				$rotate = imagerotate( $source, 180, 0 );
+				if ( ! $rotate ) {
+					return $err;
+				}
+				break;
+			case 'rotleft':
+				$rotate = imagerotate( $source, 90, 0 );
+				if ( ! $rotate ) {
+					return $err;
+				}
+				break;
+			case 'flip':
+				if ( ! imageflip( $source, IMG_FLIP_VERTICAL ) ) {
+					return $err;;
+				}
+				$rotate = $source;
+				break;
+			case 'flop':
+				if ( ! imageflip( $source, IMG_FLIP_HORIZONTAL ) ) {
+					return $err;;
+				}
+				$rotate = $source;
+				break;
+		}
+
+		// Save the image
+		switch ( $img[2] ) {
+			case 1:
+				$err = '15';
+				$bret = imagegif( $rotate, $file, 95 );
+				break;
+			case 2:
+				$err = '16';
+				$bret = imagejpeg( $rotate, $file );
+				break;
+			case 3:
+				$err = '17';
+				$bret = imagepng( $rotate, $file );
+				break;
+			default:
+				$err = '20';
+				$bret = false;
+		}
+		if ( ! $bret ) return $err;
+
+		// Destroy the source
+		imagedestroy( $source );
+
+		// Destroy the result
+		imagedestroy( $rotate );
 	}
-
-	// Save the image
-	switch ( $img[2] ) {
-		case 1:
-			$err = '15';
-			$bret = imagegif( $rotate, $file, 95 );
-			break;
-		case 2:
-			$err = '16';
-			$bret = imagejpeg( $rotate, $file );
-			break;
-		case 3:
-			$err = '17';
-			$bret = imagepng( $rotate, $file );
-			break;
-		default:
-			$err = '20';
-			$bret = false;
-	}
-	if ( ! $bret ) return $err;
-
-	// Destroy the source
-	imagedestroy( $source );
-
-	// Destroy the result
-	imagedestroy( $rotate );
 
 	// accessable
 	wppa_chmod( $file );
@@ -699,6 +749,8 @@ function wppa_admin_page_links( $curpage, $pagesize, $count, $link, $extra = '' 
 		if ( $curpage != '1' ) {
 			?><a href="<?php echo( $prevurl ) ?>"><?php _e( 'Prev page' , 'wp-photo-album-plus') ?></a><?php
 		}
+
+/*
 		$i = '1';
 		while ( $i <= $npages ) {
 			if ( $i == $curpage ) {
@@ -716,6 +768,22 @@ function wppa_admin_page_links( $curpage, $pagesize, $count, $link, $extra = '' 
 			}
 			$i++;
 		}
+*/
+
+		echo '<select onchange="document.location = jQuery( this ).val()" >';
+		$i = '1';
+		while ( $i <= $npages ) {
+			if ( $i == $curpage ) {
+				echo '<option selected="selected" >' . $i . '</option>';
+			}
+			else {
+				echo '<option value="' . $pagurl . $i . $extra . '"' . ( $i == $npages ? ' title="' . $lastpagecount . '"' : '' ) . ' >' . $i . '</option>';
+			}
+			$i++;
+		}
+		echo '</select>';
+
+
 		if ( $curpage != $npages ) {
 			echo
 				' <a href="' . $nexturl . '" >' .
@@ -888,6 +956,7 @@ global $warning_given_small;
 		// Get and verify the size
 		$img_size = getimagesize( $file );
 
+		// Assume success finding image size
 		if ( $img_size ) {
 			if ( wppa_check_memory_limit( '', $img_size['0'], $img_size['1'] ) === false ) {
 				wppa_error_message( sprintf( __( 'ERROR: Attempt to upload a photo that is too large to process (%s).' , 'wp-photo-album-plus'), $name ).wppa_check_memory_limit() );
@@ -900,11 +969,14 @@ global $warning_given_small;
 				$warning_given_small = true;
 			}
 		}
+
+		// No image size found
 		else {
-			wppa_error_message( __( 'ERROR: Unable to retrieve image size of' , 'wp-photo-album-plus').' '.$name.' '.__( 'Are you sure it is a photo?' , 'wp-photo-album-plus') );
+			wppa_error_message( __( 'ERROR: Unable to retrieve image size of' , 'wp-photo-album-plus').' '.$file.' '.__( 'Are you sure it is a photo?' , 'wp-photo-album-plus') );
 			wppa( 'ajax_import_files_error', __( 'No photo found', 'wp-photo-album-plus' ) );
 			return false;
 		}
+
 		// Get ext based on mimetype, regardless of ext
 		switch( $img_size[2] ) { 	// mime type
 			case 1: $ext = 'gif'; break;

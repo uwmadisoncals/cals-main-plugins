@@ -95,5 +95,9 @@ abstract class Toolset_User_Editors_Medium_Abstract
 	public function addManager( Toolset_User_Editors_Manager_Interface $manager ) {
 		$this->manager = $manager;
 	}
+	
+	public function getManager() {
+		return $this->manager;
+	}
 
 }

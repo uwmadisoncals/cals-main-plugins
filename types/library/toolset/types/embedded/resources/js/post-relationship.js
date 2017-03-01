@@ -1204,9 +1204,9 @@ jQuery(document).ready(function($) {
 function wpcfGetCommaSign() {
     var comma = ',';
 
-    if( typeof postL10n !== 'undefined' && postL10n.comma !== undefined ) {
+    if( typeof postL10n !== 'undefined' && typeof postL10n.comma !== 'undefined' ) {
         comma = postL10n.comma;
-    } else if( typeof window.tagsBoxL10n !== 'undefined' && window.tagsBoxL10n.tagDelimiter !== undefined ) {
+    } else if( typeof window.tagsBoxL10n !== 'undefined' && typeof window.tagsBoxL10n.tagDelimiter !== 'undefined' ) {
         comma = window.tagsBoxL10n.tagDelimiter;
     }
 

@@ -3,12 +3,18 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version 6.6.12
+* Version 6.6.13
 *
 *
 */
 
 // Add an item to the index
+//
+// @1: string. Type. Can be 'album' os 'photo'
+// @2: int. Id. The id of the album or the photo.
+//
+// The actual addition of searchable words and ids into the index db table is handled in a cron job.
+// If this function is called real-time, it simply notifys cron to scan all albums or photos on missing items.
 function wppa_index_add( $type, $id ) {
 global $wpdb;
 global $acount;
@@ -27,26 +33,31 @@ global $pcount;
 			return;
 		}
 
-		$album = wppa_cache_album( $id );
+		// If album is gone, trigger cron to cleanup the index
+		if ( ! wppa_album_exists( $id ) ) {
+			wppa_schedule_maintenance_proc( 'wppa_cleanup_index' );
+			return;
+		}
 
 		// Find the raw text, all qTranslate languages
 		$words = wppa_index_get_raw_album( $id );
 
-		// Convert to santized array of ndexable words
+		// Convert to santized array of indexable words
 		$words = wppa_index_raw_to_words( $words );
 
 		// Process all the words to see if they must be added to the index
 		foreach ( $words as $word ) {
 
 			// Get the row of the index table where the word is registered.
-			$indexline = $wpdb->get_row($wpdb->prepare("SELECT * FROM `".WPPA_INDEX."` WHERE `slug` = %s", $word), ARRAY_A);
+			$indexline = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . WPPA_INDEX . "` WHERE `slug` = %s", $word ), ARRAY_A );
 
 			// If this line does not exist yet, create it with only one album number as data
 			if ( ! $indexline ) {
 				wppa_create_index_entry( array( 'slug' => $word, 'albums' => $id ) );
+				wppa_log( 'Cron', 'Adding index slug {b}' . $word . '{/b} for album # {b}' . $id . '{/b}' );
 			}
 
-			// Index line already exutst, process this album id for this word
+			// Index line already exitst, process this album id for this word
 			else {
 
 				// Convert existing album ids to an array
@@ -65,12 +76,12 @@ global $pcount;
 					$newalbums = wppa_index_array_to_string( $oldalbums );
 
 					// Update db
-					$wpdb->query($wpdb->prepare( "UPDATE `".WPPA_INDEX."` SET `albums` = %s WHERE `id` = %s", $newalbums, $indexline['id']));
+					$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_INDEX . "` SET `albums` = %s WHERE `id` = %s", $newalbums, $indexline['id'] ) );
 
 				}
 			}
 		}
-		$acount ++;
+		$acount++;
 	}
 
 	elseif ( $type == 'photo' ) {
@@ -86,78 +97,158 @@ global $pcount;
 			return;
 		}
 
-		$thumb = wppa_cache_thumb($id);
+		// Find the raw text, all qTranslate languages
+		$words = wppa_index_get_raw_photo( $id );
 
-		// Find the raw text
-		$words = wppa_index_get_raw_photo($id);
+		// Convert to santized array of indexable words
+		$words = wppa_index_raw_to_words( $words );
 
-		$words = wppa_index_raw_to_words($words);	// convert raw string to sanitized array
+		// Process all the words to see if they must be added to the index
 		foreach ( $words as $word ) {
-			$indexline = $wpdb->get_row($wpdb->prepare("SELECT * FROM `".WPPA_INDEX."` WHERE `slug` = %s", $word), ARRAY_A);
-			if ( ! $indexline ) {	// create new entry
+
+			// Get the row of the index table where the word is registered.
+			$indexline = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . WPPA_INDEX . "` WHERE `slug` = %s", $word ), ARRAY_A );
+
+			// If this line does not exist yet, create it with only one album number as data
+			if ( ! $indexline ) {
 				wppa_create_index_entry( array( 'slug' => $word, 'photos' => $id ) );
+				wppa_log( 'Cron', 'Adding index slug {b}' . $word . '{/b} for photo # {b}' . $id . '{/b}' );
 			}
-			else { 	// Add to entry
-				$oldphotos = wppa_index_string_to_array($indexline['photos']);
+
+			// Index line already exitst, process this photo id for this word
+			else {
+
+				// Convert existing album ids to an array
+				$oldphotos = wppa_index_string_to_array( $indexline['photos'] );
+
+				// If not in yet...
 				if ( ! in_array( $id, $oldphotos ) ) {
+
+					// Add it
 					$oldphotos[] = $id;
+
+					// Report addition
 					wppa_log( 'Cron', 'Adding photo # {b}'.$id.'{/b} to index slug {b}'.$word.'{/b}');
-					sort($oldphotos);
-					$newphotos = wppa_index_array_to_string($oldphotos);
-					$wpdb->query($wpdb->prepare( "UPDATE `".WPPA_INDEX."` SET `photos` = %s WHERE `id` = %s", $newphotos, $indexline['id']));
+
+					// Covert to string again
+					$newphotos = wppa_index_array_to_string( $oldphotos );
+
+					// Update db
+					$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_INDEX . "` SET `photos` = %s WHERE `id` = %s", $newphotos, $indexline['id'] ) );
 				}
 			}
 
 		}
-		$pcount ++;
+		$pcount++;
 	}
 
-	else wppa_dbg_msg('Error, unimplemented type in wppa_index_add().', 'red', 'force');
+	else {
+
+		// Log error
+		wppa_log( 'Error, unimplemented type {b}' . $type . '{/b} in wppa_index_add().' );
+	}
 }
 
 // Convert raw data string to indexable word array
-function wppa_index_raw_to_words($xtext, $noskips = false, $minlen = '2' ) {
+// Sanitizes any string and clips it into an array of potential slugs in the index db table.
+//
+// @1: string. Any test string may contain all kind of garbage.
+//
+function wppa_index_raw_to_words( $xtext ) {
 
+	// Find chars to be replaced by delimiters (spaces)
 	$ignore = array( 	'"', "'", '`', '\\', '>', '<', ',', ':', ';', '!', '?', '=', '_',
 						'[', ']', '(', ')', '{', '}', '..', '...', '....', "\n", "\r",
 						"\t", '.jpg', '.png', '.gif', '&#039', '&amp',
-						'w#cc0', 'w#cc1', 'w#cc2', 'w#cc3', 'w#cc4', 'w#cc5', 'w#cc6', 'w#cc7', 'w#cc8', 'w#cc9'
+						'w#cc0', 'w#cc1', 'w#cc2', 'w#cc3', 'w#cc4', 'w#cc5', 'w#cc6', 'w#cc7', 'w#cc8', 'w#cc9',
+						'w#cd0', 'w#cd1', 'w#cd2', 'w#cd3', 'w#cd4', 'w#cd5', 'w#cd6', 'w#cd7', 'w#cd8', 'w#cd9',
+						'#',
 					);
 	if ( wppa_switch( 'index_ignore_slash' ) ) {
 		$ignore[] = '/';
 	}
-	if ( $noskips ) $skips = array();
-	else $skips = get_option( 'wppa_index_skips', array() );
 
+	// Find words to skip
+	$skips = get_option( 'wppa_index_skips', array() );
+
+	// Find minimum token length
+	$minlen = wppa_opt( 'search_min_length' );
+
+	// Init results array
 	$result = array();
+
+	// Process text
 	if ( $xtext ) {
-		$text = strtolower($xtext);
-		$text = html_entity_decode($text);
-		$text = wppa_strip_tags($text, 'script&style');	// strip style and script tags inclusive content
-		$text = str_replace('>', '> ', $text);			// Make sure <td>word1</td><td>word2</td> will not endup in 'word1word2', but in 'word1' 'word2'
-		$text = strip_tags($text);						// Now strip the tags
-														// Strip qTranslate language shortcodes: [:*]
-		$text = str_replace($ignore, ' ', $text);		// Remove funny chars
-		$text = str_replace(array('è', 'é', 'ë'), 'e', $text);	// Remove accents
-		$text = str_replace(array('ò', 'ó', 'ö'), 'o', $text);	//
-		$text = str_replace(array('à', 'á', 'ä'), 'a', $text);	//
-		$text = str_replace(array('ù', 'ú', 'ü'), 'u', $text); 	//
-		$text = str_replace(array('ì', 'í', 'ï'), 'i', $text); 	//
-		$text = str_replace('ç', 'c', $text);				// Remoce cédille
-		$text = trim($text);
-		$text = trim($text, " ./-");
-		while ( strpos($text, '  ') ) $text = str_replace('  ', ' ', $text);	// Compress spaces
-		$words = explode(' ', $text);
+
+		// Sanitize
+		// Uses downcase only
+		$text = strtolower( $xtext );
+
+		// Convert to real chars/symbols
+		$text = html_entity_decode( $text );
+
+		// strip style and script tags inclusive content
+		$text = wppa_strip_tags( $text, 'script&style' );
+
+		// Make sure <td>word1</td><td>word2</td> will not endup in 'word1word2', but in 'word1' 'word2'
+		$text = str_replace( '>', '> ', $text );
+
+		// Now strip remaining tags without stripping the content
+		$text = strip_tags( $text );
+
+		// Strip qTranslate language shortcodes: [:*]
+		$text = preg_replace( '/\[:..\]|\[:\]/', ' ', $text );
+
+		// Replace ignorable chars and words by delimiters ( $ignore is an array )
+		$text = str_replace( $ignore, ' ', $text );
+
+		// Remove accents
+		$text = str_replace( array( 'è', 'é', 'ë'), 'e', $text );
+		$text = str_replace( array( 'ò', 'ó', 'ö'), 'o', $text );
+		$text = str_replace( array( 'à', 'á', 'ä'), 'a', $text );
+		$text = str_replace( array( 'ù', 'ú', 'ü'), 'u', $text );
+		$text = str_replace( array( 'ì', 'í', 'ï'), 'i', $text );
+		$text = str_replace( 'ç', 'c', $text );
+
+		// Trim
+		$text = trim( $text );
+		$text = trim( $text, " ./-" );
+
+		// Replace multiple space chars by one space char
+		while ( strpos( $text, '  ' ) ) {
+			$text = str_replace( '  ', ' ', $text );
+		}
+
+		// Convert to array
+		$words = explode( ' ', $text );
+
+		// Decide for each word if it is in
 		foreach ( $words as $word ) {
-			$word = trim($word);
-			$word = trim($word, " ./-");
-			if ( strlen($word) >= $minlen && ! in_array($word, $skips) ) $result[] = $word;
-			if ( strpos($word, '-') !== false ) {
-				$fracts = explode('-', $word);
+
+			// Trim word
+			$word = trim( $word );
+			$word = trim( $word, " ./-" );
+
+			// If lare enough and not a word to skip, use it: copy to array $result
+			if ( strlen( $word ) >= $minlen && ! in_array( $word, $skips ) ) {
+				$result[] = $word;
+			}
+
+			// If the word contains (a) dashe(s), also process the fractions before/between/after the dash(es)
+			if ( strpos( $word, '-' ) !== false ) {
+
+				// Break word into fragments
+				$fracts = explode( '-', $word );
 				foreach ( $fracts as $fract ) {
-					$fract = trim($fract);
-					$fract = trim($fract, " ./-");
-					if ( strlen($fract) >= $minlen && ! in_array($fract, $skips) ) $result[] = $fract;
+
+					// Trim
+					$fract = trim( $fract );
+					$fract = trim( $fract, " ./-" );
+
+					// If lare enough and not a word to skip, use it: copy to array $result
+					if ( strlen( $fract ) >= $minlen && ! in_array( $fract, $skips ) ) {
+						$result[] = $fract;
+					}
 				}
 			}
 		}
@@ -166,7 +257,11 @@ function wppa_index_raw_to_words($xtext, $noskips = false, $minlen = '2' ) {
 	// Remove numbers optionaly
 	if ( wppa_switch( 'search_numbers_void' ) ) {
 		foreach ( array_keys( $result ) as $key ) {
-			$t = ltrim( $result[$key], '0' ); 	// Strip leading zeroes
+
+			// Strip leading zeroes
+			$t = ltrim( $result[$key], '0' );
+
+			// If nothing left (zoroes only) or numeric, discard it
 			if ( ! $t || is_numeric( $t ) ) {
 				unset( $result[$key] );
 			}
@@ -176,7 +271,9 @@ function wppa_index_raw_to_words($xtext, $noskips = false, $minlen = '2' ) {
 	// Remove dups and sort
 	$result = array_unique( $result );
 
+	// Done !
 	return $result;
+
 }
 
 // Expand compressed string
@@ -328,77 +425,6 @@ global $wpdb;
 	$wpdb->query( "DELETE FROM `".WPPA_INDEX."` WHERE `albums` = '' AND `photos` = ''" );	// Cleanup empty entries
 }
 
-// Use this function if you know the current photo data matches the index info. Mostly fails...
-function wppa_index_quick_remove($type, $id) {
-global $wpdb;
-
-	// If there is a cron job running cleaning the index and this is not that cron job, do nothing
-	if ( get_option( 'wppa_cleanup_index_user' ) == 'cron-job' && ! wppa_is_cron() ) {
-		return;
-	}
-
-	// If no user runs the cleanup proc, start it as cron job
-	if ( ! get_option( 'wppa_cleanup_index_user' ) ) {
-		wppa_schedule_maintenance_proc( 'wppa_cleanup_index' );
-		return;
-	}
-
-	if ( $type == 'album' ) {
-
-		$album = wppa_cache_album($id);
-
-		$words = stripslashes( $album['name'] ).' '.stripslashes( $album['description'] ).' '.$album['cats'];
-		$words = wppa_index_raw_to_words($words);
-
-		foreach ( $words as $word ) {
-			$indexline = $wpdb->get_row("SELECT * FROM `".WPPA_INDEX."` WHERE `slug` = '".$word."'", ARRAY_A);
-			$array = wppa_index_string_to_array($indexline['albums']);
-			foreach ( array_keys($array) as $k ) {
-				if ( $array[$k] == $id ) {
-					unset ( $array[$k] );
-					$string = wppa_index_array_to_string($array);
-					if ( $string || $indexline['photos'] ) {
-						$wpdb->query("UPDATE `".WPPA_INDEX."` SET `albums` = '".$string."' WHERE `id` = ".$indexline['id']);
-					}
-					else {
-						$wpdb->query("DELETE FROM `".WPPA_INDEX."` WHERE `id` = ".$indexline['id']);
-					}
-				}
-			}
-		}
-
-	}
-	elseif ( $type == 'photo') {
-
-		$thumb = wppa_cache_thumb($id);
-
-		// Find the raw text
-		$words = stripslashes( $thumb['name'] ).' '.$thumb['filename'].' '.stripslashes( $thumb['description'] ).' '.$thumb['tags'];
-		$coms = $wpdb->get_results($wpdb->prepare( "SELECT `comment` FROM `" . WPPA_COMMENTS . "` WHERE `photo` = %s AND `status` = 'approved'", $thumb['id'] ), ARRAY_A );
-		if ( $coms ) foreach ( $coms as $com ) {
-			$words .= ' '.stripslashes( $com['comment'] );
-		}
-		$words = wppa_index_raw_to_words($words, 'noskips');
-
-		foreach ( $words as $word ) {
-			$indexline = $wpdb->get_row("SELECT * FROM `".WPPA_INDEX."` WHERE `slug` = '".$word."'", ARRAY_A);
-			$array = wppa_index_string_to_array($indexline['photos']);
-			foreach ( array_keys($array) as $k ) {
-				if ( $array[$k] == $id ) {
-					unset ( $array[$k] );
-					$string = wppa_index_array_to_string($array);
-					if ( $string || $indexline['albums'] ) {
-						$wpdb->query("UPDATE `".WPPA_INDEX."` SET `photos` = '".$string."' WHERE `id` = ".$indexline['id']);
-					}
-					else {
-						$wpdb->query("DELETE FROM `".WPPA_INDEX."` WHERE `id` = ".$indexline['id']);
-					}
-				}
-			}
-		}
-	}
-}
-
 // Re-index an edited item
 function wppa_index_update($type, $id) {
 	wppa_index_remove($type, $id);
@@ -424,14 +450,23 @@ function wppa_index_compute_skips() {
 	update_option( 'wppa_index_skips', $result );
 }
 
-// Find the raw text for album, all qTranslate languages
+// Find the raw text for indexing album, all qTranslate languages
+//
+// @1: int: album id
 function wppa_index_get_raw_album( $id ) {
+
+	// Get the album data
 	$album = wppa_cache_album( $id );
-	$words = wppa_get_album_desc( $id ) . ' ' . wppa_get_album_name( $id );
-//	$words = stripslashes($album['name']).' '.stripslashes($album['description']);
+
+	// Get words from name and description
+	$words = wppa_get_album_desc( $id, array( 'translate' => false ) ) . ' ' . wppa_get_album_name( $id, array( 'translate' => false ) );
+
+	// Optionally album categories
 	if ( wppa_switch( 'search_cats' ) ) {
 		$words .= ' '.$album['cats'];
 	}
+
+	// Done!
 	return $words;
 }
 
@@ -439,33 +474,15 @@ function wppa_index_get_raw_photo( $id ) {
 global $wpdb;
 
 	$thumb 	= wppa_cache_thumb( $id );
-/*
-	$desc 	= stripslashes($thumb['description']);
-	$desc 	= wppa_filter_iptc( $desc, $thumb['id'] );	// Render IPTC tags
-	$desc 	= wppa_filter_exif( $desc, $thumb['id'] );	// Render EXIF tags
 
-	$custom = wppa_get_photo_item( $id, 'custom' );
-	if ( $custom ) {
-		$custom_data = unserialize( $custom );
-		for ( $i = 0; $i < 10; $i++ ) {
-			if ( wppa_switch( 'custom_visible_'.$i ) ) {		// May be displayed
-				$desc = str_replace( 'w#cd'.$i, __( stripslashes( $custom_data[$i] ) ), $desc );	// Data
-			}
-			else {
-				$desc = str_replace( 'w#cd'.$i, '', $desc );	// Data
-			}
-		}
-	}
-	$words 	= stripslashes($thumb['name']).' '.$thumb['filename'].' '.$desc;
-*/
-	$words = wppa_get_photo_desc( $id ) . ' ' . wppa_get_photo_name( $id );
+	$words = wppa_get_photo_desc( $id, array( 'translate' => false ) ) . ' ' . wppa_get_photo_name( $id, array( 'translate' => false ) );
 
 	if ( wppa_switch( 'search_tags' ) ) $words .= ' '.$thumb['tags'];																					// Tags
 	if ( wppa_switch( 'search_comments' ) ) {
 		$coms = $wpdb->get_results($wpdb->prepare( "SELECT `comment` FROM `" . WPPA_COMMENTS . "` WHERE `photo` = %s AND `status` = 'approved'", $thumb['id'] ), ARRAY_A );
 		if ( $coms ) {
 			foreach ( $coms as $com ) {
-				$words .= ' '.stripslashes( $com['comment'] );
+				$words .= ' ' . stripslashes( $com['comment'] );
 			}
 		}
 	}

@@ -138,7 +138,7 @@ class Types_Page_Hidden_Helper extends Types_Page_Abstract {
 	private function new_post_field_group_action( $type ) {
 
 		$type_object = get_post_type_object( $type );
-		$title = sprintf( __( 'Field Group for %s', 'types' ), $type_object->labels->name );
+		$title = sprintf( __( 'Field Group for %s', 'wpcf' ), $type_object->labels->name );
 		$name = sanitize_title( $title );
 
 		$new_post_field_group = Types_Field_Group_Post_Factory::get_instance()->create( $name, $title, 'publish' );

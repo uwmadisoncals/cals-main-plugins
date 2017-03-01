@@ -1,84 +1,95 @@
-var WPViews = WPViews || {};
+/**
+ * Backend script for the Content Template editor for Beaver Builder, 
+ * as loop elements in Views and WordPress Archives Loop output sections.
+ * This initializes the Beaver Builder overlay anc handles the change in user editor to BB.
+ *
+ * @summary Inline Content Template editor manager for Beaver Builder compatibility,.
+ *
+ * @since 2.3.0
+ * @requires jquery.js
+ * @requires underscore.js
+ */
 
-WPViews.ViewEditScreenUserEditorBeaver = function( $ ) {
+/* global toolset_user_editors_beaver_layout_template_i18n */
+
+var ToolsetCommon			= ToolsetCommon || {};
+ToolsetCommon.UserEditor	= ToolsetCommon.UserEditor || {};
+
+ToolsetCommon.UserEditor.BeaverBuilderBackendLayoutTemplate = function( $ ) {
 	
 	var self = this;
 	
 	self.selector			= '.js-wpv-ct-listing';
 	self.overlay			= "<div class='wpv-setting-overlay js-wpv-layout-template-overlay' style='top:36px'>";
 	self.overlay				+= "<div class='wpv-transparency' style='opacity:0.9'></div>";
-	//self.overlay				+= "<i class='icon-lock fa fa-lock'></i>";
-	self.overlay				+= "<div class='wpv-layout-template-overlay-info toolset-alert toolset-alert-info' style='position:absolute;top:5px;left:5px;right:5px;bottom:5px;margin:0;'>";
+	self.overlay				+= "<div class='wpv-layout-template-overlay-info toolset-alert toolset-alert-info'>";
 	self.overlay					+= "<p><strong>" + toolset_user_editors_beaver_layout_template_i18n.template_overlay.title + "</strong></p>";
 	self.overlay					+= "<p>" + toolset_user_editors_beaver_layout_template_i18n.template_overlay.text + "</p>";
-	self.overlay					+= "<p><a href='" + toolset_user_editors_beaver_layout_template_i18n.template_editor_url + "' target='_blank' class='button button-secondary js-wpv-layout-template-overlay-info-link'>" + toolset_user_editors_beaver_layout_template_i18n.template_overlay.button + " <i class='fa fa-chevron-right' aria-hidden='true'></i></a></p>";
+	self.overlay					+= "<p>";
+	self.overlay						+= "<a href='" + toolset_user_editors_beaver_layout_template_i18n.template_editor_url + "' target='_blank' class='button button-secondary js-wpv-layout-template-overlay-info-link'>" + toolset_user_editors_beaver_layout_template_i18n.template_overlay.button + "</a>";
+	self.overlay					+= '</p><p>';
+	self.overlay						+= "<a href='#' class='wpv-ct-apply-user-editor-basic js-wpv-ct-apply-user-editor js-wpv-ct-apply-user-editor-basic' data-editor='basic'>" + toolset_user_editors_beaver_layout_template_i18n.template_overlay.discard + "</a>";
+	self.overlay					+= "</p>";
 	self.overlay				+= "</div>";
 	self.overlay			+= "</div>";
-	self.overlay_container	= $( self.overlay );
+	self.overlayContainer	= $( self.overlay );
 	
-	self.init_beaver_editors = function() {
+	self.initBeaverEditors = function() {
 		$( self.selector ).each( function() {
-			self.init_beaver_editor( $( this ) );
+			self.initBeaverEditor( $( this ) );
 		});
 		return self;
 	};
 	
-	self.init_beaver_editor = function( item ) {
+	self.initBeaverEditor = function( item ) {
 		if ( 
-			item.hasClass( 'js-wpv-ct-listing-user-editor-beaver-inited' ) 
+			item.hasClass( 'js-wpv-ct-listing-user-editor-inited' ) 
 			|| item.find( '.CodeMirror' ).length == 0
 		) {
-			// This has been inited before, it it is rendered closed
+			// This has been inited before, or it is rendered closed
 			return self;
 		}
 		var attributes = item.data( 'attributes' );
 		_.defaults( attributes, { builder: 'basic' } );
-		item.addClass( 'js-wpv-ct-listing-user-editor-beaver-inited' );
 		if ( attributes.builder == 'beaver' ) {
-			item.prepend( self.overlay_container );
+			item.addClass( 'js-wpv-ct-listing-user-editor-inited' );
+			item.find( '.js-wpv-layout-template-overlay' ).remove();
+			item.find( '.js-wpv-ct-apply-user-editor:not(.js-wpv-ct-apply-user-editor-beaver)' ).prop( 'disabled', false );
+			item.prepend( self.overlayContainer.clone() );
 			item.find( '.CodeMirror' ).css( { 'height' : '0px'} );
-			self.update_beaver_ct_editor_link_target( item );
-		} else if ( attributes.builder == 'basic' ) {
-			var template_id = item.data( 'id' ),
-				ct_editor_basic_panel_args = { 
-				editor:		'wpv_ct_inline_editor_' + template_id,
-				content:	'',
-				keep:		'permanent',
-				type:		'info'
-			};
-			//Toolset.hooks.doAction( 'wpv-action-wpv-add-codemirror-panel', ct_editor_basic_panel_args );
-			// @todo I would add a Codemirror panel here to let users know how to add BB to this CT
+			self.updateBeaverCTEditorLinkTarget( item );
 		}
+		return self;
 	};
 	
-	self.reload_beaver_editors_link_target = function() {
+	self.reloadBeaverEditorsLinkTarget = function() {
 		$( self.selector ).each( function() {
-			self.update_beaver_ct_editor_link_target( $( this ) );
+			self.updateBeaverCTEditorLinkTarget( $( this ) );
 		});
 		return self;
 	};
 	
-	self.update_beaver_ct_editor_link_target = function( item ) {
-		ct_editor_link = item.find( '.js-wpv-layout-template-overlay-info-link' ),
-		ct_editor_link_target = toolset_user_editors_beaver_layout_template_i18n.template_editor_url + '&ct_id=' + item.data( 'id' );
-		var query_mode = Toolset.hooks.applyFilters( 'wpv-filter-wpv-edit-screen-get-query-mode', 'normal' );
-		switch ( query_mode ) {
+	self.updateBeaverCTEditorLinkTarget = function( item ) {
+		var ctEditorLink = item.find( '.js-wpv-layout-template-overlay-info-link' ),
+			ctEditorLinkTarget = toolset_user_editors_beaver_layout_template_i18n.template_editor_url + '&ct_id=' + item.data( 'id' ),
+			queryMode = Toolset.hooks.applyFilters( 'wpv-filter-wpv-edit-screen-get-query-mode', 'normal' );
+		switch ( queryMode ) {
 			case 'normal':
-				var query_type = $( '.js-wpv-query-type:checked' ).val();
-				switch ( query_type ) {
+				var queryType = $( '.js-wpv-query-type:checked' ).val();
+				switch ( queryType ) {
 					case 'posts':
 						$('.js-wpv-query-post-type:checked').map( function() {
-							ct_editor_link_target += '&preview_post_type[]=' + $( this ).val();
+							ctEditorLinkTarget += '&preview_post_type[]=' + $( this ).val();
 						});
 						break;
 					case 'taxonomy':
 						$('.js-wpv-query-taxonomy-type:checked').map( function() {
-							ct_editor_link_target += '&preview_taxonomy[]=' + $( this ).val();
+							ctEditorLinkTarget += '&preview_taxonomy[]=' + $( this ).val();
 						});
 						break;
 					case 'users':
 						$('.js-wpv-query-users-type:checked').map( function() {
-							ct_editor_link_target += '&preview_user[]=' + $( this ).val();
+							ctEditorLinkTarget += '&preview_user[]=' + $( this ).val();
 						});
 						break;
 				}
@@ -90,39 +101,54 @@ WPViews.ViewEditScreenUserEditorBeaver = function( $ ) {
 							
 							break;
 						case 'post_type' :
-							ct_editor_link_target += '&preview_post_type_archive[]=' + $( this ).data( 'name' );
+							ctEditorLinkTarget += '&preview_post_type_archive[]=' + $( this ).data( 'name' );
 							break;
 						case 'taxonomy':
-							ct_editor_link_target += '&preview_taxonomy_archive[]=' + $( this ).data( 'name' );
+							ctEditorLinkTarget += '&preview_taxonomy_archive[]=' + $( this ).data( 'name' );
 							break;
 					}
 				});
 				break;
 		}
-		ct_editor_link.attr( 'href', ct_editor_link_target );
+		ctEditorLink.attr( 'href', ctEditorLinkTarget );
 		return self;
 	};
 	
-	$( document ).on( 'js_event_wpv_query_type_options_saved', '.js-wpv-query-type-update', function( event, query_type ) {
-		self.reload_beaver_editors_link_target();
+	$( document ).on( 'js_event_wpv_query_type_options_saved', '.js-wpv-query-type-update', function( event, queryType ) {
+		self.reloadBeaverEditorsLinkTarget();
 	});
 	
-	self.set_inline_content_template_events = function( template_id ) {
-		self.init_beaver_editor( $( '.js-wpv-ct-listing-' + template_id ) );
+	self.setInlineContentTemplateEvents = function( templateId ) {
+		self.initBeaverEditor( $( '.js-wpv-ct-listing-' + templateId ) );
 	};
 	
-	$( document ).on( 'js_event_wpv_ct_inline_editor_inited', function( event, template_id ) {
-		self.init_beaver_editor( $( '.js-wpv-ct-listing-' + template_id ) );
+	$( document ).on( 'js_event_wpv_ct_inline_editor_inited', function( event, templateId ) {
+		self.initBeaverEditor( $( '.js-wpv-ct-listing-' + templateId ) );
 	});
 	
-	self.init_hooks = function() {
-		Toolset.hooks.addAction( 'wpv-action-wpv-set-inline-content-template-events', self.set_inline_content_template_events );
+	self.setUserEditorToBeaver = function( ctId ) {
+		var item = $( '.js-wpv-ct-listing-' + ctId, '.js-wpv-inline-content-template-listing' ),
+			attributes = item.data( 'attributes' );
+		
+		attributes.builder = 'beaver';
+		item.data( 'attributes', attributes );
+		
+		if ( item.find( '.CodeMirror' ).length == 0 ) {
+			item.find( '.js-wpv-content-template-open' ).trigger( 'click' );
+		} else {
+			self.initBeaverEditor( item );
+		}
+	};
+	
+	self.initHooks = function() {
+		Toolset.hooks.addAction( 'wpv-action-wpv-set-inline-content-template-events', self.setInlineContentTemplateEvents );
+		Toolset.hooks.addAction( 'toolset-action-toolset-set-user-editor-to-beaver', self.setUserEditorToBeaver );
 		return self;
 	};
 	
 	self.init = function() {
-		self.init_beaver_editors()
-			.init_hooks();
+		self.initBeaverEditors()
+			.initHooks();
 		
 	};
 	
@@ -131,5 +157,5 @@ WPViews.ViewEditScreenUserEditorBeaver = function( $ ) {
 };
 
 jQuery( document ).ready( function( $ ) {
-    WPViews.view_edit_screen_user_editor_beaver = new WPViews.ViewEditScreenUserEditorBeaver( $ );
+   ToolsetCommon.UserEditor.BeaverBuilderBackendLayoutTemplateInstance = new ToolsetCommon.UserEditor.BeaverBuilderBackendLayoutTemplate( $ );
 });

@@ -1,18 +1,36 @@
-var wpv_preview_post_container = jQuery( '.toolset-editors-select-preview-post' ),
-    wpv_preview_post = jQuery( '#wpv-ct-preview-post' );
+/**
+ * Frontend script for the Content Template editor for Beaver Builder.
+ * This controls the changes in the post preview as well as redirection on exit.
+ *
+ * @summary Frontend Content Template editor manager for Beaver Builder compatibility,.
+ *
+ * @since 2.3.0
+ * @requires jquery.js
+ */
 
-(function( $ ) {
-    $( 'document' ).ready( function() {
-        FLBuilder._updateLayout();
-        wpv_preview_post_container.prependTo( '.fl-builder-bar-actions' );
-        wpv_preview_post_container.show();
-    } );
+/* globals jQuery, toolset_user_editors */
 
-    $( window ).load( function() {
-        FLBuilder._exitUrl = toolset_user_editors.mediumUrl;
-    } );
+var ToolsetCommon			= ToolsetCommon || {};
+ToolsetCommon.UserEditor	= ToolsetCommon.UserEditor || {};
 
-    wpv_preview_post.on( 'change', function() {
+ToolsetCommon.UserEditor.BeaverBuilderFrontendEditor = function( $ ) {
+
+	var self = this;
+	
+	self.extraContainer = $( '.js-toolset-editors-frontend-editor-extra' );
+	
+    self.previewPostSelector = $( '#wpv-ct-preview-post' );
+	
+	self.setExitUrl		= function() {
+		FLBuilder._exitUrl = toolset_user_editors.mediumUrl;
+	};
+	
+	$( window ).load( self.setExitUrl );
+	$( document ).on( 'click', '.fl-builder-save-actions .fl-builder-publish-button', self.setExitUrl );
+	$( document ).on( 'click', '.fl-builder-save-actions .fl-builder-discard-button', self.setExitUrl );
+	$( document ).on( 'click', '.fl-builder-save-actions .fl-builder-cancel-button', self.setExitUrl );
+	
+	self.previewPostSelector.on( 'change', function() {
         $.ajax( {
             type: 'post',
             dataType: 'json',
@@ -28,4 +46,17 @@ var wpv_preview_post_container = jQuery( '.toolset-editors-select-preview-post' 
             }
         } );
     } );
-})( jQuery );
+	
+	self.init = function() {
+		self.extraContainer.insertBefore( '.fl-builder-bar-actions' );
+		self.extraContainer.show();
+		FLBuilder._updateLayout();
+    };
+	
+	self.init();
+	
+};
+
+jQuery( document ).ready( function( $ ) {
+	ToolsetCommon.UserEditor.BeaverBuilderFrontendEditorInstance = new ToolsetCommon.UserEditor.BeaverBuilderFrontendEditor( $ );
+});

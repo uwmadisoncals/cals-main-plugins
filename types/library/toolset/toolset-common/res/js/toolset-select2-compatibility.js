@@ -149,6 +149,7 @@ ToolsetCommon.toolset_select2ExecMethods = function(el, method, param){
 						jQuery(el).toolset_select2_original("close");
 					}
 					break;
+				case "destroy":
 				case "destory":
 					jQuery(el).removeClass("toolset_select2_converted");
 					jQuery(el).toolset_select2_original("destroy");

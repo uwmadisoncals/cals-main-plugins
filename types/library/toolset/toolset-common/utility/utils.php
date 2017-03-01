@@ -14,7 +14,7 @@ define('WPT_UTILS', true);
  *
  * @since unknown
  */
-if (!class_exists('Toolset_Utils')) {
+if( ! class_exists( 'Toolset_Utils', false ) ) {
 
     /**
      * ToolsetUtils
@@ -280,7 +280,7 @@ if (!function_exists('wp_json_encode')) {
     }
 }
 
-if (!class_exists('Toolset_ArrayUtils')) {
+if( ! class_exists( 'Toolset_ArrayUtils', false ) ) {
 
     Class Toolset_ArrayUtils {
 
@@ -316,6 +316,10 @@ if (!class_exists('Toolset_ArrayUtils')) {
         }
 
         function value_in_array($array) {
+            if( ! is_array( $array ) ) {
+                return false;
+            }
+
             return in_array($this->value, array_values($array));
         }
 
@@ -329,7 +333,7 @@ if (!class_exists('Toolset_ArrayUtils')) {
 
 
 
-if (!class_exists('Toolset_ErrorHandler')) {
+if( ! class_exists( 'Toolset_ErrorHandler', false ) ) {
 
     /**
      * ErrorHandler that can be used to catch internal PHP errors
@@ -520,17 +524,17 @@ if (!function_exists('toolset_getget')) {
  */
 if (!function_exists('toolset_getarr')) {
 
-    function toolset_getarr(&$source, $key, $default = '', $valid = null) {
-        if (isset($source[$key])) {
-            $val = $source[$key];
-            if (is_array($valid) && !in_array($val, $valid)) {
-                return $default;
-            }
+	function toolset_getarr( &$source, $key, $default = '', $valid = null ) {
+		if ( isset( $source[ $key ] ) ) {
+			$val = $source[ $key ];
+			if ( is_array( $valid ) && ! in_array( $val, $valid ) ) {
+				return $default;
+			}
 
-            return $val;
-        } else {
-            return $default;
-        }
-    }
+			return $val;
+		} else {
+			return $default;
+		}
+	}
 
 }

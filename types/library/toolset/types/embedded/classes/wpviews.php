@@ -68,7 +68,7 @@ class WPCF_WPViews {
 			// We are on a post edit page, add the relevant(?) postmeta and usermeta groups
 			WPCF_WPViews::register_types_postmeta_shortcodes_dialog_groups();
 			WPCF_WPViews::register_types_usermeta_shortcodes_dialog_groups();
-		} else if ( in_array( $pagenow, array( 'term.php' ) ) ) {
+		} else if ( in_array( $pagenow, array( 'edit-tags.php', 'term.php' ) ) ) {
 			WPCF_WPViews::register_types_termmeta_shortcodes_dialog_groups();
 		} else if ( in_array( $pagenow, array( 'profile.php', 'user-new.php', 'user-edit.php' ) ) ) {
 			WPCF_WPViews::register_types_usermeta_shortcodes_dialog_groups();
@@ -161,6 +161,7 @@ class WPCF_WPViews {
 	 */
 	public static function register_types_termmeta_shortcodes_dialog_groups() {
 		//Get types groups and fields
+		global $pagenow;
 		$groups = wpcf_admin_fields_get_groups( TYPES_TERM_META_FIELD_GROUP_CPT_NAME, 'group_active' );
 		$add = array();
 		if ( ! empty( $groups ) ) {
@@ -168,22 +169,46 @@ class WPCF_WPViews {
 				$fields = wpcf_admin_fields_get_fields_by_group( $group['id'], 'slug', true, false, true, TYPES_TERM_META_FIELD_GROUP_CPT_NAME, 'wpcf-termmeta' );
 				if ( ! empty( $fields ) ) {
 
-					$group_id = 'types-termmeta-' . $group['id'];
-					$group_data = array(
+					$group_id_taxonomy = 'types-termmeta-taxonomy-' . $group['id'];
+					$group_data_taxonomy = array(
 						'name' => $group['name'],
 						'target' => array( 'taxonomy' ),
 						'fields' => array()
 					);
+					
+					$group_id_archive = 'types-termmeta-archive-' . $group['id'];
+					$group_data_archive = array(
+						'name' => sprintf( __( '%s (Termmeta fields for term archives)', 'wpcf' ), $group['name'] ),
+						'target' => array( 'posts' ),
+						'fields' => array()
+					);
 
 					foreach ( $fields as $field_id => $field ) {
-						$group_data['fields'][ $field['id'] ] = array(
+						$group_data_taxonomy['fields'][ $field['id'] ] = array(
+							'name' => stripslashes( $field['name'] ),
+							'shortcode' => 'types termmeta="' . $field['id'] . '"][/types',
+							'callback' => 'wpcfFieldsEditorCallback(\'' . $field['id'] . '\', \'views-termmeta\', -1)'
+						);
+						$group_data_archive['fields'][ $field['id'] ] = array(
 							'name' => stripslashes( $field['name'] ),
 							'shortcode' => 'types termmeta="' . $field['id'] . '"][/types',
 							'callback' => 'wpcfFieldsEditorCallback(\'' . $field['id'] . '\', \'views-termmeta\', -1)'
 						);
 					}
 
-					do_action( 'wpv_action_wpv_register_dialog_group', $group_id, $group_data );
+					do_action( 'wpv_action_wpv_register_dialog_group', $group_id_taxonomy, $group_data_taxonomy );
+
+					if (
+						$pagenow == 'admin.php'
+						&& isset( $_GET['page'] )
+						&& in_array( $_GET['page'], array(
+							'view-archives-editor',
+							'dd_layouts_edit'
+						) )
+					) {
+						do_action( 'wpv_action_wpv_register_dialog_group', $group_id_archive, $group_data_archive );
+					}
+					
 				}
 			}
 		}

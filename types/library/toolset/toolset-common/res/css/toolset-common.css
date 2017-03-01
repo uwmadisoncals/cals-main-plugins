@@ -260,6 +260,7 @@ Helper styles
 
 .toolset-mightlong-list {
 	overflow: hidden;
+	list-style: outside none none;
 }
 
 	.toolset-mightlong-list li {

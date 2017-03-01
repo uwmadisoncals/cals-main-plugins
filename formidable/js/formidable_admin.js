@@ -1089,7 +1089,7 @@ function frmAdminBuildJS(){
 	function fillDropdownOpts(field, sourceID, includeBlank){
 		if ( field !== null ) {
 			removeDropdownOpts(field);
-			var opts = jQuery('input[name^="field_options[options_'+sourceID+'"][name$="[value]"');
+			var opts = jQuery('input[name^="field_options[options_'+sourceID+'"][name$="[value]"]');
 			var l = opts.length;
 			jQuery.each(opts, function() {
 				var labelName = this.name.replace('[value]', '[label]');
@@ -2241,9 +2241,19 @@ function frmAdminBuildJS(){
 
     function initiateMultiselect(){
         jQuery('.frm_multiselect').multiselect({
-            templates: {ul:'<ul class="multiselect-container frm-dropdown-menu"></ul>'},
+			templates: {ul:'<ul class="multiselect-container frm-dropdown-menu"></ul>'},
 			buttonContainer: '<div class="btn-group frm-btn-group" />',
-			nonSelectedText:frm_admin_js['default']// TODO: should be noneSelectedText
+			nonSelectedText:frm_admin_js['default'],// TODO: should be noneSelectedText
+			onDropdownShown: function( event ) {
+				var action = jQuery( event.currentTarget.closest( '.frm_form_action_settings' ) );
+				if ( action.length ) {
+					jQuery( '#wpcontent' ).click(function () {
+						if ( jQuery( '.multiselect-container.frm-dropdown-menu' ).is( ':visible' ) ) {
+							jQuery( event.currentTarget ).removeClass('open');
+						}
+					});
+				}
+			},
         });
     }
 
@@ -2622,9 +2632,9 @@ function frmAdminBuildJS(){
 			jQuery('#postbox-container-1').on('mousedown', '#frm_adv_info a, .frm_field_list a', function(e){
 				e.preventDefault();
 			});
-			
-			jQuery('.subsubsub a.frmids').click(function(e){toggleKeyID('frmids',e);});
-			jQuery('.subsubsub a.frmkeys').click(function(e){toggleKeyID('frmkeys',e);});
+
+			jQuery('#frm_adv_info').on('click', '.subsubsub a.frmids', function(e){toggleKeyID('frmids',e);});
+			jQuery('#frm_adv_info').on('click', '.subsubsub a.frmkeys', function(e){toggleKeyID('frmkeys',e);});
 
 			if(typeof(tinymce)=='object'){  
 				DOM=tinymce.DOM; 
@@ -2646,7 +2656,7 @@ function frmAdminBuildJS(){
 			}
 
 		},
-		
+
 		viewInit: function(){
 			// add form nav
 			var $navCont = document.getElementById('frm_nav_container');

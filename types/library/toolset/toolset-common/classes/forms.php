@@ -202,7 +202,7 @@ if (!class_exists('Enlimbo_Forms_Wpcf')) {
         /**
          * Renders form.
          * 
-         * @return type 
+         * @return string
          */
         public function renderForm()
         {
@@ -242,7 +242,7 @@ if (!class_exists('Enlimbo_Forms_Wpcf')) {
          * Renders elements.
          * 
          * @param type $elements
-         * @return type 
+         * @return string
          */
         public function renderElements($elements)
         {

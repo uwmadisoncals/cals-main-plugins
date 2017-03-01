@@ -17,16 +17,26 @@ class Toolset_User_Editors_Medium_Screen_Content_Template_Frontend_Editor
 		if( is_admin() || ! current_user_can( 'manage_options' ) ) {
 			return false;
 		}
-
+		// todo we need to move here an equivalent to the editor screen action method
+		// It should do what equivalentEditorScreenIsActive does, as it will be removed
+		// It should get the methods now on /editor/screen/beaver/frontend-editor.php that are user editor agnostic
+		// And we move there the ones that are BB only related
+		$this->action();
 		return true;
+	}
+	
+	private function action() {
+		
 	}
 
 	public function equivalentEditorScreenIsActive() {
-		add_action( 'init', array( $this, '_actionRegisterAsPostType' ) );
-		add_action( 'wp', array( $this, '_actionLoadMediumIdByPost' ), -1 );
+		add_action( 'init', array( $this, 'register_as_post_type' ) );
+		add_action( 'wp', array( $this, 'load_medium_id_by_post' ), -1 );
+		
+		add_action( 'wp', array( $this, 'register_assets' ) );
 	}
 
-	public function _actionLoadMediumIdByPost() {
+	public function load_medium_id_by_post() {
 		global $post;
 
 		if( ! is_object( $post ) || $post->post_type != 'view-template'  ) {
@@ -37,6 +47,9 @@ class Toolset_User_Editors_Medium_Screen_Content_Template_Frontend_Editor
 
 		// todo outsource complete preview selector to 'resources'
 		add_action( 'wp_footer', array( $this, 'render_preview_post_selector') );
+		
+		// set global post helper labels outside the frontend editor
+		add_action( 'wp', array( $this, 'set_global_post_helper_labels' ) );
 
 		// set preview post as global post
 		// todo move to beaver/screen/backend
@@ -46,37 +59,49 @@ class Toolset_User_Editors_Medium_Screen_Content_Template_Frontend_Editor
 		// todo move to beaver/screen/backend
 		add_action( 'fl_builder_after_render_content', array( $this, 'reset_preview_post' ) );
 
-		add_action( 'wp_enqueue_scripts', array( $this, '_actionStyleAndScripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	}
 
-
-	public function _actionStyleAndScripts() {
-		// ./backend.css
-		wp_enqueue_style(
-			'toolset-user-editors-ct-frontend-editor-style',
+	public function register_assets() {
+		
+		$toolset_assets_manager = Toolset_Assets_Manager::getInstance();
+		
+		$toolset_assets_manager->register_style(
+			'toolset-user-editors-ct-frontend-editor-style', 
 			TOOLSET_COMMON_URL . '/user-editors/medium/screen/content-template/frontend-editor.css',
 			array(),
 			TOOLSET_COMMON_VERSION
 		);
 
-		// ./backend.js
-		wp_enqueue_script(
+		$toolset_assets_manager->register_script(
 			'toolset-user-editors-ct-frontend-editor-script',
 			TOOLSET_COMMON_URL . '/user-editors/medium/screen/content-template/frontend-editor.js',
 			array( 'jquery' ),
 			TOOLSET_COMMON_VERSION,
 			true
 		);
+		
+		$toolset_assets_manager->localize_script(
+			'toolset-user-editors-ct-frontend-editor-script',
+			'toolset_user_editors',
+			array(
+				'nonce' => wp_create_nonce( 'toolset_user_editors' ),
+				'mediumId' => $this->manager->getMedium()->getId(),
+				'mediumUrl' => admin_url( 'admin.php?page=ct-editor&ct_id=' . $this->manager->getMedium()->getId() ),
+			)
+		);
+		
+	}
 
-		wp_localize_script( 'toolset-user-editors-ct-frontend-editor-script', 'toolset_user_editors', array(
-			'nonce' => wp_create_nonce( 'toolset_user_editors' ),
-			'mediumId' => $this->manager->getMedium()->getId(),
-			'mediumUrl' => admin_url( 'admin.php?page=ct-editor&ct_id=' . $this->manager->getMedium()->getId() ),
-		) );
+	public function enqueue_assets() {
+		
+		do_action( 'toolset_enqueue_styles',	array( 'toolset-user-editors-ct-frontend-editor-style' ) );
+		do_action( 'toolset_enqueue_scripts',	array( 'toolset-user-editors-ct-frontend-editor-script' ) );
+		
 	}
 	
 
-	public function _actionRegisterAsPostType() {
+	public function register_as_post_type() {
 		register_post_type( 'view-template', array(
 			'public'             => false,
 			'publicly_queryable' => true,
@@ -87,6 +112,15 @@ class Toolset_User_Editors_Medium_Screen_Content_Template_Frontend_Editor
 		) );
 
 		flush_rewrite_rules();
+	}
+	
+	public function set_global_post_helper_labels() {
+		if( isset( $_GET['fl_builder'] ) ) {
+			global $post;
+			$post->post_title	= __( '{{Post title}}', 'wpv-views' );
+			$post->post_author	= get_current_user_id();
+			$post->post_date	= date( "Y-m-d H:i:s" );
+		}
 	}
 
 	public function set_preview_post() {
@@ -117,6 +151,7 @@ class Toolset_User_Editors_Medium_Screen_Content_Template_Frontend_Editor
 		}
 	}
 
+	// @todo Offer to preview only posts that have this CT assigned, when frontend editing a CT assigned to single posts.
 	public function render_preview_post_selector() {
 		if( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) {
 			global $post;
@@ -125,47 +160,66 @@ class Toolset_User_Editors_Medium_Screen_Content_Template_Frontend_Editor
 			$preview_slug = array_key_exists( 'preview_slug', $toolset_frontend_editor )
 				? $toolset_frontend_editor['preview_slug']
 				: false;
-
+				
+			$preview_posts = array();
 
 			if( $toolset_frontend_editor['preview_domain'] == 'post' ) {
-				$preview_posts =  wp_get_recent_posts( array( 'post_type' => $preview_slug ), ARRAY_A );
-			} else {
-
-				$terms = get_terms( $preview_slug );
-				$term_ids = array();
-				foreach( $terms as $term ) {
-					$term_ids[] = $term->term_id;
+				if ( post_type_exists( $preview_slug ) ) {
+					$preview_posts =  wp_get_recent_posts( array( 'post_type' => $preview_slug ), ARRAY_A );
 				}
+			} else {
+				if ( taxonomy_exists( $preview_slug ) ) {
+					
+					$terms = get_terms( $preview_slug );
+					$term_ids = array();
+					foreach( $terms as $term ) {
+						$term_ids[] = $term->term_id;
+					}
 
-				$preview_posts =  wp_get_recent_posts( array( 'post_type' => 'any', 'tax_query' => array(
-					array(
-						'taxonomy' => $preview_slug,
-						'field' => 'id',
-						'terms' => $term_ids
-					))), ARRAY_A );
+					$preview_posts =  wp_get_recent_posts( array( 'post_type' => 'any', 'tax_query' => array(
+						array(
+							'taxonomy' => $preview_slug,
+							'field' => 'id',
+							'terms' => $term_ids
+						))), ARRAY_A );
+					
+				}
 			}
 
 			$preview_post = $this->get_preview_post_id( $post->ID );
+			$preview_post_offered = false;
 			
 			$selected = $preview_post == 0
 				? ' selected="selected"'
 				: '';
 
-			echo '<div class="toolset-editors-select-preview-post" style="display: none;">';
-			echo __( 'Preview with:', 'wpv-views' );
+			echo '<span class="fl-builder-bar-title js-toolset-editors-frontend-editor-extra" style="display:none;border-left:solid 1px #ccc;padding-bottom:6px;font-size:13px;">';
+			echo '<i class="icon icon-toolset-logo" style="color: #F05A29; font-size: 30px; vertical-align: middle;"></i>';
+			echo '<span>';
+			
+			echo __( 'Preview this Content Template with:', 'wpv-views' );
 
 			echo ' <select id="wpv-ct-preview-post">';
-			echo '<option value="0"' . $selected . '>'.__( 'No Shortcode Rendering', 'wp-views' ).'</option>';
+			echo '<option value="0"' . $selected . '>'.__( 'No post', 'wp-views' ).'</option>';
 
 			foreach( $preview_posts as $single_post ) {
 				$selected = $preview_post == $single_post['ID']
 					? ' selected="selected"'
 					: '';
+				if ( ! empty( $selected ) ) {
+					$preview_post_offered = true;
+				}
 				echo '<option value="' . $single_post['ID'] . '"' . $selected . '>'.$single_post['post_title'].'</option>';
 			}
 			echo '</select>';
-			echo '<i class="fa fa-question-circle fa-lg wpv-ct-preview-post-help js-wpv-ct-preview-post-help" aria-hidden="true" onclick="alert(\'' . esc_js( 'You are using Beaver Builder to design a template. This selector lets you choose with what content to preview the template.', 'wpv-views' ) . '\');"></i>';
-			echo '</div>';
+			
+			echo '</span>';
+			
+			echo '</span>';
+			
+			if ( ! $preview_post_offered ) {
+				$this->store_preview_post_id( $post->ID, 0 );
+			}
 		}
 	}
 

@@ -346,8 +346,7 @@
     text-align: left;
 }
 
-.js .widget .widget-top,
-.js .postbox h3 {
+.js .widget .widget-top{
     cursor:pointer;
 }
 
@@ -357,9 +356,7 @@
     border: medium none;
 }
 
-.ddl-dialog .widget,
-.postbox,
-.stuffbox {
+.ddl-dialog .widget{
     margin-bottom: 1px;
     background: none repeat scroll 0 0 transparent;
 }
@@ -369,8 +366,7 @@
 }
 
 .widget,
-.widget .widget-top,
-.postbox, .stuffbox {
+.widget .widget-top{
     border: none;
     background:none;
 }

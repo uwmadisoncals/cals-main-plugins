@@ -28,7 +28,7 @@ class Toolset_User_Editors_Editor_Visual_Composer
 		// version too low
 		// Todo generalise prove of version and move to abstract for all editors
 		if( version_compare( WPB_VC_VERSION, $this->minimum_version ) < 0 ) {
-			add_filter( 'wpv_ct_control_switch_editor_buttons', array( $this, '_filterAddDisabledButton' ) );
+			add_filter( 'wpv_ct_control_switch_editor_buttons', array( $this, 'add_disabled_button' ) );
 			return false;
 		}
 
@@ -37,7 +37,7 @@ class Toolset_User_Editors_Editor_Visual_Composer
 
 	public function run() {
 		// register medium slug
-		add_filter( 'vc_check_post_type_validation', array( $this, '_filterSupportMedium' ), 10, 2 );
+		add_filter( 'vc_check_post_type_validation', array( $this, 'support_medium' ), 10, 2 );
 	}
 
 	/**
@@ -46,7 +46,7 @@ class Toolset_User_Editors_Editor_Visual_Composer
 	 * @param $buttons
 	 * @return array
 	 */
-	public function _filterAddDisabledButton( $buttons ) {
+	public function add_disabled_button( $buttons ) {
 		$buttons[] = '<button class="button-secondary" onClick="javascript:alert( jQuery( this ).attr( \'title\' ) );" title="' . sprintf( __( 'Version %s or higher required', 'wpv-views' ), $this->minimum_version ) . '">' . $this->name . '</button>';
 		$buttons = array_reverse( $buttons );
 		return $buttons;
@@ -62,7 +62,7 @@ class Toolset_User_Editors_Editor_Visual_Composer
 	 *
 	 * @return bool
 	 */
-	public function _filterSupportMedium( $default, $type ) {
+	public function support_medium( $default, $type ) {
 		if( $type == $this->medium->getSlug() )
 			return true;
 
