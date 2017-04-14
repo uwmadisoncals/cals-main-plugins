@@ -14,6 +14,13 @@ jQuery(document).ready(function ($) {
 		};
 	} // end polyfill
 
+	// Another snippet to support IE11
+	String.prototype.endsWith = function(pattern) {
+		var d = this.length - pattern.length;
+		return d >= 0 && this.lastIndexOf(pattern) === d;
+	};
+	// End snippet to support IE11
+
 	// Check to see if user set alternate class
 	var target  = ( cssTarget !== 'img.' ? cssTarget : 'img.style-svg' );
 

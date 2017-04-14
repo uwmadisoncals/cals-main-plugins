@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.6.15
+* Version 6.6.19
 *
 */
 
@@ -13,49 +13,49 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 require_once 'wppa-admin-functions.php';
 
 global $wppa_all_maintenance_slugs;
-$wppa_all_maintenance_slugs = array( 'wppa_remake_index_albums',
-							'wppa_remove_empty_albums',
-							'wppa_remake_index_photos',
-							'wppa_apply_default_photoname_all',
-							'wppa_apply_new_photodesc_all',
-							'wppa_append_to_photodesc',
-							'wppa_remove_from_photodesc',
-							'wppa_remove_file_extensions',
-							'wppa_readd_file_extensions',
-							'wppa_all_ext_to_lower',
-							'wppa_regen_thumbs',
-							'wppa_rerate',
-							'wppa_recup',
-							'wppa_file_system',
-							'wppa_cleanup',
-							'wppa_remake',
-							'wppa_list_index',
-							'wppa_blacklist_user',
-							'wppa_un_blacklist_user',
-							'wppa_rating_clear',
-							'wppa_viewcount_clear',
-							'wppa_iptc_clear',
-							'wppa_exif_clear',
-							'wppa_watermark_all',
-							'wppa_create_all_autopages',
-							'wppa_delete_all_autopages',
-							'wppa_leading_zeros',
-							'wppa_add_gpx_tag',
-							'wppa_add_hd_tag',
-							'wppa_optimize_ewww',
-							'wppa_comp_sizes',
-							'wppa_edit_tag',
-							'wppa_sync_cloud',
-							'wppa_sanitize_tags',
-							'wppa_sanitize_cats',
-							'wppa_test_proc',
-							'wppa_crypt_photos',
-							'wppa_crypt_albums',
-							'wppa_create_o1_files',
-							'wppa_owner_to_name_proc',
-							'wppa_move_all_photos',
-							'wppa_cleanup_index',
-						);
+$wppa_all_maintenance_slugs = array( 	'wppa_remake_index_albums',
+										'wppa_remove_empty_albums',
+										'wppa_remake_index_photos',
+										'wppa_apply_default_photoname_all',
+										'wppa_apply_new_photodesc_all',
+										'wppa_append_to_photodesc',
+										'wppa_remove_from_photodesc',
+										'wppa_remove_file_extensions',
+										'wppa_readd_file_extensions',
+										'wppa_all_ext_to_lower',
+										'wppa_regen_thumbs',
+										'wppa_rerate',
+										'wppa_recup',
+										'wppa_file_system',
+										'wppa_cleanup',
+										'wppa_remake',
+										'wppa_list_index',
+										'wppa_blacklist_user',
+										'wppa_un_blacklist_user',
+										'wppa_rating_clear',
+										'wppa_viewcount_clear',
+										'wppa_iptc_clear',
+										'wppa_exif_clear',
+										'wppa_watermark_all',
+										'wppa_create_all_autopages',
+										'wppa_delete_all_autopages',
+										'wppa_leading_zeros',
+										'wppa_add_gpx_tag',
+										'wppa_add_hd_tag',
+										'wppa_optimize_ewww',
+										'wppa_comp_sizes',
+										'wppa_edit_tag',
+										'wppa_sync_cloud',
+										'wppa_sanitize_tags',
+										'wppa_sanitize_cats',
+										'wppa_test_proc',
+										'wppa_crypt_photos',
+										'wppa_crypt_albums',
+										'wppa_create_o1_files',
+										'wppa_owner_to_name_proc',
+										'wppa_move_all_photos',
+										'wppa_cleanup_index',
+									);
 
 // Main maintenace module
 // Must return a string like: errormesssage||$slug||status||togo
@@ -65,6 +65,7 @@ global $wppa_session;
 global $wppa_supported_video_extensions;
 global $wppa_supported_audio_extensions;
 global $wppa_all_maintenance_slugs;
+global $wppa_timestamp_start;
 
 	// Check for multiple maintenance procs
 	if ( ! wppa_switch( 'maint_ignore_concurrency_error' ) && ! wppa_is_cron() ) {
@@ -91,16 +92,29 @@ global $wppa_all_maintenance_slugs;
 	wppa_extend_session();
 
 	// Initialize
-	// Cron job: limit-30 sec, realtime: 5 sec
-	$limit 		= min( 60, max( 30, ini_get( 'max_execution_time' ) ) );
-	$endtime 	= ( wppa_is_cron() ? time() + $limit - '30' : time() + '5' );
+	if ( wppa_is_cron() ) {
+		$ini = ini_get( 'max_execution_time' );
+		if ( ! $ini ) {
+			$ini = 30;
+		}
+		if ( $wppa_timestamp_start ) {
+			$endtime = $wppa_timestamp_start + $ini - 5;
+		}
+		else {
+			$endtime = time() + 5;
+		}
+	}
+	else {
+		$endtime = time() + 5;
+	}
 	$chunksize 	= '1000';
-	$lastid 	= strval( intval ( get_option( $slug.'_last', '0' ) ) );
+	$lastid 	= strval( intval ( get_option( $slug . '_last', '0' ) ) );
 	$errtxt 	= '';
 	$id 		= '0';
 	$topid 		= '0';
 	$reload 	= '';
 	$to_delete_from_cloudinary = array();
+	$aborted 	= false;
 
 	if ( ! isset( $wppa_session ) ) $wppa_session = array();
 	if ( ! isset( $wppa_session[$slug.'_fixed'] ) )   $wppa_session[$slug.'_fixed'] = '0';
@@ -119,10 +133,10 @@ global $wppa_all_maintenance_slugs;
 	// Pre-processing needed?
 	if ( $lastid == '0' ) {
 		if (  wppa_is_cron() ) {
-			wppa_log( 'Cron', 'Cron job {b}' . $slug . '{/b} started.' );
+			wppa_log( 'Cron', 'Cron job {b}' . $slug . '{/b} started. Allowed runtime: ' . ( $endtime - time() ) . 's. Cron id = ' . wppa_is_cron() );
 		}
 		else {
-			wppa_log( 'Obs', 'Maintenance proc {b}' . $slug . '{/b} started.' );
+			wppa_log( 'Obs', 'Maintenance proc {b}' . $slug . '{/b} started. Allowed runtime: ' . ( $endtime - time() ) . 's.' );
 		}
 		switch ( $slug ) {
 
@@ -216,6 +230,12 @@ global $wppa_all_maintenance_slugs;
 
 		}
 		wppa_save_session();
+	}
+
+	if ( $lastid != '0' ) {
+		if (  wppa_is_cron() ) {
+			wppa_log( 'Cron', 'Cron job {b}' . $slug . '{/b} continued. Allowed runtime: ' . ( $endtime - time() ) . 's. Cron id = ' . wppa_is_cron() );
+		}
 	}
 
 	// Dispatch on albums / photos / single actions
@@ -411,8 +431,8 @@ global $wppa_all_maintenance_slugs;
 							$fixed_this = true;
 						}
 						$EXT = strtoupper( $ext );
-						$rawpath = wppa_strip_ext( wppa_get_photo_path( $id ) );
-						$rawthumb = wppa_strip_ext( wppa_get_thumb_path( $id ) );
+						$rawpath = wppa_strip_ext( wppa_get_photo_path( $id, false ) );
+						$rawthumb = wppa_strip_ext( wppa_get_thumb_path( $id, false ) );
 						$fixed_this = false;
 						if ( wppa_is_multi( $id ) ) {
 
@@ -446,7 +466,7 @@ global $wppa_all_maintenance_slugs;
 						break;
 
 					case 'wppa_regen_thumbs':
-						if ( ! wppa_is_video( $id ) || file_exists( str_replace( 'xxx', 'jpg', wppa_get_photo_path( $id ) ) ) ) {
+						if ( ! wppa_is_video( $id ) || file_exists( wppa_get_photo_path( $id ) ) ) {
 							wppa_create_thumbnail( $id );
 						}
 						break;
@@ -476,8 +496,8 @@ global $wppa_all_maintenance_slugs;
 							// Media files
 							if ( wppa_is_multi( $id ) ) {	// Can NOT use wppa_has_audio() or wppa_is_video(), they use wppa_get_photo_path() without fs switch!!
 								$exts 		= array_merge( $wppa_supported_video_extensions, $wppa_supported_audio_extensions );
-								$pathfrom 	= wppa_get_photo_path( $id, $from );
-								$pathto 	= wppa_get_photo_path( $id, $to );
+								$pathfrom 	= wppa_get_photo_path( $id, false, $from );
+								$pathto 	= wppa_get_photo_path( $id, false, $to );
 							//	wppa_log( 'dbg', 'Trying: '.$pathfrom );
 								foreach ( $exts as $ext ) {
 									if ( is_file( str_replace( '.xxx', '.'.$ext, $pathfrom ) ) ) {
@@ -488,13 +508,13 @@ global $wppa_all_maintenance_slugs;
 							}
 
 							// Poster / photo
-							if ( file_exists( wppa_fix_poster_ext( wppa_get_photo_path( $id, $from ), $id ) ) ) {
-								@ rename ( wppa_fix_poster_ext( wppa_get_photo_path( $id, $from ), $id ), wppa_fix_poster_ext( wppa_get_photo_path( $id, $to ), $id ) );
+							if ( file_exists( wppa_get_photo_path( $id, true, $from ) ) ) {
+								@ rename ( wppa_get_photo_path( $id, true, $from ), wppa_get_photo_path( $id, true, $to ) );
 							}
 
 							// Thumbnail
-							if ( file_exists( wppa_fix_poster_ext( wppa_get_thumb_path( $id, $from ), $id ) ) ) {
-								@ rename ( wppa_fix_poster_ext( wppa_get_thumb_path( $id, $from ), $id ), wppa_fix_poster_ext( wppa_get_thumb_path( $id, $to ), $id ) );
+							if ( file_exists( wppa_get_thumb_path( $id, true, $from ) ) ) {
+								@ rename ( wppa_get_thumb_path( $id, true, $from ), wppa_get_thumb_path( $id, true, $to ) );
 							}
 
 						}
@@ -849,12 +869,13 @@ global $wppa_all_maintenance_slugs;
 
 						if ( is_array( $photos ) ) foreach( array_keys( $photos ) as $pidx ) {
 
-							if ( $pidx < $last ) continue;
+							if ( $pidx < $last ) continue;	// Skip already done
 							if ( $last && $pidx == $last ) {
 								wppa_log('Cron', 'Continuing cleanup index at slug = {b}' . $indexes[$idx]['slug'] . '{/b}, element # = {b}' . $last . '{/b}' );
 							}
 
-							if ( time() < ( $endtime + 2 ) ) {
+							// For some unknown reason this loop does not return used memory. Hence the memory check
+							if ( ( time() < ( $endtime + 2 ) ) && ( memory_get_usage() < ( 0.9 * wppa_memry_limit() ) ) ) {
 								$pho 	= $photos[$pidx];
 
 								// If photo gone, remove it from index
@@ -866,13 +887,16 @@ global $wppa_all_maintenance_slugs;
 								else {
 									$words = wppa_index_raw_to_words( wppa_index_get_raw_photo( $pho ) );
 									if ( ! in_array( $indexes[$idx]['slug'], $words ) ) {
-									wppa_log( 'Cron', 'Removed index entry photo {b}' . $pho . '{/b} from slug {b}' . $indexes[$idx]['slug'] . '{/b}' );
+										wppa_log( 'Cron', 'Removed index entry photo {b}' . $pho . '{/b} from slug {b}' . $indexes[$idx]['slug'] . '{/b}' );
 										unset( $photos[$pidx] );
 									}
-									wppa_cache_thumb( 'invalidate', $pho );	// Prevent cache overflow
+									wppa_cache_thumb( 'invalidate' );	// Prevent cache overflow
 								}
 							}
-							else break;
+							else {
+								$aborted = true;
+							}
+							if ( $aborted ) break;
 						}
 						if ( $cp && $pidx != ( $cp - 1 ) ) {
 							wppa_log( 'Cron', 	'Could not complete scan of index item # {b}' . $indexes[$idx]['id'] . '{/b},' .
@@ -904,9 +928,9 @@ global $wppa_all_maintenance_slugs;
 						break;
 				}
 
-				// Test for timeout / ready
+				// Update status
 				if ( wppa_is_cron() ) {
-					if ( time() > $endtime ) {
+					if ( ( time() > $endtime ) || ( memory_get_usage() >= ( 0.9 * wppa_memry_limit() ) ) ) {
 						update_option( $slug.'_status', __('Scheduled cron job', 'wp-photo-album-plus'));
 					}
 					else {
@@ -914,7 +938,9 @@ global $wppa_all_maintenance_slugs;
 					}
 				}
 
-				if ( time() > $endtime ) break; 	// Time out
+				if ( time() > $endtime ) break;
+				if ( memory_get_usage() >= ( 0.9 * wppa_memry_limit() ) ) break;
+				if ( $aborted ) break;
 			}
 
 			break; 	// End process index
@@ -1000,6 +1026,8 @@ global $wppa_all_maintenance_slugs;
 		switch ( $slug ) {
 			case 'wppa_remake_index_albums':
 			case 'wppa_remake_index_photos':
+				wppa_schedule_maintenance_proc( 'wppa_cleanup_index' );
+				break;
 			case 'wppa_cleanup_index':
 				$wpdb->query( "DELETE FROM `".WPPA_INDEX."` WHERE `albums` = '' AND `photos` = ''" );	// Remove empty entries
 				delete_option( 'wppa_index_need_remake' );
@@ -1379,7 +1407,7 @@ global $wpdb;
 	$iptcfix = false;
 	$exiffix = false;
 	$file = wppa_get_source_path( $id );
-	if ( ! is_file( $file ) ) $file = wppa_get_photo_path( $id );
+	if ( ! is_file( $file ) ) $file = wppa_get_photo_path( $id, false );
 
 	if ( is_file ( $file ) ) {					// Not a dir
 		$attr = getimagesize( $file, $info );

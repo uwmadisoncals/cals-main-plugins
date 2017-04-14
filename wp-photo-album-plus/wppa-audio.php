@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all audio routines
-* Version 6.3.12
+* Version 6.6.18
 *
 */
 
@@ -25,7 +25,7 @@ global $wppa_supported_audio_extensions;
 	if ( $ext != 'xxx' ) return false;	// This is not a audio
 
 	$result = array();
-	$path = wppa_get_photo_path( $id );
+	$path = wppa_get_photo_path( $id, false );
 	$raw_path = wppa_strip_ext( $path );
 	foreach ( $wppa_supported_audio_extensions as $ext ) {
 		if ( is_file( $raw_path.'.'.$ext ) ) {
@@ -139,7 +139,7 @@ function wppa_get_audio_body( $id, $for_lb = false, $w = '0', $h = '0' ) {
 	// Collect other data
 	$width 		= $w ? $w : wppa_get_photox( $id );
 	$height 	= $h ? $h : wppa_get_photoy( $id );
-	$source 	= wppa_get_photo_url( $id );
+	$source 	= wppa_get_photo_url( $id, false );
 	$source 	= substr( $source, 0, strrpos( $source, '.' ) );
 	$class 		= $for_lb ? ' class="wppa-overlay-img"' : '';
 
@@ -193,9 +193,9 @@ global $wppa_supported_audio_extensions;
 	if ( ! wppa_has_audio( $fromid ) ) return false;
 
 	// Get paths
-	$from_path 		= wppa_get_photo_path( $fromid );
+	$from_path 		= wppa_get_photo_path( $fromid, false );
 	$raw_from_path 	= wppa_strip_ext( $from_path );
-	$to_path 		= wppa_get_photo_path( $toid );
+	$to_path 		= wppa_get_photo_path( $toid, false );
 	$raw_to_path 	= wppa_strip_ext( $to_path );
 
 	// Copy the media files
@@ -206,20 +206,6 @@ global $wppa_supported_audio_extensions;
 		}
 	}
 
-/*
-	// Copy the poster file
-	$poster = wppa_fix_poster_ext( $from_path, $fromid );
-	if ( is_file( $poster ) ) {
-		if ( ! copy( $poster,  $raw_to_path . '.' . wppa_get_ext( $from_path ) ) ) return false;
-	}
-
-	// Copy the poster thumb
-	$poster_thumb 		= wppa_fix_poster_ext( wppa_get_thumb_path( $fromid ) );
-	$poster_thumb_to 	= wppa_strip_ext( wppa_get_thumb_path( $toid ) ) . '.' . wppa_get_ext( $poster_thumb );
-	if ( is_file( $poster_thumb ) ) {
-		if ( ! copy( $poster_thumb, $poster_thumb_to ) ) return false;
-	}
-*/
 	// Done!
 	return true;
 }

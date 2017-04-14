@@ -1,9 +1,9 @@
 === WP Photo Album Plus ===
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
-Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto
-Version: 6.6.15
-Stable tag: 6.6.15
+Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick
+Version: 6.6.21
+Stable tag: 6.6.21
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -180,6 +180,93 @@ Oh, just Google on 'picture resizer' and you will find a bunch of free programs 
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
 
+= 6.6.21 =
+
+= Bug Fixes =
+
+* QR widget now works as designed
+
+= 6.6.20 =
+
+= Bug Fixes =
+
+* Fixed a Qr code display issue.
+
+= Other Changes =
+
+* Spinners are now .svg images (except in IE) and have the same color as the navigation symbols as listed in Table II-B14 and 15, and the corner rounding is like the setting in Table II-J11.
+* Added charset=utf8 to the headers in mails sent by wppa.
+* Share text to Twitter is shortened.
+
+= 6.6.19 =
+
+= New Features =
+
+* Table IV-E12.1 Rating on two lines. Works only with graphic display when show average is on.
+* Deleted photos can be undeleted during at least one hour by the admin or any wppa super user. See the Album table after one or more photos have been deleted.
+* Table IV-F11. Enable clickable links in comments.
+
+= Other Changes =
+
+* Source file deletion is now also done at the background.
+* QR codes can be cached. This reduces the load on the qrserver and hence prevents DoS. Default off, Setting: Table IX-K1.4. Qrcodes are svg images in this case.
+
+= 6.6.18 =
+
+= Bug Fixes =
+
+* The max photo pixelsize message in the frontend upload dialog now also checks for the setting in Table VII-B10.
+If this value is set, it has precedence over the memory check.
+Make sure you do not set this value larger than the memory can handle.
+* Improved background indexing to ensure faster update of indexes in all cases.
+* On ssl pages, on the comments section, the gravatar url was insecure. Fixed.
+* The QR widget is no longer insecure on ssl pages.
+* Photo of the day selection. If set to random, restored the feature that more than one photos of the day on a single page will be different.
+
+= New Features =
+
+* A few more buttons on the Edit Album information screen.
+
+= Other Changes =
+
+* ImageMagick can now be used together with Cloudinary.
+* If there is only one Grant Parent, the users album will now be created regardless of if it is going to be used.
+
+= 6.6.17 =
+
+= Bug Fixes =
+
+* Default image audiostub.png was missing. Re-added.
+* When the php ini setting max_execution_time is not set properly, cron jobs will run at least 15 seconds, not just for one item.
+
+= New Features =
+
+* ImageMagick Phase II. When ImageMagick is activated, the photo admin page has over a dozen extra manipulation buttons that act instantaneously.
+
+= Other Changes =
+
+= 6.6.16 =
+
+= Bug Fixes =
+
+* Treecounts on album cover set to 'total' (Table II-E5) did not display the sub-sub-album count on sub-albums. Fixed.
+* Removed the link to album/photo edit on the upload admin page when the user has no rights to edit.
+* Fixed the admin bar menu options in case the user has no edit rights.
+* Rating V was no longer replaced by *. Fixed.
+* User skips for indexing (Table IX-E18.2) were not processed properly. Fixed.
+* Upload Box B stopped working at version 6.5.02. Fixed.
+
+= New Features =
+
+* You can configure retries for failed mails in Table IX-A10. Retries take place every hour.
+
+= Other Changes =
+
+* Downsizing and thumbnail creation by ImageMagick is implemented.
+* Button text is now reset after frontend upload.
+* Improved delete album and cleanup deleted photos.
+* Performance improvements during upload by removing redundant double creating thumbnails.
+
 = 6.6.15 =
 
 = Bug Fixes =
@@ -191,7 +278,7 @@ See for additional information: <a href="http://www.wppa.nl/changelog/" >The doc
 
 = New Features =
 
-* ImageMagic phase I. Command interface. See Table IX-K7. Implemented: rotation of non-standard orientation, rotate and flip on the photo admin page.
+* ImageMagick phase I. Command interface. See Table IX-K7. Implemented: rotation of non-standard orientation, rotate and flip on the photo admin page.
 This feature is still under development. If you see unexpected behaviour, please report it here: https://wordpress.org/support/plugin/wp-photo-album-plus
 
 = Other Changes =

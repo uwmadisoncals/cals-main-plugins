@@ -4,8 +4,9 @@ Plugin Name: Peter's Post Notes
 Plugin URI: http://www.theblog.ca/wordpress-post-notes
 Description: Add notes on the "edit post" and "edit page" screens' sidebars, as well as general notes on the dashboard, in WordPress 2.8 and up. When used with Peter's Collaboration E-mails 1.2 and up, the notes are sent along with the e-mails in the collaboration workflow.
 Author: Peter Keung
-Version: 1.6.3
+Version: 1.6.4
 Change Log:
+2017-03-11  1.6.4: In the Collaboration Notes dashboard, skip notes attached to non-existent posts. (Thanks Alex!)
 2016-11-19  1.6.3: Bug fixes: do not show private notes in "Latest notes" column; fix capability check when showing "Edit" links. (Thanks Alex!)
 2016-11-06  1.6.2: Fix query bug for users with no associated posts. (Thanks Alex!) Also remove code warning when displaying an unlimited number of notes.
 2016-02-13  1.6.1: Improve UX by wrapping checkboxes inside labels. (Thanks Hrohh!)
@@ -55,7 +56,7 @@ global $ppn_version;
 // Name of the database table that will hold the post-specific notes
 $ppn_db_notes = $wpdb->prefix . 'collabnotes';
 $ppn_db_generalnotes = $wpdb->prefix . 'generalnotes';
-$ppn_version = '1.6.3';
+$ppn_version = '1.6.4';
 
 /* --------------------------------------------
 Helper functions
@@ -577,15 +578,19 @@ function ppn_dashboard() {
             $author_name = ppnFunctionCollection::get_author_name( $ppn_newest_post->author );
             $ppn_post = get_post($ppn_newest_post->postid, OBJECT);
             
-            print '<li><strong>';
-            if( $ppn_newest_post->personal )
+            // The post might have been deleted, so we will skip the note
+            if( $ppn_post )
             {
-                print '[private] ';
+                print '<li><strong>';
+                if( $ppn_newest_post->personal )
+                {
+                    print '[private] ';
+                }
+                print $author_name . '</strong>: ' . stripslashes($ppn_newest_post->notecontent) . '<br />';
+                print '<em>' . mysql2date(__('M j, Y \a\t G:i', 'peters_post_notes'), $ppn_newest_post->notetime) . '</em> '.__('on', 'peters_post_notes').' ';
+                print '<a href="post.php?action=edit&post=' . $ppn_newest_post->postid . '">' . $ppn_post->post_title . '</a> (' . $ppn_post->post_status . ')';
+                print '</li>' . "\n";
             }
-            print $author_name . '</strong>: ' . stripslashes($ppn_newest_post->notecontent) . '<br />';
-            print '<em>' . mysql2date(__('M j, Y \a\t G:i', 'peters_post_notes'), $ppn_newest_post->notetime) . '</em> '.__('on', 'peters_post_notes').' ';
-            print '<a href="post.php?action=edit&post=' . $ppn_newest_post->postid . '">' . $ppn_post->post_title . '</a> (' . $ppn_post->post_status . ')';
-            print '</li>' . "\n";
         }
         
         print '</ul>' . "\n";

@@ -10,7 +10,7 @@ class FrmAppHelper {
 	/**
 	 * @since 2.0
 	 */
-	public static $plug_version = '2.03.03';
+	public static $plug_version = '2.03.04';
 
     /**
      * @since 1.07.02
@@ -884,7 +884,7 @@ class FrmAppHelper {
 		}
 
 		$query = $wp_scripts->registered[ $handle ];
-		if ( is_object( $query ) ) {
+		if ( is_object( $query ) && ! empty( $query->ver ) ) {
 			$ver = $query->ver;
 		}
 

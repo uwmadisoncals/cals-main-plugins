@@ -33,7 +33,9 @@ function bodhi_svg_support_settings_page() {
 
 	}
 
-	global $bodhi_svgs_options;
+	// Swapped the global with this line to work with WordPress Bedrock on LEMP stack | https://wordpress.org/support/topic/settings-not-saving-24/
+	// global $bodhi_svgs_options;
+	$bodhi_svgs_options = get_option( 'bodhi_svgs_settings' );
 
 	require( BODHI_SVGS_PLUGIN_PATH . 'admin/svgs-settings-page.php' );
 

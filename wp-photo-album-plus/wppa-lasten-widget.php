@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the last uploaded photos
-* Version 6.4.17
+* Version 6.4.18
 */
 
 class LasTenWidget extends WP_Widget {
@@ -132,7 +132,7 @@ class LasTenWidget extends WP_Widget {
 				$link       = wppa_get_imglnk_a('lasten', $image['id'], '', $tit, '', $no_album, str_replace( ',', '.', $album ) );
 				$file       = wppa_get_thumb_path($image['id']);
 				$imgstyle_a = wppa_get_imgstyle_a( $image['id'], $file, $maxw, 'center', 'ltthumb');
-				$imgurl 	= wppa_get_thumb_url( $image['id'], '', $imgstyle_a['width'], $imgstyle_a['height'] );
+				$imgurl 	= wppa_get_thumb_url( $image['id'], true, '', $imgstyle_a['width'], $imgstyle_a['height'] );
 				$imgevents 	= wppa_get_imgevents('thumb', $image['id'], true);
 				$title 		= $link ? esc_attr(stripslashes($link['title'])) : '';
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version 6.6.12
+* Version 6.6.19
 *
 */
 
@@ -71,6 +71,10 @@ global $wpdb;
 			}
 		}
 	}
+
+	// Update index
+	wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
+
 	return true;
 
 /*
@@ -169,11 +173,10 @@ global $wpdb;
 				$doit = true;
 				break;
 			case 'album':
-				// Album id is > 0. -9 means: marked for deletion
-				if ( ( wppa_is_int($itemvalue) && $itemvalue > 0 ) || $itemvalue = '-9' ) {
-					$doit = true;
-				}
-				else wppa_log('err', 'Invalid album id found in wppa_update_album(): '.$itemvalue);
+				$doit = true;
+				break;
+			case 'magickstack':
+				$doit = true;
 				break;
 
 			default:
@@ -187,5 +190,9 @@ global $wpdb;
 			}
 		}
 	}
+
+	// Update index
+	wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+
 	return true;
 }

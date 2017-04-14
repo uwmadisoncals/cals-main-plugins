@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 6.6.11
+* Version 6.6.16
 *
 */
 
@@ -77,7 +77,7 @@ global $upload_album;
 				wppa_ok_message( __( 'Connecting to edit album...' , 'wp-photo-album-plus' ) ); ?>
 				<script type="text/javascript">document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id='.$upload_album, 'js' ) ) ?>';</script>
 			<?php }
-			else {
+			elseif ( wppa_opt( 'upload_edit' ) != 'none' ) {
 				wppa_ok_message( __( 'Connecting to edit photos...' , 'wp-photo-album-plus' ) ); ?>
 				<script type="text/javascript">document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_edit_photo', 'js' ) ) ?>';</script>
 			<?php }
@@ -92,7 +92,7 @@ global $upload_album;
 				wppa_ok_message( __( 'Connecting to edit album...' , 'wp-photo-album-plus' ) ); ?>
 				<script type="text/javascript">document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id='.$upload_album, 'js' ) ) ?>';</script>
 			<?php }
-			else {
+			elseif ( wppa_opt( 'upload_edit' ) != 'none' ) {
 				wppa_ok_message( __( 'Connecting to edit photos...' , 'wp-photo-album-plus' ) ); ?>
 				<script type="text/javascript">document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_edit_photo', 'js' ) ) ?>';</script>
 			<?php }
@@ -348,21 +348,24 @@ global $upload_album;
 						' value="' . __( 'Upload Multiple Photos', 'wp-photo-album-plus' ) . '"' .
 						' onclick="if ( document.getElementById( \'wppa-album-s\' ).value == 0 ) { alert( \'' . __( 'Please select an album' , 'wp-photo-album-plus' ) . '\' ); return false; }"' .
 					' />' .
-					' ' .
-					'<input' .
-						' type="checkbox"' .
-						' id="wppa-go-edit-multiple"' .
-						' name="wppa-go-edit-multiple"' .
-						' onchange="wppaCookieCheckbox( this, \'wppa-go-edit-multiple\' )"' .
-					' />' .
-					'<script type="text/javascript" >' .
-						'if ( wppa_getCookie( \'wppa-go-edit-multiple\' ) == \'on\' ) document.getElementById( \'wppa-go-edit-multiple\' ).checked = \'checked\';' .
-					'</script>';
+					' ';
+					if ( current_user_can( 'wppa_admin' ) || wppa_opt( 'upload_edit' ) != 'none' ) {
+						echo
+						'<input' .
+							' type="checkbox"' .
+							' id="wppa-go-edit-multiple"' .
+							' name="wppa-go-edit-multiple"' .
+							' onchange="wppaCookieCheckbox( this, \'wppa-go-edit-multiple\' )"' .
+						' />' .
+						'<script type="text/javascript" >' .
+							'if ( wppa_getCookie( \'wppa-go-edit-multiple\' ) == \'on\' ) document.getElementById( \'wppa-go-edit-multiple\' ).checked = \'checked\';' .
+						'</script>';
+					}
 
 					if ( current_user_can( 'wppa_admin' ) ) {
 						_e( 'After upload: Go to the <b>Edit Album</b> page.', 'wp-photo-album-plus');
 					}
-					else {
+					elseif ( wppa_opt( 'upload_edit' ) != 'none' ) {
 						_e( 'After upload: Go to the <b>Edit Photos</b> page.', 'wp-photo-album-plus');
 					}
 				echo
@@ -422,28 +425,31 @@ global $upload_album;
 						' value="' . __( 'Upload Single Photos' , 'wp-photo-album-plus') . '"' .
 						' onclick="if ( document.getElementById( \'wppa-album-m\' ).value == 0 ) { alert( \'' . __( 'Please select an album' , 'wp-photo-album-plus' ) . '\' ); return false; }"' .
 					' />' .
-					' ' .
-					'<input' .
-						' type="checkbox"' .
-						' id="wppa-go-edit-single"' .
-						' name="wppa-go-edit-single"' .
-						' onchange="wppaCookieCheckbox( this, \'wppa-go-edit-single\' )" />' .
-					'<script type="text/javascript" >' .
-						'if ( wppa_getCookie( \'wppa-go-edit-single\' ) == \'on\' ) document.getElementById( \'wppa-go-edit-single\' ).checked = \'checked\';' .
-					'</script>';
+					' ';
+					if ( current_user_can( 'wppa_admin' ) || wppa_opt( 'upload_edit' ) != 'none' ) {
+						echo
+						'<input' .
+							' type="checkbox"' .
+							' id="wppa-go-edit-single"' .
+							' name="wppa-go-edit-single"' .
+							' onchange="wppaCookieCheckbox( this, \'wppa-go-edit-single\' )" />' .
+						'<script type="text/javascript" >' .
+							'if ( wppa_getCookie( \'wppa-go-edit-single\' ) == \'on\' ) document.getElementById( \'wppa-go-edit-single\' ).checked = \'checked\';' .
+						'</script>';
+					}
 
 					if ( current_user_can( 'wppa_admin' ) ) {
 						_e( 'After upload: Go to the <b>Edit Album</b> page.' , 'wp-photo-album-plus');
 					}
-					else {
+					elseif ( wppa_opt( 'upload_edit' ) != 'none' ) {
 						_e( 'After upload: Go to the <b>Edit Photos</b> page.' , 'wp-photo-album-plus');
 					}
 				echo
 				'</form>' .
 				'<script type="text/javascript">' .
-				'<!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->' .
+//				'<!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->' .
 					'var multi_selector = new MultiSelector( document.getElementById( \'files_list\' ), ' . $max_files . ');' .
-				'<!-- Pass in the file element -->' .
+//				'<!-- Pass in the file element -->' .
 					'multi_selector.addElement( document.getElementById( \'my_file_element\' ) );' .
 				'</script>' .
 			'</div>';

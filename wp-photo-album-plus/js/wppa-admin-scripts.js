@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.6.15
+/* Version 6.6.19
 /* Various js routines used in admin pages
 */
 
@@ -1014,8 +1014,18 @@ function wppaAjaxDeletePhoto(photo, bef, aft) {
 
 	var before = '';
 	var after = '';
-	if ( bef ) before = bef;
-	if ( aft ) after = aft;
+	if ( bef ) {
+		before = bef;
+	}
+	else {
+		before = '<div style="padding-left:5px;" >';
+	}
+	if ( aft ) {
+		after = aft;
+	}
+	else {
+		aftrer = '</div>';
+	}
 
 	wppaFeAjaxLog('in');
 
@@ -1058,6 +1068,58 @@ function wppaAjaxDeletePhoto(photo, bef, aft) {
 				else {
 					document.getElementById('photoitem-'+photo).innerHTML = before+ArrValues[2]+after;	// OK
 					wppaProcessFull(ArrValues[3], ArrValues[4]);
+				}
+				wppaFeAjaxLog('out');
+			}
+			else {	// status != 200
+				document.getElementById('photoitem-'+photo).innerHTML = before+'<span style="color:red;" >Comm error '+xmlhttp.status+': '+xmlhttp.statusText+'</span>'+after;
+			}
+		}
+	}
+}
+
+function wppaAjaxUndeletePhoto(photo) {
+
+	wppaFeAjaxLog('in');
+
+	var xmlhttp = wppaGetXmlHttp();
+
+	// Make the Ajax url
+	var url = wppaAjaxUrl+'?action=wppa&wppa-action=undelete-photo&photo-id='+photo;
+	url += '&wppa-nonce='+document.getElementById('photo-nonce-'+photo).value;
+
+	// Do the Ajax action
+	xmlhttp.open('GET',url,true);
+	xmlhttp.send();
+
+	// Process the result
+	xmlhttp.onreadystatechange=function() {
+		switch (xmlhttp.readyState) {
+		case 1:
+			document.getElementById('photostatus-'+photo).innerHTML = 'server connection established';
+			break;
+		case 2:
+			document.getElementById('photostatus-'+photo).innerHTML = 'request received';
+			break;
+		case 3:
+			document.getElementById('photostatus-'+photo).innerHTML = 'processing request';
+			break;
+		case 4:
+			if ( xmlhttp.status == 200 ) {
+
+				var str = wppaTrim(xmlhttp.responseText);
+				var ArrValues = str.split("||");
+				if ( ArrValues[0] == 'ER' ) {
+					alert(ArrValues[3]);
+					jQuery('#wppa-delete-'+photo).css('text-decoration','line-through');
+				}
+				else if (ArrValues[0] != '') {
+					alert('The server returned unexpected output:\n'+ArrValues[0]);
+				}
+
+				if ( ArrValues[1] == 0 ) document.getElementById('photostatus-'+photo).innerHTML = ArrValues[2];	// Error
+				else {
+					document.getElementById('photoitem-'+photo).innerHTML = '<div style="padding-left:5px;" >' + ArrValues[2] + '</div>';	// OK
 				}
 				wppaFeAjaxLog('out');
 			}
@@ -1282,6 +1344,41 @@ function _wppaAjaxUpdatePhoto( photo, actionslug, value, refresh, bef, aft ) {
 											else {
 												jQuery('#photostatus-'+photo).html( 'Working, please wait... (' + wppaAjaxPhotoCount[photo] + ')' );
 											}
+
+											// Increment photo version no
+											if ( ArrValues[3] ) {
+												var href = jQuery( '#fs-a-' + photo ).attr( 'href' );
+												var arr = href.split( '=' );
+
+												arr[1] = parseInt( arr[1] ) + 1;
+												jQuery( '#fs-a-' + photo ).attr( 'href', arr[0] + '=' + arr[1] );
+												jQuery( '#fs-img-' + photo ).attr( 'src', arr[0] + '=' + arr[1] );
+											}
+
+											// Increment thumbnail version
+											if ( ArrValues[4] ) {
+												var src = jQuery( '#tnp-' + photo ).attr( 'src' );
+												var arr = src.split( '=' );
+												arr[1] = parseInt( arr[1] ) + 1;
+												jQuery( '#tnp-' + photo ).attr( 'src', arr[0] + '=' + arr[1] );
+											}
+
+											// Update Magic stack
+											if ( typeof( ArrValues[5] ) != 'undefined' ) {
+												jQuery( '#imstack-' + photo ).html( ArrValues[5] );
+												if ( ArrValues[5].length > 0 ) {
+													jQuery( '#imstackbutton-' + photo ).css( 'display', '' );
+												}
+												else {
+													jQuery( '#imstackbutton-' + photo ).css( 'display', 'none' );
+												}
+											}
+
+											// Update display file sizes
+											if ( typeof( ArrValues[6] ) != 'undefined' ) {
+												jQuery( '#dispfileinfo-' + photo ).html( ArrValues[6] );
+											}
+
 											break;
 										case '99':	// Photo is gone
 											jQuery( '#photoitem-' + photo ).html( bef+'<span style="color:red">' + ArrValues[2] + '</span>'+aft );
@@ -1324,7 +1421,7 @@ function _wppaAjaxUpdatePhoto( photo, actionslug, value, refresh, bef, aft ) {
 									if ( refresh && ArrValues[1] == '0' ) {
 										jQuery( '#photostatus-' + photo ).after( '<span style="color:blue;font-weight:bold;"> Reloading...</span>' );
 										jQuery( '#wppa-photo-spin-' + photo ).css( { visibility: 'visible' } );
-										setTimeout( function() { wppaReload( '#photo_'+photo ) }, 100 );
+										setTimeout( function() { wppaReload( '#photo_'+photo ) }, 1000 );
 										return;
 									}
 								},
@@ -1340,7 +1437,7 @@ function _wppaAjaxUpdatePhoto( photo, actionslug, value, refresh, bef, aft ) {
 									wppaConsoleLog( '_wppaAjaxUpdatePhoto failed. Error = ' + error + ', status = ' + status, 'force' );
 								},
 					complete: 	function( xhr, status, newurl ) {
-
+									jQuery( '#wppa-admin-spinner' ).css( 'display', 'none' );
 								}
 				} );
 }
@@ -1845,10 +1942,8 @@ function wppaAjaxPopupWindow( slug ) {
 			break;
 	}
 	var desc = '';
-	var width = 1024;
+	var width = jQuery(window).width() * 0.9;
 	var height = 512;
-
-	if ( screen.availWidth < width ) width = screen.availWidth;
 
 	var xmlhttp = wppaGetXmlHttp();
 
@@ -1883,6 +1978,7 @@ function wppaAjaxPopupWindow( slug ) {
 																				padding: 			'8px',
 																				backgroundColor: 	'#cccccc',
 																				boxSizing: 			'content-box',
+																				zIndex: 			'9999',
 																			});
 												jQuery( '.ui-dialog-titlebar' ).css(
 																						{
@@ -2272,6 +2368,10 @@ function wppaEditSearch( url, id ) {
 	else {
 		document.location.href = url + '&wppa-searchstring=' + ss;
 	}
+}
+
+function wppaEditTrash( url ) {
+	document.location.href = url;
 }
 
 function wppaExportDbTable( table ) {

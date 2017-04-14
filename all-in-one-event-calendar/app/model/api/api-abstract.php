@@ -73,9 +73,9 @@ abstract class Ai1ec_Api_Abstract extends Ai1ec_App {
 		delete_option( self::WP_OPTION_KEY );
 
 		// Clear transient API data
-		delete_site_transient( 'ai1ec_api_feeds_subscriptions' );
-		delete_site_transient( 'ai1ec_api_subscriptions' );
-		delete_site_transient( 'ai1ec_api_features' );
+		delete_transient( 'ai1ec_api_feeds_subscriptions' );
+		delete_transient( 'ai1ec_api_subscriptions' );
+		delete_transient( 'ai1ec_api_features' );
 	}
 
 	/**
@@ -269,16 +269,18 @@ abstract class Ai1ec_Api_Abstract extends Ai1ec_App {
 			if ( ! $createIfNotExists ) {
 				return 0;
 			}
-			//if the calendar is not saved on settings it should exists on API
+			// Try to find the calendar in the API
 			$ticketing_calendar_id = $this->_find_user_calendar();
 			if ( 0 < $ticketing_calendar_id  ) {
-				$this->save_calendar_id( $ticketing_calendar_id );				
+				$this->save_calendar_id( $ticketing_calendar_id );
+
 				return $ticketing_calendar_id;
 			} else {
-				//if the calendar should not exist on API, we will created
+				// If the calendar doesn't exist in the API, create a new one
 				$ticketing_calendar_id = $this->_create_calendar();
 				if ( 0 < $ticketing_calendar_id ) {
 					$this->save_calendar_id( $ticketing_calendar_id );
+
 					return $ticketing_calendar_id;
 				} else {
 					return 0;
@@ -297,13 +299,13 @@ abstract class Ai1ec_Api_Abstract extends Ai1ec_App {
 		);
 		$response = $this->request_api( 'GET', AI1EC_API_URL . 'calendars', 
 			json_encode( $body )
-		); 		
+		);
 		if ( $this->is_response_success( $response ) ) {
 			if ( is_array( $response->body ) ) {
 				return $response->body[0]->id;
 			} else {
 				return $response->body->id;
-			}			
+			}
 		} else {
 			return 0;
 		}
@@ -370,7 +372,7 @@ abstract class Ai1ec_Api_Abstract extends Ai1ec_App {
 	 * @return array List of subscriptions and limits
 	 */
 	protected function get_subscriptions( $force_refresh = false ) {
-		$subscriptions = get_site_transient( 'ai1ec_api_subscriptions' );
+		$subscriptions = get_transient( 'ai1ec_api_subscriptions' );
 
 		if ( false === $subscriptions || $force_refresh || ( defined( 'AI1EC_DEBUG' ) && AI1EC_DEBUG )  ) {
 			$response = $this->request_api( 'GET', AI1EC_API_URL . 'calendars/' . $this->_get_ticket_calendar() . '/subscriptions',
@@ -383,9 +385,9 @@ abstract class Ai1ec_Api_Abstract extends Ai1ec_App {
 				$subscriptions = array();
 			}
 
-			// Save for 30 minutes
-			$minutes = 30;
-			set_site_transient( 'ai1ec_api_subscriptions', $subscriptions, $minutes * 60 );
+			// Save for 15 minutes
+			$minutes = 15;
+			set_transient( 'ai1ec_api_subscriptions', $subscriptions, $minutes * 60 );
 		}
 
 		return $subscriptions;

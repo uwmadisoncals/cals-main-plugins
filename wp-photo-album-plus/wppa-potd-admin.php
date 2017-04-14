@@ -3,7 +3,7 @@
 * Pachkage: wp-photo-album-plus
 *
 * admin photo of the day widget
-* version 6.6.12
+* version 6.6.18
 *
 */
 
@@ -325,7 +325,7 @@ global $wppa_defaults;
 				$photo = wppa_get_potd();
 				if ( $photo ) {
 					$html = '<div style="display:inline-block;width:25%;text-align:center;vertical-align:middle;">' .
-								'<img src="' . wppa_fix_poster_ext(wppa_get_thumb_url( $photo['id'] ), $photo['id'] ) . '" />' .
+								'<img src="' . wppa_get_thumb_url( $photo['id'] ) . '" />' .
 							'</div>' .
 							'<div style="display:inline-block;width:75%;text-align:center;vertical-align:middle;" >' .
 								__('Album', 'wp-photo-album-plus') . ': ' . wppa_get_album_name( $photo['album'] ) .
@@ -448,7 +448,7 @@ global $wppa_defaults;
 											// The image if a photo
 											else {
 												echo '<img' .
-														' src=" '. wppa_fix_poster_ext( wppa_get_thumb_url( $id ), $id ) . '"' .
+														' src=" '. wppa_get_thumb_url( $id ) . '"' .
 														' style="' .
 															'max-width:180px;' .
 															'max-height:135px;' .

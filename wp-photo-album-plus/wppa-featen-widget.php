@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the featured photos
-* Version 6.4.17
+* Version 6.4.18
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -120,7 +120,7 @@ class FeaTenWidget extends WP_Widget {
 				$width      = $imgstyle_a['width'];
 				$height     = $imgstyle_a['height'];
 				$cursor		= $imgstyle_a['cursor'];
-				$imgurl 	= wppa_get_thumb_url( $image['id'], '', $width, $height );
+				$imgurl 	= wppa_get_thumb_url( $image['id'], true, '', $width, $height );
 
 				$imgevents = wppa_get_imgevents('thumb', $image['id'], true);
 

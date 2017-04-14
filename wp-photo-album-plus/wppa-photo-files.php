@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version 6.6.15
+* Version 6.6.20
 *
 */
 
@@ -34,9 +34,9 @@ function wppa_make_o1_source( $id ) {
 	// Make destination path
 	$dst_path = wppa_get_o1_source_path( $id );
 
-	// Imagic
-	if ( wppa_opt( 'image_magic' ) ) {
-		wppa_image_magic( 'convert ' . $src_path . ' -auto-orient ' . $dst_path );
+	// ImageMagick
+	if ( wppa_opt( 'image_magick' ) ) {
+		wppa_image_magick( 'convert ' . $src_path . ' -auto-orient ' . $dst_path );
 	}
 
 	// Classic
@@ -76,7 +76,7 @@ function wppa_orientate_image( $id, $ori ) {
 		return;
 	}
 
-	wppa_orientate_image_file( wppa_fix_poster_ext( wppa_get_photo_path( $id ), $id ), $ori );
+	wppa_orientate_image_file( wppa_get_photo_path( $id ), $ori );
 	wppa_bump_photo_rev();
 }
 
@@ -148,9 +148,9 @@ function wppa_orientate_image_file( $file, $ori ) {
 
 // Make the display and thumbnails from a given pathname or upload temp image file.
 // The id and extension must be supplied.
-function wppa_make_the_photo_files( $file, $id, $ext ) {
+function wppa_make_the_photo_files( $file, $id, $ext, $do_thumb = true ) {
 global $wpdb;
-
+//wppa_log('dbg', 'make called with'.$file.' '.$id.' '.$ext.' '.$do_thumb);
 	$thumb = wppa_cache_thumb( $id );
 
 	$src_size = @getimagesize( $file, $info );
@@ -168,129 +168,160 @@ global $wpdb;
 		$newimage = wppa_strip_ext( $newimage ) . '.' . strtolower( $ext );
 	}
 
+	// Max sizes
+	if ( wppa_opt( 'resize_to' ) == '0' ) {	// from fullsize
+		$max_width 	= wppa_opt( 'fullsize' );
+		$max_height = wppa_opt( 'maxheight' );
+	}
+	else {										// from selection
+		$screen = explode( 'x', wppa_opt( 'resize_to' ) );
+		$max_width 	= $screen[0];
+		$max_height = $screen[1];
+	}
+
 	// If Resize on upload is checked
 	if ( wppa_switch( 'resize_on_upload' ) ) {
 
-		// Picture sizes
-		$src_width 	= $src_size[0];
+		// ImageMagick
+		if ( wppa_opt( 'image_magick' ) ) {
 
-		// Temp convert to logical width if stereo
-		if ( $thumb['stereo'] ) {
-			$src_width /= 2;
-		}
-		$src_height = $src_size[1];
-
-		// Max sizes
-		if ( wppa_opt( 'resize_to' ) == '0' ) {	// from fullsize
-			$max_width 	= wppa_opt( 'fullsize' );
-			$max_height = wppa_opt( 'maxheight' );
-		}
-		else {										// from selection
-			$screen = explode( 'x', wppa_opt( 'resize_to' ) );
-			$max_width 	= $screen[0];
-			$max_height = $screen[1];
-		}
-
-		// If orientation needs +/- 90 deg rotation, swap max x and max y
-		$ori = wppa_get_exif_orientation( $file );
-		if ( $ori >= 5 && $ori <= 8 ) {
-			$t = $max_width;
-			$max_width = $max_height;
-			$max_height = $t;
-		}
-
-		// Is source more landscape or more portrait than max window
-		if ( $src_width/$src_height > $max_width/$max_height ) {	// focus on width
-			$focus = 'W';
-			$need_downsize = ( $src_width > $max_width );
-		}
-		else {														// focus on height
-			$focus = 'H';
-			$need_downsize = ( $src_height > $max_height );
-		}
-
-		// Convert back to physical size
-		if ( $thumb['stereo'] ) {
-			$src_width *= 2;
-		}
-
-		// Downsize required ?
-		if ( $need_downsize ) {
-
-			// Find mime type
-			$mime = $src_size[2];
-
-			// Create the source image
-			switch ( $mime ) {	// mime type
-				case 1: // gif
-					$temp = @ imagecreatefromgif( $file );
-					if ( $temp ) {
-						$src = imagecreatetruecolor( $src_width, $src_height );
-						imagecopy( $src, $temp, 0, 0, 0, 0, $src_width, $src_height );
-						imagedestroy( $temp );
-					}
-					else $src = false;
-					break;
-				case 2:	// jpeg
-					if ( ! function_exists( 'wppa_imagecreatefromjpeg' ) ) {
-						wppa_log( 'Error', 'Function wppa_imagecreatefromjpeg does not exist.' );
-					}
-					$src = @ wppa_imagecreatefromjpeg( $file );
-					break;
-				case 3:	// png
-					$src = @ imagecreatefrompng( $file );
-					break;
+			// If jpg, apply jpeg quality
+			$q = wppa_opt( 'jpeg_quality' );
+			$quality = '';
+			if ( wppa_get_ext( $file ) == 'jpg' ) {
+				$quality = '-quality ' . $q;
 			}
 
-			if ( ! $src ) {
-				wppa_log( 'Error', 'Image file '.$file.' is corrupt while downsizing photo' );
-				return false;
-			}
-
-			// Create the ( empty ) destination image
-			if ( $focus == 'W') {
-				if ( $thumb['stereo'] ) $max_width *= 2;
-				$dst_width 	= $max_width;
-				$dst_height = round( $max_width * $src_height / $src_width );
-			}
-			else {
-				$dst_height = $max_height;
-				$dst_width = round( $max_height * $src_width / $src_height );
-			}
-			$dst = imagecreatetruecolor( $dst_width, $dst_height );
-
-			// If Png, save transparancy
-			if ( $mime == 3 ) {
-				imagealphablending( $dst, false );
-				imagesavealpha( $dst, true );
-			}
-
-			// Do the copy
-			imagecopyresampled( $dst, $src, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height );
-
-			// Remove source image
-			imagedestroy( $src );
-
-			// Save the photo
-			switch ( $mime ) {	// mime type
-				case 1:
-					imagegif( $dst, $newimage );
-					break;
-				case 2:
-					imagejpeg( $dst, $newimage, wppa_opt( 'jpeg_quality' ) );
-					break;
-				case 3:
-					imagepng( $dst, $newimage, 6 );
-					break;
-			}
-
-			// Remove destination image
-			imagedestroy( $dst );
+			wppa_image_magick( 'convert ' . $file . ' ' . $quality . ' -resize ' . ( $thumb['stereo'] ? 2 * $max_width : $max_width ) . 'x' . $max_height . ' ' . $newimage );
 		}
-		else {	// No downsize needed, picture is small enough
-			copy( $file, $newimage );
+
+		// Classic GD
+		else {
+
+			// Picture sizes
+			$src_width 	= $src_size[0];
+
+			// Temp convert to logical width if stereo
+			if ( $thumb['stereo'] ) {
+				$src_width /= 2;
+			}
+			$src_height = $src_size[1];
+
+/*			// Max sizes
+			if ( wppa_opt( 'resize_to' ) == '0' ) {	// from fullsize
+				$max_width 	= wppa_opt( 'fullsize' );
+				$max_height = wppa_opt( 'maxheight' );
+			}
+			else {										// from selection
+				$screen = explode( 'x', wppa_opt( 'resize_to' ) );
+				$max_width 	= $screen[0];
+				$max_height = $screen[1];
+			}
+*/
+			// If orientation needs +/- 90 deg rotation, swap max x and max y
+			$ori = wppa_get_exif_orientation( $file );
+			if ( $ori >= 5 && $ori <= 8 ) {
+				$t = $max_width;
+				$max_width = $max_height;
+				$max_height = $t;
+			}
+
+			// Is source more landscape or more portrait than max window
+			if ( $src_width/$src_height > $max_width/$max_height ) {	// focus on width
+				$focus = 'W';
+				$need_downsize = ( $src_width > $max_width );
+			}
+			else {														// focus on height
+				$focus = 'H';
+				$need_downsize = ( $src_height > $max_height );
+			}
+
+			// Convert back to physical size
+			if ( $thumb['stereo'] ) {
+				$src_width *= 2;
+			}
+
+			// Downsize required ?
+			if ( $need_downsize ) {
+
+				// Find mime type
+				$mime = $src_size[2];
+
+				// Create the source image
+				switch ( $mime ) {	// mime type
+					case 1: // gif
+						$temp = @ imagecreatefromgif( $file );
+						if ( $temp ) {
+							$src = imagecreatetruecolor( $src_width, $src_height );
+							imagecopy( $src, $temp, 0, 0, 0, 0, $src_width, $src_height );
+							imagedestroy( $temp );
+						}
+						else $src = false;
+						break;
+					case 2:	// jpeg
+						if ( ! function_exists( 'wppa_imagecreatefromjpeg' ) ) {
+							wppa_log( 'Error', 'Function wppa_imagecreatefromjpeg does not exist.' );
+						}
+						$src = @ wppa_imagecreatefromjpeg( $file );
+						break;
+					case 3:	// png
+						$src = @ imagecreatefrompng( $file );
+						break;
+				}
+
+				if ( ! $src ) {
+					wppa_log( 'Error', 'Image file '.$file.' is corrupt while downsizing photo' );
+					return false;
+				}
+
+				// Create the ( empty ) destination image
+				if ( $focus == 'W') {
+					if ( $thumb['stereo'] ) $max_width *= 2;
+					$dst_width 	= $max_width;
+					$dst_height = round( $max_width * $src_height / $src_width );
+				}
+				else {
+					$dst_height = $max_height;
+					$dst_width = round( $max_height * $src_width / $src_height );
+				}
+				$dst = imagecreatetruecolor( $dst_width, $dst_height );
+
+				// If Png, save transparancy
+				if ( $mime == 3 ) {
+					imagealphablending( $dst, false );
+					imagesavealpha( $dst, true );
+				}
+
+				// Do the copy
+				imagecopyresampled( $dst, $src, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height );
+
+				// Remove source image
+				imagedestroy( $src );
+
+				// Save the photo
+				switch ( $mime ) {	// mime type
+					case 1:
+						imagegif( $dst, $newimage );
+						break;
+					case 2:
+						imagejpeg( $dst, $newimage, wppa_opt( 'jpeg_quality' ) );
+						break;
+					case 3:
+						imagepng( $dst, $newimage, 6 );
+						break;
+				}
+
+				// Remove destination image
+				imagedestroy( $dst );
+
+			}
+			else {	// No downsize needed, picture is small enough
+				copy( $file, $newimage );
+			}
 		}
-	}	// No resize on upload checked
+	}
+
+	// No resize on upload checked
 	else {
 		copy( $file, $newimage );
 	}
@@ -350,7 +381,9 @@ global $wpdb;
 	wppa_create_stereo_images( $id );
 
 	// Create thumbnail...
-	wppa_create_thumbnail( $id );
+	if ( $do_thumb ) {
+		wppa_create_thumbnail( $id );
+	}
 
 	// Clear (super)cache
 	wppa_clear_cache();
@@ -361,34 +394,32 @@ global $wpdb;
 // Create thubnail
 function wppa_create_thumbnail( $id, $use_source = true ) {
 
-	// Find file to make thumbnail from
-	$source_path = wppa_fix_poster_ext( wppa_get_source_path( $id ), $id );
+	if ( $use_source && ! wppa_switch( 'watermark_thumbs' ) ) {
 
-	// Use source if requested and available
-	if ( $use_source ) {
+		// Try o1 source
+		$file = wppa_get_o1_source_path( $id );
 
-		if ( ! wppa_switch( 'watermark_thumbs' ) && is_file( $source_path ) ) {
-			$file = $source_path;										// Use sourcefile
-		}
-		else {
-			$file = wppa_fix_poster_ext( wppa_get_photo_path( $id ), $id );	// Use photofile
+		// Try source path
+		if ( ! is_file( $file ) ) {
+			$file = wppa_get_source_path( $id );
 		}
 
-		// Non standard orientation files: never use source
-		$orient = wppa_get_exif_orientation( $file );
-		if ( $orient > '1' ) {
-			$file = wppa_fix_poster_ext( wppa_get_photo_path( $id ), $id );	// Use photofile
+		// Use photo path
+		if ( ! is_file( $file ) ) {
+			$file = wppa_get_photo_path( $id );
 		}
 	}
+
+	// Not source requested
 	else {
-		$file = wppa_fix_poster_ext( wppa_get_photo_path( $id ), $id );	// Use photofile
+		$file = wppa_get_photo_path( $id );
 	}
 
 	// Max side
 	$max_side = wppa_get_minisize();
 
 	// Check file
-	if ( ! file_exists( $file ) ) return false;		// No file, fail
+	if ( ! is_file( $file ) ) return false;		// No file, fail
 	$img_attr = getimagesize( $file );
 	if ( ! $img_attr ) return false;				// Not an image, fail
 
@@ -397,9 +428,6 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 
 	// Get output path
 	$thumbpath = wppa_get_thumb_path( $id );
-	if ( wppa_get_ext( $thumbpath ) == 'xxx' ) { // Video poster
-		$thumbpath = wppa_strip_ext( $thumbpath ) . '.jpg';
-	}
 
 	// Source size
 	$src_size_w = $img_attr[0];
@@ -430,156 +458,165 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 		$src_size_w *= 2;
 	}
 
-	// Create the source image
-	switch ( $mime ) {	// mime type
-		case 1: // gif
-			$temp = @ imagecreatefromgif( $file );
-			if ( $temp ) {
-				$src = imagecreatetruecolor( $src_size_w, $src_size_h );
-				imagecopy( $src, $temp, 0, 0, 0, 0, $src_size_w, $src_size_h );
-				imagedestroy( $temp );
-			}
-			else $src = false;
-			break;
-		case 2:	// jpeg
-			if ( ! function_exists( 'wppa_imagecreatefromjpeg' ) ) wppa_log( 'Error', 'Function wppa_imagecreatefromjpeg does not exist.' );
-			$src = @ wppa_imagecreatefromjpeg( $file );
-			break;
-		case 3:	// png
-			$src = @ imagecreatefrompng( $file );
-			break;
-	}
-	if ( ! $src ) {
-		wppa_log( 'Error', 'Image file '.$file.' is corrupt while creating thmbnail' );
-		return true;
+	// Image Magick?
+	if ( wppa_opt( 'image_magick' ) && $type == 'none' ) {
+		wppa_image_magick( 'convert ' . $file . ' -thumbnail ' . $max_side . 'x' . $max_side . ' ' . $thumbpath );
 	}
 
-	// Compute the destination image size
-	if ( $dst_asp < 1.0 ) {	// Landscape
-		$dst_size_w = $max_side;
-		$dst_size_h = round( $max_side * $dst_asp );
-	}
-	else {					// Portrait
-		$dst_size_w = round( $max_side / $dst_asp );
-		$dst_size_h = $max_side;
-	}
-
-	// Create the ( empty ) destination image
-	$dst = imagecreatetruecolor( $dst_size_w, $dst_size_h );
-	if ( $mime == 3 ) {	// Png, save transparancy
-		imagealphablending( $dst, false );
-		imagesavealpha( $dst, true );
-	}
-
-	// Fill with the required color
-	$c = trim( strtolower( wppa_opt( 'bgcolor_thumbnail' ) ) );
-	if ( $c != '#000000' ) {
-		$r = hexdec( substr( $c, 1, 2 ) );
-		$g = hexdec( substr( $c, 3, 2 ) );
-		$b = hexdec( substr( $c, 5, 2 ) );
-		$color = imagecolorallocate( $dst, $r, $g, $b );
-		if ( $color === false ) {
-			wppa_log( 'Err', 'Unable to set background color to: '.$r.', '.$g.', '.$b.' in wppa_create_thumbnail' );
+	// Classic GD
+	else {
+		// Create the source image
+		switch ( $mime ) {	// mime type
+			case 1: // gif
+				$temp = @ imagecreatefromgif( $file );
+				if ( $temp ) {
+					$src = imagecreatetruecolor( $src_size_w, $src_size_h );
+					imagecopy( $src, $temp, 0, 0, 0, 0, $src_size_w, $src_size_h );
+					imagedestroy( $temp );
+				}
+				else $src = false;
+				break;
+			case 2:	// jpeg
+				if ( ! function_exists( 'wppa_imagecreatefromjpeg' ) ) wppa_log( 'Error', 'Function wppa_imagecreatefromjpeg does not exist.' );
+				$src = @ wppa_imagecreatefromjpeg( $file );
+				break;
+			case 3:	// png
+				$src = @ imagecreatefrompng( $file );
+				break;
 		}
-		else {
-			imagefilledrectangle( $dst, 0, 0, $dst_size_w, $dst_size_h, $color );
+		if ( ! $src ) {
+			wppa_log( 'Error', 'Image file '.$file.' is corrupt while creating thmbnail' );
+			return true;
 		}
-	}
 
-	// Switch on what we have to do
-	switch ( $type ) {
-		case 'none':	// Use aspect from fullsize image
-			$src_x = 0;
-			$src_y = 0;
-			$src_w = $src_size_w;
-			$src_h = $src_size_h;
-			$dst_x = 0;
-			$dst_y = 0;
-			$dst_w = $dst_size_w;
-			$dst_h = $dst_size_h;
-			break;
-		case 'clip':	// Clip image to given aspect ratio
-			if ( $src_asp < $dst_asp ) {	// Source image more landscape than destination
-				$dst_x = 0;
-				$dst_y = 0;
-				$dst_w = $dst_size_w;
-				$dst_h = $dst_size_h;
-				$src_x = round( ( $src_size_w - $src_size_h / $dst_asp ) / 2 );
-				$src_y = 0;
-				$src_w = round( $src_size_h / $dst_asp );
-				$src_h = $src_size_h;
+		// Compute the destination image size
+		if ( $dst_asp < 1.0 ) {	// Landscape
+			$dst_size_w = $max_side;
+			$dst_size_h = round( $max_side * $dst_asp );
+		}
+		else {					// Portrait
+			$dst_size_w = round( $max_side / $dst_asp );
+			$dst_size_h = $max_side;
+		}
+
+		// Create the ( empty ) destination image
+		$dst = imagecreatetruecolor( $dst_size_w, $dst_size_h );
+		if ( $mime == 3 ) {	// Png, save transparancy
+			imagealphablending( $dst, false );
+			imagesavealpha( $dst, true );
+		}
+
+		// Fill with the required color
+		$c = trim( strtolower( wppa_opt( 'bgcolor_thumbnail' ) ) );
+		if ( $c != '#000000' ) {
+			$r = hexdec( substr( $c, 1, 2 ) );
+			$g = hexdec( substr( $c, 3, 2 ) );
+			$b = hexdec( substr( $c, 5, 2 ) );
+			$color = imagecolorallocate( $dst, $r, $g, $b );
+			if ( $color === false ) {
+				wppa_log( 'Err', 'Unable to set background color to: '.$r.', '.$g.', '.$b.' in wppa_create_thumbnail' );
 			}
 			else {
-				$dst_x = 0;
-				$dst_y = 0;
-				$dst_w = $dst_size_w;
-				$dst_h = $dst_size_h;
-				$src_x = 0;
-				$src_y = round( ( $src_size_h - $src_size_w * $dst_asp ) / 2 );
-				$src_w = $src_size_w;
-				$src_h = round( $src_size_w * $dst_asp );
+				imagefilledrectangle( $dst, 0, 0, $dst_size_w, $dst_size_h, $color );
 			}
-			break;
-		case 'padd':	// Padd image to given aspect ratio
-			if ( $src_asp < $dst_asp ) {	// Source image more landscape than destination
-				$dst_x = 0;
-				$dst_y = round( ( $dst_size_h - $dst_size_w * $src_asp ) / 2 );
-				$dst_w = $dst_size_w;
-				$dst_h = round( $dst_size_w * $src_asp );
+		}
+
+		// Switch on what we have to do
+		switch ( $type ) {
+			case 'none':	// Use aspect from fullsize image
 				$src_x = 0;
 				$src_y = 0;
 				$src_w = $src_size_w;
 				$src_h = $src_size_h;
-			}
-			else {
-				$dst_x = round( ( $dst_size_w - $dst_size_h / $src_asp ) / 2 );
+				$dst_x = 0;
 				$dst_y = 0;
-				$dst_w = round( $dst_size_h / $src_asp );
+				$dst_w = $dst_size_w;
 				$dst_h = $dst_size_h;
-				$src_x = 0;
-				$src_y = 0;
-				$src_w = $src_size_w;
-				$src_h = $src_size_h;
-			}
-			break;
-		default:		// Not implemented
-			return false;
+				break;
+			case 'clip':	// Clip image to given aspect ratio
+				if ( $src_asp < $dst_asp ) {	// Source image more landscape than destination
+					$dst_x = 0;
+					$dst_y = 0;
+					$dst_w = $dst_size_w;
+					$dst_h = $dst_size_h;
+					$src_x = round( ( $src_size_w - $src_size_h / $dst_asp ) / 2 );
+					$src_y = 0;
+					$src_w = round( $src_size_h / $dst_asp );
+					$src_h = $src_size_h;
+				}
+				else {
+					$dst_x = 0;
+					$dst_y = 0;
+					$dst_w = $dst_size_w;
+					$dst_h = $dst_size_h;
+					$src_x = 0;
+					$src_y = round( ( $src_size_h - $src_size_w * $dst_asp ) / 2 );
+					$src_w = $src_size_w;
+					$src_h = round( $src_size_w * $dst_asp );
+				}
+				break;
+			case 'padd':	// Padd image to given aspect ratio
+				if ( $src_asp < $dst_asp ) {	// Source image more landscape than destination
+					$dst_x = 0;
+					$dst_y = round( ( $dst_size_h - $dst_size_w * $src_asp ) / 2 );
+					$dst_w = $dst_size_w;
+					$dst_h = round( $dst_size_w * $src_asp );
+					$src_x = 0;
+					$src_y = 0;
+					$src_w = $src_size_w;
+					$src_h = $src_size_h;
+				}
+				else {
+					$dst_x = round( ( $dst_size_w - $dst_size_h / $src_asp ) / 2 );
+					$dst_y = 0;
+					$dst_w = round( $dst_size_h / $src_asp );
+					$dst_h = $dst_size_h;
+					$src_x = 0;
+					$src_y = 0;
+					$src_w = $src_size_w;
+					$src_h = $src_size_h;
+				}
+				break;
+			default:		// Not implemented
+				return false;
+		}
+
+		// Copy left half if stereo
+		if ( wppa_get_photo_item( $id, 'stereo' ) ) {
+			$src_w /= 2;
+		}
+
+		// Do the copy
+		imagecopyresampled( $dst, $src, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h );
+
+		// Save the thumb
+		$thumbpath = wppa_strip_ext( $thumbpath );
+		switch ( $mime ) {	// mime type
+			case 1:
+				$full_thumbpath = $thumbpath . '.gif';
+				imagegif( $dst, $full_thumbpath );
+				break;
+			case 2:
+				$full_thumbpath = $thumbpath . '.jpg';
+				imagejpeg( $dst, $full_thumbpath, wppa_opt( 'jpeg_quality' ) );
+				break;
+			case 3:
+				$full_thumbpath = $thumbpath . '.png';
+				imagepng( $dst, $full_thumbpath, 6 );
+				break;
+		}
+		$thumbpath = $full_thumbpath;
+
+		// Cleanup
+		imagedestroy( $src );
+		imagedestroy( $dst );
 	}
-
-	// Copy left half if stereo
-	if ( wppa_get_photo_item( $id, 'stereo' ) ) {
-		$src_w /= 2;
-	}
-
-	// Do the copy
-	imagecopyresampled( $dst, $src, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h );
-
-	// Save the thumb
-	$thumbpath = wppa_strip_ext( $thumbpath );
-	switch ( $mime ) {	// mime type
-		case 1:
-			$full_thumbpath = $thumbpath . '.gif';
-			imagegif( $dst, $full_thumbpath );
-			break;
-		case 2:
-			$full_thumbpath = $thumbpath . '.jpg';
-			imagejpeg( $dst, $full_thumbpath, wppa_opt( 'jpeg_quality' ) );
-			break;
-		case 3:
-			$full_thumbpath = $thumbpath . '.png';
-			imagepng( $dst, $full_thumbpath, 6 );
-			break;
-	}
-
-	// Cleanup
-	imagedestroy( $src );
-	imagedestroy( $dst );
 
 	// Make sure file is accessable
-	wppa_chmod( $full_thumbpath );
+	wppa_chmod( $thumbpath );
 
 	// Optimize
-	wppa_optimize_image_file( $full_thumbpath );
+	wppa_optimize_image_file( $thumbpath );
 
 	// Compute and save sizes
 	wppa_get_thumbx( $id, 'force' );	// forces recalc x and y
@@ -596,20 +633,48 @@ function wppa_imagecreatefromjpeg( $file ) {
 	return $img;
 }
 
-// Process ImageMagic command
-function wppa_image_magic( $command ) {
+// See if ImageMagick command exists
+function wppa_is_magick( $command ) {
+	if ( ! $command ) {
+		return false;
+	}
+	if ( ! wppa_opt( 'image_magick' ) ) {
+		return false;
+	}
+	return is_file( rtrim( wppa_opt( 'image_magick' ), '/' ) . '/' . $command );
+}
+
+// Process ImageMagick command
+function wppa_image_magick( $command ) {
 
 	// Image magic enabled?
-	if ( ! wppa_opt( 'image_magic' ) ) {
+	if ( ! wppa_opt( 'image_magick' ) ) {
 		return '-9';
 	}
 
-	$path = rtrim( wppa_opt( 'image_magic' ), '/' ) . '/';
+	// Image Magick root dir
+	$path = rtrim( wppa_opt( 'image_magick' ), '/' ) . '/';
+
+	// Try to prepend 'magick' to the command if its not already there.
+	// This is for forward compatibility, e.g. when 'magick' exists but 'convert' not.
+	if ( wppa_is_magick( 'magick' ) && substr( $command, 0, 6 ) != 'magick' ) {
+		$command = 'magick ' . $command;
+	}
 	$out  = array();
 	$err  = 0;
 	$run  = exec( $path . $command, $out, $err );
+
+	$logcom = $command;
+	$logcom = str_replace( ABSPATH, '...', $logcom );
+	$logcom = str_replace( wppa_opt( 'image_magick' ), '...', $logcom );
+
 	if ( $err ) {
-		wppa_log( 'Err', 'Exec ' . $path . $command . ' returned ' . $err );
+		$key = $err ? 'Err' : 'Dbg';
+		wppa_log( $key, 'Exec ' . $logcom . ' returned ' . $err ); //, true );
+		foreach( $out as $line ) {
+			wppa_log( 'OBS', $line );
+		}
 	}
+
 	return $err;
 }

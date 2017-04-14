@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.6.15
+* Version 6.6.20
 *
 */
 
@@ -270,8 +270,8 @@ global $wpdb;
 	$status 	= $photo['status'];
 	$filename 	= $photo['filename'];
 	$location	= $photo['location'];
-	$oldimage 	= wppa_fix_poster_ext( wppa_get_photo_path( $photo['id'] ), $photo['id'] );
-	$oldthumb 	= wppa_fix_poster_ext( wppa_get_thumb_path( $photo['id'] ), $photo['id'] );
+	$oldimage 	= wppa_get_photo_path( $photo['id'] );
+	$oldthumb 	= wppa_get_thumb_path( $photo['id'] );
 	$tags 		= $photo['tags'];
 	$exifdtm 	= $photo['exifdtm'];
 
@@ -306,8 +306,8 @@ global $wpdb;
 	// Find copied photo details
 	if ( ! $id ) return $err;
 	$image_id = $id;
-	$newimage = wppa_strip_ext( wppa_get_photo_path( $image_id ) ) . '.' . wppa_get_ext( $oldimage );
-	$newthumb = wppa_strip_ext( wppa_get_thumb_path( $image_id ) ) . '.' . wppa_get_ext( $oldthumb );
+	$newimage = wppa_strip_ext( wppa_get_photo_path( $image_id, false ) ) . '.' . wppa_get_ext( $oldimage );
+	$newthumb = wppa_strip_ext( wppa_get_thumb_path( $image_id, false ) ) . '.' . wppa_get_ext( $oldthumb );
 
 	$err = '5';
 	// Do the filesystem copy
@@ -374,124 +374,95 @@ global $wpdb;
 
 	// Get the image
 	$err = '3';
-	$file = wppa_fix_poster_ext( wppa_get_photo_path( $id ), $id );
-	if ( !is_file( $file ) ) return $err;
+	$file = wppa_get_photo_path( $id );
+	if ( ! is_file( $file ) ) return $err;
 
 	// Get the imgdetails
 	$err = '4';
 	$img = getimagesize( $file );
 	if ( ! $img ) return $err;
 
-	// Imagick
-	if ( wppa_opt( 'image_magic' ) ) {
+	// Get the image
+	switch ( $img[2] ) {
+		case 1:	// gif
+			$err = '5';
+			$source = imagecreatefromgif( $file );
+			break;
+		case 2: // jpg
+			$err = '6';
+			$source = wppa_imagecreatefromjpeg( $file );
+			break;
+		case 3: // png
+			$err = '7';
+			$source = imagecreatefrompng( $file );
+			break;
+		default: // unsupported mimetype
+			$err = '10';
+			$source = false;
+	}
+	if ( ! $source ) return $err;
 
-		// Rotate the image
-		$err = '11';
+	// Rotate the image
+	$err = '11';
+	switch( $ang ) {
 
-		switch( $ang ) {
-			case 'rotright':
-				wppa_image_magic( 'convert ' . $file . ' -rotate 90 ' . $file );
-				break;
-			case 'rot180':
-				wppa_image_magic( 'convert ' . $file . ' -rotate 180 ' . $file );
-				break;
-			case 'rotleft':
-				wppa_image_magic( 'convert ' . $file . ' -rotate -90 ' . $file );
-				break;
-			case 'flip':
-				wppa_image_magic( 'convert ' . $file . ' -flip ' . $file );
-				break;
-			case 'flop':
-				wppa_image_magic( 'convert ' . $file . ' -flop ' . $file );
-				break;
-		}
+		case 'rotright':
+			$rotate = imagerotate( $source, -90, 0 );
+			if ( ! $rotate ) {
+				return $err;
+			}
+			break;
+		case 'rot180':
+			$rotate = imagerotate( $source, 180, 0 );
+			if ( ! $rotate ) {
+				return $err;
+			}
+			break;
+		case 'rotleft':
+			$rotate = imagerotate( $source, 90, 0 );
+			if ( ! $rotate ) {
+				return $err;
+			}
+			break;
+		case 'flip':
+			if ( ! imageflip( $source, IMG_FLIP_VERTICAL ) ) {
+				return $err;;
+			}
+			$rotate = $source;
+			break;
+		case 'flop':
+			if ( ! imageflip( $source, IMG_FLIP_HORIZONTAL ) ) {
+				return $err;;
+			}
+			$rotate = $source;
+			break;
 	}
 
-	// Classic
-	else {
-
-		// Get the image
-		switch ( $img[2] ) {
-			case 1:	// gif
-				$err = '5';
-				$source = imagecreatefromgif( $file );
-				break;
-			case 2: // jpg
-				$err = '6';
-				$source = wppa_imagecreatefromjpeg( $file );
-				break;
-			case 3: // png
-				$err = '7';
-				$source = imagecreatefrompng( $file );
-				break;
-			default: // unsupported mimetype
-				$err = '10';
-				$source = false;
-		}
-		if ( ! $source ) return $err;
-
-		// Rotate the image
-		$err = '11';
-		switch( $ang ) {
-
-			case 'rotright':
-				$rotate = imagerotate( $source, -90, 0 );
-				if ( ! $rotate ) {
-					return $err;
-				}
-				break;
-			case 'rot180':
-				$rotate = imagerotate( $source, 180, 0 );
-				if ( ! $rotate ) {
-					return $err;
-				}
-				break;
-			case 'rotleft':
-				$rotate = imagerotate( $source, 90, 0 );
-				if ( ! $rotate ) {
-					return $err;
-				}
-				break;
-			case 'flip':
-				if ( ! imageflip( $source, IMG_FLIP_VERTICAL ) ) {
-					return $err;;
-				}
-				$rotate = $source;
-				break;
-			case 'flop':
-				if ( ! imageflip( $source, IMG_FLIP_HORIZONTAL ) ) {
-					return $err;;
-				}
-				$rotate = $source;
-				break;
-		}
-
-		// Save the image
-		switch ( $img[2] ) {
-			case 1:
-				$err = '15';
-				$bret = imagegif( $rotate, $file, 95 );
-				break;
-			case 2:
-				$err = '16';
-				$bret = imagejpeg( $rotate, $file );
-				break;
-			case 3:
-				$err = '17';
-				$bret = imagepng( $rotate, $file );
-				break;
-			default:
-				$err = '20';
-				$bret = false;
-		}
-		if ( ! $bret ) return $err;
-
-		// Destroy the source
-		imagedestroy( $source );
-
-		// Destroy the result
-		imagedestroy( $rotate );
+	// Save the image
+	switch ( $img[2] ) {
+		case 1:
+			$err = '15';
+			$bret = imagegif( $rotate, $file, 95 );
+			break;
+		case 2:
+			$err = '16';
+			$bret = imagejpeg( $rotate, $file );
+			break;
+		case 3:
+			$err = '17';
+			$bret = imagepng( $rotate, $file );
+			break;
+		default:
+			$err = '20';
+			$bret = false;
 	}
+	if ( ! $bret ) return $err;
+
+	// Destroy the source
+	imagedestroy( $source );
+
+	// Destroy the result
+	imagedestroy( $rotate );
 
 	// accessable
 	wppa_chmod( $file );
@@ -743,6 +714,9 @@ function wppa_admin_page_links( $curpage, $pagesize, $count, $link, $extra = '' 
 	$nexturl 		= $link.'&wppa-page='.$nextpage.$extra;
 	$npages 		= ceil( $count / $pagesize );
 	$lastpagecount 	= $count % $pagesize;
+	if ( ! $lastpagecount ) {
+		$lastpagecount = $pagesize;
+	}
 
 	if ( $npages > '1' ) {
 		echo '<div style="line-height:1.5em" >';
@@ -807,6 +781,9 @@ global $wpdb;
 		if ( $ext == 'jpeg' ) $ext = 'jpg';
 	}
 
+	// Make proper oriented source
+	wppa_make_o1_source( $id );
+
 	// Make the files
 	wppa_make_the_photo_files( $file, $id, $ext );
 
@@ -819,13 +796,13 @@ global $wpdb;
 	// Save source
 	wppa_save_source( $file, $name, $photo['album'] );
 
-	// Make proper oriented source
-	wppa_make_o1_source( $id );
-
 	// Update filename if not present. this is for backward compatibility when there were no filenames saved yet
 	if ( ! wppa_get_photo_item( $id, 'filename' ) ) {
 		wppa_update_photo( array( 'id' => $id, 'filename' => $name ) );
 	}
+
+	// Clear magick stack
+	wppa_update_photo( array( 'id' => $id, 'magickstack' => '' ) );
 
 	// Update modified timestamp
 	wppa_update_modified( $id );
@@ -1033,8 +1010,20 @@ global $warning_given_small;
 			wppa_flush_upldr_cache( 'photoid', $id );
 		}
 
-		// Make the photo files
-		if ( wppa_make_the_photo_files( $file, $id, $ext ) ) {
+		// For photo file creation, if possible, use proper oriented source file, not temp file and also not url
+		$t = wppa_get_o1_source_path( $id );
+		if ( is_file( $t ) ) {
+			$file = $t;
+		}
+		else {
+			$t = wppa_get_source_path( $id );
+			if ( is_file( $t ) ) {
+				$file = $t;
+			}
+		}
+
+		// Make the photo files.
+		if ( wppa_make_the_photo_files( $file, $id, $ext, ! wppa_does_thumb_need_watermark( $id ) ) ) {
 
 			// Repair photoname if not supplied and not standard
 			wppa_set_default_name( $id, $name );
@@ -1049,7 +1038,7 @@ global $warning_given_small;
 			wppa_add_watermark( $id );
 
 			// also to thumbnail?
-			if ( wppa_switch( 'watermark_thumbs' ) ) {
+			if ( wppa_does_thumb_need_watermark( $id ) ) {
 				wppa_create_thumbnail( $id );
 			}
 			// Is it a default coverimage?
@@ -1068,7 +1057,7 @@ function wppa_admin_spinner() {
 
 	$result = 	'<img' .
 					' id="wppa-admin-spinner"' .
-					' src="' . wppa_get_imgdir( 'loader.gif' ).'"' .
+					' src="' . wppa_get_imgdir( wppa_is_ie() ? 'loader.gif' : 'loader.svg' ) . '"' .
 					' alt="Spinner"' .
 					' style="' .
 						'position:fixed;' .
@@ -1180,9 +1169,20 @@ global $wpdb;
 	$lastalbum = $wpdb->get_row( "SELECT `id`, `name` FROM `".WPPA_ALBUMS."` ORDER BY `id` DESC LIMIT 1", ARRAY_A );
 	if ( $lastalbum ) echo '<br />'.sprintf(__('The most recently added album is <strong>%s</strong> (%d).', 'wp-photo-album-plus'), __(stripslashes($lastalbum['name']), 'wp-photo-album-plus'), $lastalbum['id']);
 	$lastphoto = $wpdb->get_row( "SELECT `id`, `name`, `album` FROM `".WPPA_PHOTOS."` ORDER BY `timestamp` DESC LIMIT 1", ARRAY_A );
-	$lastphotoalbum = $wpdb->get_row($wpdb->prepare( "SELECT `id`, `name` FROM `".WPPA_ALBUMS."` WHERE `id` = %s", $lastphoto['album']), ARRAY_A );
+	if ( $lastphoto['album'] < '1' ) {
+		$trashed = true;
+		$album = - ( $lastphoto['album'] + '9' );
+	}
+	else {
+		$trashed = false;
+		$album = $lastphoto['album'];
+	}
+	$lastphotoalbum = $wpdb->get_row($wpdb->prepare( "SELECT `id`, `name` FROM `".WPPA_ALBUMS."` WHERE `id` = %s", $album), ARRAY_A );
 	if ( $lastphoto ) {
 		echo '<br />'.sprintf(__('The most recently added photo is <strong>%s</strong> (%d)', 'wp-photo-album-plus'), __(stripslashes($lastphoto['name']), 'wp-photo-album-plus'), $lastphoto['id']);
 		echo ' '.sprintf(__('in album <strong>%s</strong> (%d).', 'wp-photo-album-plus'), __(stripslashes($lastphotoalbum['name']), 'wp-photo-album-plus'), $lastphotoalbum['id']);
+		if ( $trashed ) {
+			echo ' <span style="color:red" >' . __('Deleted', 'wp-photo-album-plus' ) . '</span>';
+		}
 	}
 }

@@ -1085,7 +1085,7 @@ class cnMetabox_Render {
 							'before'   => '<div' . $class . $id . $style . '>',
 							'after'    => '</div>',
 						),
-						$value
+						$value = cnSanitize::string( 'textarea', $value )
 					);
 
 					break;
@@ -1343,13 +1343,13 @@ class cnMetabox_Render {
 				'd', 'j', 'l', 'z', // Day.
 				'm', 'n', 'M', 'F', // Month.
 				'y','Y',            // Year.
-			    '/', ', ', ' ', ',' // Separator.
+			    '-', ', ', ' ', ',' // Separator.
 			),
 			array(
 				'dd', 'dd', 'dd', 'dd',
 				'mm', 'mm', 'mm', 'mm',
 				'yy', 'yy',
-				'-', '-', '-', '-'
+				'/', '/', '/', '/'
 			),
 			get_option( 'date_format' )
 		);
@@ -1670,6 +1670,3 @@ class cnMetabox_Process {
 		return $value;
 	}
 }
-
-// cnMetaboxAPI has to load before cnAdminFunction otherwise the action to save the meta is not added in time to run.
-cnMetaboxAPI::init();

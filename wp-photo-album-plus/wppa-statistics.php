@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version 6.6.09
+* Version 6.6.18
 *
 */
 
@@ -548,6 +548,7 @@ global $wpdb;
 		$result = array_combine( $keys, $treecounts );
 		$result = serialize( $result );
 
+		// Manually update. If used wppa_update_album, remake index would be triggered
 		$iret = $wpdb->query( "UPDATE `" . WPPA_ALBUMS . "` SET `treecounts` = '$result' WHERE `id` = $alb" );
 		wppa_cache_album( 'invalidate', $alb );
 	}

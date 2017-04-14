@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version 6.6.13
+* Version 6.6.19
 *
 */
 
@@ -16,7 +16,7 @@ global $wpdb;
 static $album;
 static $album_cache_2;
 
-	if ( $id == '-9' ) {
+	if ( $id <= '-9' ) {
 		return false;
 	}
 
@@ -73,9 +73,6 @@ static $album_cache_2;
 	if ( wppa_is_enum( $id ) && ! wppa_is_int( $id ) ) {
 		return false;	// enums not supporte yet
 	}
-	if ( $id == '-9' ) {
-		return false;
-	}
 	if ( ! wppa_is_int( $id ) || $id < '1' ) {
 		$album = false;
 		wppa_dbg_msg( 'Invalid arg wppa_cache_album('.$id.')', 'red' );
@@ -131,9 +128,16 @@ static $thumb_cache_2;
 
 	// Invalidate ?
 	if ( $id == 'invalidate' ) {
-		if ( isset( $thumb_cache_2[$data] ) ) unset( $thumb_cache_2[$data] );
-		$thumb = false;
-		return false;
+		if ( $data ) {
+			if ( isset( $thumb_cache_2[$data] ) ) unset( $thumb_cache_2[$data] );
+			$thumb = false;
+			return false;
+		}
+		else {
+			$thumb = null;
+			$thumb_cache_2 = null;
+			return false;
+		}
 	}
 
 	// Add ?
@@ -492,7 +496,7 @@ function wppa_get_album_name( $id, $xargs = array() ) { // $extended = false ) {
 			}
 			return $name;
 		}
-		if ( $id == '-9' ) {
+		if ( $id <= '-9' ) {
 			if ( $args['translate'] ) {
 				$name = __( '--- deleted ---', 'wp-photo-album-plus' );
 			}
@@ -527,7 +531,7 @@ function wppa_get_album_name( $id, $xargs = array() ) { // $extended = false ) {
 	}
 
 	if ( ! $id ) return '';
-	elseif ( $id == '-9' ) {
+	elseif ( $id <= '-9' ) {
 		return '';
 	}
 	elseif ( ! is_numeric( $id ) || $id < '1' ) {
@@ -855,12 +859,6 @@ function wppa_get_thumbphotoxy( $id, $key, $force = false ) {
 	}
 	else {
 		$file = wppa_get_photo_path( $id );
-	}
-
-	if ( wppa_get_ext( $file ) == 'xxx' ) {
-//		if ( $key == 'photox' || $key == 'photoy' ) {
-			$file = wppa_fix_poster_ext( $file, $id );
-//		}
 	}
 
 	if ( ! is_file( $file ) && ! $force ) {

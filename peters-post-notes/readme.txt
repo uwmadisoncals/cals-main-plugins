@@ -36,7 +36,8 @@ For an illustrated explanation on how the plugin works with [Peter's Collaborati
 * lt\_LT translation by Vincent G of http://www.host1free.com
 * it\_IT translation by Ludo
 * cs\_CZ translation by Michal Kuk
-* sk_SK translation by Patrik Žec (PATWIST) of http://patwist.com
+* sk\_SK translation by Patrik Žec (PATWIST) of http://patwist.com
+* he\_IL translation by Itamar Megged
 
 = Requirements =
 
@@ -51,6 +52,9 @@ Unzip the peters\_post\_notes folder to your WordPress plugins folder. It should
 Please visit the plugin page at http://www.theblog.ca/wordpress-post-notes with any questions.
 
 == Changelog ==
+
+= 1.6.4 =
+* 2017-03-11: In the Collaboration Notes dashboard, skip notes attached to non-existent posts. (Thanks Alex!)
 
 = 1.6.3 =
 * 2016-11-19: Bug fixes: do not show private notes in "Latest notes" column; fix capability check when showing "Edit" links. (Thanks Alex!)

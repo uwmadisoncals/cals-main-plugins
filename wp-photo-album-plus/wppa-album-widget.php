@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 6.5.04
+* Version 6.6.18
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -101,7 +101,7 @@ class AlbumWidget extends WP_Widget {
 					$cursor		= $imgstyle_a['cursor'];
 					if ( wppa_switch( 'show_albwidget_tooltip') ) $title = esc_attr(strip_tags(wppa_get_album_desc($album['id'])));
 					else $title = '';
-					$imgurl 	= wppa_get_thumb_url( $image['id'], '', $width, $height );
+					$imgurl 	= wppa_get_thumb_url( $image['id'], true, '', $width, $height );
 				}
 				else {
 					$link       = '';
@@ -113,12 +113,12 @@ class AlbumWidget extends WP_Widget {
 					$cursor		= 'default';
 					$title 		= sprintf(__('Upload at least %d photos to this album!', 'wp-photo-album-plus'), wppa_opt( 'min_thumbs' ) - $imgcount + 1);
 					if ( $imageid ) {	// The 'empty album has a cover image
-						$file       = wppa_get_thumb_path($image['id']);
+						$file       = wppa_get_thumb_path( $image['id'] );
 						$imgstyle_a = wppa_get_imgstyle_a( $image['id'], $file, $maxw, 'center', 'albthumb' );
 						$imgstyle   = $imgstyle_a['style'];
 						$width      = $imgstyle_a['width'];
 						$height     = $imgstyle_a['height'];
-						$imgurl 	= wppa_get_thumb_url( $image['id'], '', $width, $height );
+						$imgurl 	= wppa_get_thumb_url( $image['id'], true, '', $width, $height );
 					}
 					else {
 						$imgurl		= wppa_get_imgdir().'album32.png';
@@ -167,7 +167,7 @@ class AlbumWidget extends WP_Widget {
 									$siz['0'] = wppa_get_photox( $thumb['id'] );
 									$siz['1'] = wppa_get_photoy( $thumb['id'] );
 								}
-								$link 		= wppa_fix_poster_ext( wppa_get_photo_url( $thumb['id'], '', $siz['0'], $siz['1'] ), $thumb['id'] );
+								$link 		= wppa_get_photo_url( $thumb['id'], true, '', $siz['0'], $siz['1'] );
 								$is_video 	= wppa_is_video( $thumb['id'] );
 								$has_audio 	= wppa_has_audio( $thumb['id'] );
 

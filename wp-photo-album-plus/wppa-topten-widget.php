@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the top rated photos
-* Version 6.6.13
+* Version 6.6.19
 */
 
 class TopTenWidget extends WP_Widget {
@@ -128,13 +128,13 @@ class TopTenWidget extends WP_Widget {
 			if ( $medalsonly ) {
 				$thumbs = $wpdb->get_results( 	"SELECT * FROM `".WPPA_PHOTOS."` " .
 												"WHERE `status` IN ( 'gold', 'silver', 'bronze' ) " .
-												"AND `album` <> '-9' " .
+												"AND `album` > '0' " .
 												"ORDER BY " . $sortby . " " .
 												"LIMIT " . $max, ARRAY_A );
 			}
 			else {
 				$thumbs = $wpdb->get_results( 	"SELECT * FROM `".WPPA_PHOTOS."` " .
-												"WHERE `album` <> '-9' " .
+												"WHERE `album` > '0' " .
 												"ORDER BY " . $sortby . " " .
 												"LIMIT " . $max, ARRAY_A );
 			}
@@ -168,7 +168,7 @@ class TopTenWidget extends WP_Widget {
 				$link       = wppa_get_imglnk_a('topten', $image['id'], '', $tit, '', $no_album, $compressed_albumenum );
 				$file       = wppa_get_thumb_path($image['id']);
 				$imgstyle_a = wppa_get_imgstyle_a( $image['id'], $file, $maxw, 'center', 'ttthumb');
-				$imgurl 	= wppa_get_thumb_url($image['id'], '', $imgstyle_a['width'], $imgstyle_a['height']);
+				$imgurl 	= wppa_get_thumb_url($image['id'], true, '', $imgstyle_a['width'], $imgstyle_a['height']);
 				$imgevents 	= wppa_get_imgevents('thumb', $image['id'], true);
 				$title 		= $link ? esc_attr(stripslashes($link['title'])) : '';
 

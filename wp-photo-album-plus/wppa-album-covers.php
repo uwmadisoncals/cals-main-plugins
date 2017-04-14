@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version 6.6.11
+* Version 6.6.18
 *
 */
 
@@ -899,10 +899,7 @@ global $wpdb;
 					$siz['0'] = wppa_get_photox( $id );
 					$siz['1'] = wppa_get_photoy( $id );
 				}
-				$link = wppa_get_photo_url( $id, '', $siz['0'], $siz['1'] );
-				if ( wppa_has_audio( $id ) ) {
-					$link = wppa_fix_poster_ext( $link, $id );
-				}
+				$link 		= wppa_get_photo_url( $id, true, '', $siz['0'], $siz['1'] );
 				$is_video 	= wppa_is_video( $id );
 				$has_audio 	= wppa_has_audio( $id );
 
@@ -1114,11 +1111,7 @@ global $wpdb;
 					$siz['1'] = wppa_get_photoy( $thumb['id'] );
 				}
 
-				$link = wppa_get_photo_url( $thumb['id'], '', $siz['0'], $siz['1'] );
-				if ( wppa_has_audio( $thumb['id'] ) ) {
-					$link = wppa_fix_poster_ext( $link, $thumb['id'] );
-				}
-
+				$link 		= wppa_get_photo_url( $thumb['id'], true, '', $siz['0'], $siz['1'] );
 				$is_video 	= wppa_is_video( $thumb['id'] );
 				$has_audio 	= wppa_has_audio( $thumb['id'] );
 
@@ -1516,6 +1509,7 @@ function wppa_album_cover_view_link(
 
 				$na 	= $albumcount;
 				$nta 	= $treecount['treealbums'] > $albumcount ? $treecount['treealbums'] : '';
+				$ntax 	= $treecount['treealbums'] > $albumcount ? $treecount['treealbums'] : $albumcount;
 				$np 	= $photocount > $mincount ? $photocount : '';
 				$ntp 	= $treecount['treephotos'] > $photocount ? $treecount['treephotos'] : '';
 				$ntpx 	= $treecount['treephotos'] > $photocount ? $treecount['treephotos'] : $photocount;
@@ -1523,8 +1517,8 @@ function wppa_album_cover_view_link(
 				$text 	= __( 'View' , 'wp-photo-album-plus') . ' ';
 
 				if ( wppa_opt( 'show_treecount' ) == 'total' ) {
-					if ( $nta ) {
-						$text .= sprintf( _n( '%d album', '%d albums', $nta, 'wp-photo-album-plus' ), $nta ) . ' ';
+					if ( $ntax ) {
+						$text .= sprintf( _n( '%d album', '%d albums', $ntax, 'wp-photo-album-plus' ), $ntax ) . ' ';
 					}
 					if ( $ntpx ) {
 						$text .= sprintf( _n( '%d photo', '%d photos', $ntpx, 'wp-photo-album-plus' ), $ntpx ) . ' ';
@@ -1798,7 +1792,7 @@ global $wpdb;
 					break;
 				case 'microthumbs':
 					$coverphoto_id = wppa_get_coverphoto_id( $album['id'] );
-					$src = wppa_fix_poster_ext( wppa_get_thumb_url( $coverphoto_id ), $coverphoto_id );
+					$src = wppa_get_thumb_url( $coverphoto_id );
 					if ( $link_type == 'none' ) {
 						wppa_out( 	'<img' .
 										' class="wppa-cover-sublink-img"' .

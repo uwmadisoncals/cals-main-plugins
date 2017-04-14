@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.6.15
+* Version 6.6.19
 *
 */
 
@@ -1298,11 +1298,13 @@ global $wppa_locale;
 
 	// qr code
 	if ( wppa_switch( 'share_qr' ) && $key != 'thumb' ) {
-		$src 	= 	'http://api.qrserver.com/v1/create-qr-code/' .
-						'?data=' . urlencode( $share_url ) .
+		$src 	= 	'http' . ( is_ssl() ? 's' : '' ) . '://api.qrserver.com/v1/create-qr-code/' .
+						'?format=svg' .
 						'&size=80x80' .
 						'&color=' . trim( wppa_opt( 'qr_color' ), '#' ) .
-						'&bgcolor=' . trim( wppa_opt( 'qr_bgcolor' ), '#' );
+						'&bgcolor=' . trim( wppa_opt( 'qr_bgcolor' ), '#' ) .
+						'&data=' . urlencode( $share_url );
+		$src 	= 	wppa_create_qrcode_cache( $src );
 		$qr 	= 	'<div style="float:left; padding:2px;" >' .
 						'<img' .
 							' src="' . $src . '"' .
@@ -1601,11 +1603,13 @@ global $wpdb;
 
 	// qr code
 	if ( wppa_switch( 'share_qr' ) ) {
-		$src 	= 	'http://api.qrserver.com/v1/create-qr-code/' .
-						'?data=' . urlencode( $share_url ) .
+		$src 	= 	'http' . ( is_ssl() ? 's' : '' ) . '://api.qrserver.com/v1/create-qr-code/' .
+						'?format=svg' .
 						'&size=80x80' .
 						'&color=' . trim( wppa_opt( 'qr_color' ), '#' ) .
-						'&bgcolor=' . trim( wppa_opt( 'qr_bgcolor' ), '#' );
+						'&bgcolor=' . trim( wppa_opt( 'qr_bgcolor' ), '#' ) .
+						'&data=' . urlencode( $share_url );
+		$src 	= 	wppa_create_qrcode_cache( $src );
 		$qr 	= 	'<div style="float:left; padding:2px;" >' .
 						'<img' .
 							' src="' . $src . '"' .
@@ -2421,6 +2425,9 @@ static $albums_granted;
 
 	$result .=
 
+	// Save the button text
+	'<script>var wppaUploadButtonText="' . esc_js( $value ) . '"</script>' .
+
 	// The (hidden) functional button
 	'<input' .
 		' type="file"' .
@@ -2448,6 +2455,7 @@ static $albums_granted;
 		' type="button"' .
 		' style="width:100%;margin-top:8px;margin-bottom:8px;padding-left:0;padding-right:0;"' .
 		' id="wppa-user-upload-' . $yalb . '-' . $mocc . '-display"' .
+		' class="wppa-upload-button"' .
 		' value="' . $value . '"' .
 		' onclick="jQuery( \'#wppa-user-upload-' . $yalb . '-' . $mocc . '\' ).click();"' .
 	'/>';
@@ -2461,14 +2469,24 @@ static $albums_granted;
 									$max,
 									'wp-photo-album-plus' ), $max ) .
 				'</div>';
-			$maxsize = wppa_check_memory_limit( false );
-			if ( is_array( $maxsize ) ) {
+
+			if ( wppa_opt( 'upload_fronend_maxsize' ) ) {
+				$maxsize = wppa_opt( 'upload_fronend_maxsize' );
 				$result .=
 					'<div style="font-size:10px;" >' .
-						sprintf( 	__( 'Max photo size: %d x %d (%2.1f MegaPixel)', 'wp-photo-album-plus' ),
-									$maxsize['maxx'], $maxsize['maxy'], $maxsize['maxp']/( 1024*1024 )
-								) .
+						sprintf( __( 'Max photo size: %d x %d pixels', 'wp-photo-album-plus' ), $maxsize, $maxsize ) .
 					'</div>';
+			}
+			else {
+				$maxsize = wppa_check_memory_limit( false );
+				if ( is_array( $maxsize ) ) {
+					$result .=
+						'<div style="font-size:10px;" >' .
+							sprintf( 	__( 'Max photo size: %d x %d (%2.1f MegaPixel)', 'wp-photo-album-plus' ),
+										$maxsize['maxx'], $maxsize['maxy'], $maxsize['maxp']/( 1024*1024 )
+									) .
+						'</div>';
+				}
 			}
 		}
 	}
@@ -2846,6 +2864,7 @@ static $albums_granted;
 						success: function() {
 							jQuery("#bar-'.$yalb.'-'.$mocc.'").width(\'100%\');
 							jQuery("#percent-'.$yalb.'-'.$mocc.'").html(\'' . __( 'Done!', 'wp-photo-album-plus' ) . '\');
+							jQuery(".wppa-upload-button").val(wppaUploadButtonText);
 						},
 						complete: function(response) {
 							jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="font-size: 10px;" >\'+response.responseText+\'</span>\' );'.
@@ -3169,7 +3188,7 @@ global $wpdb;
 									$avt = 	'
 										<img' .
 											' class="wppa-box-text wppa-td"' .
-											' src="http://www.gravatar.com/avatar/' .
+											' src="http' . ( is_ssl() ? 's' : '' ) . '://www.gravatar.com/avatar/' .
 													md5( strtolower( trim( $comment['email'] ) ) ) .
 													'.jpg?d='.urlencode( $default ) . '&s=' . wppa_opt( 'gravatar_size' ) . '"' .
 											' alt="' . __( 'Avatar', 'wp-photo-album-plus' ) . '"' .
@@ -3203,8 +3222,17 @@ global $wpdb;
 									__wcs( 'wppa-box-text' ) .
 									__wcs( 'wppa-td' ) .
 									'"' .
-								' >'.
-								html_entity_decode( esc_js( stripslashes( wppa_convert_smilies( $comment['comment'] ) ) ) );
+								' >';
+
+								$c = $comment['comment'];
+								$c = wppa_convert_smilies( $c );
+								$c = stripslashes( $c );
+								$c = esc_js( $c );
+								$c = html_entity_decode( $c );
+								if ( wppa_switch( 'comment_clickable' ) ) {
+									$c = make_clickable( $c );
+								}
+								$result .= $c;
 
 								if ( $comment['status'] != 'approved' && ( current_user_can( 'wppa_moderate' ) || current_user_can( 'wppa_comments' ) ) ) {
 									if ( wppa( 'no_esc' ) ) {
@@ -3932,7 +3960,7 @@ function wppa_bestof_html( $args, $widget = true ) {
 						// The image
 						$result .= 	'<img' .
 										' style="height:'.$maxh.'px; width:'.$maxw.'px;"' .
-										' src="' . wppa_fix_poster_ext( wppa_get_photo_url( $id, '', $maxw, $maxh ), $id ) . '"' .
+										' src="' . wppa_get_photo_url( $id, true, '', $maxw, $maxh ) . '"' .
 										' ' . wppa_get_imgalt( $id ) .
 										' />';
 

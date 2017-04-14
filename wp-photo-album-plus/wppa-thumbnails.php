@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version 6.6.13
+* Version 6.6.18
 *
 */
 
@@ -60,7 +60,7 @@ global $wpdb;
 	}
 
 	// If no image to display, die gracefully
-	$imgsrc = wppa_fix_poster_ext( wppa_get_thumb_path( $id ), $id );
+	$imgsrc = wppa_get_thumb_path( $id );
 	if ( ! wppa_is_video( $id ) && ! is_file( $imgsrc ) && ! wppa_has_audio( $id ) ) {
 		$result .= '<div' .
 						' class="' . $class . '"' .
@@ -109,7 +109,7 @@ global $wpdb;
 	}
 
 	// More image attributes
-	$imgurl    	= wppa_fix_poster_ext( wppa_get_thumb_url( $id, '', $popwidth, $popheight ), $id );
+	$imgurl    	= wppa_get_thumb_url( $id, true, '', $popwidth, $popheight );
 	$events    	= wppa_get_imgevents( 'thumb', $id );
 	$imgalt		= wppa_get_imgalt( $id );	// returns something like ' alt="Any text" '
 	$title 		= esc_attr( wppa_get_photo_name( $id ) );
@@ -776,10 +776,10 @@ global $thlinkmsggiven;
 	// Get the album info
 	$album = wppa_cache_album( $thumb['album'] );
 
-	$path 		= wppa_fix_poster_ext( wppa_get_thumb_path( $id ), $id );
+	$path 		= wppa_get_thumb_path( $id );
 	$imgattr_a 	= wppa_get_imgstyle_a( $id, $path, wppa_opt( 'smallsize' ), '', 'cover' );
 	$events 	= is_feed() ? '' : wppa_get_imgevents( 'cover' );
-	$src 		= wppa_fix_poster_ext( wppa_get_thumb_url( $id, '', $imgattr_a['width'], $imgattr_a['height'] ), $id );
+	$src 		= wppa_get_thumb_url( $id, true, '', $imgattr_a['width'], $imgattr_a['height'] );
 	$link 		= wppa_get_imglnk_a( 'thumb', $id );
 
 	if ( $link ) {
@@ -1070,7 +1070,7 @@ global $wpdb;
 	// Get photo info
 	$is_video 		= wppa_is_video( $id );
 	$has_audio 		= wppa_has_audio( $id );
-	$imgsrc 		= wppa_fix_poster_ext( wppa_get_thumb_path( $id ), $id );
+	$imgsrc 		= wppa_get_thumb_path( $id );
 
 	if ( ! wppa_is_video( $id ) && ! is_file( $imgsrc ) ) {
 		$result .= 	'<div' .
@@ -1153,7 +1153,7 @@ global $wpdb;
 		$popheight 	= $imgheight;
 	}
 
-	$imgurl    	= wppa_fix_poster_ext( wppa_get_thumb_url( $id, '', $popwidth, $popheight ), $id );
+	$imgurl    	= wppa_get_thumb_url( $id, true, '', $popwidth, $popheight );
 	$events    	= wppa_get_imgevents( 'thumb', $id );
 	$imgalt		= wppa_get_imgalt( $id );	// returns something like ' alt="Any text" '
 	$title 		= esc_attr( wppa_get_masonry_title( $id ) ); // esc_attr( wppa_get_photo_name( $id ) );
@@ -1777,7 +1777,7 @@ function wppa_do_filmthumb( $id, $idx, $do_for_feed = false, $glue = false ) {
 	$thumb 		= wppa_cache_thumb( $id );
 
 	$result 	= '';
-	$src 		= wppa_fix_poster_ext( wppa_get_thumb_path( $thumb['id'] ), $thumb['id'] );
+	$src 		= wppa_get_thumb_path( $thumb['id'] );
 	$max_size 	= wppa_opt( 'film_thumbsize' );
 	if ( wppa_in_widget() ) $max_size /= 2;
 	$com_alt 	= wppa( 'is_comten' ) && wppa_switch( 'comten_alt_display' ) && ! wppa_in_widget();
@@ -1788,7 +1788,7 @@ function wppa_do_filmthumb( $id, $idx, $do_for_feed = false, $glue = false ) {
 	$imgheight 	= $imgattr_a['height'];
 	$cursor    	= $imgattr_a['cursor'];
 
-	$url 		= wppa_fix_poster_ext( wppa_get_thumb_url( $thumb['id'], '', $imgwidth, $imgheight ), $thumb['id'] );
+	$url 		= wppa_get_thumb_url( $thumb['id'], true, '', $imgwidth, $imgheight );
 	$furl 		= str_replace( '/thumbs', '', $url );
 	$events 	= wppa_get_imgevents( 'film', $thumb['id'], 'nopopup', $idx );
 	$thumbname 	= wppa_get_photo_name( $thumb['id'] );

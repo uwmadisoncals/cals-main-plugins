@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Frontend links
-* Version 6.6.15
+* Version 6.6.18
 *
 */
 
@@ -1499,13 +1499,13 @@ global $wpdb;
 		case 'file':		// The plain file
 			if ( $is_video ) {
 				$siz = array( wppa_get_videox( $id ), wppa_get_videoy( $id ) );
-				$result['url'] = wppa_get_photo_url( $id, '', $siz['0'], $siz['1'] );
+				$result['url'] = wppa_get_photo_url( $id, false, '', $siz['0'], $siz['1'] );
 				reset( $is_video );
 				$result['url'] = str_replace( 'xxx', current( $is_video ), $result['url'] );
 			}
 			else {
 				$siz = array( wppa_get_photox( $id ), wppa_get_photoy( $id ) );
-				$result['url'] = wppa_get_photo_url( $id, '', $siz['0'], $siz['1'] );
+				$result['url'] = wppa_get_photo_url( $id, false, '', $siz['0'], $siz['1'] );
 			}
 			$result['title'] = $title;
 			$result['is_url'] = true;
@@ -1517,7 +1517,7 @@ global $wpdb;
 		case 'lightboxsingle':
 			if ( $is_video ) {
 				$siz = array( wppa_get_videox( $id ), wppa_get_videoy( $id ) );
-				$result['url'] = wppa_get_photo_url( $id, '', $siz['0'], $siz['1'] );
+				$result['url'] = wppa_get_photo_url( $id, false, '', $siz['0'], $siz['1'] );
 				//$result['url'] = str_replace( 'xxx', $is_video['0'], $result['url'] );
 			}
 			else {
@@ -1526,7 +1526,7 @@ global $wpdb;
 				}
 				else {
 					$siz = array( wppa_get_photox( $id ), wppa_get_photoy( $id ) );
-					$result['url'] = wppa_get_photo_url( $id, '', $siz['0'], $siz['1'] );
+					$result['url'] = wppa_get_photo_url( $id, false, '', $siz['0'], $siz['1'] );
 				}
 			}
 			$result['title'] = $title;
@@ -1675,18 +1675,7 @@ global $wpdb;
 			else {
 				$wid = wppa_get_photox( $id );
 				$hig = wppa_get_photoy( $id );
-				/*
-				$imgsize = getimagesize( wppa_get_photo_path( $id ) );
-				if ( $imgsize ) {
-					$wid = $imgsize['0'];
-					$hig = $imgsize['1'];
-				}
-				else {
-					$wid = '0';
-					$hig = '0';
-				}
-				*/
-				$url = wppa_fix_poster_ext( wppa_get_photo_url( $id, '', $wid, $hig ), $id );
+				$url = wppa_get_photo_url( $id, true, '', $wid, $hig );
 
 				$result['url'] = esc_attr( 'wppaFullPopUp( ' . wppa( 'mocc' ) . ', ' . $id . ', "' . $url . '", ' . $wid . ', ' . $hig . ' )' );
 			}

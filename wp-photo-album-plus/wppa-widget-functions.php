@@ -2,7 +2,7 @@
 /* wppa-widget-functions.php
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.6.12
+/* Version 6.6.18
 /*
 */
 
@@ -174,8 +174,10 @@ function wppa_get_potd() {
 global $wpdb;
 static $potd;
 
-	// Been here before?
-	if ( $potd ) return $potd;
+	// Been here before? ( except for random )
+	if ( wppa_opt( 'potd_method' ) != '2' ) {
+		if ( $potd ) return $potd;
+	}
 
 	$id = 0;
 	switch ( wppa_opt( 'potd_method' ) ) {

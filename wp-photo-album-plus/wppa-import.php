@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.6.15
+* Version 6.6.18
 *
 */
 
@@ -1778,8 +1778,8 @@ global $wppa_supported_audio_extensions;
 					wppa_delete_source( basename( $file ), $alb );
 
 					// Remove possible existing posters, the file-extension may be different as before
-					$old_photo = wppa_strip_ext( wppa_get_photo_path( $is_poster ) );
-					$old_thumb = wppa_strip_ext( wppa_get_thumb_path( $is_poster ) );
+					$old_photo = wppa_strip_ext( wppa_get_photo_path( $is_poster, false ) );
+					$old_thumb = wppa_strip_ext( wppa_get_thumb_path( $is_poster, false ) );
 					foreach ( $wppa_supported_photo_extensions as $pext ) {
 						if ( is_file( $old_photo . '.' . $pext ) ) unlink( $old_photo . '.' . $pext );
 						if ( is_file( $old_thumb . '.' . $pext ) ) unlink( $old_thumb . '.' . $pext );
@@ -1957,7 +1957,7 @@ global $wppa_supported_audio_extensions;
 					}
 
 					// Add video filetype
-					$newpath = wppa_strip_ext( wppa_get_photo_path( $id ) ).'.'.$ext;
+					$newpath = wppa_strip_ext( wppa_get_photo_path( $id, false ) ).'.'.$ext;
 					$fs = filesize( $file );
 					if ( $fs > 1024*1024*64 || $delv ) {	// copy fails for files > 64 Mb
 
@@ -2029,7 +2029,7 @@ global $wppa_supported_audio_extensions;
 					}
 
 					// Add audio filetype
-					$newpath = wppa_strip_ext( wppa_get_photo_path( $id ) ).'.'.$ext;
+					$newpath = wppa_strip_ext( wppa_get_photo_path( $id, false ) ).'.'.$ext;
 					copy( $file, $newpath );
 					if ( $delu ) unlink( $file );
 					if ( wppa( 'ajax' ) ) {

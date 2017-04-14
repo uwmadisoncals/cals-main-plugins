@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
-* Version 6.6.15
+* Version 6.6.19
 *
 *
 */
@@ -11,7 +11,13 @@
 // Are we in a cron job?
 function wppa_is_cron() {
 
-	return ( defined( 'DOING_CRON' ) || isset( $_GET['doing_wp_cron'] ) );
+	if ( isset( $_GET['doing_wp_cron'] ) ) {
+		return $_GET['doing_wp_cron'];
+	}
+	if ( defined( 'DOING_CRON' ) ) {
+		return DOING_CRON;
+	}
+	return false;
 }
 
 // Activate our maintenance hook
@@ -24,8 +30,23 @@ function wppa_schedule_maintenance_proc( $slug, $from_settings_page = false ) {
 	if ( ! wp_next_scheduled( 'wppa_cron_event', array( $slug ) ) ) {
 		wp_schedule_single_event( time() + 30, 'wppa_cron_event', array( $slug ) );
 		$backtrace = debug_backtrace();
-		$args = is_array( $backtrace[1]['args'] ) ? implode( ', ', $backtrace[1]['args'] ) : '';
-		wppa_log( 'Cron', '{b}' . $slug . '{/b} scheduled by {b}' . $backtrace[1]['function'] . '(' . $args . '){/b} on line {b}' . $backtrace[0]['line'] . '{/b} of ' . basename( $backtrace[0]['file'] ) );
+		$args = '';
+		if ( is_array( $backtrace[1]['args'] ) ) {
+			foreach( $backtrace[1]['args'] as $arg ) {
+				if ( $args ) {
+					$args .= ', ';
+				}
+				$args .= str_replace( "\n", '', var_export( $arg, true ) );
+			}
+			if ( $args ) {
+				$args = ' ' . str_replace( ',)', ', )', $args ) . ' ';
+			}
+		}
+		elseif ( $backtrace[1]['args'] ) {
+			$args = " '" . $backtrace[1]['args'] . "' ";
+		}
+
+		wppa_log( 'Cron', '{b}' . $slug . '{/b} scheduled by {b}' . $backtrace[1]['function'] . '(' . $args . '){/b} on line {b}' . $backtrace[0]['line'] . '{/b} of ' . basename( $backtrace[0]['file'] ) . ' called by ' . $backtrace[2]['function'] );
 	}
 
 	// Update appropriate options
@@ -85,6 +106,8 @@ function wppa_do_cleanup() {
 global $wpdb;
 global $wppa_all_maintenance_slugs;
 
+	wppa_log( 'Cron', 'Cron job {b}wppa_cleanup{/b} started.' );
+
 	// Cleanup session db table
 	$lifetime 	= 3600;			// Sessions expire after one hour
 	$savetime 	= 86400;		// Save session data for 24 hour
@@ -112,8 +135,14 @@ global $wppa_all_maintenance_slugs;
 		}
 	}
 
+	// Find lost photos, update their album to -9, meaning trashed
+	$album_ids = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_ALBUMS . "`" );
+	if ( ! empty( $album_ids ) ) {
+		$lost = $wpdb->query( "UPDATE `" . WPPA_PHOTOS . "` SET `album` = '-9' WHERE `album` > '0' AND `album` NOT IN ( " . implode( ',', $album_ids ) . " ) " );
+	}
+
 	// Remove 'deleted' photos from system
-	$dels = $wpdb->get_col( "SELECT `id` FROM `".WPPA_PHOTOS."` WHERE `album` = '-9'" );
+	$dels = $wpdb->get_col( "SELECT `id` FROM `".WPPA_PHOTOS."` WHERE `album` <= '-9' AND `modified` < " . ( time() - 3600 ) );
 	foreach( $dels as $del ) {
 		wppa_delete_photo( $del );
 		wppa_log( 'Cron', 'Removed photo {b}' . $del . '{/b} from system' );
@@ -123,8 +152,47 @@ global $wppa_all_maintenance_slugs;
 	wppa_create_pl_htaccess();
 
 	// Cleanup index
+	wppa_index_compute_skips();
 	wppa_schedule_maintenance_proc( 'wppa_cleanup_index' );
 
+	// Retry failed mails
+	if ( wppa_opt( 'retry_mails' ) ) {
+
+		$failed_mails = get_option( 'wppa_failed_mails' );
+		if ( is_array( $failed_mails ) ) {
+
+			foreach( array_keys( $failed_mails ) as $key ) {
+
+				$mail = $failed_mails[$key];
+				$mess = $mail['message'] . '(retried mail)';
+
+				// Retry
+				if ( wp_mail( $mail['to'], $mail['subj'], $mess, $mail['headers'], $mail['att'] ) ) {
+
+					// Set counter to 0
+					$failed_mails[$key]['retry'] = '0';
+				}
+				else {
+
+					// Decrease retry counter
+					$failed_mails[$key]['retry']--;
+					wppa_log( 'Cron', 'Retried mail to ' . $mail['to'] . ' failed. Tries to go = ' . $failed_mails[$key]['retry'] );
+				}
+			}
+
+			// Cleanup
+			foreach( array_keys( $failed_mails ) as $key ) {
+				if ( $failed_mails[$key]['retry'] < '1' ) {
+					unset( $failed_mails[$key] );
+				}
+			}
+		}
+
+		// Store updated failed mails
+		update_option( 'wppa_failed_mails', $failed_mails );
+	}
+
+	wppa_log( 'Cron', 'Cron job {b}wppa_cleanup{/b} completed.' );
 }
 
 // Activate treecount update proc
@@ -151,7 +219,7 @@ global $wpdb;
 			wppa_verify_treecounts_a( $alb );
 			wppa_log( 'Cron', 'Cron fixed treecounts for ' . $alb );
 		}
-		if ( time() > $start + 30 ) {
+		if ( time() > $start + 15 ) {
 			wppa_schedule_treecount_update();
 			exit();
 		}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.6.13
+* Version 6.6.20
 *
 */
 
@@ -111,6 +111,7 @@ global $silent;
 					custom longtext NOT NULL,
 					stereo smallint NOT NULL default '0',
 					crypt tinytext NOT NULL,
+					magickstack text NOT NULL,
 					PRIMARY KEY  (id),
 					KEY albumkey (album),
 					KEY statuskey (status(6))
@@ -523,6 +524,11 @@ global $silent;
 			}
 		}
 
+		if ( $old_rev <= '6618' ) {
+			wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
+			wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+		}
+
 	}
 
 	// Set Defaults
@@ -557,7 +563,7 @@ global $silent;
 	}
 
 	// Copy audiostub.jpg, the default audiostub
-	$fromfile = WPPA_PATH . '/images/audiostub.jpg';
+	$fromfile = WPPA_PATH . '/img/audiostub.jpg';
 	$tofile = WPPA_UPLOAD_PATH . '/audiostub';
 	if ( ! is_file( $tofile . '.jpg' ) && ! is_file( $tofile . '.gif' ) && ! is_file( $tofile . '.png' ) ) {
 		@ copy( $fromfile, $tofile . '.jpg' );
@@ -825,6 +831,7 @@ Hide Camera info
 						'wppa_dislike_show_count'			=> 'yes',		// 7.2
 						'wppa_rating_display_type'			=> 'graphic',	// 8
 						'wppa_show_avg_rating'				=> 'yes',		// 9
+						'wppa_show_avg_mine_2' 				=> 'no',
 						'wppa_show_comments' 				=> 'yes',		// 10
 						'wppa_comment_gravatar'				=> 'monsterid',		// 11
 						'wppa_comment_gravatar_url'			=> 'http://',	// 12
@@ -1086,9 +1093,9 @@ Hide Camera info
 						'wppa_bgcolor_modal' 			=> '#ffffff',
 						'wppa_bcolor_modal' 			=> '#ffffff',
 						'wppa_svg_color' 				=> '#666666',
-						'wppa_svg_bg_color' 			=> '#dddddd',
+						'wppa_svg_bg_color' 			=> 'transparent',
 						'wppa_ovl_svg_color' 			=> '#999999',
-						'wppa_ovl_svg_bg_color' 		=> '#ffffff',
+						'wppa_ovl_svg_bg_color' 		=> 'transparent',
 
 						// Table IV: Behaviour
 						// A System
@@ -1206,6 +1213,7 @@ Hide Camera info
 						'wppa_comten_alt_thumbsize'		=> '75',
 						'wppa_comment_smiley_picker'	=> 'no',
 						'wppa_mail_upl_email' 			=> 'yes',
+						'wppa_comment_clickable' 		=> 'no',
 
 						// G Overlay
 						'wppa_ovl_opacity'				=> '80',
@@ -1479,6 +1487,7 @@ Hide Camera info
 						'wppa_leading_zeros' 		=> '',
 						'wppa_add_gpx_tag' 			=> '',
 						'wppa_optimize_ewww' 		=> '',
+						'wppa_optimize_ewww_skip_one' 	=> '',
 						'wppa_tag_to_edit' 			=> '',
 						'wppa_new_tag_value' 		=> '',
 						'wppa_edit_tag' 			=> '',
@@ -1541,6 +1550,7 @@ Hide Camera info
 						'wppa_allow_import_source' 		=> 'no',
 						'wppa_enable_generator' 		=> 'yes',
 						'wppa_log_cron' 				=> 'no',	// A9
+						'wppa_retry_mails' 				=> '0', 	// A10
 
 
 						// IX D New
@@ -1679,7 +1689,7 @@ Hide Camera info
 						'wppa_fotomoto_fontsize'				=> '',
 						'wppa_fotomoto_hide_when_running'		=> 'no',
 						'wppa_fotomoto_min_width' 				=> '400',
-						'wppa_image_magic' 						=> '',
+						'wppa_image_magick' 						=> '',
 
 						// L photo shortcode
 						'wppa_photo_shortcode_enabled' 			=> 'yes',
@@ -1727,6 +1737,7 @@ Hide Camera info
 						'wppa_qr_size'				=> '200',
 						'wppa_qr_color'				=> '#000000',
 						'wppa_qr_bgcolor'			=> '#FFFFFF',
+						'wppa_qr_cache' 			=> 'no',
 
 						'wppa_dismiss_admin_notice_scripts_are_obsolete' => 'no',
 

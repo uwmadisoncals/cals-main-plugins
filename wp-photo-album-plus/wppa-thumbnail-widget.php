@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail photos
-* Version 6.4.17
+* Version 6.4.18
 */
 
 class ThumbnailWidget extends WP_Widget {
@@ -98,7 +98,7 @@ class ThumbnailWidget extends WP_Widget {
 				$link       = wppa_get_imglnk_a('tnwidget', $image['id']);
 				$file       = wppa_get_thumb_path($image['id']);
 				$imgstyle_a = wppa_get_imgstyle_a( $image['id'], $file, $maxw, 'center', 'twthumb');
-				$imgurl 	= wppa_get_thumb_url( $image['id'], '', $imgstyle_a['width'], $imgstyle_a['height'] );
+				$imgurl 	= wppa_get_thumb_url( $image['id'], true, '', $imgstyle_a['width'], $imgstyle_a['height'] );
 				$imgevents 	= wppa_get_imgevents('thumb', $image['id'], true);
 				$title 		= $link ? esc_attr(stripslashes($link['title'])) : '';
 

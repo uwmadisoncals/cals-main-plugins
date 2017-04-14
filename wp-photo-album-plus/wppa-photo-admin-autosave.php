@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.6.15
+* Version 6.6.20
 *
 */
 
@@ -84,6 +84,13 @@ global $wpdb;
 										'&edit_id=' . $album .
 										'&wppa-searchstring=' . wppa_sanitize_searchstring( $_REQUEST['wppa-searchstring'] )
 									);
+		}
+
+		// Edit trased photos
+		elseif ( $album == 'trash' ) {
+			$photos = $wpdb->get_results( "SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `album` < '0' ORDER BY `modified` DESC", ARRAY_A );
+			$count 	= count( $photos );
+			$link 	= '';
 		}
 
 		// A physical album
@@ -340,8 +347,12 @@ function wppaTryDelete( id, video ) {
 	}
 
 	if ( confirm( query ) ) {
-		wppaAjaxDeletePhoto( id )
+		wppaAjaxDeletePhoto( id );
 	}
+}
+
+function wppaTryUndelete ( id ) {
+	wppaAjaxUndeletePhoto( id );
 }
 
 function wppaTryRotLeft( id ) {
@@ -405,6 +416,28 @@ function wppaTryWatermark( id ) {
 	}
 }
 
+function wppaTryMagick( id, slug ) {
+
+	var query = '<?php echo esc_js( __( 'Are you sure you want to magically process this photo?', 'wp-photo-album-plus' ) ) ?>';
+
+	if ( true || confirm( query ) ) {
+		jQuery( '#wppa-admin-spinner' ).css( 'display', 'inline' );
+		_wppaAjaxUpdatePhoto( id, slug, 0, false ); //<?php echo ( wppa( 'front_edit' ) ? 'false' : 'true' ) ?> );
+	}
+}
+
+wppaHor = false;
+function wppaToggleHorizon() {
+	if ( wppaHor ) {
+		jQuery( '#horizon' ).css( 'display', 'none' );
+		wppaHor = false;
+	}
+	else {
+		jQuery( '#horizon' ).css( 'display', 'inline' );
+		wppaHor = true;
+	}
+}
+
 </script>
 <?php
 
@@ -417,6 +450,9 @@ function wppaTryWatermark( id ) {
 
 		// Display the pagelinks
 		wppa_admin_page_links( $page, $pagesize, $count, $link );
+
+		// Horizon
+		echo '<hr id="horizon" style="position:fixed;top:300px;left:0px;border:none;background-color:#777777;z-index:100000;display:none;height:1px;width:100%;" />';
 
 		// Display all photos
 		foreach ( $photos as $photo ) {
@@ -445,6 +481,7 @@ function wppaTryWatermark( id ) {
 			$status 		= $photo['status'];
 			$tags 			= trim( stripslashes( $photo['tags'] ), ',' );
 			$stereo 		= $photo['stereo'];
+			$magickstack 	= $photo['magickstack'];
 
 			// See if item is a multimedia item
 			$is_multi 		= wppa_is_multi( $id );
@@ -489,8 +526,20 @@ function wppaTryWatermark( id ) {
 						echo
 						'<tr>' .
 							'<td>';
-								$src = wppa_get_thumb_url( $id );
-								$big = wppa_get_photo_url( $id );
+								// If ImageMagick is enabled...
+								// Fake 'for social media' to use the local file here, not cloudinary.
+								// Files from cloudinary do not reload, even with ?ver=...
+								if ( wppa_can_admin_magick( $id ) ) {
+									wppa( 'for_sm', true );
+								}
+
+								$src = wppa_get_thumb_url( $id, false );
+								$big = wppa_get_photo_url( $id, false );
+
+								if ( wppa_can_admin_magick( $id ) ) {
+									wppa( 'for_sm', false );
+								}
+
 								if ( $is_video ) {
 									reset( $is_video );
 									$big = str_replace( 'xxx', current( $is_video ), $big );
@@ -516,11 +565,13 @@ function wppaTryWatermark( id ) {
 									}
 									echo
 									'<a' .
+										' id="fs-a-' . $id . '"' .
 										' href="' . $big . '"' .
 										' target="_blank"' .
 										' title="' . esc_attr( __( 'Preview fullsize photo', 'wp-photo-album-plus' ) ) . '"' .
 										' >' .
 										'<img' .
+											' id="tnp-' . $id . '"' .
 											' src="' . $src . '"' .
 											' alt="' . esc_attr( $name ) . '"' .
 											' style="max-width: 160px; vertical-align:middle;"' .
@@ -572,20 +623,34 @@ function wppaTryWatermark( id ) {
 									' />';
 								}
 								echo
-								' ' .
+								' ';
 
 								// Album
+								$deleted = false;
+								if ( $album <= '-9' ) {
+									$album = - ( $album + '9' );
+									$deleted = true;
+								}
+								echo
 								sprintf( __( 'Album: %d (%s).' , 'wp-photo-album-plus'), $album, wppa_get_album_name( $album ) );
 
 								// Modified
-								if ( $modified > $timestamp ) {
+								if ( $deleted ) {
 									echo
-									' ' . __( 'Modified:', 'wp-photo-album-plus' ) . ' ' .
-									wppa_local_date( '', $modified ) . ' ' . __( 'local time', 'wp-photo-album-plus' );
+									'<span style="color:red;" >' .
+									__( 'Trashed', 'wp-photo-album-plus' ) .
+									'</span>';
 								}
 								else {
-									echo
-									' ' . __( 'Not modified', 'wp-photo-album-plus' );
+									if ( $modified > $timestamp ) {
+										echo
+										' ' . __( 'Modified:', 'wp-photo-album-plus' ) . ' ' .
+										wppa_local_date( '', $modified ) . ' ' . __( 'local time', 'wp-photo-album-plus' );
+									}
+									else {
+										echo
+										' ' . __( 'Not modified', 'wp-photo-album-plus' );
+									}
 								}
 								echo
 								'. ' .
@@ -814,11 +879,13 @@ function wppaTryWatermark( id ) {
 								// Display
 								echo
 								( $is_video || $has_audio  ? __( 'Poster file:', 'wp-photo-album-plus' ) : __( 'Display file:', 'wp-photo-album-plus' ) ) . ' ';
-								$dp = wppa_fix_poster_ext( wppa_get_photo_path( $id ), $id );
+								$dp = wppa_get_photo_path( $id );
 								if ( is_file( $dp ) ) {
 									echo
+									'<span id="dispfileinfo-' . $id . '" >' .
 									floor( wppa_get_photox( $id ) ) . ' x ' . floor( wppa_get_photoy( $id ) ).' px, ' .
-									wppa_get_filesize( $dp ) . '. ';
+									wppa_get_filesize( $dp ) . '.' .
+									'</span> ';
 								}
 								else {
 									echo
@@ -831,7 +898,7 @@ function wppaTryWatermark( id ) {
 								if ( ! $is_video ) {
 									echo
 									__( 'Thumbnail file:', 'wp-photo-album-plus') . ' ';
-									$tp = wppa_fix_poster_ext( wppa_get_thumb_path( $id ), $id );
+									$tp = wppa_get_thumb_path( $id );
 									if ( is_file( $tp ) ) {
 										echo
 										floor( wppa_get_thumbx( $id ) ) . ' x ' . floor( wppa_get_thumby( $id ) ) . ' px, ' .
@@ -875,7 +942,7 @@ function wppaTryWatermark( id ) {
 										echo
 										$fmt . ' ' .
 										__( 'Filesize:', 'wp-photo-album-plus' ) . ' ' .
-										wppa_get_filesize( str_replace( 'xxx', $fmt, wppa_get_photo_path( $id ) ) );
+										wppa_get_filesize( str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) );
 										$c++;
 										if ( $c == count( $is_video ) ) {
 											echo '. ';
@@ -895,7 +962,7 @@ function wppaTryWatermark( id ) {
 										echo
 										$fmt . ' ' .
 										__( 'Filesize:', 'wp-photo-album-plus' ) . ' ' .
-										wppa_get_filesize( str_replace( 'xxx', $fmt, wppa_get_photo_path( $id ) ) );
+										wppa_get_filesize( str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) );
 										$c++;
 										if ( $c == count( $is_video ) ) {
 											echo '. ';
@@ -915,7 +982,7 @@ function wppaTryWatermark( id ) {
 				echo	// Section 2
 				"\n" . '<!-- Section 2 -->';
 
-				if ( ( wppa_switch( 'enable_stereo' ) && ! $is_multi ) || ( ! $is_multi || is_file( wppa_fix_poster_ext( wppa_get_photo_path( $id ), $id ) ) ) ) {
+				if ( ( wppa_switch( 'enable_stereo' ) && ! $is_multi ) || ( ! $is_multi || is_file( wppa_get_photo_path( $id ) ) ) ) {
 					echo
 					'<table' .
 						' class="wppa-table wppa-photo-table"' .
@@ -967,7 +1034,7 @@ function wppaTryWatermark( id ) {
 
 									// Watermark
 									if ( wppa_switch( 'watermark_on' ) ) {
-										if ( ! $is_multi || is_file( wppa_fix_poster_ext( wppa_get_photo_path( $id ), $id ) ) ) {
+										if ( is_file( wppa_get_photo_path( $id ) ) ) {
 
 											// Get the current watermark file settings
 											$temp 	= wppa_get_water_file_and_pos( $id );
@@ -1010,7 +1077,7 @@ function wppaTryWatermark( id ) {
 												echo
 												'<img' .
 													' id="wppa-water-spin-' . $id . '"' .
-													' src="' . wppa_get_imgdir() . 'spinner.gif' . '"' .
+													' src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_is_ie() ? 'gif' : 'svg' ) . '"' .
 													' alt="Spin"' .
 													' style="visibility:hidden"' .
 												' />';
@@ -1046,37 +1113,39 @@ function wppaTryWatermark( id ) {
 
 								// Rotate
 								if ( ! $b_is_video ) {
-									echo
-									'<input' .
-										' type="button"' .
-										' onclick="wppaTryRotLeft( ' . $id . ' )"' .
-										' value="' . esc_attr( __( 'Rotate left', 'wp-photo-album-plus') ) . '"' .
-									' />' .
-									' ' .
-									'<input' .
-										' type="button"' .
-										' onclick="wppaTryRot180( ' . $id . ' )"' .
-										' value="' . esc_attr( __( 'Rotate 180&deg;', 'wp-photo-album-plus') ) . '"' .
-									' />' .
-									' ' .
-									'<input' .
-										' type="button"' .
-										' onclick="wppaTryRotRight( ' . $id . ' )"' .
-										' value="' . esc_attr( __( 'Rotate right', 'wp-photo-album-plus') ) . '"' .
-									' />' .
-									' ' .
-									'<input' .
-										' type="button"' .
-										' onclick="wppaTryFlip( ' . $id . ' )"' .
-										' value="' . esc_attr( __( 'Flip', 'wp-photo-album-plus') ) . '&thinsp;&#8212;"' .
-									' />' .
-									' ' .
-									'<input' .
-										' type="button"' .
-										' onclick="wppaTryFlop( ' . $id . ' )"' .
-										' value="' . esc_attr( __( 'Flip', 'wp-photo-album-plus') ) . ' |"' .
-									' />' .
-									' ';
+									if ( ! wppa_can_admin_magick( $id ) ) {
+										echo
+										'<input' .
+											' type="button"' .
+											' onclick="wppaTryRotLeft( ' . $id . ' )"' .
+											' value="' . esc_attr( __( 'Rotate left', 'wp-photo-album-plus') ) . '"' .
+										' />' .
+										' ' .
+										'<input' .
+											' type="button"' .
+											' onclick="wppaTryRot180( ' . $id . ' )"' .
+											' value="' . esc_attr( __( 'Rotate 180&deg;', 'wp-photo-album-plus') ) . '"' .
+										' />' .
+										' ' .
+										'<input' .
+											' type="button"' .
+											' onclick="wppaTryRotRight( ' . $id . ' )"' .
+											' value="' . esc_attr( __( 'Rotate right', 'wp-photo-album-plus') ) . '"' .
+										' />' .
+										' ' .
+										'<input' .
+											' type="button"' .
+											' onclick="wppaTryFlip( ' . $id . ' )"' .
+											' value="' . esc_attr( __( 'Flip', 'wp-photo-album-plus') ) . '&thinsp;&#8212;"' .
+										' />' .
+										' ' .
+										'<input' .
+											' type="button"' .
+											' onclick="wppaTryFlop( ' . $id . ' )"' .
+											' value="' . esc_attr( __( 'Flip', 'wp-photo-album-plus') ) . ' |"' .
+										' />' .
+										' ';
+									}
 								}
 
 								// Remake displayfiles
@@ -1162,8 +1231,10 @@ function wppaTryWatermark( id ) {
 									'<input' .
 										' type="button"' .
 										' style="color:red;"' .
-										' onclick="wppaTryDelete( ' . $id . ', ' . $b_is_video . ' )"' .
-										' value="' . ( $b_is_video ? esc_attr( __( 'Delete video', 'wp-photo-album-plus' ) ) : esc_attr( __( 'Delete photo', 'wp-photo-album-plus' ) ) ) . '"' .
+										' onclick="wppaTry' . ( $deleted ? 'Undelete' : 'Delete' ) . '( ' . $id . ', ' . $b_is_video . ' )"' .
+										( $deleted ?
+										' value="' . ( $b_is_video ? esc_attr( __( 'Undelete video', 'wp-photo-album-plus' ) ) : esc_attr( __( 'Undelete photo', 'wp-photo-album-plus' ) ) ) .'"' :
+										' value="' . ( $b_is_video ? esc_attr( __( 'Delete video', 'wp-photo-album-plus' ) ) : esc_attr( __( 'Delete photo', 'wp-photo-album-plus' ) ) ) . '"' ) .
 									' />' .
 									' ';
 								}
@@ -1214,6 +1285,292 @@ function wppaTryWatermark( id ) {
 						'</tr>' .
 					'</tbody>' .
 				'</table>';
+
+				// Section 3a ImageMagick editing commands
+				if ( wppa_can_admin_magick( $id ) && ! $quick ) {
+
+					echo
+					'<table' .
+						' class="wppa-table wppa-photo-table"' .
+						' style="width:100%;"' .
+						' >' .
+						'<tbody>' .
+							'<tr>' .
+								'<td>' .
+									__( '<b>ImageMagick</b> commands. The operations are execured upon the display file.', 'wp-photo-album-plus' ) . ' ' .
+									__( 'A new thumbnail image will be created from the display file.', 'wp-photo-album-plus' ) .
+								'</td>' .
+							'</tr>' .
+							'<tr>' .
+								'<td>';
+
+									// --- Actions ---
+
+									// Rotate left
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'magickrotleft\' )"' .
+										' value="' . esc_attr( __( 'Rotate left', 'wp-photo-album-plus') ) . '"' .
+									' />' .
+									' ';
+
+									// Rotat 180
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'magickrot180\' )"' .
+										' value="' . esc_attr( __( 'Rotate 180&deg;', 'wp-photo-album-plus') ) . '"' .
+									' />' .
+									' ';
+
+									// Rotate right
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'magickrotright\' )"' .
+										' value="' . esc_attr( __( 'Rotate right', 'wp-photo-album-plus') ) . '"' .
+									' />' .
+									' ';
+
+									// Flip
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'magickflip\' )"' .
+										' value="' . esc_attr( __( 'Flip', 'wp-photo-album-plus') ) . '&thinsp;&#8212;"' .
+										' title="-flip"' .
+									' />' .
+									' ';
+
+									// Flop
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'magickflop\' )"' .
+										' value="' . esc_attr( __( 'Flop', 'wp-photo-album-plus') ) . ' |"' .
+										' title="-flop"' .
+									' />' .
+									' ';
+
+									// Enhance
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'enhance\' )"' .
+										' value="' . esc_attr( __( 'Enhance', 'wp-photo-album-plus') ) . '"' .
+										' title="-enhance"' .
+									' />' .
+									' ';
+
+									// Sharpen
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'sharpen\' )"' .
+										' value="' . esc_attr( __( 'Sharpen', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-sharpen 0x1"' .
+									' />' .
+									' ';
+
+									// Blur
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'blur\' )"' .
+										' value="' . esc_attr( __( 'Blur', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-blur 0x1"' .
+									' />' .
+									' ';
+
+									// Auto gamma
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'auto-gamma\' )"' .
+										' value="' . esc_attr( __( 'Auto Gamma', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-auto-gamma"' .
+									' />' .
+									' ';
+
+									// Auto level
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'auto-level\' )"' .
+										' value="' . esc_attr( __( 'Auto Level', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-auto-level"' .
+									' />' .
+									' ';
+
+									// Contrast+
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'contrast-p\' )"' .
+										' value="' . esc_attr( __( 'Contrast+', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-brightness-contrast 0x5"' .
+									' />' .
+									' ';
+
+									// Contrast-
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'contrast-m\' )"' .
+										' value="' . esc_attr( __( 'Contrast-', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-brightness-contrast 0x-5"' .
+									' />' .
+									' ';
+
+									// Brightness+
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'brightness-p\' )"' .
+										' value="' . esc_attr( __( 'Brightness+', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-brightness-contrast 5"' .
+									' />' .
+									' ';
+
+									// Brightness-
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'brightness-m\' )"' .
+										' value="' . esc_attr( __( 'Brightness-', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-brightness-contrast -5"' .
+									' />' .
+									' ';
+
+									// Despeckle
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'despeckle\' )"' .
+										' value="' . esc_attr( __( 'Despeckle', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-despeckle"' .
+									' />' .
+									' ';
+
+									// Lenear gray
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'lineargray\' )"' .
+										' value="' . esc_attr( __( 'Linear gray', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-colorspace gray"' .
+									' />' .
+									' ';
+
+									// Non-linear gray
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'nonlineargray\' )"' .
+										' value="' . esc_attr( __( 'Non-linear gray', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-grayscale Rec709Luma"' .
+									' />' .
+									' ';
+
+									// Charcoal
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'charcoal\' )"' .
+										' value="' . esc_attr( __( 'Charcoal', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-charcoal"' .
+									' />' .
+									' ';
+
+									// Paint
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'paint\' )"' .
+										' value="' . esc_attr( __( 'Paint', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-paint"' .
+									' />' .
+									' ';
+
+									// Sepia
+									echo
+									'<input' .
+										' type="button"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'sepia\' )"' .
+										' value="' . esc_attr( __( 'Sepia', 'wp-photo-album-plus' ) ) . '"' .
+										' title="-sepia-tone 80%"' .
+									' />' .
+									' ';
+									echo
+								'</td>' .
+							'</tr>' .
+							'<tr>' .
+								'<td>' .
+									__( '<b>ImageMagick</b> command stack', 'wp-photo-album-plus' ) .
+									': ' .
+									'<span' .
+										' id="imstack-' . $id . '"' .
+										' style="color:blue;"' .
+										' >' .
+										$magickstack .
+									'</span>' .
+									' ' .
+									'<input' .
+										' type="button"' .
+										' id="imstackbutton-' . $id . '"' .
+										' onclick="wppaTryMagick( ' . $id . ', \'magickundo\' )"' .
+										' value="' . esc_attr( __( 'Undo', 'wp-photo-album-plus' ) ) . '"' .
+										' title="' . esc_attr( __( 'Undo last Magick command', 'wp-photo-album-plus' ) ) . '"' .
+										' style="' . ( $magickstack ? '' : 'display:none;' ) . '"' .
+									' />' .
+								'</td>' .
+							'</tr>';
+
+							// Fake 'for social media' to use the local file here, not cloudinary. Files from cloudinary do not reload, even with ?ver=...
+							wppa( 'for_sm', true );
+							echo
+							'<tr>' .
+								'<td>' .
+									'<img' .
+										' id="fs-img-' . $id . '"' .
+										' src="' . wppa_get_photo_url( $id ) . '"' .
+										' style="float:left;max-width:90%;" ' .
+									' />' .
+									'<div' .
+										' style="display:inline-block;vertical-align:middle;margin-left:4px;margin-top:' . ( wppa_get_photoy( $id ) / 2 - 30 ) . 'px;"' .
+										' >' .
+										'<input' .
+											' type="button"' .
+											' onclick="wppaTryMagick( ' . $id . ', \'skyleft\' );"' .
+											' value="' . esc_attr( 'Up', 'wp-photo-album-plus' ) . '"' .
+											' title="' . esc_attr( 'Turn horizon up by 0.5&deg;', 'wp-photo-album-plus' ) . '"' .
+										' />' .
+										'<br />' .
+										'<input' .
+											' type="button"' .
+											' onclick="wppaToggleHorizon()"' .
+											' value="' . esc_attr( 'Hor', 'wp-photo-album-plus' ) . '"' .
+											' title="' . esc_attr( 'Toggle horizon reference line on/off', 'wp-photo-album-plus' ) . '"' .
+										' />' .
+										'<br />' .
+										'<input' .
+											' type="button"' .
+											' onclick="wppaTryMagick( ' . $id . ', \'skyright\' );"' .
+											' value="' . esc_attr( 'Down', 'wp-photo-album-plus' ) . '"' .
+											' title="' . esc_attr( 'Turn horizon down by 0.5&deg;', 'wp-photo-album-plus' ) . '"' .
+										' />' .
+									'</div>' .
+								'</td>' .
+							'</tr>';
+
+						echo
+						'</tbody>' .
+					'</table>';
+				}
+
+				// Reset switch
+				wppa( 'for_sm', false );
 
 				echo	// Section 4
 				"\n" . '<!-- Section 4 -->' .
@@ -1273,7 +1630,7 @@ function wppaTryWatermark( id ) {
 										' />' .
 										'<img' .
 											' id="wppa-photo-spin-' . $id . '"' .
-											' src="' . wppa_get_imgdir() . 'spinner.gif"' .
+											' src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_is_ie() ? 'gif' : 'svg' ) . '"' .
 											' style="visibility:hidden"' .
 										' />' .
 									'</td>';
@@ -1553,7 +1910,7 @@ function wppaTryWatermark( id ) {
 							'</tr>';
 
 							// Display file
-							if ( is_file( wppa_fix_poster_ext( wppa_get_photo_path( $id ), $id ) ) ) {
+							if ( is_file( wppa_get_photo_path( $id ) ) ) {
 								$lru = wppa_fix_poster_ext( wppa_get_lores_url( $id ), $id );
 								echo
 								'<tr>' .
@@ -1569,7 +1926,7 @@ function wppaTryWatermark( id ) {
 							}
 
 							// Thumbnail
-							if ( is_file( wppa_fix_poster_ext( wppa_get_thumb_path( $id ), $id ) ) ) {
+							if ( is_file( wppa_get_thumb_path( $id ) ) ) {
 								$tnu = wppa_fix_poster_ext( wppa_get_tnres_url( $id ), $id );
 								echo
 								'<tr>' .
@@ -2083,13 +2440,13 @@ function wppaTryMove( id, video ) {
 							else {
 								echo
 									'<a' .
-										' href="' . wppa_fix_poster_ext( wppa_get_photo_url( $photo['id'] ), $photo['id'] ) . '"' .
+										' href="' . wppa_get_photo_url( $photo['id'] ) . '"' .
 										' target="_blank"' .
 										' title="Click to see fullsize"' .
 										' >' .
 										'<img' .
 											' class="wppa-bulk-thumb"' .
-											' src="' . wppa_fix_poster_ext( wppa_get_thumb_url( $photo['id'] ), $photo['id'] ) . '"' .
+											' src="' . wppa_get_thumb_url( $photo['id'] ) . '"' .
 											' style="max-width:' . $maxsize . 'max-height:' . $maxsize . 'px;"' .
 									//		' onmouseover="jQuery( this ).stop().animate( {height:120}, 100 )"' .
 									//		' onmouseout="jQuery( this ).stop().animate( {height:60}, 100 )"' .
@@ -2335,7 +2692,7 @@ global $wpdb;
 					xmlhttp.setRequestHeader( "Content-type","application/x-www-form-urlencoded" );
 					xmlhttp.send( data );
 					jQuery( "#wppa-sort-seqn-"+photo ).attr( 'value', seqno );	// set hidden value to new value to prevent duplicate action
-					var spinnerhtml = '<img src="'+wppaImageDirectory+'spinner.gif'+'" />';
+					var spinnerhtml = '<img src="'+wppaImageDirectory+'spinner.'+<?php echo ( wppa_is_ie() ? 'gif' : 'svg' ) ?>+'" />';
 					jQuery( '#wppa-seqno-'+photo ).html( spinnerhtml );
 				}
 			</script>
@@ -2348,7 +2705,6 @@ global $wpdb;
 							$imgs['1'] = wppa_get_videoy( $photo['id'] );
 						}
 						else {
-//							$imgs = getimagesize( wppa_get_thumb_path( $photo['id'] ) );
 							$imgs['0'] = wppa_get_thumbx( $photo['id'] );
 							$imgs['1'] = wppa_get_thumby( $photo['id'] );
 						}
@@ -2394,7 +2750,7 @@ global $wpdb;
 	-->
 					<?php }
 					else { ?>
-						<img class="wppa-bulk-thumb" src="<?php echo wppa_fix_poster_ext( wppa_get_thumb_url( $photo['id'] ), $photo['id'] ) ?>" style="max-width:<?php echo $mw ?>px; max-height:<?php echo $mh ?>px; margin-top: <?php echo $mt ?>px;" />
+						<img class="wppa-bulk-thumb" src="<?php echo wppa_get_thumb_url( $photo['id'] ) ?>" style="max-width:<?php echo $mw ?>px; max-height:<?php echo $mh ?>px; margin-top: <?php echo $mt ?>px;" />
 					<?php } ?>
 						<div style="font-size:9px; position:absolute; bottom:24px; text-align:center; width:<?php echo $size ?>px;" ><?php echo wppa_get_photo_name( $photo['id'] ) ?></div>
 						<div style="text-align: center; width: <?php echo $size ?>px; position:absolute; bottom:8px;" >
@@ -2427,7 +2783,7 @@ global $wpdb;
 global $wppa_search_stats;
 
 	$doit = false;
-//	if ( wppa_user_is( 'administrator' ) ) $doit = true;
+
 	if ( current_user_can( 'wppa_admin' ) && current_user_can( 'wppa_moderate' ) ) $doit = true;
 	if ( wppa_opt( 'upload_edit' ) != 'none' ) $doit = true;
 	if ( ! $doit ) {	// Should never get here. Only when url is manipulted manually.
@@ -2439,71 +2795,76 @@ global $wppa_search_stats;
 	$wppa_search_stats = array();
 
 	$first = true;
+	$photo_array = array();
 
-	if ( wppa_user_is( 'administrator' ) && wppa_is_int( $_REQUEST['wppa-searchstring'] ) ) {
-		$photo_array = array( $_REQUEST['wppa-searchstring'] );
+	// See if only ids given
+	if ( wppa_user_is( 'administrator' ) ) {
+		foreach ( $words as $word ) {
+			if ( wppa_is_int( $word ) ) {
+				$photo_array[] = $word;
+			}
+		}
+		asort( $photo_array );
 	}
 
-	else foreach( $words as $word ) {
+	// Nothing? Process normal serch
+	if ( ! count( $photo_array ) ) {
 
-		// Find lines in index db table
-		if ( wppa_switch( 'wild_front' ) ) {
-			$pidxs = $wpdb->get_results( "SELECT `slug`, `photos` FROM `".WPPA_INDEX."` WHERE `slug` LIKE '%".$word."%'", ARRAY_A );
-		}
-		else {
-			$pidxs = $wpdb->get_results( "SELECT `slug`, `photos` FROM `".WPPA_INDEX."` WHERE `slug` LIKE '".$word."%'", ARRAY_A );
-		}
+		foreach( $words as $word ) {
 
-		$photos = '';
-
-		foreach ( $pidxs as $pi ) {
-			$photos .= $pi['photos'].',';
-		}
-
-		if ( $first ) {
-			$photo_array 	= wppa_index_array_remove_dups( wppa_index_string_to_array( trim( $photos, ',' ) ) );
-			$count 			= empty( $photo_array ) ? '0' : count( $photo_array );
-			$list 			= implode( ',', $photo_array );
-			if ( ! $list ) {
-				$list = '0';
+			// Find lines in index db table
+			if ( wppa_switch( 'wild_front' ) ) {
+				$pidxs = $wpdb->get_results( "SELECT `slug`, `photos` FROM `".WPPA_INDEX."` WHERE `slug` LIKE '%".$word."%'", ARRAY_A );
+			}
+			else {
+				$pidxs = $wpdb->get_results( "SELECT `slug`, `photos` FROM `".WPPA_INDEX."` WHERE `slug` LIKE '".$word."%'", ARRAY_A );
 			}
 
-//			if ( wppa_user_is( 'administrator' ) ) {
-			if ( current_user_can( 'wppa_admin' ) && current_user_can( 'wppa_moderate' ) ) {
-				$real_count = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `id` IN (".$list.") " );
-				if ( $count != $real_count ) {
-					update_option( 'wppa_remake_index_photos_status', __('Required', 'wp-photo-album-plus') );
-// 					echo 'realcount mismatch:1';
-//					echo ' count='.$count.', realcount='.$real_count.'<br/>';
+			$photos = '';
+
+			foreach ( $pidxs as $pi ) {
+				$photos .= $pi['photos'].',';
+			}
+
+			if ( $first ) {
+				$photo_array 	= wppa_index_array_remove_dups( wppa_index_string_to_array( trim( $photos, ',' ) ) );
+				$count 			= empty( $photo_array ) ? '0' : count( $photo_array );
+				$list 			= implode( ',', $photo_array );
+				if ( ! $list ) {
+					$list = '0';
 				}
-			}
-			else { // Not admin, can edit own photos only
-				$real_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `id` IN (".$list.") AND `owner` = %s", wppa_get_user() ) );
-			}
 
-			$wppa_search_stats[] 	= array( 'word' => $word, 'count' => $real_count );
-			$first = false;
-		}
-		else {
-			$temp_array 	= wppa_index_array_remove_dups( wppa_index_string_to_array( trim( $photos, ',' ) ) );
-			$count 			= empty( $temp_array ) ? '0' : count( $temp_array );
-			$list 			= implode( ',', $temp_array );
-
-//			if ( wppa_user_is( 'administrator' ) ) {
-			if ( current_user_can( 'wppa_admin' ) && current_user_can( 'wppa_moderate' ) ) {
-				$real_count = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `id` IN (".$list.") " );
-				if ( $count != $real_count ) {
-					update_option( 'wppa_remake_index_photos_status', __('Required', 'wp-photo-album-plus') );
-//					echo 'realcount mismatch:2';
-//					echo ' count='.$count.', realcount='.$real_count.'<br/>';
+				if ( current_user_can( 'wppa_admin' ) && current_user_can( 'wppa_moderate' ) ) {
+					$real_count = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `id` IN (".$list.") " );
+					if ( $count != $real_count ) {
+						update_option( 'wppa_remake_index_photos_status', __('Required', 'wp-photo-album-plus') );
+					}
 				}
-			}
-			else { // Not admin, can edit own photos only
-				$real_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `id` IN (".$list.") AND `owner` = %s", wppa_get_user() ) );
-			}
+				else { // Not admin, can edit own photos only
+					$real_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `id` IN (".$list.") AND `owner` = %s", wppa_get_user() ) );
+				}
 
-			$wppa_search_stats[] 	= array( 'word' => $word, 'count' => $real_count );
-			$photo_array 			= array_intersect( $photo_array, $temp_array );
+				$wppa_search_stats[] 	= array( 'word' => $word, 'count' => $real_count );
+				$first = false;
+			}
+			else {
+				$temp_array 	= wppa_index_array_remove_dups( wppa_index_string_to_array( trim( $photos, ',' ) ) );
+				$count 			= empty( $temp_array ) ? '0' : count( $temp_array );
+				$list 			= implode( ',', $temp_array );
+
+				if ( current_user_can( 'wppa_admin' ) && current_user_can( 'wppa_moderate' ) ) {
+					$real_count = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `id` IN (".$list.") " );
+					if ( $count != $real_count ) {
+						update_option( 'wppa_remake_index_photos_status', __('Required', 'wp-photo-album-plus') );
+					}
+				}
+				else { // Not admin, can edit own photos only
+					$real_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `id` IN (".$list.") AND `owner` = %s", wppa_get_user() ) );
+				}
+
+				$wppa_search_stats[] 	= array( 'word' => $word, 'count' => $real_count );
+				$photo_array 			= array_intersect( $photo_array, $temp_array );
+			}
 		}
 	}
 
@@ -2741,7 +3102,6 @@ function wppa_fe_edit_new_style( $photo ) {
 			' type="button"' .
 			' style="margin-top:8px;"' .
 			' value="' . esc_attr( __( 'Cancel', 'wp-photo-album-plus' ) ) . '"' .
-//			' onclick="jQuery( \'.ui-button\' ).trigger(\'click\')"' .
 			' onclick="jQuery( \'#wppa-modal-container-' . strval( intval( $_REQUEST['moccur'] ) ) . '\').dialog(\'close\')"' .
 			' />';
 
@@ -2753,4 +3113,20 @@ function wppa_fe_edit_new_style( $photo ) {
 	echo
 		'</div>';
 
+}
+
+// See if this photo needs the ImageMagick features
+function wppa_can_admin_magick( $id ) {
+
+	// Is ImageMagick on board?
+	if ( ! wppa_opt( 'image_magick' ) ) {
+		return false;
+	}
+
+	// Is it a video?
+	if ( wppa_is_video( $id ) ) {
+		return false;
+	}
+
+	return true;
 }

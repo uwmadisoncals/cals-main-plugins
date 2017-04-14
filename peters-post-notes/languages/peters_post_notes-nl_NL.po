@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Peter's Post Notes v1.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-12 09:06-0800\n"
+"POT-Creation-Date: 2017-03-11 18:38-0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Peter <peter@keung.biz>\n"
 "Language-Team: translation by WPwebshop.com <info@wpwebshop.com>\n"
@@ -16,208 +16,208 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: ../peters_post_notes.php:132
+#: ../peters_post_notes.php:136
 msgid "User"
 msgstr ""
 
-#: ../peters_post_notes.php:143
+#: ../peters_post_notes.php:147
 #, fuzzy
 msgid "Latest note"
 msgstr "Privé Notitie"
 
-#: ../peters_post_notes.php:157 ../peters_post_notes.php:374
-#: ../peters_post_notes.php:574 ../peters_post_notes.php:718
+#: ../peters_post_notes.php:161 ../peters_post_notes.php:378
+#: ../peters_post_notes.php:590 ../peters_post_notes.php:742
 msgid "M j, Y \\a\\t G:i"
 msgstr "M j, Y \\a\\t G:i"
 
-#: ../peters_post_notes.php:286
+#: ../peters_post_notes.php:290
 msgid "Successfully updated plugin settings"
 msgstr ""
 
-#: ../peters_post_notes.php:331
+#: ../peters_post_notes.php:335
 msgid "Notes"
 msgstr "Notities"
 
-#: ../peters_post_notes.php:379 ../peters_post_notes.php:720
+#: ../peters_post_notes.php:383 ../peters_post_notes.php:744
 msgid "Edit"
 msgstr "Bewerken"
 
-#: ../peters_post_notes.php:384 ../peters_post_notes.php:727
+#: ../peters_post_notes.php:388 ../peters_post_notes.php:751
 msgid "Delete"
 msgstr "Verwijderen"
 
-#: ../peters_post_notes.php:391 ../peters_post_notes.php:421
-#: ../peters_post_notes.php:651 ../peters_post_notes.php:656
+#: ../peters_post_notes.php:395 ../peters_post_notes.php:425
+#: ../peters_post_notes.php:668 ../peters_post_notes.php:673
 msgid "Private note"
 msgstr "Privé Notitie"
 
-#: ../peters_post_notes.php:393 ../peters_post_notes.php:730
+#: ../peters_post_notes.php:397 ../peters_post_notes.php:754
 msgid "Save"
 msgstr "Opslaan"
 
-#: ../peters_post_notes.php:394 ../peters_post_notes.php:731
+#: ../peters_post_notes.php:398 ../peters_post_notes.php:755
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: ../peters_post_notes.php:406
+#: ../peters_post_notes.php:410
 msgid "No notes for this post."
 msgstr "Geen notities voor dit bericht."
 
-#: ../peters_post_notes.php:419 ../peters_post_notes.php:647
+#: ../peters_post_notes.php:423 ../peters_post_notes.php:664
 msgid "Add note:"
 msgstr "Notitie toevoegen:"
 
-#: ../peters_post_notes.php:487
+#: ../peters_post_notes.php:491
 msgid "Collaboration Notes"
 msgstr "Notities Samenwerking"
 
-#: ../peters_post_notes.php:574
+#: ../peters_post_notes.php:590
 msgid "on"
 msgstr "op"
 
-#: ../peters_post_notes.php:582
+#: ../peters_post_notes.php:599
 msgid "No relevant notes."
 msgstr "Geen relevante notities."
 
-#: ../peters_post_notes.php:586
+#: ../peters_post_notes.php:603
 msgid "General Notes"
 msgstr "Algemene Notities"
 
-#: ../peters_post_notes.php:635
+#: ../peters_post_notes.php:652
 #, fuzzy
 msgid "Personal notes:"
 msgstr "Algemene Notities"
 
-#: ../peters_post_notes.php:642
+#: ../peters_post_notes.php:659
 msgid "No general notes."
 msgstr "Geen algemene notities."
 
-#: ../peters_post_notes.php:659
+#: ../peters_post_notes.php:676
 msgid "Add"
 msgstr "Toevoegen"
 
-#: ../peters_post_notes.php:802
+#: ../peters_post_notes.php:826
 #, fuzzy
 msgid "Added notes table!"
 msgstr "<p>Notities tabel toegevoegd!</p>"
 
-#: ../peters_post_notes.php:820
+#: ../peters_post_notes.php:844
 #, fuzzy
 msgid "Added general notes table!"
 msgstr "<p>Algemene notities tabel toegevoegd!</p>"
 
-#: ../peters_post_notes.php:834
+#: ../peters_post_notes.php:858
 msgid "Only necessary if you updated the plugin manually"
 msgstr "Alleen nodig als je de plugin manueel bijgewerkt hebt"
 
-#: ../peters_post_notes.php:851
+#: ../peters_post_notes.php:875
 #, fuzzy
 msgid "Peter's Post Notes settings"
 msgstr "Peter's Post Notes: status"
 
-#: ../peters_post_notes.php:864
+#: ../peters_post_notes.php:888
 msgid "Which types of notes to show on the Dashboard"
 msgstr ""
 
-#: ../peters_post_notes.php:868
+#: ../peters_post_notes.php:892
 msgid "Relevant notes including the current user's notes"
 msgstr ""
 
-#: ../peters_post_notes.php:869
+#: ../peters_post_notes.php:893
 msgid "Relevant notes excluding the current user's notes"
 msgstr ""
 
-#: ../peters_post_notes.php:870
+#: ../peters_post_notes.php:894
 #, fuzzy
 msgid "All notes"
 msgstr "Notitie toevoegen:"
 
-#: ../peters_post_notes.php:876
+#: ../peters_post_notes.php:900
 msgid "How many recent notes to display on the Dashboard. 0 = unlimited"
 msgstr ""
 
-#: ../peters_post_notes.php:884
+#: ../peters_post_notes.php:908
 msgid "Character set on your site. In most cases this is \"UTF-8\""
 msgstr ""
 
-#: ../peters_post_notes.php:892
+#: ../peters_post_notes.php:916
 msgid "Show \"Add note\" text area for post within publish panel"
 msgstr ""
 
-#: ../peters_post_notes.php:896 ../peters_post_notes.php:1017
-#: ../peters_post_notes.php:1027
+#: ../peters_post_notes.php:920 ../peters_post_notes.php:1041
+#: ../peters_post_notes.php:1051
 msgid "Yes"
 msgstr ""
 
-#: ../peters_post_notes.php:897 ../peters_post_notes.php:1016
-#: ../peters_post_notes.php:1028
+#: ../peters_post_notes.php:921 ../peters_post_notes.php:1040
+#: ../peters_post_notes.php:1052
 msgid "No"
 msgstr ""
 
-#: ../peters_post_notes.php:903
+#: ../peters_post_notes.php:927
 msgid ""
 "Roles that are allowed to view all notes (used when the global setting is to "
 "only show relevant notes)"
 msgstr ""
 
-#: ../peters_post_notes.php:922
+#: ../peters_post_notes.php:946
 msgid ""
 "Capabilities that are allowed to view all notes (used when the global "
 "setting is to only show relevant notes)"
 msgstr ""
 
-#: ../peters_post_notes.php:943
+#: ../peters_post_notes.php:967
 msgid ""
 "Roles that are allowed to edit all notes (they must also be allowed to view "
 "the notes)"
 msgstr ""
 
-#: ../peters_post_notes.php:965
+#: ../peters_post_notes.php:989
 msgid ""
 "Capabilities that are allowed to edit all notes (they must also be allowed "
 "to view the notes)"
 msgstr ""
 
-#: ../peters_post_notes.php:989
+#: ../peters_post_notes.php:1013
 msgid "List of post types on which post notes should be enabled"
 msgstr ""
 
-#: ../peters_post_notes.php:1012
+#: ../peters_post_notes.php:1036
 msgid ""
 "Allow the same set of HTML tags in notes as are allowed in WordPress comments"
 msgstr ""
 
-#: ../peters_post_notes.php:1023
+#: ../peters_post_notes.php:1047
 msgid "Show \"Latest note\" column in the \"Manage posts\" page"
 msgstr ""
 
-#: ../peters_post_notes.php:1034
+#: ../peters_post_notes.php:1058
 msgid ""
 "Capability required to add a general note. (Otherwise users can only add a "
 "private note.)"
 msgstr ""
 
-#: ../peters_post_notes.php:1057
+#: ../peters_post_notes.php:1081
 msgid "Update"
 msgstr ""
 
-#: ../peters_post_notes.php:1065
+#: ../peters_post_notes.php:1089
 msgid "Peter's Post Notes"
 msgstr "Peter's Post Notes"
 
-#: ../peters_post_notes.php:1137
+#: ../peters_post_notes.php:1161
 msgid "Error: You can only edit notes that you wrote."
 msgstr "Fout: Je kunt alleen notities bewerken die jij geschreven hebt."
 
-#: ../peters_post_notes.php:1174
+#: ../peters_post_notes.php:1198
 msgid "Error: Unknown or database problem when updating note."
 msgstr "Fout: Onbekend of database probleem tijdens bijwerken notitie."
 
-#: ../peters_post_notes.php:1213
+#: ../peters_post_notes.php:1237
 msgid "Error: You can only delete notes that you wrote."
 msgstr "Fout: Je kan alleen notities verwijderen die jij geschreven hebt."
 
-#: ../peters_post_notes.php:1226
+#: ../peters_post_notes.php:1250
 msgid "Error: Unknown or database problem when deleting note."
 msgstr "Fout: Onbekend of database probleem tijdens verwijderen notitie."
 

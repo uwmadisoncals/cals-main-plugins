@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsSlideshowVersion = '6.6.13';
+var wppaJsSlideshowVersion = '6.6.20';
 
 // This is an entrypoint to load the slide data
 function wppaStoreSlideInfo(
@@ -800,11 +800,11 @@ function _wppaNextSlide_5( mocc ) {
 			}
 
 			// Push state if not slphoto
-			if ( ! _wppaSSRuns[mocc] ) {	// This is not running
+//			if ( ! _wppaSSRuns[mocc] ) {	// This is not running
 				if ( _wppaSlides[mocc].length > 1 ) {
 					wppaPushStateSlide( mocc, _wppaCurIdx[mocc], visurl );
 				}
-			}
+//			}
 		}
 
 		// If running: Wait for next slide
@@ -1480,9 +1480,13 @@ function _wppaSpeed( mocc, faster ) {
 }
 
 function _wppaLoadSpinner( mocc ) {
+return;
 
 	if ( ! document.getElementById( 'slide_frame-'+mocc ) ) return;	// filmonly
 
+	jQuery( "#wppa-ajax-spin-" + mocc ).fadeIn( 3000 );
+//	jQuery( "#wppa-ajax-spin-" + mocc ).fadeIn(); //css( 'display', '' );
+	/*
 	var top;
 	var lft;
 	var elm;
@@ -1502,11 +1506,15 @@ function _wppaLoadSpinner( mocc ) {
 	jQuery( '#spinner-'+mocc ).css( 'top',top );
 	jQuery( '#spinner-'+mocc ).css( 'left',lft );
 	jQuery( '#spinner-'+mocc ).html( '<img id="spinnerimg-'+mocc+'" src="'+wppaImageDirectory+'loading.gif" style="box-shadow: none" />' );
+	*/
 }
 
 function _wppaUnloadSpinner( mocc ) {
 
-	jQuery( '#spinner-'+mocc ).html( '' );
+//	jQuery( "#wppa-ajax-spin-" + mocc ).stop().fadeOut(); //css( 'display', 'none' );
+
+	jQuery( '#wppa-slide-spin-' + mocc ).stop().fadeOut();
+
 }
 
 function _wppaCheckRewind( mocc ) {
@@ -1678,7 +1686,7 @@ function wppaGetDislikeText( dsc,myr,incmine ) {
 
 function _wppaSetRd( mocc, avg, where ) {
 
-//alert( '_wppaSetRd() called with args:'+mocc+' '+avg+' '+where );
+wppaConsoleLog( '_wppaSetRd() called with args:'+mocc+' '+avg+' '+where, 'force' );
 	var idx1 = parseInt( avg );
 	var idx2 = idx1 + 1;
 	var frac = avg - idx1;
@@ -1687,9 +1695,13 @@ function _wppaSetRd( mocc, avg, where ) {
 	var ihigh = wppaRatingMax;
 
 	for ( idx=ilow;idx<=ihigh;idx++ ) {
-//		if ( where == '#wppa-rate-' || where == '.wppa-rate-' ) {
-//			jQuery( where+mocc+'-'+idx ).attr( 'src', wppaImageDirectory+'star.ico' );
-//		}
+		if ( where == '#wppa-rate-' || where == '.wppa-rate-' ) {
+
+			// Replace V by *
+			if ( jQuery( where+mocc+'-'+idx ).attr( 'src' ) != wppaImageDirectory+'star.ico' ) {
+				jQuery( where+mocc+'-'+idx ).attr( 'src', wppaImageDirectory+'star.ico' );
+			}
+		}
 		if ( idx <= idx1 ) {
 			jQuery( where+mocc+'-'+idx ).stop().fadeTo( 100, 1.0 );
 		}

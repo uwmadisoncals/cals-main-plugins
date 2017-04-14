@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the widget
-* Version 6.6.12
+* Version 6.6.18
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -55,7 +55,7 @@ class PhotoOfTheDay extends WP_Widget {
 			$ratio 		= wppa_get_photoy( $id ) / wppa_get_photox( $id );
 			$h 			= round( $w * $ratio );
 			$usethumb	= wppa_use_thumb_file( $id, wppa_opt( 'potd_widget_width' ), '0' );
-			$imgurl 	= wppa_fix_poster_ext( $usethumb ? wppa_get_thumb_url( $id, '', $w, $h ) : wppa_get_photo_url( $id, '', $w, $h ), $id );
+			$imgurl 	= $usethumb ? wppa_get_thumb_url( $id, true, '', $w, $h ) : wppa_get_photo_url( $id, true, '', $w, $h );
 			$name 		= wppa_get_photo_name( $id );
 			$page 		= ( in_array( wppa_opt( 'potd_linktype' ), wppa( 'links_no_page' ) ) && ! wppa_switch( 'potd_counter' ) ) ? '' : wppa_get_the_landing_page( 'potd_linkpage', __('Photo of the day', 'wp-photo-album-plus') );
 			$link 		= wppa_get_imglnk_a( 'potdwidget' , $id );

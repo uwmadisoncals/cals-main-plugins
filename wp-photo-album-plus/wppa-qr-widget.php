@@ -3,11 +3,12 @@
 * Package: wp-photo-album-plus
 *
 * display qr code
-* Version 6.3.11
+* Version 6.6.20
 */
 
 
 class wppaQRWidget extends WP_Widget {
+
     /** constructor */
     function __construct() {
 		$widget_ops = array('classname' => 'qr_widget', 'description' => __( 'WPPA+ QR Widget' , 'wp-photo-album-plus') );	//
@@ -30,40 +31,36 @@ class wppaQRWidget extends WP_Widget {
 		extract( $args );
 
  		$title 			= apply_filters('widget_title', empty( $instance['title'] ) ? __( 'QR Widget' , 'wp-photo-album-plus') : $instance['title']);
-		$qrsrc 			= 'http://api.qrserver.com/v1/create-qr-code/' .
-							'?data=' . site_url() .
-							'&amp;size='. wppa_opt( 'qr_size' ).'x'.wppa_opt( 'qr_size' ) .
-							'&amp;color='.trim( wppa_opt( 'qr_color' ), '#' ) .
-							'&amp;bgcolor='.trim( wppa_opt( 'qr_bgcolor' ) );
-		$widget_content = '
-		<div style="text-align:center;" ><img id="wppa-qr-img" src="' . $qrsrc . '" title="" alt="' . __('QR code', 'wp-photo-album-plus') . '" /></div>
-		<div style="clear:both" ></div>';
+		$qrsrc 			= 'http' . ( is_ssl() ? 's' : '' ) . '://api.qrserver.com/v1/create-qr-code/' .
+							'?format=svg' .
+							'&size='. wppa_opt( 'qr_size' ).'x'.wppa_opt( 'qr_size' ) .
+							'&color='.trim( wppa_opt( 'qr_color' ), '#' ) .
+							'&bgcolor='.trim( wppa_opt( 'qr_bgcolor' ), '#' ) .
+							'&data=' . urlencode( $_SERVER['SCRIPT_URI'] );
 
-		$widget_content .= '
-		<script type="text/javascript">
+		// Get the qrcode
+		$qrsrc = wppa_create_qrcode_cache( $qrsrc );
+
+		// Make the html
+		$widget_content =
+		'<div style="text-align:center;" >' .
+			'<img id="wppa-qr-img" src="' . $qrsrc . '" title="' . esc_attr( $_SERVER['SCRIPT_URI'] ) . '" alt="' . __('QR code', 'wp-photo-album-plus') . '" />' .
+		'</div>' .
+		'<div style="clear:both" ></div>';
+
+		$widget_content .=
+		'<script type="text/javascript">
 			/*[CDATA[*/
-			var wppaQRData = document.location.href;
-			var wppaQRDataOld = "";
-			var wppaQRSrc = "";
-			var workData = "";
+			var wppaQRUrl = document.location.href;
 
-			wppaConsoleLog( "doc.loc.href = " + wppaQRData );
+			wppaConsoleLog( "doc.loc.href = " + wppaQRUrl );
 
 			function wppaQRUpdate( arg ) {
-				if ( arg ) wppaQRData = arg;
-				if ( wppaQRData != wppaQRDataOld ) {
-					wppaQRDataOld 	= wppaQRData;
-					workData 		= wppaQRData;
-					wppaQRSrc 		= "http://api.qrserver.com/v1/create-qr-code/?data=" +
-										encodeURIComponent( workData ) +
-										"&size=' . wppa_opt( 'qr_size' ) .
-											'x' . wppa_opt( 'qr_size' ) .
-											'&color=' . trim( wppa_opt( 'qr_color' ), '#' ) .
-											'&bgcolor='.trim( wppa_opt( 'qr_bgcolor' ), '#' ) .
-										'";
-					document.getElementById( "wppa-qr-img" ).src = wppaQRSrc;
-					document.getElementById( "wppa-qr-img" ).title = workData;
+				if ( arg ) {
+					wppaQRUrl = arg;
 				}
+				wppaAjaxSetQrCodeSrc( wppaQRUrl, "wppa-qr-img" );
+				document.getElementById( "wppa-qr-img" ).title = wppaQRUrl;
 				return;
 			}
 
@@ -72,7 +69,6 @@ class wppaQRWidget extends WP_Widget {
 			});
 			/*]]*/
 		</script>';
-
 
 		echo $before_widget . $before_title . $title . $after_title . $widget_content . $after_widget;
     }

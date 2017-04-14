@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.6.15
+* Version 6.6.19
 *
 */
 
@@ -25,7 +25,7 @@ global $no_default;
 global $wppa_tags;
 global $wp_version;
 
-	// Test area
+	// Start test area
 
 	// End test area
 
@@ -286,6 +286,7 @@ global $wp_version;
 			'cachify/cachify.php',
 			'wp-deferred-javascripts/wp-deferred-javascripts.php',
 			'frndzk-photo-lightbox-gallery/frndzk_photo_gallery.php',
+			'simple-lightbox/main.php',
 			);
 		$plugins = get_option('active_plugins');
 		$matches = array_intersect($blacklist_plugins, $plugins);
@@ -364,6 +365,7 @@ global $wp_version;
 							'layout' 	=> __('Layout', 'wp-photo-album-plus'),
 							'lightbox' 	=> __('Lightbox', 'wp-photo-album-plus'),
 							'link' 		=> __('Links', 'wp-photo-album-plus'),
+							'mail' 		=> __('Mail', 'wp-photo-album-plus'),
 							'meta' 		=> __('Metadata', 'wp-photo-album-plus'),
 							'navi' 		=> __('Navigation', 'wp-photo-album-plus'),
 							'page' 		=> __('Page', 'wp-photo-album-plus'),
@@ -4383,7 +4385,7 @@ global $wp_version;
 							$slug = 'wppa_dislike_mail_every';
 							$html = wppa_input($slug, '40px', '', __('reports', 'wp-photo-album-plus'));
 							$clas = 'wppa_rating_';
-							$tags = 'rating';
+							$tags = 'rating,mail';
 							wppa_setting($slug, '7', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Pending after', 'wp-photo-album-plus');
@@ -4438,6 +4440,15 @@ global $wp_version;
 							$clas = 'wppa_rating_';
 							$tags = 'rating,layout';
 							wppa_setting($slug, '12', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Avg and Mine on 2 lines', 'wp-photo-album-plus');
+							$desc = __('Display avarage and my rating on different lines', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_show_avg_mine_2';
+							$html = wppa_checkbox($slug);
+							$clas = 'wppa_rating_';
+							$tags = 'rating,layout';
+							wppa_setting($slug, '12.1', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Single vote button text', 'wp-photo-album-plus');
 							$desc = __('The text on the voting button.', 'wp-photo-album-plus');
@@ -4581,7 +4592,7 @@ global $wp_version;
 											);
 							$html = wppa_select($slug, $opts, $vals);
 							$clas = 'wppa_comment_';
-							$tags = 'comment';
+							$tags = 'comment,mail';
 							wppa_setting($slug, '4', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Comment notify', 'wp-photo-album-plus');
@@ -4614,7 +4625,7 @@ global $wp_version;
 							}
 							$html = wppa_select($slug, $options, $values);
 							$clas = 'wppa_comment_';
-							$tags = 'comment';
+							$tags = 'comment,mail';
 							wppa_setting($slug, '5', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Comment notify previous', 'wp-photo-album-plus');
@@ -4643,7 +4654,7 @@ global $wp_version;
 							$slug = 'wppa_com_notify_approved_text';
 							$html = wppa_textarea($slug, $name);
 							$clas = 'wppa_comment_';
-							$tags = 'comment';
+							$tags = 'comment,mail';
 							wppa_setting($slug, '5.3', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Com ntfy appr email subject', 'wp-photo-album-plus');
@@ -4652,7 +4663,7 @@ global $wp_version;
 							$slug = 'wppa_com_notify_approved_subj';
 							$html = wppa_input($slug, '300px;');
 							$clas = 'wppa_comment_';
-							$tags = 'comment';
+							$tags = 'comment,mail';
 							wppa_setting($slug, '5.4', $name, $desc, $html, $help, $clas, $tags);
 
 
@@ -4699,8 +4710,18 @@ global $wp_version;
 							$slug = 'wppa_mail_upl_email';
 							$html = wppa_checkbox($slug);
 							$clas = 'wppa_comment_';
-							$tags = 'comment,layout';
+							$tags = 'comment,layout,mail';
 							wppa_setting($slug, '10', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Allow clickable links', 'wp-photo-album-plus');
+							$desc = __('Make links in comments clickable', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_comment_clickable';
+							$html = wppa_checkbox($slug);
+							$clas = 'wppa_comment_';
+							$tags = 'comment,layout';
+							wppa_setting($slug, '11', $name, $desc, $html, $help, $clas, $tags);
+
 							}
 						wppa_setting_subheader( 'G', '1', __( 'Lightbox related settings. These settings have effect only when Table IX-J3 is set to wppa' , 'wp-photo-album-plus') );
 							{
@@ -6353,7 +6374,7 @@ global $wp_version;
 							$html2 = '';
 							$html = array( $html1, $html2 );
 							$clas = '';
-							$tags = 'upload';
+							$tags = 'upload,mail';
 							wppa_setting($slug, '8', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Upload backend notify', 'wp-photo-album-plus');
@@ -6364,7 +6385,7 @@ global $wp_version;
 							$html2 = '';
 							$html = array( $html1, $html2 );
 							$clas = '';
-							$tags = 'upload';
+							$tags = 'upload,mail';
 							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Max size in pixels', 'wp-photo-album-plus');
@@ -6528,7 +6549,7 @@ global $wp_version;
 
 							$name = __('Upload Owners only', 'wp-photo-album-plus');
 							$desc = __('Limit uploads to the album owners only.', 'wp-photo-album-plus');
-							$help = esc_js(__('If checked, users can upload to their own own albums and --- public --- only.', 'wp-photo-album-plus'));
+							$help = esc_js(__('If checked, users can upload to their own albums and --- public --- only.', 'wp-photo-album-plus'));
 							$slug = 'wppa_upload_owner_only';
 							$html1 = wppa_checkbox($slug);
 							$html2 = '';
@@ -7402,7 +7423,7 @@ global $wp_version;
 								$desc = __('Optimize with EWWW image optimizer', 'wp-photo-album-plus');
 								$help = '';
 								$slug2 = 'wppa_optimize_ewww';
-								$html1 = '';
+								$html1 = wppa_ajax_button(__('Skip one', 'wp-photo-album-plus'), 'optimize_ewww_skip_one', '0', true );
 								$html2 = wppa_maintenance_button( $slug2 );
 								$html3 = wppa_status_field( $slug2 );
 								$html4 = wppa_togo_field( $slug2 );
@@ -7828,6 +7849,15 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 							$clas = '';
 							$tags = 'system';
 							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Retry failed mails', 'wp-photo-album-plus');
+							$desc = __('Select number of retries for failed mails', 'wp-photo-album-plus');
+							$help = esc_js(__('Retries occur at the background every hour', 'wp-photo-album-plus'));
+							$slug = 'wppa_retry_mails';
+							$html = wppa_number($slug, '0', '10');
+							$clas = '';
+							$tags = 'system,mail';
+							wppa_setting($slug, '10', $name, $desc, $html, $help, $clas, $tags);
 
 							}
 						wppa_setting_subheader( 'B', '1', __( 'WPPA+ Admin related miscellaneous settings' , 'wp-photo-album-plus') );
@@ -9287,7 +9317,7 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 							$html = wppa_input($slug, '50px', '', __('pixels', 'wp-photo-album-plus'));
 							$clas = '';
 							$tags = 'system';
-							wppa_setting($slug, '1', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting($slug, '1.1', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('QR color', 'wp-photo-album-plus');
 							$desc = __('The display color of the qr code (dark)', 'wp-photo-album-plus');
@@ -9296,7 +9326,7 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 							$html = wppa_input($slug, '100px', '', '', "checkColor('".$slug."')") . wppa_color_box($slug);
 							$clas = '';
 							$tags = 'system';
-							wppa_setting($slug, '2', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting($slug, '1.2', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('QR background color', 'wp-photo-album-plus');
 							$desc = __('The background color of the qr code (light)', 'wp-photo-album-plus');
@@ -9305,7 +9335,16 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 							$html = wppa_input($slug, '100px', '', '', "checkColor('".$slug."')") . wppa_color_box($slug);
 							$clas = '';
 							$tags = 'system';
-							wppa_setting($slug, '3', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting($slug, '1.3', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('QR cache', 'wp-photo-album-plus');
+							$desc = __('Enable caching QR codes', 'wp-photo-album-plus') . ' ' . sprintf( __('So far %d cache hits, %d miss', 'wp-photo-album-plus'), get_option('wppa_qr_cache_hits', '0'), get_option('wppa_qr_cache_miss', '0'));
+							$help = esc_js('Enable this to avoid DoS on heavy loads on the qrserver', 'wp-photo-album-plus');
+							$slug = 'wppa_qr_cache';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '1.4', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('CDN Service', 'wp-photo-album-plus');
 							$desc = __('Select a CDN Service you want to use.', 'wp-photo-album-plus');
@@ -9546,9 +9585,9 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 							wppa_setting($slug, '6.3', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Image Magick', 'wp-photo-album-plus');
-							$desc = __('Absulute path to the ImageMagick commands', 'wp-photo-album-plus') . ' <span style="color:red;" >' . __('experimental', 'wp-photo-album-plus') . '</span>';
+							$desc = __('Absulute path to the ImageMagick commands', 'wp-photo-album-plus');// . ' <span style="color:red;" >' . __('experimental', 'wp-photo-album-plus') . '</span>';
 							$help = esc_js(__('If you want to use ImageMagick, enter the absolute path to the ImageMagick commands', 'wp-photo-album-plus'));
-							$slug = 'wppa_image_magic';
+							$slug = 'wppa_image_magick';
 							$html = wppa_input($slug, '300px');
 							$clas = '';
 							$tags = 'system';

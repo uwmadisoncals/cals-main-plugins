@@ -337,6 +337,11 @@
       'size' => 10665,
       'sha1' => '8d7d0d81e445093ecc58577605c36320d2741ba7',
     ),
+    'less\\interactive_frontend.less' => 
+    array (
+      'size' => 2790,
+      'sha1' => '4e0de2217f0b95f318049aff0bdc244b39e765b3',
+    ),
     'less\\plugins\\datepicker3.less' => 
     array (
       'size' => 5690,
@@ -359,8 +364,8 @@
     ),
     'less\\style.less' => 
     array (
-      'size' => 20936,
-      'sha1' => '54917e6bb481eea9649ca08e9b7ba2221fdf31eb',
+      'size' => 21007,
+      'sha1' => 'a95f6f6d730ff3eed5013b6f0788835343a8a483',
     ),
     'less\\timely-font-awesome.less' => 
     array (
@@ -386,6 +391,11 @@
     array (
       'size' => 1248,
       'sha1' => '1d7fcb0178ffdf8a57e8e9c4f2fb2c0dc70e3c7f',
+    ),
+    'less\\venue-details.less' => 
+    array (
+      'size' => 932,
+      'sha1' => 'ddfc94e59e47329dcbb93c36edf5dc07587e5bf3',
     ),
     'style.css' => 
     array (

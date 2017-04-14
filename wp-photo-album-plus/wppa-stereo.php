@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the stereo stuff
-* Version 6.6.02
+* Version 6.6.16
 *
 */
 
@@ -47,18 +47,19 @@ global $wppa_supported_stereo_glasses;
 	// Feature enabled?
 	if ( ! wppa_switch( 'enable_stereo' ) ) return;
 
-	// First create new thumbnail
-	wppa_create_thumbnail( $id );
-
-	// Is it a stereo poto?
+	// Is it a stereo photo?
 	if ( ! wppa_is_stereo( $id ) ) {
 
 		// Maybe no longer, delete any anaglyphs
-		wppa_delete_stereo_images( $id );
+		if ( wppa_delete_stereo_images( $id ) ) {
+
+			// Is no longer stereo, create new thumbnail
+			wppa_create_thumbnail( $id );
+		}
 		return;
 	}
 
-	// Now the anaglyphs
+	// Now make the anaglyphs
 	foreach( $wppa_supported_stereo_types as $type ) {
 		foreach( $wppa_supported_stereo_glasses as $glas ) {
 			wppa_create_stereo_image( $id, $type, $glas );
@@ -324,6 +325,8 @@ function wppa_delete_stereo_images( $id ) {
 			unlink( $file );
 		}
 	}
+
+	return ( count( $files ) > 0 );
 }
 
 function wppa_is_stereo( $id ) {

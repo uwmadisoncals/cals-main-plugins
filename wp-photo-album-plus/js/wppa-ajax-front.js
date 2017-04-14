@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsAjaxVersion = '6.6.13';
+var wppaJsAjaxVersion = '6.6.21';
 
 var wppaRenderAdd = false;
 var wppaWaitForCounter = 0;
@@ -36,7 +36,7 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor, addHilite ) {
 										if ( _wppaSSRuns[mocc] ) _wppaStop( mocc );
 
 										// Display the spinner
-										jQuery( '#wppa-ajax-spin-'+mocc ).css( 'display', '' );
+										jQuery( '#wppa-ajax-spin-'+mocc ).fadeIn();
 									},
 						success: 	function( result, status, xhr ) {
 
@@ -125,14 +125,14 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor, addHilite ) {
 										wppaUpdateLightboxes();
 
 										// Update qrcode
-										if ( typeof( wppaQRUpdate ) != 'undefined' ) wppaQRUpdate( newurl );
+										if ( typeof( wppaQRUpdate ) != 'undefined' ) {
+											wppaConsoleLog( 'Ajax render asked qr code for '+newurl, 'force' );
+											wppaQRUpdate( newurl );
+										}
 
 										// Run Autocol?
 										wppaColWidth[mocc] = 0;
 										_wppaDoAutocol( mocc );
-
-										// Remove spinner
-										jQuery( '#wppa-ajax-spin-'+mocc ).css( 'display', 'none' );
 
 										// Report if scripts
 										var scriptPos = result.indexOf( '<script' );
@@ -163,6 +163,10 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor, addHilite ) {
 										if ( ! wppaRenderModal ) {
 											jQuery('html, body').animate({ scrollTop: jQuery("#wppa-container-"+mocc).offset().top - 32 - wppaStickyHeaderHeight }, 1000);
 										}
+
+										// Remove spinner
+										jQuery( '#wppa-ajax-spin-'+mocc ).stop().fadeOut();
+
 									}
 					} );
 	}
@@ -1046,7 +1050,29 @@ function wppaUpdatePhotoNew(id) {
 
 								}
 				} );
+}
 
+// Get qrcode and put it as src in elm
+function wppaAjaxSetQrCodeSrc( url, elm ) {
+
+	var myData = 	'action=wppa' +
+					'&wppa-action=getqrcode' +
+					'&wppa-qr-nonce=' + jQuery( '#wppa-qr-nonce' ).val() +
+					'&url=' + encodeURIComponent( url );
+
+	jQuery.ajax( {	url: 		wppaAjaxUrl,
+					data: 		myData,
+					async: 		true,
+					type: 		'POST',
+					timeout: 	10000,
+					success: 	function( result, status, xhr ) {
+									document.getElementById( elm ).src = result;
+									wppaConsoleLog( 'wppaAjaxSetQrCodeSrc put '+result+' into '+elm );
+								},
+					error: 		function( xhr, status, error ) {
+									wppaConsoleLog( 'wppaAjaxSetQrCodeSrc failed. Error = ' + error + ', status = ' + status, 'force' );
+								}
+				} );
 }
 
 // Log we're in.

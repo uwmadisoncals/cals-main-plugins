@@ -3,7 +3,7 @@
 /* Package: wp-photo-album-plus
 /*
 /* Various style computation routines
-/* Version 6.6.10
+/* Version 6.6.18
 /*
 */
 
@@ -354,26 +354,13 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 	if ( ! $id ) return $result;						// no image: no dimensions
 	if ( $file == '' ) return $result;					// no image: no dimensions
 
-	if ( wppa_has_audio( $id ) ) {
-		$file = wppa_fix_poster_ext( $file, $id );
-	}
-	if ( ! wppa_is_video( $id ) && ! is_file( $file ) ) {
-		wppa_dbg_msg( 'Please check file ' . $file . ' it is missing while expected. Id=' . $id, 'red' );
-		return $result;									// no file: no dimensions ( 2.3.0 )
-	}
-
 	if ( strpos( $file, '/wppa/thumbs/' ) ) {
 		$image_attr = wppa_get_imagexy( $id, 'thumb' );
 	}
 	else {
 		$image_attr = wppa_get_imagexy( $id, 'photo' );
 	}
-//	if ( wppa_is_video( $id ) ) {
-//		$image_attr = array( '0' => wppa_get_videox( $id ), '1' => wppa_get_videoy( $id ) );
-//	}
-//	else {
-//		$image_attr = array( '0' => wppa_get_photox( $id ), '1' => wppa_get_photoy( $id ) );
-//	}
+
 	if (
 			! $image_attr ||
 			! isset( $image_attr['0'] ) ||

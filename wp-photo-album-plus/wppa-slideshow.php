@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the slideshow high level functions
-* Version 6.6.14
+* Version 6.6.20
 *
 */
 
@@ -386,12 +386,54 @@ function wppa_slide_frame() {
 				'</div>'
 			);
 
-	wppa_out( 	'<div' .
+			switch( wppa_opt( 'icon_corner_style' ) ) {
+				case 'none':
+					$bradius = '0';
+					break;
+				case 'light':
+					$bradius = '12';
+					break;
+				case 'medium':
+					$bradius = '24';
+					break;
+				case 'heavy':
+					$bradius = '60';
+					break;
+			}
+
+	wppa_out( 	'<img' .
+					' id="wppa-slide-spin-' . wppa( 'mocc' ) . '"' .
+					' alt="spinner"' .
+					( wppa_is_ie() ? '' : ' class="wppa-svg"' ) .
+					' style="' .
+						'width:120px;' .
+						'height:120px;' .
+						'position:absolute;' .
+						'top:50%;' .
+						'margin-top:-60px;' .
+						'left:50%;' .
+						'margin-left:-60px;' .
+						'z-index:100100;' .
+						'opacity:1;' .
+						'display:block;' .
+						'fill:' . wppa_opt( 'svg_color' ) . ';' .
+						'background-color:' . wppa_opt( 'svg_bg_color' ) . ';' .
+						'box-shadow:none;' .
+						'border-radius:' . $bradius .'px;' .
+						'"' .
+					' src="' . wppa_get_imgdir() . ( wppa_is_ie() ? 'loading.gif' : 'loader.svg' ) . '"' .
+				' />'
+			);
+
+
+
+	/*'<div' .
 					' id="spinner-' . wppa( 'mocc' ) . '"' .
 					' class="spinner"' .
 					' >' .
 				'</div>'
 			);
+	*/
 
 	if ( ! wppa_page( 'oneofone' ) ) {
 
@@ -987,6 +1029,21 @@ global $wpdb;
 		// Logged in or don't care
 		if ( ! wppa_switch( 'rating_login' ) || is_user_logged_in() ) {
 
+			// Rating on 2 lines?
+			if ( wppa_switch( 'show_avg_mine_2' ) && wppa_switch( 'show_avg_rating' ) ) {
+				$result .= '<br />';
+			}
+
+			// Text left if no avg rating OR on 2 lines
+			if ( ! wppa_switch( 'show_avg_rating' ) || wppa_switch( 'show_avg_mine_2' ) ) {
+				$result .= 	'<span' .
+								' id="wppa-my-rat-'.wppa( 'mocc' ).'" ' .
+								' class="wppa-rating-label"' .
+								'>' .
+								$myrat_label .
+							'</span>&nbsp';
+			}
+
 			// Show dislike icon?
 			$pad = round( ( wppa_opt( 'ratspacing' ) - $fs ) / 2 );
 			if ( $pad < 5 ) $pad = '5';
@@ -1031,11 +1088,6 @@ global $wpdb;
 									' >' .
 								'</span>';
 				}
-			}
-
-			// Text left if no avg rating
-			if ( ! wppa_switch( 'show_avg_rating') ) {
-				$result .= $myrat_label . ':&nbsp;';
 			}
 
 			// Display the my rating stars
@@ -1083,8 +1135,8 @@ global $wpdb;
 				$i++;
 			}
 
-			// Text right if avg rating diaplayed
-			if ( wppa_switch( 'show_avg_rating' ) ) {
+			// Text right if avg rating diaplayed AND not on two lines
+			if ( wppa_switch( 'show_avg_rating' ) && ! wppa_switch( 'show_avg_mine_2' ) ) {
 				$result .= 	'&nbsp;' .
 								'<span' .
 									' id="wppa-my-rat-'.wppa( 'mocc' ).'" ' .

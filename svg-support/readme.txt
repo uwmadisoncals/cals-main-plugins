@@ -3,8 +3,8 @@ Contributors: Benbodhi
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Z9R7JERS82EQQ
 Tags: svg, vector, css, style, mime, mime type, embed, img, inline, animation
 Requires at least: 4.0
-Tested up to: 4.8-alpha-39948
-Stable tag: 2.3.6
+Tested up to: 4.8-alpha-40350
+Stable tag: 2.3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,41 +58,32 @@ Please Note: You will need to set your own height and width in your CSS for SVG 
 
 = Security =
 
-As with allowing uploads of any files, there is potential risks involved. Only allow users to upload SVG files if you trust them. You have the option to restrict SVG usage to Administrators only from the settings page. By default, anyone with Media Library access or upload_files capability will be able to upload SVG files (that is Administrators, Authors and Editors).
-
-= Translations =
-
-* US English - default, always included
-* AU English - WordPress Language Packs
-* NZ English - WordPress Language Packs
-* Serbian - translated and submitted by Ogi Djuraskovic from [first site guide](http://firstsiteguide.com/)
-* Spanish - translated and submitted by [Apasionados del Marketing](http://apasionados.es)
+As with allowing uploads of any files, there is potential risks involved. Only allow users to upload SVG files if you trust them. You have the option to restrict SVG usage to Administrators only from the settings page. By default, anyone with Media Library access or upload_files capability will be able to upload SVG files (that is Administrators, Authors and Editors). Please note that SVG files are actually XML which would allow someone to inject malicious code if you're not careful with who has upload privileges.
 
 = Feedback =
 
-* I am open to your suggestions and feedback - Thanks for using SVG Support!
+* I am open to your [suggestions and feedback](mailto:wp@benbodhi.com) - Thanks for using SVG Support!
 * Drop me a line [@benbodhi](http://twitter.com/benbodhi) or [@GoWebben](http://twitter.com/gowebben) on Twitter
 * Follow me on [my Facebook page](http://www.facebook.com/gowebben)
 * Or circle [+GoWebben](https://plus.google.com/+Gowebben/) on Google Plus ;-)
 
 *Note:* This is the second plugin I have submitted to the WordPress repository, I hope you like it. Please take a moment to rate it and click 'works' under compatibility with your version of WordPress.<br />
-As always, feel free to send me any suggestions.
+As always, feel free to [send me any suggestions](mailto:wp@benbodhi.com).
 
 == Installation ==
 
 To install this plugin:
 
 = via wp-admin =
-1. Upload the compressed version `svg-support.zip` through 'Plugins' > 'Add New' > 'Upload'
-2. Click 'Activate Plugin'
-
-or
-
 1. Visit 'Plugins' > 'Add New'
 2. Type "SVG Support" into the search field
 3. Click 'Install Plugin' and confirm in the pop up
 4. Hover over SVG Support and click 'Activate Plugin'
 
+or
+
+1. Upload the compressed version `svg-support.zip` through 'Plugins' > 'Add New' > 'Upload'
+2. Click 'Activate Plugin'
 
 = via FTP =
 1. Download plugin file and extract it
@@ -129,6 +120,10 @@ If you installed multisite prior to WordPress 3.5, then you will need to remove 
 
 If you are using SVG Support with Visual Composer or any other page builders, you will need to make sure that you can add your own class to the image. The easiest way to do this is by using a simple text or code block in the builder to put your image code in to.
 
+= How do I get this to work with the Media Library Assistant plugin? =
+
+You need to add the mime type for svg and svgz to: "MLA Settings > Media Library Assistant > Uploads (tab)" and then it works.
+
 == Screenshots ==
 
 1. Basic Settings
@@ -137,6 +132,17 @@ If you are using SVG Support with Visual Composer or any other page builders, yo
 4. Inline SVG in the front end markup
 
 == Changelog ==
+
+= 2.3.7 =
+
+* Added WP version check to wrap mime fix function needed for WP v4.7.1 - v4.7.2.
+* Moved mime fix into mime type file.
+* Modified admin notice code to make it neater.
+* Fix: attachment-modal.php issues with some servers and external SVG files (props to @abstractourist & @malthejorgensen for providing fixes, as I could not consistently reproduce the issue).
+* Compatibility: Changed a line to provide wider compatibility, specifically for WordPress Bedrock on a LEMP stack.
+* Compatibility: Added another snippet to the JS to support IE11 (apparently people still use IE).
+* Added more FAQ's.
+
 
 = 2.3.6 =
 
@@ -275,6 +281,10 @@ If you are using SVG Support with Visual Composer or any other page builders, yo
 
 == Upgrade Notice ==
 
+= 2.3.7 =
+
+* Fixes issues with media library not loading for some, attachment-modal errors and adds some wider compatibility.
+
 = 2.3.6 =
 
 * Adds support for older browsers, fixes a couple of seemingly isolated errors reported, removes some redundant code.
@@ -379,14 +389,11 @@ IMPORTANT, MAJOR CHANGES, BACKUP BEFORE UPDATING: Users that are inlining SVG wi
 
 == Translations ==
 
-* English - default, always included
-* Serbian - translated and submitted by Ogi Djuraskovic from [first site guide]( http://firstsiteguide.com/)
-* *Your translation? - [Just send it in](mailto:wp@benbodhi.com)*
-
-*Note:* This plugin is localized/translateable by default. This is very important for all users worldwide. So please contribute your language to the plugin to make it even more useful. For translating I recommend ["Loco Translate" plugin](https://wordpress.org/plugins/loco-translate/) and for validating the ["Poedit Editor"](http://www.poedit.net/).
+You can [contribute your translation here](https://translate.wordpress.org/projects/wp-plugins/svg-support).
+New to Translating WordPress? Read through the [Translator Handbook](https://make.wordpress.org/polyglots/handbook/tools/glotpress-translate-wordpress-org/) to get started.
 
 == Additional Info ==
-**Idea Behind / Philosophy:** I needed an easy way to include SVG support in sites instead of having to copy and paste the code for each one. I found a [really cool snippet](http://stackoverflow.com/questions/11978995/how-to-change-color-of-svg-image-using-css-jquery-svg-image-replacement) of jQuery written by Drew Baker a while ago and have used it (modified for WordPress) a few times until I was inspired to build it all into a plugin for ease of use and to share with others. Now styling SVG elements is super easy :)
+**Idea Behind / Philosophy:** I needed an easy way to include SVG support in sites instead of having to copy and paste the code for each one. I also needed the ability to make odd shaped image links which SVG allows by embedding the links in the SVG file directly. I found a [really cool snippet](http://stackoverflow.com/questions/11978995/how-to-change-color-of-svg-image-using-css-jquery-svg-image-replacement) of jQuery written by Drew Baker a while ago and have used it (modified for WordPress) a few times until I was inspired to build it all into a plugin for ease of use and to share with others. Now styling SVG elements is super easy :)
 
 == Future Features ==
 * Option to choose which user ID can access the settings

@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsUtilsVersion = '6.6.09';
+var wppaJsUtilsVersion = '6.6.20';
 var wppaDebug;
 
 // Trim
@@ -347,7 +347,6 @@ wppaConsoleLog('Doing ReplaceSvg', 'force');
 		var imgURL = $img.attr('src');
 		var imgStyle = $img.attr('style');
 
-		imgStyle = imgStyle.replace( 'display:none', 'display:inline' );
 
 		jQuery.get(imgURL, function(data) {
 			// Get the SVG tag, ignore the rest
@@ -361,8 +360,11 @@ wppaConsoleLog('Doing ReplaceSvg', 'force');
 			if(typeof imgClass !== 'undefined') {
 				$svg = $svg.attr('class', imgClass+' replaced-svg');
 			}
-			// Add replaces image's style to the nes SVG
+			// Add replaces image's style to the new SVG
 			if ( typeof imgStyle !== 'undefined' ) {
+				if ( typeof( imgID ) == 'undefined' || ( imgID.substr( 0, 15 ) != 'wppa-ajax-spin-' && imgID.substr( 0, 15 ) != 'wppa-ovl-spin' ) ) {
+					imgStyle = imgStyle.replace( 'display:none', 'display:inline' );
+				}
 				$svg = $svg.attr('style', imgStyle);
 			}
 

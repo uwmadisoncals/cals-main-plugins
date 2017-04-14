@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.6.15
+* Version 6.6.21
 *
 */
 
@@ -18,7 +18,7 @@ function wppa_url( $arg ) {
 }
 
 // get url of thumb
-function wppa_get_thumb_url( $id, $system = 'flat', $x = '0', $y = '0' ) {
+function wppa_get_thumb_url( $id, $fix_poster_ext = true, $system = 'flat', $x = '0', $y = '0' ) {
 global $blog_id;
 
 	// Does photo exist?
@@ -54,14 +54,21 @@ global $blog_id;
 
 	if ( get_option('wppa_file_system') == 'flat' ) $system = 'flat';	// Have been converted, ignore argument
 	if ( get_option('wppa_file_system') == 'tree' ) $system = 'tree';	// Have been converted, ignore argument
-	if ( ! is_numeric($id) || $id < '1' ) wppa_dbg_msg('Invalid arg wppa_get_thumb_url('.$id.')', 'red');
+
 	if ( $system == 'tree' ) {
-		$url = WPPA_UPLOAD_URL.'/thumbs/'.wppa_expand_id($thumb['id']).'.'.$thumb['ext'].'?ver='.get_option('wppa_thumb_version', '1');
+		$result = WPPA_UPLOAD_URL . '/thumbs/' . wppa_expand_id( $thumb['id'] ) . '.' . $thumb['ext'];
 	}
 	else {
-		$url = WPPA_UPLOAD_URL.'/thumbs/'.$thumb['id'].'.'.$thumb['ext'].'?ver='.get_option('wppa_thumb_version', '1');
+		$result = WPPA_UPLOAD_URL . '/thumbs/' . $thumb['id'] . '.' . $thumb['ext'];
 	}
-	return $url;
+
+	if ( $fix_poster_ext ) {
+		$result = wppa_fix_poster_ext( $result, $thumb['id'] );
+	}
+
+	$result .= '?ver=' . get_option( 'wppa_thumb_version', '1' );
+
+	return $result;
 }
 
 // Bump thumbnail version number
@@ -70,19 +77,32 @@ function wppa_bump_thumb_rev() {
 }
 
 // get path of thumb
-function wppa_get_thumb_path( $id, $system = 'flat' ) {
+function wppa_get_thumb_path( $id, $fix_poster_ext = true, $system = 'flat' ) {
 
 	$thumb = wppa_cache_thumb( $id );
+	if ( ! $thumb ) {
+		return false;
+	}
 
-	if ( get_option('wppa_file_system') == 'flat' ) $system = 'flat';	// Have been converted, ignore argument
-	if ( get_option('wppa_file_system') == 'tree' ) $system = 'tree';	// Have been converted, ignore argument
-	if ( ! is_numeric($id) || $id < '1' ) wppa_dbg_msg('Invalid arg wppa_get_thumb_path('.$id.')', 'red');
-	if ( $system == 'tree' ) return WPPA_UPLOAD_PATH.'/thumbs/'.wppa_expand_id($thumb['id'], true).'.'.$thumb['ext'];
-	else return WPPA_UPLOAD_PATH.'/thumbs/'.$thumb['id'].'.'.$thumb['ext'];
+	if ( get_option( 'wppa_file_system' ) == 'flat' ) $system = 'flat';	// Has been converted, ignore argument
+	if ( get_option( 'wppa_file_system' ) == 'tree' ) $system = 'tree';	// Has been converted, ignore argument
+
+	if ( $system == 'tree' ) {
+		$result = WPPA_UPLOAD_PATH.'/thumbs/'.wppa_expand_id($thumb['id'], true).'.'.$thumb['ext'];
+	}
+	else {
+		$result = WPPA_UPLOAD_PATH.'/thumbs/'.$thumb['id'].'.'.$thumb['ext'];
+	}
+
+	if ( $fix_poster_ext ) {
+		$result = wppa_fix_poster_ext( $result, $thumb['id'] );
+	}
+
+	return $result;
 }
 
 // get url of a full sized image
-function wppa_get_photo_url( $id, $system = 'flat', $x = '0', $y = '0' ) {
+function wppa_get_photo_url( $id, $fix_poster_ext = true, $system = 'flat', $x = '0', $y = '0' ) {
 global $blog_id;
 global $wppa_supported_stereo_types;
 
@@ -97,7 +117,7 @@ global $wppa_supported_stereo_types;
 	$thumb = wppa_cache_thumb( $id );
 
 
-	if ( is_feed() && wppa_switch( 'feed_use_thumb') ) return wppa_get_thumb_url($id, $system);
+	if ( is_feed() && wppa_switch( 'feed_use_thumb') ) return wppa_get_thumb_url($id, true, $system);
 
 	// If in the cloud...
 	$for_sm = wppa( 'for_sm' ); 				// Social media do not accept cloud images
@@ -141,10 +161,10 @@ global $wppa_supported_stereo_types;
 
 		// Build the url
 		if ( $st == '_flat' ) {
-			$url = WPPA_UPLOAD_URL.'/stereo/'.$id.'-'.$st.'.jpg'.'?ver='.get_option('wppa_photo_version', '1');
+			$url = WPPA_UPLOAD_URL . '/stereo/' . $id . '-' . $st . '.jpg' . '?ver=' . get_option( 'wppa_photo_version', '1' );
 		}
 		else {
-			$url = WPPA_UPLOAD_URL.'/stereo/'.$id.'-'.$st.'-'.$sg.'.jpg'.'?ver='.get_option('wppa_photo_version', '1');
+			$url = WPPA_UPLOAD_URL . '/stereo/' . $id . '-' . $st . '-' . $sg . '.jpg' . '?ver=' . get_option( 'wppa_photo_version', '1' );
 		}
 
 		// Done
@@ -153,10 +173,21 @@ global $wppa_supported_stereo_types;
 
 	if ( get_option('wppa_file_system') == 'flat' ) $system = 'flat';	// Have been converted, ignore argument
 	if ( get_option('wppa_file_system') == 'tree' ) $system = 'tree';	// Have been converted, ignore argument
-	if ( ! is_numeric($id) || $id < '1' ) wppa_dbg_msg('Invalid arg wppa_get_photo_url('.$id.')', 'red');
 
-	if ( $system == 'tree' ) return WPPA_UPLOAD_URL.'/'.wppa_expand_id($thumb['id']).'.'.$thumb['ext'].'?ver='.get_option('wppa_photo_version', '1');
-	else return WPPA_UPLOAD_URL.'/'.$thumb['id'].'.'.$thumb['ext'].'?ver='.get_option('wppa_photo_version', '1');
+	if ( $system == 'tree' ) {
+		$result = WPPA_UPLOAD_URL . '/' . wppa_expand_id( $thumb['id'] ) . '.' . $thumb['ext'];
+	}
+	else {
+		$result = WPPA_UPLOAD_URL . '/' . $thumb['id'] . '.' . $thumb['ext'];
+	}
+
+	if ( $fix_poster_ext ) {
+		$result = wppa_fix_poster_ext( $result, $thumb['id'] );
+	}
+
+	$result .= '?ver=' . get_option( 'wppa_photo_version', '1' );
+
+	return $result;
 }
 
 // Bump Fullsize photo version number
@@ -165,16 +196,26 @@ function wppa_bump_photo_rev() {
 }
 
 // get path of a full sized image
-function wppa_get_photo_path( $id, $system = 'flat' ) {
+function wppa_get_photo_path( $id, $fix_poster_ext = true, $system = 'flat' ) {
 
 	$thumb = wppa_cache_thumb( $id );
+	if ( ! $thumb ) {
+		return false;
+	}
 
 	if ( get_option( 'wppa_file_system' ) == 'flat' ) $system = 'flat';	// Have been converted, ignore argument
 	if ( get_option( 'wppa_file_system' ) == 'tree' ) $system = 'tree';	// Have been converted, ignore argument
-	if ( ! is_numeric( $id ) || $id < '1' ) wppa_dbg_msg( 'Invalid arg wppa_get_photo_path(' . $id . ')', 'red' );
 
-	if ( $system == 'tree' ) return WPPA_UPLOAD_PATH . '/' . wppa_expand_id( $thumb['id'], true ) . '.' . $thumb['ext'];
-	else return WPPA_UPLOAD_PATH . '/' . $thumb['id'] . '.' . $thumb['ext'];
+	if ( $system == 'tree' ) {
+		$result = WPPA_UPLOAD_PATH . '/' . wppa_expand_id( $thumb['id'], true ) . '.' . $thumb['ext'];
+	}
+	else {
+		$result = WPPA_UPLOAD_PATH . '/' . $thumb['id'] . '.' . $thumb['ext'];
+	}
+	if ( $fix_poster_ext ) {
+		$result = wppa_fix_poster_ext( $result, $thumb['id'] );
+	}
+	return $result;
 }
 
 // Expand id to subdir chain for new file structure
@@ -871,13 +912,21 @@ global $wpdb;
 		$iret = wp_mail( 	$user->user_email,
 							$subject,
 							$content,
-							array( 'Content-Type: text/html' ),
+							array( 'Content-Type: text/html; charset=UTF-8' ),
 							'' );
 		if ( $iret ) return;
 
 		// Failed
-		echo 'Mail sending Failed';
-		echo 'Subj='.$subject.', content='.$content;
+		if ( ! wppa_is_cron() ) {
+			echo 'Mail sending Failed';
+			echo 'Subj='.$subject.', content='.$content;
+			wppa_process_failed_mail(	$user->user_email,
+										$subject,
+										$content,
+										array( 'Content-Type: text/html; charset=UTF-8' ),
+										'' );
+		}
+
 		return;
 	}
 
@@ -918,7 +967,7 @@ function wppa_send_mail( $to, $subj, $cont, $photo, $email = '' ) {
 	}
 
 	$headers 	= array( 	'From: noreply@' . $site,
-							'Content-Type: text/html'
+							'Content-Type: text/html; charset=UTF-8'
 						);
 
 	$message_part_1	.=
@@ -973,7 +1022,14 @@ function wppa_send_mail( $to, $subj, $cont, $photo, $email = '' ) {
 	if ( $iret ) return;
 
 	// Failed
-	echo 'Mail sending Failed';
+	if ( ! wppa_is_cron() ) {
+		echo 'Mail sending Failed';
+		wppa_process_failed_mail(	$to,
+									$subject,
+									$message_part_1 . $message_part_2 . $message_part_3,
+									$headers,
+									'' );
+	}
 
 }
 
@@ -1259,17 +1315,21 @@ global $wpdb;
 
 	// Really delete only as cron job
 	if ( ! wppa_is_cron() ) {
-		wppa_update_photo( array( 'id' => $photo, 'album' => '-9' ) );
-		wppa_schedule_cleanup( 'now' );
+		if ( $album > '0' ) {
+			$newalb = - ( $album + '9' );
+			wppa_update_photo( array( 'id' => $photo, 'album' => $newalb, 'modified' => time() ) );
+			wppa_mark_treecounts( $album );
+			wppa_schedule_cleanup( 'now' );
+		}
 		return;
 	}
 
-	// Get filename
-	$filename = $photoinfo['filename'];
+	// Restore orig album #
+	$album = - ( $album + '9' );
 
 	// Delete multimedia files
 	if ( wppa_is_multi( $photo ) ) {
-		$mmfile = wppa_strip_ext( wppa_get_photo_path( $photo ) );
+		$mmfile = wppa_strip_ext( wppa_get_photo_path( $photo, false ) );
 		$allsup = array_merge( $wppa_supported_audio_extensions, $wppa_supported_video_extensions );
 		foreach( $allsup as $mmext ) {
 			if ( is_file( $mmfile.'.'.$mmext ) ) {
@@ -1278,18 +1338,16 @@ global $wpdb;
 		}
 	}
 
+	// Delete sourcefile
+	wppa_delete_source( $photoinfo['filename'], $album);
+
 	// Delete fullsize image
 	$file = wppa_get_photo_path( $photo );
-	$file = wppa_fix_poster_ext( $file, $photo );
 	if ( is_file( $file ) ) unlink( $file );
 
 	// Delete thumbnail image
 	$file = wppa_get_thumb_path( $photo );
-	$file = wppa_fix_poster_ext( $file, $photo );
 	if ( is_file( $file ) ) unlink( $file );
-
-	// Delete sourcefile
-	wppa_delete_source($filename, $album);
 
 	// Delete index
 	wppa_index_remove('photo', $photo);
@@ -1308,8 +1366,6 @@ global $wpdb;
 		wppa_delete_from_cloudinary( $photo );
 	}
 
-	// Report
-	wppa_log('Cron', 'Photo # {b}'.$photo.'{/b} removed from system');
 }
 
 function wppa_microtime($txt = '') {
@@ -1489,11 +1545,19 @@ function wppa_stx_err($msg) {
 }
 
 
-function wppa_get_og_desc( $id ) {
+function wppa_get_og_desc( $id, $short = false ) {
 
-	$result = 	sprintf( __('See this image on %s', 'wp-photo-album-plus'), str_replace( '&amp;', __( 'and' , 'wp-photo-album-plus'), get_bloginfo( 'name' ) ) ) .
-				': ' .
-				strip_shortcodes( wppa_strip_tags( wppa_html( wppa_get_photo_desc( $id ) ), 'all' ) );
+	if ( $short ) {
+		$result = 	strip_shortcodes( wppa_strip_tags( wppa_html( wppa_get_photo_desc( $id ) ), 'all' ) );
+		if ( ! $result ) {
+			$result = str_replace( '&amp;', __( 'and' , 'wp-photo-album-plus'), get_bloginfo( 'name' ) );
+		}
+	}
+	else {
+		$result = 	sprintf( __('See this image on %s', 'wp-photo-album-plus'), str_replace( '&amp;', __( 'and' , 'wp-photo-album-plus'), get_bloginfo( 'name' ) ) ) .
+					': ' .
+					strip_shortcodes( wppa_strip_tags( wppa_html( wppa_get_photo_desc( $id ) ), 'all' ) );
+	}
 
 	$result = 	apply_filters( 'wppa_get_og_desc', $result );
 
@@ -1819,6 +1883,12 @@ global $wppa_supported_photo_extensions;
 	$supext = array_merge( $wppa_supported_photo_extensions, $temp );
 
 	$thumb = wppa_cache_thumb( $id );
+	$album = $thumb['album'];
+
+	// Trashed?
+	if ( $album < '0' ) {
+		$album = - ( $album + '9' );
+	}
 
 	$multi = is_multisite();
 	if ( $multi && ! WPPA_MULTISITE_GLOBAL ) {
@@ -1827,7 +1897,7 @@ global $wppa_supported_photo_extensions;
 	else {
 		$blog = '';
 	}
-	$source_path = wppa_opt( 'source_dir' ).$blog.'/album-'.$thumb['album'].'/'.$thumb['filename'];
+	$source_path = wppa_opt( 'source_dir' ).$blog.'/album-'.$album.'/'.$thumb['filename'];
 	if ( wppa_is_multi( $id ) ) {
 		$path = wppa_strip_ext( $source_path );
 		foreach ( $supext as $ext ) {
@@ -1848,7 +1918,6 @@ function wppa_get_hires_url( $id ) {
 	// video? return the poster url
 	if ( wppa_is_video( $id ) || wppa_has_audio( $id ) ) {
 		$url = wppa_get_photo_url( $id );
-		$url = wppa_fix_poster_ext( $url, $id );
 		$temp = explode( '?', $url );
 		$url = $temp['0'];
 		return $url;
@@ -1892,13 +1961,13 @@ function wppa_get_hires_url( $id ) {
 	return $temp['0'];
 }
 function wppa_get_lores_url( $id ) {
-	$lores_url = wppa_fix_poster_ext( wppa_get_photo_url( $id ), $id );
+	$lores_url = wppa_get_photo_url( $id );
 	$temp = explode( '?', $lores_url );
 	$lores_url = $temp['0'];
 	return $lores_url;
 }
 function wppa_get_tnres_url( $id ) {
-	$tnres_url = wppa_fix_poster_ext( wppa_get_thumb_url( $id ), $id );
+	$tnres_url = wppa_get_thumb_url( $id );
 	$temp = explode( '?', $tnres_url );
 	$tnres_url = $temp['0'];
 	return $tnres_url;
@@ -2348,11 +2417,31 @@ global $wpdb;
 }
 
 function wppa_strip_ext( $file ) {
-	return preg_replace('/\.[^.]*$/', '', $file);
+
+	$strlen = strlen( $file );
+	$dotpos = strrpos( $file, '.' );
+	if ( $dotpos > ( $strlen - 6 ) ) {
+		$result = substr( $file, 0, $dotpos );
+	}
+	else {
+		$result = $file;
+	}
+
+	return $result; // preg_replace('/\.[^.]*$/', '', $file);
 }
 
 function wppa_get_ext( $file ) {
-	return str_replace( wppa_strip_ext( $file ).'.', '', $file );
+
+	$strlen = strlen( $file );
+	$dotpos = strrpos( $file, '.' );
+	if ( $dotpos > ( $strlen - 6 ) ) {
+		$result = substr( $file, $dotpos + 1 );
+	}
+	else {
+		$result = '';
+	}
+
+	return $result; // str_replace( wppa_strip_ext( $file ).'.', '', $file );
 }
 
 function wppa_encode_uri_component( $xstr ) {
@@ -2743,6 +2832,12 @@ function wppa_is_multi( $id ) {
 
 function wppa_fix_poster_ext( $fileorurl, $id ) {
 
+	// Has it extension .xxx ?
+	if ( substr( $fileorurl, -4 ) != '.xxx' ) {
+		return $fileorurl;
+	}
+
+	// Get available ext
 	$poster_ext = wppa_get_poster_ext( $id );
 
 	// If found, replace extension to ext of existing file
@@ -2774,7 +2869,7 @@ function wppa_get_poster_ext( $id ) {
 global $wppa_supported_photo_extensions;
 
 	// Init
-	$path 		= wppa_get_photo_path( $id );
+	$path 		= wppa_get_photo_path( $id, false );
 	$raw_path 	= wppa_strip_ext( $path );
 
 	// Find existing photofiles
@@ -3338,7 +3433,7 @@ global $wppa_supported_photo_extensions;
 	else {
 
 		// getimagesize on a non imagefile produces a php warning
-		$result = is_array( getimagesize( $url ) );
+		$result = is_array( @ getimagesize( $url ) );
 	}
 
 	// Done
@@ -3363,11 +3458,9 @@ function wppa_serialize( $array ) {
 
 function wppa_get_like_title_a( $id ) {
 global $wpdb;
-//static $c;
-//wppa_log('obs', 'wppa_get_like_title_a', true);
-//$c++;
+
 	$me 	= wppa_get_user();
-	$likes 	= wppa_get_photo_item( $id, 'rating_count'); //$wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_RATING . "` WHERE `photo` = $id" );
+	$likes 	= wppa_get_photo_item( $id, 'rating_count');
 	$mylike = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_RATING . "` WHERE `photo` = $id AND `user` = '$me'" );
 
 	if ( $mylike ) {
@@ -3405,5 +3498,127 @@ function wppa_print_tree( $path ) {
 		if ( is_dir( $file ) ) {
 			wppa_print_tree( $file );
 		}
+	}
+}
+
+function wppa_process_failed_mail( $to = '', $subject = '', $message = '', $headers = '', $att = '' ) {
+
+	// Ignore mails that lack essential data
+	if ( ! $to || ! $subject || ! $message ) {
+		return;
+	}
+
+	// Log mail failed
+	wppa_log( 'Err', 'Failed mail. To = ' . ( is_array( $to ) ? implode( '|', $to ) : $to ) . ', Subject = ' . $subject . ', Message = ' . $message );
+
+	// Compute mail id
+	$id = md5( ( is_array( $to ) ? implode( '|', $to ) : $to ) . $subject . $message );
+
+	// Get stack of failed mails
+	$failed_mails = get_option( 'wppa_failed_mails' );
+
+	// If no failed mails yet, create array
+	if ( ! is_array( $failed_mails ) ) {
+		$failed_mails = array();
+	}
+
+	// See if this mail appears in the failed mails list
+	$found = false;
+	foreach( array_keys( $failed_mails ) as $key ) {
+		if ( $id == $key ) {
+			$found = true;
+		}
+	}
+
+	// Found? do nothing
+	if ( $found ) {
+		return;
+	}
+
+	// Not found, add it
+	$failed_mails[$id] = array( 'to' 		=> $to,
+								'subj' 		=> $subject,
+								'message' 	=> $message,
+								'headers' 	=> $headers,
+								'att' 		=> $att,
+								'retry' 	=> wppa_opt( 'retry_mails' ),
+								);
+
+	// Store list
+	update_option( 'wppa_failed_mails', $failed_mails );
+
+}
+
+// Returns available memory in bytes
+function wppa_memry_limit() {
+
+	// get memory limit
+	$memory_limit = 0;
+	$memory_limini = wppa_convert_bytes( ini_get( 'memory_limit' ) );
+	$memory_limcfg = wppa_convert_bytes( get_cfg_var( 'memory_limit' ) );
+
+	// find the smallest not being zero
+	if ( $memory_limini && $memory_limcfg ) $memory_limit = min( $memory_limini, $memory_limcfg );
+	elseif ( $memory_limini ) $memory_limit = $memory_limini;
+	else $memory_limit = $memory_limcfg;
+
+	// No data, return 64MB
+	if ( ! $memory_limit ) {
+		return 64 * 1024 * 1024;
+	}
+
+	return $memory_limit;
+}
+
+// Create qr code cache and return its url
+function wppa_create_qrcode_cache( $qrsrc ) {
+
+	// Make sure the data portion is url encoded
+	$temp = explode( 'data=', $qrsrc );
+	$qrsrc = $temp[0] . 'data=' . urlencode( urldecode( $temp[1] ) );
+
+	// Anything to do here?
+	if ( ! wppa_switch( 'qr_cache' ) ) {
+		return str_replace( 'format=svg', 'format=png', $qrsrc );
+	}
+
+	// Make sure we have .../uploads/wppa/qr
+	if ( ! is_dir( WPPA_UPLOAD_PATH . '/qr' ) ) {
+		mkdir( WPPA_UPLOAD_PATH . '/qr' );
+	}
+
+	// In cache already?
+	$key = md5( $qrsrc );
+	if ( is_file( WPPA_UPLOAD_PATH . '/qr/' . $key . '.svg' ) ) {
+
+		// Bump cache found counter
+		update_option( 'wppa_qr_cache_hits', get_option( 'wppa_qr_cache_hits', 0 ) + 1 );
+		return WPPA_UPLOAD_URL . '/qr/' . $key . '.svg';
+	}
+
+	// Bump cache miss counter
+	update_option( 'wppa_qr_cache_miss', get_option( 'wppa_qr_cache_miss', 0 ) + 1 );
+
+	// Catch the qr image
+	$curl = curl_init();
+	curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
+	curl_setopt( $curl, CURLOPT_URL, $qrsrc );
+	$contents = curl_exec( $curl );
+	curl_close( $curl );
+
+	// Save the image
+	if ( strlen( $contents ) > 1000 ) {
+		$file = fopen( WPPA_UPLOAD_PATH . '/qr/' . $key . '.svg', 'w' );
+		if ( $file ) {
+			fwrite( $file, $contents, strlen( $contents ) );
+			fclose( $file );
+		}
+	}
+
+	if ( is_file( WPPA_UPLOAD_PATH . '/qr/' . $key . '.svg' ) ) {
+		return WPPA_UPLOAD_URL . '/qr/' . $key . '.svg';
+	}
+	else {
+		return $qrsrc;
 	}
 }

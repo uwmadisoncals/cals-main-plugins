@@ -3,7 +3,7 @@
 // Conatins lightbox modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaLightboxVersion = '6.6.15';
+var wppaLightboxVersion = '6.6.20';
 
 // Global inits
 var wppaNormsBtnOpac 		= 0.75;
@@ -324,7 +324,9 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 	wppaOvlCurIdx = idx;
 
 	// Show spinner
-	jQuery( '#wppa-overlay-sp' ).css( { visibility: 'visible' } );
+	if ( wppaOvlFirst ) {
+		jQuery( "#wppa-ovl-spin" ).fadeIn( 1500 );
+	}
 
 	// Find handy switches
 	wppaIsVideo 	= wppaOvlVideoHtmls[idx] != '';
@@ -753,7 +755,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 						wppaOvlTitles[idx] +
 					'</div>';
 				'</div>';
-
+alert(html);
 		// Insert the html
 		jQuery( '#wppa-overlay-ic' ).html( html );
 
@@ -898,7 +900,7 @@ wppaConsoleLog( 'wppaOvlSize' );
 	else {
 
 		// Remove spinner
-		jQuery( '#wppa-overlay-sp' ).css( { visibility: 'hidden' } );
+		jQuery( '#wppa-ovl-spin' ).stop().fadeOut();
 		wppaConsoleLog( 'Done '+wppaOvlIdx );
 		wppaOvlFirst = false;
 	}
@@ -1002,7 +1004,7 @@ wppaConsoleLog( 'wppaOvlFormatFull '+wppaOvlMode );
 	jQuery( '#wppa-ovl-full-bg' ).css({overflow:Overflow});
 	jQuery( '#wppa-ovl-full-bg' ).scrollTop( scrollTop );
 	jQuery( '#wppa-ovl-full-bg' ).scrollLeft( scrollLeft );
-	jQuery( '#wppa-overlay-sp' ).css({visibility:'hidden'});
+	jQuery( '#wppa-ovl-spin' ).stop().fadeOut();
 
 	return true;	// Done!
 }
@@ -1182,12 +1184,8 @@ wppaConsoleLog( 'wppaOvlHide' );
 	wppaOvlRunning = false;
 	wppaOvlMode = wppaOvlModeInitial;
 	wppaNormsBtnOpac = 0.75;
-	jQuery( '#wppa-overlay-sp' ).css({ visibility: 'hidden' });
+	jQuery( '#wppa-ovl-spin' ).stop().fadeOut();
 
-	// Remove orientationchange handler if mobile
-//	if ( wppaIsMobile ) {
-//		window.removeEventListener( 'orientationchange', wppaDoOnOrientationChange );
-//	}
 }
 
 // Perform onclick action

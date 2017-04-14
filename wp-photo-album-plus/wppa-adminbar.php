@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * enhances the admin bar with wppa+ menu
-* version 6.6.13
+* version 6.6.16
 *
 */
 
@@ -47,7 +47,7 @@ function wppa_admin_bar_menu() {
 			'title'  => __( 'Upload Photos', 'wp-photo-album-plus' ),
 			'href'   => admin_url( 'admin.php?page=wppa_upload_photos' )
 		);
-		if ( ! current_user_can( 'wppa_admin' ) ) {
+		if ( ! current_user_can( 'wppa_admin' ) && wppa_opt( 'upload_edit' ) != 'none' ) {
 			$menu_items['edit'] = array(
 				'parent' => $wppaplus,
 				'title'  => __( 'Edit Photos' , 'wp-photo-album-plus' ),
@@ -93,7 +93,7 @@ function wppa_admin_bar_menu() {
 	if ( current_user_can( 'wppa_comments' ) ) {
 		$menu_items['comments'] = array(
 			'parent' => $wppaplus,
-			'title'  => __( 'Comments', 'wp-photo-album-plus' ).$com_pending,
+			'title'  => __( 'Comments', 'wp-photo-album-plus' ) . $com_pending,
 			'href'   => admin_url( 'admin.php?page=wppa_manage_comments' )
 		);
 	}

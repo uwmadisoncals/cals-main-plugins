@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 6.6.08
+* Version 6.6.18
 *
 */
 
@@ -72,8 +72,8 @@ function wppa_get_picture_html( $args ) {
 	// Get other data
 	$link 		= wppa_get_imglnk_a( $type, $id );
 	$isthumb 	= strpos( $type, 'thumb' ) !== false;
-	$file 		= wppa_fix_poster_ext( $isthumb ? wppa_get_thumb_path( $id ) : wppa_get_photo_path( $id ), $id );
-	$href 		= wppa_fix_poster_ext( $isthumb ? wppa_get_thumb_url( $id ) : wppa_get_photo_url( $id ), $id );
+	$file 		= $isthumb ? wppa_get_thumb_path( $id ) : wppa_get_photo_path( $id );
+	$href 		= $isthumb ? wppa_get_thumb_url( $id ) : wppa_get_photo_url( $id );
 	$autocol 	= wppa( 'auto_colwidth' ) || ( wppa( 'fullsize' ) > 0 && wppa( 'fullsize' ) <= 1.0 );
 	$title 		= $link ? esc_attr( $link['title'] ) : esc_attr( stripslashes( wppa_get_photo_name( $id ) ) );
 	$alt 		= wppa_get_imgalt( $id );

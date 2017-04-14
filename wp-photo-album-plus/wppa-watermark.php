@@ -2,7 +2,7 @@
 /* wppa-watermark.php
 *
 * Functions used for the application of watermarks
-* Version 6.6.12
+* Version 6.6.18
 *
 */
 
@@ -124,7 +124,6 @@ function wppa_create_textual_watermark_file( $args ) {
 		if ( ! $image_height ) $image_height = 1000;
 	}
 	else {
-//		$temp = getimagesize( wppa_get_photo_path( $id ) );
 		$temp = wppa_get_imagexy( $id );
 		if ( ! is_array( $temp ) ) {
 			wppa_log( 'Error', 'Trying to apply a watermark on a non image file. Id = '.$id );
@@ -363,6 +362,27 @@ function wppa_get_water_file_and_pos( $id ) {
 	return $result;
 }
 
+function wppa_does_thumb_need_watermark( $id ) {
+
+	// Watermarks enabled?
+	if ( ! wppa_switch( 'watermark_on' ) ) {
+		return false;
+	}
+
+	// Watermarks on thumbs?
+	if ( ! wppa_switch( 'watermark_thumbs' ) ) {
+		return false;
+	}
+
+	// If setting is ---none--- no watermark either.
+	$temp = wppa_get_water_file_and_pos( $id );
+	if ( ! $temp['file'] || basename( $temp['file'] ) == '--- none ---' || ! is_file( $temp['file'] ) ) {
+		return false;	// No watermark this time
+	}
+
+	// Yes, we need a wm on thumb
+	return true;
+}
 
 function wppa_add_watermark( $id ) {
 
@@ -394,9 +414,7 @@ function wppa_add_watermark( $id ) {
 
 	// Open the photo file
 	$file = wppa_get_photo_path( $id );
-	if ( wppa_is_video( $id ) ) {
-		$file = wppa_fix_poster_ext( $file, $id );
-	}
+
 	if ( ! is_file( $file ) ) return false;	// File gone
 	$photosize = getimagesize( $file );
 	if ( ! is_array( $photosize ) ) {

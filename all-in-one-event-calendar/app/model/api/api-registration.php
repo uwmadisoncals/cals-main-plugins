@@ -25,14 +25,18 @@ class Ai1ec_Api_Registration extends Ai1ec_Api_Abstract {
 	 * @return object Response body in JSON.
 	 */
 	public function signin() {
-		$body['email']    = $_POST['ai1ec_email'];
-		$body['password'] = $_POST['ai1ec_password'];
-		$response         = $this->request_api( 'POST', AI1EC_API_URL . 'auth/authenticate', json_encode( $body ), true, array( 'Authorization' => null ) );
+		$body['email']         = $_POST['ai1ec_email'];
+		$body['password']      = $_POST['ai1ec_password'];
+		$body['calendar_type'] = $_POST['ai1ec_calendar_type'];
+		$response              = $this->request_api( 'POST', AI1EC_API_URL . 'auth/authenticate', json_encode( $body ), true, array( 'Authorization' => null ) );
 		if ( $this->is_response_success( $response ) ) {
 			$response_body = (array) $response->body;
-			$this->save_ticketing_settings( $response_body['message'], true, $response_body['auth_token'], $this->_find_user_calendar(), $body['email'] );
+			// Save calendar ID as 0 first, otherwise the auth data won't be saved in the database before creating/finding the calendar
+			$this->save_ticketing_settings( $response_body['message'], true, $response_body['auth_token'], 0, $body['email'] );
+			// Now save the calendar ID
+			$this->save_calendar_id( $this->_get_ticket_calendar() );
 			$this->has_payment_settings();
-			$this->get_subscriptions(true);
+			$this->get_subscriptions( true );
 			$this->sync_api_settings();
 		} else {
 			$error_message = $this->save_error_notification( $response, __( 'We were unable to Sign you In for Time.ly Network', AI1EC_PLUGIN_NAME ) );
@@ -50,11 +54,18 @@ class Ai1ec_Api_Registration extends Ai1ec_Api_Abstract {
 		$body['password']              = $_POST['ai1ec_password'];
 		$body['password_confirmation'] = $_POST['ai1ec_password_confirmation'];
 		$body['phone']                 = $_POST['ai1ec_phone'];
+		$body['calendar_type']         = $_POST['ai1ec_calendar_type'];
 		$body['terms']                 = $_POST['ai1ec_terms'];
 		$response                      = $this->request_api( 'POST', AI1EC_API_URL . 'auth/register', json_encode( $body ), true );
 		if ( $this->is_response_success( $response ) ) {
 			$response_body = (array) $response->body;
-			$this->save_ticketing_settings( $response_body['Registration'], true, $response_body['auth_token'] , $this->_create_calendar(), $body['email'] );
+			// Save calendar ID as 0 first, otherwise the auth data won't be saved in the database before creating the calendar
+			$this->save_ticketing_settings( $response_body['Registration'], true, $response_body['auth_token'] , 0, $body['email'] );
+			// Now save the calendar ID
+			$this->save_calendar_id( $this->_create_calendar() );
+			$this->has_payment_settings();
+			$this->get_subscriptions( true );
+			$this->sync_api_settings();
 		} else {
 			$error_message = $this->save_error_notification( $response, __( 'We were unable to Sign you Up for Time.ly Network', AI1EC_PLUGIN_NAME ) );
 			$this->save_ticketing_settings( $error_message, false, '', 0, null );
@@ -66,7 +77,7 @@ class Ai1ec_Api_Registration extends Ai1ec_Api_Abstract {
 	 * @return object Response body in JSON.
 	 */
 	protected function availability() {
-		$api_features = get_site_transient( 'ai1ec_api_features' );
+		$api_features = get_transient( 'ai1ec_api_features' );
 
 		if ( false === $api_features || ( defined( 'AI1EC_DEBUG' ) && AI1EC_DEBUG ) ) {
 			$response = $this->request_api( 'GET', AI1EC_API_URL . 'feature/availability', null, true );
@@ -79,7 +90,7 @@ class Ai1ec_Api_Registration extends Ai1ec_Api_Abstract {
 
 			// Save for 5 minutes
 			$minutes = 5;
-			set_site_transient( 'ai1ec_api_features', $api_features, $minutes * 60 );
+			set_transient( 'ai1ec_api_features', $api_features, $minutes * 60 );
 		}
 
 		return $api_features;
@@ -103,7 +114,7 @@ class Ai1ec_Api_Registration extends Ai1ec_Api_Abstract {
 	 * @return object Response body in JSON.
 	 */
 	protected function settings() {
-		$calendar_settings = get_site_transient( 'ai1ec_calendar_settings' );
+		$calendar_settings = get_transient( 'ai1ec_calendar_settings' );
 
 		if ( false === $calendar_settings || ( defined( 'AI1EC_DEBUG' ) && AI1EC_DEBUG ) ) {
 			$response = $this->request_api( 'GET', AI1EC_API_URL . 'calendars/' . $this->_get_ticket_calendar() . '/settings', null, true );
@@ -116,7 +127,7 @@ class Ai1ec_Api_Registration extends Ai1ec_Api_Abstract {
 
 			// Save for 5 minutes
 			$minutes = 5;
-			set_site_transient( 'ai1ec_calendar_settings', $calendar_settings, $minutes * 60 );
+			set_transient( 'ai1ec_calendar_settings', $calendar_settings, $minutes * 60 );
 		}
 
 		return $calendar_settings;

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 6.6.09
+* Version 6.6.18
 *
 */
 
@@ -267,7 +267,8 @@ global $wpdb;
 					'videoy' 			=> '0',
 					'scheduledtm' 		=> $args['album'] ? $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledtm` FROM `".WPPA_ALBUMS."` WHERE `id` = %s", $args['album'] ) ) : '',
 					'custom'			=> '',
-					'crypt' 			=> wppa_get_unique_photo_crypt()
+					'crypt' 			=> wppa_get_unique_photo_crypt(),
+					'magickstack' 		=> '',
 					) );
 
 	if ( $args['scheduledtm'] ) $args['status'] = 'scheduled';
@@ -300,9 +301,10 @@ global $wpdb;
 																	`videoy`,
 																	`scheduledtm`,
 																	`custom`,
-																	`crypt`
+																	`crypt`,
+																	`magickstack`
 																)
-														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
+														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
 																$args['id'],
 																$args['album'],
 																$args['ext'],
@@ -329,11 +331,19 @@ global $wpdb;
 																$args['videoy'],
 																$args['scheduledtm'],
 																$args['custom'],
-																$args['crypt']
+																$args['crypt'],
+																$args['magickstack']
 														);
 	$iret = $wpdb->query($query);
 
-	if ( $iret ) return $args['id'];
+	if ( $iret ) {
+
+		// Update index
+		wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+
+		return $args['id'];
+	}
+
 	else return false;
 }
 
@@ -419,6 +429,10 @@ global $wpdb;
 
 	if ( $iret ) {
 		wppa_invalidate_treecounts( $args['id'] );
+
+		// Update index
+		wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
+
 		return $args['id'];
 	}
 

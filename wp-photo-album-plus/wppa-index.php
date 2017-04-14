@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version 6.6.13
+* Version 6.6.16
 *
 *
 */
@@ -154,7 +154,7 @@ global $pcount;
 //
 // @1: string. Any test string may contain all kind of garbage.
 //
-function wppa_index_raw_to_words( $xtext ) {
+function wppa_index_raw_to_words( $xtext, $no_skips = false ) {
 
 	// Find chars to be replaced by delimiters (spaces)
 	$ignore = array( 	'"', "'", '`', '\\', '>', '<', ',', ':', ';', '!', '?', '=', '_',
@@ -169,7 +169,7 @@ function wppa_index_raw_to_words( $xtext ) {
 	}
 
 	// Find words to skip
-	$skips = get_option( 'wppa_index_skips', array() );
+	$skips = $no_skips ? array() : get_option( 'wppa_index_skips', array() );
 
 	// Find minimum token length
 	$minlen = wppa_opt( 'search_min_length' );
@@ -245,7 +245,7 @@ function wppa_index_raw_to_words( $xtext ) {
 					$fract = trim( $fract );
 					$fract = trim( $fract, " ./-" );
 
-					// If lare enough and not a word to skip, use it: copy to array $result
+					// If large enough and not a word to skip, use it: copy to array $result
 					if ( strlen( $fract ) >= $minlen && ! in_array( $fract, $skips ) ) {
 						$result[] = $fract;
 					}
@@ -436,7 +436,7 @@ function wppa_index_compute_skips() {
 
 	$user_skips 	= wppa_opt( 'search_user_void' );
 	$system_skips 	= 'w#name,w#filename,w#owner,w#displayname,w#id,w#tags,w#cats,w#timestamp,w#modified,w#views,w#amx,w#amy,w#amfs,w#url,w#hrurl,w#tnurl,w#pl';
-	$words 			= wppa_index_raw_to_words( wppa_opt( 'newphoto_description' ) . ' ' . $user_skips . ' ' . $system_skips, 'noskips' );
+	$words 			= wppa_index_raw_to_words( wppa_opt( 'newphoto_description' ) . ',' . $user_skips . ',' . $system_skips, 'noskips' );
 	sort( $words );
 
 	$result = array();

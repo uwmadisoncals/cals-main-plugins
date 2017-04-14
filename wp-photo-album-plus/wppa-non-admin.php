@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.6.15
+* Version 6.6.20
 *
 */
 
@@ -84,14 +84,56 @@ global $wpdb;
 		wppa( 'for_sm', true );
 		$imgurl = wppa_get_photo_url( $id );
 		wppa( 'for_sm', false );
-		if ( wppa_is_video( $id ) ) {
-			$imgurl = wppa_fix_poster_ext( $imgurl, $id );
-		}
 	}
 	else {
 		$imgurl = '';
 	}
 	if ( $id ) {
+
+		if ( wppa_switch( 'share_twitter' ) && wppa_opt( 'twitter_account' ) ) {
+			$thumb = wppa_cache_thumb( $id );
+
+			// Twitter wants at least 280px in width, and at least 150px in height
+			if ( $thumb ) {
+				$x = wppa_get_photo_item( $id, 'photox' );
+				$y = wppa_get_photo_item( $id, 'photoy' );
+			}
+			if ( $thumb && $x >= 280 && $y >= 150 ) {
+				$title  = wppa_get_photo_name( $id );
+				$desc 	= wppa_get_og_desc( $id, 'short' );
+				$url 	= ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+				$site   = get_bloginfo('name');
+
+				echo '
+<!-- WPPA+ Twitter Share data -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="' . wppa_opt( 'twitter_account' ) . '">
+<meta name="twitter:creator" content="' . wppa_opt( 'twitter_account' ) . '">
+<meta name="twitter:title" content="' . esc_attr( sanitize_text_field( $title ) ) . '">
+<meta name="twitter:text:description" content="' . esc_attr( sanitize_text_field( $desc ) ) . '">
+<meta name="twitter:image" content="' . esc_url( sanitize_text_field( $imgurl ) ) . '">
+<!-- WPPA+ End Twitter Share data -->
+';
+			}
+			elseif ( $thumb && $x >= 120 && $y >= 120 ) {
+				$title  = wppa_get_photo_name( $id );
+				$desc 	= wppa_get_og_desc( $id, 'short' );
+				$url 	= ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+				$site   = get_bloginfo('name');
+
+				echo '
+<!-- WPPA+ Twitter Share data -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="' . wppa_opt( 'twitter_account' ) . '">
+<meta name="twitter:title" content="' . esc_attr( sanitize_text_field( $title ) ) . '">
+<meta name="twitter:text:description" content="' . esc_attr( sanitize_text_field( $desc ) ) . '">
+<meta name="twitter:image" content="' . esc_url( sanitize_text_field( $imgurl ) ) . '">
+<!-- WPPA+ End Twitter Share data -->
+';
+
+			}
+		}
+
 		if ( wppa_switch( 'og_tags_on' ) ) {
 			$thumb = wppa_cache_thumb( $id );
 			if ( $thumb ) {
@@ -122,49 +164,7 @@ echo '
 ';
 			}
 		}
-		if ( wppa_switch( 'share_twitter' ) && wppa_opt( 'twitter_account' ) ) {
-			$thumb = wppa_cache_thumb( $id );
 
-			// Twitter wants at least 280px in width, and at least 150px in height
-			if ( $thumb ) {
-				$x = wppa_get_photo_item( $id, 'photox' );
-				$y = wppa_get_photo_item( $id, 'photoy' );
-			}
-			if ( $thumb && $x >= 280 && $y >= 150 ) {
-				$title  = wppa_get_photo_name( $id );
-				$desc 	= wppa_get_og_desc( $id );
-				$url 	= ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-				$site   = get_bloginfo('name');
-
-				echo '
-<!-- WPPA+ Twitter Share data -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="' . wppa_opt( 'twitter_account' ) . '">
-<meta name="twitter:creator" content="' . wppa_opt( 'twitter_account' ) . '">
-<meta name="twitter:title" content="' . esc_attr( sanitize_text_field( $title ) ) . '">
-<meta name="twitter:description" content="' . esc_attr( sanitize_text_field( $desc ) ) . '">
-<meta name="twitter:image" content="' . esc_url( sanitize_text_field( $imgurl ) ) . '">
-<!-- WPPA+ End Twitter Share data -->
-';
-			}
-			elseif ( $thumb && $x >= 120 && $y >= 120 ) {
-				$title  = wppa_get_photo_name( $id );
-				$desc 	= wppa_get_og_desc( $id );
-				$url 	= ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-				$site   = get_bloginfo('name');
-
-				echo '
-<!-- WPPA+ Twitter Share data -->
-<meta name="twitter:card" content="summary">
-<meta name="twitter:site" content="' . wppa_opt( 'twitter_account' ) . '">
-<meta name="twitter:title" content="' . esc_attr( sanitize_text_field( $title ) ) . '">
-<meta name="twitter:description" content="' . esc_attr( sanitize_text_field( $desc ) ) . '">
-<meta name="twitter:image" content="' . esc_url( sanitize_text_field( $imgurl ) ) . '">
-<!-- WPPA+ End Twitter Share data -->
-';
-
-			}
-		}
 	}
 
 	// To make sure we are on a page that contains at least [wppa] we check for Get var 'wppa-album'.
@@ -488,22 +488,43 @@ global $wppa_session;
 		'</div>';
 
 		// The Spinner image
+		switch( wppa_opt( 'icon_corner_style' ) ) {
+			case 'none':
+				$bradius = '0';
+				break;
+			case 'light':
+				$bradius = '12';
+				break;
+			case 'medium':
+				$bradius = '24';
+				break;
+			case 'heavy':
+				$bradius = '60';
+				break;
+		}
+
 		echo
 		'<img' .
-			' id="wppa-overlay-sp"' .
+			' id="wppa-ovl-spin"' .
 			' alt="spinner"' .
+			( wppa_is_ie() ? '' : ' class="wppa-svg"' ) .
 			' style="' .
+				'width:120px;' .
+				'height:120px;' .
 				'position:fixed;' .
 				'top:50%;' .
-				'margin-top:-16px;' .
+				'margin-top:-60px;' .
 				'left:50%;' .
-				'margin-left:-16px;' .
+				'margin-left:-60px;' .
 				'z-index:100100;' .
 				'opacity:1;' .
-				'visibility:hidden;' .
+				'display:none;' .
+				'fill:' . wppa_opt( 'ovl_svg_color' ) . ';' .
+				'background-color:' . wppa_opt( 'ovl_svg_bg_color' ) . ';' .
 				'box-shadow:none;' .
+				'border-radius:' . $bradius . 'px;' .
 				'"' .
-			' src="'.wppa_get_imgdir().'loading.gif"' .
+			' src="' . wppa_get_imgdir() . ( wppa_is_ie() ? 'loading.gif' : 'loader.svg' ) . '"' .
 		' />';
 
 		// The init vars
@@ -569,7 +590,8 @@ global $wppa_session;
 	echo '
 <!-- Nonce for various wppa actions -->';
 	// Nonce field for Ajax bump view counter from lightbox, and rating
-	wp_nonce_field('wppa-check' , 'wppa-nonce', false, true);
+	wp_nonce_field( 'wppa-check', 'wppa-nonce', false, true );
+	wp_nonce_field( 'wppa-qr-nonce', 'wppa-qr-nonce', false, true );
 
 	echo '
 <!-- Do user upload -->';

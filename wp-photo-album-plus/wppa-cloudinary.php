@@ -1,7 +1,7 @@
 <?php
 /* Only loads when php version >= 5.3
 *
-* Version 6.4.10
+* Version 6.6.18
 *
 */
 
@@ -52,9 +52,15 @@ function wppa_upload_to_cloudinary( $id ) {
 		$file 	= wppa_get_photo_path( $id );
 	}
 
+	// If ImageMagick magically edited, upload the display file
+	if ( wppa_get_photo_item( $id, 'magickstack' ) ) {
+		$file 	= wppa_get_photo_path( $id );
+	}
+
 	// Doit
 	if ( is_file ( $file ) ) {
 		\Cloudinary\Uploader::upload( $file, $args );
+		wppa_log( 'Dbg', $file . ' uploaded to Cloudinary' );
 	}
 
 }

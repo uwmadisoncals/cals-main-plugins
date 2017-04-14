@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.6.15
+* Version 6.6.21
 *
 */
 
@@ -49,6 +49,24 @@ global $wppa_log_file;
 	$wppa_action = $_REQUEST['wppa-action'];
 
 	switch ( $wppa_action ) {
+		case 'getqrcode':
+			wppa_log( 'obs', 'Ajax getqrcode for '.$_REQUEST['url'] );
+			$nonce 	= $_REQUEST['wppa-qr-nonce'];
+			if ( ! wp_verify_nonce( $nonce, 'wppa-qr-nonce' ) ) {
+				die( 'Security check falure' );
+			}
+			$url = strip_tags( $_REQUEST['url'] );
+			$src = 		'http' . ( is_ssl() ? 's' : '' ) . '://api.qrserver.com/v1/create-qr-code/' .
+						'?format=svg' .
+						'&size=' . wppa_opt( 'qr_size' ) . 'x' . wppa_opt( 'qr_size' ) .
+						'&color=' . trim( wppa_opt( 'qr_color' ), '#' ) .
+						'&bgcolor=' . trim( wppa_opt( 'qr_bgcolor' ), '#' ) .
+						'&data=' . $url;
+
+			$result = wppa_create_qrcode_cache( $src );
+			echo $result;
+			wppa_exit();
+			break;
 		case 'gettogo':
 			$slug 	= 	strip_tags( $_REQUEST['slug'] );
 			$result = 	get_option( $slug . '_togo', '' ) .
@@ -500,7 +518,6 @@ global $wppa_log_file;
 			else {
 				$source = wppa_get_photo_path( $photo );
 			}
-			$source = wppa_fix_poster_ext( $source, $photo );
 
 			// Add photo to zip
 			$wppa_zip = new ZipArchive;
@@ -572,7 +589,6 @@ global $wppa_log_file;
 				else {
 					$source = wppa_get_photo_path( $photo );
 				}
-				$source = wppa_fix_poster_ext( $source, $photo );
 
 				// Fix the extension for mm items.
 				if ( $data['ext'] == 'xxx' ) {
@@ -997,6 +1013,31 @@ global $wppa_log_file;
 			$a = wppa_allow_uploads( $album );
 			if ( ! $a ) echo 'full';
 			else echo 'notfull||'.$a;
+			break;
+
+		case 'undelete-photo':
+			$photo = $_REQUEST['photo-id'];
+			$nonce = $_REQUEST['wppa-nonce'];
+
+			// Check validity
+			if ( ! wp_verify_nonce( $nonce, 'wppa_nonce_'.$photo ) ) {
+				echo '||0||'.__( 'You do not have the rights to undelete a photo' , 'wp-photo-album-plus');
+				wppa_exit();																// Nonce check failed
+			}
+			if ( ! is_numeric( $photo ) ) {
+				echo '||0||'.__( 'Security check failure' , 'wp-photo-album-plus');
+				wppa_exit();																// Nonce check failed
+			}
+			$album = $wpdb->get_var( $wpdb->prepare( 'SELECT `album` FROM `'.WPPA_PHOTOS.'` WHERE `id` = %s', $photo ) );
+			if ( wppa_is_int( $album ) && $album < '-9' ) {
+				wppa_update_photo( array( 'id' => $photo, 'album' => - ( $album + '9' ) ) );
+				wppa_invalidate_treecounts( - ( $album + '9' ) );
+				echo '||1||<span style="color:red" >'.sprintf( __( 'Photo %s has been undeleted' , 'wp-photo-album-plus'), $photo ).'</span>';
+			}
+			else {
+				echo '||1||<span style="color:red" >'.sprintf( __( 'Could not undelete photo %s' , 'wp-photo-album-plus'), $photo ).'</span>';
+			}
+			wppa_clear_cache();
 			break;
 
 		case 'update-album':
@@ -1498,6 +1539,197 @@ global $wppa_log_file;
 					}
 					wppa_exit();
 					break;
+				case 'magickrotleft':
+				case 'magickrot180':
+				case 'magickrotright':
+				case 'magickflip':
+				case 'magickflop':
+				case 'enhance':
+				case 'sharpen':
+				case 'blur':
+				case 'auto-gamma':
+				case 'auto-level':
+				case 'contrast-p':
+				case 'contrast-m':
+				case 'brightness-p':
+				case 'brightness-m':
+				case 'despeckle':
+				case 'lineargray':
+				case 'nonlineargray':
+				case 'charcoal':
+				case 'paint':
+				case 'sepia':
+				case 'skyleft':
+				case 'skyright':
+					$path = wppa_get_photo_path( $photo );
+					switch ( $item ) {
+						case 'magickrotleft':
+							$command = '-rotate -90';
+							break;
+						case 'magickrot180':
+							$command = '-rotate 180';
+							break;
+						case 'magickrotright':
+							$command = '-rotate 90';
+							break;
+						case 'magickflip':
+							$command = '-flip';
+							break;
+						case 'magickflop':
+							$command = '-flop';
+							break;
+						case 'enhance':
+							$command = '-enhance';
+							break;
+						case 'sharpen':
+							$command = '-sharpen 0x1';
+							break;
+						case 'blur':
+							$command = '-blur 0x1';
+							break;
+						case 'auto-gamma':
+							$command = '-auto-gamma';
+							break;
+						case 'auto-level':
+							$command = '-auto-level';
+							break;
+						case 'contrast-p':
+							$command = '-brightness-contrast 0x5';
+							break;
+						case 'contrast-m':
+							$command = '-brightness-contrast 0x-5';
+							break;
+						case 'brightness-p':
+							$command = '-brightness-contrast 5';
+							break;
+						case 'brightness-m':
+							$command = '-brightness-contrast -5';
+							break;
+						case 'despeckle':
+							$command = '-despeckle';
+							break;
+						case 'lineargray':
+							$command = '-colorspace gray';
+							break;
+						case 'nonlineargray':
+							$command = '-grayscale Rec709Luma';
+							break;
+						case 'charcoal':
+							$command = '-charcoal 1';
+							break;
+						case 'paint':
+							$command = '-paint 4';
+							break;
+						case 'sepia':
+							$command = '-sepia-tone 80%';
+							break;
+						case 'skyleft':
+							$command = '-rotate -0.5 -shave ' . ( ceil( 0.0087 * wppa_get_photoy( $photo ) ) + 1 ) . 'x' . ( ceil( 0.0087 * wppa_get_photox( $photo ) ) + 1 );
+							break;
+						case 'skyright':
+							$command = '-rotate 0.5 -shave ' . ( ceil( 0.0087 * wppa_get_photoy( $photo ) ) + 1 ) . 'x' . ( ceil( 0.0087 * wppa_get_photox( $photo ) ) + 1 );
+							break;
+					}
+
+					// If jpg, apply jpeg quality
+					$q = wppa_opt( 'jpeg_quality' );
+					$quality = '';
+					if ( wppa_get_ext( $path ) == 'jpg' ) {
+						$quality = '-quality ' . $q;
+					}
+
+					// Do the magick command
+					$err = wppa_image_magick( 'convert ' . $path . ' ' . $quality . ' ' . $command . ' ' . $path );
+
+					// Error?
+					if ( $err ) {
+						echo '||'.$err.'||'.sprintf( __( 'An error occurred while trying to process photo %s' , 'wp-photo-album-plus' ), $photo );
+					}
+
+					// Housekeeping
+					else {
+
+						// Horizon correction shaves size.
+						if ( $item = 'skyleft' || $item = 'skyright' ) {
+							wppa_get_photox( $photo, true );
+						}
+
+						wppa_bump_photo_rev();
+						wppa_create_thumbnail( $photo, false );
+						$stack = wppa_get_photo_item( $photo, 'magickstack' );
+						if ( ! $stack ) {
+							$stack = $command;
+						}
+						else {
+							$stack .= ' | ' . $command;
+						}
+						wppa_update_photo( array( 'id' => $photo, 'magickstack' => $stack ) );
+
+						// Update CDN
+						$cdn = wppa_cdn( 'admin' );
+						if ( $cdn ) {
+							switch ( $cdn ) {
+								case 'cloudinary':
+									wppa_upload_to_cloudinary( $photo );
+									break;
+								default:
+									wppa_dbg_msg( 'Missing upload instructions for '.$cdn, 'red', 'force' );
+							}
+						}
+
+						echo
+							'||0||' .
+							sprintf( __( 'Command %s magically executed on photo %s', 'wp-photo-album-plus' ), '<span style="color:blue;" ><i>'.$command.'</i></span>', $photo ) .
+							'||' . get_option( 'wppa_photo_version' ) . '||' . get_option( 'wppa_thumb_version' ) . '||' . $stack .
+							'||' . floor( wppa_get_photox( $photo ) ) . ' x ' . floor( wppa_get_photoy( $photo ) ).' px, ' . wppa_get_filesize( wppa_get_photo_path( $photo ) ) . '.';
+					}
+
+					// Done
+					wppa_exit();
+					break;
+
+				case 'magickundo':
+					$path = wppa_get_photo_path( $photo );
+					$stack = wppa_get_photo_item( $photo, 'magickstack' );
+
+					// Revert all
+					wppa_remake_files( '', $photo );
+
+					// Redo all except last
+					$commands = explode( '|', $stack );
+					$i = 0;
+					$newstack = '';
+					while ( $i < ( count( $commands ) - 1 ) ) {
+
+						// Do the magick command
+						$err = wppa_image_magick( 'convert ' . $path . ' ' . trim( $commands[$i] ) . ' ' . $path );
+						$newstack .= ( $i != '0' ? ' | ' : '' ) . $commands[$i];
+						$i++;
+					}
+
+					// Housekeeping
+					wppa_bump_photo_rev();
+					wppa_create_thumbnail( $photo, false );
+					wppa_update_photo( array( 'id' => $photo, 'magickstack' => $newstack ) );
+
+					// Update CDN
+					$cdn = wppa_cdn( 'admin' );
+					if ( $cdn ) {
+						switch ( $cdn ) {
+							case 'cloudinary':
+								wppa_upload_to_cloudinary( $photo );
+								break;
+							default:
+								wppa_dbg_msg( 'Missing upload instructions for '.$cdn, 'red', 'force' );
+						}
+					}
+
+					echo
+						'||0||' .
+						sprintf( __( 'Command %s magically executed on photo %s', 'wp-photo-album-plus' ), '<span style="color:blue;" ><i>'.$item.'</i></span>', $photo ) .
+						'||' . get_option( 'wppa_photo_version' ) . '||' . get_option( 'wppa_thumb_version' ) . '||' . $newstack;
+					wppa_exit();
+					break;
 
 				case 'moveto':
 					$photodata = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM '.WPPA_PHOTOS.' WHERE `id` = %s', $photo ), ARRAY_A );
@@ -1516,7 +1748,7 @@ global $wppa_log_file;
 					}
 					wppa_invalidate_treecounts( $photodata['album'] );	// Current album
 					wppa_invalidate_treecounts( $value );				// New album
-					$iret = $wpdb->query( $wpdb->prepare( 'UPDATE '.WPPA_PHOTOS.' SET `album` = %s WHERE `id` = %s', $value, $photo ) );
+					$iret = wppa_update_photo( array( 'id' => $photo, 'album' => $value ) ); // $wpdb->query( $wpdb->prepare( 'UPDATE '.WPPA_PHOTOS.' SET `album` = %s WHERE `id` = %s', $value, $photo ) );
 					if ( $iret !== false ) {
 						wppa_move_source( $photodata['filename'], $photodata['album'], $value );
 						echo '||99||'.sprintf( __( 'Photo %s has been moved to album %s (%s)' , 'wp-photo-album-plus'), $photo, wppa_get_album_name( $value ), $value );
@@ -1910,8 +2142,30 @@ global $wppa_log_file;
 					wppa_exit();
 				}
 			}
+			elseif ( substr( $option, 0, 8 ) == 'wppa_qr_' ) { // Is qr code setting
+				if ( is_dir( WPPA_UPLOAD_PATH . '/qr' ) ) {
+					$caches = glob( WPPA_UPLOAD_PATH . '/qr/*.svg' );
+					if ( $caches ) foreach ( $caches as $cache ) {
+						unlink( $cache );
+					}
+				}
+				update_option( 'wppa_qr_cache_hits', '0' );
+				update_option( 'wppa_qr_cache_miss', '0' );
+				wppa_update_option( $option, $value );
+				$title = sprintf( __( 'Setting %s updated to %s', 'wp-photo-album-plus'), $option, $value );
+
+				// Something to do after changing the setting?
+				wppa_initialize_runtime( true );	// force reload new values
+
+				// Produce the response text
+				$output = '||0||'.esc_attr( $title ).'||';
+
+				echo $output;
+				wppa_clear_cache();
+				wppa_exit();
+				break;	// End update qr setting
+			}
 			else switch ( $option ) {
-//wppa_log('obs', 'option '.$option.' attempt to set to '.$value);
 
 				// Changing potd_album_type ( physical / virtual ) also clears potd_album
 				case 'wppa_potd_album_type':
@@ -2562,6 +2816,12 @@ global $wppa_log_file;
 					update_option( 'wppa_create_o1_files_last',  $skip );
 					break;
 
+				case 'wppa_optimize_ewww_skip_one':
+					$last = get_option( 'wppa_optimize_ewww_last', '0' );
+					$skip = $last + '1';
+					update_option( 'wppa_optimize_ewww_last',  $skip );
+					break;
+
 				case 'wppa_errorlog_purge':
 					if ( is_file( $wppa_log_file ) ) {
 						unlink( $wppa_log_file );
@@ -2674,7 +2934,7 @@ global $wppa_log_file;
 					wppa_schedule_maintenance_proc( 'wppa_cleanup_index', true );
 					ob_end_clean();
 					break;
-				case 'wppa_image_magic':
+				case 'wppa_image_magick':
 					$value = rtrim( $value, '/' );
 					$ok = true;
 					if ( $value ) {
@@ -2690,7 +2950,7 @@ global $wppa_log_file;
 					}
 					if ( ! $ok ) {
 						wppa( 'error', '4713' );
-						$alert .= __( 'This path does not contain ImageMagic commands', 'wp-photo-album-plus' );
+						$alert .= __( 'This path does not contain ImageMagick commands', 'wp-photo-album-plus' );
 					}
 					break;
 
@@ -2821,7 +3081,7 @@ global $wppa_log_file;
 
 			// I may
 			require_once 'wppa-album-admin-autosave.php';
-			wppa_del_album( $album, '' );
+			wppa_del_album( $album );
 			wppa_exit();
 			break;
 

@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.6.10';
+var wppaJsVersion = '6.6.20';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -290,6 +290,12 @@ function wppaDoInit( autoOnly ) {
 	// Looks redundant, but some installations do not execute
 	// onload="wppaReplaceSvg()" for unknown reasons
 	wppaReplaceSvg();
+
+	// Make sure ajax spinners dies
+	jQuery( '.wppa-ajax-spin' ).stop().fadeOut();
+
+	// Make sure ovl spinner dies
+	jQuery( '.wppa-ovl-spin' ).stop().fadeOut();
 }
 
 // Initialize Ajax render partial page content with history update
@@ -482,7 +488,7 @@ function _wppaDoAutocol( mocc ) {
 			}
 			idx++;
 		}
-		
+
 		if ( wppaCoverImageResponsive[mocc] ) {
 		}
 		else {
@@ -798,28 +804,15 @@ var newtext;
 	// Just to be sure we do not run into undefined error
 	if ( typeof( text ) == 'undefined' ) return '';
 
-	temp = text.split( '[script' );
-	if ( temp.length == 1 ) return text;
-
-	newtext = temp[0];
-	var idx = 0;
-	while ( temp.length > idx ) {
-		newtext += '<script';
-		idx++;
-		newtext += temp[idx];
+	while ( text.indexOf( '[script' ) != -1 ) {
+		text = text.replace( '[script', '<script' );
+	}
+	while ( text.indexOf( '[/script' ) != -1 ) {
+		text = text.replace( '[/script', '</script' );
 	}
 
-	temp = newtext.split( '[/script' );
+	return text;
 
-	newtext = temp[0];
-	idx = 0;
-	while ( temp.length > idx ) {
-		newtext += '</script';
-		idx++;
-		newtext += temp[idx];
-	}
-
-	return newtext;
 }
 
 // Filter enables the use of a <br> tag while they are removed with strip_tags
