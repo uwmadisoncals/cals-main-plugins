@@ -24,15 +24,19 @@ td {
     font-size: 12px;
     vertical-align: top;
     width: 14.285%;
+	height: 4em;
 }
 
 .details {
-    border-bottom: 1px solid #ddd;
     color: #444;
     margin-bottom: 2px;
 }
 
-.details a, .details img {
+.vevent:not(:last-child) .details {
+	border-bottom: 1px solid #ddd;
+}
+
+.details * {
     display: none;
 }
 
@@ -58,12 +62,14 @@ abbr {
 
 a {
     text-decoration: none;
-    color: #f00
+    color: #d00
 }
 
 .mc-date {
     font-weight: 700;
     font-size: 1.2em;
+	width: 1em;
+	text-align: center;
     padding: 2px 4px;
     line-height: 1;
     margin-left: 3px;
@@ -80,4 +86,13 @@ a {
     font-weight: 700;
 	font-size: 1.5em;
 	text-align: center;
+	text-decoration: underline;
+}
+
+.return:hover, .return:focus {
+	text-decoration: none;
+}
+
+@media print {
+	.return { display: none; }
 }

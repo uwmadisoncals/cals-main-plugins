@@ -343,7 +343,7 @@ function manage_my_calendar() {
 		echo $message;
 	}	
 	?>
-	<div class='wrap jd-my-calendar'>
+	<div class='wrap my-calendar-admin'>
 		<h1 id="mc-manage" class="wp-heading-inline"><?php _e( 'Manage Events', 'my-calendar' ); ?></h1>
 		<a href="<?php echo admin_url( "admin.php?page=my-calendar" ); ?>" class="page-title-action"><?php _e( 'Add New', 'my-calendar' ); ?></a> 
 		<hr class="wp-header-end">
@@ -438,7 +438,7 @@ function edit_my_calendar() {
 
 	?>
 
-	<div class="wrap jd-my-calendar">
+	<div class="wrap my-calendar-admin">
 	<?php my_calendar_check_db();
 	if ( get_site_option( 'mc_multisite' ) == 2 ) {
 		if ( get_option( 'mc_current_table' ) == 0 ) {
@@ -523,6 +523,7 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 		'%f',
 		'%f'
 	);
+	
 	if ( ( $action == 'add' || $action == 'copy' ) && $proceed == true ) {
 		$add      = $output[2]; // add format here
 		$add      = apply_filters( 'mc_before_save_insert', $add );
@@ -867,14 +868,14 @@ function mc_show_block( $field, $has_data, $data, $echo = true, $default = '' ) 
 			}
 			break;
 		case 'event_image' :
+			if ( $has_data && property_exists( $data, 'event_post' ) ) {
+				$image = ( has_post_thumbnail( $data->event_post ) ) ? get_the_post_thumbnail_url( $data->event_post ) : $data->event_image;
+				$image_id = ( has_post_thumbnail( $data->event_post ) ) ? get_post_thumbnail_id( $data->event_post ) : '';
+			} else {
+				$image = ( $has_data && $data->event_image != '' ) ? $data->event_image : '';
+				$image_id = '';
+			}	
 			if ( $show_block ) {
-				if ( $has_data && property_exists( $data, 'event_post' ) ) {
-					$image = ( has_post_thumbnail( $data->event_post ) ) ? get_the_post_thumbnail_url( $data->event_post ) : $data->event_image;
-					$image_id = ( has_post_thumbnail( $data->event_post ) ) ? get_post_thumbnail_id( $data->event_post ) : '';
-				} else {
-					$image = ( $has_data && $data->event_image != '' ) ? $data->event_image : '';
-					$image_id = '';
-				}
 				$return = '
 				<div class="mc-image-upload field-holder">
 					<input type="hidden" name="event_image_id" value="' . esc_attr( $image_id ) . '" class="textfield" id="e_image_id" />
@@ -1440,10 +1441,17 @@ if ( mc_show_edit_block( 'event_specials' ) ) {
 	</div>
 	</div><?php
 } else {
+	if ( $has_data ) {
+		$event_holiday = ( $data->event_holiday == '1' ) ? 'true' : 'false';
+		$event_fifth   = ( $data->event_fifth_week == '1' ) ? 'true' : 'false';
+	} else {
+		$event_holiday = get_option( 'mc_skip_holidays' );
+		$event_fifth   = get_option( 'mc_no_fifth_week' );
+	}
 	?>
 	<div>
-	<input type="hidden" name="event_holiday" value="true" <?php checked( get_option( 'mc_skip_holidays' ), 'true' ); ?> />
-	<input type="hidden" name="event_fifth_week" value="true" <?php checked( get_option( 'mc_no_fifth_week' ), 'true' ); ?> />
+	<input type="hidden" name="event_holiday" value="<?php esc_attr_e( $event_holiday ); ?>" />
+	<input type="hidden" name="event_fifth_week" value="<?php esc_attr_e( $event_fifth ); ?>" />
 	</div><?php
 } ?>
 <p>
@@ -1641,6 +1649,7 @@ function mc_list_events() {
 		}
 		$limit .= ( $restrict != 'archived' ) ? " AND event_status = 1" : ' AND event_status = 0';
 		$events     = $mcdb->get_results( "SELECT SQL_CALC_FOUND_ROWS event_id FROM " . my_calendar_table() . " $limit ORDER BY $sortbyvalue $sortbydirection LIMIT " . ( ( $current - 1 ) * $items_per_page ) . ", " . $items_per_page );
+
 		$found_rows = $wpdb->get_col( "SELECT FOUND_ROWS();" );
 		$items      = $found_rows[0];
 		if ( ( function_exists( 'akismet_http_post' ) || function_exists( 'bs_checker' ) ) && $allow_filters ) {
@@ -1755,8 +1764,8 @@ function mc_list_events() {
 				$categories = $mcdb->get_results( $sql );
 
 				foreach ( array_keys( $events ) as $key ) {
-					$event   =& $events[ $key ];
-					$event   = mc_get_event_core( $event->event_id );
+					$e   =& $events[ $key ];
+					$event   = mc_get_event_core( $e->event_id );
 					if ( !is_object( $event ) ) {
 						continue;
 					}

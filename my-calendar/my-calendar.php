@@ -7,7 +7,7 @@ Author: Joseph C Dolson
 Author URI: http://www.joedolson.com
 Text Domain: my-calendar
 Domain Path: lang
-Version: 2.5.6
+Version: 2.5.8
 */
 /*  Copyright 2009-2017  Joe Dolson (email : joe@joedolson.com)
 
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 } // Exit if accessed directly
 
 global $mc_version, $wpdb;
-$mc_version = '2.5.6';
+$mc_version = '2.5.8';
 
 register_activation_hook( __FILE__, 'mc_plugin_activated' );
 register_deactivation_hook( __FILE__, 'mc_plugin_deactivated' );
@@ -88,9 +88,8 @@ add_action( 'widgets_init', create_function( '', 'return register_widget("my_cal
 add_action( 'widgets_init', create_function( '', 'return register_widget("my_calendar_mini_widget");' ) );
 add_action( 'widgets_init', create_function( '', 'return register_widget("my_calendar_simple_search");' ) );
 add_action( 'init', 'my_calendar_add_feed' );
-add_action( 'admin_menu', 'my_calendar_add_javascript' );
+add_action( 'admin_menu', 'my_calendar_admin_js' );
 add_action( 'wp_footer', 'mc_footer_js' );
-add_action( 'wp_head', 'my_calendar_fouc' );
 add_action( 'init', 'mc_export_vcal', 200 );
 // Add filters 
 add_filter( 'widget_text', 'do_shortcode', 9 );

@@ -85,7 +85,7 @@ function my_calendar_manage_locations() {
 	global $wpdb;
 	$mcdb = $wpdb;
 	?>
-	<div class="wrap jd-my-calendar">
+	<div class="wrap my-calendar-admin">
 	<?php my_calendar_check_db();
 	// We do some checking to see what we're doing
 	mc_update_location_controls();
@@ -362,8 +362,7 @@ function mc_manage_locations() {
 			<?php } ?>
 		</table>
 		<p>
-			<input type="submit" class="button-secondary delete" name="mass_delete"
-			       value="<?php _e( 'Delete locations', 'my-calendar' ); ?>"/>
+			<input type="submit" class="button-secondary delete" name="mass_delete" value="<?php _e( 'Delete locations', 'my-calendar' ); ?>" />
 		</p>
 		</form><?php
 	} else {

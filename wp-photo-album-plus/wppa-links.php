@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Frontend links
-* Version 6.6.18
+* Version 6.6.22
 *
 */
 
@@ -298,17 +298,18 @@ function wppa_get_slideshow_url_ajax($id, $page = '') {
 // Pretty links decode
 function wppa_convert_from_pretty( $uri ) {
 
-	// Test if we should be here anyway
-//	if ( ! isset($_ENV["SCRIPT_URI"]) ) return $uri;
-	$wppapos = stripos($uri, '/wppaspec/');
-	if ( ! $wppapos ) return $uri;	// Is not a pretty link
-	if ( ! get_option('permalink_structure') ) return $uri;
+	// Is a pretty link given?
+	$wppapos = stripos( $uri, '/wppaspec/' );
+	if ( ! $wppapos ) return $uri;
+
+	// Works only on non-default permalinks
+	if ( ! get_option( 'permalink_structure' ) ) return $uri;
 
 	// copy start up to including slash before wppaspec
-	$newuri = substr($uri, 0, $wppapos+1);
+	$newuri = substr( $uri, 0, $wppapos + 1 );
 
 	// explode part after wppaspec/
-	$args = explode('/', substr($uri, $wppapos+10));
+	$args = explode( '/', substr( $uri, $wppapos + 10 ) );
 
 	// process 'arguments'
 	if ( count($args > 0) ) {
@@ -436,13 +437,13 @@ function wppa_convert_from_pretty( $uri ) {
 }
 
 // Pretty links Encode
-function wppa_convert_to_pretty( $xuri, $no_names = false ) {
+function wppa_convert_to_pretty( $xuri, $no_names = false, $overrule = false ) {
 
 	// Make local copy
 	$uri = $xuri;
 
 	// Only when permalink structure is not default
-	if ( ! get_option('permalink_structure') ) return $uri;
+	if ( ! get_option( 'permalink_structure' ) ) return $uri;
 
 	// Not on front page, the redirection will fail...
 //	if ( is_front_page() ) {
@@ -573,7 +574,7 @@ function wppa_convert_to_pretty( $xuri, $no_names = false ) {
 	$uri = str_replace( array( ' ', '[', ']' ), array( '%20', '%5B', '%5D' ), $uri );
 
 	// Now the actual conversion to pretty links
-	if ( ! wppa_switch( 'use_pretty_links' ) ) return $uri;
+	if ( ! wppa_switch( 'use_pretty_links' ) && ! $overrule ) return $uri;
 	if ( ! get_option( 'permalink_structure' ) ) return $uri;
 
 	// Leaving the next line out gives 404 on pretty links under certain circumstances.

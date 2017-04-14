@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.6.19
+/* Version 6.6.22
 /* Various js routines used in admin pages
 */
 
@@ -1241,6 +1241,10 @@ function wppaAjaxUpdatePhoto( photo, actionslug, elem, refresh, photoAlfaid ) {
 	wppaAjaxUpdatePhotoMonitor();
 }
 
+function wppaAjaxUpdateDelphoto( photo, actionslug, elem ) {
+	wppaAjaxUpdatePhoto( photo, 'del' + actionslug, elem );
+}
+
 // This monitor keeps track of running ajax requests
 // If many chars are typed quickly ( busy flag true ) updating will be skipped
 // until the running ajax request ends. A new request will catch up the rest of the data mods.
@@ -2159,6 +2163,14 @@ function wppaPhotoStatusChange(id) {
 	}
 	else {
 		jQuery( '.wppa-datetime-'+id ).css('display', 'none'); //prop( 'disabled', true );
+	}
+
+	// schedule delete
+	if ( jQuery( '#scheduledel-' + id ).attr( 'checked' ) == 'checked' ) {
+		jQuery( '.wppa-del-datetime-' + id ).css( 'display', '' );
+	}
+	else {
+		jQuery( '.wppa-del-datetime-' + id ).css( 'display', 'none' );
 	}
 }
 

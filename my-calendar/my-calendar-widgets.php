@@ -565,7 +565,7 @@ function my_calendar_upcoming_events( $before = 'default', $after = 'default', $
 				$today    = date( 'Y-m-d H:i', current_time( 'timestamp' ) );
 				$date     = date( 'Y-m-d H:i', strtotime( $details['date'] . ' ' . $details['time'] ) );
 				$class    = ( my_calendar_date_comp( $date, $today ) === true ) ? "past-event" : "future-event";
-				$category = 'mc_' . sanitize_title( $details['category'] );
+				$category = mc_category_class( $details, 'mc_' );
 				
 				$prepend = apply_filters( 'mc_event_upcoming_before', "<li class='$class $category'>", $class, $category );
 				$append  = apply_filters( 'mc_event_upcoming_after', '</li>', $class, $category );				
@@ -773,7 +773,7 @@ function mc_produce_upcoming_events( $events, $template, $type = 'list', $order 
 			if ( ! in_array( $details['group'], $groups ) ) {
 				$date  = date( 'Y-m-d H:i:s', strtotime( $details['dtstart'] ) );
 				$class = ( my_calendar_date_comp( $date, $today . date( 'H:i', current_time( 'timestamp' ) ) ) === true ) ? "past-event" : "future-event";
-				$category = 'mc_' . sanitize_title( $details['category'] );
+				$category = mc_category_class( $details, 'mc_' );
 				if ( my_calendar_date_equal( $date, $today ) ) {
 					$class = "today";
 				}
@@ -874,10 +874,10 @@ function my_calendar_todays_events( $category = 'default', $template = 'default'
 			} else {
 				if ( ! in_array( $e->event_group_id, $groups ) ) {
 					$event_details = mc_create_tags( $e );
-					$ts            = $e->ts_occur_begin;
-					$end           = $e->ts_occur_end;
+					$ts            = strtotime( get_date_from_gmt( date( 'Y-m-d H:i:s', $e->ts_occur_begin ) ) );
+					$end           = strtotime( get_date_from_gmt( date( 'Y-m-d H:i:s', $e->ts_occur_end ) ) );
 					$now           = current_time( 'timestamp' );
-					$category      = 'mc_' . sanitize_title( $e->category_name );
+					$category = mc_category_class( $e, 'mc_' );
 					if ( $ts < $now && $end > $now ) {
 						$class = 'on-now';
 					} else if ( $now < $ts ) {

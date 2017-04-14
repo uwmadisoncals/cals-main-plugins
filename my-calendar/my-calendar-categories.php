@@ -86,7 +86,7 @@ function my_calendar_manage_categories() {
 	$formats = array( '%s', '%s', '%s' );
 
 	?>
-	<div class="wrap jd-my-calendar">
+	<div class="wrap my-calendar-admin">
 		<?php
 		my_calendar_check_db();
 		// We do some checking to see what we're doing

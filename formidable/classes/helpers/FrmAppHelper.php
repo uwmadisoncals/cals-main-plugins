@@ -4,13 +4,13 @@ if ( ! defined('ABSPATH') ) {
 }
 
 class FrmAppHelper {
-	public static $db_version = 42; //version of the database we are moving to
+	public static $db_version = 43; //version of the database we are moving to
 	public static $pro_db_version = 37; //deprecated
 
 	/**
 	 * @since 2.0
 	 */
-	public static $plug_version = '2.03.04';
+	public static $plug_version = '2.03.06';
 
     /**
      * @since 1.07.02
@@ -67,13 +67,6 @@ class FrmAppHelper {
 
 	public static function get_affiliate() {
 		return '';
-		$affiliate_id = apply_filters( 'frm_affiliate_link', get_option('frm_aff') );
-		$affiliate_id = strtolower( $affiliate_id );
-		$allowed_affiliates = array();
-		if ( ! in_array( $affiliate_id, $allowed_affiliates ) ) {
-			$affiliate_id = false;
-		}
-		return $affiliate_id;
 	}
 
     /**

@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.6.21
+* Version 6.6.22
 *
 */
 
@@ -50,7 +50,7 @@ global $wppa_log_file;
 
 	switch ( $wppa_action ) {
 		case 'getqrcode':
-			wppa_log( 'obs', 'Ajax getqrcode for '.$_REQUEST['url'] );
+			//wppa_log( 'obs', 'Ajax getqrcode for '.$_REQUEST['url'] );
 			$nonce 	= $_REQUEST['wppa-qr-nonce'];
 			if ( ! wp_verify_nonce( $nonce, 'wppa-qr-nonce' ) ) {
 				die( 'Security check falure' );
@@ -680,7 +680,7 @@ global $wppa_log_file;
 			$photo  = wppa_decrypt_photo( $_REQUEST['wppa-rating-id'] );
 			$rating = $_REQUEST['wppa-rating'];
 			$occur  = $_REQUEST['wppa-occur'];
-			$index  = $_REQUEST['wppa-index'];
+			$index  = isset( $_REQUEST['wppa-index'] ) ? $_REQUEST['wppa-index'] : '0';
 			$nonce  = $_REQUEST['wppa-nonce'];
 
 			// Make errortext
@@ -1916,6 +1916,50 @@ global $wppa_log_file;
 					}
 					else {
 						echo '||0||'.sprintf( __( '%s of photo %s updated' , 'wp-photo-album-plus'), $itemname, $photo );
+					}
+					break;
+
+				case 'delyear':
+				case 'delmonth':
+				case 'delday':
+				case 'delhour':
+				case 'delmin':
+					$itemname = __( 'Delete date/time' , 'wp-photo-album-plus');
+					$scheduledel = $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledel` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ) );
+					if ( ! $scheduledel ) {
+						$scheduledel = wppa_get_default_scheduledtm();
+					}
+					$temp = explode( ',', $scheduledel );
+					if ( $item == 'delyear' ) 	$temp[0] = $value;
+					if ( $item == 'delmonth' ) 	$temp[1] = $value;
+					if ( $item == 'delday' ) 	$temp[2] = $value;
+					if ( $item == 'delhour' ) 	$temp[3] = $value;
+					if ( $item == 'delmin' ) 	$temp[4] = $value;
+					$scheduledel = implode( ',', $temp );
+					wppa_update_photo( array( 'id' => $photo, 'scheduledel' => $scheduledel ) );
+
+					// Make sure not deleted yet
+					$alb = $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ) );
+					if ( $alb < '-9' ) {
+						$alb = - ( $alb + '9' );
+						wppa_update_photo( array( 'id' => $photo, 'album' => $alb ) );
+					}
+					wppa_invalidate_treecounts( $alb );
+					wppa_flush_upldr_cache( 'photoid', $photo );
+					if ( wppa_is_video( $photo ) ) {
+						echo '||0||'.sprintf( __( '%s of video %s updated' , 'wp-photo-album-plus'), $itemname, $photo );
+					}
+					else {
+						echo '||0||'.sprintf( __( '%s of photo %s updated' , 'wp-photo-album-plus'), $itemname, $photo );
+					}
+					break;
+				case 'removescheduledel':
+					if ( ( current_user_can( 'wppa_admin' ) || current_user_can( 'wppa_moderate' ) ) ) {
+						wppa_update_photo( array( 'id' => $photo, 'scheduledel' => '' ) );
+						echo '||0||'.sprintf( __( 'Scheduled deletion of photo %s cancelled' , 'wp-photo-album-plus'), $photo );
+					}
+					else {
+						echo '||2||'. __( 'No rights' , 'wp-photo-album-plus');
 					}
 					break;
 

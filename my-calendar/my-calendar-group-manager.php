@@ -86,7 +86,7 @@ function edit_my_calendar_groups() {
 		}
 	} ?>
 
-	<div class="wrap jd-my-calendar" id="my-calendar"><?php
+	<div class="wrap my-calendar-admin" id="my-calendar"><?php
 	my_calendar_check_db();
 	if ( $action == 'edit' ) {
 		?>

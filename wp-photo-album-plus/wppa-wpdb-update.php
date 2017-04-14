@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version 6.6.19
+* Version 6.6.22
 *
 */
 
@@ -135,6 +135,7 @@ global $wpdb;
 				$doit = true;
 				break;
 			case 'scheduledtm':
+			case 'scheduledel':
 			case 'exifdtm':
 			case 'page_id':
 				$doit = true;

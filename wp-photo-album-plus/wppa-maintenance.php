@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.6.19
+* Version 6.6.22
 *
 */
 
@@ -850,7 +850,7 @@ global $wppa_timestamp_start;
 								else {
 									$words 	= wppa_index_raw_to_words( wppa_index_get_raw_album( $alb ) );
 									if ( ! in_array( $indexes[$idx]['slug'], $words ) ) {
-										wppa_log( 'Cron', 'Removed index entry album {b}' . $albums[$aidx] . '{/b} from keyword {b}' . $indexes[$idx]['slug'] . '{/b}' );
+						//				wppa_log( 'Cron', 'Removed index entry album {b}' . $albums[$aidx] . '{/b} from keyword {b}' . $indexes[$idx]['slug'] . '{/b}' );
 
 										unset( $albums[$aidx] );
 									}
@@ -887,7 +887,7 @@ global $wppa_timestamp_start;
 								else {
 									$words = wppa_index_raw_to_words( wppa_index_get_raw_photo( $pho ) );
 									if ( ! in_array( $indexes[$idx]['slug'], $words ) ) {
-										wppa_log( 'Cron', 'Removed index entry photo {b}' . $pho . '{/b} from slug {b}' . $indexes[$idx]['slug'] . '{/b}' );
+					//					wppa_log( 'Cron', 'Removed index entry photo {b}' . $pho . '{/b} from slug {b}' . $indexes[$idx]['slug'] . '{/b}' );
 										unset( $photos[$pidx] );
 									}
 									wppa_cache_thumb( 'invalidate' );	// Prevent cache overflow

@@ -1,4 +1,28 @@
 
+ ### v2.0.3 - 2017-04-13 
+ **Changes:** 
+ - Fixed SVN deploy script. 
+- Fixed release version.
+ 
+ ### v2.0.2 - 2017-04-13 
+ **Changes:** 
+ - Fixed svn deploy script.
+ 
+ ### v2.0.2 - 2017-04-13 
+ **Changes:** 
+ - Fixed SVN deploy
+ 
+ ### v2.0.1 - 2017-04-13 
+ **Changes:** 
+ - Fixed vendor include.
+ 
+### 2.0.0 - 13/04/2017
+**Changes:** 
+- Improved UI of the builder.
+- Added compatibility with the new options in the pro version.
+- Added new travis stack.
+- Added optin for tracking.
+
 ### 1.7.6 - 20/01/2017
 **Changes:** 
 - Fixed issue when using the same shortcode multiple times on the same page.

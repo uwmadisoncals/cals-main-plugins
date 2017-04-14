@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.6.18
+* Version 6.6.22
 *
 */
 
@@ -209,6 +209,7 @@ global $thumbs;
 		'admins_choice_users' 		=> '',
 		'for_sm' 					=> false,
 		'max_width' 				=> false,
+		'no_ver' 					=> false,
 
 	);
 }
@@ -1825,17 +1826,29 @@ global $wpdb;
 
 	$last_check = get_option( 'wppa_last_schedule_check', '0' );
 	if ( $last_check < ( time() - 300 ) ) {	// Longer than 5 mins ago
-		$to_publish = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM`".WPPA_PHOTOS."` WHERE `status` = 'scheduled' AND `scheduledtm` < %s", wppa_get_default_scheduledtm() ), ARRAY_A );
-		if ( $to_publish ) foreach ( $to_publish as $photo ) {
+
+		// Publish scheduled photos
+		$to_publish = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `status` = 'scheduled' AND `scheduledtm` < %s", wppa_get_default_scheduledtm() ), ARRAY_A );
+		if ( $to_publish ) foreach( $to_publish as $photo ) {
 			wppa_update_photo( array( 'id' => $photo['id'], 'scheduledtm' => '', 'status' => 'publish', 'timestamp' => time() ) );
 			wppa_update_album( array( 'id' => $photo['album'], 'modified' => time() ) );	// For New indicator on album
 			wppa_invalidate_treecounts( $photo['album'] );
 		}
-		$to_publish = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM`".WPPA_ALBUMS."` WHERE `scheduledtm` <> '' AND `scheduledtm` < %s", wppa_get_default_scheduledtm() ), ARRAY_A );
-		if ( $to_publish ) foreach ( $to_publish as $album ) {
+
+		// Publish scheduled albums ( for future use, currently not implemented )
+		$to_publish = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_ALBUMS."` WHERE `scheduledtm` <> '' AND `scheduledtm` < %s", wppa_get_default_scheduledtm() ), ARRAY_A );
+		if ( $to_publish ) foreach( $to_publish as $album ) {
 			wppa_update_album( array( 'id' => $album['id'], 'scheduledtm' => '' ) );
 			wppa_invalidate_treecounts( $album['id'] );
 		}
+
+		// Delete photos scheduled for deletion
+		$to_delete = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `scheduledel` <> '' AND `scheduledel` < %s", wppa_get_default_scheduledtm() ), ARRAY_A );
+		if ( $to_delete ) foreach( $to_delete as $photo ) {
+			wppa_delete_photo( $photo['id'] );
+		}
+
+		// Update timestamp of this action
 		update_option( 'wppa_last_schedule_check', time() );
 	}
 }

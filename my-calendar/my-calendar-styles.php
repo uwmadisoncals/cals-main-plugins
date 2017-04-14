@@ -166,7 +166,7 @@ function edit_my_calendar_styles() {
 		$my_calendar_style = __( 'Sorry. The file you are looking for doesn\'t appear to exist. Please check your file name and location!', 'my-calendar' );
 	}
 	?>
-	<div class="wrap jd-my-calendar">
+	<div class="wrap my-calendar-admin">
 	<?php my_calendar_check_db(); ?>
 	<h1><?php _e( 'My Calendar Styles', 'my-calendar' ); ?></h1>
 	<div class="postbox-container jcd-wide">
@@ -276,7 +276,7 @@ function edit_my_calendar_styles() {
 						$right_string = normalize_whitespace( $mc_current_style );
 						if ( $right_string ) { // if right string is blank, there is no default
 							if ( isset( $_GET['diff'] ) ) {
-								echo '<div class="wrap jd-my-calendar" id="diff">';
+								echo '<div class="wrap my-calendar-admin" id="diff">';
 								echo mc_text_diff( $left_string, $right_string, array( 
 										'title'       => __( 'Comparing Your Style with latest installed version of My Calendar', 'my-calendar' ),
 										'title_right' => __( 'Latest (from plugin)', 'my-calendar' ),
@@ -284,12 +284,12 @@ function edit_my_calendar_styles() {
 									) );
 								echo '</div>';
 							} else if ( trim( $left_string ) != trim( $right_string ) ) {
-								echo '<div class="wrap jd-my-calendar">';
+								echo '<div class="wrap my-calendar-admin">';
 								echo '<div class="updated"><p>' . __( 'There have been updates to the stylesheet.', 'my-calendar' ) . ' <a href="' . admin_url( "admin.php?page=my-calendar-styles&amp;diff#diff" ) . '">' . __( 'Compare Your Stylesheet with latest installed version of My Calendar.', 'my-calendar' ) . '</a></p></div>';
 								echo '</div>';
 							} else {
 								echo '
-						<div class="wrap jd-my-calendar">
+						<div class="wrap my-calendar-admin">
 							<p>' . __( 'Your stylesheet matches that included with My Calendar.', 'my-calendar' ) . '</p>
 						</div>';
 							}

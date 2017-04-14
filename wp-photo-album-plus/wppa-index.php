@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version 6.6.16
+* Version 6.6.22
 *
 *
 */
@@ -70,7 +70,7 @@ global $pcount;
 					$oldalbums[] = $id;
 
 					// Report addition
-					wppa_log( 'Cron', 'Adding album # {b}'.$id.'{/b} to index slug {b}'.$word.'{/b}');
+//					wppa_log( 'Cron', 'Adding album # {b}'.$id.'{/b} to index slug {b}'.$word.'{/b}');
 
 					// Covert to string again
 					$newalbums = wppa_index_array_to_string( $oldalbums );
@@ -128,7 +128,7 @@ global $pcount;
 					$oldphotos[] = $id;
 
 					// Report addition
-					wppa_log( 'Cron', 'Adding photo # {b}'.$id.'{/b} to index slug {b}'.$word.'{/b}');
+//					wppa_log( 'Cron', 'Adding photo # {b}'.$id.'{/b} to index slug {b}'.$word.'{/b}');
 
 					// Covert to string again
 					$newphotos = wppa_index_array_to_string( $oldphotos );

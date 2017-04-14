@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 6.6.18
+* Version 6.6.22
 *
 */
 
@@ -266,6 +266,7 @@ global $wpdb;
 					'videox' 			=> '0',
 					'videoy' 			=> '0',
 					'scheduledtm' 		=> $args['album'] ? $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledtm` FROM `".WPPA_ALBUMS."` WHERE `id` = %s", $args['album'] ) ) : '',
+					'scheduledel' 		=> '',
 					'custom'			=> '',
 					'crypt' 			=> wppa_get_unique_photo_crypt(),
 					'magickstack' 		=> '',
@@ -300,11 +301,12 @@ global $wpdb;
 																	`videox`,
 																	`videoy`,
 																	`scheduledtm`,
+																	`scheduledel`,
 																	`custom`,
 																	`crypt`,
 																	`magickstack`
 																)
-														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
+														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
 																$args['id'],
 																$args['album'],
 																$args['ext'],
@@ -330,6 +332,7 @@ global $wpdb;
 																$args['videox'],
 																$args['videoy'],
 																$args['scheduledtm'],
+																$args['scheduledel'],
 																$args['custom'],
 																$args['crypt'],
 																$args['magickstack']

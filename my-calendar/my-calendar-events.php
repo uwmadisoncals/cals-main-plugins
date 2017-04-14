@@ -11,13 +11,18 @@ function mc_private_categories( $return = 'query' ) {
 		if ( $cats != '' ) {
 			$cats = " AND category_id NOT IN ($cats)";
 		}
-
-		return $cats;
 	}
 
 	return $cats;
 }
 
+/**
+ * Fetch array of private categories.
+ * 
+ * @uses filter mc_private_categories
+ *
+ * @return array private categories
+ */
 function mc_get_private_categories() {
 	global $wpdb;
 	$mcdb = $wpdb;
@@ -182,6 +187,7 @@ function mc_get_rss_events( $cat_id = false ) {
 			$groups[] = $event->occur_group_id;
 		}
 	}
+	
 	return $output;
 }
 
@@ -190,8 +196,8 @@ function mc_get_rss_events( $cat_id = false ) {
  * 
  * @param integer $id Event ID in my_calendar db
  */
-function mc_get_event_core( $id ) {
-	if ( !is_numeric( $id ) ) {
+function mc_get_event_core( $id, $rebuild = false ) {
+	if ( !is_numeric( $id ) ) {		
 		return;
 	}
 	
@@ -203,8 +209,11 @@ function mc_get_event_core( $id ) {
 	// get event data
 	$event = $mcdb->get_row( "SELECT * FROM " . my_calendar_table() . " JOIN " . my_calendar_categories_table() . " ON (event_category=category_id) WHERE event_id=$id" );
 	// include first occurrence
-	$occur = $mcdb->get_row( "SELECT *, UNIX_TIMESTAMP(occur_begin) AS ts_occur_begin, UNIX_TIMESTAMP(occur_end) AS ts_occur_end FROM " . my_calendar_event_table() . " WHERE occur_event_id = $id ORDER BY occur_id ASC LIMIT 1" );
+	if ( $rebuild ) {
+		return $event;
+	}
 	
+	$occur = $mcdb->get_row( "SELECT *, UNIX_TIMESTAMP(occur_begin) AS ts_occur_begin, UNIX_TIMESTAMP(occur_end) AS ts_occur_end FROM " . my_calendar_event_table() . " WHERE occur_event_id = $id ORDER BY occur_id ASC LIMIT 1" );
 	$event = (object) array_merge( (array) $event, (array) $occur );
 	
 	return $event;
@@ -340,6 +349,44 @@ function mc_related_events( $id, $template = false, $return = false ) {
 	}
 }
 
+
+function mc_holiday_limit( $events, $holidays ) {
+	foreach ( array_keys( $events ) as $key ) {
+		if ( ! empty( $holidays[ $key ] ) ) {
+			foreach ( $events[ $key ] as $k => $event ) {
+				if ( $event->event_category != get_option( 'mc_skip_holidays_category' ) && $event->event_holiday == 1 ) {
+					unset( $events[ $key ][ $k ] );
+				}
+			}
+		}
+	}
+
+	return $events;
+}
+
+// Used to draw multiple events
+function mc_set_date_array( $events ) {
+	$event_array = array();
+	if ( is_array( $events ) ) {
+		foreach ( $events as $event ) {
+			$date = date( 'Y-m-d', strtotime( $event->occur_begin ) );
+			$end  = date( 'Y-m-d', strtotime( $event->occur_end ) );
+			if ( $date != $end ) {
+				$start = strtotime( $date );
+				$end   = strtotime( $end );
+				do {
+					$date                   = date( 'Y-m-d', $start );
+					$event_array[ $date ][] = $event;
+					$start                  = strtotime( "+1 day", $start );
+				} while ( $start <= $end );
+			} else {
+				$event_array[ $date ][] = $event;
+			}
+		}
+	}
+
+	return $event_array;
+}
 
 // get all events related to an event ID (group IDs)
 function mc_list_related( $id, $this_id, $template = '{date}, {time}' ) {	

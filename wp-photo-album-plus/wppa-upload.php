@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 6.6.16
+* Version 6.6.22
 *
 */
 
@@ -14,6 +14,9 @@ function _wppa_page_upload() {
 global $target;
 global $wppa_revno;
 global $upload_album;
+
+	// Maybe it helps...
+	set_time_limit( 0 );
 
     // sanitize system
 	$user = wppa_get_user();
@@ -229,7 +232,9 @@ global $upload_album;
 					'"' .
 				' >' .
 				sprintf( __( '<b>Notice:</b> your server allows you to upload <b>%s</b> files of maximum total <b>%s</b> bytes and allows <b>%s</b> seconds to complete.' , 'wp-photo-album-plus' ), $max_files_txt, $max_size, $max_time ) .
+				' ' .
 				__( 'If your request exceeds these limitations, it will fail, probably without an errormessage.' , 'wp-photo-album-plus' ) .
+				' ' .
 				__( 'Additionally your hosting provider may have set other limitations on uploading files.' , 'wp-photo-album-plus' ) .
 				'<br />' .
 				wppa_check_memory_limit() .

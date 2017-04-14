@@ -10,16 +10,15 @@
 	$site_description = get_bloginfo('description');
 	
 	
-	$page_title = (isset($mt_options['page_title']) && !empty($mt_options['page_title'])) ? esc_attr($mt_options['page_title']) : $site_title;
+	$page_title = (isset($mt_options['page_title']) && !empty($mt_options['page_title'])) ? wp_kses_post(stripslashes($mt_options['page_title'])) : $site_title;
 	$logo 		= (isset($mt_options['logo']) && !empty($mt_options['logo'])) ? esc_attr($mt_options['logo']) : null;
 	$logo_ext   = null;
 	
 	if (!empty($logo)) {
 		$logo = wp_get_attachment_image_src($logo, 'full');
 		$logo = esc_url($logo[0]);
-		$logo_info 	= getimagesize($logo);
-		$logo_ext 	= image_type_to_extension($logo_info[2]);
-		$logo_ext = str_replace('.', '', $logo_ext);
+        $logo_ext   = pathinfo($logo, PATHINFO_EXTENSION);
+		$logo_ext   = str_replace('.', '', $logo_ext);
 	}
 	
 	$page_description = (isset($mt_options['description']) && !empty($mt_options['description'])) ? esc_attr($mt_options['description']) : $site_description;

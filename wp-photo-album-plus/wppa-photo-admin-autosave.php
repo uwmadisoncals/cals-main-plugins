@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.6.20
+* Version 6.6.22
 *
 */
 
@@ -22,8 +22,9 @@ function _wppa_edit_photo() {
 		if ( $thumb['owner'] == wppa_get_user() ) {
 			echo
 			'<div class="wrap">' .
-				'<h2>' . __( 'Edit photo' , 'wp-photo-album-plus') . '</h2>' .
-				wppa_album_photos( '', $photo ) .
+				'<h2>' . __( 'Edit photo' , 'wp-photo-album-plus') . '</h2>';
+				wppa_album_photos( '', $photo );
+			echo
 			'</div>';
 		}
 		else {
@@ -35,8 +36,9 @@ function _wppa_edit_photo() {
 	else {
 		echo
 		'<div class="wrap">' .
-			'<h2>' . __( 'Edit photos' , 'wp-photo-album-plus') . '</h2>' .
-			wppa_album_photos( '', '', wppa_get_user() ) .
+			'<h2>' . __( 'Edit photos' , 'wp-photo-album-plus') . '</h2>';
+			wppa_album_photos( '', '', wppa_get_user() );
+		echo
 		'</div>';
 	}
 }
@@ -54,8 +56,9 @@ function _wppa_moderate_photos() {
 
 	echo
 	'<div class="wrap">' .
-		'<h2>' . __( 'Moderate photos' , 'wp-photo-album-plus') . '</h2>' .
-		wppa_album_photos( '', $photo, '', true ) .
+		'<h2>' . __( 'Moderate photos' , 'wp-photo-album-plus') . '</h2>';
+		wppa_album_photos( '', $photo, '', true );
+	echo
 	'</div>';
 }
 
@@ -86,11 +89,16 @@ global $wpdb;
 									);
 		}
 
-		// Edit trased photos
+		// Edit trashed photos
 		elseif ( $album == 'trash' ) {
-			$photos = $wpdb->get_results( "SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `album` < '0' ORDER BY `modified` DESC", ARRAY_A );
-			$count 	= count( $photos );
-			$link 	= '';
+			$count  = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_PHOTOS . "` WHERE `album` < '0'" );
+			$photos = $wpdb->get_results( "SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `album` < '0' ORDER BY `modified` DESC " . $limit, ARRAY_A );
+		//	$count 	= count( $photos );
+			$link 	= wppa_dbg_url( 	get_admin_url() . 'admin.php' .
+										'?page=wppa_admin_menu' .
+										'&tab=edit' .
+										'&edit_id=trash'
+									);
 		}
 
 		// A physical album
@@ -438,6 +446,13 @@ function wppaToggleHorizon() {
 	}
 }
 
+function wppaTryScheduledel( id ) {
+	wppaPhotoStatusChange( id );
+	if ( jQuery( '#scheduledel-' + id ).attr( 'checked' ) != 'checked' ) {
+		_wppaAjaxUpdatePhoto( id, 'removescheduledel', 0, true );
+	}
+}
+
 </script>
 <?php
 
@@ -449,6 +464,7 @@ function wppaToggleHorizon() {
 
 
 		// Display the pagelinks
+//		echo 'page_links called with: '.$page.' '.$pagesize.' '.$count.' '.$link;
 		wppa_admin_page_links( $page, $pagesize, $count, $link );
 
 		// Horizon
@@ -482,6 +498,7 @@ function wppaToggleHorizon() {
 			$tags 			= trim( stripslashes( $photo['tags'] ), ',' );
 			$stereo 		= $photo['stereo'];
 			$magickstack 	= $photo['magickstack'];
+			$scheduledel 	= $photo['scheduledel'];
 
 			// See if item is a multimedia item
 			$is_multi 		= wppa_is_multi( $id );
@@ -843,6 +860,22 @@ function wppaToggleHorizon() {
 								}
 								echo ' ';
 
+								// Schedule for delete
+								$may_change = wppa_user_is( 'administrator' ) || current_user_can( 'wppa_moderate' );
+								echo
+								__( 'Delete at', 'wp-photo-album-plus' ) .
+								' ' .
+								'<input' .
+									' type="checkbox"' .
+									' id="scheduledel-' . $id . '"' .
+									( $scheduledel ? ' checked="checked"' : '' ) .
+									( $may_change ? '' : ' disabled="disabled"' ) .
+									' onchange="wppaTryScheduledel( ' . $id . ' );"' .
+								' />' .
+								' ' .
+								wppa_get_date_time_select_html( 'delphoto', $id, $may_change ) .
+								' ';
+
 								// Update status field
 								echo
 								__( 'Remark:', 'wp-photo-album-plus' ) . ' ' .
@@ -982,7 +1015,7 @@ function wppaToggleHorizon() {
 				echo	// Section 2
 				"\n" . '<!-- Section 2 -->';
 
-				if ( ( wppa_switch( 'enable_stereo' ) && ! $is_multi ) || ( ! $is_multi || is_file( wppa_get_photo_path( $id ) ) ) ) {
+				if ( ( wppa_switch( 'enable_stereo' ) && ! $is_multi ) || ( is_file( wppa_get_photo_path( $id ) ) && wppa_switch( 'watermark_on' ) ) ) {
 					echo
 					'<table' .
 						' class="wppa-table wppa-photo-table"' .
@@ -1034,60 +1067,52 @@ function wppaToggleHorizon() {
 
 									// Watermark
 									if ( wppa_switch( 'watermark_on' ) ) {
-										if ( is_file( wppa_get_photo_path( $id ) ) ) {
 
-											// Get the current watermark file settings
-											$temp 	= wppa_get_water_file_and_pos( $id );
-											$wmfile = isset( $temp['file'] ) ? $temp['file'] : '';
-											$wmpos 	= isset( $temp['pos'] ) && isset ( $wms[$temp['pos']] ) ? $wms[$temp['pos']] : '';
+										// Get the current watermark file settings
+										$temp 	= wppa_get_water_file_and_pos( $id );
+										$wmfile = isset( $temp['file'] ) ? $temp['file'] : '';
+										$wmpos 	= isset( $temp['pos'] ) && isset ( $wms[$temp['pos']] ) ? $wms[$temp['pos']] : '';
 
+										$user = wppa_get_user();
+										if ( wppa_switch( 'watermark_user' ) || current_user_can( 'wppa_settings' ) ) {
 											echo
 											__( 'Watermark:', 'wp-photo-album-plus') . ' ';
-											if ( wppa_switch( 'watermark_on' ) ) {
-												$user = wppa_get_user();
-												if ( wppa_switch( 'watermark_user' ) || current_user_can( 'wppa_settings' ) ) {
-													echo
-													'<select' .
-														' id="wmfsel_' . $id . '"' .
-														' onchange="wppaAjaxUpdatePhoto( ' . $id . ', \'wppa_watermark_file_' . $user . '\', this );"' .
-														' >' .
-														wppa_watermark_file_select( 'user', $album ) .
-													'</select>' .
-													__( 'Pos:', 'wp-photo-album-plus' ) . ' ' .
-													'<select' .
-														' id="wmpsel_' . $id . '"' .
-														' onchange="wppaAjaxUpdatePhoto( ' . $id . ', \'wppa_watermark_pos_' . $user . '\', this );"' .
-														' >' .
-														wppa_watermark_pos_select( 'user', $album ) .
-													'</select>' .
-													'<input' .
-														' type="button"' .
-														' class="button-secundary"' .
-														' value="' . esc_attr( __( 'Apply watermark', 'wp-photo-album-plus' ) ) . '"' .
-														' onclick="wppaTryWatermark( ' . $id . ' )"' .
-													' />';
-												}
-												else {
-													echo
-													__( 'File:', 'wp-photo-album-plus' ) . ' ' . __( $wmfile, 'wp-photo-album-plus' ) . ' ';
-													if ( $wmfile != '--- none ---' ) {
-														echo __( 'Pos:', 'wp-photo-album-plus') . ' ' . $wmpos;
-													}
-												}
-												echo
-												'<img' .
-													' id="wppa-water-spin-' . $id . '"' .
-													' src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_is_ie() ? 'gif' : 'svg' ) . '"' .
-													' alt="Spin"' .
-													' style="visibility:hidden"' .
-												' />';
-											}
-											else {
-												echo
-												__( 'Not configured', 'wp-photo-album-plus' );
-											}
-											echo ' ';
+											echo
+											'<select' .
+												' id="wmfsel_' . $id . '"' .
+												' onchange="wppaAjaxUpdatePhoto( ' . $id . ', \'wppa_watermark_file_' . $user . '\', this );"' .
+												' >' .
+												wppa_watermark_file_select( 'user', $album ) .
+											'</select>' .
+											__( 'Pos:', 'wp-photo-album-plus' ) . ' ' .
+											'<select' .
+												' id="wmpsel_' . $id . '"' .
+												' onchange="wppaAjaxUpdatePhoto( ' . $id . ', \'wppa_watermark_pos_' . $user . '\', this );"' .
+												' >' .
+												wppa_watermark_pos_select( 'user', $album ) .
+											'</select>' .
+											'<input' .
+												' type="button"' .
+												' class="button-secundary"' .
+												' value="' . esc_attr( __( 'Apply watermark', 'wp-photo-album-plus' ) ) . '"' .
+												' onclick="wppaTryWatermark( ' . $id . ' )"' .
+											' />' .
+											' ' .
+											'<img' .
+												' id="wppa-water-spin-' . $id . '"' .
+												' src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_is_ie() ? 'gif' : 'svg' ) . '"' .
+												' alt="Spin"' .
+												' style="visibility:hidden"' .
+											' />';
 										}
+										elseif ( basename( $wmfile ) != '--- none ---' ) {
+											echo
+											__( 'Watermark:', 'wp-photo-album-plus') . ' ';
+											echo
+											__( 'File:', 'wp-photo-album-plus' ) . ' ' . basename( $wmfile ) . ' ' .
+											__( 'Pos:', 'wp-photo-album-plus') . ' ' . $wmpos;
+										}
+										echo ' ';
 									}
 
 								echo
@@ -1538,7 +1563,7 @@ function wppaToggleHorizon() {
 										' style="float:left;max-width:90%;" ' .
 									' />' .
 									'<div' .
-										' style="display:inline-block;vertical-align:middle;margin-left:4px;margin-top:' . ( wppa_get_photoy( $id ) / 2 - 30 ) . 'px;"' .
+										' style="display:inline-block;vertical-align:middle;margin-left:4px;margin-top:' . ( min( 600, wppa_get_photoy( $id ) ) / 2 - 30 ) . 'px;"' .
 										' >' .
 										'<input' .
 											' type="button"' .
@@ -2160,8 +2185,8 @@ function wppa_album_photos_bulk( $album ) {
 	$page 				= ( isset( $_GET['wppa-page'] ) ? max( strval( intval( $_GET['wppa-page'] ) ), '1' ) : '1' ) + ( isset( $_POST['next-after'] ) ? $_POST['next-after'] : '0' );
 	$skip 				= ( $page > '0' ? ( $page - '1' ) * $pagesize : '0' );
 	$limit 				= ( $pagesize < '1' ) ? '' : ' LIMIT '.$skip.','.$pagesize;
-	$no_confirm_delete 	= ( isset( $_REQUEST['no-confirm-delete'] ) ? true : false );
-	$no_confirm_move 	= ( isset( $_REQUEST['no-confirm-move'] ) ? true : false );
+//	$no_confirm_delete 	= wppa_getCookie(); //( isset( $_REQUEST['no-confirm-delete'] ) ? true : false );
+//	$no_confirm_move 	= wppa_getCookie(); //( isset( $_REQUEST['no-confirm-move'] ) ? true : false );
 /*
 echo 'Post=';
 print_r($_POST);
@@ -2185,7 +2210,7 @@ echo 'Page='.$page;
 		}
 
 		if ( $photos ) {
-			$plink = $link . '&next-after=' . $next_after . ( $no_confirm_delete ? '&no-confirm-delete=on' : '' ) . ( $no_confirm_move ? '&no-confirm-move=on' : '' );
+			$plink = $link . '&next-after=' . $next_after;
 			wppa_admin_page_links( $page, $pagesize, $count, $plink, '#manage-photos' );
 			?>
 			<script type="text/javascript" >
@@ -2286,11 +2311,49 @@ function wppaTryMove( id, video ) {
 		query = '<?php echo esc_js( __( 'Are you sure you want to move this photo?', 'wp-photo-album-plus' ) ) ?>';
 	}
 
-	if ( jQuery('#no-confirm-move').attr('checked') == 'checked' || confirm( query ) ) {
+	if ( jQuery('#confirm-move').attr('checked') != 'checked' || confirm( query ) ) {
 		jQuery( '#moving-' + id ).html( '<?php _e( 'Moving...', 'wp-photo-album-plus' ) ?>' );
 		_wppaAjaxUpdatePhoto( id, 'moveto', jQuery( '#target-' + id ).val(), false, '<td colspan="8" >', '</td>' );
 	}
 }
+
+function wppaToggleConfirmDelete( elm ) {
+	var status = jQuery( elm ).attr( 'checked' );
+	if ( status == 'checked' ) {
+		wppa_setCookie( 'wppaConfirmDelete', 'checked', 365 );
+	}
+	else {
+		wppa_setCookie( 'wppaConfirmDelete', 'unchecked', 365 );
+	}
+}
+function wppaToggleConfirmMove( elm ) {
+	var status = jQuery( elm ).attr( 'checked' );
+	if ( status == 'checked' ) {
+		wppa_setCookie( 'wppaConfirmMove', 'checked', 365 );
+	}
+	else {
+		wppa_setCookie( 'wppaConfirmMove', 'unchecked', 365 );
+	}
+}
+function wppaSetConfirmDelete( id ) {
+	var status = wppa_getCookie( 'wppaConfirmDelete' );
+	if ( status == 'checked' ) {
+		jQuery( '#' + id ).attr( 'checked', 'checked' );
+	}
+	else {
+		jQuery( '#' + id ).removeAttr( 'checked' );
+	}
+}
+function wppaSetConfirmMove( id ) {
+	var status = wppa_getCookie( 'wppaConfirmMove' );
+	if ( status == 'checked' ) {
+		jQuery( '#' + id ).attr( 'checked', 'checked' );
+	}
+	else {
+		jQuery( '#' + id ).removeAttr( 'checked' );
+	}
+}
+
 			</script>
 <?php /**/ ?>
 			<form action="<?php echo $link.'&wppa-page='.$page.'#manage-photos' ?>" method="post" >
@@ -2358,15 +2421,31 @@ function wppaTryMove( id, video ) {
 					}
 				?>
 
-				<input type="checkbox" id="no-confirm-delete" name="no-confirm-delete"<?php if ( $no_confirm_delete ) echo ' checked="checked"' ?> style="display:none;" />
-				<input type="checkbox" id="confirm-delete" name="confirm-delete"<?php if ( ! $no_confirm_delete ) echo ' checked="checked"' ?>
-						onchange="if ( jQuery(this).val() == 'on' ) jQuery( '#no-confirm-delete' ).attr('checked', 'checked'); else jQuery( '#no-confirm-delete' ).removeAttr( 'checked' );" /><?php _e('Confirm delete', 'wp-photo-album-plus') ?>
-				<input type="checkbox" id="no-confirm-move" name="no-confirm-move"<?php if ( $no_confirm_move ) echo ' checked="checked"' ?> style="display:none;" />
-				<input type="checkbox" id="confirm-move" name="confirm-move"<?php if ( ! $no_confirm_move ) echo ' checked="checked"' ?>
-						onchange="if ( jQuery(this).val() == 'on' ) jQuery( '#no-confirm-move' ).attr('checked', 'checked'); else jQuery( '#no-confirm-move' ).removeAttr( 'checked' );" /><?php _e('Confirm move', 'wp-photo-album-plus') ?>
+				<input
+					type="checkbox"
+					id="confirm-delete"
+					name="confirm-delete"
+					checked="checked"
+					onchange="wppaToggleConfirmDelete( this );"
+				/>
+				<?php _e('Confirm delete', 'wp-photo-album-plus') ?>
 
+				<input
+					type="checkbox"
+					id="confirm-move"
+					name="confirm-move"
+					checked="checked"
+					onchange="wppaToggleConfirmMove(this);"
+				/>
+				<?php _e('Confirm move', 'wp-photo-album-plus') ?>
 
-						<?php echo '<small style="float:right;" > (' . count( $photos ) . ')</small>'; ?>
+				<?php echo '<small style="float:right;" > (' . count( $photos ) . ')</small>'; ?>
+				<script>
+					jQuery( document ).ready( function() {
+						wppaSetConfirmDelete( 'confirm-delete' );
+						wppaSetConfirmMove( 'confirm-move' );
+					});
+				</script>
 				</h3>
 				<table class="widefat" >
 					<thead style="font-weight:bold;" >
@@ -2396,7 +2475,7 @@ function wppaTryMove( id, video ) {
 								'<br />' .
 								'<a' .
 									' id="wppa-delete-' . $photo['id'] . '"' .
-									' onclick="if ( jQuery(\'#no-confirm-delete\').attr(\'checked\') == \'checked\' ||
+									' onclick="if ( jQuery(\'#confirm-delete\').attr(\'checked\') != \'checked\' ||
 													confirm( \'' . esc_js( __( 'Are you sure you want to delete this photo?', 'wp-photo-album-plus' ) ) . '\' ) ) {
 										jQuery(this).html( \'' . esc_js( __('Deleting...', 'wp-photo-album-plus') ) . '\' );
 										wppaAjaxDeletePhoto( \'' . $photo['id'] . '\', \'<td colspan=8 >\', \'</td>\' ) }"' .

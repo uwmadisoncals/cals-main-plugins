@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.6.20
+* Version 6.6.22
 *
 */
 
@@ -108,6 +108,7 @@ global $silent;
 					photox smallint(5) NOT NULL default '0',
 					photoy smallint(5) NOT NULL default '0',
 					scheduledtm tinytext NOT NULL,
+					scheduledel tinytext NOT NULL,
 					custom longtext NOT NULL,
 					stereo smallint NOT NULL default '0',
 					crypt tinytext NOT NULL,

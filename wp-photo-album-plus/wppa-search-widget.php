@@ -3,28 +3,30 @@
 * Package: wp-photo-album-plus
 *
 * display the search widget
-* Version 6.4.17
+* Version 6.6.23
 *
 */
 
 class SearchPhotos extends WP_Widget {
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_search_photos', 'description' => __( 'WPPA+ Search Photos', 'wp-photo-album-plus') );	//
-		parent::__construct('wppa_search_photos', __('Search Photos', 'wp-photo-album-plus'), $widget_ops);															//
+		$widget_ops = array( 	'classname' => 'wppa_search_photos', 
+								'description' => __( 'WPPA+ Search Photos', 'wp-photo-album-plus' ) 
+							);
+		parent::__construct( 'wppa_search_photos', __( 'Search Photos', 'wp-photo-album-plus' ), $widget_ops );															//
     }
 
 	/** @see WP_Widget::widget */
-    function widget($args, $instance) {
+    function widget( $args, $instance ) {
 		global $widget_content;
 		global $wpdb;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
+		require_once( dirname( __FILE__ ) . '/wppa-links.php' );
+		require_once( dirname( __FILE__ ) . '/wppa-styles.php' );
+		require_once( dirname( __FILE__ ) . '/wppa-functions.php' );
+		require_once( dirname( __FILE__ ) . '/wppa-thumbnails.php' );
+		require_once( dirname( __FILE__ ) . '/wppa-boxes-html.php' );
+		require_once( dirname( __FILE__ ) . '/wppa-slideshow.php' );
 		wppa_initialize_runtime();
 
 		wppa( 'mocc', wppa( 'mocc' ) + 1 );
@@ -41,27 +43,31 @@ class SearchPhotos extends WP_Widget {
 											'landingpage' 	=> '0',
 											) );
 
- 		$widget_title = apply_filters('widget_title', $instance['title']);
+ 		$widget_title = apply_filters( 'widget_title', $instance['title'] );
 
 		// Display the widget
 		echo $before_widget;
 
-		if ( ! empty( $widget_title ) ) { echo $before_title . $widget_title . $after_title; }
+		if ( ! empty( $widget_title ) ) { 
+			echo $before_title . $widget_title . $after_title; 
+		}
 
 		echo wppa_get_search_html( $instance['label'], $instance['sub'], $instance['root'], $instance['album'], $instance['landingpage'] );
 
 		echo $after_widget;
 
+		// Reset switch
 		wppa( 'in_widget', false );
     }
 
     /** @see WP_Widget::update */
-    function update($new_instance, $old_instance) {
-		$instance = $old_instance;
+    function update( $new_instance, $old_instance ) {
+		
+		$instance 					= $old_instance;
 		$instance['title'] 			= strip_tags($new_instance['title']);
 		$instance['label']			= $new_instance['label'];
-		$instance['root']  			= $new_instance['root'];
-		$instance['sub']   			= $new_instance['sub'];
+		$instance['root']  			= isset( $new_instance['root'] ) ? $new_instance['root'] : false;
+		$instance['sub']   			= isset( $new_instance['sub'] ) ? $new_instance['sub'] : false;
 		$instance['album'] 			= $new_instance['album'];
 		$instance['landingpage']	= $new_instance['landingpage'];
 
@@ -72,7 +78,7 @@ class SearchPhotos extends WP_Widget {
     function form( $instance ) {
 		global $wpdb;
 
-		//Defaults
+		// Defaults
 		$instance 		= wp_parse_args( 	(array) $instance,
 											array(
 												'title' 		=> __( 'Search Photos', 'wp-photo-album-plus' ),
@@ -114,7 +120,7 @@ class SearchPhotos extends WP_Widget {
 				<br />
 				<?php _e('If you select an album here, it will overrule the previous checkbox using the album as a \'fixed\' root.', 'wp-photo-album-plus'); ?>
 			</small>
-			<select id="<?php echo $this->get_field_id('album'); ?>" name="<?php echo $this->get_field_name('album'); ?>" style="max-width:100%" >
+			<select id="<?php echo $this->get_field_id( 'album' ); ?>" name="<?php echo $this->get_field_name( 'album' ); ?>" style="max-width:100%" >
 				<?php echo wppa_album_select_a( array( 	'selected' 			=> $album,
 														'addblank' 			=> true,
 														'sort'				=> true,
@@ -124,16 +130,16 @@ class SearchPhotos extends WP_Widget {
 			</select>
 		</p>
 		<p>
-			<input type="checkbox" <?php if ( $sub ) echo 'checked="checked"' ?> id="<?php echo $this->get_field_id('sub'); ?>" name="<?php echo $this->get_field_name('sub'); ?>" />
+			<input type="checkbox" <?php if ( $sub ) echo 'checked="checked"' ?> id="<?php echo $this->get_field_id( 'sub' ); ?>" name="<?php echo $this->get_field_name( 'sub' ); ?>" />
 			<label for="<?php echo $this->get_field_id('sub'); ?>">
-				<?php _e('Enable subsearch', 'wp-photo-album-plus'); ?>
+				<?php _e( 'Enable subsearch', 'wp-photo-album-plus' ); ?>
 			</label>
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id('landingpage'); ?>" >
+			<label for="<?php echo $this->get_field_id( 'landingpage' ); ?>" >
 				<?php _e( 'Landing page', 'wp-photo-album-plus' ); echo ': '.$landingpage ?>
 			</label>
-			<select id="<?php echo $this->get_field_id('landingpage'); ?>" name="<?php echo $this->get_field_name('landingpage'); ?>" style="max-width:100%" >
+			<select id="<?php echo $this->get_field_id( 'landingpage' ); ?>" name="<?php echo $this->get_field_name( 'landingpage' ); ?>" style="max-width:100%" >
 				<?php
 
 				// First option
@@ -159,7 +165,7 @@ class SearchPhotos extends WP_Widget {
 					// Just translate
 					else {
 						foreach ( array_keys( $pages ) as $index ) {
-							$pages[$index]['post_title'] = __( stripslashes($pages[$index]['post_title']  ) );
+							$pages[$index]['post_title'] = __( stripslashes( $pages[$index]['post_title'] ) );
 						}
 					}
 
@@ -195,5 +201,5 @@ class SearchPhotos extends WP_Widget {
 add_action('widgets_init', 'wppa_register_SearchPhotos' );
 
 function wppa_register_SearchPhotos() {
-	register_widget("SearchPhotos");
+	register_widget( "SearchPhotos" );
 }

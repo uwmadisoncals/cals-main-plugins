@@ -56,7 +56,7 @@ ul.links li {
     font-size: .9em
 }
 
-.jd-my-calendar .metabox-holder .postbox > h2 {
+.my-calendar-admin .metabox-holder .postbox > h2 {
 	font-size: 14px;
 	padding: 8px 12px;
 	margin: 0;
@@ -79,19 +79,19 @@ span.mc-notice {
 	border: 1px solid #900;
 }
 
-.jd-my-calendar .spam {
+.my-calendar-admin .spam {
     background: #ffa
 }
 
-.jd-my-calendar .pending {
+.my-calendar-admin .pending {
     background: #eee
 }
 
-.jd-my-calendar .pending td, .jd-my-calendar .row-actions {
+.my-calendar-admin .pending td, .my-calendar-admin .row-actions {
     color: #666;
 }
 
-.jd-my-calendar fieldset fieldset {
+.my-calendar-admin fieldset fieldset {
     margin: 0 0 20px 0;
     padding-top: 2px
 }
@@ -153,12 +153,12 @@ span.mc-notice {
     column-gap: 30px
 }
 
-.jd-my-calendar .event_image {
+.my-calendar-admin .event_image {
     float: right;
     margin-left: 10px;
 }
 
-.jd-my-calendar .event_image img {
+.my-calendar-admin .event_image img {
     width: 150px;
     height: auto;
     margin: 2px 0;
@@ -175,52 +175,52 @@ span.mc-notice {
     width: 98%
 }
 
-.jd-my-calendar .postbox {
+.my-calendar-admin .postbox {
     margin: 10px 10px 0 0
 }
 
-.jd-my-calendar .postbox.wptab {
+.my-calendar-admin .postbox.wptab {
 	margin: 0 10px 0 0!important;
 	border: 1px solid #e5e5e5;
 }
 
-.jd-my-calendar .postbox .inside {
+.my-calendar-admin .postbox .inside {
     overflow: visible !important
 }
 
 
 
 /* some plugins change this, but I need it at WP default. */
-.jd-my-calendar .meta-box-sortables {
+.my-calendar-admin .meta-box-sortables {
     min-height: 0
 }
 
-.jd-my-calendar textarea {
+.my-calendar-admin textarea {
     width: 100%
 }
 
-.jd-my-calendar pre {
+.my-calendar-admin pre {
     background: #fff;
     padding: 5px;
     border: 1px solid #ddd;
     box-shadow: 1px 1px 2px #ddd
 }
 
-.jd-my-calendar label span.required {
+.my-calendar-admin label span.required {
     font-size: .9em;
     color: #c33
 }
 
-.jd-my-calendar .default {
+.my-calendar-admin .default {
     background: #fff
 }
 
-.jd-my-calendar .button-adjust {
+.my-calendar-admin .button-adjust {
     top: 10px;
     right: 0
 }
 
-.jd-my-calendar hr {
+.my-calendar-admin hr {
     width: 20%;
     margin: 0 auto;
     border: none;
@@ -233,7 +233,7 @@ span.mc-notice {
     display: inline-block
 }
 
-.jd-my-calendar .tablenav {
+.my-calendar-admin .tablenav {
     float: right
 }
 
@@ -268,17 +268,17 @@ strong.label {
 	z-index: 10;
 }
 
-.jd-my-calendar .counter {
+.my-calendar-admin .counter {
     padding-right: 6px;
     border-right: 16px solid green;
     border-radius: 20px;
 }
 
-.jd-my-calendar .counter.warning {
+.my-calendar-admin .counter.warning {
     border-color: orange;
 }
 
-.jd-my-calendar .counter.exceeded {
+.my-calendar-admin .counter.exceeded {
     border-color: red;
 }
 
@@ -339,7 +339,7 @@ strong.label {
 	display: none;
 }
 
-.jd-my-calendar .ui-accordion-header, .mc-settings-page #mc-sortable li {
+.my-calendar-admin .ui-accordion-header, .mc-settings-page #mc-sortable li {
     border: 1px solid #ddd;
     background: rgba(0, 0, 0, .10);
     padding: .5em 1em;
@@ -355,7 +355,13 @@ strong.label {
 	width: 7em;
 }
 
-.jd-my-calendar .ui-accordion-header.ui-state-hover, .ui-accordion-header.ui-state-focus, .mc-settings-page #mc-sortable li:hover {
+#mc-sortable li:nth-of-type(1) .mc-buttons .up, #mc-sortable li:nth-of-type(9) .mc-buttons .down {
+	background: none;
+	border: 1px solid transparent;
+	color: rgba( 0,0,0,.4 );
+}
+
+.my-calendar-admin .ui-accordion-header.ui-state-hover, .ui-accordion-header.ui-state-focus, .mc-settings-page #mc-sortable li:hover {
     background: #f6f6f6;
     box-shadow: 0 0 2px #ddd;
 }
@@ -375,15 +381,15 @@ input[name="mc_uri"] {
 	padding: 1em;
 }
 
-.jd-my-calendar .ui-accordion-header-active {
+.my-calendar-admin .ui-accordion-header-active {
     background: rgba(0, 0, 0, .05);
 }
 
-.jd-my-calendar .ui-accordion-header .dashicons:before {
+.my-calendar-admin .ui-accordion-header .dashicons:before {
 	content: "\f132";
 }
 
-.jd-my-calendar .ui-accordion-header-active .dashicons:before {
+.my-calendar-admin .ui-accordion-header-active .dashicons:before {
 	content: "\f460";
 }
 
@@ -396,6 +402,10 @@ input[name="mc_uri"] {
     border-radius: none;
 	background-color: #222;
 	color: #eee;
+}
+
+#mc-sortable li.mc-stop.mc-updated {
+	color: #000;
 }
 
 #mc-sortable li.mc-stop:hover {
@@ -414,10 +424,10 @@ input[name="mc_uri"] {
     text-align: center;
 }
 
-.jd-my-calendar .checkboxes {
+.my-calendar-admin .checkboxes {
     margin: 0;
 }
-.jd-my-calendar .checkboxes:after {
+.my-calendar-admin .checkboxes:after {
     content: '';
     display: table;
     clear: both;
@@ -430,7 +440,7 @@ input[name="mc_uri"] {
 	margin-bottom: 1em;
 }
 
-.jd-my-calendar .mc_permissions .checkboxes li {
+.my-calendar-admin .mc_permissions .checkboxes li {
 	display: block;
 }
 
@@ -438,14 +448,14 @@ input[name="mc_uri"] {
 	padding: 1em;
 }
 
-.jd-my-calendar .checkboxes li {
+.my-calendar-admin .checkboxes li {
     display: inline-block;
     padding: 5px;
     background: rgba(0, 0, 0, .05);
     margin: 2px;
 }
 
-.jd-my-calendar .checkboxes li:hover {
+.my-calendar-admin .checkboxes li:hover {
     background: #fff;
 }
 
@@ -457,7 +467,7 @@ input[name="mc_uri"] {
     clear: left;
 }
 
-.jd-my-calendar fieldset legend {
+.my-calendar-admin fieldset legend {
     font-weight: 700;
     padding: 0;
     font-size: 1.1em;
@@ -576,7 +586,7 @@ input[name="mc_uri"] {
 	content: "\f132";
 }
 
-.jd-my-calendar .postbox .hndle {
+.my-calendar-admin .postbox .hndle {
 	cursor: auto;
 }
 
@@ -606,7 +616,7 @@ input[name="mc_uri"] {
 	text-shadow: 1px 0 0 #000;
 }
 
-.jd-my-calendar .error .button-secondary {
+.my-calendar-admin .error .button-secondary {
 	vertical-align: baseline;
 }
 
@@ -667,7 +677,7 @@ tr.problem .error {
 	color: #fff !important;
 }
 
-.jd-my-calendar .mc-none {
+.my-calendar-admin .mc-none {
 	clear: both;
 }
 
@@ -678,7 +688,7 @@ tr.problem .error {
 }
 
 @media (max-width: 782px) {
-    .jd-my-calendar .tablenav {
+    .my-calendar-admin .tablenav {
         float: none;
     }
 	

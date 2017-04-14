@@ -59,7 +59,7 @@ function edit_mc_templates() {
 	$template = stripslashes( $template );
 	$core = mc_template_description( $key );
 	?>
-	<div class="wrap jd-my-calendar">
+	<div class="wrap my-calendar-admin">
 		<?php my_calendar_check_db(); ?>
 		<h1 class="wp-heading-inline"><?php _e( 'My Calendar Templates', 'my-calendar' ); ?></h1>
 		<a href="<?php echo add_query_arg( 'mc_template', 'add-new', admin_url( "admin.php?page=my-calendar-templates" ) ); ?>" class="page-title-action"><?php _e( 'Add New', 'my-calendar' ); ?></a> 

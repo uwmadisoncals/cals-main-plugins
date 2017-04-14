@@ -41,9 +41,8 @@ function edit_my_calendar_behaviors() {
 	$mc_ajaxjs  = stripcslashes( get_option( 'mc_ajaxjs' ) );
 	$mc_show_js = stripcslashes( get_option( 'mc_show_js' ) );
 	// Now we render the form
-	
 	?>
-	<div class="wrap jd-my-calendar">
+	<div class="wrap my-calendar-admin">
 		<?php my_calendar_check_db(); ?>
 		<h1><?php _e( 'My Calendar Scripting', 'my-calendar' ); ?></h1>
 

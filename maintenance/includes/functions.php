@@ -276,7 +276,7 @@ function generate_number_filed($title, $id, $name, $value, $placeholder = '') {
 		$page_title = $heading = $description = $logo_width = $logo_height = '';
 		
 		$allowed_tags = wp_kses_allowed_html( 'post' );
-		if (isset($mt_option['page_title']))  $page_title 	= wp_kses_post($mt_option['page_title']);
+		if (isset($mt_option['page_title']))  $page_title 	= wp_kses(stripslashes($mt_option['page_title']), $allowed_tags);
 		if (isset($mt_option['heading']))     $heading 		= wp_kses_post($mt_option['heading']);
 		if (isset($mt_option['description'])) $description 	= wp_kses(stripslashes($mt_option['description']), $allowed_tags) ;
 		if (isset($mt_option['footer_text'])) $footer_text 	= wp_kses_post($mt_option['footer_text']);
@@ -546,47 +546,56 @@ function generate_number_filed($title, $id, $name, $value, $placeholder = '') {
 	}
 	
 	
-	function load_maintenance_page() {
+	function load_maintenance_page($original_template) {
 		global $mt_options;
-		
+
 		$vCurrDate_start = $vCurrDate_end = $vCurrTime = '';
-		
-		$vdate_start = $vdate_end = date_i18n( 'Y-m-d', strtotime( current_time('mysql', 0) )); 
+		$vdate_start = $vdate_end = date_i18n( 'Y-m-d', strtotime( current_time('mysql', 0) ));
 		$vtime_start = date_i18n( 'h:i:s A', strtotime( '01:00:00 am')); 
 		$vtime_end 	 = date_i18n( 'h:i:s A', strtotime( '12:59:59 pm')); 
-			
-			if (!is_user_logged_in()) {
-				if (!empty($mt_options['state'])) {
-					
-					if (!empty($mt_options['expiry_date_start']))
-						$vdate_start = $mt_options['expiry_date_start'];
-					if (!empty($mt_options['expiry_date_end']))
-						$vdate_end = $mt_options['expiry_date_end'];
-						
-					if (!empty($mt_options['expiry_time_start']))
-						$vtime_start = $mt_options['expiry_time_start'];
-					if (!empty($mt_options['expiry_time_end']))
-						$vtime_end = $mt_options['expiry_time_end'];
-					 
-						$vCurrTime 		 = strtotime(current_time('mysql', 0));
-						
-						$vCurrDate_start = strtotime($vdate_start . ' ' . $vtime_start); 
-						$vCurrDate_end 	 = strtotime($vdate_end   . ' ' . $vtime_end); 
-						
-						if (mtCheckExclude()) return true;
-						
-						if (($vCurrTime > $vCurrDate_start) && ($vCurrTime > $vCurrDate_end)) 
-							if (!empty($mt_options['is_down'])) return true;
-						
-				} else {
-					return true;		
-				}				
-				
-				if ( file_exists (MAINTENANCE_LOAD . 'index.php')) {
-				  	 include_once MAINTENANCE_LOAD . 'index.php';
-					 exit;
-				}	
-			}
+		$isMaintenance = true;
+
+        if (!is_user_logged_in()) {
+            if (!empty($mt_options['state'])) {
+
+                if (!empty($mt_options['expiry_date_start']))
+                    $vdate_start = $mt_options['expiry_date_start'];
+                if (!empty($mt_options['expiry_date_end']))
+                    $vdate_end = $mt_options['expiry_date_end'];
+
+                if (!empty($mt_options['expiry_time_start']))
+                    $vtime_start = $mt_options['expiry_time_start'];
+                if (!empty($mt_options['expiry_time_end']))
+                    $vtime_end = $mt_options['expiry_time_end'];
+
+                    $vCurrTime 		 = strtotime(current_time('mysql', 0));
+
+                    $vCurrDate_start = strtotime($vdate_start . ' ' . $vtime_start);
+                    $vCurrDate_end 	 = strtotime($vdate_end   . ' ' . $vtime_end);
+
+                    if (mtCheckExclude()) {
+                        $isMaintenance = false;
+                    }
+
+                    if (($vCurrTime > $vCurrDate_start) && ($vCurrTime > $vCurrDate_end)) {
+                        if (!empty($mt_options['is_down'])) {
+                            $isMaintenance = false;
+                        }
+                    }
+
+            } else {
+                $isMaintenance = false;
+            }
+            if ($isMaintenance) {
+                if ( file_exists (MAINTENANCE_LOAD . 'index.php')) {
+                    return MAINTENANCE_LOAD . 'index.php';
+                }
+            } else {
+                return $original_template;
+            }
+        } else {
+            return $original_template;
+        }
 	}
 	
 	

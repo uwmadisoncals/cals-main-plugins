@@ -2,9 +2,9 @@
 Contributors: fruitfulcode
 Donate link: http://fruitfulcode.com/
 Tags: maintenance, maintenance mode, coming soon, splash page, under-construction, 503 error, administration, login, customize page, background, fullscreen, blur
-Requires at least: 3.4
+Requires at least: 3.4.1
 Tested up to: 4.7.1
-Stable tag: 3.3
+Stable tag: 3.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,16 @@ You can check <a href="http://wordpress.org/support/plugin/maintenance">support 
 
 
 == Change log ==
+
+= 3.4.1 =
+* Bug fix: Return original template if mode is off
+
+= 3.4 =
+* Improvements: WP Hide & Security plugin compatible
+* Bug fix: Update localization files
+* Bug fix: Subset fonts
+* Bug fix: Permission access by user role
+* Bug fix: Remove deprecated function getimagesize
 
 = 3.3 =
 * New: Add og meta content

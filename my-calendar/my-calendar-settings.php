@@ -393,7 +393,7 @@ function edit_my_calendar_config() {
 	$mc_link_label          = ( isset( $templates['link'] ) ) ? esc_attr( stripslashes( $templates['link'] ) ) : '';
 	?>
 
-	<div class="wrap jd-my-calendar mc-settings-page" id="mc_settings">
+	<div class="wrap my-calendar-admin mc-settings-page" id="mc_settings">
 	<?php my_calendar_check_db(); ?>
 	<h1><?php _e( 'My Calendar Settings', 'my-calendar' ); ?></h1>
 
@@ -482,8 +482,7 @@ function edit_my_calendar_config() {
 											'5' => __( 'Author', 'my-calendar' ),
 											'6' => __( 'Category', 'my-calendar' ),
 											'7' => __( 'Location Name', 'my-calendar' )
-										), '', array(), 'select' ); ?></li>
-								<li><?php mc_settings_field( 'mc_default_direction', __( 'Sort direction', 'my-calendar' ), array(
+										), '', array(), 'select' ); ?> <?php mc_settings_field( 'mc_default_direction', __( 'Sort direction', 'my-calendar' ), array(
 											'ASC' => __( 'Ascending', 'my-calendar' ),
 											'DESC' => __( 'Descending', 'my-calendar' )
 										), '', array(), 'select' ); ?></li>										
@@ -637,16 +636,7 @@ function edit_my_calendar_config() {
 								} else {
 									$label = $k;
 								}
-								
-								if ( $i == 1 ) {
-									$buttons = "<button class='down' type='button'><i class='dashicons dashicons-arrow-down'></i><span class='screen-reader-text'>Down</span></button>";
-								} else {
-									if ( $i == $count ) {
-										$buttons = "<button class='up' type='button'><i class='dashicons dashicons-arrow-up'></i><span class='screen-reader-text'>Up</span></button>";
-									} else {
-										$buttons = "<button class='up' type='button'><i class='dashicons dashicons-arrow-up'></i><span class='screen-reader-text'>Up</span></button> <button class='down'><i class='dashicons dashicons-arrow-down'></i><span class='screen-reader-text'>Down</span></button>";
-									}
-								}
+								$buttons = "<button class='up' type='button'><i class='dashicons dashicons-arrow-up' aria-hidden='true'></i><span class='screen-reader-text'>Up</span></button> <button class='down'><i class='dashicons dashicons-arrow-down' aria-hidden='true'></i><span class='screen-reader-text'>Down</span></button>";								
 								$buttons = "<div class='mc-buttons'>$buttons</div>";								
 								echo "<li class='ui-state-default mc-$k mc-$class'>$buttons <code>$label</code> $v <input type='hidden' name='mc_nav[]' value='$k' /></li>";
 								$i++;
@@ -678,8 +668,8 @@ function edit_my_calendar_config() {
 							<li><?php mc_settings_field( 'mc_show_event_vcal', __( 'Link to single event iCal download', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_show_gcal', __( 'Link to submit event to Google Calendar', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_show_map', __( 'Link to Google Map', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-							<li><?php mc_settings_field( 'mc_gmap', __( 'Google Map (single event view only)', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-							<li><?php mc_settings_field( 'mc_gmap_api_key', __( 'Google Maps API Key', 'my-calendar' ) ); ?></li>
+							<li><?php mc_settings_field( 'mc_gmap', __( 'Google Map (single view only)', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+							<li class="mc_gmap_api_key"><?php mc_settings_field( 'mc_gmap_api_key', __( 'Google Maps API Key', 'my-calendar' ) ); ?></li>
 							<li><?php mc_settings_field( 'mc_show_address', __( 'Event Address', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_short', __( 'Short description', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_desc', __( 'Full description', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>

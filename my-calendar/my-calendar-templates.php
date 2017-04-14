@@ -288,6 +288,7 @@ function mc_create_tags( $event, $context = 'filters' ) {
 	// category fields
 	$e['cat_id']          = $event->event_category;
 	$e['category']        = stripslashes( $event->category_name );
+	$e['term']            = intval( $event->category_term );
 	$e['icon']            = mc_category_icon( $event, 'img' );
 	$e['icon_html']       = "<img src='$e[icon]' class='mc-category-icon' alt='" . __( 'Category', 'my-calendar' ) . ": " . esc_attr( $event->category_name ) . "' />";
 	$e['color']           = $event->category_color;
@@ -398,7 +399,7 @@ function mc_create_tags( $event, $context = 'filters' ) {
 	$e['ical']             = $ical_link;
 	$e['ical_html']        = "<a class='ical' rel='nofollow' href='$ical_link'>" . __( 'iCal', 'my-calendar' ) . "</a>";
 	$e                     = apply_filters( 'mc_filter_shortcodes', $e, $event );
-	
+	 
 	return $e;
 }
 
@@ -425,11 +426,35 @@ function mc_get_details_label( $event, $e ) {
 	return $e_label;
 }
 
-function mc_format_timestamp( $os ) {
+function old_mc_format_timestamp( $os ) {
 	$offset = ( 60 * 60 * get_option( 'gmt_offset' ) );
 	$time   = ( get_option( 'mc_ical_utc' ) == 'true' ) ? date( "Ymd\THi00", ( mktime( date( 'H', $os ), date( 'i', $os ), date( 's', $os ), date( 'm', $os ), date( 'd', $os ), date( 'Y', $os ) ) - ( $offset ) ) ) . "Z" : date( "Ymd\THi00", ( mktime( date( 'H', $os ), date( 'i', $os ), date( 's', $os ), date( 'm', $os ), date( 'd', $os ), date( 'Y', $os ) ) ) );
 
 	return $time;
+}
+
+function mc_format_timestamp( $os ) {
+        if ( get_option( 'mc_ical_utc' ) == 'true' ) {
+                $timezone_string = get_option( 'timezone_string' );
+                if ( ! $timezone_string ) {
+                        // multiply gmt_offset by -1 because POSIX has it reversed:
+                        // http://stackoverflow.com/questions/20228224/php-timezone-issue
+                        $timezone_string = sprintf("Etc/GMT%+d", -1 * get_option('$gmt_offset') );
+                }
+
+                $timezone_object = timezone_open( $timezone_string );
+                $date_object = date_create( null, $timezone_object );
+                $date_object->setTime( date( 'H', $os ), date( 'i', $os ) );
+                $date_object->setDate( date( 'Y', $os ), date( 'm', $os ), date( 'd', $os ) );
+                $timestamp = $date_object->getTimestamp( );
+                $time = gmdate( "Ymd\THi00", $timestamp ) . "Z";
+
+        } else {
+                $os_time = mktime( date( 'H', $os ), date( 'i', $os ), date( 's', $os ), date( 'm', $os ), date( 'd', $os ), date( 'Y', $os ) );
+                $time = date( "Ymd\THi00", $os_time );
+        }
+
+        return $time;
 }
 
 function mc_runtime( $start, $end, $event ) {

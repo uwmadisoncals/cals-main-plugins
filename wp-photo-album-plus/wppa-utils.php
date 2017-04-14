@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.6.21
+* Version 6.6.22
 *
 */
 
@@ -122,7 +122,7 @@ global $wppa_supported_stereo_types;
 	// If in the cloud...
 	$for_sm = wppa( 'for_sm' ); 				// Social media do not accept cloud images
 	$is_old = wppa_too_old_for_cloud( $id );
-	if ( wppa_cdn( 'front' ) && ! wppa_is_multi( $id ) && ! $is_old && ! wppa_is_stereo( $id ) && ! $for_sm ) {
+	if ( wppa_cdn( 'front' ) && ! wppa_is_multi( $id ) && ! $is_old && ! wppa_is_stereo( $id ) && ! $for_sm && ! $thumb['magickstack'] ) {
 		switch ( wppa_cdn( 'front' ) ) {
 			case 'cloudinary':
 				$x = round($x);
@@ -185,7 +185,10 @@ global $wppa_supported_stereo_types;
 		$result = wppa_fix_poster_ext( $result, $thumb['id'] );
 	}
 
-	$result .= '?ver=' . get_option( 'wppa_photo_version', '1' );
+	// Social media do not like querystrings
+	if ( ! wppa( 'no_ver' ) ) {
+		$result .= '?ver=' . get_option( 'wppa_photo_version', '1' );
+	}
 
 	return $result;
 }

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.6.20
+* Version 6.6.22
 *
 */
 
@@ -98,12 +98,16 @@ function _wppa_admin() {
 
 			if ($_REQUEST['edit_id'] == 'trash' ) {
 				?>
-				<h2><?php _e('Manage Trashed Photos', 'wp-photo-album-plus');
-					echo ' - <small><i>'.__('Edit photo information', 'wp-photo-album-plus').'</i></small>';
+				<div class="wrap">
+					<h2><?php _e('Manage Trashed Photos', 'wp-photo-album-plus');
+						echo ' - <small><i>'.__('Edit photo information', 'wp-photo-album-plus').'</i></small>';
+						?>
+					</h2>
+					<?php
+					wppa_album_photos($ei);
 					?>
-				</h2>
+				</div>
 				<?php
-				wppa_album_photos($ei);
 
 				return;
 			}

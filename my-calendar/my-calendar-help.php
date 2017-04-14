@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function my_calendar_help() {
 	?>
 
-	<div class="wrap jd-my-calendar">
+	<div class="wrap my-calendar-admin">
 	<h1><?php _e( 'How to use My Calendar', 'my-calendar' ); ?></h1>
 
 	<div class="postbox-container jcd-wide">

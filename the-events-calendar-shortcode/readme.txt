@@ -3,11 +3,11 @@ Contributors: brianhogg
 Tags: event, events, calendar, shortcode, modern tribe
 Requires at least: 4.1
 Tested up to: 4.7.3
-Stable tag: 1.5
+Stable tag: 1.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Adds shortcode functionality to The Events Calendar Plugin (Free Version) by Modern Tribe.
+Adds shortcode functionality to The Events Calendar Plugin (Free Version) by Modern Tribe, so you can list your events anywhere.
 
 == Description ==
 
@@ -19,7 +19,7 @@ With this plugin, just add the shortcode on a page to display a list of your eve
 
 = Shortcode Options: =
 * Basic shortcode: `[ecs-list-events]`
-* cat - Represents single event category. `[ecs-list-events cat='festival']`  Use commas when you want multiple categories [ecs-list-events cat='festival, workshops']
+* cat - Represents single event category. `[ecs-list-events cat='festival']`  Use commas when you want multiple categories `[ecs-list-events cat='festival, workshops']`
 * limit - Total number of events to show. Default is 5. `[ecs-list-events limit='3']`
 * order - Order of the events to be shown. Value can be 'ASC' or 'DESC'. Default is 'ASC'. Order is based on event date. `[ecs-list-events order='DESC']`
 * date - To show or hide date. Value can be 'true' or 'false'. Default is true. `[ecs-list-events eventdetails='false']`
@@ -28,11 +28,11 @@ With this plugin, just add the shortcode on a page to display a list of your eve
   * `[ecs-list-events excerpt='true']` //displays excerpt with length 100
   * `[ecs-list-events excerpt='300']` //displays excerpt with length 300
 * thumb - To show or hide thumbnail image. Default is false. `[ecs-list-events thumb='true']` //displays post thumbnail in default thumbnail dimension from media settings.
-* You can use 2 other attributes: thumbwidth and thumbheight to customize the thumbnail size `[ecs-list-events thumb='true' thumbwidth='150' thumbheight='150']`
+* You can use thumbwidth and thumbheight to customize the thumbnail size `[ecs-list-events thumb='true' thumbwidth='150' thumbheight='150']` or thumbsize for a registered WordPress size `[ecs-list-events thumb='true' thumbsize='large']`
 * message - Message to show when there are no events. Defaults to 'There are no upcoming events at this time.'
 * viewall - Determines whether to show 'View all events' or not. Values can be 'true' or 'false'. Default to 'true' `[ecs-list-events cat='festival' limit='3' order='DESC' viewall='false']`
 * contentorder - Manage the order of content with commas. Default to `title, thumbnail, excerpt, date, venue`. `[ecs-list-events cat='festival' limit='3' order='DESC' viewall='false' contentorder='title, thumbnail, excerpt, date, venue']`
-* month - Show only specific Month. Type 'current' for displaying current month only [ecs-list-events cat='festival' month='2015-06']
+* month - Show only specific Month. Type 'current' for displaying current month only `[ecs-list-events cat='festival' month='2015-06']`
 * past - Show Outdated Events. `[ecs-list-events cat='festival' past='yes']`
 * key - Order with Start Date `[ecs-list-events cat='festival' key='start date']`
 
@@ -42,12 +42,14 @@ With this plugin, just add the shortcode on a page to display a list of your eve
 <ul>
 <li>design - Shows improved design by default, or set to 'standard' for the regular one and 'compact' for a more compact listing</li>
 <li>days - Specify how many days in the future, for example [ecs-list-events days="1"] for one day or [ecs-list-events days="7"] for one week</li>
+<li>date - Show only events for a specific day [ecs-list-events date='2017-04-16']</li>
 <li>tag - Filter by one or more tags.  Use commas when you want to filter by multiple tags.</li>
 <li>id - Show a single event, useful for displaying details of the event on a blog post or page</li>
 <li>description - Use the full description instead of the excerpt of an event in the listing</li>
 <li>raw_description - Avoid filtering any HTML (spacing, links, bullet points, etc) in the description</li>
 <li>raw_excerpt - Avoid filtering any HTML (spacing, links, etc) in the excerpt</li>
 <li>year - Show only events for a specific year</li>
+<li>timeonly - To show just the start time of the event. [ecs-list-events timeonly='true']</li>
 <li>offset - Skip a certain number of events from the beginning, useful for using multiple shortcodes on the same page (with ads in between) or splitting into columns</li>
 <li>custom design - Create one or more of your own templates for use with the shortcode</li>
 <li>hiderecurring - To only show the first instance of a recurring event, set to 'true'</li>
@@ -81,7 +83,8 @@ You can then add the `[ecs-list-events]` shortcode to the page or post you want 
 * excerpt - To show or hide the excerpt and set excerpt length. Default is false. `[ecs-list-events excerpt='true']` //displays excerpt with length 100
  excerpt='300' //displays excerpt with length 300
 * thumb - To show or hide thumbnail image. Default is false. `[ecs-list-events thumb='true']` //displays post thumbnail in default thumbnail dimension from media settings.
-* You can use 2 other attributes: thumbwidth and thumbheight to customize the thumbnail size `[ecs-list-events thumb='true' thumbwidth='150' thumbheight='150']`
+* thumbsize - Specify the size of the thumbnail. `[ecs-list-events thumb='true' thumbsize='large']`
+* thumbwidth / thumbheight - Customize the thumbnail size in pixels `[ecs-list-events thumb='true' thumbwidth='150' thumbheight='150']`
 * message - Message to show when there are no events. Defaults to 'There are no upcoming events at this time.'
 * viewall - Determines whether to show 'View all events' or not. Values can be 'true' or 'false'. Default to 'true' `[ecs-list-events cat='festival' limit='3' order='DESC' viewall='false']`
 * contentorder - Manage the order of content with commas. Default to `title, thumbnail, excerpt, date, venue`. `[ecs-list-events cat='festival' limit='3' order='DESC' viewall='false' contentorder='title, thumbnail, excerpt, date, venue']`
@@ -91,14 +94,16 @@ You can then add the `[ecs-list-events]` shortcode to the page or post you want 
 
 With [The Events Calendar Shortcode PRO](https://eventcalendarnewsletter.com/the-events-calendar-shortcode?utm_source=wordpress.org&utm_medium=link&utm_campaign=tecs-readme-faq-options&utm_content=description) you also get the following options:
 
-* design - Shows improved design by default, or set to 'standard' for the regular one and 'compact' for a more compact listing
+* design - Shows improved design by default. Set to 'standard' for the regular one, 'compact' for a more compact listing, or 'grouped' to group events by day
 * days - Specify how many days in the future, for example `[ecs-list-events days="1"]` for one day or `[ecs-list-events days="7"]` for one week
 * tag - Filter by one or more tags.  Use commas when you want to filter by multiple tags.
 * id - Show a single event, useful for displaying details of the event on a blog post or page
 * description - Use the full description instead of the excerpt of an event in the listing
 * raw_description - Avoid filtering any HTML (spacing, links, bullet points, etc) in the description
 * raw_excerpt - Avoid filtering any HTML (spacing, links, etc) in the excerpt
-* year - Show only events for a specific year
+* date - Show only events for a specific day `[ecs-list-events date='2017-04-16']`
+* year - Show only events for a specific year `[ecs-list-events year='2017']`
+* timeonly - To show just the start time of the event. `[ecs-list-events timeonly='true']`
 * offset - Skip a certain number of events from the beginning, useful for using multiple shortcodes on the same page (with ads in between) or splitting into columns
 * custom design - Create one or more of your own templates for use with the shortcode
 * hiderecurring - To only show the first instance of a recurring event, set to 'true'
@@ -107,8 +112,9 @@ With [The Events Calendar Shortcode PRO](https://eventcalendarnewsletter.com/the
 
 = How do I use this shortcode in a widget? =
 
-* You can put the shortcode in a text widget.
-* Not all themes support use of a shortcode in a widget. If a regular text widget doesn't work, put the shortcode in a <a href="https://wordpress.org/plugins/black-studio-tinymce-widget/">Visual Editor Widget</a>.
+You can put the shortcode in a text widget, though not all themes support use of a shortcode in a widget.
+
+If a regular text widget doesn't work, put the shortcode in a <a href="https://wordpress.org/plugins/black-studio-tinymce-widget/">Visual Editor Widget</a>.
 
 = What are the classes for styling the list of events? =
 By default the plugin does not include styling. Events are listed in ul li tags with appropriate classes for styling with a bit of CSS.
@@ -136,6 +142,9 @@ Put this in the template where you want the events list to display.
 3. Many settings you can use in the shortcode to change what details appear in the events listing
 
 == Upgrade Notice ==
+
+= 1.5.1 =
+* Adds thumbsize option (ie. medium, large, thumbnail, full)
 
 = 1.5 =
 * Adds ability to translate the plugin into local languages
@@ -188,6 +197,9 @@ Fix missing ul
 * Initial Release
 
 == Changelog ==
+
+= 1.5.1 =
+* Adds thumbsize option (ie. medium, large, thumbnail, full)
 
 = 1.5 =
 * Adds ability to translate the plugin into local languages

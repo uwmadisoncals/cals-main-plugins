@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.6.20
+* Version 6.6.22
 *
 */
 
@@ -82,12 +82,19 @@ global $wpdb;
 
 		// SM may not accept images from the cloud.
 		wppa( 'for_sm', true );
+
+		// SM does not want version numbers
+		wppa( 'no_ver', true );
+
 		$imgurl = wppa_get_photo_url( $id );
+		wppa( 'no_ver', false );
 		wppa( 'for_sm', false );
 	}
 	else {
 		$imgurl = '';
+		echo '<!-- WPPA+ No Photo id -->';
 	}
+
 	if ( $id ) {
 
 		if ( wppa_switch( 'share_twitter' ) && wppa_opt( 'twitter_account' ) ) {
@@ -140,6 +147,7 @@ global $wpdb;
 				$title  = wppa_get_photo_name( $id );
 				$desc 	= wppa_get_og_desc( $id );
 				$url 	= ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+				$url 	= wppa_convert_to_pretty( $url, false, true );
 				$site   = get_bloginfo('name');
 				$mime 	= wppa_get_mime_type( $id );
 				echo '

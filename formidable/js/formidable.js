@@ -4,6 +4,7 @@ function frmFrontFormJS(){
 	var action = '';
 	var jsErrors = [];
 	var lookupsLoading = 0;// TODO: switch to processesRunning and make it work with file upload fields
+	var lookupQueues = {};
 
 	function setNextPage(e){
 		/*jshint validthis:true */
@@ -65,7 +66,13 @@ function frmFrontFormJS(){
 		var dateFields = __frmDatepicker;
 		var id = this.id;
 		var idParts = id.split('-');
-		var altID = 'input[id^="'+ idParts.join('-') +'"]';
+		var altID = '';
+
+		if ( isRepeatingFieldByName( this.name ) ) {
+			altID = 'input[id^="'+ idParts[0] +'"]';
+		} else {
+			altID = 'input[id^="'+ idParts.join('-') +'"]';
+		}
 
 		jQuery.datepicker.setDefaults(jQuery.datepicker.regional['']);
 
@@ -73,6 +80,7 @@ function frmFrontFormJS(){
 		for ( var i = 0; i < dateFields.length; i++ ) {
 			if ( dateFields[i].triggerID == '#' + id || dateFields[i].triggerID == altID ) {
 				opt_key = i;
+				break;
 			}
 		}
 
@@ -152,9 +160,16 @@ function frmFrontFormJS(){
 			},
 			init: function() {
 				this.on('sending', function(file, xhr, formData) {
-					formData.append('action', 'frm_submit_dropzone' );
-					formData.append('field_id', uploadFields[i].fieldID );
-					formData.append('form_id', uploadFields[i].formID );
+					if ( isSpam() ) {
+						this.removeFile(file);
+						alert('Oops. That file looks like Spam.');
+						return false;
+					} else {
+						formData.append('action', 'frm_submit_dropzone' );
+						formData.append('field_id', uploadFields[i].fieldID );
+						formData.append('form_id', uploadFields[i].formID );
+						formData.append('nonce', frm_js.nonce );
+					}
 				});
 
 				this.on('success', function( file, response ) {
@@ -225,6 +240,15 @@ function frmFrontFormJS(){
 				}
 			}
 		});
+	}
+
+	function isSpam() {
+		var val = document.getElementById('frm_verify').value;
+		if ( val !== '' ) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	function getHiddenUploadHTML( field, mediaID, fieldName ) {
@@ -1223,6 +1247,11 @@ function frmFrontFormJS(){
 		var prevInput;
 		var valueChanged = true;
 		for ( var i= 0, l=inputs.length; i<l; i++ ){
+			if ( inputs[i].className.indexOf( 'frm_dnc' ) > -1 ) {
+				prevInput = inputs[i];
+				continue;
+			}
+
 			if ( i>0 && prevInput.name != inputs[i].name && valueChanged === true ) {
 				// Only trigger a change after all inputs in a field are cleared
 				triggerChange( jQuery(prevInput) );
@@ -1573,6 +1602,13 @@ function frmFrontFormJS(){
 	function updateSingleWatchingField( childFieldArgs, childElement ) {
 		childFieldArgs.parentVals = getParentLookupFieldVals( childFieldArgs );
 
+		if ( currentLookupHasQueue( childElement.id ) ) {
+			addLookupToQueueOfTwo( childFieldArgs, childElement );
+			return;
+		}
+
+		addLookupToQueueOfTwo( childFieldArgs, childElement );
+
 		maybeInsertValueInFieldWatchingLookup( childFieldArgs, childElement );
 	}
 
@@ -1729,6 +1765,7 @@ function frmFrontFormJS(){
 				},
 				success:function(newOptions){
 					replaceSelectLookupFieldOptions( childFieldArgs, childSelect, newOptions );
+					triggerLookupOptionsLoaded( jQuery( childDiv ) );
 					enableFormAfterLookup( childFieldArgs.formId );
 				}
 			});
@@ -1966,10 +2003,22 @@ function frmFrontFormJS(){
 				}
 
 				triggerChange( jQuery( inputs[0] ), childFieldArgs.fieldKey );
+				triggerLookupOptionsLoaded( jQuery( childDiv ) );
 
 				enableFormAfterLookup( childFieldArgs.formId );
 			}
 		});
+	}
+
+	/**
+	 * Trigger the frm_lookup_options_loaded event on the field div
+	 *
+	 * @since 2.03.05
+	 *
+	 * @param {Object} $fieldDiv
+	 */
+	function triggerLookupOptionsLoaded( $fieldDiv ) {
+		$fieldDiv.trigger( 'frmLookupOptionsLoaded' );
 	}
 
 	/**
@@ -2060,6 +2109,7 @@ function frmFrontFormJS(){
 	function maybeInsertValueInFieldWatchingLookup( childFieldArgs, childInput ) {
 		if ( isChildInputConditionallyHidden( childInput, childFieldArgs.formId ) ) {
 			// TODO: What if field is in conditionally hidden section?
+			checkQueueAfterLookupCompleted( childInput.id );
 			return;
 		}
 
@@ -2070,6 +2120,7 @@ function frmFrontFormJS(){
 				newValue = '';
 			}
 			insertValueInFieldWatchingLookup( childFieldArgs, childInput, newValue );
+			checkQueueAfterLookupCompleted( childInput.id );
 		} else {
 			// If all parents have values, check for a new value
 
@@ -2086,15 +2137,89 @@ function frmFrontFormJS(){
 					nonce:frm_js.nonce
 				},
 				success:function(newValue){
-					if ( childInput.value != newValue ) {
+					if ( ! isChildInputConditionallyHidden( childInput, childFieldArgs.formId ) && childInput.value != newValue ) {
 						insertValueInFieldWatchingLookup( childFieldArgs.fieldKey, childInput, newValue );
 					}
 
 					enableFormAfterLookup( childFieldArgs.formId );
+					checkQueueAfterLookupCompleted( childInput.id );
 				}
 			});
 		}
 	}
+
+	/**
+	 * Check if the current Lookup watcher field has a queue
+	 *
+	 * @since 2.03.05
+	 *
+	 * @param {string} elementId
+	 * @returns {boolean}
+     */
+	function currentLookupHasQueue( elementId ) {
+		return ( elementId in lookupQueues && lookupQueues[elementId].length > 0 );
+	}
+
+	/**
+	 * Add the current Lookup watcher to a queue of size two
+	 *
+	 * @since 2.03.05
+	 *
+	 * @param {Object} childFieldArgs
+	 * @param {Object} childInput
+     */
+	function addLookupToQueueOfTwo( childFieldArgs, childInput ) {
+		var elementId = childInput.id;
+
+		if ( elementId in lookupQueues ) {
+			if ( lookupQueues[elementId].length >= 2 ) {
+				lookupQueues[elementId] = lookupQueues[elementId].slice( 0, 1 );
+			}
+		} else {
+			lookupQueues[elementId] = [];
+		}
+
+		lookupQueues[elementId].push( { 'childFieldArgs':childFieldArgs, 'childInput':childInput } );
+	}
+
+	/**
+	 * Check the lookupQueue after a value lookup is completed
+	 *
+	 * @since 2.03.05
+	 *
+	 * @param {string} elementId
+     */
+	function checkQueueAfterLookupCompleted( elementId ) {
+		removeLookupFromQueue( elementId );
+		doNextItemInLookupQueue( elementId );
+	}
+
+	/**
+	 * Remove a Lookup from the queue
+	 *
+	 * @since 2.03.05
+	 *
+	 * @param {string} elementId
+	 */
+	function removeLookupFromQueue( elementId ) {
+		lookupQueues[elementId].shift();
+	}
+
+	/**
+	 * Check the current Lookup queue
+	 *
+	 * @since 2.03.05
+	 *
+	 * @param {string} elementId
+	 */
+	function doNextItemInLookupQueue( elementId ) {
+		if ( currentLookupHasQueue( elementId ) ) {
+			var childFieldArgs = lookupQueues[elementId][0].childFieldArgs;
+			var childInput = lookupQueues[elementId][0].childInput;
+			maybeInsertValueInFieldWatchingLookup( childFieldArgs, childInput );
+		}
+	}
+
 
 	/**
 	 * Insert a new text field Lookup value
@@ -3666,6 +3791,7 @@ function frmFrontFormJS(){
 
 		var chart = new google.visualization[type]( chartDiv );
 		chart.draw(data, graphData.options);
+		jQuery(document).trigger( 'frmDrawChart', [ chart, 'chart_' + graphData.graph_id, data ] );
 	}
 
 	function getGraphType(field){

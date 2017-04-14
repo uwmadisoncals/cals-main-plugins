@@ -2,12 +2,12 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick
-Version: 6.6.21
-Stable tag: 6.6.21
+Version: 6.6.23
+Stable tag: 6.6.23
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
-Tested up to: 4.7
+Tested up to: 4.8-alpha-40396
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -179,6 +179,29 @@ Oh, just Google on 'picture resizer' and you will find a bunch of free programs 
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.6.23 =
+
+= Bug Fixes =
+
+* Fixed db version number 
+
+= 6.6.22 =
+
+= Bug Fxes =
+
+* The header in the edit photo and moderate photo pages was below the photo(s). Fixed.
+
+= New Features =
+
+* Administrators, wppa superusers and moderators can now schedule the time for the automatic future deletion of photos.
+
+= Other Changes =
+
+* Status of confirmation boxes on bulk photo admin page are now saved in cookies.
+* Image urls in og:matatags have no longer a version number for cleaner urls.
+* Urls in og:metatags are now always pretty, regardless of Table IV-A6. The wp permalink structure still needs to be non-default.
+* Extra calls to the functions that remove spinners are added running 1 second later to fix possible timing related issues where spinners do not disappear where they should.
 
 = 6.6.21 =
 

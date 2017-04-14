@@ -4,7 +4,7 @@ Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
 Tested up to: 4.7
-Stable tag: 2.5.5
+Stable tag: 2.5.7
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -42,15 +42,15 @@ Easy to use for anybody, My Calendar provides enormous flexibility for designers
 * 	Shortcode Generator to create customized views of My Calendar
 *   [Developer Documentation](http://www.joedolson.com/doc-category/my-calendar-3/)
 
-= What's in My Calendar Pro? =
-
-* Let your site visitors submit events to your site (pay to post or free!).
-* Let logged-in users edit their events from the front-end.
-* Create events when you publish a blog post
-* Publish a blog post when you create an event
-* Advanced search features
-* Responsive mode
-* Import events from .ics or .csv formats via file or URL.
+> = What's in My Calendar Pro? =
+> 
+> * Let your site visitors submit events to your site (pay to post or free!).
+> * Let logged-in users edit their events from the front-end.
+> * Create events when you publish a blog post
+> * Publish a blog post when you create an event
+> * Advanced search features
+> * Responsive mode
+> * Import events from .ics or .csv formats via file or URL.
 
 = Translations =
 
@@ -82,6 +82,33 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
    with shortcode options or widget configuration.
 
 == Changelog ==
+
+= 2.5.8 =
+
+* Bug fix: mc-ajax.js referred to a class that did not always exist
+* Bug fix: Cases missed in interpreting category class values
+* Bug fix: For backwards compatibility, ensure that spaces are replaced with hyphens in category classes
+* Bug fix: Check whether templates returned are empty & ensure fallback renders
+* Bug fix: revise FOUC implementation to avoid jQuery not defined errors
+
+= 2.5.7 =
+
+* Bug fix: notice in event image field if input disabled
+* Bug fix: class setting was based on GMT timestamp according to MySQL
+* Bug fix: PHP notice thrown if requested template doesn't exist
+* Bug fix: support for embedding videos via iFrame.
+* Bug fix: JS refinements to AJAX loading; changing formats can cause panel closing not to fire due to .list/.calendar switching
+* Bug fix: JS refinements to AJAX loading; make sure everything works when positioned in the header or are excluded
+* Bug fix: always provide a category class that's valid
+* Bug fix: If mini calendar links set to open to new page, automatically disable JS
+* Bug fix: If special options hidden, always set to 'true' on event save.
+* Added: aria-current for current date.
+* Improve KSES implementation
+* Improved URL building
+* Improvements to print CSS
+* Improvements to sortable CSS
+* New filter: 'mc_category_icon'
+* New action: 'mc_print_view_head'
 
 = 2.5.6 =
 
@@ -779,6 +806,7 @@ This is a major revision.
 * Add ability to limit by multiple locations (e.g., view all events in Location 1 & Location 2; only on lvalue)
 * Event occurrence IDs can change when events dates are changed
 * Add option to insert events simultaneously to both global & local calendar in multisite networks [todo]
+* JS to delete events from front-end when logged-in
 
 == Frequently Asked Questions ==
 

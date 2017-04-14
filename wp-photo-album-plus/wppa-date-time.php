@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * date and time related functions
-* Version 6.6.00
+* Version 6.6.22
 *
 */
 
@@ -72,7 +72,7 @@ function wppa_get_date_time_select_html( $type, $id, $selectable = true ) {
 
 	$type = strtoupper( substr( $type, 0, 1 ) ).strtolower( substr( $type, 1 ) );
 
-	if ( $type == 'Photo' ) {
+	if ( $type == 'Photo' || $type == 'Delphoto' ) {
 		$thumb = wppa_cache_thumb( $id );
 	}
 	elseif ( $type == 'Album' ) {
@@ -98,7 +98,20 @@ function wppa_get_date_time_select_html( $type, $id, $selectable = true ) {
 						 '50', '51', '52', '53', '54', '55', '56', '57', '58', '59' );
 	$val_mins 	= $opt_mins;
 
-	$curval = $type == 'Photo' ? $thumb['scheduledtm'] : $album['scheduledtm'];
+	switch ( $type ) {
+		case 'Photo':
+			$curval = $thumb['scheduledtm'];
+			$class = 'wppa-datetime-' . $id;
+			break;
+		case 'Album':
+			$curval = $album['scheduledtm'];
+			$class = 'wppa-datetime-' . $id;
+			break;
+		case 'Delphoto':
+			$curval = $thumb['scheduledel'];
+			$class = 'wppa-del-datetime-' . $id;
+			break;
+	}
 
 	if ( ! $curval ) $curval = wppa_get_default_scheduledtm();
 
@@ -113,37 +126,37 @@ function wppa_get_date_time_select_html( $type, $id, $selectable = true ) {
 
 	if ( $selectable ) {
 
-		$result .= 	'<select name="wppa-day" id="wppa-day-'.$id.'" class="wppa-datetime-'.$id.'" onchange="wppaAjaxUpdate'.$type.'('.$id.', \'day\', this);" >';
+		$result .= 	'<select name="wppa-day" id="wppa-day-'.$id.'" class="'.$class.'" onchange="wppaAjaxUpdate'.$type.'('.$id.', \'day\', this);" >';
 		foreach ( array_keys( $opt_days ) as $key ) {
 			$sel =  $val_days[$key] == $cur_day ? 'selected="selected"' : '';
 			$result .= '<option value="'.$val_days[$key].'" '.$sel.' >'.$opt_days[$key].'</option>';
 		}
 		$result .= 	'</select >';
 
-		$result .= 	'<select name="wppa-month" id="wppa-month-'.$id.'" class="wppa-datetime-'.$id.'" onchange="wppaAjaxUpdate'.$type.'('.$id.', \'month\', this);" >';
+		$result .= 	'<select name="wppa-month" id="wppa-month-'.$id.'" class="'.$class.'" onchange="wppaAjaxUpdate'.$type.'('.$id.', \'month\', this);" >';
 		foreach ( array_keys( $opt_months ) as $key ) {
 			$sel =  $val_months[$key] == $cur_month ? 'selected="selected"' : '';
 			$result .= '<option value="'.$val_months[$key].'" '.$sel.' >'.$opt_months[$key].'</option>';
 		}
 		$result .= 	'</select >';
 
-		$result .= 	'<select name="wppa-year" id="wppa-year-'.$id.'" class="wppa-datetime-'.$id.'" onchange="wppaAjaxUpdate'.$type.'('.$id.', \'year\', this);" >';
+		$result .= 	'<select name="wppa-year" id="wppa-year-'.$id.'" class="'.$class.'" onchange="wppaAjaxUpdate'.$type.'('.$id.', \'year\', this);" >';
 		foreach ( array_keys( $opt_years ) as $key ) {
 			$sel =  $val_years[$key] == $cur_year ? 'selected="selected"' : '';
 			$result .= '<option value="'.$val_years[$key].'" '.$sel.' >'.$opt_years[$key].'</option>';
 		}
 		$result .= 	'</select >';
-		$result .= '<span class="wppa-datetime-'.$id.'" >@</span>';
+		$result .= '<span class="'.$class.'" >@</span>';
 
-		$result .= 	'<select name="wppa-hour" id="wppa-hour-'.$id.'" class="wppa-datetime-'.$id.'" onchange="wppaAjaxUpdate'.$type.'('.$id.', \'hour\', this);" >';
+		$result .= 	'<select name="wppa-hour" id="wppa-hour-'.$id.'" class="'.$class.'" onchange="wppaAjaxUpdate'.$type.'('.$id.', \'hour\', this);" >';
 		foreach ( array_keys( $opt_hours ) as $key ) {
 			$sel =  $val_hours[$key] == $cur_hour ? 'selected="selected"' : '';
 			$result .= '<option value="'.$val_hours[$key].'" '.$sel.' >'.$opt_hours[$key].'</option>';
 		}
 		$result .= 	'</select >';
-		$result .= '<span class="wppa-datetime-'.$id.'" >:</span>';
+		$result .= '<span class="'.$class.'" >:</span>';
 
-		$result .= 	'<select name="wppa-min" id="wppa-min-'.$id.'" class="wppa-datetime-'.$id.'" onchange="wppaAjaxUpdate'.$type.'('.$id.', \'min\', this);">';
+		$result .= 	'<select name="wppa-min" id="wppa-min-'.$id.'" class="'.$class.'" onchange="wppaAjaxUpdate'.$type.'('.$id.', \'min\', this);">';
 		foreach ( array_keys( $opt_mins ) as $key ) {
 			$sel =  $val_mins[$key] == $cur_min ? 'selected="selected"' : '';
 			$result .= '<option value="'.$val_mins[$key].'" '.$sel.' >'.$opt_mins[$key].'</option>';
@@ -152,7 +165,7 @@ function wppa_get_date_time_select_html( $type, $id, $selectable = true ) {
 
 	}
 	else {
-		$result .= '<span class="wppa-datetime-'.$id.'" >'.$cur_day.' '.$opt_months[strval(intval($cur_month))].' '.$cur_year.'@'.$cur_hour.':'.$cur_min.'</span>';
+		$result .= '<span class="'.$class.'" >'.$cur_day.' '.$opt_months[strval(intval($cur_month))].' '.$cur_year.'@'.$cur_hour.':'.$cur_min.'</span>';
 	}
 
 	return $result;
