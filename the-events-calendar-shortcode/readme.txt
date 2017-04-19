@@ -3,7 +3,7 @@ Contributors: brianhogg
 Tags: event, events, calendar, shortcode, modern tribe
 Requires at least: 4.1
 Tested up to: 4.7.3
-Stable tag: 1.5.1
+Stable tag: 1.5.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,7 +32,7 @@ With this plugin, just add the shortcode on a page to display a list of your eve
 * message - Message to show when there are no events. Defaults to 'There are no upcoming events at this time.'
 * viewall - Determines whether to show 'View all events' or not. Values can be 'true' or 'false'. Default to 'true' `[ecs-list-events cat='festival' limit='3' order='DESC' viewall='false']`
 * contentorder - Manage the order of content with commas. Default to `title, thumbnail, excerpt, date, venue`. `[ecs-list-events cat='festival' limit='3' order='DESC' viewall='false' contentorder='title, thumbnail, excerpt, date, venue']`
-* month - Show only specific Month. Type 'current' for displaying current month only `[ecs-list-events cat='festival' month='2015-06']`
+* month - Show only specific Month. Type `'current'` for displaying current month only or `'next'` for next month `[ecs-list-events cat='festival' month='2015-06']`
 * past - Show Outdated Events. `[ecs-list-events cat='festival' past='yes']`
 * key - Order with Start Date `[ecs-list-events cat='festival' key='start date']`
 
@@ -40,7 +40,7 @@ With this plugin, just add the shortcode on a page to display a list of your eve
 <blockquote>
 <h4>Additional options and benefits in the pro version</h4>
 <ul>
-<li>design - Shows improved design by default, or set to 'standard' for the regular one and 'compact' for a more compact listing</li>
+<li>design - Shows <a href="https://eventcalendarnewsletter.com/the-events-calendar-shortcode#designs?utm_source=wordpress.org&utm_medium=link&utm_campaign=tecs-readme-design&utm_content=description" target="_blank">improved design by default</a>, 'compact' for a more compact listing, or 'grouped' to group events by day</li>
 <li>days - Specify how many days in the future, for example [ecs-list-events days="1"] for one day or [ecs-list-events days="7"] for one week</li>
 <li>date - Show only events for a specific day [ecs-list-events date='2017-04-16']</li>
 <li>tag - Filter by one or more tags.  Use commas when you want to filter by multiple tags.</li>
@@ -88,7 +88,7 @@ You can then add the `[ecs-list-events]` shortcode to the page or post you want 
 * message - Message to show when there are no events. Defaults to 'There are no upcoming events at this time.'
 * viewall - Determines whether to show 'View all events' or not. Values can be 'true' or 'false'. Default to 'true' `[ecs-list-events cat='festival' limit='3' order='DESC' viewall='false']`
 * contentorder - Manage the order of content with commas. Default to `title, thumbnail, excerpt, date, venue`. `[ecs-list-events cat='festival' limit='3' order='DESC' viewall='false' contentorder='title, thumbnail, excerpt, date, venue']`
-* month - Show only specific Month. Type 'current' for displaying current month only. `[ecs-list-events cat='festival' month='2015-06']`
+* month - Show only specific month (in YYYY-MM format). Type `'current'` for displaying current month only or `'next'` for next month. `[ecs-list-events cat='festival' month='2015-06']`
 * past - Show Outdated Events. `[ecs-list-events cat='festival' past='yes']`
 * key - Order with Start Date `[ecs-list-events cat='festival' key='start date']`
 
@@ -142,6 +142,9 @@ Put this in the template where you want the events list to display.
 3. Many settings you can use in the shortcode to change what details appear in the events listing
 
 == Upgrade Notice ==
+
+= 1.5.2 =
+* Adds 'next' option for showing the next month of events
 
 = 1.5.1 =
 * Adds thumbsize option (ie. medium, large, thumbnail, full)
@@ -197,6 +200,9 @@ Fix missing ul
 * Initial Release
 
 == Changelog ==
+
+= 1.5.2 =
+* Adds 'next' option for showing the next month of events
 
 = 1.5.1 =
 * Adds thumbsize option (ie. medium, large, thumbnail, full)
