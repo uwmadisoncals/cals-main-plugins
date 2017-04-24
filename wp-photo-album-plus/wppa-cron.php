@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
-* Version 6.6.19
+* Version 6.6.24
 *
 *
 */
@@ -25,6 +25,7 @@ add_action( 'wppa_cron_event', 'wppa_do_maintenance_proc', 10, 1 );
 
 // Schedule maintenance proc
 function wppa_schedule_maintenance_proc( $slug, $from_settings_page = false ) {
+global $is_reschedule;
 
 	// Schedule cron job
 	if ( ! wp_next_scheduled( 'wppa_cron_event', array( $slug ) ) ) {
@@ -38,6 +39,7 @@ function wppa_schedule_maintenance_proc( $slug, $from_settings_page = false ) {
 				}
 				$args .= str_replace( "\n", '', var_export( $arg, true ) );
 			}
+			$args = trim( $args );
 			if ( $args ) {
 				$args = ' ' . str_replace( ',)', ', )', $args ) . ' ';
 			}
@@ -46,16 +48,17 @@ function wppa_schedule_maintenance_proc( $slug, $from_settings_page = false ) {
 			$args = " '" . $backtrace[1]['args'] . "' ";
 		}
 
-		wppa_log( 'Cron', '{b}' . $slug . '{/b} scheduled by {b}' . $backtrace[1]['function'] . '(' . $args . '){/b} on line {b}' . $backtrace[0]['line'] . '{/b} of ' . basename( $backtrace[0]['file'] ) . ' called by ' . $backtrace[2]['function'] );
+		$re = $is_reschedule ? 're-' : '';
+		wppa_log( 'Cron', '{b}' . $slug . '{/b} ' . $re . 'scheduled by {b}' . $backtrace[1]['function'] . '(' . $args . '){/b} on line {b}' . $backtrace[0]['line'] . '{/b} of ' . basename( $backtrace[0]['file'] ) . ' called by ' . $backtrace[2]['function'] );
 	}
 
 	// Update appropriate options
-	update_option( $slug . '_status', 'Scheduled cron job' );
+	update_option( $slug . '_status', 'Cron job' );
 	update_option( $slug . '_user', 'cron-job' );
 
 	// Inform calling Ajax proc about the results
 	if ( $from_settings_page ) {
-		echo '||' . $slug . '||' . __( 'Scheduled cron job', 'wp-photo-album-plus' ) . '||0||reload';
+		echo '||' . $slug . '||' . 'Cron job' . '||0||reload';
 	}
 
 }
@@ -66,18 +69,41 @@ function wppa_is_maintenance_cron_job_crashed( $slug ) {
 	// Asume not
 	$result = false;
 
-	// If there is a last timestamp longer than 15 minutes ago...
-	$last = get_option( $slug.'_lasttimestamp', '0' );
-	if ( $last && $last < ( time() - 900 ) ) {
+	// If there is a last timestamp longer than 5 minutes ago...
+	$lasttime = get_option( $slug.'_lasttimestamp', '0' );
+	if ( $lasttime && $lasttime < ( time() - 300 ) ) {
 
 		// And the user is cron
-		if ( get_option( $slug . '_user' ) == 'cron-job' ){
+		if ( get_option( $slug . '_user' ) == 'cron-job' ) {
 
 			// And proc is not scheduled
 			if ( ! wp_next_scheduled( 'wppa_cron_event', array( $slug ) ) ) {
 
 				// It is crashed
 				$result = true;
+			}
+		}
+	}
+
+	// No last timestamp, maybe never started?
+	elseif ( ! $lasttime ) {
+
+		// Nothing done yet
+		if ( get_option( $slug . 'last' ) == '0' ) {
+
+			// Togo not calculated yet
+			if ( get_option( $slug . 'togo' ) == '' ) {
+
+				// If the user is cron
+				if ( get_option( $slug . '_user' ) == 'cron-job' ) {
+
+					// And proc is not scheduled
+					if ( ! wp_next_scheduled( 'wppa_cron_event', array( $slug ) ) ) {
+
+						// It is crashed
+						$result = true;
+					}
+				}
 			}
 		}
 	}
@@ -104,9 +130,8 @@ function wppa_schedule_cleanup( $now = false ) {
 // The actual cleaner
 function wppa_do_cleanup() {
 global $wpdb;
-global $wppa_all_maintenance_slugs;
 
-	wppa_log( 'Cron', 'Cron job {b}wppa_cleanup{/b} started.' );
+	wppa_log( 'Cron', '{b}wppa_cleanup{/b} started.' );
 
 	// Cleanup session db table
 	$lifetime 	= 3600;			// Sessions expire after one hour
@@ -126,14 +151,7 @@ global $wppa_all_maintenance_slugs;
 	}
 
 	// Re-animate crashed cronjobs
-	foreach ( $wppa_all_maintenance_slugs as $slug ) {
-		if ( wppa_is_maintenance_cron_job_crashed( $slug ) ) {
-			$last = get_option( $slug . '_last' );
-			update_option( $slug . '_last', $last + 1 );
-			wppa_schedule_maintenance_proc( $slug );
-			wppa_log( 'Cron', 'Crashed cron job {b}' . $slug . '{/b} re-animated at item {b}#' . $last . '{/b}' );
-		}
-	}
+	wppa_re_animate_cron();
 
 	// Find lost photos, update their album to -9, meaning trashed
 	$album_ids = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_ALBUMS . "`" );
@@ -152,8 +170,8 @@ global $wppa_all_maintenance_slugs;
 	wppa_create_pl_htaccess();
 
 	// Cleanup index
-	wppa_index_compute_skips();
-	wppa_schedule_maintenance_proc( 'wppa_cleanup_index' );
+//	wppa_index_compute_skips();
+//	wppa_schedule_maintenance_proc( 'wppa_cleanup_index' );
 
 	// Retry failed mails
 	if ( wppa_opt( 'retry_mails' ) ) {
@@ -192,7 +210,11 @@ global $wppa_all_maintenance_slugs;
 		update_option( 'wppa_failed_mails', $failed_mails );
 	}
 
-	wppa_log( 'Cron', 'Cron job {b}wppa_cleanup{/b} completed.' );
+	wppa_log( 'Cron', '{b}wppa_cleanup{/b} completed.' );
+
+	// Redo after 5 minutes
+//	wp_schedule_single_event( time() + 300, 'wppa_cleanup' );
+//	wppa_log( 'Cron', '{b}wppa_cleanup{/b} re-scheduled' );
 }
 
 // Activate treecount update proc
@@ -224,4 +246,18 @@ global $wpdb;
 			exit();
 		}
 	}
+}
+
+function wppa_re_animate_cron() {
+global $wppa_cron_maintenance_slugs;
+
+	foreach ( $wppa_cron_maintenance_slugs as $slug ) {
+		if ( wppa_is_maintenance_cron_job_crashed( $slug ) ) {
+			$last = get_option( $slug . '_last' );
+			update_option( $slug . '_last', $last + 1 );
+			wppa_schedule_maintenance_proc( $slug );
+			wppa_log( 'Cron', '{b}' . $slug . '{/b} re-animated at item {b}#' . $last . '{/b}' );
+		}
+	}
+
 }

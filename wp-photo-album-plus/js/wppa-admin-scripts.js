@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.6.22
+/* Version 6.6.24
 /* Various js routines used in admin pages
 */
 
@@ -302,7 +302,7 @@ function wppaRefreshAfter() {
 
 function wppaFollow( id, clas ) {
 
-	if ( jQuery('#'+id).attr('checked') ) {
+	if ( jQuery('#'+id).prop('checked') ) {
 		jQuery('.'+clas).css('display', '');
 	}
 	else {
@@ -2013,11 +2013,11 @@ function wppaAjaxUpdateOptionValue(slug, elem, multisel) {
 	// on-unit to process the result
 	xmlhttp.onreadystatechange=function() {
 		if (xmlhttp.readyState != 4) {
-			document.getElementById('img_'+slug).src = wppaImageDirectory+'spinner.gif';
+			jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'spinner.gif' );
+//			document.getElementById('img_'+slug).src = wppaImageDirectory+'spinner.gif';
 		}
 		else {	// Ready
 			var str = wppaTrim(xmlhttp.responseText);
-//alert(str);
 			var ArrValues = str.split("||");
 
 			if (ArrValues[0] != '') {
@@ -2026,7 +2026,8 @@ function wppaAjaxUpdateOptionValue(slug, elem, multisel) {
 			if (xmlhttp.status!=404) {	// No Not found
 				switch (ArrValues[1]) {
 					case '0':	// No error
-						document.getElementById('img_'+slug).src = wppaImageDirectory+'tick.png';
+						jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'tick.png' );
+//						document.getElementById('img_'+slug).src = wppaImageDirectory+'tick.png';
 						if ( ArrValues[3] != '' ) alert(ArrValues[3]);
 						if ( _wppaRefreshAfter ) {
 							_wppaRefreshAfter = false;
@@ -2034,13 +2035,35 @@ function wppaAjaxUpdateOptionValue(slug, elem, multisel) {
 						}
 						break;
 					default:
-						document.getElementById('img_'+slug).src = wppaImageDirectory+'cross.png';
+						jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'cross.png' );
+//						document.getElementById('img_'+slug).src = wppaImageDirectory+'cross.png';
 						if ( ArrValues[3] != '' ) alert(ArrValues[3]);
 				}
-				document.getElementById('img_'+slug).title = ArrValues[2];
+				jQuery( '#img_'+slug ).attr( 'title', ArrValues[2] );
+//				document.getElementById('img_'+slug).title = ArrValues[2];
+
+				// Update cron statusses
+				if (  ArrValues[4] ) {
+					var tokens = ArrValues[4].split( ';' );
+					var i = 0;
+					var temp;
+					var Old, New;
+					while ( i < tokens.length ) {
+						temp = tokens[i].split( ':' );
+						Old = jQuery( '#'+ temp[0] ).html();
+						New = temp[1];
+						if ( Old != '' && New == '' ) {
+					//		New = '<span style="color:red;font-weight:bold;" onclick="document.location.reload(true)" >Reload page</span>';
+							New = '<input type="button" class="button-secundary" style="border-radius:3px;font-size:11px;height:18px;margin: 0 4px;padding:0px;color:red;background-color:pink;" onclick="document.location.reload(true)" value="Reload" />';
+						}
+						jQuery( '#'+ temp[0] ).html( New );
+						i++;
+					}
+				}
 			}
 			else {						// Not found
-				document.getElementById('img_'+slug).src = wppaImageDirectory+'cross.png';
+				jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'cross.png' );
+//				document.getElementById('img_'+slug).src = wppaImageDirectory+'cross.png';
 				document.getElementById('img_'+slug).title = 'Communication error';
 			}
 			wppaCheckInconsistencies();
@@ -2102,7 +2125,7 @@ function wppaEncode(xtext) {
 function wppaCheckInconsistencies() {
 
 	// Uses thumb popup and thumb lightbox?
-	if ( jQuery('#use_thumb_popup').attr('checked') && jQuery('#thumb_linktype').val() == 'lightbox' ) {
+	if ( jQuery('#use_thumb_popup').prop('checked') && jQuery('#thumb_linktype').val() == 'lightbox' ) {
 		jQuery('.popup-lightbox-err').css('display', '');
 	}
 	else {
@@ -2438,9 +2461,22 @@ function wppaAjaxUpdateTogo(slug) {
 					beforesend: function( xhr ) {
 								},
 					success: 	function( result, status, xhr ) {
+
+									// Split status and togo
 									var data = result.split('|');
+
+									// Update togo
 									jQuery( '#' + slug + '_togo' ).html( data[0] );
-									jQuery( '#' + slug + '_status' ).html( data[1] );
+
+									// Update status when not changing to empty, else request user to reload page
+									var Old = jQuery( '#' + slug + '_status' ).html();
+									var New = data[1];
+									if ( Old != '' && New == '' ) {
+								//		New = '<span style="color:red;font-weight:bold;" onclick="document.location.reload(true)" >Reload page</span>';
+										New = '<input type="button" class="button-secundary" style="border-radius:3px;font-size:11px;height:18px;margin: 0 4px;padding:0px;color:red;background-color:pink;" onclick="document.location.reload(true)" value="Reload" />';
+									}
+									jQuery( '#' + slug + '_status' ).html( New );
+
 									setTimeout( function() {wppaAjaxUpdateTogo(slug);}, 5000 );
 								},
 					error: 		function( xhr ) {

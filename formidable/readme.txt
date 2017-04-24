@@ -2,14 +2,14 @@
 Contributors: formidableforms, sswells, srwells, jamie.wahlin
 Tags: form, contact form, form builder, custom form, forms, form maker, form creator
 Requires at least: 3.8
-Tested up to: 4.7.3
-Stable tag: 2.03.06
+Tested up to: 4.7.4
+Stable tag: 2.03.07
 
 The best WordPress form plugin. Simple drag & drop form building, visual form styling, and unlimited email notifications. 
 
 == Description ==
 = WordPress Form Builder Plugin =
-Formidable Forms is a flexible and free WordPress form plugin. Easily create contact forms, polls and surveys, or lead generation forms. Start with pre-built form templates or create totally custom forms. From the smallest sidebar opt-in form to large job application forms, Formidable is built to do it all.
+Formidable Forms is a flexible and free WordPress form plugin. Easily create contact forms, polls and surveys, or lead generation forms. Start with pre-built form templates or create totally custom forms. From the smallest sidebar opt-in form to large job application forms, Formidable Forms is built to do it all.
 
 Create professional contact forms without any code. Use the built-in visual styler to instantly customize the look and feel of your forms. Additionally,  changing the form layout is simple with included layout classes. If you need more advanced customizations, you have complete access to edit the form HTML and CSS.
 
@@ -97,6 +97,23 @@ A. The field and form names and descriptions are all changed with in-place edit.
 [See more FAQs](https://formidableforms.com/formidable-faqs/ "Formidable Form FAQs")
 
 == Changelog ==
+
+= 2.03.07 =
+* New: Add frm_after_import_view hook.
+* New: Add frmPageChanged, frmFormComplete, and frmFormErrors jQuery events.
+* Fix: Include full where query in cache key to avoid identical keys for different queries.
+* Fix: Show all forms on the entry listing page.
+* Fix: Remove IE8-specific CSS causing errors in stylesheet.
+* **Pro Version** *
+* New: Add frm_before_create_post hook.
+* Enhancement: 	Add frm_final_submit class to submit button	to make styling easier.
+* Fix: Add more file upload spam protection.
+* Fix: Allow star rating statistics to work for non-scale fields.
+* Fix: Prevent file uploads from some specific headless browsers.
+* Fix: Clear options when switching to Lookup field type to prevent conditional logic conflicts.
+* Fix: Convert show=id to show=ID in user ID shortcodes to prevent error messages.
+* Fix: Make sure Entry Status filter works.
+* Fix: Include Lookup Checkboxes in calculations.
 
 = 2.03.06 =
 * **Pro Version** *

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version 6.6.22
+* Version 6.6.24
 *
 *
 */
@@ -15,20 +15,25 @@
 //
 // The actual addition of searchable words and ids into the index db table is handled in a cron job.
 // If this function is called real-time, it simply notifys cron to scan all albums or photos on missing items.
-function wppa_index_add( $type, $id ) {
+function wppa_index_add( $type, $id, $force = false ) {
 global $wpdb;
 global $acount;
 global $pcount;
 
 	if ( $type == 'album' ) {
 
-		// If there is a cron job running adding to the index and this is not that cron job, do nothing
-		if ( get_option( 'wppa_remake_index_albums_user' ) == 'cron-job' && ! wppa_is_cron() ) {
+		// Make sure this album will be re-indexed some time if we are not a cron job
+		if ( ! wppa_is_cron() && ! $force ) {
+			$wpdb->query( "UPDATE `" . WPPA_ALBUMS . "` SET `indexdtm` = '' WHERE `id` = " . strval( intval( $id ) ) );
+		}
+
+		// If there is a cron job running adding to the index and this is not that cron job, do nothing, unless force
+		if ( get_option( 'wppa_remake_index_albums_user' ) == 'cron-job' && ! wppa_is_cron() && ! $force ) {
 			return;
 		}
 
 		// If no user runs the remake proc, start it as cron job
-		if ( ! get_option( 'wppa_remake_index_albums_user' ) ) {
+		if ( ! get_option( 'wppa_remake_index_albums_user' ) && ! $force ) {
 			wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
 			return;
 		}
@@ -54,7 +59,9 @@ global $pcount;
 			// If this line does not exist yet, create it with only one album number as data
 			if ( ! $indexline ) {
 				wppa_create_index_entry( array( 'slug' => $word, 'albums' => $id ) );
-				wppa_log( 'Cron', 'Adding index slug {b}' . $word . '{/b} for album # {b}' . $id . '{/b}' );
+				if ( ! $force ) {
+					wppa_log( 'Cron', 'Adding index slug {b}' . $word . '{/b} for album {b}' . $id . '{/b}' );
+				}
 			}
 
 			// Index line already exitst, process this album id for this word
@@ -68,9 +75,6 @@ global $pcount;
 
 					// Add it
 					$oldalbums[] = $id;
-
-					// Report addition
-//					wppa_log( 'Cron', 'Adding album # {b}'.$id.'{/b} to index slug {b}'.$word.'{/b}');
 
 					// Covert to string again
 					$newalbums = wppa_index_array_to_string( $oldalbums );
@@ -86,13 +90,18 @@ global $pcount;
 
 	elseif ( $type == 'photo' ) {
 
+		// Make sure this photo will be re-indexed some time if we are not a cron job
+		if ( ! wppa_is_cron() && ! $force ) {
+			$wpdb->query( "UPDATE `" . WPPA_PHOTOS . "` SET `indexdtm` = '' WHERE `id` = " . strval( intval( $id ) ) );
+		}
+
 		// If there is a cron job running adding to the index and this is not that cron job, do nothing
-		if ( get_option( 'wppa_remake_index_photos_user' ) == 'cron-job' && ! wppa_is_cron() ) {
+		if ( get_option( 'wppa_remake_index_photos_user' ) == 'cron-job' && ! wppa_is_cron() && ! $force ) {
 			return;
 		}
 
 		// If no user runs the remake proc, start it as cron job
-		if ( ! get_option( 'wppa_remake_index_photos_user' ) ) {
+		if ( ! get_option( 'wppa_remake_index_photos_user' ) && ! $force ) {
 			wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
 			return;
 		}
@@ -112,7 +121,7 @@ global $pcount;
 			// If this line does not exist yet, create it with only one album number as data
 			if ( ! $indexline ) {
 				wppa_create_index_entry( array( 'slug' => $word, 'photos' => $id ) );
-				wppa_log( 'Cron', 'Adding index slug {b}' . $word . '{/b} for photo # {b}' . $id . '{/b}' );
+				wppa_log( 'Cron', 'Adding index slug {b}' . $word . '{/b} for photo {b}' . $id . '{/b}' );
 			}
 
 			// Index line already exitst, process this photo id for this word

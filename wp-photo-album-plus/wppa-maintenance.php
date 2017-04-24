@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.6.22
+* Version 6.6.24
 *
 */
 
@@ -55,6 +55,21 @@ $wppa_all_maintenance_slugs = array( 	'wppa_remake_index_albums',
 										'wppa_owner_to_name_proc',
 										'wppa_move_all_photos',
 										'wppa_cleanup_index',
+									);
+
+global $wppa_cron_maintenance_slugs;
+$wppa_cron_maintenance_slugs = array(	'wppa_remake_index_albums',
+										'wppa_remake_index_photos',
+										'wppa_regen_thumbs',
+										'wppa_rerate',
+										'wppa_recup',
+										'wppa_cleanup_index',
+										'wppa_remake',
+										'wppa_rerate',
+										'wppa_comp_sizes',
+										'wppa_add_gpx_tag',
+										'wppa_add_hd_tag',
+										'wppa_test_proc',
 									);
 
 // Main maintenace module
@@ -133,7 +148,7 @@ global $wppa_timestamp_start;
 	// Pre-processing needed?
 	if ( $lastid == '0' ) {
 		if (  wppa_is_cron() ) {
-			wppa_log( 'Cron', 'Cron job {b}' . $slug . '{/b} started. Allowed runtime: ' . ( $endtime - time() ) . 's. Cron id = ' . wppa_is_cron() );
+			wppa_log( 'Cron', '{b}' . $slug . '{/b} started. Allowed runtime: ' . ( $endtime - time() ) . 's. Cron id = ' . wppa_is_cron() );
 		}
 		else {
 			wppa_log( 'Obs', 'Maintenance proc {b}' . $slug . '{/b} started. Allowed runtime: ' . ( $endtime - time() ) . 's.' );
@@ -145,6 +160,7 @@ global $wppa_timestamp_start;
 				// Pre-Clear album index only if not cron
 				if ( ! wppa_is_cron() ) {
 					$wpdb->query( "UPDATE `" . WPPA_INDEX . "` SET `albums` = ''" );
+					$wpdb->query( "UPDATE `" . WPPA_ALBUMS . "` SET `indexdtm` = ''" );
 				}
 				wppa_index_compute_skips();
 				break;
@@ -154,6 +170,7 @@ global $wppa_timestamp_start;
 				// Pre-Clear photo index only if not cron
 				if ( ! wppa_is_cron() ) {
 					$wpdb->query( "UPDATE `" . WPPA_INDEX . "` SET `photos` = ''" );
+					$wpdb->query( "UPDATE `" . WPPA_PHOTOS . "` SET `indexdtm` = ''" );
 				}
 				wppa_index_compute_skips();
 				break;
@@ -234,7 +251,7 @@ global $wppa_timestamp_start;
 
 	if ( $lastid != '0' ) {
 		if (  wppa_is_cron() ) {
-			wppa_log( 'Cron', 'Cron job {b}' . $slug . '{/b} continued. Allowed runtime: ' . ( $endtime - time() ) . 's. Cron id = ' . wppa_is_cron() );
+			wppa_log( 'Cron', '{b}' . $slug . '{/b} continued. Allowed runtime: ' . ( $endtime - time() ) . 's. Cron id = ' . wppa_is_cron() );
 		}
 	}
 
@@ -249,8 +266,20 @@ global $wppa_timestamp_start;
 
 			// Process albums
 			$table 		= WPPA_ALBUMS;
-			$topid 		= $wpdb->get_var( "SELECT `id` FROM `".WPPA_ALBUMS."` ORDER BY `id` DESC LIMIT 1" );
-			$albums 	= $wpdb->get_results( "SELECT * FROM `".WPPA_ALBUMS."` WHERE `id` > ".$lastid." ORDER BY `id` LIMIT 100", ARRAY_A );
+
+			if ( $slug == 'wppa_remake_index_albums' ) {
+				$topid 		= $wpdb->get_var( "SELECT `id` FROM `".WPPA_ALBUMS."` ORDER BY `id` DESC LIMIT 1" );
+				$albums 	= $wpdb->get_results( 	"SELECT * FROM `" . WPPA_ALBUMS . "` " .
+													"WHERE `id` > " . $lastid . " " .
+													"AND `indexdtm` < `modified` " .
+													"ORDER BY `id` " .
+													"LIMIT 100", ARRAY_A );
+			}
+			else {
+				$topid 		= $wpdb->get_var( "SELECT `id` FROM `".WPPA_ALBUMS."` ORDER BY `id` DESC LIMIT 1" );
+				$albums 	= $wpdb->get_results( "SELECT * FROM `".WPPA_ALBUMS."` WHERE `id` > ".$lastid." ORDER BY `id` LIMIT 100", ARRAY_A );
+			}
+
 			wppa_cache_album( 'add', $albums );
 
 			if ( $albums ) foreach ( $albums as $album ) {
@@ -261,7 +290,14 @@ global $wppa_timestamp_start;
 
 					case 'wppa_remake_index_albums':
 
-						wppa_index_add( 'album', $id );
+						if ( wppa_is_cron() ) {
+							wppa_index_add( 'album', $id );
+							wppa_log( 'Cron', 'Indexed album {b}' . $id . '{/b}' );
+						}
+						else {
+							wppa_index_add( 'album', $id, 'force' );
+						}
+						$wpdb->query( "UPDATE `" . WPPA_ALBUMS . "` SET `indexdtm` = '" . time() . "' WHERE `id` = $id" );
 						break;
 
 					case 'wppa_remove_empty_albums':
@@ -339,6 +375,14 @@ global $wppa_timestamp_start;
 					$photos[]['id'] = $i;
 				}
 			}
+			elseif ( $slug == 'wppa_remake_index_photos' ) {
+				$topid 		= $wpdb->get_var( "SELECT `id` FROM `".WPPA_PHOTOS."` ORDER BY `id` DESC LIMIT 1" );
+				$photos 	= $wpdb->get_results( 	"SELECT * FROM `" . WPPA_PHOTOS . "` " .
+													"WHERE `id` > " . $lastid . " " .
+													"AND `indexdtm` < `modified` " .
+													"ORDER BY `id` " .
+													"LIMIT " . $chunksize, ARRAY_A );
+			}
 			else {
 				$topid 		= $wpdb->get_var( "SELECT `id` FROM `".WPPA_PHOTOS."` ORDER BY `id` DESC LIMIT 1" );
 				$photos 	= $wpdb->get_results( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `id` > ".$lastid." ORDER BY `id` LIMIT ".$chunksize, ARRAY_A );
@@ -371,7 +415,14 @@ global $wppa_timestamp_start;
 
 					case 'wppa_remake_index_photos':
 
-						wppa_index_add( 'photo', $id );
+						if ( wppa_is_cron() ) {
+							wppa_index_add( 'photo', $id );
+							wppa_log( 'Cron', 'Indexed photo {b}' . $id . '{/b}' );
+						}
+						else {
+							wppa_index_add( 'photo', $id, 'force' );
+						}
+						$wpdb->query( "UPDATE `" . WPPA_PHOTOS . "` SET `indexdtm` = '" . time() . "' WHERE `id` = $id" );
 						break;
 
 					case 'wppa_apply_default_photoname_all':
@@ -794,6 +845,7 @@ global $wppa_timestamp_start;
 						break;
 
 				}
+
 				// Test for timeout / ready
 				$lastid = $id;
 				update_option( $slug.'_last', $lastid );
@@ -801,12 +853,7 @@ global $wppa_timestamp_start;
 					$togo 	= $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_PHOTOS . "` WHERE `id` > %s ", $lastid ) );
 					if ( $togo ) {
 						update_option( $slug.'_togo', $togo );
-					}
-					if ( time() > $endtime ) {
-						update_option( $slug.'_status', __('Scheduled cron job', 'wp-photo-album-plus'));
-					}
-					else {
-						update_option( $slug.'_status', __('Running cron job', 'wp-photo-album-plus'));
+						update_option( $slug.'_status', 'Cron job' );
 					}
 				}
 				if ( time() > $endtime ) break; 	// Time out
@@ -930,11 +977,10 @@ global $wppa_timestamp_start;
 
 				// Update status
 				if ( wppa_is_cron() ) {
-					if ( ( time() > $endtime ) || ( memory_get_usage() >= ( 0.9 * wppa_memry_limit() ) ) ) {
-						update_option( $slug.'_status', __('Scheduled cron job', 'wp-photo-album-plus'));
-					}
-					else {
-						update_option( $slug.'_status', __('Running cron job', 'wp-photo-album-plus'));
+					$togo 	= $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_INDEX . "` WHERE `id` > %s ", $lastid ) );
+					if ( $togo ) {
+						update_option( $slug.'_togo', $togo );
+						update_option( $slug.'_status', 'Cron job' );
 					}
 				}
 
@@ -985,7 +1031,10 @@ global $wppa_timestamp_start;
 		if ( wppa_is_cron() ) {
 
 			update_option( $slug.'_togo', $togo );
-			update_option( $slug.'_status', 'Running cron' );
+			update_option( $slug.'_status', 'Cron job' );
+
+			global $is_reschedule;
+			$is_reschedule = true;
 			wppa_schedule_maintenance_proc( $slug );
 		}
 		else {
@@ -1073,7 +1122,7 @@ global $wppa_timestamp_start;
 		}
 
 		if ( wppa_is_cron() ) {
-			wppa_log( 'Cron', 'Cron job {b}' . $slug . '{/b} completed' );
+			wppa_log( 'Cron', '{b}' . $slug . '{/b} completed' );
 		}
 		else {
 			wppa_log( 'Obs', 'Maintenance proc {b}' . $slug . '{/b} completed' );

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 6.6.22
+* Version 6.6.24
 *
 */
 
@@ -196,7 +196,12 @@ global $wpdb;
 														);
 	$iret = $wpdb->query($query);
 
-	if ( $iret ) return $args['id'];
+	if ( $iret ) {
+		if ( wppa_opt( 'search_comments' ) ) {
+			wppa_update_photo( $args['photo'] );
+		}
+		return $args['id'];
+	}
 	else return false;
 }
 
@@ -270,13 +275,14 @@ global $wpdb;
 					'custom'			=> '',
 					'crypt' 			=> wppa_get_unique_photo_crypt(),
 					'magickstack' 		=> '',
+					'indexdtm' 			=> '',
 					) );
 
 	if ( $args['scheduledtm'] ) $args['status'] = 'scheduled';
 
 	if ( ! wppa_is_id_free( WPPA_PHOTOS, $args['id'] ) ) $args['id'] = wppa_nextkey( WPPA_PHOTOS );
 
-	$query = $wpdb->prepare("INSERT INTO `" . WPPA_PHOTOS . "` ( 	`id`,
+	$query = $wpdb->prepare( "INSERT INTO `" . WPPA_PHOTOS . "` ( 	`id`,
 																	`album`,
 																	`ext`,
 																	`name`,
@@ -304,9 +310,10 @@ global $wpdb;
 																	`scheduledel`,
 																	`custom`,
 																	`crypt`,
-																	`magickstack`
+																	`magickstack`,
+																	`indexdtm`
 																)
-														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
+														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
 																$args['id'],
 																$args['album'],
 																$args['ext'],
@@ -335,9 +342,10 @@ global $wpdb;
 																$args['scheduledel'],
 																$args['custom'],
 																$args['crypt'],
-																$args['magickstack']
+																$args['magickstack'],
+																$args['indexdtm']
 														);
-	$iret = $wpdb->query($query);
+	$iret = $wpdb->query( $query );
 
 	if ( $iret ) {
 
@@ -376,7 +384,8 @@ global $wpdb;
 					'cats'				=> '',
 					'scheduledtm' 		=> '',
 					'crypt' 			=> wppa_get_unique_album_crypt(),
-					'treecounts' 		=> serialize( array( 1,0,0,0,0,0,0,0,0,0,0 ) )
+					'treecounts' 		=> serialize( array( 1,0,0,0,0,0,0,0,0,0,0 ) ),
+					'indexdtm' 			=> '',
 					) );
 
 	if ( ! wppa_is_id_free( WPPA_ALBUMS, $args['id'] ) ) $args['id'] = wppa_nextkey( WPPA_ALBUMS );
@@ -402,9 +411,10 @@ global $wpdb;
 																	`cats`,
 																	`scheduledtm`,
 																	`crypt`,
-																	`treecounts`
+																	`treecounts`,
+																	`indexdtm`
 																	)
-														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
+														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
 																$args['id'],
 																trim( $args['name'] ),
 																trim( $args['description'] ),
@@ -426,7 +436,8 @@ global $wpdb;
 																$args['cats'],
 																$args['scheduledtm'],
 																$args['crypt'],
-																$args['treecounts']
+																$args['treecounts'],
+																$args['indexdtm']
 														);
 	$iret = $wpdb->query( $query );
 

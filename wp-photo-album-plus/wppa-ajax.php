@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.6.22
+* Version 6.6.24
 *
 */
 
@@ -331,6 +331,9 @@ global $wppa_log_file;
 				}
 			}
 			if ( $iret ) {
+				if ( wppa_opt( 'search_comments' ) ) {
+					wppa_update_photo( $_REQUEST['photo-id'] );
+				}
 				echo 'OK';
 			}
 			else {
@@ -382,8 +385,14 @@ global $wppa_log_file;
 				wppa_exit();
 			}
 			if ( isset( $_REQUEST['comment-id'] ) ) {	// Remove comment
+				$photo = $wpdb->get_var( $wpdb->prepare( "SELECT `photo` FROM `" . WPPA_COMMENTS . "` WHERE `id` = %s", $_REQUEST['comment-id'] ) );
 				$iret = $wpdb->query( $wpdb->prepare( "DELETE FROM `".WPPA_COMMENTS."` WHERE `id`= %s", $_REQUEST['comment-id'] ) );
-				if ( $iret ) echo 'OK||'.__( 'Comment removed' , 'wp-photo-album-plus');
+				if ( $iret ) {
+					if ( wppa_opt( 'search_comments' ) ) {
+						wppa_update_photo( $photo );
+					}
+					echo 'OK||'.__( 'Comment removed' , 'wp-photo-album-plus');
+				}
 				else _e( 'Could not remove comment' , 'wp-photo-album-plus');
 				wppa_exit();
 			}
@@ -1325,7 +1334,9 @@ global $wppa_log_file;
 			}
 
 			$iret = $wpdb->query( $wpdb->prepare( 'UPDATE `'.WPPA_COMMENTS.'` SET `status` = %s WHERE `id` = %s', $comstat, $comid ) );
-			if ( wppa_switch( 'search_comments' ) ) wppa_index_update( 'photo', $photo );
+			if ( wppa_opt( 'search_comments' ) ) {
+				wppa_update_photo( $photo );
+			}
 
 			if ( $iret !== false ) {
 				if ( $comstat == 'approved' ) {
@@ -2209,6 +2220,7 @@ global $wppa_log_file;
 				wppa_exit();
 				break;	// End update qr setting
 			}
+
 			else switch ( $option ) {
 
 				// Changing potd_album_type ( physical / virtual ) also clears potd_album
@@ -2746,10 +2758,14 @@ global $wppa_log_file;
 					$value = 'done';
 					break;
 
+				case 'wppa_excl_sep':
 				case 'wppa_search_tags':
 				case 'wppa_search_cats':
 				case 'wppa_search_comments':
-					update_option( 'wppa_index_need_remake', 'yes' );
+					$wpdb->query( "UPDATE `" . WPPA_PHOTOS . "` SET `indexdtm` = ''" );
+					wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+					$wpdb->query( "UPDATE `" . WPPA_ALBUMS . "` SET `indexdtm` = ''" );
+					wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
 					break;
 
 				case 'wppa_blacklist_user':
@@ -2939,7 +2955,7 @@ global $wppa_log_file;
 				case 'wppa_twitter_account':
 					$value = sanitize_text_field( $value );
 					$value = str_replace( ' ', '', $value );
-					if ( substr( $value, 0, 1 ) != '@' ) {
+					if ( $value != '' && substr( $value, 0, 1 ) != '@' ) {
 						wppa( 'error', '4712' );
 						$alert .= __( 'A Twitter account name must start with an at sign: @', 'wp-photo-album-plus' );
 					}
@@ -2997,6 +3013,10 @@ global $wppa_log_file;
 						$alert .= __( 'This path does not contain ImageMagick commands', 'wp-photo-album-plus' );
 					}
 					break;
+				case 'wppa_grant_cats':
+				case 'wppa_grant_tags':
+					$value = wppa_sanitize_tags( $value );
+					break;
 
 				default:
 
@@ -3007,6 +3027,11 @@ global $wppa_log_file;
 			if ( wppa( 'error' ) ) {
 				if ( ! $title ) $title = sprintf( __( 'Failed to set %s to %s', 'wp-photo-album-plus'), $option, $value );
 				if ( ! $alert ) $alert .= wppa( 'out' );
+			}
+
+			// Do not re-init dynamic files on heartbeat: no wppa_update_option() call
+			elseif ( $option == 'wppa_heartbeat' ) {
+				update_option( $option, $value );
 			}
 			else {
 				wppa_update_option( $option, $value );
@@ -3019,9 +3044,6 @@ global $wppa_log_file;
 			// Something to do after changing the setting?
 			wppa_initialize_runtime( true );	// force reload new values
 
-			// .htaccess
-//			wppa_create_wppa_htaccess();
-
 			// Thumbsize
 			$new_minisize = wppa_get_minisize();
 			if ( $old_minisize != $new_minisize ) {
@@ -3030,8 +3052,17 @@ global $wppa_log_file;
 				$alert .= ' '.__( 'Please run the appropriate action in Table VIII.' , 'wp-photo-album-plus');
 			}
 
+			// Compose the cron job status and togo fields
+			$crondata = '';
+			global $wppa_cron_maintenance_slugs;
+			foreach ( $wppa_cron_maintenance_slugs as $slug ) {
+				$crondata .= $slug . '_status:' . get_option( $slug . '_status' ) . ';';
+				$crondata .= $slug . '_togo:' . get_option( $slug . '_togo' ) . ';';
+			}
+			$crondata = rtrim ( $crondata, ';' );
+
 			// Produce the response text
-			$output = '||'.$error.'||'.esc_attr( $title ).'||'.esc_js( $alert );
+			$output = '||'.$error.'||'.esc_attr( $title ).'||'.esc_js( $alert ).'||'.$crondata;
 
 			echo $output;
 			wppa_clear_cache();

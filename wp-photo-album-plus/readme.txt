@@ -2,7 +2,7 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick
-Version: 6.6.23
+Version: 6.6.24
 Stable tag: 6.6.23
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
@@ -180,11 +180,27 @@ Oh, just Google on 'picture resizer' and you will find a bunch of free programs 
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
 
+= 6.6.24 =
+
+= Bug Fixes =
+
+* Scheduled cron jobs that never actually started are now re-animated automaticly.
+
+= New Features =
+
+* You can now specify categories and default tags that new granted albums will get. Table IX-D11.2 and 11.3
+
+= Other Chsnges =
+
+* On the Settings screen: the status and togo info about scheduled cronjobs is now more accurate and will be updated at least once per minute.
+* The automatic index maintanance at the background (cron processes) is greatly enhanced in speed and lowered in server load.
+* It is no longer required to enter your @twitterName in Table II-C13.1 to get the twitter metatags into the page source.
+
 = 6.6.23 =
 
 = Bug Fixes =
 
-* Fixed db version number 
+* Fixed db version number
 
 = 6.6.22 =
 

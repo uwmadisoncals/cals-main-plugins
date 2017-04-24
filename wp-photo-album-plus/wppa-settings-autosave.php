@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.6.19
+* Version 6.6.24
 *
 */
 
@@ -32,6 +32,9 @@ global $wp_version;
 	// Initialize
 	wppa_initialize_runtime( true );
 	$options_error = false;
+
+	// Re-animate crashec cron jobs
+	wppa_re_animate_cron();
 
 	// If watermark all is going to be run, make sure the current user has no private overrule settings
 	delete_option( 'wppa_watermark_file_'.wppa_get_user() );
@@ -311,8 +314,8 @@ global $wp_version;
 
 		// Check for pending actions
 //		if ( wppa_switch( 'indexed_search' ) ) {
-			if ( get_option( 'wppa_remake_index_albums_status' ) 	&& get_option( 'wppa_remake_index_albums_user', 	wppa_get_user() ) == wppa_get_user() ) wppa_warning_message( __( 'Rebuilding the Album index needs completion. See Table VIII' , 'wp-photo-album-plus') );
-			if ( get_option( 'wppa_remake_index_photos_status' ) 	&& get_option( 'wppa_remake_index_photos_user', 	wppa_get_user() ) == wppa_get_user() ) wppa_warning_message( __( 'Rebuilding the Photo index needs completion. See Table VIII' , 'wp-photo-album-plus') );
+//			if ( get_option( 'wppa_remake_index_albums_status' ) 	&& get_option( 'wppa_remake_index_albums_user', 	wppa_get_user() ) == wppa_get_user() ) wppa_warning_message( __( 'Rebuilding the Album index needs completion. See Table VIII' , 'wp-photo-album-plus') );
+//			if ( get_option( 'wppa_remake_index_photos_status' ) 	&& get_option( 'wppa_remake_index_photos_user', 	wppa_get_user() ) == wppa_get_user() ) wppa_warning_message( __( 'Rebuilding the Photo index needs completion. See Table VIII' , 'wp-photo-album-plus') );
 //		}
 		if ( get_option( 'wppa_remove_empty_albums_status'	) 		&& get_option( 'wppa_remove_empty_albums_user', 	wppa_get_user() ) == wppa_get_user() ) wppa_warning_message( __( 'Remove empty albums needs completion. See Table VIII', 'wp-photo-album-plus') );
 		if ( get_option( 'wppa_apply_new_photodesc_all_status' ) 	&& get_option( 'wppa_apply_new_photodesc_all_user', wppa_get_user() ) == wppa_get_user() ) wppa_warning_message( __( 'Applying new photo description needs completion. See Table VIII', 'wp-photo-album-plus') );
@@ -8444,6 +8447,24 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 									break;
 							}
 
+							$name = __('Grant categoriess', 'wp-photo-album-plus');
+							$desc = __('The categories a new granted album will get.', 'wppa');
+							$help = '';
+							$slug = 'wppa_grant_cats';
+							$html = wppa_input($slug, '150px');
+							$clas = '';
+							$tags = 'system,album';
+							wppa_setting($slug, '11.2', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Grant tags', 'wp-photo-album-plus');
+							$desc = __('The default tags the photos in a new granted album will get.', 'wppa');
+							$help = '';
+							$slug = 'wppa_grant_tags';
+							$html = wppa_input($slug, '150px');
+							$clas = '';
+							$tags = 'system,album';
+							wppa_setting($slug, '11.3', $name, $desc, $html, $help, $clas, $tags);
+
 							$name = __('Max user albums', 'wp-photo-album-plus');
 							$desc = __('The max number of albums a user can create.', 'wp-photo-album-plus');
 							$help = esc_js(__('The maximum number of albums a user can create when he is not admin and owner only is active', 'wp-photo-album-plus'));
@@ -10029,6 +10050,17 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 		<script type="text/javascript">wppaInitSettings();wppaCheckInconsistencies();</script>
 		<?php echo sprintf(__('<br />Memory used on this page: %6.2f Mb.', 'wp-photo-album-plus'), memory_get_peak_usage(true)/(1024*1024)); ?>
 		<?php echo sprintf(__('<br />There are %d settings and %d runtime parameters.', 'wp-photo-album-plus'), count($wppa_opt), count($wppa)); ?>
+		<input type="hidden" id="wppa-heartbeat" value="0" />
+		<script>
+			function wppaHeartbeat() {
+				var val = jQuery( '#wppa-heartbeat' ).val();
+				val++;
+				jQuery( '#wppa-heartbeat' ).val( val );
+				wppaAjaxUpdateOptionValue( 'heartbeat', document.getElementById( 'wppa-heartbeat' ) );
+				setTimeout( function() { wppaHeartbeat(); }, 15000 );
+			}
+			wppaHeartbeat();
+		</script>
 	</div>
 
 <?php

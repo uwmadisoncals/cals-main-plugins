@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.6.22
+* Version 6.6.24
 *
 */
 
@@ -49,8 +49,10 @@ global $wppa_defaults;
 	}
 
 	// If there is only one grant parent, make sure the granted album is created regardless of if it is used.
-	if ( wppa_is_int( wppa_opt( 'grant_parent' ) ) ) {
-		wppa_grant_albums();
+	if ( ! wppa_is_cron() && ! wppa( 'ajax' ) ) {
+		if ( wppa_is_int( wppa_opt( 'grant_parent' ) ) ) {
+			wppa_grant_albums();
+		}
 	}
 
 	if ( isset( $_GET['debug'] ) && wppa_switch( 'allow_debug' ) ) {

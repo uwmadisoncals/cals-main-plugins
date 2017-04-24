@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version 6.6.20
+* Version 6.6.24
 *
 */
 
@@ -196,7 +196,7 @@ global $wpdb;
 		}
 
 		// Classic GD
-		else {
+		if ( ! wppa_opt( 'image_magick' ) || ! is_file( $newimage ) ) {
 
 			// Picture sizes
 			$src_width 	= $src_size[0];

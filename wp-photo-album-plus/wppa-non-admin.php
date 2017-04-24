@@ -97,7 +97,7 @@ global $wpdb;
 
 	if ( $id ) {
 
-		if ( wppa_switch( 'share_twitter' ) && wppa_opt( 'twitter_account' ) ) {
+		if ( wppa_switch( 'share_twitter' ) ) {
 			$thumb = wppa_cache_thumb( $id );
 
 			// Twitter wants at least 280px in width, and at least 150px in height
@@ -106,39 +106,31 @@ global $wpdb;
 				$y = wppa_get_photo_item( $id, 'photoy' );
 			}
 			if ( $thumb && $x >= 280 && $y >= 150 ) {
-				$title  = wppa_get_photo_name( $id );
-				$desc 	= wppa_get_og_desc( $id, 'short' );
-				$url 	= ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-				$site   = get_bloginfo('name');
+				$card = 'summary_large_image';
+			}
+			else {
+				$card = 'summary';
+			}
+			$title  = wppa_get_photo_name( $id );
+			$desc 	= wppa_get_og_desc( $id, 'short' );
+			$url 	= ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+			$site   = get_bloginfo( 'name' );
+			$creat 	= wppa_opt( 'twitter_account' );
 
 				echo '
 <!-- WPPA+ Twitter Share data -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="' . wppa_opt( 'twitter_account' ) . '">
-<meta name="twitter:creator" content="' . wppa_opt( 'twitter_account' ) . '">
+<meta name="twitter:card" content="' . $card . '">
+<meta name="twitter:site" content="' . esc_attr( $site ) . '">
 <meta name="twitter:title" content="' . esc_attr( sanitize_text_field( $title ) ) . '">
 <meta name="twitter:text:description" content="' . esc_attr( sanitize_text_field( $desc ) ) . '">
-<meta name="twitter:image" content="' . esc_url( sanitize_text_field( $imgurl ) ) . '">
+<meta name="twitter:image" content="' . esc_url( $imgurl ) . '">';
+if ( $creat ) {
+	echo '
+<meta name="twitter:creator" content="' . $creat . '">';
+}
+echo '
 <!-- WPPA+ End Twitter Share data -->
 ';
-			}
-			elseif ( $thumb && $x >= 120 && $y >= 120 ) {
-				$title  = wppa_get_photo_name( $id );
-				$desc 	= wppa_get_og_desc( $id, 'short' );
-				$url 	= ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-				$site   = get_bloginfo('name');
-
-				echo '
-<!-- WPPA+ Twitter Share data -->
-<meta name="twitter:card" content="summary">
-<meta name="twitter:site" content="' . wppa_opt( 'twitter_account' ) . '">
-<meta name="twitter:title" content="' . esc_attr( sanitize_text_field( $title ) ) . '">
-<meta name="twitter:text:description" content="' . esc_attr( sanitize_text_field( $desc ) ) . '">
-<meta name="twitter:image" content="' . esc_url( sanitize_text_field( $imgurl ) ) . '">
-<!-- WPPA+ End Twitter Share data -->
-';
-
-			}
 		}
 
 		if ( wppa_switch( 'og_tags_on' ) ) {

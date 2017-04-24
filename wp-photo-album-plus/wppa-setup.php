@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.6.22
+* Version 6.6.24
 *
 */
 
@@ -74,6 +74,7 @@ global $silent;
 					treecounts text NOT NULL,
 					wmfile tinytext NOT NULL,
 					wmpos tinytext NOT NULL,
+					indexdtm tinytext NOT NULL,
 					PRIMARY KEY  (id)
 					) DEFAULT CHARACTER SET utf8;";
 
@@ -113,6 +114,7 @@ global $silent;
 					stereo smallint NOT NULL default '0',
 					crypt tinytext NOT NULL,
 					magickstack text NOT NULL,
+					indexdtm tinytext NOT NULL,
 					PRIMARY KEY  (id),
 					KEY albumkey (album),
 					KEY statuskey (status(6))
@@ -1578,6 +1580,8 @@ Hide Camera info
 						'wppa_grant_name'				=> 'display',
 						'wppa_grant_parent_sel_method' 	=> 'selectionbox',
 						'wppa_grant_parent'				=> '-1',
+						'wppa_grant_cats' 				=> '',
+						'wppa_grant_tags' 				=> '',
 						'wppa_default_parent' 			=> '0',
 						'wppa_default_parent_always' 	=> 'no',
 
@@ -1605,7 +1609,6 @@ Hide Camera info
 						'wppa_search_cats'				=> 'no',
 						'wppa_search_comments' 			=> 'no',
 						'wppa_photos_only'				=> 'no',	// 3
-//						'wppa_indexed_search'			=> 'no',
 						'wppa_max_search_photos'		=> '250',
 						'wppa_max_search_albums'		=> '25',
 						'wppa_tags_or_only'				=> 'no',
@@ -1741,6 +1744,8 @@ Hide Camera info
 						'wppa_qr_cache' 			=> 'no',
 
 						'wppa_dismiss_admin_notice_scripts_are_obsolete' => 'no',
+
+						'wppa_heartbeat' 			=> '0',
 
 						);
 
@@ -1996,7 +2001,9 @@ static $user;
 			if ( ! in_array( $parent, $my_albs_parents, true ) ) {
 
 				// make an album for this user
-				$id = wppa_create_album_entry( array ( 'name' => $name, 'description' => $desc, 'a_parent' => $parent ) );
+				$cats = wppa_opt( 'grant_cats' );
+				$deftags = wppa_opt( 'grant_tags' );
+				$id = wppa_create_album_entry( array ( 'name' => $name, 'description' => $desc, 'a_parent' => $parent, 'cats' => $cats, 'default_tags' => $deftags ) );
 				if ( $id ) {
 					wppa_log( 'Obs', 'Album ' . wppa_get_album_name( $parent ) . '(' . $parent . ')' .' -> ' . $id . ' for ' . $user . ' created.' );
 					$albums_created[] = $id;

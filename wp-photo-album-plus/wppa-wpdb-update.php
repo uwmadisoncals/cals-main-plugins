@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version 6.6.22
+* Version 6.6.24
 *
 */
 
@@ -13,7 +13,14 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 function wppa_update_album( $args ) {
 global $wpdb;
 
-	if ( ! is_array( $args ) ) return false;
+	if ( ! is_array( $args ) ) {
+		if ( wppa_is_int( $args ) ) {
+			$args = array( 'id' => $args, 'modified' => time() );
+		}
+		else {
+			return false;
+		}
+	}
 	if ( ! $args['id'] ) return false;
 	if ( ! wppa_cache_album( $args['id'] ) ) return false;
 	$id = $args['id'];
@@ -99,7 +106,14 @@ global $wpdb;
 function wppa_update_photo( $args ) {
 global $wpdb;
 
-	if ( ! is_array( $args ) ) return false;
+	if ( ! is_array( $args ) ) {
+		if ( wppa_is_int( $args ) ) {
+			$args = array( 'id' => $args, 'modified' => time() );
+		}
+		else {
+			return false;
+		}
+	}
 	if ( ! $args['id'] ) return false;
 	$thumb = wppa_cache_thumb( $args['id'] );
 	if ( ! $thumb ) return false;

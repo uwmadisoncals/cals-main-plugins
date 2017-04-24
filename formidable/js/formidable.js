@@ -160,6 +160,7 @@ function frmFrontFormJS(){
 			},
 			init: function() {
 				this.on('sending', function(file, xhr, formData) {
+
 					if ( isSpam() ) {
 						this.removeFile(file);
 						alert('Oops. That file looks like Spam.');
@@ -244,11 +245,21 @@ function frmFrontFormJS(){
 
 	function isSpam() {
 		var val = document.getElementById('frm_verify').value;
-		if ( val !== '' ) {
+		if ( val !== '' || isHeadless() ) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	function isHeadless() {
+		return (
+			window._phantom || window.callPhantom || //phantomjs
+			window.__phantomas || //PhantomJS-based web perf metrics
+			window.Buffer || //nodejs
+			window.emit || //couchjs
+			window.spawn  //rhino
+		);
 	}
 
 	function getHiddenUploadHTML( field, mediaID, fieldName ) {
@@ -3419,12 +3430,8 @@ function frmFrontFormJS(){
 						jQuery(document.getElementById('frm_edit_'+ entryIdField.val())).find('a').addClass('frm_ajax_edited').click();
 					}
 
-					var formCompleted = jQuery(response.content).find('.frm_message');
-					if ( formCompleted.length ) {
-						// if the success message is showing, run the logic
-						checkConditionalLogic( 'pageLoad' );
-					}
-					checkFieldsOnPage();
+					afterFormSubmitted( object, response );
+
 				} else if ( Object.keys(response.errors).length ) {
 					// errors were returned
 
@@ -3473,6 +3480,8 @@ function frmFrontFormJS(){
 							}
 						}
 					}
+
+					jQuery(document).trigger( 'frmFormErrors', [ object, response ] );
 
 					fieldset.removeClass('frm_doing_ajax');
 					scrollToFirstField( object );
@@ -3530,6 +3539,19 @@ function frmFrontFormJS(){
 		}
 
 		return kvp.join('&');
+	}
+
+	function afterFormSubmitted( object, response ) {
+		var formCompleted = jQuery(response.content).find('.frm_message');
+		if ( formCompleted.length ) {
+			jQuery(document).trigger( 'frmFormComplete', [ object, response ] );
+
+			// if the success message is showing, run the logic
+			checkConditionalLogic( 'pageLoad' );
+		} else {
+			jQuery(document).trigger( 'frmPageChanged', [ object, response ] );
+		}
+		checkFieldsOnPage();
 	}
 
 	function addFieldError( $fieldCont, key, jsErrors ) {
