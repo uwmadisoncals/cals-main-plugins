@@ -10,6 +10,16 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: 2.3\n"
 
+#: public/admin/plugins/ics/import_feed.php:8
+msgid "unlimited"
+msgstr ""
+
+#: public/admin/plugins/ics/import_feed.php:45
+msgid ""
+"<b>You have reached the limit of how many feeds you can import.</b><br>\n"
+"\t\tPlease sign up for EventBoost plan <a href=\"https://time.ly/eventboost/\" target=\"_blank\">here</a>."
+msgstr ""
+
 #: app/view/admin/settings.php:209
 msgid "Calendar Type:"
 msgstr ""
@@ -54,7 +64,7 @@ msgstr ""
 msgid "Timely Ticketing saves time & money. Create ticketing/registration right here and now. You do not pay any ticketing fees (other than regular PayPal transaction costs). Create as many ticketing/registration as you'd like.<br /><br />Ticketing feature is not enabled for this website. Please sign up for Ticketing plan <a href=\"https://time.ly/tickets-existing-users/\" target=\"_blank\">here</a>."
 msgstr ""
 
-#: app/view/event/single.php:214
+#: app/view/event/single.php:212
 msgid "This post was imported from a CSV/ICS file."
 msgstr ""
 
@@ -85,7 +95,7 @@ msgstr ""
 "→\t→\t→\t→\t→\t→\t→\t→\t→\tdata-original-title=\"Google kan kræve en API nøgle for at kunne vise kortet\">\n"
 "→\t→\t→\t→\t→\t→\t→\t→\t→\tGoogle Maps API nøgle</span> (<a target=\"_blank\" href=\"https://developers.google.com/maps/documentation/javascript/get-api-key#get-an-api-key\">Hent en API nøgle</a>)"
 
-#: public/admin/feed_row.php:93 public/admin/plugins/ics/import_feed.php:92
+#: public/admin/feed_row.php:93 public/admin/plugins/ics/import_feed.php:118
 msgid "Convert event's date/time to calendar's timezone"
 msgstr "Indstil begivenhedens dato/tid til at følge kalenderens tidszone"
 
@@ -109,7 +119,7 @@ msgstr "Opdter moms &amp; Fakturaindstillinger (påkrævet) "
 msgid "I read and accept the <a href=\"https://time.ly/tos\" target=\"_blank\">terms of service</a>."
 msgstr "Jeg har læst og accepterer <a href=\"https://time.ly/tos\" target=\"_blank\">vilkår og betingelser</a>."
 
-#: public/admin/feed_row.php:16 public/admin/plugins/ics/import_feed.php:41
+#: public/admin/feed_row.php:16 public/admin/plugins/ics/import_feed.php:67
 msgid "Feed URL:"
 msgstr "Feed URL:"
 
@@ -123,13 +133,13 @@ msgid "Removing"
 msgstr "Fjerner"
 
 #: public/admin/plugins/ics/display_feeds.php:6
-#: public/admin/plugins/ics/import_feed.php:6
+#: public/admin/plugins/ics/import_feed.php:15
 #: public/admin/plugins/suggested/display_feeds.php:6
 msgid "Please, Sign In to <b>Timely Network</b> to manage your feeds."
 msgstr "Log venligst ind på <b>Timely Network</b> for at håndtere dine feeds."
 
 #: public/admin/plugins/ics/display_feeds.php:10
-#: public/admin/plugins/ics/import_feed.php:10
+#: public/admin/plugins/ics/import_feed.php:19
 #: public/admin/plugins/suggested/display_feeds.php:10
 msgid "Sign In to Timely Network"
 msgstr "Log ind på Timely Network"
@@ -152,25 +162,18 @@ msgstr "Mine importerede feeds:"
 msgid "My imported Events (click on the feed to see the individually imported events):"
 msgstr "Mine importerede begivenheder (klik på hver enkelt feed for at se de importerede begivenheder):"
 
-#: public/admin/plugins/ics/import_feed.php:17
+#: public/admin/plugins/ics/import_feed.php:26
 msgid ""
 "<b>You don't have a subscription for this feature.</b><br>\n"
-"\t\tPlease <a href=\"https://time.ly/pricing/\">upgrade here</a> to a plan that\n"
+"\t\tPlease <a href=\"https://time.ly/pricing/\" target=\"_blank\">upgrade here</a> to a plan that\n"
 "\t\tsupports \"Import Feeds\"."
 msgstr ""
 
-#: public/admin/plugins/ics/import_feed.php:27
-msgid ""
-"<b>You have reached the limit of how many feeds you can import.</b><br>\n"
-"\t\tPlease <a href=\"https://time.ly/pricing/\">upgrade here</a> to a plan that\n"
-"\t\tsupports more feeds."
-msgstr ""
-
-#: public/admin/plugins/ics/import_feed.php:110
+#: public/admin/plugins/ics/import_feed.php:136
 msgid "Import feed"
 msgstr "Importer feed"
 
-#: public/admin/plugins/ics/import_feed.php:113
+#: public/admin/plugins/ics/import_feed.php:139
 msgid "Update feed"
 msgstr "Opdater feed"
 
@@ -608,7 +611,7 @@ msgstr "Klik her for tekniske detaljer"
 msgid "API URL: %s.<br/>Detail: %s"
 msgstr "API URL: %s.<br/>Detail: %s"
 
-#: app/model/api/api-abstract.php:463
+#: app/model/api/api-abstract.php:492
 msgid "Error decoding the response"
 msgstr "Fejl i afkodning af svaret"
 
@@ -946,15 +949,15 @@ msgstr "Fjern"
 msgid "Successfully imported events:"
 msgstr "Importerede begivenheder:"
 
-#: public/admin/plugins/ics/import_feed.php:63
+#: public/admin/plugins/ics/import_feed.php:89
 msgid "Allow comments on imported events"
 msgstr "Tillad kommentarer på importerede begivenheder"
 
-#: public/admin/plugins/ics/import_feed.php:70
+#: public/admin/plugins/ics/import_feed.php:96
 msgid "Show map on imported events"
 msgstr "Vis kort på importerede begivenheder"
 
-#: public/admin/plugins/ics/import_feed.php:77
+#: public/admin/plugins/ics/import_feed.php:103
 msgid "Import any tags/categories provided by feed, in addition those selected above"
 msgstr "Importer hvilke som helst tags/kategorier leveret med feed udover dem som er valgt ovenover"
 
@@ -1066,7 +1069,7 @@ msgstr "Vis kort"
 msgid "Keep original events categories and tags"
 msgstr "Bevar originale begivenhedskategorier og -tags"
 
-#: public/admin/feed_row.php:82 public/admin/plugins/ics/import_feed.php:85
+#: public/admin/feed_row.php:82 public/admin/plugins/ics/import_feed.php:111
 msgid "On refresh, preserve previously imported events that are missing from the feed"
 msgstr "Ved genindlæsning: Bevar tidligere importerede begivenheder som mangler i feed "
 
@@ -1202,7 +1205,7 @@ msgstr "Slutter"
 msgid "Ending after"
 msgstr "Slutter efter"
 
-#: public/admin/box_repeat.php:109 public/admin/plugins/ics/import_feed.php:107
+#: public/admin/box_repeat.php:109 public/admin/plugins/ics/import_feed.php:133
 msgid "Please wait&#8230;"
 msgstr "Vent venligst&#8230;"
 
@@ -1211,7 +1214,7 @@ msgid "Apply"
 msgstr "Tilføj"
 
 #: app/view/admin/settings.php:205 public/admin/box_repeat.php:116
-#: public/admin/plugins/ics/import_feed.php:101
+#: public/admin/plugins/ics/import_feed.php:127
 msgid "Cancel"
 msgstr "Fortryd"
 
@@ -2144,11 +2147,11 @@ msgstr "Køb billetter"
 msgid "Edit this occurrence (%s)"
 msgstr "Rediger denne forekomst (%s)"
 
-#: app/view/event/single.php:210
+#: app/view/event/single.php:208
 msgid "This post was replicated from another site's <a href=\"%s\" title=\"iCalendar feed\"><i class=\"ai1ec-fa ai1ec-fa-calendar\"></i> calendar feed</a>."
 msgstr "Dette indlæg er oprettet som en kopi af en anden hjemmesides <a href=\"%s\" title=\"iCalendar feed\"><i class=\"ai1ec-fa ai1ec-fa-calendar\"></i> kalenderfeed</a>."
 
-#: app/view/event/single.php:227
+#: app/view/event/single.php:225
 msgid "View original"
 msgstr "Vis oprindelige"
 

@@ -95,11 +95,12 @@ function mc_export_vcal() {
 }
 
 function my_calendar_send_vcal( $event_id ) {
+	$sitename = sanitize_title( get_bloginfo( 'name' ) );
 	header( "Content-Type: text/calendar" );
 	header( "Cache-control: private" );
 	header( 'Pragma: private' );
 	header( "Expires: Thu, 11 Nov 1977 05:40:00 GMT" ); // That's my birthday. :)
-	header( "Content-Disposition: inline; filename=my-calendar.ics" );
+	header( "Content-Disposition: inline; filename=my-calendar-$sitename.ics" );
 	$output = preg_replace( "~(?<!\r)\n~", "\r\n", my_calendar_generate_vcal( $event_id ) );
 
 	return urldecode( stripcslashes( $output ) );
@@ -275,6 +276,7 @@ function my_calendar_ical() {
 
 	$from = apply_filters( 'mc_ical_download_from', $from, $p );
 	$to   = apply_filters( 'mc_ical_download_to', $to, $p );
+	$category = ( isset( $_GET['mcat'] ) ) ? intval( $_GET['mcal'] ) : null;
 	$atts = array(
 		'category' => null,
 		'ltype'    => '',
@@ -309,9 +311,10 @@ PRODID:-//Accessible Web Design//My Calendar//http://www.joedolson.com//v' . $mc
 	//$events = my_calendar_grab_events( $from, $to, $category, $ltype, $lvalue, $source, $author, $host );
 	// my calendar grab events returns a flat array, but doesn't eliminate holiday cancellations; my-calendar_events eliminates those, but isn't a flat array. 
 	// rewrite array navigation so that this works.
-	$events = my_calendar_events( $from, $to, $category, $ltype, $lvalue, $source, $author, $host );
+	$site   = ( !isset( $_GET['site'] ) ) ? get_current_blog_id() : intval( $_GET['site'] );
+	$events = my_calendar_events( $from, $to, $category, $ltype, $lvalue, $source, $author, $host, '', $site );
 	$events = mc_flatten_event_array( $events );
-	
+		
 	if ( is_array( $events ) && ! empty( $events ) ) {
 		foreach ( array_keys( $events ) as $key ) {
 			$event =& $events[ $key ];
@@ -335,10 +338,11 @@ PRODID:-//Accessible Web Design//My Calendar//http://www.joedolson.com//v' . $mc
 	$output .= "\nEND:VCALENDAR";
 	$output = html_entity_decode( preg_replace( "~(?<!\r)\n~", "\r\n", $output ) );
 	if ( ! ( isset( $_GET['sync'] ) && $_GET['sync'] == 'true' ) ) {
+		$sitename = sanitize_title( get_bloginfo( 'name' ) );
 		header( "Content-Type: text/calendar; charset=" . get_bloginfo( 'charset' ) );
 		header( "Pragma: no-cache" );
 		header( "Expires: 0" );
-		header( "Content-Disposition: inline; filename=my-calendar.ics" );
+		header( "Content-Disposition: inline; filename=my-calendar-$sitename.ics" );
 	}
 	echo $output;
 }

@@ -488,7 +488,7 @@ function mc_save_profile() {
 	} else {
 		$edit_id = $user_ID;
 	}
-	if ( current_user_can( 'manage_options' ) ) {
+	if ( current_user_can( 'manage_options' ) && isset( $_POST['mc_user_permissions'] ) ) {
 		$mc_user_permission = $_POST['mc_user_permissions'];
 		update_user_meta( $edit_id, 'mc_user_permissions', $mc_user_permission );
 	}

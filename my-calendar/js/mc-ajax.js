@@ -14,12 +14,13 @@
                 $('li.mc-events').children().not('.event-date').hide();
                 $('li.current-day').children().show();
 				// Grid view
-				$('.calendar-event').children().not('.event-title').hide();
+				$('.calendar .calendar-event').children().not('.event-title').hide();
 				// Mini view
 				$('.mini .has-events').children().not('.trigger, .mc-date, .event-date').hide();
 				// All views
                 $( '#' + ref ).attr('tabindex', '-1').focus();
+				// Your Custom ajax load changes if needed
             });
         });		
     });
-}(jQuery));	
+}(jQuery));

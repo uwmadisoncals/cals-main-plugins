@@ -543,6 +543,7 @@ function mc_get_event_post( $event_id ) {
 function my_calendar_grab_events( $from, $to, $category = null, $ltype = '', $lvalue = '', $source = 'calendar', $author = null, $host = null, $holidays = null, $search = '', $site = false ) {
 	global $wpdb;
 	$mcdb = $wpdb;
+	
 	if ( get_option( 'mc_remote' ) == 'true' && function_exists( 'mc_remote_db' ) ) {
 		$mcdb = mc_remote_db();
 	}

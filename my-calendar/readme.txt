@@ -4,7 +4,7 @@ Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
 Tested up to: 4.7
-Stable tag: 2.5.7
+Stable tag: 2.5.9
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -82,6 +82,14 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
    with shortcode options or widget configuration.
 
 == Changelog ==
+
+= 2.5.9 =
+
+* Bug fix: class .mc-main appeared twice in day view
+* Bug fix: iCal output fetches no data on subsites in multisite networks
+* Bug fix: broken image upload script due to localization change
+* Bug fix: sorting events by category should sort by name, not ID
+* Add site name to .ics output file
 
 = 2.5.8 =
 

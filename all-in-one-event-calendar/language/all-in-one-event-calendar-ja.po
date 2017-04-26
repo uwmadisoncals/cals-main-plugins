@@ -10,6 +10,16 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: 2.3\n"
 
+#: public/admin/plugins/ics/import_feed.php:8
+msgid "unlimited"
+msgstr ""
+
+#: public/admin/plugins/ics/import_feed.php:45
+msgid ""
+"<b>You have reached the limit of how many feeds you can import.</b><br>\n"
+"\t\tPlease sign up for EventBoost plan <a href=\"https://time.ly/eventboost/\" target=\"_blank\">here</a>."
+msgstr ""
+
 #: app/view/admin/settings.php:209
 msgid "Calendar Type:"
 msgstr ""
@@ -54,7 +64,7 @@ msgstr ""
 msgid "Timely Ticketing saves time & money. Create ticketing/registration right here and now. You do not pay any ticketing fees (other than regular PayPal transaction costs). Create as many ticketing/registration as you'd like.<br /><br />Ticketing feature is not enabled for this website. Please sign up for Ticketing plan <a href=\"https://time.ly/tickets-existing-users/\" target=\"_blank\">here</a>."
 msgstr ""
 
-#: app/view/event/single.php:214
+#: app/view/event/single.php:212
 msgid "This post was imported from a CSV/ICS file."
 msgstr ""
 
@@ -82,7 +92,7 @@ msgid ""
 "\t\t\t\t\t\t\t\t\tGoogle Maps API Key</span> (<a target=\"_blank\" href=\"https://developers.google.com/maps/documentation/javascript/get-api-key#get-an-api-key\">Get an API key</a>)"
 msgstr ""
 
-#: public/admin/feed_row.php:93 public/admin/plugins/ics/import_feed.php:92
+#: public/admin/feed_row.php:93 public/admin/plugins/ics/import_feed.php:118
 msgid "Convert event's date/time to calendar's timezone"
 msgstr ""
 
@@ -106,7 +116,7 @@ msgstr ""
 msgid "I read and accept the <a href=\"https://time.ly/tos\" target=\"_blank\">terms of service</a>."
 msgstr ""
 
-#: public/admin/feed_row.php:16 public/admin/plugins/ics/import_feed.php:41
+#: public/admin/feed_row.php:16 public/admin/plugins/ics/import_feed.php:67
 msgid "Feed URL:"
 msgstr ""
 
@@ -120,13 +130,13 @@ msgid "Removing"
 msgstr ""
 
 #: public/admin/plugins/ics/display_feeds.php:6
-#: public/admin/plugins/ics/import_feed.php:6
+#: public/admin/plugins/ics/import_feed.php:15
 #: public/admin/plugins/suggested/display_feeds.php:6
 msgid "Please, Sign In to <b>Timely Network</b> to manage your feeds."
 msgstr ""
 
 #: public/admin/plugins/ics/display_feeds.php:10
-#: public/admin/plugins/ics/import_feed.php:10
+#: public/admin/plugins/ics/import_feed.php:19
 #: public/admin/plugins/suggested/display_feeds.php:10
 msgid "Sign In to Timely Network"
 msgstr ""
@@ -146,25 +156,18 @@ msgstr ""
 msgid "My imported Events (click on the feed to see the individually imported events):"
 msgstr ""
 
-#: public/admin/plugins/ics/import_feed.php:17
+#: public/admin/plugins/ics/import_feed.php:26
 msgid ""
 "<b>You don't have a subscription for this feature.</b><br>\n"
-"\t\tPlease <a href=\"https://time.ly/pricing/\">upgrade here</a> to a plan that\n"
+"\t\tPlease <a href=\"https://time.ly/pricing/\" target=\"_blank\">upgrade here</a> to a plan that\n"
 "\t\tsupports \"Import Feeds\"."
 msgstr ""
 
-#: public/admin/plugins/ics/import_feed.php:27
-msgid ""
-"<b>You have reached the limit of how many feeds you can import.</b><br>\n"
-"\t\tPlease <a href=\"https://time.ly/pricing/\">upgrade here</a> to a plan that\n"
-"\t\tsupports more feeds."
-msgstr ""
-
-#: public/admin/plugins/ics/import_feed.php:110
+#: public/admin/plugins/ics/import_feed.php:136
 msgid "Import feed"
 msgstr ""
 
-#: public/admin/plugins/ics/import_feed.php:113
+#: public/admin/plugins/ics/import_feed.php:139
 msgid "Update feed"
 msgstr ""
 
@@ -600,7 +603,7 @@ msgstr ""
 msgid "API URL: %s.<br/>Detail: %s"
 msgstr ""
 
-#: app/model/api/api-abstract.php:463
+#: app/model/api/api-abstract.php:492
 msgid "Error decoding the response"
 msgstr ""
 
@@ -938,15 +941,15 @@ msgstr "削除"
 msgid "Successfully imported events:"
 msgstr "インポートに成功したイベント:"
 
-#: public/admin/plugins/ics/import_feed.php:63
+#: public/admin/plugins/ics/import_feed.php:89
 msgid "Allow comments on imported events"
 msgstr "インポートされたイベントにコメントを許可"
 
-#: public/admin/plugins/ics/import_feed.php:70
+#: public/admin/plugins/ics/import_feed.php:96
 msgid "Show map on imported events"
 msgstr "インポートされたイベントに地図を表示する"
 
-#: public/admin/plugins/ics/import_feed.php:77
+#: public/admin/plugins/ics/import_feed.php:103
 msgid "Import any tags/categories provided by feed, in addition those selected above"
 msgstr "上で選択されたものに加えて、フィードに提供されたタグ・カテゴリをすべて持ち込む。"
 
@@ -1058,7 +1061,7 @@ msgstr "地図を表示"
 msgid "Keep original events categories and tags"
 msgstr "元のカテゴリとタグを残す"
 
-#: public/admin/feed_row.php:82 public/admin/plugins/ics/import_feed.php:85
+#: public/admin/feed_row.php:82 public/admin/plugins/ics/import_feed.php:111
 msgid "On refresh, preserve previously imported events that are missing from the feed"
 msgstr "リフレッシュ時に、フィードから失われる、以前にインポートされたイベントを取っておく。"
 
@@ -1194,7 +1197,7 @@ msgstr "終了"
 msgid "Ending after"
 msgstr "この後終了"
 
-#: public/admin/box_repeat.php:109 public/admin/plugins/ics/import_feed.php:107
+#: public/admin/box_repeat.php:109 public/admin/plugins/ics/import_feed.php:133
 msgid "Please wait&#8230;"
 msgstr "お待ちください&#8230;"
 
@@ -1203,7 +1206,7 @@ msgid "Apply"
 msgstr "適用"
 
 #: app/view/admin/settings.php:205 public/admin/box_repeat.php:116
-#: public/admin/plugins/ics/import_feed.php:101
+#: public/admin/plugins/ics/import_feed.php:127
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -2136,11 +2139,11 @@ msgstr "チケットを買う"
 msgid "Edit this occurrence (%s)"
 msgstr "この回(%s)を編集"
 
-#: app/view/event/single.php:210
+#: app/view/event/single.php:208
 msgid "This post was replicated from another site's <a href=\"%s\" title=\"iCalendar feed\"><i class=\"ai1ec-fa ai1ec-fa-calendar\"></i> calendar feed</a>."
 msgstr "この投稿は別なサイトの<a href=\"%s\" title=\"iCalendar feed\"><i class=\"ai1ec-fa ai1ec-fa-calendar\"></i>カレンダーフィード</a>から複製されました。"
 
-#: app/view/event/single.php:227
+#: app/view/event/single.php:225
 msgid "View original"
 msgstr "元を見る"
 

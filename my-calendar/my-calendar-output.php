@@ -1318,7 +1318,7 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 			if ( !isset( $nLink ) ) { 
 				$nLink = my_calendar_next_link( $c_year, $c_month, $c_day, $format, $time, $mc_show_months );
 			}
-			$feeds  = mc_rss_links( $ical_y, $ical_m, $nLink, $add, $subtract );
+			$feeds  = mc_rss_links( $ical_y, $ical_m, $nLink, $add, $subtract, $site );
 		}
 		// set up date switcher
 		if ( in_array( 'jump', $used ) ) {
@@ -1360,7 +1360,7 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 
 		if ( $time == 'day' ) {
 
-			$my_calendar_body .= "<div class='mc-main mcjs $format $time'>" . $mc_topnav;
+			$my_calendar_body .= "<div class='mcjs $format $time'>" . $mc_topnav;
 			// single day uses independent cycling.
 			$dayclass = strtolower( date( 'D', mktime( 0, 0, 0, $c_month, $c_day, $c_year ) ) );
 			$from     = $to = "$c_year-$c_month-$c_day";
@@ -1681,12 +1681,15 @@ function my_category_key( $category ) {
 }
 
 
-function mc_rss_links( $y, $m, $next, $add, $subtract ) {
+function mc_rss_links( $y, $m, $next, $add, $subtract, $site ) {
 	global $wp_rewrite;
 	$add['yr'] = $y;
 	$add['month'] = $m;
 	$add['nyr'] = $next['yr'];
 	$add['nmonth'] = $next['month'];
+	if ( $site ) {
+		$add['site'] == $site;
+	}
 	
 	$feed       = mc_feed_base() . 'my-calendar-rss';
 	$ics 		= mc_build_url( $add, $subtract,  mc_feed_base() . 'my-calendar-ics' );
