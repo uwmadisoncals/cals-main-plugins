@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.6.22
+* Version 6.6.26
 *
 */
 
@@ -40,7 +40,7 @@ function _wppa_admin() {
 	// Fix orphan albums and deleted target pages
 	$albs = $wpdb->get_results("SELECT * FROM `" . WPPA_ALBUMS . "`", ARRAY_A);
 
-	// Now we have tham, put them in cache
+	// Now we have them, put them in cache
 	wppa_cache_album( 'add', $albs );
 
 	if ( $albs ) {
@@ -62,12 +62,31 @@ function _wppa_admin() {
 		if ($_REQUEST['tab'] == 'edit'){
 			if ( isset($_REQUEST['edit_id']) ) {
 				$ei = $_REQUEST['edit_id'];
-				if ( $ei != 'new' && $ei != 'search' && $ei != 'trash' && ! is_numeric($ei) ) {
+				if ( $ei != 'new' && $ei != 'search' && $ei != 'trash' && $ei != 'single' && ! is_numeric($ei) ) {
 					wp_die('Security check failure 1');
+				}
+				if ( ! wp_verify_nonce( $_REQUEST['wppa_nonce'], 'wppa_nonce' ) ) {
+					wp_die('Security check failure 2');
 				}
 			}
 
-			if ($_REQUEST['edit_id'] == 'search') {
+			if ( $_REQUEST['edit_id'] == 'single' ) {
+				?>
+				<div class="wrap">
+					<h2><?php _e( 'Edit Single Photo', 'wp-photo-album-plus' );
+						echo ' - <small><i>'.__('Edit photo information', 'wp-photo-album-plus').'</i></small>';
+						?>
+					</h2>
+					<?php
+					wppa_album_photos($ei);
+					?>
+				</div>
+				<?php
+
+				return;
+			}
+
+			if ( $_REQUEST['edit_id'] == 'search' ) {
 
 				$back_url = get_admin_url().'admin.php?page=wppa_admin_menu';
 					if ( isset ( $_REQUEST['wppa-searchstring'] ) ) {
@@ -119,7 +138,7 @@ function _wppa_admin() {
 				if (isset($_REQUEST['parent_id'])) {
 					$parent = $_REQUEST['parent_id'];
 					if ( ! is_numeric($parent) ) {
-						wp_die('Security check failure 2');
+						wp_die('Security check failure 3');
 					}
 					$name = wppa_get_album_name($parent).'-#'.$id;
 					if ( ! current_user_can('administrator') ) {	// someone creating an album for someone else?
@@ -1029,7 +1048,7 @@ function wppaTryScheduleAll( id ) {
 
 									// Create subalbum
 									if ( wppa_can_create_album() ) {
-										$url = wppa_dbg_url( get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=new&amp;parent_id=' . $albuminfo['id'] );
+										$url = wppa_dbg_url( get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=new&amp;parent_id=' . $albuminfo['id'] . '&amp;wppa_nonce=' . wp_create_nonce( 'wppa_nonce' ) );
 										if ( wppa_switch( 'confirm_create' ) ) {
 											$onc = 'if (confirm(\''.__('Are you sure you want to create a subalbum?', 'wp-photo-album-plus').'\')) document.location=\''.$url.'\';';
 										}
@@ -1047,7 +1066,7 @@ function wppaTryScheduleAll( id ) {
 									// Create sibling
 									if ( $albuminfo['a_parent'] > '0' && wppa_can_create_album() ||
 										 $albuminfo['a_parent'] < '1' && wppa_can_create_top_album() ) {
-										$url = wppa_dbg_url( get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=new&amp;parent_id=' . $albuminfo['a_parent'] );
+										$url = wppa_dbg_url( get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=new&amp;parent_id=' . $albuminfo['a_parent'] . '&amp;wppa_nonce=' . wp_create_nonce( 'wppa_nonce' ) );
 										if ( wppa_switch( 'confirm_create' ) ) {
 											$onc = 'if (confirm(\''.__('Are you sure you want to create a subalbum?', 'wp-photo-album-plus').'\')) document.location=\''.$url.'\';';
 										}
@@ -1064,7 +1083,7 @@ function wppaTryScheduleAll( id ) {
 
 									// Edit parent
 									if ( $albuminfo['a_parent'] > '0' && wppa_album_exists( $albuminfo['a_parent'] ) && wppa_have_access( $albuminfo['a_parent'] ) ) {
-										$url = wppa_dbg_url( get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=' . $albuminfo['a_parent'] );
+										$url = wppa_dbg_url( get_admin_url() . 'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=' . $albuminfo['a_parent'] . '&amp;wppa_nonce=' . wp_create_nonce( 'wppa_nonce' ) );
 										$onc = 'document.location=\''.$url.'\';';
 										echo
 										'<input' .
@@ -1248,9 +1267,9 @@ function wppaTryScheduleAll( id ) {
 			<?php
 			// The Create new album button
 			if ( wppa_can_create_top_album() ) {
-				$url = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=new');
+				$url = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=new&amp;wppa_nonce='.wp_create_nonce('wppa_nonce'));
 				$vfy = __('Are you sure you want to create a new album?', 'wp-photo-album-plus');
-				echo '<form method="post" action="'.get_admin_url().'admin.php?page=wppa_admin_menu" style="float:left; margin-right:12px;" >';
+				echo '<form method="post" action="'.get_admin_url().'admin.php?page=wppa_admin_menu&wppa_nonce='.wp_create_nonce('wppa_nonce').'" style="float:left; margin-right:12px;" >';
 				echo '<input type="hidden" name="tab" value="edit" />';
 				echo '<input type="hidden" name="edit_id" value="new" />';
 				$onc = wppa_switch( 'confirm_create' ) ? 'onclick="return confirm(\''.$vfy.'\');"' : '';
@@ -1539,7 +1558,7 @@ global $wpdb;
 								<?php $url = wppa_ea_url($album['id'], 'del') ?>
 								<td><a href="<?php echo($url) ?>" class="wppadelete"><?php _e('Delete', 'wp-photo-album-plus'); ?></a></td>
 								<?php if ( wppa_can_create_album() ) {
-									$url = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=new&amp;parent_id='.$album['id']);
+									$url = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=new&amp;parent_id='.$album['id'].'&amp;wppa_nonce='.wp_create_nonce('wppa_nonce'));
 									if ( wppa_switch( 'confirm_create' ) ) {
 										$onc = 'if (confirm(\''.__('Are you sure you want to create a subalbum?', 'wp-photo-album-plus').'\')) document.location=\''.$url.'\';';
 										echo '<td><a onclick="'.$onc.'" class="wppacreate">'.__('Create', 'wp-photo-album-plus').'</a></td>';
@@ -2242,7 +2261,7 @@ global $wpdb;
 								<?php $url = wppa_ea_url($album['id'], 'del') ?>
 								<td><a href="<?php echo($url) ?>" class="wppadelete"><?php _e('Delete', 'wp-photo-album-plus'); ?></a></td>
 								<?php if ( wppa_can_create_album() ) {
-									$url = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=new&amp;parent_id='.$album['id']);
+									$url = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab=edit&amp;edit_id=new&amp;parent_id='.$album['id'].'&amp;wppa_nonce='.wp_create_nonce('wppa_nonce'));
 									if ( wppa_switch( 'confirm_create' ) ) {
 										$onc = 'if (confirm(\''.__('Are you sure you want to create a subalbum?', 'wp-photo-album-plus').'\')) document.location=\''.$url.'\';';
 										echo '<td><a onclick="'.$onc.'" class="wppacreate">'.__('Create', 'wp-photo-album-plus').'</a></td>';
@@ -2386,12 +2405,7 @@ global $wpdb;
 	return $output;
 }
 
-function wppa_ea_url($edit_id, $tab = 'edit') {
 
-	$nonce = wp_create_nonce('wppa_nonce');
-//	$referrer = $_SERVER["REQUEST_URI"];
-	return wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab='.$tab.'&amp;edit_id='.$edit_id.'&amp;wppa_nonce='.$nonce);
-}
 
 // Edit (sub)album sequence
 function wppa_album_sequence( $parent ) {

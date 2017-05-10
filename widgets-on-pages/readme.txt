@@ -1,36 +1,29 @@
 === Widgets on Pages ===
 Contributors: toddhalfpenny
-Donate link: http://gingerbreaddesign.co.uk/wordpress/plugins/plugins.php
-Tags: widgets, sidebar, pages, post, shortcode, inline
+Donate link: https://datamad.co.uk/donate/
+Tags: widgets, widgets in page, widgets in post, sidebar, pages, post, shortcode, inline, widgetise, widgetize
 Requires at least: 2.8
-Tested up to: 4.5.1
-Stable tag: 0.0.12
+Tested up to: 4.7.4
+Stable tag: 1.0.4
 
-The easy way to Add Widgets or Sidebars to Posts and Pages using shortcodes or template tags.
+The easiest and highest rated way to Add Widgets or Sidebars to Posts and Pages using shortcodes or template tags.
 
 == Description ==
 
-''NOTICE''
+The easiest, and highest rated way to Add Widgets to Posts and/or Pages. Create unlimited dynamic sidebars (widget areas) and insert these into a WordPress post or page.
 
-This plugin has now been superceeded by the brand new [Turbo Widgets](https://wordpress.org/plugins/turbo-widgets/) and I recommend you use that instead of this one.
+There is one default widget area that can be used or you can add more from the settings menu. You can have an unlimited number of sidebars, and these can be used multiple times.
 
-As well as being more actively maintained it also now allows widgets to be added using the lovely WYSIWYG editor so no need to deal with shortcodes... woohoo! There is also a [PRO](http://turbowidgets.net) version that includes the ability to edit the included widgets direct from the post/page via the WYSIWYG editor and the wonderful new Turbo Sidebars.
+Each sidebar can be called indepentenly by a shortcode and you can call more than one per post/page.
 
-''And back to Widgtes on Pages''
+Sidebars can be included in the post/page by using a shortcode like the following, where `x` is the name of the sidebar.
 
-The easy way to Add Widgets to Posts and/or Pages.  Allows 'in-page' widget areas so widgets can be defined via shortcut straight into page/post content.
-There is one default widget area that can be used or you can add more from the settings menu. You can currently have an unlimited number of sidebars.
-Each sidebar can be called indepentenly by  a shortcode and you can call more than one per post/page.
-Sidebars can be included in the post/page by using a shortcode like `[widgets_on_pages id=x]` where `x` is the number of the sidebar.
-Sidebars can also be named via the Widgets on Pages options page and that name can be used instead of the `x` id.
-''NOTE'' : see changelog for use if using the named sidebars
+`[widgets_on_pages id=x]`
 
+The sidebars can also be added to any theme, using template tags. This is an ace way to add widgets to a theme's header and footer.
 
 
 == Installation ==
-
-
-''NOTE'' Apologies but you may lose the widgets in your customised sidebars if upgrading from pre 0.0.8 version. The cause of this loss is required to enhance functionality and reduce further possible loss of config when changing/modifying themes. The choice to to do this was not easy but hopefully will make the plugin more stable going forward.
 
 1. Install the plugin from within the Dashboard or upload the directory `widgets-on-pages` and all its contents to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
@@ -49,9 +42,15 @@ Simply select the 'Enable Styling' setting in the Widgets on Pages options page.
 
 = I did the above but the bullets still show, what now =
 
-Your theme's CSS is probably overriding your setting... you could try using your browsers ''inspect element" function to see what part of the CSS is setting the list-style.
+Your theme's CSS is probably overriding your setting... you could try using your browsers *inspect element" function to see what part of the CSS is setting the list-style.
 
 = Can I have more than one defined sidebar area =
+
+Yes... you can have an unlimited number of sidebars defined. The number available can be administered via the settings menu.
+
+= What widgets are supported? =
+
+All of them. Yup, We've not come across a single non-working one yet.
 
 Yes... you can have an unlimited number of sidebars defined. The number available can be administered via the settings menu.
 
@@ -59,10 +58,31 @@ Yes... you can have an unlimited number of sidebars defined. The number availabl
 
 1. Setting up the sidebars.
 
-2. The 'options' page.
+2. Widgets on Pages 'Turbo Sidebars' page.
 
 
 == Changelog ==
+
+= 1.0.3 =
+1. Fixed [issue](https://wordpress.org/support/topic/settings-button-in-all-of-the-plugins/#post-8980118) with "Settings" link appearing next to each plugin.
+1. Added link to the Turbo Sidebars from the old Settings page, as per [this forum post](https://wordpress.org/support/topic/all-widgets-gone-cant-create-new-ones/), great idea.
+
+
+= 1.0.2 =
+1. Fixed issue headers being sent from template tag function.
+
+
+= 1.0.1 =
+1. Fixed issue with php warning when styling checkbox was unchecked.
+
+
+= 1.0.0 =
+
+1. Re-written to use OO approach and best practices, using the [WordPress Plugin Boilerplate](https://github.com/DevinVinson/WordPress-Plugin-Boilerplate) project and [WordPress Coding Standards](https://codex.wordpress.org/WordPress_Coding_Standards)
+1. Fixed [Undefined Index: enable_css issue](https://wordpress.org/support/topic/undefined-index-enable_css/) from the support forum
+1. Added suggestion [Enqueue the CSS](https://wordpress.org/support/topic/enqueue-the-css/) from the support forum
+1. Moved admin menu to *Appearance*
+1. Use of Turbo Sidebars as our special widget areas. Better management through CPT
 
 
 = 0.0.12 =
@@ -119,3 +139,13 @@ Minor update so that the functions.php code is not needed anymore... makes like 
 = 0.0.1 =
 
 1st release - only supports one defined in-post/page widget area
+
+
+== Upgrade Notice ==
+
+= 1.0.0 =
+
+* Minor bug-fixes, but major re-write
+* Moved admin menu to Top Level
+* Widget areas are now powered by Turbo Sidebars. Even though this has been thoroughly tested, it is highly recommended to check you Widgets are still working as expected post-install. If things are not correct the plugin should not have deleted any of the existing config and so a rollback to 0.0.12 should fix issues. If you do run into issues please post details on the support board.
+* Existing Widgets on Pages Sidebar config should be migrated automatically

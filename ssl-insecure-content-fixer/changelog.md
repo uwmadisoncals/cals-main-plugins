@@ -2,6 +2,11 @@
 
 ## Changelog
 
+### 2.3.0, 2017-05-01
+
+* added: support for Windows Azure with ARR
+* added: filter `ssl_insecure_content_domain_exclusions` for domains that can be excluded from content cleaning (ignored for enqueued scripts)
+
 ### 2.2.3, 2017-02-01
 
 * fixed: breaks Visual Composer back end editing due to a regular expression problem (now you have two!)

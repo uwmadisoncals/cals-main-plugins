@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.6.24
+* Version 6.6.26
 *
 */
 
@@ -973,6 +973,8 @@ static $labels;
 
 function wppa_get_exif_datetime( $file ) {
 
+	// Make sure we do not process a -o1.jpg file
+	$file = str_replace( '-o1.jpg', '.jpg', $file );
 	return wppa_get_exif_item( $file, 'DateTimeOriginal' );
 }
 
@@ -1028,6 +1030,9 @@ global $wppa;
 
 	// Do we need this?
 	if ( ! wppa_switch( 'save_exif' ) ) return;
+
+	// Make sure we do not process a -o1.jpg file
+	$file = str_replace( '-o1.jpg', '.jpg', $file );
 
 	// Check filetype
 	if ( ! function_exists( 'exif_imagetype' ) ) return false;
@@ -1475,6 +1480,9 @@ static $counters;
 // Get gps data from photofile
 function wppa_get_coordinates( $picture_path, $photo_id ) {
 global $wpdb;
+
+	// Make sure we look at the original, not the -o1 file
+	$picture_path = str_replace( '-o1.jpg', '.jpg', $picture_path );
 
 	// Exif on board?
 	if ( ! function_exists( 'exif_read_data' ) ) return false;

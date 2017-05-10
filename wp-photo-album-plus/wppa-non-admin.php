@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.6.22
+* Version 6.6.25
 *
 */
 
@@ -453,7 +453,7 @@ global $wppa_session;
 			echo
 			'<div' .
 				' id="wppa-fulls-btn"' .
-				' style="height:48px;z-index:100092;position:fixed;top:0;right:48px;opacity:0.75;"' .
+				' style="height:48px;z-index:100098;position:fixed;top:0;right:48px;opacity:0.75;"' .
 				' onclick="wppaOvlFull()"' .
 				' onmouseover="jQuery(this).stop().fadeTo(300,1);"' .
 //				' ontouchstart="jQuery(this).stop().fadeTo(300,1);"' .

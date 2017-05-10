@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.6.20
+* Version 6.6.25
 *
 */
 
@@ -1185,4 +1185,12 @@ global $wpdb;
 			echo ' <span style="color:red" >' . __('Deleted', 'wp-photo-album-plus' ) . '</span>';
 		}
 	}
+}
+
+// edit album url
+function wppa_ea_url($edit_id, $tab = 'edit') {
+
+	$nonce = wp_create_nonce('wppa_nonce');
+
+	return wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;tab='.$tab.'&amp;edit_id='.$edit_id.'&amp;wppa_nonce='.$nonce);
 }

@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsSlideshowVersion = '6.6.22';
+var wppaJsSlideshowVersion = '6.6.25';
 
 // This is an entrypoint to load the slide data
 function wppaStoreSlideInfo(
@@ -1481,11 +1481,11 @@ function _wppaSpeed( mocc, faster ) {
 
 function _wppaLoadSpinner( mocc ) {
 return;
-
+/*
 	if ( ! document.getElementById( 'slide_frame-'+mocc ) ) return;	// filmonly
 
 	jQuery( "#wppa-ajax-spin-" + mocc ).fadeIn( 3000 );
-
+*/
 }
 
 function _wppaUnloadSpinner( mocc ) {

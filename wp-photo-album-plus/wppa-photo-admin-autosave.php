@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.6.22
+* Version 6.6.25
 *
 */
 
@@ -85,6 +85,7 @@ global $wpdb;
 										'?page=wppa_admin_menu' .
 										'&tab=edit' .
 										'&edit_id=' . $album .
+										'&wppa_nonce=' . wp_create_nonce('wppa_nonce') .
 										'&wppa-searchstring=' . wppa_sanitize_searchstring( $_REQUEST['wppa-searchstring'] )
 									);
 		}
@@ -97,8 +98,18 @@ global $wpdb;
 			$link 	= wppa_dbg_url( 	get_admin_url() . 'admin.php' .
 										'?page=wppa_admin_menu' .
 										'&tab=edit' .
-										'&edit_id=trash'
+										'&edit_id=trash' .
+										'&wppa_nonce=' . wp_create_nonce('wppa_nonce')
 									);
+		}
+
+		// A single photo
+		elseif ( $album == 'single' ) {
+			$p = strval( intval( $_REQUEST['photo'] ) );
+			$count 	= $p ? 1 : 0;
+			$photos = $wpdb->get_results( "SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `id` = '$p'", ARRAY_A );
+			$count 	= count( $photos );
+			$link 	= '';
 		}
 
 		// A physical album
@@ -116,7 +127,8 @@ global $wpdb;
 			$link 	= wppa_dbg_url( 	get_admin_url() . 'admin.php' .
 										'?page=wppa_admin_menu' .
 										'&tab=edit' .
-										'&edit_id=' . $album
+										'&edit_id=' . $album .
+										'&wppa_nonce=' . wp_create_nonce('wppa_nonce')
 									);
 		}
 	}
@@ -149,7 +161,7 @@ global $wpdb;
 														$owner
 													), ARRAY_A
 									);
-		$link 	= wppa_dbg_url( get_admin_url() . 'admin.php' . '?page=wppa_edit_photo' );
+		$link 	= wppa_dbg_url( get_admin_url() . 'admin.php' . '?page=wppa_edit_photo' . '&wppa_nonce=' . wp_create_nonce('wppa_nonce') );
 	}
 
 	// Moderate photos
@@ -199,7 +211,7 @@ global $wpdb;
 											"ORDER BY `timestamp` DESC " .
 											$limit, ARRAY_A
 										);
-			$link 	= wppa_dbg_url( get_admin_url() . 'admin.php' . '?page=wppa_moderate_photos' );
+			$link 	= wppa_dbg_url( get_admin_url() . 'admin.php' . '?page=wppa_moderate_photos' . '&wppa_nonce=' . wp_create_nonce('wppa_nonce') );
 		}
 
 		// No photos to moderate
@@ -236,7 +248,7 @@ global $wpdb;
 												$limit,
 												ARRAY_A
 											);
-				$link 	= wppa_dbg_url( get_admin_url() . 'admin.php' . '?page=wppa_moderate_photos' );
+				$link 	= wppa_dbg_url( get_admin_url() . 'admin.php' . '?page=wppa_moderate_photos' . '&wppa_nonce=' . wp_create_nonce('wppa_nonce') );
 			}
 
 			// Nothing to do
@@ -509,7 +521,18 @@ function wppaTryScheduledel( id ) {
 
 			// Various usefull vars
 			$owner_editable = wppa_switch( 'photo_owner_change' ) && wppa_user_is( 'administrator' );
-			$sortby_orderno = wppa_get_album_item( $album, 'p_order_by' ) == '1' || wppa_get_album_item( $album, 'p_order_by' ) == '-1';
+			switch ( wppa_get_album_item( $album, 'p_order_by' ) ) {
+				case '0':
+					$temp = wppa_opt( 'list_photos_by' );
+					$sortby_orderno = ( $temp == '-1' || $temp == '1' );
+					break;
+				case '-1':
+				case '1':
+					$sortby_orderno = true;
+					break;
+				default:
+					$sortby_orderno = false;
+			}
 			$wms 	= array( 'toplft' => __( 'top - left' , 'wp-photo-album-plus'), 'topcen' => __( 'top - center' , 'wp-photo-album-plus'), 'toprht' => __( 'top - right' , 'wp-photo-album-plus'),
 							 'cenlft' => __( 'center - left' , 'wp-photo-album-plus'), 'cencen' => __( 'center - center' , 'wp-photo-album-plus'), 'cenrht' => __( 'center - right' , 'wp-photo-album-plus'),
 							 'botlft' => __( 'bottom - left' , 'wp-photo-album-plus'), 'botcen' => __( 'bottom - center' , 'wp-photo-album-plus'), 'botrht' => __( 'bottom - right' , 'wp-photo-album-plus'), );
@@ -2199,14 +2222,14 @@ echo 'Page='.$page;
 		if ( $album == 'search' ) {
 			$count 	= wppa_get_edit_search_photos( '', 'count_only' );
 			$photos = wppa_get_edit_search_photos( $limit );
-			$link 	= wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id='.$album.'&wppa-searchstring='.wppa_sanitize_searchstring($_REQUEST['wppa-searchstring']).'&bulk' );
+			$link 	= wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id='.$album.'&wppa-searchstring='.wppa_sanitize_searchstring($_REQUEST['wppa-searchstring']).'&bulk'.'&wppa_nonce=' . wp_create_nonce('wppa_nonce') );
 			wppa_show_search_statistics();
 		}
 		else {
 			$counts = wppa_get_treecounts_a( $album, true );
 			$count = $counts['selfphotos'] + $counts['pendselfphotos'] + $counts['scheduledselfphotos'];
 			$photos = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM `'.WPPA_PHOTOS.'` WHERE `album` = %s '.wppa_get_photo_order( $album, 'norandom' ).$limit, $album ), ARRAY_A );
-			$link = wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id='.$album.'&bulk' );
+			$link = wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id='.$album.'&bulk'.'&wppa_nonce=' . wp_create_nonce('wppa_nonce') );
 		}
 
 		if ( $photos ) {
@@ -2447,6 +2470,7 @@ function wppaSetConfirmMove( id ) {
 					});
 				</script>
 				</h3>
+				<?php $edit_link = wppa_ea_url( 'single', $tab = 'edit' ) ?>
 				<table class="widefat" >
 					<thead style="font-weight:bold;" >
 						<td><input type="checkbox" class="wppa-bulk-photo" onchange="jQuery( '.wppa-bulk-photo' ).attr( 'checked', this.checked );" /></td>
@@ -2471,7 +2495,12 @@ function wppaSetConfirmMove( id ) {
 							<!-- ID and delete link -->
 							<td><?php
 								echo
-								$photo['id'] .
+								'<a' .
+									' href="' . $edit_link . '&photo=' . $photo['id'] . '"' .
+									' target="_blank"' .
+									' >' .
+									$photo['id'] .
+								'</a>' .
 								'<br />' .
 								'<a' .
 									' id="wppa-delete-' . $photo['id'] . '"' .
@@ -2479,7 +2508,7 @@ function wppaSetConfirmMove( id ) {
 													confirm( \'' . esc_js( __( 'Are you sure you want to delete this photo?', 'wp-photo-album-plus' ) ) . '\' ) ) {
 										jQuery(this).html( \'' . esc_js( __('Deleting...', 'wp-photo-album-plus') ) . '\' );
 										wppaAjaxDeletePhoto( \'' . $photo['id'] . '\', \'<td colspan=8 >\', \'</td>\' ) }"' .
-									' style="color:red;font-weight:bold;"' .
+									' style="color:red;font-weight:bold;cursor:pointer;"' .
 									' >' .
 									__( 'Delete', 'wp-photo-album-plus' ) .
 								'</a>';
@@ -2667,7 +2696,7 @@ global $wpdb;
 		$is_descending 	= strpos( $photoorder, 'DESC' ) !== false;
 		$is_p_order 	= strpos( $photoorder, 'p_order' ) !== false;
 		$photos 		= $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM `'.WPPA_PHOTOS.'` WHERE `album` = %s '.$photoorder, $album ), ARRAY_A );
-		$link 			= wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id='.$album.'&bulk' );
+		$link 			= wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id='.$album.'&bulk'.'&wppa_nonce=' . wp_create_nonce('wppa_nonce') );
 		$size 			= '180';
 
 		if ( $photos ) {

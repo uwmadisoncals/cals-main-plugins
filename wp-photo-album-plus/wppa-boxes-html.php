@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.6.19
+* Version 6.6.26
 *
 */
 
@@ -2470,8 +2470,15 @@ static $albums_granted;
 									'wp-photo-album-plus' ), $max ) .
 				'</div>';
 
-			if ( wppa_opt( 'upload_fronend_maxsize' ) ) {
-				$maxsize = wppa_opt( 'upload_fronend_maxsize' );
+			if ( wppa_opt( 'upload_frontend_minsize' ) ) {
+				$minsize = wppa_opt( 'upload_frontend_minsize' );
+				$result .=
+					'<div style="font-size:10px;" >' .
+						sprintf( __( 'Min photo size: %d x %d pixels', 'wp-photo-album-plus' ), $minsize, $minsize ) .
+					'</div>';
+			}
+			if ( wppa_opt( 'upload_frontend_maxsize' ) ) {
+				$maxsize = wppa_opt( 'upload_frontend_maxsize' );
 				$result .=
 					'<div style="font-size:10px;" >' .
 						sprintf( __( 'Max photo size: %d x %d pixels', 'wp-photo-album-plus' ), $maxsize, $maxsize ) .
@@ -2664,7 +2671,7 @@ static $albums_granted;
 									' onchange="'.$onc.'"' .
 									' >';
 					if ( wppa_opt( 'up_tagselbox_content_'.$i ) ) {	// List of tags supplied
-						$tags = explode( ',', wppa_opt( 'up_tagselbox_content_'.$i ) );
+						$tags = explode( ',', trim( wppa_opt( 'up_tagselbox_content_'.$i ), ',' ) );
 						$result .= '<option value="" >&nbsp;</option>';
 						if ( is_array( $tags ) ) foreach ( $tags as $tag ) {
 							$result .= '<option class="wppa-sel-'.$yalb.'-'.$mocc.'" value="'.urlencode($tag).'">'.$tag.'</option>';
@@ -2693,6 +2700,7 @@ static $albums_granted;
 								' style="padding:0; width:100%; '.__wcs( 'wppa-box-text' ).'"' .
 								' name="wppa-new-tags"' .
 								' onchange="'.$onc.'"' .
+								' value="'.trim(wppa_opt('up_tagbox_new'), ',').'"' .
 							' />';
 			}
 

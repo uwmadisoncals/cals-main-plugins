@@ -2,8 +2,8 @@
 Contributors: strangerstudios
 Tags: memberships, membership, authorize.net, ecommerce, paypal, stripe, braintree, restrict access, restrict content, directory site, payflow
 Requires at least: 4
-Tested up to: 4.7.2
-Stable tag: 1.8.13.6
+Tested up to: 4.7.4
+Stable tag: 1.9
 
 A revenue-generating machine for membership sites. Unlimited levels with recurring payment, protected content and member management.
 
@@ -115,6 +115,24 @@ Not sure? You can find out by doing a bit a research.
 [View All Screenshots](http://www.paidmembershipspro.com/features/screenshots/)
 
 == Changelog ==
+= 1.9 =
+* BUG: Fixed issue with cancelling 2Checkout recurring subscriptions. Now using the payment_transaction_id to find/cancel the sale's recurring subscription since no subscription_transaction_id is being saved.
+* BUG: Fixed issue where old membership levels were not listed correctly in the cancellation email. (Thanks, Mike from Migrating Eye)
+* BUG: Fixed issue where "custom trial" values were not saving for discount codes.
+* BUG: Fixed issue where checkouts were still processing even if there were errors with the discount code used.
+* BUG: Fixed bug where settings added via the pmpro_custom_advanced_settings were not being saved to DB unless they were prefixed with custom_.
+* BUG: Fixed other formatting issues with settings added via pmpro_custom_advanced_settings.
+* BUG: Fixed issue where the sendInvoiceEmail method of the email class was expecting $order->discount_code to be a string, but it was sometimes a discount code object. (Thanks, Bill Stoltz)
+* FEATURE: Added the pmpro_member shortcode. See the Paid Memberships Pro website for documentation.
+* ENHANCEMENT: Added pmpro_account_membership_expiration_text filter to filter the expiration text that shows ona  user's membership account page.
+* ENHANCEMENT: Updated our Stripe and Braintree libraries to use their latest versions. This update allows our gateway integrations to support PHP7 and also removes support for PHP 5.2 and 5.3.
+* ENHANCEMENT: The Braintree level compatibility check now also looks for a properly named plan.
+* ENHANCEMENT: Better error handling when trying to update plugins that update against the PMPro license server.
+* ENHANCEMENT: Improved Italian translation. (Thanks, Francesco Pezzotti)
+* ENHANCEMENT: Improved German tranlsation. (Thanks, Simon)
+* ENHANCEMENT: Added a Sweedish tranlsation. (Thanks, Mathias Persson)
+* ENHANCEMENT: Added a "Chinese/Cantonese (Hong Kong SAR China)" tranlsation. (Thanks, Kai Chan)
+
 = 1.8.13.6 =
 * BUG: Fixed bug where credit card expiration emails would be sent to users with PayPal Express orders.
 * BUG: Fixed bug when updating billing with Stripe.

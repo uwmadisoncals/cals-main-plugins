@@ -2,12 +2,12 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick
-Version: 6.6.24
-Stable tag: 6.6.23
+Version: 6.6.26
+Stable tag: 6.6.25
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
-Tested up to: 4.8-alpha-40396
+Tested up to: 4.8-alpha-40569
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -179,6 +179,38 @@ Oh, just Google on 'picture resizer' and you will find a bunch of free programs 
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.6.26 =
+
+= Bug Fixes =
+
+* Go to edit album after backend upload did not work in Box A and B for users with wppa_admin rights due to erroneous security failure 2 message. Fixed.
+* Exif data from non-normal oriented photos was not always properly processed. Fixed.
+* Create subalbum on the collabsable album table Create link resulted in an erroneous Security check failure message. Fixed.
+
+= New Features =
+
+* Table VII-B10 has been split into 10.1 and 10.2. 10.1 is new setting: Frontend upload min size.
+
+= Other Changes =
+
+* Session db table is now cleared at plugin update.
+
+= 6.6.25 =
+
+= Bug Fixes =
+
+* Fixed a layout issue of the front-end upload dialog tags selection boxes: redundant empty lines removed.
+* When the default photo sort order was order# or order# descending and the sort method on the album admin screen was set to default, the order number fields were not editable. Fixed.
+* The fullscreen button on lightbox was under the lightbox image. Fixed the zIndex.
+
+= New Features =
+
+* You can now enter a default value for the New Tags input field on the front-end upload dialog. Table II-H13.1.
+
+= Other Changes =
+
+* The photo numbers on the photo admin pages when photos have been moved or deleted are now links to a single photo edit page, to be able to quickly correct erroneous moves or deletions.
 
 = 6.6.24 =
 

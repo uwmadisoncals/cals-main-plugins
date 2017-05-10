@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.6.20
+* Version 6.6.26
 *
 */
 
@@ -4498,8 +4498,17 @@ global $wppa_alert;
 		return false;
 	}
 
+	// Is it not too small?
+	$ms = wppa_opt( 'upload_frontend_minsize' );
+	if ( $ms ) {	// Min size configured
+		if ( $imgsize[0] < $ms || $imgsize[1] < $ms ) {
+			$wppa_alert .= esc_js( sprintf( __( 'Uploaded file is smaller than the allowed minimum of %d x %d pixels.' , 'wp-photo-album-plus'), $ms, $ms ) );
+			return false;
+		}
+	}
+
 	// Is it not too big?
-	$ms = wppa_opt( 'upload_fronend_maxsize' );
+	$ms = wppa_opt( 'upload_frontend_maxsize' );
 	if ( $ms ) {	// Max size configured
 		if ( $imgsize[0] > $ms || $imgsize[1] > $ms ) {
 			$wppa_alert .= esc_js( sprintf( __( 'Uploaded file is larger than the allowed maximum of %d x %d pixels.' , 'wp-photo-album-plus'), $ms, $ms ) );

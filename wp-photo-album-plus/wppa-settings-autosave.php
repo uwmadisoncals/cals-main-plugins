@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.6.24
+* Version 6.6.26
 *
 */
 
@@ -2899,6 +2899,15 @@ global $wp_version;
 							$clas = 'wppa_feup wppa_up_tags';
 							$tags = 'upload';
 							wppa_setting($slug, '13', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Tags box New', 'wp-photo-album-plus');
+							$desc = __('The tags in the New tags input box.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_up_tagbox_new';
+							$html = wppa_edit( $slug, get_option( $slug ), '300px' );
+							$clas = 'wppa_feup wppa_up_tags';
+							$tags = 'upload';
+							wppa_setting($slug, '13.1', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Preview tags', 'wp-photo-album-plus');
 							$desc = __('Show a preview of all tags that will be added to the photo info.', 'wp-photo-album-plus');
@@ -6391,16 +6400,27 @@ global $wp_version;
 							$tags = 'upload,mail';
 							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
 
-							$name = __('Max size in pixels', 'wp-photo-album-plus');
-							$desc = __('Max size for height and width for front-end uploads.', 'wp-photo-album-plus');
-							$help = esc_js(__('Enter the maximum size. 0 is unlimited','wppa', 'wp-photo-album-plus'));
-							$slug = 'wppa_upload_fronend_maxsize';
+							$name = __('Min size in pixels', 'wp-photo-album-plus');
+							$desc = __('Min size for height and width for front-end uploads.', 'wp-photo-album-plus');
+							$help = esc_js(__('Enter the minimum size.','wppa', 'wp-photo-album-plus'));
+							$slug = 'wppa_upload_frontend_minsize';
 							$html1 = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus'));
 							$html2 = '';
 							$html = array( $html1, $html2 );
 							$clas = '';
 							$tags = 'upload';
-							wppa_setting($slug, '10', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting($slug, '10.1', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Max size in pixels', 'wp-photo-album-plus');
+							$desc = __('Max size for height and width for front-end uploads.', 'wp-photo-album-plus');
+							$help = esc_js(__('Enter the maximum size. 0 is unlimited','wppa', 'wp-photo-album-plus'));
+							$slug = 'wppa_upload_frontend_maxsize';
+							$html1 = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus'));
+							$html2 = '';
+							$html = array( $html1, $html2 );
+							$clas = '';
+							$tags = 'upload';
+							wppa_setting($slug, '10.2', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Home after Upload', 'wp-photo-album-plus');
 							$desc = __('After successfull front-end upload, go to the home page.', 'wp-photo-album-plus');

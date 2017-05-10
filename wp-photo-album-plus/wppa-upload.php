@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 6.6.22
+* Version 6.6.26
 *
 */
 
@@ -78,7 +78,9 @@ global $upload_album;
 		if ( isset( $_POST['wppa-go-edit-multiple'] ) ) {
 			if ( current_user_can( 'wppa_admin' ) ) {
 				wppa_ok_message( __( 'Connecting to edit album...' , 'wp-photo-album-plus' ) ); ?>
-				<script type="text/javascript">document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id='.$upload_album, 'js' ) ) ?>';</script>
+				<script type="text/javascript">
+					document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id=' . $upload_album . '&wppa_nonce=' . wp_create_nonce( 'wppa_nonce', 'wppa_nonce' ), 'js' ) ) ?>';
+				</script>
 			<?php }
 			elseif ( wppa_opt( 'upload_edit' ) != 'none' ) {
 				wppa_ok_message( __( 'Connecting to edit photos...' , 'wp-photo-album-plus' ) ); ?>
@@ -93,7 +95,9 @@ global $upload_album;
 		if ( isset( $_POST['wppa-go-edit-single'] ) ) {
 			if ( current_user_can( 'wppa_admin' ) ) {
 				wppa_ok_message( __( 'Connecting to edit album...' , 'wp-photo-album-plus' ) ); ?>
-				<script type="text/javascript">document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id='.$upload_album, 'js' ) ) ?>';</script>
+				<script type="text/javascript">
+					document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id=' . $upload_album . '&wppa_nonce=' . wp_create_nonce( 'wppa_nonce', 'wppa_nonce' ), 'js' ) ) ?>';
+				</script>
 			<?php }
 			elseif ( wppa_opt( 'upload_edit' ) != 'none' ) {
 				wppa_ok_message( __( 'Connecting to edit photos...' , 'wp-photo-album-plus' ) ); ?>

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.6.24
+* Version 6.6.26
 *
 */
 
@@ -207,8 +207,8 @@ global $silent;
 	}
 
 	// Clear Session
-//	$wpdb->query( "TRUNCATE TABLE `".WPPA_SESSION."`" );
-//	wppa_session_start();
+	$wpdb->query( "TRUNCATE TABLE `".WPPA_SESSION."`" );
+	wppa_session_start();
 
 	// Convert any changed and remove obsolete setting options
 	if ( $old_rev > '100' ) {	// On update only
@@ -530,6 +530,10 @@ global $silent;
 		if ( $old_rev <= '6618' ) {
 			wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
 			wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+		}
+
+		if ( $old_rev <= '6626' ) {
+			wppa_rename_setting( 'wppa_upload_fronend_maxsize', 'wppa_upload_frontend_maxsize' );	// Fix typo
 		}
 
 	}
@@ -969,6 +973,7 @@ Hide Camera info
 						'wppa_up_tagselbox_content_3' 	=> '',
 						'wppa_up_tag_input_on' 			=> 'yes',
 						'wppa_up_tag_input_title' 		=> __( 'Enter new tags:' , 'wp-photo-album-plus'),
+						'wppa_up_tagbox_new' 			=> '',
 						'wppa_up_tag_preview' 			=> 'yes',
 						'wppa_camera_connect' 			=> 'yes',
 						'wppa_blog_it' 					=> '-none-',
@@ -1412,7 +1417,8 @@ Hide Camera info
 						'wppa_user_create_login'		=> 'yes',
 						'wppa_user_create_captcha' 		=> 'yes', 	// VII-B3
 						'wppa_user_destroy_on' 			=> 'no',
-						'wppa_upload_fronend_maxsize' 	=> '0',
+						'wppa_upload_frontend_minsize' 	=> '0',
+						'wppa_upload_frontend_maxsize' 	=> '0',
 						'wppa_void_dups' 				=> 'no',
 						'wppa_home_after_upload'		=> 'no',
 						'wppa_fe_alert' 				=> 'all',

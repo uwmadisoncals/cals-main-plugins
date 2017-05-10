@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.6.24
+* Version 6.6.25
 *
 */
 
@@ -1017,7 +1017,8 @@ global $wppa_log_file;
 			$album = $wpdb->get_var( $wpdb->prepare( 'SELECT `album` FROM `'.WPPA_PHOTOS.'` WHERE `id` = %s', $photo ) );
 			wppa_delete_photo( $photo );
 			wppa_clear_cache();
-			echo '||1||<span style="color:red" >'.sprintf( __( 'Photo %s has been deleted' , 'wp-photo-album-plus'), $photo ).'</span>';
+			$edit_link = wppa_ea_url( 'single', $tab = 'edit' ) . '&photo=' . $photo;
+			echo '||1||<span style="color:red" >' . sprintf( __( 'Photo %s has been deleted' , 'wp-photo-album-plus'), '<a href="'.$edit_link.'" target="_blank" >' . $photo . '</a>' ) . '</span>';
 			echo '||';
 			$a = wppa_allow_uploads( $album );
 			if ( ! $a ) echo 'full';
@@ -1760,9 +1761,11 @@ global $wppa_log_file;
 					wppa_invalidate_treecounts( $photodata['album'] );	// Current album
 					wppa_invalidate_treecounts( $value );				// New album
 					$iret = wppa_update_photo( array( 'id' => $photo, 'album' => $value ) ); // $wpdb->query( $wpdb->prepare( 'UPDATE '.WPPA_PHOTOS.' SET `album` = %s WHERE `id` = %s', $value, $photo ) );
+					$edit_link = wppa_ea_url( 'single', $tab = 'edit' ) . '&photo=' . $photodata['id'];
 					if ( $iret !== false ) {
 						wppa_move_source( $photodata['filename'], $photodata['album'], $value );
-						echo '||99||'.sprintf( __( 'Photo %s has been moved to album %s (%s)' , 'wp-photo-album-plus'), $photo, wppa_get_album_name( $value ), $value );
+						echo '||99||'.sprintf( __( 'Photo %s has been moved to album %s (%s)' , 'wp-photo-album-plus'), '<a href="'.$edit_link.'" target="_blank" >' . $photodata['id'] . '</a>', wppa_get_album_name( $value ), $value );
+
 					}
 					else {
 						echo '||3||'.sprintf( __( 'An error occurred while trying to move photo %s' , 'wp-photo-album-plus'), $photo );
@@ -2913,7 +2916,8 @@ global $wppa_log_file;
 				case 'wppa_up_tagselbox_content_1':
 				case 'wppa_up_tagselbox_content_2':
 				case 'wppa_up_tagselbox_content_3':
-					$value = wppa_sanitize_tags( $value );
+				case 'wppa_up_tagbox_new':
+					$value = trim( wppa_sanitize_tags( $value ), ',' );
 					break;
 
 				case 'wppa_wppa_set_shortcodes':
