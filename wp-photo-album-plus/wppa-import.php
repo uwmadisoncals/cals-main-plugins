@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.6.18
+* Version 6.6.27
 *
 */
 
@@ -180,7 +180,7 @@ global $wppa_session;
 		// Local. Find data we will going to need
 		if ( $source_type == 'local' ) {
 
-			// Get curren local dir setting
+			// Get current local dir setting
 			$source      = get_option( 'wppa_import_source_'.$user, WPPA_DEPOT_PATH );
 			if ( ! $source || ! is_dir( $source ) ) {
 				$source = WPPA_DEPOT_PATH;
@@ -282,9 +282,10 @@ global $wppa_session;
 
 				// Local: dir
 				if ( $source_type == 'local' ) {
+					wppa_update_option( 'wppa_import_root', ABSPATH . basename( content_url() ) ); // Provider may have changed disk
 					echo
 					'<select name="wppa-source" >' .
-						wppa_abs_walktree( wppa_opt( 'import_root'), $source ) .
+						wppa_abs_walktree( wppa_opt( 'import_root' ), $source ) .
 					'</select>' .
 					'<input' .
 						' type="submit"' .

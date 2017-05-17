@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.6.25
+* Version 6.6.27
 *
 */
 
@@ -1123,7 +1123,7 @@ function wppaTryScheduledel( id ) {
 											' ' .
 											'<img' .
 												' id="wppa-water-spin-' . $id . '"' .
-												' src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_is_ie() ? 'gif' : 'svg' ) . '"' .
+												' src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_use_svg() ? 'svg' : 'gif' ) . '"' .
 												' alt="Spin"' .
 												' style="visibility:hidden"' .
 											' />';
@@ -1678,7 +1678,7 @@ function wppaTryScheduledel( id ) {
 										' />' .
 										'<img' .
 											' id="wppa-photo-spin-' . $id . '"' .
-											' src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_is_ie() ? 'gif' : 'svg' ) . '"' .
+											' src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_use_svg() ? 'svg' : 'gif' ) . '"' .
 											' style="visibility:hidden"' .
 										' />' .
 									'</td>';
@@ -2800,7 +2800,7 @@ global $wpdb;
 					xmlhttp.setRequestHeader( "Content-type","application/x-www-form-urlencoded" );
 					xmlhttp.send( data );
 					jQuery( "#wppa-sort-seqn-"+photo ).attr( 'value', seqno );	// set hidden value to new value to prevent duplicate action
-					var spinnerhtml = '<img src="'+wppaImageDirectory+'spinner.'+<?php echo ( wppa_is_ie() ? 'gif' : 'svg' ) ?>+'" />';
+					var spinnerhtml = '<img src="'+wppaImageDirectory+'spinner.'+<?php echo ( wppa_use_svg() ? 'svg' : 'gif' ) ?>+'" />';
 					jQuery( '#wppa-seqno-'+photo ).html( spinnerhtml );
 				}
 			</script>

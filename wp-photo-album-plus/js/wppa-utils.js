@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsUtilsVersion = '6.6.20';
+var wppaJsUtilsVersion = '6.6.27';
 var wppaDebug;
 
 // Trim
@@ -277,6 +277,7 @@ function wppaSvgHtml( image, height, isLightbox, border, none, light, medium, he
 
 	// Find Radius
 	switch ( wppaSvgCornerStyle ) {
+		case 'gif':
 		case 'none':
 			radius = none;
 			break;
@@ -307,24 +308,24 @@ function wppaSvgHtml( image, height, isLightbox, border, none, light, medium, he
 	}
 
 	var src;
-	if ( wppaIsIe ) {
-		src = wppaImageDirectory + image + '.png';
+	if ( wppaUseSvg ) {
+		src = wppaImageDirectory + image + '.svg';
 	}
 	else {
-		src = wppaImageDirectory + image + '.svg';
+		src = wppaImageDirectory + image + '.png';
 	}
 
 	// Make the HTML
 	var result = 	'<img' +
 						' src="' + src + '"' +
-						( wppaIsIe ? '' : ' class="wppa-svg"' ) +
+						( wppaUseSvg ? ' class="wppa-svg"' : '' ) +
 						' style="' +
 							'height:' + height + ';' +
 							'fill:' + fc + ';' +
 							'background-color:' + bc + ';' +
 							( radius ? 'border-radius:' + radius + '%;' : '' ) +
 							( border ? 'border:2px solid ' + bc + ';box-sizing:border-box;' : '' ) +
-							( wppaIsIe ? '' : 'display:none;' ) +
+							( wppaUseSvg ? 'display:none;' : '' ) +
 							'text-decoration:none !important;' +
 							'vertical-align:middle;' +
 						'"' +

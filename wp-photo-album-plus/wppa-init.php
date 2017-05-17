@@ -282,6 +282,12 @@ global $pagenow;
 		}
 	}
 
+	// Cron jobs postponed?
+	if ( wppa_switch( 'maint_ignore_cron' ) ) {
+		wppa_warning_message( __( 'Please do not forget to re-enable cron jobs for wppa when you are ready doing your bulk actions. See <i>Table VIII-A0.2</i>', 'wp-photo-album-plus') );
+	}
+
+	// Finish setup
 	if ( get_option( 'wppa_prevrev' ) == '100' && get_option('wppa_i_done') != 'done' && $_SERVER['QUERY_STRING'] != 'page=wppa_options' ) {
 		wppa_ok_message( __('Please finish setting up WP Photo ALbum Plus on', 'wp-photo-album-plus') . ' <a href="'.get_admin_url().'admin.php?page=wppa_options">' . __('this page', 'wp-photo-album-plus') . '</a>' );
 	}

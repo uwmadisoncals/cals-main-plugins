@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.6.26
+* Version 6.6.27
 *
 */
 
@@ -2474,14 +2474,14 @@ static $albums_granted;
 				$minsize = wppa_opt( 'upload_frontend_minsize' );
 				$result .=
 					'<div style="font-size:10px;" >' .
-						sprintf( __( 'Min photo size: %d x %d pixels', 'wp-photo-album-plus' ), $minsize, $minsize ) .
+						sprintf( __( 'Min photo size: %d pixels', 'wp-photo-album-plus' ), $minsize ) .
 					'</div>';
 			}
 			if ( wppa_opt( 'upload_frontend_maxsize' ) ) {
 				$maxsize = wppa_opt( 'upload_frontend_maxsize' );
 				$result .=
 					'<div style="font-size:10px;" >' .
-						sprintf( __( 'Max photo size: %d x %d pixels', 'wp-photo-album-plus' ), $maxsize, $maxsize ) .
+						sprintf( __( 'Max photo size: %d pixels', 'wp-photo-album-plus' ), $maxsize ) .
 					'</div>';
 			}
 			else {

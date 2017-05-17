@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.6.24
+* Version 6.6.27
 *
 */
 
@@ -81,6 +81,12 @@ global $wppa_supported_video_extensions;
 global $wppa_supported_audio_extensions;
 global $wppa_all_maintenance_slugs;
 global $wppa_timestamp_start;
+
+	// Are we temp disbled?
+	if ( wppa_is_cron() && wppa_switch( 'maint_ignore_cron' ) ) {
+		return;
+	}
+
 
 	// Check for multiple maintenance procs
 	if ( ! wppa_switch( 'maint_ignore_concurrency_error' ) && ! wppa_is_cron() ) {

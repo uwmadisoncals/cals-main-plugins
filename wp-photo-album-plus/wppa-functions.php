@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.6.26
+* Version 6.6.27
 *
 */
 
@@ -3073,7 +3073,9 @@ global $blog_id;
 		// Spinner for Ajax
 		if ( wppa_switch( 'allow_ajax' ) ) {
 			if ( ! wppa_in_widget() ) {
+
 						switch( wppa_opt( 'icon_corner_style' ) ) {
+							case 'gif':
 							case 'none':
 								$bradius = '0';
 								break;
@@ -3090,8 +3092,8 @@ global $blog_id;
 
 				wppa_out( 	'<img' .
 								' id="wppa-ajax-spin-' . wppa( 'mocc' ) . '"' .
-								' src="'.wppa_get_imgdir().'loader.' . ( wppa_is_ie() ? 'gif' : 'svg' ) . '"' .
-								( wppa_is_ie() ? ' class="wppa-ajax-spin"' : ' class="wppa-svg wppa-ajax-spin"' ) .
+								' src="'.wppa_get_imgdir().'loader.' . ( wppa_use_svg() ? 'svg' : 'gif' ) . '"' .
+								( wppa_use_svg() ? ' class="wppa-svg wppa-ajax-spin"' : ' class="wppa-ajax-spin"' ) .
 								' alt="spinner"' .
 								' style="' .
 									'box-shadow:none;' .
@@ -4501,8 +4503,8 @@ global $wppa_alert;
 	// Is it not too small?
 	$ms = wppa_opt( 'upload_frontend_minsize' );
 	if ( $ms ) {	// Min size configured
-		if ( $imgsize[0] < $ms || $imgsize[1] < $ms ) {
-			$wppa_alert .= esc_js( sprintf( __( 'Uploaded file is smaller than the allowed minimum of %d x %d pixels.' , 'wp-photo-album-plus'), $ms, $ms ) );
+		if ( $imgsize[0] < $ms && $imgsize[1] < $ms ) {
+			$wppa_alert .= esc_js( sprintf( __( 'Uploaded file is smaller than the allowed minimum of %d pixels.' , 'wp-photo-album-plus' ), $ms ) );
 			return false;
 		}
 	}
@@ -4511,7 +4513,7 @@ global $wppa_alert;
 	$ms = wppa_opt( 'upload_frontend_maxsize' );
 	if ( $ms ) {	// Max size configured
 		if ( $imgsize[0] > $ms || $imgsize[1] > $ms ) {
-			$wppa_alert .= esc_js( sprintf( __( 'Uploaded file is larger than the allowed maximum of %d x %d pixels.' , 'wp-photo-album-plus'), $ms, $ms ) );
+			$wppa_alert .= esc_js( sprintf( __( 'Uploaded file is larger than the allowed maximum of %d pixels.' , 'wp-photo-album-plus' ), $ms ) );
 			return false;
 		}
 	}

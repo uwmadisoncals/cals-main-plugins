@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.6.12
+* Version 6.6.27
 *
 */
 
@@ -119,6 +119,7 @@ global $wppa_revno;
 		case 'slideonlyf':
 			$wppa['start_album'] = $atts['album'];
 			$wppa['is_slideonly'] = '1';
+			$wppa['is_slideonlyf'] = '1';
 			$wppa['film_on'] = '1';
 			$wppa['start_photo'] = $atts['photo'];
 			break;

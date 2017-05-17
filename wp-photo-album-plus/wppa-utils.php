@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.6.22
+* Version 6.6.27
 *
 */
 
@@ -3274,6 +3274,11 @@ global $wppa_first_id;
 // @8: string: border radius in %: heavy
 function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = false, $none = '0', $light = '10', $medium = '20', $heavy = '50' ) {
 
+	// Slideonly has no navigation
+//	if ( wppa( 'is_slideonly' ) && ! wppa( 'is_slideonlyf' ) ) {
+//		return '';
+//	}
+
 	// Find the colors
 	if ( $lightbox ) {
 		$fillcolor 	= wppa_opt( 'ovl_svg_color' );
@@ -3286,6 +3291,7 @@ function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = 
 
 	// Find the border radius
 	switch( wppa_opt( 'icon_corner_style' ) ) {
+		case 'gif':
 		case 'none':
 			$bradius = $none;
 			break;
@@ -3300,18 +3306,18 @@ function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = 
 			break;
 	}
 
-	$is_ie 		= wppa_is_ie();
-	$src 		= $is_ie ? $name . '.png' : $name . '.svg';
+	$use_svg	= wppa_use_svg();
+	$src 		= $use_svg ? $name . '.svg' : $name . '.png';
 
 	// Compose the html
 	$result 	= 	'<img' .
 						' src="' . wppa_get_imgdir( $src ) . '"' .
-						( $is_ie ? '' : ' class="wppa-svg"' ) .
+						( $use_svg ? ' class="wppa-svg"' : '' ) .
 						' style="' .
 							( $height ? 'height:' . $height . ';' : '' ) .
 							'fill:' . $fillcolor . ';' .
 							'background-color:' . $bgcolor . ';' .
-							( $is_ie ? '' : 'display:none;' ) .
+							( $use_svg ? 'display:none;' : '' ) .
 							'text-decoration:none !important;' .
 							'vertical-align:middle;' .
 							( $bradius ? 'border-radius:' . $bradius . '%;' : '' ) .
@@ -3624,4 +3630,14 @@ function wppa_create_qrcode_cache( $qrsrc ) {
 	else {
 		return $qrsrc;
 	}
+}
+
+function wppa_use_svg() {
+	if ( wppa_is_ie() ) {
+		return false;
+	}
+	if ( wppa_opt( 'icon_corner_style' ) == 'gif' ) {
+		return false;
+	}
+	return true;
 }

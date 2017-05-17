@@ -14,6 +14,9 @@
 		settings = chart.settings;
 
 		container = document.getElementById(id);
+        if (container == null) {
+            return;
+        }
 		table = new gv.DataTable({cols: series});
 
 		render = v.objects[id] || null;
@@ -197,7 +200,7 @@
 		}
 	};
 
-	g.charts.load("current", {packages: ["corechart", "geochart", "gauge", "table", "timeline"]});
+	g.charts.load("current", {packages: ["corechart", "geochart", "gauge", "table", "timeline"], mapsApiKey: v.map_api_key});
 	g.charts.setOnLoadCallback(function() {
 		gv = g.visualization;
 		v.render();

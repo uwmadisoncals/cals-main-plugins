@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.6.26
+* Version 6.6.27
 *
 */
 
@@ -1443,7 +1443,8 @@ Hide Camera info
 
 						// Table VIII: Actions
 						// A Harmless
-						'wppa_maint_ignore_concurrency_error' 	=> 'no', 	// 0
+						'wppa_maint_ignore_concurrency_error' 	=> 'no', 	// 0.1
+						'wppa_maint_ignore_cron' 				=> 'no',	// 0.2
 						'wppa_setup' 							=> '', 		// 1
 						'wppa_backup' 				=> '',
 						'wppa_load_skin' 			=> '',

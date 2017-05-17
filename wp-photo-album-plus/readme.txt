@@ -2,12 +2,12 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick
-Version: 6.6.26
-Stable tag: 6.6.25
+Version: 6.6.27
+Stable tag: 6.6.26
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
-Tested up to: 4.8-alpha-40569
+Tested up to: 4.8-alpha-40643
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -179,6 +179,24 @@ Oh, just Google on 'picture resizer' and you will find a bunch of free programs 
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.6.27 =
+
+= Bug Fixes =
+
+* The fullscreen and exit buttons on lightbox were under the lightbox image. Now really fixed.
+* If the provider changes the diskname, the 'Local import from'-root_dir is now corrected automaticly to the new value.
+* + New album in the adminbar caused erroneously a Security error 2 message. Fixed.
+
+= New Features =
+
+* You can disable cron jobs temporary in Table VIII-A0.2, Use with care!
+
+= Other Changes =
+
+* Table II-J11: Navigation symbol style has now an option to revert to non-svg icons. Usefull in case of pageload problems due to many slideshows on a page.
+* The minimum and maximum allowed fe upload image size works now as follows: an image is too small if both width and height are less than the given limit, 
+the image is too large if either width or height (or both) is larger than the given limit.
 
 = 6.6.26 =
 

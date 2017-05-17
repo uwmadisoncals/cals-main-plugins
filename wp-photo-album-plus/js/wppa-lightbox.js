@@ -3,7 +3,7 @@
 // Conatins lightbox modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaLightboxVersion = '6.6.20';
+var wppaLightboxVersion = '6.6.27';
 
 // Global inits
 var wppaNormsBtnOpac 		= 0.75;
@@ -519,6 +519,10 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 			wppaOvlFsPhotoId = 0;
 		}
 		wppaOvlFirst = false;
+		
+		// Record we are in
+		wppaOvlOpen = true;
+		
 		return false;
 	}
 
@@ -755,7 +759,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 						wppaOvlTitles[idx] +
 					'</div>';
 				'</div>';
-alert(html);
+//alert(html);
 		// Insert the html
 		jQuery( '#wppa-overlay-ic' ).html( html );
 
@@ -772,6 +776,14 @@ alert(html);
 
 		// Size
 		wppaOvlResize();
+
+		// Show fs and exit buttons
+		if ( wppaOvlFirst ) {
+			wppaShowFsButtons();
+		}
+		
+		// Record we are in
+		wppaOvlOpen = true;
 
 		// Done!
 		return false;
@@ -1174,7 +1186,7 @@ wppaConsoleLog( 'wppaOvlHide' );
 
 	// Remove background
 	jQuery( '#wppa-overlay-bg' ).fadeOut( 300 );
-
+	
 	// Remove kb handler
 	jQuery( document ).off( 'keydown', wppaOvlKeyboardHandler );
 	wppaKbHandlerInstalled = false;
@@ -1186,6 +1198,12 @@ wppaConsoleLog( 'wppaOvlHide' );
 	wppaNormsBtnOpac = 0.75;
 	jQuery( '#wppa-ovl-spin' ).stop().fadeOut();
 
+	// Remove fs and exit buttons
+	jQuery( '#wppa-fulls-btn' ).stop().fadeOut( 300 );
+	jQuery( '#wppa-exit-btn' ).stop().fadeOut( 300 );
+
+	// Record we are out
+	wppaOvlOpen = false;
 }
 
 // Perform onclick action

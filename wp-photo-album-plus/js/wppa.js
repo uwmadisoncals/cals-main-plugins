@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.6.24';
+var wppaJsVersion = '6.6.27';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -11,6 +11,7 @@ var wppaJsVersion = '6.6.24';
 // 'External' variables ( public )
 var wppaVersion = '0';
 var wppaIsIe = false;
+var wppaUseSvg = true;
 var wppaDebug;
 var wppaFullValign = [];
 var wppaFullHalign = [];
@@ -217,6 +218,7 @@ var wppaOvlShowLegenda = true;
 var wppaOvlShowStartStop = true;
 var wppaOvlRadius = 0;
 var wppaOvlBorderWidth = 16;
+var wppaOvlOpen = false;
 
 // The next lightbox var values become overwritten in wppa-non-admin.php -> wppa_load_footer()
 // Therefor they are placed here!

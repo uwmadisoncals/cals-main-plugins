@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.6.26
+* Version 6.6.27
 *
 */
 
@@ -1297,13 +1297,19 @@ global $wp_roles;
 
 	$limits = '';
 	if ( is_user_logged_in() ) {
-		if ( current_user_can( 'wppa_upload' ) ) $limits = '0/0';		// Unlimited if you have wppa_upload capabilities
+
+		// Unlimited if you have wppa_upload capabilities
+		if ( current_user_can( 'wppa_upload' ) ) {
+			$limits = '0/0';
+		}
 		else {
 			$roles = $wp_roles->roles;
 			$roles['loggedout'] = '';
 			unset ( $roles['administrator'] );
 			foreach ( array_keys( $roles ) as $role ) if ( ! $limits ) {
-				if ( current_user_can( $role ) ) $limits = get_option( 'wppa_'.$role.'_upload_limit_count', '0' ).'/'.get_option( 'wppa_'.$role.'_upload_limit_time', '0' );
+				if ( current_user_can( $role ) ) {
+					$limits = get_option( 'wppa_'.$role.'_upload_limit_count', '0' ).'/'.get_option( 'wppa_'.$role.'_upload_limit_time', '0' );
+				}
 			}
 		}
 	}

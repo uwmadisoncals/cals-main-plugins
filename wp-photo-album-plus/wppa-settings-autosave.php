@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.6.26
+* Version 6.6.27
 *
 */
 
@@ -3050,10 +3050,10 @@ global $wp_version;
 
 							$name = __('Navigation symbols style', 'wp-photo-album-plus');
 							$desc = __('The corner rounding size of navigation icons.', 'wp-photo-album-plus' );
-							$help = '';
+							$help = esc_js(__('Use gif/png if you have excessive pageload times due to many slideshows on a page', 'wp-photo-album-plus'));
 							$slug = 'wppa_icon_corner_style';
-							$opts = array(__('none', 'wp-photo-album-plus'), __('light', 'wp-photo-album-plus'), __('medium', 'wp-photo-album-plus'), __('heavy', 'wp-photo-album-plus'));
-							$vals = array('none', 'light', 'medium', 'heavy');
+							$opts = array(__('none', 'wp-photo-album-plus'), __('light', 'wp-photo-album-plus'), __('medium', 'wp-photo-album-plus'), __('heavy', 'wp-photo-album-plus'), __('use gif/png, no svg', 'wp-photo-album-plus'));
+							$vals = array('none', 'light', 'medium', 'heavy', 'gif');
 							$html = wppa_select($slug, $opts, $vals);
 							$clas = '';
 							$tags = 'layout,navi';
@@ -6923,7 +6923,20 @@ global $wp_version;
 							$html = array($html1, $html2, $html3, $html4);
 							$clas = '';
 							$tags = 'system';
-							wppa_setting(false, '0', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting(false, '0.1', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Postpone cron', 'wp-photo-album-plus');
+							$desc = __('Temporary do no background processes.', 'wp-photo-album-plus');
+							$help = esc_js(__('This setting is meant to be used a.o. during bulk import/upload. Use with care!', 'wp-photo-album-plus'));
+							$slug = 'wppa_maint_ignore_cron';
+							$html1 = wppa_checkbox( $slug );
+							$html2 = '';
+							$html3 = '';
+							$html4 = '';
+							$html = array($html1, $html2, $html3, $html4);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting(false, '0.2', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Setup', 'wp-photo-album-plus');
 							$desc = __('Re-initialize plugin.', 'wp-photo-album-plus');

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
-* Version 6.6.24
+* Version 6.6.27
 *
 *
 */
@@ -26,6 +26,11 @@ add_action( 'wppa_cron_event', 'wppa_do_maintenance_proc', 10, 1 );
 // Schedule maintenance proc
 function wppa_schedule_maintenance_proc( $slug, $from_settings_page = false ) {
 global $is_reschedule;
+
+	// Are we temp disbled?
+	if ( wppa_switch( 'maint_ignore_cron' ) ) {
+		return;
+	}
 
 	// Schedule cron job
 	if ( ! wp_next_scheduled( 'wppa_cron_event', array( $slug ) ) ) {
@@ -117,6 +122,11 @@ add_action( 'wppa_cleanup', 'wppa_do_cleanup' );
 // Schedule cleanup session database table
 function wppa_schedule_cleanup( $now = false ) {
 
+	// Are we temp disbled?
+	if ( wppa_switch( 'maint_ignore_cron' ) ) {
+		return;
+	}
+
 	// Immediate action requested?
 	if ( $now ) {
 		wp_schedule_single_event( time() + 1, 'wppa_cleanup' );
@@ -130,6 +140,11 @@ function wppa_schedule_cleanup( $now = false ) {
 // The actual cleaner
 function wppa_do_cleanup() {
 global $wpdb;
+
+	// Are we temp disbled?
+	if ( wppa_switch( 'maint_ignore_cron' ) ) {
+		return;
+	}
 
 	wppa_log( 'Cron', '{b}wppa_cleanup{/b} started.' );
 
@@ -222,6 +237,11 @@ add_action( 'wppa_update_treecounts', 'wppa_do_update_treecounts' );
 
 function wppa_schedule_treecount_update() {
 
+	// Are we temp disbled?
+	if ( wppa_switch( 'maint_ignore_cron' ) ) {
+		return;
+	}
+
 	// Schedule cron job
 	if ( ! wp_next_scheduled( 'wppa_update_treecounts' ) ) {
 		wp_schedule_single_event( time() + 10, 'wppa_update_treecounts' );
@@ -230,6 +250,11 @@ function wppa_schedule_treecount_update() {
 
 function wppa_do_update_treecounts() {
 global $wpdb;
+
+	// Are we temp disbled?
+	if ( wppa_switch( 'maint_ignore_cron' ) ) {
+		return;
+	}
 
 	$start = time();
 
@@ -250,6 +275,11 @@ global $wpdb;
 
 function wppa_re_animate_cron() {
 global $wppa_cron_maintenance_slugs;
+
+	// Are we temp disbled?
+	if ( wppa_switch( 'maint_ignore_cron' ) ) {
+		return;
+	}
 
 	foreach ( $wppa_cron_maintenance_slugs as $slug ) {
 		if ( wppa_is_maintenance_cron_job_crashed( $slug ) ) {

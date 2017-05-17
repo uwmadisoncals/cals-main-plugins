@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.6.25
+* Version 6.6.27
 *
 */
 
@@ -431,42 +431,6 @@ global $wppa_session;
 				</div>';
 			}
 
-			// The 'exit' icon
-			echo
-			'<div' .
-				' id="wppa-exit-btn"' .
-				' style="height:48px;z-index:100098;position:fixed;top:0;right:0;opacity:0.75;"' .
-				' onclick="wppaOvlHide()"' .
-				' onmouseover="jQuery(this).stop().fadeTo(300,1);"' .
-//				' ontouchstart="jQuery(this).stop().fadeTo(300,1);"' .
-				' onmouseout="jQuery(this).stop().fadeTo(300,' . $dark . ');"' .
-//				' ontouchend="jQuery(this).stop().fadeTo(300,' . $dark . ');"' .
-				' >' .
-				wppa_get_svghtml( 'Exit', '48px', true, true, '0', '0', '0', '0' ) .
-			'</div>' .
-			'<script>' .
-				'jQuery(\'#wppa-exit-btn\').on(\'touchstart\',function(){jQuery(\'#wppa-exit-btn\').stop().fadeTo(300,1);});' .
-				'jQuery(\'#wppa-exit-btn\').on(\'touchend\',function(){jQuery(\'#wppa-exit-btn\').stop().fadeTo(300,' . $dark . ');});' .
-			'</script>';
-
-			// The 'fullscreen' icon
-			echo
-			'<div' .
-				' id="wppa-fulls-btn"' .
-				' style="height:48px;z-index:100098;position:fixed;top:0;right:48px;opacity:0.75;"' .
-				' onclick="wppaOvlFull()"' .
-				' onmouseover="jQuery(this).stop().fadeTo(300,1);"' .
-//				' ontouchstart="jQuery(this).stop().fadeTo(300,1);"' .
-				' onmouseout="jQuery(this).stop().fadeTo(300,' . $dark . ');"' .
-//				' ontouchend="jQuery(this).stop().fadeTo(300,' . $dark . ');"' .
-				' >' .
-				wppa_get_svghtml( 'Full-Screen', '48px', true, true, '0', '0', '0', '0' ) .
-			'</div>' .
-			'<script>' .
-				'jQuery(\'#wppa-fulls-btn\').on(\'touchstart\',function(){jQuery(\'#wppa-fulls-btn\').stop().fadeTo(300,1);});' .
-				'jQuery(\'#wppa-fulls-btn\').on(\'touchend\',function(){jQuery(\'#wppa-fulls-btn\').stop().fadeTo(300,' . $dark . ');});' .
-			'</script>';
-
 		// Close lightbox overlay background
 		echo
 		'</div>';
@@ -487,8 +451,41 @@ global $wppa_session;
 			' >' .
 		'</div>';
 
+		// The 'exit' icon
+		echo
+		'<div' .
+			' id="wppa-exit-btn"' .
+			' style="height:48px;z-index:100098;position:fixed;top:0;right:0;opacity:0.75;display:none;"' .
+			' onclick="wppaOvlHide()"' .
+			' onmouseover="if(wppaOvlOpen){jQuery(this).stop().fadeTo(300,1);}else{jQuery(this).stop().fadeOut(300);}"' .
+			' onmouseout="if(wppaOvlOpen){jQuery(this).stop().fadeTo(300,' . $dark . ');}else{jQuery(this).stop().fadeOut(300);}"' .
+			' >' .
+			wppa_get_svghtml( 'Exit', '48px', true, true, '0', '0', '0', '0' ) .
+		'</div>' .
+		'<script>' .
+			'jQuery(\'#wppa-exit-btn\').on(\'touchstart\',function(){jQuery(\'#wppa-exit-btn\').stop().fadeTo(300,1);});' .
+			'jQuery(\'#wppa-exit-btn\').on(\'touchend\',function(){jQuery(\'#wppa-exit-btn\').stop().fadeTo(300,' . $dark . ');});' .
+		'</script>';
+
+		// The 'fullscreen' icon
+		echo
+		'<div' .
+			' id="wppa-fulls-btn"' .
+			' style="height:48px;z-index:100098;position:fixed;top:0;right:48px;opacity:0.75;display:none;"' .
+			' onclick="wppaOvlFull()"' .
+			' onmouseover="jQuery(this).stop().fadeTo(300,1);"' .
+			' onmouseout="jQuery(this).stop().fadeTo(300,' . $dark . ');"' .
+			' >' .
+			wppa_get_svghtml( 'Full-Screen', '48px', true, true, '0', '0', '0', '0' ) .
+		'</div>' .
+		'<script>' .
+			'jQuery(\'#wppa-fulls-btn\').on(\'touchstart\',function(){jQuery(\'#wppa-fulls-btn\').stop().fadeTo(300,1);});' .
+			'jQuery(\'#wppa-fulls-btn\').on(\'touchend\',function(){jQuery(\'#wppa-fulls-btn\').stop().fadeTo(300,' . $dark . ');});' .
+		'</script>';
+
 		// The Spinner image
 		switch( wppa_opt( 'icon_corner_style' ) ) {
+			case 'gif':
 			case 'none':
 				$bradius = '0';
 				break;
@@ -507,7 +504,7 @@ global $wppa_session;
 		'<img' .
 			' id="wppa-ovl-spin"' .
 			' alt="spinner"' .
-			( wppa_is_ie() ? '' : ' class="wppa-svg"' ) .
+			( wppa_use_svg() ? ' class="wppa-svg"' : '' ) .
 			' style="' .
 				'width:120px;' .
 				'height:120px;' .
@@ -524,7 +521,7 @@ global $wppa_session;
 				'box-shadow:none;' .
 				'border-radius:' . $bradius . 'px;' .
 				'"' .
-			' src="' . wppa_get_imgdir() . ( wppa_is_ie() ? 'loading.gif' : 'loader.svg' ) . '"' .
+			' src="' . wppa_get_imgdir() . ( wppa_use_svg() ? 'loader.svg' : 'loader.gif' ) . '"' .
 		' />';
 
 		// The init vars
@@ -689,6 +686,7 @@ function wppa_add_page_specific_urls() {
 	wppaUploadUrl = "' . WPPA_UPLOAD_URL . '";
 	wppaIsIe = ' . ( wppa_is_ie() ? 'true' : 'false' ) . ';
 	wppaIsSafari = ' . ( wppa_is_safari() ? 'true' : 'false' ) . ';
+	wppaUseSvg = ' . ( wppa_use_svg() ? 'true' : 'false' ) . ';
 	wppaSlideshowNavigationType = "' . wppa_get_navigation_type() . '";
 </script>
 <!-- WPPA+ END Page specific urls -->';

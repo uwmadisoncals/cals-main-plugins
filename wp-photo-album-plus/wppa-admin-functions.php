@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.6.25
+* Version 6.6.27
 *
 */
 
@@ -1057,7 +1057,7 @@ function wppa_admin_spinner() {
 
 	$result = 	'<img' .
 					' id="wppa-admin-spinner"' .
-					' src="' . wppa_get_imgdir( wppa_is_ie() ? 'loader.gif' : 'loader.svg' ) . '"' .
+					' src="' . wppa_get_imgdir( wppa_use_svg() ? 'loader.svg' : 'loader.gif' ) . '"' .
 					' alt="Spinner"' .
 					' style="' .
 						'position:fixed;' .

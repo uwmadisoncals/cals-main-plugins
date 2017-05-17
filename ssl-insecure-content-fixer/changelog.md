@@ -2,6 +2,11 @@
 
 ## Changelog
 
+### 2.4.0, 2017-05-14
+
+* fixed: don't capture content on admin pages when mode is Capture or Capture All
+* added: filter `ssl_insecure_content_disable_capture` for disabling Capture mode on selected pages / scripts
+
 ### 2.3.0, 2017-05-01
 
 * added: support for Windows Azure with ARR

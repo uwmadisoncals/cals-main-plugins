@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.6.26
+* Version 6.6.27
 *
 */
 
@@ -732,7 +732,7 @@ function wppaTryScheduleAll( id ) {
 										' />' .
 										'<img' .
 											' id="wppa-album-spin"' .
-											' src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_is_ie() ? 'gif' : 'svg' ) . '"' .
+											' src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_use_svg() ? 'svg' : 'gif' ) . '"' .
 											' alt="Spin"' .
 											' style="visibility:hidden"' .
 										' />' .
@@ -2650,7 +2650,7 @@ global $wpdb;
 				wppaAjaxInProgress++;
 
 				jQuery( "#wppa-sort-seqn-albums-" + album ).attr( 'value', seqno );	// set hidden value to new value to prevent duplicate action
-				var spinnerhtml = '<img src="' + wppaImageDirectory + 'spinner.' + <?php echo ( wppa_is_ie() ? 'gif' : 'svg' ) ?> + '" />';
+				var spinnerhtml = '<img src="' + wppaImageDirectory + 'spinner.' + <?php echo ( wppa_use_svg() ? 'svg' : 'gif' ) ?> + '" />';
 				jQuery( '#wppa-album-seqno-' + album ).html( spinnerhtml );
 			}
 		</script>

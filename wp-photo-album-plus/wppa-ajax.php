@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.6.25
+* Version 6.6.27
 *
 */
 
@@ -3020,6 +3020,14 @@ global $wppa_log_file;
 				case 'wppa_grant_cats':
 				case 'wppa_grant_tags':
 					$value = wppa_sanitize_tags( $value );
+					break;
+				case 'wppa_maint_ignore_cron':
+					if ( $value == 'no' ) {
+						wppa_update_option( 'wppa_maint_ignore_cron', 'no' );
+						wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
+						wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+						wppa_schedule_treecount_update();
+					}
 					break;
 
 				default:
