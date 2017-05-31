@@ -94,15 +94,12 @@ class GF_Field_CAPTCHA extends GF_Field {
 
 		// when user clicks on the "I'm not a robot" box, the response token is populated into a hidden field by Google, get token from POST
 		$response_token = rgpost( 'g-recaptcha-response' );
-		$is_valid = $this->verify_recaptcha_response( $response_token );
+		$is_valid       = $this->verify_recaptcha_response( $response_token );
 
 		if ( ! $is_valid ) {
 
 			$this->failed_validation  = true;
 			$this->validation_message = empty( $this->errorMessage ) ? __( 'The reCAPTCHA was invalid. Go back and try it again.', 'gravityforms' ) : $this->errorMessage;
-
-			$error_message = is_wp_error( $response ) ? $response->get_error_message() : '';
-			GFCommon::log_debug( __METHOD__ . ' - Validating the reCAPTCHA response has failed due to the following: ' . $error_message );
 
 		}
 
@@ -112,7 +109,7 @@ class GF_Field_CAPTCHA extends GF_Field {
 
 		$verify_url = 'https://www.google.com/recaptcha/api/siteverify';
 
-		if( $secret_key == null ) {
+		if ( $secret_key == null ) {
 			$secret_key = get_option( 'rg_gforms_captcha_private_key' );
 		}
 
@@ -127,7 +124,10 @@ class GF_Field_CAPTCHA extends GF_Field {
 
 		if ( ! is_wp_error( $response ) ) {
 			$result = json_decode( wp_remote_retrieve_body( $response ) );
+
 			return $result->success == true;
+		} else {
+			GFCommon::log_debug( __METHOD__ . '(): Validating the reCAPTCHA response has failed due to the following: ' . $response->get_error_message() );
 		}
 
 		return false;
@@ -191,14 +191,34 @@ class GF_Field_CAPTCHA extends GF_Field {
 					$language     = empty( $this->captchaLanguage ) ? 'en' : $this->captchaLanguage;
 
 					// script is queued for the footer with the language property specified
-					wp_enqueue_script( 'gform_recaptcha', 'https://www.google.com/recaptcha/api.js?hl=' . $language . '&onload=renderRecaptcha&render=explicit', array(), false, true );
+					wp_enqueue_script( 'gform_recaptcha', 'https://www.google.com/recaptcha/api.js?hl=' . $language . '&render=explicit', array(), false, true );
+
+					add_action( 'wp_footer', array( $this, 'ensure_recaptcha_js' ) );
+					add_action( 'gform_preview_footer', array( $this, 'ensure_recaptcha_js' ) );
+
+					$tabindex = GFCommon::$tab_index++;
 
 					$stoken = $this->use_stoken() ? sprintf( 'data-stoken=\'%s\'', esc_attr( $secure_token ) ) : '';
-					$output = "<div id='" . esc_attr( $field_id ) ."' class='ginput_container ginput_recaptcha' data-sitekey='" . esc_attr( $site_key ) . "' {$stoken} data-theme='" . esc_attr( $theme ) . "' ></div>";
+					$output = "<div id='" . esc_attr( $field_id ) ."' class='ginput_container ginput_recaptcha' data-sitekey='" . esc_attr( $site_key ) . "' {$stoken} data-theme='" . esc_attr( $theme ) . "' data-tabindex='{$tabindex}'></div>";
 
 					return $output;
 				}
 		}
+	}
+
+	public function ensure_recaptcha_js(){
+		?>
+		<script type="text/javascript">
+			var gfRecaptchaPoller = setInterval( function() {
+				if( ! window.grecaptcha ) {
+					return;
+				}
+				renderRecaptcha();
+				clearInterval( gfRecaptchaPoller );
+			}, 100 );
+		</script>
+
+		<?php
 	}
 
 	public function get_captcha() {
@@ -368,7 +388,8 @@ class GF_Field_CAPTCHA extends GF_Field {
 		$padded = $plaintext . str_repeat( chr( $pad ), $pad );
 
 		//encrypt as 128
-		$encrypted = GFCommon::encrypt( $padded, $secret_key, MCRYPT_RIJNDAEL_128 );
+		$cypher = defined( 'MCRYPT_RIJNDAEL_128' ) ? MCRYPT_RIJNDAEL_128 : false;
+		$encrypted = GFCommon::encrypt( $padded, $secret_key, $cypher );
 
 		$token = str_replace( array( '+', '/', '=' ), array( '-', '_', '' ), $encrypted );
 		GFCommon::log_debug( ' token being used is: ' . $token );

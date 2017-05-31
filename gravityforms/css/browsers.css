@@ -4,10 +4,10 @@
 browsers.css
 Gravity Forms Browser-Specific CSS
 http://www.gravityforms.com
-updated: June 19, 2016 7:35 PM GMT-5
+updated: January 12, 2017 03:56 PM (GMT-05:00) US Eastern Time
 
 Gravity Forms is a Rocketgenius project
-copyright 2008-2016 Rocketgenius Inc.
+copyright 2008-2017 Rocketgenius Inc.
 http: //www.rocketgenius.com
 this may not be redistributed without the
 express written permission of the author.
@@ -26,15 +26,6 @@ to no.
 */
 
 /* Safari specific styles */
-
-.gform_wrapper.gf_browser_safari input:not([type='radio']):not([type='checkbox']):not([type='submit']):not([type='button']),
-.gform_wrapper.gf_browser_safari textarea {
-    border: 1px solid #ccc;
-}
-
-.gform_wrapper.gf_browser_safari select {
-    padding: 2px 0 2px 3px;
-}
 
 .entry .gform_wrapper.gf_browser_safari ul li:before,
 .entry .gform_wrapper.gf_browser_safari ul li:after {
@@ -64,15 +55,20 @@ to no.
     padding: 6px 12px !important;
 }
 
-/* Google Chrome specific styles */
-
-.gform_wrapper.gf_browser_chrome input:not([type='radio']):not([type='checkbox']):not([type='submit']):not([type='button']),
-.gform_wrapper.gf_browser_chrome textarea {
-    border: 1px solid #ccc;
+.gform_wrapper.gf_browser_safari .gfield_time_ampm select {
+    max-width: 5rem !important;
+    width: calc(2rem + 20px);
 }
+
+/* Google Chrome (and now Opera) styles */
 
 .gform_wrapper.gf_browser_chrome select {
     padding: 2px 0 2px 3px;
+}
+
+.gform_wrapper.gf_browser_chrome .gfield_time_ampm select {
+    max-width: 5rem !important;
+    width: calc(3rem + 20px);
 }
 
 .gform_wrapper.gf_browser_chrome ul li:before,
@@ -146,15 +142,19 @@ to no.
     padding: 6px 12px !important;
 }
 
-/* Firefox specific styles */
-
-.gform_wrapper.gf_browser_gecko input:not([type='radio']):not([type='checkbox']):not([type='submit']):not([type='button']),
-.gform_wrapper.gf_browser_gecko textarea {
-    border: 1px solid #ccc;
+.gform_wrapper.gf_browser_chrome span.address_country {
+        margin-top:-2px;
 }
 
+/* Firefox specific styles */
+
 .gform_wrapper.gf_browser_gecko select {
-    padding: 2px 0 2px 8px;
+    padding: 2px 12px 2px 2px;
+}
+
+.gform_wrapper.gf_browser_gecko .gfield_time_ampm select {
+    max-width: 5rem !important;
+    width: calc(4rem + 25px);
 }
 
 .gform_wrapper.gf_browser_gecko ul li:before,
@@ -176,32 +176,6 @@ to no.
 .gform_wrappergf_browser_gecko .chosen-container-single .chosen-single div b {
     position: relative;
     top: 5px;
-}
-
-/* Opera specific styles */
-
-.gform_wrapper.gf_browser_opera ul li:before,
-.gform_wrapper.gf_browser_opera ul li:after,
-.entry .gform_wrapper.gf_browser_opera ul li:before,
-.entry .gform_wrapper.gf_browser_opera ul li:after {
-    content: none;
-}
-
-.gform_wrapper.gf_browser_opera .ginput_complex .ginput_right select {
-    padding: 5px 0 5px 0;
-    margin-bottom: 5px;
-}
-.gform_wrapper.gf_browser_opera .gform_body ul.gform_fields li.gfield .ginput_container #recaptcha_widget_div #recaptcha_area {
-    width: 99% !important;
-}
-
-.gform_wrapper.gf_browser_opera .left_label #recaptcha_area #recaptcha_table,
-.gform_wrapper.gf_browser_opera .right_label #recaptcha_area #recaptcha_table {
-    margin-left: 32%;
-}
-
-.gform_wrapper.gf_browser_opera select[multiple=multiple] {
-    height: auto !important;
 }
 
 /* Internet Explorer specific styles */
@@ -297,29 +271,9 @@ to no.
     content: none;
 }
 
-/* Microsoft Edge specific styles */
-
-@supports (-ms-accelerator: true) {
-
-    .gform_wrapper select  {
-        line-height: 1.7;
-    }
-    .gform_wrapper input:not([type='radio']):not([type='checkbox']):not([type='submit']):not([type='button']):not([type='image']),
-    .gform_wrapper textarea {
-        border: 1px solid #ccc;
-    }
-
-}
-
 @media only screen and (max-width: 641px)  {
 
-    /* make the selects a little larger for mobile devices */
-
-    .gform_wrapper.gf_browser_gecko ul.gform_fields li.gfield select {
-        padding: 9px 0 8px 0;
-        width: 100%;
-        margin-left: 1px;
-    }
+    /* make the nifty styled selects a little larger for mobile devices */
 
     .gform_wrapper.gf_browser_gecko .chosen-container-single .chosen-single,
     .gform_wrapper.gf_browser_safari .chosen-container-single .chosen-single,
@@ -333,20 +287,6 @@ to no.
     .gform_wrapper.gf_browser_chrome .chosen-container-single .chosen-single div b {
         position: relative;
         top: 12px;
-    }
-
-    .gform_wrapper.gf_browser_safari select {
-        line-height: 2;
-        padding: 5px 0 6px 4px;
-    }
-
-    .gform_wrapper.gf_browser_chrome select  {
-        line-height: 2;
-    }
-
-    .gform_wrapper.gf_browser_chrome .ginput_container:not(.gfield_time_ampm) select  {
-        padding: 8px 0 9px 2px;
-        width: 100% !important;
     }
 
  }

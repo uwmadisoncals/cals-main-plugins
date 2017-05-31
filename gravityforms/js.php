@@ -253,7 +253,7 @@ if ( ! class_exists( 'GFForms' ) ) {
 		} else {
 			html = "<table class='field_custom_inputs_ui'><tr>";
 			if (showInputSwitches) {
-				html += "<td></td>";
+				html += "<td><strong>" + <?php echo json_encode( esc_html__( 'Show', 'gravityforms' ) ); ?>+ "</strong></td>";
 			}
 			html += "<td><strong><?php esc_html_e( 'Field', 'gravityforms' );?></strong></td><td><strong>" + <?php echo json_encode( esc_html__( 'Custom Sub-Label', 'gravityforms' ) ); ?> + "</strong></td></tr>";
 			for (var i = 0; i < field["inputs"].length; i++) {
@@ -487,47 +487,10 @@ if ( ! class_exists( 'GFForms' ) ) {
 		var form_json = jQuery.toJSON(form);
 		gforms_original_json = form_json;
 
-		if (!isNew) {
-			jQuery("#gform_meta").val(form_json);
-			jQuery("#gform_update").submit();
-		}
-		else {
-			jQuery("#please_wait_container").show();
-			var mysack = new sack("<?php echo admin_url( 'admin-ajax.php' )?>");
-			mysack.execute = 1;
-			mysack.method = 'POST';
-			mysack.setVar("action", "rg_save_form");
-			mysack.setVar("rg_save_form", "<?php echo wp_create_nonce( 'rg_save_form' ) ?>");
-			mysack.setVar("id", form.id);
-			mysack.setVar("form", form_json);
-			mysack.onError = function () {
-				alert(<?php echo json_encode( __( 'Ajax error while saving form', 'gravityforms' ) ); ?>)
-			};
-			mysack.runAJAX();
-		}
+		jQuery("#gform_meta").val(form_json);
+		jQuery("#gform_update").submit();
 
 		return true;
-	}
-
-	function DeleteField(fieldId) {
-
-		if (form.id == 0 || confirm(<?php echo json_encode( __( "Warning! Deleting this field will also delete all entry data associated with it. 'Cancel' to stop. 'OK' to delete", 'gravityforms' ) ); ?>)) {
-
-			jQuery('#gform_fields li#field_' + fieldId).addClass('gform_pending_delete');
-			var mysack = new sack("<?php echo admin_url( 'admin-ajax.php' )?>");
-			mysack.execute = 1;
-			mysack.method = 'POST';
-			mysack.setVar("action", "rg_delete_field");
-			mysack.setVar("rg_delete_field", "<?php echo wp_create_nonce( 'rg_delete_field' ) ?>");
-			mysack.setVar("form_id", form.id);
-			mysack.setVar("field_id", fieldId);
-			mysack.onError = function () {
-				alert(<?php echo json_encode( esc_html__( 'Ajax error while deleting field.', 'gravityforms' ) ); ?>)
-			};
-			mysack.runAJAX();
-
-			return true;
-		}
 	}
 
 	function SetDefaultValues( field, index ) {
@@ -609,6 +572,7 @@ if ( ! class_exists( 'GFForms' ) ) {
 				break;
 
 			case "multiselect" :
+				field.storageType = 'json';
 			case "select" :
 				if (!field.label)
 					field.label = <?php echo json_encode( esc_html__( 'Untitled', 'gravityforms' ) ); ?>;
@@ -623,6 +587,7 @@ if ( ! class_exists( 'GFForms' ) ) {
 
 				if (!field.label)
 					field.label = <?php echo json_encode( esc_html__( 'Address', 'gravityforms' ) ); ?>;
+				field.addressType = <?php echo json_encode( GF_Fields::get( 'address' )->get_default_address_type( rgget( 'id' ) ) ) ?>;
 				field.inputs = [new Input(field.id + 0.1, <?php echo json_encode( gf_apply_filters( array( 'gform_address_street', rgget( 'id' ) ), esc_html__( 'Street Address', 'gravityforms' ), rgget( 'id' ) ) ); ?>), new Input(field.id + 0.2, <?php echo json_encode( gf_apply_filters( array( 'gform_address_street2', rgget( 'id' ) ), esc_html__( 'Address Line 2', 'gravityforms' ), rgget( 'id' ) ) ); ?>), new Input(field.id + 0.3, <?php echo json_encode( gf_apply_filters( array( 'gform_address_city', rgget( 'id' ) ), esc_html__( 'City', 'gravityforms' ), rgget( 'id' ) ) ); ?>),
 					new Input(field.id + 0.4, <?php echo json_encode( gf_apply_filters( array( 'gform_address_state', rgget( 'id' ) ), __( 'State / Province', 'gravityforms' ), rgget( 'id' ) ) ); ?>), new Input(field.id + 0.5, <?php echo json_encode( gf_apply_filters( array( 'gform_address_zip', rgget( 'id' ) ), esc_html__( 'ZIP / Postal Code', 'gravityforms' ), rgget( 'id' ) ) ); ?>), new Input(field.id + 0.6, <?php echo json_encode( gf_apply_filters( array( 'gform_address_country', rgget( 'id' ) ), esc_html__( 'Country', 'gravityforms' ), rgget( 'id' ) ) ); ?>)];
 				break;
