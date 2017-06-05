@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.6.27
+* Version 6.6.28
 *
 */
 
@@ -7591,7 +7591,7 @@ global $wp_version;
 											' id=""' .
 											' onchange="wppaAjaxUpdateOptionValue(\'move_all_photos_from\',this)"' .
 											' name="move_all_photos_to"' .
-											' style="float:left;"' .
+											' style="float:left;max-width:220px;"' .
 											' >'.
 											wppa_album_select_a(array( 	'addpleaseselect'=>true,
 																		'path'=>true,
@@ -7618,7 +7618,7 @@ global $wp_version;
 											' id=""' .
 											' onchange="wppaAjaxUpdateOptionValue(\'move_all_photos_to\',this)"' .
 											' name="move_all_photos_to"' .
-											' style="float:left;"' .
+											' style="float:left;max-width:220px;"' .
 											' >'.
 											wppa_album_select_a(array(	'addpleaseselect'=>true,
 																		'path'=>true,
@@ -9558,11 +9558,11 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 							$name = __('GPX Implementation', 'wp-photo-album-plus');
 							$desc = __('The way the maps are produced.', 'wp-photo-album-plus');
 							$help = esc_js(__('Select the way the maps are produced.', 'wp-photo-album-plus'));
-							$help .= '\n\n'.esc_js(__('When using Google maps GPX viewer plugin, you can not use Ajax (Table IV-A1)', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('When using WPPA+ Embedded code, you can use Ajax, but there are less display options.', 'wp-photo-album-plus'));
+							$help .= '\n\n'.esc_js(__('When using an external plugin, most of the times you can not use Ajax (Table IV-A1).', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('Also: it may or may not be required to load the maps js api (Table IX-K5.1)', 'wp-photo-album-plus'));
 							$slug = 'wppa_gpx_implementation';
-							$opts = array( __('--- none ---', 'wp-photo-album-plus'), __('WPPA+ Embedded code', 'wp-photo-album-plus'), __('Google maps GPX viewer plugin', 'wp-photo-album-plus') );
-							$vals = array( 'none', 'wppa-plus-embedded', 'google-maps-gpx-viewer' );
+							$opts = array( __('--- none ---', 'wp-photo-album-plus'), __('WPPA+ Embedded code', 'wp-photo-album-plus'), __('External plugin', 'wp-photo-album-plus') );
+							$vals = array( 'none', 'wppa-plus-embedded', 'external-plugin' );
 							$onch = 'wppaCheckGps();alert(\''.__('The page will be reloaded after the action has taken place.', 'wp-photo-album-plus').'\');wppaRefreshAfter();';
 							$html = wppa_select($slug, $opts, $vals, $onch);
 							$clas = '';
@@ -9571,10 +9571,19 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 
 							$name = __('Map height', 'wp-photo-album-plus');
 							$desc = __('The height of the map display.', 'wp-photo-album-plus');
-							$help = '';
+							$help = esc_js(__('This setting is for embedded implementation only.', 'wp-photo-album-plus'));
 							$slug = 'wppa_map_height';
 							$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus'));
 							$clas = 'wppa_gpx_native';
+							$tags = 'system';
+							wppa_setting($slug, '5.0', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Load maps api', 'wp-photo-album-plus');
+							$desc = __('Load the Google maps js api', 'wp-photo-album-plus');
+							$help = esc_js(__('If you use an external maps plugin, you may need to tick this box.', 'wp-photo-album-plus'));
+							$slug = 'wppa_load_map_api';
+							$html = wppa_checkbox($slug);
+							$clas = 'wppa_gpx_plugin';
 							$tags = 'system';
 							wppa_setting($slug, '5.1', $name, $desc, $html, $help, $clas, $tags);
 
@@ -9582,8 +9591,8 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 							$desc = __('Enter your Google maps api key here if you have one.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_map_apikey';
-							$html = wppa_input($slug, '200px', '');
-							$clas = 'wppa_gpx_native';
+							$html = wppa_input($slug, '300px', '');
+							$clas = '';
 							$tags = 'system';
 							wppa_setting($slug, '5.2', $name, $desc, $html, $help, $clas, $tags);
 

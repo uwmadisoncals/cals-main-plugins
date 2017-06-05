@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.6.27
+* Version 6.6.28
 *
 */
 
@@ -759,7 +759,7 @@ function wppaTryScheduleAll( id ) {
 							echo
 							'<tr>' .
 								'<td>' .
-									__( 'Catogories:', 'wp-photo-album-plus' ) .
+									__( 'Categories:', 'wp-photo-album-plus' ) .
 								'</td>' .
 								'<td>' .
 									'<input' .

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the recent commets on photos
-* Version 6.4.18
+* Version 6.6.28
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -66,7 +66,7 @@ class wppaCommentWidget extends WP_Widget {
 				$imgevents = wppa_get_imgevents('thumb', $id, true);
 
 				$title = '';
-				$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_COMMENTS."` WHERE `photo` = %s ORDER BY `timestamp` DESC", $id ), ARRAY_A );
+				$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_COMMENTS."` WHERE `photo` = %s AND `status` = 'approved' ORDER BY `timestamp` DESC", $id ), ARRAY_A );
 				if ( $comments ) {
 					$first_comment = $comments['0'];
 					foreach ( $comments as $comment ) {

@@ -2366,7 +2366,7 @@ function wppaGetSelEnumToId( cls, id ) {
 		}
 		i++;
 	}
-	jQuery( '#'+id ).attr( 'value', wppaArrayToEnum( pararr, '.' ) );
+	jQuery( '#'+id ).val( wppaArrayToEnum( pararr, '.' ) );
 }
 
 function wppaGetSelectionEnumByClass( clas, sep ) {

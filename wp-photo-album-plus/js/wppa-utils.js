@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsUtilsVersion = '6.6.27';
+var wppaJsUtilsVersion = '6.6.28';
 var wppaDebug;
 
 // Trim
@@ -315,69 +315,113 @@ function wppaSvgHtml( image, height, isLightbox, border, none, light, medium, he
 		src = wppaImageDirectory + image + '.png';
 	}
 
-	// Make the HTML
-	var result = 	'<img' +
-						' src="' + src + '"' +
-						( wppaUseSvg ? ' class="wppa-svg"' : '' ) +
-						' style="' +
-							'height:' + height + ';' +
-							'fill:' + fc + ';' +
-							'background-color:' + bc + ';' +
-							( radius ? 'border-radius:' + radius + '%;' : '' ) +
-							( border ? 'border:2px solid ' + bc + ';box-sizing:border-box;' : '' ) +
-							( wppaUseSvg ? 'display:none;' : '' ) +
-							'text-decoration:none !important;' +
-							'vertical-align:middle;' +
-						'"' +
-						' onload="wppaReplaceSvg()"' +
-					' />';
+	// Make the html. Native svg html
+	var wppaSvgArray = [ 	'Next-Button',
+							'Prev-Button',
+							'Backward-Button',
+							'Forward-Button',
+							'Pause-Button',
+							'Play-Button',
+							'Stop-Button',
+							'Eagle-1',
+							'Snail',
+							'Exit',
+							'Full-Screen',
+							'Exit-Full-Screen',
+							'Content-View'
+						];
+	if ( wppaUseSvg && jQuery.inArray( image, wppaSvgArray ) != '-1' ) {
 
-	// For systems that do not execute onload:
-	setTimeout( function() { wppaReplaceSvg(); }, 100 );
+		var result = 	'<svg' +
+							' version="1.1"' +
+							' xmlns="http://www.w3.org/2000/svg"' +
+							' xmlns:xlink="http://www.w3.org/1999/xlink"' +
+							' x="0px"' +
+							' y="0px"' +
+							' viewBox="0 0 30 30"' +
+							' style="' +
+								'enable-background:new 0 0 30 30;' +
+								( height ? 'height:' + height + ';' : '' ) +
+								'fill:' + fc + ';' +
+								'background-color:' + bc + ';' +
+								'text-decoration:none !important;' +
+								'vertical-align:middle;' +
+								( radius ? 'border-radius:' + radius + '%;' : '' ) +
+								( border ? 'border:2px solid ' + bc + ';box-sizing:border-box;' : '' ) +
+								'"' +
+							' xml:space="preserve"' +
+							' >' +
+							'<g>';
+		switch ( image ) {
+			case 'Next-Button':
+				result += 	'<path' +
+								' d="M30,0H0V30H30V0z M20,20.5' +
+									'c0,0.3-0.2,0.5-0.5,0.5S19,20.8,19,20.5v-4.2l-8.3,4.6c-0.1,0-0.2,0.1-0.2,0.1c-0.1,0-0.2,0-0.3-0.1c-0.2-0.1-0.2-0.3-0.2-0.4v-11' +
+									'c0-0.2,0.1-0.4,0.3-0.4c0.2-0.1,0.4-0.1,0.5,0l8.2,5.5V9.5C19,9.2,19.2,9,19.5,9S20,9.2,20,9.5V20.5z"' +
+							' />';
+				break;
+			case 'Prev-Button':
+				result += 	'<path' +
+								' d="M30,0H0V30H30V0z M20,20.5c0,0.2-0.1,0.4-0.3,0.4c-0.1,0-0.2,0.1-0.2,0.1c-0.1,0-0.2,0-0.3-0.1L11,15.4v5.1c0,0.3-0.2,0.5-0.5,0.5S10,20.8,10,20.5v-11' +
+								'C10,9.2,10.2,9,10.5,9S11,9.2,11,9.5v4.2l8.3-4.6c0.2-0.1,0.3-0.1,0.5,0S20,9.3,20,9.5V20.5z"' +
+							' />';
+				break;
+			case 'Pause-Button':
+				result += 	'<path' +
+								' d="M30,0H0V30H30V0z M14,20.5' +
+									'c0,0.3-0.2,0.5-0.5,0.5h-4C9.2,21,9,20.8,9,20.5v-11C9,9.2,9.2,9,9.5,9h4C13.8,9,14,9.2,14,9.5V20.5z M21,20.5' +
+									'c0,0.3-0.2,0.5-0.5,0.5h-4c-0.3,0-0.5-0.2-0.5-0.5v-11C16,9.2,16.2,9,16.5,9h4C20.8,9,21,9.2,21,9.5V20.5z"' +
+							' />';
+				break;
+			case 'Play-Button':
+				result += 	'<path' +
+								' d="M30,0H0V30H30V0z' +
+									'M19.8,14.9l-8,5C11.7,20,11.6,20,11.5,20c-0.1,0-0.2,0-0.2-0.1c-0.2-0.1-0.3-0.3-0.3-0.4v-9c0-0.2,0.1-0.3,0.2-0.4' +
+									'c0.1-0.1,0.3-0.1,0.5,0l8,4c0.2,0.1,0.3,0.2,0.3,0.4C20,14.7,19.9,14.8,19.8,14.9z"' +
+							' />';
+				break;
+			case 'Stop-Button':
+				result += 	'<path' +
+								' d="M30,0H0V30H30V0z M21,20.5' +
+									'c0,0.3-0.2,0.5-0.5,0.5h-11C9.2,21,9,20.8,9,20.5v-11C9,9.2,9.2,9,9.5,9h11C20.8,9,21,9.2,21,9.5V20.5z"' +
+							'/>';
+				break;
+			case 'Exit':
+				result += 	'<path d="M30 24.398l-8.406-8.398 8.406-8.398-5.602-5.602-8.398 8.402-8.402-8.402-5.598 5.602 8.398 8.398-8.398 8.398 5.598 5.602 8.402-8.402 8.398 8.402z"></path>';
+				break;
+			case 'Full-Screen':
+				result += 	'<path d="M27.414 24.586l-4.586-4.586-2.828 2.828 4.586 4.586-4.586 4.586h12v-12zM12 0h-12v12l4.586-4.586 4.543 4.539 2.828-2.828-4.543-4.539zM12 22.828l-2.828-2.828-4.586 4.586-4.586-4.586v12h12l-4.586-4.586zM32 0h-12l4.586 4.586-4.543 4.539 2.828 2.828 4.543-4.539 4.586 4.586z"></path>';
+				break;
+			case 'Exit-Full-Screen':
+				result += 	'<path d="M24.586 27.414l4.586 4.586 2.828-2.828-4.586-4.586 4.586-4.586h-12v12zM0 12h12v-12l-4.586 4.586-4.539-4.543-2.828 2.828 4.539 4.543zM0 29.172l2.828 2.828 4.586-4.586 4.586 4.586v-12h-12l4.586 4.586zM20 12h12l-4.586-4.586 4.547-4.543-2.828-2.828-4.547 4.543-4.586-4.586z"></path>';
+				break;
+			default:
+				alert( 'Native svg ' + image + ' not implemented' );
+		}
+		result += 			'</g>' +
+						'</svg>';
+
+	}
+
+	// Make the HTML
+	else {
+		var result = 	'<img' +
+							' src="' + src + '"' +
+							( wppaUseSvg ? ' class="wppa-svg"' : '' ) +
+							' style="' +
+								'height:' + height + ';' +
+								'fill:' + fc + ';' +
+								'background-color:' + bc + ';' +
+								( radius ? 'border-radius:' + radius + '%;' : '' ) +
+								( border ? 'border:2px solid ' + bc + ';box-sizing:border-box;' : '' ) +
+								( wppaUseSvg ? 'display:none;' : '' ) +
+								'text-decoration:none !important;' +
+								'vertical-align:middle;' +
+							'"' +
+						' />';
+	}
 
 	return result;
-}
-
-// Replace all SVG images with inline SVG tag
-function wppaReplaceSvg() {
-wppaConsoleLog('Doing ReplaceSvg', 'force');
-	jQuery('img.wppa-svg').each(function(){
-		var $img = jQuery(this);
-		var imgID = $img.attr('id');
-		var imgClass = $img.attr('class');
-		var imgURL = $img.attr('src');
-		var imgStyle = $img.attr('style');
-
-
-		jQuery.get(imgURL, function(data) {
-			// Get the SVG tag, ignore the rest
-			var $svg = jQuery(data).find('svg');
-
-			// Add replaced image's ID to the new SVG
-			if(typeof imgID !== 'undefined') {
-				$svg = $svg.attr('id', imgID);
-			}
-			// Add replaced image's classes to the new SVG
-			if(typeof imgClass !== 'undefined') {
-				$svg = $svg.attr('class', imgClass+' replaced-svg');
-			}
-			// Add replaces image's style to the new SVG
-			if ( typeof imgStyle !== 'undefined' ) {
-				if ( typeof( imgID ) == 'undefined' || ( imgID.substr( 0, 15 ) != 'wppa-ajax-spin-' && imgID.substr( 0, 15 ) != 'wppa-ovl-spin' ) ) {
-					imgStyle = imgStyle.replace( 'display:none', 'display:inline' );
-				}
-				$svg = $svg.attr('style', imgStyle);
-			}
-
-			// Remove any invalid XML tags as per http://validator.w3.org
-			$svg = $svg.removeAttr('xmlns:a');
-
-			// Replace image with new SVG
-			$img.replaceWith($svg);
-
-		}, 'xml');
-
-	});
 }
 
 // Say we're in

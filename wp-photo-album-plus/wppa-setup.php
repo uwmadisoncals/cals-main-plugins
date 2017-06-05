@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.6.27
+* Version 6.6.28
 *
 */
 
@@ -207,8 +207,8 @@ global $silent;
 	}
 
 	// Clear Session
-	$wpdb->query( "TRUNCATE TABLE `".WPPA_SESSION."`" );
-	wppa_session_start();
+//	$wpdb->query( "TRUNCATE TABLE `".WPPA_SESSION."`" );
+//	wppa_session_start();
 
 	// Convert any changed and remove obsolete setting options
 	if ( $old_rev > '100' ) {	// On update only
@@ -536,6 +536,14 @@ global $silent;
 			wppa_rename_setting( 'wppa_upload_fronend_maxsize', 'wppa_upload_frontend_maxsize' );	// Fix typo
 		}
 
+		if ( $old_rev <= '6628' ) {
+			if ( get_option( 'wppa_gpx_implementation' ) == 'wppa-plus-embedded' ) {
+				update_option( 'wppa_load_map_api', 'yes' );
+			}
+			if ( get_option( 'wppa_gpx_implementation' ) == 'google-maps-gpx-viewer' ) {
+				update_option( 'wppa_gpx_implementation', 'external-plugin' );
+			}
+		}
 	}
 
 	// Set Defaults
@@ -1561,6 +1569,7 @@ Hide Camera info
 						'wppa_enable_generator' 		=> 'yes',
 						'wppa_log_cron' 				=> 'no',	// A9
 						'wppa_retry_mails' 				=> '0', 	// A10
+						'wppa_log_ajax' 				=> 'no',
 
 
 						// IX D New
@@ -1695,6 +1704,7 @@ Hide Camera info
 						'wppa_gpx_implementation' 				=> 'none',
 						'wppa_map_height' 						=> '300',
 						'wppa_map_apikey' 						=> '',
+						'wppa_load_map_api' 					=> 'no',
 						'wppa_gpx_shortcode'					=> '[map style="width: auto; height:300px; margin:0; " marker="yes" lat="w#lat" lon="w#lon"]',
 						'wppa_fotomoto_on'						=> 'no',
 						'wppa_fotomoto_fontsize'				=> '',

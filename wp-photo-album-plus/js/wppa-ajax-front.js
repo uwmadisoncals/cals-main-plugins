@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsAjaxVersion = '6.6.21';
+var wppaJsAjaxVersion = '6.6.28';
 
 var wppaRenderAdd = false;
 var wppaWaitForCounter = 0;
@@ -157,9 +157,6 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor, addHilite ) {
 						complete: 	function( xhr, status, newurl ) {
 										wppaWaitForCounter++;
 
-										// In case onload is not executed
-										wppaReplaceSvg();
-
 										if ( ! wppaRenderModal ) {
 											jQuery('html, body').animate({ scrollTop: jQuery("#wppa-container-"+mocc).offset().top - 32 - wppaStickyHeaderHeight }, 1000);
 										}
@@ -167,6 +164,8 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor, addHilite ) {
 										// Remove spinner
 										jQuery( '#wppa-ajax-spin-'+mocc ).stop().fadeOut();
 
+										// Fake resize
+										setTimeout(function(){jQuery(window).trigger('resize')}, 250);
 									}
 					} );
 	}
@@ -1052,8 +1051,17 @@ function wppaUpdatePhotoNew(id) {
 				} );
 }
 
+var wppaLastQrcodeUrl = '';
 // Get qrcode and put it as src in elm
 function wppaAjaxSetQrCodeSrc( url, elm ) {
+
+	// Been here before with this url?
+	if ( wppaLastQrcodeUrl == url ) {
+		return;
+	}
+
+	// Remember this
+	wppaLastQrcodeUrl = url;
 
 	var myData = 	'action=wppa' +
 					'&wppa-action=getqrcode' +

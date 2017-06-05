@@ -2,7 +2,7 @@
 * Pachkage: wp-photo-album-plus
 *
 *
-* Version 6.5.08
+* Version 6.6.28
 *
 */
 
@@ -142,11 +142,11 @@ function wppaGalleryEvaluate() {
 	var admins 			= '';
 
 	// Type
-	topType = jQuery('#wppagallery-top-type').attr('value');
+	topType = jQuery('#wppagallery-top-type').val();
 	switch ( topType ) {
 		case 'galerytype':
 			jQuery('#wppagallery-galery-type-tr').show();
-			type = jQuery('#wppagallery-galery-type').attr('value');
+			type = jQuery('#wppagallery-galery-type').val();
 			needGalType = true;
 			needAlbum = true;
 			jQuery('#wppagallery-album-type-tr').show();
@@ -161,7 +161,7 @@ function wppaGalleryEvaluate() {
 			break;
 		case 'slidestype':
 			jQuery('#wppagallery-slides-type-tr').show();
-			type = jQuery('#wppagallery-slides-type').attr('value');
+			type = jQuery('#wppagallery-slides-type').val();
 			needSlideType = true;
 			needAlbum = true;
 			jQuery('#wppagallery-album-type-tr').show();
@@ -176,20 +176,14 @@ function wppaGalleryEvaluate() {
 			break;
 		case 'singletype':
 			jQuery('#wppagallery-single-type-tr').show();
-			type = jQuery('#wppagallery-single-type').attr('value');
+			type = jQuery('#wppagallery-single-type').val();
 			needPhoto = true;
 			jQuery('#wppagallery-photo-tr').show();
 			jQuery('#wppagallery-top-type').css('color', '#070');
-			if ( type == '' ) {
-				jQuery('#wppagallery-single-type').css('color', '#700');
-			}
-			else {
-				jQuery('#wppagallery-single-type').css('color', '#070');
-			}
 			break;
 		case 'searchtype':
 			jQuery('#wppagallery-search-type-tr').show();
-			type = jQuery('#wppagallery-search-type').attr('value');
+			type = jQuery('#wppagallery-search-type').val();
 			needSearchType = true;
 			searchType = type;
 			switch ( type ) {
@@ -231,15 +225,15 @@ function wppaGalleryEvaluate() {
 					break;
 				case 'superview':
 					jQuery('#wppagallery-album-super-tr').show();
-					album = jQuery('#wppagallery-album-super-parent').attr('value');
+					album = jQuery('#wppagallery-album-super-parent').val();
 					break;
 				case 'calendar':
 					jQuery('#wppagallery-calendar-tr').show();
 					jQuery('#wppagallery-album-super-tr').show();	// Optional parent album
-					caltype = jQuery('#wppagallery-calendar-type').attr('value');
+					caltype = jQuery('#wppagallery-calendar-type').val();
 					reverse = jQuery('#wppagallery-calendar-reverse').attr('checked');
 					allopen = jQuery('#wppagallery-calendar-allopen').attr('checked');
-					parent  = jQuery('#wppagallery-album-super-parent').attr('value');
+					parent  = jQuery('#wppagallery-album-super-parent').val();
 					break;
 				default:
 			}
@@ -253,7 +247,7 @@ function wppaGalleryEvaluate() {
 			break;
 		case 'misceltype':
 			jQuery('#wppagallery-miscel-type-tr').show();
-			type = jQuery('#wppagallery-miscel-type').attr('value');
+			type = jQuery('#wppagallery-miscel-type').val();
 			needMiscType = true;
 			switch ( type ) {
 				case 'generic':
@@ -288,7 +282,7 @@ function wppaGalleryEvaluate() {
 
 	// Album
 	if ( needAlbum ) {
-		albumType = jQuery('#wppagallery-album-type').attr('value');
+		albumType = jQuery('#wppagallery-album-type').val();
 		switch ( albumType ) {
 			case 'real':
 				jQuery('#wppagallery-album-real-tr').show();
@@ -325,11 +319,11 @@ function wppaGalleryEvaluate() {
 				// and get the album identifier
 				if ( type == 'cover') {
 					jQuery('#wppagallery-album-virt-cover-tr').show();
-					album = jQuery('#wppagallery-album-virt-cover').attr('value');
+					album = jQuery('#wppagallery-album-virt-cover').val();
 				}
 				else {	// type != cover
 					jQuery('#wppagallery-album-virt-tr').show();
-					album = jQuery('#wppagallery-album-virt').attr('value');
+					album = jQuery('#wppagallery-album-virt').val();
 				}
 
 				// Now displatch on album identifier found
@@ -346,7 +340,7 @@ function wppaGalleryEvaluate() {
 							parent = wppaGetSelectionEnumByClass('.wppagallery-album-ropt');
 							if ( parent == '' ) parent = '0';
 							jQuery('#wppagallery-photo-count-tr').show();
-							count = jQuery('#wppagallery-photo-count').attr('value');
+							count = jQuery('#wppagallery-photo-count').val();
 							break;
 						case '#tags':
 							jQuery('#wppagallery-phototags-tr').show();
@@ -375,9 +369,9 @@ function wppaGalleryEvaluate() {
 							break;
 						case '#last':
 							jQuery('#wppagallery-album-parent-tr').show();
-							parent = jQuery('#wppagallery-album-parent-parent').attr('value');
+							parent = jQuery('#wppagallery-album-parent-parent').val();
 							jQuery('#wppagallery-album-count-tr').show();
-							count = jQuery('#wppagallery-album-count').attr('value');
+							count = jQuery('#wppagallery-album-count').val();
 							break;
 						case '#cat':
 							jQuery('#wppagallery-albumcat-tr').show();
@@ -409,7 +403,7 @@ function wppaGalleryEvaluate() {
 							jQuery('#wppagallery-owner-tr').show();
 							jQuery('#wppagallery-owner').css('color', '#700');
 							needOwner = true;
-							owner = jQuery('#wppagallery-owner').attr('value');
+							owner = jQuery('#wppagallery-owner').val();
 							if ( owner != '' ) {
 								jQuery('#wppagallery-owner').css('color', '#070');
 								jQuery('#wppagallery-owner-parent-tr').show();
@@ -463,17 +457,18 @@ function wppaGalleryEvaluate() {
 
 	// Photo
 	if ( needPhoto ) {
-		photo = jQuery('#wppagallery-photo').attr('value');
-		id = photo.split('.');
-		id = id[0];
-		if ( photo == '' ) {
-			jQuery('#wppagallery-photo').css('color', '#700');
-		}
-		else {
+		photo = jQuery('#wppagallery-photo').val();
+		if ( photo ) {
+			id = photo.replace(/\//g,'');			
+			id = id.split('.');
+			id = id[0];
 			jQuery('#wppagallery-photo-preview-tr').show();
 			wppaTinyMcePhotoPreview( photo )
 			shortcode += ' photo="'+id+'"';
 			jQuery('#wppagallery-photo').css('color', '#070');
+		}
+		else {
+			jQuery('#wppagallery-photo').css('color', '#700');
 		}
 	}
 

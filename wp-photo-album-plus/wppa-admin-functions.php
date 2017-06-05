@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.6.27
+* Version 6.6.28
 *
 */
 
@@ -191,29 +191,26 @@ global $wpdb;
 
 // display usefull message
 function wppa_update_message( $msg, $fixed = false, $id = '' ) {
-?>
-    <div id="wppa-ms-<?php echo $id ?>" class="updated fade" <?php if ( $fixed ) echo 'style="position: fixed; width: 80%; text-align: center; text-weight:bold;"' ?>><p><strong><?php echo( $msg ); ?></strong></p></div>
-<?php
+
+	echo '<div class="notice notice-info is-dismissible"><p>' . $msg . '</p></div>';
 }
 
 // display error message
-function wppa_error_message( $msg, $fixed = false, $id = '' ) {
-?>
-	<div id="wppa-er-<?php echo $id ?>" class="error <?php if ( $fixed == 'fixed' ) echo fade ?>" <?php if ( $fixed == 'hidden' ) echo 'style="display:none;"'; if ( $fixed == 'fixed' ) echo 'style="position: fixed;"' ?>><p><strong><?php echo( $msg ); ?></strong></p></div>
-<?php
-	wppa_log( 'Error', $msg );
+function wppa_error_message( $msg ) {
+
+	echo '<div class="notice notice-error is-dismissible"><p>' . $msg . '</p></div>';
 }
+
 // display warning message
 function wppa_warning_message( $msg, $fixed = false, $id = '' ) {
-?>
-	<div id="wppa-wr-<?php echo $id ?>" class="updated <?php if ( $fixed == 'fixed' ) echo fade ?>" <?php if ( $fixed == 'hidden' ) echo 'style="display:none;"'; if ( $fixed == 'fixed' ) echo 'style="position: fixed;"' ?>><p><strong><?php echo( $msg ); ?></strong></p></div>
-<?php
+
+	echo '<div class="notice notice-warning is-dismissible"><p>' . $msg . '</p></div>';
 }
+
 // display ok message
-function wppa_ok_message( $msg, $fixed = false, $id = '' ) {
-?>
-	<div id="wppa-ok-<?php echo $id ?>" class="updated <?php if ( $fixed == 'fixed' ) echo fade ?>" style="background-color: #e0ffe0; border-color: #55ee55;" ><p id="wppa-ok-p" ><strong><?php echo( $msg ); ?></strong></p></div>
-<?php
+function wppa_ok_message( $msg ) {
+
+	echo '<div class="notice notice-success is-dismissible"><p>' . $msg . '</p></div>';
 }
 
 function wppa_check_numeric( $value, $minval, $target, $maxval = '' ) {
@@ -1057,7 +1054,7 @@ function wppa_admin_spinner() {
 
 	$result = 	'<img' .
 					' id="wppa-admin-spinner"' .
-					' src="' . wppa_get_imgdir( wppa_use_svg() ? 'loader.svg' : 'loader.gif' ) . '"' .
+					' src="' . wppa_get_imgdir( wppa_use_svg( 'admin' ) ? 'loader.svg' : 'loader.gif' ) . '"' .
 					' alt="Spinner"' .
 					' style="' .
 						'position:fixed;' .

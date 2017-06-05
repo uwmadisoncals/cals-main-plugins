@@ -1,4 +1,4 @@
-=== Toolset Types ===
+=== Toolset Types - Custom Post Types, Custom Fields and Taxonomies ===
 Contributors: AmirHelzer, brucepearson, christianglingener, jadpm, zaantar
 Donate link: http://wp-types.com
 Tags: CMS, custom field, custom fields, custom post type, custom post types, field, fields post, post type, post types, taxonomies, taxonomy, toolset
@@ -6,14 +6,14 @@ Text Domain: wpcf
 Domain Path: /embedded/locale
 License: GPLv2
 Requires at least: 3.7
-Tested up to: 4.7.1
-Stable tag: 2.2.8
+Tested up to: 4.7.3
+Stable tag: 2.2.11
 
 The complete and reliable plugin for managing custom post types, custom taxonomies and custom fields.
 
 == Description ==
 
-**Types let's you customize the WordPress admin by adding content types, custom fields and taxonomies. You will be able to craft the WordPress admin and turn it into your very own content management system.**
+**Toolset Types let’s you add custom post types, custom fields and custom taxonomies to the WordPress admin. A convenient dashboard lets you control everything from one place.**
 
 [vimeo https://vimeo.com/176428571]
 
@@ -22,25 +22,22 @@ If you're an experienced PHP developer, you'll appreciate Types comprehensive [f
 
 You will find detailed guides on [adding custom post types, fields and taxonomy to the front-end](https://wp-types.com/documentation/customizing-sites-using-php/), including:
 
-* [Creating templates for single custom posts](https://wp-types.com/documentation/customizing-sites-using-php/creating-templates-single-custom-posts)
-* [Creating templates for custom post type archives](https://wp-types.com/documentation/customizing-sites-using-php/creating-templates-custom-post-type-archives)
-* [Creating custom user profiles](https://wp-types.com/documentation/customizing-sites-using-php/creating-custom-user-profiles)
-* [Create taxonomy term archives](https://wp-types.com/documentation/customizing-sites-using-php/creating-taxonomy-term-archives)
+* [Creating templates for single custom posts](https://wp-types.com/documentation/customizing-sites-using-php/creating-templates-single-custom-posts/)
+* [Creating templates for custom post type archives](https://wp-types.com/documentation/customizing-sites-using-php/creating-templates-custom-post-type-archives/)
+* [Creating custom user profiles](https://wp-types.com/documentation/customizing-sites-using-php/creating-custom-user-profiles/)
+* [Create taxonomy term archives](https://wp-types.com/documentation/customizing-sites-using-php/creating-taxonomy-term-archives/)
 
 and [more](https://wp-types.com/documentation/customizing-sites-using-php/).
 
 **Too much technical stuff to learn?** The full [Toolset](http://wp-types.com) package lets you build complete WordPress sites from within the admin dashboard.
 
-= CUSTOM FIELDS FOR CONTENT AND USERS =
-Types lets you add custom fields for both posts (meaning, WordPress posts, pages and custom content types), as well as users. You can add any field types to different user profiles.
+= CUSTOM FIELDS FOR CONTENT, TAXONOMY TERMS AND USERS =
+Types lets you add custom fields for posts (meaning, WordPress posts, pages and custom content types), taxonomy terms and users. You can add any field types to different user profiles.
 
 = ACCESS CONTROL FOR FIELDS =
 Using [Access](https://wp-types.com/home/toolset-components/#access), you will be able to control what fields different users can edit and view. This way, you can make some field groups read-only for certain users, and fully-editable for other users.
 
 For example, when you build a membership site, the site admin will be able to change membership levels for everyone and users will see their membership fields as read-only.
-
-= DESIGN CUSTOM FIELDS WITH EASE =
-Types fields come with a built-in CSS editor, letting you design how fields appear in the WordPress admin. You can design both full-edit and read-only field display modes.
 
 = RELIABLE SUPPORT =
 To get support for Types, please join our [technical support forum](http://wp-types.com/forums/). You will receive support directly from our developers, helping you deliver great sites on time and correctly.
@@ -148,17 +145,28 @@ Additionally, Types is the only plugin that lets you define parent/child relatio
 
 == Screenshots ==
 
-1. Post Types list
-2. Custom Taxonomies list
-3. Edit Post Type
-4. Edit Taxonomy
-5. Editing post field group
-6. Editing user field group
-7. Inserting custom fields to content
-8. Custom fields on the post editing page
-9. Bulk editing child content using Field Tables
+1. Toolset Dashboard
+2. Post Types list
+3. Custom Taxonomies list
+4. Edit Post Type
+5. Edit Taxonomy
+6. Editing post field group
+7. Editing user field group
+8. Inserting custom fields to content
+9. Custom fields on the post editing page
+10. Bulk editing child content using Field Tables
 
 == Changelog ==
+
+= 2.2.11 =
+* Removed notices, to push users to activate Layouts theme integration plugins based on the current theme
+* Added filter to remove/add automatic notices on demand
+
+= 2.2.10 =
+* Compatibility changes for CRED 1.9
+* Updated Font Awesome to version 4.7.0
+* Fixed broken link in parent relationship table on unpublished posts
+* Fixed a compatibility issue with Soliloquy Slider
 
 = 2.2.9 =
 * Added the feature to display posts and pages in Toolset dashboard by default.

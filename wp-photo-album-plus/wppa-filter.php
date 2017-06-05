@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.6.27
+* Version 6.6.28
 *
 */
 
@@ -499,7 +499,7 @@ global $wppa_postid;
 	wppa_reset_occurrance();
 
 	// Get and validate photo id
-	if ( is_numeric( $xatts[0] ) ) {
+	if ( isset( $xatts[0] ) && is_numeric( $xatts[0] ) ) {
 		$photo = $xatts[0];
 		if ( ! wppa_photo_exists( $photo ) ) {
 			return sprintf( __( 'Photo %d does not exist', 'wp-photo-album-plus' ), $photo );

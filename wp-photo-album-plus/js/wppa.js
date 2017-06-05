@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.6.27';
+var wppaJsVersion = '6.6.28';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -288,11 +288,6 @@ function wppaDoInit( autoOnly ) {
 		}
 	}
 
-	// Replave .svg images with svg html.
-	// Looks redundant, but some installations do not execute
-	// onload="wppaReplaceSvg()" for unknown reasons
-	wppaReplaceSvg();
-
 	// Make sure ajax spinners dies
 	jQuery( '.wppa-ajax-spin' ).stop().fadeOut();
 	setTimeout( function() {jQuery( '.wppa-ajax-spin' ).stop().fadeOut();}, 1000 );
@@ -458,16 +453,26 @@ function wppaGetContainerWidth( mocc ) {
 // Do the responsive size adjustment
 function _wppaDoAutocol( mocc ) {
 
-	wppaConsoleLog( 'Doing autocol '+mocc );
-
-	if ( ! wppaAutoColumnWidth[mocc] ) return;	// Not auto
-
+	// Auto?
+	if ( ! wppaAutoColumnWidth[mocc] ) return;
 	var w;
 	var h;
 
 	// Container
-	w = wppaGetContainerWidth( mocc );//document.getElementById( 'wppa-container-'+mocc ).parentNode.clientWidth;
+	w = wppaGetContainerWidth( mocc );
+
+	// Anything changed?
+	if ( wppaColWidth[mocc] == w ) {
+		return;
+	}
+
+	// Log we are in
+	wppaConsoleLog( 'Doing autocol '+mocc );
+
+	// Update current width
 	wppaColWidth[mocc] = w;
+
+	// Adjust container
 	jQuery( ".wppa-container-"+mocc ).css( 'width',w );
 	if ( wppaRenderModal ) {
 		jQuery( ".ui-dialog" ).css( 'width', w );
@@ -518,8 +523,6 @@ function _wppaDoAutocol( mocc ) {
 		else {
 			jQuery( ".wppa-asym-text-frame-mcr-"+mocc ).css( 'width',w - wppaTextFrameDelta );
 			var myCss = {
-	//			'width'		: w,
-	//			'maxWidth'	: w,
 				'marginLeft': '0px',
 				'float'		: 'left'
 			}
@@ -1257,7 +1260,7 @@ function wppaUpdateSearchRoot( text, root ) {
 	items = jQuery( ".wppa-search-root-id" );
 	i = 0;
 	while ( i < items.length ) {
-		jQuery( items[i] ).attr( 'value', root );
+		jQuery( items[i] ).val( root );
 		i++;
 	}
 }

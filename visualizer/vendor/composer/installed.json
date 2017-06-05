@@ -38,24 +38,32 @@
         "version_normalized": "9999999-dev",
         "source": {
             "type": "git",
-            "url": "git@github.com:Codeinwp/themeisle-sdk.git",
-            "reference": "154eeed18afdaeafface47acffa8426764c68308"
+            "url": "https://github.com/Codeinwp/themeisle-sdk.git",
+            "reference": "baa84a7f47fabed805b7678b5d01775d0d16cc9f"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/Codeinwp/themeisle-sdk/zipball/154eeed18afdaeafface47acffa8426764c68308",
-            "reference": "154eeed18afdaeafface47acffa8426764c68308",
+            "url": "https://api.github.com/repos/Codeinwp/themeisle-sdk/zipball/baa84a7f47fabed805b7678b5d01775d0d16cc9f",
+            "reference": "baa84a7f47fabed805b7678b5d01775d0d16cc9f",
             "shasum": ""
         },
-        "time": "2017-05-12 14:50:37",
+        "time": "2017-05-31 11:42:19",
         "type": "library",
-        "installation-source": "source",
+        "installation-source": "dist",
         "autoload": {
             "classmap": [
                 "class-themeisle-sdk-loader.php",
                 "class-themeisle-sdk-product.php",
                 "class-themeisle-sdk-logger.php",
-                "class-themeisle-sdk-licenser.php"
+                "class-themeisle-sdk-licenser.php",
+                "class-themeisle-sdk-feedback-factory.php",
+                "class-themeisle-sdk-feedback.php",
+                "class-themeisle-sdk-feedback-deactivate.php",
+                "class-themeisle-sdk-feedback-review.php",
+                "class-themeisle-sdk-notification-manager.php",
+                "class-themeisle-sdk-widget.php",
+                "class-themeisle-sdk-widget-dashboard-blog.php",
+                "class-themeisle-sdk-widgets-factory.php"
             ]
         },
         "license": [
@@ -74,7 +82,8 @@
             "wordpress"
         ],
         "support": {
-            "issues": "https://github.com/Codeinwp/themeisle-sdk/issues"
+            "issues": "https://github.com/Codeinwp/themeisle-sdk/issues",
+            "source": "https://github.com/Codeinwp/themeisle-sdk/tree/master"
         }
     }
 ]

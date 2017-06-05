@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.6.27
+* Version 6.6.28
 *
 */
 
@@ -48,6 +48,10 @@ global $wppa_log_file;
 
 	$wppa_action = $_REQUEST['wppa-action'];
 
+	if ( wppa_switch( 'log_ajax' ) ) {
+		wppa_log( 'Obs', 'Ajax action = '.$wppa_action.', querystring = '.$_SERVER['REQUEST_URI'] );
+	}
+	
 	switch ( $wppa_action ) {
 		case 'getqrcode':
 			//wppa_log( 'obs', 'Ajax getqrcode for '.$_REQUEST['url'] );
@@ -2720,7 +2724,12 @@ global $wppa_log_file;
 						}
 						if ( wppa_opt( 'gpx_implementation' ) == 'none' ) {
 							wppa_update_option( 'wppa_gpx_implementation', 'wppa-plus-embedded' );
+							wppa_update_option( 'wppa_load_map_api', 'yes' );
 						}
+					}
+					if ( $value == 'no' ) {
+						wppa_update_option( 'gpx_implementation', 'none' );
+						wppa_update_option( 'wppa_load_map_api', 'no' );
 					}
 					break;
 
@@ -2856,8 +2865,12 @@ global $wppa_log_file;
 						}
 						if ( ! wppa_switch( 'custom_on' ) ) {
 							wppa_update_option( 'wppa_custom_on', 'yes' );
-							$alert .= __( 'The display of the custom box has been enabled' , 'wp-photo-album-plus');
+							$alert .= __( 'The display of the custom box has been enabled.' , 'wp-photo-album-plus');
 						}
+					}
+					if ( $value == 'wppa-plus-embedded' ) {
+						wppa_update_option( 'wppa_load_map_api', 'yes' );
+						$alert .= __( 'The Google maps API will be loaded on all pages to enable the use of Ajax page content changes that use maps.', 'wp-photo-album-plus');
 					}
 					break;
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.6.27
+* Version 6.6.28
 *
 */
 
@@ -109,6 +109,10 @@ global $wppa_session;
 
 		wppa( 'is_cover', wppa_get_get( 'cover' ) );
 		wppa( 'is_slide', wppa_get_get( 'slide' ) || ( wppa_get_get( 'album' ) !== false && wppa_get_get( 'photo' ) ) );
+		if ( wppa_get_get( 'slideonly' ) ) {
+			wppa( 'is_slide', true );
+			wppa( 'is_slideonly', true );
+		}
 		if ( wppa( 'is_slide' ) ) {
 			wppa( 'start_photo', wppa_get_get( 'photo' ) );		// Start a slideshow here
 		}
@@ -3090,27 +3094,57 @@ global $blog_id;
 								break;
 						}
 
-				wppa_out( 	'<img' .
-								' id="wppa-ajax-spin-' . wppa( 'mocc' ) . '"' .
-								' src="'.wppa_get_imgdir().'loader.' . ( wppa_use_svg() ? 'svg' : 'gif' ) . '"' .
-								( wppa_use_svg() ? ' class="wppa-svg wppa-ajax-spin"' : ' class="wppa-ajax-spin"' ) .
-								' alt="spinner"' .
-								' style="' .
-									'box-shadow:none;' .
-									'z-index:1010;' .
-									'position:fixed;' .
-									'top:50%;' .
-									'margin-top:-60px;' .
-									'left:50%;' .
-									'margin-left:-60px;' .
-									'display:none;' .
-									'fill:' . wppa_opt( 'svg_color' ) . ';' .
-									'background-color:' . wppa_opt( 'svg_bg_color' ) . ';' .
-									'border-radius:' . $bradius . 'px;' .
-									'box-shadow:none;' .
-								'"' .
-							' />'
-						);
+				if ( wppa_use_svg() ) {
+					wppa_out(	'<svg' .
+									' id="wppa-ajax-spin-' . wppa( 'mocc' ) . '"' .
+									' class="wppa-ajax-spin uil-default"' .
+									' width="120px"' .
+									' height="120px"' .
+									' xmlns="http://www.w3.org/2000/svg"' .
+									' viewBox="0 0 100 100"' .
+									' preserveAspectRatio="xMidYMid"' .
+									' style="' .
+										'box-shadow:none;' .
+										'z-index:1010;' .
+										'position:fixed;' .
+										'top:50%;' .
+										'margin-top:-60px;' .
+										'left:50%;' .
+										'margin-left:-60px;' .
+										'display:none;' .
+										'fill:' . wppa_opt( 'svg_color' ) . ';' .
+										'background-color:' . wppa_opt( 'svg_bg_color' ) . ';' .
+										'border-radius:' . $bradius . 'px;' .
+										'box-shadow:none;' .
+										'"' .
+									' >' .
+									wppa_get_spinner_svg_body_html() .
+								'</svg>'
+							);
+				}
+				else {
+					wppa_out( 	'<img' .
+									' id="wppa-ajax-spin-' . wppa( 'mocc' ) . '"' .
+									' src="'.wppa_get_imgdir().'loader.' . ( wppa_use_svg() ? 'svg' : 'gif' ) . '"' .
+									( wppa_use_svg() ? ' class="wppa-svg wppa-ajax-spin"' : ' class="wppa-ajax-spin"' ) .
+									' alt="spinner"' .
+									' style="' .
+										'box-shadow:none;' .
+										'z-index:1010;' .
+										'position:fixed;' .
+										'top:50%;' .
+										'margin-top:-60px;' .
+										'left:50%;' .
+										'margin-left:-60px;' .
+										'display:none;' .
+										'fill:' . wppa_opt( 'svg_color' ) . ';' .
+										'background-color:' . wppa_opt( 'svg_bg_color' ) . ';' .
+										'border-radius:' . $bradius . 'px;' .
+										'box-shadow:none;' .
+									'"' .
+								' />'
+							);
+				}
 			}
 		}
 

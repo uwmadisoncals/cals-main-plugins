@@ -64,8 +64,8 @@ class Widgets_On_Pages_Public {
 	 * @since    1.0.0
 	 */
 	public static function widgets_on_page( $atts ) {
-		extract( shortcode_atts( array( 'id' => '1' ), $atts ) );
-		$str = "<div id='" . str_replace( ' ', '_', $id ) . "' class='widgets_on_page'>
+		extract( shortcode_atts( array( 'id' => '1', 'tiny' => '1', 'small' => '1', 'medium' => '1', 'large' => '1', 'wide' => '1' ), $atts ) );
+		$str = "<div id='" . str_replace( ' ', '_', $id ) . "' class='widgets_on_page wop_tiny" . $tiny . '  wop_small' . $small . '  wop_medium' . $medium . '  wop_large' . $large . '  wop_wide' . $wide  ."'>
 			<ul>";
 
 		// Legacy bullshit.
@@ -102,7 +102,7 @@ class Widgets_On_Pages_Public {
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *
-	 * @since    1.0.4
+	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
 

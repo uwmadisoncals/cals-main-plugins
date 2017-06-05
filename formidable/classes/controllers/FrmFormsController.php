@@ -567,9 +567,16 @@ class FrmFormsController {
 		);
 	}
 
-	public static function hidden_columns( $result ) {
-		return $result;
-    }
+	public static function hidden_columns( $hidden_columns ) {
+		$type = isset( $_REQUEST['form_type'] ) ? $_REQUEST['form_type'] : '';
+
+		if ( $type === 'template' ) {
+			$hidden_columns[] = 'id';
+			$hidden_columns[] = 'form_key';
+		}
+
+		return $hidden_columns;
+	}
 
 	public static function save_per_page( $save, $option, $value ) {
         if ( $option == 'formidable_page_formidable_per_page' ) {
@@ -638,6 +645,8 @@ class FrmFormsController {
             wp_die(__( 'That template cannot be edited', 'formidable' ));
         }
 
+		self::clean_submit_html( $values );
+
         $action_controls = FrmFormActionsController::get_form_actions();
 
         $sections = apply_filters('frm_add_form_settings_section', array(), $values);
@@ -647,6 +656,19 @@ class FrmFormsController {
 
 		require( FrmAppHelper::plugin_path() . '/classes/views/frm-forms/settings.php' );
     }
+
+	/**
+	 * Replace old Submit Button href with new href to avoid errors in Chrome
+	 *
+	 * @since 2.03.08
+	 *
+	 * @param array|boolean $values
+	 */
+	private static function clean_submit_html( &$values ) {
+		if ( is_array( $values ) && isset( $values['submit_html'] ) ) {
+			$values['submit_html'] = str_replace( 'javascript:void(0)', '#', $values['submit_html'] );
+		}
+	}
 
     public static function mb_tags_box( $form_id, $class = '' ) {
         $fields = FrmField::get_all_for_form($form_id, '', 'include');
@@ -716,6 +738,7 @@ class FrmFormsController {
 			$entry_shortcodes['editlink location="front" label="Edit" page_id=x'] = __( 'Edit Entry Link', 'formidable' );
 			$entry_shortcodes['evenodd'] = __( 'Even/Odd', 'formidable' );
 			$entry_shortcodes['entry_count'] = __( 'Entry Count', 'formidable' );
+			$entry_shortcodes['event_date format="Y-m-d"'] = __( 'Calendar Date', 'formidable' );
 		}
 
 		/**

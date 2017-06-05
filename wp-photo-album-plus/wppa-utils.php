@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.6.27
+* Version 6.6.28
 *
 */
 
@@ -254,9 +254,11 @@ global $wppa;
 
 	// Switch on implementation type
 	switch ( $type ) {
-		case 'google-maps-gpx-viewer':
+		case 'external-plugin':
 			$geo = str_replace( 'w#lon', $lon, str_replace( 'w#lat', $lat, wppa_opt( 'gpx_shortcode' ) ) );
 			$geo = str_replace( 'w#ip', $_SERVER['REMOTE_ADDR'], $geo );
+			$geo = str_replace( 'w#gmapikey', wppa_opt( 'map_apikey' ), $geo );
+
 			$geo = do_shortcode( $geo );
 			$wppa['geo'] .= '<div id="geodiv-' . wppa( 'mocc' ) . '-' . $id . '" style="display:none;">' . $geo . '</div>';
 			break;
@@ -3309,8 +3311,177 @@ function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = 
 	$use_svg	= wppa_use_svg();
 	$src 		= $use_svg ? $name . '.svg' : $name . '.png';
 
-	// Compose the html
-	$result 	= 	'<img' .
+	// Compose the html. Native svg html
+	if ( $use_svg && in_array( $name, array( 	'Next-Button',
+												'Prev-Button',
+												'Backward-Button',
+												'Forward-Button',
+												'Pause-Button',
+												'Play-Button',
+												'Stop-Button',
+												'Eagle-1',
+												'Snail',
+												'Exit',
+												'Full-Screen',
+												'Exit-Full-Screen',
+												'Content-View',
+
+																) ) ) {
+
+		$result = 	'<svg' .
+						' version="1.1"' .
+						' xmlns="http://www.w3.org/2000/svg"' .
+						' xmlns:xlink="http://www.w3.org/1999/xlink"' .
+						' x="0px"' .
+						' y="0px"' .
+						' viewBox="0 0 30 30"' .
+						' style="' .
+							'enable-background:new 0 0 30 30;' .
+							( $height ? 'height:' . $height . ';' : '' ) .
+							'fill:' . $fillcolor . ';' .
+							'background-color:' . $bgcolor . ';' .
+							'text-decoration:none !important;' .
+							'vertical-align:middle;' .
+							( $bradius ? 'border-radius:' . $bradius . '%;' : '' ) .
+							( $border ? 'border:2px solid ' . $bgcolor . ';box-sizing:border-box;' : '' ) .
+							'"' .
+						' xml:space="preserve"' .
+						' >' .
+						'<g>';
+		switch ( $name ) {
+
+			case 'Next-Button':
+				$result .= 	'<path' .
+								' d="M30,0H0V30H30V0z M20,20.5' .
+									'c0,0.3-0.2,0.5-0.5,0.5S19,20.8,19,20.5v-4.2l-8.3,4.6c-0.1,0-0.2,0.1-0.2,0.1c-0.1,0-0.2,0-0.3-0.1c-0.2-0.1-0.2-0.3-0.2-0.4v-11' .
+									'c0-0.2,0.1-0.4,0.3-0.4c0.2-0.1,0.4-0.1,0.5,0l8.2,5.5V9.5C19,9.2,19.2,9,19.5,9S20,9.2,20,9.5V20.5z"' .
+							' />';
+				break;
+			case 'Prev-Button':
+				$result .= 	'<path' .
+								' d="M30,0H0V30H30V0z M20,20.5c0,0.2-0.1,0.4-0.3,0.4c-0.1,0-0.2,0.1-0.2,0.1c-0.1,0-0.2,0-0.3-0.1L11,15.4v5.1c0,0.3-0.2,0.5-0.5,0.5S10,20.8,10,20.5v-11' .
+								'C10,9.2,10.2,9,10.5,9S11,9.2,11,9.5v4.2l8.3-4.6c0.2-0.1,0.3-0.1,0.5,0S20,9.3,20,9.5V20.5z"' .
+							' />';
+				break;
+			case 'Backward-Button':
+				$result .= 	'<path' .
+								' d="M30,0H0V30H30V0z M23,20.5' .
+									'c0,0.2-0.1,0.3-0.2,0.4c-0.2,0.1-0.3,0.1-0.5,0L16,17.4v3.1c0,0.2-0.1,0.4-0.3,0.4c-0.1,0-0.1,0.1-0.2,0.1c-0.1,0-0.2,0-0.3-0.1' .
+									'l-8-6C7.1,14.8,7,14.6,7,14.5c0-0.2,0.1-0.3,0.2-0.4l8-5c0.2-0.1,0.3-0.1,0.5,0C15.9,9.2,16,9.3,16,9.5v3.1l6.3-3.6' .
+									'c0.2-0.1,0.3-0.1,0.5,0C22.9,9.2,23,9.3,23,9.5V20.5z"' .
+							' />';
+				break;
+			case 'Forward-Button':
+				$result .= 	'<path' .
+								' d="M30,0H0V30H30V0z' .
+									'M22.8,15.9l-8,5c-0.2,0.1-0.3,0.1-0.5,0c-0.2-0.1-0.3-0.3-0.3-0.4v-3.1l-6.3,3.6C7.7,21,7.6,21,7.5,21c-0.1,0-0.2,0-0.3-0.1' .
+									'C7.1,20.8,7,20.7,7,20.5v-11c0-0.2,0.1-0.3,0.2-0.4C7.4,9,7.6,9,7.7,9.1l6.3,3.6V9.5c0-0.2,0.1-0.4,0.3-0.4c0.2-0.1,0.4-0.1,0.5,0' .
+									'l8,6c0.1,0.1,0.2,0.3,0.2,0.4C23,15.7,22.9,15.8,22.8,15.9z"' .
+							' />';
+				break;
+			case 'Pause-Button':
+				$result .= 	'<path' .
+								' d="M30,0H0V30H30V0z M14,20.5' .
+									'c0,0.3-0.2,0.5-0.5,0.5h-4C9.2,21,9,20.8,9,20.5v-11C9,9.2,9.2,9,9.5,9h4C13.8,9,14,9.2,14,9.5V20.5z M21,20.5' .
+									'c0,0.3-0.2,0.5-0.5,0.5h-4c-0.3,0-0.5-0.2-0.5-0.5v-11C16,9.2,16.2,9,16.5,9h4C20.8,9,21,9.2,21,9.5V20.5z"' .
+							' />';
+				break;
+			case 'Play-Button':
+				$result .= 	'<path' .
+								' d="M30,0H0V30H30V0z' .
+									'M19.8,14.9l-8,5C11.7,20,11.6,20,11.5,20c-0.1,0-0.2,0-0.2-0.1c-0.2-0.1-0.3-0.3-0.3-0.4v-9c0-0.2,0.1-0.3,0.2-0.4' .
+									'c0.1-0.1,0.3-0.1,0.5,0l8,4c0.2,0.1,0.3,0.2,0.3,0.4C20,14.7,19.9,14.8,19.8,14.9z"' .
+							' />';
+				break;
+			case 'Stop-Button':
+				$result .= 	'<path' .
+								' d="M30,0H0V30H30V0z M21,20.5' .
+									'c0,0.3-0.2,0.5-0.5,0.5h-11C9.2,21,9,20.8,9,20.5v-11C9,9.2,9.2,9,9.5,9h11C20.8,9,21,9.2,21,9.5V20.5z"' .
+							'/>';
+				break;
+			case 'Eagle-1':
+				$result .= 	'<path' .
+								' d="M29.9,19.2c-0.1-0.1-0.2-0.2-0.4-0.2c-3.7,0-6.2-0.6-7.6-1.1c-0.1,0-0.1,0.1-0.2,0.1c-1.2,1.2-4,2.6-4.6,2.9' .
+									'c-0.1,0-0.1,0.1-0.2,0.1c-0.2,0-0.4-0.1-0.4-0.3c-0.1-0.2,0-0.5,0.2-0.7c0.3-0.2,2.9-1.4,4.1-2.5l0,0c0.1-0.1,0.1-0.1,0.2-0.2' .
+									'c0.7-0.7,2.5-0.5,3.3-0.3c0,0,0.1,0,0.1,0c0.2,0.1,0.4,0,0.5-0.2c0,0,0,0,0,0c0,0,0,0,0,0c0.1-0.2,0.1-0.3,0.2-0.5c0,0,0-0.1,0-0.1' .
+									'c0-0.1,0.1-0.3,0.1-0.4c0,0,0-0.1,0-0.1c0-0.1,0-0.3,0-0.4c0,0,0-0.1,0-0.1c0-0.1-0.1-0.3-0.2-0.4c0,0,0,0,0-0.1' .
+									'c-0.1-0.1-0.1-0.2-0.2-0.2c0,0-0.1-0.1-0.1-0.1c-0.1,0-0.1-0.1-0.2-0.1c0,0-0.1-0.1-0.1-0.1c-0.1,0-0.1-0.1-0.2-0.1' .
+									'c-0.1,0-0.1-0.1-0.2-0.1c-0.1,0-0.1-0.1-0.2-0.1c0,0-0.1,0-0.1-0.1c-0.1,0-0.2-0.1-0.2-0.1c0,0-0.1,0-0.1,0c-0.4-0.1-0.7-0.2-1-0.2' .
+									'c0-0.1-0.1-0.2-0.1-0.3c-0.1-0.2-0.2-0.3-0.3-0.5c-0.2-0.2-0.4-0.3-0.6-0.4C21,12.1,20.6,12,20,12c-0.3,0-0.6,0-0.8,0.1' .
+									'c-0.1,0-0.1,0-0.2,0c-0.2,0-0.5,0.1-0.7,0.1c0,0-0.1,0-0.1,0c-0.2,0.1-0.5,0.1-0.7,0.2c0,0,0,0,0,0c-1.2,0.5-2.2,1.2-3,1.8' .
+									'c-0.5,0.3-0.9,0.6-1.2,0.8c-0.2,0.1-0.5,0-0.7-0.2c-0.1-0.3,0-0.5,0.2-0.7c0.2-0.1,0.6-0.4,0.9-0.6c-1.6-0.6-4-2-4-5.4' .
+									'c0-4.1,1.9-5.6,3.2-6.6c0.3-0.2,0.6-0.4,0.8-0.7C14,0.7,14,0.5,14,0.3S13.7,0,13.5,0C10.1,0,8.1,2,7,3.5v-1C7,2.3,6.9,2.1,6.7,2' .
+									'C6.5,2,6.3,2,6.1,2.1C4.5,3.8,3.9,5.4,3.7,6.8L3.4,6.3C3.4,6.1,3.2,6,3.1,6S2.8,6,2.6,6.1C1.8,7,1.3,8,1.3,9c0,0.5,0.1,1,0.3,1.4' .
+									'l-1-0.4c-0.2-0.1-0.3,0-0.5,0.1C0.1,10.2,0,10.3,0,10.5c0,2.7,0.5,4.4,1.4,5.2c0.1,0.1,0.2,0.1,0.3,0.2C1.4,16.4,1,17.4,1,18.5' .
+									'c0,1.5,2.6,2.5,4.5,3c-1,0.4-2,1-2,2c0,0.5-1.6,1.2-3.1,1.5c-0.2,0-0.3,0.2-0.4,0.4c-0.1,0.2,0,0.4,0.2,0.5C0.4,26,4.9,30,8.5,30' .
+									'C8.8,30,9,29.8,9,29.5c0-3.1,3.5-5,4.5-5.4c0.6,0.3,2,0.9,5,0.9c1.9,0,2.9-0.3,3.2-1l1.6,0.9c0.1,0,0.2,0.1,0.3,0.1' .
+									'c3.4,0,4.3-1.1,4.4-1.2c0.1-0.2,0.1-0.5-0.1-0.6l-0.8-0.8c2.1-0.6,2.9-2.6,2.9-2.7C30,19.5,30,19.3,29.9,19.2z M20.5,14' .
+									'c0.3,0,0.5,0.2,0.5,0.5S20.8,15,20.5,15S20,14.8,20,14.5S20.2,14,20.5,14z"' .
+							' />';
+				break;
+			case 'Snail':
+				$result .= 	'<path' .
+								' d="M28.5,16.3L30,9.1c0.1-0.3-0.1-0.5-0.4-0.6c-0.3-0.1-0.5,0.1-0.6,0.4L27.6,16c0,0-0.1,0-0.1,0L27,10c0-0.3-0.3-0.5-0.5-0.5' .
+									'C26.2,9.5,26,9.8,26,10l0.5,6.1c-0.4,0.1-0.7,0.2-1.1,0.3l0,0c-1.4,2-4.8,4.1-6.9,4.1c-1.9,0-3.8-0.1-5.2-1.1' .
+									'c-0.1-0.1-0.2-0.2-0.2-0.4c0-0.1,0-0.3,0.2-0.4l1.2-1.1c1.5-1.9,1.6-4.7,1.6-5.5c0-1.8-1.2-5.5-5-5.5c-3.7,0-5,2.7-5,5' .
+									'c0,2.7,2.1,3,3,3c1.5,0,3-1.3,3-2.5c0-1.1-0.4-1.5-1.5-1.5C9.4,10.5,9,10.9,9,12c0,0.3-0.2,0.5-0.5,0.5S8,12.3,8,12' .
+									'c0-1.6,0.9-2.5,2.5-2.5c1.7,0,2.5,0.8,2.5,2.5c0,1.8-1.9,3.5-4,3.5c-1.9,0-4-1.1-4-4c0-3,1.9-6,6-6c4.1,0,6,3.8,6,6.5' .
+									'c0,1.1-0.2,4-1.8,6.1l-0.8,0.7c1.2,0.5,2.6,0.6,4.1,0.6c1.8,0,5.2-2.3,6.2-3.9l0,0c0.3-0.7,0.3-1.6,0.3-2.7c0-0.3,0-0.5,0-0.8' .
+									'c0-2-3-9.5-12-9.5C4.8,2.5,1,7.9,1,13c0,3,1.3,5.3,3.8,6.5c-0.5,0.4-1.4,1.1-2.6,1.6C0.1,21.8,0,24.9,0,25c0,0.2,0.1,0.4,0.3,0.4' .
+									'c0.2,0.1,0.4,0.1,0.5,0c0,0,1.3-0.9,4.1-0.9c1.6,0,2.6,0.6,3.6,1c0.7,0.4,1.3,0.7,2.1,0.7c0.5,0,0.6,0.1,0.8,0.4' .
+									'c0.3,0.4,0.6,0.8,1.7,0.8c1,0,1.4-0.3,1.8-0.6c0.3-0.2,0.6-0.4,1.2-0.4c0.6,0,0.9,0.2,1.3,0.4c0.4,0.3,1,0.6,1.9,0.6' .
+									'c1.4,0,1.6-1,1.8-1.6c0.1-0.4,0.2-0.8,0.4-1c0.2-0.2,0.4-0.1,1,0.1c0.6,0.2,1.4,0.6,2.1-0.1c0.6-0.6,0.7-1.1,0.8-1.5' .
+									'c0.1-0.4,0.1-0.6,0.5-1c0.6-0.5,2-0.1,2.4,0.1c0.2,0.1,0.5,0,0.6-0.2c0-0.1,1.1-1.7,1.1-3.3C30,17.8,29.4,16.8,28.5,16.3z"' .
+							' />';
+				break;
+			case 'Exit':
+				$result .= 	'<path d="M30 24.398l-8.406-8.398 8.406-8.398-5.602-5.602-8.398 8.402-8.402-8.402-5.598 5.602 8.398 8.398-8.398 8.398 5.598 5.602 8.402-8.402 8.398 8.402z"></path>';
+				break;
+			case 'Full-Screen':
+				$result .= 	'<path d="M27.414 24.586l-4.586-4.586-2.828 2.828 4.586 4.586-4.586 4.586h12v-12zM12 0h-12v12l4.586-4.586 4.543 4.539 2.828-2.828-4.543-4.539zM12 22.828l-2.828-2.828-4.586 4.586-4.586-4.586v12h12l-4.586-4.586zM32 0h-12l4.586 4.586-4.543 4.539 2.828 2.828 4.543-4.539 4.586 4.586z"></path>';
+				break;
+			case 'Exit-Full-Screen':
+				$result .= 	'<path d="M24.586 27.414l4.586 4.586 2.828-2.828-4.586-4.586 4.586-4.586h-12v12zM0 12h12v-12l-4.586 4.586-4.539-4.543-2.828 2.828 4.539 4.543zM0 29.172l2.828 2.828 4.586-4.586 4.586 4.586v-12h-12l4.586 4.586zM20 12h12l-4.586-4.586 4.547-4.543-2.828-2.828-4.547 4.543-4.586-4.586z"></path>';
+				break;
+			case 'Content-View':
+				$result .= 	'<path' .
+								' d="M21.5,25.5h4c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-4c-0.276,0-0.5,0.224-0.5,0.5S21.224,25.5,21.5,25.5z' .
+									'M21.5,18.5h4c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-4c-0.276,0-0.5,0.224-0.5,0.5S21.224,18.5,21.5,18.5z M21.5,23.5h4' .
+									'c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-4c-0.276,0-0.5,0.224-0.5,0.5S21.224,23.5,21.5,23.5z M21.5,16.5h4' .
+									'c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-4c-0.276,0-0.5,0.224-0.5,0.5S21.224,16.5,21.5,16.5z M21.5,11.5h4' .
+									'c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-4c-0.276,0-0.5,0.224-0.5,0.5S21.224,11.5,21.5,11.5z M26.864,0.5H3.136' .
+									'C1.407,0.5,0,1.866,0,3.545v22.91C0,28.134,1.407,29.5,3.136,29.5h23.728c1.729,0,3.136-1.366,3.136-3.045V3.545' .
+									'C30,1.866,28.593,0.5,26.864,0.5z M9.5,2.5C9.776,2.5,10,2.724,10,3S9.776,3.5,9.5,3.5S9,3.276,9,3S9.224,2.5,9.5,2.5z M6.5,2.5' .
+									'C6.776,2.5,7,2.724,7,3S6.776,3.5,6.5,3.5S6,3.276,6,3S6.224,2.5,6.5,2.5z M3.5,2.5C3.776,2.5,4,2.724,4,3S3.776,3.5,3.5,3.5' .
+									'S3,3.276,3,3S3.224,2.5,3.5,2.5z M29,26.455c0,1.128-0.958,2.045-2.136,2.045H3.136C1.958,28.5,1,27.583,1,26.455V5.5h28V26.455z' .
+									'M21.5,9.5h4C25.776,9.5,26,9.276,26,9s-0.224-0.5-0.5-0.5h-4C21.224,8.5,21,8.724,21,9S21.224,9.5,21.5,9.5z M4.5,25.5h2' .
+									'C6.776,25.5,7,25.276,7,25v-2c0-0.276-0.224-0.5-0.5-0.5h-2C4.224,22.5,4,22.724,4,23v2C4,25.276,4.224,25.5,4.5,25.5z M17.5,11.5' .
+									'h2c0.276,0,0.5-0.224,0.5-0.5V9c0-0.276-0.224-0.5-0.5-0.5h-2C17.224,8.5,17,8.724,17,9v2C17,11.276,17.224,11.5,17.5,11.5z' .
+									'M8.5,25.5h4c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-4C8.224,24.5,8,24.724,8,25S8.224,25.5,8.5,25.5z M8.5,18.5h4' .
+									'c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-4C8.224,17.5,8,17.724,8,18S8.224,18.5,8.5,18.5z M8.5,23.5h4' .
+									'c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-4C8.224,22.5,8,22.724,8,23S8.224,23.5,8.5,23.5z M4.5,11.5h2' .
+									'C6.776,11.5,7,11.276,7,11V9c0-0.276-0.224-0.5-0.5-0.5h-2C4.224,8.5,4,8.724,4,9v2C4,11.276,4.224,11.5,4.5,11.5z M4.5,18.5h2' .
+									'C6.776,18.5,7,18.276,7,18v-2c0-0.276-0.224-0.5-0.5-0.5h-2C4.224,15.5,4,15.724,4,16v2C4,18.276,4.224,18.5,4.5,18.5z M17.5,25.5' .
+									'h2c0.276,0,0.5-0.224,0.5-0.5v-2c0-0.276-0.224-0.5-0.5-0.5h-2c-0.276,0-0.5,0.224-0.5,0.5v2C17,25.276,17.224,25.5,17.5,25.5z' .
+									'M17.5,18.5h2c0.276,0,0.5-0.224,0.5-0.5v-2c0-0.276-0.224-0.5-0.5-0.5h-2c-0.276,0-0.5,0.224-0.5,0.5v2' .
+									'C17,18.276,17.224,18.5,17.5,18.5z M8.5,16.5h4c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-4C8.224,15.5,8,15.724,8,16' .
+									'S8.224,16.5,8.5,16.5z M8.5,9.5h4C12.776,9.5,13,9.276,13,9s-0.224-0.5-0.5-0.5h-4C8.224,8.5,8,8.724,8,9S8.224,9.5,8.5,9.5z' .
+									'M8.5,11.5h4c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-4C8.224,10.5,8,10.724,8,11S8.224,11.5,8.5,11.5z"' .
+							' />';
+				break;
+
+		}
+
+		$result .= 		'</g>' .
+					'</svg>';
+
+		return $result;
+	}
+
+	// Compose html. Non native svg or gif/png
+	else {
+wppa_log('dbg','Still used for '.$name);
+		$result = 	'<img' .
 						' src="' . wppa_get_imgdir( $src ) . '"' .
 						( $use_svg ? ' class="wppa-svg"' : '' ) .
 						' style="' .
@@ -3325,9 +3496,9 @@ function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = 
 
 						'"' .
 						' alt="' . $name . '"' .
-						' onload="wppaReplaceSvg()"' .
+//						' onload="wppaReplaceSvg()"' .
 					' />';
-
+	}
 	return $result;
 }
 
@@ -3632,12 +3803,68 @@ function wppa_create_qrcode_cache( $qrsrc ) {
 	}
 }
 
-function wppa_use_svg() {
+function wppa_use_svg( $is_admin = false ) {
 	if ( wppa_is_ie() ) {
 		return false;
 	}
-	if ( wppa_opt( 'icon_corner_style' ) == 'gif' ) {
+	if ( ! $is_admin && wppa_opt( 'icon_corner_style' ) == 'gif' ) {
 		return false;
 	}
 	return true;
+}
+
+function wppa_get_spinner_svg_body_html() {
+	$result =
+		'<rect x="0" y="0" width="100" height="100" fill="none" class="bk" >' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(0 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(22.5 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.09375s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(45 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.1875s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(67.5 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.28125s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(90 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.375s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(112.5 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.46875s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(135 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.5625s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(157.5 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.65625s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(180 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.75s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(202.5 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.84375s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(225 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.9375s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(247.5 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.03125s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(270 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.125s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(292.5 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.21875s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(315 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.3125s" repeatCount="indefinite"/>' .
+		'</rect>' .
+		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(337.5 50 50) translate(0 -32)">' .
+			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.40625s" repeatCount="indefinite"/>' .
+		'</rect>';
+
+	return $result;
 }

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display album names linking to content
-* Version 6.6.09
+* Version 6.6.28
 */
 
 class AlbumNavigatorWidget extends WP_Widget {
@@ -139,7 +139,6 @@ class AlbumNavigatorWidget extends WP_Widget {
 			else $ca = '0';
 			$ca = wppa_force_numeric_else( $ca, '0' );
 			if ( $ca && ! wppa_album_exists( $ca ) ) {
-//				wppa_log('dbg', 'Non-existent album '.$ca.' in url. Referrer= '.$_ENV["HTTP_REFERER"].', Request uri= '.$_ENV["REQUEST_URI"]);
 				$ca = '0';
 			}
 		}
@@ -168,7 +167,7 @@ class AlbumNavigatorWidget extends WP_Widget {
 							<div style="cursor:default;width:12px;float:left;text-align:center;font-weight:bold;" class="anw-'.$w.'-'.$a.'-" onclick="jQuery(\'.anw-'.$w.'-'.$a.'\').css(\'display\',\'\'); jQuery(\'.anw-'.$w.'-'.$a.'-\').css(\'display\',\'none\');" >'.( $a == $ca ? '&raquo;' : '+').'</div>
 							<div style="cursor:default;width:12px;float:left;text-align:center;font-weight:bold;display:none;" class="anw-'.$w.'-'.$a.'" onclick="jQuery(\'.anw-'.$w.'-'.$a.'-\').css(\'display\',\'\'); jQuery(\'.anw-'.$w.'-'.$a.'\').css(\'display\',\'none\'); jQuery(\'.p-'.$w.'-'.$a.'\').css(\'display\',\'none\');" >'.( $a == $ca ? '&raquo;' : '-').'</div>';
 						else $result .= '
-							<div style="width:12px;float:left;" >&nbsp;'.( $a == $ca ? '&raquo;' : '').'</div>';
+							<span style="width:12px;" >&nbsp;' . ( $a == $ca ? '&raquo;' : '&nbsp;' ) . '</span>';
 						$result .= '
 							<a href="'.wppa_encrypt_url(wppa_get_permalink( $page ).'&amp;wppa-album='.$a.'&amp;wppa-cover=0&amp;wppa-occur=1'.$slide).'">'.wppa_get_album_name( $a ).'</a>
 						</li>';

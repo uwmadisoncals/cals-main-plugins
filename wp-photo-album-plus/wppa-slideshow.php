@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the slideshow high level functions
-* Version 6.6.27
+* Version 6.6.28
 *
 */
 
@@ -402,11 +402,15 @@ function wppa_slide_frame() {
 					break;
 			}
 
-//	if ( ! wppa( 'is_slideonly' ) || wppa( 'is_slideonlyf' ) ) {
-		wppa_out( 	'<img' .
+	if ( wppa_use_svg() ) {
+		wppa_out(	'<svg' .
 						' id="wppa-slide-spin-' . wppa( 'mocc' ) . '"' .
-						' alt="spinner"' .
-						( wppa_use_svg() ? ' class="wppa-svg"' : '' ) .
+						' class="wppa-ajax-spin uil-default"' .
+						' width="120px"' .
+						' height="120px"' .
+						' xmlns="http://www.w3.org/2000/svg"' .
+						' viewBox="0 0 100 100"' .
+						' preserveAspectRatio="xMidYMid"' .
 						' style="' .
 							'width:120px;' .
 							'height:120px;' .
@@ -423,10 +427,35 @@ function wppa_slide_frame() {
 							'box-shadow:none;' .
 							'border-radius:' . $bradius .'px;' .
 							'"' .
-						' src="' . wppa_get_imgdir() . ( wppa_use_svg() ? 'loader.svg' : 'loader.gif' ) . '"' .
+						' >' .
+						wppa_get_spinner_svg_body_html() .
+					'</svg>'
+		);
+	}
+	else {
+		wppa_out( 	'<img' .
+						' id="wppa-slide-spin-' . wppa( 'mocc' ) . '"' .
+						' alt="spinner"' .
+						' style="' .
+							'width:120px;' .
+							'height:120px;' .
+							'position:absolute;' .
+							'top:50%;' .
+							'margin-top:-60px;' .
+							'left:50%;' .
+							'margin-left:-60px;' .
+							'z-index:100100;' .
+							'opacity:1;' .
+							'display:block;' .
+//							'fill:' . wppa_opt( 'svg_color' ) . ';' .
+							'background-color:' . wppa_opt( 'svg_bg_color' ) . ';' .
+							'box-shadow:none;' .
+							'border-radius:' . $bradius .'px;' .
+							'"' .
+						' src="' . wppa_get_imgdir() . 'loader.gif"' .
 					' />'
 				);
-//	}
+	}
 
 
 	/*'<div' .

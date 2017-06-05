@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsSlideshowVersion = '6.6.25';
+var wppaJsSlideshowVersion = '6.6.28';
 
 // This is an entrypoint to load the slide data
 function wppaStoreSlideInfo(
@@ -142,11 +142,8 @@ function wppaStoreSlideInfo(
 	_wppaOgDsc[mocc][id] = ogdsc;
 	_wppaId[mocc][id] = photoid;		// reqd for rating and comment and monkey and registering views
 	_wppaAvg[mocc][id] = avgrat;		// avg ratig value
-wppaConsoleLog( '_wppaAvg[mocc][id]='+_wppaAvg[mocc][id], 'force' );
 	_wppaDisc[mocc][id] = discount;		// Dislike count
-wppaConsoleLog( 'discount='+discount, 'force' );
 	_wppaMyr[mocc][id] = myrat;			// my rating
-wppaConsoleLog( 'myrat='+myrat, 'force' );
 	_wppaVRU[mocc][id] = rateurl;		// url that performs the vote and returns to the page
 	_wppaLinkUrl[mocc][id] = linkurl;
 	_wppaLinkTitle[mocc][id] = linktitle;
@@ -508,7 +505,7 @@ function _wppaNextSlide_2( mocc ) {
 		if ( 1 == elm.nodeType ) {											// Is html
 			if ( 'IMG' == elm.nodeName ) {									// Is an image
 				if ( ! elm.complete ) {										// Is not complete yet
-					setTimeout( '_wppaNextSlide_2( ' + mocc + ' )', 100 );	// Try again after 100 ms
+					setTimeout( '_wppaNextSlide_2( ' + mocc + ' )', 200 );	// Try again after 100 ms
 					wppaConsoleLog( 'Retry next2' );						// Log retry
 					return;
 				}
@@ -837,6 +834,8 @@ function _wppaNextSlide_5( mocc ) {
 			}
 		}
 	}
+
+	jQuery( window ).trigger( 'resize' );
 }
 
 // Format a slide
@@ -1527,11 +1526,13 @@ function _wppaCheckRewind( mocc ) {
 }
 
 function _wppaSetRatingDisplay( mocc ) {
-wppaConsoleLog( '_wppaSetRatingDisplay() called with arg '+mocc, 'force');
-wppaConsoleLog( '_wppaAvg[mocc][_wppaCurIdx[mocc]]='+_wppaAvg[mocc][_wppaCurIdx[mocc]]+' _wppaCurIdx[mocc]='+_wppaCurIdx[mocc], 'force');
+
+	// Rating bar present?
+	if ( ! document.getElementById( 'wppa-rating-'+mocc ) ) {
+		return;
+	}
 
 	var idx, avg, tmp, cnt, dsc, myr, dsctxt;
-	if ( ! document.getElementById( 'wppa-rating-'+mocc ) ) return; 	// No rating bar
 
 	avg = _wppaAvg[mocc][_wppaCurIdx[mocc]];
 	if ( typeof( avg ) == 'undefined' ) return;
@@ -1559,8 +1560,6 @@ wppaConsoleLog( '_wppaAvg[mocc][_wppaCurIdx[mocc]]='+_wppaAvg[mocc][_wppaCurIdx[
 
 	dsc = _wppaDisc[mocc][_wppaCurIdx[mocc]];
 	myr = _wppaMyr[mocc][_wppaCurIdx[mocc]];
-
-	wppaConsoleLog( 'avg='+avg+' cnt='+cnt+' dsc='+dsc+' myr='+myr );
 
 	// Graphic display ?
 	if ( wppaRatingDisplayType == 'graphic' ) {
@@ -1664,7 +1663,6 @@ function wppaGetDislikeText( dsc,myr,incmine ) {
 
 function _wppaSetRd( mocc, avg, where ) {
 
-wppaConsoleLog( '_wppaSetRd() called with args:'+mocc+' '+avg+' '+where, 'force' );
 	var idx1 = parseInt( avg );
 	var idx2 = idx1 + 1;
 	var frac = avg - idx1;

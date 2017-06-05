@@ -3,7 +3,7 @@ Contributors: hlashbrooke, whyisjake, psykro, PodcastMotor, simondowdles
 Tags: podcast, audio, video, vodcast, rss, mp3, mp4, feed, itunes, podcasting, media, stitcher, google play, playlist
 Requires at least: 4.4
 Tested up to: 4.7.3
-Stable tag: 1.16.2
+Stable tag: 1.16.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,12 @@ You can find complete user and developer documentation (along with the FAQs) on 
 14. An example of the styled podcast RSS feed when viewed directly in the browser.
 
 == Changelog ==
+
+= 1.16.3 =
+* 2017-05-29
+* UPDATE SUMMARY:  Bugfix release for backward compatibility
+* [FIX] Fixed a parse error causing the plugin not to be activated
+* [FIX] Fixed an error with the plugin upgrade process
 
 = 1.16.2 =
 * 2017-05-22

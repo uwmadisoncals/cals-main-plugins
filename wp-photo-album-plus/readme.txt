@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick
-Version: 6.6.27
-Stable tag: 6.6.26
+Version: 6.6.28
+Stable tag: 6.6.27
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -118,7 +118,7 @@ to the new multisite standards, do the following:
 
 = Which other plugins do you recommand to use with WPPA+, and which not? =
 
-* Recommanded plugins: qTranslate, WP Super Cache, Cube Points, Simple Cart & Buy Now, Google-Maps-GPX-Viewer.
+* Recommanded plugins: qTranslate, WP Super Cache, Cube Points, Simple Cart & Buy Now.
 * Plugins that break up WPPA+: My Live Signature.
 * Google Analytics for WordPress will break the slideshow in most cases when *Track outbound clicks & downloads:* has been checked in its configuration.
 
@@ -180,6 +180,26 @@ Oh, just Google on 'picture resizer' and you will find a bunch of free programs 
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
 
+= 6.6.28 =
+
+= Bug Fixes =
+
+* Fixed a typo in album admin.
+* Fixed photo id in shortcode generator when filesystem is tree structure.
+* Unapproved comments showed up in the comment widget. Fixed.
+* Fixed a layout issue in the Album navigator widget.
+* Fixed a layout issue in Table VIII-B.
+
+= New Features =
+
+= Other Changes =
+
+* Svg icons are now directly coded in html, causing a dramatic performance improvement.
+* The plugin **Google maps GPX viewer** stopped working due to lack of maintenance. If you want to use any external plugin, set Table IX-K5 to **External plugin** and read the help of IX-K5.
+A suitable external plugin should have the possibility to use a shortcode with the **latitude** and **longitude** as arguments; and the google maps api js must be loaded once on all pages.
+The shortcode for the external plugin can be entered in Table IX-K5.3.
+The following keywords can be used in the shortcode: 'w#lon', 'w#lat', 'w#ip', 'w#gmapikey', for longitude, lattitude, the visitors ipaddress and google maps api key.
+
 = 6.6.27 =
 
 = Bug Fixes =
@@ -195,7 +215,7 @@ See for additional information: <a href="http://www.wppa.nl/changelog/" >The doc
 = Other Changes =
 
 * Table II-J11: Navigation symbol style has now an option to revert to non-svg icons. Usefull in case of pageload problems due to many slideshows on a page.
-* The minimum and maximum allowed fe upload image size works now as follows: an image is too small if both width and height are less than the given limit, 
+* The minimum and maximum allowed fe upload image size works now as follows: an image is too small if both width and height are less than the given limit,
 the image is too large if either width or height (or both) is larger than the given limit.
 
 = 6.6.26 =

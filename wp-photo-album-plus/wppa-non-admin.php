@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.6.27
+* Version 6.6.28
 *
 */
 
@@ -335,7 +335,7 @@ global $wppa_opt;
 	}
 
 	// google maps
-	if ( wppa_opt( 'gpx_implementation' ) == 'wppa-plus-embedded' && strpos( wppa_opt( 'custom_content' ), 'w#location' ) !== false ) {
+	if ( ( wppa_switch( 'load_map_api' ) || wppa_opt( 'gpx_implementation' ) == 'wppa-plus-embedded' ) && strpos( wppa_opt( 'custom_content' ), 'w#location' ) !== false ) {
 		if ( wppa_opt( 'map_apikey' ) ) {
 			wp_enqueue_script( 'wppa-geo', 'https://maps.googleapis.com/maps/api/js?key='.wppa_opt( 'map_apikey' ).'&sensor=false', '', $wppa_api_version, $footer );
 		}
@@ -500,29 +500,59 @@ global $wppa_session;
 				break;
 		}
 
-		echo
-		'<img' .
-			' id="wppa-ovl-spin"' .
-			' alt="spinner"' .
-			( wppa_use_svg() ? ' class="wppa-svg"' : '' ) .
-			' style="' .
-				'width:120px;' .
-				'height:120px;' .
-				'position:fixed;' .
-				'top:50%;' .
-				'margin-top:-60px;' .
-				'left:50%;' .
-				'margin-left:-60px;' .
-				'z-index:100100;' .
-				'opacity:1;' .
-				'display:none;' .
-				'fill:' . wppa_opt( 'ovl_svg_color' ) . ';' .
-				'background-color:' . wppa_opt( 'ovl_svg_bg_color' ) . ';' .
-				'box-shadow:none;' .
-				'border-radius:' . $bradius . 'px;' .
-				'"' .
-			' src="' . wppa_get_imgdir() . ( wppa_use_svg() ? 'loader.svg' : 'loader.gif' ) . '"' .
-		' />';
+		if ( wppa_use_svg() ) {
+			echo
+			'<svg' .
+				' id="wppa-ovl-spin"' .
+				' width="120px"' .
+				' height="120px"' .
+				' xmlns="http://www.w3.org/2000/svg"' .
+				' viewBox="0 0 100 100"' .
+				' preserveAspectRatio="xMidYMid"' .
+				' style="' .
+					'width:120px;' .
+					'height:120px;' .
+					'position:fixed;' .
+					'top:50%;' .
+					'margin-top:-60px;' .
+					'left:50%;' .
+					'margin-left:-60px;' .
+					'z-index:100100;' .
+					'opacity:1;' .
+					'display:none;' .
+					'fill:' . wppa_opt( 'ovl_svg_color' ) . ';' .
+					'background-color:' . wppa_opt( 'ovl_svg_bg_color' ) . ';' .
+					'box-shadow:none;' .
+					'border-radius:' . $bradius . 'px;' .
+					'"' .				' >' .
+				wppa_get_spinner_svg_body_html() .
+			'</svg>';
+		}
+		else {
+			echo
+			'<img' .
+				' id="wppa-ovl-spin"' .
+				' alt="spinner"' .
+				( wppa_use_svg() ? ' class="wppa-svg"' : '' ) .
+				' style="' .
+					'width:120px;' .
+					'height:120px;' .
+					'position:fixed;' .
+					'top:50%;' .
+					'margin-top:-60px;' .
+					'left:50%;' .
+					'margin-left:-60px;' .
+					'z-index:100100;' .
+					'opacity:1;' .
+					'display:none;' .
+					'fill:' . wppa_opt( 'ovl_svg_color' ) . ';' .
+					'background-color:' . wppa_opt( 'ovl_svg_bg_color' ) . ';' .
+					'box-shadow:none;' .
+					'border-radius:' . $bradius . 'px;' .
+					'"' .
+				' src="' . wppa_get_imgdir() . ( wppa_use_svg() ? 'loader.svg' : 'loader.gif' ) . '"' .
+			' />';
+		}
 
 		// The init vars
 		echo '

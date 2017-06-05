@@ -302,6 +302,10 @@ $arrow_icons = FrmStylesHelper::arrow_icons();
     margin-bottom:0<?php echo esc_html( $important ) ?>;
 }
 
+.<?php echo esc_html( $style_class ) ?> textarea{
+	vertical-align:top;
+}
+
 .<?php echo esc_html( $style_class ) ?> input[type=text],
 .<?php echo esc_html( $style_class ) ?> input[type=password],
 .<?php echo esc_html( $style_class ) ?> input[type=email],
@@ -396,6 +400,10 @@ $arrow_icons = FrmStylesHelper::arrow_icons();
 .<?php echo esc_html( $style_class ) ?> input.frm_other_input:not(.frm_other_full){
     width:auto <?php echo esc_html( $important ) ?>;
     margin-left:5px <?php echo esc_html( $important ) ?>;
+}
+
+.<?php echo esc_html( $style_class ) ?> .horizontal_radio input.frm_other_input:not(.frm_other_full):not(.frm_pos_none) {
+	display:inline-block<?php echo esc_html( $important ) ?>;
 }
 
 .<?php echo esc_html( $style_class ) ?> .frm_full input.frm_other_input:not(.frm_other_full){
@@ -635,6 +643,12 @@ if ( ! $submit_style ) { ?>
     font-weight:<?php echo esc_html( $check_weight . $important ) ?>;
     display:inline;
 	white-space:normal;
+}
+
+.<?php echo esc_html( $style_class ) ?> .frm_radio input[type=radio],
+.<?php echo esc_html( $style_class ) ?> .frm_checkbox input[type=checkbox] {
+	font-size: <?php echo esc_html( $check_font_size . $important ) ?>;
+	position: static<?php echo esc_html( $important ) ?>;;
 }
 
 .<?php echo esc_html( $style_class ) ?> .frm_blank_field input[type=text],
@@ -913,6 +927,11 @@ if ( ! $submit_style ) { ?>
 /* Start Chosen */
 .<?php echo esc_html( $style_class ) ?> .chosen-container{
     font-size:<?php echo esc_html( $field_font_size . $important ) ?>;
+}
+
+.<?php echo esc_html( $style_class ) ?> .chosen-container .chosen-results li,
+.<?php echo esc_html( $style_class ) ?> .chosen-container .chosen-results li span{
+	color:<?php echo esc_html( $text_color . $important ) ?>;
 }
 
 .<?php echo esc_html( $style_class ) ?> .chosen-container-single .chosen-single{

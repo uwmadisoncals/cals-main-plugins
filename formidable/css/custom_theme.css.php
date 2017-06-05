@@ -825,9 +825,11 @@ select.frm_loading_lookup{
 }
 
 .frm_form_field .frm_checkbox,
-.frm_form_field .frm_radio{
-    margin-top: 0;
-    margin-bottom: 0;
+.frm_form_field .frm_checkbox + .frm_checkbox,
+.frm_form_field .frm_radio,
+.frm_form_field .frm_radio + .frm_radio{
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 .frm_form_field.frm_three_col .frm_radio,
@@ -930,6 +932,10 @@ select.frm_loading_lookup{
 .frm_text_block .frm_checkbox input[type=checkbox],
 .frm_text_block .frm_radio input[type=radio]{
     margin-right:4px;
+}
+
+.frm_form_field.frm_label_justify label.frm_primary_label{
+	text-align:justify !important;
 }
 
 .frm_form_field.frm_capitalize input,

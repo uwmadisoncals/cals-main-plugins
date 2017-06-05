@@ -90,6 +90,7 @@ class FrmHooksController {
 
 		// Addons Controller
 		add_action( 'admin_menu', 'FrmAddonsController::menu', 100 );
+		add_filter( 'upgrader_pre_download', 'FrmAddonsController::add_shorten_edd_filename_filter', 10, 4 );
 
         // Entries Controller
         add_action( 'admin_menu', 'FrmEntriesController::menu', 12 );
