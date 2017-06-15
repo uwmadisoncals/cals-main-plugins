@@ -127,10 +127,12 @@ function my_calendar_access( $atts ) {
 
 function my_calendar_filters( $atts ) {
 	extract( shortcode_atts( array(
-		'show' => 'categories,locations'
+		'show' => 'categories,locations', 
+		'target_url' => '',
+		'ltype' => 'name'
 	), $atts, 'my_calendar_filters' ) );
 
-	return mc_filters( $show );
+	return mc_filters( $show, $target_url, $ltype );
 }
 
 

@@ -322,7 +322,7 @@ function wvrx_ts_sc_tab_group( $args, $content ) {
 
     // enqueue the theme support jslib only now when it will actually be needed!
 
-    wp_enqueue_script('wvrxtsJSLib', wvrx_ts_plugins_url('/js/wvrx-ts-jslib', WVRX_TS_MINIFY . '.js'),array('jquery'),WVRX_TS_VERSION,true);
+    // wp_enqueue_script('wvrxtsJSLib', wvrx_ts_plugins_url('/js/wvrx-ts-jslib', WVRX_TS_MINIFY . '.js'),array('jquery'),WVRX_TS_VERSION,true);
 
     if ( !isset( $GLOBALS['wvrx_ts_tab_id'] ) )
         $GLOBALS['wvrx_ts_tab_id'] = 1;

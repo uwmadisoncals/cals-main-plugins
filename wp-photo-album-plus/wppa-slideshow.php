@@ -471,6 +471,8 @@ function wppa_slide_frame() {
 		// Big browsing buttons enabled ?
 		if ( ( wppa_switch( 'show_bbb' ) && ! wppa_in_widget() ) ||
 			 ( wppa_switch( 'show_bbb_widget' ) && wppa_in_widget() ) ) {
+			$h = wppa( 'slideframeheight' );
+			$h -= wppa_get_audio_control_height();
 
 			wppa_out( 	'<img' .
 							' id="bbb-' . wppa( 'mocc' ) . '-l"' .
@@ -485,7 +487,7 @@ function wppa_slide_frame() {
 								'float:left;' .
 								'top:0px;' .
 								'width:' . ( wppa( 'slideframewidth' ) * 0.5 ) . 'px;' .
-								'height:' . wppa( 'slideframeheight' ) . 'px;' .
+								'height:' . $h . 'px;' .
 								'box-shadow:none;' .
 								'cursor:default;' .
 								'"' .
@@ -506,7 +508,7 @@ function wppa_slide_frame() {
 								'float:right;' .
 								'top:0px;' .
 								'width:' . ( wppa( 'slideframewidth' ) * 0.5 ) . 'px;' .
-								'height:' . wppa( 'slideframeheight' ) . 'px;' .
+								'height:' . $h . 'px;' .
 								'box-shadow:none;' .
 								'cursor:default;' .
 								'"' .

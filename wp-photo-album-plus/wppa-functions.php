@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.6.28
+* Version 6.6.29
 *
 */
 
@@ -1030,6 +1030,12 @@ global $wppa_session;
 			if ( isset( $album_array['0'] ) ) $final_array = array_merge( $final_array, $album_array['0'] );
 		}
 
+		// If Catbox specifies a category to limit, remove all albums that do not have the desired cat.
+		if ( wppa( 'catbox' ) ) {
+			$catalbs = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_ALBUMS . "` WHERE `cats` LIKE '%" . wppa( 'catbox' ) . "%' " );
+			$final_array = array_intersect( $final_array, $catalbs );
+		}
+
 		// Compose WHERE clause
 		$selection = " `id` = '0' ";
 		foreach ( array_keys( $final_array ) as $p ) {
@@ -1671,6 +1677,19 @@ global $wppa_session;
 			$root_albs = wppa_expand_enum( wppa_alb_to_enum_children( $root ) );
 			$root_albs = str_replace( '.', ',', $root_albs );
 			$alb_clause = $root_albs ? ' AND `album` IN ('.$root_albs.') ' : '';
+		}
+
+		// Maybe cats limitation
+		elseif ( wppa( 'catbox' ) ) {
+
+			$catalbs = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_ALBUMS . "` WHERE `cats` LIKE '%" . wppa( 'catbox' ) . "%' " );
+
+			if ( ! empty( $catalbs ) ) {
+				$alb_clause = " AND `album` IN ( " . implode( ',', $catalbs ) . " ) ";
+			}
+			else {
+				$alb_clause = " AND `album` > '0' ";
+			}
 		}
 
 		// exclude separate if required
@@ -4203,7 +4222,32 @@ global $wppa_alert;
 					wppa_alert( sprintf( __( 'Album #%s created' , 'wp-photo-album-plus'), $album ) );
 				}
 				wppa_invalidate_treecounts( $parent );
+				wppa_verify_treecounts_a( $parent );
 				wppa_create_pl_htaccess();
+				if ( wppa_opt( 'fe_create_ntfy' ) ) {
+					$users = explode( ',', wppa_opt( 'fe_create_ntfy' ) );
+					if ( ! empty( $users ) ) foreach( $users as $usr ) {
+						$user = get_user_by( 'login', trim( $usr ) );
+						if ( ! empty( $user ) ) {
+							$cont 	= 	array();
+							$cont[] = 	sprintf( __( 'User %s created album #%s with name %s.' ), '<b>' . wppa_get_user() . '</b>', $album, '<b>' . $albumname . '</b>' );
+							$cont[] = 	'<b>' .
+											__( 'Description:' ) .
+										'</b>' .
+										'<br/><br/>' .
+										'<blockquote style="color:#000077; background-color: #dddddd; border:1px solid black; padding: 6px; border-radius 4px;" >' .
+											'<em>' .
+												strip_tags( wppa_get_post( 'wppa-album-desc' ) ) .
+											'</em>' .
+										'</blockquote>';
+							if ( $parent > '0' ) {
+								$cont[] = sprintf( __('The new album is a subalbum of album %s', 'wp-photo-album-plus'), '<b>' . wppa_get_album_name( $parent ) . '</b>' );
+							}
+							$cont[] = 	__('You are receiving this email because you are assigned to monitor new album creations.', 'wp-photo-album-plus');
+							wppa_send_mail( $user->user_email, __( 'New useralbum created', 'wp-photo-album-plus'), $cont );
+						}
+					}
+				}
 			}
 			else {
 				wppa_alert( __( 'Could not create album' , 'wp-photo-album-plus') );
@@ -4343,9 +4387,9 @@ global $wppa_alert;
 				if ( wppa_opt( 'fe_alert' ) != '-none-' || $fail ) {
 					wppa_alert( $alert, $reload );
 				}
-				elseif( ! $blogged ) {
-					wppa_alert( '', $reload );
-				}
+//				elseif( ! $blogged ) {
+//					wppa_alert( '', $reload );
+//				}
 
 				// Redirect to blogpost
 				if ( $blogged ) {
@@ -4491,7 +4535,8 @@ global $wppa_alert;
 
 		// Housekeeping
 		wppa_update_album( array( 'id' => $alb, 'modified' => time() ) );
-		wppa_invalidate_treecounts( $alb );
+		wppa_verify_treecounts_a( $alb );
+	//	wppa_invalidate_treecounts( $alb, 'now' );
 		wppa_flush_upldr_cache( 'photoid', $id );
 
 		// Add video filetype
@@ -4616,6 +4661,7 @@ global $wppa_alert;
 		wppa_make_o1_source( $id );
 		wppa_update_album( array( 'id' => $alb, 'modified' => time() ) );
 		wppa_invalidate_treecounts( $alb );
+		wppa_verify_treecounts_a( $alb );
 		wppa_flush_upldr_cache( 'photoid', $id );
 	}
 	$source_file = $file['tmp_name'];

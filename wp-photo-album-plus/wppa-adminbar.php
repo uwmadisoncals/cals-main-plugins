@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * enhances the admin bar with wppa+ menu
-* version 6.6.27
+* version 6.6.29
 *
 */
 
@@ -103,6 +103,16 @@ function wppa_admin_bar_menu() {
 		'title'  => __( 'Documentation', 'wp-photo-album-plus' ),
 		'href'   => 'http://wppa.nl'
 	);
+
+	if ( current_user_can( 'administrator' ) ) {
+		if ( get_option( 'wppa_logfile_on_menu' ) == 'yes' ) {
+			$menu_items['logfile'] = array(
+				'parent' => $wppaplus,
+				'title'  => __( 'Logfile', 'wp-photo-album-plus' ),
+				'href'   => admin_url( 'admin.php?page=wppa_log' )
+			);
+		}
+	}
 
 	// Add top-level item
 	$wp_admin_bar->add_menu( array(

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version 6.6.00
+* Version 6.6.29
 *
 */
 
@@ -69,6 +69,9 @@ function wppa_add_admin() {
 	add_submenu_page( 'wppa_admin_menu',  __('Photo of the day Widget', 'wp-photo-album-plus'), __('Photo of the day', 'wp-photo-album-plus'),       'wppa_potd', 		 'wppa_photo_of_the_day', 'wppa_sidebar_page_options' );
 	add_submenu_page( 'wppa_admin_menu',  __('Manage comments', 'wp-photo-album-plus'),         __('Comments', 'wp-photo-album-plus').$com_pending,  'wppa_comments',      'wppa_manage_comments', 'wppa_comment_admin' );
     add_submenu_page( 'wppa_admin_menu',  __('Help &amp; Info', 'wp-photo-album-plus'),         __('Documentation', 'wp-photo-album-plus'),        'wppa_help',          'wppa_help',            'wppa_page_help' );
+	if ( get_option( 'wppa_logfile_on_menu' ) == 'yes' ) {
+		add_submenu_page( 'wppa_admin_menu',  __('Logfile', 'wp-photo-album-plus'), 				__('Logfile', 'wp-photo-album-plus'), 				'administrator',  	 'wppa_log', 			'wppa_log_page' );
+	}
 }
 
 /* ADMIN STYLES */

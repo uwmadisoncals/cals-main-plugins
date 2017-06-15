@@ -1,7 +1,7 @@
 (function ($) {
     'use strict';
     $(function () {
-        $(document).on('click', '.my-calendar-header a.mcajax', function (e) {
+        $(document).on('click', ".my-calendar-header a.mcajax, .my-calendar-footer a.mcajax", function (e) {
 			var calendar = $( this ).closest( '.mc-main' );
 			var ref = calendar.attr('id');
             e.preventDefault();

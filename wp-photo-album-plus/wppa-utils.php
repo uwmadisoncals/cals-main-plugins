@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.6.28
+* Version 6.6.29
 *
 */
 
@@ -955,7 +955,7 @@ global $wpdb;
 }
 
 
-function wppa_send_mail( $to, $subj, $cont, $photo, $email = '' ) {
+function wppa_send_mail( $to, $subj, $cont, $photo = '0', $email = '' ) {
 
 	$message_part_1 = '';
 	$message_part_2 = '';
@@ -982,7 +982,7 @@ function wppa_send_mail( $to, $subj, $cont, $photo, $email = '' ) {
 	'</head>' .
 	'<body>' .
 		'<h3>'.$subj.'</h3>' .
-		'<p><img src="'.wppa_get_thumb_url($photo).'" '.wppa_get_imgalt($photo).'/></p>';
+		( $photo ? '<p><img src="'.wppa_get_thumb_url($photo).'" '.wppa_get_imgalt($photo).'/></p>' : '' );
 		if ( is_array($cont) ) {
 			foreach ( $cont as $c ) if ( $c ) {
 				$message_part_1 .= '<p>'.$c.'</p>';
@@ -1025,6 +1025,8 @@ function wppa_send_mail( $to, $subj, $cont, $photo, $email = '' ) {
 						$headers,
 						'' );
 	if ( $iret ) return;
+
+	wppa_log( 'Err', 'Mail sending failed. to=' . $to . ', subject=' . $subject . ', message=' . $message_part_1 . $message_part_2 . $message_part_3 );
 
 	// Failed
 	if ( ! wppa_is_cron() ) {
@@ -1593,17 +1595,20 @@ global $wppa_log_file;
 	// Sanitize type
 	$t = strtolower( substr( $xtype, 0, 1 ) );
 	switch ( $t ) {
+		case 'a':
+			$type = '{span style="color:blue;" }Ajax{/span}';
+			break;
 		case 'c':
-			$type = 'Cron';
+			$type = '{span style="color:blue;" }Cron{/span}';
 			if ( ! wppa_switch( 'log_cron' ) ) {
 				return;
 			}
 			break;
 		case 'd':
-			$type = 'Dbg';
+			$type = '{span style="color:orange;" }Dbg{/span}';
 			break;
 		case 'e':
-			$type = 'Err';
+			$type = '{span style="color:red;" }Err{/span}';
 			break;
 		case 'f':
 			$type = 'Fix';
@@ -1615,7 +1620,7 @@ global $wppa_log_file;
 			$type = 'Upl';
 			break;
 		case 'w':
-			$type = 'War';
+			$type = '{span style="color:yellow;" }War{/span}';
 			break;
 		default:
 			$type = 'Misc';
@@ -3480,7 +3485,7 @@ function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = 
 
 	// Compose html. Non native svg or gif/png
 	else {
-wppa_log('dbg','Still used for '.$name);
+wppa_log('dbg','Still used for '.$name,true);
 		$result = 	'<img' .
 						' src="' . wppa_get_imgdir( $src ) . '"' .
 						( $use_svg ? ' class="wppa-svg"' : '' ) .

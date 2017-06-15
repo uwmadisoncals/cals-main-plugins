@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.6.28
+* Version 6.6.29
 *
 */
 
@@ -728,7 +728,7 @@ Hide Camera info
 						'wppa_initial_colwidth' 		=> '640',
 						'wppa_resize_on_upload' 		=> 'yes',	// 2
 						'wppa_resize_to'				=> '0',		// 3
-						'wppa_min_thumbs' 				=> '1',		// 4
+						'wppa_min_thumbs' 				=> '0',		// 4
 						'wppa_bwidth' 					=> '1',		// 5
 						'wppa_bradius' 					=> '6',		// 6
 						'wppa_box_spacing'				=> '8',		// 7
@@ -1404,6 +1404,7 @@ Hide Camera info
 						'wppa_user_album_edit_on' 		=> 'no',
 						'wppa_upload_moderate'			=> 'no',
 						'wppa_fe_upload_private' 		=> 'no',
+						'wppa_mail_on_approve' 			=> 'no',
 						'wppa_upload_edit'				=> 'none',
 						'wppa_upload_edit_users' 		=> 'admin',
 						'wppa_upload_edit_theme_css' 	=> 'no',
@@ -1431,6 +1432,8 @@ Hide Camera info
 						'wppa_home_after_upload'		=> 'no',
 						'wppa_fe_alert' 				=> 'all',
 						'wppa_fe_upload_max_albums' 	=> '200', 	// VII-B13
+
+						'wppa_fe_create_ntfy' 			=> '', 	// VII-B1.3
 
 						'wppa_editor_upload_limit_count'		=> '0',
 						'wppa_editor_upload_limit_time'			=> '0',
@@ -1516,9 +1519,12 @@ Hide Camera info
 						'wppa_move_all_photos_from' => '',
 						'wppa_move_all_photos_to' 	=> '',
 
+						'wppa_logfile_on_menu' 		=> 'no',
 
-						'wppa_test_proc' 					=> '',		// 99
+
+						'wppa_custom_photo_proc' 					=> '',		// 99
 						'wppa_test_proc_ad_inf' 			=> 'no',	// 99
+						'wppa_custom_album_proc' 						=> '', 		// 99
 
 
 						// Table IX: Miscellaneous
@@ -1570,6 +1576,7 @@ Hide Camera info
 						'wppa_log_cron' 				=> 'no',	// A9
 						'wppa_retry_mails' 				=> '0', 	// A10
 						'wppa_log_ajax' 				=> 'no',
+						'wppa_moderate_bulk' 			=> 'no', 	// B20
 
 
 						// IX D New

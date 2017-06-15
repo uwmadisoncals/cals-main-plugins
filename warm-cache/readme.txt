@@ -2,8 +2,8 @@
 Contributors: ramon fincken
 Tags: cache, warm, keep, xml, sitemap, load, speed, quick, tag, w3tc, optimize, page cache, preload, google, pagespeed, webmaster, sitemap, generator, warmup, cold, expire, expired, nginx, varnish, microcaching, microcache
 Requires at least: 3.5
-Tested up to: 4.6.1
-Stable tag: 2.1
+Tested up to: 4.8
+Stable tag: 2.2.1
 
 Crawls your website-pages based on google XML sitemap. If you have a caching plugin this will keep your cache warm. Speeds up your site.
 
@@ -17,7 +17,7 @@ Will show average page load times and pages visited.<br>
 
 Needs google XML sitemap to read the generated XML file.<br>
 Needs a cronjob (wget or curl) to call the plugin. You need to setup the cronjob yourself! (Or ask your sysadmin to help you).<br>
-* Coding by <a href="http://www.mijnpress.nl" title="MijnPress.nl WordPress ontwikkelaars">MijnPress.nl</a><br>
+* Coding by <a href="https://www.mijnpress.nl" title="MijnPress.nl WordPress ontwikkelaars">MijnPress.nl</a><br>
 * Crawl script idea by <a href="http://blogs.tech-recipes.com/johnny/2006/09/17/handling-the-digg-effect-with-wordpress-caching/">http://blogs.tech-recipes.com/johnny/2006/09/17/handling-the-digg-effect-with-wordpress-caching/</a>
 
 == Installation ==
@@ -30,6 +30,13 @@ page cache expiration time. <br>Example: Page cache expiration = 1 hour, so set 
 <br>Set it higher when you have lots of pages
 
 == Frequently Asked Questions ==
+= I have multiple (language / domain) sitemaps, but I can only add one sitemap! =
+> Use a sitemap index, pointing to all your (custom/sub)-sitemaps. Only add the sitemap main index file to the plugin
+
+= How to disable logging completely (for very large sites)? =
+> Set a define in your wp-config (at the top, newline, after <?php ) with name MP_WARM_CACHE_NO_LOGGING_AT_ALL and value "yes"
+Example
+define('MP_WARM_CACHE_NO_LOGGING_AT_ALL', 'yes');
 
 = How to run a cronjob? =
 > Ask your webhost how to set up a get call using wget or curl. See Installation for instructions howmany times you should call the cronjob.
@@ -60,6 +67,12 @@ The support forums over here, drop me a tweet to notify me of your support topic
 I always check my tweets, so mention my name with @ramonfincken and your problem.
 
 == Changelog ==
+= 2.2.1 =
+Bugfix: PHP notices
+
+= 2.2 =
+Added: Option to disable logging completely (for very large sites) see FAQ how to do so
+
 = 2.1 =
 Bugfix: No gzip compression in ob_start filter<br>
 Bugfix: Devision by zero fixed in wp-admin statistics page<br>

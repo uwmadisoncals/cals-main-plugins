@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.6.27
+* Version 6.6.29
 *
 */
 
@@ -48,7 +48,8 @@ $wppa_all_maintenance_slugs = array( 	'wppa_remake_index_albums',
 										'wppa_sync_cloud',
 										'wppa_sanitize_tags',
 										'wppa_sanitize_cats',
-										'wppa_test_proc',
+										'wppa_custom_album_proc',
+										'wppa_custom_photo_proc',
 										'wppa_crypt_photos',
 										'wppa_crypt_albums',
 										'wppa_create_o1_files',
@@ -69,7 +70,7 @@ $wppa_cron_maintenance_slugs = array(	'wppa_remake_index_albums',
 										'wppa_comp_sizes',
 										'wppa_add_gpx_tag',
 										'wppa_add_hd_tag',
-										'wppa_test_proc',
+										
 									);
 
 // Main maintenace module
@@ -269,6 +270,7 @@ global $wppa_timestamp_start;
 		case 'wppa_remove_empty_albums':
 		case 'wppa_sanitize_cats':
 		case 'wppa_crypt_albums':
+		case 'wppa_custom_album_proc':
 
 			// Process albums
 			$table 		= WPPA_ALBUMS;
@@ -328,6 +330,10 @@ global $wppa_timestamp_start;
 						wppa_update_album( array( 'id' => $album['id'], 'crypt' => wppa_get_unique_album_crypt() ) );
 						break;
 
+					case 'wppa_custom_album_proc':
+						$file = WPPA_UPLOAD_PATH . '/procs/wppa_custom_album_proc.php';
+						include $file;
+						break;
 
 				}
 				// Test for timeout / ready
@@ -366,7 +372,7 @@ global $wppa_timestamp_start;
 		case 'wppa_sync_cloud':
 		case 'wppa_sanitize_tags':
 		case 'wppa_crypt_photos':
-		case 'wppa_test_proc':
+		case 'wppa_custom_photo_proc':
 		case 'wppa_create_o1_files':
 		case 'wppa_owner_to_name_proc':
 		case 'wppa_move_all_photos':
@@ -808,46 +814,9 @@ global $wppa_timestamp_start;
 						}
 						break;
 
-					case 'wppa_test_proc':
-						$old_tags = $photo['tags'];
-						$tags 	= '';
-						// Location
-						$temp 	= explode( '/', $photo['location'] );
-						if ( ! isset( $temp['2'] ) ) $temp['2'] = false;
-						if ( ! isset( $temp['3'] ) ) $temp['3'] = false;
-						$lat 	= $temp['2'];
-						$lon 	= $temp['3'];
-						if ( $lat < 0.01 && $lat > -0.01 &&  $lon < 0.01 && $lon > -0.01 ) {
-							$lat = false;
-							$lon = false;
-						}
-						if ( $photo['location'] && $lat && $lon ) {
-							$tags .= ',GPX';
-						}
-						// HD?
-						$size 	= wppa_get_artmonkey_size_a( $photo['id'] );
-						if ( is_array( $size ) && $size['x'] >= 1920 && $size['y'] >= 1080 ) {
-							$tags .= ',HD';
-						}
-						// Album names
-						$albid 	= $photo['album'];
-						$albnam = wppa_get_album_item( $albid, 'name' );
-						$tags .= ',' . $albnam;
-						while ( $albid > '0' ) {
-							$albid = wppa_get_album_item( $albid, 'a_parent' );
-							if ( $albid > '0' ) {
-								$tags .= ',' . wppa_get_album_item( $albid, 'name' );
-							}
-						}
-						$tags = wppa_sanitize_tags( $tags );
-
-						// Update only if new data differs from existing data
-						if ( $old_tags != $tags ) {
-							wppa_update_photo( array( 'id' => $photo['id'], 'tags' => $tags ) );
-							wppa_index_update( 'photo', $photo['id'] );
-							wppa_clear_taglist();
-						}
-
+					case 'wppa_custom_photo_proc':
+						$file = WPPA_UPLOAD_PATH . '/procs/wppa_custom_photo_proc.php';
+						include $file;
 						break;
 
 				}
@@ -1011,6 +980,7 @@ global $wppa_timestamp_start;
 				wppa_delete_from_cloudinary( $to_delete_from_cloudinary );
 			}
 			break;
+
 	}
 
 	// Register lastid
@@ -1118,9 +1088,6 @@ global $wppa_timestamp_start;
 				break;
 			case 'wppa_sanitize_cats':
 				wppa_clear_catlist();
-				break;
-			case 'wppa_test_proc':
-				wppa_clear_taglist();
 				break;
 			case 'wppa_sync_cloud':
 				unset( $wppa_session['cloudinary_ids'] );
@@ -1236,8 +1203,8 @@ global $wppa_log_file;
 			else {
 				$size 	= filesize( $wppa_log_file );
 				$data 	= fread( $file, $size );
-				$data 	= htmlspecialchars( strip_tags( $data ) );
-				$data 	= str_replace( array( '{b}', '{/b}', "\n" ), array( '<b>', '</b>', '<br />' ), $data );
+				$data 	= strip_tags( $data );
+				$data 	= str_replace( array( '{b}', '{/b}', "\n", '{span', '{/span}', '" }' ), array( '<b>', '</b>', '<br />', '<span', '</span>', '" >' ), $data );
 				$result .= $data;
 				fclose( $file );
 			}
@@ -1548,3 +1515,25 @@ function wppa_fix_source_path() {
 	}
 }
 
+function wppa_log_page() {
+
+	echo
+	'<div class="wrap">' .
+		wppa_admin_spinner() .
+		wp_nonce_field( 'wppa-nonce', 'wppa-nonce', true, false ) .
+		'<img id="icon-album" src="' . WPPA_URL . '/img/page_green.png" />' .
+		'<h1 style="display:inline" >' . __('WP Photo Album Plus Logfile', 'wp-photo-album-plus') .
+			'<input' .
+				' class="button-secundary"' .
+				' style="float:right; border-radius:3px; font-size: 16px; height: 28px; padding: 0 4px;"' .
+				' value="Purge logfile"' .
+				' onclick="wppaAjaxUpdateOptionValue(\'errorlog_purge\', 0);jQuery(\'#wppa-maintenance-list\').fadeOut(2000);"' .
+				' type="button" >' .
+		'</h1>' .
+		'<style type="text/css" >h2 { display:none; }</style>' .
+
+		wppa_do_maintenance_popup( 'wppa_list_errorlog' ) .
+
+	'</div>';
+
+}

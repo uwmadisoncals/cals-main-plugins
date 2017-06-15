@@ -63,6 +63,10 @@ ul.links li {
 	line-height: 1.4;
 }
 
+#my-calendar-admin-table {
+	margin-bottom: 1em;
+}
+
 #toggle {
     height: 2em
 }
@@ -562,6 +566,10 @@ input[name="mc_uri"] {
     float: right;
 }
 
+.mc-admin-footer .mc-search {
+	float: none;
+}
+
 .mc_add_new {
 	position: relative;
 	z-index: 200;
@@ -678,6 +686,10 @@ tr.problem .error {
 }
 
 .my-calendar-admin .mc-none {
+	clear: both;
+}
+
+.event-actions {
 	clear: both;
 }
 

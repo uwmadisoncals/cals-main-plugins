@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.6.28
+* Version 6.6.29
 *
 */
 
@@ -49,9 +49,13 @@ global $wppa_log_file;
 	$wppa_action = $_REQUEST['wppa-action'];
 
 	if ( wppa_switch( 'log_ajax' ) ) {
-		wppa_log( 'Obs', 'Ajax action = '.$wppa_action.', querystring = '.$_SERVER['REQUEST_URI'] );
+		$args = '';
+		foreach( array_keys( $_REQUEST ) as $key ) {
+			$args .= $key . '=' . $_REQUEST[$key] . ', ';
+		}
+		wppa_log( 'Ajx', 'Args = ' . $args );
 	}
-	
+
 	switch ( $wppa_action ) {
 		case 'getqrcode':
 			//wppa_log( 'obs', 'Ajax getqrcode for '.$_REQUEST['url'] );
@@ -1339,7 +1343,7 @@ global $wppa_log_file;
 			}
 
 			$iret = $wpdb->query( $wpdb->prepare( 'UPDATE `'.WPPA_COMMENTS.'` SET `status` = %s WHERE `id` = %s', $comstat, $comid ) );
-			if ( wppa_opt( 'search_comments' ) ) {
+			if ( wppa_switch( 'search_comments' ) ) {
 				wppa_update_photo( $photo );
 			}
 
@@ -1806,7 +1810,7 @@ global $wppa_log_file;
 
 				case 'status':
 				if ( ! current_user_can( 'wppa_moderate' ) && ! current_user_can( 'wppa_admin' ) ) die( 'Security check failure #78' );
-					wppa_invalidate_treecounts( wppa_get_photo_item( $photo, 'album' ) ); // $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ) ) );
+					wppa_invalidate_treecounts( wppa_get_photo_item( $photo, 'album' ) );
 				case 'owner':
 				case 'name':
 				case 'description':
@@ -1819,12 +1823,31 @@ global $wppa_log_file;
 				case 'videox':
 				case 'videoy':
 					switch ( $item ) {
+						case 'status':
+							if ( wppa_switch( 'mail_on_approve' ) ) {
+								$oldstatus = wppa_get_photo_item( $photo, 'status' );
+								if ( $oldstatus == 'pending' ) {
+									if ( $value == 'publish' ) {
+										$owner 	= wppa_get_photo_item( $photo, 'owner' );
+										$user 	= get_user_by( 'login', $owner );
+										$to 	= $user->user_email;
+										$subj 	= __('Photo approved', 'wp-photo-album-plus');
+										$cont 	= sprintf( 	__('Your recently uploaded photo %s in album %s has been approved', 'wp-photo-album-plus'),
+															'<b>' . wppa_get_photo_item( $photo, 'name' ) . '</b>',
+															'<b>' . wppa_get_album_name( wppa_get_photo_item( $photo, 'album' ) ) . '</b>'
+														);
+										wppa_send_mail( $to, $subj, $cont, $photo, 'void' );
+									}
+								}
+							}
+							$itemname = __( 'Status', 'wp-photo-album-plus');
+							break;
 						case 'name':
 							$value = strip_tags( $value );
-							$itemname = __( 'Name' , 'wp-photo-album-plus');
+							$itemname = __( 'Name', 'wp-photo-album-plus');
 							break;
 						case 'description':
-							$itemname = __( 'Description' , 'wp-photo-album-plus');
+							$itemname = __( 'Description', 'wp-photo-album-plus');
 							if ( wppa_switch( 'check_balance' ) ) {
 								$value = str_replace( array( '<br/>','<br>' ), '<br />', $value );
 								if ( balanceTags( $value, true ) != $value ) {
@@ -2229,6 +2252,28 @@ global $wppa_log_file;
 			}
 
 			else switch ( $option ) {
+				
+				// Custom mainetance procedures
+				case 'wppa_custom_album_proc':
+				case 'wppa_custom_photo_proc':
+					$err = false;
+					$path = WPPA_UPLOAD_PATH . '/procs/' . $option . '.php';
+					if ( ! is_dir( dirname( $path ) ) ) {
+						mkdir( dirname( $path ) );
+					}
+					$file = fopen( $path, 'wb' );
+					if ( ! $file ) {
+						$err = true;
+					}
+					if ( fwrite( $file, $value ) === false ) {
+						$err = true;
+					}
+					@ fclose( $file );
+					if ( $err ) {
+						$title = __( 'Failed to save code', 'wp-photo-album-plus' );
+						$alert = __( 'Failed to save code', 'wp-photo-album-plus' );
+					}
+					break;
 
 				// Changing potd_album_type ( physical / virtual ) also clears potd_album
 				case 'wppa_potd_album_type':

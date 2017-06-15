@@ -141,11 +141,11 @@ With <em>Weaver Xtreme Plus</em>, you can also specify background images for var
 	do_action('weaverxplus_admin','general_appearance');
 }
 
-function wvrx_ts_new_xp_opt($opt) {
+function wvrx_ts_new_xp_opt($vers, $opt) {
 	// don't support new xp opts in old xp
-	if ( !function_exists('weaverxplus_plugin_installed') || version_compare( WEAVER_XPLUS_VERSION, '2.90', '>=') )
+	if ( function_exists('weaverxplus_plugin_installed') && version_compare( WEAVER_XPLUS_VERSION, $vers, '>=') )
 		return $opt;
-	return array('name' => $opt['name'], 'info' => __('This option requires X-Plus Version 3.0','weaver-xtreme'), 'type' => 'note' );
+	return array('name' => $opt['name'], 'info' => __('This option requires X-Plus Version greater or equal to ','weaver-xtreme') . $vers , 'type' => 'note' );
 }
 
 // ======================== Main Options > Custom ========================
@@ -389,7 +389,7 @@ array( 'name' => __('Header Other options', 'weaver-xtreme'), 'type' => 'break')
 		'id' => 'header_image_height_int', 'type' => 'val_px',
 		'info' => __('Change the suggested height of the Header Image. This only affects the clipping window on the Appearance:Header page. Header images will be responsively sized. If used with <em>Header Image Rendering</em>, this value will be used to set the minimum height of the BG image. (Default: 188px)', 'weaver-xtreme' /*adm*/)),
 
-		wvrx_ts_new_xp_opt(
+		wvrx_ts_new_xp_opt( '3.0',		// >= 3.0
 		array('name' => __('Header Image Rendering', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'header_image_render', 'type' => '+select_id',	//code
 		'info' => __('How to render header image: as img in header or as header area bg image. When rendered as a BG image, other options such as moving Title/Tagline or having image link to home page are not meaningful. (Default: &lt;img&gt; in header div) (&starf;Plus)', 'weaver-xtreme' /*adm*/),
@@ -435,7 +435,7 @@ array( 'name' => __('Header Other options', 'weaver-xtreme'), 'type' => 'break')
 	array('name' => '<small>' . __('Show On Home Page Only', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'header_image_html_home_only', 'type' => 'checkbox',
 		'info' => __('Check to use the Image HTML Replacement only on your Front/Home page.', 'weaver-xtreme' /*adm*/)),
 
-		wvrx_ts_new_xp_opt(
+		wvrx_ts_new_xp_opt( '3.0', // >= 3.0
 	array('name' => '<small>' . __('Also show BG Header Image', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'header_image_html_plus_bg', 'type' => '+checkbox',
 		'info' => __('If you have Image HTML Replacement defined - including Per Page/Post - and also have have set the standard Header Image to display as a BG image, then show <em>both</em> the BG image and the replacement HTML. (&starf;Plus)', 'weaver-xtreme' /*adm*/)) ),
 
@@ -893,6 +893,11 @@ function weaverx_mainopts_content() {
 	array('name' => '<span class="i-left" style="font-size:150%;">&harr;</span><small>' . __('Featured Image Width, Pages', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'page_fi_width', 'type' => '+val_percent',
 		'info' => __('Width of Featured Image on Pages. Max Width in %, overrides FI Size selection. (&starf;Plus)', 'weaver-xtreme' /*adm*/) ),
+	array('name' => '<small>' . __("Don't add link to FI", 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'page_fi_nolink', 'type' => '+checkbox',
+		'info' => __('Do not add link to Featured Image. (&starf;Plus)', 'weaver-xtreme' /*adm*/) ),
+
+
 
 	array('name' => __('Lists - &lt;HR&gt; - Tables', 'weaver-xtreme' /*adm*/), 'id' => '-list-view', 'type'=>'subheader_alt',
 		'info' => __('Other options related to content', 'weaver-xtreme' /*adm*/)),
@@ -1206,6 +1211,10 @@ function weaverx_mainopts_posts() {
 
 	array('name' => __('Full Width FI BG Image:', 'weaver-xtreme' /*adm*/), 'type' => 'note',
 		'info' => __('To create full width Post BG images from the FI, check the <em>Post Area Extend BG Attributes</em> box at <em>Full Width</em> tab.', 'weaver-xtreme' /*adm*/)),
+
+	array('name' => '<small>' . __("Don't add link to FI", 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'post_fi_nolink', 'type' => '+checkbox',
+		'info' => __('Do not add link to Featured Image for any post layout. (&starf;Plus)', 'weaver-xtreme' /*adm*/) ),
 
 	array('name' => '<span class="i-left" style=font-size:120%;">&nbsp;&#10538;</span>' . __('FI Location - Full Post', 'weaver-xtreme' /*adm*/),
 		'id' => 'post_full_fi_location', 'type' => 'fi_location_post',

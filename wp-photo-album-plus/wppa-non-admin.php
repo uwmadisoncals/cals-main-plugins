@@ -718,6 +718,7 @@ function wppa_add_page_specific_urls() {
 	wppaIsSafari = ' . ( wppa_is_safari() ? 'true' : 'false' ) . ';
 	wppaUseSvg = ' . ( wppa_use_svg() ? 'true' : 'false' ) . ';
 	wppaSlideshowNavigationType = "' . wppa_get_navigation_type() . '";
+	wppaAudioHeight = '.wppa_get_audio_control_height().';
 </script>
 <!-- WPPA+ END Page specific urls -->';
 
@@ -920,7 +921,6 @@ global $wppa_init_js_data;
 	wppaOvlHires = '.( wppa_switch( 'lb_hres' ) ? 'true' : 'false' ).';
 	wppaSlideVideoStart = '.( wppa_switch( 'start_slide_video' ) ? 'true' : 'false' ).';
 	wppaSlideAudioStart = '.( wppa_switch( 'start_slide_audio' ) ? 'true' : 'false' ).';
-	wppaAudioHeight = '.wppa_get_audio_control_height().';
 	wppaRel = "'.( wppa_opt( 'lightbox_name' ) == 'wppa' ? 'data-rel' : 'rel' ).'";
 	wppaOvlRadius = '.wppa_opt( 'ovl_border_radius' ).';
 	wppaOvlBorderWidth = '.wppa_opt( 'ovl_border_width' ).';

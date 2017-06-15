@@ -3,7 +3,7 @@
 Plugin Name: Warm cache
 Plugin URI: https://www.mijnpress.nl
 Description: Crawls your website-pages based on any XML sitemap plugin. If you have a caching plugin this wil keep your cache warm. Speeds up your site.
-Version: 2.1
+Version: 2.2.1
 Author: Ramon Fincken
 Author URI: https://www.mijnpress.nl
 */
@@ -143,7 +143,7 @@ class warm_cache extends mijnpress_plugin_framework
 		$this->flush_loadbalancer = get_option("plugin_warm_cache_lb_flush");
 	}
 
-	function addPluginSubMenu($title = '',$function = '', $file = '', $capability = 10, $where = '')
+	function addPluginSubMenu_($title = '',$function = '')
 	{
 		parent::addPluginSubMenu('Warm cache', array('warm_cache', 'admin_menu'), __FILE__);
 	}
@@ -151,7 +151,7 @@ class warm_cache extends mijnpress_plugin_framework
 	/**
 	 * Additional links on the plugin page
 	 */
-	function addPluginContent($links, $file, $void1 = '', $void2 = '') {
+	function addPluginContent_($links, $file) {
 		$links = parent::addPluginContent('warm_cache/warm-cache.php', $links, $file);
 		return $links;
 	}
@@ -373,8 +373,8 @@ else
 {
 	if(is_admin())
 	{
-		add_action('admin_menu', array('warm_cache', 'addPluginSubMenu'));
-		add_filter('plugin_row_meta', array('warm_cache', 'addPluginContent'), 10, 2);
+		add_action('admin_menu', array('warm_cache', 'addPluginSubMenu_'));
+		add_filter('plugin_row_meta', array('warm_cache', 'addPluginContent_'), 10, 2);
 		add_action('admin_notices', array('warm_cache', 'admin_notices'));
 	}
 }

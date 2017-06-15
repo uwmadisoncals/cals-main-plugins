@@ -49,7 +49,7 @@ function weaverx_process_options_themes() {
 	}
 
 	// save/restore options
-	if ( weaverx_submitted( 'weaverx_clear_messages' )) {
+	if ( weaverx_submitted( 'weaverx_clear_messages' ) ) {
 		return true;
 	}
 	if (weaverx_submitted('reset_weaverx')) {
@@ -702,6 +702,7 @@ function weaverx_ex_set_current_to_serialized_values($contents)  {
 				$new_cache[$key] = $val;	// keep
 		}
 		$opts = $restore['weaverx_base'];	// fetch base opts
+
 		weaverx_delete_all_options();
 
 		foreach ($opts as $key => $val) {
@@ -713,17 +714,21 @@ function weaverx_ex_set_current_to_serialized_values($contents)  {
 			weaverx_setopt($key,$val,false);
 		}
 	} else if ($type == 'backup') {
-		weaverx_delete_all_options();
+		weaverx_delete_all_options( );
 
 		$opts = $restore['weaverx_base'];	// fetch base opts
 		foreach ($opts as $key => $val) {
 			weaverx_setopt($key, $val, false);	// overwrite with saved values
 		}
 	}
-	weaverx_setopt('weaverx_version_id',$version); // keep version, force save of db
-	weaverx_setopt('wvrx_css_saved','');
+
+	weaverx_setopt('weaverx_version_id',$version, false); // keep version, force save of db
+	weaverx_setopt('wvrx_css_saved','', false);
+
+
 	weaverx_setopt('last_option','Weaver Xtreme');
 	weaverx_save_opts('loading theme');	// OK, now we've saved the options, update them in the DB
+	
 	return true;
 }
 

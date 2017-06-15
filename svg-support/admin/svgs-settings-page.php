@@ -64,6 +64,7 @@
 											<?php _e( 'Yes', 'svg-support' ); ?><br /><small class="description"><?php _e(' Restricts SVG upload priveledges to Administrators.', 'svg-support' ); ?></small>
 										</td>
 									</tr>
+
 									<tr valign="top" class="svgs-advanced">
 										<!-- Allow choice of js in footer true or false -->
 										<th scope="row">
@@ -75,6 +76,7 @@
 											<?php _e( 'Yes', 'svg-support' ); ?><br /><small class="description"><?php _e(' Normally, scripts are placed in <code>head</code> of the HTML document. If this parameter is true, the script is placed before the closing <code>body</code> tag. This requires the theme to have the <code>wp_footer()</code> template tag in the appropriate place.', 'svg-support' ); ?></small>
 										</td>
 									</tr>
+
 									<tr valign="top" class="svgs-advanced">
 										<!-- Automatically insert class to target in images when inserting into posts/pages -->
 										<th scope="row">
@@ -86,6 +88,7 @@
 											<?php _e( 'Yes', 'svg-support' ); ?><br /><small class="description"><?php _e(' Checking this will make sure that either the default class or the custom one you set below is inserted into the style attributes of <code>img</code> tags when you insert SVG images. Additionally, it will remove all of the default WordPress classes. It will leave normal image types as default and only affect SVG files.', 'svg-support' ); ?></small>
 										</td>
 									</tr>
+
 									<tr valign="top" class="svgs-advanced">
 										<!-- Custom CSS target field so users can set their own class to target -->
 										<th scope="row">
@@ -148,6 +151,16 @@
 
 					</div> <!-- .postbox -->
 
+					<div class="postbox">
+						<h3><span><?php _e( 'Compress and Optimize Images with ShortPixel', 'svg-support' ); ?></span></h3>
+						<div class="inside">
+							<?php echo '<a target="_blank" class="shortpixel-logo" href="https://shortpixel.com/h/af/OLKMLXE207471"><img src="' . BODHI_SVGS_PLUGIN_URL . '/admin/img/shortpixel.png" /></a>'; ?>
+							<p><?php _e( 'Now that you\'ve set up SVG Support on your site, it\'s time to look at optimizing your existing images (jpg & png).', 'svg-support' ); ?></p>
+							<p><?php _e( 'ShortPixel improves website performance by reducing the size of your images. The results are no different in quality from the original, plus your originals are stored in a backup folder for you.', 'svg-support' ); ?></p>
+							<p><a class="shortpixel-button button-primary" href="https://shortpixel.com/h/af/OLKMLXE207471"><?php _e( 'Try ShortPixel WordPress Plugin for FREE', 'svg-support' ); ?></a></p>
+						</div> <!-- .inside -->
+					</div> <!-- .postbox -->
+
 				</div> <!-- .meta-box-sortables .ui-sortable -->
 
 			</div> <!-- post-body-content -->
@@ -158,18 +171,15 @@
 				<div class="meta-box-sortables">
 
 					<div class="postbox">
-
 						<h3><span><?php _e( 'Ratings & Reviews', 'svg-support' ); ?></span></h3>
 						<div class="inside">
 							<p><?php _e( 'If you like <strong>SVG Support</strong> please consider leaving a', 'svg-support' ); ?> <a href="https://wordpress.org/support/view/plugin-reviews/svg-support?filter=5#postform" target="_blank" class="svgs-rating-link">&#9733;&#9733;&#9733;&#9733;&#9733;</a> <?php _e( 'rating.', 'svg-support' ); ?><br><?php _e( 'A huge thanks in advance!', 'svg-support' ); ?></p>
 							<p><a href="https://wordpress.org/support/view/plugin-reviews/svg-support?filter=5#postform" target="_blank" class="button-primary">Leave a rating</a></p>
 						</div> <!-- .inside -->
-
 					</div> <!-- .postbox -->
 
 					<div class="postbox">
-
-						<h3><span><?php _e( 'Plugin Features', 'svg-support' ); ?></span></h3>
+						<h3><span><?php _e( 'SVG Support Features', 'svg-support' ); ?></span></h3>
 						<div class="inside">
 							<ul>
 								<li><strong><?php _e( 'Basic Use', 'svg-support' ); ?></strong></li>
@@ -184,11 +194,9 @@
 								<li><?php _e( 'Inline SVG featured image support', 'svg-support' ); ?></li>
 							</ul>
 						</div> <!-- .inside -->
-
 					</div> <!-- .postbox -->
 
 					<div class="postbox">
-
 						<h3><span><?php _e( 'About The Plugin', 'svg-support' ); ?></span></h3>
 						<div class="inside">
 							<p><?php _e( 'You can read about this plugin in detail on', 'svg-support' ); ?> <a target="_blank" href="http://wordpress.org/plugins/svg-support/"><?php _e( 'The WordPress Plugin Repository', 'svg-support' ); ?></a>.</p>
@@ -196,16 +204,13 @@
 							<p><a target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Z9R7JERS82EQQ"><?php _e( 'Donate to author &rarr;', 'svg-support' ); ?></a>
 							<p>&copy; <a target="_blank" href="http://benbodhi.com">Benbodhi</a> <?php _e( 'from', 'svg-support' ); ?> <a target="_blank" href="http://gowebben.com">GoWebben</a>.
 						</div> <!-- .inside -->
-
 					</div> <!-- .postbox -->
 
 					<div class="postbox">
-
 						<h3><span><?php _e( 'GoWebben Hosting', 'svg-support' ); ?></span></h3>
 						<div class="inside">
 							<p><a target="_blank" href="https://secure.gowebben.com/cart.php?promocode=svg-support"><?php _e( 'Claim your FREE $25 credit from', 'svg-support' ); ?> GoWebben</a> - <?php _e( 'No catch, just free credit for using this plugin! It will be applied automatically using the link provided, but in any case you can simply use code: SVGSUPPORT during checkout.', 'svg-support' ); ?></p>
 						</div> <!-- .inside -->
-
 					</div> <!-- .postbox -->
 
 				</div> <!-- .meta-box-sortables -->

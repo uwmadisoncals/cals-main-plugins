@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.6.27
+* Version 6.6.29
 *
 */
 
@@ -57,7 +57,12 @@ function _wppa_moderate_photos() {
 	echo
 	'<div class="wrap">' .
 		'<h2>' . __( 'Moderate photos' , 'wp-photo-album-plus') . '</h2>';
-		wppa_album_photos( '', $photo, '', true );
+		if ( wppa_switch( 'moderate_bulk' ) ) {
+			wppa_album_photos_bulk( 'moderate' );
+		}
+		else {
+			wppa_album_photos( '', $photo, '', true );
+		}
 	echo
 	'</div>';
 }
@@ -208,7 +213,7 @@ global $wpdb;
 			$photos = $wpdb->get_results( 	"SELECT * " .
 											"FROM `" . WPPA_PHOTOS . "` " .
 											"WHERE `status` = 'pending' " . $orphotois . " " .
-											"ORDER BY `timestamp` DESC " .
+											"ORDER BY `album` DESC, `timestamp` DESC " .
 											$limit, ARRAY_A
 										);
 			$link 	= wppa_dbg_url( get_admin_url() . 'admin.php' . '?page=wppa_moderate_photos' . '&wppa_nonce=' . wp_create_nonce('wppa_nonce') );
@@ -482,6 +487,9 @@ function wppaTryScheduledel( id ) {
 		// Horizon
 		echo '<hr id="horizon" style="position:fixed;top:300px;left:0px;border:none;background-color:#777777;z-index:100000;display:none;height:1px;width:100%;" />';
 
+		// Albun name if moderate
+		static $modalbum;
+
 		// Display all photos
 		foreach ( $photos as $photo ) {
 
@@ -536,6 +544,14 @@ function wppaTryScheduledel( id ) {
 			$wms 	= array( 'toplft' => __( 'top - left' , 'wp-photo-album-plus'), 'topcen' => __( 'top - center' , 'wp-photo-album-plus'), 'toprht' => __( 'top - right' , 'wp-photo-album-plus'),
 							 'cenlft' => __( 'center - left' , 'wp-photo-album-plus'), 'cencen' => __( 'center - center' , 'wp-photo-album-plus'), 'cenrht' => __( 'center - right' , 'wp-photo-album-plus'),
 							 'botlft' => __( 'bottom - left' , 'wp-photo-album-plus'), 'botcen' => __( 'bottom - center' , 'wp-photo-album-plus'), 'botrht' => __( 'bottom - right' , 'wp-photo-album-plus'), );
+
+			// Album for moderate
+			if ( $modalbum != $album ) {
+				echo '<h3>' . sprintf( 	__( 'Edit/Moderate photos from album %s by %s', 'wp-photo-album-plus' ),
+										'<i>' . wppa_get_album_name( $album ) . '</i>',
+										'<i>' . wppa_get_album_item( $album, 'owner' ) . '</i>' ) . '</h3>';
+				$modalbum = $album;
+			}
 
 			echo 	// Anchor for scroll to
 			"\n" . '<a id="photo_' . $id . '" ></a>';
@@ -600,8 +616,8 @@ function wppaTryScheduledel( id ) {
 								}
 								else {
 									if ( $has_audio ) {
-										$big = wppa_fix_poster_ext( $big, $id );
-										$src = wppa_fix_poster_ext( $src, $id );
+										$src = wppa_get_thumb_url( $id );
+										$big = wppa_get_photo_url( $id );
 									}
 									echo
 									'<a' .
@@ -2077,6 +2093,13 @@ function wppa_album_photos_bulk( $album ) {
 	// Check input
 	wppa_vfy_arg( 'wppa-page' );
 
+	if ( $album == 'moderate' ) {
+		// Can i moderate?
+		if ( ! current_user_can( 'wppa_moderate' ) ) {
+			wp_die( __( 'You do not have the rights to do this' , 'wp-photo-album-plus') );
+		}
+	}
+
 	// Init
 	$count = '0';
 	$abort = false;
@@ -2219,7 +2242,12 @@ echo '<br />';
 echo 'Page='.$page;
 */
 	if ( $album ) {
-		if ( $album == 'search' ) {
+		if ( $album == 'moderate' ) {
+			$photos	= $wpdb->get_results( "SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `status` = 'pending' ORDER BY `album` DESC, `timestamp` DESC " . $limit, ARRAY_A );
+			$count 	= count( $photos );
+			$link 	= wppa_dbg_url( get_admin_url().'admin.php?page=wppa_moderate_photos' );
+		}
+		elseif ( $album == 'search' ) {
 			$count 	= wppa_get_edit_search_photos( '', 'count_only' );
 			$photos = wppa_get_edit_search_photos( $limit );
 			$link 	= wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id='.$album.'&wppa-searchstring='.wppa_sanitize_searchstring($_REQUEST['wppa-searchstring']).'&bulk'.'&wppa_nonce=' . wp_create_nonce('wppa_nonce') );
@@ -2485,6 +2513,19 @@ function wppaSetConfirmMove( id ) {
 					<tbody>
 						<?php foreach ( $photos as $photo ) { ?>
 						<?php $id = $photo['id']; ?>
+
+						<?php // Album for moderate
+						static $modalbum;
+						if ( $album == 'moderate' ) {
+							if ( $modalbum != $photo['album'] ) {
+								echo '<tr><td colspan="8" style="background-color:lightgreen;" ><h3 style="margin:0;" >' . sprintf( 	__( 'Moderate photos from album %s by %s', 'wp-photo-album-plus' ),
+																			'<i>' . wppa_get_album_name( $photo['album'] ) . '</i>',
+																			'<i>' . wppa_get_album_item( $photo['album'], 'owner' ) . '</i>' ) . '</h3></td></tr>';
+								$modalbum = $photo['album'];
+							}
+						}
+						?>
+
 						<?php $maxsize = wppa_get_minisize(); ?>
 						<tr id="photoitem-<?php echo $photo['id'] ?>" >
 							<!-- Checkbox -->
@@ -2673,8 +2714,11 @@ function wppaSetConfirmMove( id ) {
 				if ( isset( $_REQUEST['wppa-searchstring'] ) ) {
 					echo '<h3>'.__( 'No photos matching your search criteria.' , 'wp-photo-album-plus').'</h3>';
 				}
+				elseif ( $album == 'moderate' ) {
+					echo '<h3>'.__( 'No photos to moderate', 'wp-photo-album-plus' ) . '</h3>';
+				}
 				else {
-					echo '<h3>'.__( 'No photos yet in this album.' , 'wp-photo-album-plus').'</h3>';
+					echo '<h3>'.__( 'No photos yet in this album.' , 'wp-photo-album-plus' ).'</h3>';
 				}
 			}
 			else {

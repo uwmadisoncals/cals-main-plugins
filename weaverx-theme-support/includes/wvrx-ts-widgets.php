@@ -10,7 +10,7 @@ class WeaverX_Widget_Text extends WP_Widget {
 		$widget_ops = array('classname' => 'WeaverX_Widget_Text',
 		 'description' => __('Text Widget with Two Columns - with HTML and shortcode support. Also adds shortcodes to standard Text widget.','weaverx-theme-support' /*adm*/));
 		$control_ops = array('width' => 400, 'height' => 350);
-		parent::__construct('wvrx2_text', __('Weaver X Text 2','weaverx-theme-support' /*adm*/), $widget_ops, $control_ops);
+		parent::__construct('wvrx2_text', __('Weaver Text 2 Col','weaverx-theme-support' /*adm*/), $widget_ops, $control_ops);
 	}
 
 	function widget( $args, $instance ) {
@@ -75,7 +75,7 @@ class WeaverX_Widget_PPText extends WP_Widget {
     function __construct() {
 	$widget_ops = array('classname' => 'wvrx_widget_pptext', 'description' =>
 	    __('Display text on a Per Page basis. Add to Widget area to see instructions.','weaverx-theme-support' /*adm*/) );
-	parent::__construct('wvrx_pptext', __('Weaver X Per Page Text','weaverx-theme-support' /*adm*/), $widget_ops);
+	parent::__construct('wvrx_pptext', __('Weaver Per Page Text','weaverx-theme-support' /*adm*/), $widget_ops);
     }
 
     function widget( $args, $instance ) {
@@ -117,7 +117,7 @@ class WeaverX_Widget_Login extends WP_Widget {
 
 	function __construct() {
 		$widget_ops = array('classname' => 'wvrx_widget_login', 'description' => __( "Log in/out, admin", 'weaverx-theme-support' /*adm*/ ) );
-		parent::__construct('wvrx_login', __('Weaver X Login','weaverx-theme-support' /*adm*/), $widget_ops);
+		parent::__construct('wvrx_login', __('Weaver Login','weaverx-theme-support' /*adm*/), $widget_ops);
 	}
 
 	function widget( $args, $instance ) {

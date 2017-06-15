@@ -8,10 +8,10 @@ textarea.wvrx-edit-dir {direction: ltr !important;}
 .wvrx_ts_yellow {font-weight:bold;color:orange;}
 .wvrx_ts_red {font-weight:bold;color:red;}
 
-.wvr-help ul {list-style: disc; margin-left:30px;}
-.wvr-option-section {font-weight:bold;font-size:120%;color:blue;}
+.atw-help ul {list-style: disc; margin-left:30px;}
+.atw-option-section {font-weight:bold;font-size:120%;color:blue;}
 
-.wvr-wrap {
+.atw-wrap {
 	max-width:95%;
 }
 
@@ -104,17 +104,17 @@ ul.yetiisub a.active {
 	border-color: #00c;
 	color: #00f;
 }
-.wvr-small-submit {
+.atw-small-submit {
 	padding: 1.0em 0;
 	margin: 1px 0;
 	font-size:90%;
 }
 
-.wvr-option-header {background:#D0D0D8;line-height:1.8em;width:95%;color:blue;font-size:large;font-weight:bold;padding-left:4px;}
-.wvr-option-subheader {background:#EAEAEA;line-height:1.8em;width:95%;color:blue;font-size:larger;font-weight:bold;padding-left:4px;}
-.wvr-row-header {background:#D0D0D8;line-height:1.8em;padding-left:4px;}
-.wvr-row-subheader {background:#EAEAEA;padding-left:4px;}
-.wvr-row-subheader-alt {background:#F4F4F4;padding-left:4px;}
+.atw-option-header {background:#D0D0D8;line-height:1.8em;width:95%;color:blue;font-size:large;font-weight:bold;padding-left:4px;}
+.atw-option-subheader {background:#EAEAEA;line-height:1.8em;width:95%;color:blue;font-size:larger;font-weight:bold;padding-left:4px;}
+.atw-row-header {background:#D0D0D8;line-height:1.8em;padding-left:4px;}
+.atw-row-subheader {background:#EAEAEA;padding-left:4px;}
+.atw-row-subheader-alt {background:#F4F4F4;padding-left:4px;}
 /* layouts for layout boxes */
 .l_layout {display:block; width:140px; height:110px; float:left; margin-right:10px; margin-bottom:10px; display:inline;border:1px solid #888; color:black;text-align:center;font:15px arial,sans-serif;}
 .l_layout span {display:block;}

@@ -212,7 +212,21 @@ global $wppa_supported_audio_extensions;
 
 function wppa_get_audio_control_height() {
 
-	if ( strpos( $_SERVER["HTTP_USER_AGENT"], 'Safari' ) ) {
+	if ( strpos( $_SERVER["HTTP_USER_AGENT"], 'Edge' ) ) {
+		$result = '30';
+	}
+	elseif ( strpos( $_SERVER["HTTP_USER_AGENT"], 'Firefox' ) ) {
+		$result = '40';
+	}
+	elseif ( strpos( $_SERVER["HTTP_USER_AGENT"], 'Chrome' ) ) {
+		if ( wppa_is_mobile() ) {
+			$result = '48';
+		}
+		else {
+			$result = '32';
+		}
+	}
+	elseif ( strpos( $_SERVER["HTTP_USER_AGENT"], 'Safari' ) ) {
 		$result = '16';
 	}
 	else {

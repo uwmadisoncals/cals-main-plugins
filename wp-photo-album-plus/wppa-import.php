@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.6.27
+* Version 6.6.29
 *
 */
 
@@ -2378,7 +2378,12 @@ global $wppa_supported_audio_extensions;
 
 												// Update custom fields
 												foreach( array_keys( $custptrs ) as $idx ) {
-													$cust_data[$idx] = wppa_sanitize_custom_field( $data_arr[$custptrs[$idx]] );
+													if ( isset( $data_arr[$custptrs[$idx]] ) ) {
+														$cust_data[$idx] = wppa_sanitize_custom_field( $data_arr[$custptrs[$idx]] );
+													}
+													else {
+														$cust_data[$idx] = '';
+													}
 												}
 												wppa_update_photo( array( 'id' => $photo['id'], 'custom' => serialize( $cust_data ) ) );
 
@@ -2744,17 +2749,20 @@ function wppa_extract( $xpath, $delz ) {
 			$zip = new ZipArchive;
 			if ( $zip->open( $xpath ) === true ) {
 
-				$supported_file_ext = array( 'jpg', 'png', 'gif', 'JPG', 'PNG', 'GIF', 'amf', 'pmf' );
+				$supported_file_ext = array( 'jpg', 'png', 'gif', 'JPG', 'PNG', 'GIF', 'amf', 'pmf', 'zip', 'csv' );
 				$done = '0';
 				$skip = '0';
 				for( $i = 0; $i < $zip->numFiles; $i++ ){
 					$stat = $zip->statIndex( $i );
 					$file_ext = @ end( explode( '.', $stat['name'] ) );
+					
 					if ( in_array( $file_ext, $supported_file_ext ) ) {
 						$zip->extractTo( WPPA_DEPOT_PATH, $stat['name'] );
 						$done++;
 					}
-					else {
+					
+					// Assuming that entries without a file extension are directries. No warning on directory.
+					elseif ( strpos( $stat['name'], '.' ) !== false && strlen( $file_ext ) < 5 ) {
 						wppa_warning_message( sprintf( __( 'File %s is of an unsupported filetype and has been ignored during extraction.', 'wp-photo-album-plus'), wppa_sanitize_file_name( $stat['name'] ) ) );
 						$skip++;
 					}
@@ -2841,13 +2849,21 @@ global $wppa_session;
 		}
 
 		// Now import the files
-		$photofiles = glob( $file.'/*' );
+		// First escape special regexp chars
+		$xfile = str_replace( array( '[', ']', '(', ')', '{', '}', '$', '+' ), array( '\[', '\]', '\(', '\)', '\{', '\}', '\$', '\+' ), $file );
+		$photofiles = glob( $xfile.'/*' );
 		if ( $photofiles ) foreach ( $photofiles as $photofile ) {
 			if ( ! is_dir( $photofile ) ) {
 
 				if ( ! isset( $wppa_session[$photofile] ) || ! wppa_switch( 'keep_import_files' ) ) {
 
-					if ( wppa_albumphoto_exists( $alb, basename( $photofile ) ) ) {
+					// If we find a .csv file, move it to our depot and give a warning message
+					if ( wppa_get_ext( $photofile ) == 'csv' ) {
+						copy( $photofile, WPPA_DEPOT_PATH . '/' . basename( $photofile ) );
+						@ unlink( $photofile );
+						wppa_warning_message( sprintf( __( '.csv file %s has been moved to your depot.', 'wp-photo-album-plus' ), basename( $photofile ) ) );
+					}
+					elseif ( wppa_albumphoto_exists( $alb, basename( $photofile ) ) ) {
 						if ( ! wppa_switch( 'keep_import_files' ) ) {
 							wppa_warning_message( 'Photo '.basename( $photofile ).' already exists in album '.$alb.'. Removed. (2)' );
 						}
@@ -2867,7 +2883,7 @@ global $wppa_session;
 		}
 
 		// Now go deeper, process the subdirs
-		$subdirs = glob( $file.'/*' );
+		$subdirs = glob( $xfile.'/*' );
 		if ( $subdirs ) foreach ( $subdirs as $subdir ) {
 			if ( is_dir( $subdir ) ) {
 				if ( basename( $subdir ) != '.' && basename( $subdir ) != '..' ) {

@@ -9,8 +9,8 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: weaverx-theme-support
 Requires at least: 4.5
-Tested up to: 4.7
-Stable tag: 3.1
+Tested up to: 4.8
+Stable tag: 3.1.6
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -38,9 +38,9 @@ Includes complete documentation help file. Instructions for using the shortcodes
 
 = Widgets Included =
 
-* **Weaver X 2 Column Text Widget** - Add text into two columns in a widget
-* **Weaver X Per Page Text Widget** - Add a text widget on a per page basis
-* **Weaver X Login** - Simplified login widget
+* **Weaver 2 Column Text Widget** - Add text into two columns in a widget
+* **Weaver Per Page Text Widget** - Add a text widget on a per page basis
+* **Weaver Login** - Simplified login widget
 
 = Licenses =
 
@@ -76,10 +76,19 @@ See ChangeLog for changes to this version.
 
 == ChangeLog ==
 
+= 3.1.6 =
+* New: Legacy options for Weaver Xtreme Plus 3.1
+* New: support for some new Weaver Xtreme Plus 3.1 options
+* Tweak: don't need plugin stylesheet any more - included in Weaver Xtreme
+* Tweak: no need for separate JS lib - included in Weaver Xtreme
+* Note: jumped to 3.1.6 to match corresponding Weaver Xtrme version
+* WP 4.8 compatibility update
+
+
 = 3.1 =
-New: Support for WordPress Custom Header Video
-Tweak: show version in output
-Tweak: updated per page / per post option scan
+* New: Support for WordPress Custom Header Video
+* Tweak: show version in output
+* * Tweak: updated per page / per post option scan
 Fix: removed duplicated tagline width option
 
 = 3.0 =

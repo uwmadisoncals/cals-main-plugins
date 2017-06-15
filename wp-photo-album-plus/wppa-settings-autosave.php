@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.6.28
+* Version 6.6.29
 *
 */
 
@@ -6273,6 +6273,17 @@ global $wp_version;
 							$tags = 'access,album';
 							wppa_setting($slug, '1.2', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('User create notify', 'wp-photo-album-plus');
+							$desc = __('Notify these users when an album is created at the front-end', 'wp-photo-album-plus');
+							$help = esc_js(__('Enter login names seperated by comma\'s (,)', 'wp-photo-album-plus'));
+							$slug = 'wppa_fe_create_ntfy';
+							$html1 = wppa_input($slug, '300px' );
+							$html2 = '';
+							$html = array( $html1, $html2 );
+							$clas = '';
+							$tags = 'mail,album';
+							wppa_setting($slug, '1.3', $name, $desc, $html, $help, $clas, $tags);
+
 							$name = __('User create Albums login', 'wp-photo-album-plus');
 							$desc = __('Frontend album creation requires the user is logged in.', 'wp-photo-album-plus');
 							$help = '';//esc_js(__('If you uncheck this box, make sure you check the item Owners only in the next sub-table.'));
@@ -6377,6 +6388,17 @@ global $wp_version;
 							$clas = '';
 							$tags = 'upload';
 							wppa_setting($slug, '7.1', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Notify approve photo', 'wp-photo-album-plus');
+							$desc = __('Send an email to the owner when a photo is approved', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_mail_on_approve';
+							$html1 = wppa_checkbox($slug);
+							$html2 = '';
+							$html = array( $html1, $html2 );
+							$clas = '';
+							$tags = 'upload,mail';
+							wppa_setting($slug, '7.2', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Upload notify', 'wp-photo-album-plus');
 							$desc = __('Notify admin at frontend upload.', 'wp-photo-album-plus');
@@ -7638,23 +7660,35 @@ global $wp_version;
 								wppa_setting(false, '19.2', $name, $desc, $html, $help, $clas, $tags);
 
 							}
-if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 
+							if ( current_user_can( 'administrator' ) ) {
+								$name = __('Custom album proc', 'wp-photo-album-plus');
+								$desc = __('The php code to execute on all albums');
+								$help = esc_js(__('Only run this if you know what you are doing!', 'wp-photo-album-plus'));
+								$slug2 = 'wppa_custom_album_proc';
+								$html1 = wppa_textarea( $slug2 );
+								$html2 = wppa_maintenance_button( $slug2 );
+								$html3 = wppa_status_field( $slug2 );
+								$html4 = wppa_togo_field( $slug2 );
+								$html = array($html1, $html2, $html3, $html4);
+								$clas = '';
+								$tags = 'system';
+								wppa_setting(false, '98', $name, $desc, $html, $help, $clas, $tags);
 
-							$name = __('Test proc');
-							$desc = __('For OpaJaap only');
-							$help = '';
-							$slug2 = 'wppa_test_proc';
-							$html1 = wppa_cronjob_button( $slug2 );// . __('ad inf', 'wp-photo-album-plus') . wppa_checkbox( $slug2.'_ad_inf' );
-							$html2 = wppa_maintenance_button( $slug2 );
-							$html3 = wppa_status_field( $slug2 );
-							$html4 = wppa_togo_field( $slug2 );
-							$html = array($html1, $html2, $html3, $html4);
-							$clas = '';
-							$tags = 'system';
-							wppa_setting(false, '99', $name, $desc, $html, $help, $clas, $tags);
+								$name = __('Custom photo proc', 'wp-photo-album-plus');
+								$desc = __('The php code to execute on all photos');
+								$help = esc_js(__('Only run this if you know what you are doing!', 'wp-photo-album-plus'));
+								$slug2 = 'wppa_custom_photo_proc';
+								$html1 = wppa_textarea( $slug2 );
+								$html2 = wppa_maintenance_button( $slug2 );
+								$html3 = wppa_status_field( $slug2 );
+								$html4 = wppa_togo_field( $slug2 );
+								$html = array($html1, $html2, $html3, $html4);
+								$clas = '';
+								$tags = 'system';
+								wppa_setting(false, '99', $name, $desc, $html, $help, $clas, $tags);
+							}
 
-}
 						wppa_setting_subheader('C', '4', __('Listings', 'wp-photo-album-plus'));
 
 							$name = __('List Logfile', 'wp-photo-album-plus');
@@ -7662,10 +7696,11 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 							$help = '';
 							$slug1 = 'wppa_errorlog_purge';
 							$slug2 = 'wppa_list_errorlog';
+							$slug4 = 'wppa_logfile_on_menu';
 							$html1 = wppa_ajax_button(__('Purge logfile', 'wp-photo-album-plus'), 'errorlog_purge', '0', true );
 							$html2 = wppa_popup_button( $slug2 );
-							$html3 = '';
-							$html4 = '';
+							$html3 = __('On menu', 'wp-photo-album-plus');
+							$html4 = wppa_checkbox($slug4);
 							$html = array($html1, $html2, $html3, $html4);
 							$clas = '';
 							$tags = 'system';
@@ -7884,7 +7919,16 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 							$html = wppa_checkbox($slug);
 							$clas = '';
 							$tags = 'system';
-							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting($slug, '9.1', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Log Ajax', 'wp-photo-album-plus');
+							$desc = __('Keep track of cron activity in the wppa logfile.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_log_ajax';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '9.2', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Retry failed mails', 'wp-photo-album-plus');
 							$desc = __('Select number of retries for failed mails', 'wp-photo-album-plus');
@@ -8105,6 +8149,15 @@ if ( strpos( $_SERVER['SERVER_NAME'], 'opajaap' ) !== false ) {
 							$clas = '';
 							$tags = 'system';
 							wppa_setting($slug, '19', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Bulk photo moderation', 'wp-photo-album-plus');
+							$desc = __('Use bulk edit for photo moderation', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_moderate_bulk';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '20', $name, $desc, $html, $help, $clas, $tags);
 							}
 						wppa_setting_subheader( 'C', '1', __( 'SEO related settings' , 'wp-photo-album-plus') );
 							{

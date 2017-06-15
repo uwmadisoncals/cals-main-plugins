@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.6.27
+* Version 6.6.29
 *
 */
 
@@ -50,7 +50,7 @@ global $wppa_defaults;
 
 	// If there is only one grant parent, make sure the granted album is created regardless of if it is used.
 	if ( ! wppa_is_cron() && ! wppa( 'ajax' ) ) {
-		if ( wppa_is_int( wppa_opt( 'grant_parent' ) ) ) {
+		if ( wppa_is_int( get_option( 'wppa_grant_parent' ) ) ) {
 			wppa_grant_albums();
 		}
 	}
@@ -212,6 +212,7 @@ global $thumbs;
 		'for_sm' 					=> false,
 		'max_width' 				=> false,
 		'no_ver' 					=> false,
+		'catbox' 					=> '',
 
 	);
 }
@@ -837,6 +838,18 @@ global $wppa;
 				break;
 			default:
 				break;
+		}
+	}
+
+	if ( $wppa['src'] ) {
+		if ( wppa_get_get( 'catbox' ) ) {
+			$wppa['catbox'] = wppa_get_get( 'catbox' );
+		}
+		if ( wppa_get_post( 'catbox' ) ) {
+			$wppa['catbox'] = wppa_get_post( 'catbox' );
+		}
+		if ( isset ( $wppa['catbox'] ) ) {
+			$wppa['catbox'] = wppa_sanitize_cats( $wppa['catbox'] );
 		}
 	}
 

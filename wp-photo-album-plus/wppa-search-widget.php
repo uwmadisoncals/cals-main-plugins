@@ -3,15 +3,15 @@
 * Package: wp-photo-album-plus
 *
 * display the search widget
-* Version 6.6.23
+* Version 6.6.29
 *
 */
 
 class SearchPhotos extends WP_Widget {
     /** constructor */
     function __construct() {
-		$widget_ops = array( 	'classname' => 'wppa_search_photos', 
-								'description' => __( 'WPPA+ Search Photos', 'wp-photo-album-plus' ) 
+		$widget_ops = array( 	'classname' => 'wppa_search_photos',
+								'description' => __( 'WPPA+ Search Photos', 'wp-photo-album-plus' )
 							);
 		parent::__construct( 'wppa_search_photos', __( 'Search Photos', 'wp-photo-album-plus' ), $widget_ops );															//
     }
@@ -41,6 +41,7 @@ class SearchPhotos extends WP_Widget {
 											'sub' 			=> false,
 											'album' 		=> '',
 											'landingpage' 	=> '0',
+											'catbox' 		=> false,
 											) );
 
  		$widget_title = apply_filters( 'widget_title', $instance['title'] );
@@ -48,11 +49,11 @@ class SearchPhotos extends WP_Widget {
 		// Display the widget
 		echo $before_widget;
 
-		if ( ! empty( $widget_title ) ) { 
-			echo $before_title . $widget_title . $after_title; 
+		if ( ! empty( $widget_title ) ) {
+			echo $before_title . $widget_title . $after_title;
 		}
 
-		echo wppa_get_search_html( $instance['label'], $instance['sub'], $instance['root'], $instance['album'], $instance['landingpage'] );
+		echo wppa_get_search_html( $instance['label'], $instance['sub'], $instance['root'], $instance['album'], $instance['landingpage'], $instance['catbox'] );
 
 		echo $after_widget;
 
@@ -62,7 +63,7 @@ class SearchPhotos extends WP_Widget {
 
     /** @see WP_Widget::update */
     function update( $new_instance, $old_instance ) {
-		
+
 		$instance 					= $old_instance;
 		$instance['title'] 			= strip_tags($new_instance['title']);
 		$instance['label']			= $new_instance['label'];
@@ -70,6 +71,7 @@ class SearchPhotos extends WP_Widget {
 		$instance['sub']   			= isset( $new_instance['sub'] ) ? $new_instance['sub'] : false;
 		$instance['album'] 			= $new_instance['album'];
 		$instance['landingpage']	= $new_instance['landingpage'];
+		$instance['catbox'] 		= $new_instance['catbox'];
 
         return $instance;
     }
@@ -87,6 +89,7 @@ class SearchPhotos extends WP_Widget {
 												'sub' 			=> false,
 												'album' 		=> '',
 												'landingpage' 	=> '',
+												'catbox' 		=> false,
 												) );
 		$title 			= $instance['title'];
 		$label 			= $instance['label'];
@@ -94,6 +97,7 @@ class SearchPhotos extends WP_Widget {
 		$sub   			= $instance['sub'];
 		$album 			= $instance['album'];
 		$landingpage  	= $instance['landingpage'];
+		$catbox 		= $instance['catbox'];
 	?>
 		<p>
 			<label for="<?php echo $this->get_field_id('title'); ?>">
@@ -133,6 +137,12 @@ class SearchPhotos extends WP_Widget {
 			<input type="checkbox" <?php if ( $sub ) echo 'checked="checked"' ?> id="<?php echo $this->get_field_id( 'sub' ); ?>" name="<?php echo $this->get_field_name( 'sub' ); ?>" />
 			<label for="<?php echo $this->get_field_id('sub'); ?>">
 				<?php _e( 'Enable subsearch', 'wp-photo-album-plus' ); ?>
+			</label>
+		</p>
+		<p>
+			<input type="checkbox" <?php if ( $catbox ) echo 'checked="checked"' ?> id="<?php echo $this->get_field_id( 'catbox' ); ?>" name="<?php echo $this->get_field_name( 'catbox' ); ?>" />
+			<label for="<?php echo $this->get_field_id('catbox'); ?>">
+				<?php _e( 'Add category selectionbox', 'wp-photo-album-plus' ); ?>
 			</label>
 		</p>
 		<p>

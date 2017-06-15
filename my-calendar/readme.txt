@@ -4,7 +4,7 @@ Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
 Tested up to: 4.7
-Stable tag: 2.5.9
+Stable tag: 2.5.10
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -16,9 +16,9 @@ My Calendar does WordPress event management with richly customizable ways to dis
 
 Easy to use for anybody, My Calendar provides enormous flexibility for designers and developers needing a custom calendar.
 
-* 	[Buy the User's Guide](http://www.joedolson.com/my-calendar/users-guide/) for extensive help with set up and use.
 *   [Buy My Calendar Pro](https://www.joedolson.com/my-calendar/pro/), the premium extension for My Calendar
-*   [Use My Tickets](https://wordpress.org/plugins/my-tickets/) and sell tickets to your My Calendar events
+*   [Use My Tickets](https://wordpress.org/plugins/my-tickets/) and sell tickets for My Calendar events
+* 	[Buy the User's Guide](http://www.joedolson.com/my-calendar/users-guide/) for extensive help with set up and use.
 
 = Features: =
 
@@ -82,6 +82,31 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
    with shortcode options or widget configuration.
 
 == Changelog ==
+
+= 2.5.11 =
+
+* Bug fix: Bottom mass action buttons outside of form
+* Bug fix: User select form used 'checked' instead of 'selected'
+
+= 2.5.10 =
+
+* Bug fix: allow parsing of non-English strings through strtotime()
+* Bug fix: trim whitespace off array keys in location controller
+* Bug fix: Don't display 'Add Event' menu in adminbar if remote event database is enabled
+* Bug fix: All day events correctly exported in iCal files
+* Bug fix: Footer navigation not shown on single day view
+* Bug fix: Execute AJAX navigation from both header and footer containers
+* Bug fix: {icon_html} returned broken image if category had no assigned icon
+* Removed obsolete PHP 4 compatibility for clone keyword
+* Added hook to prevent activation if PHP version below 5.3.0.
+* New filter: define custom target calendar URL via 'mc_get_uri' filter
+* New action: 'mc_insert_recurring' run while creating event instances
+* New filter to customize default event length: 'mc_default_event_length'
+* New filter: 'mc_show_week_number' to turn on column indicating displayed week's number. (props Josef Fällman)
+* UI Change: Duplicate navigation and search on events list at bottom of list
+* Miscellaneous improvements to the My Calendar Filters shortcode: set target URL & change location search type, add as widget
+* New widget: My Calendar event filters 
+* Added inverse color style declaration to category color template tag
 
 = 2.5.9 =
 
@@ -824,7 +849,7 @@ Because the majority of users end up on my web site asking for help anyway -- an
 
 = This plug-in is really complicated. Why can't you personally help me figure out how to use it? =
 
-I can! Just not in person. I've written a User's Guide for My Calendar, which you can [purchase at my web site](https://www.joedolson.com/my-calendar/users-guide/) for $25. This helps defray the thousands of hours I've spent developing the plug-in and providing support. Please, consider buying the User's Guide or [making a donation](https://www.joedolson.com/donate.php) before asking for support!
+I can! But not in person. I've written a User's Guide for My Calendar, which you can [purchase at my web site](https://www.joedolson.com/my-calendar/users-guide/) for $25. This helps defray the thousands of hours I've spent developing the plug-in and providing support. Please, consider buying the User's Guide or [making a donation](https://www.joedolson.com/donate.php) before asking for support!
 
 = Can my visitors or members submit events? =
 

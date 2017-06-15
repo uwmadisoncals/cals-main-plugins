@@ -2,12 +2,12 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick
-Version: 6.6.28
-Stable tag: 6.6.27
+Version: 6.6.29
+Stable tag: 6.6.28
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
-Tested up to: 4.8-alpha-40643
+Tested up to: 4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -179,6 +179,36 @@ Oh, just Google on 'picture resizer' and you will find a bunch of free programs 
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.6.29 =
+
+= Bug Fixes =
+
+* The names of directories to be imported may now contain the following regexp special chracters: '[', ']', '(', ')', '{', '}', '$', '+'.
+* Albums that contain only pending photos are no longer seen as empty for the owner of the pending photos.
+* Posterfiles for audio did not show up in photo admin. Fixed.
+* Multimedia items did not show up as cover images. Fixed.
+* Big browse buttons do no longer cover the multimedia control bar.
+* Fixed a layout issue of the audio control bar.
+* On import zipfiles there will no longer be a warning message on extraction of a directory.
+* On import albums, any .csv file found will be moved to your depot directory to be processed on the next pass when the photos exist instead of being ignored.
+
+= New Features =
+
+* You can add an album category selectionbox in the photo search widget. There is not yet a shortcode argument analogon.
+* You can see the wppa logfile directly from the admin menu and admin bar if you are an admin and you enabled it in Table VIII-C1.
+* Table VII-B7.2: Notify approve photo. When the status of a photo changes from 'pending' to 'publish', the owner gets a notification email.
+* Zipfiles to import may now contain zipfiles. The import procedure has to be repeated to unzip the zipped zipfiles.
+* Zipfiles may now contain .csv files.
+* Moderate photos now sorts photos on a per album basis. You can select the use of the bulk photo editor for moderation in Table IX-B20.
+* Table VII-B1.3 Create notify. Send email to specified user(s) when a user creates an album.
+* You (administrator) can exucute custom code on all albums or photos in Table VIII-B98 and Table VIII-B99
+
+= Other Changes =
+
+* After front-end upload from the album cover or thumbnail display, one will be directed to the album content (thumbnail) view.
+* Log Ajax actions. Table IX-A9.2.
+* Changed default of Table I-A4: Photocount treshold to 0. There are other methods to show a cover image. This has no effect on existing installations.
 
 = 6.6.28 =
 

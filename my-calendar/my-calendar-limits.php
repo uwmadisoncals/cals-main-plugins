@@ -254,8 +254,8 @@ function mc_limit_string( $type = '', $ltype = '', $lvalue = '' ) {
 				$current_location = $lvalue;
 			}
 		} else {
-			$location         = urldecode( $_GET['ltype'] );			
-			$current_location = urldecode( $_GET['loc'] );
+			$location         = isset( $_GET['ltype'] ) ? urldecode( $_GET['ltype'] ) : $location;			
+			$current_location = isset( $_GET['loc'] ) ? urldecode( $_GET['loc'] ) : $current_location;
 		}
 		switch ( $location ) {
 			case "name" :

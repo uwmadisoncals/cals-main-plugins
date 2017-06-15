@@ -565,7 +565,7 @@ function _wppaDoAutocol( mocc ) {
 	// Slide
 	wppaFormatSlide( mocc );
 
-	// Audio on slide
+	// Audio
 	jQuery( "#audio-slide-"+mocc ).css( 'width', w - wppaBoxDelta - 6 );
 
 	// Comments

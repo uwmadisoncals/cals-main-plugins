@@ -21,6 +21,17 @@
 		"oAP": "\/admin\/admin-notice.php",
 		"oF": 0
 		},
+	"\/admin\/img\/shortpixel.png": {
+		"ft": 32768,
+		"iS": 3373,
+		"oA": 0,
+		"oAP": "\/admin\/img\/shortpixel.png",
+		"oF": 0,
+		"oIPL": 0,
+		"opt": 0,
+		"oT": 1,
+		"q": 100
+		},
 	"\/admin\/plugin-action-meta-links.php": {
 		"ft": 8192,
 		"oA": 2,

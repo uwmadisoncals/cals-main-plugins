@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsSlideshowVersion = '6.6.28';
+var wppaJsSlideshowVersion = '6.6.29';
 
 // This is an entrypoint to load the slide data
 function wppaStoreSlideInfo(
@@ -337,7 +337,7 @@ function _wppaNextSlide( mocc, mode ) {
 	var fg = _wppaFg[mocc];
 	var bg = 1 - fg;
 
-	// If a video is playing, delay a running slideshow
+	// If audio video is playing, delay a running slideshow
 	if ( ( wppaVideoPlaying[mocc] || wppaAudioPlaying[mocc] ) && _wppaSSRuns[mocc] ) {
 		setTimeout( '_wppaNextSlide( '+mocc+', \''+mode+'\' )', 500 ); 	// Retry after 500 ms
 		return;
@@ -963,19 +963,28 @@ function wppaFormatSlide( mocc ) {
 		}
 
 		// Size audio
-		if ( audios.length > 0 ) {
-			var i = 0;
-			jQuery( audios[i] ).css( { width:imgw, left:( contw - imgw ) / 2 } );
-			i++;
+		var h = jQuery( audios ).height();
+		if ( h && h > 0 ) {
+			wppaAudioHeight = h;
+			jQuery( audios ).css({height:wppaAudioHeight,width:imgw,left:((contw - imgw ) / 2)});
 		}
 	}
 
-	// Size Big Browse Buttons
-	var bbbwidth = parseInt( framew/3 );
-	var leftmarg = bbbwidth*2;
+	// Size Big Browse Buttons. 
+	var bbbwidth 	= parseInt( framew / 3 );
+	var leftmarg 	= bbbwidth*2;
+	var bbbheight;
+	
+	// Make sure they do not cover the audio controlbar.
+	if ( audios.length > 0 ) {
+		bbbheight 	= frameh - wppaAudioHeight - wppaSlideBorderWidth - margt;
+	}
+	else {
+		bbbheight 	= frameh;
+	}
 
-	jQuery( '#bbb-'+mocc+'-l' ).css( {height:frameh, width:bbbwidth, left:0});
-	jQuery( '#bbb-'+mocc+'-r' ).css( {height:frameh, width:bbbwidth, left:leftmarg});
+	jQuery( '#bbb-'+mocc+'-l' ).css( {height:bbbheight, width:bbbwidth, left:0});
+	jQuery( '#bbb-'+mocc+'-r' ).css( {height:bbbheight, width:bbbwidth, left:leftmarg});
 }
 
 
@@ -1153,7 +1162,7 @@ function wppaMakeTheSlideHtml( mocc, bgfg, idx ) {
 							'z-index:10;' +
 							'width:'+_wppaVideoNatWidth[mocc][idx]+'px;' +
 							'left:'+( Math.max( 0, ( wppaGetContainerWidth( mocc ) - _wppaVideoNatWidth[mocc][idx] ) / 2 ) )+'px;' +
-							'padding:0 '+wppaSlideBorderWidth+'px;' +
+							'padding:0;' +
 							'box-sizing:border-box;' +
 							'"' +
 						' >' +

@@ -83,7 +83,7 @@ global $wpdb;
 //									$coverphoto
 //								);
 	$image 		= wppa_cache_thumb( $coverphoto ); //$wpdb->get_row( $query, ARRAY_A );
-	$photocount = wppa_get_photo_count( $albumid, 'use_treecounts' );
+	$photocount = wppa_get_photo_count( $albumid );
 	$albumcount = wppa_get_album_count( $albumid, 'use_treecounts' );
 	$mincount 	= wppa_get_mincount();
 
@@ -171,7 +171,7 @@ global $wpdb;
 											'cover'
 										);
 		$src 		= wppa_get_thumb_url( 	$coverphoto,
-											'',
+											true,
 											$imgattr_a['width'],
 											$imgattr_a['height']
 										);
@@ -387,7 +387,7 @@ global $wpdb;
 		$coverphoto = false;
 	}
 
-	$photocount = wppa_get_photo_count( $albumid, 'use_treecounts' );
+	$photocount = wppa_get_photo_count( $albumid );
 	$albumcount = wppa_get_album_count( $albumid, 'use_treecounts' );
 	$mincount 	= wppa_get_mincount();
 	$title 		= '';
@@ -448,7 +448,7 @@ global $wpdb;
 											);
 		$imgattrs_a[] 	= $imgattr_a;
 		$srcs[] 		= wppa_get_thumb_url( 	$coverphoto,
-												'',
+												true,
 												$imgattr_a['width'],
 												$imgattr_a['height']
 											);
@@ -616,7 +616,7 @@ global $wpdb;
 	$image 		= wppa_cache_thumb( $coverphoto ); //$wpdb->get_row( $wpdb->prepare(
 //					"SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `id` = %s", $coverphoto
 //					), ARRAY_A );
-	$photocount = wppa_get_photo_count( $albumid, true );
+	$photocount = wppa_get_photo_count( $albumid );
 	$albumcount = wppa_get_album_count( $albumid, true );
 	$mincount 	= wppa_get_mincount();
 	$title 		= '';
@@ -678,7 +678,7 @@ global $wpdb;
 		$imgattr_a 	= wppa_get_imgstyle_a(
 							$coverphoto, $path, wppa_opt( 'smallsize' ), '', 'cover' );
 		$src 		= wppa_get_thumb_url(
-							$coverphoto, '', $imgattr_a['width'], $imgattr_a['height'] );
+							$coverphoto, true, $imgattr_a['width'], $imgattr_a['height'] );
 	}
 	else {
 		$path 		= '';
@@ -1716,7 +1716,7 @@ global $wpdb;
 
 			// Find the content 'View' link
 			$albumid 			= $album['id'];
-			$photocount 		= wppa_get_photo_count( $albumid, 'use_treecounts' );
+			$photocount 		= wppa_get_photo_count( $albumid );
 
 			// Thumbnails and covers, show sub-album covers
 			// in case slideshow is requested on an empty album

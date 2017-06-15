@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function bodhi_svgs_admin_menu() {
 
 	add_options_page(
-		__('SVG Support Options and Instructions', 'svg-support'),
+		__('SVG Support Settings and Usage', 'svg-support'),
 		__('SVG Support', 'svg-support'),
 		'manage_options',
 		'svg-support',

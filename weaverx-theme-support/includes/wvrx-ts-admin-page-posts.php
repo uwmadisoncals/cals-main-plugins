@@ -203,7 +203,6 @@ function wvrx_ts_pwp_cols() {
 		'info' => __('Use <em>Masonry</em> for multi-column display. <em>Not compatible with FI BG images.</em>','weaverx-theme-support' /*adm*/),
 		'value' => array(
 			array('val' => '', 'desc' => '&nbsp;' ),
-			array('val' => '1', 'desc' => __('1 Column','weaverx-theme-support' /*adm*/) ),
 			array('val' => '2', 'desc' => __('2 Columns','weaverx-theme-support' /*adm*/) ),
 			array('val' => '3', 'desc' => __('3 Columns','weaverx-theme-support' /*adm*/) ),
 			array('val' => '4', 'desc' => __('4 Columns','weaverx-theme-support' /*adm*/) ),
@@ -706,7 +705,7 @@ function wvrx_ts_save_post_fields($post_id) {
 	'_pp_footer_add_class', '_pp_container_add_class', '_pp_content_add_class', '_pp_post_add_class',
 	'_pp_infobar_add_class', '_pp_wrapper_add_class', '_pp_header_add_class', '_pp_header_image_html_text',
 	'_pp_alt_primary_menu', '_pp_alt_secondary_menu', '_pp_alt_mini_menu', '_pp_video_active', '_pp_video_url',
-	'_pp_video_aspect', '_pp_video_render'
+	'_pp_video_aspect', '_pp_video_render', '_pp_alt_theme'
 	);
 
 if (weaverx_allow_multisite()) {
@@ -774,11 +773,11 @@ Custom styles will not be displayed by the Page Editor.'
 ?>
 <br /><br />
 	<textarea class="wvrx-edit" placeholder=" " name="_pp_post_styles" rows=2 style="width: 95%"><?php echo(get_post_meta($post->ID, "_pp_post_styles", true)); ?></textarea>
-</small><br />
+</small><br /><br />
 	<?php
 
 	if (!$raw_template) {
-	_e('<em>Per Page Area Added Classes</em><br />Add classes to selected wrapping areas for this page only. Useful for full width layouts - e.g. Parallax.','weaver-xtreme-plus' /*adm*/);
+	_e('<strong>Per Page Area Added Classes</strong><br />Add classes to selected wrapping areas for this page only. Useful for full width layouts - e.g. Parallax.','weaver-xtreme-plus' /*adm*/);
 	// 'footer', 'container', 'content', 'post', 'infobar', 'wrapper', 'header' as "_pp_{$area}_add_class"
 	$areas = array ('wrapper', 'header', 'infobar', 'container', 'content', 'post', 'footer');
 
@@ -810,9 +809,10 @@ Custom styles will not be displayed by the Page Editor.'
 	} else {
 	?>
 	<hr /><p>
-	You may replace one of the standard Header Menus (Primary, Secondary, or Header Mini) on this page. If there the menu hasn't been
-	set in the Menus options, then you can set that menu for just this page.
-	<br /><br />
+	<?php
+	_e("<strong>Replacement Menus</strong><br />You may replace one of the standard Header Menus (Primary, Secondary, or Header Mini) on this page. If there the menu hasn't been	set in the Menus options, then you can set that menu for just this page.",'weaver-xtreme-plus' /*adm*/);
+?>
+	<br />
 	<label for="_pp_alt_primary_menu"><strong><?php echo('Alternate Primary Menu' /*a*/ ); ?></strong></label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<select id="_pp_alt_primary_menu" name="_pp_alt_primary_menu">
 		<option value=''> </option>
@@ -847,8 +847,49 @@ Custom styles will not be displayed by the Page Editor.'
 	</p>
 <?php
 	}
+	echo '<p>';
+	_e("<strong>Alternate Subtheme</strong><br />You may specify an alternate Weaver Xtreme subtheme that you have saved on your host filesystem for this page. See Legacy Weaver Xtreme Admin : Save/Restore tab to save a subtheme.",'weaver-xtreme' /*adm*/);
 
-	echo '<hr /><span style="clear:both;"/></span><strong>' . __('Header Image Replacement HTML','weaver-xtreme-plus') . '</strong> (&starf;Plus)' ;
+	echo '<br /><br />';
+	if (version_compare( WEAVER_XPLUS_VERSION, '3.1', '>=')) {
+		_e('<em>Please select a previously saved theme settings file (either .wxt or .wxb).</em>','weaver-xtreme');
+		_e('Note: This page will still use the default site subtheme settings to display in the Page Editor (i.e., on this screen).','weaver-xtreme');
+
+	    // build the theme file list
+		$themes = array();
+		$upload_dir = wp_upload_dir();
+	    $theme_dir = trailingslashit( $upload_dir['basedir'] ) . 'weaverx-subthemes/';
+	    if( $media_dir = opendir($theme_dir) ) {
+			while ($m_file = readdir($media_dir)) {
+				$len = strlen($m_file);
+				$ext = $len > 4 ? substr($m_file,$len-4,4) : '';
+				if($ext == '.wxt' || $ext == '.wxb' ) {
+					$themes[] = $m_file;
+				}
+			}
+	    }
+?>
+	<br />
+
+	<label for="_pp_alt_theme"><strong><?php echo('Alternate Subtheme for this Page: ' /*a*/ ); ?></strong></label> &nbsp;
+	<select id="_pp_alt_theme" name="_pp_alt_theme">
+		<option value=''> </option>
+<?php
+		foreach ( $themes as $subtheme ) {
+			$selected = get_post_meta($post->ID, "_pp_alt_theme", true) == $subtheme ? ' selected="selected"' : '';
+			echo '<option'. $selected .' value="'. $subtheme .'">'. $subtheme .'</option>';
+		}
+?>
+	</select>
+<?php
+
+
+	} else {
+		_e('<em>This option requires Weaver Xtreme Plus version 3.1 or greater.</em>','weaver-xtreme');
+	}
+
+
+	echo '<br /><hr /><span style="clear:both;"/></span><strong>' . __('Header Image Replacement HTML','weaver-xtreme-plus') . '</strong> (&starf;Plus)' ;
 ?>
 	</p>
 	<p>

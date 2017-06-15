@@ -25,12 +25,12 @@ if ( ! function_exists( 'is_ssl' ) ) {
 	}
 }
 
-function my_calendar_getUsers() {
-	return mc_get_users();
+function my_calendar_getUsers( $group = 'authors' ) {
+	return mc_get_users( $group );
 }
 
 // mod from Mike T
-function mc_get_users() {
+function mc_get_users( $group = 'authors' ) {
 	global $blog_id;
 	$count = count_users( 'time' );
 	$args  = array(
@@ -38,19 +38,19 @@ function mc_get_users() {
 		'orderby' => 'display_name',
 		'fields'  => array( 'ID', 'user_nicename', 'display_name' )
 	);
-	$args  = apply_filters( 'mc_filter_user_arguments', $args, $count );
+	$args  = apply_filters( 'mc_filter_user_arguments', $args, $count, $group );
 	$users = new WP_User_Query( $args );
 
 	return $users->get_results();
 }
 
-function mc_selected_users( $selected ) {
+function mc_selected_users( $selected = '', $group = 'authors' ) {
 	$selected = explode( ',', $selected );
-	$users    = mc_get_users();
+	$users    = mc_get_users( $group );
 	$options  = '';
 	foreach ( $users as $u ) {
 		if ( in_array( $u->ID, $selected ) ) {
-			$checked = ' checked="checked"';
+			$checked = ' selected="selected"';
 		} else {
 			$checked = '';
 		}
@@ -427,7 +427,7 @@ function mc_get_current_url() {
 	$current_url = home_url( add_query_arg( $args, $wp->request ) );
 		
 	if ( $wp_rewrite->using_index_permalinks() && strpos( $current_url, 'index.php' ) === false ) {
-		$current_url = str_replace( home_url(), home_url( '/' ) . 'index.php', $home );
+		$current_url = str_replace( home_url(), home_url( '/' ) . 'index.php', $current_url );
 	}
 	if ( $wp_rewrite->using_permalinks() ) {
 		$current_url = trailingslashit( $current_url );
@@ -1005,19 +1005,10 @@ function jd_option_selected( $field, $value, $type = 'checkbox' ) {
 	return $output;
 }
 
-// compatibility of clone keyword between PHP 5 and 4
-if ( version_compare( phpversion(), '5.0' ) < 0 ) {
-	eval( '
-	function clone($object) {
-	  return $object;
-	}
-	' );
-}
-
 add_action( 'admin_bar_menu', 'my_calendar_admin_bar', 200 );
 function my_calendar_admin_bar() {
 	global $wp_admin_bar;
-	if ( current_user_can( 'mc_add_events' ) ) {
+	if ( current_user_can( 'mc_add_events' ) && get_option( 'mc_remote' ) != 'true' ) {
 		$url  = apply_filters( 'mc_add_events_url', admin_url( 'admin.php?page=my-calendar' ) );
 		$args = array( 'id' => 'mc-add-event', 'title' => __( 'Add Event', 'my-calendar' ), 'href' => $url );
 		$wp_admin_bar->add_node( $args );
@@ -1709,7 +1700,10 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 								$return[] = $data;
 							}
 							if ( ! $test ) {
-								$wpdb->insert( my_calendar_event_table(), $data, $format );
+								$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'daily' );
+								if ( ! $insert ) {
+									$wpdb->insert( my_calendar_event_table(), $data, $format );
+								}
 							}
 						} else {
 							$numforward ++;
@@ -1733,7 +1727,10 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 							$return[] = $data;
 						}						
 						if ( ! $test ) {
-							$sql = $wpdb->insert( my_calendar_event_table(), $data, $format );
+							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'weekly' );
+							if ( ! $insert ) {							
+								$sql = $wpdb->insert( my_calendar_event_table(), $data, $format );
+							}
 						}
 					}
 					break;
@@ -1754,7 +1751,10 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 							$return[] = $data;
 						}
 						if ( ! $test ) {
-							$wpdb->insert( my_calendar_event_table(), $data, $format );
+							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'biweekly' );
+							if ( ! $insert ) {							
+								$wpdb->insert( my_calendar_event_table(), $data, $format );
+							}
 						}
 					}
 					break;
@@ -1775,7 +1775,10 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 							$return[] = $data;
 						}
 						if ( ! $test ) {
-							$wpdb->insert( my_calendar_event_table(), $data, $format );
+							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'monthly' );
+							if ( ! $insert ) {	
+								$wpdb->insert( my_calendar_event_table(), $data, $format );
+							}
 						}
 					}
 					break;
@@ -1793,7 +1796,10 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 					);
 
 					if ( ! $test ) {
-						$wpdb->insert( my_calendar_event_table(), $data, $format );
+						$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'month-by-day' );
+						if ( ! $insert ) {						
+							$wpdb->insert( my_calendar_event_table(), $data, $format );
+						}
 					}
 					$numforward = $numforward - 1;
 					for ( $i = 0; $i <= $numforward; $i ++ ) {
@@ -1822,7 +1828,10 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 							return $data;
 						}
 						if ( ! $test ) {
-							$wpdb->insert( my_calendar_event_table(), $data, $format );
+							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'month-by-day' );
+							if ( ! $insert ) {								
+								$wpdb->insert( my_calendar_event_table(), $data, $format );
+							}
 						}
 						$newbegin = my_calendar_add_date( date( 'Y-m-d  H:i:s', $newbegin ), 28, 0, 0 );
 						$newend   = my_calendar_add_date( date( 'Y-m-d  H:i:s', $newend ), 28, 0, 0 );
@@ -1845,7 +1854,10 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 							$return[] = $data;
 						}
 						if ( ! $test ) {
-							$wpdb->insert( my_calendar_event_table(), $data, $format );
+							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'annual' );
+							if ( ! $insert ) {								
+								$wpdb->insert( my_calendar_event_table(), $data, $format );
+							}
 						}
 					}
 					break;
@@ -1861,7 +1873,10 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 			'occur_group_id' => $group_id
 		);
 		if ( ! $test ) {
-			$wpdb->insert( my_calendar_event_table(), $data, $format );
+			$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'single' );
+			if ( ! $insert ) {				
+				$wpdb->insert( my_calendar_event_table(), $data, $format );
+			}
 		}
 	}
 
@@ -1870,39 +1885,6 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 	}
 	
 	return $data;
-}
-
-function mc_get_details_link( $event ) {
-	if ( is_numeric( $event ) ) {
-		$event = mc_get_event( $event );
-	}
-	// if available, and not querying remotely, use permalink.
-	$permalinks   = apply_filters( 'mc_use_permalinks', get_option( 'mc_use_permalinks' ) );
-	$permalinks   = ( $permalinks === 1 || $permalinks === true || $permalinks === 'true' ) ? true : false;
-	$details_link = mc_event_link( $event );
-	if ( $event->event_post != 0 && get_option( 'mc_remote' ) != 'true' && $permalinks ) {
-		$details_link = add_query_arg( 'mc_id', $event->occur_id, get_permalink( $event->event_post ) );
-	} else {
-		if ( get_option( 'mc_uri' ) != '' && _mc_is_url( get_option( 'mc_uri' ) ) ) {
-			$details_link = mc_build_url( array( 'mc_id' => $event->occur_id ), array(
-					'month',
-					'dy',
-					'yr',
-					'ltype',
-					'loc',
-					'mcat',
-					'format',
-					'feed',
-					'page_id',
-					'p',
-					'mcs',
-					'time',
-					'page'
-				), get_option( 'mc_uri' ) );
-		}
-	}
-
-	return apply_filters( 'mc_customize_details_link', $details_link, $event );
 }
 
 // Actions -- these are action hooks attached to My Calendar events, usable to add additional actions during those events.

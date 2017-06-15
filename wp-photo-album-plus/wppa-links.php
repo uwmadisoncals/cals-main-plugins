@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Frontend links
-* Version 6.6.22
+* Version 6.6.29
 *
 */
 
@@ -411,6 +411,9 @@ function wppa_convert_from_pretty( $uri ) {
 				case 'vt':
 					$deltauri = 'wppa-vt=';
 					break;
+				case 'cb':
+					$deltauri = 'wppa-catbox';
+					break;
 
 				default:
 					$deltauri = '';
@@ -424,7 +427,7 @@ function wppa_convert_from_pretty( $uri ) {
 //			}
 			if ( $deltauri ) {
 				$newuri .= $deltauri;
-				$newuri .= substr($arg, 2);
+				$newuri .= substr( $arg, 2 );
 			}
 			else {
 				$newuri = rtrim( $newuri, '&' );
@@ -512,6 +515,7 @@ function wppa_convert_to_pretty( $xuri, $no_names = false, $overrule = false ) {
 					'debug',
 					'inv',
 					'vt',
+					'catbox',
 					);
 
 	$uri = $parts[0] . '?';
@@ -629,6 +633,7 @@ function wppa_convert_to_pretty( $xuri, $no_names = false, $overrule = false ) {
 						'caldate',
 						'inv',
 						'vt',
+						'catbox',
 					);
 	if ( count($args) > 0 ) {
 		foreach ( $args as $arg ) {
@@ -727,6 +732,9 @@ function wppa_convert_to_pretty( $xuri, $no_names = false, $overrule = false ) {
 						break;
 					case 'vt':
 						$newuri .= 'vt';
+						break;
+					case 'catbox':
+						$newuri .= 'cb';
 						break;
 				}
 				if ( $val !== false ) {
@@ -1758,6 +1766,10 @@ global $wpdb;
 
 		if ( wppa( 'src' ) && ! wppa( 'is_related' ) && ! wppa_in_widget() ) {
 			$result['url'] .= '&amp;wppa-searchstring=' . urlencode( wppa( 'searchstring' ) );
+		}
+
+		if ( wppa( 'catbox' ) ) {
+			$result['url'] .= '&amp;wppa-catbox=' . urlencode( trim( wppa( 'catbox' ), ',' ) );
 		}
 
 		if ( $wich == 'topten' ) {

@@ -428,8 +428,8 @@ function my_calendar_print_group_fields( $data, $mode, $event_id, $group_id = ''
 							} ?></label>
 						<select id="e_host" name="event_host">
 							<?php
-							// Grab all the categories and list them
-							$userList = mc_get_users();
+							// Grab hosts and list them
+							$userList = mc_get_users( 'hosts' );
 							foreach ( $userList as $u ) {
 								echo '<option value="' . $u->ID . '"';
 								if ( is_object( $data ) && $data->event_host == $u->ID ) {

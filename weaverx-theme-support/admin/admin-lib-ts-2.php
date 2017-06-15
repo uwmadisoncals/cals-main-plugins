@@ -661,7 +661,7 @@ function weaverx_form_menu_opts( $value, $submit = false ) {
 		array('name' => '<span class="i-left dashicons dashicons-editor-code"></span><small>' . __('Left HTML', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id . '_html_left', 'type' => '+textarea',
 			'placeholder' => __('Any HTML, including shortcodes.', 'weaver-xtreme' /*adm*/),
-			'info' => __('Add HTML Left (Works best with Centered Menu) (&diams;)(&starf;Plus)', 'weaver-xtreme' /*adm*/)),
+			'info' => __('Add HTML Left (Works best with Centered Menu)(&starf;Plus)', 'weaver-xtreme' /*adm*/)),
 		array( 'name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide Area', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id .'_hide_left', 'type' => '+select_hide',
 			'info' => '<em>' . $name . '</em>' . __(': Hide Left HTML', 'weaver-xtreme' /*adm*/) ),
@@ -670,7 +670,7 @@ function weaverx_form_menu_opts( $value, $submit = false ) {
 		array('name' => '<span class="i-left dashicons dashicons-editor-code"></span><small>' . __('Right HTML', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => $id . '_html_right', 'type' => $right_text,
 			'placeholder' => __('Any HTML, including shortcodes.', 'weaver-xtreme' /*adm*/),
-			'info' => __('Add HTML to Menu on Right (Works best with Centered Menu) (&diams;)', 'weaver-xtreme' /*adm*/) . $right_plus),
+			'info' => __('Add HTML to Menu on Right (Works best with Centered Menu)', 'weaver-xtreme' /*adm*/) . $right_plus),
 
 
 		array( 'name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide Area', 'weaver-xtreme' /*adm*/) . '</small>',

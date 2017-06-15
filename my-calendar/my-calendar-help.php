@@ -150,10 +150,10 @@ function my_calendar_help() {
 
 			<h4><?php _e( 'Calendar Filter Shortcodes', 'my-calendar' ); ?></h4>
 
-			<textarea readonly='readonly' class="large-text readonly">[mc_filters show="categories,locations"]</textarea>
+			<textarea readonly='readonly' class="large-text readonly">[mc_filters show="categories,locations" target_url='' ltype='name']</textarea>
 
 			<p>
-				<?php _e( 'Displays all available filters as a single form. The <code>show</code> attribute takes three keywords: categories, locations, and access, to indicate which filters to show and in what order.', 'my-calendar' ); ?>
+				<?php _e( 'Displays all available filters as a single form. The <code>show</code> attribute takes three keywords: categories, locations, and access, to indicate which filters to show and in what order.', 'my-calendar' ); ?> <?php _e( 'Use "target_url" to pass the URL for a page where results should be shown. The target page should use the "[my_calendar]" shortcode.', 'my-calendar' ); ?> <?php _e( 'Use "ltype" to change the type of data being searched.', 'my-calendar' ); ?>
 			</p>
 
 			<textarea readonly='readonly' class="large-text readonly">[my_calendar_locations show="list" type="saved" datatype="name"]</textarea>

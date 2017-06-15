@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // draw array of information into a template with {$key} formatted tags
 function jd_draw_template( $array, $template, $type = 'list' ) {
 	$template = stripcslashes( $template );
+		
 	foreach ( $array as $key => $value ) {
 		// disallow anything not allowed in posts
 		// fields where mc_kses_posts shouldn't run
@@ -18,7 +19,7 @@ function jd_draw_template( $array, $template, $type = 'list' ) {
 			if ( strpos( $template, "{" . $key ) !== false ) {			
 				if ( $type != 'list' ) {
 					if ( $key == 'link' && $value == '' ) {
-						$value = ( get_option( 'mc_uri' ) != '' && ! is_numeric( get_option( 'mc_uri' ) ) ) ? get_option( 'mc_uri' ) : home_url();
+						$value = ( get_option( 'mc_uri' ) != '' && ! is_numeric( get_option( 'mc_uri' ) ) ) ? mc_get_uri( false, $array ) : home_url();
 					}
 					if ( $key != 'guid' ) {
 						$value = htmlentities( $value );
@@ -49,12 +50,12 @@ function jd_draw_template( $array, $template, $type = 'list' ) {
 			// secondary search for RSS output
 			$rss_search = "{rss_$key}";
 			if ( strpos( $template, $rss_search ) !== false ) {
-				$value    = ent2ncr( $value ); // WP native function.
+				$value    = ent2ncr( $value ); // WP core function.
 				$template = stripcslashes( str_replace( $rss_search, $value, $template ) );
 			}
 		}
 	}
-
+	
 	return stripslashes( trim( $template ) );
 }
 
@@ -262,8 +263,8 @@ function mc_create_tags( $event, $context = 'filters' ) {
 	$endtime           = ( $event->event_end == '23:59:59' ) ? '00:00:00' : date( 'H:i:s', strtotime( $real_end_date ) );
 	$e['endtime']      = ( $real_end_date == $real_begin_date || $event->event_hide_end == 1 || date( 'H:i:s', strtotime( $real_end_date ) ) == '23:59:59' ) ? '' : date_i18n( get_option( 'mc_time_format' ), strtotime( $endtime ) );
 	$e['runtime']      = mc_runtime( $event->ts_occur_begin, $event->ts_occur_end, $event );
-	$e['dtstart'] = date( 'Y-m-d\TH:i:s', strtotime( $real_begin_date ) );// hcal formatted
-	$e['dtend']   = date( 'Y-m-d\TH:i:s', strtotime( $real_end_date ) );    //hcal formatted end
+	$e['dtstart'] = date( 'Y-m-d\TH:i:s', strtotime( $real_begin_date ) );  // hcal formatted
+	$e['dtend']   = date( 'Y-m-d\TH:i:s', strtotime( $real_end_date ) );    // hcal formatted end
 	$e['rssdate'] = date( 'D, d M Y H:i:s +0000', strtotime( $event->event_added ) );
 	$date         = date_i18n( apply_filters( 'mc_date_format', $date_format, 'template_begin' ), strtotime( $real_begin_date ) );
 	$date_end     = date_i18n( apply_filters( 'mc_date_format', $date_format, 'template_end' ), strtotime( $real_end_date ) );
@@ -290,9 +291,12 @@ function mc_create_tags( $event, $context = 'filters' ) {
 	$e['category']        = stripslashes( $event->category_name );
 	$e['term']            = intval( $event->category_term );
 	$e['icon']            = mc_category_icon( $event, 'img' );
-	$e['icon_html']       = "<img src='$e[icon]' class='mc-category-icon' alt='" . __( 'Category', 'my-calendar' ) . ": " . esc_attr( $event->category_name ) . "' />";
+	$e['icon_html']       = ( $e['icon'] != '' ) ? "<img src='$e[icon]' class='mc-category-icon' alt='" . __( 'Category', 'my-calendar' ) . ": " . esc_attr( $event->category_name ) . "' />" : '';
 	$e['color']           = $event->category_color;
-	$e['color_css']       = "<span style='background-color: $event->category_color'>"; // this is because widgets now strip out style attributes.
+		$hex   = ( strpos( $event->category_color, '#' ) !== 0 ) ? '#' : '';
+		$color = $hex . $event->category_color;
+		$inverse = mc_inverse_color( $color );	
+	$e['color_css']       = "<span style='background-color: $event->category_color; color: $inverse'>"; // this is because widgets now strip out style attributes.
 	$e['close_color_css'] = "</span>";
 
 	// special
@@ -344,10 +348,10 @@ function mc_create_tags( $event, $context = 'filters' ) {
 	$e['linking_title'] = ( $e['linking'] != '' ) ? "<a href='" . $e['linking'] . "'>" . $e['title'] . "</a>" : $e['title'];
 	
 	if ( $context != 'related' && ( is_singular( 'mc-events' ) || isset( $_GET['mc_id'] ) ) ) {
-		$related_template   = apply_filters( 'mc_related_template', "{date}, {time}", $event );
-		$e['related']       = '<ul class="related-events">' . mc_list_related( $event->event_group_id, $event->event_id, $related_template ) . '</ul>';
+		$related_template = apply_filters( 'mc_related_template', "{date}, {time}", $event );
+		$e['related']     = '<ul class="related-events">' . mc_list_related( $event->event_group_id, $event->event_id, $related_template ) . '</ul>';
 	} else {
-		$e['related']       = '';
+		$e['related']     = '';
 	}
 	
 	// location fields
@@ -386,7 +390,7 @@ function mc_create_tags( $event, $context = 'filters' ) {
 	$e['ical_description'] = str_replace( "\r", "=0D=0A=", $event->event_desc );
 	$e['ical_desc']        = $strip_desc;
 	$e['ical_start']       = $dtstart;
-	$e['ical_end']         = $dtend;
+	$e['ical_end']         = ( mc_is_all_day( $event ) ) ? date( 'Ymd\THi00', strtotime( $dtend ) + 60 ) : $dtend;
 	$ical_link             = mc_build_url( array( 'vcal' => $event->occur_id ), array(
 			'month',
 			'dy',
@@ -395,7 +399,7 @@ function mc_create_tags( $event, $context = 'filters' ) {
 			'loc',
 			'mcat',
 			'format'
-		), get_option( 'mc_uri' ) );
+		), mc_get_uri( $event ) );
 	$e['ical']             = $ical_link;
 	$e['ical_html']        = "<a class='ical' rel='nofollow' href='$ical_link'>" . __( 'iCal', 'my-calendar' ) . "</a>";
 	$e                     = apply_filters( 'mc_filter_shortcodes', $e, $event );
@@ -412,6 +416,59 @@ function mc_notime_label( $event ) {
 	$notime = ( $notime != '' ) ? $notime : get_option( 'mc_notime_text' );
 	
 	return apply_filters( 'mc_notime_label', $notime, $event );
+}
+
+
+function mc_get_details_link( $event ) {
+	if ( is_numeric( $event ) ) {
+		$event = mc_get_event( $event );
+	}
+	$uri = mc_get_uri( $event );
+	
+	// if available, and not querying remotely, use permalink.
+	$permalinks   = apply_filters( 'mc_use_permalinks', get_option( 'mc_use_permalinks' ) );
+	$permalinks   = ( $permalinks === 1 || $permalinks === true || $permalinks === 'true' ) ? true : false;
+	$details_link = mc_event_link( $event );
+	if ( $event->event_post != 0 && get_option( 'mc_remote' ) != 'true' && $permalinks ) {
+		$details_link = add_query_arg( 'mc_id', $event->occur_id, get_permalink( $event->event_post ) );
+	} else {
+		if ( get_option( 'mc_uri' ) != '' && _mc_is_url( get_option( 'mc_uri' ) ) ) {
+			$details_link = mc_build_url( array( 'mc_id' => $event->occur_id ), array(
+					'month',
+					'dy',
+					'yr',
+					'ltype',
+					'loc',
+					'mcat',
+					'format',
+					'feed',
+					'page_id',
+					'p',
+					'mcs',
+					'time',
+					'page'
+				), $uri );
+		}
+	}
+
+	return apply_filters( 'mc_customize_details_link', $details_link, $event );
+}
+
+/**
+ * Get URI from settings
+ *
+ * @param object $event Event object
+ * @param array $args  Any arguments passed
+ *
+ * @uses filter 'mc_get_uri'
+ *
+ * @return string URL
+ */
+function mc_get_uri( $event = false, $args = array() ) {
+	// for a brief period of time, mc_uri was a post ID.
+	$uri = ( is_numeric( get_option( 'mc_uri' ) ) ) ? get_permalink( get_option( 'mc_uri' ) ) : get_option( 'mc_uri' );
+	
+	return apply_filters( 'mc_get_uri', $uri, $event, $args );
 }
 
 function mc_get_details_label( $event, $e ) {
@@ -435,23 +492,25 @@ function old_mc_format_timestamp( $os ) {
 
 function mc_format_timestamp( $os ) {
         if ( get_option( 'mc_ical_utc' ) == 'true' ) {
-                $timezone_string = get_option( 'timezone_string' );
-                if ( ! $timezone_string ) {
-                        // multiply gmt_offset by -1 because POSIX has it reversed:
-                        // http://stackoverflow.com/questions/20228224/php-timezone-issue
-                        $timezone_string = sprintf("Etc/GMT%+d", -1 * get_option('$gmt_offset') );
-                }
+			$timezone_string = get_option( 'timezone_string' );
+			if ( ! $timezone_string ) {
+					// multiply gmt_offset by -1 because POSIX has it reversed:
+					// http://stackoverflow.com/questions/20228224/php-timezone-issue
+					$timezone_string = sprintf("Etc/GMT%+d", -1 * get_option('$gmt_offset') );
+			}
 
-                $timezone_object = timezone_open( $timezone_string );
-                $date_object = date_create( null, $timezone_object );
-                $date_object->setTime( date( 'H', $os ), date( 'i', $os ) );
-                $date_object->setDate( date( 'Y', $os ), date( 'm', $os ), date( 'd', $os ) );
-                $timestamp = $date_object->getTimestamp( );
-                $time = gmdate( "Ymd\THi00", $timestamp ) . "Z";
+			$timezone_object = timezone_open( $timezone_string );
+			$date_object     = date_create( null, $timezone_object );
+			
+			$date_object->setTime( date( 'H', $os ), date( 'i', $os ) );
+			$date_object->setDate( date( 'Y', $os ), date( 'm', $os ), date( 'd', $os ) );
+			
+			$timestamp       = $date_object->getTimestamp( );
+			$time            = gmdate( "Ymd\THi00", $timestamp ) . "Z";
 
         } else {
-                $os_time = mktime( date( 'H', $os ), date( 'i', $os ), date( 's', $os ), date( 'm', $os ), date( 'd', $os ), date( 'Y', $os ) );
-                $time = date( "Ymd\THi00", $os_time );
+			$os_time = mktime( date( 'H', $os ), date( 'i', $os ), date( 's', $os ), date( 'm', $os ), date( 'd', $os ), date( 'Y', $os ) );
+			$time = date( "Ymd\THi00", $os_time );
         }
 
         return $time;

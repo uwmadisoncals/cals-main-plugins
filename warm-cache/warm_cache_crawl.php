@@ -141,47 +141,48 @@ if(defined('PLUGIN_WARM_CACHE_CALLED'))
 	echo "<br/>Updating to start (next time) at : $newstart";
 	update_option('plugin_warm_cache_start', $newstart);
 	
-	
+	if( !defined('MP_WARM_CACHE_NO_LOGGING_AT_ALL') ) {
 
-	$mtime = microtime();
-	$mtime = explode(" ", $mtime);
-	$mtime = $mtime[1] + $mtime[0];
-	$endtime = $mtime;
-	$totaltime = ($endtime - $starttime);
-	$cnt = count($newvalue['pages']);
-	$returnstring = '<br/><br/>Crawled '.$cnt. ' pages in ' .$totaltime. ' seconds.';
+		$mtime = microtime();
+		$mtime = explode(" ", $mtime);
+		$mtime = $mtime[1] + $mtime[0];
+		$endtime = $mtime;
+		$totaltime = ($endtime - $starttime);
+		$cnt = count($newvalue['pages']);
+		$returnstring = '<br/><br/>Crawled '.$cnt. ' pages in ' .$totaltime. ' seconds.';
 
-	$post = array ();
-	$post['post_title'] = date('l jS F Y h:i:s A', $starttime);
-	$post['post_type'] = 'warmcache';
-	$post['post_content'] = $newvalue['url']."\n<br/>".$returnstring."\n<br/>".implode("\n<br/>", $newvalue['pages']);
-	$post['post_status'] = 'publish';
-	$post['post_author'] = 0; // FIXME? author
-	// GOGOGO
-	try {
-		if(!function_exists('is_user_logged_in')) {
-			require_once( ABSPATH . "wp-includes/pluggable.php" );
+		$post = array ();
+		$post['post_title'] = date('l jS F Y h:i:s A', $starttime);
+		$post['post_type'] = 'warmcache';
+		$post['post_content'] = $newvalue['url']."\n<br/>".$returnstring."\n<br/>".implode("\n<br/>", $newvalue['pages']);
+		$post['post_status'] = 'publish';
+		$post['post_author'] = 0; // FIXME? author
+		// GOGOGO
+		try {
+			if(!function_exists('is_user_logged_in')) {
+				require_once( ABSPATH . "wp-includes/pluggable.php" );
+			}
+			$this_page_id = wp_insert_post($post);
+			if($this_page_id) {
+				add_post_meta($this_page_id, 'mytime', $totaltime);
+				add_post_meta($this_page_id, 'mypages', $cnt);
+				add_post_meta($this_page_id, 'totalpages', $totalcount);
+			}	
+		} catch (Exception $e) {
+			echo $e->getMessage();
 		}
-		$this_page_id = wp_insert_post($post);
-		if($this_page_id) {
-			add_post_meta($this_page_id, 'mytime', $totaltime);
-			add_post_meta($this_page_id, 'mypages', $cnt);
-			add_post_meta($this_page_id, 'totalpages', $totalcount);
-		}	
-	} catch (Exception $e) {
-		echo $e->getMessage();
-	}
 	
-	// Cleanup, delete old data
-	$period_php = '180 minutes';
-	$myposts = get_posts('post_type=warmcache&numberposts=100&order=ASC&orderby=post_date');
+		// Cleanup, delete old data
+		$period_php = '180 minutes';
+		$myposts = get_posts('post_type=warmcache&numberposts=100&order=ASC&orderby=post_date');
 	
-	$now = strtotime("now");
-	foreach ($myposts AS $post) {
-		$post_date_plus_visibleperiod = strtotime($post->post_date . " +" . $period_php);
-		if ($post_date_plus_visibleperiod < $now) {
-			wp_delete_post($post->ID, false);
-		}						
+		$now = strtotime("now");
+		foreach ($myposts AS $post) {
+			$post_date_plus_visibleperiod = strtotime($post->post_date . " +" . $period_php);
+			if ($post_date_plus_visibleperiod < $now) {
+				wp_delete_post($post->ID, false);
+			}						
+		}
 	}
 	
 	echo $returnstring;

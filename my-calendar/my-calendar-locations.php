@@ -262,6 +262,13 @@ function mc_show_location_form( $view = 'add', $curID = '' ) {
 <?php
 }
 
+/**
+ * Check whether this location field has pre-entered controls on input
+ *
+ * @param string $this_field field name
+ * 
+ * @return boolean true if location field is controlled
+ */
 function mc_controlled_field( $this_field ) {
 	$this_field = trim( $this_field );
 	$controls   = get_option( 'mc_location_controls' );
@@ -276,13 +283,22 @@ function mc_controlled_field( $this_field ) {
 	}
 }
 
+/**
+ * Return select element with the controlled values for a location field
+ *
+ * @param string $fieldname Name of field
+ * @param string $selected currently selected value
+ * @param string $context current context: entering new location or new event
+ *
+ * @return string HTML select element with values
+ */ 
 function mc_location_controller( $fieldname, $selected, $context = 'location' ) {
 	$field    = ( $context == 'location' ) ? 'location_' . $fieldname : 'event_' . $fieldname;
 	$selected = esc_attr( trim( $selected ) );
 	$options  = get_option( 'mc_location_controls' );
 	$regions  = $options[ 'event_' . $fieldname ];
 	$form     = "<select name='$field' id='e_$fieldname'>";
-	if ( $selected == '' || in_array( $selected, array_keys( $regions ) ) ) {
+	if ( $selected == '' || in_array( $selected, array_map( 'trim', array_keys( $regions ) ) ) ) {
 		$form .= "<option value=''>". __( 'None', 'my-calendar' )."</option>\n";
 	} else {
 		$form .= "<option value='$selected'>$selected " . __( '(Not a controlled value)', 'my-calendar' ) . "</option>\n";

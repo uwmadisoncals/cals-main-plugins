@@ -7,7 +7,7 @@ Author: Joseph C Dolson
 Author URI: http://www.joedolson.com
 Text Domain: my-calendar
 Domain Path: lang
-Version: 2.5.9
+Version: 2.5.11
 */
 /*  Copyright 2009-2017  Joe Dolson (email : joe@joedolson.com)
 
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 } // Exit if accessed directly
 
 global $mc_version, $wpdb;
-$mc_version = '2.5.9';
+$mc_version = '2.5.11';
 
 register_activation_hook( __FILE__, 'mc_plugin_activated' );
 register_deactivation_hook( __FILE__, 'mc_plugin_deactivated' );
@@ -40,6 +40,18 @@ function mc_plugin_activated() {
 		mc_upgrade_db();
 	}
 	check_my_calendar();
+}
+
+register_activation_hook(__FILE__, 'mc_activation_hook');
+function mc_activation_hook() {
+    $required_php_version = '5.3.0';
+
+    if ( version_compare( PHP_VERSION, $required_php_version, '<' ) ) { 
+        $plugin_data = get_plugin_data(__FILE__, false);
+		$message = sprintf( __( '%s requires PHP version %s or higher. Your current PHP version is %s', 'my-calendar' ), $plugin_data['Name'], $required_php_version, phpversion() );
+        echo "<p>{$message}</p>";
+        exit;
+    } 
 }
 
 function mc_plugin_deactivated() {
@@ -87,6 +99,7 @@ add_action( 'widgets_init', create_function( '', 'return register_widget("my_cal
 add_action( 'widgets_init', create_function( '', 'return register_widget("my_calendar_upcoming_widget");' ) );
 add_action( 'widgets_init', create_function( '', 'return register_widget("my_calendar_mini_widget");' ) );
 add_action( 'widgets_init', create_function( '', 'return register_widget("my_calendar_simple_search");' ) );
+add_action( 'widgets_init', create_function( '', 'return register_widget("my_calendar_filters");' ) );
 add_action( 'init', 'my_calendar_add_feed' );
 add_action( 'admin_menu', 'my_calendar_admin_js' );
 add_action( 'wp_footer', 'mc_footer_js' );

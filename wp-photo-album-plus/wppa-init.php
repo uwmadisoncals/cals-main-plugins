@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version 6.6.13
+* Version 6.6.29
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -283,7 +283,7 @@ global $pagenow;
 	}
 
 	// Cron jobs postponed?
-	if ( wppa_switch( 'maint_ignore_cron' ) ) {
+	if ( get_option( 'wppa_maint_ignore_cron' ) == 'yes' ) {
 		wppa_warning_message( __( 'Please do not forget to re-enable cron jobs for wppa when you are ready doing your bulk actions. See <i>Table VIII-A0.2</i>', 'wp-photo-album-plus') );
 	}
 

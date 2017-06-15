@@ -80,8 +80,8 @@ function mc_generator( $type ) {
 				<?php _e( '<strong>Note:</strong> If you provide a location filter value, it must be an exact match for that information as saved with your events. (e.g. "Saint Paul" is not equivalent to "saint paul" or "St. Paul")', 'my-calendar' ); ?>
 			</p>
 			<?php
-			// Grab users and list them
-			$users   = mc_get_users();
+			// Grab authors and list them
+			$users   = mc_get_users( 'authors' );
 			$options = '';
 			foreach ( $users as $u ) {
 				$options .= '<option value="' . $u->ID . '">' . esc_html( $u->display_name ) . "</option>\n";
@@ -94,6 +94,13 @@ function mc_generator( $type ) {
 					<?php echo $options; ?>
 				</select>
 			</p>
+			<?php
+			// Grab authors and list them
+			$users   = mc_get_users( 'hosts' );
+			$options = '';
+			foreach ( $users as $u ) {
+				$options .= '<option value="' . $u->ID . '">' . esc_html( $u->display_name ) . "</option>\n";
+			} ?>			
 			<p>
 				<label for="host"><?php _e( 'Limit by Host', 'my-calendar' ); ?></label>
 				<select name="host[]" id="host" multiple="multiple">

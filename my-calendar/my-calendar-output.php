@@ -189,6 +189,7 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 	if ( $event->category_private == 1 && ! is_user_logged_in() ) {
 		return '';
 	}
+	
 	// assign empty values to template sections
 	$header      = $address = $more = $author = $list_title = $title = $output = $container = $short = $description = $link = $vcal = $gcal = '';
 	$date_format = ( get_option( 'mc_date_format' ) != '' ) ? get_option( 'mc_date_format' ) : get_option( 'date_format' );
@@ -234,6 +235,7 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 			}
 		}
 	}
+	
 	$mc_display_author = get_option( 'mc_display_author' );
 	$display_map       = get_option( 'mc_show_map' );
 	$display_address   = get_option( 'mc_show_address' );
@@ -252,7 +254,7 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 		case 'single' : $title_template   = ( mc_get_template( 'title_solo' ) == '' ) ? '{title}' : mc_get_template( 'title_solo' ); break;
 		default: $title_template          = ( mc_get_template( 'title' ) == '' ) ? '{title}' : mc_get_template( 'title' );
 	}
-
+	
 	$event_title    = jd_draw_template( $data, $title_template );
 	$event_title    = ( $event_title == '' ) ? jd_draw_template( $data, '{title}' ) : mc_kses_post( $event_title ); //prevent empty titles
 
@@ -268,18 +270,19 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 	} else {
 		$wrap = $balance = '';
 	}
+	
 	$current_date  = date_i18n( apply_filters( 'mc_date_format', $date_format, 'details' ), strtotime( $process_date ) );
 	$group_class   = ( $event->event_span == 1 ) ? ' multidate group' . $event->event_group_id : '';
 	$heading_level = apply_filters( 'mc_heading_level_table', 'h3', $type, $time, $template );
 	$inner_heading = apply_filters( 'mc_heading_inner_title', $wrap . $image . trim( $event_title ) . $balance, $event_title, $event );
-	$header .= ( $type != 'single' && $type != 'list' ) ? "<$heading_level class='event-title summary$group_class' id='$uid-$day_id-$type-title'>$inner_heading</$heading_level>\n" : '';
-	$event_title = ( $type == 'single' ) ? apply_filters( 'mc_single_event_title', $event_title, $event ) : $event_title;
-	$title       = ( $type == 'single' && ! is_singular( 'mc-events' ) ) ? "<h2 class='event-title summary'>$image $event_title</h2>\n" : '<span class="summary screen-reader-text">' . $event_title . '</span>';
-	$title       = apply_filters( 'mc_event_title', $title, $event, $event_title, $image );
-	$header     .= '<span class="summary">' . $title . '</span>';
-	$close_image = apply_filters( 'mc_close_button', "<img src=\"" . plugin_dir_url( __FILE__ ) . "images/event-close.png\" alt='" . __( 'Close', 'my-calendar' ) . "' />" );
-	$close_button = "<button type='button' aria-controls='$uid-$day_id-$type-details' class='mc-toggle close'>$close_image</button>";
-	
+	$header       .= ( $type != 'single' && $type != 'list' ) ? "<$heading_level class='event-title summary$group_class' id='$uid-$day_id-$type-title'>$inner_heading</$heading_level>\n" : '';
+	$event_title   = ( $type == 'single' ) ? apply_filters( 'mc_single_event_title', $event_title, $event ) : $event_title;
+	$title         = ( $type == 'single' && ! is_singular( 'mc-events' ) ) ? "<h2 class='event-title summary'>$image $event_title</h2>\n" : '<span class="summary screen-reader-text">' . $event_title . '</span>';
+	$title         = apply_filters( 'mc_event_title', $title, $event, $event_title, $image );
+	$header       .= '<span class="summary">' . $title . '</span>';
+	$close_image   = apply_filters( 'mc_close_button', "<img src=\"" . plugin_dir_url( __FILE__ ) . "images/event-close.png\" alt='" . __( 'Close', 'my-calendar' ) . "' />" );
+	$close_button  = "<button type='button' aria-controls='$uid-$day_id-$type-details' class='mc-toggle close'>$close_image</button>";
+		
 	if ( mc_show_details( $time, $type ) ) {
 		$close = ( $type == 'calendar' || $type == 'mini' ) ? $close_button : '';
 
@@ -334,7 +337,8 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 				$atts  = apply_filters( 'mc_post_thumbnail_atts', array( 'class' => 'mc-image photo' ) );
 				$image = get_the_post_thumbnail( $event->event_post, $default_size, $atts );
 			} else {
-				$image = ( $event->event_image != '' ) ? "<img src='$event->event_image' alt='' class='mc-image photo' />" : '';
+				$alt   = esc_attr( apply_filters( 'mc_event_image_alt', '', $event ) );
+				$image = ( $event->event_image != '' ) ? "<img src='$event->event_image' alt='$alt' class='mc-image photo' />" : '';
 			}
 			
 			if ( get_option( 'mc_desc' ) == 'true' || $type == 'single' ) {
@@ -367,7 +371,7 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 
 			$status     = ( $status != '' ) ? "<p>$status</p>" : '';
 			$status     = apply_filters( 'mc_registration_state', $status, $event );
-			$return_url = apply_filters( 'mc_return_uri', get_option( 'mc_uri' ) );
+			$return_url = apply_filters( 'mc_return_uri', mc_get_uri( $event ) );
 			$return     = ( $type == 'single' ) ? "<p class='view-full'><a href='$return_url'>" . __( 'View full calendar', 'my-calendar' ) . "</a></p>" : '';
 
 			if ( ! mc_show_details( $time, $type ) ) {
@@ -1355,7 +1359,7 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 			}
 		}
 		if ( $mc_bottomnav != '' ) {
-			$mc_bottomnav = "<div class='mc_bottomnav'>$mc_bottomnav</div>";
+			$mc_bottomnav = "<div class='mc_bottomnav my-calendar-footer'>$mc_bottomnav</div>";
 		}
 
 		if ( $time == 'day' ) {
@@ -1442,6 +1446,9 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 				} else {
 					$my_calendar_body .= ( $tr == 'tr' ) ? "<thead>\n" : '<div class="mc-table-body">';
 					$my_calendar_body .= "<$tr class='mc-row'>\n";
+					if ( apply_filters( 'mc_show_week_number', false, $args ) ) {
+						$my_calendar_body .= "<th class='mc-week-number'>" . __( 'Week', 'my-calendar' ) . "</th>";
+					}			
 					for ( $i = 0; $i <= 6; $i ++ ) {
 						if ( $start_of_week == 0 ) {
 							$class = ( $i < 6 && $i > 0 ) ? 'day-heading' : 'weekend-heading';
@@ -1490,6 +1497,21 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 								$is_anchor = $is_close_anchor = "";
 							}
 							$td = apply_filters( 'mc_grid_day_wrapper', 'td', $format );
+							if ( apply_filters( 'mc_show_week_number', false, $args ) ) {
+								if ( ( date( 'N', $start ) == $start_of_week || $start == strtotime( $from ) || !$week_number_shown ) ) {
+									$week_number_shown = false;
+									if ( $format != "list" ) {
+										$weeknumber        = date( 'W', $start);
+										$my_calendar_body .= "<td class='week_number'>$weeknumber</td>";
+										$week_number_shown = true;
+									}
+									if ( $format == "list" && !empty( $events ) && !$week_number_shown ) {
+										$weeknumber        = date( 'W', $start);
+										$my_calendar_body .= "<li class='mc-week-number'><span class='week-number-text'>" . __( 'Week', 'my-calendar' ) . "</span> <span class='week-number-number'>$weeknumber</span></li>";
+										$week_number_shown = true;
+									}
+								}
+							}
 							if ( ! empty( $events ) ) {
 								$hide_nextmonth = apply_filters( 'mc_hide_nextmonth', false );
 								if ( $hide_nextmonth == true && $monthclass == 'nextmonth' ) {
@@ -1521,8 +1543,9 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 												'mcat',
 												'cid',
 												'mc_id'
-											), apply_filters( 'mc_modify_day_uri', get_option( 'mc_uri' ) ) );
-										$link    = ( get_option( 'mc_uri' ) != '' && ! is_numeric( get_option( 'mc_uri' ) ) ) ? $day_url : '#';
+											), apply_filters( 'mc_modify_day_uri', mc_get_uri( $events[0], $args ) )
+										);
+										$link    = ( $day_url != '' ) ? $day_url : '#';
 									} else {
 										$atype    = str_replace( 'anchor', '', get_option( 'mc_open_day_uri' ) );
 										$ad       = str_pad( date( 'j', $start ), 2, '0', STR_PAD_LEFT ); // need to match format in ID
@@ -1618,8 +1641,8 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 					}
 				}
 			}
-			$my_calendar_body .= $mc_bottomnav;
 		}
+		$my_calendar_body .= $mc_bottomnav;
 	}
 	// The actual printing is done by the shortcode function.
 	$my_calendar_body .= apply_filters( 'mc_after_calendar', '', $args );
@@ -1836,10 +1859,17 @@ function my_calendar_prev_link( $cur_year, $cur_month, $cur_day, $format, $time 
 	return $output;
 }
 
-function mc_filters( $args ) {
-	$fields      = explode( ',', $args );
+function mc_filters( $args, $target_url, $ltype ) {
+	if ( !is_array( $args ) ) {
+		$fields      = explode( ',', $args );
+	} else {
+		$fields = $args;
+	}
+	if ( empty( $fields ) ) {
+		return;
+	}
 	$return      = false;
-	$current_url = mc_get_current_url();
+	$current_url = ( $target_url != '' && _mc_is_url( $target_url ) ) ? $target_url : mc_get_current_url();
 	$form        = "
 	<div id='mc_filters'>
 		<form action='" . $current_url . "' method='get'>\n";
@@ -1853,7 +1883,7 @@ function mc_filters( $args ) {
 	foreach ( $qsa as $name => $argument ) {
 		$name     = esc_attr( strip_tags( $name ) );
 		$argument = esc_attr( strip_tags( $argument ) );
-		if ( $name == 'access' || $name == 'mcat' || $name == 'ltype' || $name == 'lvalue' && in_array( $name, $args ) ) {
+		if ( ( $name == 'access' || $name == 'mcat' || $name == 'loc' || $name == 'ltype' ) ) {
 		} else {
 			$form .= '		<input type="hidden" name="' . $name . '" value="' . $argument . '" />' . "\n";
 		}
@@ -1866,7 +1896,7 @@ function mc_filters( $args ) {
 				$return = true;
 				break;
 			case 'locations':
-				$form .= my_calendar_locations_list( 'form', 'saved', 'name', 'group' );
+				$form .= my_calendar_locations_list( 'form', 'saved', $ltype, 'group' );
 				$return = true;
 				break;
 			case 'access':
@@ -2138,7 +2168,7 @@ function my_calendar_searchform( $type, $url ) {
 	$query = ( isset( $_GET['mcs'] ) ) ? $_GET['mcs'] : '';
 	if ( $type == 'simple' ) {
 		if ( !$url || $url == '' ) {
-			$url = ( get_option( 'mc_uri' ) != '' ) ? get_option( 'mc_uri' ) : home_url();
+			$url = ( get_option( 'mc_uri' ) != '' ) ? mc_get_uri( false, array( 'type' => $type ) ) : home_url();
 		}
 		return '
 		<div class="mc-search-container" role="search">

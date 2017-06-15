@@ -53,65 +53,65 @@ Click the<span style="color:red; vertical-align: middle; margin-left:.25em;" cla
 
     <h3><?php _e('Shortcodes','weaverx-theme-support' /*adm*/); ?></h3>
     <ul>
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">Blog Info - [bloginfo]</span> - Display blog info as provided by WordPress bloginfo function','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">Blog Info - [bloginfo]</span> - Display blog info as provided by WordPress bloginfo function','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#bloginfo',__('Help for Blog Info','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __("[bloginfo name='WP bloginfo name' style='style-rules']",'weaverx-theme-support' /*adm*/)); ?></code>
     </li>
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">Box - [box]</span> - Display content in a Box','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">Box - [box]</span> - Display content in a Box','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#box',__('Help for Box','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __("[box background=#fff align=left border=true border_rule='border-css' border_radius=4 color=#000 margin=1 padding=1 shadow=1 style='style-rules' width=100]text[/box]",'weaverx-theme-support' /*adm*/)); ?></code>
     </li>
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">DIV - [div]text[/div]</span> - Wrap content in a &lt;div&gt; tag','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">DIV - [div]text[/div]</span> - Wrap content in a &lt;div&gt; tag','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#scdiv',__('Help for Header Div','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __("[div id='class_id' class='class_name' style='style_values']text[/div]",'weaverx-theme-support' /*adm*/)); ?></code>
     </li>
-    <li<?php wvrx_ts_fix_short($prefix, __('><span class="wvr-blue">Header Image - [header_image]</span> - Display default header image','weaverx-theme-support' /*adm*/)); ?>
+    <li<?php wvrx_ts_fix_short($prefix, __('><span class="atw-blue">Header Image - [header_image]</span> - Display default header image','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#headerimage',__('Help for Header Image','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __("[header_image h='size' w='size' style='inline-style']",'weaverx-theme-support' /*adm*/)); ?></code>
     </li>
 
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">HTML - [html]</span> - Wrap content in any HTML tag','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">HTML - [html]</span> - Wrap content in any HTML tag','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#schtml',__('Help for HTML','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __("[html html-tag args='parameters']",'weaverx-theme-support' /*adm*/)); ?></code>
     </li>
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">iFrame - [iframe]</span> - Display external content in an iframe','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">iFrame - [iframe]</span> - Display external content in an iframe','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#sciframe',__('Help for iframe','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __("[iframe src='//example.com' height=600 percent=100 style='style']",'weaverx-theme-support' /*adm*/)); ?></code>
     </li>
-	<li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">Login - [login style="CSS Style"]</span> - Show simple Login/Logout link','weaverx-theme-support' /*adm*/)); ?>
+	<li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">Login - [login style="CSS Style"]</span> - Show simple Login/Logout link','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#sclogin',__('Help for login','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __("[login style=\"CSS Style\"]",'weaverx-theme-support' /*adm*/)); ?></code>
     </li>
 
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">Show If- [show_if]</span> - Show content only if args meet specified conditions','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">Show If- [show_if]</span> - Show content only if args meet specified conditions','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#scshowif',__('Help for Show/Hide If','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __('[show|hide_if device=device logged_in=true/false not_post_id=id-list post_id=id-list user_can=what]text[/show|hide_if]','weaverx-theme-support' /*adm*/)); ?></code>
     </li>
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">Hide If - [hide_if]</span> - Hide content','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">Hide If - [hide_if]</span> - Hide content','weaverx-theme-support' /*adm*/)); ?>
     </li>
 
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">Site Tagline - [site_tagline style="style" matchtheme=false]</span> - Display the site tagline','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">Site Tagline - [site_tagline style="style" matchtheme=false]</span> - Display the site tagline','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#sitetitlesc',__('Help for Site Tagline','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __("[site_tagline style='inline-style']",'weaverx-theme-support' /*adm*/)); ?></code>
     </li>
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">Site Title - [site_title style="style" matchtheme=false]</span> - Display the site title','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">Site Title - [site_title style="style" matchtheme=false]</span> - Display the site title','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#sitetitlesc',__('Help for Site Title','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __("[site_title style='inline-style']",'weaverx-theme-support' /*adm*/)); ?></code>
     </li>
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">SPAN - [span]text[/span]</span> - Wrap content in a &lt;span&gt; tag','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">SPAN - [span]text[/span]</span> - Wrap content in a &lt;span&gt; tag','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#scdiv',__('Help for Span','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __("[span id='class_id' class='class_name' style='style_values']text[/span]",'weaverx-theme-support' /*adm*/)); ?></code>
     </li>
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">Tab Group - [tab_group]</span> - Display content on separate tabs','weaverx-theme-support' /*adm*/));?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">Tab Group - [tab_group]</span> - Display content on separate tabs','weaverx-theme-support' /*adm*/));?>
         <?php wvrx_ts_help_link('help.html#tab_group',__('Help for Tab Group','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __('[tab_group][tab]...[/tab][tab]...[/tab][/tab_group]','weaverx-theme-support' /*adm*/)); ?></code>
     </li>
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">Vimeo - [vimeo]</span> - Display video from Vimeo responsively, with options','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">Vimeo - [vimeo]</span> - Display video from Vimeo responsively, with options','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#video',__('Help for Video','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __('[vimeo vimeo-url id=videoid sd=0 percent=100 center=1 color=#hex autoplay=0 loop=0 portrait=1 title=1 byline=1]','weaverx-theme-support' /*adm*/)); ?></code>
     </li>
 
-    <li><?php wvrx_ts_fix_short($prefix, __('<span class="wvr-blue">YouTube - [youtube]</span> - Display video from YouTube responsively, with options','weaverx-theme-support' /*adm*/)); ?>
+    <li><?php wvrx_ts_fix_short($prefix, __('<span class="atw-blue">YouTube - [youtube]</span> - Display video from YouTube responsively, with options','weaverx-theme-support' /*adm*/)); ?>
         <?php wvrx_ts_help_link('help.html#video',__('Help for Video','weaverx-theme-support' /*adm*/));?><br />
         <code><?php wvrx_ts_fix_short($prefix, __('[youtube youtube-url id=videoid sd=0 percent=100 center=1 rel=0 privacy=0  see_help_for_others]','weaverx-theme-support' /*adm*/)); ?></code>
     </li>
@@ -135,15 +135,15 @@ Click the<span style="color:red; vertical-align: middle; margin-left:.25em;" cla
 
     <h3><?php _e('Widgets','weaverx-theme-support' /*adm*/); ?></h3>
     <ul>
-    <li><?php _e('<span class="wvr-blue">Weaver X Login Widget</span> - Simplified login widget','weaverx-theme-support' /*adm*/); ?>
+    <li><?php _e('<span class="atw-blue">Weaver Login Widget</span> - Simplified login widget','weaverx-theme-support' /*adm*/); ?>
         <?php wvrx_ts_help_link('help.html#widg-login',__('Help for Login Widget','weaverx-theme-support' /*adm*/));?>
     </li>
 
-    <li><?php _e('<span class="wvr-blue">Weaver X Per Page Text</span> - Display text on a per page basis, based on a Custom Field value','weaverx-theme-support' /*adm*/); ?>
+    <li><?php _e('<span class="atw-blue">Weaver Per Page Text</span> - Display text on a per page basis, based on a Custom Field value','weaverx-theme-support' /*adm*/); ?>
         <?php wvrx_ts_help_link('help.html##widg_pp_text',__('Help for Per Page Text Widget','weaverx-theme-support' /*adm*/));?>
     </li>
 
-    <li><?php _e('<span class="wvr-blue">Weaver X Text 2</span> - Display text in two columns - great for wide top/bottom widgets','weaverx-theme-support' /*adm*/); ?>
+    <li><?php _e('<span class="atw-blue">Weaver Text 2 Col</span> - Display text in two columns - great for wide top/bottom widgets','weaverx-theme-support' /*adm*/); ?>
         <?php wvrx_ts_help_link('help.html#widg_text_2',__('Help for Two Column Text Widget','weaverx-theme-support' /*adm*/));?>
     </li>
     </ul>
@@ -183,6 +183,9 @@ diagnose the problem, but you can delete it from your forum post right after you
 
 <button id="btn-sysinfo" class="button-primary">Copy To Clipboard</button>
 <?php
+	//if (WEAVERX_DEV_MODE && isset($GLOBALS['POST_COPY']) && $GLOBALS['POST_COPY'] != false ) {
+	//	echo '<pre>$_POST:'; var_dump($GLOBALS['POST_COPY']); echo '</pre>';
+	//}
 }
 
 add_action('weaverx_ts_show_version','weaverx_ts_show_version_action');

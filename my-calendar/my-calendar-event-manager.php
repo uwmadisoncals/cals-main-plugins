@@ -162,7 +162,7 @@ function manage_my_calendar() {
 				$event_instance = (int) $_GET['date'];
 				$sql            = "SELECT occur_begin FROM " . my_calendar_event_table() . " WHERE occur_id=" . $event_instance;
 				$inst           = $mcdb->get_var( $sql );
-				$instance_date  = '(' . date( 'Y-m-d', strtotime( $inst ) ) . ')';
+				$instance_date  = '(' . date( 'Y-m-d', mc_strtotime( $inst ) ) . ')';
 			} else {
 				$instance_date = '';
 			} ?>
@@ -577,12 +577,16 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 		if ( mc_can_edit_event( $event_id ) ) {
 			$update       = $output[2];
 			$update       = apply_filters( 'mc_before_save_update', $update, $event_id );
-			$endtime      = date( "H:i:00", strtotime( $update['event_endtime'] ) );
+			$endtime      = date( "H:i:00", mc_strtotime( $update['event_endtime'] ) );
+			$prev_eb      = ( isset( $_POST['prev_event_begin'] ) ) ? $_POST['prev_event_begin'] : '';
+			$prev_et      = ( isset( $_POST['prev_event_time'] ) ) ? $_POST['prev_event_time'] : '';
+			$prev_ee      = ( isset( $_POST['prev_event_end'] ) ) ? $_POST['prev_event_end'] : '';
+			$prev_eet     = ( isset( $_POST['prev_event_endtime'] ) ) ? $_POST['prev_event_endtime'] : '';
 			$date_changed = (
-				$update['event_begin'] != $_POST['prev_event_begin'] ||
-				date( "H:i:00", strtotime( $update['event_time'] ) ) != $_POST['prev_event_time'] ||
-				$update['event_end'] != $_POST['prev_event_end'] ||
-				( $endtime != $_POST['prev_event_endtime'] && ( $_POST['prev_event_endtime'] != '' && $endtime != '23:59:59' ) ) ) 
+				$update['event_begin'] != $prev_eb ||
+				date( "H:i:00", mc_strtotime( $update['event_time'] ) ) != $prev_et ||
+				$update['event_end'] != $prev_ee ||
+				( $endtime != $prev_eet && ( $prev_eet != '' && $endtime != '23:59:59' ) ) ) 
 				? true : false; 
 			if ( isset( $_POST['event_instance'] ) ) {
 				// compares the information sent to the information saved for a given event.
@@ -621,11 +625,13 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 					$update,
 					array( 'event_id' => $event_id ),
 					$formats,
-					'%d' );					
+					'%d' );	
+
 				$recur_changed = ( $update['event_repeats'] != $_POST['prev_event_repeats'] || $update['event_recur'] != $_POST['prev_event_recur'] ) ? true : false;
 				if ( $date_changed || $recur_changed ) {
 					// TODO: if date or recur changed, do generation of new instances, then iterate over existing occurrences
 					// to update & delete remaining
+					// ISSUE: this results in all new event IDs, which breaks links. Need to resolve. TODO
 					mc_delete_instances( $event_id );
 					mc_increment_event( $event_id );
 					mc_delete_cache();
@@ -793,19 +799,8 @@ function mc_show_block( $field, $has_data, $data, $echo = true, $default = '' ) 
 	switch ( $field ) {
 		case 'event_host' :
 			if ( $show_block ) {
-				$users = mc_get_users();
-				$select = '';
-				foreach ( $users as $u ) {
-					$display_name = ( $u->display_name == '' ) ? $u->user_nicename : $u->display_name;
-					if ( is_object( $data ) && $data->event_host == $u->ID ) {
-						$selected = ' selected="selected"';
-					} else if ( is_object( $u ) && $u->ID == $user_ID && empty( $data->event_host ) ) {
-						$selected = ' selected="selected"';
-					} else {
-						$selected = '';
-					}
-					$select .= "<option value='$u->ID'$selected>$display_name</option>\n";
-				}
+				$host   = ( empty( $data->event_host ) ) ? $user_ID : $data->event_host;
+				$select = mc_selected_users( $host, 'hosts' );
 				$return = '
 					<p>
 					<label for="e_host">' . __( 'Host', 'my-calendar' ) . '</label>
@@ -817,12 +812,8 @@ function mc_show_block( $field, $has_data, $data, $echo = true, $default = '' ) 
 			break;
 		case 'event_author' :
 			if ( $show_block && is_object( $data ) && $data->event_author === '0' ) {
-				$users = mc_get_users();
-				$select = '';
-				foreach ( $users as $u ) {
-					$display_name = ( $u->display_name == '' ) ? $u->user_nicename : $u->display_name;
-					$select .= "<option value='$u->ID'>$display_name</option>\n";
-				}
+				$author = ( empty( $data->event_author ) ) ? $user_ID : $data->event_author;
+				$select = mc_selected_users( $author, 'authors' );
 				$return = '
 					<p>
 					<label for="e_author">' . __( 'Author', 'my-calendar' ) . '</label>
@@ -1171,7 +1162,7 @@ function mc_form_fields( $data, $mode, $event_id ) {
 			<?php
 			if ( ! empty( $_GET['date'] ) && $data->event_recur != 'S' ) {
 				$event   = mc_get_event( $instance );
-				$date    = date_i18n( get_option( 'mc_date_format' ), strtotime( $event->occur_begin ) );
+				$date    = date_i18n( get_option( 'mc_date_format' ), mc_strtotime( $event->occur_begin ) );
 				$message = __( "You are editing the <strong>$date</strong> instance of this event. Other instances of this event will not be changed.", 'my-calendar' );
 				echo "<div class='message updated'><p>$message</p></div>";
 			} else if ( isset( $_GET['date'] ) && empty( $_GET['date'] ) ) {
@@ -1658,6 +1649,7 @@ function mc_list_events() {
 		
 		$found_rows = $wpdb->get_col( "SELECT FOUND_ROWS();" );
 		$items      = $found_rows[0];
+		// Navigation
 		if ( ( function_exists( 'akismet_http_post' ) || function_exists( 'bs_checker' ) ) && $allow_filters ) {
 			?>
 			<ul class="links">
@@ -1859,13 +1851,13 @@ function mc_list_events() {
 								<?php if ( $event->event_label != '' ) { ?><a class='mc_filter' href='<?php $elabel = urlencode( $event->event_label ); echo admin_url( "admin.php?page=my-calendar-manage&amp;filter=$elabel&amp;restrict=where" ); ?>' title="<?php _e( 'Filter by location', 'my-calendar' ); ?>"><span class="screen-reader-text"><?php _e( 'Show only: ', 'my-calendar' ); ?></span><?php echo strip_tags( stripslashes( $event->event_label ) ); ?></a><?php } ?>
 							</td>
 							<?php if ( $event->event_endtime != "23:59:59" ) {
-								$eventTime = date_i18n( get_option( 'mc_time_format' ), strtotime( $event->event_time ) );
+								$eventTime = date_i18n( get_option( 'mc_time_format' ), mc_strtotime( $event->event_time ) );
 							} else {
 								$eventTime = mc_notime_label( $event );
 							} ?>
 							<td><?php
 								$date_format = ( get_option( 'mc_date_format' ) == '' ) ? get_option( 'date_format' ) : get_option( 'mc_date_format' );
-								$begin       = date_i18n( $date_format, strtotime( $event->event_begin ) );
+								$begin       = date_i18n( $date_format, mc_strtotime( $event->event_begin ) );
 								echo "$begin, $eventTime"; ?>
 								<div class="recurs">
 									<strong><?php _e( 'Recurs', 'my-calendar' ); ?></strong>
@@ -1942,7 +1934,55 @@ function mc_list_events() {
 				}
 				?>
 			</table>
-			<p>
+			<?php
+			// navigation
+			if ( ( function_exists( 'akismet_http_post' ) || function_exists( 'bs_checker' ) ) && $allow_filters ) {
+			?>
+			<ul class="links">
+			<li>
+				<a <?php echo ( isset( $_GET['restrict'] ) && $_GET['restrict'] == 'flagged' ) ? 'class="active-link"' : ''; ?>
+					href="<?php echo admin_url( 'admin.php?page=my-calendar-manage&amp;restrict=flagged&amp;filter=1' ); ?>"><?php _e( 'Spam', 'my-calendar' ); ?></a>
+			</li>
+			</ul><?php
+		}
+		if ( get_option( 'mc_event_approve' ) == 'true' ) {
+			?>
+			<ul class="links">
+			<li>
+				<a <?php echo ( isset( $_GET['limit'] ) && $_GET['limit'] == 'published' ) ? 'class="active-link"' : ''; ?>
+					href="<?php echo admin_url( 'admin.php?page=my-calendar-manage&amp;limit=published' ); ?>"><?php _e( 'Published', 'my-calendar' ); ?></a>
+			</li>
+			<li>
+				<a <?php echo ( isset( $_GET['limit'] ) && $_GET['limit'] == 'reserved' ) ? 'class="active-link"' : ''; ?>
+					href="<?php echo admin_url( 'admin.php?page=my-calendar-manage&amp;limit=reserved' ); ?>"><?php _e( 'Reserved', 'my-calendar' ); ?></a>
+			</li>
+			<li>
+				<a <?php echo ( isset( $_GET['limit'] ) && $_GET['limit'] == 'all' || ! isset( $_GET['limit'] ) ) ? 'class="active-link"' : ''; ?>
+					href="<?php echo admin_url( 'admin.php?page=my-calendar-manage&amp;restrict=archived' ); ?>"><?php _e( 'Archived', 'my-calendar' ); ?></a>
+			</li>
+			<li>
+				<a <?php echo ( isset( $_GET['limit'] ) && $_GET['limit'] == 'all' || ! isset( $_GET['limit'] ) ) ? 'class="active-link"' : ''; ?>
+					href="<?php echo admin_url( 'admin.php?page=my-calendar-manage&amp;limit=all' ); ?>"><?php _e( 'All', 'my-calendar' ); ?></a>
+			</li>
+			</ul><?php
+		}
+		echo $filtered;
+		$num_pages = ceil( $items / $items_per_page );
+		if ( $num_pages > 1 ) {
+			$page_links = paginate_links( array(
+				'base'      => add_query_arg( 'paged', '%#%' ),
+				'format'    => '',
+				'prev_text' => __( '&laquo; Previous<span class="screen-reader-text"> Events</span>', 'my-calendar' ),
+				'next_text' => __( 'Next<span class="screen-reader-text"> Events</span> &raquo;', 'my-calendar' ),
+				'total'     => $num_pages,
+				'current'   => $current,
+				'mid_size'  => 1
+			) );
+			printf( "<div class='tablenav'><div class='tablenav-pages'>%s</div></div>", $page_links );
+		}
+		?>
+		<div class='mc-admin-footer'>
+			<p class="event-actions">
 				<input type="submit" class="button-secondary delete" name="mass_delete" value="<?php _e( 'Delete events', 'my-calendar' ); ?>"/>
 				<?php if ( current_user_can( 'mc_approve_events' ) ) { ?>
 					<input type="submit" class="button-secondary mc-approve" name="mass_approve" value="<?php _e( 'Approve events', 'my-calendar' ); ?>"/>
@@ -1960,6 +2000,21 @@ function mc_list_events() {
 				<?php } ?>
 			</p>
 			</form>
+			<div class='mc-search'>
+			<form action="<?php echo esc_url( add_query_arg( $_GET, admin_url( 'admin.php' ) ) ); ?>" method="post">
+				<div><input type="hidden" name="_wpnonce"
+				            value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/>
+				</div>
+				<div>
+					<label for="mc_search_footer" class='screen-reader-text'><?php _e( 'Search', 'my-calendar' ); ?></label>
+					<input type='text' role='search' name='mcs' id='mc_search_footer'
+					       value='<?php if ( isset( $_POST['mcs'] ) ) {
+						       esc_attr_e( $_POST['mcs'] );
+					       } ?>'/> <input type='submit' value='<?php _e( 'Search Events', 'my-calendar' ); ?>' class='button-secondary'/>
+				</div>
+			</form>
+			</div>
+		</div>
 		<?php 
 		} else { ?>
 			<p class='mc-none'><?php _e( "There are no events in the database meeting your current criteria.", 'my-calendar' ) ?></p><?php
@@ -1992,15 +2047,15 @@ function mc_check_data( $action, $post, $i ) {
 		// ...AND there's no reason to allow it, since weekday events will NEVER happen on the weekend.
 		$begin = trim( $post['event_begin'][ $i ] );
 		$end   = ( ! empty( $post['event_end'] ) ) ? trim( $post['event_end'][ $i ] ) : $post['event_begin'][ $i ];
-		if ( $recur == 'E' && ( date( 'w', strtotime( $begin ) ) == 0 || date( 'w', strtotime( $begin ) ) == 6 ) ) {
-			if ( date( 'w', strtotime( $begin ) ) == 0 ) {
+		if ( $recur == 'E' && ( date( 'w', mc_strtotime( $begin ) ) == 0 || date( 'w', mc_strtotime( $begin ) ) == 6 ) ) {
+			if ( date( 'w', mc_strtotime( $begin ) ) == 0 ) {
 				$newbegin = my_calendar_add_date( $begin, 1 );
 				if ( ! empty( $post['event_end'][ $i ] ) ) {
 					$newend = my_calendar_add_date( $end, 1 );
 				} else {
 					$newend = $newbegin;
 				}
-			} else if ( date( 'w', strtotime( $begin ) ) == 6 ) {
+			} else if ( date( 'w', mc_strtotime( $begin ) ) == 6 ) {
 				$newbegin = my_calendar_add_date( $begin, 2 );
 				if ( ! empty( $post['event_end'][ $i ] ) ) {
 					$newend = my_calendar_add_date( $end, 2 );
@@ -2015,10 +2070,11 @@ function mc_check_data( $action, $post, $i ) {
 			$end   = ! empty( $post['event_end'][ $i ] ) ? trim( $post['event_end'][ $i ] ) : $begin;
 		}
 
-		$begin   = date( 'Y-m-d', strtotime( $begin ) );// regardless of entry format, convert.
+		$begin   = date( 'Y-m-d', mc_strtotime( $begin ) );// regardless of entry format, convert.
 		$time    = ! empty( $post['event_time'][ $i ] ) ? trim( $post['event_time'][ $i ] ) : '';
 		if ( $time != '' ) {
-			$endtime = ! empty( $post['event_endtime'][ $i ] ) ? trim( $post['event_endtime'][ $i ] ) : date( 'H:i:s', strtotime( $time . ' +1 hour' ) );
+			$default_modifier = apply_filters( 'mc_default_event_length', '1 hour' );
+			$endtime = ! empty( $post['event_endtime'][ $i ] ) ? trim( $post['event_endtime'][ $i ] ) : date( 'H:i:s', mc_strtotime( $time . ' +' . $default_modifier ) );
 		} else {
 			$endtime = ! empty( $post['event_endtime'][ $i ] ) ? trim( $post['event_endtime'][ $i ] ) : '';
 		}
@@ -2026,18 +2082,18 @@ function mc_check_data( $action, $post, $i ) {
 		$endtime = ( $endtime == '' && $time == '00:00:00' ) ? '23:59:59' : $endtime; // set at end of night if np
 
 		// prevent setting enddate to incorrect value on copy.
-		if ( strtotime( $end ) < strtotime( $begin ) && $action == 'copy' ) {
-			$end = date( 'Y-m-d', ( strtotime( $begin ) + ( strtotime( $post['prev_event_end'] ) - strtotime( $post['prev_event_begin'] ) ) ) );
+		if ( mc_strtotime( $end ) < mc_strtotime( $begin ) && $action == 'copy' ) {
+			$end = date( 'Y-m-d', ( mc_strtotime( $begin ) + ( mc_strtotime( $post['prev_event_end'] ) - mc_strtotime( $post['prev_event_begin'] ) ) ) );
 		}
 		if ( isset( $post['event_allday'] ) && (int) $post['event_allday'] !== 0 ) {
 			$time = '00:00:00'; $endtime = '23:59:59';
 		}
 		
 		// verify formats
-		$time = date( 'H:i:s', strtotime( $time ) );
-		$endtime = date( 'H:i:s', strtotime( $endtime ) );
+		$time = date( 'H:i:s', mc_strtotime( $time ) );
+		$endtime = date( 'H:i:s', mc_strtotime( $endtime ) );
 		
-		$end                = date( 'Y-m-d', strtotime( $end ) ); // regardless of entry format, convert.			
+		$end                = date( 'Y-m-d', mc_strtotime( $end ) ); // regardless of entry format, convert.			
 		$repeats            = ( isset( $post['event_repeats'] ) ) ? trim( $post['event_repeats'] ) : 0;
 		$host               = ! empty( $post['event_host'] ) ? $post['event_host'] : $current_user->ID;
 		
@@ -2141,7 +2197,7 @@ function mc_check_data( $action, $post, $i ) {
 		// Perform validation on the submitted dates - checks for valid years and months
 		if ( mc_checkdate( $begin ) && mc_checkdate( $end ) ) {
 			// Make sure dates are equal or end date is later than start date
-			if ( strtotime( "$end $endtime" ) < strtotime( "$begin $time" ) ) {
+			if ( mc_strtotime( "$end $endtime" ) < mc_strtotime( "$begin $time" ) ) {
 				$errors .= "<div class='error'><p><strong>" . __( 'Error', 'my-calendar' ) . ":</strong> " . __( 'Your event end date must be either after or the same as your event begin date', 'my-calendar' ) . "</p></div>";
 			}
 		} else {
@@ -2149,7 +2205,7 @@ function mc_check_data( $action, $post, $i ) {
 		}
 
 		// We check for a valid time, or an empty one
-		$time            = ( $time == '' ) ? '23:59:59' : date( 'H:i:00', strtotime( $time ) );
+		$time            = ( $time == '' ) ? '23:59:59' : date( 'H:i:00', mc_strtotime( $time ) );
 		$time_format_one = '/^([0-1][0-9]):([0-5][0-9]):([0-5][0-9])$/';
 		$time_format_two = '/^([2][0-3]):([0-5][0-9]):([0-5][0-9])$/';
 		if ( preg_match( $time_format_one, $time ) || preg_match( $time_format_two, $time ) || $time == '' ) {
@@ -2413,7 +2469,7 @@ function mc_instance_list( $id, $occur = false, $template = '<h3>{title}</h3>{de
 	$results = $wpdb->get_results( $sql );
 	if ( is_array( $results ) && is_admin() ) {
 		foreach ( $results as $result ) {
-			$begin = "<span id='occur_date_$result->occur_id'>" . date_i18n( get_option( 'mc_date_format' ), strtotime( $result->occur_begin ) ) . ', ' . date( get_option( 'mc_time_format' ), strtotime( $result->occur_begin ) ) . "</span>";
+			$begin = "<span id='occur_date_$result->occur_id'>" . date_i18n( get_option( 'mc_date_format' ), mc_strtotime( $result->occur_begin ) ) . ', ' . date( get_option( 'mc_time_format' ), mc_strtotime( $result->occur_begin ) ) . "</span>";
 			if ( $result->occur_id == $occur ) {
 				$control = '';
 				$edit    = "<em>" . __( 'Editing Now', 'my-calendar' ) . "</em>";
@@ -2480,14 +2536,14 @@ function mc_standard_datetime_input( $form, $has_data, $data, $instance, $contex
 		$event_end   = esc_attr( $data->event_end );
 		if ( isset( $_GET['date'] ) ) {
 			$event       = mc_get_event( (int) $_GET['date'] );
-			$event_begin = date( 'Y-m-d', strtotime( $event->occur_begin ) );
-			$event_end   = date( 'Y-m-d', strtotime( $event->occur_end ) );
+			$event_begin = date( 'Y-m-d', mc_strtotime( $event->occur_begin ) );
+			$event_end   = date( 'Y-m-d', mc_strtotime( $event->occur_end ) );
 			if ( $event_begin == $event_end ) {
 				$event_end = '';
 			};
 		}
-		$starttime = ( mc_is_all_day( $data ) ) ? '' : date( "h:i A", strtotime( $data->event_time ) );
-		$endtime   = ( mc_is_all_day( $data ) ) ? '' : date( "h:i A", strtotime( $data->event_endtime ) );
+		$starttime = ( mc_is_all_day( $data ) ) ? '' : date( "h:i A", mc_strtotime( $data->event_time ) );
+		$endtime   = ( mc_is_all_day( $data ) ) ? '' : date( "h:i A", mc_strtotime( $data->event_endtime ) );
 	} else {
 		$event_begin = date( "Y-m-d" );
 		$event_end   = $starttime = $endtime = '';
@@ -2584,4 +2640,65 @@ function mc_post_update_event( $id ) {
 	if ( esc_url( $featured_image ) ) {
 		mc_update_data( $event_id, 'event_image', $featured_image, '%s' );
 	}
+}
+
+/**
+ * Parse a string and replace internationalized months with English so strtotime() will parse correctly
+ */
+function mc_strtotime( $string ) {	
+	$months = array(
+		date_i18n( 'F', strtotime( 'January 1' ) ),
+		date_i18n( 'F', strtotime( 'February 1' ) ),
+		date_i18n( 'F', strtotime( 'March 1' ) ),
+		date_i18n( 'F', strtotime( 'April 1' ) ),
+		date_i18n( 'F', strtotime( 'May 1' ) ),
+		date_i18n( 'F', strtotime( 'June 1' ) ),
+		date_i18n( 'F', strtotime( 'July 1' ) ),
+		date_i18n( 'F', strtotime( 'August 1' ) ),
+		date_i18n( 'F', strtotime( 'September 1' ) ),
+		date_i18n( 'F', strtotime( 'October 1' ) ),
+		date_i18n( 'F', strtotime( 'November 1' ) ),
+		date_i18n( 'F', strtotime( 'December 1' ) ),
+		date_i18n( 'M', strtotime( 'January 1' ) ),
+		date_i18n( 'M', strtotime( 'February 1' ) ),
+		date_i18n( 'M', strtotime( 'March 1' ) ),
+		date_i18n( 'M', strtotime( 'April 1' ) ),
+		date_i18n( 'M', strtotime( 'May 1' ) ),
+		date_i18n( 'M', strtotime( 'June 1' ) ),
+		date_i18n( 'M', strtotime( 'July 1' ) ),
+		date_i18n( 'M', strtotime( 'August 1' ) ),
+		date_i18n( 'M', strtotime( 'September 1' ) ),
+		date_i18n( 'M', strtotime( 'October 1' ) ),
+		date_i18n( 'M', strtotime( 'November 1' ) ),
+		date_i18n( 'M', strtotime( 'December 1' ) )	
+	);
+	$english = array(
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December',
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
+	);
+	
+	return strtotime( str_replace( $months, $english, $string ) );
+
 }

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.6.27
+* Version 6.6.29
 *
 */
 
@@ -128,7 +128,7 @@ function wppa_search_box() {
 }
 
 // Get search html
-function wppa_get_search_html( $label = '', $sub = false, $rt = false, $force_root = '', $page = '' ) {
+function wppa_get_search_html( $label = '', $sub = false, $rt = false, $force_root = '', $page = '', $catbox = false ) {
 global $wppa_session;
 
 	$wppa_session['has_searchbox'] = true;
@@ -159,7 +159,36 @@ global $wppa_session;
 		' class="widget_search"' .
 		' >' .
 		'<div>' .
-			$label .
+			$label;
+			if ( $catbox ) {
+				$cats = wppa_get_catlist();
+				$result .=
+				'<label for="wppa-catbox-' . $mocc . '" >' . __( 'Category', 'wp-photo-album-plus' ) . ': ' .
+				'<select' .
+					' id="wppa-catbox-' . $mocc . '"' .
+					' name="wppa-catbox"' .
+					' >';
+
+					$current = '';
+					if ( wppa_get_get( 'catbox' ) ) {
+						$current = wppa_get_get( 'catbox' );
+					}
+					elseif ( wppa_get_post( 'catbox' ) ) {
+						$current = wppa_get_post( 'catbox' );
+					}
+					if ( $current ) {
+						$current = trim( wppa_sanitize_cats( $current ), ',' );
+					}
+
+					$result .= '<option value="" >' . __( '--- all ---', 'wp-photo-album-plus' ) . '</option>';
+					foreach( array_keys( $cats ) as $cat ) {
+						$result .= '<option value="' . $cat . '" ' . ( $current == $cat ? 'selected="selected"' : '' ) . ' >' . $cat . '</option>';
+					}
+				$result .=
+				'</select>' .
+				'<br />';
+			}
+			$result .=
 			'<input' .
 				' type="text"' .
 				' class="wppa-search-input"' .
@@ -2846,6 +2875,18 @@ static $albums_granted;
 	// Done
 	$result .= '</form></div>';
 
+	// If ajax upload and from cover or thumbnail area, go display the thumbnails after upload
+	if ( $where == 'cover' || $where == 'thumb' ) {
+		$url_after_ajax_upload = wppa_get_permalink() . 'wppa-occur=' . wppa( 'occur' ) . '&wppa-cover=0&wppa-album=' . $alb;
+		$ajax_url_after_upload = str_replace( '&amp;', '&', wppa_get_ajaxlink() ) . 'wppa-occur=' . wppa( 'occur' ) . '&wppa-cover=0&wppa-album=' . $alb;
+		$on_complete = 'wppaDoAjaxRender( ' . $occur . ', \'' . $ajax_url_after_upload . '\', \'' . $url_after_ajax_upload . '\' );';
+	}
+	else {
+		$url_after_ajax_upload = '';
+		$ajax_url_after_upload = '';
+		$on_complete = '';
+	}
+
 	// Ajax upload script
 	if ( $ajax_upload ) {
 		$result .=
@@ -2876,7 +2917,7 @@ static $albums_granted;
 						},
 						complete: function(response) {
 							jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="font-size: 10px;" >\'+response.responseText+\'</span>\' );'.
-							( $where == 'thumb' ? 'document.location.reload(true)' : '' ).'
+							( $where == 'thumb' || $where == 'cover' ? $on_complete : '' ).'
 						},
 						error: function() {
 							jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="color: red;" >'.__( 'ERROR: unable to upload files.', 'wp-photo-album-plus' ).'</span>\' );

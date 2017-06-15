@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 6.6.25
+* Version 6.6.29
 *
 */
 
@@ -244,16 +244,21 @@ global $wppa_session;
 			elseif ( isset( $_REQUEST['searchstring'] ) ) {
 				$value .= $_REQUEST['searchstring'];
 			}
+			if ( wppa( 'catbox' ) ) {
+				$value .= ', ' . __( 'in category:', 'wp-photo-album-plus' ) . ' ' . trim( wppa( 'catbox' ), ',' );
+			}
 			$value .= $albtxt;
 
 			if ( wppa( 'is_slide' ) ) {
-//				$value  = __( 'Searchstring:' , 'wp-photo-album-plus') . ' ' . ( isset ( $wppa_session['display_searchstring'] ) ? $wppa_session['display_searchstring'] : stripslashes( wppa( 'searchstring' ) ) ) . $albtxt;
 				$thumbhref 	= wppa_get_permalink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-searchstring='.stripslashes( str_replace( ' ', '+', $wppa_session['use_searchstring'] ) );
 				$thumbajax 	= wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-searchstring='.stripslashes( str_replace( ' ', '+', $wppa_session['use_searchstring'] ) );
+				if ( wppa( 'catbox' ) ) {
+					$thumbhref .= '&amp;wppa-catbox=' . trim( wppa( 'catbox' ), ',' );
+					$thumbajax .= '&amp;wppa-catbox=' . trim( wppa( 'catbox' ), ',' );
+				}
 				$title  = __( 'View the thumbnails' , 'wp-photo-album-plus');
 				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
 			}
-//			$value  = __( 'Searchstring:' , 'wp-photo-album-plus') . ' ' . ( isset ( $wppa_session['display_searchstring'] ) ? $wppa_session['display_searchstring'] : stripslashes( wppa( 'searchstring' ) ) ) . $albtxt;
 			$href 	= '';
 			$title	= isset ( $wppa_session['display_searchstring'] ) ? wppa_dss_to_title( $wppa_session['display_searchstring'] ) : '';
 			wppa_bcitem( $value, $href, $title, 'b9' );

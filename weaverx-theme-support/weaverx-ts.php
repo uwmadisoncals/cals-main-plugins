@@ -5,7 +5,7 @@ Plugin URI: http://weavertheme.com/plugins
 Description: Weaver Xtreme Theme Support - a package of useful shortcodes and widgets that integrates closely with the Weaver Xtreme and Weaver Foundation themes.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 3.1
+Version: 3.1.6
 License: GPL V3
 
 Weaver Xtreme Theme Support
@@ -43,7 +43,7 @@ function wvrx_is_user_logged_in() {
 
 if ( strpos( $theme, '/weaver-xtreme') !== false ) {		// only load if Weaver Xtreme is the theme
 
-define ('WVRX_TS_VERSION','3.1');
+define ('WVRX_TS_VERSION','3.1.6');
 define ('WVRX_TS_MINIFY','.min');		// '' for dev, '.min' for production
 define ('WVRX_TS_APPEARANCE_PAGE', false );
 
@@ -63,18 +63,14 @@ function wvrx_ts_enqueue_scripts() {	// action definition
 
     // add plugin CSS here, too.
 
-    wp_register_style('wvrx-ts-style-sheet',wvrx_ts_plugins_url('weaverx-ts-style', WVRX_TS_MINIFY.'.css'),null,WVRX_TS_VERSION,'all');
-    wp_enqueue_style('wvrx-ts-style-sheet');
+	// these are now in Weaver Xtreme 3.1 so don't need double loading
+
+    //wp_register_style('wvrx-ts-style-sheet',wvrx_ts_plugins_url('weaverx-ts-style', WVRX_TS_MINIFY.'.css'),null,WVRX_TS_VERSION,'all');
+    //wp_enqueue_style('wvrx-ts-style-sheet');
 }
 
 add_action('wp_enqueue_scripts', 'wvrx_ts_enqueue_scripts' );
 
-/* not compatible with pre 2.2 XPlus
-function wvrx_ts_admin_enqueue_scripts() {
-	wp_enqueue_script('wvrxtsJSLib', wvrx_ts_plugins_url('/admin/assets/js/jscolor/jscolor','.js'),array('jquery'),WVRX_TS_VERSION,true);
-}
-
-add_action( 'admin_enqueue_scripts', 'wvrx_ts_admin_enqueue_scripts' ); */
 
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-runtime-lib.php'); // NOW - load the basic library
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-widgets.php'); 		// widgets runtime library

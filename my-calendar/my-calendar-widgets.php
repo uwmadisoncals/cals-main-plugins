@@ -52,6 +52,98 @@ class my_calendar_simple_search extends WP_Widget {
 	}
 }
 
+
+class my_calendar_filters extends WP_Widget {
+	function __construct() {
+		parent::__construct( 
+			false, 
+			$name = __( 'My Calendar: Event Filters', 'my-calendar' ),
+			array( 'customize_selective_refresh' => true )
+		);
+	}
+
+	function widget( $args, $instance ) {
+		extract( $args );
+		$widget_title = apply_filters( 'widget_title', $instance['title'], $instance, $args );
+		$widget_title = ( $widget_title != '' ) ? $before_title . $widget_title . $after_title : '';		
+		$widget_url   = ( isset( $instance['url'] ) ) ? $instance['url'] : mc_get_uri();
+		$ltype        = ( isset( $instance['ltype'] ) ) ? $instance['ltype'] : false;
+		$show         = ( isset( $instance['show'] ) ) ? $instance['show'] : array();	
+		$show         = implode( $show, ',' );
+		
+		echo $before_widget;
+		echo ( $instance['title'] != '' ) ? $widget_title : '';
+		
+		echo mc_filters( $show, $widget_url, $ltype );
+		echo $after_widget;
+	}
+
+	function form( $instance ) {
+		$widget_title = ( isset( $instance['title'] ) ) ? $instance['title'] : '';
+		$widget_url   = ( isset( $instance['url'] ) ) ? $instance['url'] : mc_get_uri();
+		$ltype        = ( isset( $instance['ltype'] ) ) ? $instance['ltype'] : false;
+		$show         = ( isset( $instance['show'] ) ) ? $instance['show'] : array();
+			
+		?>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title', 'my-calendar' ); ?>
+				:</label><br/>
+			<input class="widefat" type="text" id="<?php echo $this->get_field_id( 'title' ); ?>"
+			       name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php esc_attr_e( $widget_title ); ?>"/>
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Target Calendar Page', 'my-calendar' ); ?>
+				:</label><br/>
+			<input class="widefat" type="text" id="<?php echo $this->get_field_id( 'url' ); ?>"
+			       name="<?php echo $this->get_field_name( 'url' ); ?>" value="<?php echo esc_url( $widget_url ); ?>"/>
+		</p>
+		<ul>
+			<?php $locations = in_array( 'locations', $show ) ? 'checked="checked"' : ''; ?>
+			<li>
+				<input type="checkbox" id="<?php echo $this->get_field_id( 'show' ); ?>_locations" name="<?php echo $this->get_field_name( 'show' ); ?>[]" value="locations" <?php echo $locations; ?> /> <label for="<?php echo $this->get_field_id( 'show' ); ?>_locations"><?php _e( "Locations", 'my-calendar' ); ?></label>
+			</li>
+			<?php $categories = in_array( 'categories', $show ) ? 'checked="checked"' : ''; ?>
+			<li>
+				<input type="checkbox" id="<?php echo $this->get_field_id( 'show' ); ?>_categories" name="<?php echo $this->get_field_name( 'show' ); ?>[]" value="categories" <?php echo $categories; ?> /> <label for="<?php echo $this->get_field_id( 'show' ); ?>_categories"><?php _e( "Categories", 'my-calendar' ); ?></label>
+			</li>
+			<?php $access = in_array( 'access', $show ) ? 'checked="checked"' : ''; ?>
+			<li>
+				<input type="checkbox" id="<?php echo $this->get_field_id( 'show' ); ?>_access" name="<?php echo $this->get_field_name( 'show' ); ?>[]" value="access" <?php echo $access; ?> /> <label for="<?php echo $this->get_field_id( 'show' ); ?>_access"><?php _e( "Accessibility Features", 'my-calendar' ); ?></label>	
+			</li>
+		</ul>		
+		<p>
+			<label
+				for="<?php echo $this->get_field_id( 'ltype' ); ?>"><?php _e( 'Filter locations by', 'my-calendar' ); ?></label>
+			<select id="<?php echo $this->get_field_id( 'ltype' ); ?>"
+			        name="<?php echo $this->get_field_name( 'ltype' ); ?>">
+				<option
+					value="name" <?php selected( $ltype, 'name' ); ?>><?php _e( 'Location Name', 'my-calendar' ) ?></option>
+				<option
+					value="state" <?php selected( $ltype, 'state' ); ?>><?php _e( 'State/Province', 'my-calendar' ) ?></option>
+				<option
+					value="city" <?php selected( $ltype, 'city' ); ?>><?php _e( 'City', 'my-calendar' ) ?></option>
+				<option
+					value="region" <?php selected( $ltype, 'region' ); ?>><?php _e( 'Region', 'my-calendar' ) ?></option>
+				<option
+					value="zip" <?php selected( $ltype, 'zip' ); ?>><?php _e( 'Postal Code', 'my-calendar' ) ?></option>
+				<option
+					value="country" <?php selected( $ltype, 'country' ); ?>><?php _e( 'Country', 'my-calendar' ) ?></option>					
+			</select>
+		</p>		
+	<?php
+	}
+
+	function update( $new, $old ) {
+		$instance          = $old;
+		$instance['title'] = mc_kses_post( $new['title'] );
+		$instance['url']   = esc_url_raw( $new['url'] );
+		$instance['ltype'] = sanitize_title( $new['ltype'] );
+		$instance['show']  = array_map( 'sanitize_title', $new['show'] );
+
+		return $instance;
+	}
+}
+
 class my_calendar_today_widget extends WP_Widget {
 
 	function __construct() {
@@ -66,7 +158,7 @@ class my_calendar_today_widget extends WP_Widget {
 		$the_category   = ( $instance['my_calendar_today_category'] == '' ) ? 'default' : esc_attr( $instance['my_calendar_today_category'] );
 		$author         = ( ! isset( $instance['my_calendar_today_author'] ) || $instance['my_calendar_today_author'] == '' ) ? 'all' : esc_attr( $instance['my_calendar_today_author'] );
 		$host           = ( ! isset( $instance['mc_host'] ) || $instance['mc_host'] == '' ) ? 'all' : esc_attr( $instance['mc_host'] );
-		$default_link   = ( is_numeric( get_option( 'mc_uri' ) ) ) ? get_permalink( get_option( 'mc_uri' ) ) : get_option( 'mc_uri' );
+		$default_link   = mc_get_uri( false, $args );
 		$widget_link    = ( ! empty( $instance['my_calendar_today_linked'] ) && $instance['my_calendar_today_linked'] == 'yes' ) ? $default_link : '';
 		$widget_link    = ( ! empty( $instance['mc_link'] ) ) ? esc_url( $instance['mc_link'] ) : $widget_link;
 		$widget_title   = empty( $the_title ) ? '' : $the_title;
@@ -99,7 +191,7 @@ class my_calendar_today_widget extends WP_Widget {
 		$widget_linked   = ( isset( $instance['my_calendar_today_linked'] ) ) ? esc_attr( $instance['my_calendar_today_linked'] ) : '';
 		$date            = ( isset( $instance['mc_date'] ) ) ? esc_attr( $instance['mc_date'] ) : '';
 		if ( $widget_linked == 'yes' ) {
-			$default_link = ( is_numeric( get_option( 'mc_uri' ) ) ) ? get_permalink( get_option( 'mc_uri' ) ) : get_option( 'mc_uri' );
+			$default_link = mc_get_uri( false, $instance );
 		} else {
 			$default_link = '';
 		}
@@ -208,7 +300,7 @@ class my_calendar_upcoming_widget extends WP_Widget {
 		$the_category   = ( $instance['my_calendar_upcoming_category'] == '' ) ? 'default' : esc_attr( $instance['my_calendar_upcoming_category'] );
 		$author         = ( ! isset( $instance['my_calendar_upcoming_author'] ) || $instance['my_calendar_upcoming_author'] == '' ) ? 'default' : esc_attr( $instance['my_calendar_upcoming_author'] );
 		$host           = ( ! isset( $instance['mc_host'] ) || $instance['mc_host'] == '' ) ? 'default' : esc_attr( $instance['mc_host'] );
-		$widget_link    = ( isset( $instance['my_calendar_upcoming_linked'] ) && $instance['my_calendar_upcoming_linked'] == 'yes' ) ? get_option( 'mc_uri' ) : '';
+		$widget_link    = ( isset( $instance['my_calendar_upcoming_linked'] ) && $instance['my_calendar_upcoming_linked'] == 'yes' ) ? mc_get_uri( false, $instance ) : '';
 		$widget_link    = ( ! empty( $instance['mc_link'] ) ) ? esc_url( $instance['mc_link'] ) : $widget_link;
 		$widget_title   = empty( $the_title ) ? '' : $the_title;
 		$widget_title   = ( $widget_link == '' ) ? $widget_title : "<a href='$widget_link'>$widget_title</a>";
@@ -250,7 +342,7 @@ class my_calendar_upcoming_widget extends WP_Widget {
 		$site       = ( isset( $instance['mc_site'] ) ) ? esc_attr( $instance['mc_site'] ) : '';
 		
 		if ( $linked == 'yes' ) {
-			$default_link = ( is_numeric( get_option( 'mc_uri' ) ) ) ? get_permalink( get_option( 'mc_uri' ) ) : get_option( 'mc_uri' );
+			$default_link = mc_get_uri( false, $instance );
 		} else {
 			$default_link = '';
 		}

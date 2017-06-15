@@ -16,7 +16,7 @@ function weaverx_ts_admin_saverestore() {
 	if (! $style_date ) $style_date = __('No saved settings', 'weaver-xtreme' /*adm*/);
 ?>
 
-<div class="atw-option-header" style="clear:both;"><?php _e('Save/Restore Theme Settings', 'weaver-xtreme' /*adm*/);weaverx_help_link('help.html#SaveRestore',_e('Help on Save/Restore Themes', 'weaver-xtreme' /*adm*/));?></div>
+<div class="atw-option-header" style="clear:both;"><?php _e('Save/Restore Theme Settings', 'weaver-xtreme' /*adm*/);weaverx_help_link('help.html#SaveRestore',__('Help on Save/Restore Themes', 'weaver-xtreme' /*adm*/));?></div>
 <p>
 <?php _e('Note: if you have Weaver Xtreme Plus installed, then options marked with &starf;Plus will be included in saves and restores.', 'weaver-xtreme' /*adm*/); ?>
 </p>
@@ -127,7 +127,7 @@ function weaverx_saverestore(){
 if (function_exists('weaverxplus_plugin_installed'))
 	echo '<p>' .
 __('Note: Downloaded settings include <em>Weaver Xtreme Plus</em> settings.
-Setting files from Weaver Xtreme Plus can be uploaded to the Free Weaver Xtreme version, but will not be used or saved by the free version.', 'weaver-xtreme' /*adm*/)
+Setting files from Weaver Xtreme Plus can be uploaded to the Free Weaver Xtreme version, but will not be used or saved by the free version. If you get error messages while downloading or uploading (a very rare host related issue), try the Customizer save/restore options instead.', 'weaver-xtreme' /*adm*/)
 . '</p>';
 ?>
 
@@ -156,6 +156,22 @@ __('Note: Any Weaver Xtreme Plus settings will <em>not</em> be restored for Weav
 	</table>
 	<?php weaverx_nonce_field('uploadtheme'); ?>
 	</form>
+
+<h3 class="atw-option-header" style="color:blue;">
+	<?php _e('Save/Restore Current Settings in files on your site\'s host file system. (&starf;Plus)', 'weaver-xtreme' /*adm*/); ?>
+</h3>
+<p>
+	<?php _e('This option allows you to save and restore current subtheme settings on the file system of your site\' host.', 'weaver-xtreme' /*adm*/); ?>
+</p>
+<p>
 <?php
+	if (!function_exists('weaverxplus_plugin_installed') || !version_compare(WEAVER_XPLUS_VERSION, '3.1','>=') ) {
+		echo '<strong>'; _e('This option requires Weaver Xtreme Plus version greater or equal to ','weaver_xtreme') ; echo '3.1</strong>';
+	} else {
+		do_action('weaverxplus_admin','save_restore_files');
+	}
+	echo '</p>';
 }
+
+
 ?>
