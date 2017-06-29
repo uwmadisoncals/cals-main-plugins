@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.6.29
+* Version 6.6.31
 *
 */
 
@@ -806,7 +806,7 @@ function wppaTryScheduledel( id ) {
 								if ( $dislikes ) {
 									echo
 									'<span style="color:red" >' .
-										sprintf( __( 'Disliked by %d visitors', 'wp-photo-album-plus' ), $dislikes ) . '. ' .
+										sprintf( _n( 'Disliked by %d visitor', 'Disliked by %d visitors', $dislikes, 'wp-photo-album-plus' ), $dislikes ) . '. ' .
 									'</span>';
 								}
 								$pending = wppa_pendrat_get( $id );
@@ -1257,6 +1257,7 @@ function wppaTryScheduledel( id ) {
 										__( 'Target album for copy/move:', 'wp-photo-album-plus' ) .
 										'<select' .
 											' id="target-' . $id . '"' .
+											' style="max-width:500px;"' .
 											' >' .
 											$album_select[$album] .
 										'</select>';
@@ -1731,11 +1732,14 @@ function wppaTryScheduledel( id ) {
 						}
 
 						// Tags
+						$allowed = ! wppa_switch( 'newtags_is_restricted' ) || wppa_user_is( 'administrator' );
 						echo
 						'<tr>' .
 							'<td>' .
 								__( 'Tags:', 'wp-photo-album-plus' ) .
-							'</td>' .
+							'</td>';
+
+							echo
 							'<td>' .
 								'<input' .
 									' id="tags-' . $id . '"' .
@@ -1743,12 +1747,16 @@ function wppaTryScheduledel( id ) {
 									' style="width:100%;"' .
 									' onchange="wppaAjaxUpdatePhoto( ' . $id . ', \'tags\', this )"' .
 									' value="' . $tags . '"' .
+									( $allowed ? '' : ' readonly="readonly"' ) .
 								' />' .
+								( $allowed ?
 								'<br />' .
 								'<span class="description" >' .
 									__( 'Separate tags with commas.', 'wp-photo-album-plus') .
-								'</span>' .
-							'</td>' .
+								'</span>' : '' ) .
+							'</td>';
+
+							echo
 							'<td>' .
 								'<select' .
 									' onchange="wppaAddTag( this.value, \'tags-' . $id . '\' ); wppaAjaxUpdatePhoto( ' . $id . ', \'tags\', document.getElementById( \'tags-' . $id . '\' ) )"' .
@@ -1758,6 +1766,9 @@ function wppaTryScheduledel( id ) {
 										echo '<option value="" >' . __( '- select -', 'wp-photo-album-plus' ) . '</option>';
 										foreach ( $taglist as $tag ) {
 											echo '<option value="' . $tag['tag'] . '" >' . $tag['tag'] . '</option>';
+										}
+										if ( ! $allowed ) {
+											echo '<option value="-clear-" >' . __( '- clear -', 'wp-photo-album-plus' ) . '</option>';
 										}
 									}
 									else {
@@ -1769,7 +1780,7 @@ function wppaTryScheduledel( id ) {
 								'<span class="description" >' .
 									__( 'Select to add', 'wp-photo-album-plus' ) .
 								'</span>' .
-							'</td>' .
+							'</td>';
 						'</tr>';
 
 						// Custom
@@ -2607,7 +2618,7 @@ function wppaSetConfirmMove( id ) {
 							<!-- Name, size, move -->
 							<!-- Name -->
 							<td style="width:25%;" >
-								<input type="text" style="width:100%;" id="pname-<?php echo $photo['id'] ?>" onchange="wppaAjaxUpdatePhoto( <?php echo $photo['id'] ?>, 'name', this );" value="<?php echo esc_attr( stripslashes( $photo['name'] ) ) ?>" />
+								<input type="text" style="width:300px;" id="pname-<?php echo $photo['id'] ?>" onchange="wppaAjaxUpdatePhoto( <?php echo $photo['id'] ?>, 'name', this );" value="<?php echo esc_attr( stripslashes( $photo['name'] ) ) ?>" />
 								<!-- Size -->
 								<?php
 								if ( wppa_is_video( $photo['id'] ) ) {
@@ -2630,11 +2641,11 @@ function wppaSetConfirmMove( id ) {
 
 										// If not done yet, get the album options html with the current album excluded
 										if ( ! isset( $album_select[$album] ) ) {
-											$album_select[$album] = wppa_album_select_a( array( 	'checkaccess' => true,
-																									'path' => wppa_switch( 'hier_albsel' ),
-																									'exclude' => $album,
-																									'selected' => '0',
-																									'addpleaseselect' => true
+											$album_select[$album] = wppa_album_select_a( array( 	'checkaccess' 		=> true,
+																									'path' 				=> wppa_switch( 'hier_albsel' ),
+																									'exclude' 			=> $album,
+																									'selected' 			=> '0',
+																									'addpleaseselect' 	=> true,
 																								)
 																						);
 										}
@@ -2644,6 +2655,7 @@ function wppaSetConfirmMove( id ) {
 										'<select' .
 											' id="target-' . $id . '"' .
 											' onchange="wppaTryMove(' . $id . ', ' . ( wppa_is_video( $id ) ? 'true' : 'false' ) . ');"' .
+											' style="max-width:300px;"' .
 											' >' .
 											$album_select[$album] .
 										'</select>' .
@@ -2844,7 +2856,7 @@ global $wpdb;
 					xmlhttp.setRequestHeader( "Content-type","application/x-www-form-urlencoded" );
 					xmlhttp.send( data );
 					jQuery( "#wppa-sort-seqn-"+photo ).attr( 'value', seqno );	// set hidden value to new value to prevent duplicate action
-					var spinnerhtml = '<img src="'+wppaImageDirectory+'spinner.'+<?php echo ( wppa_use_svg() ? 'svg' : 'gif' ) ?>+'" />';
+					var spinnerhtml = '<img src="'+wppaImageDirectory+'spinner.'+'<?php echo ( wppa_use_svg() ? 'svg' : 'gif' ) ?>'+'" />';
 					jQuery( '#wppa-seqno-'+photo ).html( spinnerhtml );
 				}
 			</script>

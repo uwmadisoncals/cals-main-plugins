@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.6.28
+* Version 6.7.00
 *
 */
 
@@ -56,6 +56,7 @@ global $wppa_revno;
 		'admin' 	=> '',
 		'parent' 	=> '',
 		'alt' 		=> '',
+		'timeout' 	=> '',
 	), $xatts );
 
 	// Init
@@ -110,11 +111,17 @@ global $wppa_revno;
 			$wppa['start_album'] = $atts['album'];
 			$wppa['is_slide'] = '1';
 			$wppa['start_photo'] = $atts['photo'];
+			if ( $atts['timeout'] ) {
+				$wppa['in_widget_timeout'] = ( $atts['timeout'] == 'random' ? 'random' : strval( abs( intval( $atts['timeout'] ) ) ) );
+			}
 			break;
 		case 'slideonly':
 			$wppa['start_album'] = $atts['album'];
 			$wppa['is_slideonly'] = '1';
 			$wppa['start_photo'] = $atts['photo'];
+			if ( $atts['timeout'] ) {
+				$wppa['in_widget_timeout'] = ( $atts['timeout'] == 'random' ? 'random' : strval( abs( intval( $atts['timeout'] ) ) ) );
+			}
 			break;
 		case 'slideonlyf':
 			$wppa['start_album'] = $atts['album'];
@@ -122,6 +129,9 @@ global $wppa_revno;
 			$wppa['is_slideonlyf'] = '1';
 			$wppa['film_on'] = '1';
 			$wppa['start_photo'] = $atts['photo'];
+			if ( $atts['timeout'] ) {
+				$wppa['in_widget_timeout'] = ( $atts['timeout'] == 'random' ? 'random' : strval( abs( intval( $atts['timeout'] ) ) ) );
+			}
 			break;
 		case 'slidef':
 			$wppa['start_album'] = $atts['album'];

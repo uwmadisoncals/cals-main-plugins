@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version 6.6.29
+* Version 6.6.30
 *
 */
 
@@ -63,7 +63,7 @@ function wppa_add_admin() {
 		add_submenu_page( 'wppa_admin_menu',  __('Edit Photos', 'wp-photo-album-plus'), 		 __('Edit Photos', 'wp-photo-album-plus'), 		   'wppa_upload', 		 'wppa_edit_photo', 	 'wppa_edit_photo' );
 	}
 	add_submenu_page( 'wppa_admin_menu',  __('Import Photos', 'wp-photo-album-plus'),           __('Import Photos', 'wp-photo-album-plus'),          'wppa_import',        'wppa_import_photos',   'wppa_page_import' );
-	add_submenu_page( 'wppa_admin_menu',  __('Moderate Photos', 'wp-photo-album-plus'),		 __('Moderate Photos', 'wp-photo-album-plus').$tot_pending, 'wppa_moderate', 	 'wppa_moderate_photos', 'wppa_page_moderate' );
+	add_submenu_page( 'wppa_admin_menu',  __('Moderate Photos', 'wp-photo-album-plus'),		 __('Moderate Photos', 'wp-photo-album-plus').(wppa_switch('moderate_bulk')?$upl_pending:$tot_pending), 'wppa_moderate', 	 'wppa_moderate_photos', 'wppa_page_moderate' );
 	add_submenu_page( 'wppa_admin_menu',  __('Export Photos', 'wp-photo-album-plus'),           __('Export Photos', 'wp-photo-album-plus'),          'wppa_export',     	 'wppa_export_photos',   'wppa_page_export' );
     add_submenu_page( 'wppa_admin_menu',  __('Settings', 'wp-photo-album-plus'),                __('Settings', 'wp-photo-album-plus'),               'wppa_settings',      'wppa_options',         'wppa_page_options' );
 	add_submenu_page( 'wppa_admin_menu',  __('Photo of the day Widget', 'wp-photo-album-plus'), __('Photo of the day', 'wp-photo-album-plus'),       'wppa_potd', 		 'wppa_photo_of_the_day', 'wppa_sidebar_page_options' );

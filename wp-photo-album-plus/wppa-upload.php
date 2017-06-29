@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 6.6.26
+* Version 6.6.30
 *
 */
 
@@ -186,7 +186,7 @@ global $upload_album;
 						'<label for="wppa-album">' .
 							__( 'Album:' , 'wp-photo-album-plus') .
 						'</label>' .
-						'<select name="wppa-album" id="wppa-album-s" >' .
+						'<select name="wppa-album" id="wppa-album-s" style="max-width:100%;" >' .
 							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true ) ) .
 						'</select>' .
 					'</p>';
@@ -328,7 +328,7 @@ global $upload_album;
 					'</script>' .
 					'<p>' .
 						'<label for="wppa-album">' . __( 'Album:' , 'wp-photo-album-plus' ) . '</label>' .
-						'<select name="wppa-album" id="wppa-album-s">' .
+						'<select name="wppa-album" id="wppa-album-s" style="max-width:100%;" >' .
 							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true ) ) .
 						'</select>' .
 					'</p>';
@@ -405,7 +405,7 @@ global $upload_album;
 					'</div>' .
 					'<p>' .
 						'<label for="wppa-album">' . __( 'Album:' , 'wp-photo-album-plus') . '</label>' .
-						'<select name="wppa-album" id="wppa-album-m">' .
+						'<select name="wppa-album" id="wppa-album-m" style="max-width:100%;" >' .
 							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true ) ) .
 						'</select>' .
 					'</p>';
@@ -539,10 +539,12 @@ global $upload_album;
 					return;
 				}
 				if ( ! $file['error'][$i] ) {
+					wppa_pdf_preprocess( $file, $upload_album, $i );
 					$id = wppa_insert_photo( $file['tmp_name'][$i], $upload_album, $file['name'][$i] );
 					if ( $id ) {
 						$uploaded_a_file = true;
 						$count++;
+						wppa_pdf_postprocess( $id );
 						wppa_backend_upload_mail( $id, $upload_album, $file['name'][$i] );
 					}
 					else {
@@ -573,10 +575,12 @@ global $upload_album;
 	$count = '0';
 	foreach ( $_FILES as $file ) {
 		if ( $file['tmp_name'] != '' ) {
+			wppa_pdf_preprocess( $file, $upload_album );
 			$id = wppa_insert_photo( $file['tmp_name'], $upload_album, $file['name'] );
 			if ( $id ) {
 				$uploaded_a_file = true;
 				$count++;
+				wppa_pdf_postprocess( $id );
 				wppa_backend_upload_mail( $id, $upload_album, $file['name'] );
 			}
 			else {

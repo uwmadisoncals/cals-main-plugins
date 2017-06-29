@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the best rated photos
-* Version 6.5.00
+* Version 6.7.00
 *
 */
 
@@ -171,7 +171,7 @@ class BestOfWidget extends WP_Widget {
 		</select>
 		';
 
-		_e( sprintf( 'Display the %1s best %2s based on ratings given during %3s and sorted by %4s', $count_html, $what_html, $period_html, $sort_html ) , 'wp-photo-album-plus');
+		echo sprintf( __( 'Display the %1s best %2s based on ratings given during %3s and sorted by %4s', 'wp-photo-album-plus' ), $count_html, $what_html, $period_html, $sort_html );
 
 ?>
 

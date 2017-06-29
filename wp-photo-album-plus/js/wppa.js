@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.6.28';
+var wppaJsVersion = '6.7.00';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -447,7 +447,7 @@ function wppaGetContainerWidth( mocc ) {
 		w = jQuery( elm ).width();
 	}
 
-	return w * wppaAutoColumnFrac[mocc];
+	return parseInt( w * wppaAutoColumnFrac[mocc] );
 }
 
 // Do the responsive size adjustment

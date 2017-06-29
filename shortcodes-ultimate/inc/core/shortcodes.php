@@ -629,7 +629,7 @@ class Su_Shortcodes {
 		$autoplay = ( $atts['autoplay'] === 'yes' ) ? '?autoplay=1' : '';
 		// Create player
 		$return[] = '<div class="su-youtube su-responsive-media-' . $atts['responsive'] . su_ecssc( $atts ) . '">';
-		$return[] = '<iframe width="' . $atts['width'] . '" height="' . $atts['height'] . '" src="http://www.youtube.com/embed/' . $id . $autoplay . '" frameborder="0" allowfullscreen="true"></iframe>';
+		$return[] = '<iframe width="' . $atts['width'] . '" height="' . $atts['height'] . '" src="https://www.youtube.com/embed/' . $id . $autoplay . '" frameborder="0" allowfullscreen="true"></iframe>';
 		$return[] = '</div>';
 		su_query_asset( 'css', 'su-media-shortcodes' );
 		// Return result
@@ -847,7 +847,11 @@ class Su_Shortcodes {
 		$atts['id'] = su_scattr( $atts['id'] );
 		// Prepare link text
 		$text = ( $content ) ? $content : get_the_title( $atts['id'] );
-		return '<a href="' . get_permalink( $atts['id'] ) . '" class="' . su_ecssc( $atts ) . '" title="' . $text . '" target="_' . $atts['target'] . '">' . $text . '</a>';
+		if (current_user_can('read',$atts['id'])) {
+			return '<a href="' . get_permalink( $atts['id'] ) . '" class="' . su_ecssc( $atts ) . '" title="' . $text . '" target="_' . $atts['target'] . '">' . $text . '</a>';
+		} else {
+			return $text;
+		}
 	}
 
 	public static function members( $atts = null, $content = null ) {
@@ -971,7 +975,7 @@ class Su_Shortcodes {
 				'class'      => ''
 			), $atts, 'gmap' );
 		su_query_asset( 'css', 'su-media-shortcodes' );
-		return '<div class="su-gmap su-responsive-media-' . $atts['responsive'] . su_ecssc( $atts ) . '"><iframe width="' . $atts['width'] . '" height="' . $atts['height'] . '" src="http://maps.google.com/maps?q=' . urlencode( su_scattr( $atts['address'] ) ) . '&amp;output=embed"></iframe></div>';
+		return '<div class="su-gmap su-responsive-media-' . $atts['responsive'] . su_ecssc( $atts ) . '"><iframe width="' . $atts['width'] . '" height="' . $atts['height'] . '" src="//maps.google.com/maps?q=' . urlencode( su_scattr( $atts['address'] ) ) . '&amp;output=embed"></iframe></div>';
 	}
 
 	public static function slider( $atts = null, $content = null ) {
@@ -1103,7 +1107,7 @@ class Su_Shortcodes {
 				// Open slide
 				$return .= '<div class="su-carousel-slide">';
 				// Slide content with link
-				if ( $slide['link'] ) $return .= '<a href="' . $slide['link'] . '"' . $target . 'title="' . esc_attr( $slide['title'] ) . '"><img src="' . $image['url'] . '" alt="' . esc_attr( $slide['title'] ) . '" />' . $title . '</a>';
+				if ( $slide['link'] ) $return .= '<a href="' . $slide['link'] . '"' . $target . ' title="' . esc_attr( $slide['title'] ) . '"><img src="' . $image['url'] . '" alt="' . esc_attr( $slide['title'] ) . '" />' . $title . '</a>';
 				// Slide content without link
 				else $return .= '<a><img src="' . $image['url'] . '" alt="' . esc_attr( $slide['title'] ) . '" />' . $title . '</a>';
 				// Close slide
@@ -1267,6 +1271,7 @@ class Su_Shortcodes {
 			// Term string to array
 			$tax_term = explode( ',', $tax_term );
 			// Validate operator
+			$tax_operator = str_replace( array( 0, 1, 2 ), array( 'IN', 'NOT IN', 'AND' ), $tax_operator );
 			if ( !in_array( $tax_operator, array( 'IN', 'NOT IN', 'AND' ) ) ) $tax_operator = 'IN';
 			$tax_args = array( 'tax_query' => array( array(
 						'taxonomy' => $taxonomy,

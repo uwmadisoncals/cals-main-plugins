@@ -3,14 +3,14 @@
 * Package: wp-photo-album-plus
 *
 * display the tagcloud widget
-* Version 6.4.17
+* Version 6.7.00
 *
 */
 
 class TagcloudPhotos extends WP_Widget {
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_tagcloud_photos', 'description' => __( 'WPPA+ Photo Tags', 'wp-photo-album-plus') );	//
+		$widget_ops = array('classname' => 'wppa_tagcloud_photos', 'description' => __( 'WPPA+ Photo Tagcloud', 'wp-photo-album-plus') );	//
 		parent::__construct('wppa_tagcloud_photos', __('Photo Tag Cloud', 'wp-photo-album-plus'), $widget_ops);															//
     }
 
@@ -77,7 +77,7 @@ class TagcloudPhotos extends WP_Widget {
 			echo '</select>';
 		echo '</p>';
 		if ( isset($instance['tags']['0']) && $instance['tags']['0'] ) $s = implode(',', $instance['tags']); else $s = __('--- all ---', 'wp-photo-album-plus');
-		echo '<p>Currently selected tags: <br /><b>'.$s.'</b></p>';
+		echo '<p>' . __( 'Currently selected tags', 'wp-photo-album-plus' ) . ': <br /><b>'.$s.'</b></p>';
 
     }
 

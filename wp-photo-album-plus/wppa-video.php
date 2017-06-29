@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all video routines
-* Version 6.6.18
+* Version 6.6.20
 *
 */
 
@@ -145,9 +145,16 @@ function wppa_get_video_body( $id, $for_lb = false, $w = '0', $h = '0' ) {
 	$source 	= substr( $source, 0, strrpos( $source, '.' ) );
 	$class 		= $for_lb ? ' class="wppa-overlay-img"' : '';
 
-	$is_opera 	= strpos( $_SERVER["HTTP_USER_AGENT"], 'OPR' );
-	$is_ie 		= strpos( $_SERVER["HTTP_USER_AGENT"], 'Trident' );
-	$is_safari 	= strpos( $_SERVER["HTTP_USER_AGENT"], 'Safari' );
+	if ( isset( $_SERVER["HTTP_USER_AGENT"] ) ) {
+		$is_opera 	= strpos( $_SERVER["HTTP_USER_AGENT"], 'OPR' );
+		$is_ie 		= strpos( $_SERVER["HTTP_USER_AGENT"], 'Trident' );
+		$is_safari 	= strpos( $_SERVER["HTTP_USER_AGENT"], 'Safari' );
+	}
+	else {
+		$is_opera 	= false;
+		$is_ie 		= false;
+		$is_safari 	= false;
+	}
 
 	wppa_dbg_msg('Mp4:'.$mp4.', Opera:'.$is_opera.', Ie:'.$is_ie.', Saf:'.$is_safari);
 

@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.6.24
+/* Version 6.6.30
 /* Various js routines used in admin pages
 */
 
@@ -2189,7 +2189,7 @@ function wppaPhotoStatusChange(id) {
 	}
 
 	// schedule delete
-	if ( jQuery( '#scheduledel-' + id ).attr( 'checked' ) == 'checked' ) {
+	if ( jQuery( '#scheduledel-' + id ).prop( 'checked' ) ) {
 		jQuery( '.wppa-del-datetime-' + id ).css( 'display', '' );
 	}
 	else {
@@ -2234,6 +2234,9 @@ function wppaAddTag(val, id) {
 		}
 		else {
 			elm.value = val;
+		}
+		if ( val == '-clear-' ) {
+			elm.value = '';
 		}
 	}
 }

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.6.29
+* Version 6.7.00
 *
 */
 
@@ -1467,7 +1467,10 @@ $tweet = urlencode( $share_url );
 		// New style under development
 		$li = 	'<div class="wppa-share-icon" style="float:left; padding:0 2px;" >' .
 					'<a' .
-						' href="https://www.linkedin.com/shareArticle?mini=true&url=' . urlencode( $share_url ) . '" >' .
+						' title="' . sprintf( __( 'Share %s on LinkedIn' ,'wp-photo-album-plus' ), esc_attr( $photo_name ) ) . '"' .
+						' href="https://www.linkedin.com/shareArticle?mini=true&url=' . urlencode( $share_url ) . '"' .
+						' target="_blank"' .
+						' >' .
 						'<img src="' . wppa_get_imgdir() . 'linkedin.png" style="height:' . $s . 'px;vertical-align:top;" />' .
 					'</a>' .
 				'</div>';
@@ -2414,6 +2417,9 @@ static $albums_granted;
 	if ( $may_audio ) {
 		$accept .= ',.' . implode( ',.', $wppa_supported_audio_extensions );
 	}
+	if ( wppa_can_pdf() ) {
+		$accept .= ',.pdf';
+	}
 
 	if ( $one_only ) {
 		if ( $on_camera ) {
@@ -2450,6 +2456,9 @@ static $albums_granted;
 				$value = esc_attr( __( 'Select Photos', 'wp-photo-album-plus' ) );
 			}
 		}
+	}
+	if ( wppa_can_pdf() ) {
+		$value .= ' / Pdf';
 	}
 
 	$result .=

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.6.29
+* Version 6.7.00
 *
 */
 
@@ -2059,6 +2059,7 @@ static $user;
 	// Find image url
 	if ( wppa_switch( 'fotomoto_on' ) && ! wppa_is_stereo( $id ) ) {
 		$photourl = wppa_get_hires_url( $id );
+		$photourl = str_replace( '.pdf', '.jpg', $photourl );
 	}
 	elseif ( wppa_use_thumb_file( $id, $style_a['width'], $style_a['height'] ) && ! wppa_is_stereo( $id ) ) {
 		$photourl = wppa_get_thumb_url( $id, true, '', $style_a['width'], $style_a['height'] );
@@ -2163,28 +2164,33 @@ static $user;
 				' />';
 		}
 		if ( wppa_user_is( 'administrator' ) && wppa_switch( 'enable_admins_choice' ) ) {
-			$choicelink = '
-				<div' .
+
+			if ( wppa_is_photo_in_zip( $thumb['id'] ) ) {
+				$choicelink =
+				'<input' .
 					' id="admin-choice-' . wppa_encrypt_photo($thumb['id']) . '-' . wppa( 'mocc' ) . '"' .
-					' style="float:right;margin-right:6px;color:gray;"' .
-					' >';
-					if ( ! wppa_is_photo_in_zip( $thumb['id'] ) ) {
-						$choicelink .=
-						'<a' .
-							' style="color:blue;"' .
-							' onclick="' .
-								'_wppaStop( ' . wppa( 'mocc' ) . ' );' .
-								esc_attr( 'if ( confirm( "' . __( 'Are you sure you want to add this photo to your zip?' , 'wp-photo-album-plus') . '" ) ) ' .
-									'wppaAjaxAddPhotoToZip( '.wppa( 'mocc' ).', '.esc_js('\''.wppa_encrypt_photo($thumb['id']).'\'').', false ); return false;' ).'"' .
-							'>' .
-							__( 'MyChoice' , 'wp-photo-album-plus') .
-						'</a>';
-					}
-					else {
-						$choicelink .= __('Selected', 'wp-photo-album-plus');
-					}
-				$choicelink .=
-				'</div>';
+					' type="button"' .
+					' style="float:right;margin-right:6px;"' .
+					' disabled="disabled"' .
+					' value="' . esc_attr( __( 'Selected', 'wp-photo-album-plus' ) ) . '"' .
+				' />';
+
+			}
+			else {
+				$choicelink =
+				'<input' .
+					' id="admin-choice-' . wppa_encrypt_photo($thumb['id']) . '-' . wppa( 'mocc' ) . '"' .
+					' type="button"' .
+					' style="float:right;margin-right:6px;"' .
+					' onclick="' .
+						'_wppaStop( ' . wppa( 'mocc' ) . ' );' .
+						esc_attr( 'if ( confirm( "' . __( 'Are you sure you want to add this photo to your zip?' , 'wp-photo-album-plus') . '" ) ) ' .
+						'wppaAjaxAddPhotoToZip( '.wppa( 'mocc' ).', '.esc_js('\''.wppa_encrypt_photo($thumb['id']).'\'').', false ); return false;' ).'"' .
+
+					' value="' . esc_attr( __( 'MyChoice', 'wp-photo-album-plus' ) ) . '"' .
+				' />';
+
+			}
 		}
 	}
 	if ( $editlink || $dellink || $choicelink ) $desc = $editlink.$dellink.$choicelink.'<div style="clear:both"></div>'.$desc;
@@ -2320,6 +2326,9 @@ global $wppa_done;
 		case 'none':
 			$status = 'approved';
 			break;
+		case 'wprules':
+			$status = wppa_check_comment( $user, $email, $comment );
+			break;
 	}
 	if ( current_user_can( 'wppa_moderate' ) ) $status = 'approved';	// Need not moderate comments issued by moderator
 
@@ -2328,12 +2337,14 @@ global $wppa_done;
 	if ( ! wppa_is_int( $cedit ) ) wp_die( 'Security check falure 14' );
 
 	// Check captcha
+	$wrong_captcha = false;
 	if ( ( is_user_logged_in() && wppa_opt( 'comment_captcha' ) == 'all' ) ||
 		 ( ! is_user_logged_in() && wppa_opt( 'comment_captcha' ) != 'none' ) )	{
 		$captkey = $id;
 		if ( $cedit ) $captkey = $wpdb->get_var( $wpdb->prepare( 'SELECT `timestamp` FROM `'.WPPA_COMMENTS.'` WHERE `id` = %s', $cedit ) );
 		if ( ! wppa_check_captcha( $captkey ) ) {
-				$status = 'spam';
+			$status = 'spam';
+			$wrong_captcha = true;
 		}
 	}
 
@@ -2357,6 +2368,7 @@ global $wppa_done;
 			}
 		}
 		else {
+
 			// See if a refresh happened
 			$old_entry = $wpdb->prepare( 'SELECT * FROM `'.WPPA_COMMENTS.'` WHERE `photo` = %s AND `user` = %s AND `comment` = %s LIMIT 1', $photo, $user, $save_comment );
 			$iret = $wpdb->query( $old_entry );
@@ -2365,10 +2377,41 @@ global $wppa_done;
 				return;
 			}
 			$key = wppa_create_comments_entry( array( 'photo' => $photo, 'user' => $user, 'email' => $email, 'comment' => $save_comment, 'status' => $status ) );
-			if ( $key ) wppa( 'comment_id', $key );
+			if ( $key ) {
+				wppa( 'comment_id', $key );
+			}
+			if ( $policy != 'wprules' ) {
+				switch( $status ) {
+					case 'pending':
+						wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} held for moderation' );
+						break;
+					case 'spam':
+						wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} marked as spam' );
+						break;
+					case 'approved':
+						wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} approved' );
+						break;
+				}
+			}
 		}
+
 		if ( $iret !== false ) {
-			if ( $status != 'spam' ) {
+			if ( $status == 'spam' ) {
+				if ( $wrong_captcha ) {
+					echo
+					'<script type="text/javascript">' .
+						'alert( "'.__( 'Sorry, you gave a wrong answer.\n\nPlease try again to solve the computation.' , 'wp-photo-album-plus').'" )' .
+					'</script>';
+				}
+				else {
+					echo
+					'<script type="text/javascript">' .
+						'alert( "'.__( 'Sorry, your comment is not accepted.' , 'wp-photo-album-plus').'" )' .
+					'</script>';
+				}
+			}
+			else {
+
 				if ( $cedit ) {
 					if ( wppa_switch( 'comment_notify_added' ) ) {
 						echo( '<script id="cme" type="text/javascript">alert( "'.__( 'Comment edited' , 'wp-photo-album-plus').'" );jQuery( "#cme" ).html( "" );</script>' );
@@ -2527,11 +2570,6 @@ global $wppa_done;
 						echo( '<script id="cme" type="text/javascript">alert( "'.__( 'Comment added' , 'wp-photo-album-plus').'" );jQuery( "#cme" ).html( "" );</script>' );
 					}
 				}
-			}
-			else {
-				echo 	'<script type="text/javascript">' .
-							'alert( "'.__( 'Sorry, you gave a wrong answer.\n\nPlease try again to solve the computation.' , 'wp-photo-album-plus').'" )' .
-						'</script>';
 			}
 
 			wppa( 'comment_photo', $id );
@@ -4566,9 +4604,12 @@ global $wppa_alert;
 		$id = false;
 	}
 
+	// Do the pdf preprocessing if it is a pdf
+	wppa_pdf_preprocess( $file, $alb );
+
 	// Is it an image?
 	$imgsize = getimagesize( $file['tmp_name'] );
-	if ( !is_array( $imgsize ) ) {
+	if ( ! is_array( $imgsize ) ) {
 		$wppa_alert .= esc_js( __( 'Uploaded file is not an image' , 'wp-photo-album-plus') ) . '.';
 		return false;
 	}
@@ -4712,6 +4753,10 @@ global $wppa_alert;
 			}
 			wppa_send_mail( $to, $subj, $cont, $id );
 		}
+
+		// Do pdf postprocessing
+		wppa_pdf_postprocess( $id );
+
 		return $id;
 	}
 
@@ -5036,4 +5081,158 @@ global $wpdb;
 		}
 	}
 	return $wait_text;
+}
+
+// Get comment status according to wp discussion rules
+// Reurns 'approved', 'pending' or 'spam'
+function wppa_check_comment( $user, $email, $comment ) {
+global $wpdb;
+
+    // If manual moderation is enabled, skip all checks and return 'pending'.
+    if ( 1 == get_option( 'comment_moderation' ) ) {
+		wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} held for moderation (1)' );
+        return 'pending';
+	}
+
+	// Some other required data
+	$user_ip 	= $_SERVER["REMOTE_ADDR"];
+	$ser_agent 	= $_SERVER["HTTP_USER_AGENT"];
+
+    // Check for the number of external links if a max allowed number is set.
+    if ( $max_links = get_option( 'comment_max_links' ) ) {
+        $num_links = preg_match_all( '/<a [^>]*href/i', $comment, $out );
+
+        /**
+         * Filters the number of links found in a comment.
+         *
+         * @since 3.0.0
+         * @since 4.7.0 Added the `$comment` parameter.
+         *
+         * @param int    $num_links The number of links found.
+         * @param string $url       Comment author's URL. Included in allowed links total.
+         * @param string $comment   Content of the comment.
+         */
+        $num_links = apply_filters( 'comment_max_links_url', $num_links, '', $comment );
+
+        /*
+         * If the number of links in the comment exceeds the allowed amount,
+         * fail the check by returning false.
+         */
+        if ( $num_links >= $max_links ) {
+			wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} held for moderation due to too many links' );
+            return 'pending';
+		}
+    }
+
+    $mod_keys = trim( get_option( 'moderation_keys' ) );
+
+    // If moderation 'keys' (keywords) are set, process them.
+    if ( ! empty( $mod_keys ) ) {
+        $words = explode( "\n", $mod_keys );
+
+        foreach ( (array) $words as $word) {
+            $word = trim($word);
+
+            // Skip empty lines.
+            if ( empty( $word ) )
+                continue;
+
+            /*
+             * Do some escaping magic so that '#' (number of) characters in the spam
+             * words don't break things:
+             */
+            $word = preg_quote( $word, '#' );
+
+            /*
+             * Check the comment fields for moderation keywords. If any are found,
+             * fail the check for the given field by returning false.
+             */
+            $pattern = "#$word#i";
+            if ( preg_match( $pattern, $user ) ||
+				 preg_match( $pattern, $email ) ||
+				 preg_match( $pattern, $comment ) ||
+				 preg_match( $pattern, $user_ip ) ||
+				 preg_match( $pattern, $user_agent ) ) {
+				wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} held for moderation due to moderation key found' );
+				return 'pending';
+			}
+        }
+    }
+
+    $blacklist_keys = trim( get_option( 'blacklist_keys' ) );
+
+    // If blacklist 'keys' (keywords) are set, process them.
+    if ( ! empty( $blacklist_keys ) ) {
+        $words = explode( "\n", $blacklist_keys );
+
+        foreach ( (array) $words as $word) {
+            $word = trim($word);
+
+            // Skip empty lines.
+            if ( empty( $word ) )
+                continue;
+
+            /*
+             * Do some escaping magic so that '#' (number of) characters in the spam
+             * words don't break things:
+             */
+            $word = preg_quote( $word, '#' );
+
+            /*
+             * Check the comment fields for moderation keywords. If any are found,
+             * fail the check for the given field by returning false.
+             */
+            $pattern = "#$word#i";
+            if ( preg_match( $pattern, $user ) ||
+				 preg_match( $pattern, $email ) ||
+				 preg_match( $pattern, $comment ) ||
+				 preg_match( $pattern, $user_ip ) ||
+				 preg_match( $pattern, $user_agent ) ) {
+				wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} marked as spam due to blacklist (1)' );
+				return 'spam';
+			}
+        }
+    }
+
+    /*
+     * Check if the option to approve comments by previously-approved authors is enabled.
+     *
+     * If it is enabled, check whether the comment author has a previously-approved comment,
+     * as well as whether there are any moderation keywords (if set) present in the author
+     * email address. If both checks pass, return true. Otherwise, return false.
+     */
+    if ( 1 == get_option( 'comment_whitelist' ) ) {
+        if ( $user != '' && $email != '' ) {
+            $comment_user = get_user_by( 'email', wp_unslash( $email ) );
+            if ( ! empty( $comment_user->ID ) ) {
+                $ok_to_comment =
+					$wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE user_id = %d AND comment_approved = '1'", $comment_user->ID ) ) +
+					$wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "` WHERE `user` = %s AND `status` = 'approved'", $user ) );
+            } else {
+                $ok_to_comment =
+					$wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE comment_author = %s AND comment_author_email = %s and comment_approved = '1' LIMIT 1", $user, $email ) ) +
+					$wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "` WHERE `email` = %s AND `status` = 'approved'", $email ) );
+            }
+            if ( ( $ok_to_comment >= 1 ) && ( empty( $mod_keys ) || false === strpos( $email, $mod_keys ) ) && ( empty( $blacklist_keys ) || false === strpos( $email, $blacklist_keys ) ) ) {
+				wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} approved due to whitelist' );
+				return 'approved';
+			}
+            elseif ( ! empty( $blacklist_keys ) && strpos( $email, $blacklist_keys ) ) {
+				wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} marked as spam due to blacklist (2)' );
+				return 'spam';
+			}
+			else {
+				wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} held for moderation due to not yet whitelisted' );
+                return 'pending';
+			}
+        }
+		else {
+			wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} held for moderation (2)' );
+            return 'pending';
+        }
+    }
+
+	wppa_log( 'Com', 'Comment {i}' . $comment . '{/i} approved (2)' );
+
+    return 'approved';
 }

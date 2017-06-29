@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all audio routines
-* Version 6.6.18
+* Version 6.6.20
 *
 */
 
@@ -212,7 +212,10 @@ global $wppa_supported_audio_extensions;
 
 function wppa_get_audio_control_height() {
 
-	if ( strpos( $_SERVER["HTTP_USER_AGENT"], 'Edge' ) ) {
+	if ( ! isset( $_SERVER["HTTP_USER_AGENT"] ) ) {
+		$result = '24';
+	}
+	elseif ( strpos( $_SERVER["HTTP_USER_AGENT"], 'Edge' ) ) {
 		$result = '30';
 	}
 	elseif ( strpos( $_SERVER["HTTP_USER_AGENT"], 'Firefox' ) ) {

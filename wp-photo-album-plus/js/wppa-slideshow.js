@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsSlideshowVersion = '6.6.29';
+var wppaJsSlideshowVersion = '6.6.31';
 
 // This is an entrypoint to load the slide data
 function wppaStoreSlideInfo(
@@ -53,7 +53,8 @@ function wppaStoreSlideInfo(
 		_wppaOgDsc[mocc] = [];
 		_wppaCurIdx[mocc] = -1;
 		_wppaNxtIdx[mocc] = 0;
-		if ( parseInt( iwtimeout ) > 0 ) _wppaTimeOut[mocc] = parseInt( iwtimeout );
+		if ( iwtimeout == 'random' ) _wppaTimeOut[mocc] = 'random';
+		else if ( parseInt( iwtimeout ) > 0 ) _wppaTimeOut[mocc] = parseInt( iwtimeout );
 		else _wppaTimeOut[mocc] = wppaSlideShowTimeOut;
 		_wppaSSRuns[mocc] = false;
 		_wppaTP[mocc] = -2;	// -2 means NO, index for _wppaStartStop otherwise

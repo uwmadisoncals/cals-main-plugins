@@ -3,435 +3,464 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* Version 6.6.18
+* Version 6.7.00
 *
 */
 
-if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 
-function _wppa_comment_admin() {
-global $wpdb;
+// LOAD THE BASE CLASS
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+}
 
-	$continue = true;
+// CREATE A PACKAGE CLASS *****************************
+class WPPA_Comment_table extends WP_List_Table {
 
-	// Check input
-	wppa_vfy_arg('tab', true);
-	wppa_vfy_arg('edit_id');
-	wppa_vfy_arg('wppa-page');
-	wppa_vfy_arg('commentid');
-	wppa_vfy_arg('delete_id');
+	var $data;
 
-	if (isset($_GET['tab'])) {
-		if ($_GET['tab'] == 'edit') {
-			$id = $_GET['edit_id'];
-			$comment = $wpdb->get_row($wpdb->prepare( "SELECT * FROM ".WPPA_COMMENTS." WHERE id = %s LIMIT 1", $id ), ARRAY_A);
-			if ($comment) {
-			?>
-			<div class="wrap">
-				<?php $iconurl = WPPA_URL.'/img/comment.png'; ?>
-				<div id="icon-album" class="icon32" style="background: transparent url(<?php echo($iconurl); ?>) no-repeat">
-					<br />
-				</div>
-				<h2><?php _e('Photo Albums -> Edit Comment', 'wp-photo-album-plus'); ?></h2>
-				<?php $action = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_manage_comments');
-					if ( isset($_GET['wppa-page']) ) {
-						$action .= '&compage='.strval(intval($_GET['wppa-page']));
-					}
-					if ( isset($_GET['commentid']) ) {
-						$action .= '&commentid='.strval(intval($_GET['commentid']));
-					}
-				?>
-				<form action="<?php echo $action ?>" method="post">
+	function __construct() {
+		global $status, $page;
 
-					<?php wp_nonce_field('$wppa_nonce', WPPA_NONCE); ?>
-					<input type="hidden" name="edit_comment" value="<?php echo($comment['id']) ?>" />
-					<table class="form-table albumtable">
-						<tbody>
-							<tr style="vertical-align:top" >
-								<th>
-									<?php $photo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM ".WPPA_PHOTOS." WHERE id =  %s", $comment['photo'] ), "ARRAY_A" ) ?>
-									<?php $url = wppa_get_thumb_url( $comment['photo'] ); ?>
-									<img src="<?php echo($url) ?>" />
-								</th>
-								<td>
-									<?php echo(__($photo['name']).'<br/><br/>'.__(stripslashes($photo['description']))) ?>
-								</td>
-							</tr>
-							<tr>
-								<th scope="row"><label ><?php _e('Photo:', 'wp-photo-album-plus'); ?></label></th>
-								<td><?php echo($comment['photo']) ?></td>
-							</tr>
-							<tr>
-								<th scope="row"><label ><?php _e('Album:', 'wp-photo-album-plus'); ?></label></th>
-								<td><?php
-									echo wppa_get_album_name($photo['album']);
-									?>
-								</td>
-							</tr>
-							<tr>
-								<th scope="row"><label ><?php _e('User:', 'wp-photo-album-plus') ?></label></th>
-								<td><input style="width:300px;" type="text" name="user" value="<?php echo($comment['user']) ?>" /></td>
-							</tr>
-							<tr>
-								<th scope="row"><label ><?php _e('Email:', 'wp-photo-album-plus') ?></label></th>
-								<td><input style="width:300px;" type="text" name="email" value="<?php echo($comment['email']) ?>" /></td>
-							</tr>
-							<tr>
-								<th scope="row"><label><?php _e('Comment:', 'wp-photo-album-plus') ?></label></th>
-								<td><textarea style="width:300px; height:150px;" name="comment"><?php echo esc_textarea(stripslashes($comment['comment'])) ?></textarea></td>
-							</tr>
-						</tbody>
-					</table>
-					<p>
-						<input type="submit" class="button-primary" name="wppa_submit" value="<?php _e('Save Changes', 'wp-photo-album-plus'); ?>" />
-					</p>
-				</form>
-			<?php
-			}
-			$continue = false;
-		}
-		if ($_GET['tab'] == 'delete') {
-			$id = strval(intval($_GET['delete_id']));
-			$photo = $wpdb->get_var( $wpdb->prepare( "SELECT `photo` FROM `".WPPA_COMMENTS."` WHERE `id` = %s", $id ) );
-			$iret = $wpdb->query($wpdb->prepare( "DELETE FROM `".WPPA_COMMENTS."` WHERE `id` = %s LIMIT 1", $id ) );
-			if ( $iret !== false ) {
-				if ( wppa_switch( 'search_comments' ) ) wppa_index_update( 'photo', $photo );
-				wppa_update_message(__('Comment deleted', 'wp-photo-album-plus') );
-			}
-			else {
-				wppa_error_message('Error deleting comment');
-			}
-			$continue = true;
+		// Set parent defaults
+		parent::__construct( array(
+			'singular'  => 'comment',
+			'plural'    => 'comments',
+			'ajax'      => false        //does this table support ajax?
+		) );
+
+	}
+
+	// Filter
+	function extra_tablenav( $which ) {
+
+		if ( 'top' === $which ) {
+			$comment_show = isset( $_COOKIE['comadmin-show'] ) ? $_COOKIE['comadmin-show'] : 'all';
+			echo
+			'<div class="alignleft actions">' .
+				'<select id="wppa_comadmin_show" name="wppa_comadmin_show" onchange="" >
+					<option value="all" ' . ( $comment_show == 'all' ? 'selected="selected"' : '' ) . ' >' . __( 'all', 'wp-photo-album-plus' ) . '</option>
+					<option value="pending" ' . ( $comment_show == 'pending' ? 'selected="selected"' : '' ) . '>' . __( 'pending', 'wp-photo-album-plus' ) . '</option>
+					<option value="approved" ' . ( $comment_show == 'approved' ? 'selected="selected"' : '' ) . '>' . __( 'approved', 'wp-photo-album-plus' ) . '</option>
+					<option value="spam" ' . ( $comment_show == 'spam' ? 'selected="selected"' : '' ) . '>' . __( 'spam', 'wp-photo-album-plus' ) . '</option>
+				</select>' .
+				'<input' .
+					' type="button"' .
+					' class="button"' .
+					' style="margin: 1px 8px 0 0;"' .
+					' onclick="wppa_setCookie(\'comadmin-show\', jQuery( \'#wppa_comadmin_show\' ).val(), \'365\'); document.location.reload(true);"' .
+					' value="' . esc_attr( __( 'Filter', 'wp-photo-album-plus' ) ) . '"' .
+				' />' .
+			'</div>';
 		}
 	}
 
-	if ($continue) {
+	function column_default( $item, $column_name ) {
+		switch( $column_name ) {
+			case 'id':
+			case 'user':
+			case 'ip':
+			case 'status':
+				return $item[$column_name];
+			default:
+				return print_r($item,true); //Show the whole array for troubleshooting purposes
+		}
+	}
 
-		// Update anything or do bulkaction
-		if (isset($_POST['wppa_submit'])) {
-			// Security check
-			check_admin_referer( '$wppa_nonce', WPPA_NONCE );
+	function column_user( $item ) {
 
-			// Updates
-			$iret = true;
-			if (isset($_POST['wppa_comadmin_show'])) wppa_update_option('wppa_comadmin_show', $_POST['wppa_comadmin_show']);
-			if (isset($_POST['wppa_comadmin_linkpage'])) wppa_update_option('wppa_comadmin_linkpage', $_POST['wppa_comadmin_linkpage']);
-			if (isset($_POST['wppa_comadmin_order'])) wppa_update_option('wppa_comadmin_order', $_POST['wppa_comadmin_order']);
-			if (isset($_POST['edit_comment'])) $iret = wppa_edit_comment($_POST['edit_comment']);
+		return $item['user'] . '<br />' . $item['ip'];
+	}
 
-			// Bulk actions
-			if (isset($_POST['bulkaction'])) switch ($_POST['bulkaction']) {
-				case 'approveall':
-					$coms_to_proc = $wpdb->get_results( "SELECT `id` FROM `" . WPPA_COMMENTS . "` WHERE status = 'pending'", ARRAY_A );
-					$query = "UPDATE " . WPPA_COMMENTS . " SET status = 'approved' WHERE status = 'pending'";
-					if ( $wpdb->query($query) === false ) {
-						wppa_error_message(__('Could not bulk update status', 'wp-photo-album-plus'));
-						$iret = false;
-					}
-					else {
-						if ( $coms_to_proc ) {
-							foreach( $coms_to_proc as $item ) {
-								wppa_send_comment_approved_email( $item['id'] );
-							}
-						}
-						$iret = true;
-					}
-					break;
-				case 'spamall':
-					$query = "UPDATE " . WPPA_COMMENTS . " SET status = 'spam' WHERE status = 'pending'";
-					if ( $wpdb->query($query) === false ) {
-						wppa_error_message(__('Could not bulk update status', 'wp-photo-album-plus'));
-						$iret = false;
-					}
-					else $iret = true;
-					break;
-				case 'delspam':
-					$query = "DELETE FROM " . WPPA_COMMENTS . " WHERE status = 'spam'";
-					if ( $wpdb->query($query) === false ) {
-						wppa_error_message(__('Could not bulk delete spam', 'wp-photo-album-plus'));
-						$iret = false;
-					}
-					break;
+	function column_timestamp( $item ) {
+
+		return wppa_local_date( false, $item['timestamp'] );
+	}
+
+	function column_photo( $item ) {
+
+		$photo 	= $item['photo'];
+		$src 	= wppa_get_thumb_url( $photo );
+		$title 	= esc_attr( wppa_get_photo_name( $photo ) ) . ' (' . wppa_get_album_name( wppa_get_photo_item( $photo, 'album' ) ) . ')';
+		$result =
+		'<img' .
+			' src="' . $src . '"' .
+			' style="width:100px;max-height:75px;"' .
+			' title="' . $title . '"' .
+		' />' .
+		'<br />' .
+		'#' . $item['id'] . ' ' .
+		__( 'Photo', 'wp-photo-album-plus' ) . ' #' . $item['photo'];
+
+		return $result;
+	}
+
+	function column_email( $item ) {
+
+		return make_clickable( $item['email'] );
+	}
+
+	function column_commenttext( $item ) {
+
+		$action =
+		'<a' .
+			' id="href-' . $item['id'] . '"' .
+			' style="display:none;"' .
+			' href="' .
+				'?page=' . $_REQUEST['page'] .
+				'&comment=' . $item['id'] .
+				'&action=editsingle' .
+				'&commenttext=' . urlencode( $item['comment'] ) .
+				'"
+			>' .
+			__( 'Update', 'wp-photo-album-plus' ) .
+		'</a>';
+
+		$actions = array(
+			'editsingle' 	=> $action,
+		);
+
+		$result =
+		'<textarea' .
+			' id="commenttext-' . $item['id'] . '"' .
+			' style="width:98%;"' .
+			' onchange="wppaUpdateHref(\'' . $item['id'] . '\')"' .
+			' >' .
+			stripslashes( $item['comment'] ) .
+		'</textarea>' .
+		$this->row_actions( $actions );
+
+		return $result;
+	}
+
+	function column_status( $item ) {
+
+		$p1 = '<a href="?page=' . $_REQUEST['page'] . '&comment=' . $item['id'];
+		$actions = array(
+			'approvesingle' 	=> $p1 . '&action=approvesingle" >' . __( 'Approve', 'wp-photo-album-plus' ) . '</a>',
+			'pendingsingle' 	=> $p1 . '&action=pendingsingle" >' . __( 'Pending', 'wp-photo-album-plus' ) . '</a>',
+			'spamsingle'    	=> $p1 . '&action=spamsingle" >' . 	  __( 'Spam', 'wp-photo-album-plus' ) . '</a>',
+			'deletesingle' 		=> $p1 . '&action=deletesingle" >' .  __( 'Delete', 'wp-photo-album-plus' ) . '</a>',
+		);
+
+		switch( $item['status'] ) {
+			case 'pending':
+				$status = __( 'Pending', 'wp-photo-album-plus' );
+				$color 	= 'red';
+				unset( $actions['pendingsingle'] );
+				break;
+			case 'approved':
+				$status = __( 'Approved', 'wp-photo-album-plus' );
+				$color 	= 'black';
+				unset( $actions['approvesingle'] );
+				break;
+			case 'spam':
+				$status = __( 'Spam', 'wp-photo-album-plus' );
+				$color 	= 'red';
+				unset( $actions['spamsingle'] );
+				break;
+			default:
+				$status = '';
+				$color 	= 'red';
+		}
+		$result = '<span id="status-' . $item['id'] . '" style="color:' . $color . ';" >' . $status . '</span>';
+		$result .= $this->row_actions( $actions );
+
+		return $result;
+	}
+
+	function column_cb( $item ){
+
+		$result =
+		'<input type="checkbox" name="' . $this->_args['singular'] . '[]" value="' . $item['id'] . '" />';
+
+		return $result;
+	}
+
+	function get_columns() {
+		$columns = array(
+			'cb'       		=> '<input type="checkbox" />', //Render a checkbox instead of text
+			'photo' 		=> __( 'Photo', 'wp-photo-album-plus' ),
+			'user' 			=> __( 'User', 'wp-photo-album-plus' ),
+			'email' 		=> __( 'User email', 'wp-photo-album-plus' ),
+			'timestamp' 	=> __( 'Timestamp', 'wp-photo-album-plus' ),
+			'status' 		=> __( 'Status', 'wp-photo-album-plus' ),
+			'commenttext' 	=> __( 'Comment', 'wp-photo-album-plus' ),
+		);
+		return $columns;
+	}
+
+	function get_sortable_columns() {
+		$sortable_columns = array(
+			'id'     	=> array( 'id', false ),     //true means it's already sorted
+			'timestamp' => array( 'timestamp', true ),
+			'photo'  	=> array( 'photo', false ),
+			'user' 		=> array( 'user', false ),
+		);
+		return $sortable_columns;
+	}
+
+	function get_bulk_actions() {
+		$actions = array(
+			'approve' 	=> __( 'Approve', 'wp-photo-album-plus' ),
+			'delete'    => __( 'Delete', 'wp-photo-album-plus' ),
+		);
+		return $actions;
+	}
+
+	// process_bulk_action also processes single actions as long as the query arg &action= exists
+	function process_bulk_action() {
+		global $wpdb;
+
+		// If it is a bulk action, $_GET['comment']  holds an array of record ids
+		// If it is a single action, $_GET['comment'] holds a single record id.
+		$id = isset( $_GET['comment'] ) ? $_GET['comment'] : '';
+		if ( is_array( $id ) ) {
+			$ids = $id;
+		}
+		else {
+			$ids = (array) $id;
+		}
+
+		$current_action = $this->current_action();
+
+		if ( $current_action && $id ) {
+
+			// Delete
+			if ( 'delete' === $current_action || 'deletesingle' === $current_action ) {
+				foreach( $ids as $id ) {
+					$wpdb->query( $wpdb->prepare( "DELETE FROM `" . WPPA_COMMENTS . "` WHERE `id` = %s", $id ) );
+				}
 			}
 
-			if ($iret) wppa_update_message(__('Changes Saved', 'wp-photo-album-plus'));
+			// Approve
+			if ( 'approve' === $current_action || 'approvesingle' === $current_action ) {
+				foreach( $ids as $id ) {
 
-			// Clear (super)cache
-			wppa_clear_cache();
-		} // Submit
+					$iret = $wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_COMMENTS . "` SET `status` = 'approved' WHERE `id` = %s", $id ) );
 
-		// Delete trash
-		$query = "DELETE FROM " . WPPA_COMMENTS . " WHERE status = 'trash'";
-		$wpdb->query($query);
+					if ( $iret ) {
+						wppa_send_comment_approved_email( $id );
+						$photo = $wpdb->get_var( $wpdb->prepare( "SELECT `photo` FROM `" . WPPA_COMMENTS . "` WHERE `id` = %s", $id ) );
+						wppa_add_credit_points( wppa_opt( 'cp_points_comment_appr' ), __( 'Photo comment approved' , 'wp-photo-album-plus'), $photo, '', wppa_get_photo_item( $photo, 'owner' )	);
+					}
+				}
+			}
 
-		// Initialize normal display
-		$wppa_comadmin_linkpage = get_option('wppa_comadmin_linkpage', '0');
-		if ( $wppa_comadmin_linkpage ) {
-			$exists = $wpdb->get_var("SELECT `post_title` FROM `".$wpdb->posts."` WHERE `ID` = ".$wppa_comadmin_linkpage);
-			if ( ! $exists ) {
-				$wppa_comadmin_linkpage = '0';
-				update_option('wppa_comadmin_linkpage', '0');
+			// Spam
+			if ( 'spam' === $current_action || 'spamsingle' === $current_action ) {
+				foreach( $ids as $id ) {
+					$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_COMMENTS . "` SET `status` = 'spam' WHERE `id` = %s", $id ) );
+				}
+			}
+
+			// Pending
+			if ( 'pending' === $current_action || 'pendingsingle' === $current_action ) {
+				foreach( $ids as $id ) {
+					$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_COMMENTS . "` SET `status` = 'pending' WHERE `id` = %s", $id ) );
+				}
+			}
+
+			// Edit, exists single only
+			if ( 'editsingle' === $current_action ) {
+				$commenttext = $_GET['commenttext'];
+				$id = $_GET['comment'];
+				$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_COMMENTS . "` SET `comment` = %s WHERE `id` = %s", $commenttext, $id ) );
+			}
+
+			// Update index in the near future
+			if ( wppa_switch( 'search_comments' ) ) {
+				foreach( $ids as $id ) {
+					$photo = $wpdb->get_var( $wpdb->prepare( "SELECT `photo` FROM `" . WPPA_COMMENTS . "` WHERE `id` = %s", $id ) );
+					wppa_index_update( 'photo', $photo );
+				}
 			}
 		}
-		$moderating = isset($_REQUEST['commentid']);
-?>
-		<div class="wrap">
-			<?php $iconurl = WPPA_URL.'/img/comment.png'; ?>
-			<div id="icon-album" class="icon32" style="background: transparent url(<?php echo($iconurl); ?>) no-repeat">
-				<br />
-			</div>
-			<h2>
-				<?php if ( $moderating ) _e('Photo Albums -> Moderate Comment', 'wp-photo-album-plus');
-					else _e('Photo Albums -> Comment admin', 'wp-photo-album-plus');
-				?>
-			</h2>
+	}
 
-			<?php if (! wppa_switch( 'show_comments')) _e('<h3>The Comment system is not activated</h3><p>To activate: check Table II item 18 on the <b>Photo Albums -> Settings</b> screen and press <b>Save Changes</b>', 'wp-photo-album-plus'); ?>
+	function prepare_items() {
+		global $wpdb;
 
-			<?php if ( ! $moderating ) { ?>
-			<!-- Statistics -->
-			<table>
-				<tbody>
-					<tr>
-						<td><h3 style="margin:0; color:#777777;"><?php _e('Total:', 'wp-photo-album-plus') ?></h3></td>
-						<td><h3 style="margin:0;"><?php $count = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_COMMENTS."`" ); echo $count ?></h3></td>
-					</tr>
-					<tr>
-						<td><h3 style="margin:0; color:green;"><?php _e('Approved:', 'wp-photo-album-plus') ?></h3></td>
-						<td><h3 style="margin:0;"><?php $count = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_COMMENTS."` WHERE `status` = 'approved'" ); echo $count ?></h3></td>
-					</tr>
-					<tr>
-						<td><h3 style="margin:0; color:#e66f00;"><?php _e('Pending:', 'wp-photo-album-plus') ?></h3></td>
-						<td><h3 style="margin:0;"><?php $count = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_COMMENTS."` WHERE `status` = 'pending'" ); echo $count ?></h3></td>
-					</tr>
-					<tr>
-						<td><h3 style="margin:0; color:red;"><?php _e('Spam:', 'wp-photo-album-plus') ?></h3></td>
-						<td><h3 style="margin:0;"><?php $count = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_COMMENTS."` WHERE `status` = 'spam'" ); echo $count ?></h3></td>
-					</tr>
-					<?php if ( wppa_opt( 'spam_maxage' ) != 'none' ) { ?>
-					<tr>
-						<td><h3 style="margin:0; color:red;"><?php _e('Auto deleted spam:', 'wp-photo-album-plus') ?></h3></td>
-						<td><h3 style="margin:0;"><?php echo get_option('wppa_spam_auto_delcount', '0') ?></h3></td>
-					</tr>
-					<?php } ?>
-				</tbody>
-			</table>
-			<!-- end statistics -->
+		$per_page 	= wppa_opt( 'comment_admin_pagesize' );
+		$columns 	= $this->get_columns();
+		$hidden 	= array();
+		$sortable 	= $this->get_sortable_columns();
 
-			<!-- Settings -->
-			<div style="border:1px solid #ccc; padding:4px; margin:4px 0" >
-				<h3><?php _e('Settings', 'wp-photo-album-plus') ?></h3>
-				<form action="<?php echo wppa_dbg_url(get_admin_url().'admin.php?page=wppa_manage_comments') ?>" method="post">
-					<p>
-						<?php
-							wp_nonce_field('$wppa_nonce', WPPA_NONCE);
-							_e('Linkpage:', 'wp-photo-album-plus');
-						?>
-						<select name="wppa_comadmin_linkpage">
-							<option value="0" <?php if ($wppa_comadmin_linkpage=='0') echo 'selected="selected"' ?> disabled="disabled" ><?php _e('--- Please select a page ---', 'wp-photo-album-plus') ?></option>
-							<?php
-								$query = "SELECT `ID`, `post_title`, `post_content` FROM `" . $wpdb->posts . "` WHERE `post_type` = 'page' AND `post_status` = 'publish' ORDER BY `post_title` ASC";
-								$pages = $wpdb->get_results ($query, ARRAY_A);
-								if ($pages) {
-									foreach ($pages as $page) {
-										if ( stripos($page['post_content'], '%%wppa%%') !== false || stripos($page['post_content'], '[wppa') !== false ) {
-											if ($wppa_comadmin_linkpage == $page['ID']) $sel = 'selected="selected"';
-											else $sel = '';
-											echo '<option value="'.$page['ID'].'" '.$sel.'>'.__($page['post_title'], 'wp-photo-album-plus').'</option>';
-										}
-									}
-								}
-							?>
-						</select>
-						<?php _e('You can see the photo and all its comments on the selected page by clicking on the thumbnail image', 'wp-photo-album-plus'); ?>
-					</p>
-					<?php $comment_show = wppa_opt( 'comadmin_show' ) ?>
-					<p>
-						<?php _e('Display status:', 'wp-photo-album-plus') ?>
-						<select name="wppa_comadmin_show">
-							<option value="all" <?php if ($comment_show == 'all') echo('selected="selected"') ?>><?php _e('all', 'wp-photo-album-plus') ?></option>
-							<option value="pending" <?php if ($comment_show == 'pending') echo('selected="selected"') ?>><?php _e('pending', 'wp-photo-album-plus') ?></option>
-							<option value="approved" <?php if ($comment_show == 'approved') echo('selected="selected"') ?>><?php _e('approved', 'wp-photo-album-plus') ?></option>
-							<option value="spam" <?php if ($comment_show == 'spam') echo('selected="selected"') ?>><?php _e('spam', 'wp-photo-album-plus') ?></option>
-						</select>
-						<?php $comment_order = wppa_opt( 'comadmin_order' ) ?>
-						<?php _e('Display order:', 'wp-photo-album-plus') ?>
-						<select name="wppa_comadmin_order">
-							<option value="timestamp" <?php if ($comment_order == 'timestamp') echo('selected="selected"') ?>><?php _e('timestamp', 'wp-photo-album-plus') ?></option>
-							<option value="photo" <?php if ($comment_order == 'photo') echo('selected="selected"') ?>><?php _e('photo', 'wp-photo-album-plus') ?></option>
-						</select>
-						<?php _e('Bulk action:', 'wp-photo-album-plus') ?>
-						<select name="bulkaction">
-							<option value=""><?php  ?></option>
-							<option value="approveall"><?php _e('Approve all pending', 'wp-photo-album-plus') ?></option>
-							<option value="spamall"><?php _e('Move all pending to spam', 'wp-photo-album-plus') ?></option>
-							<option value="delspam"><?php _e('Delete all spam', 'wp-photo-album-plus') ?></option>
-						</select>
-						<input type="submit" class="button-primary" name="wppa_submit" value="<?php _e('Save Settings / Perform bulk action', 'wp-photo-album-plus'); ?>" />
-					</p>
-				</form>
-			</div>
-			<!-- End Settings -->
+		$this->_column_headers = array( $columns, $hidden, $sortable );
+		$this->process_bulk_action();
 
-			<?php
-			}
-			if ( $moderating ) {
-				$pagesize = '1';
-				$where = " WHERE `id` = '".$_REQUEST['commentid']."'";
-				$order = '';
-				$curpage = '1';
-				$limit = '';
-			}
-			else {
-				$pagsize = wppa_opt( 'comment_admin_pagesize' );
-				$where = ( $comment_show == 'all' ) ? '' : " WHERE `status` = '".$comment_show."'";
-				$order = " ORDER BY `".$comment_order."`";
-				if ( $comment_order == 'timestamp' ) $order .= " DESC";
-				if (isset($_GET['wppa-page'])) {
-					$curpage = strval(intval($_GET['wppa-page']));
-					$offset = (strval(intval($_GET['wppa-page'])) - 1) * $pagsize;
-					$limit = " LIMIT ".$offset.",".$pagsize;
+		$filter 	= '';
+
+		// Moderate single only?
+		$moderating = isset( $_REQUEST['commentid'] );
+		if ( $moderating ) {
+			$filter = "WHERE `id` = " . strval( intval( $_REQUEST['commentid'] ) );
+		}
+
+		// Normal use
+		else {
+			if ( isset( $_COOKIE['comadmin-show'] ) ) {
+				switch( $_COOKIE['comadmin-show'] ) {
+					case 'all':
+						break;
+					case 'spam':
+						$filter = "WHERE `status` = 'spam'";
+						break;
+					case 'pending':
+						$filter = "WHERE `status` = 'pending'";
+						break;
+					case 'approved':
+						$filter = "WHERE `status` = 'approved'";
+						break;
 				}
-				else {
-					$limit = ' LIMIT 0,'.$pagsize;
-					$curpage = '1';
-				}
-				if ( $pagsize == '0' ) $limit = ''; // Paginating is off
-
-				$nitems = $wpdb->get_var( "SELECT COUNT(*) FROM ".WPPA_COMMENTS.$where );
-				$link = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_manage_comments');
-				wppa_admin_page_links($curpage, $pagsize, $nitems, $link);
 			}
-			?>
-			<table class="widefat">
-				<thead style="font-weight: bold" class="">
-					<tr>
-						<th scope="col"><?php _e('Photo', 'wp-photo-album-plus') ?><br />
-										<?php _e('(Album)', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('#', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('IP', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('User', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('Email', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('Time since', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('Comment', 'wp-photo-album-plus') ?></th>
-						<th scope="col" style="width: 130px;" ><?php _e('Status', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('Edit', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('Delete', 'wp-photo-album-plus') ?></th>
-					</tr>
-				</thead>
-				<tbody class="wppa_table_1">
-					<?php
-					$comments = $wpdb->get_results( "SELECT * FROM `".WPPA_COMMENTS."`".$where.$order.$limit, ARRAY_A);
-					if ($comments) {
-						foreach ($comments as $com) { ?>
-							<tr>
-								<?php
-								$photo = $wpdb->get_row($wpdb->prepare("SELECT * FROM ".WPPA_PHOTOS." WHERE id = %s", $com['photo']), 'ARRAY_A');
-								if ($photo) {
-									$alb = $photo['album'];
-									$pname = __($photo['name'], 'wp-photo-album-plus');
-									$albname = '('.wppa_get_album_name($alb).')';
-								}
-								else {
-									$alb = '';
-									$pname = '';
-									$albname = '';
-								}
-								if ($wppa_comadmin_linkpage == '0') { ?>
-									<td style="text-align:center">
-										<img src="<?php echo wppa_get_thumb_url( $com['photo'] ); ?>" style="max-height:64px;max-width:64px;" />
-										<br />
-										<?php echo $albname ?>
-									</td><?php
-								}
-								else {
-									$url = get_page_link($wppa_comadmin_linkpage);
-									if (strpos($url, '?')) $url .= '&';
-									else $url .= '?';
-									$url .= 'wppa-album='.$alb.'&wppa-photo='.$com['photo'].'&wppa-occur=1'; ?>
-									<td style="text-align:center">
-										<a href="<? echo $url ?>" target="_blank">
-											<img title="<?php _e('Click to see the fullsize photo and all comments', 'wp-photo-album-plus') ?>" src="<?php echo wppa_get_thumb_url( $com['photo'] ); ?>" style="max-height:64px;max-width:64px;" />
-										</a>
-										<br />
-										<?php echo $albname ?>
-									</td><?php
-								} ?>
-								<td><?php echo $com['photo'] ?></td>
-								<td><?php echo $com['ip'] ?></td>
-								<td><?php echo $com['user'] ?></td>
-								<td><?php
-									if ( $com['email'] ) {
-										$subject = str_replace(' ', '%20', sprintf(__('Reply to your comment on photo: %s on %s', 'wp-photo-album-plus'), $pname, get_bloginfo('name')));
-										echo '<a href="mailto:'.$com['email'].'?Subject='.$subject.'" title="'.__('Reply', 'wp-photo-album-plus').'" >'.$com['email'].'</a>';
-									}
-									else {
-										echo $com['email'];
-									} ?>
-								</td>
-								<td><?php echo wppa_get_time_since($com['timestamp']) ?></td>
-								<td><?php echo stripslashes($com['comment']) ?></td>
-								<td>
-									<input type="hidden" id="photo-nonce-<?php echo $com['photo'] ?>" value="<?php echo wp_create_nonce('wppa_nonce_'.$com['photo']);  ?>" />
-									<select name="status['<?php echo $com['id'] ?>']" onchange="jQuery('#wppa-comment-spin-<?php echo $com['id'] ?>').css('visibility', 'visible'); wppaAjaxUpdateCommentStatus(<?php echo $com['photo'] ?>, <?php echo $com['id'] ?>, this.value)">
-										<option value="pending" 	<?php if($com['status'] == 'pending') 	echo 'selected="selected"' ?>><?php _e('Pending', 'wp-photo-album-plus') ?></option>
-										<option value="approved" 	<?php if($com['status'] == 'approved') 	echo 'selected="selected"' ?>><?php _e('Approved', 'wp-photo-album-plus') ?></option>
-										<option value="spam" 		<?php if($com['status'] == 'spam') 		echo 'selected="selected"' ?>><?php _e('Spam', 'wp-photo-album-plus') ?></option>
-									</select>
-									<img id="wppa-comment-spin-<?php echo $com['id'] ?>" src="<?php echo wppa_get_imgdir().'spinner.gif' ?>" style="visibility:hidden" />
-								</td>
-								<?php $url = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_manage_comments&tab=edit&edit_id='.$com['id']);
-									if ( isset($_GET['wppa-page'])) $url .= '&compage='.strval(intval($_GET['wppa-page']));
-									if ( isset($_GET['commentid']) ) $url .= '&commentid='.strval(intval($_GET['commentid'])); ?>
-								<?php $delurl = wppa_dbg_url(get_admin_url().'admin.php?page=wppa_manage_comments&tab=delete&delete_id='.$com['id']) ?>
-								<td style="color:green; cursor:pointer;" onclick="document.location='<?php echo($url) ?>'"><b><?php _e('Edit', 'wp-photo-album-plus') ?></b></td>
-								<td style="color:red; cursor:pointer;" onclick="if (confirm('<?php _e('Are you sure you want to delete this comment?', 'wp-photo-album-plus') ?>')) document.location = '<?php echo($delurl) ?>';"><b><?php _e('Delete', 'wp-photo-album-plus') ?></b></td>
-							</tr>
-						<?php }
-					}
-					?>
-				</tbody>
-				<tfoot style="font-weight: bold" class="">
-					<tr>
-						<th scope="col"><?php _e('Photo', 'wp-photo-album-plus') ?><br />
-										<?php _e('(Album)', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('#', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('IP', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('User', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('Email', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('Time since', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('Comment', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('Status', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('Edit', 'wp-photo-album-plus') ?></th>
-						<th scope="col"><?php _e('Delete', 'wp-photo-album-plus') ?></th>
-					</tr>
-				</tfoot>
-			</table>
-			<?php if ( ! $moderating ) wppa_admin_page_links($curpage, $pagsize, $nitems, $link) ?>
-		</form>
-	</div>
-	<?php
+		}
+
+	    $data = $wpdb->get_results( "SELECT * FROM `" . WPPA_COMMENTS . "` " . $filter . " ORDER BY `timestamp` DESC", ARRAY_A );
+
+		function usort_reorder( $a, $b ) {
+			$orderby = ( ! empty( $_REQUEST['orderby'] ) ) ? $_REQUEST['orderby'] : 'timestamp'; //If no sort, default to title
+			$order = ( ! empty( $_REQUEST['order'] ) ) ? $_REQUEST['order'] : 'desc'; //If no order, default to asc
+			$result = strcmp( $a[$orderby], $b[$orderby] ); //Determine sort order
+			return ( $order === 'asc' ) ? $result : -$result; //Send final sort direction to usort
+		}
+		usort( $data, 'usort_reorder' );
+
+		$current_page 	= $this->get_pagenum();
+		$total_items 	= count( $data );
+		if ( $per_page ) {
+			$data 			= array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
+		}
+		$this->items 	= $data;
+
+		$this->set_pagination_args( array(
+			'total_items' => $total_items,                  	//WE have to calculate the total number of items
+			'per_page'    => ( $per_page ? $per_page : $total_items ),                     	//WE have to determine how many items to show on a page
+			'total_pages' => ( $per_page ? ceil( $total_items / $per_page ) : 1 ),   //WE have to calculate the total number of pages
+		) );
 	}
 }
 
-function wppa_edit_comment($id) {
-global $wpdb;
 
-	$record = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM ".WPPA_COMMENTS." WHERE id = %s LIMIT 0,1", $id ), ARRAY_A );
-	if ($record) {
-		if (isset($_POST['comment'])) $record['comment'] = $_POST['comment'];
-		if (isset($_POST['email'])) $record['email'] = $_POST['email'];
-		if (isset($_POST['user'])) $record['user'] = $_POST['user'];
+// The command admin page
+function _wppa_comment_admin() {
+	global $wpdb;
 
-		$iret = $wpdb->query($wpdb->prepare( "UPDATE `".WPPA_COMMENTS."` SET `comment` = %s, `email` = %s, `user` = %s WHERE `id` = %s LIMIT 1", $record['comment'], $record['email'], $record['user'], $id ) );
-		if ($iret === false) {
-			wppa_error_message(__('Unable to update comment. Err =', 'wp-photo-album-plus').' 2.');
-			return false;
+	// Create an instance of our package class...
+	$testListTable = new WPPA_Comment_table();
+
+	// Fetch, prepare, sort, and filter our data...
+	$testListTable->prepare_items();
+
+	// Moderate single only?
+	$moderating = isset( $_REQUEST['commentid'] );
+
+	// Open page
+	echo
+	'<div class="wrap">
+		<script type="text/javascript" >
+			function wppaUpdateHref( id ) {
+				var val 	= encodeURIComponent(jQuery(\'#commenttext-\'+id).val());
+				var href 	= jQuery(\'#href-\'+id).attr(\'href\');
+				var arr 	= href.split(\'commenttext=\');
+				arr[1] 		= val;
+				href 		= arr[0] + \'commenttext=\' + arr[1];
+				jQuery(\'#href-\'+id).attr(\'href\', href);
+				jQuery(\'#href-\'+id).css(\'display\',\'inline\');
+			}
+		</script>
+		<style type="text/css" >
+			.column-photo {
+				width:110px;
+			}
+			.column-user, .column-email, .column-timestamp {
+				width:160px;
+			}
+			.column-status {
+				width:100px;
+			}
+		</style>
+		<h1>' .
+			( $moderating ? __( 'Photo Albums -> Moderate Comment', 'wp-photo-album-plus' ) :
+							__( 'Photo Albums -> Comment admin', 'wp-photo-album-plus' ) ) .
+		'</h1>';
+		if ( $moderating ) {
+			$status_show = array( 'pending', 'spam' );
 		}
-		return true;
-	}
-	else {
-		wppa_error_message(__('Unable to update comment. Err =', 'wp-photo-album-plus').' 1.');
-		return false;
-	}
+		else {
+
+			// Statistics
+			$t_to_txt = array( 	'none' 		=> false,
+								'600' 		=> sprintf( _n('%d minute', '%d minutes', '10', 'wp-photo-album-plus'), '10'),
+								'1800' 		=> sprintf( _n('%d minute', '%d minutes', '30', 'wp-photo-album-plus'), '30'),
+								'3600' 		=> sprintf( _n('%d hour', '%d hours', '1', 'wp-photo-album-plus'), '1'),
+								'86400' 	=> sprintf( _n('%d day', '%d days', '1', 'wp-photo-album-plus'), '1'),
+								'604800' 	=> sprintf( _n('%d week', '%d weeks', '1', 'wp-photo-album-plus'), '1'),
+							);
+			$spamtime = $t_to_txt[wppa_opt( 'spam_maxage' )];
+
+			echo
+			'<table>
+				<tbody>
+					<tr>
+						<td style="margin:0; font-weight:bold; color:#777777;">' . __( 'Total:', 'wp-photo-album-plus' ) . '</td>
+						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "`" ) . '</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td style="margin:0; font-weight:bold; color:green;">' . __( 'Approved:', 'wp-photo-album-plus' ) . '</td>
+						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "` WHERE `status` = 'approved'" ) . '</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td style="margin:0; font-weight:bold; color:#e66f00;">' . __( 'Pending:', 'wp-photo-album-plus' ) . '</td>
+						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "` WHERE `status` = 'pending'" ) . '</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td style="margin:0; font-weight:bold; color:red;">' . __( 'Spam:', 'wp-photo-album-plus' ) . '</td>
+						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "` WHERE `status` = 'spam'" ) . '</td>
+						<td></td>
+					</tr>';
+					if ( $spamtime ) {
+						echo
+						'<tr>
+							<td style="margin:0; font-weight:bold; color:red;">' . __( 'Auto deleted spam:', 'wp-photo-album-plus' ) . '</td>
+							<td style="margin:0; font-weight:bold;">' . get_option( 'wppa_spam_auto_delcount', '0' ) . '</td>
+							<td>' . sprintf( __( 'Comments marked as spam will be deleted when they are entered longer than %s ago.', 'wp-photo-album-plus' ), $spamtime ) . '</td>
+						</tr>';
+					}
+				echo
+				'</tbody>
+			</table>';
+
+			/*
+			// Filter
+			$comment_show = isset( $_COOKIE['comadmin-show'] ) ? $_COOKIE['comadmin-show'] : 'all';
+			echo
+			'<p>' .
+				'<b>' . __( 'Filter', 'wp-photo-album-plus' ) . ': </b>' .
+				'<select name="wppa_comadmin_show" onchange="wppa_setCookie(\'comadmin-show\', this.value, \'365\'); document.location.reload(true);" >
+					<option value="all" ' . ( $comment_show == 'all' ? 'selected="selected"' : '' ) . ' >' . __( 'all', 'wp-photo-album-plus' ) . '</option>
+					<option value="pending" ' . ( $comment_show == 'pending' ? 'selected="selected"' : '' ) . '>' . __( 'pending', 'wp-photo-album-plus' ) . '</option>
+					<option value="approved" ' . ( $comment_show == 'approved' ? 'selected="selected"' : '' ) . '>' . __( 'approved', 'wp-photo-album-plus' ) . '</option>
+					<option value="spam" ' . ( $comment_show == 'spam' ? 'selected="selected"' : '' ) . '>' . __( 'spam', 'wp-photo-album-plus' ) . '</option>
+				</select>
+			</p>';
+			*/
+		}
+
+		echo
+		'<!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
+		<form id="wppa-comment-form" method="GET" >
+
+			<!-- For plugins, we also need to ensure that the form posts back to our current page -->
+			<input type="hidden" name="page" value="' . $_REQUEST['page'] , '" />
+
+			<!-- Now we can render the completed list table -->';
+			$testListTable->display();
+		echo
+		'</form>
+
+	</div>';
+
 }

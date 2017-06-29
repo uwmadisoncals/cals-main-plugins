@@ -2,7 +2,7 @@
 * Pachkage: wp-photo-album-plus
 *
 *
-* Version 6.6.28
+* Version 6.6.31
 *
 */
 
@@ -413,7 +413,9 @@ function wppaGalleryEvaluate() {
 						case '#all':
 							break;
 						default:
-							alert( 'Unimplemented virtual album: '+album );
+							if ( album != null ) {
+								alert( wppaUIERR + ': ' + album );
+							}
 					}
 					if ( ( album != '#cat' || cats != '' ) &&
 						( album != '#owner' || owner != '' ) &&
@@ -459,7 +461,7 @@ function wppaGalleryEvaluate() {
 	if ( needPhoto ) {
 		photo = jQuery('#wppagallery-photo').val();
 		if ( photo ) {
-			id = photo.replace(/\//g,'');			
+			id = photo.replace(/\//g,'');
 			id = id.split('.');
 			id = id[0];
 			jQuery('#wppagallery-photo-preview-tr').show();

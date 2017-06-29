@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.6.29
+* Version 6.6.30
 *
 */
 
@@ -70,7 +70,7 @@ $wppa_cron_maintenance_slugs = array(	'wppa_remake_index_albums',
 										'wppa_comp_sizes',
 										'wppa_add_gpx_tag',
 										'wppa_add_hd_tag',
-										
+
 									);
 
 // Main maintenace module
@@ -835,7 +835,7 @@ global $wppa_timestamp_start;
 			}
 			else {	// Nothing to do, Done anyway
 				$lastid = $topid;
-				wppa_log( 'Debug', 'Maintenance proc {b}'.$slug.'{/b} Done!');
+				wppa_log( wppa_is_cron() ? 'Cron' : 'Obs', 'Maintenance proc {b}' . $slug . '{/b} Done!' );
 			}
 			break;	// End process photos
 
@@ -1204,7 +1204,7 @@ global $wppa_log_file;
 				$size 	= filesize( $wppa_log_file );
 				$data 	= fread( $file, $size );
 				$data 	= strip_tags( $data );
-				$data 	= str_replace( array( '{b}', '{/b}', "\n", '{span', '{/span}', '" }' ), array( '<b>', '</b>', '<br />', '<span', '</span>', '" >' ), $data );
+				$data 	= str_replace( array( '{b}', '{/b}', '{i}', '{/i}', "\n", '{span', '{/span}', '" }' ), array( '<b>', '</b>', '<i>', '</i>', '<br />', '<span', '</span>', '" >' ), $data );
 				$result .= $data;
 				fclose( $file );
 			}

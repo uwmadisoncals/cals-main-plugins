@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsAjaxVersion = '6.6.28';
+var wppaJsAjaxVersion = '6.6.31';
 
 var wppaRenderAdd = false;
 var wppaWaitForCounter = 0;
@@ -325,7 +325,13 @@ function wppaAjaxAddPhotoToZip( mocc, id, reload ) {
 								// Adding succeeded?
 								var rtxt = result.split( '||' );
 								if ( rtxt[0] == 'OK' ) {
+
+									// For the thumbnails
 									jQuery('#admin-choice-'+id+'-'+mocc).html(rtxt[1]);
+
+									// For the slideshow
+									jQuery('#admin-choice-'+id+'-'+mocc).val(rtxt[1]);
+									jQuery('#admin-choice-'+id+'-'+mocc).prop('disabled', true);
 								}
 								else {
 									alert( result );

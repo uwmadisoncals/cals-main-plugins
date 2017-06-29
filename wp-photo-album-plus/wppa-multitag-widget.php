@@ -3,14 +3,14 @@
 * Package: wp-photo-album-plus
 *
 * display the multitag widget
-* Version 6.3.11
+* Version 6.7.00
 *
 */
 
 class MultitagPhotos extends WP_Widget {
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_multitag_photos', 'description' => __( 'WPPA+ Photo Tags', 'wp-photo-album-plus') );	//
+		$widget_ops = array('classname' => 'wppa_multitag_photos', 'description' => __( 'WPPA+ Photo Tags Selection', 'wp-photo-album-plus') );	//
 		parent::__construct('wppa_multitag_photos', __('Photo Tags Filter', 'wp-photo-album-plus'), $widget_ops);															//
     }
 
@@ -82,7 +82,7 @@ class MultitagPhotos extends WP_Widget {
 			echo '</select>';
 		echo '</p>';
 		if ( isset($instance['tags']['0']) && $instance['tags']['0'] ) $s = implode(',', $instance['tags']); else $s = __('--- all ---', 'wp-photo-album-plus');
-		echo '<p>Currently selected tags: <br /><b>'.$s.'</b></p>';
+		echo '<p>' . __( 'Currently selected tags', 'wp-photo-album-plus' ) . ': <br /><b>'.$s.'</b></p>';
     }
 
 } // class MultitagPhotos

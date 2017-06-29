@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the search widget
-* Version 6.6.29
+* Version 6.7.00
 *
 */
 
@@ -117,6 +117,10 @@ class SearchPhotos extends WP_Widget {
 			<label for="<?php echo $this->get_field_id('root'); ?>">
 				<?php _e('Enable rootsearch', 'wp-photo-album-plus'); ?>
 			</label>
+			<br />
+			<small>
+				<?php _e('See Table IX-E17 to change the label text', 'wp-photo-album-plus'); ?>
+			</small>
 		</p>
 		<p>
 			<small>
@@ -138,6 +142,10 @@ class SearchPhotos extends WP_Widget {
 			<label for="<?php echo $this->get_field_id('sub'); ?>">
 				<?php _e( 'Enable subsearch', 'wp-photo-album-plus' ); ?>
 			</label>
+			<br />
+			<small>
+				<?php _e('See Table IX-E16 to change the label text', 'wp-photo-album-plus'); ?>
+			</small>
 		</p>
 		<p>
 			<input type="checkbox" <?php if ( $catbox ) echo 'checked="checked"' ?> id="<?php echo $this->get_field_id( 'catbox' ); ?>" name="<?php echo $this->get_field_name( 'catbox' ); ?>" />
@@ -156,7 +164,7 @@ class SearchPhotos extends WP_Widget {
 				$selected = $landingpage == '0' ? ' selected="selected"' : '';
 				?>
 				<option value="0" <?php echo $selected ?> >
-					<?php _e( '--- Default ---', 'wp-photo-album-plus' ) ?>
+					<?php _e( '--- default ---', 'wp-photo-album-plus' ) ?>
 				</option>
 				<?php
 

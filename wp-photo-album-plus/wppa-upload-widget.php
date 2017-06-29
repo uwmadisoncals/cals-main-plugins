@@ -6,13 +6,13 @@
 *
 * A wppa widget to upload photos
 *
-* Version 6.4.17
+* Version 6.7.00
 */
 
 class WppaUploadWidget extends WP_Widget {
 
 	function __construct() {
-		$widget_ops = array('classname' => 'wppa_upload_widget', 'description' => __('WPPA+ Upload photos widget', 'wp-photo-album-plus'));
+		$widget_ops = array('classname' => 'wppa_upload_widget', 'description' => __('WPPA+ Widget to upload photos at the frontend', 'wp-photo-album-plus'));
 		parent::__construct('wppa_upload_widget', __('WPPA+ Upload', 'wp-photo-album-plus'), $widget_ops);
 	}
 

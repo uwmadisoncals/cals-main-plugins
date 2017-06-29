@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a list of users linking to their photos
-* Version 6.6.07
+* Version 6.7.00
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 class UpldrWidget extends WP_Widget {
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_upldr_widget', 'description' => __( 'WPPA+ Uploader Photos', 'wp-photo-album-plus') );
+		$widget_ops = array('classname' => 'wppa_upldr_widget', 'description' => __( 'WPPA+ Widget to show which users uploaded how many photos', 'wp-photo-album-plus') );
 		parent::__construct('wppa_upldr_widget', __('Uploader Photos', 'wp-photo-album-plus'), $widget_ops);
     }
 
@@ -242,7 +242,7 @@ class UpldrWidget extends WP_Widget {
 			</select>
 		</p>
 
-		<p><label for="<?php echo $this->get_field_id('showownercount'); ?>"><?php _e('Show count of owners:', 'wp-photo-album-plus'); ?></label>
+		<p>
 			<input
 				type="checkbox"
 				class="widefat"
@@ -251,9 +251,10 @@ class UpldrWidget extends WP_Widget {
 				value="on"
 				<?php if ( $instance['showownercount'] == 'on' ) echo ' checked="checked"'; ?>
 			/>
+			<label for="<?php echo $this->get_field_id('showownercount'); ?>"><?php _e('Show count of owners:', 'wp-photo-album-plus'); ?></label>
 		</p>
 
-		<p><label for="<?php echo $this->get_field_id('showphotocount'); ?>"><?php _e('Show count of photos:', 'wp-photo-album-plus'); ?></label>
+		<p>
 			<input
 				type="checkbox"
 				class="widefat"
@@ -262,6 +263,7 @@ class UpldrWidget extends WP_Widget {
 				value="on"
 				<?php if ( $instance['showphotocount'] == 'on' ) echo ' checked="checked"'; ?>
 			/>
+			<label for="<?php echo $this->get_field_id('showphotocount'); ?>"><?php _e('Show count of photos:', 'wp-photo-album-plus'); ?></label>
 		</p>
 
 <?php

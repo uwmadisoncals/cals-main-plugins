@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Frontend links
-* Version 6.6.29
+* Version 6.6.30
 *
 */
 
@@ -837,11 +837,11 @@ function wppa_moderate_links( $type, $id, $comid = '' ) {
 				<a class="wppa-approve-'.$comid.'" style="font-weight:bold; color:green; cursor:pointer;" onclick="if ( confirm(\''.__('Are you sure you want to publish this comment?', 'wp-photo-album-plus').'\') ) wppaAjaxApproveComment(\''.$comid.'\')">
 					'.$app.
 				'</a>';
-				if ( current_user_can('wppa_moderate') ) $result .= '
+				if ( current_user_can('wppa_moderate') && ! wppa_switch( 'moderate_bulk' ) ) $result .= '
 				<a class="wppa-approve-'.$comid.'" style="font-weight:bold; color:blue; cursor:pointer;" onclick="document.location=\''.get_admin_url().'admin.php?page=wppa_moderate_photos&amp;photo='.$id.'\'" >
 					'.$mod1.
 				'</a>';
-				if ( current_user_can('wppa_comments') ) $result .= '
+				if ( current_user_can('wppa_comments') || current_user_can('wppa_moderate') ) $result .= '
 				<a class="wppa-approve-'.$comid.'" style="font-weight:bold; color:blue; cursor:pointer;" onclick="document.location=\''.get_admin_url().'admin.php?page=wppa_manage_comments&amp;commentid='.$comid.'\'" >
 					'.$mod2.
 				'</a>';

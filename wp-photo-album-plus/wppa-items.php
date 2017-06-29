@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version 6.6.19
+* Version 6.6.30
 *
 */
 
@@ -513,10 +513,10 @@ function wppa_get_album_name( $id, $xargs = array() ) { // $extended = false ) {
 	else {
 		if ( $id == '-2' ) {
 			if ( $args['translate'] ) {
-				$name = __( 'All Albums', 'wp-photo-album-plus' );
+				$name = __( 'All albums', 'wp-photo-album-plus' );
 			}
 			else {
-				$name = 'All Albums';
+				$name = 'All albums';
 			}
 			return $name;
 		}

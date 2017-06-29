@@ -389,8 +389,8 @@
     ),
     'style.css' => 
     array (
-      'size' => 267,
-      'sha1' => '860be5e3b568d69d4f6134425bada531b7314acf',
+      'size' => 269,
+      'sha1' => 'b4bedbc9a32c3276f410e346a865249f822f1f37',
     ),
   ),
 );

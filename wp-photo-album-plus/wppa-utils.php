@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.6.29
+* Version 6.7.00
 *
 */
 
@@ -1592,16 +1592,35 @@ function wppa_log( $xtype, $msg, $trace = false, $listuri = false ) {
 global $wppa_session;
 global $wppa_log_file;
 
+	// Do not log during plugin activation or update
+	if ( strpos( $_SERVER['REQUEST_URI'], '/wp-admin/plugins.php' ) !== false ) {
+		return;
+	}
+	if ( strpos( $_SERVER['REQUEST_URI'], '/wp-admin/update-core.php' ) !== false ) {
+		return;
+	}
+
 	// Sanitize type
 	$t = strtolower( substr( $xtype, 0, 1 ) );
+	$u = strtolower( substr( $xtype, 1, 1 ) );
 	switch ( $t ) {
 		case 'a':
 			$type = '{span style="color:blue;" }Ajax{/span}';
 			break;
 		case 'c':
-			$type = '{span style="color:blue;" }Cron{/span}';
-			if ( ! wppa_switch( 'log_cron' ) ) {
-				return;
+			switch ( $u ) {
+				case 'r':
+					$type = '{span style="color:blue;" }Cron{/span}';
+					if ( ! wppa_switch( 'log_cron' ) ) {
+						return;
+					}
+					break;
+				case 'o':
+					$type = '{span style="color:cyan;" }Com{/span}';
+					if ( ! wppa_switch( 'log_comments' ) ) {
+						return;
+					}
+					break;
 			}
 			break;
 		case 'd':
@@ -3485,7 +3504,7 @@ function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = 
 
 	// Compose html. Non native svg or gif/png
 	else {
-wppa_log('dbg','Still used for '.$name,true);
+if ( $use_svg ) wppa_log('dbg','Still used for '.$name,true);
 		$result = 	'<img' .
 						' src="' . wppa_get_imgdir( $src ) . '"' .
 						( $use_svg ? ' class="wppa-svg"' : '' ) .
@@ -3570,8 +3589,7 @@ function wppa_chmod( $fso ) {
 
 // Test if a given url is to a photo file
 function wppa_is_url_a_photo( $url ) {
-
-global $wppa_supported_photo_extensions;
+	global $wppa_supported_photo_extensions;
 
 	// Init
 	$result = true;
@@ -3581,15 +3599,6 @@ global $wppa_supported_photo_extensions;
 	if ( ! in_array( $ext, $wppa_supported_photo_extensions ) ) {
 		return false;
 	}
-
-	/*
-	// If importing from wppa tree filesystem...
-	if ( wppa( 'is_wppa_tree' ) ) {
-
-		// To prvent fatal double expansion, first compress, double comprees is not fatal
-		$url = wppa_expand_tree_path( wppa_compress_tree_path( $url ) );
-	}
-	*/
 
 	// Using curl may be protected/limited
 	// Use curl to see if the url is found to prevent a php warning
@@ -3872,4 +3881,119 @@ function wppa_get_spinner_svg_body_html() {
 		'</rect>';
 
 	return $result;
+}
+
+// Can i handle pdf files?
+function wppa_can_pdf() {
+
+	if ( wppa_opt( 'image_magick' ) && wppa_switch( 'enable_pdf' ) ) {
+		return true;
+	}
+	return false;
+}
+
+// Are we on a windows platform?
+function wppa_is_windows() {
+
+	// Windows uses \ instead of /, so if no / in ABSPATH, we are on a windows platform
+	return strpos( ABSPATH, '/' ) === false;
+}
+
+// If it is a pdf, do preprocessing. We mod &file, hence &$file
+function wppa_pdf_preprocess( &$file, $alb, $i = false ) {
+
+	// If pdf not enabled, nothing to do.
+	if ( ! wppa_can_pdf() ) return;
+
+	// Is it a pdf?
+	if ( $i === false ) {
+		$is_pdf = wppa_get_ext( $file['name'] ) == 'pdf';
+		$single = true;
+	}
+
+	// One file out of a multiple upload
+	else {
+		$is_pdf = wppa_get_ext( $file['name'][$i] ) == 'pdf';
+		$single = false;
+	}
+
+	// Only continue if this is a pdf
+	if ( ! $is_pdf ) {
+		return;
+	}
+
+	// Make sure there are no spaces in the filename, otherwise the download link is broken
+	if ( $single ) {
+		$file['name'] = str_replace( ' ', '_', $file['name'] );
+	}
+	else {
+		$file['name'][$i] = str_replace( ' ', '_', $file['name'][$i] );
+	}
+
+	// Copy pdf to source dir,
+	$src = wppa_get_source_album_dir( $alb );
+	if ( ! is_dir( $src ) ) {
+		mkdir( $src );
+	}
+	$src .=  '/';
+
+	if ( $single ) {
+		copy( $file['tmp_name'], $src . $file['name'] );
+	}
+	else {
+		copy( $file['tmp_name'][$i], $src . $file['name'][$i] );
+	}
+
+	// Make it a jpg in the source dir,
+	if ( $single ) {
+		$jpg = wppa_strip_ext( $file['name'] ) . '.jpg';
+		if ( wppa_is_windows() ) {
+
+			// On windows the filename[pageno] must be enclosed in "", on unix in ''
+			wppa_image_magick( 'convert  -density 300 "' . $src . $file['name'] . '[0]" ' . $src . $jpg, null, $result );
+		}
+		else {
+			wppa_image_magick( "convert  -density 300 '" . $src . $file['name'] . "[0]' " . $src . $jpg, null, $result );
+		}
+	}
+	else {
+		$jpg = wppa_strip_ext( $file['name'][$i] ) . '.jpg';
+		if ( wppa_is_windows() ) {
+
+			// On windows the filename[pageno] must be enclosed in "", on unix in ''
+			wppa_image_magick( 'convert  -density 300 "' . $src . $file['name'][$i] . '[0]" ' . $src . $jpg, null, $result );
+		}
+		else {
+			wppa_image_magick( "convert  -density 300 '" . $src . $file['name'][$i] . "[0]' " . $src . $jpg, null, $result );
+		}
+	}
+
+	// Copy the jpg image back to $file['name'] and $file['tmp_name']
+	if ( $single ) {
+		$file['name'] = $jpg;
+		copy( $src . $jpg, $file['tmp_name'] );
+	}
+	else {
+		$file['name'][$i] = $jpg;
+		copy( $src . $jpg, $file['tmp_name'][$i] );
+	}
+
+	// and continue as if it was a jpg, but remember its a .pdf
+	wppa( 'is_pdf', true );
+
+	return;
+}
+
+// If it is a pdf, do postprocessing
+function wppa_pdf_postprocess( $id ) {
+
+	// If pdf...
+	if ( wppa( 'is_pdf' ) ) {
+		$filename = wppa_get_photo_item( $id, 'filename' );
+		$filename = str_replace( '.jpg', '.pdf', $filename );
+		wppa_update_photo( array( 'id' => $id, 'filename' => $filename ) );
+	}
+
+	// Reset switch
+	wppa( 'is_pdf', false );
 }

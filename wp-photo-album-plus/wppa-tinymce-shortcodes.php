@@ -3,7 +3,7 @@
 * Pachkage: wp-photo-album-plus
 *
 *
-* Version 6.6.11
+* Version 6.7.00
 *
 */
 
@@ -61,6 +61,7 @@ global $wppa_api_version;
 		echo("\t".'wppaSiteUrl = "'.site_url().'";'."\n");
 		echo("\t".'wppaWppaUrl = "'.WPPA_URL.'";'."\n");
 		echo("\t".'wppaIncludeUrl = "'.trim(includes_url(), '/').'";'."\n");
+		echo("\t".'wppaUIERR = "'.__('Unimplemented virtual album', 'wp-photo-album-plus').'";');
 	echo("/* ]]> */\n");
 	echo("</script>\n");
 }
@@ -299,7 +300,7 @@ global $wpdb;
 				'</td>'.
 			'</tr>'.
 			'<tr id="wppagallery-album-real-search-tr" style="display:none;" >' .
-				'<th><label for="">'.__('Search album:', 'wp-photo-album-plus').'</label></th>'.
+				'<th><label for="">'.__('Filter album:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
 					'<input id="wppagallery-album-real-search" type="text" onkeyup="wppaGalleryEvaluate()" />'.
 					'<br />'.
@@ -599,7 +600,7 @@ global $wpdb;
 					'</select>'.
 					'<br />'.
 					'<input type="checkbox" id="wppagallery-calendar-reverse" onchange="wppaGalleryEvaluate()" >'.__('Last date first', 'wp-photo-album-plus').'&nbsp;&nbsp;'.
-					'<input type="checkbox" id="wppagallery-calendar-allopen" onchange="wppaGalleryEvaluate()" >'.__('Initially display all', 'wppw', 'wp-photo-album-plus').
+					'<input type="checkbox" id="wppagallery-calendar-allopen" onchange="wppaGalleryEvaluate()" >'.__('Initially display all', 'wp-photo-album-plus').
 				'</td>'.
 			'</tr>'.
 
@@ -639,8 +640,8 @@ global $wpdb;
 		'</div>'.
 		'<div><small>'.__('This is a preview of the shortcode that is being generated. You may edit the comment', 'wp-photo-album-plus').'</small></div>'.
 		'<p class="submit">'.
-			'<input type="button" id="wppagallery-submit" class="button-primary" value="'.__('Insert Gallery', 'wp-photo-album-plus').'" name="submit" />&nbsp;'.
-			'<input type="button" id="wppagallery-submit-notok" class="button-secundary" value="'.__('insert Gallery', 'wp-photo-album-plus').'" onclick="alert(\''.esc_js(__('Please complete the shortcode specs', 'wp-photo-album-plus')).'\')" />&nbsp;'.
+			'<input type="button" id="wppagallery-submit" class="button-primary" value="'.__('Insert Shortcode', 'wp-photo-album-plus').'" name="submit" />&nbsp;'.
+			'<input type="button" id="wppagallery-submit-notok" class="button-secundary" value="'.__('Insert Shortcode', 'wp-photo-album-plus').'" onclick="alert(\''.esc_js(__('Please complete the shortcode specs', 'wp-photo-album-plus')).'\')" />&nbsp;'.
 		'</p>'.
 	'</div>'.
 	'<script type="text/javascript" >wppaGalleryEvaluate();</script>';

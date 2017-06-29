@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.6.29
+* Version 6.7.00
 *
 */
 
@@ -297,13 +297,27 @@ global $wppa_session;
 
 				// Remote: url
 				else {
+					if ( wppa_is_mobile() ) {
+						echo
+						'<br />' .
+						'<input' .
+							' type="text"' .
+							' style="width:100%"' .
+							' name="wppa-source-remote"' .
+							' value="' . $source . '"' .
+						' />' .
+						'<br />';
+					}
+					else {
+						echo
+						'<input' .
+							' type="text"' .
+							' style="width:50%"' .
+							' name="wppa-source-remote"' .
+							' value="' . $source . '"' .
+						' />';
+					}
 					echo
-					'<input' .
-						' type="text"' .
-						' style="width:50%"' .
-						' name="wppa-source-remote"' .
-						' value="' . $source . '"' .
-					' />' .
 					__( 'Max:', 'wp-photo-album-plus' ) .
 					'<input' .
 						' type="text"' .
@@ -1869,6 +1883,15 @@ global $wppa_supported_audio_extensions;
 									unlink( $unsanitized_path_name );
 									if ( is_file( $meta ) ) unlink( $meta );
 								}
+
+								// If ajax and remote and not a page, update url to successfully imported photo
+								if ( wppa( 'ajax' ) && wppa( 'is_remote' ) ) {
+									$setting = get_option( 'wppa_import_source_url_'.$user, 'http://' );
+									$setting_x = wppa_expand_tree_path( $setting );
+									if ( wppa_is_url_a_photo( $setting ) || wppa_is_url_a_photo( $setting_x ) ) {
+										update_option( 'wppa_import_source_url_' . wppa_get_user(), wppa_compress_tree_path( $unsanitized_path_name ) );
+									}
+								}
 							}
 							else {
 								wppa_error_message( __( 'Error inserting photo', 'wp-photo-album-plus') . ' ' . basename( $file ) . '.' );
@@ -2550,7 +2573,7 @@ global $wppa_supported_audio_extensions;
 		if ( $zcount ) $msg .= $zcount.' '.__( 'Zipfiles extracted.', 'wp-photo-album-plus').' ';
 		if ( $acount ) $msg .= $acount.' '.__( 'Albums created.', 'wp-photo-album-plus').' ';
 		if ( $dircount ) $msg .= $dircount.' '.__( 'Directory to album imports.', 'wp-photo-album-plus').' ';
-		if ( $photocount ) $msg .= ' '.sprintf( __( 'With total %s photos.','wppa', 'wp-photo-album-plus'), $photocount ).' ';
+		if ( $photocount ) $msg .= ' '.sprintf( __( 'With total %s photos.', 'wp-photo-album-plus'), $photocount ).' ';
 		if ( $pcount ) {
 			if ( isset( $_POST['wppa-update'] ) ) {
 				$msg .= $pcount.' '.__( 'Photos updated', 'wp-photo-album-plus' );
@@ -2755,12 +2778,12 @@ function wppa_extract( $xpath, $delz ) {
 				for( $i = 0; $i < $zip->numFiles; $i++ ){
 					$stat = $zip->statIndex( $i );
 					$file_ext = @ end( explode( '.', $stat['name'] ) );
-					
+
 					if ( in_array( $file_ext, $supported_file_ext ) ) {
 						$zip->extractTo( WPPA_DEPOT_PATH, $stat['name'] );
 						$done++;
 					}
-					
+
 					// Assuming that entries without a file extension are directries. No warning on directory.
 					elseif ( strpos( $stat['name'], '.' ) !== false && strlen( $file_ext ) < 5 ) {
 						wppa_warning_message( sprintf( __( 'File %s is of an unsupported filetype and has been ignored during extraction.', 'wp-photo-album-plus'), wppa_sanitize_file_name( $stat['name'] ) ) );

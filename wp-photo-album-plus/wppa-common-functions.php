@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.6.29
+* Version 6.6.30
 *
 */
 
@@ -213,6 +213,7 @@ global $thumbs;
 		'max_width' 				=> false,
 		'no_ver' 					=> false,
 		'catbox' 					=> '',
+		'is_pdf' 					=> false,
 
 	);
 }

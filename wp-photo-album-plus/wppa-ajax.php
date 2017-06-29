@@ -2252,7 +2252,7 @@ global $wppa_log_file;
 			}
 
 			else switch ( $option ) {
-				
+
 				// Custom mainetance procedures
 				case 'wppa_custom_album_proc':
 				case 'wppa_custom_photo_proc':
@@ -2791,6 +2791,9 @@ global $wppa_log_file;
 						wppa_update_option( 'wppa_fotomoto_on', 'yes' );
 						wppa_update_option( 'wppa_custom_on', 'yes' );
 					}
+					else {
+						wppa_update_option( 'wppa_fotomoto_on', 'no' );
+					}
 					break;
 
 				case 'wppa_i_video':
@@ -2808,6 +2811,15 @@ global $wppa_log_file;
 					}
 					else {
 						wppa_update_option( 'wppa_enable_audio', 'no' );
+					}
+					break;
+
+				case 'wppa_i_pdf':
+					if ( $value == 'yes' ) {
+						wppa_update_option( 'wppa_enable_pdf', 'yes' );
+					}
+					else {
+						wppa_update_option( 'wppa_enable_pdf', 'no' );
 					}
 					break;
 

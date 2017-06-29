@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 6.6.24
+* Version 6.6.30
 *
 */
 
@@ -197,7 +197,7 @@ global $wpdb;
 	$iret = $wpdb->query($query);
 
 	if ( $iret ) {
-		if ( wppa_opt( 'search_comments' ) ) {
+		if ( wppa_switch( 'search_comments' ) ) {
 			wppa_update_photo( $args['photo'] );
 		}
 		return $args['id'];

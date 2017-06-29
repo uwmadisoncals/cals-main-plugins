@@ -3,14 +3,14 @@
 * Package: wp-photo-album-plus
 *
 * display the admins-choice widget
-* Version 6.4.14
+* Version 6.7.00
 *
 */
 
 class AdminsChoice extends WP_Widget {
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_admins_choice', 'description' => __( 'Admins choice of photos', 'wp-photo-album-plus') );	//
+		$widget_ops = array('classname' => 'wppa_admins_choice', 'description' => __( 'WPPA+ Admins choice of photos', 'wp-photo-album-plus') );	//
 		parent::__construct('wppa_admins_choice', __('Admins Choice', 'wp-photo-album-plus'), $widget_ops);															//
     }
 

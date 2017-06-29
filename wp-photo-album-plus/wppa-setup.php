@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.6.29
+* Version 6.7.00
 *
 */
 
@@ -428,7 +428,7 @@ global $silent;
 		if ( $old_rev <= '6411' ) {
 			$old = get_option( 'wppa_upload_edit', 'no' );
 			if ( $old == 'no' ) {
-				update_option( 'wppa_upload_edit', 'none', false );
+				update_option( 'wppa_upload_edit', '-none-', false );
 			}
 			if ( $old == 'yes' ) {
 				update_option( 'wppa_upload_edit', 'classic', false );
@@ -542,6 +542,12 @@ global $silent;
 			}
 			if ( get_option( 'wppa_gpx_implementation' ) == 'google-maps-gpx-viewer' ) {
 				update_option( 'wppa_gpx_implementation', 'external-plugin' );
+			}
+		}
+
+		if ( $old_rev <= '6630' ) {
+			if ( get_option( 'wppa_upload_edit' ) == 'none' ) {
+				update_option( 'wppa_upload_edit', '-none-' );
 			}
 		}
 	}
@@ -720,6 +726,7 @@ Hide Camera info
 						'wppa_i_video' 					=> '',
 						'wppa_i_audio' 					=> '',
 						'wppa_i_stereo' 				=> '',
+						'wppa_i_pdf' 					=> '',
 						'wppa_i_done'					=> '',
 
 						// Table I: Sizes
@@ -1136,6 +1143,7 @@ Hide Camera info
 						'wppa_custom_style' 			=> '',
 						'wppa_use_custom_style_file' 	=> 'no',
 						'wppa_js_css_optional' 			=> 'no',
+						'wppa_enable_pdf' 				=> 'no', 	// IV-A30
 						'wppa_use_custom_theme_file' 	=> 'no',
 						'wppa_cre_uploads_htaccess' 	=> 'remove',
 						'wppa_debug_trace_on' 			=> 'no',
@@ -1405,7 +1413,7 @@ Hide Camera info
 						'wppa_upload_moderate'			=> 'no',
 						'wppa_fe_upload_private' 		=> 'no',
 						'wppa_mail_on_approve' 			=> 'no',
-						'wppa_upload_edit'				=> 'none',
+						'wppa_upload_edit'				=> '-none-',
 						'wppa_upload_edit_users' 		=> 'admin',
 						'wppa_upload_edit_theme_css' 	=> 'no',
 						'wppa_fe_edit_name' 			=> 'yes',
@@ -1573,10 +1581,11 @@ Hide Camera info
 						'wppa_import_root' 				=> ABSPATH . 'wp-content',
 						'wppa_allow_import_source' 		=> 'no',
 						'wppa_enable_generator' 		=> 'yes',
-						'wppa_log_cron' 				=> 'no',	// A9
-						'wppa_retry_mails' 				=> '0', 	// A10
-						'wppa_log_ajax' 				=> 'no',
+						'wppa_log_cron' 				=> 'no',	// A9.1
+						'wppa_log_ajax' 				=> 'no', 	// A9.2
+						'wppa_log_comments' 			=> 'no', 	// A9.3
 						'wppa_moderate_bulk' 			=> 'no', 	// B20
+						'wppa_retry_mails' 				=> '0', 	// A10
 
 
 						// IX D New
@@ -1614,6 +1623,7 @@ Hide Camera info
 						'wppa_covertype_is_restricted'	=> 'no',
 						'wppa_porder_restricted'		=> 'no',
 						'wppa_reup_is_restricted' 		=> 'yes',
+						'wppa_newtags_is_restricted' 	=> 'no',
 
 //						'wppa_strip_file_ext'			=> 'no',
 						'wppa_newphoto_name_method' 	=> 'filename',

@@ -118,8 +118,9 @@ http://docs.themeisle.com/article/610-how-can-i-edit-the-data-manually
 5. Charts library
 
 == Changelog ==
-= 2.1.6 = 
+= 2.1.7 = 
 
+* Updated sdk loading logic.
 
 
 

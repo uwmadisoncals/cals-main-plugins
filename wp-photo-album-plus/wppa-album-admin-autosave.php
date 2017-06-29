@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.6.28
+* Version 6.7.00
 *
 */
 
@@ -424,7 +424,7 @@ function wppaTryScheduleAll( id ) {
 
 									// Order # -->
 									echo
-									__( 'Album sort order #:', 'wp-photo-album-plus' ) . ' ' .
+									__( 'Album order #', 'wp-photo-album-plus' ) . ': ' .
 									'<input' .
 										' type="text"' .
 										' onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'a_order\', this )"' .
@@ -446,7 +446,7 @@ function wppaTryScheduleAll( id ) {
 										echo
 										'<select' .
 											' id="wppa-parsel"' .
-											' style="max-width:100%;"' .
+											' style="max-width:500px;"' .
 											' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'a_parent\', this )"' .
 											' >' .
 											wppa_album_select_a( array( 'checkaccess' => true,
@@ -465,7 +465,7 @@ function wppaTryScheduleAll( id ) {
 										echo
 										'<select' .
 											' id="wppa-parsel"' .
-											' style="max-width:100%;"' .
+											' style="max-width:500px;"' .
 											' onchange="wppaAjaxUpdateAlbum( '. $id . ', \'a_parent\', this )"' .
 											' >' .
 											wppa_album_select_a( array( 'checkaccess' => true,
@@ -1008,7 +1008,7 @@ function wppaTryScheduleAll( id ) {
 									echo
 									'<input' .
 										' type="button"' .
-										' title="' . esc_attr( __( 'Tag all photos in this album with the default tags.', 'wp-photo-album-plus' ) ) . '"' .
+										' title="' . esc_attr( __( 'Schedule all photos in this album for later publishing.', 'wp-photo-album-plus' ) ) . '"' .
 										' onclick="wppaTryScheduleAll( ' . $id . ' )"' .
 										' value="' . esc_attr( __( 'Schedule all', 'wp-photo-album-plus' ) ) . '"' .
 									' />';
@@ -2437,6 +2437,7 @@ global $wpdb;
 		else {
 			_e( 'You can edit sub-album sequence order here when you set the album order to "Order #" or "Order # desc" in the "Sub album sort order:" selection box above.' );
 		}
+		echo '<br />';
 		return;
 	}
 
@@ -2650,7 +2651,7 @@ global $wpdb;
 				wppaAjaxInProgress++;
 
 				jQuery( "#wppa-sort-seqn-albums-" + album ).attr( 'value', seqno );	// set hidden value to new value to prevent duplicate action
-				var spinnerhtml = '<img src="' + wppaImageDirectory + 'spinner.' + <?php echo ( wppa_use_svg() ? 'svg' : 'gif' ) ?> + '" />';
+				var spinnerhtml = '<img src="' + wppaImageDirectory + 'spinner.' + '<?php echo ( wppa_use_svg() ? 'svg' : 'gif' ) ?>' + '" />';
 				jQuery( '#wppa-album-seqno-' + album ).html( spinnerhtml );
 			}
 		</script>

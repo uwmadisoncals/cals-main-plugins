@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a slideshow in the sidebar
-* Version 6.4.17
+* Version 6.7.00
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -201,12 +201,14 @@ class SlideshowWidget extends WP_Widget {
 		<p><label for="<?php echo $this->get_field_id('width'); ?>"><?php _e('Width:', 'wp-photo-album-plus'); ?></label> <input class="widefat" style="width:15%;" id="<?php echo $this->get_field_id('width'); ?>" name="<?php echo $this->get_field_name('width'); ?>" type="text" value="<?php echo $width; ?>" />&nbsp;<?php _e('pixels.', 'wp-photo-album-plus') ?>
 		<label for="<?php echo $this->get_field_id('height'); ?>"><?php _e('Height:', 'wp-photo-album-plus'); ?></label> <input class="widefat" style="width:15%;" id="<?php echo $this->get_field_id('height'); ?>" name="<?php echo $this->get_field_name('height'); ?>" type="text" value="<?php echo $height; ?>" />&nbsp;<?php _e('pixels.', 'wp-photo-album-plus') ?></p>
 		<p>
+			<?php _e('Set to \'yes\' if there are only portrait images in the album and you want the photos to fill the full width of the widget. Set to \'no\' otherwise.', 'wp-photo-album-plus') ?>
+			<?php _e('If set to \'yes\', Vertical alignment will be forced to \'fit\'.', 'wp-photo-album-plus') ?>
+			<br />
 			<?php _e('Portrait only:', 'wp-photo-album-plus'); ?>
 			<select id="<?php echo $this->get_field_id('ponly'); ?>" name="<?php echo $this->get_field_name('ponly'); ?>">
 				<option value="no" <?php if ($ponly == 'no') echo 'selected="selected"' ?>><?php _e('no.', 'wp-photo-album-plus'); ?></option>
 				<option value="yes" <?php if ($ponly == 'yes') echo 'selected="selected"' ?>><?php _e('yes.', 'wp-photo-album-plus'); ?></option>
-			</select>&nbsp;<?php _e('Set to \'yes\' if there are only portrait images in the album and you want the photos to fill the full width of the widget.<br/>Set to \'no\' otherwise.', 'wp-photo-album-plus') ?>
-			&nbsp;<?php _e('If set to \'yes\', Vertical alignment will be forced to \'fit\'.', 'wp-photo-album-plus') ?>
+			</select>
 		</p>
 		<p>
 			<?php _e('Vertical alignment:', 'wp-photo-album-plus'); ?>

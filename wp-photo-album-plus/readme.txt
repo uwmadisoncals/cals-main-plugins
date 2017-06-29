@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, gallery, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick
-Version: 6.6.29
-Stable tag: 6.6.28
+Version: 6.7.00
+Stable tag: 6.6.30
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -179,6 +179,39 @@ Oh, just Google on 'picture resizer' and you will find a bunch of free programs 
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.7.00 =
+
+= Bug Fixes =
+
+* Many textual fixes, thanx to Stefan Eggers who has completed the german translations.
+* Fixed a rounding issue in the calculation of wppa container width when thw width in the shortcode was set to a fraction, causing intermittent layout issues.
+
+= New Features =
+
+* New shortcode attribute **timeout** for slideshows (type="slide", type="slideonly", type="slideonlyf"). Usage: [wppa type="slide" album="13" timeout="2000"][/wppa] for 2000ms. (2s.) timeout.
+[wppa type="slide" album="13" timeout="random"][/wppa] for a random timeout between 2 and 7 times the animation speed.
+* Completed translations for the German language, by Stefan Eggers
+
+= 6.6.30 =
+
+= Bug Fixes =
+
+* Photo modified date/time was not updated when a comment was entered. Fixed.
+* Drag/drop album sequence stopped working. Fixed.
+
+= New Features =
+
+* Table IV-F3 added option 'Use WP Discussion rules'. This applies to moderation only, the email notification rules are not changed, i.e. Table IV-F5, 5.1 and 5.2.
+* You can monitor commenting in the Wppa log (Table VIII-C1) if Table IX-A9.3 is ticked.
+* Table VII-C9: New tags restricted. Only admin and wppa superusers can add new tags to photos, other users can only select existing tags and remove all tags from a photo.
+* Table IV-A30: Enable pdf. To upload pdf files. The first page of the pdf file is converted to a .jpg file and treated as a photo, the photo permalink enables the download of the original full pdf file.
+This feature requires ImageMagick to be enabled. See Table IX-K7.
+
+= Other Cganges =
+
+* Many minor cosmetic changes.
+* The comment admin page has been recoded.
 
 = 6.6.29 =
 
