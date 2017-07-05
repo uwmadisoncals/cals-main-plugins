@@ -616,17 +616,18 @@ class Ai1ec_Event_Search extends Ai1ec_Base {
 		}
 		$dbi        = $this->_registry->get( 'dbi.dbi' );
 		$table_name = $dbi->get_table_name( 'ai1ec_events' );
-		$argv       = array( $url, $uid, $url );
+		$argv       = array( $uid, $url );
 		// fix issue where invalid feed URLs were assigned
-		$update     = 'UPDATE ' . $table_name . ' SET `ical_feed_url` = %s' .
-			' WHERE `ical_uid` = %s AND `ical_feed_url` != %s';
-		$query   = $dbi->prepare( $update, $argv);
-		$success = $dbi->query( $query );
-
+		$delete     = 'SELECT `post_id` FROM `'. $table_name .
+			'` WHERE `ical_uid` = %s AND `ical_feed_url` != %s';
+		$post_ids   = $dbi->get_col( $dbi->prepare( $delete, $argv ) );
+		foreach ( $post_ids as $pid ) {
+			wp_delete_post( $pid, true );
+		}
 		// retrieve actual feed ID if any
 		$select = 'SELECT `post_id` FROM `' . $table_name .
 			'` WHERE `ical_uid` = %s';
-		return $dbi->get_var( $dbi->prepare( $select, array( $uid ) ) );
+		return $dbi->get_var( $dbi->prepare( $select, $argv ) );
 	}
 
 	/**
