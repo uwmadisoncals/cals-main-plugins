@@ -3,8 +3,8 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
-Tested up to: 4.7
-Stable tag: 2.5.10
+Tested up to: 4.8
+Stable tag: 2.5.11
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -80,8 +80,14 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 4. Edit or create a page on your blog which includes the shortcode [my_calendar] and visit
    the page you have edited or created. You should see your calendar. Visit My Calendar -> Help for assistance
    with shortcode options or widget configuration.
-
+   
 == Changelog ==
+
+= 2.5.12 = 
+
+* Bug fix: missing space in conflict identification
+* Bug fix: internationalization of string to time created conflict when entering month abbreviations
+* Add filter to enable creation of a custom content editor
 
 = 2.5.11 =
 
@@ -840,6 +846,7 @@ This is a major revision.
 * Event occurrence IDs can change when events dates are changed
 * Add option to insert events simultaneously to both global & local calendar in multisite networks [todo]
 * JS to delete events from front-end when logged-in
+* TODO: delete this instance and all subsequent instances
 
 == Frequently Asked Questions ==
 

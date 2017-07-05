@@ -3,7 +3,7 @@ Contributors: ramon fincken
 Tags: cache, warm, keep, xml, sitemap, load, speed, quick, tag, w3tc, optimize, page cache, preload, google, pagespeed, webmaster, sitemap, generator, warmup, cold, expire, expired, nginx, varnish, microcaching, microcache
 Requires at least: 3.5
 Tested up to: 4.8
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 
 Crawls your website-pages based on google XML sitemap. If you have a caching plugin this will keep your cache warm. Speeds up your site.
 
@@ -52,9 +52,7 @@ Feel free to ignore creation of posts with warmcache.<br>
 See https://wordpress.org/support/topic/29-september-2016-update-causing-constant-post-update-notifications-from-secur/
 
 = I have set up the cronjob but the stats table on the plugin page remains empty. =
-> If you have object caching such as W3 total cache, the statistics cannot be read.<br>
-A help topic about this is placed <a href="http://wordpress.org/support/topic/plugin-w3-total-cache-strange-transient-problem?replies=1">on the support forums</a>.
-Note that the script is crawling your XML file (check your webhosts access log), but you cannot see the statistics.
+> @see The plugin shows an error, it cannot read the XML sitemap
 
 = How to override the 20 pages crawl limit =
 > Set a define in your wp-config (at the top, newline, after <?php ) with name MP_WARM_CACHE_FILTER_LIMIT and value INTEGER
@@ -67,6 +65,10 @@ The support forums over here, drop me a tweet to notify me of your support topic
 I always check my tweets, so mention my name with @ramonfincken and your problem.
 
 == Changelog ==
+= 2.2.2 =
+Bugfix: Fixed skipping the first item in sitemap(s). Thanks Jeff (@upekshapriya) for reporting<br>
+Added: simplexml_load_string function check
+
 = 2.2.1 =
 Bugfix: PHP notices
 

@@ -3,7 +3,7 @@
 Plugin Name: Warm cache
 Plugin URI: https://www.mijnpress.nl
 Description: Crawls your website-pages based on any XML sitemap plugin. If you have a caching plugin this wil keep your cache warm. Speeds up your site.
-Version: 2.2.1
+Version: 2.2.2
 Author: Ramon Fincken
 Author URI: https://www.mijnpress.nl
 */
@@ -95,6 +95,11 @@ class warm_cache extends mijnpress_plugin_framework
 			if(!$sitemapSyntaxOK) {
 				echo '<div class="error"><p>A notice from plugin Warm-cache: Your configured sitemap url ( <a href="'.$sitemap_url.'">'.$sitemap_url.'</a> ) is configured, but does not appear to contain an xml opening tag, or a combination of urlset or sitemap, I cannot crawl your pages. Please check your sitemap plugin to fix your currupt sitemap.<br/>Note: this check will be cached for 2 minutes. So if you fix the problem, this notice might still be present for 2 minutes.</p>
 <p>Error detail: '.$errormsg. '</p></div>';
+			}
+
+			if( !function_exists('simplexml_load_string') ) {
+				echo '<div class="error"><p>PHP Function simplexml_load_string is not available on your server, please contact your host.</p>
+				<p>Error detail: undefined function simplexml_load_string</p></div>';
 			}
 		}
 	}	

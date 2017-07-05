@@ -1515,44 +1515,46 @@ function weaverx_mainopts_layout() {
 			array('val' => 'one-column', 'desc' => __('No sidebars, content only', 'weaver-xtreme' /*adm*/) )
 	)),
 
-	array('name' => '<small>' . __('Page', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'layout_page', 'type' => 'select_layout',
+	array('name' => __('Page', 'weaver-xtreme' /*adm*/), 'id' => 'layout_page', 'type' => 'select_layout',
 		'info' => __('Layout for normal Pages on your site.', 'weaver-xtreme' /*adm*/),
 		'value' => ''
 	  ),
-	array('name' => '<small>' . __('Blog', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'layout_blog', 'type' => 'select_layout',
+	array('name' => __('Blog', 'weaver-xtreme' /*adm*/), 'id' => 'layout_blog', 'type' => 'select_layout',
 		'info' => __('Layout for main blog page. Includes "Page with Posts" Page templates.', 'weaver-xtreme' /*adm*/),
 		'value' => ''
 	  ),
-	array('name' => '<small>' . __('Post Single Page', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'layout_single', 'type' => 'select_layout',
+	array('name' => __('Post Single Page', 'weaver-xtreme' /*adm*/), 'id' => 'layout_single', 'type' => 'select_layout',
 		'info' => __('Layout for Posts displayed as a single page.', 'weaver-xtreme' /*adm*/),
 		'value' => ''
 	  ),
-	array('name' => '<small>' . __('Attachments', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'layout_image', 'type' => '+select_layout',
+
+	array('name' => __('Attachments', 'weaver-xtreme' /*adm*/), 'id' => 'layout_image', 'type' => '+select_layout',
 		'info' => __('Layout for attachment pages such as images. (&starf;Plus)', 'weaver-xtreme' /*adm*/),
 		'value' => ''
 	  ),
-	array('name' => '<small>' . __('Date Archive', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'layout_archive', 'type' => '+select_layout',
+
+	array('name' => __('Date Archive', 'weaver-xtreme' /*adm*/), 'id' => 'layout_archive', 'type' => '+select_layout',
 		'info' => __('Layout for archive by date pages. (&starf;Plus)', 'weaver-xtreme' /*adm*/),
 		'value' => ''
 	  ),
-	array('name' => '<small>' . __('Category Archive', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'layout_category', 'type' => '+select_layout',
+
+	array('name' => __('Category Archive', 'weaver-xtreme' /*adm*/), 'id' => 'layout_category', 'type' => '+select_layout',
 		'info' => __('Layout for category archive pages. (&starf;Plus)', 'weaver-xtreme' /*adm*/),
 		'value' => ''
 	  ),
-	array('name' => '<small>' . __('Tags Archive', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'layout_tag', 'type' => '+select_layout',
+	array('name' => __('Tags Archive', 'weaver-xtreme' /*adm*/), 'id' => 'layout_tag', 'type' => '+select_layout',
 		'info' => __('Layout for tag archive pages. (&starf;Plus)', 'weaver-xtreme' /*adm*/),
 		'value' => ''
 	  ),
-	array('name' => '<small>' . __('Author Archive</small>', 'weaver-xtreme' /*adm*/), 'id' => 'layout_author', 'type' => '+select_layout',
+
+	array('name' => __('Author Archive</small>', 'weaver-xtreme' /*adm*/), 'id' => 'layout_author', 'type' => '+select_layout',
 		'info' => __('Layout for author archive pages. (&starf;Plus)', 'weaver-xtreme' /*adm*/),
 		'value' => ''
 	  ),
-	array('name' => '<small>' . __('Search Results, 404</small>', 'weaver-xtreme' /*adm*/), 'id' => 'layout_search', 'type' => '+select_layout',
+	array('name' => __('Search Results, 404</small>', 'weaver-xtreme' /*adm*/), 'id' => 'layout_search', 'type' => '+select_layout',
 		'info' => __('Layout for search results and 404 pages. (&starf;Plus)', 'weaver-xtreme' /*adm*/),
 		'value' => ''
 	  ),
-
-
 
 	array('name' => '<span class="i-left" style="font-size:120%;">&harr;</span><small>' . __('Left Sidebar Width', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'left_sb_width_int', 'type' => 'val_percent',
 		'info' => __('Width for Left Sidebar (Default: 25%)', 'weaver-xtreme' /*adm*/),
@@ -1575,6 +1577,9 @@ function weaverx_mainopts_layout() {
 
 	array('name' => __('Flow color to bottom', 'weaver-xtreme' /*adm*/), 'id' => 'flow_color', 'type' => '+checkbox',
 		'info' => __('If checked, Content and Sidebar bg colors will flow to bottom of the Container (that is, equal heights). You must provide background colors for the Content and Sidebars or the default bg color will be used. (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
+
+	array('name' => __('Alt Page Themes', 'weaver-xtreme' /*adm*/), 'id' => '-editor-codex', 'type' => 'header_area',
+		'info' => __('&starf; Weaver Xtreme Plus (V 3.1.1 or later) allows you to set Alternative Themes for the blog, single, and other archive-like pages.', 'weaver-xtreme' /*adm*/)),
 
 
 

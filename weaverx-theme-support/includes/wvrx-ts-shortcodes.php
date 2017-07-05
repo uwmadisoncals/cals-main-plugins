@@ -362,9 +362,17 @@ function wvrx_ts_sc_tab_group( $args, $content ) {
     $out = '*** Unclosed or mismatched [tab_group] shortcodes ***';
 
     if ( isset( $GLOBALS['wvrx_ts_tabs'] ) && is_array( $GLOBALS['wvrx_ts_tabs'] ) ) {
+		$n = 0;
         foreach ( $GLOBALS['wvrx_ts_tabs'] as $tab ) {
-            $tabs[] = '<span>' . $tab['title'] . '</span>'. "\n";
-            $panes[] = "\n" .'<div class="wvr-tabs-pane">' . $tab['content'] . '</div>';
+			$n++;
+            $tabs[] = '<span>' . $tab['title'] . '</span>' . "\n";
+			// on page refresh, this simple code reverts to the first tab showing. Since this is under JS fixup, there was a bit of
+			// a flash until page loaded. By initially adding wvr-tabs-hide class and making that hidden, the flash is eliminated since
+			// the JS hides/unhides anyway. Added Version 3.1.8
+			if ($n == 1)
+				$panes[] = "\n" .'<div class="wvr-tabs-pane wvr-tabs-show">' . wvrx_ts_strip_pp($tab['content']) . '</div>';
+			else
+				$panes[] = "\n" .'<div class="wvr-tabs-pane wvr-tabs-hide">' . wvrx_ts_strip_pp($tab['content']) . '</div>';
         }
         $out = '<div id="' . $group_id . '" class="wvr-tabs wvr-tabs-style"> <!-- tab_group -->' . "\n"
             . '<div class="wvr-tabs-nav">' . "\n"
@@ -379,6 +387,15 @@ function wvrx_ts_sc_tab_group( $args, $content ) {
     unset( $GLOBALS['wvrx_ts_in_tab_container'],$GLOBALS['wvrx_ts_tabs'],$GLOBALS['wvrx_ts_num_tabs']);
 
     return $add_style . $out;
+}
+
+function wvrx_ts_strip_pp( $content ) {
+	// strip leading </p>\n<p> from tab content - added by editor
+	$loc = strpos($content, "</p>\n<p>");
+	if ( $loc !== false && $loc == 0 ) {
+		return substr($content, 8);
+	}
+	return $content;
 }
 
 function wvrx_ts_sc_tab( $args, $content ) {

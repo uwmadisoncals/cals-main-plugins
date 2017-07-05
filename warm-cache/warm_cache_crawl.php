@@ -81,14 +81,14 @@ if(defined('PLUGIN_WARM_CACHE_CALLED'))
 			// No need to crawl our own post type .. bail
 			return;
 		}
-
 		$xmldata = wp_remote_retrieve_body(wp_remote_get($sitemap_url));
+
 		$xml = simplexml_load_string($xmldata);
-	
+
 		$cnt = count($xml->url);
 		if($cnt > 0)
 		{
-			for($i = 0;$i < $cnt;$i++){
+			for($i = -1; $i < $cnt; $i++){
 				if($hits >= $limit) {
 					return;
 				}

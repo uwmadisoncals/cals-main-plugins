@@ -238,7 +238,7 @@ function mc_default_settings() {
 		'mini'       => $mini_template,
 		'rss'        => $rss_template,
 		'details'    => $single_template,
-		'label'      => addslashes( 'More<span class="screen-reader-text"> about {title}</span>' )
+		'label'      => addslashes( __( 'More<span class="screen-reader-text"> about {title}</span>', 'my-calendar' ) )
 	) );
 	add_option( 'mc_skip_holidays', 'false' );
 	add_option( 'mc_css_file', 'twentyfifteen.css' );

@@ -1426,6 +1426,7 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 					$list_heading = jd_draw_template( $values, stripslashes( get_option( 'mc_week_caption' ) ) );
 				}
 				$h2 = apply_filters( 'mc_list_header_level', 'h2' );
+				$list_heading = apply_filters( 'mc_list_heading', $list_heading,  $current_month_header, $through_month_header, $caption_text );
 				$my_calendar_body .= "<$h2 class=\"heading my-calendar-$time\">$list_heading</$h2>\n";
 			}
 			// If not a valid time or layout format, skip.

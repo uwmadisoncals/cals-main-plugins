@@ -260,6 +260,18 @@ the <em></em>&mdash; Select &mdash;</em> default value.','weaverx-theme-support'
 <?php
 		return;
 	}
+
+	$updir = wp_upload_dir();
+	$dir = trailingslashit($updir['basedir']) . 'weaverx-subthemes/editor-style-wvrx.css';
+
+	if (!@file_exists( $dir ))  { ?>
+<div style="padding:2px; border:2px solid red; background:#FAA;">
+<?php _e('<strong>Note!</strong>
+Please open the <em>Appearance:Weaver Xtreme Admin:Main Options</em> page and <em>Save Settings</em> to enable full editor theme match styling.','weaverx-theme-support' /*adm*/); ?>
+</div><br />
+<?php
+	}
+
 	echo '<strong>' . __('Page Templates','weaverx-theme-support' /*adm*/) . '</strong>';
 	weaverx_help_link('help.html#PageTemplates',__('Help for Weaver Xtreme Page Templates','weaverx-theme-support' /*adm*/));
 	echo '<span style="float:right;">(' . __('This Page\'s ID: ','weaverx-theme-support' /*adm*/); the_ID() ; echo ')</span>';
@@ -526,7 +538,18 @@ function wvrx_ts_post_extras() {
 ?>
 <div style="line-height:150%;">
 <p>
-	<?php
+<?php
+	$updir = wp_upload_dir();
+	$dir = trailingslashit($updir['basedir']) . 'weaverx-subthemes/editor-style-wvrx.css';
+
+	if (!@file_exists( $dir ))  { ?>
+<div style="padding:2px; border:2px solid red; background:#FAA;">
+<?php _e('<strong>Note!</strong>
+Please open the <em>Appearance:Weaver Xtreme Admin:Main Options</em> page and <em>Save Settings</em> to enable full editor theme match styling.','weaverx-theme-support' /*adm*/); ?>
+</div><br />
+<?php
+	}
+
 	echo '<strong>' . __('Per Post Options','weaverx-theme-support' /*adm*/) . '</strong>';
 	weaverx_help_link('help.html#PerPage', __('Help for Per Post Options','weaverx-theme-support' /*adm*/));
 	echo '<span style="float:right;">(' . __('This Post\'s ID: ','weaverx-theme-support' /*adm*/); the_ID() ; echo ')</span>';
@@ -856,18 +879,7 @@ Custom styles will not be displayed by the Page Editor.'
 		_e('Note: This page will still use the default site subtheme settings to display in the Page Editor (i.e., on this screen).','weaver-xtreme');
 
 	    // build the theme file list
-		$themes = array();
-		$upload_dir = wp_upload_dir();
-	    $theme_dir = trailingslashit( $upload_dir['basedir'] ) . 'weaverx-subthemes/';
-	    if( $media_dir = opendir($theme_dir) ) {
-			while ($m_file = readdir($media_dir)) {
-				$len = strlen($m_file);
-				$ext = $len > 4 ? substr($m_file,$len-4,4) : '';
-				if($ext == '.wxt' || $ext == '.wxb' ) {
-					$themes[] = $m_file;
-				}
-			}
-	    }
+		$themes = wvrx_ts_get_alt_themes();
 ?>
 	<br />
 
@@ -982,6 +994,22 @@ Weaver Xtreme Plus supports code and HTML insertion for some areas. To add code,
 <?php
 }
 }	// end of action function
+
+function wvrx_ts_get_alt_themes() {
+	$themes = array();
+	$upload_dir = wp_upload_dir();
+	$theme_dir = trailingslashit( $upload_dir['basedir'] ) . 'weaverx-subthemes/';
+	if( $media_dir = opendir($theme_dir) ) {
+		while ($m_file = readdir($media_dir)) {
+			$len = strlen($m_file);
+			$ext = $len > 4 ? substr($m_file,$len-4,4) : '';
+			if($ext == '.wxt' || $ext == '.wxb' ) {
+				$themes[] = $m_file;
+			}
+		}
+	}
+	return $themes;
+}
 
 add_action( 'wvrx_ts_xp_perpoststyle', 'wvrx_ts_xp_perpoststyle_action' );
 

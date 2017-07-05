@@ -58,7 +58,7 @@ class mijnpress_plugin_framework
 {
     var $showcredits = true;
     var $showcredits_fordevelopers = true;
-    var $all_plugins = array('Admin renamer extended','Simple add pages or posts','Force apply terms and conditions','GTmetrix website performance','Antispam for all fields','Mass Delete Tags','Auto Prune Posts','Warm cache','See attachments','Automatic Comment Scheduler','Subscribe2 widget','Define Constants','Mass Delete Unused Tags','WPML flag in menu', 'WPsc MijnPress');
+    var $all_plugins = array('Simple add pages or posts','Force apply terms and conditions','Antispam for all fields','Mass Delete Tags','Auto Prune Posts','Warm cache','See attachments','Automatic Comment Scheduler','Define Constants','Mass Delete Unused Tags','WPML flag in menu');
     
     /**
      * Left menu display in Plugin menu
@@ -79,7 +79,7 @@ class mijnpress_plugin_framework
             if($config_url) $links[] = '<a href="'.$config_url.'">' . __('Settings') . '</a>';
             $links[] = '<a href="http://donate.ramonfincken.com">' . __('Donate') . '</a>';
             $links[] = '<a href="http://pluginsupport.mijnpress.nl">' . __('Support') . '</a>';
-            $links[] = '<a href="http://www.mijnpress.nl">' . __('Custom WordPress coding nodig?') . '</a>';
+            $links[] = '<a href="https://www.mijnpress.nl">' . __('Custom WordPress coding nodig?') . '</a>';
         }
         return $links;
     }

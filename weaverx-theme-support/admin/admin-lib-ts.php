@@ -230,6 +230,9 @@ function weaverx_form_show_options($weaverx_olist, $begin_table = true, $end_tab
 			case 'select_id':
 				weaverx_form_select_id($value);
 				break;
+			case 'select_alt_theme':
+				weaverx_form_select_alt_theme($value);
+				break;
 			case 'select_layout':
 				weaverx_form_select_layout($value);
 				break;
@@ -728,7 +731,7 @@ function weaverx_ex_set_current_to_serialized_values($contents)  {
 
 	weaverx_setopt('last_option','Weaver Xtreme');
 	weaverx_save_opts('loading theme');	// OK, now we've saved the options, update them in the DB
-	
+
 	return true;
 }
 

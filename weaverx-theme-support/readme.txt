@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: weaverx-theme-support
 Requires at least: 4.5
 Tested up to: 4.8
-Stable tag: 3.1.7
+Stable tag: 3.1.8
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -75,6 +75,13 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog ==
+= 3.1.8 =
+* Fix: New editor style file no longer needs Weaver Xtreme Plus
+* New: Display message if need to save options to generate editor-style-wvrx.css file.
+* New: Support for Weaver Xtreme Plus archive per page alt theme
+* Tweak: Handle leading </p> in tabs shortcode
+* Tweak: improved styling for tab shortcode for improved visibility when loading
+
 = 3.1.7 =
 * Fix: Added new way to style the page/post editor. Some security plugins block previous method.
 * Tweak: updated page/post editor styling to better match theme settings - requires Weaver Xtreme 3.1.7 or later.

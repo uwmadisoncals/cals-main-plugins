@@ -138,6 +138,29 @@ function weaverx_form_select_id( $value, $show_row = true ) {
 	<?php }
 }
 
+function weaverx_form_select_alt_theme($value) {
+	$list = array(array('val' => 'default', 'desc' => __('Use Default', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'right', 'desc' => __('Sidebars on Right', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'right-top', 'desc' => __('Sidebars on Right (stack top)', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'left', 'desc' => __('Sidebars on Left', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'left-top', 'desc' => __(' Sidebars on Left (stack top)', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'split', 'desc' => __('Split - Sidebars on Right and Left', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'split-top', 'desc' => __('Split (stack top)', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'one-column', 'desc' => __('No sidebars, content only', 'weaver-xtreme' /*adm*/) )
+	);
+
+	$themes = wvrx_ts_get_alt_themes();
+	$list = array();
+	$list[] = array( 'val' => '', 'desc' => '');
+	foreach ( $themes as $subtheme ) {
+		$list[] = array( 'val' => $subtheme, 'desc' => $subtheme);
+	}
+
+
+	$value['value'] = $list;
+	weaverx_form_select_id($value);
+}
+
 function weaverx_form_select_layout($value) {
 	$list = array(array('val' => 'default', 'desc' => __('Use Default', 'weaver-xtreme' /*adm*/) ),
 		array('val' => 'right', 'desc' => __('Sidebars on Right', 'weaver-xtreme' /*adm*/) ),

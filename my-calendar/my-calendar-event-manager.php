@@ -53,6 +53,7 @@ function mc_event_post( $action, $data, $event_id ) {
 		if ( $data['event_image'] == '' ) {
 			delete_post_thumbnail( $post_id );
 		} else {
+			// check POST data
 			$attachment_id = ( isset( $_POST['event_image_id'] ) && is_numeric( $_POST['event_image_id'] ) ) ? $_POST['event_image_id'] : false;
 			if ( $attachment_id ) {
 				set_post_thumbnail( $post_id, $attachment_id );
@@ -831,21 +832,26 @@ function mc_show_block( $field, $has_data, $data, $echo = true, $default = '' ) 
 				global $current_screen;
 				// because wp_editor cannot return a value, event_desc fields cannot be filtered if its enabled.
 				$value = ( $has_data ) ? stripslashes( $data->event_desc ) : '';
-				if ( $current_screen->base == 'post' ) {
-					$return = '<div class="event_description">
-									<label for="content" class="screen-reader-text">' . __( 'Event Description', 'my-calendar' ) . '</label>
-									<textarea id="content" name="content" class="event_desc" rows="8" cols="80">' . stripslashes( esc_attr( $value ) ) . '</textarea>
-								</div>';
+				$custom_editor = apply_filters( 'mc_custom_content_editor', false, $value, $data );
+				if ( $custom_editor !== false ) {
+					$return = $custom_editor;
 				} else {
-					echo '
-					<div class="event_description">
-					<label for="content" class="screen-reader-text">' . __( 'Event Description', 'my-calendar' ) . '</label>';
-					if ( user_can_richedit() ) {
-						wp_editor( $value, 'content', array( 'textarea_rows' => 10 ) );
+					if ( $current_screen->base == 'post' ) {
+						$return = '<div class="event_description">
+										<label for="content" class="screen-reader-text">' . __( 'Event Description', 'my-calendar' ) . '</label>
+										<textarea id="content" name="content" class="event_desc" rows="8" cols="80">' . stripslashes( esc_attr( $value ) ) . '</textarea>
+									</div>';
 					} else {
-						echo '<textarea id="content" name="content" class="event_desc" rows="8" cols="80">' . stripslashes( esc_attr( $value ) ) . '</textarea>';
+						echo '
+						<div class="event_description">
+						<label for="content" class="screen-reader-text">' . __( 'Event Description', 'my-calendar' ) . '</label>';
+						if ( user_can_richedit() ) {
+							wp_editor( $value, 'content', array( 'textarea_rows' => 10 ) );
+						} else {
+							echo '<textarea id="content" name="content" class="event_desc" rows="8" cols="80">' . stripslashes( esc_attr( $value ) ) . '</textarea>';
+						}
+						echo '</div>';
 					}
-					echo '</div>';
 				}
 			}
 			break;
@@ -2365,7 +2371,7 @@ function mcs_check_conflicts( $begin, $time, $end, $endtime, $event_label ) {
 	$event_query     = "SELECT occur_id 
 					FROM " . my_calendar_table() . "
 					ON ( " . my_calendar_event_table() . "
-					JOINevent_id=occur_event_id) 
+					JOIN event_id=occur_event_id) 
 					WHERE $select_location
 					( occur_begin BETWEEN '$begin $time'AND '$end $endtime'OR occur_end BETWEEN '$begin $time'AND '$end $endtime')";
 	$results         = $wpdb->get_results( $event_query );
@@ -2645,7 +2651,7 @@ function mc_post_update_event( $id ) {
 /**
  * Parse a string and replace internationalized months with English so strtotime() will parse correctly
  */
-function mc_strtotime( $string ) {	
+function mc_strtotime( $string ) {
 	$months = array(
 		date_i18n( 'F', strtotime( 'January 1' ) ),
 		date_i18n( 'F', strtotime( 'February 1' ) ),
@@ -2685,20 +2691,20 @@ function mc_strtotime( $string ) {
 		'October',
 		'November',
 		'December',
-		'January',
-		'February',
-		'March',
-		'April',
+		'Jan',
+		'Feb',
+		'Mar',
+		'Apr',
 		'May',
-		'June',
-		'July',
-		'August',
-		'September',
-		'October',
-		'November',
-		'December'
+		'Jun',
+		'Jul',
+		'Aug',
+		'Sep',
+		'Oct',
+		'Nov',
+		'Dec'
 	);
-	
+		
 	return strtotime( str_replace( $months, $english, $string ) );
 
 }

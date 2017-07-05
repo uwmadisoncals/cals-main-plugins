@@ -291,9 +291,9 @@ function weaverx_ts_get_sysinfo() {
 add_action('weaverx_save_mcecss', 'weaverx_ts_save_mcecss');		// theme support plugin saved editor css in file
 
 function weaverx_ts_save_mcecss() {
-	// generate and save mcecss style file
+	// generate and save mcecss style file (using direct PHP file access)
 
-	if (!weaverx_f_file_access_available() || !current_user_can( 'edit_theme_options' ) ) {
+	if (!current_user_can( 'edit_theme_options' ) ) {
 		return;
 	}
 
@@ -302,7 +302,7 @@ function weaverx_ts_save_mcecss() {
 
 	$usename = 'editor-style-wvrx.css';
 
-	$theme_dir_exists = weaverx_f_mkdir($save_dir);
+	$theme_dir_exists = wp_mkdir_p($save_dir);	// direct to wp mkdir
 	if (!$theme_dir_exists) {
 		weaverx_f_file_access_fail(__('Unable to create directory to save editor style file. Probably a file system permission problem. Directory', 'weaver-xtreme' /*adm*/) . $save_dir);
 		return;
@@ -310,21 +310,21 @@ function weaverx_ts_save_mcecss() {
 
 	$theme_dir_writable = $theme_dir_exists;
 
-   if (!weaverx_f_is_writable($save_dir)) {
+   if (!@is_writable($save_dir)) {		// direct php access
 		weaverx_f_file_access_fail(__('Directory not writable to save editor style file. Probably a file system permission problem. Directory: ', 'weaver-xtreme' /*adm*/) . $save_dir);
 		return;
 	}
 
 	$filename = $save_dir . '/'. $usename;    // we will add txt
 
-	if (!$theme_dir_writable || !$theme_dir_exists || !($handle = weaverx_f_open($filename, 'w')) ) {
+	if (!$theme_dir_writable || !$theme_dir_exists || !($handle = fopen($filename, 'w')) ) {	// Direct php
 		weaverx_f_file_access_fail(__('Unable to create editor style file. Probably a file system permission problem. File: ', 'weaver-xtreme' /*adm*/) . $filename);
 		return;
 	}
 
 	weaverx_ts_output_edit_style($handle);
 
-	if (!weaverx_f_close($handle)) {
+	if (!fclose($handle)) {
 		weaverx_f_file_access_fail(__('Unable to create editor css file. Probably a file system permission problem. File: ', 'weaver-xtreme' /*adm*/) . $filename);
 		return '';
 	}
@@ -618,7 +618,7 @@ tr th, thead th {color: inherit;background:none;font-weight:normal;line-height:n
 		$put .= "text-decoration:underline;";
 	$put .= "}\n";
 
-	weaverx_f_write($handle, $put);
+	fwrite($handle, $put);
 	return;
 }
 
@@ -637,7 +637,7 @@ function weaverx_ts_mce_css( $default_style ) {
 	$path = trailingslashit($updir['baseurl']) . 'weaverx-subthemes/editor-style-wvrx.css';
 
 	if (!@file_exists( $dir ))
-		return '';
+		return $default_style;
 
 	if (is_ssl()) $path = str_replace('http:','https:',$path);
 	return $default_style . ',' . $path;
