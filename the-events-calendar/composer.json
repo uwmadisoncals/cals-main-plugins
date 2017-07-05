@@ -1,0 +1,28 @@
+{
+  "name": "moderntribe/the-events-calendar",
+  "description": "The Events Calendar WordPress plugin by Modern Tribe",
+  "type": "wordpress-plugin",
+  "keywords": [
+    "wordpress",
+    "events"
+  ],
+  "homepage": "http://tri.be/shop/wordpress-events-calendar/",
+  "license": "GPL-2.0",
+  "require-dev": {
+    "lucatume/wp-browser": "~1.14",
+    "xamin/handlebars.php": "^0.10.3",
+    "mikey179/vfsStream": "^1.6"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "config": {
+    "preferred-install": "dist"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tribe\\Tests\\Modules\\Core\\": "tests/_support/Modules"
+    }
+  },
+  "require": {
+  }
+}
