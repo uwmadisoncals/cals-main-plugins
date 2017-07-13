@@ -53,6 +53,28 @@ class VarnishMultiPurger {
 		add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
 	}
 
+  	/**
+	 * Admin Init
+	 *
+	 * @since 4.1
+	 * @access public
+	 */
+	public function admin_init() {
+
+		// Failure: Pre WP 4.7		
+		if ( version_compare( get_bloginfo( 'version' ), '4.7', '<=' ) ) {
+			deactivate_plugins( plugin_basename( __FILE__ ) );
+			add_action( 'admin_notices' , array( $this, 'require_wp_version_notice'));
+			return;
+		}
+
+		// Warning: No Pretty Permalinks!
+		if ( '' == get_option( 'permalink_structure' ) && current_user_can( 'manage_options' ) ) {
+			add_action( 'admin_notices' , array( $this, 'require_pretty_permalinks_notice' ) );
+			return;
+		}
+	}
+  
 	/**
 	 * Plugin Init
 	 *
@@ -61,12 +83,6 @@ class VarnishMultiPurger {
 	 */
 	public function init() {
 		global $blog_id;
-
-		// Warning: No Pretty Permalinks!
-		if ( '' == get_option( 'permalink_structure' ) && current_user_can('manage_options') ) {
-			add_action( 'admin_notices' , array( $this, 'prettyPermalinksMessage'));
-			return;
-		}
 
 		// get my events
 		$events = $this->getRegisterEvents();
@@ -131,6 +147,16 @@ class VarnishMultiPurger {
 		echo "<div id='message' class='error'><p>" . sprintf( __( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="%1$s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), admin_url( 'options-permalink.php' ) ) . "</p></div>";
 	}
 
+  	/**
+	 * Require: WP Version Message
+	 * Explains you need WordPress 4.7+ to use this plugin
+	 *
+	 * @since 4.1
+	 */
+	function require_wp_version_notice() {
+		echo "<div id='message' class='error'><p>" . sprintf( __( 'Varnish Multi HTTP Purge requires WordPress 4.7 or greater. Please <a href="%1$s">upgrade WordPress</a>.', 'varnish-http-purge' ), admin_url( 'update-core.php' ) ) . "</p></div>";
+	}
+  
 	/**
 	 * The Home URL
 	 * Get the Home URL and allow it to be filterable
@@ -270,12 +296,16 @@ class VarnishMultiPurger {
 	public function purgeUrl($url) {
 		$p = parse_url($url);
 
+      	// Determine if we're using regex to flush all pages or not
+		$pregex = '';
+		$x_purge_method = 'default';
+      
 		if ( isset($p['query']) && ( $p['query'] == 'vhp-regex' ) ) {
 			$pregex = '.*';
-			$varnish_x_purgemethod = 'regex';
-		} else {
-			$pregex = '';
-			$varnish_x_purgemethod = 'default';
+			$x_purge_method = 'regex';
+#		} else {
+#			$pregex = '';
+#			$x_purge_method = 'default';
 		}
 
 		// Build a varniship
@@ -304,12 +334,12 @@ class VarnishMultiPurger {
 
 		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
 
-		/**
-		 * Original code for purging with one varnish IP
-		 * Removed 11/16/2016
-		 */
-		 
-		// If we made varniship, let it sail
+//		/**
+//		 * Original code for purging with one varnish IP
+//		 * Removed 11/16/2016
+//		 */
+//		 
+//		// If we made varniship, let it sail
 // 		if ( isset($varniship) && $varniship != null ) {
 // 			$host = $varniship;
 // 		} else {
@@ -321,9 +351,9 @@ class VarnishMultiPurger {
 // 		if (!empty($p['query']) && $p['query'] != 'vhp-regex') {
 // 			$purgeme .= '?' . $p['query'];
 // 		}
-
-		// Cleanup CURL functions to be wp_remote_request and thus better
-		// http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
+//
+//		// Cleanup CURL functions to be wp_remote_request and thus better
+//		// http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
 // 		$response = wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
 // 
 // 		do_action('after_purge_url', $url, $purgeme, $response);
@@ -343,10 +373,17 @@ class VarnishMultiPurger {
 				$purgeme .= '?' . $p['query'];
 			}
 
-            // Cleanup CURL functions to be wp_remote_request and thus better
-            // http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
-			$response = wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
-			do_action('after_purge_url', $url, $purgeme, $response);
+        /**
+		 * Filters the HTTP headers to send with a PURGE request.
+		 *
+		 * @since 4.1
+		 */
+		$headers = apply_filters( 'varnish_http_purge_headers', array( 'host' => $p['host'], 'X-Purge-Method' => $x_purge_method ) );
+
+        // Cleanup CURL functions to be wp_remote_request and thus better
+        // http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
+		$response = wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
+		do_action('after_purge_url', $url, $purgeme, $response);
 		}
         } else {
             $purgeme = $schema.$p['host'].$path.$pregex;
@@ -391,95 +428,134 @@ class VarnishMultiPurger {
 	 * @access public
 	 */
 	public function purgePost( $postId ) {
+
+		// Future Me: You may need this if you figure out how to use an array
+		// further down with versions of WP and their json versions.
+		// global $wp_version;
 		
 		// If this is a valid post we want to purge the post, 
 		// the home page and any associated tags and categories
+		$valid_post_status = array( 'publish', 'private', 'trash' );
+		$this_post_status  = get_post_status( $postId );
 
-		$validPostStatus = array("publish", "trash");
-		$thisPostStatus  = get_post_status($postId);
+		// Not all post types are created equal
+		$invalid_post_type = array( 'nav_menu_item', 'revision' );
+		$noarchive_post_type = array( 'post', 'page' );
+		$this_post_type = get_post_type( $postId );
+				
+		// Determine the route for the rest API
+		// This will need to be revisted if WP updates the version.
+		// Future me: Consider an array? 4.7-4.7.3 use v2, and then adapt from there?
+		$rest_api_route  = 'wp/v2'; 
 
 		// array to collect all our URLs
 		$listofurls = array();
 
-		if( get_permalink($postId) == true && in_array($thisPostStatus, $validPostStatus) ) {
-			// If this is a post with a permalink AND it's published or trashed, 
-			// we're going to add a ton of things to flush.
-			
-			// Category purge based on Donnacha's work in WP Super Cache
-			$categories = get_the_category($postId);
-			if ( $categories ) {
-				foreach ($categories as $cat) {
-					array_push($listofurls, get_category_link( $cat->term_id ) );
-				}
-			}
-			// Tag purge based on Donnacha's work in WP Super Cache
-			$tags = get_the_tags($postId);
-			if ( $tags ) {
-				foreach ($tags as $tag) {
-					array_push($listofurls, get_tag_link( $tag->term_id ) );
-				}
-			}
-
-			// Author URL
-			array_push($listofurls,
-				get_author_posts_url( get_post_field( 'post_author', $postId ) ),
-				get_author_feed_link( get_post_field( 'post_author', $postId ) )
-			);
-
-			// Archives and their feeds
-			$archiveurls = array();
-			if ( get_post_type_archive_link( get_post_type( $postId ) ) == true ) {
-				array_push($listofurls,
-					get_post_type_archive_link( get_post_type( $postId ) ),
-					get_post_type_archive_feed_link( get_post_type( $postId ) )
-				);
-			}
+		// Verify we have a permalink and that we're a valid post status and a not an invalid post type
+		if( get_permalink( $postId ) == true && in_array( $this_post_status, $valid_post_status ) && !in_array( $this_post_type, $invalid_post_type ) ) {
 
 			// Post URL
-			array_push( $listofurls, get_permalink($postId) );
+			array_push( $listofurls, get_permalink( $postId ) );
 
-			// Also clean URL for trashed post.
-			if ( $thisPostStatus == "trash" ) {
-				$trashpost = get_permalink($postId);
-				$trashpost = str_replace("__trashed", "", $trashpost);
-				array_push( $listofurls, $trashpost, $trashpost.'feed/' );
+			// JSON API Permalink for the post based on type
+			// We only want to do this if the rest_base exists
+			// But we apparently have to force it for posts and pages (seriously?)
+			$post_type_object = get_post_type_object( $postId );	
+			if ( isset( $post_type_object->rest_base ) ) {
+				$rest_permalink = get_rest_url() . $rest_api_route . '/' . $post_type_object->rest_base . '/' . $postId . '/';
+			} elseif ( $this_post_type == 'post' ) {
+				$rest_permalink = get_rest_url() . $rest_api_route . '/posts/' . $postId . '/';
+			} elseif ( $this_post_type == 'page' ) {
+				$rest_permalink = get_rest_url() . $rest_api_route . '/pages/' . $postId . '/';
 			}
-			
+			array_push( $listofurls, $rest_permalink );
+
 			// Add in AMP permalink if Automattic's AMP is installed
-			if ( function_exists('amp_get_permalink') ) {
-				array_push( $listofurls, amp_get_permalink($postId) );
+			if ( function_exists( 'amp_get_permalink' ) ) {
+				array_push( $listofurls, amp_get_permalink( $postId ) );
 			}
 			
 			// Regular AMP url for posts
-			array_push( $listofurls, get_permalink($postId).'amp/' );
-			
-			// Feeds
-			array_push($listofurls,
-				get_bloginfo_rss('rdf_url') ,
-				get_bloginfo_rss('rss_url') ,
-				get_bloginfo_rss('rss2_url'),
-				get_bloginfo_rss('atom_url'),
-				get_bloginfo_rss('comments_rss2_url'),
-				get_post_comments_feed_link($postId)
-			);
+			array_push( $listofurls, get_permalink( $postId ) . 'amp/' );
 
-			// Home Page and (if used) posts page
-			array_push( $listofurls, $this->the_home_url().'/' );
-			if ( get_option('show_on_front') == 'page' ) {
-				// Ensure we have a page_for_posts setting to avoid empty URL
-				if ( get_option('page_for_posts') ) {
-					array_push( $listofurls, get_permalink( get_option('page_for_posts') ) );
+			// Also clean URL for trashed post.
+			if ( $this_post_status == 'trash' ) {
+				$trashpost = get_permalink( $postId );
+				$trashpost = str_replace( '__trashed', '', $trashpost );
+				array_push( $listofurls, $trashpost, $trashpost . 'feed/' );
+			}
+
+			// Category purge based on Donnacha's work in WP Super Cache
+			$categories = get_the_category( $postId) ;
+			if ( $categories ) {
+				foreach ( $categories as $cat ) {
+					array_push( $listofurls, 
+						get_category_link( $cat->term_id ),
+						get_rest_url() . $rest_api_route . '/categories/' . $cat->term_id . '/'
+					);
 				}
 			}
+			// Tag purge based on Donnacha's work in WP Super Cache
+			$tags = get_the_tags( $postId );
+			if ( $tags ) {
+				foreach ( $tags as $tag ) {
+					array_push( $listofurls, 
+						get_tag_link( $tag->term_id ),
+						get_rest_url() . $rest_api_route . '/tags/' . $tag->term_id . '/'
+					);
+				}
+			}
+			
+			// Author URL
+			$author_id = get_post_field( 'post_author', $postId );
+			array_push( $listofurls,
+				get_author_posts_url( $author_id ),
+				get_author_feed_link( $author_id ),
+				get_rest_url() . $rest_api_route . '/users/' . $author_id . '/'
+			);
+
+			// Archives and their feeds
+			if ( $this_post_type && !in_array( $this_post_type, $noarchive_post_type ) ) {
+				array_push( $listofurls,
+					get_post_type_archive_link( get_post_type( $postId ) ),
+					get_post_type_archive_feed_link( get_post_type( $postId ) )
+					// Need to add in JSON?
+				);
+			}
+			
+			// Feeds
+			array_push( $listofurls,
+				get_bloginfo_rss( 'rdf_url' ),
+				get_bloginfo_rss( 'rss_url' ),
+				get_bloginfo_rss( 'rss2_url' ),
+				get_bloginfo_rss( 'atom_url' ),
+				get_bloginfo_rss( 'comments_rss2_url' ),
+				get_post_comments_feed_link( $postId )
+			);
+
+			// Home Pages and (if used) posts page
+			array_push( $listofurls, 
+				get_rest_url(),
+				$this->the_home_url() . '/'
+				);
+			if ( get_option( 'show_on_front' ) == 'page' ) {
+				// Ensure we have a page_for_posts setting to avoid empty URL
+				if ( get_option('page_for_posts') ) {
+					array_push( $listofurls, get_permalink( get_option( 'page_for_posts' ) ) );
+				}
+			}
+			
 		} else {
 			// We're not sure how we got here, but bail instead of processing anything else.
 			return;
 		}
 		
 		// Now flush all the URLs we've collected provided the array isn't empty
-		if ( !empty($listofurls) ) {
-			foreach ($listofurls as $url) {
-				array_push($this->purgeUrls, $url ) ;
+		// And make sure each URL only gets purged once, eh?
+		if ( !empty( $listofurls ) ) {
+			$purgeurls = array_unique( $listofurls, SORT_REGULAR );
+			foreach ( $purgeurls as $url ) {
+				array_push( $this->purgeUrls, $url ) ;
 			}
 		}
 
@@ -488,6 +564,7 @@ class VarnishMultiPurger {
         // @param int $postId the id of the new/edited post
         $this->purgeUrls = apply_filters( 'vhp_purge_urls', $this->purgeUrls, $postId );
 	}
+
 
 }
 
