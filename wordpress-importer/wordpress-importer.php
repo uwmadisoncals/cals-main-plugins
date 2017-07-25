@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: WordPress Importer
+Plugin Name: WordPress Importer (CALS Modified)
 Plugin URI: http://wordpress.org/extend/plugins/wordpress-importer/
 Description: Import posts, pages, comments, custom fields, categories, tags and more from a WordPress export file.
-Author: wordpressdotorg
+Author: wordpressdotorg/CALS IT
 Author URI: http://wordpress.org/
-Version: 0.6.3
+Version: 100.6.3
 Text Domain: wordpress-importer
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
@@ -988,7 +988,7 @@ class WP_Import extends WP_Importer {
 			return new WP_Error( 'upload_dir_error', $upload['error'] );
 
 		// fetch the remote url and write it to the placeholder file
-		$headers = wp_get_http( $url, $upload['file'] );
+		$headers = WP_Http::get( $url, $upload['file'] );
 
 		// request failed
 		if ( ! $headers ) {
