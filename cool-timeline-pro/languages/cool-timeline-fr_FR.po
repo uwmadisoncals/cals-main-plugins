@@ -1,0 +1,707 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Cool Timeline\n"
+"POT-Creation-Date: 2017-01-28 10:51+0000\n"
+"PO-Revision-Date: 2017-01-28 11:09+0000\n"
+"Last-Translator: admin <satinder.abc@gmail.com>\n"
+"Language-Team: French (France)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco - https://localise.biz/\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: cooltimeline.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+"Report-Msgid-Bugs-To: \n"
+"Language: fr-FR\n"
+"Plural-Forms: nplurals=2; plural=n > 1"
+
+#: includes/social-timeline.php:103 includes/cool_vc_addon.php:149
+#: includes/cool_vc_addon.php:349 includes/views/horizontal-timeline.php:69
+msgid "d/m/Y"
+msgstr "d/m/Y"
+
+#: includes/ctl-helpers.php:71
+msgid "M d , Y"
+msgstr "M d , Y"
+
+#: includes/ctl-helpers.php:345 includes/ctl-helpers.php:358
+msgctxt "Used between list items, there is a space after the comma."
+msgid ", "
+msgstr ", "
+
+#: includes/ctl-helpers.php:349
+msgctxt "Used before category names."
+msgid "Categories"
+msgstr "Catégories"
+
+#: includes/ctl-helpers.php:361
+msgctxt "Used before tag names."
+msgid "Tags"
+msgstr "Mots clés"
+
+#: includes/cool_timeline_posttype.php:57
+msgid "cool-timeline"
+msgstr "Cool-timeline"
+
+#: includes/cool_timeline_posttype.php:83
+msgctxt "Taxonomy General Name"
+msgid "Categories"
+msgstr "Catégories"
+
+#: includes/cool_timeline_posttype.php:84
+msgctxt "Taxonomy Singular Name"
+msgid "Category"
+msgstr "Catégories"
+
+#: includes/cool_timeline_posttype.php:85
+msgid "Categories"
+msgstr "Catégories"
+
+#: includes/cool_timeline_posttype.php:86
+msgid "All Items"
+msgstr "Tous les articles"
+
+#: includes/cool_timeline_posttype.php:87
+msgid "Parent Item"
+msgstr "Article parent"
+
+#: includes/cool_timeline_posttype.php:89
+msgid "New Item Name"
+msgstr "Nouveau nom d'élément"
+
+#: includes/cool_timeline_posttype.php:90
+msgid "Add New Item"
+msgstr "Ajoute un nouvel objet"
+
+#: includes/cool_timeline_posttype.php:91
+msgid "Edit Item"
+msgstr "Modifier l'article"
+
+#: includes/cool_timeline_posttype.php:92
+msgid "Update Item"
+msgstr "Mettre à jour l'élément"
+
+#: includes/cool_timeline_posttype.php:93
+msgid "View Item"
+msgstr "Regarder l'objet"
+
+#: includes/cool_timeline_posttype.php:94
+msgid "Separate items with commas"
+msgstr "Séparez les éléments avec des virgules"
+
+#: includes/cool_timeline_posttype.php:95
+msgid "Add or remove items"
+msgstr "Ajouter ou supprimer des éléments"
+
+#: includes/cool_timeline_posttype.php:96
+msgid "Choose from the most used"
+msgstr "Choisissez parmi les plus utilisés"
+
+#: includes/cool_timeline_posttype.php:97
+msgid "Popular Items"
+msgstr "Articles populaires"
+
+#: includes/cool_timeline_posttype.php:98
+msgid "Search Items"
+msgstr "Rechercher des articles"
+
+#: includes/cool_timeline_posttype.php:99
+msgid "Not Found"
+msgstr "Pas trouvé"
+
+#: includes/cool_timeline_posttype.php:100
+msgid "No items"
+msgstr "Pas d'objet"
+
+#: includes/cool_timeline_posttype.php:101
+msgid "Items list"
+msgstr "Liste des articles"
+
+#: includes/cool_timeline_posttype.php:102
+msgid "Items list navigation"
+msgstr "Navigation dans la liste des articles"
+
+#: includes/cool_timeline_posttype.php:151
+msgctxt "column name"
+msgid "Story Title"
+msgstr "Titre de l'histoire"
+
+#: includes/cool_timeline_posttype.php:153
+msgctxt "column name"
+msgid "Story Date"
+msgstr "Date de l'histoire"
+
+#: includes/cool_timeline_posttype.php:154
+msgctxt "column name"
+msgid "Story Category"
+msgstr "Catégorie d'histoire"
+
+#: includes/cool_timeline_posttype.php:155
+msgid "Story Format"
+msgstr "Format d'histoire"
+
+#: includes/cool_timeline_posttype.php:156
+msgctxt "column name"
+msgid "Published Date"
+msgstr "date de publication"
+
+#: includes/cool_vc_addon.php:32
+msgid "Cool Timeline Default"
+msgstr "Par défaut"
+
+#: includes/cool_vc_addon.php:33
+msgid "Create Stories Timeline"
+msgstr "Créer une chronologie"
+
+#: includes/cool_vc_addon.php:45
+msgid "Select Stories Category"
+msgstr "Sélectionnez la catégorie Stories"
+
+#: includes/cool_vc_addon.php:48
+msgid "Create Category Specific Timeline (By Default - All Categories)"
+msgstr "Créer une chronologie spécifique (Par défaut - Toutes les catégories)"
+
+#: includes/cool_vc_addon.php:55
+msgid "Timeline Type"
+msgstr "Type de chronologie"
+
+#: includes/cool_vc_addon.php:58
+msgid "Vertical Timeline (Default)"
+msgstr "Chronologie verticale (par défaut)"
+
+#: includes/cool_vc_addon.php:59
+msgid "Horizontal Timeline"
+msgstr "Chronologie horizontale"
+
+#: includes/cool_vc_addon.php:69
+msgid "Vertical Timeline Layout"
+msgstr "Disposition de timeline verticale"
+
+#: includes/cool_vc_addon.php:72
+msgid "Vertical Both side"
+msgstr "Vertical Les deux côtés"
+
+#: includes/cool_vc_addon.php:73
+msgid "Vertical one sided"
+msgstr "Vertical one sided"
+
+#: includes/cool_vc_addon.php:76 includes/cool_vc_addon.php:276
+msgid "Select your timeline layout "
+msgstr "Sélectionnez votre plan de montage chronologique"
+
+#: includes/cool_vc_addon.php:83 includes/cool_vc_addon.php:283
+msgid "Timeline Designs"
+msgstr "Chronologie"
+
+#: includes/cool_vc_addon.php:86 includes/cool_vc_addon.php:119
+#: includes/cool_vc_addon.php:144 includes/cool_vc_addon.php:286
+#: includes/cool_vc_addon.php:319 includes/cool_vc_addon.php:344
+#: includes/cool_vc_addon.php:474
+msgid "Default"
+msgstr "Défaut"
+
+#: includes/cool_vc_addon.php:87 includes/cool_vc_addon.php:287
+msgid "Flat Design"
+msgstr "Design plat"
+
+#: includes/cool_vc_addon.php:88 includes/cool_vc_addon.php:288
+msgid "Classic Design"
+msgstr "Conception Classique"
+
+#: includes/cool_vc_addon.php:89 includes/cool_vc_addon.php:289
+msgid "Elegant Design"
+msgstr "Design élégant"
+
+#: includes/cool_vc_addon.php:92 includes/cool_vc_addon.php:292
+msgid ""
+"Choose Timeline Designs (Check Vertical Designs & Horizontal Designs )\n"
+"                       <br><a target=\"_blank\" href=\"http://www."
+"cooltimeline.com/cool-timeline-pro-vertical-designs\">Vertical Timeline "
+"demos</a>\n"
+"                          |   <a target=\"_blank\" href=\"http://www."
+"cooltimeline.com/horizontal-timeline-designs-demos\">Horizontal Timeline "
+"demos</a>"
+msgstr ""
+"Choisissez les conceptions de la chronologie (Vérifiez les dessins verticaux "
+"et les dessins horizontaux)\n"
+"                       <br> <a target=\"_blank\" href=\"http://www."
+"cooltimeline.com/cool-timeline-pro-vertical-designs\"> Démonstrations "
+"chronologiques verticales </a>\n"
+"                          | <a target=\"_blank\" href=\"http://www."
+"cooltimeline.com/horizontal-timeline-designs-demos\"> Délais Horizontaux </a>"
+
+#: includes/cool_vc_addon.php:99 includes/cool_vc_addon.php:299
+msgid "Display Stories Blocks/Columns"
+msgstr "Afficher les histoires Blocs / colonnes"
+
+#: includes/cool_vc_addon.php:102
+msgid "Select number of items"
+msgstr "Sélectionnez le nombre d'articles"
+
+#: includes/cool_vc_addon.php:108
+msgid ""
+"*This Options Is Not For Default Design. (<a href=\"http://www.cooltimeline."
+"com/horizontal-timeline-flat-design\">Horizontal Timeline</a>"
+msgstr ""
+"* Cette option n'est pas pour la conception par défaut. (<a href=\"http:"
+"//www.cooltimeline.com/horizontal-timeline-flat-design\"> chronologie "
+"horizontale </a>"
+
+#: includes/cool_vc_addon.php:110
+msgid "This options is not for default desgin."
+msgstr "Cette option n'est pas pour la desgin par défaut."
+
+#: includes/cool_vc_addon.php:116 includes/cool_vc_addon.php:316
+#: includes/cool_vc_addon.php:471
+msgid "Timeline skin"
+msgstr "Peau de timeline"
+
+#: includes/cool_vc_addon.php:120 includes/cool_vc_addon.php:320
+#: includes/cool_vc_addon.php:475
+msgid "Light"
+msgstr "Lumière"
+
+#: includes/cool_vc_addon.php:121 includes/cool_vc_addon.php:321
+#: includes/cool_vc_addon.php:476
+msgid "dark"
+msgstr "foncé"
+
+#: includes/cool_vc_addon.php:123
+msgid "Create Light, Dark or Colorful Timeline"
+msgstr "Créer un scénario clair, sombre ou coloré"
+
+#: includes/cool_vc_addon.php:129 includes/cool_vc_addon.php:329
+msgid "Order"
+msgstr "Commande"
+
+#: includes/cool_vc_addon.php:132 includes/cool_vc_addon.php:332
+msgid "DESC"
+msgstr "DESC"
+
+#: includes/cool_vc_addon.php:133 includes/cool_vc_addon.php:333
+msgid "ASC"
+msgstr "ASC"
+
+#: includes/cool_vc_addon.php:135 includes/cool_vc_addon.php:335
+msgid "Timeline Stories order like:- DESC(2017-1900) , ASC(1900-2017)"
+msgstr ""
+"Ordre des histoires de chronologie comme: - DESC (2017-1900), ASC (1900-2017)"
+
+#: includes/cool_vc_addon.php:141 includes/cool_vc_addon.php:341
+msgid "Date Formats"
+msgstr "Formats de date"
+
+#: includes/cool_vc_addon.php:145 includes/cool_vc_addon.php:345
+msgid "F j"
+msgstr "F j"
+
+#: includes/cool_vc_addon.php:146 includes/cool_vc_addon.php:346
+msgid "F j Y"
+msgstr "F j Y"
+
+#: includes/cool_vc_addon.php:147 includes/cool_vc_addon.php:347
+msgid "Y-m-d"
+msgstr "Y-m-d"
+
+#: includes/cool_vc_addon.php:148 includes/cool_vc_addon.php:348
+msgid "m/d/Y"
+msgstr "m/d/Y"
+
+#: includes/cool_vc_addon.php:150 includes/cool_vc_addon.php:350
+msgid "F j Y g:i A"
+msgstr "F j Y g:i A"
+
+#: includes/cool_vc_addon.php:151 includes/cool_vc_addon.php:351
+msgid "Y"
+msgstr "Y"
+
+#: includes/cool_vc_addon.php:153 includes/cool_vc_addon.php:353
+msgid "Timeline Stories dates custom formats"
+msgstr "Chronologie dates formats personnalisés"
+
+#: includes/cool_vc_addon.php:159
+msgid "Show number of Stories"
+msgstr "Afficher le nombre d'histoires"
+
+#: includes/cool_vc_addon.php:163 includes/cool_vc_addon.php:363
+msgid "You Can Show Pagination After These Posts In Vertical Timeline."
+msgstr ""
+"Vous pouvez afficher la pagination après ces messages dans la chronologie "
+"verticale."
+
+#: includes/cool_vc_addon.php:169 includes/cool_vc_addon.php:369
+msgid "Icons"
+msgstr "Icônes"
+
+#: includes/cool_vc_addon.php:172 includes/cool_vc_addon.php:372
+msgid "YES"
+msgstr "OUI"
+
+#: includes/cool_vc_addon.php:173 includes/cool_vc_addon.php:373
+msgid "NO"
+msgstr "NON"
+
+#: includes/cool_vc_addon.php:175 includes/cool_vc_addon.php:375
+msgid "Display Icons In Timeline Stories. By default Is Dot."
+msgstr "Afficher les icônes dans les chroniques. Par défaut est Dot."
+
+#: includes/cool_vc_addon.php:181 includes/cool_vc_addon.php:381
+msgid "Animations Effect"
+msgstr "Animations Effet"
+
+#: includes/cool_vc_addon.php:184 includes/cool_vc_addon.php:384
+msgid "bounceInUp"
+msgstr "BounceInUp"
+
+#: includes/cool_vc_addon.php:185 includes/cool_vc_addon.php:385
+msgid "bounceInDown"
+msgstr "bounceInDown"
+
+#: includes/cool_vc_addon.php:186 includes/cool_vc_addon.php:386
+msgid "bounceInLeft"
+msgstr "bounceInLeft"
+
+#: includes/cool_vc_addon.php:187 includes/cool_vc_addon.php:387
+msgid "bounceInRight"
+msgstr "bounceInRight"
+
+#: includes/cool_vc_addon.php:188 includes/cool_vc_addon.php:388
+msgid "slideInDown"
+msgstr "slideInDown"
+
+#: includes/cool_vc_addon.php:189 includes/cool_vc_addon.php:389
+msgid "slideInUp"
+msgstr "SlideInUp"
+
+#: includes/cool_vc_addon.php:190 includes/cool_vc_addon.php:390
+msgid "slideInLeft"
+msgstr "slideInLeft"
+
+#: includes/cool_vc_addon.php:191 includes/cool_vc_addon.php:391
+msgid "slideInRight"
+msgstr "slideInRight"
+
+#: includes/cool_vc_addon.php:192 includes/cool_vc_addon.php:392
+msgid "shake"
+msgstr "secouer"
+
+#: includes/cool_vc_addon.php:193 includes/cool_vc_addon.php:393
+msgid "wobble"
+msgstr "osciller"
+
+#: includes/cool_vc_addon.php:194 includes/cool_vc_addon.php:394
+msgid "swing"
+msgstr "balançoire"
+
+#: includes/cool_vc_addon.php:195 includes/cool_vc_addon.php:395
+msgid "jello"
+msgstr "Jello"
+
+#: includes/cool_vc_addon.php:196 includes/cool_vc_addon.php:396
+msgid "flip"
+msgstr "Flip"
+
+#: includes/cool_vc_addon.php:197 includes/cool_vc_addon.php:397
+msgid "fadein"
+msgstr "Fadein"
+
+#: includes/cool_vc_addon.php:198 includes/cool_vc_addon.php:398
+msgid "rotatein"
+msgstr "Rotatein"
+
+#: includes/cool_vc_addon.php:199 includes/cool_vc_addon.php:399
+msgid "None"
+msgstr "Aucun"
+
+#: includes/cool_vc_addon.php:201 includes/cool_vc_addon.php:401
+msgid ""
+"Add Animations Effect Inside Timeline. You Can Check Effects Demo From <a  "
+"target='_blank' href='https://daneden.github.io/animate.css/'>Animate.css</a>"
+"."
+msgstr ""
+"Ajouter effet d'animation dans la chronologie. Vous pouvez vérifier la démo "
+"des effets de <a target='_blank'href='https://daneden.github.io/animate."
+"css/'> Animate.css </a>."
+
+#: includes/cool_vc_addon.php:214
+msgid "Cool Content Timeline"
+msgstr "Contenu de la page"
+
+#: includes/cool_vc_addon.php:215
+msgid "Create Blog Posts Timeline"
+msgstr "Créer des chroniques"
+
+#: includes/cool_vc_addon.php:228
+msgid "Content Post type"
+msgstr "Contenu Type de message"
+
+#: includes/cool_vc_addon.php:230
+msgid "post"
+msgstr "poster"
+
+#: includes/cool_vc_addon.php:231
+msgid ""
+"Don't Change This If You Are Creating Blog Posts Timeline or Define Content "
+"Type Of Your Timeline Like:- Posts"
+msgstr ""
+"Ne changez pas ceci si vous créez des posts de blog Timeline ou définissez "
+"le type de contenu de votre chronologie comme: - Messages"
+
+#: includes/cool_vc_addon.php:238
+msgid "Taxonomy Name "
+msgstr "Nom de taxonomie"
+
+#: includes/cool_vc_addon.php:240
+msgid "category"
+msgstr "Catégorie"
+
+#: includes/cool_vc_addon.php:241
+msgid ""
+"Don't Change This If You Are Creating Blog Posts Timeline or Define Content "
+"Type Taxonomy."
+msgstr ""
+"Ne changez pas ceci si vous créez des chroniques de posts de blog ou "
+"définissez la taxonomie de type de contenu."
+
+#: includes/cool_vc_addon.php:248
+msgid "Category Specific Timeline (Add Category Slug)"
+msgstr "Calendrier spécifique à la catégorie (Ajouter slug de catégorie)"
+
+#: includes/cool_vc_addon.php:252
+msgid ""
+"Show Category Specific Blog Posts. Like For cooltimeline.com/category/fb-"
+"history/ it will be <b>fb-history</b>."
+msgstr ""
+"Afficher les messages de blog spécifiques à la catégorie. Comme pour "
+"cooltimeline.com/category/fb-history/ il sera <b> fb-history </ b>."
+
+#: includes/cool_vc_addon.php:258
+msgid "Tag Specific Timeline (Add Category Slug)"
+msgstr "Calendrier spécifique à la balise (Ajouter slug de catégorie)"
+
+#: includes/cool_vc_addon.php:262
+msgid ""
+"Show Tag Specific Blog Posts. Like For cooltimeline.com/tag/fb-history/ it "
+"will be <b>fb-history</b>."
+msgstr ""
+"Afficher les messages spécifiques au blog. Comme pour cooltimeline."
+"com/tag/fb-history/ il sera <b> fb-history </ b>."
+
+#: includes/cool_vc_addon.php:268
+msgid "Timeline Layout"
+msgstr "Plan de montage chronologique"
+
+#: includes/cool_vc_addon.php:271
+msgid "Default Layout (Vertical Both side)"
+msgstr "Disposition par défaut (Vertical Both side)"
+
+#: includes/cool_vc_addon.php:272
+msgid "One Side Layout (Vertical one sided)"
+msgstr "Une disposition latérale (verticale un côté)"
+
+#: includes/cool_vc_addon.php:273
+msgid "Horizontal Layout"
+msgstr "Horizontal Layout"
+
+#: includes/cool_vc_addon.php:302
+msgid "Select no of items"
+msgstr "Sélectionner aucun élément"
+
+#: includes/cool_vc_addon.php:308
+msgid "Horizontal Layout (This option only for content timeline)"
+msgstr ""
+"Mise en page horizontale (cette option est réservée au contenu de la "
+"chronologie)"
+
+#: includes/cool_vc_addon.php:310
+msgid "*This Options Is Not For Default Design. (Check Demo Here)"
+msgstr ""
+"* Cette option n'est pas pour la conception par défaut. (Vérifiez la démo "
+"ici)"
+
+#: includes/cool_vc_addon.php:323
+msgid "Create Light, Dark or Colorful Timeline."
+msgstr "Créez une chronologie claire, sombre ou colorée."
+
+#: includes/cool_vc_addon.php:359 includes/cool_vc_addon.php:484
+msgid "Show number of posts"
+msgstr "Afficher le nombre de messages"
+
+#: includes/cool_vc_addon.php:415
+msgid "Cool Social Timeline "
+msgstr "Chronologie sociale fraîche"
+
+#: includes/cool_vc_addon.php:416
+msgid "Facebook Page Timeline"
+msgstr "Chronologie de la page Facebook"
+
+#: includes/cool_vc_addon.php:443
+msgid "Facebook App Id"
+msgstr "Identifiant de l'application Facebook"
+
+#: includes/cool_vc_addon.php:447
+msgid "Facebook App Id."
+msgstr "Identifiant de l'application Facebook"
+
+#: includes/cool_vc_addon.php:452 includes/cool_vc_addon.php:456
+msgid "Facbook APP secret Key"
+msgstr "Facbook clé secrète APP"
+
+#: includes/cool_vc_addon.php:461
+msgid "Facbook Page name"
+msgstr "Facbook Nom de la page"
+
+#: includes/cool_vc_addon.php:465
+msgid ""
+"Facbook Page name E.g <a target=\"_blank\" href=\"https://diigo.com/097qi4\">"
+"techcrunch</a>"
+msgstr ""
+"Facbook Nom de la page E.g <a target=\"_blank\" href=\"https://diigo."
+"com/097qi4\"> techcrunch </a>"
+
+#: includes/cool_vc_addon.php:478
+msgid "Create Light, Dark or Colorful Timeline.."
+msgstr "Créez une chronologie claire, sombre ou colorée .."
+
+#: includes/cool_vc_addon.php:488
+msgid "Show number of posts desc."
+msgstr "Montrer le nombre de messages desc."
+
+#: includes/views/content-timeline.php:182
+msgid "D/M/Y"
+msgstr "D/M/Y"
+
+#: includes/views/content-timeline.php:183
+msgid "d/m/Y,H:i"
+msgstr "d/m/Y,H:i"
+
+#: includes/views/content-timeline.php:193
+msgid "Read more"
+msgstr "Lire la suite"
+
+#. Plugin Name of the plugin/theme
+msgid "Cool Timeline Pro"
+msgstr "Cool Timeline Pro"
+
+#. Description of the plugin/theme
+msgid ""
+"Use Cool Timeline pro wordpress plugin to showcase your life or your company "
+"story in a vertical timeline format. Cool Timeline Pro is an advanced "
+"timeline plugin that creates responsive vertical storyline automatically in "
+"chronological order based on the year and date of your posts."
+msgstr ""
+"Utilisez Cool Timeline pro wordpress plugin pour mettre en valeur votre vie "
+"ou votre histoire de l'entreprise dans un format de montage chronologique "
+"verticale. Cool Timeline Pro est un plugin de timeline avancé qui crée une "
+"histoire verticale réactive automatiquement dans l'ordre chronologique en "
+"fonction de l'année et la date de vos messages."
+
+#. Author of the plugin/theme
+msgid "CoolHappy,satinder-singh"
+msgstr "CoolHappy,satinder-singh"
+
+#: includes/ctl-helpers.php:122
+msgid " of "
+msgstr " of "
+
+#: includes/ctl-helpers.php:124
+msgid " Page "
+msgstr " Page "
+
+#: includes/cool_timeline_template.php:36
+msgid "Read More"
+msgstr "Lire la suite"
+
+#: includes/cool_timeline_template.php:329
+#: includes/views/content-timeline.php:473
+#, php-format
+msgid "<%s class=\"timeline-main-title center-block\">%s</%s>"
+msgstr "<%s class=\"timeline-main-title center-block\">%s</%s>"
+
+#: includes/cool_timeline_posttype.php:31
+msgctxt "Post Type General Name"
+msgid "Timeline Stories"
+msgstr "Chronologie Histoires"
+
+#: includes/cool_timeline_posttype.php:32
+msgctxt "Post Type Singular Name"
+msgid "Timeline Stories"
+msgstr "Chronologie Histoires"
+
+#: includes/cool_timeline_posttype.php:33
+#: includes/cool_timeline_posttype.php:34
+msgid "Timeline Stories"
+msgstr "Chronologie Histoires"
+
+#: includes/cool_timeline_posttype.php:35
+#: includes/cool_timeline_posttype.php:88
+msgid "Parent Item:"
+msgstr "Article parent:"
+
+#: includes/cool_timeline_posttype.php:36
+msgid "All Stories"
+msgstr "Toutes les histoires"
+
+#: includes/cool_timeline_posttype.php:37
+msgid "Add New Story"
+msgstr "Ajouter une nouvelle histoire"
+
+#: includes/cool_timeline_posttype.php:38
+msgid "Add New"
+msgstr "Ajouter un nouveau"
+
+#: includes/cool_timeline_posttype.php:39
+msgid "New Story"
+msgstr "Nouvelle histoire"
+
+#: includes/cool_timeline_posttype.php:40
+msgid "Edit Story"
+msgstr "Modifier l'histoire"
+
+#: includes/cool_timeline_posttype.php:41
+msgid "Update Story"
+msgstr "Mettre à jour l'histoire"
+
+#: includes/cool_timeline_posttype.php:42
+msgid "View Story"
+msgstr "Voir l'histoire"
+
+#: includes/cool_timeline_posttype.php:43
+msgid "Search Story"
+msgstr "Rechercher une histoire"
+
+#: includes/cool_timeline_posttype.php:44
+msgid "Not found"
+msgstr "Pas trouvé"
+
+#: includes/cool_timeline_posttype.php:45
+msgid "Not found in Trash"
+msgstr "Pas trouvé dans la Corbeille"
+
+#: includes/cool_timeline_posttype.php:58
+msgid "Timeline Post Type Description"
+msgstr "Description du type de poste"
+
+#. Plugin Name of the plugin/theme
+#: includes/cool_vc_addon.php:38
+msgid "Cool Timeline"
+msgstr "Cool Chronologie"
+
+#: includes/views/content-timeline.php:113 includes/views/default.php:3
+msgid "d/M/Y"
+msgstr "D / M / Y"
+
+#: includes/views/content-timeline.php:422 includes/views/default.php:467
+msgid "Sorry,You have not added any story yet"
+msgstr "Désolé, Vous n'avez pas encore ajouté d'histoire"
+
+#. Plugin URI of the plugin/theme
+#. Author URI of the plugin/theme
+msgid "http://www.cooltimeline.com"
+msgstr "Http://www.cooltimeline.com"
