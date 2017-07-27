@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.7.00
+* Version 6.7.02
 *
 */
 
@@ -353,7 +353,7 @@ global $wppa_session;
 			'<a href="' . $url . '" >' .
 				__( 'create one', 'wp-photo-album-plus' ) . ' ' .
 			'</a> ' .
-			__( 'beofre you can upload your photos.', 'wp-photo-album-plus' ) .
+			__( 'before you can import your photos.', 'wp-photo-album-plus' ) .
 		'</p>';
 		return;
 	}
@@ -563,7 +563,8 @@ global $wppa_session;
 															'selected' 			=> get_option( 'wppa-photo-album-import-'.wppa_get_user(), '0' ),
 															'addpleaseselect' 	=> true,
 															'checkowner' 		=> true,
-															'checkupload' 		=> true
+															'checkupload' 		=> true,
+															'sort' 				=> true,
 														) ) .
 						'</select>' .
 						__( 'Photos that have (<em>name</em>)[<em>album</em>] will be imported by that <em>name</em> in that <em>album</em>.', 'wp-photo-album-plus') .
@@ -802,6 +803,9 @@ global $wppa_session;
 											}
 											else {
 												$img_url = str_replace( ABSPATH, home_url().'/', $file );
+												if ( is_ssl() ) {
+													$img_url = str_replace( 'http://', 'https://', $img_url );
+												}
 											}
 											echo
 											'<img src="' . $img_url . '"' .
@@ -851,7 +855,8 @@ global $wppa_session;
 															'selected' 			=> get_option( 'wppa-video-album-import-'.wppa_get_user(), '0' ),
 															'addpleaseselect'	=> true,
 															'checkowner' 		=> true,
-															'checkupload' 		=> true
+															'checkupload' 		=> true,
+															'sort'				=> true,
 														) ) .
 						'</select>' .
 					'</p>';
@@ -958,7 +963,8 @@ global $wppa_session;
 															'selected' 			=> get_option( 'wppa-audio-album-import-'.wppa_get_user(), '0' ),
 															'addpleaseselect' 	=> true,
 															'checkowner' 		=> true,
-															'checkupload' 		=> true
+															'checkupload' 		=> true,
+															'sort' 				=> true,
 														) ) .
 						'</select>' .
 					'</p>';

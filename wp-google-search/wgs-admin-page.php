@@ -76,6 +76,22 @@ class WGS_Admin_Page {
 			'wgs_general_section' // Section           
 		);
 
+		add_settings_field(
+			'use_default_correction_css2', // ID
+			__('Use default corrections CSS version2','wgs'), // Title 
+			array($this, 'posttype_callback'), // Callback
+			'wgs_general_settings', // Page / tab page
+			'wgs_general_section' // Section           
+		);
+
+		add_settings_field(
+			'use_default_correction_css3', // ID
+			__('Use default corrections CSS version3','wgs'), // Title 
+			array($this, 'posttype_callback'), // Callback
+			'wgs_general_settings', // Page / tab page
+			'wgs_general_section' // Section           
+		);
+
         add_settings_field( //HIDDEN
             'search_gcse_page_id', // ID
             'search_gcse_page_id', // Title 
@@ -103,7 +119,9 @@ class WGS_Admin_Page {
 			'searchbox_before_results' => '0',
 			'linktarget_blank' => '0',
 			'support_overlay_display' => '0',
-			'use_default_correction_css' => '1',
+			'use_default_correction_css' => '0', //this is an older css, thus it is not switched on by default
+			'use_default_correction_css2' => '1',
+			'use_default_correction_css3' => '0', //this is an optional correction, thus default is 0
 		) );
 		
 		update_option( 'wgs_general_settings', $options );
@@ -200,7 +218,7 @@ class WGS_Admin_Page {
 						</tr>							
 			 
 						<tr valign="top">
-							<th scope="row"><?php echo __('Use default corrections CSS','wgs') . ':' ?></th>
+							<th scope="row"><?php echo __('Use default corrections CSS v1','wgs') . ':' ?></th>
 							<td>
 								<?php
 								printf(
@@ -208,12 +226,41 @@ class WGS_Admin_Page {
 									<input type="checkbox" id="use_default_correction_css" name="wgs_general_settings[use_default_correction_css]"
 									value="1"' . checked( 1, esc_attr( $options['use_default_correction_css']), false ) . ' />'
 								);
-								echo '<br /><span class="description">' . __('If this option is turned on, some css will be applied to improve the appearance of search elements in case of most WordPress themes.','wgs') . '</span>';
+								echo '<br /><span class="description">' . __('DEPRECTED: If this option is turned on, some css will be applied to improve the appearance of search elements in case of most WordPress themes. This is an older css settings collection, please use the following CSS 2 setting instead of this.','wgs') . '</span>';
 									
 								?>    
 							</td>
 						</tr>							
+
+						<tr valign="top">
+							<th scope="row"><?php echo __('Use default corrections CSS v2','wgs') . ':' ?></th>
+							<td>
+								<?php
+								printf(
+									'<input type="hidden" name="wgs_general_settings[use_default_correction_css2]" value="0"/>
+									<input type="checkbox" id="use_default_correction_css2" name="wgs_general_settings[use_default_correction_css2]"
+									value="1"' . checked( 1, esc_attr( $options['use_default_correction_css2']), false ) . ' />'
+								);
+								echo '<br /><span class="description">' . __('If this option is turned on, some css will be applied to improve the appearance of search elements. Styling of Google Search box is theme dependent because your theme settings have an effect on Google CSE styling too. It is possible that custom css settings are needed. Aks your site designer about it.','wgs') . '</span>';
+								
+								?>    
+							</td>
+						</tr>							
 	
+						<tr valign="top">
+							<th scope="row"><?php echo __('Use default corrections CSS v3','wgs') . ':' ?></th>
+							<td>
+								<?php
+								printf(
+									'<input type="hidden" name="wgs_general_settings[use_default_correction_css3]" value="0"/>
+									<input type="checkbox" id="use_default_correction_css3" name="wgs_general_settings[use_default_correction_css3]"
+									value="1"' . checked( 1, esc_attr( $options['use_default_correction_css3']), false ) . ' />'
+								);
+								echo '<br /><span class="description">' . __('Switch it on to move down search button some pixels.','wgs') . '</span>';
+									
+								?>    
+							</td>
+						</tr>							
 	
 						<tr valign="top">
 							<th scope="row"><?php echo __('Search Page Target URL','wgs') . ':' ?></th>

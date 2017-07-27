@@ -3,16 +3,17 @@
 * Package: wp-photo-album-plus
 *
 * display a list of users linking to their photos
-* Version 6.7.00
+* Version 6.7.01
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 
 class UpldrWidget extends WP_Widget {
+
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_upldr_widget', 'description' => __( 'WPPA+ Widget to show which users uploaded how many photos', 'wp-photo-album-plus') );
-		parent::__construct('wppa_upldr_widget', __('Uploader Photos', 'wp-photo-album-plus'), $widget_ops);
+		$widget_ops = array( 'classname' => 'wppa_upldr_widget', 'description' => __( 'Display which users uploaded how many photos', 'wp-photo-album-plus' ) );
+		parent::__construct( 'wppa_upldr_widget', __( 'WPPA+ Uploader Photos', 'wp-photo-album-plus' ), $widget_ops );
     }
 
 	/** @see WP_Widget::widget */
@@ -33,20 +34,20 @@ class UpldrWidget extends WP_Widget {
 		extract( $args );
 
 		$instance 		= wp_parse_args( (array) $instance, array(
-														'title' 	=> '',
+														'title' 	=> __( 'Uploader Photos', 'wp-photo-album-plus' ),
 														'sortby' 	=> 'name',
 														'ignore' 	=> 'admin',
 														'parent' 	=> ''
 														) );
- 		$widget_title 		= apply_filters('widget_title', $instance['title'] );
+ 		$widget_title 		= apply_filters( 'widget_title', $instance['title'] );
 		$page 				= in_array( 'album', wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page('upldr_widget_linkpage', __('User uploaded photos', 'wp-photo-album-plus'));
 		$ignorelist			= explode(',', $instance['ignore']);
 		$upldrcache 		= wppa_get_upldr_cache();
 		$needupdate 		= false;
 		$users 				= wppa_get_users();
 		$workarr 			= array();
-		$showownercount 	= ( $instance['showownercount'] == 'on' );
-		$showphotocount 	= ( $instance['showphotocount'] == 'on' );
+		$showownercount 	= wppa_checked( $instance['showownercount'] );
+		$showphotocount 	= wppa_checked( $instance['showphotocount'] );
 		$total_ownercount 	= 0;
 		$total_photocount 	= 0;
 
@@ -163,7 +164,8 @@ class UpldrWidget extends WP_Widget {
     }
 
     /** @see WP_Widget::update */
-    function update($new_instance, $old_instance) {
+    function update( $new_instance, $old_instance ) {
+
 		$instance = $old_instance;
 		$instance['title'] 			= strip_tags($new_instance['title']);
 		$instance['sortby'] 		= $new_instance['sortby'];
@@ -178,37 +180,45 @@ class UpldrWidget extends WP_Widget {
     }
 
     /** @see WP_Widget::form */
-    function form($instance) {
+    function form( $instance ) {
 		global $wpdb;
 
 		//Defaults
 		$instance 		= wp_parse_args( (array) $instance, array(
-														'title' 			=> __('User Photos', 'wp-photo-album-plus'),
+														'title' 			=> __( 'Uploader Photos', 'wp-photo-album-plus' ),
 														'sortby' 			=> 'name',
 														'ignore' 			=> 'admin',
 														'parent' 			=> '',
 														'showownercount' 	=> '',
 														'showphotocount' 	=> ''
 														) );
- 		$widget_title 	= apply_filters('widget_title', $instance['title']);
 
+		// Title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
+
+		// Sortby
+		$options = array(	__( 'Display name', 'wp-photo-album-plus' ),
+							__( 'Number of photos', 'wp-photo-album-plus' ),
+							__( 'Most recent photo', 'wp-photo-album-plus' ),
+							);
+		$values  = array( 	'name',
+							'count',
+							'date',
+							);
+		echo
+		wppa_widget_selection( $this, 'sortby', $instance['sortby'], __( 'Sort by', 'wp-photo-album-plus' ), $options, $values );
+
+		// Ignore these users
+		echo
+		wppa_widget_input( 	$this,
+							'ignore',
+							$instance['ignore'],
+							__( 'Ignore', 'wp-photo-album-plus' ),
+							__( 'Enter loginnames seperated by commas', 'wp-photo-album-plus' )
+							);
 ?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wp-photo-album-plus'); ?></label>
-			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $widget_title; ?>" />
-		</p>
 
-		<p><label for="<?php echo $this->get_field_id('sortby'); ?>"><?php _e('Sort by:', 'wp-photo-album-plus'); ?></label>
-			<select class="widefat" id="<?php echo $this->get_field_id('sortby'); ?>" name="<?php echo $this->get_field_name('sortby'); ?>" >
-				<option value="name" <?php if ($instance['sortby'] == 'name') echo 'selected="selected"' ?>><?php _e('Display name', 'wp-photo-album-plus') ?></option>
-				<option value="count" <?php if ($instance['sortby'] == 'count') echo 'selected="selected"' ?>><?php _e('Number of photos', 'wp-photo-album-plus') ?></option>
-				<option value="date" <?php if ($instance['sortby'] == 'date') echo 'selected="selected"' ?>><?php _e('Most recent photo', 'wp-photo-album-plus') ?></option>
-			</select>
-		</p>
-
-		<p><label for="<?php echo $this->get_field_id('ignore'); ?>"><?php _e('Ignore:', 'wp-photo-album-plus'); ?></label>
-			<input class="widefat" id="<?php echo $this->get_field_id('ignore'); ?>" name="<?php echo $this->get_field_name('ignore'); ?>" value="<?php echo $instance['ignore'] ?>" />
-			<small><?php _e('Enter loginnames seperated by commas', 'wp-photo-album-plus') ?></small>
-		</p>
 
 		<p><label for="<?php echo $this->get_field_id('parent'); ?>"><?php _e('Look only in albums (including sub-albums):', 'wp-photo-album-plus'); ?></label>
 			<input type="hidden" id="<?php echo $this->get_field_id('parent'); ?>" name="<?php echo $this->get_field_name('parent'); ?>" value="<?php echo $instance['parent'] ?>" />
@@ -241,32 +251,15 @@ class UpldrWidget extends WP_Widget {
 			?>
 			</select>
 		</p>
-
-		<p>
-			<input
-				type="checkbox"
-				class="widefat"
-				id="<?php echo $this->get_field_id('showownercount'); ?>"
-				name="<?php echo $this->get_field_name('showownercount'); ?>"
-				value="on"
-				<?php if ( $instance['showownercount'] == 'on' ) echo ' checked="checked"'; ?>
-			/>
-			<label for="<?php echo $this->get_field_id('showownercount'); ?>"><?php _e('Show count of owners:', 'wp-photo-album-plus'); ?></label>
-		</p>
-
-		<p>
-			<input
-				type="checkbox"
-				class="widefat"
-				id="<?php echo $this->get_field_id('showphotocount'); ?>"
-				name="<?php echo $this->get_field_name('showphotocount'); ?>"
-				value="on"
-				<?php if ( $instance['showphotocount'] == 'on' ) echo ' checked="checked"'; ?>
-			/>
-			<label for="<?php echo $this->get_field_id('showphotocount'); ?>"><?php _e('Show count of photos:', 'wp-photo-album-plus'); ?></label>
-		</p>
-
 <?php
+		// Ownercount
+		echo
+		wppa_widget_checkbox( $this, 'showownercount', $instance['showownercount'], __( 'Show count of owners', 'wp-photo-album-plus' ) );
+
+		// Photocount
+		echo
+		wppa_widget_checkbox( $this, 'showphotocount', $instance['showphotocount'], __( 'Show count of photos', 'wp-photo-album-plus' ) );
+
     }
 
 	function get_widget_id() {

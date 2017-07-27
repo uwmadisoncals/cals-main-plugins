@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 6.6.18
+* Version 6.7.01
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -12,8 +12,8 @@ class AlbumWidget extends WP_Widget {
 
     /** constructor */
     function __construct() {
-		$widget_ops = array( 'classname' => 'wppa_album_widget', 'description' => __( 'WPPA+ Albums' , 'wp-photo-album-plus') );
-		parent::__construct( 'wppa_album_widget', __( 'Thumbnail Albums' , 'wp-photo-album-plus'), $widget_ops );
+		$widget_ops = array( 'classname' => 'wppa_album_widget', 'description' => __( 'Display thumbnail images that link to albums' , 'wp-photo-album-plus') );
+		parent::__construct( 'wppa_album_widget', __( 'WPPA+ Photo Albums' , 'wp-photo-album-plus'), $widget_ops );
     }
 
 	/** @see WP_Widget::widget */
@@ -34,7 +34,7 @@ class AlbumWidget extends WP_Widget {
         extract( $args );
 
 		$instance = wp_parse_args( (array) $instance, array(
-													'title' 	=> '',		// Widget title
+													'title' 	=> __( 'Photo Albums' , 'wp-photo-album-plus'),		// Widget title
 													'parent' 	=> 'none',	// Parent album
 													'name' 		=> 'no',		// Display album name?
 													'skip' 		=> 'yes'		// Skip empty albums
@@ -42,36 +42,26 @@ class AlbumWidget extends WP_Widget {
 							//						'size' 		=> wppa_opt( 'album_widget_size' )
 													) );
 
-		$widget_title = apply_filters('widget_title', $instance['title']);
+		$widget_title = apply_filters( 'widget_title', $instance['title'] );
 
-		$page = in_array( wppa_opt( 'album_widget_linktype' ), wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page('album_widget_linkpage', __('Photo Albums', 'wp-photo-album-plus'));
-
-		$max  	= wppa_opt( 'album_widget_count' );
-		if ( ! $max ) $max = '10';
+		$page 	= in_array( wppa_opt( 'album_widget_linktype' ), wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page( 'album_widget_linkpage', __( 'Photo Albums', 'wp-photo-album-plus' ) );
+		$max  	= wppa_opt( 'album_widget_count' ) ? wppa_opt( 'album_widget_count' ) : '10';
+		$maxw 	= wppa_opt( 'album_widget_size' );
+		$maxh 	= wppa_checked( $instance['name'] ) ? $maxw + 18 : $maxw;
 		$parent = $instance['parent'];
-		$name 	= $instance['name'];
-		$skip 	= $instance['skip'];
 
-		if ( is_numeric($parent) ) {
-			$albums = $wpdb->get_results($wpdb->prepare( 'SELECT * FROM `'.WPPA_ALBUMS.'` WHERE `a_parent` = %s '.wppa_get_album_order($parent), $parent ), ARRAY_A );
-		}
-		else {
-			switch ($parent) {
-				case 'all':
-					$albums = $wpdb->get_results( 'SELECT * FROM `'.WPPA_ALBUMS.'` '.wppa_get_album_order(), ARRAY_A );
-					break;
-				case 'last':
-					$albums = $wpdb->get_results( 'SELECT * FROM `'.WPPA_ALBUMS.'` ORDER BY `timestamp` DESC', ARRAY_A );
-					break;
-				default:
-					wppa_dbg_msg('Error, unimplemented album selection: '.$parent.' in Album widget.', 'red', true);
-				}
+		switch ( $parent ) {
+			case 'all':
+				$albums = $wpdb->get_results( 'SELECT * FROM `' . WPPA_ALBUMS . '` ' . wppa_get_album_order(), ARRAY_A );
+				break;
+			case 'last':
+				$albums = $wpdb->get_results( 'SELECT * FROM `' . WPPA_ALBUMS . '` ORDER BY `timestamp` DESC', ARRAY_A );
+				break;
+			default:
+				$albums = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM `' . WPPA_ALBUMS . '` WHERE `a_parent` = %s ' . wppa_get_album_order( $parent ), $parent ), ARRAY_A );
 		}
 
 		$widget_content = "\n".'<!-- WPPA+ album Widget start -->';
-		$maxw = wppa_opt( 'album_widget_size' );
-		$maxh = $maxw;
-		if ( $name == 'yes' ) $maxh += 18;
 
 		$count = 0;
 		if ( $albums ) foreach ( $albums as $album ) {
@@ -79,14 +69,9 @@ class AlbumWidget extends WP_Widget {
 			if ( $count < $max ) {
 
 				$imageid 		= wppa_get_coverphoto_id( $album['id'] );
-				if ( $imageid ) {
-					$image 		= wppa_cache_thumb( $imageid ); //$wpdb->get_row( $wpdb->prepare( 'SELECT * FROM `'.WPPA_PHOTOS.'` WHERE `id` = %s', $imageid ), ARRAY_A );
-				}
-				else {
-					$image = false;
-				}
+				$image 			= $imageid ? wppa_cache_thumb( $imageid ) : false;
 				$imgcount 		= $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM '.WPPA_PHOTOS.' WHERE `album` = %s', $album['id']  ) );
-				$subalbumcount 	= wppa_has_children( $album['id'] ); // $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_ALBUMS."` WHERE `a_parent` = %s", $album['id'] ) );
+				$subalbumcount 	= wppa_has_children( $album['id'] );
 				$thumb 			= $image;
 
 				// Make the HTML for current picture
@@ -129,11 +114,23 @@ class AlbumWidget extends WP_Widget {
 					$imgurl = wppa_fix_poster_ext( $imgurl, $image['id'] );
 				}
 
-				if ( $imgcount > wppa_opt( 'min_thumbs' ) || $skip == 'no' ) {
+				if ( $imgcount > wppa_opt( 'min_thumbs' ) || ! wppa_checked( $instance['skip'] ) ) {
 
-					$widget_content .= "\n".'<div class="wppa-widget" style="width:'.$maxw.'px; height:'.$maxh.'px; margin:4px; display:inline; text-align:center; float:left;">';
+					$widget_content .=
+					'<div' .
+						' class="wppa-widget"' .
+						' style="' .
+							'width:' . $maxw . 'px;' .
+							'height:' . $maxh . 'px;' .
+							'margin:4px;' .
+							'display:inline;' .
+							'text-align:center;' .
+							'float:left;' .
+							'overflow:hidden;' .
+							'"
+						>';
 
-					if ($link) {
+					if ( $link ) {
 						if ( $link['is_url'] ) {	// Is a href
 							$widget_content .= "\n\t".'<a href="'.$link['url'].'" title="'.$title.'" target="'.$link['target'].'" >';
 							if ( $imageid && wppa_is_video( $image['id'] ) ) {
@@ -274,7 +271,9 @@ class AlbumWidget extends WP_Widget {
 						}
 					}
 
-					if ($name == 'yes') $widget_content .= "\n\t".'<span style="font-size:'.wppa_opt( 'fontsize_widget_thumb' ).'px; min-height:100%;">'.__(stripslashes($album['name']), 'wp-photo-album-plus').'</span>';
+					if ( wppa_checked( $instance['name'] ) ) {
+						$widget_content .= "\n\t".'<span style="font-size:'.wppa_opt( 'fontsize_widget_thumb' ).'px; min-height:100%;">'.__(stripslashes($album['name']), 'wp-photo-album-plus').'</span>';
+					}
 
 					$widget_content .= "\n".'</div>';
 
@@ -282,80 +281,93 @@ class AlbumWidget extends WP_Widget {
 				}
 			}
 		}
-		else $widget_content .= 'There are no albums (yet).';
+		else {
+			$widget_content .= __( 'There are no albums (yet)', 'wp-photo-album-plus' );
+		}
 
 		$widget_content .= '<div style="clear:both"></div>';
 
 		$widget_content .= "\n".'<!-- WPPA+ thumbnail Widget end -->';
 
 		echo "\n" . $before_widget;
-		if ( !empty( $widget_title ) ) { echo $before_title . $widget_title . $after_title; }
+		if ( ! empty( $widget_title ) ) {
+			echo $before_title . $widget_title . $after_title;
+		}
 		echo $widget_content . $after_widget;
 
 		wppa( 'in_widget', false );
     }
 
     /** @see WP_Widget::update */
-    function update($new_instance, $old_instance) {
+    function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
-		$instance['title'] = strip_tags($new_instance['title']);
+		$instance['title'] 	= strip_tags( $new_instance['title'] );
 		$instance['parent'] = $new_instance['parent'];
-		$instance['name'] = $new_instance['name'];
-		$instance['skip'] = $new_instance['skip'];
+		$instance['name'] 	= $new_instance['name'];
+		$instance['skip'] 	= $new_instance['skip'];
 
         return $instance;
     }
 
     /** @see WP_Widget::form */
-    function form($instance) {
+    function form( $instance ) {
 		global $wpdb;
 
 		//Defaults
 		$instance = wp_parse_args( (array) $instance, array(
-															'title' => __('Thumbnail Albums', 'wp-photo-album-plus'),
+															'title' => __( 'Thumbnail Albums', 'wp-photo-album-plus' ),
 															'parent' => '0',
 															'name' => 'no',
 															'skip' => 'yes' ) );
- 		$parent = $instance['parent'];
-		$name = $instance['name'];
-		$skip = $instance['skip'];
-		$widget_title = $instance['title'];
-?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wp-photo-album-plus'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $widget_title; ?>" /></p>
-		<p><label for="<?php echo $this->get_field_id('parent'); ?>"><?php _e('Album selection or Parent album:', 'wp-photo-album-plus'); ?></label>
-			<select class="widefat" id="<?php echo $this->get_field_id('parent'); ?>" name="<?php echo $this->get_field_name('parent'); ?>" >
 
-				<option value="all" <?php if ($parent == 'all') echo 'selected="selected"' ?>><?php _e('--- all albums ---', 'wp-photo-album-plus') ?></option>
-				<option value="0"  <?php if ($parent == '0')  echo 'selected="selected"' ?>><?php _e('--- all generic albums ---', 'wp-photo-album-plus') ?></option>
-				<option value="-1" <?php if ($parent == '-1') echo 'selected="selected"' ?>><?php _e('--- all separate albums ---', 'wp-photo-album-plus') ?></option>
-				<option value="last" <?php if ($parent == 'last') echo 'selected="selected"' ?>><?php _e('--- most recently added albums ---', 'wp-photo-album-plus') ?></option>
-				<?php $albs = $wpdb->get_results( "SELECT * FROM `".WPPA_ALBUMS."` ORDER BY `name`", ARRAY_A);
-				if ( $albs ) foreach( $albs as $alb ) {
-					echo '<option value="'.$alb['id'].'" ';
-					if ( $parent == $alb['id'] ) echo 'selected="selected" ';
-					if ( ! wppa_has_children($alb['id']) ) echo 'disabled="disabled" ';
-					echo '>'.__(stripslashes($alb['name']), 'wp-photo-album-plus').'</option>';
-				} ?>
+		// Widget title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
 
-			</select>
-		</p>
-		<p>
-			<?php _e('Show album names:', 'wp-photo-album-plus'); ?>
-			<select id="<?php echo $this->get_field_id('name'); ?>" name="<?php echo $this->get_field_name('name'); ?>">
-				<option value="no" <?php if ($name == 'no') echo 'selected="selected"' ?>><?php _e('no.', 'wp-photo-album-plus'); ?></option>
-				<option value="yes" <?php if ($name == 'yes') echo 'selected="selected"' ?>><?php _e('yes.', 'wp-photo-album-plus'); ?></option>
-			</select>
-		</p>
-		<p>
-			<?php _e('Skip "empty" albums:', 'wp-photo-album-plus'); ?>
-			<select id="<?php echo $this->get_field_id('skip'); ?>" name="<?php echo $this->get_field_name('skip'); ?>">
-				<option value="no" <?php if ($skip == 'no') echo 'selected="selected"' ?>><?php _e('no.', 'wp-photo-album-plus'); ?></option>
-				<option value="yes" <?php if ($skip == 'yes') echo 'selected="selected"' ?>><?php _e('yes.', 'wp-photo-album-plus'); ?></option>
-			</select>
-		</p>
+		// Parent album selection
+		$albs = $wpdb->get_results( "SELECT `id`, `name` FROM `" . WPPA_ALBUMS . "` ORDER BY `name`", ARRAY_A );
 
-		<p><?php _e('You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus'); ?></p>
-<?php
+		$options 	= array(
+							__( '--- all albums ---', 'wp-photo-album-plus' ),
+							__( '--- all generic albums ---', 'wp-photo-album-plus' ),
+							__( '--- all separate albums ---', 'wp-photo-album-plus' ),
+							__( '--- most recently added albums ---', 'wp-photo-album-plus' ),
+
+						);
+
+		$values 	= array(
+							'all',
+							'0',
+							'-1',
+							'last',
+						);
+
+		$disabled 	= array(
+							false,
+							false,
+							false,
+							false,
+						);
+
+		if ( $albs ) foreach( $albs as $alb ) {
+			$options[] 	= $alb['name'];
+			$values[] 	= $alb['id'];
+			$disabled[] = ! wppa_has_children( $alb['id'] );
+		}
+
+		echo
+		wppa_widget_selection( $this, 'parent', $instance['parent'],  __( 'Album selection or Parent album', 'wp-photo-album-plus' ), $options, $values, $disabled ) .
+
+		// Show album name?
+		wppa_widget_checkbox( $this, 'name', $instance['name'], __( 'Show album names', 'wp-photo-album-plus' ) ) .
+
+		// Skip empty albums?
+		wppa_widget_checkbox( $this, 'skip', $instance['skip'], __( 'Skip "empty" albums', 'wp-photo-album-plus' ) ) .
+
+		'<p>' .
+			__( 'You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus') .
+			' ' . __( 'Table I-F9 and 10', 'wp-photo-album-plus' ) .
+		'</p>';
     }
 
 } // class AlbumWidget

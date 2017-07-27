@@ -300,9 +300,7 @@
         background: #ffffff;
         padding: 10px 20px;
     }
-    #all-package-settings .nav.nav-tabs{
-        margin-bottom: 10px;background: #f5f5f5;padding-top: 10px;padding-left: 10px;margin-top: -6px;margin-left: -12px;margin-right: -12px;
-    }
+     
 .w3eden .tooltip-inner{ border-radius: 2px !important; font-family: courier, monospace; padding: 8px 13px;  text-align: left; font-size: 12px; max-width: 250px; }
 .w3eden input[type=radio]{ margin-top: 0; }
  .form-control.input-sm{ display: inline; }

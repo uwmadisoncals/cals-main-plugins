@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.7.00';
+var wppaJsVersion = '6.7.03';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -149,6 +149,7 @@ var wppaUploadEdit = 'none';
 var wppaPageArg = '';
 var wppaSlideshowNavigationType = 'icons';
 var wppaCoverImageResponsive = [];
+var wppaSearchBoxSelItems = [];
 
 // 'Internal' variables ( private )
 var _wppaId = [];
@@ -601,6 +602,16 @@ function _wppaDoAutocol( mocc ) {
 	jQuery( ".wppa-mphoto-"+mocc ).css( 'width',w + 10 );
 	jQuery( ".wppa-mimg-"+mocc ).css( 'width',w );
 	jQuery( ".wppa-mimg-"+mocc ).css( 'height', '' );
+
+	// Search box
+	if ( wppaSearchBoxSelItems[mocc] > 0 ) {
+		if ( w / wppaSearchBoxSelItems[mocc] < 125 ) {
+			jQuery( ".wppa-searchsel-item-"+mocc ).css( 'width', '100%' );
+		}
+		else {
+			jQuery( ".wppa-searchsel-item-"+mocc ).css( 'width', ( 100 / wppaSearchBoxSelItems[mocc] ) + '%' );
+		}
+	}
 
 }
 

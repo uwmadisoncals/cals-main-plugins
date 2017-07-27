@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.6.31
+* Version 6.7.01
 *
 */
 
@@ -1248,7 +1248,8 @@ function wppaTryScheduledel( id ) {
 																									'path' => wppa_switch( 'hier_albsel' ),
 																									'exclude' => $album,
 																									'selected' => '0',
-																									'addpleaseselect' => true
+																									'addpleaseselect' => true,
+																									'sort' => true,
 																								)
 																						);
 										}
@@ -1362,7 +1363,7 @@ function wppaTryScheduledel( id ) {
 						'<tbody>' .
 							'<tr>' .
 								'<td>' .
-									__( '<b>ImageMagick</b> commands. The operations are execured upon the display file.', 'wp-photo-album-plus' ) . ' ' .
+									__( '<b>ImageMagick</b> commands. The operations are executed upon the display file.', 'wp-photo-album-plus' ) . ' ' .
 									__( 'A new thumbnail image will be created from the display file.', 'wp-photo-album-plus' ) .
 								'</td>' .
 							'</tr>' .
@@ -2435,7 +2436,13 @@ function wppaSetConfirmMove( id ) {
 					<?php } ?>
 				</select>
 				<select name="wppa-bulk-album" id="wppa-bulk-album" style="display:none;" onchange="wppa_setCookie( 'wppa_bulk_album',this.value,365 );" >
-					<?php echo wppa_album_select_a( array( 'checkaccess' => true, 'path' => wppa_switch( 'hier_albsel' ), 'exclude' => $album, 'selected' => '0', 'addpleaseselect' => true ) ) ?>
+					<?php echo wppa_album_select_a( array( 	'checkaccess' 		=> true, 
+															'path' 				=> wppa_switch( 'hier_albsel' ), 
+															'exclude' 			=> $album, 
+															'selected' 			=> '0', 
+															'addpleaseselect' 	=> true,
+															'sort' 				=> true,
+															) ) ?>
 				</select>
 				<select name="wppa-bulk-status" id="wppa-bulk-status" style="display:none;" onchange="wppa_setCookie( 'wppa_bulk_status',this.value,365 );" >
 					<option value="" ><?php _e( '- select a status -' , 'wp-photo-album-plus') ?></option>
@@ -2646,6 +2653,7 @@ function wppaSetConfirmMove( id ) {
 																									'exclude' 			=> $album,
 																									'selected' 			=> '0',
 																									'addpleaseselect' 	=> true,
+																									'sort' 				=> true,
 																								)
 																						);
 										}

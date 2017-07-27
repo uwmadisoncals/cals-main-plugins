@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 6.6.30
+* Version 6.7.03
 *
 */
 
@@ -166,7 +166,7 @@ global $upload_album;
 				'<p>' .
 					__( 'There are no albums where you are allowed to upload photos to.', 'wp-photo-album-plus' ) .
 					'<br />' .
-					__( 'Ask your administrator to create at least one album that is accessable for you to upload to, or ask him to give you album admin rights.', 'wp-photo-album-plus' ) .
+					__( 'Ask your administrator to create at least one album that is accessible for you to upload to, or ask him to give you album admin rights.', 'wp-photo-album-plus' ) .
 				'</p>';
 				return;
 			}
@@ -187,7 +187,7 @@ global $upload_album;
 							__( 'Album:' , 'wp-photo-album-plus') .
 						'</label>' .
 						'<select name="wppa-album" id="wppa-album-s" style="max-width:100%;" >' .
-							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true ) ) .
+							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true, 'sort' => true ) ) .
 						'</select>' .
 					'</p>';
 					if ( wppa_switch( 'watermark_on' ) && ( wppa_switch( 'watermark_user' ) || current_user_can( 'wppa_settings' ) ) ) {
@@ -329,7 +329,7 @@ global $upload_album;
 					'<p>' .
 						'<label for="wppa-album">' . __( 'Album:' , 'wp-photo-album-plus' ) . '</label>' .
 						'<select name="wppa-album" id="wppa-album-s" style="max-width:100%;" >' .
-							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true ) ) .
+							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true, 'sort' => true ) ) .
 						'</select>' .
 					'</p>';
 
@@ -406,7 +406,7 @@ global $upload_album;
 					'<p>' .
 						'<label for="wppa-album">' . __( 'Album:' , 'wp-photo-album-plus') . '</label>' .
 						'<select name="wppa-album" id="wppa-album-m" style="max-width:100%;" >' .
-							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true ) ) .
+							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true, 'sort' => true ) ) .
 						'</select>' .
 					'</p>';
 

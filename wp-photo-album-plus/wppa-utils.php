@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.7.00
+* Version 6.7.04
 *
 */
 
@@ -385,7 +385,7 @@ global $wppa_opt;
 
 	// Old style?
 	if ( substr( $xkey, 0, 5 ) == 'wppa_' ) {
-		wppa_log( 'War', $xkey . ' used as old style switch', true );
+		wppa_log( 'Dbg', $xkey . ' used as old style switch', true );
 		$key = $xkey;
 	}
 	else {
@@ -395,11 +395,11 @@ global $wppa_opt;
 	if ( isset( $wppa_opt[$key] ) ) {
 		if ( $wppa_opt[$key] == 'yes' ) return true;
 		elseif ( $wppa_opt[$key] == 'no' ) return false;
-		else wppa_log( 'War', '$wppa_opt['.$key.'] is not a yes/no setting', true );
+		else wppa_log( 'Dbg', '$wppa_opt['.$key.'] is not a yes/no setting', true );
 		return $wppa_opt[$key]; // Return the right value afterall
 	}
 
-	wppa_log( 'Err', '$wppa_opt['.$key.'] is not a setting', true );
+	wppa_log( 'Dbg', '$wppa_opt['.$key.'] is not a setting', true );
 
 	return false;
 }
@@ -414,7 +414,7 @@ global $wppa_opt;
 
 	// Old style?
 	if ( substr( $xkey, 0, 5 ) == 'wppa_' ) {
-		wppa_log( 'War', $xkey . ' used as old style option', true );
+		wppa_log( 'Dbg', $xkey . ' used as old style option', true );
 		$key = $xkey;
 	}
 	else {
@@ -423,13 +423,13 @@ global $wppa_opt;
 
 	if ( isset( $wppa_opt[$key] ) ) {
 		if ( $wppa_opt[$key] == 'yes' || $wppa_opt[$key] == 'no' ) {
-			wppa_log( 'Error', '$wppa_opt['.$key.'] is a yes/no setting, not a value', true );
+			wppa_log( 'Dbg', '$wppa_opt['.$key.'] is a yes/no setting, not a value', true );
 			return ( $wppa_opt[$key] == 'yes' ); // Return the right value afterall
 		}
 		return trim( $wppa_opt[$key] );
 	}
 
-	wppa_log( 'Err', '$wppa_opt['.$key.'] is not a setting', true );
+	wppa_log( 'Dbg', '$wppa_opt['.$key.'] is not a setting', true );
 
 	return false;
 }
@@ -634,9 +634,9 @@ global $wpdb;
 		$photos = $wpdb->get_results( 	"SELECT `id`, `tags` " .
 										"FROM `" . WPPA_PHOTOS . "` " .
 										"WHERE `status` <> 'pending' " .
-											"AND `status` <> 'scheduled' " .
-											"AND `tags` <> '' " .
-											"LIMIT " . $skip . "," . $pagsize,
+										"AND `status` <> 'scheduled' " .
+										"AND `tags` <> '' " .
+										"LIMIT " . $skip . "," . $pagsize,
 										ARRAY_A );
 
 		// If photos found, process the tags, if any
@@ -665,6 +665,21 @@ global $wpdb;
 			$done = true;
 		}
 		$skip += $pagsize;
+	}
+
+	// Add the minimum existing tags
+	$minimum_tags = wppa_opt( 'minimum_tags' );
+	if ( $minimum_tags ) {
+		$tags = explode( ',', $minimum_tags );
+		foreach ( $tags as $tag ) {
+			if ( $tag ) {
+				if ( ! isset( $result[$tag] ) ) { 	// A not occurring tag
+					$result[$tag]['tag'] = $tag;
+					$result[$tag]['count'] = '0';
+					$result[$tag]['ids'] = array();
+				}
+			}
+		}
 	}
 
 	// If any tags found, calculate fractions
@@ -1010,7 +1025,7 @@ function wppa_send_mail( $to, $subj, $cont, $photo = '0', $email = '' ) {
 		$message_part_3 .=
 		'<p>' .
 			'<small>' .
-				sprintf(__('This message is automaticly generated at %s. It is useless to respond to it.', 'wp-photo-album-plus'), '<a href="'.home_url().'" >'.home_url().'</a>') .
+				sprintf(__('This message is automatically generated at %s. It is useless to respond to it.', 'wp-photo-album-plus'), '<a href="'.home_url().'" >'.home_url().'</a>') .
 			'</small>' .
 		'</p>' .
 	'</body>' .
@@ -1630,7 +1645,17 @@ global $wppa_log_file;
 			$type = '{span style="color:red;" }Err{/span}';
 			break;
 		case 'f':
-			$type = 'Fix';
+			switch ( $u ) {
+				case 's':
+					$type = '{span style="color:blue;" }Fso{/span}';
+					if ( ! wppa_switch( 'log_fso' ) ) {
+						return;
+					}
+					break;
+				case 'i':
+					$type = 'Fix';
+					break;
+			}
 			break;
 		case 'o':
 			$type = 'Obs';
@@ -2388,13 +2413,13 @@ function wppa_mktree( $path ) {
 function wppa_mkdir( $path ) {
 	if ( ! is_dir( $path ) ) {
 		mkdir( $path );
-		wppa_chmod( $path );
 		if ( is_dir( $path ) ) {
-			wppa_log( 'Obs', 'Created path: ' .$path );
+			wppa_log( 'Fso', 'Created path: ' . $path );
 		}
 		else {
 			wppa_log( 'Err', 'Could not create: ' . $path );
 		}
+		wppa_chmod( $path );
 	}
 }
 
@@ -3577,12 +3602,44 @@ function wppa_is_safari() {
 
 function wppa_chmod( $fso ) {
 
+	$perms = fileperms( $fso ) & 0777;
+	
 	if ( is_dir( $fso ) ) {
-		@ chmod( $fso, 0755 );
+		
+		// Check file permissions
+		if ( 0755 !== ( $perms & 0755 ) ) {
+			
+			// If not sufficient, try to change
+			@ chmod( $fso, 0755 );
+			clearstatcache();
+			
+			// If still no luck
+			if ( 0755 !== ( fileperms( $fso ) & 0755 ) ) {
+				wppa_log( 'Fso', sprintf( 'Unable to set filepermissions on %s from %o to 0755', $fso, $perms ) );
+			}
+			else {
+				wppa_log( 'Fso', sprintf( 'Successfully set filepermissions on %s from %o to 0755', $fso, $perms ) );
+			}
+		}
 	}
 
 	if ( is_file( $fso ) ) {
-		@ chmod( $fso, 0644 );
+		
+		// Check file permissions
+		if ( 0644 !== ( fileperms( $fso ) & 0644 ) ) {
+			
+			// If not sufficient, try to change
+			@ chmod( $fso, 0644 );
+			clearstatcache();
+			
+			// If still no luck
+			if ( 0644 !== ( fileperms( $fso ) & 0644 ) ) {
+				wppa_log( 'Fso', sprintf( 'Unable to set filepermissions on %s from %o to 0644', $fso, $perms ) );
+			}
+			else {
+				wppa_log( 'Fso', sprintf( 'Successfully set filepermissions on %s from %o to 0644', $fso, $perms ) );
+			}
+		}
 	}
 
 }
@@ -3997,3 +4054,4 @@ function wppa_pdf_postprocess( $id ) {
 	// Reset switch
 	wppa( 'is_pdf', false );
 }
+

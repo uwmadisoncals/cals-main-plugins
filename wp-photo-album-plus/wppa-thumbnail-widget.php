@@ -3,14 +3,15 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail photos
-* Version 6.4.18
+* Version 6.7.01
 */
 
 class ThumbnailWidget extends WP_Widget {
+
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_thumbnail_widget', 'description' => __( 'WPPA+ Thumbnails', 'wp-photo-album-plus') );
-		parent::__construct('wppa_thumbnail_widget', __('Thumbnail Photos', 'wp-photo-album-plus'), $widget_ops);
+		$widget_ops = array( 'classname' => 'wppa_thumbnail_widget', 'description' => __( 'Display thumbnails of the photos in an album', 'wp-photo-album-plus' ) );
+		parent::__construct( 'wppa_thumbnail_widget', __( 'WPPA+ Thumbnail Photos', 'wp-photo-album-plus' ), $widget_ops );
     }
 
 	/** @see WP_Widget::widget */
@@ -32,7 +33,7 @@ class ThumbnailWidget extends WP_Widget {
         extract( $args );
 
 		$instance 		= wp_parse_args( (array) $instance, array(
-														'title' 	=> '',
+														'title' 	=> __( 'Thumbnail Photos', 'wp-photo-album-plus' ),
 														'album' 	=> 'no',
 														'link' 		=> '',
 														'linktitle' => '',
@@ -41,15 +42,15 @@ class ThumbnailWidget extends WP_Widget {
 														'sortby' 	=> wppa_get_photo_order('0'),
 														'limit' 	=> wppa_opt( 'thumbnail_widget_count' )
 														) );
-//		$widget_title 	= apply_filters('widget_title', $instance['title']);
-		$widget_title 	= apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance, $this->id_base );
+		$widget_title 	= apply_filters( 'widget_title', $instance['title'] );
+//		$widget_title 	= apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance, $this->id_base );
 
 		$widget_link	= $instance['link'];
 		$page 			= in_array( wppa_opt( 'thumbnail_widget_linktype' ), wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page('thumbnail_widget_linkpage', __('Thumbnail photos', 'wp-photo-album-plus'));
 		$max  			= $instance['limit'];
 		$sortby 		= $instance['sortby'];
 		$album 			= $instance['album'];
-		$name 			= $instance['name'];
+		$name 			= wppa_checked( $instance['name'] ) ? 'yes' : 'no';
 		$display 		= $instance['display'];
 		$linktitle 		= $instance['linktitle'];
 
@@ -159,11 +160,11 @@ class ThumbnailWidget extends WP_Widget {
     }
 
     /** @see WP_Widget::form */
-    function form($instance) {
+    function form( $instance ) {
 
 		//Defaults
 		$instance = wp_parse_args( (array) $instance, array(
-															'title'		=> __('Thumbnail Photos', 'wp-photo-album-plus'),
+															'title'		=> __( 'Thumbnail Photos', 'wp-photo-album-plus' ),
 															'link'	 	=> '',
 															'linktitle' => '',
 															'album' 	=> '0',
@@ -172,65 +173,66 @@ class ThumbnailWidget extends WP_Widget {
 															'sortby' 	=> wppa_get_photo_order('0'),
 															'limit' 	=> wppa_opt( 'thumbnail_widget_count' )
 															) );
- 		$album 			= $instance['album'];
-		$name 			= $instance['name'];
-		$widget_title 	= $instance['title'];
-		$widget_link 	= $instance['link'];
-		$link_title 	= $instance['linktitle'];
-		$display 		= $instance['display'];
-		$sortby 		= $instance['sortby'];
-		$limit			= $instance['limit'];
-?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wp-photo-album-plus'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $widget_title; ?>" /></p>
 
-		<p><label for="<?php echo $this->get_field_id('link'); ?>"><?php _e('Link from the title:', 'wp-photo-album-plus'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('link'); ?>" name="<?php echo $this->get_field_name('link'); ?>" type="text" value="<?php echo $widget_link; ?>" /></p>
-		<p><label for="<?php echo $this->get_field_id('link'); ?>"><?php _e('Link Title ( tooltip ):', 'wp-photo-album-plus'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('linktitle'); ?>" name="<?php echo $this->get_field_name('linktitle'); ?>" type="text" value="<?php echo $widget_link; ?>" /></p>
+		// Title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) ) .
 
-		<p><label for="<?php echo $this->get_field_id('album'); ?>"><?php _e('Album:', 'wp-photo-album-plus'); ?></label>
-			<select class="widefat" id="<?php echo $this->get_field_id('album'); ?>" name="<?php echo $this->get_field_name('album'); ?>" >
+		// Link from the widget title
+		wppa_widget_input( $this, 'link', $instance['link'], __( 'Link from the title', 'wp-photo-album-plus' ) ) .
 
-				<?php echo wppa_album_select_a(array('selected' => $album, 'addseparate' => true, 'addall' => true, 'path' => wppa_switch( 'hier_albsel'))) //('', $album, true, '', '', true); ?>
+		// Tooltip on the link from the title
+		wppa_widget_input( $this, 'linktitle', $instance['linktitle'], __( 'Link Title ( tooltip )', 'wp-photo-album-plus' ) );
 
-			</select>
-		</p>
+		// Album
+		$body = wppa_album_select_a( array( 'selected' => $instance['album'], 'addseparate' => true, 'addall' => true, 'path' => wppa_switch( 'hier_albsel' ) ) );
+		echo
+		wppa_widget_selection_frame( $this, 'album', $body, __( 'Album', 'wp-photo-album-plus' ) );
 
-		<p>
-			<?php _e('Sort by:', 'wp-photo-album-plus'); ?>
-			<select class="widefat" id="<?php echo $this->get_field_id('sortby'); ?>" name="<?php echo $this->get_field_name('sortby'); ?>">
-				<option value="" <?php if ( $sortby == '' ) echo 'selected="selected"' ?>><?php _e('--- none ---', 'wp-photo-album-plus') ?></option>
-				<option value="ORDER BY `p_order`" <?php if ( $sortby == 'ORDER BY `p_order`' ) echo 'selected="selected"' ?>><?php _e('Order #', 'wp-photo-album-plus') ?></option>
-				<option value="ORDER BY `name`" <?php if ( $sortby == 'ORDER BY `name`' ) echo 'selected="selected"' ?>><?php _e('Name', 'wp-photo-album-plus') ?></option>
-				<option value="ORDER BY RAND()" <?php if ( $sortby == 'ORDER BY RAND()' ) echo 'selected="selected"' ?>><?php _e('Random', 'wp-photo-album-plus') ?></option>
-				<option value="ORDER BY `mean_rating` DESC" <?php if ( $sortby == 'ORDER BY `mean_rating` DESC' ) echo 'selected="selected"' ?>><?php _e('Rating mean value desc', 'wp-photo-album-plus') ?></option>
-				<option value="ORDER BY `rating_count` DESC" <?php if ( $sortby == 'ORDER BY `rating_count` DESC' ) echo 'selected="selected"' ?>><?php _e('Number of votes desc', 'wp-photo-album-plus') ?></option>
-				<option value="ORDER BY `timestamp` DESC" <?php if ( $sortby == 'ORDER BY `timestamp` DESC' ) echo 'selected="selected"' ?>><?php _e('Timestamp desc', 'wp-photo-album-plus') ?></option>
-			</select>
-		</p>
+		// Sort by
+		$options = array( 	__( '--- none ---', 'wp-photo-album-plus' ),
+							__( 'Order #', 'wp-photo-album-plus' ),
+							__( 'Name', 'wp-photo-album-plus' ),
+							__( 'Random', 'wp-photo-album-plus' ),
+							__( 'Rating mean value desc', 'wp-photo-album-plus' ),
+							__( 'Number of votes desc', 'wp-photo-album-plus' ),
+							__( 'Timestamp desc', 'wp-photo-album-plus' ),
+							);
+		$values  = array(	'',
+							'ORDER BY `p_order`',
+							'ORDER BY `name`',
+							'ORDER BY RAND()',
+							'ORDER BY `mean_rating` DESC',
+							'ORDER BY `rating_count` DESC',
+							'ORDER BY `timestamp` DESC',
+							);
+		echo
+		wppa_widget_selection( $this, 'sortby', $instance['sortby'], __( 'Sort by', 'wp-photo-album-plus' ), $options, $values );
 
-		<p>
-			<?php _e('Max number:', 'wp-photo-album-plus') ?>
-			<input id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" value="<?php echo $limit ?>">
-		</p>
+		// Max number
+		echo
+		wppa_widget_number( $this, 'limit', $instance['limit'], __( 'Max number', 'wp-photo-album-plus' ), '1', '100' );
 
-		<p>
-			<?php _e('Display:', 'wp-photo-album-plus'); ?>
-			<select id="<?php echo $this->get_field_id('display'); ?>" name="<?php echo $this->get_field_name('display'); ?>">
-				<option value="thumbs" <?php if ($display == 'thumbs') echo 'selected="selected"' ?>><?php _e('thumbnail images', 'wp-photo-album-plus'); ?></option>
-				<option value="names" <?php if ($display == 'names') echo 'selected="selected"' ?>><?php _e('photo names', 'wp-photo-album-plus'); ?></option>
-			</select>
+		// Display type
+		$options = array( 	__( 'thumbnail images', 'wp-photo-album-plus' ),
+							__( 'photo names', 'wp-photo-album-plus' ),
+							);
+		$values  = array( 	'thumbs',
+							'names',
+							);
+		echo
+		wppa_widget_selection( $this, 'display', $instance['display'], __( 'Display', 'wp-photo-album-plus' ), $options, $values );
 
-		</p>
+		// Names under thumbs
+		echo
+		wppa_widget_checkbox( $this, 'name', $instance['name'], __( 'Show photo names under thumbnails', 'wp-photo-album-plus' ) );
 
-		<p>
-			<?php _e('Show photo names <small>under thumbnails only</small>:', 'wp-photo-album-plus'); ?>
-			<select id="<?php echo $this->get_field_id('name'); ?>" name="<?php echo $this->get_field_name('name'); ?>">
-				<option value="no" <?php if ($name == 'no') echo 'selected="selected"' ?>><?php _e('no.', 'wp-photo-album-plus'); ?></option>
-				<option value="yes" <?php if ($name == 'yes') echo 'selected="selected"' ?>><?php _e('yes.', 'wp-photo-album-plus'); ?></option>
-			</select>
-		</p>
+		echo
+		'<p>' .
+			__( 'You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus' ) .
+			' ' . __( 'Table I-F5 and 6', 'wp-photo-album-plus' ) .
+		'</p>';
 
-		<p><?php _e('You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus'); ?></p>
-<?php
     }
 
 } // class thumbnailWidget

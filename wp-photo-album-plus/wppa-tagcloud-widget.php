@@ -3,15 +3,16 @@
 * Package: wp-photo-album-plus
 *
 * display the tagcloud widget
-* Version 6.7.00
+* Version 6.7.01
 *
 */
 
 class TagcloudPhotos extends WP_Widget {
+
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_tagcloud_photos', 'description' => __( 'WPPA+ Photo Tagcloud', 'wp-photo-album-plus') );	//
-		parent::__construct('wppa_tagcloud_photos', __('Photo Tag Cloud', 'wp-photo-album-plus'), $widget_ops);															//
+		$widget_ops = array( 'classname' => 'wppa_tagcloud_photos', 'description' => __( 'Display a cloud of photo tags', 'wp-photo-album-plus' ) );	//
+		parent::__construct( 'wppa_tagcloud_photos', __( 'WPPA+ Photo Tag Cloud', 'wp-photo-album-plus' ), $widget_ops );															//
     }
 
 	/** @see WP_Widget::widget */
@@ -31,7 +32,7 @@ class TagcloudPhotos extends WP_Widget {
 
         extract( $args );
 
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __('Photo Tags', 'wp-photo-album-plus'), 'tags' => array() ) );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Photo Tag Cloud', 'wp-photo-album-plus' ), 'tags' => array() ) );
         if ( empty( $instance['tags'] ) ) $instance['tags'] = array();
 
  		$widget_title = apply_filters('widget_title', $instance['title']);
@@ -58,26 +59,37 @@ class TagcloudPhotos extends WP_Widget {
     }
 
     /** @see WP_Widget::form */
-    function form($instance) {
+    function form( $instance ) {
+
 		//Defaults
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __('Photo Tags', 'wp-photo-album-plus'), 'tags' => '' ) );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Photo Tag Cloud', 'wp-photo-album-plus' ), 'tags' => '' ) );
 		$title = $instance['title'];
 		$stags = $instance['tags'];
 		if ( ! $stags ) $stags = array();
 
-		echo '<p><label for="' . $this->get_field_id('title') . '">' . __('Title:', 'wp-photo-album-plus') . '</label><input class="widefat" id="' . $this->get_field_id('title') . '" name="' . $this->get_field_name('title') . '" type="text" value="' . $title . '" /></p>';
-		echo '<p><label for="' . $this->get_field_id('tags') . '">' . __('Select multiple tags or --- all ---:', 'wp-photo-album-plus') . '</label><br />';
-			echo '<select class="widefat" id="' . $this->get_field_id('tags') . '" name="' . $this->get_field_name('tags') . '[]" multiple="multiple" >'.
-					'<option value="" >'.__('--- all ---', 'wp-photo-album-plus').'</option>';
-						$tags = wppa_get_taglist();
-						if ( $tags ) foreach ( array_keys($tags) as $tag ) {
-							if ( in_array($tag, $stags) ) $sel = ' selected="selected"'; else $sel = '';
-							echo '<option value="'.$tag.'"'.$sel.' >'.$tag.'</option>';
-						}
-			echo '</select>';
-		echo '</p>';
-		if ( isset($instance['tags']['0']) && $instance['tags']['0'] ) $s = implode(',', $instance['tags']); else $s = __('--- all ---', 'wp-photo-album-plus');
-		echo '<p>' . __( 'Currently selected tags', 'wp-photo-album-plus' ) . ': <br /><b>'.$s.'</b></p>';
+		// Title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
+
+		// Tags selection
+		$tags = wppa_get_taglist();
+		$body =
+		'<option value="" >' . __( '--- all ---', 'wp-photo-album-plus' ) . '</option>';
+		if ( $tags ) foreach ( array_keys( $tags ) as $tag ) {
+			if ( in_array( $tag, $stags ) ) $sel = ' selected="selected"'; else $sel = '';
+			$body .= '<option value="' . $tag . '"' . $sel . ' >' . $tag . '</option>';
+		}
+		echo
+		wppa_widget_selection_frame( $this, 'tags', $body, __( 'Select multiple tags or --- all ---', 'wp-photo-album-plus' ), 'multi' );
+
+		// Show current selection
+		if ( isset( $instance['tags']['0'] ) && $instance['tags']['0'] ) {
+			$s = implode( ',', $instance['tags'] );
+		}
+		else {
+			$s = __( '--- all ---', 'wp-photo-album-plus' );
+		}
+		echo '<p style="word-break:break-all;" >' . __( 'Currently selected tags', 'wp-photo-album-plus' ) . ': <br /><b>' . $s . '</b></p>';
 
     }
 

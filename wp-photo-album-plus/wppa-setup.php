@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.7.00
+* Version 6.7.04
 *
 */
 
@@ -262,7 +262,7 @@ global $silent;
 			wppa_copy_setting('wppa_slideshow_blank', 'wppa_sphoto_blank');
 			wppa_copy_setting('wppa_slideshow_overrule', 'wppa_sphoto_overrule');
 		}
-		if ( $old_rev <= '474' ) {	// Convert album and photo descriptions to contain html in stead of htmlspecialchars. Allowing html is assumed, if not permitted, wppa_html will convert to specialcars.
+		if ( $old_rev <= '474' ) {	// Convert album and photo descriptions to contain html instead of htmlspecialchars. Allowing html is assumed, if not permitted, wppa_html will convert to specialcars.
 			// html
 			$at = 0; $ah = 0; $pt = 0; $ph = 0;
 			$albs = $wpdb->get_results('SELECT `id`, `description` FROM '.WPPA_ALBUMS, ARRAY_A);
@@ -811,6 +811,7 @@ Hide Camera info
 						'wppa_magnifier'				=> 'magnifier-small.png',	// 2
 						'wppa_ovl_border_width' 		=> '8',
 						'wppa_ovl_border_radius' 		=> '12',
+						'wppa_ovl_fsx_btn_size' 		=> '48',
 
 						// H Video
 						'wppa_video_width'				=> '640',
@@ -1584,8 +1585,12 @@ Hide Camera info
 						'wppa_log_cron' 				=> 'no',	// A9.1
 						'wppa_log_ajax' 				=> 'no', 	// A9.2
 						'wppa_log_comments' 			=> 'no', 	// A9.3
+						'wppa_log_fso' 					=> 'no', 	// A9.4
 						'wppa_moderate_bulk' 			=> 'no', 	// B20
 						'wppa_retry_mails' 				=> '0', 	// A10
+						'wppa_minimum_tags' 			=> '', 		// A11
+
+						'wppa_login_url' 				=> site_url( 'wp-login.php', 'login' ), 	// A
 
 
 						// IX D New
@@ -1637,6 +1642,7 @@ Hide Camera info
 
 						// E Search
 						'wppa_search_linkpage' 			=> '0',		// 1
+						'wppa_search_oc' 				=> '1',
 						'wppa_excl_sep' 				=> 'no',	// 2
 						'wppa_search_tags'				=> 'no',
 						'wppa_search_cats'				=> 'no',
@@ -1658,6 +1664,14 @@ Hide Camera info
 						'wppa_search_numbers_void' 		=> 'no',
 						'wppa_index_ignore_slash' 		=> 'no',
 //						'wppa_index_skips' 				=> '',	// Do not add, this is an array
+						'wppa_search_catbox' 			=> 'no',
+						'wppa_search_selboxes' 			=> '0',
+						'wppa_search_caption_0' 		=> '',
+						'wppa_search_selbox_0' 			=> '',
+						'wppa_search_caption_1' 		=> '',
+						'wppa_search_selbox_1' 			=> '',
+						'wppa_search_caption_2' 		=> '',
+						'wppa_search_selbox_2' 			=> '',
 
 						// F Watermark
 						'wppa_watermark_on'				=> 'no',

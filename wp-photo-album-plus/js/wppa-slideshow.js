@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsSlideshowVersion = '6.6.31';
+var wppaJsSlideshowVersion = '6.7.01';
 
 // This is an entrypoint to load the slide data
 function wppaStoreSlideInfo(
@@ -965,17 +965,18 @@ function wppaFormatSlide( mocc ) {
 
 		// Size audio
 		var h = jQuery( audios ).height();
+		var l = ( framew - imgw ) / 2;
 		if ( h && h > 0 ) {
 			wppaAudioHeight = h;
-			jQuery( audios ).css({height:wppaAudioHeight,width:imgw,left:((contw - imgw ) / 2)});
+			jQuery( audios ).css({height:wppaAudioHeight,width:imgw,left:l});
 		}
 	}
 
-	// Size Big Browse Buttons. 
+	// Size Big Browse Buttons.
 	var bbbwidth 	= parseInt( framew / 3 );
 	var leftmarg 	= bbbwidth*2;
 	var bbbheight;
-	
+
 	// Make sure they do not cover the audio controlbar.
 	if ( audios.length > 0 ) {
 		bbbheight 	= frameh - wppaAudioHeight - wppaSlideBorderWidth - margt;
@@ -1162,7 +1163,7 @@ function wppaMakeTheSlideHtml( mocc, bgfg, idx ) {
 							'top:-'+( wppaAudioHeight + wppaSlideBorderWidth )+'px;' +
 							'z-index:10;' +
 							'width:'+_wppaVideoNatWidth[mocc][idx]+'px;' +
-							'left:'+( Math.max( 0, ( wppaGetContainerWidth( mocc ) - _wppaVideoNatWidth[mocc][idx] ) / 2 ) )+'px;' +
+
 							'padding:0;' +
 							'box-sizing:border-box;' +
 							'"' +

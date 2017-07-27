@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.6.28
+* Version 6.7.02
 *
 */
 
@@ -461,7 +461,7 @@ global $wpdb;
 	// Destroy the result
 	imagedestroy( $rotate );
 
-	// accessable
+	// accessible
 	wppa_chmod( $file );
 
 	// Optimized
@@ -490,10 +490,10 @@ function wppa_sanitize_files() {
 
 	// Get this users depot directory
 	$depot = WPPA_DEPOT_PATH;
-	__wppa_sanitize_files( $depot );
+	_wppa_sanitze_files( $depot );
 }
 
-function __wppa_sanitize_files( $root ) {
+function _wppa_sanitze_files( $root ) {
 global $wppa_supported_video_extensions;
 global $wppa_supported_audio_extensions;
 
@@ -536,7 +536,7 @@ global $wppa_supported_audio_extensions;
 		elseif ( is_dir( $file ) ) {
 			$entry = basename( $file );
 			if ( $entry != '.' && $entry != '..' ) {
-				__wppa_sanitize_files( $file );
+				_wppa_sanitze_files( $file );
 			}
 		}
 	}
@@ -978,7 +978,7 @@ global $warning_given_small;
 			return false;
 		}
 		if ( ! wppa_have_access( $alb ) ) {
-			wppa_error_message( sprintf( __( 'Album %s does not exist or is not accessable while trying to add a photo' , 'wp-photo-album-plus'), $alb ) );
+			wppa_error_message( sprintf( __( 'Album %s does not exist or is not accessible while trying to add a photo' , 'wp-photo-album-plus'), $alb ) );
 			return false;
 		}
 		$status = ( wppa_switch( 'upload_moderate' ) && ! current_user_can( 'wppa_admin' ) ) ? 'pending' : 'publish';

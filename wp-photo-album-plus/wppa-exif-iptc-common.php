@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * exif and iptc common functions
-* version 6.4.19
+* version 6.7.02
 *
 *
 */
@@ -307,60 +307,61 @@ E#9209		Flash						Must be formatted according to table
 										0x5f	= Auto, Fired, Red-eye reduction, Return detected
 */
 		case 'E#9209':
+			// PHP7 '0x0' etc generates warning because octal strings are no longer suppported, but they are real strings here
 			switch ($data) {
-				case '0x0':
+				case '0'.'x0':
 				case '0': $result = __('No Flash', 'wp-photo-album-plus'); break;
-				case '0x1':
+				case '0'.'x1':
 				case '1': $result = __('Fired', 'wp-photo-album-plus'); break;
-				case '0x5':
+				case '0'.'x5':
 				case '5': $result = __('Fired, Return not detected', 'wp-photo-album-plus'); break;
-				case '0x7':
+				case '0'.'x7':
 				case '7': $result = __('Fired, Return detected', 'wp-photo-album-plus'); break;
-				case '0x8':
+				case '0'.'x8':
 				case '8': $result = __('On, Did not fire', 'wp-photo-album-plus'); break;
-				case '0x9':
+				case '0'.'x9':
 				case '9': $result = __('On, Fired', 'wp-photo-album-plus'); break;
-				case '0xd':
+				case '0'.'xd':
 				case '13': $result = __('On, Return not detected', 'wp-photo-album-plus'); break;
-				case '0xf':
+				case '0'.'xf':
 				case '15': $result = __('On, Return detected', 'wp-photo-album-plus'); break;
-				case '0x10':
+				case '0'.'x10':
 				case '16': $result = __('Off, Did not fire', 'wp-photo-album-plus'); break;
-				case '0x14':
+				case '0'.'x14':
 				case '20': $result = __('Off, Did not fire, Return not detected', 'wp-photo-album-plus'); break;
-				case '0x18':
+				case '0'.'x18':
 				case '24': $result = __('Auto, Did not fire', 'wp-photo-album-plus'); break;
-				case '0x19':
+				case '0'.'x19':
 				case '25': $result = __('Auto, Fired', 'wp-photo-album-plus'); break;
-				case '0x1d':
+				case '0'.'x1d':
 				case '29': $result = __('Auto, Fired, Return not detected', 'wp-photo-album-plus'); break;
-				case '0x1f':
+				case '0'.'x1f':
 				case '31': $result = __('Auto, Fired, Return detected', 'wp-photo-album-plus'); break;
-				case '0x20':
+				case '0'.'x20':
 				case '32': $result = __('No flash function', 'wp-photo-album-plus'); break;
-				case '0x30':
+				case '0'.'x30':
 				case '48': $result = __('Off, No flash function', 'wp-photo-album-plus'); break;
-				case '0x41':
+				case '0'.'x41':
 				case '65': $result = __('Fired, Red-eye reduction', 'wp-photo-album-plus'); break;
-				case '0x45':
+				case '0'.'x45':
 				case '69': $result = __('Fired, Red-eye reduction, Return not detected', 'wp-photo-album-plus'); break;
-				case '0x47':
+				case '0'.'x47':
 				case '71': $result = __('Fired, Red-eye reduction, Return detected', 'wp-photo-album-plus'); break;
-				case '0x49':
+				case '0'.'x49':
 				case '73': $result = __('On, Red-eye reduction', 'wp-photo-album-plus'); break;
-				case '0x4d':
+				case '0'.'x4d':
 				case '77': $result = __('Red-eye reduction, Return not detected', 'wp-photo-album-plus'); break;
-				case '0x4f':
+				case '0'.'x4f':
 				case '79': $result = __('On, Red-eye reduction, Return detected', 'wp-photo-album-plus'); break;
-				case '0x50':
+				case '0'.'x50':
 				case '80': $result = __('Off, Red-eye reduction', 'wp-photo-album-plus'); break;
-				case '0x58':
+				case '0'.'x58':
 				case '88': $result = __('Auto, Did not fire, Red-eye reduction', 'wp-photo-album-plus'); break;
-				case '0x59':
+				case '0'.'x59':
 				case '89': $result = __('Auto, Fired, Red-eye reduction', 'wp-photo-album-plus'); break;
-				case '0x5d':
+				case '0'.'x5d':
 				case '93': $result = __('Auto, Fired, Red-eye reduction, Return not detected', 'wp-photo-album-plus'); break;
-				case '0x5f':
+				case '0'.'x5f':
 				case '95': $result = __('Auto, Fired, Red-eye reduction, Return detected', 'wp-photo-album-plus'); break;
 			}
 			break;

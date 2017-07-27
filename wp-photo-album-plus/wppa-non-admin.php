@@ -455,12 +455,12 @@ global $wppa_session;
 		echo
 		'<div' .
 			' id="wppa-exit-btn"' .
-			' style="height:48px;z-index:100098;position:fixed;top:0;right:0;opacity:0.75;display:none;"' .
+			' style="height:' . wppa_opt( 'ovl_fsx_btn_size' ) . 'px;z-index:100098;position:fixed;top:0;right:0;opacity:0.75;display:none;"' .
 			' onclick="wppaOvlHide()"' .
 			' onmouseover="if(wppaOvlOpen){jQuery(this).stop().fadeTo(300,1);}else{jQuery(this).stop().fadeOut(300);}"' .
 			' onmouseout="if(wppaOvlOpen){jQuery(this).stop().fadeTo(300,' . $dark . ');}else{jQuery(this).stop().fadeOut(300);}"' .
 			' >' .
-			wppa_get_svghtml( 'Exit', '48px', true, true, '0', '0', '0', '0' ) .
+			wppa_get_svghtml( 'Exit', wppa_opt( 'ovl_fsx_btn_size' ) . 'px', true, true, '0', '0', '0', '0' ) .
 		'</div>' .
 		'<script>' .
 			'jQuery(\'#wppa-exit-btn\').on(\'touchstart\',function(){jQuery(\'#wppa-exit-btn\').stop().fadeTo(300,1);});' .
@@ -471,12 +471,12 @@ global $wppa_session;
 		echo
 		'<div' .
 			' id="wppa-fulls-btn"' .
-			' style="height:48px;z-index:100098;position:fixed;top:0;right:48px;opacity:0.75;display:none;"' .
+			' style="height:' . wppa_opt( 'ovl_fsx_btn_size' ) . 'px;z-index:100098;position:fixed;top:0;right:' . wppa_opt( 'ovl_fsx_btn_size' ) . 'px;opacity:0.75;display:none;"' .
 			' onclick="wppaOvlFull()"' .
 			' onmouseover="jQuery(this).stop().fadeTo(300,1);"' .
 			' onmouseout="jQuery(this).stop().fadeTo(300,' . $dark . ');"' .
 			' >' .
-			wppa_get_svghtml( 'Full-Screen', '48px', true, true, '0', '0', '0', '0' ) .
+			wppa_get_svghtml( 'Full-Screen', wppa_opt( 'ovl_fsx_btn_size' ) . 'px', true, true, '0', '0', '0', '0' ) .
 		'</div>' .
 		'<script>' .
 			'jQuery(\'#wppa-fulls-btn\').on(\'touchstart\',function(){jQuery(\'#wppa-fulls-btn\').stop().fadeTo(300,1);});' .
@@ -581,6 +581,7 @@ global $wppa_session;
 			wppaOvlShowStartStop = '.( wppa_switch( 'ovl_show_startstop' ) ? 'true' : 'false' ).';
 			wppaToggleFullScreen = "'. __( 'Toggle fullscreen', 'wp-photo-album-plus' ) . '";
 			wppaIsMobile = '.( wppa_is_mobile() ? 'true' : 'false' ).';
+			wppaOvlFsExitBtnSize = "'.wppa_opt( 'ovl_fsx_btn_size' ).'";
 		</script>
 		';
 	}

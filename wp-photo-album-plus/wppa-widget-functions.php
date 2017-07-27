@@ -2,7 +2,7 @@
 /* wppa-widget-functions.php
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.6.18
+/* Version 6.7.01
 /*
 */
 
@@ -22,6 +22,7 @@ Related settings are:
 			'wppa_potd_offset',
 			'wppa_potd_photo',
 
+This fila also contains functions for the use in the widget activation screens for all widgets.
 */
 
 // This function returns an array of photos that meet the current photo of the day selection criteria
@@ -321,5 +322,187 @@ static $potd;
 	}
 
 	$potd = $result;
+	return $result;
+}
+
+// Get widget checkbox html
+function wppa_widget_checkbox( $class, $item, $value, $label, $subtext = '' ) {
+
+	$result =
+	'<p style="clear:both;" >' .
+		'<input' .
+			' id="' . $class->get_field_id( $item ) . '"' .
+			' name="' . $class->get_field_name( $item ) . '"' .
+			' type="checkbox"' .
+			wppa_checked( $value ) .
+		' />&nbsp;' .
+		'<label' .
+			' for="' . $class->get_field_id( $item ) . '"' .
+			' >' .
+			$label .
+		'</label>' .
+		( $subtext ? '<small ><br />' . $subtext . '</small>' : '' ) .
+	'</p>';
+
+	return $result;
+}
+
+// Widget input html
+//
+// Typical usage:
+//
+// echo 		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
+//
+function wppa_widget_input( $class, $item, $value, $label, $subtext = '' ) {
+
+	$result =
+	'<p style="clear:both;" >' .
+		'<label' .
+			' for="' . $class->get_field_id( $item ) . '"' .
+			' >' .
+			$label . ':' .
+		'</label>' .
+		'<input' .
+			' class="widefat"' .
+			' id="' . $class->get_field_id( $item ) . '"' .
+			' name="' . $class->get_field_name( $item ) . '"' .
+			' type="text"' .
+			' value="' . esc_attr( $value ) . '"' .
+		'/>' .
+		( $subtext ? '<small>' . $subtext . '</small>' : '' ) .
+	'</p>';
+
+	return $result;
+}
+
+function wppa_widget_textarea( $class, $item, $value, $label ) {
+
+	$result =
+	'<p>' .
+		'<label' .
+			' for="' . $class->get_field_id( $item ) . '"' .
+			' >' .
+			$label . ':' .
+		'</label>' .
+		'<textarea' .
+			' class="widefat"' .
+			' rows="16"' .
+			' id="' . $class->get_field_id( 'text' ) . '"' .
+			' name="' . $class->get_field_name( 'text' ) . '"' .
+			' >' .
+			$value .
+		'</textarea>' .
+	'</p>';
+
+	return $result;
+}
+
+// Widget input number_format
+function wppa_widget_number( $class, $item, $value, $label, $min, $max, $subtext = '', $float = false ) {
+
+	$_50 = wppa_is_ie() ? '60px;': '60%';
+
+	$result =
+	'<p' . ( $float ? ' style="width:50%;float:left;"' : '' ) . '>' .
+		'<label' .
+			' for="' . $class->get_field_id( $item ) . '"' .
+			' >' .
+			$label . ':' .
+		'</label>' .
+		'<br />' .
+		'<input' .
+			' id="' . $class->get_field_id( $item ) . '"' .
+			' name="' . $class->get_field_name( $item ) . '"' .
+			' style="' . ( $float ? 'width:' . $_50 . ';' : '' ) . '"' .
+			' type="number"' .
+			' min="' . $min . '"' .
+			' max="' . $max . '"' .
+			' value="' . esc_attr( $value ) . '"' .
+			' onchange="if(jQuery(this).val()<' . $min . '||jQuery(this).val()>' . $max . '){alert(\'' . esc_js( sprintf( __( 'Please enter a number >= %1s and <= %2s', 'wp-photo-album-plus'),$min, $max ) ) . '\');jQuery(this).val(\'' . $max . '\');return false;}"' .
+		'/>' .
+		( $subtext ? '<small>' . $subtext . '</small>' : '' ) .
+	'</p>';
+
+	return $result;
+}
+
+// Widget selection box
+function wppa_widget_selection( $class, $item, $value, $label, $options, $values, $disabled = array(), $cls = 'widefat', $subtext = '' ) {
+
+	$result =
+	'<p>' .
+		'<label' .
+			' for="' . $class->get_field_id( $item ) . '"' .
+			' >' .
+			$label . ':' .
+		'</label>' .
+		( $cls ? '' : '<br />' ) .
+		'<select' .
+			' class="' . $cls . '"' .
+			' id="' . $class->get_field_id( $item ) . '"' .
+			' name="' . $class->get_field_name( $item ) . '"' .
+			' >';
+
+			foreach( array_keys( $options ) as $key ) {
+				$result .=
+				'<option' .
+					' value="' . $values[$key] . '"' .
+					( $value == $values[$key] ? ' selected="selected"' : '' ) .
+					( isset( $disabled[$key] ) && $disabled[$key] ? ' disabled="disabled"' : '' ) .
+					' >' .
+					__( $options[$key] ) .
+				'</option>';
+			}
+
+		$result .=
+		'</select>' .
+		( $subtext ? '<small>' . ( $cls ? '' : '<br />' ) .$subtext . '</small>' : '' ) .
+	'</p>';
+
+	return $result;
+}
+
+// Widget selection box frame
+function wppa_widget_selection_frame( $class, $item, $body, $label, $multi = false, $subtext = '' ) {
+
+	$result =
+	'<p>' .
+		'<label' .
+			' for="' . $class->get_field_id( $item ) . '"' .
+			' >' .
+			$label . ':' .
+		'</label>' .
+		'<select' .
+			' class="widefat"' .
+			' id="' . $class->get_field_id( $item ) . '"' .
+			' name="' . $class->get_field_name( $item ) . ( $multi ? '[]' : '' ) . '"' .
+			( $multi ? ' multiple="multiple"' : '' ) .
+			' >' .
+			$body .
+		'</select>' .
+		( $subtext ? '<small >' . $subtext . '</small>' : '' ) .
+	'</p>';
+
+	return $result;
+}
+
+// Get checked html
+function wppa_checked( $arg ) {
+
+	// Backward compat yes/no selectionbox
+	if ( $arg == 'no' ) {
+		$result = '';
+	}
+
+	// 'yes' or 'on'
+	elseif ( $arg ) {
+		$result = ' checked="checked"';
+	}
+
+	// ''
+	else {
+		$result = '';
+	}
+
 	return $result;
 }

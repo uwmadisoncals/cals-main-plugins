@@ -3,17 +3,18 @@
 * Package: wp-photo-album-plus
 *
 * display the search widget
-* Version 6.7.00
+* Version 6.7.03
 *
 */
 
 class SearchPhotos extends WP_Widget {
+
     /** constructor */
     function __construct() {
 		$widget_ops = array( 	'classname' => 'wppa_search_photos',
-								'description' => __( 'WPPA+ Search Photos', 'wp-photo-album-plus' )
+								'description' => __( 'Display search photos dialog', 'wp-photo-album-plus' )
 							);
-		parent::__construct( 'wppa_search_photos', __( 'Search Photos', 'wp-photo-album-plus' ), $widget_ops );															//
+		parent::__construct( 'wppa_search_photos', __( 'WPPA+ Search Photos', 'wp-photo-album-plus' ), $widget_ops );															//
     }
 
 	/** @see WP_Widget::widget */
@@ -35,13 +36,14 @@ class SearchPhotos extends WP_Widget {
         extract( $args );
 
 		$instance = wp_parse_args( (array) 	$instance,
-									array( 	'title' 		=> __('Search Photos', 'wp-photo-album-plus'),
+									array( 	'title' 		=> __( 'Search Photos', 'wp-photo-album-plus' ),
 											'label' 		=> '',
 											'root' 			=> false,
 											'sub' 			=> false,
-											'album' 		=> '',
+											'album' 		=> '0',
 											'landingpage' 	=> '0',
 											'catbox' 		=> false,
+											'selboxes' 		=> false,
 											) );
 
  		$widget_title = apply_filters( 'widget_title', $instance['title'] );
@@ -53,7 +55,14 @@ class SearchPhotos extends WP_Widget {
 			echo $before_title . $widget_title . $after_title;
 		}
 
-		echo wppa_get_search_html( $instance['label'], $instance['sub'], $instance['root'], $instance['album'], $instance['landingpage'], $instance['catbox'] );
+		echo wppa_get_search_html( 	$instance['label'],
+									wppa_checked( $instance['sub'] ),
+									wppa_checked( $instance['root'] ),
+									$instance['album'],
+									$instance['landingpage'],
+									wppa_checked( $instance['catbox'] ),
+									wppa_checked( $instance['selboxes'] ) ? wppa_opt( 'search_selboxes' ) : false
+									);
 
 		echo $after_widget;
 
@@ -72,6 +81,7 @@ class SearchPhotos extends WP_Widget {
 		$instance['album'] 			= $new_instance['album'];
 		$instance['landingpage']	= $new_instance['landingpage'];
 		$instance['catbox'] 		= $new_instance['catbox'];
+		$instance['selboxes'] 		= $new_instance['selboxes'];
 
         return $instance;
     }
@@ -87,130 +97,126 @@ class SearchPhotos extends WP_Widget {
 												'label' 		=> '',
 												'root' 			=> false,
 												'sub' 			=> false,
-												'album' 		=> '',
+												'album' 		=> '0',
 												'landingpage' 	=> '',
 												'catbox' 		=> false,
+												'selboxes' 		=> false,
 												) );
-		$title 			= $instance['title'];
-		$label 			= $instance['label'];
-		$root  			= $instance['root'];
-		$sub   			= $instance['sub'];
-		$album 			= $instance['album'];
-		$landingpage  	= $instance['landingpage'];
-		$catbox 		= $instance['catbox'];
-	?>
-		<p>
-			<label for="<?php echo $this->get_field_id('title'); ?>">
-				<?php _e('Title:', 'wp-photo-album-plus'); ?>
-			</label>
-			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" />
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id('label'); ?>">
-				<?php _e('Text:', 'wp-photo-album-plus');  ?>
-			</label>
-			<input class="widefat" id="<?php echo $this->get_field_id('label'); ?>" name="<?php echo $this->get_field_name('label'); ?>" type="text" value="<?php echo esc_attr($label) ?>" />
-		</p>
-		<small><?php _e('Enter optional text that will appear before the input box. This may contain HTML so you can change font size and color.', 'wp-photo-album-plus'); ?></small>
-		<p>
-			<input type="checkbox" <?php if ( $root ) echo 'checked="checked"' ?> id="<?php echo $this->get_field_id('root'); ?>" name="<?php echo $this->get_field_name('root'); ?>" />
-			<label for="<?php echo $this->get_field_id('root'); ?>">
-				<?php _e('Enable rootsearch', 'wp-photo-album-plus'); ?>
-			</label>
-			<br />
-			<small>
-				<?php _e('See Table IX-E17 to change the label text', 'wp-photo-album-plus'); ?>
-			</small>
-		</p>
-		<p>
-			<small>
-				<?php _e('If you want the search to be limited to a specific album and its (grand)children, select the album here.', 'wp-photo-album-plus'); ?>
-				<br />
-				<?php _e('If you select an album here, it will overrule the previous checkbox using the album as a \'fixed\' root.', 'wp-photo-album-plus'); ?>
-			</small>
-			<select id="<?php echo $this->get_field_id( 'album' ); ?>" name="<?php echo $this->get_field_name( 'album' ); ?>" style="max-width:100%" >
-				<?php echo wppa_album_select_a( array( 	'selected' 			=> $album,
-														'addblank' 			=> true,
-														'sort'				=> true,
-														'path' 				=> true,
-														 ) )
-				?>
-			</select>
-		</p>
-		<p>
-			<input type="checkbox" <?php if ( $sub ) echo 'checked="checked"' ?> id="<?php echo $this->get_field_id( 'sub' ); ?>" name="<?php echo $this->get_field_name( 'sub' ); ?>" />
-			<label for="<?php echo $this->get_field_id('sub'); ?>">
-				<?php _e( 'Enable subsearch', 'wp-photo-album-plus' ); ?>
-			</label>
-			<br />
-			<small>
-				<?php _e('See Table IX-E16 to change the label text', 'wp-photo-album-plus'); ?>
-			</small>
-		</p>
-		<p>
-			<input type="checkbox" <?php if ( $catbox ) echo 'checked="checked"' ?> id="<?php echo $this->get_field_id( 'catbox' ); ?>" name="<?php echo $this->get_field_name( 'catbox' ); ?>" />
-			<label for="<?php echo $this->get_field_id('catbox'); ?>">
-				<?php _e( 'Add category selectionbox', 'wp-photo-album-plus' ); ?>
-			</label>
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id( 'landingpage' ); ?>" >
-				<?php _e( 'Landing page', 'wp-photo-album-plus' ); echo ': '.$landingpage ?>
-			</label>
-			<select id="<?php echo $this->get_field_id( 'landingpage' ); ?>" name="<?php echo $this->get_field_name( 'landingpage' ); ?>" style="max-width:100%" >
-				<?php
 
-				// First option
-				$selected = $landingpage == '0' ? ' selected="selected"' : '';
-				?>
-				<option value="0" <?php echo $selected ?> >
-					<?php _e( '--- default ---', 'wp-photo-album-plus' ) ?>
-				</option>
-				<?php
+		// Title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
 
-				// Pages if any
-				$query = 	"SELECT ID, post_title, post_content, post_parent " .
-							"FROM " . $wpdb->posts . " " .
-							"WHERE post_type = 'page' AND post_status = 'publish' " .
-							"ORDER BY post_title ASC";
-				$pages = 	$wpdb->get_results( $query, ARRAY_A );
+		// Pre input text
+		echo
+		wppa_widget_input( 	$this,
+							'label',
+							$instance['label'],
+							__( 'Text above input field', 'wp-photo-album-plus' ),
+							__( 'Enter optional text that will appear before the input box. This may contain HTML so you can change font size and color.', 'wp-photo-album-plus' )
+							);
 
-				if ( $pages ) {
+		// Enable rootsearch
+		echo
+		wppa_widget_checkbox( 	$this,
+								'root',
+								$instance['root'],
+								__( 'Enable rootsearch', 'wp-photo-album-plus' ),
+								__( 'See Table IX-E17 to change the label text', 'wp-photo-album-plus' )
+								);
 
-					// Add parents optionally OR translate only
-					if ( wppa_switch( 'hier_pagesel' ) ) $pages = wppa_add_parents( $pages );
+		// Fixed root?
+		$body = wppa_album_select_a( array( 	'selected' 			=> $instance['album'],
+												'addblank' 			=> true,
+												'sort'				=> true,
+												'path' 				=> true,
+												) );
+		echo
+		wppa_widget_selection_frame( 	$this,
+										'album',
+										$body,
+										__( 'Album', 'wp-photo-album-plus' ),
+										false,
+										__( 'If you want the search to be limited to a specific album and its (grand)children, select the album here.', 'wp-photo-album-plus' ) .
+											' ' .
+											__( 'If you select an album here, it will overrule the previous checkbox using the album as a \'fixed\' root.', 'wp-photo-album-plus' )
+										);
 
-					// Just translate
-					else {
-						foreach ( array_keys( $pages ) as $index ) {
-							$pages[$index]['post_title'] = __( stripslashes( $pages[$index]['post_title'] ) );
-						}
-					}
+		// Subsearch?
+		echo
+		wppa_widget_checkbox( 	$this,
+								'sub',
+								$instance['sub'],
+								__( 'Enable subsearch', 'wp-photo-album-plus' ),
+								__( 'See Table IX-E16 to change the label text', 'wp-photo-album-plus' )
+								);
 
-					// Sort alpahbetically
-					$pages = wppa_array_sort( $pages, 'post_title' );
+		// Category selection
+		echo
+		wppa_widget_checkbox( 	$this,
+								'catbox',
+								$instance['catbox'],
+								__( 'Add category selectionbox', 'wp-photo-album-plus' ),
+								__( 'Enables the visitor to limit the results to an album category', 'wp-photo-album-plus' )
+								);
 
-					// Display option
-					foreach ( $pages as $page ) {
-						$selected = $page['ID'] == $landingpage ? ' selected="selected"' : '';
-						$d = strpos( $page['post_content'], '[wppa' ) === false && strpos( $page['post_content'], '%%wppa%%' ) === false;
-						$disabled = $d ? ' disabled="disabled"' : '';
-						?>
-						<option value="<?php echo $page['ID'] ?>"<?php echo $selected ?><?php echo $disabled ?> >
-							<?php _e( $page['post_title'] ) ?>
-						</option>
-						<?php
-					}
+		// Selection boxes
+		echo
+		wppa_widget_checkbox( 	$this,
+								'selboxes',
+								$instance['selboxes'],
+								__( 'Add selectionboxes with pre-defined tokens', 'wp-photo-album-plus' ),
+								__( 'See Table IX-E20.x for configuration', 'wp-photo-album-plus' )
+								);
+
+		// Landing page
+		$options 	= array( __( '--- default ---', 'wp-photo-album-plus' ) );
+		$values  	= array( '0' );
+		$disabled 	= array( false );
+
+		$query = 	"SELECT ID, post_title, post_content, post_parent " .
+					"FROM " . $wpdb->posts . " " .
+					"WHERE post_type = 'page' AND post_status = 'publish' " .
+					"ORDER BY post_title ASC";
+		$pages = 	$wpdb->get_results( $query, ARRAY_A );
+
+		if ( $pages ) {
+
+			// Add parents optionally OR translate only
+			if ( wppa_switch( 'hier_pagesel' ) ) $pages = wppa_add_parents( $pages );
+
+			// Just translate qTranslate-x
+			else {
+				foreach ( array_keys( $pages ) as $index ) {
+					$pages[$index]['post_title'] = __( stripslashes( $pages[$index]['post_title'] ) );
 				}
-				?>
-			</select>
-		</p>
-		<p>
-			<small>
-				<?php _e( 'The default page will be created automaticly', 'wp-photo-album-plus' ) ?>
-			</small>
-		</p>
-<?php
+			}
+
+			// Sort alpahbetically
+			$pages = wppa_array_sort( $pages, 'post_title' );
+
+			// Options / values
+			foreach ( $pages as $page ) {
+
+				$options[] 	= __( $page['post_title'] );
+				$values[] 	= $page['ID'];
+				$disabled[] = strpos( $page['post_content'], '[wppa' ) === false && strpos( $page['post_content'], '%%wppa%%' ) === false;
+
+			}
+		}
+
+		echo
+		wppa_widget_selection( 	$this,
+								'landingpage',
+								$instance['landingpage'],
+								__( 'Landing page', 'wp-photo-album-plus' ),
+								$options,
+								$values,
+								$disabled,
+								'widefat',
+								__( 'The default page will be created automatically', 'wp-photo-album-plus' )
+								);
+
     }
 
 } // class SearchPhotos

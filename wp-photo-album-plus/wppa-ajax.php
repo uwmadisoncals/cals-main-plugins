@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.6.29
+* Version 6.7.04
 *
 */
 
@@ -1479,7 +1479,7 @@ global $wppa_log_file;
 					$iret = $wpdb->query( $wpdb->prepare( 'UPDATE `'.WPPA_PHOTOS.'` SET `location` = %s WHERE `id` = %s', $geo, $photo ) );
 					if ( $iret ) echo '||0||'.__( 'Lattitude updated' , 'wp-photo-album-plus');
 					else {
-						echo '||1||'.__( 'Could not update lattitude' , 'wp-photo-album-plus');
+						echo '||1||'.__( 'Could not update latitude' , 'wp-photo-album-plus');
 					}
 					wppa_exit();
 					break;
@@ -3043,10 +3043,6 @@ global $wppa_log_file;
 					}
 					break;
 
-				case 'wppa_cre_uploads_htaccess':
-					wppa_create_wppa_htaccess();
-					break;
-
 				case 'wppa_search_numbers_void':
 				case 'wppa_index_ignore_slash':
 					ob_start();
@@ -3099,6 +3095,10 @@ global $wppa_log_file;
 						wppa_schedule_treecount_update();
 					}
 					break;
+				case 'wppa_minimum_tags':
+					$value = trim( wppa_sanitize_tags( $value ), ',' );
+					wppa_clear_taglist();
+					break;
 
 				default:
 
@@ -3125,6 +3125,10 @@ global $wppa_log_file;
 
 			// Something to do after changing the setting?
 			wppa_initialize_runtime( true );	// force reload new values
+
+			if ( $option == 'wppa_cre_uploads_htaccess' ) {
+				wppa_create_wppa_htaccess();
+			}
 
 			// Thumbsize
 			$new_minisize = wppa_get_minisize();

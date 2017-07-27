@@ -1,6 +1,6 @@
 <!-- WPDM Link Template: Call to Action 3 -->
 
-<blockquote class="well c2a3">
+<div class="well c2a3">
     <div class="media">
         <div class="pull-left" align="left">
             [icon]
@@ -16,5 +16,5 @@
 
     </div>
 
-</blockquote>
+</div>
 <style>.well.c2a3 .btn.wpdm-download-link{ padding: 11px 30px;font-size: 11pt; } .well.c2a3 .media-body{ font-size: 11pt; } .well.c2a3 .wpdm_icon{ height: 42px; width: auto; }</style>

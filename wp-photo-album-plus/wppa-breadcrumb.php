@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 6.6.29
+* Version 6.7.02
 *
 */
 
@@ -70,7 +70,7 @@ global $wppa_session;
 	// See if the album is a 'stand alone' album
 	$separate = wppa_is_separate( $alb );
 
-	// See if the album links to slides in stead of thumbnails
+	// See if the album links to slides instead of thumbnails
 	$slide = ( wppa_get_album_title_linktype( $alb ) == 'slide' ) ? '&amp;wppa-slide' : '';
 
 	// See if we link to covers or to contents
@@ -88,9 +88,9 @@ global $wppa_session;
 					' id="wppa-bc-'.wppa( 'mocc' ) . '"' .
 					' class="wppa-nav wppa-box wppa-nav-text wppa-bc"' .
 					' style="' .
-						__wcs( 'wppa-nav' ) .
-						__wcs( 'wppa-box' ) .
-						__wcs( 'wppa-nav-text' ) .
+						wppa_wcs( 'wppa-nav' ) .
+						wppa_wcs( 'wppa-box' ) .
+						wppa_wcs( 'wppa-nav-text' ) .
 					'" >' );
 
 		// Do we need Home?
@@ -548,7 +548,7 @@ global $wppa_session;
 										' href="' . $thumbhref . '"' .
 										' title="' . __( 'Thumbnail view' , 'wp-photo-album-plus') . '"' .
 										' class="wppa-nav-text"' .
-										' style="' . __wcs( 'wppa-nav-text' ) . 'float:right; cursor:pointer; text-decoration:none;"' .
+										' style="' . wppa_wcs( 'wppa-nav-text' ) . 'float:right; cursor:pointer; text-decoration:none;"' .
 										' >' .
 										wppa_get_svghtml( 'Content-View', '1.5em', false, false, '10', '10', '10', '10' ) .
 									'</a>' );
@@ -563,7 +563,7 @@ global $wppa_session;
 					wppa_out( 	'<span' .
 									' title="' . __( 'Thumbnail view', 'wp-photo-album-plus' ) . '"' .
 									' class="wppa-nav-text"' .
-									' style="'.__wcs( 'wppa-nav-text' ).'float:right; cursor:pointer;"' .
+									' style="'.wppa_wcs( 'wppa-nav-text' ).'float:right; cursor:pointer;"' .
 									' onclick="' . $onclick . '"' .
 									' >' .
 									wppa_get_svghtml( 'Content-View', '1.5em', false, false, '10', '10', '10', '10' ) .
@@ -610,7 +610,7 @@ static $sep;
 						' onclick="wppaDoAjaxRender(' . wppa( 'mocc' ) . ', \'' . $ajax . '\', \'' . $href . '\' );"' :
 						' href="' . $href . '"' ) .
 						' class="wppa-nav-text ' . $class . '"' .
-						' style="cursor:pointer;' . __wcs( 'wppa-nav-text' ).'"' .
+						' style="cursor:pointer;' . wppa_wcs( 'wppa-nav-text' ).'"' .
 						' title="' . esc_attr( $title ) . '" >' .
 						$value .
 					'</a>' );
@@ -621,7 +621,7 @@ static $sep;
 						' class="wppa-nav-text '.$class.'"' .
 						' style="' .
 							( $title ? 'cursor:pointer;' : '' ) .
-							__wcs( 'wppa-nav-text' ) .
+							wppa_wcs( 'wppa-nav-text' ) .
 							'"' .
 						' title="' . esc_attr( $title ) . '"' .
 						' >' .
@@ -657,7 +657,7 @@ static $sep;
 	}
 	wppa_out(	'<span' .
 					' class="wppa-nav-text ' . $class . '"' .
-					' style="' . __wcs( 'wppa-nav-text' ).'"' .
+					' style="' . wppa_wcs( 'wppa-nav-text' ).'"' .
 					' >' .
 					$sep .
 				'</span>' );

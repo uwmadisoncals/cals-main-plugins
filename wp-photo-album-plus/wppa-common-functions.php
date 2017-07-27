@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.6.30
+* Version 6.7.03
 *
 */
 
@@ -642,14 +642,14 @@ function wppa_get_time_since( $oldtime ) {
 
 }
 
-// See if an album or any album is accessable for the current user
+// See if an album or any album is accessible for the current user
 function wppa_have_access( $alb = '0' ) {
 global $wpdb;
 global $current_user;
 
 //	if ( !$alb ) $alb = 'any'; //return false;
 
-	// See if there is any album accessable
+	// See if there is any album accessible
 	if ( ! $alb ) { // == 'any' ) {
 
 		// Administrator has always access OR If all albums are public
@@ -677,7 +677,7 @@ global $current_user;
 			$any_albs = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_ALBUMS."` WHERE `owner` = %s", $user ) );
 
 			if ( $any_albs ) return true;
-			else return false;	// No albums for user accessable
+			else return false;	// No albums for user accessible
 		}
 	}
 
@@ -781,6 +781,9 @@ function wppa_get_minisize() {
 function wppa_test_for_search( $at_session_start = false ) {
 global $wppa;
 
+	// Assume not
+	$str = '';
+
 	if ( isset( $_REQUEST['wppa-searchstring'] ) ) {	// wppa+ search
 		$str = $_REQUEST['wppa-searchstring'];
 	}
@@ -790,8 +793,14 @@ global $wppa;
 	elseif ( isset( $_REQUEST['s'] ) ) {				// wp search
 		$str = $_REQUEST['s'];
 	}
-	else { // Not search
-		$str = '';
+
+	// Selection boxes present and with a value?
+	for ( $i = 0; $i < 3; $i++ ) {
+		if ( isset( $_REQUEST['wppa-searchselbox-' . $i] ) ) {
+			if ( $_REQUEST['wppa-searchselbox-' . $i] ) {
+				$str .= ' ' . $_REQUEST['wppa-searchselbox-' . $i];
+			}
+		}
 	}
 
 	// Sanitize
@@ -813,7 +822,7 @@ global $wppa;
 	// Did we do wppa_initialize_runtime() ?
 	if ( is_array( $wppa ) && ! $at_session_start ) {
 		$wppa['searchstring'] = $str;
-		if ( $wppa['searchstring'] && $wppa['occur'] == '1' && ! wppa_in_widget() ) $wppa['src'] = true;
+		if ( $wppa['searchstring'] && $wppa['occur'] == wppa_opt( 'search_oc' ) && ! wppa_in_widget() ) $wppa['src'] = true;
 		else $wppa['src'] = false;
 		if ( isset( $_REQUEST['s'] ) ) {
 			$wppa['src'] = true;
@@ -1675,7 +1684,7 @@ global $wpdb;
 									);
 
 		// Must be sorted now...
-		$args['sort'] = true;
+//		$args['sort'] = true;
 	}
 
 	/* Can not add to cache because only "SELECT * " can be added

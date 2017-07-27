@@ -3,15 +3,16 @@
 * Package: wp-photo-album-plus
 *
 * ask the album / display you want
-* Version 6.3.11
+* Version 6.7.01
 */
 
 
 class WppaSuperView extends WP_Widget {
+
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_super_view', 'description' => __( 'WPPA+ Selectable display', 'wp-photo-album-plus') );	//
-		parent::__construct('wppa_super_view', __('Super View Photos', 'wp-photo-album-plus'), $widget_ops);															//
+		$widget_ops = array( 'classname' => 'wppa_super_view', 'description' => __( 'Display a super selection dialog', 'wp-photo-album-plus' ) );
+		parent::__construct( 'wppa_super_view', __( 'WPPA+ Super View', 'wp-photo-album-plus'), $widget_ops );
     }
 
 	/** @see WP_Widget::widget */
@@ -29,14 +30,14 @@ class WppaSuperView extends WP_Widget {
 
         extract( $args );
 		$instance = wp_parse_args( (array) $instance, array(
-														'title' => '',
+														'title' => __( 'Super View', 'wp-photo-album-plus' ),
 														'root'	=> '0',
 														'sort'	=> true,
 														) );
 
- 		$widget_title 	= apply_filters('widget_title', $instance['title'] );
+ 		$widget_title 	= apply_filters( 'widget_title', $instance['title'] );
 		$album_root 	= $instance['root'];
-		$sort 			= $instance['sort'];
+		$sort 			= wppa_checked( $instance['sort'] ) ? true : false;
 
 		wppa( 'in_widget', 'superview' );
 		wppa_bump_mocc();
@@ -59,34 +60,32 @@ class WppaSuperView extends WP_Widget {
     }
 
     /** @see WP_Widget::form */
-    function form($instance) {
+    function form( $instance ) {
+
 		//Defaults
-		$instance = wp_parse_args( (array) $instance, array( 	'title' => __( 'Super View Photos' , 'wp-photo-album-plus'),
+		$instance = wp_parse_args( (array) $instance, array( 	'title' => __( 'Super View' , 'wp-photo-album-plus' ),
 																'root' 	=> '0',
 																'sort'	=> true
 															) );
-		$title 	= esc_attr( $instance['title'] );
-		$root 	= $instance['root'];
-		$sort 	= $instance['sort'];
-	?>
-		<p>
-			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wp-photo-album-plus'); ?></label>
-			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" />
-		</p>
-		<p>
-			<label for="<?php echo $this->get_field_id('root'); ?>"><?php _e('Enable (sub)albums of:', 'wp-photo-album-plus'); ?></label>
-			<select class="widefat" id="<?php echo $this->get_field_id('root'); ?>" name="<?php echo $this->get_field_name('root'); ?>" >
-				<?php echo wppa_album_select_a( array( 'selected' => $root, 'addall' => true, 'addseparate' => true, 'addgeneric' => true, 'path' => true ) ) ?>
-			</select>
-		</p>
-			<label for="<?php echo $this->get_field_id('sort'); ?>"><?php _e('Sort alphabeticly:', 'wp-photo-album-plus'); ?></label>
-			<select class="widefat" id="<?php echo $this->get_field_id('sort'); ?>" name="<?php echo $this->get_field_name('sort'); ?>" >
-				<option value="0" ><?php _e('no, use album sort method', 'wp-photo-album-plus') ?></option>
-				<option value="1" <?php if ( $sort ) echo 'selected="selected"' ?> ><?php _e('yes', 'wp-photo-album-plus') ?></option>
-			</select>
-		<p>
-		</p>
-<?php
+
+		// Title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
+
+		// Root
+		$body = wppa_album_select_a( array( 'selected' => $instance['root'], 'addall' => true, 'addseparate' => true, 'addgeneric' => true, 'path' => true ) );
+		echo
+		wppa_widget_selection_frame( $this, 'root', $body, __( 'Enable (sub)albums of', 'wp-photo-album-plus' ) );
+
+		// Sort
+		echo
+		wppa_widget_checkbox( 	$this,
+								'sort',
+								$instance['sort'],
+								__( 'Sort alphabetically', 'wp-photo-album-plus' ),
+								__( 'If unticked, the album sort method for the album or system will be used', 'wp-photo-album-plus' )
+								);
+
     }
 
 } // class WppaSuperView

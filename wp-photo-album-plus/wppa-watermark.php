@@ -2,7 +2,7 @@
 /* wppa-watermark.php
 *
 * Functions used for the application of watermarks
-* Version 6.6.18
+* Version 6.7.01
 *
 */
 
@@ -481,7 +481,7 @@ function wppa_add_watermark( $id ) {
 			break;
 	}
 
-	// accessable
+	// accessible
 	wppa_chmod( $file );
 
 	// Optimized

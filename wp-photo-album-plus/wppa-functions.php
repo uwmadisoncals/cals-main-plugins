@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.7.00
+* Version 6.7.03
 *
 */
 
@@ -695,7 +695,7 @@ global $wppa_session;
 	}
 
 	// Subsearch or rootsearch?
-	if ( wppa( 'occur' ) == '1' && ! wppa( 'in_widget' ) && ( $wppa_session['has_searchbox'] || isset( $_REQUEST['wppa-forceroot'] ) ) ) {
+	if ( wppa( 'occur' ) == wppa_opt( 'search_oc' ) && ! wppa( 'in_widget' ) && ( $wppa_session['has_searchbox'] || isset( $_REQUEST['wppa-forceroot'] ) ) ) {
 
 		// Is it a search now?
 		if ( wppa( 'src' ) ) {
@@ -1668,7 +1668,7 @@ global $wppa_session;
 		$alb_clause = '';
 
 		// If rootsearch, the album clause resticts to sub the root
-		// else: maybe exclude separates
+		// else: maybe category limited or exclude separates
 		// See for rootsearch
 		if ( wppa( 'is_rootsearch' ) && isset ( $wppa_session['search_root'] ) ) {
 
@@ -3387,6 +3387,7 @@ global $blog_id;
 
 				wppa_add_js_page_data( 	"\n" . 'wppaLightboxSingle[' . wppa( 'mocc' ) . '] = ' . ( wppa_opt( 'slideshow_linktype' ) == 'lightboxsingle' ? 'true': 'false' ) . ';' );
 			}
+			wppa_add_js_page_data( "\n" . 'wppaSearchBoxSelItems[' . wppa( 'mocc' ) . '] = ' . ( ( wppa_switch( 'search_catbox' ) ? 1 : 0 ) + wppa_opt( 'search_selboxes' ) + 1 ) . ';' );
 		wppa_add_js_page_data( "\n" . '</script>' );
 
 	}
@@ -3542,7 +3543,7 @@ function wppa_popup() {
 	wppa_out( 	'<div' .
 					' id="wppa-popup-'.wppa( 'mocc' ).'"' .
 					' class="wppa-popup-frame wppa-thumb-text"' .
-					' style="max-width:2048px;'.__wcs( 'wppa-thumb-text' ).'"' .
+					' style="max-width:2048px;'.wppa_wcs( 'wppa-thumb-text' ).'"' .
 					' onmouseout="wppaPopDown( '.wppa( 'mocc' ).' );"' .
 					' >' .
 				'</div>' .
@@ -3698,7 +3699,7 @@ function wppa_get_preambule() {
 
 function wppa_dummy_bar( $msg = '' ) {
 
-	wppa_out( '<div style="margin:4px 0; '.__wcs( 'wppa-box' ).__wcs( 'wppa-nav' ).'text-align:center;">'.$msg.'</div>' );
+	wppa_out( '<div style="margin:4px 0; '.wppa_wcs( 'wppa-box' ).wppa_wcs( 'wppa-nav' ).'text-align:center;">'.$msg.'</div>' );
 }
 
 function wppa_rating_count_by_id( $id = '' ) {
@@ -3790,14 +3791,14 @@ function wppa_get_text_frame_style( $photo_left, $type ) {
 				}
 				switch ( $photo_pos ) {
 					case 'left':
-						$result = 'style="width:'.$width.'%;float:right;'.__wcs( 'wppa-cover-text-frame' ).'"';
+						$result = 'style="width:'.$width.'%;float:right;'.wppa_wcs( 'wppa-cover-text-frame' ).'"';
 						break;
 					case 'right':
-						$result = 'style="width:'.$width.'%;float:left;'.__wcs( 'wppa-cover-text-frame' ).'"';
+						$result = 'style="width:'.$width.'%;float:left;'.wppa_wcs( 'wppa-cover-text-frame' ).'"';
 						break;
 					case 'top':
 					case 'bottom':
-						$result = 'style="'.__wcs( 'wppa-cover-text-frame' ).'"';
+						$result = 'style="'.wppa_wcs( 'wppa-cover-text-frame' ).'"';
 						break;
 					default:
 						wppa_dbg_msg( 'Illegal $photo_pos in wppa_get_text_frame_style', 'red' );
@@ -3807,15 +3808,15 @@ function wppa_get_text_frame_style( $photo_left, $type ) {
 				switch ( $photo_pos ) {
 					case 'left':
 						$width -= wppa_get_textframe_delta();
-						$result = 'style="width:'.$width.'px; float:right;'.__wcs( 'wppa-cover-text-frame' ).'"';
+						$result = 'style="width:'.$width.'px; float:right;'.wppa_wcs( 'wppa-cover-text-frame' ).'"';
 						break;
 					case 'right':
 						$width -= wppa_get_textframe_delta();
-						$result = 'style="width:'.$width.'px; float:left;'.__wcs( 'wppa-cover-text-frame' ).'"';
+						$result = 'style="width:'.$width.'px; float:left;'.wppa_wcs( 'wppa-cover-text-frame' ).'"';
 						break;
 					case 'top':
 					case 'bottom':
-						$result = 'style="'.__wcs( 'wppa-cover-text-frame' ).'"';
+						$result = 'style="'.wppa_wcs( 'wppa-cover-text-frame' ).'"';
 						break;
 					default:
 						wppa_dbg_msg( 'Illegal $photo_pos in wppa_get_text_frame_style', 'red' );
@@ -3882,7 +3883,7 @@ function wppa_force_balance_pee( $xtext ) {
 	$done = false;
 	$temp = strtolower( $text );
 
-	// see if this chunk ends in <p> in which case we remove that in stead of appending a </p>
+	// see if this chunk ends in <p> in which case we remove that instead of appending a </p>
 	$len = strlen( $temp );
 	if ( $len > 3 ) {
 		if ( substr( $temp, $len - 3 ) == '<p>' ) {

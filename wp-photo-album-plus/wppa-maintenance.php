@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.6.30
+* Version 6.7.04
 *
 */
 
@@ -316,6 +316,7 @@ global $wppa_timestamp_start;
 							wppa_delete_album_source( $id );
 							wppa_invalidate_treecounts( $id );
 							wppa_index_remove( 'album', $id );
+							wppa_clear_catlist();
 						}
 						break;
 

@@ -37,6 +37,9 @@ class ShortCodes
         add_shortcode('wpdm_all_packages', array($this, 'allPackages'));
         add_shortcode('wpdm-all-packages', array($this, 'allPackages'));
 
+        //Search Result
+        add_shortcode('wpdm_search_result', array($this, 'searchResult'));
+
         //Packages by tag
         add_shortcode("wpdm_tag", array($this, 'packagesByTag'));
 
@@ -142,6 +145,8 @@ class ShortCodes
             $id = trim($id, ", ");
             $cids = explode(",", $id);
         }
+
+        if(!isset($items_per_page) || $items_per_page < 1) $items_per_page = 10;
 
         global $wpdb, $current_user, $post, $wp_query;
 
@@ -250,6 +255,25 @@ class ShortCodes
         $title = isset($title) && $title !=''?"<h3>$title</h3>":"";
 
         return "<div class='w3eden'>" . $title . $desc  . $html  . $pgn . "<div style='clear:both'></div></div>";
+    }
+
+    /**
+     * @param array $params
+     * @return array|null|WP_Post
+     * @usage Shortcode callback function for [wpdm_simple_search]
+     */
+    function searchResult( $params = array() ){
+        global $wpdb;
+        if(is_array($params))
+            @extract($params);
+        $template = isset($template) && $template != '' ? $template : 'link-template-calltoaction3';
+        $items_per_page = isset($items_per_page) ? $items_per_page : 0;
+        update_post_meta(get_the_ID(), "__wpdm_link_template", $template);
+        update_post_meta(get_the_ID(), "__wpdm_items_per_page", $items_per_page);
+
+        $html = $this->Packages(array('items_per_page' => $items_per_page, 'template' => $template, 's' => wpdm_query_var('q'), 'paging' => false, 'toolbar' => 0,'cols'=>3, 'colspad'=>2, 'colsphone' => 1));
+        $html = "<div class='w3eden'><form style='margin-bottom: 20px'><div class='input-group input-group-lg'><div class='input-group-addon no-radius'><i class='fa fa-search'></i></div><input type='text' name='q' value='".esc_attr(wpdm_query_var('q'))."' class='form-control input-lg no-radius' /></div></form><div class='container-fluid'><div class='row'>{$html}</div></div>";
+        return str_replace(array("\r","\n"),"",$html);
     }
 
 

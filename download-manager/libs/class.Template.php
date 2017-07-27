@@ -34,7 +34,8 @@ class Template
 
     function fetch($template, $tpldir = ''){
         $template = self::locate($template, $tpldir);
-        extract($this->Vars);
+        if(is_array($this->Vars))
+            extract($this->Vars);
         ob_start();
         include $template;
         return ob_get_clean();

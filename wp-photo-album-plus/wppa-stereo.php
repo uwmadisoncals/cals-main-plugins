@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the stereo stuff
-* Version 6.6.16
+* Version 6.7.01
 *
 */
 
@@ -289,7 +289,7 @@ static $f114;
 			break;
 	}
 
-	// accessable
+	// accessible
 	wppa_chmod( $tofile );
 
 	// Optimized

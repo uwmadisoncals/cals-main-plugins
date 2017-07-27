@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.7.00
+* Version 6.7.04
 *
 */
 
@@ -533,7 +533,7 @@ global $wp_version;
 							{
 							$name = __('Is your theme <i>responsive</i>?', 'wp-photo-album-plus');
 							$desc = __('Responsive themes have a layout that varies with the size of the browser window.', 'wp-photo-album-plus');
-							$help = esc_js(__('WPPA+ needs to know this to automaticly adept the width of the display to the available width on the page.', 'wp-photo-album-plus'));
+							$help = esc_js(__('WPPA+ needs to know this to automatically adept the width of the display to the available width on the page.', 'wp-photo-album-plus'));
 							$slug = 'wppa_i_responsive';
 							$opts = array('', __('yes', 'wp-photo-album-plus'), __('no', 'wp-photo-album-plus'));
 							$vals = array('', 'yes', 'no');
@@ -916,7 +916,7 @@ global $wp_version;
 							$tags = 'size,sm,slide';
 							wppa_setting($slug, '6', $name, $desc, $html.__('pixels', 'wp-photo-album-plus'), $help, $clas, $tags);
 
-							$name = __('Mini Treshold', 'wp-photo-album-plus');
+							$name = __('Mini Threshold', 'wp-photo-album-plus');
 							$desc = __('Show mini text at slideshow smaller than.', 'wp-photo-album-plus');
 							$help = esc_js(__('Display Next and Prev. as opposed to Next photo and Previous photo when the cotainer is smaller than this size.', 'wp-photo-album-plus'));
 							$help .= '\n\n'.esc_js(__('Special use in responsive themes.', 'wp-photo-album-plus'));
@@ -1459,6 +1459,17 @@ global $wp_version;
 							$clas = '';
 							$tags = 'size,lightbox,layout';
 							wppa_setting($slug, '4', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Fullscreen button size', 'wp-photo-album-plus');
+							$desc = __('Fullscreen and exit button size', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_ovl_fsx_btn_size';
+							$opts = array( '16', '24', '32', '40', '48', '56', '60' );
+							$vals = $opts;
+							$html = wppa_select($slug, $opts, $vals) . __('pixels', 'wp-photo-album-plus');
+							$clas = '';
+							$tags = 'size,lightbox,layout';
+							wppa_setting($slug, '5', $name, $desc, $html, $help, $clas, $tags);
 
 							}
 						wppa_setting_subheader( 'H', '1', __( 'Video related size settings' , 'wp-photo-album-plus') );
@@ -3297,7 +3308,7 @@ global $wp_version;
 							$name = __('Upload', 'wp-photo-album-plus');
 							$desc = __('Upload box background.', 'wp-photo-album-plus');
 							$help = esc_js(__('Enter valid CSS colors for upload box backgrounds and borders.', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('See the Upload box, created by the shortocde [wppa type="upload"][/wppa]', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('See the Upload box, created by the shortcode [wppa type="upload"][/wppa]', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_bgcolor_upload';
 							$slug2 = 'wppa_bcolor_upload';
 							$slug = array($slug1, $slug2);
@@ -3311,7 +3322,7 @@ global $wp_version;
 							$name = __('Multitag', 'wp-photo-album-plus');
 							$desc = __('Multitag box background.', 'wp-photo-album-plus');
 							$help = esc_js(__('Enter valid CSS colors for multitag box backgrounds and borders.', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('See the Multitag search box, created by the shortocde [wppa type="multitag"][/wppa]', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('See the Multitag search box, created by the shortcode [wppa type="multitag"][/wppa]', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_bgcolor_multitag';
 							$slug2 = 'wppa_bcolor_multitag';
 							$slug = array($slug1, $slug2);
@@ -3325,7 +3336,7 @@ global $wp_version;
 							$name = __('Tagcloud', 'wp-photo-album-plus');
 							$desc = __('Tagcloud box background.', 'wp-photo-album-plus');
 							$help = esc_js(__('Enter valid CSS colors for tagcloud box backgrounds and borders.', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('See the Tagcloud search box, created by the shortocde [wppa type="tagcloud"][/wppa]', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('See the Tagcloud search box, created by the shortcode [wppa type="tagcloud"][/wppa]', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_bgcolor_tagcloud';
 							$slug2 = 'wppa_bcolor_tagcloud';
 							$slug = array($slug1, $slug2);
@@ -3339,7 +3350,7 @@ global $wp_version;
 							$name = __('Superview', 'wp-photo-album-plus');
 							$desc = __('Superview box background.', 'wp-photo-album-plus');
 							$help = esc_js(__('Enter valid CSS colors for superview box backgrounds and borders.', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('See the Superview search box, created by the shortocde [wppa type="superview"][/wppa]', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('See the Superview search box, created by the shortcode [wppa type="superview"][/wppa]', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_bgcolor_superview';
 							$slug2 = 'wppa_bcolor_superview';
 							$slug = array($slug1, $slug2);
@@ -3353,7 +3364,7 @@ global $wp_version;
 							$name = __('Search', 'wp-photo-album-plus');
 							$desc = __('Search box background.', 'wp-photo-album-plus');
 							$help = esc_js(__('Enter valid CSS colors for search box backgrounds and borders.', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('See the Search box, created by the shortocde [wppa type="search"][/wppa]', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('See the Search box, created by the shortcode [wppa type="search"][/wppa]', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_bgcolor_search';
 							$slug2 = 'wppa_bcolor_search';
 							$slug = array($slug1, $slug2);
@@ -3367,7 +3378,7 @@ global $wp_version;
 							$name = __('BestOf', 'wp-photo-album-plus');
 							$desc = __('BestOf box background.', 'wp-photo-album-plus');
 							$help = esc_js(__('Enter valid CSS colors for bestof box backgrounds and borders.', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('See the Best of box, created by the shortocde [wppa type="bestof"][/wppa]', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('See the Best of box, created by the shortcode [wppa type="bestof"][/wppa]', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_bgcolor_bestof';
 							$slug2 = 'wppa_bcolor_bestof';
 							$slug = array($slug1, $slug2);
@@ -3381,7 +3392,7 @@ global $wp_version;
 							$name = __('Calendar', 'wp-photo-album-plus');
 							$desc = __('Calendar box background.', 'wp-photo-album-plus');
 							$help = esc_js(__('Enter valid CSS colors for calendar box backgrounds and borders.', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('See the Calendar box, created by the shortocde [wppa type="calendar"][/wppa]', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('See the Calendar box, created by the shortcode [wppa type="calendar"][/wppa]', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_bgcolor_calendar';
 							$slug2 = 'wppa_bcolor_calendar';
 							$slug = array($slug1, $slug2);
@@ -3395,7 +3406,7 @@ global $wp_version;
 							$name = __('Stereo', 'wp-photo-album-plus');
 							$desc = __('Stereo mode selection box background.', 'wp-photo-album-plus');
 							$help = esc_js(__('Enter valid CSS colors for stereo mode selection box backgrounds and borders.', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('See the Stereo type selection box, created by the shortocde [wppa type="stereo"][/wppa]', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('See the Stereo type selection box, created by the shortcode [wppa type="stereo"][/wppa]', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_bgcolor_stereo';
 							$slug2 = 'wppa_bcolor_stereo';
 							$slug = array($slug1, $slug2);
@@ -3409,7 +3420,7 @@ global $wp_version;
 							$name = __('Admins Choice', 'wp-photo-album-plus');
 							$desc = __('Admins choice box background.', 'wp-photo-album-plus');
 							$help = esc_js(__('Enter valid CSS colors for admins choice box backgrounds and borders.', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('See the Admins choice box, created by the shortocde [wppa type="choice"][/wppa]', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('See the Admins choice box, created by the shortcode [wppa type="choice"][/wppa]', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_bgcolor_adminschoice';
 							$slug2 = 'wppa_bcolor_adminschoice';
 							$slug = array($slug1, $slug2);
@@ -3545,7 +3556,7 @@ global $wp_version;
 
 							$name = __('Photo names in urls', 'wp-photo-album-plus');
 							$desc = __('Display photo names in urls.', 'wp-photo-album-plus');
-							$help = esc_js(__('Urls to wppa+ displays will contain photonames in stead of numbers.', 'wp-photo-album-plus'));
+							$help = esc_js(__('Urls to wppa+ displays will contain photonames instead of numbers.', 'wp-photo-album-plus'));
 							$help .= '\n'.esc_js(__('It is your responsibility to avoid duplicate names of photos in the same album.', 'wp-photo-album-plus'));
 							$slug = 'wppa_use_photo_names_in_urls';
 							$html = wppa_checkbox($slug);
@@ -3555,7 +3566,7 @@ global $wp_version;
 
 							$name = __('Album names in urls', 'wp-photo-album-plus');
 							$desc = __('Display album names in urls.', 'wp-photo-album-plus');
-							$help = esc_js(__('Urls to wppa+ displays will contain albumnames in stead of numbers.', 'wp-photo-album-plus'));
+							$help = esc_js(__('Urls to wppa+ displays will contain albumnames instead of numbers.', 'wp-photo-album-plus'));
 							$help .= '\n'.esc_js(__('It is your responsibility to avoid duplicate names of albums in the system.', 'wp-photo-album-plus'));
 							$slug = 'wppa_use_album_names_in_urls';
 							$html = wppa_checkbox($slug);
@@ -3565,7 +3576,7 @@ global $wp_version;
 
 							$name = __('Use short query args', 'wp-photo-album-plus');
 							$desc = __('Use &album=... &photo=...', 'wp-photo-album-plus');
-							$help = esc_js(__('Urls to wppa+ displays will contain &album=... &photo=... in stead of &wppa-album=... &wppa-photo=...', 'wp-photo-album-plus'));
+							$help = esc_js(__('Urls to wppa+ displays will contain &album=... &photo=... instead of &wppa-album=... &wppa-photo=...', 'wp-photo-album-plus'));
 							$help .= '\n'.esc_js(__('Use this setting only when there are no conflicts with other plugins that may interprete arguments like &album= etc.', 'wp-photo-album-plus'));
 							$slug = 'wppa_use_short_qargs';
 							$html = wppa_checkbox($slug);
@@ -3575,7 +3586,7 @@ global $wp_version;
 
 							$name = __('Enable pretty links', 'wp-photo-album-plus');
 							$desc = __('Enable the generation and understanding of pretty links.', 'wp-photo-album-plus');
-							$help = esc_js(__('If checked, links to social media and the qr code will have "/token1/token2/" etc in stead of "&arg1=..&arg2=.." etc.', 'wp-photo-album-plus'));
+							$help = esc_js(__('If checked, links to social media and the qr code will have "/token1/token2/" etc instead of "&arg1=..&arg2=.." etc.', 'wp-photo-album-plus'));
 							$help .= '\n'.esc_js(__('These types of links will be interpreted and cause a redirection on entering.', 'wp-photo-album-plus'));
 							$help .= '\n'.esc_js(__('It is recommended to check this box. It shortens links dramatically and simplifies qr codes.', 'wp-photo-album-plus'));
 							$help .= '\n'.esc_js(__('However, you may encounter conflicts with themes and/or other plugins, so test it throughly!', 'wp-photo-album-plus'));
@@ -4405,7 +4416,7 @@ global $wp_version;
 							$name = __('Notify inappropriate', 'wp-photo-album-plus');
 							$desc = __('Notify admin every x times.', 'wp-photo-album-plus');
 							$help = esc_js(__('If this number is positive, there will be a thumb down icon in the rating bar.', 'wp-photo-album-plus'));
-							$help .= '\n\n'.esc_js(__('Cicking the thumbdown icon indicates a user dislikes a photo.', 'wp-photo-album-plus'));
+							$help .= '\n\n'.esc_js(__('Clicking the thumbdown icon indicates a user dislikes a photo.', 'wp-photo-album-plus'));
 							$help .= '\n'.esc_js(__('Admin will be notified by email after every x dislikes.', 'wp-photo-album-plus'));
 							$help .= '\n'.esc_js(__('A value of 0 disables this feature.', 'wp-photo-album-plus'));
 							$help .= '\n\n'.esc_js(__('If "One button vote" is selected in Table I-E1, this setting has no meaning', 'wp-photo-album-plus'));
@@ -4849,7 +4860,7 @@ global $wp_version;
 							wppa_setting($slug, '6', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Video autostart', 'wp-photo-album-plus');
-							$desc = __('Videos on lightbox start automaticly.', 'wp-photo-album-plus');
+							$desc = __('Videos on lightbox start automatically.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_ovl_video_start';
 							$html = wppa_checkbox($slug);
@@ -4858,7 +4869,7 @@ global $wp_version;
 							wppa_setting($slug, '7', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Audio autostart', 'wp-photo-album-plus');
-							$desc = __('Audio on lightbox start automaticly.', 'wp-photo-album-plus');
+							$desc = __('Audio on lightbox start automatically.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_ovl_audio_start';
 							$html = wppa_checkbox($slug);
@@ -5746,7 +5757,7 @@ global $wp_version;
 							{
 							$name = __('Xphoto', 'wp-photo-album-plus');
 							$desc = __('Media-like (like WP photo with - extended - caption) photo link.', 'wp-photo-album-plus');
-							$help = esc_js(__('Select the type of link you want, or no link at all, to act on a photo in the style of s wp photo with - an extended - caption.', 'wp-photo-album-plus'));
+							$help = esc_js(__('Select the type of link you want, or no link at all, to act on a photo in the style of a wp photo with - an extended - caption.', 'wp-photo-album-plus'));
 							$help .= '\n'.esc_js(__('If you select the fullsize photo on its own, it will be stretched to fit, regardless of that setting.', 'wp-photo-album-plus')); /* oneofone is treated as portrait only */
 							$help .= '\n'.esc_js(__('Note that a page must have at least [wppa][/wppa] in its content to show up the photo(s).', 'wp-photo-album-plus'));
 							$slug1 = 'wppa_xphoto_linktype';
@@ -8023,6 +8034,15 @@ global $wp_version;
 							$tags = 'system';
 							wppa_setting($slug, '9.3', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Log File events', 'wp-photo-album-plus');
+							$desc = __('Keep track of dir/file creations and chmod.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_log_fso';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '9.4', $name, $desc, $html, $help, $clas, $tags);
+
 							$name = __('Retry failed mails', 'wp-photo-album-plus');
 							$desc = __('Select number of retries for failed mails', 'wp-photo-album-plus');
 							$help = esc_js(__('Retries occur at the background every hour', 'wp-photo-album-plus'));
@@ -8031,6 +8051,25 @@ global $wp_version;
 							$clas = '';
 							$tags = 'system,mail';
 							wppa_setting($slug, '10', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Minimum tags', 'wp-photo-album-plus');
+							$desc = __('These tags exist even when they do not occur in any photo.', 'wp-photo-album-plus');
+							$help = esc_js(__('Enter tags, separated by comma\'s (,)', 'wp-photo-album-plus'));
+							$help .= '\n\n'.esc_js(__('Tags exist when they appear on any photo, and vanish when they do no longer appear. Except the tags you list here; they exist always.', 'wp-photo-album-plus'));;
+							$slug = 'wppa_minimum_tags';
+							$html = wppa_input($slug, '300px');
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '11', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Login link', 'wp-photo-album-plus');
+							$desc = __('Modify this link if you have a custom login page.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_login_url';
+							$html = wppa_input($slug, '300px');
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '12', $name, $desc, $html, $help, $clas, $tags);
 
 							}
 						wppa_setting_subheader( 'B', '1', __( 'WPPA+ Admin related miscellaneous settings' , 'wp-photo-album-plus') );
@@ -8179,7 +8218,7 @@ global $wp_version;
 							$tags = 'system';
 							wppa_setting($slug, '12', $name, $desc, $html, $help, $clas, $tags);
 
-							$name = __('Import page prieviews', 'wp-photo-album-plus');
+							$name = __('Import page previews', 'wp-photo-album-plus');
 							$desc = __('Show thumbnail previews in import admin page.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_import_preview';
@@ -8359,7 +8398,7 @@ global $wp_version;
 							wppa_setting($slug, '1.3', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Modified Photo', 'wp-photo-album-plus');
-							$desc = __('Maximum time a photo is indicated as Modofied', 'wp-photo-album-plus');
+							$desc = __('Maximum time a photo is indicated as Modified', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_max_photo_modtime';
 							$html = wppa_select($slug, $options, $values);
@@ -8673,7 +8712,7 @@ global $wp_version;
 
 							$name = __('Default coverphoto', 'wp-photo-album-plus');
 							$desc = __('Name of photofile to become cover image', 'wp-photo-album-plus');
-							$help = esc_js(__('If you name a photofile like this setting before upload, it will become the coverimage automaticly.', 'wp-photo-album-plus'));
+							$help = esc_js(__('If you name a photofile like this setting before upload, it will become the coverimage automatically.', 'wp-photo-album-plus'));
 							$slug = 'wppa_default_coverimage_name';
 							$html = wppa_input($slug, '150px');
 							$clas = '';
@@ -8742,7 +8781,7 @@ global $wp_version;
 							$desc = __('Display the search results on page.', 'wp-photo-album-plus');
 							$help = esc_js(__('Select the page to be used to display search results. The page MUST contain [wppa][/wppa].', 'wp-photo-album-plus'));
 							$help .= '\n'.esc_js(__('You may give it the title "Search results" or something alike.', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('Or you ou may use the standard page on which you display the generic album.', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('Or you may use the standard page on which you display the generic album.', 'wp-photo-album-plus'));
 							$slug = 'wppa_search_linkpage';
 							wppa_verify_page($slug);
 							$query = "SELECT ID, post_title, post_content FROM " . $wpdb->posts . " WHERE post_type = 'page' AND post_status = 'publish' ORDER BY post_title ASC";
@@ -8772,7 +8811,14 @@ global $wp_version;
 							}
 							$clas = '';
 							$tags = 'system,search,page';
-							$html = wppa_select($slug, $options, $values, '', '', true);
+							$html1 = wppa_select($slug, $options, $values, '', '', true);
+
+							$slug2 = 'wppa_search_oc';
+							$opts2 = array('1','2','3','4','5');
+							$vals2 = array('1','2','3','4','5');
+							$html2 = '<div style="float:right;" ><div style="font-size:9px;foat:left;" class="'.$clas.'" >'.__('Occur', 'wp-photo-album-plus').'</div>'.wppa_select($slug2, $opts2, $vals2, '', $clas).'</div>';
+
+							$html = $html1 . $html2;
 							wppa_setting(false, '1', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Exclude separate', 'wp-photo-album-plus');
@@ -8868,7 +8914,6 @@ global $wp_version;
 							$name = __('Floating searchtoken', 'wp-photo-album-plus');
 							$desc = __('A match need not start at the first char.', 'wp-photo-album-plus');
 							$help = esc_js(__('A match is found while searching also when the entered token is somewhere in the middle of a word.', 'wp-photo-album-plus'));
-							$help .= '\n\n'.esc_js(__('This works in indexed search only!', 'wp-photo-album-plus'));
 							$slug = 'wppa_wild_front';
 							$html = wppa_checkbox($slug);
 							$clas = '';
@@ -8952,7 +8997,7 @@ global $wp_version;
 
 							$name = __('Exclude numbers', 'wp-photo-album-plus');
 							$desc = __('Exclude numbers from search index.', 'wp-photo-album-plus');
-							$help = esc_js(__('If ticked, photos and albums are not searcheable by numbers.', 'wp-photo-album-plus'));
+							$help = esc_js(__('If ticked, photos and albums are not searchable by numbers.', 'wp-photo-album-plus'));
 							$slug = 'wppa_search_numbers_void';
 							$html = wppa_checkbox($slug);
 							$clas = '';
@@ -8967,6 +9012,81 @@ global $wp_version;
 							$clas = '';
 							$tags = 'system,search';
 							wppa_setting($slug, '18.4', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Search category box', 'wp-photo-album-plus');
+							$desc = __('Add a category selection box', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_search_catbox';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '19', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Search selection boxes', 'wp-photo-album-plus');
+							$desc = __('Enter number of search selection boxes.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_search_selboxes';
+							$opts = array( '0', '1', '2', '3' );
+							$vals = $opts;
+							$html = wppa_select( $slug, $opts, $vals );
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '20.0', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = sprintf(__('Box %s caption', 'wp-photo-album-plus'), '1');
+							$desc = __('Enter caption text', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_search_caption_0';
+							$html = wppa_input($slug, '150px;');
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '20.1', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = sprintf(__('Box %s content', 'wp-photo-album-plus'), '1');
+							$desc = __('Enter search tokens, one per line.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_search_selbox_0';
+							$html = wppa_textarea($slug);
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '20.2', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = sprintf(__('Box %s caption', 'wp-photo-album-plus'), '2');
+							$desc = __('Enter caption text', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_search_caption_1';
+							$html = wppa_input($slug, '150px;');
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '20.3', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = sprintf(__('Box %s content', 'wp-photo-album-plus'), '2');
+							$desc = __('Enter search tokens, one per line.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_search_selbox_1';
+							$html = wppa_textarea($slug);
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '20.4', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = sprintf(__('Box %s caption', 'wp-photo-album-plus'), '3');
+							$desc = __('Enter caption text', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_search_caption_2';
+							$html = wppa_input($slug, '150px;');
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '20.5', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = sprintf(__('Box %s content', 'wp-photo-album-plus'), '3');
+							$desc = __('Enter search tokens, one per line.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_search_selbox_2';
+							$html = wppa_textarea($slug);
+							$clas = '';
+							$tags = 'system,search';
+							wppa_setting($slug, '20.6', $name, $desc, $html, $help, $clas, $tags);
+
 							}
 						wppa_setting_subheader( 'F', '1', __( 'Watermark related settings' , 'wp-photo-album-plus') );
 							{
@@ -9041,7 +9161,7 @@ global $wp_version;
 							wppa_setting($slug, '7', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Textual watermark font', 'wp-photo-album-plus');
-							$desc = __('The font to use with textusl watermarks.', 'wp-photo-album-plus');
+							$desc = __('The font to use with textual watermarks.', 'wp-photo-album-plus');
 							$help = esc_js(__('Except for the system font, are font files of type ttf and reside in', 'wp-photo-album-plus') . ' ' . WPPA_UPLOAD_URL . '/fonts/');
 							$slug = 'wppa_textual_watermark_font';
 							$fopts = array( 'System' );
@@ -9074,7 +9194,7 @@ global $wp_version;
 							$desc = __('You can set the size of the truetype fonts only.', 'wp-photo-album-plus');
 							$help = esc_js(__('System font can have size 1,2,3,4 or 5, in some stoneage fontsize units. Any value > 5 will be treated as 5.', 'wp-photo-album-plus'));
 							$help .= '\n\n'.esc_js(__('Truetype fonts can have any positive integer size, if your PHPs GD version is 1, in pixels, in GD2 in points.', 'wp-photo-album-plus'));
-							$help .= '\n'.esc_js(__('It is unclear howmany pixels a point is...', 'wp-photo-album-plus'));
+							$help .= '\n'.esc_js(__('It is unclear how many pixels a point is...', 'wp-photo-album-plus'));
 							$slug = 'wppa_textual_watermark_size';
 							$html = wppa_input($slug, '50px', '', 'points');
 							$clas = 'wppa_watermark';
@@ -9778,7 +9898,7 @@ global $wp_version;
 
 							$name = __('Hide when running', 'wp-photo-album-plus');
 							$desc = __('Hide toolbar on running slideshows', 'wp-photo-album-plus');
-							$help = esc_js(__('The Fotomoto toolbar will re-appear when the slidshow stops.', 'wp-photo-album-plus'));
+							$help = esc_js(__('The Fotomoto toolbar will re-appear when the slideshow stops.', 'wp-photo-album-plus'));
 							$slug = 'wppa_fotomoto_hide_when_running';
 							$html = wppa_checkbox($slug);
 							$clas = 'wppa_fotomoto';
@@ -9795,7 +9915,7 @@ global $wp_version;
 							wppa_setting($slug, '6.3', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Image Magick', 'wp-photo-album-plus');
-							$desc = __('Absulute path to the ImageMagick commands', 'wp-photo-album-plus');// . ' <span style="color:red;" >' . __('experimental', 'wp-photo-album-plus') . '</span>';
+							$desc = __('Absolute path to the ImageMagick commands', 'wp-photo-album-plus');// . ' <span style="color:red;" >' . __('experimental', 'wp-photo-album-plus') . '</span>';
 							$help = esc_js(__('If you want to use ImageMagick, enter the absolute path to the ImageMagick commands', 'wp-photo-album-plus'));
 							$slug = 'wppa_image_magick';
 							$html = wppa_input($slug, '300px');
@@ -9807,7 +9927,7 @@ global $wp_version;
 							{
 							$name = __('Enable shortcode [photo ..]', 'wp-photo-album-plus');
 							$desc = __('Make the use of shortcode [photo ..] possible', 'wp-photo-album-plus');
-							$help = esc_js(__('Only disbale this when there is a conflict with another plugin', 'wp-photo-album-plus'));
+							$help = esc_js(__('Only disable this when there is a conflict with another plugin', 'wp-photo-album-plus'));
 							$slug = 'wppa_photo_shortcode_enabled';
 							$html = wppa_checkbox($slug);
 							$clas = '';

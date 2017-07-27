@@ -3,16 +3,17 @@
 * Package: wp-photo-album-plus
 *
 * display the widget
-* Version 6.6.18
+* Version 6.7.01
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 
 class PhotoOfTheDay extends WP_Widget {
+
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_widget', 'description' => __( 'WPPA+ Photo Of The Day', 'wp-photo-album-plus') );	//
-		parent::__construct('wppa_widget', __('Photo Of The Day', 'wp-photo-album-plus'), $widget_ops);															//
+		$widget_ops = array( 'classname' => 'wppa_widget', 'description' => __( 'Display Photo Of The Day', 'wp-photo-album-plus' ) );	//
+		parent::__construct( 'wppa_widget', __( 'WPPA+ Photo Of The Day', 'wp-photo-album-plus' ), $widget_ops );															//
     }
 
 	/** @see WP_Widget::widget */
@@ -31,6 +32,9 @@ class PhotoOfTheDay extends WP_Widget {
 		wppa_initialize_runtime();
 
         extract( $args );
+
+		// Defaults
+		$instance = wp_parse_args( (array) $instance, array( 'title' => wppa_opt( 'potd_title' ) ) );
 
 		$widget_title = apply_filters('widget_title', $instance['title']);
 
@@ -204,13 +208,18 @@ class PhotoOfTheDay extends WP_Widget {
     /** @see WP_Widget::form */
     function form( $instance ) {
 
-		//Defaults
-		$instance = wp_parse_args( (array) $instance, array( 'title' => wppa_opt( 'potd_title') ) );
-		$widget_title = $instance['title'];
-		?>
-			<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wp-photo-album-plus'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $widget_title; ?>" /></p>
-			<p><?php _e('You can set the content and the sizes in this widget in the <b>Photo Albums -> Photo of the day</b> admin page.', 'wp-photo-album-plus'); ?></p>
-		<?php
+		// Defaults
+		$instance = wp_parse_args( (array) $instance, array( 'title' => wppa_opt( 'potd_title' ) ) );
+
+		// Title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
+
+		// Explanation
+		echo
+		'<p>' .
+			__( 'You can set the content and the sizes in this widget in the <b>Photo Albums -> Photo of the day</b> admin page.', 'wp-photo-album-plus' ) .
+		'</p>';
     }
 
 } // class PhotoOfTheDay

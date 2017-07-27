@@ -3,14 +3,15 @@
 * Package: wp-photo-album-plus
 *
 * display the last uploaded photos
-* Version 6.4.18
+* Version 6.7.01
 */
 
 class LasTenWidget extends WP_Widget {
+
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_lasten_widget', 'description' => __( 'WPPA+ Last Ten Uploaded Photos', 'wp-photo-album-plus') );
-		parent::__construct('wppa_lasten_widget', __('Last Ten Photos', 'wp-photo-album-plus'), $widget_ops);
+		$widget_ops = array( 'classname' => 'wppa_lasten_widget', 'description' => __( 'Display most recently uploaded photos', 'wp-photo-album-plus' ) );
+		parent::__construct( 'wppa_lasten_widget', __( 'WPPA+ Last Ten Photos', 'wp-photo-album-plus' ), $widget_ops );
     }
 
 	/** @see WP_Widget::widget */
@@ -32,7 +33,7 @@ class LasTenWidget extends WP_Widget {
         extract( $args );
 
 		$instance 		= wp_parse_args( (array) $instance, array(
-														'title' => '',
+														'title' => __( 'Last Ten Photos', 'wp-photo-album-plus' ),
 														'album' => '',
 														'albumenum' => '',
 														'timesince' => 'yes',
@@ -42,13 +43,13 @@ class LasTenWidget extends WP_Widget {
 		$widget_title 	= apply_filters('widget_title', $instance['title'] );
 		$page 			= in_array( wppa_opt( 'lasten_widget_linktype' ), wppa( 'links_no_page' ) ) ?
 							'' :
-							wppa_get_the_landing_page( 'lasten_widget_linkpage', __( 'Last Ten Uploaded Photos', 'wp-photo-album-plus' ) );
+							wppa_get_the_landing_page( 'lasten_widget_linkpage', __( 'Last Ten Photos', 'wp-photo-album-plus' ) );
 		$max  			= wppa_opt( 'lasten_count' );
 		$album 			= $instance['album'];
-		$timesince 		= $instance['timesince'];
+		$timesince 		= wppa_checked( $instance['timesince'] ) ? 'yes' : 'no';
 		$display 		= $instance['display'];
 		$albumenum 		= $instance['albumenum'];
-		$subs 			= $instance['includesubs'] == 'yes';
+		$subs 			= wppa_checked( $instance['includesubs'] );
 
 		switch ( $album ) {
 			case '-99': // 'Multiple see below' is a list of id, seperated by comma's
@@ -183,63 +184,61 @@ class LasTenWidget extends WP_Widget {
 		global $wppa_opt;
 		//Defaults
 		$instance 		= wp_parse_args( (array) $instance, array(
-															'title' 		=> __('Last Ten Photos', 'wp-photo-album-plus'),
+															'title' 		=> __( 'Last Ten Photos', 'wp-photo-album-plus' ),
 															'album' 		=> '0',
 															'albumenum' 	=> '',
 															'timesince' 	=> 'yes',
 															'display' 		=> 'thumbs',
 															'includesubs' 	=> 'no',
 															) );
- 		$widget_title 	= apply_filters('widget_title', $instance['title']);
-		$album 			= $instance['album'];
-		$album_enum 	= $instance['albumenum'];
-		$timesince 		= $instance['timesince'];
-		$display 		= $instance['display'];
-		$subs 			= $instance['includesubs'];
-?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wp-photo-album-plus'); ?></label>
-			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $widget_title; ?>" />
-		</p>
-		<p><label for="<?php echo $this->get_field_id('album'); ?>"><?php _e('Album:', 'wp-photo-album-plus'); ?></label>
-			<select class="widefat" id="<?php echo $this->get_field_id('album'); ?>" name="<?php echo $this->get_field_name('album'); ?>" >
 
-				<?php echo wppa_album_select_a(array('selected' => $album, 'addall' => true, 'addmultiple' => true, 'addnumbers' => true, 'path' => wppa_switch( 'hier_albsel'))) //('', $album, true, '', '', true, '', '', true, true); ?>
+		// Title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
 
-			</select>
-		</p>
+		// Album
+		$body = wppa_album_select_a( array( 'selected' 		=> $instance['album'],
+											'addall' 		=> true,
+											'addmultiple' 	=> true,
+											'addnumbers' 	=> true,
+											'path' 			=> wppa_switch( 'hier_albsel' ),
+											) );
+		echo
+		wppa_widget_selection_frame( $this, 'album', $body, __( 'Album', 'wp-photo-album-plus' ) );
 
-		<p id="wppa-albums-enum" style="display:block;" ><label for="<?php echo $this->get_field_id('albumenum'); ?>"><?php _e('Albums:', 'wp-photo-album-plus'); ?></label>
-		<small style="color:blue;" ><br /><?php _e('Select --- multiple see below --- in the Album selection box. Then enter album numbers seperated by commas', 'wp-photo-album-plus') ?></small>
-			<input class="widefat" id="<?php echo $this->get_field_id('albumenum'); ?>" name="<?php echo $this->get_field_name('albumenum'); ?>" type="text" value="<?php echo $album_enum ?>" />
-		</p>
+		// Album enumeration
+		echo
+		wppa_widget_input( 	$this,
+							'albumenum',
+							$instance['albumenum'],
+							__( 'Albums', 'wp-photo-album-plus' ),
+							__( 'Select --- multiple see below --- in the Album selection box. Then enter album numbers seperated by commas', 'wp-photo-album-plus' )
+							);
 
-		<p>
-			<?php _e('Include subalbums:', 'wp-photo-album-plus') ?>
-			<select id="<?php echo $this->get_field_id('includesubs'); ?>" name="<?php echo $this->get_field_name('includesubs'); ?>">
-				<option value="no" <?php if ($subs == 'no') echo 'selected="selected"' ?>><?php _e('no', 'wp-photo-album-plus') ?></option>
-				<option value="yes" <?php if ($subs == 'yes') echo 'selected="selected"' ?>><?php _e('yes', 'wp-photo-album-plus') ?></option>
-			</select>
-		</p>
+		// Include subalbums
+		echo
+		wppa_widget_checkbox( $this, 'includesubs', $instance['includesubs'], __( 'Include subalbums', 'wp-photo-album-plus' ) );
 
-		<p>
-			<?php _e('Display:', 'wp-photo-album-plus'); ?>
-			<select id="<?php echo $this->get_field_id('display'); ?>" name="<?php echo $this->get_field_name('display'); ?>">
-				<option value="thumbs" <?php if ($display == 'thumbs') echo 'selected="selected"' ?>><?php _e('thumbnail images', 'wp-photo-album-plus'); ?></option>
-				<option value="names" <?php if ($display == 'names') echo 'selected="selected"' ?>><?php _e('photo names', 'wp-photo-album-plus'); ?></option>
-			</select>
+		// Display type
+		$options = array( 	__( 'thumbnail images', 'wp-photo-album-plus' ),
+							__( 'photo names', 'wp-photo-album-plus' ),
+							);
+		$values  = array(	'thumbs',
+							'names',
+							);
+		echo
+		wppa_widget_selection( $this, 'display', $instance['display'], __( 'Display type', 'wp-photo-album-plus' ), $options, $values );
 
-		</p>
+		// Time since
+		echo
+		wppa_widget_checkbox( $this, 'timesince', $instance['timesince'], __( 'Show time since', 'wp-photo-album-plus' ) );
 
-		<p>
-			<?php _e('Show time since:', 'wp-photo-album-plus'); ?>
-			<select id="<?php echo $this->get_field_id('timesince'); ?>" name="<?php echo $this->get_field_name('timesince'); ?>">
-				<option value="no" <?php if ($timesince == 'no') echo 'selected="selected"' ?>><?php _e('no.', 'wp-photo-album-plus'); ?></option>
-				<option value="yes" <?php if ($timesince == 'yes') echo 'selected="selected"' ?>><?php _e('yes.', 'wp-photo-album-plus'); ?></option>
-			</select>
-		</p>
+		echo
+		'<p>' .
+			__( 'You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus' ) .
+			' ' . __( 'Table I-F7 and 8', 'wp-photo-album-plus' ) .
+		'</p>';
 
-		<p><?php _e('You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus'); ?></p>
-<?php
     }
 
 } // class LasTenWidget

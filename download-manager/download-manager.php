@@ -4,7 +4,7 @@ Plugin Name: Download Manager
 Plugin URI: https://www.wpdownloadmanager.com/purchases/
 Description: Manage, Protect and Track File Downloads from your WordPress site
 Author: Shaon
-Version: 2.9.52
+Version: 2.9.53
 Author URI: https://www.wpdownloadmanager.com/
 Text Domain: download-manager
 Domain Path: /languages
@@ -17,7 +17,7 @@ namespace WPDM;
 if(!isset($_SESSION))
 @session_start();
 
-define('WPDM_Version','2.9.52');
+define('WPDM_Version','2.9.53');
 
 $content_dir = str_replace('\\','/',WP_CONTENT_DIR);
 
@@ -104,8 +104,8 @@ class WordPressDownloadManager{
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         foreach($sqls as $sql){
-            //$wpdb->query($sql);
-            dbDelta($sql);
+            $wpdb->query($sql);
+            ///dbDelta($sql);
         }
 
 
@@ -287,6 +287,8 @@ class WordPressDownloadManager{
             var wpdm_site_url = '<?php echo site_url('/'); ?>';
             var wpdm_home_url = '<?php echo home_url('/'); ?>';
             var ajax_url = '<?php echo admin_url('admin-ajax.php'); ?>';
+            var wpdm_ajax_url = '<?php echo admin_url('admin-ajax.php'); ?>';
+            var wpdm_ajax_popup = '<?php echo get_option('__wpdm_ajax_popup', 0); ?>';
         </script>
 
 

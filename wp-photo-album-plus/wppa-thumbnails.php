@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version 6.6.18
+* Version 6.7.02
 *
 */
 
@@ -568,7 +568,7 @@ global $wpdb;
 					'<span' .
 						' id="wppa-liketext-' . $id . '-' . wppa( 'mocc' ) . '"' .
 						' class="wppa-thumb-text"' .
-						' style="'.__wcs( 'wppa-thumb-text' ).'"' .
+						' style="'.wppa_wcs( 'wppa-thumb-text' ).'"' .
 						'> ' .
 						$lt['display'] .
 					'</span>';
@@ -595,7 +595,7 @@ global $wpdb;
 		if ( wppa_switch( 'thumb_text_name' ) || wppa_switch( 'thumb_text_owner' ) ) {
 			$result .= 	'<div' .
 							' class="wppa-thumb-text"' .
-							' style="'.__wcs( 'wppa-thumb-text' ).'"' .
+							' style="'.wppa_wcs( 'wppa-thumb-text' ).'"' .
 							' >' .
 							wppa_get_photo_name( $id, array( 'addowner' => wppa_switch( 'thumb_text_owner' ), 'showname' => wppa_switch( 'thumb_text_name' ) ) ) .
 						'</div>';
@@ -605,7 +605,7 @@ global $wpdb;
 		if ( wppa_switch( 'thumb_text_virt_album' ) && wppa_is_virtual() && wppa( 'start_album' ) != $thumb['album'] ) {
 			$result .= 	'<div' .
 							' class="wppa-thumb-text"' .
-							' style="' . __wcs( 'wppa-thumb-text' ) . '"' .
+							' style="' . wppa_wcs( 'wppa-thumb-text' ) . '"' .
 							' >' .
 							'<a' .
 								' href="' . wppa_get_album_url( $thumb['album'] ) . '"' .
@@ -621,7 +621,7 @@ global $wpdb;
 		if ( wppa_switch( 'share_on_thumbs' ) ) {
 			$result .= 	'<div' .
 							' class="wppa-thumb-text"' .
-							' style="' . __wcs( 'wppa-thumb-text' ) . '"' .
+							' style="' . wppa_wcs( 'wppa-thumb-text' ) . '"' .
 							' >' .
 							wppa_get_share_html( $id, 'thumb' ) .
 						'</div>';
@@ -634,7 +634,7 @@ global $wpdb;
 			$result .=
 				'<div' .
 					' class="wppa-thumb-text"' .
-					' style="' . __wcs( 'wppa-thumb-text' ) . '"' .
+					' style="' . wppa_wcs( 'wppa-thumb-text' ) . '"' .
 					' >';
 
 				// The admins choice link
@@ -709,7 +709,7 @@ global $wpdb;
 
 			$result .= 	'<div' .
 							' class="wppa-thumb-text"' .
-							' style="'.__wcs( 'wppa-thumb-text' ).'"' .
+							' style="'.wppa_wcs( 'wppa-thumb-text' ).'"' .
 							' >' . $desc .
 						'</div>';
 		}
@@ -720,7 +720,7 @@ global $wpdb;
 			if ( $rating && wppa_switch( 'show_rating_count' ) ) $rating .= ' ( '.wppa_get_rating_count_by_id( $id ).' )';
 			$result .= 	'<div' .
 							' class="wppa-thumb-text"' .
-							' style="'.__wcs( 'wppa-thumb-text' ).'"' .
+							' style="'.wppa_wcs( 'wppa-thumb-text' ).'"' .
 							' >' . $rating .
 						'</div>';
 		}
@@ -731,7 +731,7 @@ global $wpdb;
 			if ( $comcount ) {
 				$result .= 	'<div' .
 								' class="wppa-thumb-text"' .
-								' style="'.__wcs( 'wppa-thumb-text' ).'"' .
+								' style="'.wppa_wcs( 'wppa-thumb-text' ).'"' .
 								' >' . sprintf( _n( '%d comment', '%d comments', $comcount, 'wp-photo-album-plus'), $comcount ) .
 							'</div>';
 			}
@@ -741,7 +741,7 @@ global $wpdb;
 		if ( wppa_switch( 'thumb_text_viewcount' ) ) {
 			$result .= 	'<div' .
 							' class="wppa-thumb-text"' .
-							' style="clear:both;'.__wcs( 'wppa-thumb-text' ).'"' .
+							' style="clear:both;'.wppa_wcs( 'wppa-thumb-text' ).'"' .
 							' >' . sprintf( _n( '%d view', '%d views', $thumb['views'], 'wp-photo-album-plus'), $thumb['views'] ) .
 						'</div>';
 		}
@@ -805,7 +805,7 @@ global $thlinkmsggiven;
 	$photo_left = wppa_switch( 'thumbphoto_left' );
 	$class_asym = 'wppa-asym-text-frame-'.$mcr.wppa( 'mocc' );
 
-	$style = __wcs( 'wppa-box' ).__wcs( 'wppa-'.wppa( 'alt' ) );
+	$style = wppa_wcs( 'wppa-box' ).wppa_wcs( 'wppa-'.wppa( 'alt' ) );
 	if ( is_feed() ) $style .= ' padding:7px;';
 
 	$wid = wppa_get_cover_width( 'thumb' );
@@ -850,7 +850,7 @@ global $thlinkmsggiven;
 												' href="' . $href . '"' .
 												' target="' . $target . '"' .
 												' title="' . $title . '"' .
-												' style="' . __wcs( 'wppa-title' ) . '"' .
+												' style="' . wppa_wcs( 'wppa-title' ) . '"' .
 												' >' . wppa_get_photo_name( $id ) .
 											'</a>';
 							}
@@ -870,7 +870,7 @@ global $thlinkmsggiven;
 
 			$result .= 	'<p' .
 							' class="wppa-box-text wppa-black"' .
-							' style="' . __wcs( 'wppa-box-text' ) . __wcs( 'wppa-black' ) .
+							' style="' . wppa_wcs( 'wppa-box-text' ) . wppa_wcs( 'wppa-black' ) .
 							'" >' . $desc .
 						'</p>';
 		$result .= 	'</div>';
@@ -945,7 +945,7 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 					//		'onclick' 		=> '',
 							'lb' 			=> false,
 							'class' 		=> 'image wppa-img',
-							'style' 		=> __wcs( 'wppa-img' ).$imgattr.$cursor		//$imgstyle
+							'style' 		=> wppa_wcs( 'wppa-img' ).$imgattr.$cursor		//$imgstyle
 						) );
 			}
 			else {
@@ -955,7 +955,7 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 								' class="image wppa-img"' .
 								' width="' . $imgwidth . '"' .
 								' height="' . $imgheight . '"' .
-								' style="' . __wcs( 'wppa-img' ) . $imgattr . $cursor . '"' .
+								' style="' . wppa_wcs( 'wppa-img' ) . $imgattr . $cursor . '"' .
 								' ' . $events .
 							' />';
 			}
@@ -984,7 +984,7 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 					//		'onclick' 		=> '',
 							'lb' 			=> false,
 							'class' 		=> 'image wppa-img',
-							'style' 		=> __wcs( 'wppa-img' ).$imgattr		//$imgstyle
+							'style' 		=> wppa_wcs( 'wppa-img' ).$imgattr		//$imgstyle
 						) );
 			}
 			else {
@@ -994,7 +994,7 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 								' class="image wppa-img"' .
 								' width="' . $imgwidth . '"' .
 								' height="' . $imgheight . '"' .
-								' style="' . __wcs( 'wppa-img' ) . $imgattr . '"' .
+								' style="' . wppa_wcs( 'wppa-img' ) . $imgattr . '"' .
 								' ' . $events .
 								' />';
 			}
@@ -1017,7 +1017,7 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 							'onclick' 		=> $href,
 							'lb' 			=> false,
 							'class' 		=> 'image wppa-img',
-							'style' 		=> __wcs( 'wppa-img' ).$imgattr		//$imgstyle
+							'style' 		=> wppa_wcs( 'wppa-img' ).$imgattr		//$imgstyle
 						) );
 		}
 		else {
@@ -1027,7 +1027,7 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 							' class="image wppa-img"' .
 							' width="' . $imgwidth . '"' .
 							' height="' . $imgheight . '"' .
-							' style="' . __wcs( 'wppa-img' ) . $imgattr . '"' .
+							' style="' . wppa_wcs( 'wppa-img' ) . $imgattr . '"' .
 							' ' . $events .
 							' onclick="' . $href . '"' .
 							' />';

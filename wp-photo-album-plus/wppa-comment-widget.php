@@ -3,16 +3,17 @@
 * Package: wp-photo-album-plus
 *
 * display the recent commets on photos
-* Version 6.6.28
+* Version 6.7.01
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 
 class wppaCommentWidget extends WP_Widget {
+
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_comment_widget', 'description' => __( 'WPPA+ Comments on Photos', 'wp-photo-album-plus') );
-		parent::__construct('wppa_comment_widget', __('Comments on Photos', 'wp-photo-album-plus'), $widget_ops);
+		$widget_ops = array( 'classname' => 'wppa_comment_widget', 'description' => __( 'Display comments on Photos', 'wp-photo-album-plus') );
+		parent::__construct( 'wppa_comment_widget', __( 'WPPA+ Comments on Photos', 'wp-photo-album-plus' ), $widget_ops );
     }
 
 	/** @see WP_Widget::widget */
@@ -27,19 +28,18 @@ class wppaCommentWidget extends WP_Widget {
 		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
-		wppa( 'in_widget', 'com' );
-		wppa_bump_mocc();
-
 		// Hide widget if not logged in and login required to see comments
 		if ( wppa_switch( 'comment_view_login' ) && ! is_user_logged_in() ) {
 			return;
 		}
 
         extract( $args );
-
-		$page 			= in_array( wppa_opt( 'comment_widget_linktype' ), wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page('comment_widget_linkpage', __('Recently commented photos', 'wp-photo-album-plus'));
+		wppa( 'in_widget', 'com' );
+		wppa_bump_mocc();
+		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __( 'Comments on photos', 'wp-photo-album-plus' ) ) );
+		$page 			= in_array( wppa_opt( 'comment_widget_linktype' ), wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page( 'comment_widget_linkpage', __( 'Recently commented photos', 'wp-photo-album-plus' ) );
 		$max  			= wppa_opt( 'comten_count' );
-		$widget_title 	= apply_filters('widget_title', $instance['title']);
+		$widget_title 	= apply_filters( 'widget_title', $instance['title'] );
 		$photo_ids 		= wppa_get_comten_ids( $max );
 		$widget_content = "\n".'<!-- WPPA+ Comment Widget start -->';
 		$maxw 			= wppa_opt( 'comten_size' );
@@ -48,7 +48,7 @@ class wppaCommentWidget extends WP_Widget {
 		if ( $photo_ids ) foreach( $photo_ids as $id ) {
 
 			// Make the HTML for current comment
-			$widget_content .= "\n".'<div class="wppa-widget" style="width:'.$maxw.'px; height:'.$maxh.'px; margin:4px; display:inline; text-align:center; float:left;">';
+			$widget_content .= "\n".'<div class="wppa-widget" style="width:' . $maxw . 'px; height:' . $maxh . 'px; margin:4px; display:inline; text-align:center; float:left;">';
 
 			$image = wppa_cache_thumb( $id );
 
@@ -63,15 +63,15 @@ class wppaCommentWidget extends WP_Widget {
 				$cursor		= $imgstyle_a['cursor'];
 				$imgurl 	= wppa_get_thumb_url($id, true, '', $width, $height);
 
-				$imgevents = wppa_get_imgevents('thumb', $id, true);
+				$imgevents = wppa_get_imgevents( 'thumb', $id, true );
 
 				$title = '';
-				$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_COMMENTS."` WHERE `photo` = %s AND `status` = 'approved' ORDER BY `timestamp` DESC", $id ), ARRAY_A );
+				$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . WPPA_COMMENTS . "` WHERE `photo` = %s AND `status` = 'approved' ORDER BY `timestamp` DESC", $id ), ARRAY_A );
 				if ( $comments ) {
 					$first_comment = $comments['0'];
 					foreach ( $comments as $comment ) {
-						$title .= $comment['user'].' '.__( 'wrote' , 'wp-photo-album-plus' ).' '.wppa_get_time_since( $comment['timestamp'] ).":\n";
-						$title .= $comment['comment']."\n\n";
+						$title .= $comment['user'] . ' ' . __( 'wrote' , 'wp-photo-album-plus' ) . ' ' . wppa_get_time_since( $comment['timestamp'] ).":\n";
+						$title .= stripslashes( $comment['comment'] ) . "\n\n";
 					}
 				}
 				$title = esc_attr( strip_tags( trim ( $title ) ) );
@@ -79,7 +79,7 @@ class wppaCommentWidget extends WP_Widget {
 				$album = '0';
 				$display = 'thumbs';
 
-				$widget_content .= wppa_get_the_widget_thumb('comten', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $imgevents);
+				$widget_content .= wppa_get_the_widget_thumb( 'comten', $image, $album, $display, $link, $title, $imgurl, $imgstyle_a, $imgevents );
 
 			}
 
@@ -103,22 +103,30 @@ class wppaCommentWidget extends WP_Widget {
     }
 
     /** @see WP_Widget::update */
-    function update($new_instance, $old_instance) {
+    function update( $new_instance, $old_instance ) {
+
 		$instance = $old_instance;
-		$instance['title'] = strip_tags($new_instance['title']);
+		$instance['title'] = strip_tags( $new_instance['title'] );
 
         return $instance;
     }
 
     /** @see WP_Widget::form */
-    function form($instance) {
+    function form( $instance ) {
+
 		//Defaults
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __('Comments on Photos', 'wp-photo-album-plus') ) );
- 		$widget_title = $instance['title'];
-?>
-			<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wp-photo-album-plus'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $widget_title; ?>" /></p>
-			<p><?php _e('You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus'); ?></p>
-<?php
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Comments on Photos', 'wp-photo-album-plus' ) ) );
+
+		// Title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
+
+		echo
+		'<p>' .
+			__( 'You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus' ) .
+			' ' . __( 'Table I-F3 and 4', 'wp-photo-album-plus' ) .
+		'</p>';
+
     }
 
 } // class wppaCommentWidget

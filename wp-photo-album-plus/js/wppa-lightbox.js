@@ -14,6 +14,7 @@ var wppaKbHandlerInstalled 	= false;
 var wppaOvlMode 			= '';
 var wppaOvlCurIdx 			= 0;
 var wppaOvlSvgInverse 		= false;
+var wppaOvlFsExitBtnSize 	= '48';
 
 // Global size specs
 var wppaSavedContainerWidth = 0;
@@ -470,28 +471,28 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 		var dark = wppaIsMobile ? '0.1' : '0.1';
 		html += '<div' +
 					' id="wppa-exit-btn"' +
-					' style="height:48px;z-index:100098;position:fixed;top:0;right:0;opacity:' + wppaNormsBtnOpac + ';"' +
+					' style="height:'+wppaOvlFsExitBtnSize+'px;z-index:100098;position:fixed;top:0;right:0;opacity:' + wppaNormsBtnOpac + ';"' +
 					' onclick="wppaOvlHide()"' +
 					' onmouseover="jQuery(this).stop().fadeTo(300,1);"' +
 					' ontouchstart="jQuery(this).stop().fadeTo(300,1);"' +
 					' onmouseout="jQuery(this).stop().fadeTo(300,' + dark + ');wppaNormsBtnOpac=' + dark + ';"' +
 					' ontouchend="jQuery(this).stop().fadeTo(300,' + dark + ');wppaNormsBtnOpac=' + dark + ';"' +
 					' >' +
-					wppaSvgHtml( 'Exit', '48px', true, true, '0', '0', '0', '0' ) +
+					wppaSvgHtml( 'Exit', wppaOvlFsExitBtnSize+'px', true, true, '0', '0', '0', '0' ) +
 				'</div>';
 
 
 		// The 'back to normal' icon
 		html += '<div' +
 					' id="wppa-norms-btn"' +
-					' style="height:48px;z-index:100098;position:fixed;top:0;right:48px;opacity:' + wppaNormsBtnOpac + ';"' +
+					' style="height:48px;z-index:100098;position:fixed;top:0;right:' + wppaOvlFsExitBtnSize + 'px;opacity:' + wppaNormsBtnOpac + ';"' +
 					' onclick="wppaOvlNorm()"' +
 					' onmouseover="jQuery(this).stop().fadeTo(300,1);"' +
 					' ontouchstart="jQuery(this).stop().fadeTo(300,1);"' +
 					' onmouseout="jQuery(this).stop().fadeTo(300,' + dark + ');wppaNormsBtnOpac=' + dark + ';"' +
 					' ontouchend="jQuery(this).stop().fadeTo(300,' + dark + ');wppaNormsBtnOpac=' + dark + ';"' +
 					' >' +
-					wppaSvgHtml( 'Exit-Full-Screen', '48px', true, true, '0', '0', '0', '0' ) +
+					wppaSvgHtml( 'Exit-Full-Screen', wppaOvlFsExitBtnSize+'px', true, true, '0', '0', '0', '0' ) +
 				'</div>';
 
 		// Replacing the html stops a running video,

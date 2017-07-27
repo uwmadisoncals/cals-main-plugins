@@ -4,7 +4,7 @@ class WGS_Widget extends WP_Widget {
 
 
 	function __construct() {	
-		parent::WP_Widget(false, $name = __('WP Goosgle Search (WGS)','wgs'));
+		parent::__construct(false, $name = __('WP Google Search (WGS)','wgs'));
 		
 	}
 

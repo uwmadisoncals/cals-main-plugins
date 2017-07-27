@@ -1,15 +1,15 @@
 <?php
 /*
 Plugin Name: WP Google Search
-Plugin URI: http://webshoplogic.com/
-Description: This plugin gives a very simple way to integrate Google Search into your WordPress site.  
-Version: 1.0.5
+Plugin URI: http://webshoplogic.com/wp-google-search/
+Description: This plugin gives a very simple way to add Google Search to your WordPress site.  
+Version: 1.0.7
 Author: WebshopLogic
 Author URI: http://webshoplogic.com/
 License: GPLv2 or later
 Text Domain: wgs
 Requires at least: 3.7
-Tested up to: 4.5.2
+Tested up to: 4.8
 */
 
 if ( ! class_exists( 'WP_Google_Search' ) ) {
@@ -63,8 +63,14 @@ class WP_Google_Search {
 
 			wp_enqueue_script( 'google_cse_v2' );
 			
-			if ($options['use_default_correction_css'] == 1)
+			if ( isset($options['use_default_correction_css']) and $options['use_default_correction_css'] == 1 )
 				wp_enqueue_style( 'wgs', plugins_url('wgs.css', __FILE__) );
+
+			if ( isset($options['use_default_correction_css2']) and $options['use_default_correction_css2'] == 1 )
+				wp_enqueue_style( 'wgs2', plugins_url('wgs2.css', __FILE__) );
+
+			if ( isset($options['use_default_correction_css3']) and $options['use_default_correction_css3'] == 1)
+				wp_enqueue_style( 'wgs3', plugins_url('wgs3.css', __FILE__) );
 			
 			$script_params = array(
 				'google_search_engine_id' => $options['google_search_engine_id']

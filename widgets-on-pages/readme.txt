@@ -3,8 +3,8 @@ Contributors: toddhalfpenny
 Donate link: https://datamad.co.uk/donate/
 Tags: widgets, widgets in page, widgets in post, sidebar, pages, post, shortcode, inline, widgetise, widgetize, theme
 Requires at least: 2.8
-Tested up to: 4.7.5
-Stable tag: 1.1.0
+Tested up to: 4.8
+Stable tag: 1.1.1
 
 The easiest and highest rated way to Add Widgets or Sidebars to Posts and Pages using shortcodes or template tags.
 
@@ -21,6 +21,8 @@ Sidebars can be included in the post/page by using a shortcode like the followin
 `[widgets_on_pages id=x]`
 
 > With the [PRO](https://datamad.co.uk/wordpress-plugins/widgets-on-pages/) version the widgets can be inserted simply with clicks-not-code using a wizard in the visual editor. This version also includes layout options to easily set the widgets in columns/grid presentation.
+>
+> The Pro version also includes support for auto-inserting widgets/sidebars into posts and/or pages, with the ability to have them appear before or after the main content.
 
 The sidebars can also be added to any theme, using template tags. This is an ace way to add widgets/sidebars to a theme's header and footer (or any other part of a theme).
 
@@ -30,7 +32,7 @@ https://www.youtube.com/watch?v=w2LfCihCqRI
 
 **Current Features Include**
 
-* Highest Rating - 116 5* Reviews
+* Highest Rating - 120 5* Reviews
 * No Coding needed
 * Create unlimited sidebars
 * Place them in posts/pages/custom post types
@@ -39,9 +41,9 @@ https://www.youtube.com/watch?v=w2LfCihCqRI
 
 **Recent Reviews**
 
-> **&#8727; &#8727; &#8727; &#8727; &#8727;** Works as advertised + timely response to support request - [3cstudio](https://wordpress.org/support/topic/works-as-advertised-timely-response-to-support-request/)
->
->  **&#8727; &#8727; &#8727; &#8727; &#8727;** Saving me HOURS of work - [andynick](https://wordpress.org/support/topic/saving-me-hours-of-work/)
+**&#8727; &#8727; &#8727; &#8727; &#8727;** Works as advertised + timely response to support request - [3cstudio](https://wordpress.org/support/topic/works-as-advertised-timely-response-to-support-request/)
+
+**&#8727; &#8727; &#8727; &#8727; &#8727;** Saving me HOURS of work - [andynick](https://wordpress.org/support/topic/saving-me-hours-of-work/)
 
 == Installation ==
 
@@ -82,6 +84,11 @@ Yes... you can have an unlimited number of sidebars defined. The number availabl
 
 
 == Changelog ==
+
+= 1.1.1 =
+
+1. Bugfix - remove TurboSidebars from Search results
+
 
 = 1.1.0 =
 

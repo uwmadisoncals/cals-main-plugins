@@ -34,7 +34,7 @@ class WordPressDownloadManagerAdmin
      * Enqueue admin scripts & styles
      */
     function enqueueScripts(){
-        if(get_post_type()=='wpdmpro'||in_array(wpdm_query_var('page'),array('settings','emails','wpdm-stats','templates','importable-files','wpdm-addons', 'orders','pp-license', 'payouts'))){
+        if(get_post_type()=='wpdmpro'||in_array(wpdm_query_var('page'),array('','settings','emails','wpdm-stats','templates','importable-files','wpdm-addons', 'orders','pp-license', 'payouts'))){
             wp_enqueue_script('jquery');
             wp_enqueue_script('jquery-form');
             wp_enqueue_script('jquery-ui-core');

@@ -1,5 +1,5 @@
 ﻿=== WordPress Download Manager ===
-Contributors: w3eden, codename065, shahriar0822, shimo16ab, shafayat-alam, tauhidul-alam
+Contributors: w3eden, codename065, shahriar0822, shimo16ab, shafayat-alam
 Donate link: 
 Tags: digital store, eshop, ecommerce, e-commerce, file management,  document management plugin, download manager, file manager, download monitor, download counter, password protection, download protection
 Requires at least: 3.4
@@ -148,6 +148,13 @@ Check download stats and get a push notification when someone downloads, install
 12. Invoice
 
 == Changelog ==
+
+= 2.9.53 =
+* Fixed the issue with download history clear button
+* Fixed the issue with datatable sorting
+* Fixed issue with search widget
+* Recoded search result shortcode ( [wpdm_search_result] )
+* Fixed the issue with signup email
 
 = 2.9.52 =
 * Compatibility release for WordPress 4.8

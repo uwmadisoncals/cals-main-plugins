@@ -75,8 +75,8 @@ class FileList
                     $ind = \WPDM_Crypt::Encrypt($sfile);
                     $pc++;
 
-                    if (!@is_array($fileinfo[$sfile])) $fileinfo[$sfile] = array();
-                    if (!@is_array($fileinfo[$fileID])) $fileinfo[$fileID] = array();
+                    if (!isset($fileinfo[$sfile]) || !@is_array($fileinfo[$sfile])) $fileinfo[$sfile] = array();
+                    if (!isset($fileinfo[$fileID]) || !@is_array($fileinfo[$fileID])) $fileinfo[$fileID] = array();
 
                     $filePass = isset($fileinfo[$sfile]['password'])?$fileinfo[$sfile]['password']:(isset($fileinfo[$fileID]['password'])?$fileinfo[$fileID]['password']:'');
                     $fileTitle = isset($fileinfo[$sfile]['title']) && $fileinfo[$sfile]['title'] != '' ? $fileinfo[$sfile]['title']:(isset($fileinfo[$fileID]['title']) && $fileinfo[$fileID]['title'] != '' ? $fileinfo[$fileID]['title']:preg_replace("/([0-9]+)_/", "",wpdm_basename($sfile)));

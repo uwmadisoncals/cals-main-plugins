@@ -3,18 +3,19 @@
 * Package: wp-photo-album-plus
 *
 * display the top rated photos
-* Version 6.3.11
+* Version 6.7.01
 */
 
 class wppaStereoWidget extends WP_Widget {
+
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_stereo_widget', 'description' => __( 'WPPA+ Stereo settings', 'wp-photo-album-plus') );
-		parent::__construct('wppa_stereo_widget', __('3D Settings', 'wp-photo-album-plus'), $widget_ops);
+		$widget_ops = array( 'classname' => 'wppa_stereo_widget', 'description' => __( 'Display stereo photo settings dialog', 'wp-photo-album-plus' ) );
+		parent::__construct( 'wppa_stereo_widget', __( 'WPPA+ Stereo Photo Settings', 'wp-photo-album-plus' ), $widget_ops );
     }
 
 	/** @see WP_Widget::widget */
-    function widget($args, $instance) {
+    function widget( $args, $instance ) {
 		global $wpdb;
 
 		require_once(dirname(__FILE__) . '/wppa-links.php');
@@ -30,7 +31,7 @@ class wppaStereoWidget extends WP_Widget {
 
 		extract( $args );
 
-		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __('3D Stereo Settings', 'wp-photo-album-plus') ) );
+		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __('Stereo Photo Settings', 'wp-photo-album-plus') ) );
 
 
  		$widget_title 	= apply_filters('widget_title', $instance['title'] );
@@ -61,15 +62,12 @@ class wppaStereoWidget extends WP_Widget {
     function form($instance) {
 
 		//Defaults
-		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __('3D Stereo Settings', 'wp-photo-album-plus') ) );
- 		$widget_title 	= apply_filters('widget_title', $instance['title']);
+		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __( 'Stereo Photo Settings', 'wp-photo-album-plus ' ) ) );
 
-?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wp-photo-album-plus'); ?></label>
-			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $widget_title; ?>" />
-		</p>
+		// Title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
 
-<?php
     }
 
 } // class wppaStereoWidget

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.7.00
+* Version 6.7.01
 *
 */
 
@@ -393,7 +393,7 @@ global $wppa_revno;
 	// Store
 	$wppa_shortcode_results[$key] = $result;
 
-	// Return the placeholder ( = the key ) in stead of $result
+	// Return the placeholder ( = the key ) instead of $result
 	return $key;
 
 }

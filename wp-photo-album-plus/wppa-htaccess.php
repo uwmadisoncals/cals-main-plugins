@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various funcions
-* Version 6.6.12
+* Version 6.7.04
 *
 */
 
@@ -32,6 +32,10 @@ function wppa_create_wppa_htaccess_( $filename ) {
 				fwrite( $file, "\n" . 'Order Allow,Deny' );
 				fwrite( $file, "\n" . 'Allow from all' );
 				fclose( $file );
+				wppa_log( 'Fso', 'File ' . $filename . ' created.' );
+			}
+			else {
+				wppa_log( 'Err', 'Can not create ' . $filename );
 			}
 			break;
 
@@ -66,12 +70,20 @@ RewriteRule \.(jpg|jpeg|png|gif)$ - [NC,F]
 				fwrite( $file, "\n" . 'RewriteRule \.(jpg|jpeg|png|gif|mp4|ogv|webm|mp3|wav|ogg)$ - [NC,F]' );
 				fwrite( $file, "\n" . '</IfModule>' );
 				fclose( $file );
+				wppa_log( 'Fso', 'File ' . $filename . ' created.' );
 			}
+			else {
+				wppa_log( 'Err', 'Can not create ' . $filename );
+			}
+
 			break;
 
 		// Destroy it
 		case 'remove':
-			@ unlink( $filename );
+			if ( is_file( $filename ) ) {
+				unlink( $filename );
+				wppa_log( 'Fso', 'File ' . $filename . ' removed.' );
+			}
 			break;
 
 		// Leave unchanged

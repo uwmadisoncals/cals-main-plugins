@@ -3,7 +3,7 @@
 * Pachkage: wp-photo-album-plus
 *
 *
-* Version 6.7.00
+* Version 6.7.01
 *
 */
 
@@ -612,7 +612,7 @@ global $wpdb;
 					'<br />'.
 					'<small>'.
 						__('Specify the horizontal size in pixels or <span style="color:blue" >auto</span>.', 'wp-photo-album-plus').' '.
-						__('A value less than <span style="color:blue" >100</span> will automaticly be interpreted as a <span style="color:blue" >percentage</span> of the available space.', 'wp-photo-album-plus').
+						__('A value less than <span style="color:blue" >100</span> will automatically be interpreted as a <span style="color:blue" >percentage</span> of the available space.', 'wp-photo-album-plus').
 						__('For responsive with a fixed maximum, add the max to auto e.g. <span style="color:blue" >auto,550</span>', 'wp-photo-album-plus' ).'<br />'.
 						__('Leave this blank for default size', 'wp-photo-album-plus').
 						'</small>'.

@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version 6.6.18
+* Version 6.7.02
 *
 */
 
@@ -23,7 +23,7 @@ function wppa_get_statistics() {
 	$p_id = wppa_get_parentalbumid($y_id);
 	$p_name = __(wppa_get_album_name($p_id), 'wp-photo-album-plus');
 
-	$result = '<div class="wppa-box wppa-nav" style="text-align: center; '.__wcs('wppa-box').__wcs('wppa-nav').'">';
+	$result = '<div class="wppa-box wppa-nav" style="text-align: center; '.wppa_wcs('wppa-box').wppa_wcs('wppa-nav').'">';
 	$result .= sprintf( _n( 'There is %d photo album', 'There are %d photo albums', $count, 'wp-photo-album-plus'), $count );
 	$result .= ' '.__('The last album added is', 'wp-photo-album-plus').' ';
 	$result .= '<a href="'.wppa_get_permalink().'wppa-album='.$y_id.'&amp;wppa-cover=0&amp;wppa-occur=1">'.$y_name.'</a>';

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.7.00
+* Version 6.7.02
 *
 */
 
@@ -293,7 +293,7 @@ function wppaTryScheduleAll( id ) {
 	var query;
 
 	if ( jQuery( '#schedule-box' ).attr( 'checked' ) != 'checked' ) {
-		query = '<?php echo esc_js( __( 'Please switch feature on and set dat/time to schedule first', 'wp-photo-album-plus' ) ) ?>';
+		query = '<?php echo esc_js( __( 'Please switch feature on and set date/time to schedule first', 'wp-photo-album-plus' ) ) ?>';
 		alert( query );
 		return;
 	}
@@ -923,7 +923,7 @@ function wppaTryScheduleAll( id ) {
 											'</select>' .
 											'<br />' .
 											'<span class="description" >' .
-												__( 'If you want, you can link the title to a WP page in stead of the album\'s content. If so, select the page the title links to.', 'wp-photo-album-plus' ) .
+												__( 'If you want, you can link the title to a WP page instead of the album\'s content. If so, select the page the title links to.', 'wp-photo-album-plus' ) .
 											'</span>';
 										}
 									echo
@@ -1279,9 +1279,9 @@ function wppaTryScheduleAll( id ) {
 			// The switch to button(s)
 			if ( wppa_extended_access() ) {
 				if ( $style == 'flat' ) { ?>
-					<input type="button" class="button-secundary" onclick="document.location='<?php echo wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;switchto=collapsable') ?>'" value="<?php _e('Switch to Collapsable table', 'wp-photo-album-plus'); ?>" />
+					<input type="button" class="button-secundary" onclick="document.location='<?php echo wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;switchto=collapsible') ?>'" value="<?php _e('Switch to Collapsable table', 'wp-photo-album-plus'); ?>" />
 				<?php }
-				if ( $style == 'collapsable' ) { ?>
+				if ( $style == 'collapsible' ) { ?>
 					<input type="button" class="button-secundary" onclick="document.location='<?php echo wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;switchto=flat') ?>'" value="<?php _e('Switch to Flat table', 'wp-photo-album-plus'); ?>" />
 					<input
 						type="button"
@@ -1315,7 +1315,7 @@ function wppaTryScheduleAll( id ) {
 			<br />
 			<?php // The table of existing albums
 				if ( $style == 'flat' ) wppa_admin_albums_flat();
-				else wppa_admin_albums_collapsable();
+				else wppa_admin_albums_collapsible();
 			?>
 			<br />
 
@@ -1347,7 +1347,7 @@ global $wpdb;
 	// Read all albums, pre-ordered
 	$albums = $wpdb->get_results( "SELECT * FROM `" . WPPA_ALBUMS . "` ORDER BY " . get_option( 'wppa_album_order_'.wppa_get_user(), 'id' ) . ( get_option( 'wppa_album_order_' . wppa_get_user() . '_reverse' ) == 'yes' ? " DESC" : "" ) , ARRAY_A );
 
-	// Remove non accessable albums
+	// Remove non accessible albums
 	$temp = $albums;
 	$albums = array();
 	foreach ( array_keys( $temp ) as $idx ) {
@@ -1671,8 +1671,8 @@ global $wpdb;
 	}
 }
 
-// The albums table collapsable
-function wppa_admin_albums_collapsable() {
+// The albums table collapsible
+function wppa_admin_albums_collapsible() {
 global $wpdb;
 
 	// Init
@@ -1693,7 +1693,7 @@ global $wpdb;
 	// Read all albums, pre-ordered
 	$albums = $wpdb->get_results( "SELECT * FROM `" . WPPA_ALBUMS . "` ORDER BY " . get_option( 'wppa_album_order_'.wppa_get_user(), 'id' ) . ( get_option( 'wppa_album_order_' . wppa_get_user() . '_reverse' ) == 'yes' ? " DESC" : "" ) , ARRAY_A );
 
-	// Remove non accessable albums
+	// Remove non accessible albums
 	$temp = $albums;
 	$albums = array();
 	foreach ( array_keys( $temp ) as $idx ) {
@@ -2018,7 +2018,7 @@ global $wpdb;
 	}
 }
 
-function wppa_search_edit( $collapsable = false ) {
+function wppa_search_edit( $collapsible = false ) {
 
 	$doit = false;
 	if ( current_user_can( 'wppa_admin' ) && current_user_can( 'wppa_moderate' ) ) $doit = true;
@@ -2028,7 +2028,7 @@ function wppa_search_edit( $collapsable = false ) {
 
 	$result =
 	'<tr>' .
-		'<td colspan="' . ( $collapsable ? 19 : 13 ) . '" >' .
+		'<td colspan="' . ( $collapsible ? 19 : 13 ) . '" >' .
 			'<em>' .
 				__( 'Search for photos to edit', 'wp-photo-album-plus' ) .
 			'</em>' .
@@ -2038,11 +2038,11 @@ function wppa_search_edit( $collapsable = false ) {
 		'</td>' .
 	'</tr>' .
 	'<tr class="alternate" >' .
-		( $collapsable ? '<td></td>' : '' ) .
+		( $collapsible ? '<td></td>' : '' ) .
 		'<td>' .
 			__( 'Any', 'wp-photo-album-plus' ) .
 		'</td>' .
-		( $collapsable ? '<td></td><td></td><td></td><td></td><td></td>' : '' ) .
+		( $collapsible ? '<td></td><td></td><td></td><td></td><td></td>' : '' ) .
 		'<td>' .
 			__( 'Search for', 'wp-photo-album-plus' ) .
 		'</td>' .
@@ -2083,7 +2083,7 @@ function wppa_search_edit( $collapsable = false ) {
 	echo $result;
 }
 
-function wppa_trash_edit( $collapsable = false ) {
+function wppa_trash_edit( $collapsible = false ) {
 global $wpdb;
 
 	$doit = false;
@@ -2097,14 +2097,14 @@ global $wpdb;
 
 	$result =
 	'<tr>';
-		if ( $collapsable ) {
+		if ( $collapsible ) {
 			$result .= '<td></td>';
 		}
 		$result .=
 		'<td>' .
 			__( 'Any', 'wp-photo-album-plus' ) .
 		'</td>';
-		if ( $collapsable ) {
+		if ( $collapsible ) {
 			$result .= '<td></td><td></td><td></td><td></td><td></td>';
 		}
 		$result .=
@@ -2195,7 +2195,7 @@ global $wpdb;
 					$counts = wppa_get_treecounts_a($album['id'], true);
 					$pendcount = $counts['pendselfphotos'];
 					$schedulecount = $counts['scheduledselfphotos'];
-					$haschildren = wppa_have_accessable_children($album);
+					$haschildren = wppa_have_accessible_children( $album );
 					{
 						$class = '';
 						if ( $parent != '0' && $parent != '-1' ) {
@@ -2284,7 +2284,7 @@ global $wpdb;
 
 }
 
-function wppa_have_accessable_children( $alb ) {
+function wppa_have_accessible_children( $alb ) {
 global $wpdb;
 
 	$albums = $wpdb->get_results( "SELECT * FROM `" . WPPA_ALBUMS . "` WHERE `a_parent` = " . $alb['id'], ARRAY_A );
@@ -2339,6 +2339,7 @@ global $wpdb;
 	$wpdb->query( $wpdb->prepare( 'DELETE FROM `' . WPPA_ALBUMS . '` WHERE `id` = %s LIMIT 1', $id ) );
 	wppa_delete_album_source( $id );
 	wppa_index_remove( 'album', $id );
+	wppa_clear_catlist();
 
 	$msg = __( 'Album Deleted.' , 'wp-photo-album-plus');
 	if ( wppa( 'ajax' ) ) {

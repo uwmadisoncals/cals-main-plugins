@@ -263,8 +263,8 @@ function wpdm_getlink()
     $data = array('error' => '', 'downloadurl' => '');
 
     if(isset($_POST['reCaptchaVerify'])){
-        $ret = remote_post('https://www.google.com/recaptcha/api/siteverify', array('secret' => get_option('_wpdm_recaptcha_secret_key'), 'response' => $_POST['reCaptchaVerify'], 'remoteip' => $_SERVER['REMOTE_ADDR']));
-        $ret = json_decode($ret);
+        $ret = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', array('method' => 'POST', 'body' => array('secret' => get_option('_wpdm_recaptcha_secret_key'), 'response' => $_POST['reCaptchaVerify'], 'remoteip' => $_SERVER['REMOTE_ADDR'])));
+        $ret = json_decode($ret->body);
         if($ret->success == 1){
             $_SESSION['_wpdm_unlocked_'.$file['ID']] = 1;
             update_post_meta($file['ID'], "__wpdmkey_".$key, 3);
@@ -1178,6 +1178,35 @@ function wpdm_login_form($params = array()){
     include(WPDM_BASE_DIR . 'tpls/wpdm-be-member.php');
     //echo "</div>";
     return ob_get_clean();
+}
+
+function wpdm_user_dashboard_url(){
+    $id = get_option('__wpdm_user_dashboard', 0);
+    if($id > 0) {
+        $url = get_permalink($id);
+    }
+    else $url = home_url('/');
+    return $url;
+}
+
+function wpdm_login_url($redirect = ''){
+    $id = get_option('__wpdm_login_url', 0);
+    if($id > 0) {
+        $url = get_permalink($id);
+        if($redirect != '')
+            $url .= (strstr($url,'?')?'&':'?').'redirect_to='.$redirect;
+    }
+    else $url = wp_login_url($redirect);
+    return $url;
+}
+
+function wpdm_lostpassword_url(){
+    return add_query_arg(array('action' => 'lostpassword'), wpdm_login_url());
+}
+
+function wpdm_logout_url($redirect = ''){
+    $logout_url = home_url("/?logout=".wp_create_nonce(NONCE_KEY));
+    return $redirect!=''?add_query_arg(array('redirect_to' => $redirect), $logout_url):$logout_url;
 }
 
 

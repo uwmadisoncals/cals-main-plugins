@@ -3,7 +3,7 @@
 * Pachkage: wp-photo-album-plus
 *
 * admin photo of the day widget
-* version 6.6.18
+* version 6.7.01
 *
 */
 
@@ -175,7 +175,7 @@ global $wppa_defaults;
 					$html = '<select' .
 								' id="wppa_potd_album"' .
 								' name="wppa_potd_album"' .
-								' style="float:left; max-width: 100%; height: auto !important;"' .
+								' style="float:left; max-width: 400px; height: auto !important;"' .
 								' multiple="multiple"' .
 								' onchange="didsome=true;wppaAjaxUpdateOptionValue(\'potd_album\', this, true)"' .
 							//	' onblur="document.location.reload(true);"' .

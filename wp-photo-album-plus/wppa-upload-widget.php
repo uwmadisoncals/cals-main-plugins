@@ -2,18 +2,16 @@
 /* wppa-upload-widget.php
 * Package: wp-photo-album-plus
 *
-* upload wppa+ widget
-*
 * A wppa widget to upload photos
 *
-* Version 6.7.00
+* Version 6.7.01
 */
 
 class WppaUploadWidget extends WP_Widget {
 
 	function __construct() {
-		$widget_ops = array('classname' => 'wppa_upload_widget', 'description' => __('WPPA+ Widget to upload photos at the frontend', 'wp-photo-album-plus'));
-		parent::__construct('wppa_upload_widget', __('WPPA+ Upload', 'wp-photo-album-plus'), $widget_ops);
+		$widget_ops = array( 'classname' => 'wppa_upload_widget', 'description' => __( 'Display upload photos dialog', 'wp-photo-album-plus' ) );
+		parent::__construct( 'wppa_upload_widget', __( 'WPPA+ Upload Photos', 'wp-photo-album-plus' ), $widget_ops );
 	}
 
 	function widget( $args, $instance ) {
@@ -29,13 +27,13 @@ class WppaUploadWidget extends WP_Widget {
 
 		extract($args);
 		$instance = wp_parse_args( (array) $instance,
-									array( 	'title' 	=> '',
+									array( 	'title' 	=> __( 'Upload Photos', 'wp-photo-album-plus' ),
 											'album' 	=> '0'
 										));
- 		$title = apply_filters('widget_title', $instance['title']);
+ 		$title = apply_filters( 'widget_title', $instance['title'] );
 		$album = $instance['album'];
 
-		if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_ALBUMS."` WHERE `id` = %d", $album ) ) ) {
+		if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "` WHERE `id` = %d", $album ) ) ) {
 			$album = '0';	// Album vanished
 		}
 
@@ -46,7 +44,7 @@ class WppaUploadWidget extends WP_Widget {
 		$mocc = wppa( 'mocc' );
 		$is_responsive = wppa_opt( 'colwidth' ) == 'auto';
 
-		if ( $is_responsive ) {	// Responsive widgetwppaAutoColumnWidth[1] = true;
+		if ( $is_responsive ) {	// Responsive widget
 			$js = wppa_get_responsive_widget_js_html( $mocc );
 		}
 		else {
@@ -55,12 +53,26 @@ class WppaUploadWidget extends WP_Widget {
 		$create = wppa_get_user_create_html( $album, wppa_opt( 'widget_width' ), 'widget' );
 		$upload = wppa_get_user_upload_html( $album, wppa_opt( 'widget_width' ), 'widget', $is_responsive );
 
-		if ( ! $create && ! $upload ) return;	// Nothing to do
+		// Anything to do?
+		if ( ! $create && ! $upload ) {
+			return;
+		}
 
-		$text = '<div id="wppa-container-'.$mocc.'" class="wppa-upload-widget" style="margin-top:2px; margin-left:2px;" >'.$js.$create.$upload.'</div>';
+		$text =
+		'<div' .
+			' id="wppa-container-' . $mocc . '"' .
+			' class="wppa-upload-widget"' .
+			' style="margin-top:2px;margin-left:2px;"' .
+			' >' .
+			$js .
+			$create .
+			$upload .
+		'</div>';
 
 		echo $before_widget;
-		if ( ! empty( $title ) ) { echo $before_title . $title . $after_title; }
+		if ( ! empty( $title ) ) {
+			echo $before_title . $title . $after_title;
+		}
 		echo $text;
 		echo '<div style="clear:both"></div>';
 		echo $after_widget;
@@ -70,25 +82,27 @@ class WppaUploadWidget extends WP_Widget {
 
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
-		$instance['title'] = strip_tags($new_instance['title']);
+		$instance['title'] = strip_tags( $new_instance['title'] );
 		$instance['album'] = strval( intval( $new_instance['album'] ) );
 		return $instance;
 	}
 
 	function form( $instance ) {
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __('Upload Photos', 'wp-photo-album-plus'), 'album' => '0' ) );
-		$title = $instance['title'];
-		$album = $instance['album'];
-?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wp-photo-album-plus'); ?></label>
-		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></p>
-		<p><label for="<?php echo $this->get_field_id('album'); ?>"><?php _e('Album:', 'wp-photo-album-plus'); ?></label>
-		<select class="widefat" id="<?php echo $this->get_field_id('album'); ?>" name="<?php echo $this->get_field_name('album'); ?>" >
-			<?php echo wppa_album_select_a(array('path' => wppa_switch( 'hier_albsel'), 'selected' => $album, 'addselbox' => true)) ?>
-		</select>
-<?php
+
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Upload Photos', 'wp-photo-album-plus' ), 'album' => '0' ) );
+
+		// Widget title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
+
+		// Album selection
+		$body = wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'selected' => $instance['album'], 'addselbox' => true ) );
+		echo
+		wppa_widget_selection_frame( $this, 'album', $body, __( 'Album', 'wp-photo-album-plus' ) );
+
 	}
 }
+
 // register WppaUploadWidget
 add_action('widgets_init', 'wppa_register_WppaUploadWidget' );
 

@@ -73,7 +73,7 @@ class Widgets_On_Pages_Admin
             3
         );
     }
-    
+
     /**
      * Sets "Settings" link on listing in Plugins screen.
      *
@@ -86,7 +86,7 @@ class Widgets_On_Pages_Admin
             'settings' => '<a href="' . admin_url( '/options-general.php?page=widgets-on-pages' ) . '">' . __( 'Settings', 'widgets-on-pages' ) . '</a>',
         ), $links );
     }
-    
+
     /**
      * Adds extra links under plugin description in listing on Plugins screen.
      *
@@ -96,7 +96,7 @@ class Widgets_On_Pages_Admin
      */
     public function wop_register_plugins_links( $links, $file )
     {
-        
+
         if ( strpos( $file, $this->plugin_name ) !== false ) {
             $new_links = array(
                 'donate' => '<a href="https://datamad.co.uk/donate.php" target="_blank">Donate</a>',
@@ -104,10 +104,10 @@ class Widgets_On_Pages_Admin
             );
             $links = array_merge( $links, $new_links );
         }
-        
+
         return $links;
     }
-    
+
     /**
      * Adds Admin Menu item.
      *
@@ -143,7 +143,7 @@ class Widgets_On_Pages_Admin
             'edit.php?post_type=turbo-sidebar-cpt'
         );
     }
-    
+
     /**
      * Register our setting
      *
@@ -153,7 +153,7 @@ class Widgets_On_Pages_Admin
     {
         register_setting( 'wop_options', 'wop_options_field' );
     }
-    
+
     /**
      * Render the options page for plugin
      *
@@ -163,7 +163,7 @@ class Widgets_On_Pages_Admin
     {
         include_once 'partials/widgets-on-pages-admin-display.php';
     }
-    
+
     /**
      * Render the options page for plugin
      *
@@ -174,16 +174,16 @@ class Widgets_On_Pages_Admin
      */
     public function wop_plugin_help( $text, $screen_id, $screen )
     {
-        
+
         if ( $screen_id == $this->wop_option_screen_id ) {
             $text = '<h5>Need help with the Widgets on Pages plugin?</h5>';
             $text .= '<p>Check out the documentation and support forums for help with this plugin.</p>';
             $text .= '<a href="http://wordpress.org/extend/plugins/widgets-on-pages/">Documentation</a><br /><a href="https://wordpress.org/support/plugin/widgets-on-pages/">Support forums</a>';
         }
-        
+
         return $text;
     }
-    
+
     /**
      * Removes meta boxes from admin screen
      *
@@ -193,7 +193,7 @@ class Widgets_On_Pages_Admin
     {
         remove_meta_box( 'postexcerpt', 'turbo-sidebar-cpt', 'normal' );
     }
-    
+
     /**
      * Adds meta boxes from admin screen
      *
@@ -211,7 +211,7 @@ class Widgets_On_Pages_Admin
             null
         );
     }
-    
+
     /**
      * Shortcode metabox markup
      *
@@ -224,7 +224,7 @@ class Widgets_On_Pages_Admin
         $shortcode_id = '[widgets_on_pages id="' . $object->post_title . '"]';
         echo  '<p id="wop-shortcode">' . $shortcode_id . '</p>' ;
     }
-    
+
     /**
      * Creates a new Turbo Sidebars custom post type
      *
@@ -240,7 +240,7 @@ class Widgets_On_Pages_Admin
         $opts['can_export'] = true;
         $opts['capability_type'] = $cap_type;
         $opts['description'] = '';
-        $opts['exclude_from_search'] = false;
+        $opts['exclude_from_search'] = true;
         $opts['has_archive'] = false;
         $opts['hierarchical'] = false;
         $opts['map_meta_cap'] = true;
@@ -293,7 +293,7 @@ class Widgets_On_Pages_Admin
         $opts = apply_filters( 'turbo-sidebars-cpt-options', $opts );
         register_post_type( strtolower( $cpt_name ), $opts );
     }
-    
+
     /**
      * Register the sidebars, based upon our Turbo Sidebars.
      *
@@ -309,7 +309,7 @@ class Widgets_On_Pages_Admin
         $loop = new WP_Query( $args );
         while ( $loop->have_posts() ) {
             $loop->the_post();
-            
+
             if ( is_numeric( $loop->post->post_name ) ) {
                 $name = 'Widgets on Pages ' . $loop->post->post_name;
                 $shortcode_id = $loop->post->post_name;
@@ -319,7 +319,7 @@ class Widgets_On_Pages_Admin
                 $id = 'wop-' . $loop->post->post_name;
                 $shortcode_id = $loop->post->post_title;
             }
-            
+
             if ( '' != $loop->post->post_excerpt ) {
                 $id = 'wop-' . $loop->post->post_excerpt;
             }
@@ -336,7 +336,7 @@ class Widgets_On_Pages_Admin
             ) );
         }
     }
-    
+
     /**
      * Register the stylesheets for the admin area.
      *
@@ -363,7 +363,7 @@ class Widgets_On_Pages_Admin
             'all'
         );
     }
-    
+
     /**
      * Register the JavaScript for the admin area.
      *

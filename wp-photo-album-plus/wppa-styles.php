@@ -3,7 +3,7 @@
 /* Package: wp-photo-album-plus
 /*
 /* Various style computation routines
-/* Version 6.6.18
+/* Version 6.7.02
 /*
 */
 
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 
 // Create dynamic css file
 // This function creates the dynamic css file with styles that depend on the settings.
-// Any updates to this routine must also be implemented in __wcs()
+// Any updates to this routine must also be implemented in wppa_wcs()
 function wppa_create_wppa_dynamic_css() {
 global $wppa_dynamic_css_data;
 
@@ -677,7 +677,7 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 // dependant of the wppa_inline_css switch.
 // Styles should be passed as is . They must be independatnt of settings,
 // and appear in the standard wppa-styles.css file.
-function __wis( $style ) {
+function wppa_wis( $style ) {
 
 	if ( ! wppa_switch( 'inline_css' ) ) {
 		return '';	// No inline styles
@@ -691,7 +691,7 @@ function __wis( $style ) {
 // dependant of the wppa_inline_css switch.
 // The class is passed and the corresponding inline styles are returned.
 // Any updates to this routine must also be implemented in wppa_create_wppa_dynamic_css().
-function __wcs( $class ) {
+function wppa_wcs( $class ) {
 
 	if ( ! wppa_switch( 'inline_css' ) ) {
 		return '';	// No inline styles
@@ -931,8 +931,8 @@ function __wcs( $class ) {
 			$result .= 'padding: 3px 2px 3px 0; border: 0';
 			break;
 		default:
-			wppa_dbg_msg( 'Unexpected error in __wcs, unknown class: ' . $class, 'red' );
-			wppa_log( 'Err', 'Unexpected error in __wcs, unknown class: ' . $class );
+			wppa_dbg_msg( 'Unexpected error in wppa_wcs, unknown class: ' . $class, 'red' );
+			wppa_log( 'Err', 'Unexpected error in wppa_wcs, unknown class: ' . $class );
 	}
 	return $result;
 }

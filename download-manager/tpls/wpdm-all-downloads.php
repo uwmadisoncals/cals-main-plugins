@@ -6,7 +6,12 @@ if(!isset($params['items_per_page'])) $params['items_per_page'] = 20;
 
 $column_positions = array();
 
-if(isset($params['jstable']) && $params['jstable']==1): ?>
+if(isset($params['jstable']) && $params['jstable']==1):
+
+    $datatable_col = ( isset($params['order_by']) && $params['order_by'] == 'title' ) ? '0' : '2';
+    $datatable_order = ( isset($params['order']) && $params['order'] == 'DESC' ) ? 'desc' : 'asc';
+
+    ?>
     <script src="<?php echo WPDM_BASE_URL.'assets/js/jquery.dataTables.min.js' ?>"></script>
     <link href="<?php echo WPDM_BASE_URL.'assets/css/jquery.dataTables.min.css' ?>" rel="stylesheet" />
     <style>
@@ -40,7 +45,7 @@ if(isset($params['jstable']) && $params['jstable']==1): ?>
     <script>
         jQuery(function($){
             $('#wpdmmydls-<?php echo $tid; ?>').dataTable({
-                "order": [[ 2, "desc" ]],
+                "order": [[ <?php echo $datatable_col; ?>, "<?php echo $datatable_order; ?>" ]],
                 "language": {
                     "lengthMenu": "<?php _e("Display _MENU_ downloads per page",'download-manager')?>",
                     "zeroRecords": "<?php _e("Nothing _START_ to - sorry",'download-manager')?>",

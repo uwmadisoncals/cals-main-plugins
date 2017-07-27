@@ -3,13 +3,13 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 6.6.12
+* Version 6.7.01
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
 * The use of $_SESSION data is therefor no longer reliable
 * This file contains routines to obtain the same functionality, but more secure.
-* In the application use the global $wppa_session in stead of $_SESSION['wppa_session']
+* In the application use the global $wppa_session instead of $_SESSION['wppa_session']
 *
 */
 

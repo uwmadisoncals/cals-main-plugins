@@ -1109,6 +1109,7 @@ class Package {
         $package_data_meta = array(
             'files'           => array(),
             'fileinfo'           => array(),
+            //'password'           => '',
             'package_dir'           => '',
             'link_label'          => __('Download','download-manager'),
             'download_count'           => 0,

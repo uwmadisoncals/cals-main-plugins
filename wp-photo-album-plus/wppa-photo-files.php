@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version 6.6.24
+* Version 6.7.01
 *
 */
 
@@ -329,7 +329,7 @@ global $wpdb;
 	// File successfully created ?
 	if ( is_file ( $newimage ) ) {
 
-		// Make sure file is accessable
+		// Make sure file is accessible
 		wppa_chmod( $newimage );
 
 		// Optimize file
@@ -612,7 +612,7 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 		imagedestroy( $dst );
 	}
 
-	// Make sure file is accessable
+	// Make sure file is accessible
 	wppa_chmod( $thumbpath );
 
 	// Optimize

@@ -33,7 +33,6 @@ class Apply {
         add_action( 'wp_head', array($this, 'addGenerator'), 9);
         add_filter('pre_get_posts', array($this, 'queryTag'));
         add_filter('the_excerpt_embed', array($this, 'oEmbed'));
-        add_action( 'wp_ajax_wpdm_clear_stats', array($this, 'clearStats'));
 
     }
 
@@ -41,6 +40,7 @@ class Apply {
         if(!is_admin()) return;
         add_action( 'admin_init', array($this, 'sfbAccess'));
         add_action('save_post', array( $this, 'DashboardPages' ));
+        add_action( 'wp_ajax_wpdm_clear_stats', array($this, 'clearStats'));
 
     }
 
@@ -502,9 +502,9 @@ class Apply {
     }
 
     function clearStats(){
-        if(!current_user_can('manage_options')) return;
+        if(!current_user_can('manage_options')) die('error');
         global $wpdb;
-        $wpdb->query('truncate table '.$wpdb->prefix.'ahm_stats');
+        $wpdb->query('truncate table '.$wpdb->prefix.'ahm_download_stats');
         die('ok');
     }
 

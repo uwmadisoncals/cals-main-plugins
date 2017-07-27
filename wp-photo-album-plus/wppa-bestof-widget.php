@@ -3,17 +3,18 @@
 * Package: wp-photo-album-plus
 *
 * display the best rated photos
-* Version 6.7.00
+* Version 6.7.01
 *
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 
 class BestOfWidget extends WP_Widget {
+
     /** constructor */
     function __construct() {
-		$widget_ops = array('classname' => 'wppa_bestof_widget', 'description' => __( 'WPPA+ Best Of Rated Photos', 'wp-photo-album-plus') );
-		parent::__construct('wppa_bestof_widget', __('Best Of Photos', 'wp-photo-album-plus'), $widget_ops);
+		$widget_ops = array( 'classname' => 'wppa_bestof_widget', 'description' => __( 'Display thumbnails or owners of top rated photos', 'wp-photo-album-plus' ) );
+		parent::__construct( 'wppa_bestof_widget', __( 'WPPA+ Best Of Photos', 'wp-photo-album-plus' ), $widget_ops );
     }
 
 	/** @see WP_Widget::widget */
@@ -34,8 +35,8 @@ class BestOfWidget extends WP_Widget {
 		extract( $args );
 
 		$instance 		= wp_parse_args( (array) $instance, array(
-														'title' 	=> '',
-														'count' 	=> '1',
+														'title' 	=> __( 'Best Of Photos', 'wp-photo-album-plus' ),
+														'count' 	=> '10',
 														'sortby' 	=> 'maxratingcount',
 														'display' 	=> 'photo',
 														'period' 	=> 'thisweek',
@@ -45,18 +46,17 @@ class BestOfWidget extends WP_Widget {
 														'linktype' 	=> 'none',
 														) );
 
- 		$widget_title 	= apply_filters('widget_title', $instance['title'] );
-		$page 			= in_array( $instance['linktype'], wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page('bestof_widget_linkpage', __('Best Of Photos', 'wp-photo-album-plus'));
-		$count 			= $instance['count'];
+ 		$widget_title 	= apply_filters( 'widget_title', $instance['title'] );
+		$page 			= in_array( $instance['linktype'], wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page( 'bestof_widget_linkpage', __( 'Best Of Photos', 'wp-photo-album-plus' ) );
+		$count 			= $instance['count'] ? $instance['count'] : '10';
 		$sortby 		= $instance['sortby'];
 		$display 		= $instance['display'];
 		$period 		= $instance['period'];
-		$maxratings 	= $instance['maxratings'];
-		$meanrat		= $instance['meanrat'];
-		$ratcount 		= $instance['ratcount'];
+		$maxratings 	= wppa_checked( $instance['maxratings'] ) ? 'yes' : '';
+		$meanrat		= wppa_checked( $instance['meanrat'] ) ? 'yes' : '';
+		$ratcount 		= wppa_checked( $instance['ratcount'] ) ? 'yes' : '';
 		$linktype 		= $instance['linktype'];
 		$size 			= wppa_opt( 'widget_width' );
-//		$data 			= wppa_get_the_bestof( $count, $period, $sortby, $display );
 		$lineheight 	= wppa_opt( 'fontsize_widget_thumb' ) * 1.5;
 
 		$widget_content = "\n".'<!-- WPPA+ BestOf Widget start -->';
@@ -71,24 +71,26 @@ class BestOfWidget extends WP_Widget {
 														'ratcount' 		=> $ratcount,
 														'linktype' 		=> $linktype,
 														'size' 			=> $size,
-														'lineheight' 	=> $lineheight
-
+														'lineheight' 	=> $lineheight,
 														) );
 
 		$widget_content .= '<div style="clear:both"></div>';
 		$widget_content .= "\n".'<!-- WPPA+ BestOf Widget end -->';
 
 		echo "\n" . $before_widget;
-		if ( !empty( $widget_title ) ) { echo $before_title . $widget_title . $after_title; }
+		if ( ! empty( $widget_title ) ) {
+			echo $before_title . $widget_title . $after_title;
+		}
 		echo $widget_content . $after_widget;
 
 		wppa( 'in_widget', false );
     }
 
     /** @see WP_Widget::update */
-    function update($new_instance, $old_instance) {
+    function update( $new_instance, $old_instance ) {
+
 		$instance = $old_instance;
-		$instance['title'] 		= strip_tags($new_instance['title']);
+		$instance['title'] 		= strip_tags( $new_instance['title'] );
 		$instance['count'] 		= $new_instance['count'];
 		$instance['sortby'] 	= $new_instance['sortby'];
 		$instance['display'] 	= $new_instance['display'];
@@ -102,12 +104,12 @@ class BestOfWidget extends WP_Widget {
     }
 
     /** @see WP_Widget::form */
-    function form($instance) {
+    function form( $instance ) {
 
-		//Defaults
+		// Defaults
 		$instance 		= wp_parse_args( (array) $instance, array(
-														'title' 	=> __('Best Of Photos', 'wp-photo-album-plus'),
-														'count' 	=> '1',
+														'title' 	=> __( 'Best Of Photos', 'wp-photo-album-plus' ),
+														'count' 	=> '10',
 														'sortby' 	=> 'maxratingcount',
 														'display' 	=> 'photo',
 														'period' 	=> 'thisweek',
@@ -117,94 +119,86 @@ class BestOfWidget extends WP_Widget {
 														'linktype' 	=> 'none'
 														) );
 
- 		$widget_title 	= $instance['title'];
-		$count 			= $instance['count'];
-		$sortby 		= $instance['sortby'];
-		$display 		= $instance['display'];
-		$period 		= $instance['period'];
-		$maxratings 	= $instance['maxratings'];
-		$meanrat		= $instance['meanrat'];
-		$ratcount 		= $instance['ratcount'];
-		$linktype		= $instance['linktype'];
+		// WP Bug?
+		if ( ! $instance['count'] ) {
+			$instance['count'] = '10';
+		}
 
-		?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'wp-photo-album-plus'); ?></label>
-			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $widget_title; ?>" />
-		</p>
-		<?php
+		// Widget Title
+		echo
+		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) ) .
 
-		$count_html 	= '
-		<select id="'.$this->get_field_id('count').'" name="'.$this->get_field_name('count').'" >
-			<option value="1" '.( $count == '1' ? 'selected="selected"' : '' ).' >1</option>
-			<option value="2" '.( $count == '2' ? 'selected="selected"' : '' ).' >2</option>
-			<option value="3" '.( $count == '3' ? 'selected="selected"' : '' ).' >3</option>
-			<option value="4" '.( $count == '4' ? 'selected="selected"' : '' ).' >4</option>
-			<option value="5" '.( $count == '5' ? 'selected="selected"' : '' ).' >5</option>
-			<option value="6" '.( $count == '6' ? 'selected="selected"' : '' ).' >6</option>
-			<option value="7" '.( $count == '7' ? 'selected="selected"' : '' ).' >7</option>
-			<option value="8" '.( $count == '8' ? 'selected="selected"' : '' ).' >8</option>
-			<option value="9" '.( $count == '9' ? 'selected="selected"' : '' ).' >9</option>
-			<option value="10" '.( $count == '10' ? 'selected="selected"' : '' ).' >10</option>
-		</select>
-		';
-		$what_html 		= '
-		<select id="'.$this->get_field_id('display').'" name="'.$this->get_field_name('display').'" >
-			<option value="photo" '.( $display == 'photo' ? 'selected="selected"' : '' ).' >'.__('Photo(s)', 'wp-photo-album-plus').'</option>
-			<option value="owner" '.( $display == 'owner' ? 'selected="selected"' : '' ).' >'.__('Owner(s)', 'wp-photo-album-plus').'</option>
-		</select>
-		';
-		$period_html 	= '
-		<select id="'.$this->get_field_id('period').'" name="'.$this->get_field_name('period').'" >
-			<option value="lastweek" '.( $period == 'lastweek' ? 'selected="selected"' : '' ).' >'.__('Last week', 'wp-photo-album-plus').'</option>
-			<option value="thisweek" '.( $period == 'thisweek' ? 'selected="selected"' : '' ).' >'.__('This week', 'wp-photo-album-plus').'</option>
-			<option value="lastmonth" '.( $period == 'lastmonth' ? 'selected="selected"' : '' ).' >'.__('Last month', 'wp-photo-album-plus').'</option>
-			<option value="thismonth" '.( $period == 'thismonth' ? 'selected="selected"' : '' ).' >'.__('This month', 'wp-photo-album-plus').'</option>
-			<option value="lastyear" '.( $period == 'lastyear' ? 'selected="selected"' : '' ).' >'.__('Last year', 'wp-photo-album-plus').'</option>
-			<option value="thisyear" '.( $period == 'thisyear' ? 'selected="selected"' : '' ).' >'.__('This year', 'wp-photo-album-plus').'</option>
-		</select>
-		';
-		$sort_html 		= '
-		<select id="'.$this->get_field_id('sortby').'" name="'.$this->get_field_name('sortby').'" >
-			<option value="maxratingcount" '.( $sortby == 'maxratingcount' ? 'selected="selected"' : '' ).' >'.__('Number of max ratings', 'wp-photo-album-plus').'</option>
-			<option value="meanrating" '.( $sortby == 'meanrating' ? 'selected="selected"' : '' ).' >'.__('Mean value', 'wp-photo-album-plus').'</option>
-			<option value="ratingcount" '.( $sortby == 'ratingcount' ? 'selected="selected"' : '' ).' >'.__('Number of votes', 'wp-photo-album-plus').'</option>
-		</select>
-		';
+		// Max number to diaplsy
+		wppa_widget_number( $this, 'count', $instance['count'], __( 'Max number of thumbnails', 'wp-photo-album-plus' ), '1', '25' );
 
-		echo sprintf( __( 'Display the %1s best %2s based on ratings given during %3s and sorted by %4s', 'wp-photo-album-plus' ), $count_html, $what_html, $period_html, $sort_html );
+		// What to display
+		$options 	= array( 	__( 'Photos', 'wp-photo-album-plus' ),
+								__( 'Owners', 'wp-photo-album-plus' ),
+								);
+		$values 	= array(	'photo',
+								'owner',
+								);
 
-?>
+		echo
+		wppa_widget_selection( $this, 'display', $instance['display'], __( 'Select photos or owners', 'wp-photo-album-plus' ), $options, $values, array(), '' );
 
-		<p><label ><?php _e('Subtitle:', 'wp-photo-album-plus'); ?></label>
-			<br /><?php _e('No of max ratings:', 'wp-photo-album-plus'); ?>
-			<select id="<?php echo $this->get_field_id('maxratings'); ?>" name="<?php echo $this->get_field_name('maxratings'); ?>" >
-				<option value="yes" <?php if ( $meanrat == 'yes' ) echo 'selected="selected"' ?>><?php _e('yes', 'wp-photo-album-plus') ?></option>
-				<option value="no" <?php if ( $meanrat == 'no' ) echo 'selected="selected"' ?>><?php _e('no', 'wp-photo-album-plus') ?></option>
-			</select>
-			<br /><?php _e('Mean rating:', 'wp-photo-album-plus'); ?>
-			<select id="<?php echo $this->get_field_id('meanrat'); ?>" name="<?php echo $this->get_field_name('meanrat'); ?>" >
-				<option value="yes" <?php if ( $meanrat == 'yes' ) echo 'selected="selected"' ?>><?php _e('yes', 'wp-photo-album-plus') ?></option>
-				<option value="no" <?php if ( $meanrat == 'no' ) echo 'selected="selected"' ?>><?php _e('no', 'wp-photo-album-plus') ?></option>
-			</select>
-			<br /><?php _e('Rating count:', 'wp-photo-album-plus'); ?>
-			<select id="<?php echo $this->get_field_id('ratcount'); ?>" name="<?php echo $this->get_field_name('ratcount'); ?>" >
-				<option value="yes" <?php if ( $ratcount == 'yes' ) echo 'selected="selected"' ?>><?php _e('yes', 'wp-photo-album-plus') ?></option>
-				<option value="no" <?php if ( $ratcount == 'no' ) echo 'selected="selected"' ?>><?php _e('no', 'wp-photo-album-plus') ?></option>
-			</select>
-		</p>
+		// Period
+		$options 	= array( 	__( 'Last week', 'wp-photo-album-plus' ),
+								__( 'This week', 'wp-photo-album-plus' ),
+								__( 'Last month', 'wp-photo-album-plus' ),
+								__( 'This month', 'wp-photo-album-plus' ),
+								__( 'Last year', 'wp-photo-album-plus' ),
+								__( 'This year', 'wp-photo-album-plus' ),
+								);
+		$values 	= array( 	'lastweek',
+								'thisweek',
+								'lastmonth',
+								'thismonth',
+								'lastyear',
+								'thisyear',
+								);
+		echo
+		wppa_widget_selection( $this, 'period', $instance['period'], __( 'Limit to ratings given during', 'wp-photo-album-plus' ), $options, $values, array(), '' );
 
-		<p><label><?php _e('Link to:', 'wp-photo-album-plus') ?></label>
-			<select id="<?php echo $this->get_field_id('linktype'); ?>" name="<?php echo $this->get_field_name('linktype'); ?>" >
-				<option value="none" <?php if ( $linktype == 'none' ) echo 'selected="selected"' ?>><?php _e('--- none ---', 'wp-photo-album-plus') ?></option>
-				<option value="owneralbums" <?php if ( $linktype == 'owneralbums' ) echo 'selected="selected"' ?>><?php _e('The authors album(s)', 'wp-photo-album-plus') ?></option>
-				<option value="ownerphotos" <?php if ( $linktype == 'ownerphotos' ) echo 'selected="selected"' ?>><?php _e('The photos in the authors album(s), thumbnails', 'wp-photo-album-plus') ?></option>
-				<option value="ownerphotosslide" <?php if ( $linktype == 'ownerphotosslide' ) echo 'selected="selected"' ?>><?php _e('The photos in the authors album(s), slideshow', 'wp-photo-album-plus') ?></option>
-				<option value="upldrphotos" <?php if ( $linktype == 'upldrphotos' ) echo 'selected="selected"' ?>><?php _e('All the authors photos, thumbnails', 'wp-photo-album-plus') ?></option>
-				<option value="upldrphotosslide" <?php if ( $linktype == 'upldrphotosslide' ) echo 'selected="selected"' ?>><?php _e('All the authors photos, slideshow', 'wp-photo-album-plus') ?></option>
-			</select>
-		</p>
+		// Sort by
+		$options 	= array( 	__( 'Number of max ratings', 'wp-photo-album-plus' ),
+								__( 'Mean value', 'wp-photo-album-plus' ),
+								__( 'Number of votes', 'wp-photo-album-plus' ),
+								);
+		$values 	= array( 	'maxratingcount',
+								'meanrating',
+								'ratingcount',
+								);
+		echo
+		wppa_widget_selection( $this, 'sortby', $instance['sortby'], __( 'Sort by', 'wp-photo-album-plus' ), $options, $values, array(), '' ) .
 
-<?php
+		// Number of max ratings
+		wppa_widget_checkbox( $this, 'maxratings', $instance['maxratings'], __( 'Show number of max ratings', 'wp-photo-album-plus' ) ) .
+
+		// Mean rating
+		wppa_widget_checkbox( $this, 'meanrat', $instance['meanrat'], __( 'Show mean rating', 'wp-photo-album-plus') ) .
+
+		// Number of ratings
+		wppa_widget_checkbox( $this, 'ratcount', $instance['ratcount'], __( 'Show number of ratings', 'wp-photo-album-plus') );
+
+		// Link to
+		$options 	= array( 	__( '--- none ---', 'wp-photo-album-plus' ),
+								__( 'The authors album(s)', 'wp-photo-album-plus' ),
+								__( 'The photos in the authors album(s), thumbnails', 'wp-photo-album-plus' ),
+								__( 'The photos in the authors album(s), slideshow', 'wp-photo-album-plus' ),
+								__( 'All the authors photos, thumbnails', 'wp-photo-album-plus' ),
+								__( 'All the authors photos, slideshow', 'wp-photo-album-plus' ),
+								);
+		$values 	= array( 	'none',
+								'owneralbums',
+								'ownerphotos',
+								'ownerphotosslide',
+								'upldrphotos',
+								'upldrphotosslide',
+								);
+		echo
+		wppa_widget_selection( $this, 'linktype', $instance['linktype'], __( 'Link to', 'wp-photo-album-plus' ), $options, $values, array(), '' );
+
     }
 
 } // class BestOfWidget
