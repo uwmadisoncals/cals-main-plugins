@@ -230,6 +230,7 @@ class Toolset_Assets_Manager {
 	const STYLE_TOOLSET_PROMOTION = 'toolset-promotion';
 
 
+
 	// chosen lib
 	const STYLE_TOOLSET_CHOSEN = 'toolset-chosen-styles';
 
@@ -237,6 +238,8 @@ class Toolset_Assets_Manager {
 	//
 	//
 	const STYLE_JQUERY_UI_DIALOG = 'wp-jquery-ui-dialog';
+
+	const STYLE_ONTHEGOSYSTEMS_ICONS = 'onthegosystems-icons';
 
 
 	/**
@@ -476,6 +479,13 @@ class Toolset_Assets_Manager {
 			self::STYLE_TOOLSET_DIALOGS_OVERRIDES,
 			$this->assets_url . '/res/css/toolset-dialogs.css',
 			array(),
+			TOOLSET_COMMON_VERSION
+		);
+
+		$this->register_style(
+			self::STYLE_ONTHEGOSYSTEMS_ICONS,
+			ON_THE_GO_SYSTEMS_BRANDING_REL_PATH . 'onthegosystems-icons/css/onthegosystems-icons.css',
+			array( self::STYLE_TOOLSET_COMMON ),
 			TOOLSET_COMMON_VERSION
 		);
 

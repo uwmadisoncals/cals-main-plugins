@@ -298,6 +298,23 @@ body.wpt-loading .wpt-modal {
     margin-bottom: 5px;
 }
 
-.wpt-repdelete {
+.wpt-repdrag
+,.wpt-credfile-delete
+,.wpt-credfile-undo {
+    margin: 0 5px 0 0;
+}
+.wpt-repdelete, .wpt-date-clear {
+    margin: 0 0 0 5px;
+}
+.wpt-repadd {
+    margin-top: 5px !important;
+}
+.wpt-repctl {
     margin-top: 5px;
+    border-bottom: 1px solid #CCC;
+    padding-bottom: 10px;
+}
+
+.wpt-repctl:hover {
+    background-color: #ededed;
 }

@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.7.03
+* Version 6.7.05
 *
 */
 
@@ -795,16 +795,21 @@ global $wppa;
 	}
 
 	// Selection boxes present and with a value?
+	$t = '';
 	for ( $i = 0; $i < 3; $i++ ) {
 		if ( isset( $_REQUEST['wppa-searchselbox-' . $i] ) ) {
 			if ( $_REQUEST['wppa-searchselbox-' . $i] ) {
-				$str .= ' ' . $_REQUEST['wppa-searchselbox-' . $i];
+				$t .= ' ' . $_REQUEST['wppa-searchselbox-' . $i];
 			}
 		}
 	}
+	if ( $t ) {
+		$str = $t . ' ' . $str;
+		$str = trim( $str );
+	}
 
 	// Sanitize
-	$ignore = array( '"', "'", '\\', '>', '<', ':', ';', '!', '?', '=', '_', '[', ']', '(', ')', '{', '}' );
+	$ignore = array( '"', "'", '\\', '>', '<', ':', ';', '?', '=', '_', '[', ']', '(', ')', '{', '}' );
 	$str = wppa_decode_uri_component( $str );
 	$str = str_replace( $ignore, ' ', $str );
 	$str = strip_tags( $str );

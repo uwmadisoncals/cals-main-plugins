@@ -201,6 +201,12 @@ class WPToolset_Field_Date extends FieldFactory
             if ( $readonly ) {
                 $attributes_hour_minute[ 'disabled' ] = 'disabled';
             }
+			
+			if ( array_key_exists( 'use_bootstrap', $this->_data ) && $this->_data['use_bootstrap']
+		        && $output != 'bootstrap'
+	        ) {
+		        $attributes_hour_minute['style'] = 'display:inline;width:auto;';
+	        }
 
             // Hour
             $hours = 24;
@@ -214,7 +220,7 @@ class WPToolset_Field_Date extends FieldFactory
             }
             if ( $readonly ) {
 
-                if ( ( $output == 'bootstrap' ) ) {
+                if ( $output == 'bootstrap' ) {
                     $form[] = array(
                         '#type' => 'hidden',
                         '#value' => $hour,
@@ -240,22 +246,31 @@ class WPToolset_Field_Date extends FieldFactory
                     )
                 );
             } else {
-                $hour_element = array(
-                    '#type' => 'select',
-                    '#before' => '<span class="wpt-form-label">' . __( 'Hour', 'wpv-views' ) . '</span>',
-                    '#options' => $options,
-                    '#default_value' => $hour,
-                    '#name' => $this->getName() . '[hour]',
-                    '#inline' => true,
-                    '#attributes' => array(
-                        'title' => esc_attr(__('Select', 'wpv-views')) . " Date"
-                    )
-                );
-            }
-
-            if ( ( $output == 'bootstrap' ) ) {
-                unset($hour_element[ '#inline' ]);
-                $hour_element[ '#attributes' ][ 'class' ] = 'form-control';
+                if ( $output == 'bootstrap' ) {
+		            $hour_element = array(
+			            '#type' => 'select',
+			            '#before' => '<span class="wpt-form-label">' . __( 'Hour', 'wpv-views' ) . '</span>',
+			            '#options' => $options,
+			            '#default_value' => $hour,
+			            '#name' => $this->getName() . '[hour]',
+			            '#attributes' => array(
+				            'title' => esc_attr( __( 'Select', 'wpv-views' ) ) . " Date",
+				            'class' => 'form-control',
+			            ),
+		            );
+	            } else {
+		            $hour_element = array(
+			            '#type' => 'select',
+			            '#before' => '<span class="wpt-form-label">' . __( 'Hour', 'wpv-views' ) . '</span>',
+			            '#options' => $options,
+			            '#default_value' => $hour,
+			            '#name' => $this->getName() . '[hour]',
+			            '#inline' => true,
+			            '#attributes' => array(
+				            'title' => esc_attr( __( 'Select', 'wpv-views' ) ) . " Date",
+			            ),
+		            );
+	            }
             }
 
             if ( !empty($attributes_hour_minute) ) {
@@ -274,7 +289,7 @@ class WPToolset_Field_Date extends FieldFactory
             }
             if ( $readonly ) {
 
-                if ( ( $output == 'bootstrap' ) ) {
+                if ( $output == 'bootstrap' ) {
                     $form[] = array(
                         '#type' => 'hidden',
                         '#value' => $minute,
@@ -301,22 +316,31 @@ class WPToolset_Field_Date extends FieldFactory
                     )
                 );
             } else {
-                $minute_element = array(
-                    '#type' => 'select',
-                    '#before' => '<span class="wpt-form-label">' . __( 'Minute', 'wpv-views' ) . '</span>',
-                    '#options' => $options,
-                    '#default_value' => $minute,
-                    '#name' => $this->getName() . '[minute]',
-                    '#inline' => true,
-                    '#attributes' => array(
-                        'title' => esc_attr(__('Select minute', 'wpv-views'))
-                    )
-                );
-            }
-
-            if ( ( $output == 'bootstrap' ) ) {
-                unset($minute_element[ '#inline' ]);
-                $minute_element[ '#attributes' ][ 'class' ] = 'form-control';
+                if ( $output == 'bootstrap' ) {
+		            $minute_element = array(
+			            '#type' => 'select',
+			            '#before' => '<span class="wpt-form-label">' . __( 'Minute', 'wpv-views' ) . '</span>',
+			            '#options' => $options,
+			            '#default_value' => $minute,
+			            '#name' => $this->getName() . '[minute]',
+			            '#attributes' => array(
+				            'title' => esc_attr( __( 'Select minute', 'wpv-views' ) ),
+				            'class' => 'form-control',
+			            ),
+		            );
+	            } else {
+		            $minute_element = array(
+			            '#type' => 'select',
+			            '#before' => '<span class="wpt-form-label">' . __( 'Minute', 'wpv-views' ) . '</span>',
+			            '#options' => $options,
+			            '#default_value' => $minute,
+			            '#name' => $this->getName() . '[minute]',
+			            '#inline' => true,
+			            '#attributes' => array(
+				            'title' => esc_attr( __( 'Select minute', 'wpv-views' ) ),
+			            ),
+		            );
+	            }
             }
 
             if ( !empty($attributes_hour_minute) ) {

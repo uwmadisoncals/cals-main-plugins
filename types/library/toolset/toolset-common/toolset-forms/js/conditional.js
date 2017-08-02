@@ -39,38 +39,6 @@ var wptCond = (function ($) {
         //_init_custom();
     }
 
-    // hide / show effects
-
-    $.fn.condSlideFadeDown = function (speed, easing, callback) {
-        easing = easing || 'linear';
-        return this.each(function () {
-            $(this).fadeIn(speed, function () {
-                //$(this).css('height', 'auto');
-                if ($.browser.msie) {
-                    this.style.removeAttribute('filter');
-                }
-                if ($.isFunction(callback)) {
-                    callback.call(this);
-                }
-            });
-        });
-    };
-
-    $.fn.condSlideFadeUp = function (speed, easing, callback) {
-        easing = easing || 'linear';
-        return this.each(function () {
-            $(this).fadeOut(speed, function () {
-                //$(this).css('height', 'auto');
-                if ($.browser.msie) {
-                    this.style.removeAttribute('filter');
-                }
-                if ($.isFunction(callback)) {
-                    callback.call(this);
-                }
-            });
-        });
-    };
-
     function _getTrigger(trigger, formID)
     {
         var $trigger = $('[data-wpt-name="' + trigger + '"]', formID);
@@ -746,24 +714,18 @@ var wptCond = (function ($) {
             }
             $el.addClass('wpt-conditional-visible').removeClass('wpt-conditional-hidden js-wpt-remove-on-submit js-wpt-validation-ignore');
             switch (effectmode) {
-                case 'fade-slide':
-                    setTimeout(function () {
-                        $el.stop(true).condSlideFadeDown('linear', function () {
-                            $(document).trigger('js_event_toolset_forms_conditional_field_toggled', data_for_events);
-                        });
-                    }, delay);
-                    break;
                 case 'slide':
                     setTimeout(function () {
-                        $el.stop(true).slideDown('linear', function () {
+                        $el.slideDown('fast', function () {
                             $el.css('height', 'auto');
                             $(document).trigger('js_event_toolset_forms_conditional_field_toggled', data_for_events);
                         });
                     }, delay);
                     break;
+				case 'fade-slide':
                 case 'fade':
                     setTimeout(function () {
-                        $el.stop(true).fadeIn('fast', function () {
+                        $el.fadeIn('fast', function () {
                             $(document).trigger('js_event_toolset_forms_conditional_field_toggled', data_for_events);
                         });
                     }, delay);
@@ -781,24 +743,18 @@ var wptCond = (function ($) {
         } else {
             $el.addClass('wpt-conditional-hidden js-wpt-remove-on-submit js-wpt-validation-ignore').removeClass('wpt-conditional-visible');
             switch (effectmode) {
-                case 'fade-slide':
-                    setTimeout(function () {
-                        $el.stop(true).condSlideFadeUp('linear', function () {
-                            $(document).trigger('js_event_toolset_forms_conditional_field_toggled', data_for_events);
-                        });
-                    }, delay);
-                    break;
                 case 'slide':
                     setTimeout(function () {
-                        $el.stop(true).slideUp('linear', function () {
+                        $el.slideUp('fast', function () {
                             $el.css('height', 'auto');
                             $(document).trigger('js_event_toolset_forms_conditional_field_toggled', data_for_events);
                         });
                     }, delay);
                     break;
+				case 'fade-slide':
                 case 'fade':
                     setTimeout(function () {
-                        $el.stop(true).fadeOut('fast', function () {
+                        $el.fadeOut('fast', function () {
                             $(document).trigger('js_event_toolset_forms_conditional_field_toggled', data_for_events);
                         });
                     }, delay);
@@ -816,6 +772,11 @@ var wptCond = (function ($) {
         }
     }
 
+	// @bug This seems to be only used by date.js on its conditional_check_date method,
+	// which again gets only used by its ajaxConditional method, 
+	// which seems hooked into a commented out JS action.
+	// The PHP side is in bootstrap.php :-/
+	// I do not think we have AJAX conditionals, not even for date fields :-//
     function ajaxCheck(formID, field, conditions)
     {
         var values = {};
@@ -892,11 +853,15 @@ var wptCond = (function ($) {
 
     jQuery(document).on('cred_form_ready', function(evt, evt_data){
 
-        //Queue initialisation, init date fields first then the conditional groups to prevent jQuery validation errors
+        // Queue initialisation, init date fields first then the conditional groups to prevent jQuery validation errors
+		// @bug This does not init date fields as they are actually initialized on CRED forms in date.js
+		// and they require a flag source: 'cred_form_ready_init'
         setTimeout(function(){
             wptDate.init('#' + evt_data.form_id);
         }, 1);
 
+		// @bug This is inid in main.js:18 and I can not even start wondering what side effects can have doing it twice
+		// For now, sjow/hide effects are binded twice and that might be causing some nasty visual :-(
         setTimeout(function(){
             init();
         }, 2);
@@ -909,4 +874,3 @@ var wptCond = (function ($) {
     };
 
 })(jQuery);
-

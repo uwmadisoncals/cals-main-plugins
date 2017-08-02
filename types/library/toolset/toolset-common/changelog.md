@@ -1,5 +1,8 @@
 # Toolset Common Library
 
+## 2.4.3
+- Compatibility with Types 2.2.14, Vies 2.4.1, CRED 1.9.1, Access 2.4.2 and Layouts 2.0.2
+
 ## 2.4.2
 - Removed notices, which leads to documentation of integration between Layouts and 3rd party themes
 

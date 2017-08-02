@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version 6.6.24
+* Version 6.7.05
 *
 *
 */
@@ -163,10 +163,10 @@ global $pcount;
 //
 // @1: string. Any test string may contain all kind of garbage.
 //
-function wppa_index_raw_to_words( $xtext, $no_skips = false ) {
+function wppa_index_raw_to_words( $xtext, $no_skips = false, $minlen = '3', $no_excl = true ) {
 
 	// Find chars to be replaced by delimiters (spaces)
-	$ignore = array( 	'"', "'", '`', '\\', '>', '<', ',', ':', ';', '!', '?', '=', '_',
+	$ignore = array( 	'"', "'", '`', '\\', '>', '<', ',', ':', ';', '?', '=', '_',
 						'[', ']', '(', ')', '{', '}', '..', '...', '....', "\n", "\r",
 						"\t", '.jpg', '.png', '.gif', '&#039', '&amp',
 						'w#cc0', 'w#cc1', 'w#cc2', 'w#cc3', 'w#cc4', 'w#cc5', 'w#cc6', 'w#cc7', 'w#cc8', 'w#cc9',
@@ -175,6 +175,9 @@ function wppa_index_raw_to_words( $xtext, $no_skips = false ) {
 					);
 	if ( wppa_switch( 'index_ignore_slash' ) ) {
 		$ignore[] = '/';
+	}
+	if ( $no_excl ) {
+		$ignore[] = '!';
 	}
 
 	// Find words to skip

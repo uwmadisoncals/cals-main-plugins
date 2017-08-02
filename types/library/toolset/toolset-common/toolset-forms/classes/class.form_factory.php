@@ -20,7 +20,7 @@ class FormFactory extends FormAbstract {
     private $form = array();
     private $nameForm;
     private $theForm;
-    protected $_validation, $_conditional, $_repetitive;
+    protected $_validation, $_conditional, $_repetitive, $_use_bootstrap;
 
     public function __construct( $nameForm = 'default' )
     {
@@ -31,6 +31,7 @@ class FormFactory extends FormAbstract {
         $this->nameForm = $nameForm;
         $this->field_count = 0;
         $this->theForm = new Enlimbo_Forms($nameForm);
+		$this->_use_bootstrap = false;
 
         wp_register_script( 'wptoolset-forms', WPTOOLSET_FORMS_RELPATH . '/js/main.js', array('jquery', 'underscore', 'suggest'), WPTOOLSET_FORMS_VERSION, true );
         wp_enqueue_script( 'wptoolset-forms' );
@@ -69,6 +70,12 @@ class FormFactory extends FormAbstract {
 				) {
                     $load_cred_bootstrap_css = false;
                 }
+				if (
+		            array_key_exists( 'use_bootstrap', $cred_cred_settings )
+		            && $cred_cred_settings['use_bootstrap']
+	            ) {
+		            $this->_use_bootstrap = true;
+	            }
             }
 
             /**
@@ -201,6 +208,7 @@ class FormFactory extends FormAbstract {
         /**
          * add bootstrap config to every field
          */
+		$config['use_bootstrap'] = $this->theForm->form_settings['use_bootstrap'];
         $config[ 'has_media_button' ] = $this->theForm->form_settings[ 'has_media_button' ];
 
         /**

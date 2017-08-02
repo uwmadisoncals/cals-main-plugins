@@ -21,23 +21,34 @@ var wptValidation = (function ($) {
          */
         $.validator.addMethod("extension", function (value, element, param) {
             param = typeof param === "string" ? param.replace(/,/g, "|") : param;
-            if ($(element).attr('res') && $(element).attr('res') != "")
+            if ($(element).attr('res') && $(element).attr('res') != "") {
                 return true;
-            return this.optional(element) || value.match(new RegExp(".(" + param + ")$", "i"));
+            }
+            return ( this.optional(element) || value.match( new RegExp(".(" + param + ")$", "i") ) );
         });
 
         /**
          * add hexadecimal to validator method
          */
         $.validator.addMethod("hexadecimal", function (value, element, param) {
-            return value == "" || /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value);
+            return ( value == "" || /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value) );
+        });
+        
+        /**
+         * add equalto method
+         */
+        $.validator.addMethod("equalto", function (value, element, param) {
+            if (param[1]) {
+                return ( value == $("input[name='" + param[1] + "']").val() );
+            }
+            return false;
         });
 
         /**
          * add skype to validator method
          */
         $.validator.addMethod("skype", function (value, element, param) {
-            return value == "" || /^([a-z0-9\.\_\,\-\#]+)$/i.test(value);
+            return ( value == "" || /^([a-z0-9\.\_\,\-\#]+)$/i.test(value) );
         });
 
         /**
@@ -48,8 +59,9 @@ var wptValidation = (function ($) {
             var _value = $(element).val();
 
             // check if dependency is met
-            if (!this.depend(param, element))
+            if (!this.depend(param, element)) {
                 return "dependency-mismatch";
+            }
             switch (element.nodeName.toLowerCase()) {
                 case 'select':
                     return _value && $.trim(_value).length > 0;
@@ -57,22 +69,27 @@ var wptValidation = (function ($) {
                     if (jQuery(element).hasClass("wpt-form-radio")) {
                         var val = jQuery('input[name="' + _name + '"]:checked').val();
 
-                        if (wptValidationDebug)
+                        if (wptValidationDebug) {
                             console.log("radio " + (typeof val != 'undefined' && val && $.trim(val).length > 0));
+                        }
 
-                        return typeof val != 'undefined' && val && $.trim(val).length > 0;
+                        return ( typeof val != 'undefined' && val && $.trim(val).length > 0 );
                     }
 
                     var $element = jQuery(element).siblings('input[type="hidden"]').first();
                     var elementFieldType = $element.attr('data-wpt-type');
-                    if ($element &&
-                        !$element.prop("disabled") &&
-                        ( elementFieldType == 'file' || elementFieldType == 'video' || elementFieldType == 'image' )) {
+                    if ($element
+                        && !$element.prop("disabled")
+                        && ( elementFieldType == 'file'
+                            || elementFieldType == 'video'
+                            || elementFieldType == 'image' )
+                    ) {
                         var val = $element.val();
-                        if (wptValidationDebug)
+                        if (wptValidationDebug) {
                             console.log("hidden " + (val && $.trim(val).length > 0));
+                        }
 
-                        return val && $.trim(val).length > 0;
+                        return ( val && $.trim(val).length > 0 );
                     }
 
                     if (jQuery(element).attr('type') == "checkbox") {
@@ -83,23 +100,26 @@ var wptValidation = (function ($) {
                     }
                     
                     if (jQuery(element).hasClass("hasDatepicker")) {
-                        if (wptValidationDebug)
+                        if (wptValidationDebug) {
                             console.log("hasDatepicker");
+                        }
                         return false;
                     }
 
                     if (this.checkable(element)) {
-                        if (wptValidationDebug)
+                        if (wptValidationDebug) {
                             console.log("checkable " + (this.getLength(value, element) > 0));
-                        return this.getLength(value, element) > 0;
+                        }
+                        return ( this.getLength(value, element) > 0 );
                     }
 
-                    if (wptValidationDebug)
+                    if (wptValidationDebug) {
                         console.log(_name + " default: " + value + " val: " + _value + " " + ($.trim(_value).length > 0));
+                    }
 
-                    return $.trim(_value).length > 0;
+                    return ( $.trim(_value).length > 0 );
                 default:
-                    return $.trim(value).length > 0;
+                    return ( $.trim(value).length > 0 );
             }
         });
 
@@ -180,8 +200,9 @@ var wptValidation = (function ($) {
 
         // On some pages the form may not be ready yet at this point (e.g. Edit Term page).
         jQuery(document).ready(function () {
-            if (wptValidationDebug)
+            if (wptValidationDebug) {
                 console.log($form.selector);
+            }
 
             jQuery(document).off('submit', $form.selector, null);
             jQuery(document).on('submit', $form.selector, function () {
@@ -280,10 +301,12 @@ var wptValidation = (function ($) {
                 area_id = $area.prop('id');
             if (typeof area_id !== 'undefined') {
                 if (typeof tinyMCE !== 'undefined') {
+					// @bug This is broken when AJAX subitting a CRED form that is set to keep displaying the form,
+					// when the WYSIWYG field was submitted in the Text mode
                     tinyMCE.get(area_id).remove();
                 }
                 tinyMCE.init(tinyMCEPreInit.mceInit[area_id]);
-				// Note that this Quicktags initialization is broken by design
+				// @bug This Quicktags initialization is broken by design
 				// since WPV_Toolset.add_qt_editor_buttons expects as second parameter a Codemirror editor instace
 				// and here we are passing just a textarea ID.
                 var quick = quicktags(tinyMCEPreInit.qtInit[area_id]);
@@ -295,6 +318,9 @@ var wptValidation = (function ($) {
         jQuery("button.switch-tmce").click();
     }
 
+	// @bug This event callback is defined in a limbo never executed, hence the callback will never be fired
+	// @bug The event lists used here should be space-separated, otherwise it will get fired at an event with a name
+	// "js_event_wpv_pagination_completed," (mind the last comma), which obviously does not exist
     $(document).on('js_event_wpv_pagination_completed, js_event_wpv_parametric_search_results_updated', function (event, data) {
         if (typeof wptValidation !== 'undefined') {
             wptValidation.init();
@@ -400,8 +426,6 @@ jQuery(document).ready(function () {
         wptValidation.applyRules(container);
     });
     wptCallbacks.conditionalCheck.add(function (container) {
-        if(container.indexOf('#cred') == -1){
-            wptValidation.applyRules(container);
-        }
+        wptValidation.applyRules(container);
     });
 });

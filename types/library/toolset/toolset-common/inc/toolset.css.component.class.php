@@ -66,7 +66,7 @@ if ( ! class_exists( 'Toolset_CssComponent' ) ) {
             }
 
             foreach($get_components['other'] as $key=>$value){
-                array_push( $buttons, 'css_components_'.$key.'_button' );
+                array_push( $buttons, 'other_'.$key.'_button' );
             }
 
             return $buttons;
@@ -174,21 +174,21 @@ if ( ! class_exists( 'Toolset_CssComponent' ) ) {
                         'hide_editor_pop_msg' => (get_option( 'toolset_bs_component_hide_pop_msg' )) ? get_option( 'toolset_bs_component_hide_pop_msg' ) : "no",
                         'show_bs_buttons_cm_status' => (get_option( 'toolset_bs_component_show_buttons_cm_status' )) ? get_option( 'toolset_bs_component_show_buttons_cm_status' ) : "no",
                         'show_bs_buttons_tinymce_status' => (get_option( 'toolset_bs_component_show_buttons_tinymce_status' )) ? get_option( 'toolset_bs_component_show_buttons_tinymce_status' ) : "no",
-                        'toggle_button_label_toggle' => __('Toggle Bootstrap Components', "toolset-common"),
-                        'toggle_button_tooltip' => __('Bootstrap Components Toggle', "toolset-common"),
+                        'toggle_button_label_toggle' => __('Toggle Bootstrap Components', "wpv-views"),
+                        'toggle_button_tooltip' => __('Bootstrap Components Toggle', "wpv-views"),
                     ),
                 )
             );
 
 			do_action('toolset_localize_script', 'toolset-css-component-grids', 'Toolset_CssComponent_Grids', array(
                     'button'	=> array(
-						'label'	=> __( 'Grid', 'toolset-common' )
+						'label'	=> __( 'Grid', 'wpv-views' )
 					),
 					'dialog'	=> array(
-						'title'		=> __( 'Bootstrap Grid', 'tolset-common' ),
+						'title'		=> __( 'Bootstrap Grid', 'wpv-views' ),
 						'content'	=> $this->get_grid_dialog_content(),
-						'insert'	=> __( 'Insert grid', 'toolset-common' ),
-						'cancel'	=> __( 'Cancel', 'toolset-common' ),
+						'insert'	=> __( 'Insert grid', 'wpv-views' ),
+						'cancel'	=> __( 'Cancel', 'wpv-views' ),
 					)
                 )
             );
@@ -211,62 +211,62 @@ if ( ! class_exists( 'Toolset_CssComponent' ) ) {
                         <ul class="toolset-bootstrap-grid-types js-toolset-bootstrap-grid-type">
                             <li>
                                 <figure class="grid-type selected">
-                                    <img class="item-preview" data-name="grid-type-two-even" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/two-even.png" alt="<?php echo esc_html( __( '2 even columns', 'toolset-common' ) ); ?>">
-                                    <span><?php echo esc_html( __( '2 even columns', 'toolset-common' ) ); ?></span>
+                                    <img class="item-preview" data-name="grid-type-two-even" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/two-even.png" alt="<?php echo esc_html( __( '2 even columns', 'wpv-views' ) ); ?>">
+                                    <span><?php echo esc_html( __( '2 even columns', 'wpv-views' ) ); ?></span>
                                 </figure>
                                 <label class="radio" data-target="grid-type-two-even" for="grid-type-two-even" style="display:none">
                                     <input type="radio" name="grid_type" id="grid-type-two-even" value="two-even" checked="checked">
-                                    <?php echo esc_html( __( '2 even columns', 'toolset-common' ) ); ?>
+                                    <?php echo esc_html( __( '2 even columns', 'wpv-views' ) ); ?>
                                 </label>
                             </li>
                             <li>
                                 <figure class="grid-type">
-                                    <img class="item-preview" data-name="grid-type-two-uneven" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/two-uneven-wide-narrow.png" alt="<?php echo esc_html( __( '2 columns (wide and narrow)', 'toolset-common' ) ); ?>">
-                                    <span><?php echo esc_html( __( '2 columns (wide and narrow)', 'toolset-common' ) ); ?></span>
+                                    <img class="item-preview" data-name="grid-type-two-uneven" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/two-uneven-wide-narrow.png" alt="<?php echo esc_html( __( '2 columns (wide and narrow)', 'wpv-views' ) ); ?>">
+                                    <span><?php echo esc_html( __( '2 columns (wide and narrow)', 'wpv-views' ) ); ?></span>
                                 </figure>
                                 <label class="radio" data-target="grid-type-two-uneven" for="grid-type-two-uneven" style="display:none">
                                     <input type="radio" name="grid_type" id="grid-type-two-uneven" value="two-uneven">
-                                    <?php echo esc_html( __( '2 columns (wide and narrow)', 'toolset-common' ) ); ?>
+                                    <?php echo esc_html( __( '2 columns (wide and narrow)', 'wpv-views' ) ); ?>
                                 </label>
                             </li>
                             <li>
                                 <figure class="grid-type">
-                                    <img class="item-preview" data-name="grid-type-three-even" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/three-even.png" alt="<?php echo esc_html( __( '3 even columns', 'toolset-common' ) ); ?>">
-                                    <span><?php echo esc_html( __( '3 even columns', 'toolset-common' ) ); ?></span>
+                                    <img class="item-preview" data-name="grid-type-three-even" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/three-even.png" alt="<?php echo esc_html( __( '3 even columns', 'wpv-views' ) ); ?>">
+                                    <span><?php echo esc_html( __( '3 even columns', 'wpv-views' ) ); ?></span>
                                 </figure>
                                 <label class="radio" data-target="grid-type-three-even" for="grid-type-three-even" style="display:none">
                                     <input type="radio" name="grid_type" id="grid-type-three-even" value="three-even">
-                                    <?php echo esc_html( __( '3 even columns', 'toolset-common' ) ); ?>
+                                    <?php echo esc_html( __( '3 even columns', 'wpv-views' ) ); ?>
                                 </label>
                             </li>
                             <li>
                                 <figure class="grid-type">
-                                    <img class="item-preview" data-name="grid-type-three-uneven" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/three-uneven-narrow-wide-narrow.png" alt="<?php echo esc_html( __( '3 columns (1 wide and 2 narrow)', 'toolset-common' ) ); ?>">
-                                    <span><?php echo esc_html( __( '3 columns (1 wide and 2 narrow)', 'toolset-common' ) ); ?></span>
+                                    <img class="item-preview" data-name="grid-type-three-uneven" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/three-uneven-narrow-wide-narrow.png" alt="<?php echo esc_html( __( '3 columns (1 wide and 2 narrow)', 'wpv-views' ) ); ?>">
+                                    <span><?php echo esc_html( __( '3 columns (1 wide and 2 narrow)', 'wpv-views' ) ); ?></span>
                                 </figure>
                                 <label class="radio" data-target="grid-type-three-uneven" for="grid-type-three-uneven" style="display:none">
                                     <input type="radio" name="grid_type" id="grid-type-three-uneven" value="three-uneven">
-                                    <?php echo esc_html( __( '3 columns (1 wide and 2 narrow)', 'toolset-common' ) ); ?>
+                                    <?php echo esc_html( __( '3 columns (1 wide and 2 narrow)', 'wpv-views' ) ); ?>
                                 </label>
                             </li>
                             <li>
                                 <figure class="grid-type">
-                                    <img class="item-preview" data-name="grid-type-four-even" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/four-even.png" alt="<?php echo esc_html( __( '4 even columns', 'toolset-common' ) ); ?>">
-                                    <span><?php echo esc_html( __( '4 even columns', 'toolset-common' ) ); ?></span>
+                                    <img class="item-preview" data-name="grid-type-four-even" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/four-even.png" alt="<?php echo esc_html( __( '4 even columns', 'wpv-views' ) ); ?>">
+                                    <span><?php echo esc_html( __( '4 even columns', 'wpv-views' ) ); ?></span>
                                 </figure>
                                 <label class="radio" data-target="grid-type-four-even" for="grid-type-four-even" style="display:none">
                                     <input type="radio" name="grid_type" id="grid-type-four-even" value="four-even">
-                                    <?php echo esc_html( __( '4 even columns', 'toolset-common' ) ); ?>
+                                    <?php echo esc_html( __( '4 even columns', 'wpv-views' ) ); ?>
                                 </label>
                             </li>
                             <li>
                                 <figure class="grid-type">
-                                    <img class="item-preview" data-name="grid-type-six-even" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/six-even.png" alt="<?php echo esc_html( __( '6 even columns', 'toolset-common' ) ); ?>">
-                                    <span><?php echo esc_html( __( '6 even columns', 'toolset-common' ) ); ?></span>
+                                    <img class="item-preview" data-name="grid-type-six-even" src="<?php echo TOOLSET_COMMON_URL; ?>/res/images/toolset.bs-component/six-even.png" alt="<?php echo esc_html( __( '6 even columns', 'wpv-views' ) ); ?>">
+                                    <span><?php echo esc_html( __( '6 even columns', 'wpv-views' ) ); ?></span>
                                 </figure>
                                 <label class="radio" data-target="grid-type-six-even" for="grid-type-six-even" style="display:none">
                                     <input type="radio" name="grid_type" id="grid-type-six-even" value="six-even">
-                                    <?php echo esc_html( __( '6 even columns', 'toolset-common' ) ); ?>
+                                    <?php echo esc_html( __( '6 even columns', 'wpv-views' ) ); ?>
                                 </label>
                             </li>
                         </ul>
@@ -277,7 +277,7 @@ if ( ! class_exists( 'Toolset_CssComponent' ) ) {
                         $doc_link = '<a href="%s" target="_blank">%s</a>';
                         $doc_link .= '<span style="margin-left: 3px;"></span><a style="text-decoration: none;" target="_blank" href="%s"><i class="icon-external-link fa fa-external-link icon-small"></i></a>';
 
-                        printf( $doc_link, $url, esc_html( __( 'Bootstrap Grid documentation', 'toolset-common' ) ), $url );
+                        printf( $doc_link, $url, esc_html( __( 'Bootstrap Grid documentation', 'wpv-views' ) ), $url );
                         ?>
                     </div>
 				</div>

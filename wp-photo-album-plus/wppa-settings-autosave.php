@@ -772,7 +772,7 @@ global $wp_version;
 							$slug = 'wppa_min_thumbs';
 							$html = wppa_input($slug, '40px', '', __('photos', 'wp-photo-album-plus'));
 							$clas = '';
-							$tags = 'size,system';
+							$tags = 'size,system,album';
 							wppa_setting($slug, '4', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Border thickness', 'wp-photo-album-plus');
@@ -3766,7 +3766,7 @@ global $wp_version;
 							$slug = 'wppa_thumbs_first';
 							$html = wppa_checkbox($slug);
 							$clas = '';
-							$tags = 'system,layout';
+							$tags = 'system,layout,album';
 							wppa_setting($slug, '20', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Login links', 'wp-photo-album-plus');
@@ -6218,7 +6218,7 @@ global $wp_version;
 							$html4 = '';
 							$html = array($html1, $html2, $html3, $html4);
 							$clas = '';
-							$tags = 'link';
+							$tags = 'link,cover';
 							wppa_setting($slug, '11', $name, $desc, $html, $help, $clas, $tags);
 							}
 

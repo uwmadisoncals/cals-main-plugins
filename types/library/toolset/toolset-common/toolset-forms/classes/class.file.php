@@ -34,7 +34,13 @@ class WPToolset_Field_File extends WPToolset_Field_Textfield {
 			wp_enqueue_script( 'wptoolset-field-file' );
 		}
 
-		if ( Toolset_Utils::is_real_admin() ) {
+		// Note: we check whether the current_screen action has been fired because sometimes 
+		// some plugins might perform somethign that loads this field before get_current_screen() is defined.
+		// This happens with an image widget module of Jetpack, for example.
+		if ( 
+			Toolset_Utils::is_real_admin() 
+			&& did_action( 'current_screen' ) > 0
+		) {
 			$screen = get_current_screen();
 			if ( isset( $screen->parent_base ) && 'users' == $screen->parent_base ) {
 				wp_enqueue_media();

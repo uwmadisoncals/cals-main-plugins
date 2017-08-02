@@ -107,6 +107,7 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 	}
 
 	public function metaform() {
+		$use_bootstrap = array_key_exists( 'use_bootstrap', $this->_data ) && $this->_data['use_bootstrap'];
 		$attributes = $this->getAttr();
 		$this->output = ( isset( $attributes['output'] ) ) ? $attributes['output'] : "";
 
@@ -161,92 +162,88 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 		 */
 		$add_text_button_value = apply_filters( 'toolset_button_add_text', esc_attr( $attributes['add_text'] ) );
 
-		/**
-		 * Input Text/Selectbox Parent container
-		 */
-		$open_container = '<div style="display:none" class="wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new-' . $taxonomy_name . '" data-taxonomy="' . $taxonomy_name . '">';
-		$close_container = '</div>';
+		if ( $this->output == 'bootstrap' ) {
+			/**
+			 * Input Text/Selectbox Parent container
+			 */
+			$open_container = '<div style="display:none" class="form-group wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new-container js-wpt-hierarchical-taxonomy-add-new-' . $taxonomy_name . '" data-taxonomy="' . $taxonomy_name . '">';
+			$close_container = '</div>';
 
-		/**
-		 * The textfield input
-		 */
-		$metaform[] = array(
-			'#type' => 'textfield',
-			'#title' => '',
-			'#description' => '',
-			'#name' => "new_tax_text_" . $taxonomy_name,
-			'#value' => '',
-			'#attributes' => array(
-				'data-taxonomy' => $taxonomy_name,
-				'data-taxtype' => 'hierarchical',
-				'class' => "wpt-new-taxonomy-title js-wpt-new-taxonomy-title {$shortcode_class}",
-			),
-			'#validate' => $this->getValidationData(),
-			'#before' => $open_container,
-		);
-
-		/**
-		 * The select for parent
-		 */
-		$metaform[] = array(
-			'#type' => 'select',
-			'#title' => '',
-			'#options' => array(
-				array(
-					'#title' => $attributes['parent_text'],
-					'#value' => -1,
+			/**
+			 * The textfield input
+			 */
+			$metaform[] = array(
+				'#type' => 'textfield',
+				'#title' => '',
+				'#description' => '',
+				'#name' => "new_tax_text_" . $taxonomy_name,
+				'#value' => '',
+				'#attributes' => array(
+					'data-taxonomy' => $taxonomy_name,
+					'data-taxtype' => 'hierarchical',
+					'class' => "form-control wpt-new-taxonomy-title js-wpt-new-taxonomy-title {$shortcode_class}",
 				),
-			),
-			'#default_value' => 0,
-			'#description' => '',
-			'#name' => "new_tax_select_" . $taxonomy_name,
-			'#attributes' => array(
-				'data-parent-text' => $attributes['parent_text'],
-				'data-taxonomy' => $taxonomy_name,
-				'class' => "js-taxonomy-parent wpt-taxonomy-parent {$shortcode_class}",
-			),
-			'#validate' => $this->getValidationData(),
-		);
+				'#validate' => $this->getValidationData(),
+				'#before' => $open_container,
+			);
 
-		$bootstrap_class = "";
-		if ( $this->output == 'bootstrap' ) {
+			/**
+			 * The select for parent
+			 */
+			$metaform[] = array(
+				'#type' => 'select',
+				'#title' => '',
+				'#options' => array(
+					array(
+						'#title' => $attributes['parent_text'],
+						'#value' => -1,
+					),
+				),
+				'#default_value' => 0,
+				'#description' => '',
+				'#name' => "new_tax_select_" . $taxonomy_name,
+				'#attributes' => array(
+					'data-parent-text' => $attributes['parent_text'],
+					'data-taxonomy' => $taxonomy_name,
+					'class' => "form-control js-taxonomy-parent wpt-taxonomy-parent {$shortcode_class}",
+				),
+				'#validate' => $this->getValidationData(),
+			);
+
 			$bootstrap_class = "btn btn-default";
-		}
 
-		/**
-		 * The add button
-		 */
-		$metaform[] = array(
-			'#type' => 'button',
-			'#title' => '',
-			'#description' => '',
-			'#name' => "new_tax_button_{$taxonomy_name}",
-			'#value' => $add_text_button_value,
-			'#attributes' => array(
-				'data-taxonomy' => $taxonomy_name,
-				'data-build_what' => $build_what,
-				'class' => "wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new {$bootstrap_class}",
-				'data-output' => $this->output,
-			),
-			'#validate' => $this->getValidationData(),
-			'#after' => $close_container,
-		);
+			/**
+			 * The add button
+			 */
+			$metaform[] = array(
+				'#type' => 'button',
+				'#title' => '',
+				'#description' => '',
+				'#name' => "new_tax_button_{$taxonomy_name}",
+				'#value' => $add_text_button_value,
+				'#attributes' => array(
+					'data-taxonomy' => $taxonomy_name,
+					'data-build_what' => $build_what,
+					'class' => "wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new {$bootstrap_class}",
+					'data-output' => $this->output,
+				),
+				'#validate' => $this->getValidationData(),
+				'#after' => $close_container,
+			);
 
-
-		if ( $this->output == 'bootstrap' ) {
 			$class = 'wpt-hierarchical-taxonomy-add-new-show-hide js-wpt-hierarchical-taxonomy-add-new-show-hide dashicons-before dashicons-plus-alt';
 
 			$bootstrap_button = "<a
-				style='display:none;'
-                data-taxonomy='{$taxonomy_name}'
-                data-after-selector='js-wpt-hierarchical-taxonomy-add-new-{$taxonomy_name}' 
-                data-open='" . $add_new_text_button_value . "' 
-                data-close='" . $cancel_button_value . "' 
-                data-output='" . $this->output . "'     
-                class = '{$class}'  
-                role = 'button' 
-                name = 'btn_{$taxonomy_name}' 
-                >{$add_new_text_button_value}</a>";
+			style='display:none;'
+            data-taxonomy='{$taxonomy_name}'
+            data-after-selector='js-wpt-hierarchical-taxonomy-add-new-{$taxonomy_name}' 
+            data-open='" . $add_new_text_button_value . "' 
+            data-close='" . $cancel_button_value . "' 
+            data-output='" . $this->output . "'     
+            class = '{$class}'  
+            role = 'button' 
+            name = 'btn_{$taxonomy_name}' 
+            >{$add_new_text_button_value}</a>";
 
 			$metaform[] = array(
 				'#type' => 'markup',
@@ -254,28 +251,91 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 			);
 
 		} else {
-			$class = 'wpt-hierarchical-taxonomy-add-new-show-hide js-wpt-hierarchical-taxonomy-add-new-show-hide';
-
 			$metaform[] = array(
 				'#type' => 'button',
-				'#title' => 'main_add_new',
+				'#title' => '',
 				'#description' => '',
 				'#name' => "btn_{$taxonomy_name}",
 				'#value' => $add_new_text_button_value,
 				'#attributes' => array(
-					'style' => 'display:none',
+					'style' => 'display:none;',
 					'data-taxonomy' => $taxonomy_name,
 					'data-build_what' => $build_what,
-					'data-after-selector' => "js-wpt-hierarchical-taxonomy-add-new-{$taxonomy_name}",
+					'data-after-selector' => 'js-wpt-hierarchical-taxonomy-add-new-' . $taxonomy_name,
 					'data-open' => $add_new_text_button_value,
-					'data-close' => $cancel_button_value,
-					'class' => $class,
-					'data-output' => $this->output,
+					'data-close' => $cancel_button_value, // TODO adjust the button value depending on open/close action
+					'class' => $use_bootstrap ? 'btn btn-default wpt-hierarchical-taxonomy-add-new-show-hide js-wpt-hierarchical-taxonomy-add-new-show-hide' : 'wpt-hierarchical-taxonomy-add-new-show-hide js-wpt-hierarchical-taxonomy-add-new-show-hide',
 				),
 				'#validate' => $this->getValidationData(),
 			);
-		}
 
+			// Input for new taxonomy
+
+			if ( $use_bootstrap ) {
+				$container = '<div style="display:none" class="form-group wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new-container js-wpt-hierarchical-taxonomy-add-new-' . $taxonomy_name . '" data-taxonomy="' . $taxonomy_name . '">';
+			} else {
+				$container = '<div style="display:none" class="wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new-container js-wpt-hierarchical-taxonomy-add-new-' . $taxonomy_name . '" data-taxonomy="' . $taxonomy_name . '">';
+			}
+
+			/**
+			 * The textfield input
+			 */
+			$metaform[] = array(
+				'#type' => 'textfield',
+				'#title' => '',
+				'#description' => '',
+				'#name' => "new_tax_text_{$taxonomy_name}",
+				'#value' => '',
+				'#attributes' => array(
+					'data-taxonomy' => $taxonomy_name,
+					'data-taxtype' => 'hierarchical',
+					'class' => $use_bootstrap ? 'inline wpt-new-taxonomy-title js-wpt-new-taxonomy-title' : 'wpt-new-taxonomy-title js-wpt-new-taxonomy-title',
+				),
+				'#validate' => $this->getValidationData(),
+				'#before' => $container,
+			);
+
+			/**
+			 * The select for parent
+			 */
+			$metaform[] = array(
+				'#type' => 'select',
+				'#title' => '',
+				'#options' => array(
+					array(
+						'#title' => $attributes['parent_text'],
+						'#value' => -1,
+					),
+				),
+				'#default_value' => 0,
+				'#description' => '',
+				'#name' => "new_tax_select_{$taxonomy_name}",
+				'#attributes' => array(
+					'data-parent-text' => $attributes['parent_text'],
+					'data-taxonomy' => $taxonomy_name,
+					'class' => 'js-taxonomy-parent wpt-taxonomy-parent',
+				),
+				'#validate' => $this->getValidationData(),
+			);
+
+			/**
+			 * The add button
+			 */
+			$metaform[] = array(
+				'#type' => 'button',
+				'#title' => '',
+				'#description' => '',
+				'#name' => "new_tax_button_" . $taxonomy_name,
+				'#value' => $add_text_button_value,
+				'#attributes' => array(
+					'data-taxonomy' => $taxonomy_name,
+					'data-build_what' => $build_what,
+					'class' => $use_bootstrap ? 'btn btn-default wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new' : 'wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new',
+				),
+				'#validate' => $this->getValidationData(),
+				'#after' => '</div>',
+			);
+		}
 
 		/**
 		 * toolset_filter_taxonomyhierarchical_metaform
@@ -505,6 +565,7 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 					$is_checked_by_default = in_array( $term_id, $this->getValue() );
 				}
 				$classes = array();
+				$classes[] = 'checkbox';
 				$classes[] = 'tax-' . sanitize_title( $names[ $term_id ] );
 				$classes[] = 'tax-' . $this->_data['name'] . '-' . $term_id;
 				/**

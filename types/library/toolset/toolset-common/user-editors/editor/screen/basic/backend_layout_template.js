@@ -128,7 +128,7 @@ WPViews.ViewEditScreenUserEditorBasic = function( $ ) {
 		e.preventDefault();
 		
 		var thiz = $( this ),
-			editor = thiz.data( 'editor' );
+			editor = thiz.data( 'editor' ),
 			item = thiz.closest( self.selector ),
 			ctId = item.data( 'id' ),
 			data = {

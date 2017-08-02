@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick, pdf
-Version: 6.7.04
-Stable tag: 6.7.03
+Version: 6.7.05
+Stable tag: 6.7.04
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -112,11 +112,7 @@ If this happens, make sure (ask your hosting provider) that you have all the rig
 
 = How does the search widget work? =
 
-* A space between words means AND, a comma between words means OR.
-Example: search for 'one two, three four, five' gives a result when either 'one' AND 'two' appears in the same (combination of) name and description.
-If it matches the name and description of an album, you get the album, and/or the photo.
-OR this might apply for ('three' AND 'four') OR 'five'.
-The tokens must be at least 3 characters in length.
+* See the documentation on the WPPA+ Docs & Demos site: https://wppa.nl/docs-by-subject/search/regular-search/
 
 = How can i translate the plugin into my language? =
 
@@ -130,6 +126,16 @@ The tokens must be at least 3 characters in length.
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.7.05 =
+
+= Bug Fixes =
+
+* Album selectionboxes on the album admin page have alphabetically sorted content again.
+
+= New Features =
+
+* Negate option in search. Enter token1 !token2 to get all albums/photos that match token1 but do not match token2.
 
 = 6.7.04 =
 

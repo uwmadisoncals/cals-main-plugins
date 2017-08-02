@@ -65,9 +65,13 @@ if ( ! class_exists( 'Toolset_Admin_Bar_Menu', false ) ) {
 
 				// Mmmm check the dependencies here, and maybe even register the icons somehow
 				// We should be registering the style sitewide, not just on the admin side, on the right dependency
-				wp_enqueue_style( 'toolset-common', WPV_URL_EMBEDDED . '/toolset/toolset-common/res/css/toolset-common.css', array(), WPV_VERSION );
-                wp_enqueue_style( 'onthegosystems-icons', WPV_URL_EMBEDDED . '/toolset/onthego-resources/onthegosystems-icons/css/onthegosystems-icons.css', array( 'toolset-common' ), WPV_VERSION );
-				
+				$asset_manager = Toolset_Assets_Manager::getInstance();
+				$asset_manager->enqueue_styles(
+					array(
+						Toolset_Assets_Manager::STYLE_TOOLSET_COMMON,
+						Toolset_Assets_Manager::STYLE_ONTHEGOSYSTEMS_ICONS,
+					)
+				);
             }
         }
 

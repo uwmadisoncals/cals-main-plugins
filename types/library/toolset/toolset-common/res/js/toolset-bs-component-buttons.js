@@ -19,20 +19,8 @@ ToolsetCommon.BootstrapCssComponentsQuickTags = function($){
             if(get_instance){ 
                 $instance = get_instance;
                 self.add_bootstrap_components_buttons($instance);
-                
-                var $my_buttons = self.generate_codemirror_bs_buttons($instance);
-                self.wrap_codemirror_buttons($instance,$my_buttons);
             }
         });
-        
-        Toolset.hooks.addAction( 'toolset_text_editor_CodeMirror_init_only_buttons', function( get_instance ) {
-            if(get_instance){ 
-                $instance = get_instance;
-                self.add_bootstrap_components_buttons($instance);
-            }
-        });
-
-        
     };
 
     self.wrap_codemirror_buttons = function($instance,$buttons){
@@ -111,44 +99,40 @@ ToolsetCommon.BootstrapCssComponentsQuickTags = function($){
         return codemirror_buttons;
 
     };
-    
-    
-    
-    self.add_bootstrap_components_buttons = function(instance){
 
-        if(typeof $bootstrap_components !== 'object'){
+    self.add_bootstrap_components_buttons = function( instance ) {
+        if( typeof $bootstrap_components !== 'object' ){
             return;
         }
 
-        // toggle button div
-
-
-        // button toogle button :)
-        if(jQuery('#qt_'+instance+'_bs_component_show_hide_button').length === 0){
-            
-            if(jQuery('#codemirror-buttons-for-'+$instance).is(":hidden") === true){
-                var button_value = Toolset_CssComponent.DDL_CSS_JS.button_toggle_show;
-            } else {
-                var button_value = Toolset_CssComponent.DDL_CSS_JS.button_toggle_hide;
-            }
-
-            var toggle_toolbar_div = jQuery("#wp-"+$instance+"-editor-container .quicktags-toolbar");
-            if(toggle_toolbar_div.length === 0){
-
-                var views_toolbar = jQuery("#qt_"+$instance+"_toolbar");
-                if(views_toolbar !== 0){
-                    toggle_toolbar_div = views_toolbar;
-                }
-            }
-
-            toggle_toolbar_div.append('<input type="button" id="qt_'+instance+'_bs_component_show_hide_button" class="ed_button button button-small" value="'+button_value+'">');
-
-            jQuery( '#qt_'+instance+'_bs_component_show_hide_button' ).click(function() {
-                Toolset.hooks.doAction( 'bs_components_toggle_buttons', instance );
-            });
+        if ( typeof( QTags.getInstance( instance ).getButton( 'bs_component_show_hide_button' ) ) === 'undefined'  ) {
+            QTags.addButton(
+                'bs_component_show_hide_button',
+                Toolset_CssComponent.DDL_CSS_JS.button_toggle_show,
+                self.bs_components_toggle_buttons,
+                '',
+                'b',
+                Toolset_CssComponent.DDL_CSS_JS.button_toggle_show,
+                140,
+                instance
+            );
         }
-       
     };
+
+    self.bs_components_toggle_buttons = function( instance ) {
+        var button_id = instance.id;
+        var regex = /qt_(.*)_bs_component_show_hide_button/i;
+        var matches = button_id.match(regex);
+        Toolset.hooks.doAction( 'bs_components_toggle_buttons', matches[1] );
+    };
+
+    jQuery( document ).on( 'quicktags-init', function( event, editor ) {
+        if ( typeof( editor.getButton( 'bs_component_show_hide_button' ) ) !== 'undefined'  ) {
+            $instance = editor.id;
+            var $my_buttons = self.generate_codemirror_bs_buttons( $instance );
+            self.wrap_codemirror_buttons( $instance, $my_buttons );
+        }
+    });
     
 
     self.init();

@@ -33,15 +33,7 @@ jQuery(document).on('cred_form_ready', function (event, event_data) {
             jQuery('input.wpt-taxonomy-add-new', $parent).click();
         }, 50);
     });
-
-    var $current_form = jQuery('#' + event_data.form_id);
-    if (jQuery(".wpt-hierarchical-taxonomy-add-new-show-hide", $current_form).is(":hidden")) {
-        setTimeout(
-            function () {
-                jQuery(".wpt-hierarchical-taxonomy-add-new-show-hide:hidden", $current_form).remove();
-            }
-            , 200);
-    }
+	
 });
 
 var wptFilters = {};
@@ -116,7 +108,7 @@ function showHideMostPopularTaxonomy(el) {
     var form = jQuery(el).closest('form');
     jQuery('.shmpt-' + taxonomy, form).toggle();
 
-    if (data_type_output == 'output') {
+    if (data_type_output == 'bootstrap') {
         var curr = jQuery(el).text();
         if (curr == jQuery(el).data('show-popular-text')) {
             jQuery(el).text(jQuery(el).data('hide-popular-text'), form);
@@ -270,6 +262,8 @@ function initTaxonomies(values, taxonomy, url, fieldId) {
     }
 }
 
+// @bug This does not belong here: move to the CRED frontend script or write its own
+// and make sure it includs the taxonomy initialization pseudo-mini-script around here
 toolsetForms.CRED_taxonomy = function () {
 
     var self = this;
@@ -284,22 +278,49 @@ toolsetForms.CRED_taxonomy = function () {
         self._initialize_hierachical();
     };
 
+	/**
+	 * Initialize hierarchical taxonomis on a form.
+	 *
+	 * The taxonomy field itself will add, hidden, the structure to add a new term, and the button to show/hide it.
+	 * Here, we just take those structures and move them to the specific shortcode placeholder output, if any, 
+	 * or remove them otherwise.
+	 *
+	 * @since unknown
+	 * @since 1.9.1 Make the structure be moved to the placeholder.
+	 */
     self._initialize_hierachical = function () {
-        jQuery('.js-taxonomy-hierarchical-button-placeholder').each(function () {
-            var placeholder = jQuery(this);
-            var label = jQuery(this).attr('data-label');
-            var taxonomy = jQuery(this).data('taxonomy');
-            var $form = jQuery(this).closest('form');
-            var $buttons = jQuery('[name="btn_' + taxonomy + '"]', $form);
-            $buttons.show();
-        });
-
-        self._fill_parent_drop_down()
+		jQuery( '.js-wpt-hierarchical-taxonomy-add-new-container' ).each( function() {
+			
+			var $addNewContainer = jQuery( this ),
+				$form = $addNewContainer.closest( 'form' ),
+				$taxonomy = $addNewContainer.data( 'taxonomy' ),
+				$addNewShowHide = jQuery( '.js-wpt-hierarchical-taxonomy-add-new-show-hide[data-taxonomy="' + $taxonomy + '"]', $form ),
+				$placeholder = jQuery( '.js-taxonomy-hierarchical-button-placeholder[data-taxonomy="' + $taxonomy + '"]', $form );
+			
+			if ( $placeholder.length > 0 ) {
+				$addNewShowHide
+					.insertAfter( $placeholder )
+					.show();
+				$placeholder.replaceWith( $addNewContainer );
+				self._fill_parent_drop_down( $form );
+			} else {
+				$addNewContainer.remove();
+				$addNewShowHide.remove();
+			}
+			
+		});
     };
 
-    self._fill_parent_drop_down = function () {
-        jQuery('select.js-taxonomy-parent').each(function () {
-            var $form = jQuery(this).closest('form');
+	/**
+	 * Fill hierarchical taxonomy parent select dropdown.
+	 *
+	 * @param object $form
+	 *
+	 * @since unknown
+	 * @since 1.9.1 Add a $form paramete to only initialize parent selectors for hierarchical taxonomies on a given form.
+	 */
+    self._fill_parent_drop_down = function ( $form ) {
+        jQuery('select.js-taxonomy-parent', $form ).each(function () {
             var $select = jQuery(this);
 
             // remove all the options
@@ -388,21 +409,35 @@ toolsetForms.CRED_taxonomy = function () {
         });
 
         jQuery('.js-wpt-hierarchical-taxonomy-add-new-show-hide').on('click', function () {
-            if (jQuery(this).text() == jQuery(this).data('close')) {
-                if (jQuery(this).data('output') == 'bootstrap') {
-                    jQuery(this).html(jQuery(this).data('open')).removeClass('dashicons-dismiss').addClass('dashicons-plus-alt');
-                } else {
-                    jQuery(this).val(jQuery(this).data('open')).removeClass('btn-cancel');
-                }
-            } else {
-                if (jQuery(this).data('output') == 'bootstrap') {
-                    jQuery(this).html(jQuery(this).data('close')).removeClass('dashicons-plus-alt').addClass('dashicons-dismiss');
-                } else {
-                    jQuery(this).val(jQuery(this).data('close')).addClass('btn-cancel');
-                }
-            }
-            var $thiz = jQuery(this), taxonomy = $thiz.data('taxonomy');
-            self.add_new_show_hide(taxonomy, this);
+			var $button = jQuery( this ),
+				$taxonomy = $button.data( 'taxonomy' ),
+				$output = $button.data( 'output' );
+			if ( $output == 'bootstrap' ) {
+				// Dealing with an anchor button
+				if ( $button.text() == $button.data( 'close' ) ) {
+					$button
+						.html( $button.data('open') )
+						.removeClass('dashicons-dismiss')
+						.addClass('dashicons-plus-alt');
+				} else {
+					$button
+						.html( $button.data('close') )
+						.removeClass('dashicons-plus-alt')
+						.addClass('dashicons-dismiss');
+				}
+			} else {
+				// Dealing with an input button
+				if ( $button.val() == $button.data( 'close' ) ) {
+					$button
+						.val( $button.data('open') )
+						.removeClass('btn-cancel');
+				} else {
+					$button
+						.val( $button.data('close') )
+						.addClass('btn-cancel');
+				}
+			}
+            self.add_new_show_hide( $taxonomy, this );
         });
     };
 
@@ -485,9 +520,9 @@ toolsetForms.CRED_taxonomy = function () {
 
             var new_checkbox = "";
             if (isBootstrap) {
-                new_checkbox = '<li class="checkbox"><label><input data-parent="' + parent + '" class="wpt-form-checkbox form-checkbox" type="checkbox" name="' + taxonomy + '[]" data-value="' + new_taxonomy + '" checked="checked" value="' + new_taxonomy + '"></input>' + new_taxonomy + '</label></li>';
+                new_checkbox = '<li class="checkbox"><label class="wpt-form-label wpt-form-checkbox-label"><input data-parent="' + parent + '" class="wpt-form-checkbox form-checkbox checkbox" type="checkbox" name="' + taxonomy + '[]" data-value="' + new_taxonomy + '" checked="checked" value="' + new_taxonomy + '"></input>' + new_taxonomy + '</label></li>';
             } else {
-                new_checkbox = '<li><input data-parent="' + parent + '" class="wpt-form-checkbox form-checkbox checkbox" type="checkbox" name="' + taxonomy + '[]" checked="checked" value="' + new_taxonomy + '"></input><label>' + new_taxonomy + '</label></li>';
+                new_checkbox = '<li><input data-parent="' + parent + '" class="wpt-form-checkbox form-checkbox checkbox" type="checkbox" name="' + taxonomy + '[]" checked="checked" value="' + new_taxonomy + '"></input><label class="wpt-form-label wpt-form-checkbox-label">' + new_taxonomy + '</label></li>';
             }
             // find the first checkbox sharing parent
             var $first_checkbox = jQuery('input[name="' + taxonomy + '\[\]"][data-parent="' + parent + '"]:first', $form);
@@ -563,7 +598,7 @@ toolsetForms.CRED_taxonomy = function () {
 
         jQuery('[name="new_tax_text_' + taxonomy + '"]', $form).val('');
 
-        self._fill_parent_drop_down();
+        self._fill_parent_drop_down( $form );
     };
 
     self._update_hierachy = function (taxonomy, new_taxonomy, $form) {

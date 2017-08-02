@@ -324,11 +324,23 @@ class Toolset_Common_Bootstrap {
 				Toolset_Admin_Notices_Manager::init();
 			}
 
-            // Load Admin Notices Controller (user of our Toolset_Admin_Notices_Manager)
+			// Load Theme Integration Class
+			// Wait until Toolset Common 2.5
+			/*
+			if ( ! class_exists( 'Toolset_Theme_Integration', false ) ) {
+				require_once( TOOLSET_COMMON_PATH . '/inc/toolset.theme.integration.php' );
+				Toolset_Theme_Integration::get_instance();
+			}
+			*/
+
+			// Load Admin Notices Controller (user of our Toolset_Admin_Notices_Manager)
             if( ! class_exists( 'Toolset_Controller_Admin_Notices', false ) ) {
 				require_once( TOOLSET_COMMON_PATH . '/inc/controller/admin/notices.php' );
 				new Toolset_Controller_Admin_Notices();
             }
+
+            // Get compatibility loader class instance
+            Toolset_Compatibility_Loader::get_instance();
 
 			require_once( TOOLSET_COMMON_PATH . '/inc/toolset.compatibility.php' );
 			require_once( TOOLSET_COMMON_PATH . '/inc/toolset.function.helpers.php' );

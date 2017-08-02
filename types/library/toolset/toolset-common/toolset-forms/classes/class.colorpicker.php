@@ -69,11 +69,19 @@ class WPToolset_Field_Colorpicker extends FieldFactory
 
     public function metaform()
     {
+		$field_data = $this->getData();
         $validation = $this->getValidationData();
-        $validation = $this->addTypeValidation($validation);
-        $this->setValidationData($validation);
+        //CRED Colorpicker Generic fields has now the hexadecimal validation rule
+	    //so avoiding the force of validation for cred_generic field
+	    //TODO: once will be present this feature to Types we can remove this condition completely
+	    if ( ! isset( $field_data['attribute']['cred_generic'] ) ) {
+	    	//We are forcing the hexadecimal validation to this colorpicker field
+		    //because in Types is still not present in the field settings popup the input of the validation field
+		    $validation = $this->addTypeValidation( $validation );
+		    $this->setValidationData( $validation );
+	    }
 
-        $attributes = $this->getAttr();    
+        $attributes = $this->getAttr();
         $shortcode_class = array_key_exists( 'class', $attributes ) ? $attributes['class'] : "";
         $attributes['class'] = "js-wpt-colorpicker {$shortcode_class}"; // What is this js-wpt-cond-trigger classname for?
 

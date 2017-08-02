@@ -1,3 +1,9 @@
+= 1.8.1 =
+* Fixed a bug potentially making the downloads list under the Commercial not display correctly
+
+= 1.8 =
+* Added support for update channels (beta, developement and production)
+
 = 1.7.17 =
 * Fixed some warnings and notices
 

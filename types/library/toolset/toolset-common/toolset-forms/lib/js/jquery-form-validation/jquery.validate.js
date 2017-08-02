@@ -382,30 +382,38 @@
 
                 message = $('.wpt-form-error').data('message-single');
 
-                if (typeof message != 'undefined') {
+                if (typeof message !== 'undefined') {
 
                     $('.wpt-form-error').each(function () {
                         formId = $(this).closest("form").find('input[name=_cred_cred_prefix_form_id]').val();
-                        if ($(this).css('display') == 'block' && $(this).attr('id') !== 'wpt-form-message-' + formId && $(this).attr('id') !== 'lbl_generic') {
+                        var $wpt_form_message = $('#wpt-form-message-' + formId);
+                        if ( $(this).css('display') == 'block'
+                            && $(this).attr('id') !== 'wpt-form-message-' + formId
+                            && $(this).attr('id') !== 'lbl_generic' )
+                        {
                             total_errors += 1;
                         }
+
                         if (total_errors > 0) {
                             message = $(this).closest("form").find('.wpt-form-error').data('message-single');
                             if (total_errors > 1) {
                                 message = $(this).closest("form").find('.wpt-form-error').data('message-plural');
                             }
-
                             message = message.replace('%NN', total_errors);
-                            $('#wpt-form-message-' + formId).html(message);
-                            if (_form_submitted)
-                                $('#wpt-form-message-' + formId).show();
+
+                            if (_form_submitted) {
+                                $wpt_form_message.html(message);
+                                $wpt_form_message.show();
+                            }
                         } else {
-                            $('#wpt-form-message-' + formId).html('');
-                            if (_form_submitted)
-                                $('#wpt-form-message-' + formId).hide();
+                            $wpt_form_message.html('');
+                            if (_form_submitted) {
+                                $wpt_form_message.hide();
+                            }
                         }
                     });
                 }
+                _form_submitted = false;
                 total_errors = 0;
                 error_list = '';
             },

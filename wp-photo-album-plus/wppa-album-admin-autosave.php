@@ -456,7 +456,8 @@ function wppaTryScheduleAll( id ) {
 																		'addnone' => true,
 																		'addseparate' => true,
 																		'disableancestors' => true,
-																		'path' => wppa_switch( 'hier_albsel' )
+																		'path' => wppa_switch( 'hier_albsel' ),
+																		'sort' => true,
 																		)
 																) .
 											'</select>';
@@ -473,7 +474,8 @@ function wppaTryScheduleAll( id ) {
 																		'selected' => $a_parent,
 																		'addselected' => true,
 																		'disableancestors' => true,
-																		'path' => wppa_switch( 'hier_albsel' )
+																		'path' => wppa_switch( 'hier_albsel' ),
+																		'sort' => true,
 																		)
 																) .
 										'</select>';
@@ -1208,7 +1210,14 @@ function wppaTryScheduleAll( id ) {
 						<input type="radio" name="wppa-del-photos" value="delete" checked="checked" /> <?php _e('Delete', 'wp-photo-album-plus'); ?><br />
 						<input type="radio" name="wppa-del-photos" value="move" /> <?php _e('Move to:', 'wp-photo-album-plus'); ?>
 						<select name="wppa-move-album">
-							<?php echo wppa_album_select_a(array('checkaccess' => true, 'path' => wppa_switch( 'hier_albsel'), 'selected' => '0', 'exclude' => $_REQUEST['edit_id'], 'addpleaseselect' => true)) ?>
+							<?php echo wppa_album_select_a( array(	'checkaccess' => true, 
+																	'path' => wppa_switch( 'hier_albsel'), 
+																	'selected' => '0', 
+																	'exclude' => $_REQUEST['edit_id'], 
+																	'addpleaseselect' => true,
+																	'sort' => true,
+																	) )
+							?>
 						</select>
 					</p>
 

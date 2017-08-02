@@ -3,25 +3,28 @@
  *
  *
  */
+$has_output_bootstrap = (isset( $cfg['attribute']['output'] ) && $cfg['attribute']['output'] == 'bootstrap');
+
 if ( is_admin() ) {
     $child_div_classes = array('js-wpt-field-items');
+	if (  ! $has_output_bootstrap && $cfg['use_bootstrap'] && in_array( $cfg['type'], array( 'date', 'select' ) ) ) {
+		$child_div_classes[] = 'form-inline';
+	}
 	$field_additional_classes = apply_filters('toolset_field_additional_classes', '', $cfg);
     ?><div class="js-wpt-field wpt-field js-wpt-<?php echo $cfg['type']; ?> wpt-<?php echo $cfg['type']; ?><?php if ( @$cfg['repetitive'] ) echo ' js-wpt-repetitive wpt-repetitive'; ?><?php echo $field_additional_classes; ?>" data-wpt-type="<?php echo $cfg['type']; ?>" data-wpt-id="<?php echo $cfg['id']; ?>">
-        <div class="<?php echo implode( ' ', $child_div_classes ); ?>">
-            <?php
-            foreach ( $html as $out ):
-                include 'metaform-item.php';
-            endforeach;
-            ?>
-            <?php if ( @$cfg['repetitive'] ): ?>
-                <a href="#" class="js-wpt-repadd wpt-repadd button button-small button-primary-toolset" data-wpt-type="<?php echo $cfg['type']; ?>" data-wpt-id="<?php echo $cfg['id']; ?>"><?php echo apply_filters( 'toolset_button_add_repetition_text', __( 'Add new', 'wpv-views' ), $cfg ); ?></a>
-            <?php endif; ?>
-        </div>
+    <div class="<?php echo implode( ' ', $child_div_classes ); ?>">
+		<?php
+		foreach ( $html as $out ):
+			include 'metaform-item.php';
+		endforeach;
+		?>
+		<?php if ( @$cfg['repetitive'] ): ?>
+            <a href="#" class="js-wpt-repadd wpt-repadd button button-small button-primary-toolset" data-wpt-type="<?php echo $cfg['type']; ?>" data-wpt-id="<?php echo $cfg['id']; ?>"><?php echo apply_filters( 'toolset_button_add_repetition_text', __( 'Add new', 'wpv-views' ), $cfg ); ?></a>
+		<?php endif; ?>
     </div>
-    <?php
+    </div>
+	<?php
 } else {
-    $has_output_bootstrap = (isset( $cfg['attribute']['output'] ) && $cfg['attribute']['output'] == 'bootstrap');
-
     // CHeck if we need a wrapper
     $types_without_wrapper = array('submit', 'hidden');
     $needs_wrapper = true;
@@ -54,6 +57,10 @@ if ( is_admin() ) {
     // Adjust classnames for container and buttons
     $button_extra_classnames = '';
     $container_classes = '';
+	if ( ! $has_output_bootstrap && array_key_exists( 'use_bootstrap', $cfg ) && $cfg['use_bootstrap'] ) {
+		$button_extra_classnames .= ' btn btn-default btn-sm';
+		$container_classes .= ' form-group';
+	}
     if ( array_key_exists( 'repetitive', $cfg ) ) {
         $container_classes .= ' js-wpt-repetitive wpt-repetitive';
     }
@@ -67,12 +74,12 @@ if ( is_admin() ) {
     }
     if ( $cfg['repetitive'] ) {
         if ( $has_output_bootstrap ) {
-            echo '<a role="button" class="js-wpt-repadd wpt-repadd dashicons-before dashicons-plus-alt" data-wpt-type="' . $cfg['type'] . '" data-wpt-id="' . $cfg['id'] . '">' . apply_filters( 'toolset_button_add_repetition_text', esc_attr( __( 'Add new', 'wpv-views' ) ), $cfg ) . '</a>';
-        } else {
-            echo '<input type="button" class="js-wpt-repadd wpt-repadd' . $button_extra_classnames . '" data-wpt-type="' . $cfg['type'] . '" data-wpt-id="' . $cfg['id'] . '" value="';
-            echo apply_filters( 'toolset_button_add_repetition_text', esc_attr( sprintf( __( 'Add new %s', 'wpv-views' ), $cfg['title'] ) ), $cfg );
-            echo '" />';
-        }
+			echo '<a role="button" class="js-wpt-repadd wpt-repadd dashicons-before dashicons-plus-alt" data-wpt-type="' . $cfg['type'] . '" data-wpt-id="' . $cfg['id'] . '">' . apply_filters( 'toolset_button_add_repetition_text', esc_attr( __( 'Add new', 'wpv-views' ) ), $cfg ) . '</a>';
+		} else {
+			echo '<input type="button" class="js-wpt-repadd wpt-repadd' . $button_extra_classnames . '" data-wpt-type="' . $cfg['type'] . '" data-wpt-id="' . $cfg['id'] . '" value="';
+			echo apply_filters( 'toolset_button_add_repetition_text', esc_attr( sprintf( __( 'Add new %s', 'wpv-views' ), $cfg['title'] ) ), $cfg );
+			echo '" />';
+		}
     }
     if ( $needs_wrapper ) {
         echo '</div>';

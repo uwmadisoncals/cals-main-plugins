@@ -35,7 +35,7 @@ if ( ! class_exists( 'Toolset_DialogBoxes', false ) ) {
 		}
 
 		function register_scripts( $scripts ) {
-			$scripts['ddl-abstract-dialog']	= new Toolset_Script( 'ddl-abstract-dialog', TOOLSET_COMMON_URL . '/utility/dialogs/js/views/abstract/ddl-abstract-dialog.js', array('jquery','wpdialogs'), '0.1', false );
+			$scripts['ddl-abstract-dialog']	= new Toolset_Script( 'ddl-abstract-dialog', TOOLSET_COMMON_URL . '/utility/dialogs/js/views/abstract/ddl-abstract-dialog.js', array( 'jquery', 'wpdialogs', Toolset_Assets_Manager::SCRIPT_UTILS ), '0.1', false );
 			$scripts['ddl-dialog-boxes']	= new Toolset_Script( 'ddl-dialog-boxes', TOOLSET_COMMON_URL . '/utility/dialogs/js/views/abstract/dialog-view.js', array('jquery','ddl-abstract-dialog', 'underscore', 'backbone'), '0.1', false );
 
 			return $scripts;
@@ -50,7 +50,8 @@ if ( ! class_exists( 'Toolset_DialogBoxes', false ) ) {
 				array(
 					'ddl-dialogs-css',
 					'ddl-dialogs-general-css',
-					'ddl-dialogs-forms-css'
+					'ddl-dialogs-forms-css',
+					Toolset_Assets_Manager::STYLE_FONT_AWESOME,
 				)
 			);
 

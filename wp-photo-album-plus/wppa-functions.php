@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.7.03
+* Version 6.7.05
 *
 */
 
@@ -994,41 +994,11 @@ global $wppa_session;
 
 	// Search?
 	elseif ( wppa( 'src' ) ) {
-		$final_array = array();
-		$chunks = explode( ',', stripslashes( strtolower( wppa( 'searchstring' ) ) ) );
-		// all chunks
-		foreach ( $chunks as $chunk ) if ( strlen( trim( $chunk ) ) ) {
-			$words = wppa_index_raw_to_words( $chunk );
-			$album_array = array();
-			// all words in the searchstring
-			foreach ( $words as $word ) {
-				$word = trim( $word );
-				if ( strlen( $word ) > 1 ) {
-					if ( strlen( $word ) > 10 ) $word = substr( $word, 0, 10 );
-					if ( wppa_switch( 'wild_front' ) ) {
-						$aidxs = $wpdb->get_results( "SELECT `slug`, `albums` FROM `".WPPA_INDEX."` WHERE `slug` LIKE '%".$word."%'", ARRAY_A );
-					}
-					else {
-						$aidxs = $wpdb->get_results( "SELECT `slug`, `albums` FROM `".WPPA_INDEX."` WHERE `slug` LIKE '".$word."%'", ARRAY_A );
-					}
-					$albums = '';
-					if ( $aidxs ) {
-						foreach ( $aidxs as $ai ) {
-							$albums .= $ai['albums'].',';
-						}
-					}
-					$album_array[] = wppa_index_string_to_array( trim( $albums, ',' ) );
-				}
-			}
-			// Must meet all words: intersect photo sets
-			foreach ( array_keys( $album_array ) as $idx ) {
-				if ( $idx > '0' ) {
-					$album_array['0'] = array_intersect( $album_array['0'], $album_array[$idx] );
-				}
-			}
-			// Save partial result
-			if ( isset( $album_array['0'] ) ) $final_array = array_merge( $final_array, $album_array['0'] );
-		}
+
+		$searchstring = wppa( 'searchstring' );
+		if ( ! empty ( $wppa_session['use_searchstring'] ) ) $searchstring = $wppa_session['use_searchstring'];
+
+		$final_array = wppa_get_array_ids_from_searchstring( $searchstring, 'albums' );
 
 		// If Catbox specifies a category to limit, remove all albums that do not have the desired cat.
 		if ( wppa( 'catbox' ) ) {
@@ -1595,67 +1565,22 @@ global $wppa_session;
 		if ( ! empty ( $wppa_session['use_searchstring'] ) ) $searchstring = $wppa_session['use_searchstring'];
 
 		$final_array = array();
-		$chunks = explode( ',', stripslashes( strtolower( $searchstring ) ) );
-
-		// all chunks
-		foreach ( $chunks as $chunk ) if ( strlen( trim( $chunk ) ) ) {
-			$words = wppa_index_raw_to_words( $chunk, false, wppa_opt( 'search_min_length' ) );
-			$photo_array = array();
-			// all words in the searchstring
-			foreach ( $words as $word ) {
-				$word = trim( $word );
-				if ( strlen( $word ) >= wppa_opt( 'search_min_length' ) ) {
-					if ( strlen( $word ) > 20 ) $word = substr( $word, 0, 20 );
-					if ( wppa_switch( 'wild_front' ) ) {
-						$pidxs = $wpdb->get_results( "SELECT `slug`, `photos` FROM `".WPPA_INDEX."` WHERE `slug` LIKE '%".$word."%'", ARRAY_A );
-					}
-					else {
-						$pidxs = $wpdb->get_results( "SELECT `slug`, `photos` FROM `".WPPA_INDEX."` WHERE `slug` LIKE '".$word."%'", ARRAY_A );
-					}
-					$photos = '';
-					if ( $pidxs ) {
-						foreach ( $pidxs as $pi ) {
-							$photos .= $pi['photos'].',';
-						}
-					}
-					$photo_array[] = wppa_index_string_to_array( trim( $photos, ',' ) );
-				}
-			}
-			// Must meet all words: intersect photo sets
-			foreach ( array_keys( $photo_array ) as $idx ) {
-				if ( $idx > '0' ) {
-					$photo_array['0'] = array_intersect( $photo_array['0'], $photo_array[$idx] );
-				}
-			}
-			// Save partial result
-			if ( isset( $photo_array['0'] ) ) $final_array = array_merge( $final_array, $photo_array['0'] );
-
-			// Remove dups
-			$final_array = array_unique( $final_array );
-		}
+		$final_array = wppa_get_array_ids_from_searchstring( $searchstring, 'photos' );
 
 		// Remove scheduled and pending and trashed when not can moderate
 		if ( ! current_user_can( 'wppa_moderate' ) ) {
-			$needmod = $wpdb->get_results( "SELECT `id` FROM `".WPPA_PHOTOS."` WHERE `status` = 'scheduled' OR `status` = 'pending' OR `album` <= '-9'", ARRAY_A );
+			$needmod = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_PHOTOS . "` WHERE `status` = 'scheduled' OR `status` = 'pending' OR `album` <= '-9'" );
 			if ( is_array( $needmod ) ) {
-				$delta = array();
-				foreach ( $needmod as $item ) {
-					$delta[] = $item['id'];
-				}
+				$final_array = array_diff( $final_array, $needmod );
 			}
-			$final_array = array_diff( $final_array, $delta );
 		}
 
 		// Remove private and trashed when not logged in
 		if ( ! is_user_logged_in() ) {
-			$needlogin = $wpdb->get_results( "SELECT `id` FROM `".WPPA_PHOTOS."` WHERE `status` = 'private' OR `album` <= '-9'", ARRAY_A );
+			$needlogin = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_PHOTOS . "` WHERE `status` = 'private' OR `album` <= '-9'" );
 			if ( is_array( $needlogin ) ) {
-				$delta = array();
-				foreach ( $needlogin as $item ) {
-					$delta[] = $item['id'];
-				}
+				$final_array = array_diff( $final_array, $needlogin );
 			}
-			$final_array = array_diff( $final_array, $delta );
 		}
 
 		// remove dups from $final_array
@@ -1667,7 +1592,7 @@ global $wppa_session;
 		// Make album clause
 		$alb_clause = '';
 
-		// If rootsearch, the album clause resticts to sub the root
+		// If rootsearch, the album clause restricts to sub the root
 		// else: maybe category limited or exclude separates
 		// See for rootsearch
 		if ( wppa( 'is_rootsearch' ) && isset ( $wppa_session['search_root'] ) ) {
@@ -1830,6 +1755,130 @@ global $wppa_session;
 	// Do query and return result after copy result to $thumbs!!
 	$thumbs = wppa_do_get_thumbs_query( $query );
 	return $thumbs;
+}
+
+// Get the array of ids based on the supplied searchstring
+function wppa_get_array_ids_from_searchstring( $searchstring, $type ) {
+global $wpdb;
+
+	// Sanitize input
+	if ( ! in_array( $type, array( 'albums', 'photos' ) ) ) {
+		die( 'Unsupported type:' . $type . ' in wppa_get_array_ids_from_searchstring()' );
+	}
+
+	// Split searchstring into OR chunks
+	$chunks = explode( ',', stripslashes( strtolower( $searchstring ) ) );
+
+	// Init
+	$final_array 	= array();
+
+	// Do all non empty chunks
+	foreach ( $chunks as $chunk ) if ( strlen( trim( $chunk ) ) ) {
+
+		// Init this chunk
+		$not_words 		= array();
+		$item_array 	= array();
+		$not_item_array = array();
+
+		// Get the words of this chunk
+		$words = wppa_index_raw_to_words( $chunk, false, wppa_opt( 'search_min_length' ), false );
+
+		// Remove !words and put them into the not_words array.
+		if ( ! empty( $words ) ) foreach( array_keys( $words ) as $key ) {
+			if ( substr( $words[$key], 0, 1 ) == '!' ) {
+				$not_words[] = substr( $words[$key], 1 );
+				unset( $words[$key] );
+			}
+		}
+
+		// Meet all words in the chunk if it is not empty
+		if ( ! empty( $words ) ) {
+
+			// Process all words from this chunk
+			foreach ( $words as $word ) {
+
+				// Ceanup word
+				$word = trim( $word );
+
+				// Process only if the search token is long enough
+				if ( strlen( $word ) >= wppa_opt( 'search_min_length' ) ) {
+
+					// Trim searchword to a max of 20 chars
+					if ( strlen( $word ) > 20 ) $word = substr( $word, 0, 20 );
+
+					// Floating searchtoken?
+					if ( wppa_switch( 'wild_front' ) ) {
+						$idxs = $wpdb->get_col( "SELECT `" . $type . "` FROM `" . WPPA_INDEX . "` WHERE `slug` LIKE '%" . $word . "%'" );
+					}
+					else {
+						$idxs = $wpdb->get_col( "SELECT `" . $type . "` FROM `" . WPPA_INDEX . "` WHERE `slug` LIKE '" . $word . "%'" );
+					}
+
+					// $item_array is an array of arrays with item ids per word.
+					$ids = array();
+					if ( ! empty( $idxs ) ) foreach( $idxs as $i ) {
+						$ids = array_merge( $ids, wppa_index_string_to_array( $i ) );
+					}
+					$item_array[] = $ids;
+
+				}
+			}
+
+			// Must meet all words: intersect item sets. The first element serves as accumulator.
+			foreach ( array_keys( $item_array ) as $idx ) {
+				if ( $idx > 0 ) {
+					$item_array[0] = array_intersect( $item_array[0], $item_array[$idx] );
+				}
+			}
+		}
+
+		// Now remove possible results that are excluded by the !words in this chunk
+		if ( ! empty( $not_words ) ) {
+
+			// Do all not words
+			foreach( $not_words as $word ) {
+
+				// Process only if the search token is long enough
+				if ( strlen( $word ) >= wppa_opt( 'search_min_length' ) ) {
+
+					// Trim searchword to a max of 20 chars
+					if ( strlen( $word ) > 20 ) $word = substr( $word, 0, 20 );
+
+					// Floating searchtoken?
+					if ( wppa_switch( 'wild_front' ) ) {
+						$idxs = $wpdb->get_col( "SELECT `" . $type . "` FROM `" . WPPA_INDEX . "` WHERE `slug` LIKE '%" . $word . "%'" );
+					}
+					else {
+						$idxs = $wpdb->get_col( "SELECT `" . $type . "` FROM `" . WPPA_INDEX . "` WHERE `slug` LIKE '" . $word . "%'" );
+					}
+
+					// Find ids to exclude for the current !word
+					$ids = array();
+					if ( ! empty( $idxs ) ) foreach( $idxs as $i ) {
+						$ids = array_merge( $ids, wppa_index_string_to_array( $i ) );
+					}
+
+					// Accumuate items to exclude in $not_item_array for this chunk.
+					$not_item_array = array_merge( $not_item_array, $ids );
+				}
+			}
+		}
+
+		// All words and not wrds of this chunk processed, remove not_array from item_array
+		if ( ! empty( $not_item_array ) ) {
+			$item_array[0] = array_diff( $item_array[0], $not_item_array );
+		}
+
+		// Save partial result of this chunk into the final_array accumulator
+		if ( isset( $item_array[0] ) ) {
+			$final_array = array_merge( $final_array, $item_array[0] );
+		}
+	}
+
+	// Remove dups
+	$final_array = array_unique( $final_array );
+
+	return $final_array;
 }
 
 // Handle the select thumbs query

@@ -187,8 +187,8 @@ jQuery(document).ready(function () {
 });
 
 //Init date fields after CRED form is ready
-jQuery(document).on('cred_form_ready', function(){
-    wptDate.init('body', {
+jQuery(document).on('cred_form_ready', function( evt, form_data ){
+    wptDate.init("#" + form_data.form_id, {
         source: 'cred_form_ready_init'
     });
 });

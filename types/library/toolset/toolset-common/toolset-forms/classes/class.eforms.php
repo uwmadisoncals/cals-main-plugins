@@ -81,6 +81,7 @@ class Enlimbo_Forms {
 		 */
 		$this->form_settings = array(
 			'has_media_button' => true,
+			'use_bootstrap' => false,
 		);
 		$this->_id = $id;
 		if ( ! Toolset_Utils::is_real_admin() ) {
@@ -91,6 +92,13 @@ class Enlimbo_Forms {
 				$this->form_settings = $form_settings->form;
 			}
 			unset( $form_settings );
+			/**
+			 * check CRED setting for bootstrap: only on frontend
+			 */
+			$cred_cred_settings = get_option('cred_cred_settings');
+			if (is_array($cred_cred_settings)) {
+				$this->form_settings['use_bootstrap'] = array_key_exists('use_bootstrap', $cred_cred_settings) && $cred_cred_settings['use_bootstrap'];
+			}
 		}
 	}
 
@@ -427,6 +435,26 @@ class Enlimbo_Forms {
 		$classes = array();
 		$classes[] = $this->css_class . '-' . $element['#type'];
 		$classes[] = 'form-' . $element['#type'];
+		
+		if ($this->form_settings['use_bootstrap']) {
+			switch ($element['#type']) {
+				case 'hidden':
+				case 'button':
+				case 'submit':
+				case 'radio':
+				case 'checkbox':
+				case 'file':
+					//cred-162
+				case 'option':
+					break;
+				default:
+					$classes[] = 'form-control';
+			}
+		} else {
+			if ('hidden' != $element['#type']) {
+				$classes[] = $element['#type'];
+			}
+		}
 
 		if ( 'hidden' != $element['#type'] ) {
 			$classes[] = $element['#type'];
@@ -542,7 +570,9 @@ class Enlimbo_Forms {
 		$classes[] = 'form-item-' . $element['#type'];
 		$classes[] = $this->css_class . '-item';
 		$classes[] = $this->css_class . '-item-' . $element['#type'];
-
+		if ($this->form_settings['use_bootstrap']) {
+			$classes[] = 'form-group';
+		}
 		if ( preg_match( '/_hidden$/', $element['#id'] ) && ! is_admin() ) {
 			$classes[] = 'wpt-form-hide-container';
 		}
