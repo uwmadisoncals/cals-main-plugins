@@ -108,6 +108,11 @@
             });
             $(this).tooltip('show');
         });
+
+        // preventDefault for all links with # href
+        $('#aam-container').delegate('a[href="#"]', 'click', function(event) {
+            event.preventDefault();
+        });
     };
 
     /**
@@ -140,10 +145,12 @@
         );
 
         //highlight screen if the same level
-        if (parseInt(level) >= aamLocal.level) {
+        if (parseInt(level) >= aamLocal.level || type === 'default') {
             $('.aam-current-subject').addClass('danger');
+            $('#wpcontent').css('background-color', '#FAEBEA');
         } else {
             $('.aam-current-subject').removeClass('danger');
+            $('#wpcontent').css('background-color', '#FFFFFF');
         }
 
         this.triggerHook('setSubject');
@@ -176,19 +183,11 @@
     
     /**
      * 
-     * @param {type} param
-     * @param {type} value
-     * @param {type} object
-     * @param {type} object_id
-     * @returns {undefined}
      */
-    AAM.prototype.save = function(param, value, object, object_id) {
-        var result = null;
-        
+    AAM.prototype.save = function(param, value, object, object_id, successCallback) {
         $.ajax(aamLocal.ajaxurl, {
             type: 'POST',
             dataType: 'json',
-            async: false,
             data: {
                 action: 'aam',
                 sub_action: 'save',
@@ -201,14 +200,39 @@
                 objectId: object_id
             },
             success: function (response) {
-                result = response;
+                if (typeof successCallback === 'function') {
+                    successCallback(response);
+                }
             },
             error: function () {
                 aam.notification('danger', aam.__('Application error'));
             }
         });
-        
-        return result;
+    };
+
+    /**
+     * 
+     * @param {type} option
+     * @returns {undefined}
+     */
+    AAM.prototype.reset = function(object) {
+        $.ajax(aamLocal.ajaxurl, {
+            type: 'POST',
+            data: {
+                action: 'aam',
+                sub_action: 'reset',
+                _ajax_nonce: aamLocal.nonce,
+                subject: this.getSubject().type,
+                subjectId: this.getSubject().id,
+                object: object
+            },
+            success: function () {
+                aam.fetchContent();
+            },
+            error: function () {
+                aam.notification('danger', aam.__('Application error'));
+            }
+        });
     };
     
     /**

@@ -261,8 +261,8 @@ function my_calendar_draw_event( $event, $type = "calendar", $process_date, $tim
 	if ( strpos( $event_title, 'href' ) === false && $type != 'mini' && $type != 'list' ) {
 		if ( get_option( 'mc_open_uri' ) == 'true' ) {
 			$details_link = esc_url( mc_get_details_link( $event ) );
-			$wrap         = "<a href='$details_link' class='url summary$has_image'>";
-			$balance      = "</a>";
+			$wrap         = ( _mc_is_url( $details_link ) ) ?  "<a href='$details_link' class='url summary$has_image'>" : '<span class="no-link">';
+			$balance      = ( _mc_is_url( $details_link ) ) ? "</a>" : '</span>';
 		} else {
 			$wrap    = "<a href='#$uid-$day_id-$type-details' class='url summary$has_image'>";
 			$balance = "</a>";
@@ -1059,10 +1059,10 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 		'smonth'   => $smonth,
 		'sday'     => $sday 
 	);
-	// args used in Md5 hash cannot include 'time' or 'format', since those can be changed by navigation.
+	
+	// args used in Md5 hash cannot include 'time', 'category', or 'format', since those can be changed by navigation.
 	$hash_args = array(
 		'name'     => $name,
-		'category' => $category,
 		'above'    => $above,
 		'below'    => $below,
 		'ltype'    => $ltype,

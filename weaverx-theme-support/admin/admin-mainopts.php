@@ -575,7 +575,7 @@ array( 'name' => __('Header Other options', 'weaver-xtreme'), 'type' => 'break')
 
 	array('name' => '<span class="i-left dashicons dashicons-editor-kitchensink"></span>' . __('Fixed-Top Header Widget Area', 'weaver-xtreme' /*adm*/) ,
 			'id' => 'header_sb_fixedtop', 'type' => 'checkbox',
-			'info' => __('Fix the Header Widget Area to top of page. Use the <em>Expand/Extend BG Attributes</em> on the "Full Width" tab to make a full width Header Widget Area.', 'weaver-xtreme' /*adm*/)),
+			'info' => __('Fix the Header Widget Area to top of page. If primary/secondary menus also fixed-top, header widget area will always be after secondary and before primary. Use the <em>Expand/Extend BG Attributes</em> on the "Full Width" tab to make a full width Header Widget Area.', 'weaver-xtreme' /*adm*/)),
 
 	array( 'type' => 'submit'),
 

@@ -2,13 +2,13 @@
 Contributors: Benbodhi
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Z9R7JERS82EQQ
 Tags: svg, vector, css, style, mime, mime type, embed, img, inline, animation, animate, js
-Requires at least: 4.0
-Tested up to: 4.8
-Stable tag: 2.3.10
+Requires at least: 4.8
+Tested up to: 4.9-alpha-41335
+Stable tag: 2.3.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Allow SVG file uploads using the WordPress Media Library uploader plus direct styling/animation of SVG elements using CSS/JS.
+Allow SVG file uploads using the WordPress Media Library uploader plus the ability to inline SVG files for direct styling/animation of SVG elements using CSS/JS.
 
 == Description ==
 
@@ -55,17 +55,18 @@ or
 `<img class="your-custom-class" alt="alt-text" src="image-source.svg" />`
 
 The whole IMG tag element will now be dynamically replaced by the actual code of your SVG, making the inner content targetable.<br />
-This allows you to target elements within your SVG using CSS.
+This allows you to target elements within your SVG using CSS and JS.
 
 You can remove all other attributes from the IMG tag as it will disappear anyway.
 
 There’s a setting to automatically add your class to the IMG tag for you when you're inserting SVG’s in to a post or page, which also removes unnecessary tags.
+Since 2.3.11, you can force all SVG files to be rendered inline with a single checkbox. Additionally, you can now choose whether to use the minified or expanded version of the JS file.
 
 *Featured Images:* If a post/page is saved with your SVG as a featured image, a checkbox will display in the featured image meta box to allow you to render it inline (only if advanced mode is active).
 
 Please Note: If your SVG isn’t showing, it’s likely that it is being displayed with 0 height and width. In this case, you will need to set your own height and width in your CSS for SVG files to display correctly.
 
-*If you are having any issues, please use the support tab and I will try my best to get back to you quickly*
+*If you're having any issues, please use the support tab and I will try my best to get back to you quickly*
 
 == Security ==
 
@@ -73,12 +74,12 @@ As with allowing uploads of any files, there is potential risks involved. Only a
 
 == Feedback ==
 
-* I am open to your [suggestions and feedback](mailto:wp@benbodhi.com) - Thanks for using SVG Support!
+* I'm open to your [suggestions and feedback](mailto:wp@benbodhi.com) - Thanks for using SVG Support!
 * Tag me [@benbodhi](https://twitter.com/benbodhi) or [@GoWebben](https://twitter.com/gowebben) on Twitter
 * Like & Follow [my Facebook page](https://www.facebook.com/gowebben)
 * Or circle [+GoWebben](https://plus.google.com/+Gowebben/) on Google Plus ;-)
 
-*Note:* This is the second plugin on the WordPress repository, I hope you like it. Please take a moment to rate it and click 'works' under compatibility with your version of WordPress.
+*Note:* This is my second plugin on the WordPress repository, I hope you like it. Please take a moment to rate it and click 'works' under compatibility with your version of WordPress.
 
 == Translations ==
 
@@ -88,17 +89,13 @@ New to Translating WordPress? Read through the [Translator Handbook](https://mak
 == Additional Info ==
 **Idea Behind / Philosophy:** I needed an easy way to include SVG support in sites instead of having to copy and paste the code for each one. I also needed the ability to make odd shaped image links which SVG allows by embedding the links in the SVG file directly. I found a [really cool snippet](http://stackoverflow.com/questions/11978995/how-to-change-color-of-svg-image-using-css-jquery-svg-image-replacement) of jQuery written by Drew Baker a while ago and have used it (modified for WordPress) a few times until I was inspired to build it all into a plugin for ease of use and to share with others. Now styling SVG elements is super easy :)
 
-== Future Features ==
-* Option to choose which user ID can access the settings
-* Option to choose specific user ID's for usage restriction (both helpful if you have multiple administrators)
-* Built in SVG animation editor
-
 Again, feel free to [shoot me suggestions](mailto:wp@benbodhi.com)
 
 == Credits ==
 Plugin by [Benbodhi](https://benbodhi.com/) [@benbodhi](https://twitter.com/benbodhi) from [GoWebben](http://gowebben.com/) [@GoWebben](https://twitter.com/gowebben)
 
-Thanks to [laurosello](https://wordpress.org/support/profile/laurosollero) for his code contribution in svg-inline.php.
+Thanks to [ipokkel](https://wordpress.org/support/users/ipokkel/) for his suggestions and code contributions.
+Thanks to [laurosello](https://wordpress.org/support/users/laurosollero) for his code contribution.
 Logo By W3C, CC BY 2.5, [https://commons.wikimedia.org/w/index.php?curid=1895005](https://commons.wikimedia.org/w/index.php?curid=1895005).
 
 == Frequently Asked Questions ==
@@ -162,6 +159,14 @@ or
 
 
 == Changelog ==
+
+= 2.3.11 =
+
+* New: Feature to use expanded JS file rather than the minified/compressed version (useful for bundling and minifying using external caching plugins).
+* New: Force Inline SVG option. This feature allows you to force all of your SVG files to be rendered inline regardless of classes applied. Addresses issues where you can't add your own class to an image for some reason. For example, some page builder image elements. Also addresses changing your target class in the settings and needing to change all of your already embedded media, allowing you to simply force render rather than update all of the classes.
+* Modified the readme file and descriptions a bit.
+* Refined some code in functions/featured-image.php line 69 to address a warning.
+* Updated "Requires at least" tag to 4.8 (though it should still work in older versions, there was issues with core during the 4.7 phase and it's time for you to update anyway).
 
 = 2.3.10 =
 
@@ -326,6 +331,10 @@ or
 * Initial Release.
 
 == Upgrade Notice ==
+
+= 2.3.11 =
+
+* New Features and Fixes! Now you can force ALL of your SVG files (old and new) to be rendered inline in a single click with the new "Force Inline SVG" setting. You can also choose to use an expanded version of the inline JS if you want to minify it separately using a caching plugin or similar.
 
 = 2.3.10 =
 

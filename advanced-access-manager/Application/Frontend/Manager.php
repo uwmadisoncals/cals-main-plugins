@@ -321,7 +321,7 @@ class AAM_Frontend_Manager {
     public function thePosts($posts) {
         $current = $this->getCurrentPost();
         
-        if (is_array($posts)) {
+        if (is_array($posts) && !$this->isMainWP()) {
             foreach ($posts as $i => $post) {
                 if ($current && ($current->ID == $post->ID)) { continue; }
                 
@@ -415,7 +415,7 @@ class AAM_Frontend_Manager {
      * @param type $query
      */
     public function preparePostQuery($query) {
-        if ($this->skip === false) {
+        if (($this->skip === false) && $this->isMainWP()) {
             $this->skip = true;
             $filtered   = AAM_Core_API::getFilteredPostList($query);
             $this->skip = false;
@@ -429,6 +429,27 @@ class AAM_Frontend_Manager {
                 $query->query_vars['post__not_in'] = $filtered;
             }
         }
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return boolean
+     */
+    protected function isMainWP() {
+        $result = false;
+
+        foreach(debug_backtrace() as $level) {
+            $class = (isset($level['class']) ? $level['class'] : null);
+            $func  = (isset($level['function']) ? $level['function'] : null);
+
+            if ($class == 'WP' && $func == 'main') {
+                $result = true;
+                break;
+            }
+        }
+
+        return $result;
     }
 
     /**

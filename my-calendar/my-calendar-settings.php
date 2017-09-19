@@ -570,8 +570,7 @@ function edit_my_calendar_config() {
 
 			<div class="inside">
 				<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#mc-output" ); ?>">
-					<div><input type="hidden" name="_wpnonce"
-					            value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/></div>
+					<div><input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/></div>
 					<input type="submit" name="save" class="button screen-reader-text" value="<?php _e( 'Save Output Settings', 'my-calendar' ); ?>" /></p>		
 					<fieldset>
 						<legend><?php _e( 'Calendar Link Targets', 'my-calendar' ); ?></legend>

@@ -3,7 +3,7 @@ function frmFrontFormJS(){
 	var currentlyAddingRow = false;
 	var action = '';
 	var jsErrors = [];
-	var lookupsLoading = 0;// TODO: switch to processesRunning and make it work with file upload fields
+	var processesRunning = 0;
 	var lookupQueues = {};
 
 	function setNextPage(e){
@@ -195,6 +195,9 @@ function frmFrontFormJS(){
 				});
 
 				this.on('complete', function( file ) {
+					processesRunning--;
+					removeSubmitLoading(form, 'enable');
+
 					if ( typeof file.mediaID !== 'undefined' ) {
 						if ( uploadFields[i].uploadMultiple ) {
 							jQuery(file.previewElement).append( getHiddenUploadHTML( uploadFields[i], file.mediaID, fieldName ) );
@@ -210,11 +213,9 @@ function frmFrontFormJS(){
 				});
 
 				this.on('addedfile', function(){
+					processesRunning++;
 					showSubmitLoading( form );
-				});
 
-				this.on('queuecomplete', function(){
-					removeSubmitLoading( form, 'enable' );
 				});
 
 				this.on('removedfile', function( file ) {
@@ -1876,9 +1877,9 @@ function frmFrontFormJS(){
 	 * @param {String} formId
      */
 	function disableFormPreLookup( formId ) {
-		lookupsLoading++;
+		processesRunning++;
 
-		if ( lookupsLoading <= 1 ) {
+		if ( processesRunning === 1 ) {
 
 			var form = getFormById( formId );
 			if ( form !== null ) {
@@ -1894,9 +1895,9 @@ function frmFrontFormJS(){
 	 * @param {String} formId
 	 */
 	function enableFormAfterLookup( formId ) {
-		lookupsLoading--;
+		processesRunning--;
 
-		if ( lookupsLoading <= 0 ) {
+		if ( processesRunning <= 0 ) {
 
 			var form = getFormById( formId );
 			if ( form !== null ) {
@@ -2788,7 +2789,7 @@ function frmFrontFormJS(){
 
 		if ( totalField.val() !== total ) {
 			totalField.val(total);
-			if ( triggerField === null || totalField.attr('name') != triggerField.attr('name') ) {
+			if ( triggerField === null || typeof triggerField === 'undefined' || totalField.attr('name') != triggerField.attr('name') ) {
 				triggerChange( totalField, field_key );
 			}
 		}
@@ -3013,7 +3014,7 @@ function frmFrontFormJS(){
 			calcField = jQuery(field.thisFieldCall);
 		} else {
 			calcField = getSiblingField( field );
-			if ( calcField === null || typeof calcField === 'undefined' ) {
+			if ( calcField === null || typeof calcField === 'undefined' || calcField.length < 1  ) {
 				calcField = jQuery(field.thisFieldCall);
 			}
 		}
@@ -3685,6 +3686,10 @@ function frmFrontFormJS(){
 	}
 
 	function removeSubmitLoading( $object, enable ) {
+		if ( processesRunning > 0 ) {
+			return;
+		}
+
 		$object.removeClass('frm_loading_form');
 
 		$object.trigger( 'frmEndFormLoading' );
@@ -4460,7 +4465,7 @@ function frmFrontFormJS(){
 			jQuery(document).on('click', '.frm_remove_link', removeFile);
 
 			jQuery(document).on('focusin', 'input[data-frmmask]', function(){
-				jQuery(this).mask( jQuery(this).data('frmmask').toString() );
+				jQuery(this).mask( jQuery(this).data('frmmask').toString(), { autoclear: false } );
 			});
 
 			jQuery(document).on('change', '.frm-show-form input[name^="item_meta"], .frm-show-form select[name^="item_meta"], .frm-show-form textarea[name^="item_meta"]', maybeCheckDependent);
@@ -4805,7 +4810,7 @@ function frmAfterRecaptcha(token){
 }
 
 function frmUpdateField(entry_id,field_id,value,message,num){
-	jQuery(document.getElementById('frm_update_field_'+entry_id+'_'+field_id)).html('<span class="frm-loading-img"></span>');
+	jQuery(document.getElementById('frm_update_field_'+entry_id+'_'+field_id+'_'+num)).html('<span class="frm-loading-img"></span>');
 	jQuery.ajax({
 		type:'POST',url:frm_js.ajax_url,
 		data:{action:'frm_entries_update_field_ajax', entry_id:entry_id, field_id:field_id, value:value, nonce:frm_js.nonce},

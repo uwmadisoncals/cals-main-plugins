@@ -78,7 +78,19 @@
 									</tr>
 
 									<tr valign="top" class="svgs-advanced">
-										<!-- Automatically insert class to target in images when inserting into posts/pages -->
+										<!-- Select whether to use minified or expanded JS file  -->
+										<th scope="row">
+											<label for="bodhi_svgs_settings[use_expanded_js]"><strong><?php _e( 'Use Expanded JS?', 'svg-support' ); ?></strong></label>
+										</th>
+										<td>
+											<?php printf(
+												'<input id="bodhi_svgs_settings[use_expanded_js]" name="bodhi_svgs_settings[use_expanded_js]" type="checkbox" %2$s />', 'bodhi_svgs_settings_use_expanded_js', checked( isset( $bodhi_svgs_options['use_expanded_js'] ), true, false ) ); ?>
+											<?php _e( 'Yes', 'svg-support' ); ?><br /><small class="description"><?php _e(' Checking this will use the expanded JS file instead of the minified JS file. Useful if you want to minify this externally using a caching plugin or similar.', 'svg-support' ); ?></small>
+										</td>
+									</tr>
+
+									<tr valign="top" class="svgs-advanced">
+										<!-- Automatically insert class to target in images when inserting into posts/pages from admin edit screen -->
 										<th scope="row">
 											<label for="bodhi_svgs_settings[auto_insert_class]"><strong><?php _e( 'Automatically insert class?', 'svg-support' ); ?></strong></label>
 										</th>
@@ -96,6 +108,18 @@
 										</th>
 										<td>
 											<input id="bodhi_svgs_settings[css_target]" class="all-options code" name="bodhi_svgs_settings[css_target]" type="text" value="<?php if( isset( $bodhi_svgs_options['css_target'] ) ) echo $bodhi_svgs_options['css_target']; ?>"><br /><small class="description"><?php _e( 'The default target class is <code>style-svg</code>. You can change it to your own class such as <code>my-class</code> by typing it here.<br />Leave blank to use the default class.', 'svg-support' ); ?></small>
+										</td>
+									</tr>
+
+									<tr valign="top" class="svgs-advanced">
+										<!-- Automatically insert class to target in images on front end page via jQuery -->
+										<th scope="row">
+											<label for="bodhi_svgs_settings[force_inline_svg]"><strong><?php _e( 'Force Inline SVG?', 'svg-support' ); ?></strong></label>
+										</th>
+										<td>
+											<?php printf(
+												'<input id="bodhi_svgs_settings[force_inline_svg]" name="bodhi_svgs_settings[force_inline_svg]" type="checkbox" %2$s />', 'bodhi_svgs_settings_force_inline_svg', checked( isset( $bodhi_svgs_options['force_inline_svg'] ), true, false ) ); ?>
+											<?php _e( 'Yes', 'svg-support' ); ?><br /><small class="description"><?php _e(' <strong>Use with caution!</strong> Checking this will automatically add the SVG class to ALL image tags containing SVG file sources in the rendered HTML via javascript and will therefore render all of your SVG files inline.<br /><em>Use case scenario: When using a visual builder such as in the Divi Theme or The Divi Builder, the class is not automatically added with the "Automatically insert class?" option selected or the builder module doesn\'t give you the option to manually add a CSS class directly to your image.</em>', 'svg-support' ); ?></small>
 										</td>
 									</tr>
 
@@ -161,6 +185,14 @@
 						</div> <!-- .inside -->
 					</div> <!-- .postbox -->
 
+					<div class="postbox">
+						<h3><span><?php _e( 'Animate and Optimize your SVG files using these open source projects', 'svg-support' ); ?></span></h3>
+						<div class="inside">
+							<p><a href="https://maxwellito.github.io/vivus-instant/" target="_blank">Vivus Instant for SVG animation</a> <?php _e( 'Upload your SVG files and use the tools provided to animate strokes.', 'svg-support' ); ?></p>
+							<p><a href="https://jakearchibald.github.io/svgomg/" target="_blank">SVGOMG for SVG optimisation</a> <?php _e( 'An online tool to optimize your SVG files.', 'svg-support' ); ?></p>
+						</div> <!-- .inside -->
+					</div> <!-- .postbox -->
+
 				</div> <!-- .meta-box-sortables .ui-sortable -->
 
 			</div> <!-- post-body-content -->
@@ -192,6 +224,7 @@
 								<li><?php _e( 'Include multiple URL\'s inside single SVG', 'svg-support' ); ?></li>
 								<li><?php _e( 'Use odd shapes as links', 'svg-support' ); ?></li>
 								<li><?php _e( 'Inline SVG featured image support', 'svg-support' ); ?></li>
+								<li><?php _e( 'Force all SVG files to be rendered inline', 'svg-support' ); ?></li>
 							</ul>
 						</div> <!-- .inside -->
 					</div> <!-- .postbox -->

@@ -7,7 +7,7 @@ Author: Joseph C Dolson
 Author URI: http://www.joedolson.com
 Text Domain: my-calendar
 Domain Path: lang
-Version: 2.5.12
+Version: 2.5.13
 */
 /*  Copyright 2009-2017  Joe Dolson (email : joe@joedolson.com)
 
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 } // Exit if accessed directly
 
 global $mc_version, $wpdb;
-$mc_version = '2.5.12';
+$mc_version = '2.5.13';
 
 register_activation_hook( __FILE__, 'mc_plugin_activated' );
 register_deactivation_hook( __FILE__, 'mc_plugin_deactivated' );
@@ -87,7 +87,7 @@ include( dirname( __FILE__ ) . '/my-calendar-generator.php' );
 // Enable internationalisation
 add_action( 'plugins_loaded', 'mc_load_textdomain' );
 function mc_load_textdomain() {
-	// don't change this; just gradually remove shipped translations when .org trans become complete.
+	// don't change this; just gradually remove shipped translations if .org trans become complete.
 	load_plugin_textdomain( 'my-calendar', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 }
 

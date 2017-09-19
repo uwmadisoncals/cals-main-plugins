@@ -53,6 +53,7 @@ Also, you may use WordPress Download Manager as a complete e-Commerce Solution f
 *	Category embed short-code
 *	Advanced server file browser
 *	Complete category and file tree using a simple short-code [wpdm_tree]
+*   MP4 video upload and play support
 *   Translation Ready
 
 = Complete Digital Store Solution: =
@@ -79,11 +80,11 @@ Use [Premium Package – Complete Digital Store Solution](https://www.wpdownload
 *   Sales Notification Directly in Your Mobile with Push Message
 *   Very Detailed Sales Reports
 *   Order Notes & Messaging System
-*   Full-featured Digital Products Marketplace with Front-end product submission & payout management ( This Feature Requires WPDM v4+ )
-*   Sell individual files ( like single song from an album )  ( This Feature Requires WPDM v4+ )
 *   Extended Product Licensing System
 *   License Level Pricing
 *   Easy to implement license API for license system integration
+*   Full-featured Digital Products Marketplace with Front-end product submission & payout management ( This Feature Requires WPDM v4+ )
+*   Sell individual files ( like single song from an album )  ( This Feature Requires WPDM v4+ )
 *   and [much more...](https://www.wpdownloadmanager.com/downloads/ecommerce-add-ons/)
 
 
@@ -146,8 +147,26 @@ Check download stats and get a push notification when someone downloads, install
 10. Orders Page ( Admin )
 11. Order Details ( Admin )
 12. Invoice
+13. Video Player
 
 == Changelog ==
+
+= 2.9.57 =
+* Added new option to attach external URL as download link
+* Added translation support for page templates
+* Added mp4 video upload and play support
+* Added new page template for video file
+* Hide empty fields from page template automatically
+
+= 2.9.56 =
+* Added new page template for the files with price
+* Fixed issue with stat export
+
+= 2.9.55 =
+* Added various filter option on download stats
+* Added stats export option
+* Removed enqueued scripts and styles from admin pages where it is not necessary
+* Improved add-on page
 
 = 2.9.54 =
 * Fixed issue with captcha verify

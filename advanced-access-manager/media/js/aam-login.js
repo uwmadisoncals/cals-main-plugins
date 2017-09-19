@@ -1,6 +1,19 @@
+/**
+ * ======================================================================
+ * LICENSE: This file is subject to the terms and conditions defined in *
+ * file 'license.txt', which is part of this source code package.       *
+ * ======================================================================
+ */
+
 if (typeof jQuery !== 'undefined') {
     (function ($) {
         $('document').ready(function () {
+            $('.login-input').bind('keyup', function(event) {
+                if (event.which === 13) {
+                    $('.aam-login-submit').trigger('click');
+                }
+            });
+
             $('.aam-login-submit').each(function () {
                 $(this).bind('click', function () {
                     var button = $(this);

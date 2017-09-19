@@ -1088,7 +1088,7 @@ function mc_list_groups() {
 					<?php
 					$recurs = str_split( $event->event_recur, 1 );
 					$recur  = $recurs[0];
-					$every  = ( isset( $recurs[1] ) ) ? $recurs[1] : 1;
+					$every  = ( isset( $recurs[1] ) ) ? str_replace( $recurs[0], '', $event->event_recur ) : 1;
 
 					// Interpret the DB values into something human readable
 					switch ( $recur ) {

@@ -1,17 +1,17 @@
 === Our Team Showcase ===
 Contributors: smartcat
-Donate link: http://smartcatdesign.net
+Donate link: https://smartcatdesign.net/downloads/our-team-showcase/
 Tags: team, staff, directory, employees, widget, shortcode, members, carousel, honeycomb, stack, grid, custom, template, social, profile, custom post type, portfolio, profile,meet team, skills, cv,v-card, portal
-Requires at least: 4.0
-Tested up to: 4.4.1
-Stable tag: 2.42
+Requires at least: 4.6
+Tested up to: 4.8.1
+Stable tag: 4.1.0
 License: GPLv2 or later
 
 The best way to display your employees, team members, or any type of list. Multiple appealing templates,SEO friendly, re-order functionality.
 
 == Description ==
 
-[View Demo](https://smartcatdesign.net/our-team-showcase-demo/)
+[View Demo](http://wordpressteamplugin.com/templates/)
 
 Our Team Showcase allows you to easily create and display your team members & staff and show them on your site with ease. Your visitors will see a beautiful & animated
 list of your team, with their pictures, links to social icons, and link to each member page. 
@@ -87,6 +87,26 @@ Team Member Details & Icons:
 2. OR - Upload the unpacked folder folder via FTP into /wp-content/plugins
 
 == Changelog == 
+
+= 4.1.1 =
+1. fix bug with error when saving posts
+2. fix php error for un-install
+
+= 4.1.0 =
+1. Added a new field for additional social network
+2. Shortcode now supports multiple groups
+
+= 4.0.2 = 
+1. Bug fixes
+2. Full compatibility with PHP5.4
+
+= 4.0.1 =
+1. Patch plugin code to be backwards compatible with older PHP versions
+2. Added the ability to display multiple groups in one shortcode
+3. New members now are added last
+
+= 4.0.0 = 
+Plugin re-write. Settings and team member data will be maintained
 
 = 3.0.0
 1. Added new social icons ( pinterest, instagram )

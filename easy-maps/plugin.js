@@ -1,7 +1,7 @@
 ( function() {
 	tinymce.PluginManager.add( 'trippy_autocomplete', function( editor, url ) {
 		
-		var trippyBaseUrl = "http://www.trippy.com";
+		var trippyBaseUrl = "https://www.trippy.com";
 		
 		function triggerAlert(editor, e) {
 			if (String.fromCharCode(e.charCode || e.keyCode) === "@") {
@@ -49,7 +49,7 @@
 				
 				var allPlaces = $(rawContent).find(".trippy-place-element");
 				
-				var trippyStaticMapUrl = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=275x275";
+				var trippyStaticMapUrl = "https://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=275x275";
 				
 				for (var i = 0; i < allPlaces.length; i++) {
 					var label = i + 1;
@@ -213,7 +213,7 @@
 							}
 
 							
-//							var trippyStaticMapUrl = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=275x275";
+//							var trippyStaticMapUrl = "https://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=275x275";
 //								trippyStaticMapUrl += "&markers=color:red%7Clabel:*%7C" + places[i].latitude +"," +places[i].longitude;
 								
 	//							recordItem += "<div class=\"trippy-autocompleter-result-map\" style=\"position:absolute; right:-295px; top:0px; padding:10px; \"><img src=\"" + trippyStaticMapUrl + "\"></div>";

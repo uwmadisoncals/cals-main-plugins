@@ -39,15 +39,15 @@
         "source": {
             "type": "git",
             "url": "https://github.com/Codeinwp/themeisle-sdk.git",
-            "reference": "ebbbe0398ef8ee9922d17704e1dd2e9114e53ccb"
+            "reference": "1fb829fd268e739864b6f1822239c1112d80853f"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/Codeinwp/themeisle-sdk/zipball/ebbbe0398ef8ee9922d17704e1dd2e9114e53ccb",
-            "reference": "ebbbe0398ef8ee9922d17704e1dd2e9114e53ccb",
+            "url": "https://api.github.com/repos/Codeinwp/themeisle-sdk/zipball/1fb829fd268e739864b6f1822239c1112d80853f",
+            "reference": "1fb829fd268e739864b6f1822239c1112d80853f",
             "shasum": ""
         },
-        "time": "2017-07-04 13:54:14",
+        "time": "2017-08-22 16:09:34",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -74,5 +74,64 @@
             "issues": "https://github.com/Codeinwp/themeisle-sdk/issues",
             "source": "https://github.com/Codeinwp/themeisle-sdk/tree/master"
         }
+    },
+    {
+        "name": "phpoffice/phpexcel",
+        "version": "1.8.1",
+        "version_normalized": "1.8.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/PHPOffice/PHPExcel.git",
+            "reference": "372c7cbb695a6f6f1e62649381aeaa37e7e70b32"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/PHPOffice/PHPExcel/zipball/372c7cbb695a6f6f1e62649381aeaa37e7e70b32",
+            "reference": "372c7cbb695a6f6f1e62649381aeaa37e7e70b32",
+            "shasum": ""
+        },
+        "require": {
+            "ext-xml": "*",
+            "ext-xmlwriter": "*",
+            "php": ">=5.2.0"
+        },
+        "time": "2015-05-01 07:00:55",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "PHPExcel": "Classes/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL"
+        ],
+        "authors": [
+            {
+                "name": "Maarten Balliauw",
+                "homepage": "http://blog.maartenballiauw.be"
+            },
+            {
+                "name": "Mark Baker"
+            },
+            {
+                "name": "Franck Lefevre",
+                "homepage": "http://blog.rootslabs.net"
+            },
+            {
+                "name": "Erik Tilt"
+            }
+        ],
+        "description": "PHPExcel - OpenXML - Read, Create and Write Spreadsheet documents in PHP - Spreadsheet engine",
+        "homepage": "http://phpexcel.codeplex.com",
+        "keywords": [
+            "OpenXML",
+            "excel",
+            "php",
+            "spreadsheet",
+            "xls",
+            "xlsx"
+        ]
     }
 ]

@@ -512,6 +512,14 @@ input[name="mc_uri"] {
     width: 60%;
 }
 
+select[name="event_recur"] {
+	vertical-align: top;
+}
+
+.my-calendar-admin li.events_access_notes {
+	padding: 0px 1px 1px 5px;
+}
+
 .req {
     color: red;
 }

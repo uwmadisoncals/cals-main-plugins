@@ -372,7 +372,7 @@ If you have a theme using transparent backgrounds, this option will likely impro
 	<label><input type="checkbox" name="<?php weaverx_sapi_main_name('_hide_auto_css_rules'); ?>" id="hide_auto_css_rules" <?php checked(weaverx_getopt_checked( '_hide_auto_css_rules' )); ?> />
 <?php _e('Don\'t auto-display CSS rules - <small>Checking this box will disable the auto-display of Main Option elements that have CSS settings.</small> &diams;', 'weaver-xtreme' /*adm*/); ?></label><br />
 
-	<input name="<?php weaverx_sapi_main_name('_css_rows'); ?>" id="css_rows" type="text" style="width:30px;height:20px;" class="regular-text" value="<?php weaverx_esc_textarea(weaverx_getopt('_css_rows')); ?>" />
+	<input name="<?php weaverx_sapi_main_name('_css_rows'); ?>" id="css_rows" type="text" style="width:30px;" class="regular-text" value="<?php weaverx_esc_textarea(weaverx_getopt('_css_rows')); ?>" />
 <?php _e('lines - Set CSS+ text box height - <small>You can increase the default height of the CSS+ input area (1 to 25 lines).</small> &diams;', 'weaver-xtreme' /*adm*/); ?>
 <br />
  <br />

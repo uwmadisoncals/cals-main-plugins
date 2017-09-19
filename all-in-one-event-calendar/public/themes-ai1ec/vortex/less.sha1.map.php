@@ -374,8 +374,8 @@
     ),
     'less\\user_variables.php' => 
     array (
-      'size' => 7322,
-      'sha1' => '8a2e190b67e93b8ca39382552fbda0deb19baf72',
+      'size' => 8612,
+      'sha1' => 'eac102828cb0188f135039907e2b6ba503536baf',
     ),
     'less\\variables.less' => 
     array (

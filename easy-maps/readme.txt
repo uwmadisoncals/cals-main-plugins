@@ -2,10 +2,10 @@
 Contributors: awerhane74, usetrippy
 Tags: maps, travel
 Requires at least: 3.5.0
-Tested up to: 4.3.1
+Tested up to: 4.8.1
 Stable tag: trunk
 License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Enhance your posts with Google Maps.  Use the Easy Maps plugin to easily create more dynamic content with an inline editor.
 
@@ -42,6 +42,9 @@ A: Type the "@" symbol to trigger the autocompleter.  Alternatively, you can cli
 4. What it looks like in a published post
 
 == Changelog ==
+
+= 1.1.9 =
+* Migrate to https for SSL support
 
 = 1.1.8 =
 * Fix marker labels for special case of many markers

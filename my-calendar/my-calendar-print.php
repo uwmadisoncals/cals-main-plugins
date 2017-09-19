@@ -48,6 +48,7 @@ echo $head;
 		'ltype' => $ltype,
 		'lvalue' => $lvalue
 	);
+	
 	echo my_calendar( 'print', 'calendar', $category, $time, $ltype, $lvalue, 'mc-print-view', '', '', null, null, 'none', 'none' );
 	$return_url = ( get_option( 'mc_uri' ) != '' && ! is_numeric( get_option( 'mc_uri' ) ) ) ? mc_get_uri( false, $args ) : home_url();
 	$return_url = apply_filters( 'mc_print_return_url', $return_url, $category, $time, $ltype, $lvalue );

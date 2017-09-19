@@ -171,12 +171,48 @@ function wpdm_plugin_data($dir){
     return false;
 }
 
+/**
+ * @usage Update Notification for Custom Addons
+ * @param $plugin_name
+ * @param $version
+ * @param $update_url
+ */
+function wpdm_plugin_update_email($plugin_name, $version, $update_url)
+{
+
+    $admin_email = get_option('admin_email');
+    $hash = "__wpdm_".md5($plugin_name.$version);
+    $sent = get_option($hash, false);
+    if(!$sent) {
+        $email = array(
+            'label' => __('New Package Notification', 'wpdmpro'),
+            'for' => 'admin',
+            'default' => array('subject' => __($plugin_name . ': Update Available', 'wpdmpro'),
+                'from_name' => "WordPress Download Manager",
+                'from_email' => "support@wpdownloadmanager.com",
+                'to_email' => $admin_email,
+                'message' => ''
+            ));
+        $main_content = 'New version available. Please update your copy.<br/><br/><table class="table" style="width: 100%" cellpadding="10px"><tr><td width="120px">Plugin Name:</td><td>' . $plugin_name . '</td></tr><tr><td width="120px">Version:</td><td>' . $version . '</td></tr><tr><td width="120px"></td><td><div style="padding-top: 10px;"><a style="border:1px solid #5f9f60 !important;color: #ffffff;background: #5f9f60;padding:10px 25px;text-decoration:none;font-weight:bold !important;text-transform:uppercase" class="btn" href="' . $update_url . '">Update Now</a></div></td></tr></table>';
+        $template = $email['default'];
+        $template_file = "default.html";
+        $template_data = file_get_contents(wpdm_tpl_path($template_file, WPDM_BASE_DIR . 'email-templates/'));
+        $message = str_replace(array("[#sitename#]", "[#site_url#]", "[#site_tagline#]","[#message#]", "[#facebook#]"), array("WordPress Download Manager", "https://www.wpdownloadmanager.com/", "Plugin Update Available", $main_content, "https://www.facebook.com/wpdownloadmanager/"), $template_data);
+
+        $headers = "From: WordPress Download Manager <support@wpdownloadmanager.com>\r\nContent-type: text/html\r\n";
+
+        wp_mail($admin_email, $plugin_name . ': Update Available', $message, $headers);
+        update_option($hash, 1);
+
+    }
+}
+
 function wpdm_check_update()
 {
 
     if(!current_user_can(WPDM_ADMIN_CAP)) return;
 
-
+    include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
     $latest = '';//get_option('wpdm_latest');
     $latest_check = get_option('wpdm_latest_check');
@@ -203,15 +239,16 @@ function wpdm_check_update()
             if (version_compare($plugin_data['Version'], $latestv, '<') == true  && $plugin_dir != 'download-manager') {
                 $plugin_name = $plugin_data['Name'];
                 $plugin_info_url = $plugin_data['PluginURI'];
+                $active = is_plugin_active($plugin_data['plugin_index_file'])?'active':'';
                 $trid = sanitize_title($plugin_name);
                 $plugin_update_url =  admin_url('/edit.php?post_type=wpdmpro&page=settings&tab=plugin-update&plugin='.$plugin_dir); //'https://www.wpdownloadmanager.com/purchases/?'; //
                 if($trid!=''){
-                    //plugin_update_email($plugin_name, $latestv, $plugin_update_url);
+                    wpdm_plugin_update_email($plugin_name, $latestv, $plugin_update_url);
                     if ($page == 'plugins') {
                         echo <<<NOTICE
      <script type="text/javascript">
       jQuery(function(){
-        jQuery('tr:data[data-slug={$trid}]').addClass('update').after('<tr class="plugin-update-tr"><td colspan=3 class="plugin-update colspanchange"><div class="update-message notice inline notice-warning notice-alt"><p>There is a new version of <strong>{$plugin_name}</strong> available. <a href="{$plugin_update_url}&v={$latestv}" style="margin-left:10px" target=_blank>Update now ( v{$latestv} )</a></p></div></td></tr>');
+        jQuery('tr:data[data-slug={$trid}]').addClass('update').after('<tr class="plugin-update-tr {$active} update"><td colspan=3 class="plugin-update colspanchange"><div class="update-message notice inline notice-warning notice-alt"><p>There is a new version of <strong>{$plugin_name}</strong> available. <a href="{$plugin_update_url}&v={$latestv}" style="margin-left:10px" target=_blank>Update now ( v{$latestv} )</a></p></div></td></tr>');
       });
       </script>
 NOTICE;

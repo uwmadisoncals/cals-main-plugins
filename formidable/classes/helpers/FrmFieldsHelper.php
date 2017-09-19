@@ -687,7 +687,7 @@ DEFAULT_HTML;
                 case 'user_agent':
                 case 'user-agent':
                     $entry->description = maybe_unserialize($entry->description);
-					$replace_with = FrmEntryFormat::get_browser( $entry->description['browser'] );
+					$replace_with = FrmEntriesHelper::get_browser( $entry->description['browser'] );
                 break;
 
                 case 'created_at':
@@ -846,7 +846,7 @@ DEFAULT_HTML;
             }
 			unset( $autop );
 		} else if ( is_array( $replace_with ) ) {
-			if ( $atts['show'] && isset( $replace_with[ $atts['show'] ] ) ) {
+			if ( isset( $atts['show'] ) && $atts['show'] && isset( $replace_with[ $atts['show'] ] ) ) {
 				$replace_with = $replace_with[ $atts['show'] ];
 			} else {
 				$replace_with = implode( $sep, $replace_with );

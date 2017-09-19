@@ -33,8 +33,9 @@ class WordPressDownloadManagerAdmin
     /**
      * Enqueue admin scripts & styles
      */
-    function enqueueScripts(){
-        if(get_post_type()=='wpdmpro'||in_array(wpdm_query_var('page'),array('','settings','emails','wpdm-stats','templates','importable-files','wpdm-addons', 'orders','pp-license', 'payouts'))){
+    function enqueueScripts($hook){
+
+        if(get_post_type()=='wpdmpro' || wpdm_query_var('post_type') == 'wpdmpro' || $hook == 'index.php'){
             wp_enqueue_script('jquery');
             wp_enqueue_script('jquery-form');
             wp_enqueue_script('jquery-ui-core');
@@ -53,13 +54,17 @@ class WordPressDownloadManagerAdmin
             wp_enqueue_style('choosen-css', plugins_url('/download-manager/assets/css/chosen.css'));
             wp_enqueue_style('jqui-css', plugins_url('/download-manager/assets/jqui/theme/jquery-ui.css'));
 
-            wp_enqueue_script('wpdm-bootstrap', plugins_url('/download-manager/assets/bootstrap/js/bootstrap.min.js'), array('jquery'));
             wp_enqueue_script('wpdm-admin', plugins_url('/download-manager/assets/js/wpdm-admin.js'), array('jquery'));
             wp_enqueue_style('font-awesome', WPDM_BASE_URL.'assets/font-awesome/css/font-awesome.min.css');
+        }
+
+        if(get_post_type()=='wpdmpro' || wpdm_query_var('post_type') == 'wpdmpro' || $hook == 'index.php'){
+            wp_enqueue_script('wpdm-bootstrap', plugins_url('/download-manager/assets/bootstrap/js/bootstrap.min.js'), array('jquery'));
             wp_enqueue_style('wpdm-bootstrap', plugins_url('/download-manager/assets/bootstrap/css/bootstrap.css'));
             wp_enqueue_style('wpdm-bootstrap-theme', plugins_url('/download-manager/assets/bootstrap/css/bootstrap-theme.min.css'));
             wp_enqueue_style('wpdm-admin-styles', plugins_url('/download-manager/assets/css/admin-styles.css'));
         }
+
     }
 
 

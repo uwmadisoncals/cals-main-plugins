@@ -536,6 +536,7 @@ function mc_get_event_post( $event_id ) {
 			return $event->event_post;
 		}
 	}
+	
 	return false;
 }
 

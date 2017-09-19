@@ -1,9 +1,9 @@
 === SiteOrigin Widgets Bundle ===
 Tags: bundle, widget, button, slider, image, carousel, price table, google maps, tinymce, social links
 Requires at least: 4.2
-Tested up to: 4.8
-Stable tag: 1.9.5
-Build time: 2017-07-25T10:31:10+02:00
+Tested up to: 4.8.1
+Stable tag: 1.9.10
+Build time: 2017-09-14T08:47:54+02:00
 License: GPLv3 or later
 Contributors: gpriday, braam-genis
 Donate link: https://siteorigin.com/downloads/contribution/
@@ -53,6 +53,41 @@ The SiteOrigin Widgets Bundle is the perfect platform to build widgets for your 
 3. An example of the button widget.
 
 == Changelog ==
+
+= 1.9.10 - 14 September 2017 =
+* TinyMCE field: fixed issue with filter for TinyMCE plugins.
+* Added teaser messages for SiteOrigin Premium addons.
+
+= 1.9.9 - 31 August 2017 =
+* Avoid using relative paths in asset URLs.
+* Fixed compat with latest Elementor update.
+
+= 1.9.8 - 21 August 2017 =
+* Use WordPress functions to exit AJAX actions.
+* TinyMCE field: Initialized once.
+* TinyMCE field: Simplified switching between TinyMCE and QuickTags.
+* TinyMCE field: Check if individual TinyMCE settings are encoded as JSON and decode before re-encoding all settings.
+* Some compat fixes for Elementor.
+* TinyMCE field: Temporarily disable Jetpack Grunion editor.
+* Use correct JS dependencies for Beaver Builder compatibility when `WP_DEBUG` not defined.
+* Removed unnecessary enqueues in Beaver Builder compat for dashicons and wp media scripts.
+* Post carousel: Only handle horizontal swipes.
+
+= 1.9.7 - 11 August 2017 =
+* Contact: Added user configurable field for 'From:' address.
+* TinyMCE field: Use editor stylesheets for new TinyMCE editor.
+* TinyMCE field: Use UTF-8 encoding for text output.
+* Sliders: Check whether `$frames` is empty before using.
+* Google Maps: Prevent automatic center for routes.
+
+= 1.9.6 - 4 August 2017 =
+* Slider: Background Video: Try embedding the video if oEmbed fails.
+* Contact: Added some nonce checks.
+* Contact: add reply-to header.
+* Remove elementor panel width override.
+* Editor: Fix TinyMCE editor button filters in WP >= 4.8.
+* Editor: Preserve encoded HTML entities in TinyMCE field.
+* TinyMCE field: Added missing `tiny_mce_before_init` filter.
 
 = 1.9.5 - 25 July 2017 =
 * Fixed icon field selection.

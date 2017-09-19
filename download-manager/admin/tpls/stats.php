@@ -3,7 +3,8 @@
 
     <div class="panel panel-default" id="wpdm-wrapper-panel">
         <div class="panel-heading">
-            <button type="button" id="cdh" class="btn btn-default btn-sm pull-right" style="font-weight: 600"><i class="sinc fa fa-refresh color-green"></i><?php _e("Clear Download History",'download-manager'); ?></button>
+            <button type="button" id="cdh" class="btn btn-default btn-sm pull-right" style="font-weight: 600;margin-left: 10px;"><i class="sinc fa fa-refresh color-purple"></i><?php _e("Clear History",'download-manager'); ?></button>
+             <a class="btn btn-default btn-sm pull-right" href="edit.php?post_type=wpdmpro&page=wpdm-stats&task=export" style="font-weight: 600"><i class="sinc fa fa-download color-green"></i><?php _e("Export History",'download-manager'); ?></a>
             <b><i class="fa fa-bar-chart-o color-purple"></i> &nbsp; <?php echo __('Download History','download-manager'); ?></b>
 
         </div>

@@ -5,7 +5,7 @@
         <tr>
             <th><?php _e('Package Name','download-manager'); ?></th>
             <th><?php _e('Download Time','download-manager'); ?></th>
-            <th><?php _e('IP','download-manager'); ?></th>
+            <th><?php _e('User/IP','download-manager'); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -13,13 +13,17 @@
         global $wp_rewrite, $wp_query, $wpdb;
         $items_per_page = 30;
         $start = isset($_GET['pgd'])?((int)$_GET['pgd']-1)*$items_per_page:0;
-        $res = $wpdb->get_results("select p.post_title,s.* from {$wpdb->prefix}posts p, {$wpdb->prefix}ahm_download_stats s where s.pid = p.ID order by `timestamp` desc limit $start, $items_per_page");
+        $moreCond = '';
+        if(wpdm_query_var('pid') > 0) $moreCond .= " and p.ID = ".wpdm_query_var('pid');
+        if(wpdm_query_var('uid') > 0) $moreCond .= " and s.uid = ".wpdm_query_var('uid');
+        if(wpdm_query_var('ip') > 0) $moreCond .= " and s.ip = ".wpdm_query_var('ip');
+        $res = $wpdb->get_results("select p.ID as pid,p.post_title,s.* from {$wpdb->prefix}posts p, {$wpdb->prefix}ahm_download_stats s where s.pid = p.ID $moreCond order by `timestamp` desc limit $start, $items_per_page");
         foreach($res as $stat){
             ?>
             <tr>
-                <td><a href="<?php echo get_permalink($stat->pid); ?>"><?php echo $stat->post_title; ?></a></td>
+                <td><a href="<?php echo get_permalink($stat->pid); ?>"><?php echo $stat->post_title; ?></a> | <a href="edit.php?post_type=wpdmpro&page=wpdm-stats&pid=<?php echo $stat->pid; ?>"><i class="fa fa-area-chart"></i></a></td>
                 <td><?php echo date(get_option('date_format')." H:i",$stat->timestamp); ?></td>
-                <td><?php echo $stat->uid > 0?get_user_by('id', $stat->uid)->display_name . " / ":''; ?><?php echo $stat->ip; ?></td>
+                <td><?php echo $stat->uid > 0?"<a href='edit.php?post_type=wpdmpro&page=wpdm-stats&uid={$stat->uid}'>".get_user_by('id', $stat->uid)->display_name . "</a> / ":''; ?><a href='edit.php?post_type=wpdmpro&page=wpdm-stats&ip=<?php echo $stat->ip; ?>'><?php echo $stat->ip; ?></a></td>
             </tr>
             <?php
         }

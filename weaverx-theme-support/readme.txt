@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: weaverx-theme-support
 Requires at least: 4.5
 Tested up to: 4.8
-Stable tag: 3.1.8
+Stable tag: 3.1.9
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -75,6 +75,12 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog ==
+- 3.1.9 =
+* Fix: Recognize https: for vimeo link
+* Tweak: Added 'end=nnn' option for [ you_tube ] shortcode
+* Tweak: minor option wording change
+* Tweak: Legacy options interface: style text box height for some option values (e.g., margins)
+
 = 3.1.8 =
 * Fix: New editor style file no longer needs Weaver Xtreme Plus
 * New: Display message if need to save options to generate editor-style-wvrx.css file.

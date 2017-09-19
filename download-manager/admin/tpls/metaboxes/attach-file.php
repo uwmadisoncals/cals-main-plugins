@@ -37,17 +37,18 @@
     <?php  if(current_user_can('access_server_browser')){ ?>
     <li><a href="#browse" data-toggle="tab"><?php _e('Browse', 'download-manager'); ?></a></li>
     <?php } ?>
+    <li><a href="#remote" role="tab" data-toggle="tab"><?php echo __('URL','wpdmpro'); ?></a></li>
 </ul>
     <div class="tab-content">
     <div class="tab-pane active" id="upload">
         <div id="plupload-upload-ui" class="hide-if-no-js">
             <div id="drag-drop-area">
-                <div class="drag-drop-inside">
-                    <p class="drag-drop-info"><?php _e('Drop files here'); ?></p>
+                <div class="drag-drop-inside" style="margin-top: 40px">
+                    <p class="drag-drop-info" style="letter-spacing: 1px;font-size: 10pt"><?php _e('Drop files here'); ?><p>
                     <p>&mdash; <?php _ex('or', 'Uploader: Drop files here - or - Select Files'); ?> &mdash;</p>
                     <p class="drag-drop-buttons">
-                        <input id="plupload-browse-button" type="button" value="<?php esc_attr_e('Select Files'); ?>" class="button" /><br/>
-                        <small>[ Max: <?php echo (int)(wp_max_upload_size()/1048576); ?> MB ]</small>
+                        <button id="plupload-browse-button" type="button" class="btn btn-sm btn-default"><i class="fa fa-folder-open color-green"></i> <?php esc_attr_e('Select Files'); ?></button><br/>
+                        <small style="margin-top: 15px;display: block">[ Max: <?php echo (int)(wp_max_upload_size()/1048576); ?> MB ]</small>
                     </p>
                 </div>
             </div>
@@ -159,6 +160,9 @@
 <div id="browse" class="tab-pane">
     <?php  if(current_user_can('access_server_browser')) wpdm_file_browser(); ?>
 </div>
+        <div class="tab-pane" id="remote" class="w3eden">
+            <div class="input-group"><input type="url" id="rurl" class="form-control" placeholder="Insert URL"><span class="input-group-btn"><button type="button" id="rmta" class="btn btn-default"><i class="fa fa-plus-circle"></i></button></span></div>
+        </div>
 </div>
 </div>
 
@@ -176,17 +180,9 @@ jQuery(function(){
             return false;
             }
 
-        jQuery('#wpdm-files').dataTable().fnAddData( [
-            "<input type='hidden' id='in_"+ID+"' name='file[files][]' value='"+file+"' /><img id='del_"+ID+"' src='<?php echo plugins_url(); ?>/download-manager/assets/images/minus.png' rel='del' align=left />",
-            file,
-            "<input style='width:99%' type='text' name='file[fileinfo]["+file+"][title]' value='"+filename+"' onclick='this.select()'>",
-            "<input size='10' type='text' id='indpass_"+ID+"' name='file[fileinfo]["+file+"][password]' value=''> <img style='cursor: pointer;float: right;margin-top: -3px' class='genpass' onclick=\"return generatepass('indpass_"+ID+"')\" title='Generate Password' src=\"<?php echo plugins_url('download-manager/assets/images/generate-pass.png'); ?>\" />"
-        ] );
-        jQuery('#wpdm-files tbody tr:last-child').attr('id',ID).addClass('cfile');
+            jQuery('#wpdmfile').val(file);
+            jQuery('#cfl').html('<div><strong>'+file+'</strong>').slideDown();
 
-        jQuery("#wpdm-files tbody").sortable();
-
-        jQuery('#'+ID).fadeIn();
 
     });
 

@@ -66,7 +66,7 @@ function bodhi_svgs_add_class_to_thumbnail( $thumb ) {
 
 	$inline_featured_image = get_post_meta( get_the_ID(), 'inline_featured_image' );
 
-	if ( in_array( 1, $inline_featured_image ) ) {
+	if ( is_array( $inline_featured_image ) && in_array( 1, $inline_featured_image ) ) {
 
 		global $bodhi_svgs_options;
 

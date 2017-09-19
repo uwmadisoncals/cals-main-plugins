@@ -161,6 +161,20 @@ class FileSystem
     }
 
     /**
+     * @usage Sends download headers only
+     * @param $filename
+     * @param int $size
+     */
+    public static function downloadHeaders($filename, $size = 1024000){
+        @ob_end_clean();
+        header("Content-Description: File Transfer");
+        header("Content-Type: text/plain");
+        header("Content-disposition: attachment;filename=\"$filename\"");
+        header("Content-Transfer-Encoding: text/plain");
+        header("Content-Length: " . $size);
+    }
+
+    /**
      * @usage Create ZIP from given file list
      * @param $files
      * @param $zipname

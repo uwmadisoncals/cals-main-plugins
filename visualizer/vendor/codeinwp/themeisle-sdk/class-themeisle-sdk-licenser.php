@@ -90,13 +90,14 @@ if ( ! class_exists( 'ThemeIsle_SDK_Licenser' ) ) :
 			// Decode the JSON response
 			$themes = json_decode( $r['body']['themes'] );
 
-			unset( $themes->themes->{ $this->product->get_slug() } );
+			unset( $themes->themes->{$this->product->get_slug()} );
 
 			// Encode the updated JSON response
 			$r['body']['themes'] = json_encode( $themes );
 
 			return $r;
 		}
+
 		/**
 		 * Register the setting for the license of the product
 		 *
@@ -228,25 +229,35 @@ if ( ! class_exists( 'ThemeIsle_SDK_Licenser' ) ) :
 				return false;
 			}
 			$status                = $this->get_license_status();
-			$no_activations_string = apply_filters( $this->product->get_key() . '_lc_no_activations_string', 'No activations left for %s !!!. You need to
+			$no_activations_string = apply_filters(
+				$this->product->get_key() . '_lc_no_activations_string', 'No activations left for %s !!!. You need to
 									upgrade your plan in order to use %s on more
 									websites. Please ask the %s
-									Staff for more details.' );
-			$no_valid_string       = apply_filters( $this->product->get_key() . '_lc_no_valid_string', 'In order to benefit from updates and support for %s , please add
+									Staff for more details.'
+			);
+			$no_valid_string       = apply_filters(
+				$this->product->get_key() . '_lc_no_valid_string', 'In order to benefit from updates and support for %s , please add
 								your license code from your  <a href="%s" target="_blank">purchase history</a> and validate it <a
-									href="%s">here</a> ' );
-			$expiration_string     = apply_filters( $this->product->get_key() . '_lc_expiration_string', 'Your license is about to expire
-									for %s. You can go to %s and renew it   ' );
+									href="%s">here</a> '
+			);
+			$expiration_string     = apply_filters(
+				$this->product->get_key() . '_lc_expiration_string', 'Your license is about to expire
+									for %s. You can go to %s and renew it   '
+			);
 			$hide_notice_string    = apply_filters( $this->product->get_key() . '_lc_hide_notice_string', 'Hide Notice' );
 			if ( $status != 'valid' ) {
 				if ( $this->check_activation() ) {
 					if ( $this->check_hide( 'activation' ) ) {
 						?>
 						<div class="error">
-							<p><strong><?php
-									echo sprintf( $no_activations_string, $this->product->get_name(), $this->product->get_name(), '<a href="' . $this->product->get_store_url() . '"
-																	target="_blank">' . $this->product->get_store_name() . '</a>' );
-									?></strong> | <a
+							<p><strong>
+									<?php
+									echo sprintf(
+										$no_activations_string, $this->product->get_name(), $this->product->get_name(), '<a href="' . $this->product->get_store_url() . '"
+																	target="_blank">' . $this->product->get_store_name() . '</a>'
+									);
+									?>
+								</strong> | <a
 										href="<?php echo add_query_arg( $this->product->get_key() . '_activation', 'yes' ); ?> "><?php echo $hide_notice_string; ?></a>
 							</p>
 						</div>
@@ -271,9 +282,15 @@ if ( ! class_exists( 'ThemeIsle_SDK_Licenser' ) ) :
 						?>
 						<div class="update-nag">
 							<p>
-								<strong><?php echo sprintf( $expiration_string, $this->product->get_name() . ' ' . $this->product->get_type(), '<a
+								<strong>
+									<?php
+									echo sprintf(
+										$expiration_string, $this->product->get_name() . ' ' . $this->product->get_type(), '<a
 										href="' . $this->renew_url() . '"
-										target="_blank">' . $this->product->get_store_name() . '</a>' ); ?> </strong> |
+										target="_blank">' . $this->product->get_store_name() . '</a>'
+									);
+									?>
+								</strong> |
 								<a
 										href="<?php echo add_query_arg( $this->product->get_key() . '_hide_expiration', 'yes' ); ?> "><?php echo $hide_notice_string; ?></a>
 							</p>
@@ -333,10 +350,12 @@ if ( ! class_exists( 'ThemeIsle_SDK_Licenser' ) ) :
 				'url'        => rawurlencode( home_url() ),
 			);
 			// Call the custom API.
-			$response = wp_remote_get( add_query_arg( $api_params, $this->product->get_store_url() ), array(
-				'timeout'   => 15,
-				'sslverify' => false,
-			) );
+			$response = wp_remote_get(
+				add_query_arg( $api_params, $this->product->get_store_url() ), array(
+					'timeout'   => 15,
+					'sslverify' => false,
+				)
+			);
 			if ( is_wp_error( $response ) ) {
 				$license_data          = new stdClass();
 				$license_data->license = 'valid';
@@ -436,10 +455,12 @@ if ( ! class_exists( 'ThemeIsle_SDK_Licenser' ) ) :
 		 */
 		public function enable() {
 			if ( $this->product->get_type() == 'plugin' ) {
-				add_filter( 'pre_set_site_transient_update_plugins', array(
-					$this,
-					'pre_set_site_transient_update_plugins_filter',
-				) );
+				add_filter(
+					'pre_set_site_transient_update_plugins', array(
+						$this,
+						'pre_set_site_transient_update_plugins_filter',
+					)
+				);
 				add_filter( 'plugins_api', array( $this, 'plugins_api_filter' ), 10, 3 );
 				add_filter( 'http_request_args', array( $this, 'http_request_args' ), 10, 2 );
 			}
@@ -473,10 +494,12 @@ if ( ! class_exists( 'ThemeIsle_SDK_Licenser' ) ) :
 				return;
 			}
 			$update_url     = wp_nonce_url( 'update.php?action=upgrade-theme&amp;theme=' . urlencode( $this->product->get_slug() ), 'upgrade-theme_' . $this->product->get_slug() );
-			$update_onclick = ' onclick="if ( confirm(\'' . esc_js( __( 'Updating this theme will lose any customizations you have made. Cancel to stop, OK to update.' ) ) . '\') ) {return true;}return false;"';
+			$update_message = apply_filters( 'themeisle_sdk_license_update_message', 'Updating this theme will lose any customizations you have made. Cancel to stop, OK to update.' );
+			$update_onclick = ' onclick="if ( confirm(\'' . esc_js( $update_message ) . '\') ) {return true;}return false;"';
 			if ( version_compare( $this->product->get_version(), $api_response->new_version, '<' ) ) {
 				echo '<div id="update-nag">';
-				printf( '<strong>%1$s %2$s</strong> is available. <a href="%3$s" class="thickbox" title="%4s">Check out what\'s new</a> or <a href="%5$s"%6$s>update now</a>.',
+				printf(
+					'<strong>%1$s %2$s</strong> is available. <a href="%3$s" class="thickbox" title="%4s">Check out what\'s new</a> or <a href="%5$s"%6$s>update now</a>.',
 					$theme->get( 'Name' ),
 					$api_response->new_version,
 					'#TB_inline?width=640&amp;inlineId=' . $this->product->get_version() . '_changelog',
@@ -534,11 +557,13 @@ if ( ! class_exists( 'ThemeIsle_SDK_Licenser' ) ) :
 					'author'     => $this->product->get_store_name(),
 					'url'        => rawurlencode( home_url() ),
 				);
-				$response   = wp_remote_post( $this->product->get_store_url(), array(
-					'timeout'   => 15,
-					'sslverify' => false,
-					'body'      => $api_params,
-				) );
+				$response   = wp_remote_post(
+					$this->product->get_store_url(), array(
+						'timeout'   => 15,
+						'sslverify' => false,
+						'body'      => $api_params,
+					)
+				);
 				// make sure the response was successful
 				if ( is_wp_error( $response ) || 200 != wp_remote_retrieve_response_code( $response ) ) {
 					$failed = true;
@@ -606,7 +631,7 @@ if ( ! class_exists( 'ThemeIsle_SDK_Licenser' ) ) :
 		 * @uses         is_wp_error()
 		 *
 		 * @param string $_action The requested action.
-		 * @param array  $_data   Parameters for the API action.
+		 * @param array  $_data Parameters for the API action.
 		 *
 		 * @return false||object
 		 */
@@ -622,11 +647,13 @@ if ( ! class_exists( 'ThemeIsle_SDK_Licenser' ) ) :
 				'author'     => $this->product->get_store_name(),
 				'url'        => rawurlencode( home_url() ),
 			);
-			$request    = wp_remote_post( $this->product->get_store_url(), array(
-				'timeout'   => 15,
-				'sslverify' => false,
-				'body'      => $api_params,
-			) );
+			$request    = wp_remote_post(
+				$this->product->get_store_url(), array(
+					'timeout'   => 15,
+					'sslverify' => false,
+					'body'      => $api_params,
+				)
+			);
 			if ( ! is_wp_error( $request ) ) :
 				$request = json_decode( wp_remote_retrieve_body( $request ) );
 				if ( $request && isset( $request->sections ) ) {
@@ -644,9 +671,9 @@ if ( ! class_exists( 'ThemeIsle_SDK_Licenser' ) ) :
 		 *
 		 * @uses api_request()
 		 *
-		 * @param mixed  $_data   Plugin data.
+		 * @param mixed  $_data Plugin data.
 		 * @param string $_action Action to send.
-		 * @param object $_args   Arguments to use.
+		 * @param object $_args Arguments to use.
 		 *
 		 * @return object $_data
 		 */
@@ -666,7 +693,7 @@ if ( ! class_exists( 'ThemeIsle_SDK_Licenser' ) ) :
 		 * Disable SSL verification in order to prevent download update failures
 		 *
 		 * @param array  $args Http args.
-		 * @param string $url  Url to check.
+		 * @param string $url Url to check.
 		 *
 		 * @return object $array
 		 */

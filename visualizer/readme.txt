@@ -2,7 +2,7 @@
 Contributors:  codeinwp,marius2012,marius_codeinwp,hardeepasrani,themeisle,Madalin_ThemeIsle,rozroz
 Tags: chart, charts, charting, graph, graphs, graphing, visualisation, visualise data, visualization, visualize data, HTML5, canvas, pie chart, line chart, bar chart, column chart, gauge chart, area chart, scatter chart, candlestick chart, geo chart, google visualization api
 Requires at least: 3.5
-Tested up to: 4.8.0
+Tested up to: 4.8
 Stable tag: trunk
 License: GPL v2.0 or later
 License URI: http://www.opensource.org/licenses/gpl-license.php
@@ -21,6 +21,8 @@ The plugin uses Google Visualization API to add responsive & animated charts/dia
 > * Easy edit the data using a live editor
 > * 3 more chart types ( Combo, Timeline and Table chart )
 > * Auto synchronize with your online file.
+> * Create private charts.
+> * Allow users to edit charts.
 > * Create charts from your wordpress posts, pages,products or any other post_type.
 > * Priority email support from the developer of the plugin
 > * Support and updates for 1 year
@@ -56,6 +58,7 @@ The plugins works perfectly with the all <a href="http://justfreethemes.com" rel
 * [Create combo chart](https://demo.themeisle.com/visualizer/combo-chart/)
 * [Create scatter chart](https://demo.themeisle.com/visualizer/scatter-chart/)
 * [Create timeline chart](https://demo.themeisle.com/visualizer/timeline-chart/)
+* [Chart using frontend action links](https://demo.themeisle.com/visualizer/frontend-action-links/)
 
 
 == Installation ==
@@ -69,45 +72,68 @@ The plugins works perfectly with the all <a href="http://justfreethemes.com" rel
 
 Pay attention that to turn your shortcodes into graphs, your theme has to have `<?php wp_footer(); ?>` call at the bottom of **footer.php** file.
 
+= Is there any documentation available for this plugin? =
+
+[http://docs.themeisle.com/article/428-visualizer-charts-and-graphs-documentation](http://docs.themeisle.com/article/428-visualizer-charts-and-graphs-documentation)
+
+= How to format chart series values? =
+
+[http://docs.themeisle.com/article/672-how-to-format-series-values](http://docs.themeisle.com/article/672-how-to-format-series-values)
+
+= How to create charts from your WordPress posts? =
+
+[http://docs.themeisle.com/article/673-how-to-create-charts-from-your-wordpress-posts](http://docs.themeisle.com/article/673-how-to-create-charts-from-your-wordpress-posts)
+
+= How to automatically sync charts with online files? =
+
+[http://docs.themeisle.com/article/674-how-to-automatically-sync-charts-with-online-files](http://docs.themeisle.com/article/674-how-to-automatically-sync-charts-with-online-files)
+
 = How can I create a chart? =
 
-http://docs.themeisle.com/article/597-create-chart
+[http://docs.themeisle.com/article/597-create-chart](http://docs.themeisle.com/article/597-create-chart)
 
 = How can I edit a chart? =
 
-http://docs.themeisle.com/article/602-how-can-i-edit-a-chart
+[http://docs.themeisle.com/article/602-how-can-i-edit-a-chart](http://docs.themeisle.com/article/602-how-can-i-edit-a-chart)
 
 = How can I delete a chart? =
 
-http://docs.themeisle.com/article/600-delete-chart
+[http://docs.themeisle.com/article/600-delete-chart](http://docs.themeisle.com/article/600-delete-chart)
 
 = How can I clone a chart? =
 
-http://docs.themeisle.com/article/598-clone-chart
+[http://docs.themeisle.com/article/598-clone-chart](http://docs.themeisle.com/article/598-clone-chart)
 
 = How can I highlight a single bar? =
 
-http://docs.themeisle.com/article/603-how-can-i-highlight-a-single-bar
+[http://docs.themeisle.com/article/603-how-can-i-highlight-a-single-bar](http://docs.themeisle.com/article/603-how-can-i-highlight-a-single-bar)
 
 = How can I populate chart series and data dynamically? =
 
-http://docs.themeisle.com/article/605-how-can-i-populate-chart-series-and-data-dynamically
+[http://docs.themeisle.com/article/605-how-can-i-populate-chart-series-and-data-dynamically](http://docs.themeisle.com/article/605-how-can-i-populate-chart-series-and-data-dynamically)
 
 = How can I populate data from Google Spreadsheet? =
 
-http://docs.themeisle.com/article/607-how-can-i-populate-data-from-google-spreadsheet
+[http://docs.themeisle.com/article/607-how-can-i-populate-data-from-google-spreadsheet](http://docs.themeisle.com/article/607-how-can-i-populate-data-from-google-spreadsheet)
 
 = How can i import content from another chart? =
 
-http://docs.themeisle.com/article/609-how-can-i-import-content-from-another-chart
+[http://docs.themeisle.com/article/609-how-can-i-import-content-from-another-chart](http://docs.themeisle.com/article/609-how-can-i-import-content-from-another-chart)
 
 = How to export a chart? =
 
-http://docs.themeisle.com/article/608-how-to-export-a-chart
+[http://docs.themeisle.com/article/608-how-to-export-a-chart](http://docs.themeisle.com/article/608-how-to-export-a-chart)
 
 = How can i edit the data manually? =
 
-http://docs.themeisle.com/article/610-how-can-i-edit-the-data-manually
+[http://docs.themeisle.com/article/610-how-can-i-edit-the-data-manually](http://docs.themeisle.com/article/610-how-can-i-edit-the-data-manually)
+
+= How to enable frontend action buttons? =
+
+[http://docs.themeisle.com/article/675-how-to-enable-frontend-action-buttons](http://docs.themeisle.com/article/675-how-to-enable-frontend-action-buttons)
+= How to use Google Visualization variables? =
+
+[http://docs.themeisle.com/article/691-how-to-use-google-visualization-variables](http://docs.themeisle.com/article/691-how-to-use-google-visualization-variables)
 
 == Screenshots ==
 
@@ -118,6 +144,18 @@ http://docs.themeisle.com/article/610-how-can-i-edit-the-data-manually
 5. Charts library
 
 == Changelog ==
+= 3.0.0 - 2017-09-05  = 
+
+* Adds support manual configuration according to Google Visualization API.
+* Improves compatibility with more features from the pro version.
+
+
+= 2.2.0 - 2017-08-16  = 
+
+* Added custom number format for pie chart.
+* Added frontend actions buttons ( Print, Export to CSV, Export to Excel, Copy)
+
+
 = 2.1.9 - 2017-07-10  = 
 
 * Fixed display error with hex color.

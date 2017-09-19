@@ -5,19 +5,23 @@
     <div class="col-md-12"><br/>
 
 <ul class="list-group">
-  <li class="list-group-item">
+  <li class="list-group-item [hide_empty:version]">
+    <span class="badge">[version]</span>
+    [txt=Version]
+  </li>
+  <li class="list-group-item [hide_empty:download_count]">
     <span class="badge">[download_count]</span>
-    Download
+    [txt=Download]
   </li>
-  <li class="list-group-item">
+  <li class="list-group-item [hide_empty:file_size]">
     <span class="badge">[file_size]</span>
-    File Size
+    [txt=File Size]
   </li>
-  <li class="list-group-item">
+  <li class="list-group-item [hide_empty:create_date]">
     <span class="badge">[create_date]</span>
-    Create Date
+    [txt=Create Date]
   </li>
-  <li class="list-group-item">
+  <li class="list-group-item [hide_empty:download_link_extended]">
     [download_link_extended]
   </li>
 </ul>

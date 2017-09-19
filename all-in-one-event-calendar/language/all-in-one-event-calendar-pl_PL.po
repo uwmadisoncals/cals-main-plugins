@@ -10,11 +10,51 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: 2.3\n"
 
+#: app/view/admin/add-new-event.php:35
+msgid "Empower your calendar, build your community"
+msgstr ""
+
+#: app/view/admin/add-new-event.php:50
+msgid "<ul class=\"ai1ec-features-list\"><li><a href=\"https://time.ly/hub\" target=\"_blank\">Pull events from other calendars</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">Pull events from Facebook</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">Add a Newsletter</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">Get public event submissions</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">Charge people to post events</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">Add social sharing</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">And more</a></li></ul>"
+msgstr ""
+
+#: app/view/admin/samples.php:26 app/view/admin/samples.php:27
+msgid "Samples"
+msgstr ""
+
+#: app/model/settings.php:880
+msgid ""
+"Optional. Use this JavaScript-based shortcut to place the\n"
+"                        calendar a DOM element other than the usual page content container\n"
+"                        if you are unable to create an appropriate page template\n"
+"                         for the calendar page. To use, enter a\n"
+"                        <a target=\"_blank\" href=\"https://api.jquery.com/category/selectors/\">\n"
+"                        jQuery selector</a> that evaluates to a single DOM element.\n"
+"                        Any existing markup found within the target will be replaced\n"
+"                        by the calendar."
+msgstr ""
+
+#: app/model/settings.php:588
+msgid ""
+"In <span class=\"ai1ec-tooltip-toggle\"\n"
+"                        data-original-title=\"These include Agenda view,\n"
+"                        the Upcoming Events widget, and some extended views.\">\n"
+"                        Agenda-like views</span>, <strong>include all events\n"
+"                        from last day shown</strong>"
+msgstr ""
+
+#: app/model/settings.php:558
+msgid ""
+"<span class=\"ai1ec-tooltip-toggle\"\n"
+"                                    data-original-title=\"Google may request for an API key in order to show the map\">\n"
+"                                    Google Maps API Key</span> (<a target=\"_blank\" href=\"https://developers.google.com/maps/documentation/javascript/get-api-key#get-an-api-key\">Get an API key</a>)"
+msgstr ""
+
 #: app/controller/javascript.php:462
 msgid "Please enter a valid Registration URL, starting with https:// or http://."
 msgstr ""
 
-#: app/view/event/single.php:206
+#: app/view/event/single.php:209
 msgid "No data"
 msgstr ""
 
@@ -25,7 +65,7 @@ msgstr ""
 #: public/admin/plugins/ics/import_feed.php:45
 msgid ""
 "<b>You have reached the limit of how many feeds you can import.</b><br>\n"
-"\t\tPlease sign up for EventBoost plan <a href=\"https://time.ly/eventboost/\" target=\"_blank\">here</a>."
+"        Please sign up for EventBoost plan <a href=\"https://time.ly/eventboost/\" target=\"_blank\">here</a>."
 msgstr ""
 
 #: app/view/admin/settings.php:209
@@ -68,11 +108,11 @@ msgstr ""
 msgid "Other"
 msgstr ""
 
-#: app/view/admin/add-new-event.php:312
+#: app/view/admin/add-new-event.php:337
 msgid "Timely Ticketing saves time & money. Create ticketing/registration right here and now. You do not pay any ticketing fees (other than regular PayPal transaction costs). Create as many ticketing/registration as you'd like.<br /><br />Ticketing feature is not enabled for this website. Please sign up for Ticketing plan <a href=\"https://time.ly/tickets-existing-users/\" target=\"_blank\">here</a>."
 msgstr ""
 
-#: app/view/event/single.php:228
+#: app/view/event/single.php:231
 msgid "This post was imported from a CSV/ICS file."
 msgstr ""
 
@@ -91,13 +131,6 @@ msgstr ""
 
 #: public/admin/box_event_cost.php:53
 msgid "Time.ly Tickets"
-msgstr ""
-
-#: app/model/settings.php:558
-msgid ""
-"<span class=\"ai1ec-tooltip-toggle\"\n"
-"\t\t\t\t\t\t\t\t\tdata-original-title=\"Google may request for an API key in order to show the map\">\n"
-"\t\t\t\t\t\t\t\t\tGoogle Maps API Key</span> (<a target=\"_blank\" href=\"https://developers.google.com/maps/documentation/javascript/get-api-key#get-an-api-key\">Get an API key</a>)"
 msgstr ""
 
 #: public/admin/feed_row.php:93 public/admin/plugins/ics/import_feed.php:118
@@ -152,8 +185,8 @@ msgstr ""
 #: public/admin/plugins/ics/display_feeds.php:22
 msgid ""
 "<b>Your feeds will be migrated at the next scheduled refresh (it can take up to one hour).</b><br />\n"
-"\t\tYou can't edit or remove them at the moment.\n"
-"\t\tPlease, visit this page later to manage your feeds."
+"        You can't edit or remove them at the moment.\n"
+"        Please, visit this page later to manage your feeds."
 msgstr ""
 
 #: public/admin/plugins/ics/display_feeds.php:33
@@ -167,8 +200,8 @@ msgstr ""
 #: public/admin/plugins/ics/import_feed.php:26
 msgid ""
 "<b>You don't have a subscription for this feature.</b><br>\n"
-"\t\tPlease <a href=\"https://time.ly/pricing/\" target=\"_blank\">upgrade here</a> to a plan that\n"
-"\t\tsupports \"Import Feeds\"."
+"        Please <a href=\"https://time.ly/pricing/\" target=\"_blank\">upgrade here</a> to a plan that\n"
+"        supports \"Import Feeds\"."
 msgstr ""
 
 #: public/admin/plugins/ics/import_feed.php:136
@@ -232,7 +265,7 @@ msgstr ""
 msgid "We were unable to get the Event Details from Time.ly Ticketing"
 msgstr ""
 
-#: app/view/admin/add-new-event.php:307
+#: app/view/admin/add-new-event.php:332
 msgid "Ticketing is currently not available for this website. Please, try again later."
 msgstr ""
 
@@ -264,7 +297,7 @@ msgstr ""
 msgid "My Feeds"
 msgstr ""
 
-#: lib/calendar-feed/ics.php:889
+#: lib/calendar-feed/ics.php:891
 msgid "Event imported"
 msgstr ""
 
@@ -349,15 +382,15 @@ msgstr ""
 msgid "Cache dynamically generated JS files. Improves performance."
 msgstr ""
 
-#: app/view/admin/add-new-event.php:412
+#: app/view/admin/add-new-event.php:437
 msgid "<span class=\"ai1ec-info-text\">The event was submitted by this Organizer.</span>"
 msgstr ""
 
-#: app/view/admin/add-new-event.php:421
+#: app/view/admin/add-new-event.php:446
 msgid ", email: "
 msgstr ""
 
-#: app/view/admin/add-new-event.php:425
+#: app/view/admin/add-new-event.php:450
 msgid "<span class=\"ai1ec-info-text\">The event was submitted by %s.</span>"
 msgstr ""
 
@@ -522,7 +555,7 @@ msgid "Cost options not available, this event was imported from an external cale
 msgstr ""
 
 #: public/admin/box_event_cost.php:35
-msgid "This event was created using Timely Network. Sign in with the accouunt %s to see the Ticket options."
+msgid "This event was created using Timely Network. Sign in with the account %s to see the Ticket options."
 msgstr ""
 
 #: public/admin/box_event_cost.php:39
@@ -596,7 +629,7 @@ msgstr ""
 #: app/controller/javascript.php:508
 msgid ""
 "<b>\n"
-"\t\t\t\tThe Event has the cost option Tickets selected but no ticket was included.</b>"
+"                The Event has the cost option Tickets selected but no ticket was included.</b>"
 msgstr ""
 
 #: app/controller/javascript.php:588
@@ -607,11 +640,11 @@ msgstr ""
 msgid "Click here for technical details"
 msgstr ""
 
-#: app/model/api/api-abstract.php:194
+#: app/model/api/api-abstract.php:197
 msgid "API URL: %s.<br/>Detail: %s"
 msgstr ""
 
-#: app/model/api/api-abstract.php:492
+#: app/model/api/api-abstract.php:545
 msgid "Error decoding the response"
 msgstr ""
 
@@ -639,7 +672,7 @@ msgstr ""
 msgid "This Event was replicated from another site. Changes are not allowed."
 msgstr ""
 
-#: app/model/api/api-ticketing.php:75 app/view/admin/add-new-event.php:359
+#: app/model/api/api-ticketing.php:75 app/view/admin/add-new-event.php:384
 #: app/view/admin/all-events.php:214
 msgid "This Event was created using a different account %s. Changes are not allowed."
 msgstr ""
@@ -1798,7 +1831,7 @@ msgstr "Ostrzeżenie:"
 msgid "It is currently not supported to embed more than one calendar in the same page. Do not attempt to embed the calendar via shortcode in a page that already displays the calendar."
 msgstr "Obecnie nie można wstawić więcej niż jednego kalendarza na stronie. Nie należy także wstawiać innego kalendarza poprzez kod na stronie, gdzie już jest inny kalendarz. "
 
-#: lib/import-export/ics.php:876
+#: lib/import-export/ics.php:881
 msgid "Tickets: "
 msgstr ""
 
@@ -2046,31 +2079,31 @@ msgstr ""
 msgid "The add-on \"%s\" has been disabled due to an error:"
 msgstr ""
 
-#: lib/calendar-feed/ics.php:379
+#: lib/calendar-feed/ics.php:381
 msgid "Do you want to keep the events imported from the calendar or remove them?"
 msgstr "Chcesz zachować zaimportowane wydarzenia z kalendarza czy je usunąć?"
 
-#: lib/calendar-feed/ics.php:385
+#: lib/calendar-feed/ics.php:387
 msgid "Removing ICS Feed"
 msgstr "Usuwanie źródła ICS"
 
-#: lib/calendar-feed/ics.php:388
+#: lib/calendar-feed/ics.php:390
 msgid "Keep Events"
 msgstr "Zachowaj Wydarzenia"
 
-#: lib/calendar-feed/ics.php:391
+#: lib/calendar-feed/ics.php:393
 msgid "Remove Events"
 msgstr "Usuń wydarzenia"
 
-#: lib/calendar-feed/ics.php:566 lib/calendar-feed/ics.php:835
+#: lib/calendar-feed/ics.php:568 lib/calendar-feed/ics.php:837
 msgid "Oh, submission was not accepted."
 msgstr ""
 
-#: lib/calendar-feed/ics.php:761
+#: lib/calendar-feed/ics.php:763
 msgid "Deleted %d events"
 msgstr "Udunięto wydarzeń: %d"
 
-#: lib/calendar-feed/ics.php:815 lib/calendar-feed/ics.php:970
+#: lib/calendar-feed/ics.php:817 lib/calendar-feed/ics.php:972
 msgid "Feed deleted"
 msgstr "Źródło usunięte"
 
@@ -2147,11 +2180,11 @@ msgstr "Kup bilety"
 msgid "Edit this occurrence (%s)"
 msgstr "Edytuj to wystąpienie (%s)"
 
-#: app/view/event/single.php:224
+#: app/view/event/single.php:227
 msgid "This post was replicated from another site's <a href=\"%s\" title=\"iCalendar feed\"><i class=\"ai1ec-fa ai1ec-fa-calendar\"></i> calendar feed</a>."
 msgstr ""
 
-#: app/view/event/single.php:241
+#: app/view/event/single.php:244
 msgid "View original"
 msgstr "Zobacz oryginał"
 
@@ -2200,11 +2233,11 @@ msgstr[0] "Zaimportowano %s wydarzenie"
 msgstr[1] "Zaimportowano %s wydarzenia"
 msgstr[2] "Zaimportowano %s wydarzeń"
 
-#: lib/calendar-feed/ics.php:208 lib/calendar-feed/ics.php:769
+#: lib/calendar-feed/ics.php:208 lib/calendar-feed/ics.php:771
 msgid "Invalid ICS feed ID"
 msgstr "Niepoprawne ID źródła ICS"
 
-#: lib/calendar-feed/ics.php:362 lib/calendar-feed/import.php:82
+#: lib/calendar-feed/ics.php:364 lib/calendar-feed/import.php:82
 msgid "Categories (optional)"
 msgstr "Kategorie (opcjonalne)"
 
@@ -2890,10 +2923,10 @@ msgstr "Obecność <strong>robots.txt</strong> na tej stronie"
 #: app/model/settings.php:978
 msgid ""
 "The Robot Exclusion Standard, also known as the Robots Exclusion Protocol or\n"
-"\t\t\t\t\t\t<code><a href=\"https://en.wikipedia.org/wiki/Robots.txt\" target=\"_blank\">robots.txt</a></code>\n"
-"\t\t\t\t\t\tprotocol, is a convention for cooperating web crawlers and other web robots\n"
-"\t\t\t\t\t\tabout accessing all or part of a website that is otherwise publicly viewable.\n"
-"\t\t\t\t\t\tYou can change it manually by editing <code>robots.txt</code> in your root WordPress directory."
+"                        <code><a href=\"https://en.wikipedia.org/wiki/Robots.txt\" target=\"_blank\">robots.txt</a></code>\n"
+"                        protocol, is a convention for cooperating web crawlers and other web robots\n"
+"                        about accessing all or part of a website that is otherwise publicly viewable.\n"
+"                        You can change it manually by editing <code>robots.txt</code> in your root WordPress directory."
 msgstr ""
 
 #: app/model/settings.php:995
@@ -2916,11 +2949,11 @@ msgstr ""
 msgid "Event Details"
 msgstr "Szczegóły Wydarzenia"
 
-#: app/view/admin/add-new-event.php:505
+#: app/view/admin/add-new-event.php:530
 msgid "Set banner image"
 msgstr "Ustaw obrazek banera"
 
-#: app/view/admin/add-new-event.php:506
+#: app/view/admin/add-new-event.php:531
 msgid "Remove banner image"
 msgstr "Usuń obrazek banera"
 
@@ -3016,18 +3049,6 @@ msgstr ""
 msgid "Move calendar into this DOM element"
 msgstr "Osadź kalendarz w tym elemencie DOM"
 
-#: app/model/settings.php:880
-msgid ""
-"Optional. Use this JavaScript-based shortcut to place the\n"
-"\t\t\t\t\t\tcalendar a DOM element other than the usual page content container\n"
-"\t\t\t\t\t\tif you are unable to create an appropriate page template\n"
-"\t\t\t\t\t\t for the calendar page. To use, enter a\n"
-"\t\t\t\t\t\t<a target=\"_blank\" href=\"https://api.jquery.com/category/selectors/\">\n"
-"\t\t\t\t\t\tjQuery selector</a> that evaluates to a single DOM element.\n"
-"\t\t\t\t\t\tAny existing markup found within the target will be replaced\n"
-"\t\t\t\t\t\tby the calendar."
-msgstr ""
-
 #: app/model/settings.php:899
 msgid "<strong>Skip <tt>in_the_loop()</tt> check </strong> that protects against multiple calendar output"
 msgstr "<strong>Opuść <tt>in_the_loop()</tt> zaznaczanie </strong>, które chroni przeciwko wielu wyjściom kalendarza"
@@ -3075,20 +3096,6 @@ msgstr "<strong>Kolor otoczenia tekstu wydarzenia</strong> w widoku Miesiąca"
 #: app/model/settings.php:576
 msgid "Only applies to events that span a single day."
 msgstr "Stosuje się jedynie do wydarzeń trwających jeden dzień."
-
-#: app/model/settings.php:588
-msgid ""
-"In <span class=\"ai1ec-tooltip-toggle\"\n"
-"\t\t\t\t\t\tdata-original-title=\"These include Agenda view,\n"
-"\t\t\t\t\t\tthe Upcoming Events widget, and some extended views.\">\n"
-"\t\t\t\t\t\tAgenda-like views</span>, <strong>include all events\n"
-"\t\t\t\t\t\tfrom last day shown</strong>"
-msgstr ""
-"W <span class=\"ai1ec-tooltip-toggle\"\n"
-"→\t→\t→\t→\t→\t→\tdata-original-title=\"To zawiera widok agendy,\n"
-"→\t→\t→\t→\t→\t→\twidżet nadchodzących wydarzeń i inne widoki rozszerzone.\">\n"
-"→\t→\t→\t→\t→\t→\tWidok agendy</span>, <strong>zawiera wszystkie wydarzenia\n"
-"→\t→\t→\t→\t→\t→\t ostatniego pokazanego wydzrzenia</strong>"
 
 #: app/model/settings.php:604
 msgid "Keep all events <strong>expanded</strong> in Agenda view"
@@ -3146,19 +3153,19 @@ msgstr "Tylko smartfony (< 768px)"
 msgid "Not available"
 msgstr ""
 
-#: app/model/api/api-abstract.php:188
+#: app/model/api/api-abstract.php:191
 msgid "%s.<br/>Detail: %s."
 msgstr ""
 
-#: app/model/api/api-abstract.php:200
+#: app/model/api/api-abstract.php:203
 msgid "API URL: %s.<br/>Detail: %s - %s"
 msgstr ""
 
-#: app/model/api/api-abstract.php:208
+#: app/model/api/api-abstract.php:211
 msgid "%s. Please reload this page to try again. If this error persists, please contact us at %s. In your report please include the information below.<br/>%s."
 msgstr ""
 
-#: app/model/api/api-abstract.php:215
+#: app/model/api/api-abstract.php:218
 msgid "%s. Please try again. If this error persists, please contact us at %s. In your report please include the information below.<br/>%s."
 msgstr ""
 
@@ -3485,7 +3492,7 @@ msgstr "Nie można zainicjować tej skórki kalendarza. Użyto skórki domyślne
 msgid "Calendar Themes"
 msgstr "Szablony Kalendarza"
 
-#: app/controller/front.php:1063
+#: app/controller/front.php:1069
 msgid "Your database is found to be corrupt. Likely previous update has failed. Please restore All-in-One Event Calendar tables from a backup and retry.<br>Following errors were found:<br>%s"
 msgstr "Baza danych uszkodzona. Prawdopodobnie poprzednia aktualizacja danych skończyła się niepowodzeniem. Przywróć bazę z kopii bezpieczeństwa i spróbuj jeszcze raz. <br>Znaleziono następujące błędy:<br>%s"
 

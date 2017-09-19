@@ -467,7 +467,7 @@ class Package {
     }
 
     /**
-     * @usage Generate play button for link template
+     * @usage Generates play button for link template
      * @param $package
      * @param bool $return
      * @param $style
@@ -501,6 +501,32 @@ class Package {
 
         echo  $audiohtml;
 
+    }
+
+    /**
+     * @param $ID
+     * @param $files
+     * @param int $width
+     * @return string
+     */
+    public static function videoPlayer($ID, $files, $width = 800){
+
+        $videos = array();
+        foreach($files as $index => $file){
+            $realpath = file_exists($file)?$file:UPLOAD_DIR.$file;
+            $filetype = wp_check_filetype( $realpath );
+            $tmpvar = explode('/',$filetype['type']);
+            if($tmpvar[0]=='video')
+                $videos[] =  $file;
+        }
+
+        $player_html = '';
+        if(count($videos)>0) {
+            $video = home_url("/?wpdmdl={$ID}&ind=".\WPDM_Crypt::Encrypt($videos[0])."&play=".basename($videos[0]));
+            $player_html = "<video id='__wpdm_videoplayer' class='thumbnail' width=\"{$width}\" controls><source src=\"{$video}\" type=\"video/mp4\">Your browser does not support HTML5 video.</video>";
+        }
+        $player_html = apply_filters("wpdm_video_player_html", $player_html, $ID, $file, $width);
+        return $player_html;
     }
 
     /**
@@ -697,7 +723,7 @@ class Package {
             if ($embed == 1)
                 $adata = "</strong><table class='table all-locks-table' style='border:0px'><tr><td style='padding:5px 0px;border:0px;'>" . $data . "</td></tr></table>";
             else {
-                $dataattrs = $popstyle == 'pop-over'? 'data-title="<button type=button id=\'close\' class=\'btn btn-link btn-xs pull-right po-close\' style=\'margin-top:-4px;margin-right:-10px\'><i class=\'fa fa-times text-danger\'></i></button> '.__('Download','download-manager').' ' . $package['title'] . '"' : 'data-toggle="modal" data-target="#pkg_' . $package['ID'] . "_" . $unqid . '"';
+                $dataattrs = $popstyle == 'pop-over'? 'data-title="'.__('Download','download-manager').' ' . $package['title'] . '"' : 'data-toggle="modal" data-target="#pkg_' . $package['ID'] . "_" . $unqid . '"';
                 $adata = '<a href="#pkg_' . $package['ID'] . "_" . $unqid . '" '.$dataattrs.' class="wpdm-download-link wpdm-download-locked ' . $popstyle . ' ' . $package['btnclass'] . '">' . $package['link_label'] . '</a>';
                 if ($popstyle == 'pop-over')
                     $adata .= '<div class="modal fade"><div class="row all-locks"  id="pkg_' . $package['ID'] . "_" . $unqid . '">' . $data . '</div></div>';
@@ -944,6 +970,9 @@ class Package {
         preg_match_all("/\[thumb_gallery_([0-9]+)x([0-9]+)\]/", $template, $gmatches);
         preg_match_all("/\[excerpt_([0-9]+)\]/", $template, $xmatches);
         preg_match_all("/\[pdf_thumb_([0-9]+)x([0-9]+)\]/", $template, $pmatches);
+        preg_match_all("/\[txt=([^\]]+)\]/", $template, $txtmatches);
+        preg_match_all("/\[hide_empty:([^\]]+)\]/", $template, $hematches);
+        preg_match_all("/\[video_player_([0-9]+)\]/", $template, $vdmatches);
 
         $thumb = wp_get_attachment_image_src(get_post_thumbnail_id($vars['ID']), 'full');
         $vars['preview'] = $thumb['0'];
@@ -951,6 +980,17 @@ class Package {
         $pdf = isset($vars['files'][0])?$vars['files'][0]:'';
         $ext = explode(".", $pdf);
         $ext = end($ext);
+
+        foreach ($vdmatches[0] as $nd => $scode) {
+            $scode = str_replace(array('[', ']'), '', $scode);
+            $vars[$scode] =  self::videoPlayer($vars['ID'], $vars['files'], $vdmatches[1][$nd]);
+        }
+
+        //Replace all txt variables
+        foreach ($txtmatches[0] as $nd => $scode) {
+            $scode = str_replace(array('[', ']'), '', $scode);
+            $vars[$scode] =  __($txtmatches[1][$nd], "wpdmpro");
+        }
 
         // Parse [pdf_thumb] tag in link/page template
         if(strpos($template, 'pdf_thumb')) {
@@ -1004,6 +1044,14 @@ class Package {
 
         if(strpos($template, 'doc_preview'))
             $vars['doc_preview'] = self::docPreview($vars);
+
+        foreach ($hematches[0] as $index => $hide_empty){
+            $hide_empty = str_replace(array('[', ']'), '', $hide_empty);
+            if(isset($vars[$hematches[1][$index]]) && ( $vars[$hematches[1][$index]] == '' || $vars[$hematches[1][$index]] == '0' ))
+                $vars[$hide_empty] = 'wpdm_hide wpdm_remove_empty';
+            else
+                $value[$hide_empty] = '';
+        }
 
         // If need to re-process any data before fetch template
         $vars = apply_filters("wdm_before_fetch_template", $vars);

@@ -260,6 +260,7 @@ function my_calendar_write_js() {
 		?>
 		<script>
 			//<![CDATA[
+			if ( typeof(mc_months) !== "undefined" ) {
 			jQuery(document).ready(function ($) {
 				$( '.mc-datepicker' ).pickadate({
 					monthsFull: mc_months,
@@ -274,6 +275,18 @@ function my_calendar_write_js() {
 					format: mc_time_format,
 					editable: true		
 				});
+			});
+			} else {
+				jQuery(document).ready(function ($) {	
+					var datepicked = $( '.mc-datepicker' ).attr( 'data-value' );
+					$( '.mc-datepicker' ).val( datepicked );
+				});
+			}
+			//]]>			
+		</script>
+		<script>
+			//<![CDATA[		
+			jQuery(document).ready(function ($) {		
 				$('#mc-accordion').accordion( { collapsible: true, active: false, heightStyle: 'content' } );
 				<?php
 				if ( function_exists( 'jd_doTwitterAPIPost' ) && isset( $_GET['page'] ) && $_GET['page'] == 'my-calendar' ) { 
@@ -366,21 +379,25 @@ $script = '
 				if ( get_option( 'mc_calendar_javascript' ) != 1 && get_option( 'mc_open_uri' ) != 'true' ) {
 					$url = apply_filters( 'mc_grid_js', plugins_url( 'js/mc-grid.js', __FILE__ ) );
 					wp_enqueue_script( 'mc.grid', $url, array( 'jquery' ) );
+					wp_localize_script( 'mc.grid', 'mcgrid', 'true' );
 					$enqueue_mcjs = true;
 				}
 				if ( get_option( 'mc_list_javascript' ) != 1 ) {
 					$url = apply_filters( 'mc_list_js', plugins_url( 'js/mc-list.js', __FILE__ ) );
 					wp_enqueue_script( 'mc.list', $url, array( 'jquery' ) );
+					wp_localize_script( 'mc.list', 'mclist', 'true' );					
 					$enqueue_mcjs = true;
 				}
 				if ( get_option( 'mc_mini_javascript' ) != 1 && get_option( 'mc_open_day_uri' ) != 'true' ) {
 					$url = apply_filters( 'mc_mini_js', plugins_url( 'js/mc-mini.js', __FILE__ ) );
 					wp_enqueue_script( 'mc.mini', $url, array( 'jquery' ) );
+					wp_localize_script( 'mc.mini', 'mcmini', 'true' );
 					$enqueue_mcjs = true;
 				}
 				if ( get_option( 'mc_ajax_javascript' ) != 1 ) {
 					$url = apply_filters( 'mc_ajax_js', plugins_url( 'js/mc-ajax.js', __FILE__ ) );
 					wp_enqueue_script( 'mc.ajax', $url, array( 'jquery' ) );
+					wp_localize_script( 'mc.ajax', 'mcAjax', 'true' );					
 					$enqueue_mcjs = true;
 				}
 				if ( $enqueue_mcjs ) {
@@ -1674,7 +1691,8 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 	$format   = array( '%d', '%s', '%s', '%d' );
 	$recurs   = str_split( $event->event_recur, 1 );
 	$recur    = $recurs[0];
-	$every    = ( isset( $recurs[1] ) ) ? $recurs[1] : 1;
+	// can't use 2nd value directly if it's two digits
+	$every    = ( isset( $recurs[1] ) ) ? str_replace( $recurs[0], '', $event->event_recur ) : 1;
 	if ( $recur != "S" ) {
 		// if this event had a rep of 0, translate that.
 		$event_repetition = ( $event->event_repeats != 0 ) ? $event->event_repeats : _mc_increment_values( $recur );
@@ -1682,11 +1700,67 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 		if ( $recur != 'S' ) {
 			switch ( $recur ) {
 				case "D":
-				case "E":
 					for ( $i = 0; $i <= $numforward; $i ++ ) {
 						$begin = my_calendar_add_date( $orig_begin, $i * $every, 0, 0 );
 						$end   = my_calendar_add_date( $orig_end, $i * $every, 0, 0 );
-						if ( ( $recur == 'E' && ( date( 'w', $begin ) != 0 && date( 'w', $begin ) != 6 ) ) || $recur == 'D' ) {
+
+						$data = array(
+							'occur_event_id' => $id,
+							'occur_begin'    => date( 'Y-m-d  H:i:s', $begin ),
+							'occur_end'      => date( 'Y-m-d  H:i:s', $end ),
+							'occur_group_id' => $group_id
+						);
+						if ( $test == 'test' && $i > 0 ) {
+							return $data;
+						}
+						if ( $test == true ) {
+							$return[] = $data;
+						}
+						if ( ! $test ) {
+							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'daily' );
+							if ( ! $insert ) {
+								$wpdb->insert( my_calendar_event_table(), $data, $format );
+							}
+						}
+					}
+				break;
+				case "E":
+					// This doesn't work for weekdays unless the period is less than one week, as it doesn't account for day repetitions.
+					// probably need to set up two nested for loops two identify the number of days forward required to go through x week days.
+					// $every = e.g. every 14 weekdays
+					// $numforward = e.g. 7 times
+					if ( $every < 7 ) {
+						for ( $i = 0; $i <= $numforward; $i ++ ) {
+							$begin = my_calendar_add_date( $orig_begin, $i * $every, 0, 0 );
+							$end   = my_calendar_add_date( $orig_end, $i * $every, 0, 0 );
+							if ( ( date( 'w', $begin ) != 0 && date( 'w', $begin ) != 6 ) ) {
+								$data = array(
+									'occur_event_id' => $id,
+									'occur_begin'    => date( 'Y-m-d  H:i:s', $begin ),
+									'occur_end'      => date( 'Y-m-d  H:i:s', $end ),
+									'occur_group_id' => $group_id
+								);
+								if ( $test == 'test' && $i > 0 ) {
+									return $data;
+								}
+								if ( $test == true ) {
+									$return[] = $data;
+								}
+								if ( ! $test ) {
+									$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'daily' );
+									if ( ! $insert ) {
+										$wpdb->insert( my_calendar_event_table(), $data, $format );
+									}
+								}
+							} else {
+								$numforward ++;
+							}
+						}
+					} else {
+						// get number of weeks included in data'
+						for( $i = 0; $i <= $event_repetition; $i ++ ) {
+							$begin = strtotime( $orig_begin . ' ' . ( $every *  $i ) . ' weekdays' );
+							$end   = strtotime( $orig_end . ' ' . ( $every * $i ) . ' weekdays' );
 							$data = array(
 								'occur_event_id' => $id,
 								'occur_begin'    => date( 'Y-m-d  H:i:s', $begin ),
@@ -1705,8 +1779,6 @@ function mc_increment_event( $id, $post = array(), $test = false ) {
 									$wpdb->insert( my_calendar_event_table(), $data, $format );
 								}
 							}
-						} else {
-							$numforward ++;
 						}
 					}
 					break;
@@ -1901,6 +1973,7 @@ function mc_register_actions() {
 
 // Filters
 add_filter( 'post_updated_messages', 'mc_posttypes_messages' );
+add_filter( 'tmp_grunion_allow_editor_view', '__return_false' );
 
 // Actions
 add_action( 'init', 'mc_taxonomies', 0 );

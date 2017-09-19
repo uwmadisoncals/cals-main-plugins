@@ -65,15 +65,20 @@ class Widgets_On_Pages_Admin
         add_action( 'admin_init', array( $this, 'wop_register_settings' ) );
         add_action( 'widgets_init', array( $this, 'wop_register_sidebar' ) );
         add_action( 'admin_menu', array( $this, 'wop_remove_hidden_meta' ) );
-        add_action( 'add_meta_boxes', array( $this, 'wop_add_custom_meta' ) );
+        // Shortcode/Template Tag Custom Meta on Turbo Sidebar CTP.
+        add_action( 'load-post.php', array( $this, 'wop_load_post_hook' ) );
         add_filter(
             'contextual_help',
             array( $this, 'wop_plugin_help' ),
             10,
             3
         );
+        if ( wop_fs()->is_not_paying() ) {
+            // Auto Insert Turbo Sidebar PRO-feature Custom Meta.
+            add_action( 'add_meta_boxes', array( $this, 'wop_add_free_custom_meta' ) );
+        }
     }
-
+    
     /**
      * Sets "Settings" link on listing in Plugins screen.
      *
@@ -86,7 +91,7 @@ class Widgets_On_Pages_Admin
             'settings' => '<a href="' . admin_url( '/options-general.php?page=widgets-on-pages' ) . '">' . __( 'Settings', 'widgets-on-pages' ) . '</a>',
         ), $links );
     }
-
+    
     /**
      * Adds extra links under plugin description in listing on Plugins screen.
      *
@@ -96,7 +101,7 @@ class Widgets_On_Pages_Admin
      */
     public function wop_register_plugins_links( $links, $file )
     {
-
+        
         if ( strpos( $file, $this->plugin_name ) !== false ) {
             $new_links = array(
                 'donate' => '<a href="https://datamad.co.uk/donate.php" target="_blank">Donate</a>',
@@ -104,10 +109,10 @@ class Widgets_On_Pages_Admin
             );
             $links = array_merge( $links, $new_links );
         }
-
+        
         return $links;
     }
-
+    
     /**
      * Adds Admin Menu item.
      *
@@ -139,11 +144,11 @@ class Widgets_On_Pages_Admin
             $this->plugin_name,
             'Turbo Sidebars',
             'Turbo Sidebars',
-            'manage_options',
+            'edit_posts',
             'edit.php?post_type=turbo-sidebar-cpt'
         );
     }
-
+    
     /**
      * Register our setting
      *
@@ -153,7 +158,7 @@ class Widgets_On_Pages_Admin
     {
         register_setting( 'wop_options', 'wop_options_field' );
     }
-
+    
     /**
      * Render the options page for plugin
      *
@@ -163,7 +168,7 @@ class Widgets_On_Pages_Admin
     {
         include_once 'partials/widgets-on-pages-admin-display.php';
     }
-
+    
     /**
      * Render the options page for plugin
      *
@@ -174,16 +179,16 @@ class Widgets_On_Pages_Admin
      */
     public function wop_plugin_help( $text, $screen_id, $screen )
     {
-
+        
         if ( $screen_id == $this->wop_option_screen_id ) {
             $text = '<h5>Need help with the Widgets on Pages plugin?</h5>';
             $text .= '<p>Check out the documentation and support forums for help with this plugin.</p>';
             $text .= '<a href="http://wordpress.org/extend/plugins/widgets-on-pages/">Documentation</a><br /><a href="https://wordpress.org/support/plugin/widgets-on-pages/">Support forums</a>';
         }
-
+        
         return $text;
     }
-
+    
     /**
      * Removes meta boxes from admin screen
      *
@@ -193,17 +198,30 @@ class Widgets_On_Pages_Admin
     {
         remove_meta_box( 'postexcerpt', 'turbo-sidebar-cpt', 'normal' );
     }
-
+    
     /**
-     * Adds meta boxes from admin screen
+     * Hook to add action for shortcode / template tag meta boxes
+     * Note: We have this seprate function for the action as we saw this error
+     * 	https://wordpress.org/support/topic/warning-call_user_func_array-expects-parameter-1-to-be-a-valid-callback-13/#post-9420083
+     *
+     * @since  1.3.0
+     */
+    public function wop_load_post_hook()
+    {
+        add_action( 'add_meta_boxes', array( $this, 'wop_add_edit_only_custom_meta' ) );
+    }
+    
+    /**
+     * Adds meta boxes from admin screen (Shortcode and Template Tag)
      *
      * @since  1.1.0
      */
-    public function wop_add_custom_meta()
+    public function wop_add_edit_only_custom_meta()
     {
+        // Shortcode & Template Tag- for info and copying.
         add_meta_box(
             'wop-cpt-shortcode-meta-box',
-            'Shortcode',
+            __( 'Shortcode / Template Tag', 'widgets-on-pages' ),
             array( $this, 'cpt_shortcode_meta_box_markup' ),
             'turbo-sidebar-cpt',
             'side',
@@ -211,20 +229,175 @@ class Widgets_On_Pages_Admin
             null
         );
     }
-
+    
+    /**
+     * Adds meta boxes from admin screen
+     *
+     * @since  1.1.0
+     */
+    public function wop_add_custom_meta()
+    {
+    }
+    
+    /**
+     * Adds meta boxes from admin screen
+     *
+     * @since  1.3.0
+     */
+    public function wop_add_free_custom_meta()
+    {
+        // Auto Insert.
+        add_meta_box(
+            'wop-cpt-autoinsert-free-meta-box',
+            __( 'Auto Insert', 'widgets-on-pages' ),
+            array( $this, 'cpt_autoinsert_free_meta_box_markup' ),
+            'turbo-sidebar-cpt',
+            'normal',
+            'low',
+            null
+        );
+    }
+    
     /**
      * Shortcode metabox markup
      *
-     * @param object $object Our WP post.
+     * @param object $post Our WP post.
      * @since 1.1.0
      */
-    public function cpt_shortcode_meta_box_markup( $object )
+    public function cpt_shortcode_meta_box_markup( $post )
     {
-        echo  __( '<p>Use this shortcode in your post/page</p>', 'widgets-on-pages' ) ;
-        $shortcode_id = '[widgets_on_pages id="' . $object->post_title . '"]';
-        echo  '<p id="wop-shortcode">' . $shortcode_id . '</p>' ;
+        echo  __( '<h4>Shortcode</h4><p>Use this shortcode in your post/page</h4>', 'widgets-on-pages' ) ;
+        $shortcode_id = '[widgets_on_pages id="' . $post->post_title . '"]';
+        ?>
+		<?php 
+        echo  '<p id="wop-shortcode">' . $shortcode_id . '</p><button type="button" id="bq_copy_sc" value="Copy Shortcode" class="button-secondary" />Copy Shortcode</button>' ;
+        
+        if ( wop_fs()->is_not_paying() ) {
+            echo  '<section><h3>' . esc_html__( 'Insert using the visual editor', 'widgets-on-pages' ) . '</h3>' ;
+            echo  '<p><a href="' . wop_fs()->get_upgrade_url() . '">' . esc_html__( 'Upgrade Now', 'widgets-on-pages' ) . '</a>' . esc_html__( ' to use the visual editor and arrange widgets in columns, too!', 'widgets-on-pages' ) ;
+            echo  '</section>' ;
+        }
+        
+        echo  __( '<h4>Template Tag</h4><p>Use this code to include the sidebar in your theme.</h4>', 'widgets-on-pages' ) ;
+        $shortcode_id = esc_html( '<?php widgets_on_template("' . $post->post_title . '");?>' );
+        echo  '<p id="wop-template-tag">' . $shortcode_id . '</p><button type="button" id="bq_copy_tt" value="Copy Shortcode" class="button-secondary" />Copy PHP</button>' ;
     }
+    
+    /**
+     * Auto Insert PRO INFO metabox markup
+     *
+     * @since 1.3.0
+     */
+    public function cpt_autoinsert_free_meta_box_markup()
+    {
+        ?>
+		<div class='inside'>
+			<?php 
+        echo  '<h4>' . esc_html__( 'Auto Insert options is a Widgets on Pages PRO feature', 'widgets-on-pages' ) . '</h4><p>' . esc_html__( 'To auto-insert widgets into your theme\'s header, before-or-after page content, or into your theme\'s footer you need ', 'widgets-on-pages' ) . '<a href="' . wop_fs()->get_upgrade_url() . '">Widgets on Pages PRO.</a></p><p><a href="' . wop_fs()->get_upgrade_url() . '">' . esc_html__( 'Upgrade now', 'widgets-on-pages' ) . '</a> ' . esc_html( 'to access these features (and more), updates and priority support', 'widgets-on-pages' ) . '</p>' ;
+        echo  '<a class="button-primary" href="' . wop_fs()->get_upgrade_url() . '">' . esc_html__( 'Get PRO Features', 'widgets-on-pages' ) . '</a>' ;
+        ?>
+		</div>
+		<hr/>
+		<div class='inside'>
+			<h3><?php 
+        _e( 'Auto Insert', 'widgets-on-pages' );
+        ?>
+</h3>
+			<p>
+				<input type="radio"  disabled /> Yes<br />
+				<input type="radio"  disabled/> No
+			</p>
+		</div>
 
+		<div class='inside'>
+			<h3><?php 
+        _e( 'Position', 'widgets-on-pages' );
+        ?>
+</h3>
+			<p>
+				<input type="radio" disabled /> Before Header<br />
+				<input type="radio" disabled /> After Header
+			</p>
+			<p>
+				<input type="radio" disabled /> Before Content<br />
+				<input type="radio" disabled /> After Content
+			</p>
+			<p>
+				<input type="radio" disabled /> Before Footer<br />
+				<input type="radio" disabled /> After Footer
+			</p>
+			</p>
+		</div>
+
+		<div class='inside'>
+			<h3><?php 
+        _e( 'Show on Posts / Pages', 'widgets-on-pages' );
+        ?>
+</h3>
+			<p>
+				<input type="radio" disabled /> Posts<br />
+				<input type="radio" disabled /> Pages<br />
+				<input type="radio" disabled /> Posts &amp; Pages
+			</p>
+		</div>
+
+		<div class='inside'>
+			<h3><?php 
+        _e( 'Layout Options', 'widgets-on-pages' );
+        ?>
+</h3>
+			<p><?php 
+        _e( 'Number of widget columms per screen size', 'widgets-on-pages' );
+        ?>
+</p>
+			<p><label><?php 
+        _e( 'Small Screen', 'widgets-on-pages' );
+        ?>
+</label>
+				<select>
+				    <option value="1" selected>1</option>
+				    <option value="2">2</option>
+				    <option value="3">3</option>
+				    <option value="4">4</option>
+				</select>
+			</p>
+			<p><label><?php 
+        _e( 'Medium Screen', 'widgets-on-pages' );
+        ?>
+</label>
+				<select>
+				    <option value="1">1</option>
+				    <option value="2">2</option>
+				    <option value="3">3</option>
+				    <option value="4">4</option>
+				</select>
+			</p>
+			<p><label><?php 
+        _e( 'Large Screen', 'widgets-on-pages' );
+        ?>
+</label>
+				<select>
+				    <option value="1">1</option>
+				    <option value="2">2</option>
+				    <option value="3">3</option>
+				    <option value="4">4</option>
+				</select>
+			</p>
+			<p><label><?php 
+        _e( 'Wide Screen', 'widgets-on-pages' );
+        ?>
+</label>
+				<select>
+				    <option value="1"></option>
+				    <option value="2"></option>
+				    <option value="3"></option>
+				    <option value="4"></option>
+				</select>
+			</p>
+
+		<?php 
+    }
+    
     /**
      * Creates a new Turbo Sidebars custom post type
      *
@@ -293,7 +466,7 @@ class Widgets_On_Pages_Admin
         $opts = apply_filters( 'turbo-sidebars-cpt-options', $opts );
         register_post_type( strtolower( $cpt_name ), $opts );
     }
-
+    
     /**
      * Register the sidebars, based upon our Turbo Sidebars.
      *
@@ -306,22 +479,24 @@ class Widgets_On_Pages_Admin
             'post_type'      => 'turbo-sidebar-cpt',
             'posts_per_page' => 100,
         );
-        $loop = new WP_Query( $args );
-        while ( $loop->have_posts() ) {
-            $loop->the_post();
-
-            if ( is_numeric( $loop->post->post_name ) ) {
-                $name = 'Widgets on Pages ' . $loop->post->post_name;
-                $shortcode_id = $loop->post->post_name;
-                $id = 'wop-' . $loop->post->post_name;
+        // Note: not using WP_Query as can cause pages to not display (e.g. Manage
+        // Subscriptions link with Subscribe to Comments Reloaded - https://core.trac.wordpress.org/ticket/18408).
+        $myposts = get_posts( $args );
+        foreach ( $myposts as $post ) {
+            setup_postdata( $post );
+            
+            if ( is_numeric( $post->post_name ) ) {
+                $name = 'Widgets on Pages ' . $post->post_name;
+                $shortcode_id = $post->post_name;
+                $id = 'wop-' . $post->post_name;
             } else {
-                $name = $loop->post->post_title;
-                $id = 'wop-' . $loop->post->post_name;
-                $shortcode_id = $loop->post->post_title;
+                $name = $post->post_title;
+                $id = 'wop-' . $post->post_name;
+                $shortcode_id = $post->post_title;
             }
-
-            if ( '' != $loop->post->post_excerpt ) {
-                $id = 'wop-' . $loop->post->post_excerpt;
+            
+            if ( '' != $post->post_excerpt ) {
+                $id = 'wop-' . $post->post_excerpt;
             }
             $desc = 'Widgets on Pages sidebar. Use shortcode';
             register_sidebar( array(
@@ -336,7 +511,7 @@ class Widgets_On_Pages_Admin
             ) );
         }
     }
-
+    
     /**
      * Register the stylesheets for the admin area.
      *
@@ -363,14 +538,50 @@ class Widgets_On_Pages_Admin
             'all'
         );
     }
-
+    
     /**
      * Register the JavaScript for the admin area.
      *
+     * @param string $hook Name of our hook.
      * @since    1.0.0
      */
-    public function enqueue_scripts()
+    public function enqueue_scripts( $hook )
     {
+        /**
+         * This function is provided for demonstration purposes only.
+         *
+         * An instance of this class should be passed to the run() function
+         * defined in Widgets_On_Pages_Loader as all of the hooks are defined
+         * in that particular class.
+         *
+         * The Widgets_On_Pages_Loader will then create the relationship
+         * between the defined hooks and the functions defined in this
+         * class.
+         */
+        // Load our JS for Turbo Sidebars admin screen.
+        
+        if ( in_array( $hook, array( 'post.php', 'post-new.php' ) ) ) {
+            $screen = get_current_screen();
+            
+            if ( is_object( $screen ) && 'turbo-sidebar-cpt' == $screen->post_type ) {
+                wp_enqueue_script(
+                    $this->plugin_name,
+                    plugin_dir_url( __FILE__ ) . 'js/wop-cpt-admin.js',
+                    array( 'jquery' ),
+                    $this->version,
+                    true
+                );
+                wp_enqueue_script(
+                    $this->plugin_name . '_prem',
+                    plugin_dir_url( __FILE__ ) . 'js/wop-cpt-admin__premium_only.js',
+                    array( 'jquery' ),
+                    $this->version,
+                    true
+                );
+            }
+        
+        }
+    
     }
 
 }

@@ -31,7 +31,7 @@ function weaverx_form_text($value,$media=false) {
 	<tr>
 	<th scope="row" align="right"><?php weaverx_echo_name($value); ?>:&nbsp;</th>
 	<td>
-		<input name="<?php weaverx_sapi_main_name($value['id']); ?>" id="<?php echo $value['id']; ?>" type="text" style="width:<?php echo $twide;?>px;height:22px;" class="regular-text" value="<?php echo esc_textarea(weaverx_getopt( $value['id'] )); ?>" />
+		<input name="<?php weaverx_sapi_main_name($value['id']); ?>" id="<?php echo $value['id']; ?>" type="text" style="width:<?php echo $twide;?>px;" class="regular-text" value="<?php echo esc_textarea(weaverx_getopt( $value['id'] )); ?>" />
 <?php
 	if ($media) {
 	   weaverx_media_lib_button($value['id']);
@@ -49,7 +49,7 @@ function weaverx_form_val($value, $unit = '') {
 	<tr>
 	<th scope="row" align="right"><?php weaverx_echo_name($value); ?>:&nbsp;</th>
 	<td>
-		<input name="<?php weaverx_sapi_main_name($value['id']); ?>" id="<?php echo $value['id']; ?>" type="text" style="width:50px;height:22px;" class="regular-text" value="<?php echo esc_textarea(weaverx_getopt( $value['id'] )); ?>" /> <?php echo $unit; ?>
+		<input name="<?php weaverx_sapi_main_name($value['id']); ?>" id="<?php echo $value['id']; ?>" type="text" style="width:50px;" class="regular-text" value="<?php echo esc_textarea(weaverx_getopt( $value['id'] )); ?>" /> <?php echo $unit; ?>
 	</td>
 <?php	weaverx_form_info($value);
 ?>
@@ -65,8 +65,8 @@ function weaverx_form_text_xy($value,$x='X', $y='Y', $units='px') {
 	<tr>
 	<th scope="row" align="right"><?php weaverx_echo_name($value); echo $colon;?>&nbsp;</th>
 	<td>
-		<?php echo '<span class="rtl-break">' . $x;?>:<input name="<?php weaverx_sapi_main_name($xid); ?>" id="<?php echo $xid; ?>" type="text" style="width:40px;height:20px;" class="regular-text" value="<?php weaverx_esc_textarea(weaverx_getopt( $xid )); ?>" /> <?php echo $units; ?></span>
-		&nbsp;<?php echo '<span class="rtl-break">' . $y;?>:<input name="<?php weaverx_sapi_main_name($yid); ?>" id="<?php echo $yid; ?>" type="text" style="width:40px;height:20px;" class="regular-text" value="<?php weaverx_esc_textarea(weaverx_getopt( $yid )); ?>" /> <?php echo $units; ?></span>
+		<?php echo '<span class="rtl-break">' . $x;?>:<input name="<?php weaverx_sapi_main_name($xid); ?>" id="<?php echo $xid; ?>" type="text" style="width:40px;" class="regular-text" value="<?php weaverx_esc_textarea(weaverx_getopt( $xid )); ?>" /> <?php echo $units; ?></span>
+		&nbsp;<?php echo '<span class="rtl-break">' . $y;?>:<input name="<?php weaverx_sapi_main_name($yid); ?>" id="<?php echo $yid; ?>" type="text" style="width:40px;" class="regular-text" value="<?php weaverx_esc_textarea(weaverx_getopt( $yid )); ?>" /> <?php echo $units; ?></span>
 	</td>
 <?php	weaverx_form_info($value);
 ?>

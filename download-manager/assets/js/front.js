@@ -31,7 +31,7 @@ jQuery(function ($) {
                 html: true,
                 content: function () {
 
-                    return $dc.html();
+                    return $dc.html()+'<div style="padding-top: 10px;border-top: 1px solid #eeeeee;text-align: right"><button class="btn btn-danger btn-xs po-close" s><i class="fa fa-times-circle"></i> Close</button></div>';
 
 
                 }

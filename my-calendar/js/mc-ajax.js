@@ -11,12 +11,18 @@
             $('#' + ref).load(link + ' #' + ref + ' > *', function () {
 				// functions to execute when new view loads.
 				// List view
-                $('li.mc-events').children().not('.event-date').hide();
-                $('li.current-day').children().show();
+				if ( typeof(mclist) !== "undefined" && mclist == 'true' ) {
+					$('li.mc-events').children().not('.event-date').hide();
+					$('li.current-day').children().show();
+				}
 				// Grid view
-				$('.calendar .calendar-event').children().not('.event-title').hide();
+				if ( typeof(mcgrid) !== "undefined" && mcgrid == 'true' ) {
+					$('.calendar .calendar-event').children().not('.event-title').hide();
+				}
 				// Mini view
-				$('.mini .has-events').children().not('.trigger, .mc-date, .event-date').hide();
+				if  ( typeof(mcmini) !== "undefined" && mcmini  == 'true' ) {
+					$('.mini .has-events').children().not('.trigger, .mc-date, .event-date').hide();
+				}
 				// All views
                 $( '#' + ref ).attr('tabindex', '-1').focus();
 				// Your Custom ajax load changes if needed

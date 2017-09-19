@@ -4,7 +4,7 @@ Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
 Tested up to: 4.8
-Stable tag: 2.5.11
+Stable tag: 2.5.13
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -34,7 +34,7 @@ Easy to use for anybody, My Calendar provides enormous flexibility for designers
 *	Edit occurrences of recurring events
 * 	Rich permissions handling to restrict access to parts of My Calendar
 * 	Email notification to administrator when events are scheduled or reserved
-* 	Post to Twitter when events are created. (with [WP to Twitter](http://wordpress.org/extend/plugins/wp-to-twitter/))
+* 	Post to Twitter when events are created with [WP to Twitter](http://wordpress.org/extend/plugins/wp-to-twitter/)
 *	Location Manager for frequently used venues
 *   Fetch events from a remote database. (Sharing events in a network of sites.)
 *   Import events from [Kieran O'Shea's Calendar plugin](http://wordpress.org/extend/plugins/calendar/)
@@ -82,6 +82,18 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
    with shortcode options or widget configuration.
    
 == Changelog ==
+
+= 2.5.13 =
+
+* Bug fix: Categories can not be part of the md5 hash used to identify unique tables (breaks AJAX nav for categories)
+* Bug fix: recurring scheduling for week-days only not functional when 7 days or greater
+* Bug fix: Print view location filters broken
+* Bug fix: Make AJAX scripting aware of which other scripts are enabled.
+* Bug fix: Sort scheduled dates for event by date
+* Bug fix: JetPack Grunion Contact form interfered with TinyMCE in contexts outside of post editor (https://github.com/Automattic/jetpack/issues/7598)
+* Bug fix: ensure date is retained if datepicker disabled
+* Bug fix: archived events filter marked as active when not
+* 
 
 = 2.5.12 = 
 

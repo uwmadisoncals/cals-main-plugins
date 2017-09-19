@@ -799,7 +799,7 @@ function mc_image_data( $e, $event ) {
 function mc_event_recur_string( $event, $real_begin_date ) {
 	$recurs      = str_split( $event->event_recur, 1 );
 	$recur       = $recurs[0];
-	$every       = ( isset( $recurs[1] ) ) ? $recurs[1] : 1;
+	$every    = ( isset( $recurs[1] ) ) ? str_replace( $recurs[0], '', $event->event_recur ) : 1;
 	$month_date  = date( 'dS', strtotime( $real_begin_date ) );
 	$day_name    = date_i18n( 'l', strtotime( $real_begin_date ) );
 	$week_number = mc_ordinal( week_of_month( date( 'j', strtotime( $real_begin_date ) ) ) + 1 );

@@ -4,7 +4,7 @@ Donate link: https://www.tipsandtricks-hq.com
 Tags: download, downloads, count, counter, tracker, tracking, hits, logging, monitor, manager, files, media, digital, download monitor, download manager, downloadmanager, file manager, protect downloads, password, download category, file tree, ajax, download template, grid, documents, ip address
 Requires at least: 4.1.0
 Tested up to: 4.8
-Stable tag: 3.4.2
+Stable tag: 3.4.7
 License: GPLv2 or later
 
 Easily manage downloadable files and monitor downloads of your digital files from your WordPress site.
@@ -47,6 +47,7 @@ https://www.youtube.com/watch?v=L-mXbs7kp0s
 * Ability to search and sort your downloadable files in the admin dashboard.
 * Track the number of downloads for each of your files.
 * Track the visitors country.
+* View the daily download counts of your items in a chart.
 * WordPress Shortcode for embedding a download link for a file.
 * Tinymce button in the WordPress post/page editor so you can easily add the shortcode.
 * You can customize the "Download Now" button text of an item to anything you want.
@@ -170,6 +171,21 @@ Yes
 For screenshots please visit the [download monitor plugin page](https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin)
 
 == Changelog ==
+
+= 3.4.7 =
+- Reworked the file upload interface to make it more user-friendly. 
+- Delete Plugin Data button now also deletes taxonomies and rewrite rules related to plugin.
+
+= 3.4.6 =
+- Added option to delete plugin's settings, data and tables from database.
+- Added "Login Page URL" option to optionally specify a login page URL when user is required to be logged in to download.
+
+= 3.4.5 =
+- Updated the slug of the new stats menu in this plugin so it doesn't conflict with jetpack's stat menu.
+
+= 3.4.4 =
+- Added "Stats" menu in the plugin that shows download count using a chart.
+- Removed the "modal" class definition from the admin CSS file.
 
 = 3.4.3 =
 - The [sdm_search_form] can take the fancy template as a shortcode argument to display the search result using that template.

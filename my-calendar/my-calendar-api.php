@@ -327,7 +327,7 @@ PRODID:-//Accessible Web Design//My Calendar//http://www.joedolson.com//v' . $mc
 					if ( !empty( $alarm ) ) {
 						$alert = mc_generate_alert_ical( $alarm );
 					}					
-					
+					$template = apply_filters( 'mc_filter_ical_template', $template );
 					$template = str_replace( '{alert}', $alert, $template );
 					
 					$output .= "\n" . jd_draw_template( $array, $template, 'ical' );

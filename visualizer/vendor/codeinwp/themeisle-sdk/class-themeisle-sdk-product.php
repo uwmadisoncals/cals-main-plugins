@@ -60,13 +60,13 @@ if ( ! class_exists( 'ThemeIsle_SDK_Product' ) ) :
 		/**
 		 * @var array $allowed_authors The allowed authors.
 		 */
-		private $allowed_authors = array( 'proteusthemes.com' );
+		private $allowed_authors = array( 'proteusthemes.com', 'anarieldesign.com' );
 		/**
 		 * @var bool $requires_license Either user needs to activate it with license.
 		 */
 		private $requires_license;
 		/**
-		 * @var bool $wordpress_available Either is available on wordpress or not.
+		 * @var bool $wordpress_available Either is available on WordPress or not.
 		 */
 		private $wordpress_available;
 		/**
@@ -152,7 +152,7 @@ if ( ! class_exists( 'ThemeIsle_SDK_Product' ) ) :
 			if ( $this->require_uninstall_feedback() ) {
 				$this->feedback_types[] = 'deactivate';
 			}
-			if ( $this->is_wordpress_available() && $this->get_type() === 'plugin' ) {
+			if ( $this->is_wordpress_available() ) {
 				$this->feedback_types[] = 'review';
 			}
 		}
@@ -343,7 +343,7 @@ if ( ! class_exists( 'ThemeIsle_SDK_Product' ) ) :
 		 * @return bool Either we log the data or not.
 		 */
 		public function is_logger_active() {
-			// If is not available on wordpress log this automatically.
+			// If is not available on WordPress log this automatically.
 			if ( ! $this->is_wordpress_available() ) {
 				return true;
 			} else {
@@ -385,7 +385,16 @@ if ( ! class_exists( 'ThemeIsle_SDK_Product' ) ) :
 		 * @return bool Either we should require feedback on uninstall or not.
 		 */
 		public function require_uninstall_feedback() {
-			return $this->get_type() === 'plugin';
+			if ( $this->get_type() == 'theme' && ! $this->is_external_author() ) {
+				return ! get_transient( 'ti_sdk_pause_' . $this->get_key(), false );
+			}
+
+			if ( $this->get_type() == 'plugin' ) {
+
+				return true;
+			}
+
+			return false;
 		}
 
 	}

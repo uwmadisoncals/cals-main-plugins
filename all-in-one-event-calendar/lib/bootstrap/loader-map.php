@@ -1730,6 +1730,13 @@
       'i' => 'g',
       'r' => 'y',
     ),
+    'Ai1ec_View_Samples' => 
+    array (
+      'f' => AI1EC_PATH . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'samples.php',
+      'c' => 'Ai1ec_View_Samples',
+      'i' => 'g',
+      'r' => 'y',
+    ),
     'Ai1ec_View_Theme_Options' => 
     array (
       'f' => AI1EC_PATH . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'theme-options.php',
@@ -2794,6 +2801,12 @@
     array (
       'f' => AI1EC_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'twig' . DIRECTORY_SEPARATOR . 'TokenStream.php',
       'c' => 'Twig_TokenStream',
+      'i' => 'g',
+    ),
+    '__TwigTemplate_0447a59855caefa2ecc09a0bf3843f75a34fb954d803ddc5f93adb7966efa525' => 
+    array (
+      'f' => AI1EC_PATH . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'twig' . DIRECTORY_SEPARATOR . '04' . DIRECTORY_SEPARATOR . '47' . DIRECTORY_SEPARATOR . 'a59855caefa2ecc09a0bf3843f75a34fb954d803ddc5f93adb7966efa525.php',
+      'c' => '__TwigTemplate_0447a59855caefa2ecc09a0bf3843f75a34fb954d803ddc5f93adb7966efa525',
       'i' => 'g',
     ),
     '__TwigTemplate_08e44d5fc50332367b2d7e81902230ac0e7ea950ee003ec7a490752fc6534c00' => 
@@ -4805,6 +4818,12 @@
       'i' => 'g',
       'r' => 'y',
     ),
+    'twig.04.47.a59855caefa2ecc09a0bf3843f75a34fb954d803ddc5f93adb7966efa525' => 
+    array (
+      'f' => AI1EC_PATH . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'twig' . DIRECTORY_SEPARATOR . '04' . DIRECTORY_SEPARATOR . '47' . DIRECTORY_SEPARATOR . 'a59855caefa2ecc09a0bf3843f75a34fb954d803ddc5f93adb7966efa525.php',
+      'c' => '__TwigTemplate_0447a59855caefa2ecc09a0bf3843f75a34fb954d803ddc5f93adb7966efa525',
+      'i' => 'g',
+    ),
     'twig.08.e4.4d5fc50332367b2d7e81902230ac0e7ea950ee003ec7a490752fc6534c00' => 
     array (
       'f' => AI1EC_PATH . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'twig' . DIRECTORY_SEPARATOR . '08' . DIRECTORY_SEPARATOR . 'e4' . DIRECTORY_SEPARATOR . '4d5fc50332367b2d7e81902230ac0e7ea950ee003ec7a490752fc6534c00.php',
@@ -6312,6 +6331,13 @@
     array (
       'f' => AI1EC_PATH . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'organize.php',
       'c' => 'Ai1ec_View_Organize',
+      'i' => 'g',
+      'r' => 'y',
+    ),
+    'view.admin.samples' => 
+    array (
+      'f' => AI1EC_PATH . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'samples.php',
+      'c' => 'Ai1ec_View_Samples',
       'i' => 'g',
       'r' => 'y',
     ),

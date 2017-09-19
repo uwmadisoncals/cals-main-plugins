@@ -1,6 +1,5 @@
 <?php
 
-
 // Include simplehtmldom
 if( ! class_exists( 'simple_html_dom_node' ) ) {
 	include_once( 'simple_html_dom.php' );
@@ -10,9 +9,9 @@ if( ! class_exists( 'simple_html_dom_node' ) ) {
  * Plugin Name: Easy Maps for Wordpress
  * Description: Enhance your posts with Google Maps.  Use the Trippy Easy Maps plugin to easily create more dynamic content.
  * Plugin URI:
- * Version:     1.1.8
+ * Version:     1.1.9
  * Author:      Team Trippy
- * Author URI:  http://www.trippy.com
+ * Author URI:  https://www.trippy.com
  * License:     GPLv2
  * License URI: ./assets/license.txt
  * Text Domain:
@@ -185,10 +184,10 @@ function trippy_render_map($contentBody, $isAdminMode) {
 	
 	$mapWidthMinusBorders = $mapWidth - 10;
 	
-	$trippyStaticMapUrl = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=". $mapWidthMinusBorders . "x250";
+	$trippyStaticMapUrl = "https://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=". $mapWidthMinusBorders . "x250";
 	$label = 0;
 	
-	$trippy_base_url = "http://www.trippy.com";
+	$trippy_base_url = "https://www.trippy.com";
 	
 	$trippyMapDetailUrl = $trippy_base_url . "/places/map?utm_campaign=EASY_MAPS&utm_source=" . $_SERVER['SERVER_NAME']. "&utm_medium=map&placeIds=";
 	
@@ -238,7 +237,7 @@ function trippy_render_map($contentBody, $isAdminMode) {
 
 	if (strlen($trippyStaticMapUrl) > 2000) {
 		$label = 0;
-		$trippyStaticMapUrl = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=". $mapWidthMinusBorders . "x250";
+		$trippyStaticMapUrl = "https://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=". $mapWidthMinusBorders . "x250";
 		foreach($html->find('.trippy-place-element') as $element) {
 			$coords = explode(",",$element->{'data-coords'});
 			$coords[0] = round($coords[0],4);
@@ -250,7 +249,7 @@ function trippy_render_map($contentBody, $isAdminMode) {
 
 	if (strlen($trippyStaticMapUrl) > 2000) {
 		$label = 0;
-		$trippyStaticMapUrl = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=". $mapWidthMinusBorders . "x250";
+		$trippyStaticMapUrl = "https://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=". $mapWidthMinusBorders . "x250";
 		foreach($html->find('.trippy-place-element') as $element) {
 			$coords = explode(",",$element->{'data-coords'});
 			$coords[0] = round($coords[0],2);
@@ -277,7 +276,7 @@ function trippy_render_map($contentBody, $isAdminMode) {
 			$inline_style = "";
 		}
 		
-		return "<div style=\"".$inline_style."\" class=\"trippy-map-panel-preview-container trippy-map-panel-preview-container-" . $currentLayoutMode . "\"><div class=\"trippy-map-panel-title\">Mentioned in this post</div><a href=\"". $trippyMapDetailUrl . "\" target=\"_blank\"><img src=\"" . $trippyStaticMapUrl . "\" class=\"trippy-map-panel-preview-map-img\"><!--</a>-->". $trippyPlacesList. " <div class=\"trippy-map-panel-preview-container-header\">" . ($isAdminMode || is_preview() ? "" : "<img src=\"" . $trippyTrackingUrl.  "\" width=\"1\" height=\"1\" style=\"float:left;\">"). "<span class=\"trippy-map-panel-preview-container-header-contents\"><a href=\"http://www.trippy.com\" target=\"_blank\">powered by <strong>trippy</strong></a> &nbsp;|&nbsp; <a href=\"". $pluginUrl . "\" target=\"_blank\">get the wordpress map plugin</a></span></div></div>";	
+		return "<div style=\"".$inline_style."\" class=\"trippy-map-panel-preview-container trippy-map-panel-preview-container-" . $currentLayoutMode . "\"><div class=\"trippy-map-panel-title\">Mentioned in this post</div><a href=\"". $trippyMapDetailUrl . "\" target=\"_blank\"><img src=\"" . $trippyStaticMapUrl . "\" class=\"trippy-map-panel-preview-map-img\"><!--</a>-->". $trippyPlacesList. " <div class=\"trippy-map-panel-preview-container-header\">" . ($isAdminMode || is_preview() ? "" : "<img src=\"" . $trippyTrackingUrl.  "\" width=\"1\" height=\"1\" style=\"float:left;\">"). "<span class=\"trippy-map-panel-preview-container-header-contents\"><a href=\"https://www.trippy.com\" target=\"_blank\">powered by <strong>trippy</strong></a> &nbsp;|&nbsp; <a href=\"". $pluginUrl . "\" target=\"_blank\">get the wordpress map plugin</a></span></div></div>";	
 	} else {
 		return "";
 	}
@@ -349,4 +348,3 @@ function trippy_add_map_content_after_post($content){
 	}
 	return $content;
 }
-

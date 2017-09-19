@@ -1061,9 +1061,21 @@ function wpdm_array_splice_assoc(&$input, $offset, $length, $replacement) {
  */
 function wpdm_install_addon(){
     if(isset($_REQUEST['addon']) && current_user_can(WPDM_ADMIN_CAP)){
+        include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
         include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
         include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
         $upgrader = new Plugin_Upgrader( new Plugin_Installer_Skin( compact('title', 'url', 'nonce', 'plugin', 'api') ) );
+        $plugin_dir = isset($_REQUEST['dirname'])?$_REQUEST['dirname']:false;
+        if($plugin_dir) {
+            $plugin_data = wpdm_plugin_data($plugin_dir);
+            $plugin_file = $plugin_data ? $plugin_data['plugin_index_file'] : false;
+            if ($plugin_file) {
+                if (is_plugin_active($plugin_file)) {
+                    deactivate_plugins($plugin_file);
+                }
+                delete_plugins(array($plugin_file));
+            }
+        }
         if(strpos($_REQUEST['addon'], '.zip'))
             $downloadlink = $_REQUEST['addon'];
         else

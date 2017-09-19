@@ -2,10 +2,13 @@
 <script type="text/javascript" src="<?php echo includes_url();?>/js/jquery/jquery.form.min.js"></script>
 <link rel="stylesheet" href="<?php echo plugins_url('/download-manager/assets/css/chosen.css'); ?>" />
 <script language="JavaScript" src="<?php echo plugins_url('/download-manager/assets/js/chosen.jquery.min.js'); ?>"></script>
-<link rel="stylesheet" type="text/css" href="<?php echo plugins_url('/download-manager/bootstrap/css/bootstrap.css');?>" />
 
 <style>
 
+    .note{
+        color: #888888;
+
+    }
     input{
         padding: 7px;
     }
@@ -188,7 +191,34 @@
     .list-group-item:hover{
         background: #fafafa;
     }
+    .panel-default .panel-body{
+        font-size: 9pt;
+    }
+    .panel-default .panel-footer{
+        font-size: 8pt;
+    }
+    .addonlist.panel-default .panel-body a{
+        white-space: nowrap;
+        overflow: hidden;
+        display: inline-block;
+        max-width: 98%;
+        text-overflow: ellipsis;
+    }
+    .list-group-item{
+        border-radius: 3px !important;
 
+    }
+    .w3eden a:hover,
+    .w3eden a{
+        text-decoration: none !important;
+    }
+    #filter-mods a{
+        font-size: 8pt;
+        padding: 5px 15px;
+    }
+    .updated{
+        display: none;
+    }
 </style>
 
 <div class="wrap w3eden">
@@ -196,8 +226,8 @@
 <?php if(is_array($cats)){ ?>
 <div class="container-fluid">
 <div class="row" id="addonlist" style="margin-top: -15px">
-    <div class="col-md-12"><div class="panel panel-default">
-            <div class="panel-heading"><h3><?php _e('WPDM Add-Ons','download-manager'); ?></h3></div>
+    <div class="col-md-12"><div class="panel panel-default" style="margin-top: 30px">
+            <div class="panel-heading"><h3 style="font-size: 13pt;font-weight: 600;letter-spacing: 1px;line-height: 30px"><i class="fa fa-plug color-purple"></i> &nbsp;<?php _e('WPDM Add-Ons','download-manager'); ?></h3></div>
             <div class="panel-body"><ul class="nav nav-pills" id="filter-mods"><li class="active"><a href="#all" rel="all">All Add-Ons</a></li>
 
 <?php
@@ -206,30 +236,40 @@ foreach($cats as $cat){
 }
 ?>
 </ul></div></div></div>
-    <div class="col-md-12">
-<ul class='list-group'>
+
+<div row'>
 <?php foreach($data->post_extra as $package){
+    $files = (array)$package->files;
+    $file = str_replace(".zip", "",array_shift($files));
+    $file = explode("/", $file);
+    $file = end($file);
+    $plugininfo = wpdm_plugin_data($file);
+    $linklabel = ($plugininfo)?'<span class="color-purple"><i class="fa fa-refresh"></i> Update</span>':'<span class="color-green"><i class="fa fa-plus-circle"></i> Install</span>';
  ?>
-    <li class="list-group-item all <?php echo implode(" ", $package->cats); ?>">
+    <div class="col-md-3 all <?php echo implode(" ", $package->cats); ?>">
+
+    <div class="addonlist panel panel-default">
+        <div class="panel-body">
+            <b><a target="_blank" title="<?php echo $package->title; ?>" class="ttip" href="<?php echo $package->link; ?>"><?php echo $package->title;?></a></b>
 
 
-        <b><a href="<?php echo $package->link; ?>"><?php echo $package->title; ?></a></b> [ <?php echo $package->pinfo->version; ?> ]
-
-
-        <div class="pull-right">
+        </div>
+        <div class="panel-footer text-right">
             <?php if($package->price>0){ ?>
-            <a class="btn-purchase" data-toggle="modal" data-backdrop="true" data-target="#addonmodal" href="#" rel="<?php echo $package->ID; ?>" style="border: 0;border-radius: 2px"><i class="fa fa-shopping-cart"></i> &nbsp;Buy Now &nbsp; <span class="label label-warning" style="font-size: 8pt;padding: 1px 5px;margin-top: 1px"><?php echo $package->currency.$package->price; ?></span> </a>
+                <a class="btn-purchase" data-toggle="modal" data-backdrop="true" data-target="#addonmodal" href="#" rel="<?php echo $package->ID; ?>" style="border: 0;border-radius: 2px;"><i class="fa fa-shopping-cart"></i> &nbsp;Buy Now <span class="label label-success" style="font-size: 8pt;padding: 1px 5px;margin-top: 1px"><?php echo $package->currency.$package->price; ?></span> </a>
             <?php } else { ?>
-                <a class="btn-install" data-toggle="modal" rel="<?php echo $package->ID; ?>" data-backdrop="true" data-target="#addonmodal" href="#" style="border: 0;border-radius: 2px"><i class="fa fa-download"></i> &nbsp;Download & Install</a>
+                <a class="btn-install" data-toggle="modal" data-addondir="<?php echo $file; ?>" rel="<?php echo $package->ID; ?>" data-backdrop="true" data-target="#addonmodal" href="#" style="border: 0;border-radius: 2px"><?php echo $linklabel; ?> <span class="label label-danger" style="font-size: 8pt;padding: 1px 5px;margin-top: 1px">Free</span> </a>
             <?php } ?>
+            <span class="note pull-left"><i class="fa fa-server" aria-hidden="true"></i> &nbsp;<?php echo $package->pinfo->version; ?></span>
+        </div>
         </div>
 
 
-        </li>
+        </div>
 <?php
 }
 ?>
-</ul>
+
 </div>
 </div>
 
@@ -279,7 +319,7 @@ foreach($cats as $cat){
                 jQuery('.modal-dialog').css('width','500px');
                 jQuery('.modal-footer .btn-danger').html('Close');
                 jQuery('#modalcontents').css('padding','20px').css('background','#ffffff');
-                jQuery.post(ajaxurl,{action:'wpdm-install-addon', addon: e.relatedTarget.rel}, function(res){
+                jQuery.post(ajaxurl,{action:'wpdm-install-addon', addon: e.relatedTarget.rel, dirname: jQuery(e.relatedTarget).data('addondir')}, function(res){
                     jQuery('#modalcontents').html(res.replace('Return to Plugin Installer',''));
                 });
             }

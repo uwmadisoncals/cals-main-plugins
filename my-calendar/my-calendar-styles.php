@@ -189,8 +189,7 @@ function edit_my_calendar_styles() {
 							?>
 							<fieldset>
 								<p>
-									<label
-										for="mc_css_file"><?php _e( 'Select My Calendar Theme', 'my-calendar' ); ?></label>
+									<label for="mc_css_file"><?php _e( 'Select My Calendar Theme', 'my-calendar' ); ?></label>
 									<select name="mc_css_file" id="mc_css_file"><?php
 										if ( ! empty( $files ) ) {
 											echo "<optgroup label='" . __( 'Your Custom Stylesheets', 'my-calendar' ) . "'>\n";

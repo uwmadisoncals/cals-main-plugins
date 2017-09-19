@@ -4,36 +4,37 @@
 */
 
 function wvrx_ts_setup_shortcodes() {
-    // we setup all of our shortcodes only after the theme has been loaded...
 
-    $codes = array(						    // list of shortcodes
-    array('bloginfo' => 'wvrx_ts_sc_bloginfo'),      // [bloginfo]
-    array('box' => 'wvrx_ts_sc_box'),       // [box]
-	array('div' => 'wvrx_ts_sc_div'),       // [div]
-    array('header_image' => 'wvrx_ts_sc_header_image'),      // [header_image]
-    array('hide_if' => 'wvrx_ts_sc_hide_if' ),	      		// [hide_if]
-    array('html' => 'wvrx_ts_sc_html'),		// [html]
-    array('iframe' => 'wvrx_ts_sc_iframe'),         // [iframe]
-	array('login' => 'wvrx_ts_sc_login'),		// [login]
-    array('show_if' => 'wvrx_ts_sc_show_if' ),	      		// [show_if]
-	array('span' => 'wvrx_ts_sc_span'),	    // [span]
-	array('site_tagline' => 'wvrx_ts_sc_site_tagline'),   // [site_tagline]
-	array('site_title' => 'wvrx_ts_sc_site_title'), // [site_title]
-	array('tab_group' => 'wvrx_ts_sc_tab_group',
-          'tab' => 'wvrx_ts_sc_tab'),               // [tab_group], [tab]
-	array('vimeo' => 'wvrx_ts_sc_vimeo'),           // [vimeo]
-	array('youtube' => 'wvrx_ts_sc_youtube'),       // [youtube]
-	array('weaverx_info' => 'wvrx_ts_weaverx_sc_info'),     // [weaverx_info]
+	$codes = array(						    // list of shortcodes
+	'bloginfo' => 'wvrx_ts_sc_bloginfo',      // [bloginfo]
+    'box' => 'wvrx_ts_sc_box',       // [box]
+	'div' => 'wvrx_ts_sc_div',       // [div]
+    'header_image' => 'wvrx_ts_sc_header_image',      // [header_image]
+    'hide_if' => 'wvrx_ts_sc_hide_if' ,	      		// [hide_if]
+    'html' => 'wvrx_ts_sc_html',		// [html]
+    'iframe' => 'wvrx_ts_sc_iframe',         // [iframe]
+	'login' => 'wvrx_ts_sc_login',		// [login]
+    'show_if' => 'wvrx_ts_sc_show_if' ,	      		// [show_if]
+	'span' => 'wvrx_ts_sc_span',	    // [span]
+	'site_tagline' => 'wvrx_ts_sc_site_tagline',   // [site_tagline]
+	'site_title' => 'wvrx_ts_sc_site_title', // [site_title]
+	'tab_group' => 'wvrx_ts_sc_tab_group',
+    'tab' => 'wvrx_ts_sc_tab',               // [tab_group], [tab]
+	'vimeo' => 'wvrx_ts_sc_vimeo',           // [vimeo]
+	'youtube' => 'wvrx_ts_sc_yt',       // [youtube]
+	'weaverx_info' => 'wvrx_ts_weaverx_sc_info'    // [weaverx_info]
     );
 
 	$prefix = get_option('wvrx_toggle_shortcode_prefix');
 
-	foreach ($codes as $code) {
-		wvrx_ts_set_shortcodes($code, $prefix);
+	foreach ($codes as $code => $func ) {
+		remove_shortcode($prefix . $code);		// use our shortcode instead of someone elses.
+        add_shortcode($prefix . $code, $func);
 	}
 }
 
-add_action('init', 'wvrx_ts_setup_shortcodes');  // allow shortcodes to load after theme has loaded so we know which version to use
+// load our definitions of shortcodes later than probably most anyone else so that we user our versions.
+add_action('init', 'wvrx_ts_setup_shortcodes', 99);
 
 // ===============  [box] ===================
 function wvrx_ts_sc_box( $args = '', $text ) {
@@ -415,10 +416,12 @@ function wvrx_ts_sc_tab( $args, $content ) {
 
 
 // ===============  [youtube id=videoid sd=0 hd=0 related=0 https=0 privacy=0 w=0 h=0] ======================
-function wvrx_ts_sc_youtube($args = '') {
+
+
+function wvrx_ts_sc_yt($args = '') {
     $share = '';
     if ( isset ( $args[0] ) )
-	$share = trim($args[0]);
+		$share = trim($args[0]);
 
 
     // http://code.google.com/apis/youtube/player_parameters.html
@@ -440,6 +443,7 @@ function wvrx_ts_sc_youtube($args = '') {
         'controls' => '1',
         'disablekb' => '0',
         'egm' => '0',
+		'end' => false,
         'fs' => '1',
         'fullscreen' => 1,
         'hd' => '0',
@@ -458,6 +462,7 @@ function wvrx_ts_sc_youtube($args = '') {
 
     ), $args));
 
+
     if (!$share && !$id)
         return __('<strong>No share or id values provided for youtube shortcode.</strong>','weaverx-theme-support' /*adm*/);
 
@@ -468,8 +473,7 @@ function wvrx_ts_sc_youtube($args = '') {
             $share = str_replace('&amp;','+',$share);
             $share = str_replace('&','+',$share);
         }
-        $share = str_replace('http://','',$share);
-        $share = str_replace('https://','',$share);
+        $share = str_replace(array('http://','https://',"'",'"'), '' ,$share);
         if ($share)
             $id = $share;
     }
@@ -496,6 +500,7 @@ function wvrx_ts_sc_youtube($args = '') {
     $opts = wvrx_ts_add_url_opt($opts, true, 'showinfo=' . $showinfo);
     $opts = wvrx_ts_add_url_opt($opts, $showsearch != '1', 'showsearch=0');
     $opts = wvrx_ts_add_url_opt($opts, $start, 'start='.$start);
+	$opts = wvrx_ts_add_url_opt($opts, $end, 'end='.$end);
     $opts = wvrx_ts_add_url_opt($opts, $theme != 'dark', 'theme=light');
     $opts = wvrx_ts_add_url_opt($opts, $wmode, 'wmode='.$wmode);
 
@@ -550,7 +555,7 @@ function wvrx_ts_sc_vimeo($args = '') {
     if (!$share && !$id) return __('<strong>No share or id values provided for vimeo shortcode.</strong>','weaverx-theme-support' /*adm*/);
 
     if ($share)	{	// let the share override any id
-        $share = str_replace('http://vimeo.com/','',$share);
+        $share = str_replace(array('http://vimeo.com/', 'https://vimeo.com/' ),'',$share);		// fixed 3.1.9 - added https
         if ($share) $id = $share;
     }
 
@@ -693,6 +698,5 @@ function wvrx_ts_set_shortcodes($sc_list, $prefix) {
 }
 
 // ===============  Utilities ======================
-
 
 ?>
