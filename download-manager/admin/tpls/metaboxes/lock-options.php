@@ -26,6 +26,7 @@
             <label for="pps_z"><?php echo __('Password:','download-manager'); ?></label>
 
                         <input class="form-control" type="text" name="file[password]" id="pps_z" value="<?php echo get_post_meta($post->ID,'__wpdm_password', true); ?>" />
+            <em class="note"><small><?php _e('If you want to use multiple passwords, keep each one inside [], like [123][456][789]', 'download-manager'); ?></small></em>
 
 
         </div>

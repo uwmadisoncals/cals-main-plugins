@@ -65,23 +65,59 @@ class Packages
     function uploadFile(){
         check_ajax_referer('wpdm_admin_upload_file');
         if(!current_user_can('upload_files')) die('-2');
-        $ext = explode('.', $_FILES['package_file']['name']);
+
+        $name = isset($_FILES['package_file']['name']) && !isset($_REQUEST["chunks"])?$_FILES['package_file']['name']:$_REQUEST['name'];
+
+        $ext = explode('.', $name);
         $ext = end($ext);
         $ext = strtolower($ext);
         if(in_array($ext, array('php', 'js', 'html', 'py', 'pl', 'htaccess'))) die('-3');
-        if(file_exists(UPLOAD_DIR.$_FILES['package_file']['name']) && get_option('__wpdm_overwrrite_file',0)==1){
-            @unlink(UPLOAD_DIR.$_FILES['package_file']['name']);
+
+        if(file_exists(UPLOAD_DIR.$name) && get_option('__wpdm_overwrrite_file',0)==1){
+            @unlink(UPLOAD_DIR.$name);
         }
-        if(file_exists(UPLOAD_DIR.$_FILES['package_file']['name']))
-            $filename = time().'wpdm_'.$_FILES['package_file']['name'];
+        if(file_exists(UPLOAD_DIR.$_FILES['package_file']['name']) && !isset($_REQUEST["chunks"]))
+            $filename = time().'wpdm_'.$name;
         else
-            $filename = $_FILES['package_file']['name'];
+            $filename = $name;
         do_action("wpdm_before_upload_file", $_FILES['package_file']);
-        move_uploaded_file($_FILES['package_file']['tmp_name'],UPLOAD_DIR.$filename);
+
+        if(isset($_REQUEST["chunks"])) $this->chunkUploadFile(UPLOAD_DIR.$filename);
+        else
+            move_uploaded_file($_FILES['package_file']['tmp_name'],UPLOAD_DIR.$filename);
         $filename = apply_filters("wpdm_after_upload_file", $filename);
         //@unlink($status['file']);
         echo "|||".$filename."|||";
         exit;
+    }
+
+    function chunkUploadFile($destFilePath){
+
+        $chunk = isset($_REQUEST["chunk"]) ? intval($_REQUEST["chunk"]) : 0;
+        $chunks = isset($_REQUEST["chunks"]) ? intval($_REQUEST["chunks"]) : 0;
+
+        $out = @fopen("{$destFilePath}.part", $chunk == 0 ? "wb" : "ab");
+        if ($out) {
+            // Read binary input stream and append it to temp file
+            $in = @fopen($_FILES['package_file']['tmp_name'], "rb");
+
+            if ($in) {
+                while ($buff = fread($in, 4096))
+                    fwrite($out, $buff);
+            } else
+                die('-3');
+
+            @fclose($in);
+            @fclose($out);
+
+            @unlink($_FILES['package_file']['tmp_name']);
+        } else
+            die('-3');
+
+        if (!$chunks || $chunk == $chunks - 1) {
+            // Strip the temp .part suffix off
+            rename("{$destFilePath}.part", $destFilePath);
+        }
     }
 
 

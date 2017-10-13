@@ -4,7 +4,7 @@ Contributors: ModernTribe, aguseo, borkweb, barry.hughes, bordoni, brianjessee, 
 Tags: events, calendar, event, venue, organizer, dates, date, google maps, conference, workshop, concert, meeting, seminar, summit, class, modern tribe, tribe, widget
 Donate link: http://m.tri.be/29
 Requires at least: 4.5
-Stable tag: 4.6
+Stable tag: 4.6.1
 Tested up to: 4.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -326,6 +326,26 @@ The plugin is made with love by [Modern Tribe Inc](http://m.tri.be/2s).
 Please see the changelog for the complete list of changes in this release. Remember to always make a backup of your database and files before updating!
 
 == Changelog ==
+
+= [4.6.1] 2017-10-04 =
+
+* Fix - Fixed "Next Events" and "Previous Events" navigation links in list views, which would sometimes make a category-filtered list view lose its category filter as a user navigated through pages of future or past events (props @forumhelpdesk and @atomicdust for reporting this!) [72013]
+* Fix - Fixed some layout issues with the Tribe Bar datepicker that would arise when using a Twentysixteen or Twentyfifteen child them (thanks to @stefanrueegger for reporting this) [46471]
+* Fix - Prevented modification of event titles within the loop when using TRIBE_MODIFY_GLOBAL_TITLE [89273]
+* Fix - Fixed issue when exporting all-day multi-day events via iCal where the end date was one day early (Thank you @fairmont for reporting this!) [87775]
+* Fix - Fixed issues with the jQuery Timepicker vendor script conflicting with other plugins' similar scripts (props: @hcny et al.) [74644]
+* Fix - Fixed an issue that would prevent Event Aggregator scheduled imports from running [88395]
+* Fix - Fixed the "Start Time" and "End Time" timepicker fields in the event-creation screen to make it impossible to have an end date/time that comes before the start date/time [72686]
+* Tweak - Remove unnecessary parameters from some remove_action calls in the plugin (thanks to @JPry on GitHub for submitting this fix!) [88867]
+* Tweak - Adjusted the EA cron start time so that it never gets created in the past [88965]
+* Tweak - Improved options format in the Event Aggregator settings [88970]
+* Tweak - Added a filter to CSV importer for altering the delimiter, escaping, and enclosing characters [70570]
+* Tweak - Adjusted the `tribe_update_venue()` template tag so it no longer creates some unnecessary meta fields involving post_title, post_content, etc. (thanks @oheinrich for bringing this to our attention) [66968]
+* Tweak - Improved the performance of The Events Calendar REST API tweaking some queries [89743]
+* Tweak - Add support for a `found_posts` argument in `tribe_get_events`, `tribe_get_venues` and `tribe_get_organizers` functions to return the number of posts found matching the current query arguments [89743]
+* Deprecated - Deprecated the `tribe-events-bar-date-search-default-value` filter; use `tribe_events_bar_date_search_default_value` instead [67482]
+* Language - Improvements to aid translatability of text throughout plugin (props: @ramiy) [88982]
+* Language - 7 new strings added, 180 updated, 4 fuzzied, and 3 obsoleted
 
 = [4.6] 2017-09-25 =
 

@@ -48,7 +48,7 @@
                     <p>&mdash; <?php _ex('or', 'Uploader: Drop files here - or - Select Files'); ?> &mdash;</p>
                     <p class="drag-drop-buttons">
                         <button id="plupload-browse-button" type="button" class="btn btn-sm btn-default"><i class="fa fa-folder-open color-green"></i> <?php esc_attr_e('Select Files'); ?></button><br/>
-                        <small style="margin-top: 15px;display: block">[ Max: <?php echo (int)(wp_max_upload_size()/1048576); ?> MB ]</small>
+                        <small style="margin-top: 15px;display: block">[ Max: <?php echo get_option('__wpdm_chunk_upload',0) == 1?'No Limit':(int)(wp_max_upload_size()/1048576).' MB'; ?> ]</small>
                     </p>
                 </div>
             </div>
@@ -63,20 +63,24 @@
             'drop_element'        => 'drag-drop-area',
             'file_data_name'      => 'package_file',
             'multiple_queues'     => true,
-            'max_file_size'       => wp_max_upload_size().'b',
             'url'                 => admin_url('admin-ajax.php'),
             'flash_swf_url'       => includes_url('js/plupload/plupload.flash.swf'),
             'silverlight_xap_url' => includes_url('js/plupload/plupload.silverlight.xap'),
             'filters'             => array(array('title' => __('Allowed Files'), 'extensions' => '*')),
             'multipart'           => true,
             'urlstream_upload'    => true,
-
             // additional post data to send to our ajax hook
             'multipart_params'    => array(
                 '_ajax_nonce' => wp_create_nonce('wpdm_admin_upload_file'),
                 'action'      => 'wpdm_admin_upload_file',            // the ajax action name
             ),
         );
+
+        if(get_option('__wpdm_chunk_upload',0) == 1){
+            $plupload_init['chunk_size'] = get_option('__wpdm_chunk_size', 1024).'kb';
+            $plupload_init['max_retries'] = 3;
+        } else
+            $plupload_init['max_file_size'] = wp_max_upload_size().'b';
 
         // we should probably not apply this filter, plugins may expect wp's media uploader...
         $plupload_init = apply_filters('plupload_init', $plupload_init); ?>

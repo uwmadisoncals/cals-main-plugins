@@ -2,12 +2,12 @@
 <div class="wrap w3eden">
 
 <div style="clear: both;"></div>
-    <form method="post" id="wdm_settings_form">
+    <form method="post" id="wdm_settings_form" style="margin-top:35px;">
  <div class="panel panel-default" id="wpdm-wrapper-panel">
-     <div class="panel-heading"><button type="submit" class="btn btn-default pull-right" style="font-weight: 600"><i class="sinc fa fa-save color-green"></i> &nbsp; <?php _e("Save Settings",'download-manager'); ?></button><h3 class="h"><i class="fa fa-cogs color-purple"></i>&nbsp;&nbsp;<?php _e("Download Manager Settings",'download-manager'); ?></h3>
+     <div class="panel-heading"><button type="submit" class="btn btn-default pull-right" style="font-weight: 600"><i class="sinc fa fa-save color-green"></i> <?php _e("Save Settings",'download-manager'); ?></button><h3 class="h"><i class="fa fa-cogs color-purple"></i>&nbsp;&nbsp;<?php _e("Download Manager Settings",'download-manager'); ?></h3>
 
      </div>
-     <div class="panel-heading" style="background: #f5f5f5 !important;border: 0;border-radius: 0;border-bottom: 1px solid #eeeeee;margin-top: 55px">
+     <div class="panel-heading" style="background: #f5f5f5 !important;border: 0;border-radius: 0;border-bottom: 1px solid #eeeeee;margin-top: 53px">
          <div id="msgst" onclick="jQuery(this).html('');" class="pull-right text-success" style="font-weight: normal;font-style: italic"></div>
          <a class="text-success" href='https://wordpress.org/support/view/plugin-reviews/download-manager?rate=5#postform' title="Please consider it when you get some free moments" target="_blank">A <span class="ttip" title="5 Stars"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></span> rating will inspire me a lot. Thanks for your time &#128522;</a>
      </div>
@@ -32,7 +32,7 @@ call_user_func($stabs[$tab]['callback']); ?>
 </div> <br>
 <br>
 
-         <button type="submit" class="btn btn-primary"><i class="sinc fa fa-save"></i> &nbsp; <?php _e("Save Settings",'download-manager'); ?></button>
+         <button type="submit" class="btn btn-info btn-lg"><i class="sinc fa fa-save"></i> &nbsp;<?php _e("Save Settings",'download-manager'); ?></button>
 
 <br>
  

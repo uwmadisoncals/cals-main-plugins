@@ -19,6 +19,7 @@ Also, you may use WordPress Download Manager as a complete e-Commerce Solution f
 = Features =
 *	Custom post type and taxonomy, adding a download is just like creating a post
 *   Drag and Drop File Upload
+*   Chunk upload support to override http max upload limit
 *   Attach file directly from your server using server file browser
 *   Quick add panel with tinymce editor button to create and insert a download easily when you are editing a post or page
 *   Google Drive support to store your files in Google drive ( 15 GB of space for free)
@@ -28,17 +29,17 @@ Also, you may use WordPress Download Manager as a complete e-Commerce Solution f
 *   Option to "Open in Browser" or "Download" files ( PDFs or images )
 *	Control who can access to download
 *   Category level access control
-*   Download Speed Control
+*   Download speed control
 *	Password protection
 *	CAPTCHA protection
 *   IP block option to prevent bot downloads or downloads from unwanted IP addresses
 *   Download logs to check who is downloading which file from where and when
 *   Terms protection - Agree with Terms & Conditions before download
-*	Download Counter to see total download count for each file
+*	Download counter to see total download count for each file
 *	Custom download link icon
 *	File type icon support
 *   Full Featured User Dashboard ( use short-code [wpdm_user_dashboard] )
-*   Custom Front-end Login / Signup form short-code
+*   Custom front-end login / signup form short-code
 *   Custom oEmbed template
 *	DataTable support ( use short-code [wpdm-all-packages jstable=1 items_per_page=20] )
 *	Searching and Sorting Option
@@ -70,6 +71,7 @@ Use [Premium Package – Complete Digital Store Solution](https://www.wpdownload
 *   Email Saved Cart
 *   Product & Price variations
 *   Promotional Pricing for Your Digital Products
+*   "Pay As You Want" pricing
 *   Invoice Generation
 *   Easiest Checkout System
 *   Guest Checkout and Guest Download
@@ -150,6 +152,12 @@ Check download stats and get a push notification when someone downloads, install
 13. Video Player
 
 == Changelog ==
+
+= 2.9.58 =
+* Added support for chunk upload
+* Fixed template file path issue
+* Improved UI
+* Added multiple password support
 
 = 2.9.57 =
 * Added new option to attach external URL as download link

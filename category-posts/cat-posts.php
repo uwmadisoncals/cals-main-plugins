@@ -4,7 +4,7 @@ Plugin Name: Category Posts Widget
 Plugin URI: https://wordpress.org/plugins/category-posts/
 Description: Adds a widget that shows the most recent posts from a single category.
 Author: TipTopPress
-Version: 4.7.2
+Version: 4.7.3
 Author URI: http://tiptoppress.com
 Text Domain: category-posts
 Domain Path: /languages
@@ -15,7 +15,7 @@ namespace categoryPosts;
 // Don't call the file directly
 if ( !defined( 'ABSPATH' ) ) exit;
 
-const CAT_POST_VERSION = "4.7.2";
+const CAT_POST_VERSION = "4.7.3";
 const CAT_POST_DOC_URL = "http://tiptoppress.com/category-posts-widget/documentation-4-7?utm_source=widget_cpw&utm_campaign=documentation_4_7_cpw&utm_medium=form";
 
 const SHORTCODE_NAME = 'catposts';
@@ -37,12 +37,12 @@ function wp_admin_bar_customize_menu() {
 		return;
 
 	$current_url = "";
-	if ( isset($_GET['post']) || $_GET['post'] !== '' )
+	if ( isset( $_GET['post'] ) && $_GET['post'] !== '' )
 		$current_url = get_permalink( $_GET['post'] );		
 	$customize_url = add_query_arg( 'url', urlencode( $current_url ), wp_customize_url() );
 
-	$p =  get_post( $_GET['post']);		
-	$names = shortcode_names(SHORTCODE_NAME,$p->post_content);
+	$p     = isset( $_GET['post'] ) && ! empty( $_GET['post'] ) ? get_post( $_GET['post']) : false;		
+	$names = $p ? shortcode_names( SHORTCODE_NAME, $p->post_content ) : array();
 	if( empty($names) )
 		return;
 		
@@ -505,7 +505,7 @@ class Widget extends \WP_Widget {
             $title_args = array('echo'=>false);
 
 			if ($no_link)
-				$ret .= '<span '.$class . '">';
+				$ret .= '<span '.$class.'>';
 			else
 				$ret .= '<a '.$class . ' href="'.get_the_permalink().'" title="'.the_title_attribute($title_args).'">';
 
@@ -542,6 +542,18 @@ class Widget extends \WP_Widget {
 			'orderby' => $sort_by,
 			'order' => $sort_order
 		);
+
+                $valid_status = array('publish', 'future', 'both');
+                if ( isset($instance['status']) && in_array($instance['status'],$valid_status) ) {
+                        $status = $instance['status'];
+			if ($status == 'both') {
+        			$args['post_status'] = array('publish', 'future');
+			} else {
+        			$args['post_status'] = $status;
+			}
+                } else {
+        		$args['post_status'] = 'publish';
+                }
         
         if (isset($instance["num"])) 
             $args['showposts'] = (int) $instance["num"];
@@ -639,32 +651,40 @@ class Widget extends \WP_Widget {
 	function footerHTML($instance) {
 
 		$ret = "";
-		if (isset ( $instance["footer_link"] ) && !empty ( $instance["footer_link"] )) {
-			if (empty($instance["footer_link_text"]))
-				$instance["footer_link_text"] = $instance["footer_link"];
-			$ret = "<a";
-			if( !(isset( $instance['disable_css'] ) && $instance['disable_css'])) { 
-				$ret.= " class=\"cat-post-footer-link\""; 
-			}
-			if (isset($instance["cat"]) && ($instance["cat"] != 0) && (get_category($instance["cat"]) != null) ) {
-				$ret .= " href=\"" . get_category_link($instance["cat"]) . "\">" . esc_html($instance["footer_link_text"]) . "</a>";
-			} else {
-				// link to posts page if category not found. 
-				// this maybe the blog page or home page
-				if( isset ( $instance["footer_link"] ) && !empty ( $instance["footer_link"] ) ) {
-					$ret .= " href=\"" . esc_url($instance["footer_link"]) . "\">" . esc_html($instance["footer_link_text"]) . "</a>";
-				} else {
-					$blog_page = get_option('page_for_posts');
-					if ($blog_page)
-						$ret .= " href=\"" . get_permalink($blog_page) . "\">" . esc_html($instance["footer_link_text"]) . "</a>";
-					else
-						$ret .= " href=\"" . home_url() . "\">" . esc_html($instance["footer_link_text"]) . "</a>";
-				}
+		$url = '';
+		$text = '';
+		
+		if (isset ( $instance["footer_link"] ))
+			$url = $instance["footer_link"];
+		
+		if (isset ( $instance["footer_link_text"] ))
+			$text = $instance["footer_link_text"];
+
+		// if url is set, but no text, just use the url as text
+		if (empty($text) && !empty($url))
+			$text = $url;
+		
+		// if no url is set but just text, assume the url should be to the relevant archive page
+		// category archive for categories filter and home page or blog page when "all categories"
+		// is used
+		if (!empty($text) && empty($url)) {
+			if (isset($instance["cat"]) && ($instance["cat"] != 0) && (get_category($instance["cat"]) != null) )
+				$url = get_category_link($instance["cat"]);
+			else {
+				$blog_page = get_option('page_for_posts');
+				if ($blog_page)
+					$url = get_permalink($blog_page);
+				else
+					$url = home_url();
 			}
 		}
+		
+		if (!empty($url))
+			$ret .= '<a class="cat-post-footer-link" href="' . esc_url($url) . '">' . esc_html($text) . '</a>';
+		
 		return $ret;
 	}
-
+	
 	/**
 	 * Calculate the HTML for a post item based on the widget settings and post.
      * Expected to be called in an active loop with all the globals set
@@ -1023,6 +1043,7 @@ class Widget extends \WP_Widget {
 			'num'                  => get_option('posts_per_page'),
 			'offset'               => 1,
 			'sort_by'              => '',
+			'status'               => '',
 			'asc_sort_order'       => '',
 			'exclude_current_post' => '',
 			'hideNoThumb'          => '',
@@ -1032,6 +1053,7 @@ class Widget extends \WP_Widget {
 		$num                  = $instance['num'];
 		$offset               = $instance['offset'];
 		$sort_by              = $instance['sort_by'];
+		$status               = $instance['status'];
 		$asc_sort_order       = $instance['asc_sort_order'];
 		$exclude_current_post = $instance['exclude_current_post'];
 		$hideNoThumb          = $instance['hideNoThumb'];
@@ -1061,6 +1083,16 @@ class Widget extends \WP_Widget {
                 <label for="<?php echo $this->get_field_id("offset"); ?>">
                     <?php _e('Start with post','category-posts'); ?>:
                     <input style="text-align: center; width: 30%;" id="<?php echo $this->get_field_id("offset"); ?>" name="<?php echo $this->get_field_name("offset"); ?>" type="number" min="1" value="<?php echo absint($instance["offset"]); ?>" />
+                </label>
+            </p>
+            <p>
+                <label for="<?php echo $this->get_field_id("status"); ?>">
+                    <?php _e('Status','category-posts'); ?>:
+                    <select id="<?php echo $this->get_field_id("status"); ?>" name="<?php echo $this->get_field_name("status"); ?>">
+                        <option value="publish"<?php selected( $instance["status"], "publish" ); ?>><?php _e('Published','category-posts')?></option>
+                        <option value="future"<?php selected( $instance["status"], "future" ); ?>><?php _e('Scheduled','category-posts')?></option>
+                        <option value="both"<?php selected( $instance["status"], "both" ); ?>><?php _e('Published & Scheduled','category-posts')?></option>
+                    </select>
                 </label>
             </p>
             <p>
@@ -1386,7 +1418,7 @@ class Widget extends \WP_Widget {
 						<input class="widefat" style="width:60%;" placeholder="<?php _e('... more by this topic','category-posts')?>" id="<?php echo $this->get_field_id("footer_link_text"); ?>" name="<?php echo $this->get_field_name("footer_link_text"); ?>" type="text" value="<?php echo esc_attr($instance["footer_link_text"]); ?>" />
 					</label>
 				</p>
-                <p class="categoryposts-data-panel-footer-footerLink" style="display:<?php echo ((bool) $cat == 0) ? 'block' : 'none'?>">
+                <p class="categoryposts-data-panel-footer-footerLink">
                     <label for="<?php echo $this->get_field_id("footer_link"); ?>">
                         <?php _e( 'Footer link URL','category-posts' ); ?>:
                         <input class="widefat" style="width:60%;" placeholder="<?php _e('... URL of more link','category-posts')?>" id="<?php echo $this->get_field_id("footer_link"); ?>" name="<?php echo $this->get_field_name("footer_link"); ?>" type="text" value="<?php echo esc_attr($instance["footer_link"]); ?>" />
@@ -1637,6 +1669,7 @@ function default_settings()  {
 				'num'                             => get_option('posts_per_page'),
 				'offset'                          => 1,
 				'sort_by'                         => 'date',
+				'status'                          => 'publish',
 				'asc_sort_order'                  => false,
 				'exclude_current_post'            => false,
 				'hideNoThumb'                     => false,
@@ -1986,14 +2019,14 @@ function show_user_profile( $user ) {
 		<tr>
 			<th><label for="<?php echo __NAMESPACE__?>[panels]"><?php _e('Open panels behavior','category-posts')?></label></th>
 			<td>
-				<input type="checkbox" name="<?php echo __NAMESPACE__?>[panels]" id="<?php echo __NAMESPACE__?>[panels]" <?php checked($accordion); ?>">
+				<input type="checkbox" name="<?php echo __NAMESPACE__?>[panels]" id="<?php echo __NAMESPACE__?>[panels]" <?php checked($accordion); ?>>
 				<label for=<?php echo __NAMESPACE__?>[panels]><?php _e('Close the curremtly open panel when opening a new one','category-posts')?></label>
 			</td>
 		</tr>
 		<tr>
 			<th><label for="<?php echo __NAMESPACE__?>[editor]"><?php _e('Visual editor button','category-posts')?></label></th>
 			<td>
-				<input type="checkbox" name="<?php echo __NAMESPACE__?>[editor]" id="<?php echo __NAMESPACE__?>[editor]" <?php checked($editor); ?>">
+				<input type="checkbox" name="<?php echo __NAMESPACE__?>[editor]" id="<?php echo __NAMESPACE__?>[editor]" <?php checked($editor); ?>>
 				<label for="<?php echo __NAMESPACE__?>[editor]"><?php _e('Hide the "insert shortcode" button from the editor','category-posts')?></label>
 			</td>
 		</tr>
@@ -2106,20 +2139,8 @@ class virtualWidget {
 		if (!$is_shortcode)
 			$widget_id .= '-internal';
 	
-		if (!(isset($settings['disable_font_styles']) && $settings['disable_font_styles'])) { // checks if disable font styles is not set
-			$rules = array( // rules that should be applied to all widgets
-				'.cat-post-item img {max-width: initial; max-height: initial;}',
-				'.cat-post-title {font-size: 15px;}',
-				'.cat-post-current .cat-post-title {font-weight: bold; text-transform: uppercase;}',
-				'.cat-post-date {font-size: 12px;	line-height: 18px; font-style: italic; margin-bottom: 10px;}',
-				'.cat-post-comment-num {font-size: 12px; line-height: 18px;}',
-				'.cat-post-author {margin-bottom: 0;}',
-				'.cat-post-thumbnail {margin: 5px 10px 5px 0; display: block;}',
-				'.cat-post-item:before {content: ""; display: table; clear: both;}',
-				'.cat-post-item:after {content: ""; display: table;	clear: both;}',
-				'.cat-post-item img {margin: initial;}',
-			);
-		} else {
+		if (!(isset($settings['disable_css']) && $settings['disable_css'])) { // checks if css disable is not set
+		
 			$rules = array( // rules that should be applied to all widgets
 				'.cat-post-item img {max-width: initial; max-height: initial;}',
 				'.cat-post-current .cat-post-title {text-transform: uppercase;}',
@@ -2127,12 +2148,18 @@ class virtualWidget {
 				'.cat-post-author {margin-bottom: 0;}',
 				'.cat-post-thumbnail {margin: 5px 10px 5px 0; display: block;}',
 				'.cat-post-item:before {content: ""; display: table; clear: both;}',
-				'.cat-post-item:after {content: ""; display: table;	clear: both;}',
 				'.cat-post-item img {margin: initial;}',
 			);
-		}
-
-		if (!(isset($settings['disable_css']) && $settings['disable_css'])) { // checks if css disable is not set
+			
+			if (!(isset($settings['disable_font_styles']) && $settings['disable_font_styles'])) { // checks if disable font styles is not set
+				// add general rules which apply to font styling
+				$rules[] = '.cat-post-title {font-size: 15px;}';
+				$rules[] = '.cat-post-current .cat-post-title {font-weight: bold; text-transform: uppercase;}';
+				$rules[] = '.cat-post-date {font-size: 12px;	line-height: 18px; font-style: italic; margin-bottom: 10px;}';
+				$rules[] = '.cat-post-comment-num {font-size: 12px; line-height: 18px;}';
+			} else {
+				$rules[] = '.cat-post-date {margin-bottom: 10px;}';				
+			}
 
 			/*
 				the twenty seventeen theme have a border between the LI elements of a widget, 
@@ -2171,8 +2198,13 @@ class virtualWidget {
 				}
 			}
 
+            // everything link related styling
+		    // if we are dealing with "everything is a link" option, we need to add the clear:both to the a element, not the div
 			if (isset( $settings['everything_is_link'] ) && $settings['everything_is_link']) {
 				$rules[] = '.cat-post-everything-is-link { }';
+				$rules[] = '.cat-post-item a:after {content: ""; display: table;	clear: both;}';
+			} else {
+				$rules[] = '.cat-post-item:after {content: ""; display: table;	clear: both;}';
 			}
 
 			foreach ($rules as $rule) {
@@ -2191,7 +2223,10 @@ class virtualWidget {
 		}
 		
 		if ((isset($settings['use_css_cropping']) && $settings['use_css_cropping']) || !(isset($settings['disable_css']) && $settings['disable_css'])) {
-			$ret[] = '#'.$widget_id.' .cat-post-crop {overflow: hidden; display:block}';
+			if (isset($settings['use_css_cropping']) && $settings['use_css_cropping'])
+				$ret[] = '#'.$widget_id.' .cat-post-crop {overflow: hidden; display:block}';
+			else
+				$ret[] = '#'.$widget_id.' .cat-post-thumbnail span {overflow: hidden; display:block}';
 			$ret[] = '#'.$widget_id.' .cat-post-item img {margin: initial;}';
 		}
 	}

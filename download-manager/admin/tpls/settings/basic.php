@@ -104,6 +104,24 @@
                         <br/>
 
                     </div>
+                    <hr/>
+                    <div class="form-group">
+                        <input type="hidden" value="0" name="__wpdm_chunk_upload" />
+                        <label><input style="margin: 0 10px 0 0" <?php checked(1, get_option('__wpdm_chunk_upload',0)); ?> type="checkbox" value="1" name="__wpdm_chunk_upload"><?php _e('Chunk Upload','download-manager'); ?></label><br/>
+                        <em><?php _e('Check the option if you want to enable chunk upload to override http upload limits','download-manager'); ?></em>
+                        <br/>
+
+                    </div>
+                    <div class="form-group">
+                        <label><?php _e('Chunk Size','download-manager'); ?></label><br/>
+                        <div class="input-group">
+                            <input class="form-control" value="<?php echo get_option('__wpdm_chunk_size',1024); ?>" type="number"   name="__wpdm_chunk_size">
+                            <div class="input-group-addon">KB</div>
+                        </div>
+                        <br/>
+
+                    </div>
+
                 </div>
             </div>
 
@@ -114,7 +132,7 @@
                     <div class="form-group">
                         <label><?php echo __('Download Speed:','download-manager'); ?></label>
                         <div class="input-group">
-                            <input type=text class="form-control" name="__wpdm_download_speed" value="<?php echo intval(get_option('__wpdm_download_speed',4096)); ?>" />
+                            <input type=number class="form-control" name="__wpdm_download_speed" value="<?php echo intval(get_option('__wpdm_download_speed',4096)); ?>" />
                             <span class="input-group-addon">KB</span>
                         </div>
                     </div>

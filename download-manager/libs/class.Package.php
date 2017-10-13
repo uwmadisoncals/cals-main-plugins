@@ -953,15 +953,15 @@ class Package {
         if(isset($templates[$template]) && isset($templates[$template]['content'])) $template = $templates[$template]['content'];
         else
             if(!strpos(strip_tags($template), "]")){
-
+                $template = wpdm_basename($template);
                 $ltpldir = get_stylesheet_directory().'/download-manager/'.$type.'-templates/';
                 if(!file_exists($ltpldir) || !file_exists($ltpldir.$template))
                     $ltpldir = WPDM_BASE_DIR.'/tpls/'.$type.'-templates/';
-
                 if (file_exists(TEMPLATEPATH . '/' . $template)) $template = file_get_contents(TEMPLATEPATH . '/' . $template);
                 else if (file_exists($ltpldir . $template)) $template = file_get_contents($ltpldir . $template);
                 else if (file_exists($ltpldir . $template . '.php')) $template = file_get_contents($ltpldir . $template . '.php');
                 else if (file_exists($ltpldir. $type . "-template-" . $template . '.php')) $template = file_get_contents($ltpldir. $type . "-template-" . $template . '.php');
+                else $template = file_get_contents(wpdm_tpl_path($default[$type], $ltpldir));
             }
 
         preg_match_all("/\[cf ([^\]]+)\]/", $template, $cfmatches);

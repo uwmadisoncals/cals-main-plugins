@@ -216,11 +216,9 @@ class Tribe__Assets {
 	public static function maybe_get_min_file( $url ) {
 		$urls = array();
 		$wpmu_plugin_url = set_url_scheme( WPMU_PLUGIN_URL );
-		//$wp_plugin_url = set_url_scheme( WP_PLUGIN_URL );
-		//$wp_content_url = set_url_scheme( WP_CONTENT_URL );
-
-		$wp_plugin_url = set_url_scheme( plugins_url() );
-		$wp_content_url = set_url_scheme( content_url() );
+		$wp_plugin_url = set_url_scheme( WP_PLUGIN_URL );
+		$wp_content_url = set_url_scheme( WP_CONTENT_URL );
+		$plugins_url = plugins_url();
 
 		if ( 0 === strpos( $url, $wpmu_plugin_url ) ) {
 			// URL inside WPMU plugin dir.
@@ -234,6 +232,9 @@ class Tribe__Assets {
 			// URL inside WP content dir.
 			$base_dir = wp_normalize_path( WP_CONTENT_DIR );
 			$base_url = $wp_content_url;
+		} elseif ( 0 === strpos( $url, $plugins_url ) ) {
+			$base_dir = wp_normalize_path( WP_PLUGIN_DIR );
+			$base_url = $plugins_url;
 		} else {
 			// Resource needs to be inside wp-content or a plugins dir.
 			return false;
