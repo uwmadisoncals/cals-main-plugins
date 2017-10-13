@@ -154,7 +154,7 @@ class Ai1wmme_Export_Enumerate {
 		// Exclude media
 		if ( isset( $params['options']['no_media'] ) ) {
 			$exclude_filters = array_merge( $exclude_filters, array( 'uploads', 'blogs.dir' ) );
-		} else if ( isset( $params['options']['sites'] ) ) {
+		} elseif ( isset( $params['options']['sites'] ) ) {
 			$mainsite = false;
 
 			// Set main site
@@ -200,7 +200,7 @@ class Ai1wmme_Export_Enumerate {
 		}
 
 		// Create map file
-		$filemap = ai1wm_open( ai1wm_filemap_path( $params ) , 'a+' );
+		$filemap = ai1wm_open( ai1wm_filemap_path( $params ) , 'w' );
 
 		// Iterate over sites directory
 		foreach ( $include_filters as $path ) {
@@ -208,6 +208,9 @@ class Ai1wmme_Export_Enumerate {
 
 				// Iterate over content directory
 				$iterator = new Ai1wm_Recursive_Directory_Iterator( WP_CONTENT_DIR . DIRECTORY_SEPARATOR . $path );
+
+				// Exclude new line file names
+				$iterator = new Ai1wm_Recursive_Newline_Filter( $iterator );
 
 				// Recursively iterate over content directory
 				$iterator = new RecursiveIteratorIterator( $iterator, RecursiveIteratorIterator::LEAVES_ONLY, RecursiveIteratorIterator::CATCH_GET_CHILD );
@@ -219,7 +222,7 @@ class Ai1wmme_Export_Enumerate {
 							$total_files_count++;
 
 							// Add current file size
-							$total_files_size += filesize( $iterator->getPathname() );
+							$total_files_size += $iterator->getSize();
 						}
 					}
 				}
@@ -234,6 +237,9 @@ class Ai1wmme_Export_Enumerate {
 
 			// Iterate over content directory
 			$iterator = new Ai1wm_Recursive_Directory_Iterator( WP_CONTENT_DIR );
+
+			// Exclude new line file names
+			$iterator = new Ai1wm_Recursive_Newline_Filter( $iterator );
 
 			// Exclude uploads, plugins or themes
 			$iterator = new Ai1wm_Recursive_Exclude_Filter( $iterator, apply_filters( 'ai1wm_exclude_content_from_export', $exclude_filters ) );

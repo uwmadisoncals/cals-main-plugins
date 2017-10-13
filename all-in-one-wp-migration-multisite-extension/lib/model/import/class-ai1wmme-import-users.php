@@ -215,7 +215,7 @@ class Ai1wmme_Import_Users {
 			}
 
 			// Set progress
-			Ai1wm_Status::info( __( 'Done preparing users...', AI1WMME_PLUGIN_NAME ) );
+			Ai1wm_Status::info( __( 'Done preparing users.', AI1WMME_PLUGIN_NAME ) );
 		}
 
 		return $params;

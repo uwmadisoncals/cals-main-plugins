@@ -66,30 +66,32 @@ function ai1wmme_create_blog( $domain, $path, $site_id = 1 ) {
 }
 
 function ai1wmme_exclude_sites( $params = array() ) {
-	$sites = array();
+	static $sites = array();
 
 	// Add network
 	if ( is_multisite() ) {
-		foreach ( ai1wmme_get_sites() as $site ) {
-			// Add site
-			if ( in_array( $site['blog_id'], $params['options']['sites'] ) === false ) {
-				switch_to_blog( $site['blog_id'] );
+		if ( empty( $sites ) ) {
+			foreach ( ai1wmme_get_sites() as $site ) {
+				// Add site
+				if ( in_array( $site['blog_id'], $params['options']['sites'] ) === false ) {
+					switch_to_blog( $site['blog_id'] );
 
-				// Add site meta
-				$sites[] = array(
-					'BlogID'     => (int) $site['blog_id'],
-					'SiteID'     => (int) $site['site_id'],
-					'LangID'     => (int) $site['lang_id'],
-					'SiteURL'    => get_site_url( $site['blog_id'] ),
-					'HomeURL'    => get_home_url( $site['blog_id'] ),
-					'Domain'     => $site['domain'],
-					'Path'       => $site['path'],
-					'Plugins'    => array_values( array_diff( ai1wm_active_plugins(), ai1wm_active_servmask_plugins() ) ),
-					'Template'   => ai1wm_active_template(),
-					'Stylesheet' => ai1wm_active_stylesheet(),
-				);
+					// Add site meta
+					$sites[] = array(
+						'BlogID'     => (int) $site['blog_id'],
+						'SiteID'     => (int) $site['site_id'],
+						'LangID'     => (int) $site['lang_id'],
+						'SiteURL'    => get_site_url( $site['blog_id'] ),
+						'HomeURL'    => get_home_url( $site['blog_id'] ),
+						'Domain'     => $site['domain'],
+						'Path'       => $site['path'],
+						'Plugins'    => array_values( array_diff( ai1wm_active_plugins(), ai1wm_active_servmask_plugins() ) ),
+						'Template'   => ai1wm_active_template(),
+						'Stylesheet' => ai1wm_active_stylesheet(),
+					);
 
-				restore_current_blog();
+					restore_current_blog();
+				}
 			}
 		}
 	}
@@ -98,13 +100,46 @@ function ai1wmme_exclude_sites( $params = array() ) {
 }
 
 function ai1wmme_include_sites( $params = array() ) {
-	$sites = array();
+	static $sites = array();
 
 	// Add network
 	if ( is_multisite() ) {
-		foreach ( ai1wmme_get_sites() as $site ) {
-			// Add site
-			if ( in_array( $site['blog_id'], $params['options']['sites'] ) === true ) {
+		if ( empty( $sites ) ) {
+			foreach ( ai1wmme_get_sites() as $site ) {
+				// Add site
+				if ( in_array( $site['blog_id'], $params['options']['sites'] ) === true ) {
+					switch_to_blog( $site['blog_id'] );
+
+					// Add site meta
+					$sites[] = array(
+						'BlogID'     => (int) $site['blog_id'],
+						'SiteID'     => (int) $site['site_id'],
+						'LangID'     => (int) $site['lang_id'],
+						'SiteURL'    => get_site_url( $site['blog_id'] ),
+						'HomeURL'    => get_home_url( $site['blog_id'] ),
+						'Domain'     => $site['domain'],
+						'Path'       => $site['path'],
+						'Plugins'    => array_values( array_diff( ai1wm_active_plugins(), ai1wm_active_servmask_plugins() ) ),
+						'Template'   => ai1wm_active_template(),
+						'Stylesheet' => ai1wm_active_stylesheet(),
+					);
+
+					restore_current_blog();
+				}
+			}
+		}
+	}
+
+	return $sites;
+}
+
+function ai1wmme_sites( $params = array() ) {
+	static $sites = array();
+
+	// Add network
+	if ( is_multisite() ) {
+		if ( empty( $sites ) ) {
+			foreach ( ai1wmme_get_sites() as $site ) {
 				switch_to_blog( $site['blog_id'] );
 
 				// Add site meta
@@ -123,35 +158,6 @@ function ai1wmme_include_sites( $params = array() ) {
 
 				restore_current_blog();
 			}
-		}
-	}
-
-	return $sites;
-}
-
-function ai1wmme_sites( $params = array() ) {
-	$sites = array();
-
-	// Add network
-	if ( is_multisite() ) {
-		foreach ( ai1wmme_get_sites() as $site ) {
-			switch_to_blog( $site['blog_id'] );
-
-			// Add site meta
-			$sites[] = array(
-				'BlogID'     => (int) $site['blog_id'],
-				'SiteID'     => (int) $site['site_id'],
-				'LangID'     => (int) $site['lang_id'],
-				'SiteURL'    => get_site_url( $site['blog_id'] ),
-				'HomeURL'    => get_home_url( $site['blog_id'] ),
-				'Domain'     => $site['domain'],
-				'Path'       => $site['path'],
-				'Plugins'    => array_values( array_diff( ai1wm_active_plugins(), ai1wm_active_servmask_plugins() ) ),
-				'Template'   => ai1wm_active_template(),
-				'Stylesheet' => ai1wm_active_stylesheet(),
-			);
-
-			restore_current_blog();
 		}
 	}
 

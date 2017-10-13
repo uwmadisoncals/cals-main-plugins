@@ -187,7 +187,7 @@ class Ai1wmme_Import_Blogs {
 						}
 
 						// Get blog sub path
-						if ( ( $old_blog_subpath = substr_replace( trailingslashit( $subsite['Path'] ), '', stripos( trailingslashit( $subsite['Path'] ), trailingslashit( $new_blog_path ) ), strlen( trailingslashit( $new_blog_path ) ) ) ) ) {
+						if ( ( $old_blog_subpath = substr_replace( trailingslashit( $subsite['Path'] ), '', stripos( trailingslashit( $subsite['Path'] ), trailingslashit( $old_blog_path ) ), strlen( trailingslashit( $old_blog_path ) ) ) ) ) {
 							if ( ( $old_blog_subpath = explode( '/', untrailingslashit( $old_blog_subpath ) ) ) ) {
 								if ( ( $old_blog_subpath = array_filter( $old_blog_subpath ) ) ) {
 									if ( ( $new_blog_name = array_pop( $old_blog_subpath ) ) ) {
@@ -202,7 +202,7 @@ class Ai1wmme_Import_Blogs {
 								}
 							}
 						}
-					} else if ( strripos( $subsite['Domain'], $old_www_domain ) !== false ) {
+					} elseif ( strripos( $subsite['Domain'], $old_www_domain ) !== false ) {
 
 						// Get blog sub domain
 						if ( ( $old_blog_subdomain = substr_replace( $subsite['Domain'], '', strripos( $subsite['Domain'], $old_www_domain ), strlen( $old_www_domain ) ) ) ) {
@@ -218,7 +218,7 @@ class Ai1wmme_Import_Blogs {
 						}
 
 						// Get blog sub path
-						if ( ( $old_blog_subpath = substr_replace( trailingslashit( $subsite['Path'] ), '', stripos( trailingslashit( $subsite['Path'] ), trailingslashit( $new_blog_path ) ), strlen( trailingslashit( $new_blog_path ) ) ) ) ) {
+						if ( ( $old_blog_subpath = substr_replace( trailingslashit( $subsite['Path'] ), '', stripos( trailingslashit( $subsite['Path'] ), trailingslashit( $old_blog_path ) ), strlen( trailingslashit( $old_blog_path ) ) ) ) ) {
 							if ( ( $old_blog_subpath = explode( '/', untrailingslashit( $old_blog_subpath ) ) ) ) {
 								if ( ( $old_blog_subpath = array_filter( $old_blog_subpath ) ) ) {
 									if ( ( $new_blog_name = array_pop( $old_blog_subpath ) ) ) {
@@ -456,7 +456,7 @@ class Ai1wmme_Import_Blogs {
 		}
 
 		// Set progress
-		Ai1wm_Status::info( __( 'Done preparing blogs...', AI1WMME_PLUGIN_NAME ) );
+		Ai1wm_Status::info( __( 'Done preparing blogs.', AI1WMME_PLUGIN_NAME ) );
 
 		return $params;
 	}

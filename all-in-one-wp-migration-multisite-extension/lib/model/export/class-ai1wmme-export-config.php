@@ -30,9 +30,6 @@ class Ai1wmme_Export_Config {
 		// Set progress
 		Ai1wm_Status::info( __( 'Adding multisite configuration to archive...', AI1WMME_PLUGIN_NAME ) );
 
-		// Flush WP cache
-		ai1wm_cache_flush();
-
 		// Set config
 		$config = array();
 

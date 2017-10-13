@@ -6,7 +6,7 @@
 				<?php _e( 'Network (all sites)', AI1WMME_PLUGIN_NAME ); ?>
 			</label>
 		</li>
-		<?php foreach ( ai1wmme_sites() as $site ) :  ?>
+		<?php foreach ( ai1wmme_sites() as $site ) : ?>
 			<li>
 				<label for="ai1wmme-site-<?php echo $site['BlogID']; ?>">
 					<input type="checkbox" name="options[sites][]" value="<?php echo $site['BlogID']; ?>" id="ai1wmme-site-<?php echo $site['BlogID']; ?>" class="ai1wmme-sites" />

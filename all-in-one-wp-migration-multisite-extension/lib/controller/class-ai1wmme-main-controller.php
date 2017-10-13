@@ -74,7 +74,7 @@ class Ai1wmme_Main_Controller {
 	 * @return void
 	 */
 	public function register_export_scripts_and_styles( $hook ) {
-		if ( 'toplevel_page_site-migration-export' !== strtolower( $hook ) ) {
+		if ( stripos( 'toplevel_page_site-migration-export', $hook ) === false ) {
 			return;
 		}
 
@@ -95,7 +95,7 @@ class Ai1wmme_Main_Controller {
 	 * @return void
 	 */
 	public function register_import_scripts_and_styles( $hook ) {
-		if ( 'all-in-one-wp-migration_page_site-migration-import' !== strtolower( $hook ) ) {
+		if ( stripos( 'all-in-one-wp-migration_page_site-migration-import', $hook ) === false ) {
 			return;
 		}
 
