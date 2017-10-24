@@ -234,7 +234,6 @@ function edit_my_calendar_config() {
 	if ( isset( $_POST['mc_show_months'] ) ) {
 		$permalinks = get_option( 'mc_use_permalinks' );
 		$mc_open_day_uri = ( ! empty( $_POST['mc_open_day_uri'] ) ) ? $_POST['mc_open_day_uri'] : '';
-		update_option( 'mc_uri', $_POST['mc_uri'] );
 		update_option( 'mc_use_permalinks', ( ! empty( $_POST['mc_use_permalinks'] ) ) ? 'true' : 'false' );
 		update_option( 'mc_open_uri', ( ! empty( $_POST['mc_open_uri'] ) && $_POST['mc_open_uri'] == 'on' && get_option( 'mc_uri' ) != '' ) ? 'true' : 'false' );
 		update_option( 'mc_mini_uri', $_POST['mc_mini_uri'] );
@@ -243,6 +242,7 @@ function edit_my_calendar_config() {
 		update_option( 'mc_show_event_vcal', ( ! empty( $_POST['mc_show_event_vcal'] ) && $_POST['mc_show_event_vcal'] == 'on' ) ? 'true' : 'false' );
 		update_option( 'mc_show_gcal', ( ! empty( $_POST['mc_show_gcal'] ) && $_POST['mc_show_gcal'] == 'on' ) ? 'true' : 'false' );
 		update_option( 'mc_show_list_info', ( ! empty( $_POST['mc_show_list_info'] ) && $_POST['mc_show_list_info'] == 'on' ) ? 'true' : 'false' );
+		update_option( 'mc_show_list_events', ( ! empty( $_POST['mc_show_list_events'] ) && $_POST['mc_show_list_events'] == 'on' ) ? 'true' : 'false' );
 		update_option( 'mc_show_months', (int) $_POST['mc_show_months'] );
 		// calculate sequence for navigation elements
 		$top = $bottom = array();
@@ -575,8 +575,6 @@ function edit_my_calendar_config() {
 					<fieldset>
 						<legend><?php _e( 'Calendar Link Targets', 'my-calendar' ); ?></legend>
 						<ul>
-							<?php $guess = mc_guess_calendar(); ?>
-							<li><?php mc_settings_field( 'mc_uri', __( 'Where is your main calendar page?', 'my-calendar' ), '', "$guess[message]", array( 'size' => '60' ), 'url' ); ?></li>
 							<?php 
 							if ( isset( $_POST['mc_use_permalinks'] ) && $note != '' ) {
 								$url = admin_url( 'options-permalink.php#mc_cpt_base' );
@@ -695,6 +693,7 @@ function edit_my_calendar_config() {
 						<ul>
 							<li><?php mc_settings_field( 'mc_show_months', __( 'How many months of events to show at a time:', 'my-calendar' ), '', '', array( 'size' => '3' ), 'text' ); ?></li>
 							<li><?php mc_settings_field( 'mc_show_list_info', __( 'Show the first event\'s title and the number of events that day next to the date.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+							<li><?php mc_settings_field( 'mc_show_list_events', __( 'Show all event titles next to the date.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 						</ul>
 					</fieldset>					
 					

@@ -69,7 +69,7 @@ class AAM_Core_Media {
         $root    = AAM_Core_Request::server('DOCUMENT_ROOT');
         
         $this->request     = str_replace('\\', '/', $root . $request);
-        $this->request_uri = $request;
+        $this->request_uri = preg_replace('/\?.*$/', '', $request);
     }
     
     /**

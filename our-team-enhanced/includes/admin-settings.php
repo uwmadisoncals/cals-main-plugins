@@ -527,9 +527,17 @@ function do_settings_page() {
                             <li><?php _e( 'To display members from a multiple groups, add <code>[our-team group="group1,group2"]</code>', 'ots' ); ?></li>
                             <li><?php _e( 'To override the template choice from the short-code, add <code>[our-team template="grid"]</code>. <i>Template options include: grid, grid_circles, grid_circles2, carousel, hc and stacked.</i>', 'ots' ); ?></li>
                             <li><?php _e( 'To override the single template choice from the short-code add <code>[our-team single_template="vcard"]</code>. Alternatively you can set it to panel', 'ots' ); ?></li>
+                            <li><?php _e( 'To override the number of columns from the short-code add <code>[our-team columns="4"]</code>.', 'ots' ); ?></li>
+                            <li><?php _e( 'Need more help? Check out the full plugin documentation manual', 'ots' ); ?>
+                                <a href="<?php echo admin_url( 'edit.php?post_type=team_member&page=ots-docs' ); ?>">
+                                    <?php _e( 'Go to documentation', 'ots' ); ?>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
+
+                <?php do_action( 'ots_admin_sidebar_widgets' ); ?>
 
             </div>
 
@@ -755,3 +763,31 @@ function display_limit_field() {
     <p class="description"><?php _e( 'The maximum number of members to display', 'ots' ); ?></p>
 
 <?php }
+
+
+function settings_toggle( array $args ) {
+
+    $defaults = array(
+        'attrs'   => array(),
+        'checked' => false,
+        'label'   => '',
+        'slider'  => ''
+    );
+
+    $args = wp_parse_args( $args, $defaults );
+
+    echo '<input type="hidden" name="' . esc_attr( $args['name'] ) . '" value="off" />';
+
+    echo '<label class="switch">
+              <input type="checkbox"
+                     value="on"
+                     name="' . esc_attr( $args['name'] ) . '" ';
+
+    print_attrs( $args['attrs'] );
+
+    checked( 'on', $args['checked'] );
+
+    echo ' /><span class="slider ' . esc_attr( $args['slider'] ) . '"></label> ';
+    echo '<span class="label">' . esc_html( $args['label'] ) . '</span>';
+
+}

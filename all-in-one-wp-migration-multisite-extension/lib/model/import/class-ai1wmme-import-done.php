@@ -44,9 +44,12 @@ class Ai1wmme_Import_Done {
 				ai1wm_activate_sitewide_plugins( $plugins );
 			}
 
-			// Deactivate sitewide Really Simple SSL plugin
+			// Deactivate sitewide Really Simple SSL and WordPress HTTPS (SSL) plugins
 			if ( ! is_ssl() ) {
-				ai1wm_deactivate_sitewide_plugins( array( 'really-simple-ssl/rlrsssl-really-simple-ssl.php' ) );
+				ai1wm_deactivate_sitewide_plugins( array(
+					'really-simple-ssl/rlrsssl-really-simple-ssl.php',
+					'wordpress-https/wordpress-https.php',
+				) );
 			}
 
 			// Deactivate Jetpack Photon module
@@ -84,9 +87,12 @@ class Ai1wmme_Import_Done {
 					ai1wm_activate_stylesheet( $stylesheet );
 				}
 
-				// Deactivate Really Simple SSL plugin
+				// Deactivate Really Simple SSL and WordPress HTTPS (SSL) plugins
 				if ( ! is_ssl() ) {
-					ai1wm_deactivate_plugins( array( 'really-simple-ssl/rlrsssl-really-simple-ssl.php' ) );
+					ai1wm_deactivate_plugins( array(
+						'really-simple-ssl/rlrsssl-really-simple-ssl.php',
+						'wordpress-https/wordpress-https.php',
+					) );
 				}
 
 				// Deactivate Jetpack Photon module

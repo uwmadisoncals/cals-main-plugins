@@ -812,7 +812,7 @@ function mc_show_block( $field, $has_data, $data, $echo = true, $default = '' ) 
 			}
 			break;
 		case 'event_author' :
-			if ( $show_block && is_object( $data ) && $data->event_author === '0' ) {
+			if ( $show_block && is_object( $data ) && ( $data->event_author === '0' || !get_user_by( 'ID', $data->event_author ) ) ) {
 				$author = ( empty( $data->event_author ) ) ? $user_ID : $data->event_author;
 				$select = mc_selected_users( $author, 'authors' );
 				$return = '
@@ -2357,15 +2357,19 @@ function mc_check_data( $action, $post, $i ) {
 	return $data;
 }
 
+/*
+SELECT occur_id FROM wp_my_calendar_events JOIN ( wp_my_calendar ON event_id=occur_event_id) WHERE event_label = 'Wells Hall' AND ( occur_begin BETWEEN '2017-09-13 21:45:00' AND '2017-09-13 23:15:00' OR occur_end BETWEEN '2017-09-13 21:45:00' AND '2017-09-13 23:15:00')
+*/
+
 function mcs_check_conflicts( $begin, $time, $end, $endtime, $event_label ) {
 	global $wpdb;
-	$select_location = ( $event_label != '' ) ? "event_label = '$event_label'AND" : '';
+	$select_location = ( $event_label != '' ) ? "event_label = '$event_label' AND" : '';
 	$event_query     = "SELECT occur_id 
-					FROM " . my_calendar_table() . "
-					ON ( " . my_calendar_event_table() . "
-					JOIN event_id=occur_event_id) 
+					FROM " . my_calendar_event_table() . "
+					JOIN " . my_calendar_table() . "
+					ON (event_id=occur_event_id) 
 					WHERE $select_location
-					( occur_begin BETWEEN '$begin $time'AND '$end $endtime'OR occur_end BETWEEN '$begin $time'AND '$end $endtime')";
+					( occur_begin BETWEEN '$begin $time' AND '$end $endtime' OR occur_end BETWEEN '$begin $time' AND '$end $endtime')";
 	$results         = $wpdb->get_results( $event_query );
 
 	return ( ! empty( $results ) ) ? $results : false;

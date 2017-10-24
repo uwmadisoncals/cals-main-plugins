@@ -3,7 +3,7 @@
 // Conatins lightbox modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaLightboxVersion = '6.6.27';
+var wppaLightboxVersion = '6.7.06';
 
 // Global inits
 var wppaNormsBtnOpac 		= 0.75;
@@ -339,7 +339,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 		wppaOvlImgs[idx] 			= new Image();
 		wppaOvlImgs[idx].src 		= wppaOvlUrls[idx];	// Preload
 		wppaConsoleLog( 'Preloading ' + ( idx + 1 ) + '/' + wppaOvlUrls.length + ' (current)' );
-		if ( ! wppaOvlImgs[idx].complete ) {
+		if ( ! wppaIsIe && ! wppaOvlImgs[idx].complete ) {
 			wppaConsoleLog( 'Retrying preload current image' );
 			setTimeout( '_wppaOvlShow(' + idx + ')', 100 );
 			return;
@@ -936,7 +936,7 @@ wppaConsoleLog( 'wppaOvlFormatFull '+wppaOvlMode );
 	}
 	else {
 		img 		= document.getElementById( 'wppa-overlay-img' );
-		if ( ! img || ! img.complete ) {
+		if ( ! wppaIsIe && ( ! img || ! img.complete ) ) {
 
 			// Wait for load complete
 			setTimeout( 'wppaOvlFormatFull()', 100 );
@@ -1119,7 +1119,7 @@ wppaConsoleLog( 'wppaOvlRun, running='+wppaOvlRunning );
 	if ( ! wppaIsVideo ) {
 		var elm = document.getElementById( 'wppa-overlay-img' );
 		if ( elm ) {
-			if ( ! elm.complete ) {
+			if ( ! wppaIsIe && ! elm.complete ) {
 				wppaConsoleLog( 'Wait during run' );
 				setTimeout( 'wppaOvlRun()', 500 );
 				return;

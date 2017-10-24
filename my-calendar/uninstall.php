@@ -95,6 +95,7 @@ if ( ! defined( 'ABSPATH' ) && ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	delete_option( 'mc_open_day_uri' );
 	delete_option( 'mc_open_uri' );
 	delete_option( 'mc_show_list_info' );
+	delete_option( 'mc_show_list_events' );
 	delete_option( 'mc_event_link' );
 	delete_option( 'mc_default_category' );
 	delete_option( 'mc_inverse_color' );

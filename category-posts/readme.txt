@@ -4,7 +4,7 @@ Donate link: http://mkrdip.me/donate
 Tags: category, categories, posts, widget, posts widget, recent posts, category recent posts, shortcode, sidebar, excerpt, multiple widgets
 Requires at least: 2.8
 Tested up to: 4.9
-Stable tag: 4.7.3
+Stable tag: 4.7.4
 License: GPLv2 or later 
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,9 @@ We know there are peopel how use PHP 5.2 [wordpress.org/about/stats](https://wor
 
 == Changelog ==
 [Read more on our blog ...](http://tiptoppress.com/category/category-posts-widget?utm_source=wordpress_org&utm_campaign=changelog_cpw&utm_medium=web)
+
+= 4.7.4 - October 21th 2017 =
+* Bugfix for filter by post status (note private)
 
 = 4.7.3 - October 10th 2017 =
 * Add option to filter by post status

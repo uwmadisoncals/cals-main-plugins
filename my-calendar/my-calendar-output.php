@@ -511,9 +511,12 @@ function mc_edit_panel( $html, $event, $type, $time ) {
 	return $html . $edit;
 }
 
-function mc_build_date_switcher( $type = 'calendar', $cid = 'all', $time = 'month' ) {
+function mc_build_date_switcher( $type = 'calendar', $cid = 'all', $time = 'month', $date = array() ) {
 	global $wpdb;
 	$mcdb = $wpdb;
+	$c_month = isset( $date['month'] ) ? $date['month'] : date( "n", current_time( 'timestamp' ) );
+	$c_year  = isset( $date['year'] ) ? $date['year'] : date( "Y", current_time( 'timestamp' ) );
+	$c_day   = isset( $date['day'] ) ? $date['day'] : date( "j", current_time( 'timestamp' ) );
 	if ( get_option( 'mc_remote' ) == 'true' && function_exists( 'mc_remote_db' ) ) {
 		$mcdb = mc_remote_db();
 	}
@@ -544,7 +547,7 @@ function mc_build_date_switcher( $type = 'calendar', $cid = 'all', $time = 'mont
 		$day_switcher = '
           <label class="maybe-hide" for="' . $cid . '-day">' . __( 'Day', 'my-calendar' ) . ':</label> <select id="' . $cid . '-day" name="dy">' . "\n";
 		for ( $i = 1; $i <= 31; $i++ ) {
-			$day_switcher .= "<option value='$i'" . mc_day_comparison( $i ) . '>' . $i . '</option>' . "\n";
+			$day_switcher .= "<option value='$i'" . selected( $i, $c_day, false ) . '>' . $i . '</option>' . "\n";
 		}
 		$day_switcher .= '</select>';
 	}
@@ -552,7 +555,9 @@ function mc_build_date_switcher( $type = 'calendar', $cid = 'all', $time = 'mont
 	$date_switcher .= '
             <label class="maybe-hide" for="' . $cid . '-month">' . __( 'Month', 'my-calendar' ) . ':</label> <select id="' . $cid . '-month" name="month">' . "\n";
 	for ( $i = 1; $i <= 12; $i ++ ) {
-		$date_switcher .= "<option value='$i'" . mc_month_comparison( $i ) . '>' . date_i18n( 'F', mktime( 0, 0, 0, $i, 1 ) ) . '</option>' . "\n";
+		$test    = str_pad( $i, 2, '0', STR_PAD_LEFT );
+		$c_month = str_pad( $c_month, 2, '0', STR_PAD_LEFT );
+		$date_switcher .= "<option value='$i'" . selected( $test, $c_month, false ) . '>' . date_i18n( 'F', mktime( 0, 0, 0, $i, 1 ) ) . '</option>' . "\n";
 	}
 	$date_switcher .= '</select>' . "\n" . '
             <label class="maybe-hide" for="' . $cid . '-year">' . __( 'Year', 'my-calendar' ) . ':</label> <select id="' . $cid . '-year" name="yr">' . "\n";
@@ -569,19 +574,19 @@ function mc_build_date_switcher( $type = 'calendar', $cid = 'all', $time = 'mont
 	while ( $past > 0 ) {
 		$p .= '<option value="';
 		$p .= date( "Y", time() + ( $offset ) ) - $past;
-		$p .= '"' . mc_year_comparison( date( "Y", time() + ( $offset ) ) - $past ) . '>';
+		$p .= '"' . selected( date( "Y", time() + ( $offset ) ) - $past, $c_year, false ) . '>';
 		$p .= date( "Y", time() + ( $offset ) ) - $past . "</option>\n";
 		$past = $past - 1;
 	}
 	while ( $fut < $future ) {
 		$f .= '<option value="';
 		$f .= date( "Y", time() + ( $offset ) ) + $fut;
-		$f .= '"' . mc_year_comparison( date( "Y", time() + ( $offset ) ) + $fut ) . '>';
+		$f .= '"' . selected( date( "Y", time() + ( $offset ) ) + $fut, $c_year, false ) . '>';
 		$f .= date( "Y", time() + ( $offset ) ) + $fut . "</option>\n";
 		$fut = $fut + 1;
 	}
 	$date_switcher .= $p;
-	$date_switcher .= '<option value="' . date( "Y", time() + ( $offset ) ) . '"' . mc_year_comparison( date( "Y", time() + ( $offset ) ) ) . '>' . date( "Y", time() + ( $offset ) ) . "</option>\n";
+	$date_switcher .= '<option value="' . date( "Y", time() + ( $offset ) ) . '"' . selected( date( "Y", time() + ( $offset ) ), $c_year, false ) . '>' . date( "Y", time() + ( $offset ) ) . "</option>\n";
 	$date_switcher .= $f;
 	$date_switcher .= '</select> ' . $day_switcher . '<input type="submit" class="button" value="' . __( 'Go', 'my-calendar' ) . '" /></div>
 	</form></div>';
@@ -724,6 +729,13 @@ function mc_events_class( $events, $date = false ) {
 	return $events_class;
 }
 
+/**
+ * List first selected event + event count
+ *
+ * @arg $events Array of event objects
+ *
+ * @return string
+ */
 function mc_list_title( $events ) {
 	usort( $events, 'my_calendar_time_cmp' );
 	$now   = $events[0];
@@ -740,6 +752,32 @@ function mc_list_title( $events ) {
 	return $title;
 }
 
+/**
+ * List all events viewable in this context
+ *
+ * @arg $events Array of event objects
+ *
+ * @return string
+ */
+function mc_list_titles( $events ) {
+	usort( $events, 'my_calendar_time_cmp' );
+	$titles = '';
+	
+	foreach( $events as $event ) {
+		$title = apply_filters( 'mc_list_event_title_hint', mc_kses_post( stripcslashes( $event->event_title ) ), $event, $events );
+		$titles .= ( $titles != '' ) ? "<br />" . $title : $title;
+	}
+	
+	return "<span class='mc-list-event'>$titles</span>";
+}
+
+/**
+ * Output search results for a given query
+ *
+ * @param $query (mixed, array or string) Search query
+ * 
+ * @return string HTML output
+ */
 function mc_search_results( $query ) {
 	$before = apply_filters( 'mc_past_search_results', 0, 'basic' );
 	$after  = apply_filters( 'mc_future_search_results', 10, 'basic' ); // return only future events, nearest 10
@@ -754,8 +792,6 @@ function mc_search_results( $query ) {
 	}
 	
 	$event_array = mc_get_search_results( $search );
-
-	//$event_array = mc_flatten_array( $event_array );
 
 	if ( ! empty( $event_array ) ) {
 		$template = '<strong>{date}</strong> {title} {details}';
@@ -900,11 +936,17 @@ function mc_show_search_results( $content ) {
 add_action( 'template_redirect', 'mc_hidden_event' );
 function mc_hidden_event() {
 	$do_redirect = false;
+	$is_404      = false;
 	if ( isset( $_GET['mc_id'] ) ) {
 		$mc_id = intval( $_GET['mc_id'] );
-		$event = mc_get_event( $mc_id, 'object' );
-		if ( mc_event_is_hidden( $event ) ) {
+		if ( !mc_valid_id( $mc_id ) ) {
 			$do_redirect = true;
+			$is_404      = true;
+		} else {
+			$event = mc_get_event( $mc_id, 'object' );
+			if ( mc_event_is_hidden( $event ) ) {
+				$do_redirect = true;
+			}
 		}
 	} else {
 		global $wp_query;
@@ -930,7 +972,13 @@ function mc_hidden_event() {
 		if ( $id ) {
 			$uri = get_permalink( $id );
 		}
-		wp_safe_redirect( $uri );			
+		if ( !$is_404 ) {
+			wp_safe_redirect( $uri );	
+		} else {
+			global $wp_query;
+			$wp_query->set_404();
+			status_header( 404 );
+		}		
 	}
 }
 
@@ -1090,8 +1138,13 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 	}
 	$format      = apply_filters( 'mc_display_format', $format, $args );
 	
-	// mc body wrapper
-	$mc_wrapper = "<div id=\"$id\" class=\"mc-main mcjs $format $time $main_class\" aria-live='assertive' aria-atomic='true'>";
+	// mc body wrapper - what JS blocks are enabled?
+	$list_js_class = ( get_option( 'mc_list_javascript' ) == 0 )     ? 'listjs' : '';
+	$grid_js_class = ( get_option( 'mc_calendar_javascript' ) == 0 ) ? 'gridjs' : '';
+	$mini_js_class = ( get_option( 'mc_mini_javascript' ) == 0 )     ? 'minijs' : '';
+	$ajax_js_class = ( get_option( 'mc_ajax_javascript' ) == 0 )     ? 'ajaxjs' : '';
+	
+	$mc_wrapper = "<div id=\"$id\" class=\"mc-main mcjs $list_js_class $grid_js_class $mini_js_class $ajax_js_class $format $time $main_class\" aria-live='assertive' aria-atomic='true'>";
 	$mc_closer  = "</div>";
 
 	$date_format = ( get_option( 'mc_date_format' ) != '' ) ? get_option( 'mc_date_format' ) : get_option( 'date_format' );
@@ -1326,7 +1379,7 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 		}
 		// set up date switcher
 		if ( in_array( 'jump', $used ) ) {
-			$jump = ( $time != 'week' ) ? mc_build_date_switcher( $format, $main_class, $time ) : '';
+			$jump = ( $time != 'week' ) ? mc_build_date_switcher( $format, $main_class, $time, array( 'month' => $c_month, 'day' => $c_day, 'year' => $c_year ) ) : '';
 		}
 		// set up above-calendar order of fields
 		if ( get_option( 'mc_topnav' ) != '' ) {
@@ -1580,7 +1633,9 @@ function my_calendar( $name, $format, $category, $time = 'month', $ltype = '', $
 									$weekend_class = ( $is_weekend ) ? 'weekend' : '';
 									if ( $format == "list" ) {
 										if ( get_option( 'mc_show_list_info' ) == 'true' ) {
-											$title = ' - ' . $is_anchor . "<span class='mc-list-details'>" . mc_list_title( $events ) . "</span>" . $is_close_anchor;
+											$title = ' - ' . $is_anchor . "<span class='mc-list-details select-event'>" . mc_list_title( $events ) . "</span>" . $is_close_anchor;
+										} else if ( get_option( 'mc_show_list_events' ) == 'true' ) {
+											$title = ' - ' . $is_anchor . "<span class='mc-list-details all-events'>" . mc_list_titles( $events ) . "</span>" . $is_close_anchor;
 										} else {
 											$title = '';
 										}
@@ -2082,7 +2137,7 @@ function mc_build_url( $add, $subtract, $root = '' ) {
 	unset( $variables['page_id'] );
 	$home = add_query_arg( $variables, $home );
 	
-	return esc_url( $home );
+	return $home;
 }
 
 function my_calendar_show_locations( $datatype = 'name', $template = '' ) {

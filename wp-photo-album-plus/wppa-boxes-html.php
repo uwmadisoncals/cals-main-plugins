@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.7.04
+* Version 6.7.06
 *
 */
 
@@ -4115,7 +4115,30 @@ function wppa_bestof_html( $args, $widget = true ) {
 						$result .= wppa_get_medal_html_a( array( 'id' => $id, 'size' => 'M', 'where' => 'top' ) );
 
 						// The link if any
-						if ( $linktype != 'none' ) {
+						if ( $linktype == 'lightboxsingle' ) {
+							$lbtitle 	= wppa_get_lbtitle( 'sphoto', $id );
+							$videobody 	= esc_attr( wppa_get_video_body( $id ) );
+							$audiobody 	= esc_attr( wppa_get_audio_body( $id ) );
+							$videox 	= wppa_get_videox( $id );
+							$videoy 	= wppa_get_videoy( $id );
+							$result .=
+							'<a' .
+								' href="' . wppa_get_photo_url( $id ) . '"' .
+								( $lbtitle ? ' ' . wppa( 'lbtitle' ) . '="'.$lbtitle.'"' : '' ) .
+								( $videobody ? ' data-videohtml="' . $videobody . '"' : '' ) .
+								( $audiobody ? ' data-audiohtml="' . $audiobody . '"' : '' ) .
+								( $videox ? ' data-videonatwidth="' . $videox . '"' : '' ) .
+								( $videoy ? ' data-videonatheight="' . $videoy . '"' : '' ) .
+								' ' . wppa( 'rel' ) . '="'.wppa_opt( 'lightbox_name' ).'"' .
+					//			( $link['target'] ? ' target="' . $link['target'] . '"' : '' ) .
+								' class="thumb-img"' .
+								' id="a-' . $id . '-' . wppa( 'mocc' ) . '"' .
+								' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
+								' style="cursor:url( ' . wppa_get_imgdir() . wppa_opt( 'magnifier' ) . ' ),pointer;"' .
+								' title="' . wppa_zoom_in( $id ) . '"' .
+								' >';
+						}
+						elseif ( $linktype != 'none' ) {
 							switch ( $linktype ) {
 								case 'owneralbums':
 									$href = wppa_get_permalink( $page ).'wppa-cover=1&amp;wppa-owner='.$thumb['owner'].'&amp;wppa-occur=1';

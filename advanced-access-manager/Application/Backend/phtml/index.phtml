@@ -16,7 +16,7 @@
                         </h3>
                         <div class="inside" id="access-manager-inside">
                             <div class="aam-postbox-inside" id="aam-content">
-                                <p class="alert alert-info text-larger text-center" id="aam-initial-load"><?php echo AAM_Backend_View_Helper::preparePhrase('[Loading AAM UI]. Please wait few seconds. If content will not load within next 30 seconds, clear your browser cache and reload the page. If still nothing, it is most likely some sort of JavaScript or CSS conflict with one your active plugins or theme. [Contact as immediately if you are having troubles with loading AAM].', 'strong', 'strong'); ?></p>
+                                <p class="alert alert-info text-larger text-center" id="aam-initial-load"><?php echo AAM_Backend_View_Helper::preparePhrase('[Loading AAM UI]. Please wait few seconds. If content will not load within next 30 seconds, clear your browser cache and reload the page. If still nothing, it is most likely some sort of JavaScript or CSS conflict with one your active plugins or theme.', 'strong'); ?></p>
                             </div>
                             <div class="aam-help-context" >
                                 <div class="text-justify aam-large-padding">
@@ -51,6 +51,27 @@
                         </div>
                     </div>
                 <?php } ?>
+                
+                <div class="metabox-holder">
+                    <div class="postbox">
+                        <div class="inside">
+                            <div class="aam-social">
+                                <a href="https://aamplugin.com/help" title="Help" target="_blank">
+                                    <i class="icon-help-circled"></i>
+                                    <span>Help</span>
+                                </a>
+                                <a target="_blank" href="mailto:support@aamplugin.com">
+                                    <i class="icon-mail-alt"></i>
+                                    <span>Email Us</span>
+                                </a>
+                                <a href="https://wordpress.org/support/plugin/advanced-access-manager/reviews/" title="Rate Me" target="_blank">
+                                    <i class="icon-star"></i>
+                                    <span>Reviews</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <?php if (is_network_admin() && !defined('AAM_MULTISITE')) { ?>
                     <div class="metabox-holder">
@@ -242,39 +263,6 @@
                 </div>
                 
                 <?php do_action('aam-sidebar-ui-action', 'bottom'); ?>
-                
-                <div class="metabox-holder">
-                    <div class="postbox">
-                        <div class="inside">
-                            <div class="aam-social">
-                                <a href="https://aamplugin.com/help" title="Help" target="_blank">
-                                    <i class="icon-help-circled"></i>
-                                    <span>Help</span>
-                                </a>
-                                <a href="https://wordpress.org/support/plugin/advanced-access-manager/reviews/" title="Rate Me" target="_blank">
-                                    <i class="icon-star"></i>
-                                    <span>Reviews</span>
-                                </a>
-                                <a target="_blank" href="https://aamplugin.com">
-                                    <i class="icon-home"></i>
-                                    <span>Website</span>
-                                </a>
-                                <a target="_blank" href="mailto:support@aamplugin.com">
-                                    <i class="icon-mail-alt"></i>
-                                    <span>Email</span>
-                                </a>
-                            </div>
-                            
-                            <hr/>
-                            
-                            <div class="text-center">
-                                <p class="aam-promo"><strong>NEED HELP FASTER?</strong><br/>Get in touch with Google Hangouts.<br/><b>It is free.</b></p>
-                                <a href="mailto:support@aamplugin.com" class="btn btn-success" target="_blank"><i class="icon-chat-empty"></i> support@aamplugin.com</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
             </div>
         </div>
     </div>

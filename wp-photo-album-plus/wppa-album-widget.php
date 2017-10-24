@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 6.7.01
+* Version 6.7.06
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -26,6 +26,10 @@ class AlbumWidget extends WP_Widget {
 		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
 		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
 		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
+
+		// For widget display at backend: wppa_get_coverphoto_id()
+		require_once( dirname( __FILE__ ) . '/wppa-album-covers.php' );
+		
 		wppa_initialize_runtime();
 
 		wppa( 'in_widget', 'alb' );

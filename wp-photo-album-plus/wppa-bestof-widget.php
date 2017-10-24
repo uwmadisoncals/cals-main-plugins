@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the best rated photos
-* Version 6.7.01
+* Version 6.7.06
 *
 */
 
@@ -188,6 +188,7 @@ class BestOfWidget extends WP_Widget {
 								__( 'The photos in the authors album(s), slideshow', 'wp-photo-album-plus' ),
 								__( 'All the authors photos, thumbnails', 'wp-photo-album-plus' ),
 								__( 'All the authors photos, slideshow', 'wp-photo-album-plus' ),
+								__( 'Lightbox single image', 'wp-photo-album-plus' ),
 								);
 		$values 	= array( 	'none',
 								'owneralbums',
@@ -195,6 +196,7 @@ class BestOfWidget extends WP_Widget {
 								'ownerphotosslide',
 								'upldrphotos',
 								'upldrphotosslide',
+								'lightboxsingle',
 								);
 		echo
 		wppa_widget_selection( $this, 'linktype', $instance['linktype'], __( 'Link to', 'wp-photo-album-plus' ), $options, $values, array(), '' );

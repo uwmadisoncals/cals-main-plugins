@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Frontend links
-* Version 6.7.02
+* Version 6.7.06
 *
 */
 
@@ -790,6 +790,7 @@ function wppa_album_number_to_name_in_uri( $uri ) {
 function wppa_moderate_links( $type, $id, $comid = '' ) {
 
 	$thumb = wppa_cache_thumb( $id );
+	$result = '';
 
 	if ( current_user_can('wppa_moderate') || ( current_user_can('wppa_comments') && $type == 'comment' ) ) {
 		switch ( $type ) {
@@ -855,14 +856,14 @@ function wppa_moderate_links( $type, $id, $comid = '' ) {
 				break;
 		}
 	}
-	else {
+//	else {
 		if ( $type == 'comment' || $thumb['status'] != 'scheduled' ) {
-			$result = '<div style="clear:both; color:red">'.__('Awaiting moderation', 'wp-photo-album-plus').'</div>';
+			$result .= '<div style="clear:both; color:red">'.__('Awaiting moderation', 'wp-photo-album-plus').'</div>';
 		}
 		else {
-			$result = '<div style="clear:both; color:red">'.sprintf( __( 'Scheduled for %s' , 'wp-photo-album-plus'), wppa_format_scheduledtm( $thumb['scheduledtm'] ) ).'</div>';
+			$result .= '<div style="clear:both; color:red">'.sprintf( __( 'Scheduled for %s' , 'wp-photo-album-plus'), wppa_format_scheduledtm( $thumb['scheduledtm'] ) ).'</div>';
 		}
-	}
+//	}
 	return $result;
 }
 

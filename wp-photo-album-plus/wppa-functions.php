@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.7.05
+* Version 6.7.06
 *
 */
 
@@ -3780,6 +3780,7 @@ function wppa_get_cover_width( $type, $numeric = false ) {
 	if ( $numeric ) {
 		$result = str_replace( 'width:', '', $result );
 		if ( strpos( $result, '%' ) ) {
+			$result = str_replace( '%', '', $result );
 			$result = $result * wppa_opt( 'initial_colwidth' ) / '100';
 		}
 		else {
@@ -4833,7 +4834,10 @@ function wppa_fe_add_tags( $id ) {
 	else {
 		$newt = '';
 	}
+
+	$tags = urldecode( $tags );
 	$tags = wppa_sanitize_tags( str_replace( array( '\'', '"' ), ',', wppa_filter_iptc( wppa_filter_exif( $tags, $id ), $id ) ) );
+
 	if ( $tags != $oldt ) {					// Added tag(s)
 		wppa_update_photo( array( 'id' => $id, 'tags' => $tags ) );
 	}

@@ -483,3 +483,10 @@
     padding: 10px;
     max-width: 100%;
 }
+
+.mc-list-details.all-events {
+	text-align: left;
+	display: inline-block;
+	text-transform: none;
+	padding-left: 2em;
+}

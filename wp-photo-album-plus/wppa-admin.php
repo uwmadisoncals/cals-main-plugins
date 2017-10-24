@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version 6.6.30
+* Version 6.7.06
 *
 */
 
@@ -207,3 +207,101 @@ add_action( 'admin_init', 'wppa_check_tag_system' );
 
 // Check if cats system needs conversion
 add_action( 'admin_init', 'wppa_check_cat_system' );
+
+// Activity feed
+if ( true ) {
+	add_action( 'do_meta_boxes', 'wppa_activity' );
+}
+function wppa_activity(){
+	if ( function_exists( 'wp_add_dashboard_widget' ) ) {
+		wp_add_dashboard_widget( 'wppa-activity', __( 'Recent WPPA activity', 'wp-photo-album-plus' ), 'wppa_show_activity_feed' ); //, $control_callback = null, $callback_args = null ) 
+	}
+}
+function wppa_show_activity_feed() {
+global $wpdb;
+
+	// Recently uploaded photos
+	echo '<h3>' . __( 'Recently uploaded photos', 'wp-photo-album-plus' ) . '</h3>';
+	$photos = $wpdb->get_results( "SELECT * FROM `" . WPPA_PHOTOS . "` ORDER BY `timestamp` DESC LIMIT 5", ARRAY_A );
+	if ( ! empty( $photos ) ) {
+		echo
+		'<table>';
+		foreach( $photos as $photo ) {
+			echo 
+			'<tr>' .
+				'<td>' .
+					'<a href="' . wppa_get_photo_url( $photo['id'] ) . '" target="_blank" >' . 
+						'<img src="' . wppa_get_thumb_url( $photo['id'] ) . '" style="max-width:50px;max-height:50px;" /> ' .
+					'</a>' .
+				'</td>' .
+				'<td>';
+					$usr = wppa_get_user_by( 'login', $photo['owner'] );
+					$usr = $usr -> display_name;
+					if ( ! $usr ) {
+						$usr = $photo['owner'];
+					}
+					echo
+					sprintf( 	__( 'by %s in album %s', 'wp-photo-album-plus' ), 
+								'<b>' . $usr . '</b>', 
+								'<b>' . wppa_get_album_name( $photo['album'] ) . '</b> (' . $photo['album'] . ')' 
+								) .
+					'<br />' .
+					wppa_local_date( '', $photo['timestamp'] ) .
+				'</td>' .
+			'</tr />';			
+		}
+		echo
+		'</table>';
+	}
+	else {
+		echo 
+		'<p>' .
+			__( 'There are no recently uploaded photos', 'wp-photo-album-plus' ) .
+		'</p>';
+	}
+	echo '<br />';
+	
+	// Recent comments
+	echo '<h3>' . __( 'Recent comments on photos', 'wp-photo-album-plus' ) . '</h3>';
+	$comments = $wpdb->get_results( "SELECT * FROM `" . WPPA_COMMENTS . "` ORDER BY `timestamp` DESC LIMIT 5", ARRAY_A );
+	if ( ! empty( $comments ) ) {
+		echo
+		'<table>';
+		foreach( $comments as $comment ) {
+			$photo = wppa_cache_photo( $comment['photo'] );
+			echo
+			'<tr>' .
+				'<td>' .
+					'<a href="' . wppa_get_photo_url( $photo['id'] ) . '" target="_blank" >' . 
+						'<img src="' . wppa_get_thumb_url( $photo['id'] ) . '" style="max-width:50px;max-height:50px;" /> ' .
+					'</a>' .
+				'</td>' .
+				'<td>';
+					$usr = wppa_get_user_by( 'login', $comment['user'] );
+					if ( $usr ) {
+						$usr = $usr->display_name;
+					}
+					else {
+						$usr = $comment['user'];
+					}
+					echo 
+					'<i>' . $comment['comment'] . '</i>' .
+					'<br />' .
+					sprintf(	__( 'by %s', 'wp-photo-album-plus' ),
+								'<b>' . $usr . '</b>' ) .
+					'<br />' .
+					wppa_local_date( '', $photo['timestamp'] ) .
+				'</td>' .
+			'</tr>';
+		}
+		echo
+		'</table>';
+	}
+	else {
+		echo 
+		'<p>' .
+			__( 'There are no recent comments on photos', 'wp-photo-album-plus' ) .
+		'</p>';
+	}
+
+}

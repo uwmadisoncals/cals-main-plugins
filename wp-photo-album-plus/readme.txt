@@ -2,12 +2,12 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick, pdf
-Version: 6.7.05
-Stable tag: 6.7.04
+Version: 6.7.06
+Stable tag: 6.7.05
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
-Tested up to: 4.8
+Tested up to: 4.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,6 +126,24 @@ If this happens, make sure (ask your hosting provider) that you have all the rig
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.7.06 =
+
+= Bug Fixes =
+
+* Fixed hanging lightbox on old versions of Internet Explorer.
+* Album widget frontend display on backend failed due to undefined function wppa_get_coverphoto_id(). Fixed.
+* At frontend upload: selected photo tags lost accented characters. Fixed.
+* Fixed an un-well formed numeric value error in php 7.
+
+= New Features =
+
+* Added activity widget on wp desktop
+* Added link to lightbox single image on the BestOf widget.
+
+= Other Changes =
+
+* For clarity: The texts 'Awaiting moderation' and 'Scheduled for XXXX' are now also displayed for the owner of the photo and users with moderate rights where it applies.
 
 = 6.7.05 =
 

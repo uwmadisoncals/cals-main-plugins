@@ -140,5 +140,6 @@ button.mc-text-button:hover, button .mc-text-button:focus {
 	max-width: none ! important; 
 }
 
-.mcjs.mc-main .details, .mcjs.mc-main .calendar-events { display: none; }
+.mcjs.mc-main.listjs .details, .mcjs.mc-main.gridjs .calendar-events { display: none; }
 .mcjs.mc-main .single-event .details, .mcjs.mc-main .list.day .details { display: block; }
+

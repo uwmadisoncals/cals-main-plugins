@@ -4,7 +4,7 @@ Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
 Tested up to: 4.8
-Stable tag: 2.5.13
+Stable tag: 2.5.15
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -83,6 +83,21 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
    
 == Changelog ==
 
+= 2.5.15 =
+
+* Bug fix: Jumpbox rendered October as January due to unneeded character replacement
+
+= 2.5.14 =
+
+* Bug fix: saving setting for main calendar URL from front page doesn't work
+* Bug fix: esc_url only in appropriate places
+* Bug fix: Recognize month parameter from shortcode in navigation elements
+* Bug fix: 404s for deleted events
+* Bug fix: Print styles handle date in week view better
+* Bug fix: Events not visible in list with list JS disabled
+* Bug fix: SQL query for conflict checking threw errors
+* New option: list all events in list view with JS
+
 = 2.5.13 =
 
 * Bug fix: Categories can not be part of the md5 hash used to identify unique tables (breaks AJAX nav for categories)
@@ -93,7 +108,6 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 * Bug fix: JetPack Grunion Contact form interfered with TinyMCE in contexts outside of post editor (https://github.com/Automattic/jetpack/issues/7598)
 * Bug fix: ensure date is retained if datepicker disabled
 * Bug fix: archived events filter marked as active when not
-* 
 
 = 2.5.12 = 
 

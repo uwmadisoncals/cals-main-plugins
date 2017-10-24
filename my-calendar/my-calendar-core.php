@@ -375,6 +375,7 @@ $script = '
 			$inner = apply_filters( 'mc_filter_javascript_footer', $inner );
 			echo ( $inner != '' ) ? $script . $mcjs : '';
 		} else {
+			$enqueue_mcjs = false;
 			if ( @in_array( $id, $pages ) || get_option( 'mc_show_js' ) == '' ) {
 				if ( get_option( 'mc_calendar_javascript' ) != 1 && get_option( 'mc_open_uri' ) != 'true' ) {
 					$url = apply_filters( 'mc_grid_js', plugins_url( 'js/mc-grid.js', __FILE__ ) );
@@ -872,45 +873,6 @@ function mc_is_selected( $theFieldname, $theValue, $theArray = '' ) {
 		if ( $theSetting[ $theArray ]['enabled'] == $theValue ) {
 			return 'selected="selected"';
 		}
-	}
-
-	return '';
-}
-
-function mc_month_comparison( $month ) {
-	$current_month = date( "n", current_time( 'timestamp' ) );
-	if ( isset( $_GET['yr'] ) && isset( $_GET['month'] ) ) {
-		if ( $month == $_GET['month'] ) {
-			return ' selected="selected"';
-		}
-	} elseif ( $month == $current_month ) {
-		return ' selected="selected"';
-	}
-
-	return '';
-}
-
-function mc_day_comparison( $day ) {
-	$current_day = date( "j", current_time( 'timestamp' ) );
-	if ( isset( $_GET['yr'] ) && isset( $_GET['month'] ) && isset( $_GET['dy'] ) ) {
-		if ( $day == $_GET['dy'] ) {
-			return ' selected="selected"';
-		}
-	} else if ( $day == $current_day ) {
-		return ' selected="selected"';
-	}
-
-	return '';
-}
-
-function mc_year_comparison( $year ) {
-	$current_year = date( "Y", current_time( 'timestamp' ) );
-	if ( isset( $_GET['yr'] ) && isset( $_GET['month'] ) ) {
-		if ( $year == $_GET['yr'] ) {
-			return ' selected="selected"';
-		}
-	} else if ( $year == $current_year ) {
-		return ' selected="selected"';
 	}
 
 	return '';
