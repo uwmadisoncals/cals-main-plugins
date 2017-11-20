@@ -97,7 +97,12 @@ function pmpro_setOption($s, $v = NULL, $sanitize_function = 'sanitize_text_fiel
 {
 	//no value is given, set v to the p var
 	if($v === NULL && isset($_POST[$s]))
-		$v = call_user_func($sanitize_function, $_POST[$s]);
+	{	
+		if(is_array($_POST[$s]))
+			$v = array_map($sanitize_function, $_POST[$s]);
+		else
+			$v = call_user_func($sanitize_function, $_POST[$s]);
+	}
 
 	if(is_array($v))
 		$v = implode(",", $v);
@@ -151,11 +156,15 @@ function pmpro_url($page = NULL, $querystring = "", $scheme = NULL)
 	//figure out querystring
 	$querystring = str_replace("?", "", $querystring);
 	parse_str( $querystring, $query_args );
-	$url = esc_url_raw( add_query_arg( $query_args, $url ) );
+	
+	if(!empty($url)) {
+		
+		$url = esc_url_raw( add_query_arg( $query_args, $url ) );
 
-	//figure out scheme
-	if(is_ssl())
-		$url = str_replace("http:", "https:", $url);
+		//figure out scheme
+		if(is_ssl())
+			$url = str_replace("http:", "https:", $url);
+	}
 
 	return $url;
 }
@@ -1868,7 +1877,8 @@ function pmpro_getMembershipLevelsForUser($user_id = NULL, $include_inactive = f
 								UNIX_TIMESTAMP(enddate) as enddate
 							FROM {$wpdb->pmpro_membership_levels} AS l
 							JOIN {$wpdb->pmpro_memberships_users} AS mu ON (l.id = mu.membership_id)
-							WHERE mu.user_id = $user_id".($include_inactive?"":" AND mu.status = 'active'"));
+							WHERE mu.user_id = $user_id".($include_inactive?"":" AND mu.status = 'active'
+							GROUP BY ID"));
 	/**
 	 * pmpro_get_membership_levels_for_user filter.
 	 *
@@ -2032,24 +2042,28 @@ function pmpro_getCheckoutButton($level_id, $button_text = NULL, $classes = NULL
 	{
 		//get level
 		$level = pmpro_getLevel($level_id);
-
-		//replace vars
-		$replacements = array(
-			"!!id!!" => $level->id,
-			"!!name!!" => $level->name,
-			"!!description!!" => $level->description,
-			"!!confirmation!!" => $level->confirmation,
-			"!!initial_payment!!" => $level->initial_payment,
-			"!!billing_amount!!" => $level->billing_amount,
-			"!!cycle_number!!" => $level->cycle_number,
-			"!!cycle_period!!" => $level->cycle_period,
-			"!!billing_limit!!" => $level->billing_limit,
-			"!!trial_amount!!" => $level->trial_amount,
-			"!!trial_limit!!" => $level->trial_limit,
-			"!!expiration_number!!" => $level->expiration_number,
-			"!!expiration_period!!" => $level->expiration_period
-		);
-		$button_text = str_replace(array_keys($replacements), $replacements, $button_text);
+		
+		if(empty($level))
+			$r = sprintf(__("Level #%s not found.", 'paid-memberships-pro' ), $level_id);
+		else {		
+			//replace vars
+			$replacements = array(
+				"!!id!!" => $level->id,
+				"!!name!!" => $level->name,
+				"!!description!!" => $level->description,
+				"!!confirmation!!" => $level->confirmation,
+				"!!initial_payment!!" => $level->initial_payment,
+				"!!billing_amount!!" => $level->billing_amount,
+				"!!cycle_number!!" => $level->cycle_number,
+				"!!cycle_period!!" => $level->cycle_period,
+				"!!billing_limit!!" => $level->billing_limit,
+				"!!trial_amount!!" => $level->trial_amount,
+				"!!trial_limit!!" => $level->trial_limit,
+				"!!expiration_number!!" => $level->expiration_number,
+				"!!expiration_period!!" => $level->expiration_period
+			);
+			$button_text = str_replace(array_keys($replacements), $replacements, $button_text);
+		}
 
 		//button text
 		$r = "<a href=\"" . pmpro_url("checkout", "?level=" . $level_id) . "\" class=\"" . $classes . "\">" . $button_text . "</a>";

@@ -820,6 +820,8 @@ textarea:-ms-input-placeholder {
 }
 .metaslider-ui .slider-title .metaslider-shortcode {
     border: 0;
+    white-space: nowrap;
+    min-width: 250px;
     box-shadow: none;
     font-family: monospace;
     margin: 0;

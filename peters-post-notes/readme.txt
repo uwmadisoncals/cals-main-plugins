@@ -3,7 +3,7 @@ Contributors: pkthree
 Donate link: http://www.theblog.ca
 Tags: post, notification, admin, collaboration, workflow, posts
 Requires at least: 3.2
-Tested up to: 4.7
+Tested up to: 4.9
 Stable tag: trunk
 
 Add notes to the "edit post" and "edit page" sidebars. Collaborators can also share notes on the WordPress dashboard.
@@ -52,6 +52,9 @@ Unzip the peters\_post\_notes folder to your WordPress plugins folder. It should
 Please visit the plugin page at http://www.theblog.ca/wordpress-post-notes with any questions.
 
 == Changelog ==
+
+= 1.6.5 =
+* 2017-11-18: Add CSRF protection to note deletions and settings updates. (Thanks Jesse!)
 
 = 1.6.4 =
 * 2017-03-11: In the Collaboration Notes dashboard, skip notes attached to non-existent posts. (Thanks Alex!)

@@ -4,10 +4,10 @@ Donate link: https://smartcatdesign.net/downloads/our-team-showcase/
 Tags: team, staff, directory, employees, widget, shortcode, members, carousel, honeycomb, stack, grid, custom, template, social, profile, custom post type, portfolio, profile,meet team, skills, cv,v-card, portal
 Requires at least: 4.6
 Tested up to: 4.8.1
-Stable tag: 4.1.1
+Stable tag: 4.3.0
 License: GPLv2 or later
 
-The best way to display your employees, team members, or any type of list. Multiple appealing templates,SEO friendly, re-order functionality.
+The best way to display your employees, team members, or any type of list. Multiple appealing templates,SEO friendly, re-order, import/export functionality
 
 == Description ==
 
@@ -45,6 +45,7 @@ Available Customizations:
 * Output your team members anywhere with the shortcode [our-team]
 * Team Member contact info & links to social sites
 * Favorite/Recommended content for each Team Member
+* Ability to export and import team member data
 * Easy to setup
 
 Pro Version Features:
@@ -97,6 +98,13 @@ Team Member Details & Icons:
 2. OR - Upload the unpacked folder folder via FTP into /wp-content/plugins
 
 == Changelog == 
+
+= 4.3.1 =
+1. Bug fix impacting group filtering since WP4.9
+
+= 4.3.0 =
+1. Added Import & Export tools
+2. Fixes and cleanup
 
 = 4.2.0 =
 1. Added the ability to set the number of columns from the shortcode

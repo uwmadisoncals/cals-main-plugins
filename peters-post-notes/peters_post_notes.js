@@ -18,7 +18,7 @@ function ppn_ajax_edit_note( note_id, note_text, note_type, is_personal ) {
   return true;
 } // end of JavaScript function ppn_ajax_edit_note
 
-function ppn_ajax_delete_note( note_id, note_type ) {
+function ppn_ajax_delete_note( note_id, note_type, nonce_value ) {
    var petersack = new sack( ajaxurl );    
 
     petersack.execute = 1;
@@ -26,8 +26,9 @@ function ppn_ajax_delete_note( note_id, note_type ) {
     petersack.setVar( "action", "ppn_delete_note" );
     petersack.setVar( "note_id", note_id );
     petersack.setVar( "note_type", note_type );
+    petersack.setVar( "_ajax_nonce", nonce_value );
     petersack.encVar( "cookie", document.cookie, false );
-    petersack.onError = function() { alert('Ajax error in deleting note' )};
+    petersack.onError = function() { alert( 'Ajax error in deleting note' )};
     petersack.runAJAX();
 
   return true;

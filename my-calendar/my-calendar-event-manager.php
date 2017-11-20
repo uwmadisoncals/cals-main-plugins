@@ -127,13 +127,23 @@ function mc_create_event_post( $data, $event_id ) {
 		do_action( 'mc_update_event_post', $post_id, $_POST, $data, $event_id );
 		wp_publish_post( $post_id );	
 	}
+	
 	return $post_id;
 }
 
+/**
+ * Update a single field in an event.
+ *
+ * @param $field string database column
+ * @param $data  mixed value to be saved
+ * @param $event mixed string/integer could be integer or string
+ * @param $type  string signifier representing data type of $event 
+ * 
+ * @return database result
+ */
 function mc_update_event( $field, $data, $event, $type = '%d' ) {
 	global $wpdb;
 	$field  = sanitize_key( $field );
-	$type   = esc_sql( $type );
 	$result = $wpdb->query( $wpdb->prepare( "UPDATE " . my_calendar_table() . " SET $field = $type WHERE event_id=$type", $data, $event ) );
 
 	return $result;
@@ -172,7 +182,7 @@ function manage_my_calendar() {
 				<p><strong><?php _e( 'Delete Event', 'my-calendar' ); ?>
 						:</strong> <?php _e( 'Are you sure you want to delete this event?', 'my-calendar' ); ?>
 					<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/>
-					<input type="hidden" value="delete" name="event_action"/>
+					<input type="hidden" value="delete" name="event_action" />
 					<?php if ( ! empty( $_GET['date'] ) ) { ?>
 						<input type="hidden" name="event_instance" value="<?php echo (int) $_GET['date']; ?>"/>
 					<?php } ?>
@@ -181,8 +191,7 @@ function manage_my_calendar() {
 					<?php } ?>
 
 					<input type="hidden" name="event_id" value="<?php echo $event_id; ?>"/>
-					<input type="submit" name="submit" class="button-secondary delete"
-					       value="<?php _e( 'Delete', 'my-calendar' );
+					<input type="submit" name="submit" class="button-secondary delete" value="<?php _e( 'Delete', 'my-calendar' );
 					       echo " &quot;" . stripslashes( $result[0]['event_title'] ) . "&quot; $instance_date"; ?>"/>
 			</form>
 			</div><?php
@@ -675,6 +684,7 @@ function mc_delete_event( $event_id ) {
 	if ( empty( $event_id ) ) {
 		$message = "<div class='error'><p><strong>" . __( 'Error', 'my-calendar' ) . ":</strong>" . __( "You can't delete an event if you haven't submitted an event id", 'my-calendar' ) . "</p></div>";
 	} else {
+		$instance = false;
 		$post_id = mc_get_data( 'event_post', $event_id );
 		if ( empty( $_POST['event_instance'] ) ) {
 			$sql                = "DELETE FROM " . my_calendar_table() . " WHERE event_id='" . (int) $event_id . "'";
@@ -684,13 +694,18 @@ function mc_delete_event( $event_id ) {
 			$sql    = "SELECT event_id FROM " . my_calendar_table() . " WHERE event_id='" . (int) $event_id . "'";
 			$result = $mcdb->get_results( $sql );
 		} else {
-			$delete = "DELETE FROM " . my_calendar_event_table() . " WHERE occur_id = " . (int) $_POST['event_instance'];
-			$result = $mcdb->get_results( $delete );
+			$delete   = "DELETE FROM " . my_calendar_event_table() . " WHERE occur_id = " . (int) $_POST['event_instance'];
+			$result   = $mcdb->get_results( $delete );
+			$instance = true;
 		}
 		if ( empty( $result ) || empty( $result[0]->event_id ) ) {
 			mc_delete_cache();
 			// do an action using the event_id
-			do_action( 'mc_delete_event', $event_id, $post_id );
+			if ( $instance ) {
+				do_action( 'mc_delete_event_instance', $event_id, $post_id, (int) $_POST['event_instance'] );				
+			} else {
+				do_action( 'mc_delete_event', $event_id, $post_id );
+			}
 			$message = "<div class='updated'><p>" . __( 'Event deleted successfully', 'my-calendar' ) . "</p></div>";
 		} else {
 			$message = "<div class='error'><p><strong>" . __( 'Error', 'my-calendar' ) . ":</strong>" . __( 'Despite issuing a request to delete, the event still remains in the database. Please investigate.', 'my-calendar' ) . "</p></div>";
@@ -2436,7 +2451,6 @@ function mc_update_instance( $event_instance, $event_id, $update = array() ) {
 function mc_update_data( $event_id, $field, $value, $format = '%d' ) {
 	global $wpdb;
 	$data    = array( $field => $value );
-	$format  = esc_sql( $format );
 	$formats = ( $format );
 	$result  = $wpdb->update(
 		my_calendar_table(),

@@ -616,7 +616,7 @@ function mc_location_data( $field, $id ) {
 		if ( get_option( 'mc_remote' ) == 'true' && function_exists( 'mc_remote_db' ) ) {
 			$mcdb = mc_remote_db();
 		}
-		$field  = esc_sql( $field );
+		$field  = $field;
 		$sql    = $wpdb->prepare( "SELECT $field FROM " . my_calendar_locations_table() . " WHERE location_id = %d", $id );
 		$result = $mcdb->get_var( $sql );
 

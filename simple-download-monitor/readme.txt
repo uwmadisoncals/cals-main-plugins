@@ -3,8 +3,8 @@ Contributors: Tips and Tricks HQ, Ruhul Amin, josh401, mbrsolution, chesio
 Donate link: https://www.tipsandtricks-hq.com
 Tags: download, downloads, count, counter, tracker, tracking, hits, logging, monitor, manager, files, media, digital, download monitor, download manager, downloadmanager, file manager, protect downloads, password, download category, file tree, ajax, download template, grid, documents, ip address
 Requires at least: 4.1.0
-Tested up to: 4.8
-Stable tag: 3.4.8
+Tested up to: 4.9
+Stable tag: 3.4.9
 License: GPLv2 or later
 
 Easily manage downloadable files and monitor downloads of your digital files from your WordPress site.
@@ -25,7 +25,7 @@ The plugin will log the IP addresses of the users who download your digital file
 
 It has a very user-friendly interface for uploading, managing, monitoring and tracking file downloads.
 
-https://www.youtube.com/watch?v=L-mXbs7kp0s
+https://www.youtube.com/watch?v=utYIH0fILuQ
 
 = Simple Download Monitor Features =
 
@@ -63,9 +63,10 @@ https://www.youtube.com/watch?v=L-mXbs7kp0s
 * Shortcode to show a number of latest downloads to your visitors.
 * Ability to disable the download monitoring (logging) for certain items (or all items).
 * You can also choose to only monitor downloads from unique IP address only.
-* Option to specify file size info so it can be shown to your visitors.
+* Option to specify file size info so it can be shown to your visitors. [View the tutorial](https://simple-download-monitor.com/how-to-show-file-size-info-of-your-downloads/)
 * Option to specify version number info for the download item so it can be shown to your visitors.
 * Option to restrict downloads to logged-in users only.
+* Option to ignore download count from bots.
 
 View more details on the [download monitor plugin](https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin) page.
 
@@ -120,15 +121,15 @@ Example Shortcode Usage:
 
 You can check the download stats from the "Downloads->Logs" interface. It shows the number of downloads for each files, IP address of the user who downloaded it, date and time of the download.
 
-= Detailed Usage Documentation =
+** Detailed Usage Documentation **
 
 View more usage instructions on the [Download Monitor Plugin](https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin) page.
 
-= Github Repository =
+** Github Repository **
 
 https://github.com/Arsenal21/simple-download-monitor
 
-If you need some extra action hooks or filters for this plugin then let us know.
+If you need extra action hooks or filters for this plugin then let us know.
 
 == Installation ==
 
@@ -171,6 +172,11 @@ Yes
 For screenshots please visit the [download monitor plugin page](https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin)
 
 == Changelog ==
+
+= 3.4.9 =
+- Added a new option in the settings menu to ignore downloads from bots. The name of the new settings field is "Do Not Count Downloads from Bots".
+- Updated the settings menu slug to make it unique.
+- Enhancement to the password protected download function.
 
 = 3.4.8 =
 - Fixed an issue with the shortcode inserter interface showing the last 5 items only.

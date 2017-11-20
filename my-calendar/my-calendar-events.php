@@ -289,7 +289,6 @@ function mc_get_data( $field, $id ) {
 	if ( get_option( 'mc_remote' ) == 'true' && function_exists( 'mc_remote_db' ) ) {
 		$mcdb = mc_remote_db();
 	}
-	$field  = esc_sql( $field );
 	$sql    = $wpdb->prepare( "SELECT $field FROM " . my_calendar_table() . " WHERE event_id = %d", $id );
 	$result = $mcdb->get_var( $sql );
 

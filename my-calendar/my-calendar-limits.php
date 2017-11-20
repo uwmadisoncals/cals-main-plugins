@@ -131,7 +131,7 @@ function mc_select_author( $author, $type = 'event' ) {
 					}
 					$i ++;
 				} else {
-					$key       = esc_sql( trim( $key ) );
+					$key       = trim( $key );
 					$author    = get_user_by( 'login', $key ); // get author by username
 					$author_id = $author->ID;
 					if ( $i == 1 ) {
@@ -150,7 +150,7 @@ function mc_select_author( $author, $type = 'event' ) {
 			if ( is_numeric( $author ) ) {
 				$select_author = ( $type == 'all' ) ? " WHERE $data = $author" : " event_author = $author AND";
 			} else {
-				$author = esc_sql( trim( $author ) );
+				$author = trim( $author );
 				$author = get_user_by( 'login', $author ); // get author by username
 
 				if ( is_object( $author ) ) {
@@ -201,7 +201,7 @@ function mc_select_host( $host, $type = 'event' ) {
 					}
 					$i ++;
 				} else {
-					$key     = esc_sql( trim( $key ) );
+					$key     = trim( $key );
 					$host    = get_user_by( 'login', $key ); // get host by username
 					$host_id = $host->ID;
 					if ( $i == 1 ) {
@@ -220,7 +220,7 @@ function mc_select_host( $host, $type = 'event' ) {
 			if ( is_numeric( $host ) ) {
 				$select_host = ( $type == 'all' ) ? " WHERE $data = $host" : " event_host = $host AND";
 			} else {
-				$host = esc_sql( trim( $host ) );
+				$host = trim( $host );
 				$host = get_user_by( 'login', $host ); // get author by username
 
 				if ( is_object( $host ) ) {
@@ -302,9 +302,9 @@ function mc_limit_string( $type = '', $ltype = '', $lvalue = '' ) {
 			) ) ) {
 			if ( $current_location != 'all' && $current_location != '' ) {
 				if ( is_numeric( $current_location ) ) {
-					$limit_string = esc_sql( $location_type ) . ' = ' . intval( $current_location ) . ' AND';				
+					$limit_string = $location_type . ' = ' . intval( $current_location ) . ' AND';				
 				} else {
-					$limit_string = esc_sql( $location_type ) . " = '" . esc_sql( $current_location ) . "' AND";				
+					$limit_string = $location_type . " = '" . esc_sql( $current_location ) . "' AND";				
 				}
 			}
 		}

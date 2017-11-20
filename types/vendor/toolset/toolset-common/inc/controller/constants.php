@@ -5,7 +5,9 @@
  *
  * Motivation: http://www.theaveragedev.com/mocking-constants-in-tests/
  *
- * @since m2m
+ * Note: Use this *only* if you need it in unit tests!
+ *
+ * @since 2.5.1
  */
 class Toolset_Constants {
 

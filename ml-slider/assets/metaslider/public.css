@@ -2,38 +2,19 @@
  * The following styles will provide an attempt to normalize the sliders
  */
 
- /** quick resets **/
-.article .metaslider ul,
-.article .metaslider ol,
-.article .metaslider li,
-.article .metaslider img,
-.art-article .metaslider ul,
-.art-article .metaslider ol,
-.art-article .metaslider li,
-.art-article .metaslider img,
-#widgets .metaslider ul,
-#widgets .metaslider ol,
-#widgets .metaslider li,
-#widgets .metaslider img,
-.entry .metaslider ul,
-.entry .metaslider ol,
-.entry .metaslider li,
-.entry .metaslider img,
-#content .metaslider ul,
-#content .metaslider ol,
-#content .metaslider li,
-#content .metaslider img,
-.entry-content .metaslider ul,
-.entry-content .metaslider ol,
-.entry-content .metaslider li,
-.entry-content .metaslider img,
-.metaslider .flexslider ul,
-.metaslider .flexslider .slides li,
-.metaslider .flexslider .slides ul,
-.metaslider .flexslider .slides ol,
-.metaslider .flexslider .flex-direction-nav,
-.metaslider .flexslider .flex-direction-nav li,
-*[class*='-article'] .metaslider img {
+/* Reset some style. Using body to push specificity */
+body .metaslider .coin-slider,
+body .metaslider .nivoSlider,
+body .metaslider .nivoSlider img,
+body .metaslider .rslides,
+body .metaslider .rslides li,
+body .metaslider .flexslider ul.slides,
+body .metaslider .flexslider .slides li,
+body .metaslider .flexslider .slides ul,
+body .metaslider .flexslider .slides ol,
+body .metaslider .flexslider .slides img,
+body .metaslider .flexslider .flex-direction-nav,
+body .metaslider .flexslider .flex-direction-nav li {
     border: 0;
     margin: 0;
     list-style-type: none;
@@ -127,21 +108,92 @@
 
 /* Flexslider */
 
-/* Arrow styles to use background images (old style) */
-/* which makes it compatible with the theme builder */
 .metaslider .flexslider {
-    margin: 0;
-    background: transparent;
-    border:0;
+    background: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    -o-box-shadow: none;
+    border: 0;
+    margin: 0 0 40px 0;
+    max-width: none;
+    max-height: none;
 }
 
-.metaslider .flexslider .flex-control-nav {
-    width: auto;
-    position: static;
-    text-align: center;
-    padding: 10px;
-    height: 11px;
+.flex-control-nav {
+	bottom: -30px;
+	line-height: 11px;
 }
+
+/** move margin from list items to anchors */
+.flex-control-nav li {
+	margin: 0;
+}
+
+.flex-control-nav li a {
+	margin: 0 6px;
+	padding: 0;
+}
+
+.flexslider .slides li {
+    position: relative;
+    height: auto;
+}
+
+/** fix for users with RTL languages */
+.flex-viewport {
+    direction: ltr;
+}
+
+/** add transition effects to firefox **/
+.flex-direction-nav a {
+    -moz-transition: all .3s ease;
+    transition: all .3s ease;
+}
+
+.flexslider .slides p {
+    margin: 0;
+}
+
+.flex-control-nav {
+	margin: auto;
+}
+
+.metaslider .flexslider.filmstrip {
+	margin-top: 10px;
+}
+
+.metaslider .flexslider.filmstrip .slides li {
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+.metaslider .flexslider.filmstrip .slides li.flex-active-slide,
+.metaslider .flexslider.filmstrip .slides li:hover,
+.metaslider .flexslider.filmstrip .slides li:focus {
+    opacity: 1.0 !important;
+}
+
+.metaslider .flex-control-thumbs li {
+    width: auto;
+}
+
+.metaslider ol.flex-control-thumbs img,
+#content .metaslider ol.flex-control-thumbs img {
+    margin: 10px 5px 0;
+    width: auto;
+}
+
+.metaslider.nav-hidden .flexslider {
+    margin-bottom: 0;
+}
+
+.metaslider.nav-hidden.add-margin .flexslider {
+    margin-bottom: 40px;
+}
+
+/* Arrow styles to use background images (old style) */
+/* which makes it compatible with the theme builder */
 
 .metaslider .flexslider .flex-direction-nav li a:before {
     content:none!important;
@@ -152,7 +204,8 @@
     margin: -20px 0 0;
     box-shadow: none!important;
     display: block;
-    background: url('../sliders/flexslider/bg_direction_nav.png') no-repeat 0 0;
+    background-image: url('../sliders/flexslider/bg_direction_nav.png');
+    background-repeat:  no-repeat;
     position: absolute;
     top: 50%;
     z-index: 10;
@@ -163,9 +216,12 @@
        -moz-transition: opacity .25s ease-in-out;
             transition: all .3s ease;
 }
-.metaslider .flexslider .flex-direction-nav .flex-next {
-    background-position: 100% 0;
-
+.flex-direction-nav .flex-next {
+    background-position: left 0;
+}
+.flex-direction-nav .flex-next {
+    background-position: right 0;
+    text-align: left;
     /* Fix for single character text */
     text-indent: 9999px;
 }
@@ -191,7 +247,7 @@
 .metaslider .flexslider .flex-control-nav a {
     box-shadow: none !important;
 }
-.metaslider .flexslider .flexslider .slides > li {
+.metaslider .flexslider .slides > li {
     position: relative;
 }
 

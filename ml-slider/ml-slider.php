@@ -5,7 +5,7 @@
  * Plugin Name: MetaSlider
  * Plugin URI:  https://www.metaslider.com
  * Description: Easy to use slideshow plugin. Create SEO optimised responsive slideshows with Nivo Slider, Flex Slider, Coin Slider and Responsive Slides.
- * Version:     3.6.2
+ * Version:     3.6.5
  * Author:      Team Updraft
  * Author URI:  https://www.metaslider.com
  * License:     GPL-2.0+
@@ -31,7 +31,7 @@ class MetaSliderPlugin {
     /**
      * @var string
      */
-    public $version = '3.6.2';
+    public $version = '3.6.5';
 
     /**
      * @var string The lowest tier price for upgrades
@@ -1352,12 +1352,12 @@ class MetaSliderPlugin {
                                                         'type' => array(
                                                             'priority' => 0,
                                                             'type' => 'slider-lib',
-                                                            'value' => $this->slider->get_setting( 'type' ),
+                                                            'value' => $this->slider->get_setting('type'),
                                                             'options' => array(
-                                                                'flex'       => array( 'label' => __( "Flex Slider", "ml-slider" ) ),
-                                                                'responsive' => array( 'label' => __( "R. Slides", "ml-slider" ) ),
-                                                                'nivo'       => array( 'label' => __( "Nivo Slider", "ml-slider" ) ),
-                                                                'coin'       => array( 'label' => __( "Coin Slider", "ml-slider" ) )
+                                                                'flex' => array('label' => "FlexSlider"),
+                                                                'responsive' => array('label' => "R. Slides"),
+                                                                'nivo' => array('label' => "Nivo Slider"),
+                                                                'coin' => array('label' => "Coin Slider")
                                                             )
                                                         ),
                                                         'width' => array(

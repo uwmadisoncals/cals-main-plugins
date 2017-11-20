@@ -247,16 +247,19 @@ class MetaSlider {
      * Return the classes to use for the slidehsow container
      */
     private function get_container_class() {
-        $class = "metaslider metaslider-{$this->get_setting( 'type' )} metaslider-{$this->id} ml-slider";
+
+        //Add the version to the class name (if possible)
+        $version_string = str_replace('.', '-', urlencode(METASLIDER_VERSION));
+        $version_string .= defined('METASLIDERPRO_VERSION') ? ' ml-slider-pro-' . str_replace('.', '-', urlencode(METASLIDERPRO_VERSION)) : '';
+        $class = "ml-slider-{$version_string} metaslider metaslider-{$this->get_setting('type')} metaslider-{$this->id} ml-slider";
 
         // apply the css class setting
-        if ( $this->get_setting( 'cssClass' ) != 'false' ) {
-            $class .= " " . $this->get_setting( 'cssClass' );
+        if ('false' != $this->get_setting('cssClass')) {
+            $class .= " " . $this->get_setting('cssClass');
         }
 
         // handle any custom classes
-        $class = apply_filters( 'metaslider_css_classes', $class, $this->id, $this->settings );
-
+        $class = apply_filters('metaslider_css_classes', $class, $this->id, $this->settings);
         return $class;
     }
 

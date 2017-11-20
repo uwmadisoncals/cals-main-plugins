@@ -749,22 +749,6 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: src/ml-slider.php:2713
-msgid "Flex Slider"
-msgstr ""
-
-#: src/ml-slider.php:2715
-msgid "R. Slides"
-msgstr ""
-
-#: src/ml-slider.php:2717
-msgid "Nivo Slider"
-msgstr ""
-
-#: src/ml-slider.php:2719
-msgid "Coin Slider"
-msgstr ""
-
 #: src/ml-slider.php:2741, src/ml-slider.php:3257
 msgid "Width"
 msgstr ""

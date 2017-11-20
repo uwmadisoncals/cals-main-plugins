@@ -36,7 +36,7 @@ $width = (in_array(false, $installed_plugins, true)) ? 'metaslider_half_width' :
             <tr>
                 <td><i class="metaslider-premium-image"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></i>
                     <h4><?php _e('Multiple slideshow types', 'ml-slider');?></h4>
-                    <p><?php printf(__('Including %s, %s and we will soon be adding more.', 'ml-slider'), 'Flex Slider', 'Nivo Slider');?></p></td>
+                    <p><?php printf(__('Including %s, %s and we will soon be adding more.', 'ml-slider'), 'FlexSlider', 'Nivo Slider');?></p></td>
                 <td><i class="dashicons dashicons-yes" aria-label="<?php esc_attr_e('Yes', 'ml-slider');?>"></i></td>
                 <td><i class="dashicons dashicons-yes" aria-label="<?php esc_attr_e('Yes', 'ml-slider');?>"></i></td>
             </tr>

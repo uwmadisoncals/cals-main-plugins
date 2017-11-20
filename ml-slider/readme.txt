@@ -3,7 +3,7 @@ Contributors: matchalabs, DavidAnderson, dnutbourne, kbat82
 Tags: wordpress slideshow,seo,slideshow,slider,widget,wordpress slider,image slider,flexslider,flex slider,nivoslider,nivo slider,responsive,responsive slides,coinslider,coin slider,slideshow,carousel,responsive slider,vertical slides
 Donate link: https://david.dw-perspective.org.uk/donate
 Requires at least: 3.5
-Stable tag: 3.6.2
+Stable tag: 3.6.5
 Tested up to: 4.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -151,11 +151,21 @@ See https://www.metaslider.com/documentation/image-cropping/
 
 == Changelog ==
 
+= 3.6.5 - 2017/Nov/20 =
+
+* FIX: Fixes issues with bottom margin of slideshow, among other minor tweaks.
+* TWEAK: Prevents a PHP debug log item that appeared in the short-lived 3.6.4
+
+= 3.6.3 - 2017/Nov/16 =
+
+* FIX: Updates various styles to retain compatibility with previous releases based upon user feedback
+* FIX: Removes translation of slider brand names.
+* UPGRADE NOTE: If upgrading to MetaSlider 3.6+, users of the MetaSlider Add-On pack should also upgrade that plugin to a current release (2.7.1 or later).
+
 = 3.6.2 - 2017/Nov/15 =
 
 * FIX: Update various styles to retain compatibility with previous releases based upon user feedback
 * FIX: Restore compatibility with old WP versions that lack the wp_add_inline_script() function
-* UPGRADE NOTE: If upgrading to MetaSlider 3.6+, users of the MetaSlider Add-On pack should also upgrade that plugin to a current release (2.7.1 or later).
 
 = 3.6.1 - 2017/Nov/14 =
 
@@ -600,4 +610,4 @@ More info/Comments: http://www.metaslider.com/coming-soon-meta-slider-2-6-free/
 * Initial version
 
 == Upgrade Notice ==
-* 3.6.2 : 3.6 series has three new features, three fixes, various smaller tweaks. A recommended update for all. If you have the paid add-on pack, update that to version 2.7.1 or later at the same time.
+* 3.6.5 : 3.6 series has three new features, three fixes, various smaller tweaks. A recommended update for all. If you have the paid add-on pack, update that to version 2.7.1 or later at the same time.

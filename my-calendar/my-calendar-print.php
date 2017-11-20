@@ -60,12 +60,14 @@ echo $head;
 		}
 	}
 	
-	$add        = array_map( 'esc_sql', $_GET );
+	$add        = array_map( 'esc_html', $_GET );
 	unset( $add['cid'] );
 	unset( $add['feed'] );
 	unset( $add['href'] );
-	$return_url = mc_build_url( $add, array( 'feed', 'cid', 'href' ), $return_url );
-	echo "<p class='return'><a href='$return_url'>" . __( 'Return to calendar', 'my-calendar' ) . "</a></p>";
+	$return_url = apply_filters( 'mc_return_to_calendar', mc_build_url( $add, array( 'feed', 'cid', 'href' ), $return_url ), $add );
+	if ( $return_url ) {
+		echo "<p class='return'><a href='$return_url'>" . __( 'Return to calendar', 'my-calendar' ) . "</a></p>";
+	}
 	echo '
 </body>
 </html>';

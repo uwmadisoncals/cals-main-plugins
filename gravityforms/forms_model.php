@@ -1406,12 +1406,11 @@ class GFFormsModel {
 		$wpdb->query( $sql );
 	}
 
-
-
-
-
-
-
+	/**
+	 * Delete the views for the specified form.
+	 *
+	 * @param int $form_id The form ID.
+	 */
 	public static function delete_views( $form_id ) {
 		global $wpdb;
 
@@ -1421,7 +1420,7 @@ class GFFormsModel {
 		$sql = $wpdb->prepare( "DELETE FROM $form_view_table WHERE form_id=%d", $form_id );
 		$wpdb->query( $sql );
 
-        /**
+		/**
          * Fires after form views are deleted
          *
          * @param int $form_id The ID of the form that views were deleted from
@@ -2449,6 +2448,18 @@ class GFFormsModel {
 		return null;
 	}
 
+    /**
+	 * Determines if the field value matches the conditional logic rule value.
+	 *
+	 * @param mixed         $field_value  The field value to be checked.
+	 * @param mixed         $target_value The conditional logic rule value.
+	 * @param string        $operation    The conditional logic rule operator.
+	 * @param null|GF_Field $source_field The field the rule is based on.
+	 * @param null|array    $rule         The conditional logic rule properties.
+	 * @param null|array    $form         The current form.
+	 *
+	 * @return bool
+	 */
 	public static function is_value_match( $field_value, $target_value, $operation = 'is', $source_field = null, $rule = null, $form = null ) {
 
 		$is_match = false;
@@ -2458,7 +2469,7 @@ class GFFormsModel {
 				$field_value = GFCommon::prepare_post_category_value( $field_value, $source_field, 'conditional_logic' );
 			} elseif ( $source_field->type == 'multiselect' && ! empty( $field_value ) && ! is_array( $field_value ) ) {
 				// Convert the comma-delimited string into an array.
-				$field_value = explode( ',', $field_value );
+				$field_value = $source_field->to_array( $field_value );
 			} elseif ( $source_field->get_input_type() != 'checkbox' && is_array( $field_value ) && $source_field->id != $rule['fieldId'] && is_array( $source_field->get_entry_inputs() ) ) {
 				// Get the specific input value from the full field value.
 				$field_value = rgar( $field_value, $rule['fieldId'] );
@@ -2506,7 +2517,7 @@ class GFFormsModel {
 			return GFCommon::clean_number( $text, $number_format );
 		}
 
-		return $text;
+		return 0;
 	}
 
 	public static function matches_operation( $val1, $val2, $operation ) {
@@ -2976,7 +2987,7 @@ class GFFormsModel {
 				if ( ! empty( $val ) ) {
 
 					// replace commas in individual values to prevent individual value from being split into multiple values (checkboxes, multiselects)
-					if ( in_array( $field->get_input_type(), array( 'checkbox', 'multiselect' ) ) ) {
+					if ( $field->get_input_type() === 'checkbox' ) {
 						$val = str_replace( ',', '&#44;', $val );
 					}
 
@@ -2986,6 +2997,16 @@ class GFFormsModel {
 			$value = implode( ',', $value );
 		} else {
 			$value = isset( $lead[ $field->id ] ) ? $lead[ $field->id ] : '';
+
+			if ( ! empty( $value ) && $field->get_input_type() === 'multiselect' ) {
+				$items = $field->to_array( $value );
+
+				foreach ( $items as &$item ) {
+					$item = str_replace( ',', '&#44;', $item );
+				}
+
+				$value = implode( ',', $items );
+			}
 		}
 
 		return $value;
@@ -3000,6 +3021,9 @@ class GFFormsModel {
 		$images                          = array();
 
 		foreach ( $form['fields'] as $field ) {
+			if ( self::is_field_hidden( $form, $field, array(), $lead ) ) {
+				continue;
+			}
 
 			if ( $field->type == 'post_category' ) {
 				$field = GFCommon::add_categories_as_choices( $field, '' );
@@ -4099,7 +4123,7 @@ class GFFormsModel {
 		$id = $wpdb->get_var( $sql, 0, 0 );
 
 		if ( empty( $id ) ) {
-			$wpdb->query( $wpdb->prepare( "INSERT INTO $table_name(form_id, date_created, ip) values(%d, utc_timestamp(), %s)", $form_id, $ip ) );
+			$wpdb->query( $wpdb->prepare( "INSERT INTO $table_name(form_id, date_created, ip) values(%d, utc_timestamp(), %s)", $form_id, '' ) );
 		} else {
 			$wpdb->query( $wpdb->prepare( "UPDATE $table_name SET count = count+1 WHERE id=%d", $id ) );
 		}
@@ -4733,7 +4757,7 @@ class GFFormsModel {
 		if ( ! $field instanceof GF_Field ) {
 			$field = GF_Fields::create( $field );
 		}
-		$field_label = ( IS_ADMIN || RG_CURRENT_PAGE == 'select_columns.php' || RG_CURRENT_PAGE == 'print-entry.php' || rgget( 'gf_page', $_GET ) == 'select_columns' || rgget( 'gf_page', $_GET ) == 'print-entry' ) && ! empty( $field->adminLabel ) && $allow_admin_label ? $field->adminLabel : $field->label;
+		$field_label = ( GFForms::get_page() || RG_CURRENT_PAGE == 'select_columns.php' || RG_CURRENT_PAGE == 'print-entry.php' || rgget( 'gf_page', $_GET ) == 'select_columns' || rgget( 'gf_page', $_GET ) == 'print-entry' ) && ! empty( $field->adminLabel ) && $allow_admin_label ? $field->adminLabel : $field->label;
 		$input       = self::get_input( $field, $input_id );
 		if ( self::get_input_type( $field ) == 'checkbox' && $input != null ) {
 			return $input['label'];
@@ -5321,7 +5345,9 @@ class GFFormsModel {
 						}
 					}
 
-					$search_term_placeholder = rgar( $search, 'is_numeric' ) || $is_number_field ? '%f' : '%s';
+
+
+					$upper_field_number_limit = (string) (int) $key === (string) $key ? (float) $key + 0.9999 : (float) $key + 0.0001;
 
 					if ( is_array( $search_term ) ) {
 						if ( in_array( $operator, array( '=', 'in' ) ) ) {
@@ -5331,14 +5357,24 @@ class GFFormsModel {
 						}
 						// Format in SQL and sanitize the strings in the list
 						$search_terms = array_fill( 0, count( $search_term ), '%s' );
-						$search_term_placeholder = $wpdb->prepare( '( ' . implode( ', ', $search_terms ) . ' )', $search_term );
-						$search_term = ''; // Set to blank, still gets passed to wpdb::prepare below but isn't used
-					}
+						$search_terms_in = $wpdb->prepare( '( ' . implode( ', ', $search_terms ) . ' )', $search_term );
 
-					$upper_field_number_limit = (string) (int) $key === (string) $key ? (float) $key + 0.9999 : (float) $key + 0.0001;
-					/* doesn't support "<>" for checkboxes */
-					$field_query = $wpdb->prepare(
-						"
+						/* doesn't support "<>" for checkboxes */
+						$field_query = $wpdb->prepare(
+							"
+                        l.id IN
+                        (
+                        SELECT
+                        lead_id
+                        from {$lead_details_table_name}
+                        WHERE (field_number BETWEEN %s AND %s AND value {$operator} {$search_terms_in})
+                        {$form_id_where}
+                        )", (float) $key - 0.0001, $upper_field_number_limit );
+					} else {
+						$search_term_placeholder = rgar( $search, 'is_numeric' ) || $is_number_field ? '%f' : '%s';
+						/* doesn't support "<>" for checkboxes */
+						$field_query = $wpdb->prepare(
+							"
                         l.id IN
                         (
                         SELECT
@@ -5347,8 +5383,8 @@ class GFFormsModel {
                         WHERE (field_number BETWEEN %s AND %s AND value {$operator} {$search_term_placeholder})
                         {$form_id_where}
                         )", (float) $key - 0.0001, $upper_field_number_limit, $search_term
-					);
-
+						);
+					}
 
 					if ( ( empty( $val ) && $operator != '<>' ) || $val === '%%' || ( $operator === '<>' && ! empty( $val ) ) ) {
 						$skipped_field_query = $wpdb->prepare(
@@ -5360,7 +5396,7 @@ class GFFormsModel {
                             from {$lead_details_table_name}
                             WHERE (field_number BETWEEN %s AND %s)
                             {$form_id_where}
-                            )", (float) $key - 0.0001, $upper_field_number_limit, $search_term
+                            )", (float) $key - 0.0001, $upper_field_number_limit
 						);
 						$field_query = '(' . $field_query . ' OR ' . $skipped_field_query . ')';
 					}
@@ -5444,10 +5480,6 @@ class GFFormsModel {
 				case 'meta':
 					/* doesn't support '<>' for multiple values of the same key */
 
-					$meta        = rgar( $entry_meta, $key );
-					$placeholder = rgar( $meta, 'is_numeric' ) ? '%s' : '%s';
-					$search_term = 'like' == $operator ? "%$val%" : $val;
-
 					if ( is_array( $search_term ) ) {
 						if ( in_array( $operator, array( '=', 'in' ) ) ) {
 							$operator = 'IN';
@@ -5455,12 +5487,23 @@ class GFFormsModel {
 							$operator = 'NOT IN';
 						}
 						$search_terms = array_fill( 0, count( $search_term ), '%s' );
-						$placeholder = $wpdb->prepare( '( ' . implode( ', ', $search_terms ) . ' )', $search_term );
+						$search_terms_in = $wpdb->prepare( '( ' . implode( ', ', $search_terms ) . ' )', $search_term );
 
-						$search_term = '';
-					}
-
-					$sql_array[] = $wpdb->prepare(
+						$sql_array[] = $wpdb->prepare(
+						"
+                        l.id IN
+                        (
+                        SELECT
+                        lead_id
+                        FROM $lead_meta_table_name
+                        WHERE meta_key=%s AND meta_value $operator $search_terms_in
+                        $form_id_where
+                        )", $search['key'] );
+					} else {
+						$meta = rgar( $entry_meta, $key );
+						$placeholder = rgar( $meta, 'is_numeric' ) ? '%s' : '%s';
+						$search_term = 'like' == $operator ? "%$val%" : $val;
+						$sql_array[] = $wpdb->prepare(
 						"
                         l.id IN
                         (
@@ -5470,9 +5513,10 @@ class GFFormsModel {
                         WHERE meta_key=%s AND meta_value $operator $placeholder
                         $form_id_where
                         )", $search['key'], $search_term
-					);
-					break;
+						);
+					}
 
+					break;
 			}
 		}
 

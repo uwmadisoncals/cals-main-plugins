@@ -24,7 +24,7 @@ function my_calendar_insert( $atts, $content = null ) {
 	), $atts, 'my_calendar' ) );
 	if ( $format != 'mini' ) {
 		if ( isset( $_GET['format'] ) ) {
-			$format = esc_sql( $_GET['format'] );
+			$format = $_GET['format'];
 		}
 	}
 	global $user_ID;

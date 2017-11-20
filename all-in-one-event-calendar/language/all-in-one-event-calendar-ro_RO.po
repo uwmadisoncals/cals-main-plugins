@@ -2,13 +2,25 @@
 # This file is distributed under the same license as the 2.3 package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2016-01-21 20:44:27+0000\n"
+"PO-Revision-Date: 2017-11-16 20:02:48+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);\n"
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: 2.3\n"
+
+#: app/model/settings.php:870
+msgid "<div class=\"ai1ec-twitterinfo-wrap\"><b>Twitter</b><br>This feature allows your events to be automatically tweeted before they happen. Great way to add regular content to your twitter roll and keep your audience informed of all your great events. This feature is not yet enabled in your product. Please purchase it as a standalone for a low annual subscription or inside the Core+ bundle. <a target=\"_blank\" href=\"https://time.ly/wordpress-calendar-plugin/addons/\">Click here.</a></div>"
+msgstr ""
+
+#: app/view/admin/settings.php:158
+msgid "Twitter"
+msgstr "Twitter"
+
+#: public/admin/box_support.php:44
+msgid "More Features"
+msgstr "Mai multe specificații"
 
 #: app/view/admin/add-new-event.php:35
 msgid "Empower your calendar, build your community"
@@ -20,9 +32,9 @@ msgstr ""
 
 #: app/view/admin/samples.php:26 app/view/admin/samples.php:27
 msgid "Samples"
-msgstr ""
+msgstr "Mostre"
 
-#: app/model/settings.php:880
+#: app/model/settings.php:893
 msgid ""
 "Optional. Use this JavaScript-based shortcut to place the\n"
 "                        calendar a DOM element other than the usual page content container\n"
@@ -56,11 +68,11 @@ msgstr ""
 
 #: app/view/event/single.php:209
 msgid "No data"
-msgstr ""
+msgstr "Lipsă date"
 
 #: public/admin/plugins/ics/import_feed.php:8
 msgid "unlimited"
-msgstr ""
+msgstr "nelimitat"
 
 #: public/admin/plugins/ics/import_feed.php:45
 msgid ""
@@ -68,45 +80,45 @@ msgid ""
 "        Please sign up for EventBoost plan <a href=\"https://time.ly/eventboost/\" target=\"_blank\">here</a>."
 msgstr ""
 
-#: app/view/admin/settings.php:209
+#: app/view/admin/settings.php:214
 msgid "Calendar Type:"
-msgstr ""
+msgstr "Tip de calendar"
 
-#: app/view/admin/settings.php:211
+#: app/view/admin/settings.php:216
 msgid "Tourism"
-msgstr ""
+msgstr "Turism"
 
-#: app/view/admin/settings.php:212
+#: app/view/admin/settings.php:217
 msgid "Media"
-msgstr ""
+msgstr "Media"
 
-#: app/view/admin/settings.php:213
+#: app/view/admin/settings.php:218
 msgid "Community Hubs"
 msgstr ""
 
-#: app/view/admin/settings.php:214
-msgid "Education"
-msgstr ""
-
-#: app/view/admin/settings.php:215
-msgid "Venue/Business"
-msgstr ""
-
-#: app/view/admin/settings.php:216
-msgid "Artist/Performer"
-msgstr ""
-
-#: app/view/admin/settings.php:217
-msgid "Church/Spiritual"
-msgstr ""
-
-#: app/view/admin/settings.php:218
-msgid "Association/Group"
-msgstr ""
-
 #: app/view/admin/settings.php:219
+msgid "Education"
+msgstr "Educație"
+
+#: app/view/admin/settings.php:220
+msgid "Venue/Business"
+msgstr "Local/Afacere"
+
+#: app/view/admin/settings.php:221
+msgid "Artist/Performer"
+msgstr "Artist"
+
+#: app/view/admin/settings.php:222
+msgid "Church/Spiritual"
+msgstr "Biserică/Spiritualitate"
+
+#: app/view/admin/settings.php:223
+msgid "Association/Group"
+msgstr "Asociație/Grup"
+
+#: app/view/admin/settings.php:224
 msgid "Other"
-msgstr ""
+msgstr "Altele"
 
 #: app/view/admin/add-new-event.php:337
 msgid "Timely Ticketing saves time & money. Create ticketing/registration right here and now. You do not pay any ticketing fees (other than regular PayPal transaction costs). Create as many ticketing/registration as you'd like.<br /><br />Ticketing feature is not enabled for this website. Please sign up for Ticketing plan <a href=\"https://time.ly/tickets-existing-users/\" target=\"_blank\">here</a>."
@@ -116,26 +128,26 @@ msgstr ""
 msgid "This post was imported from a CSV/ICS file."
 msgstr ""
 
-#: app/view/admin/tickets.php:71 app/view/admin/tickets.php:86
-#: app/view/admin/tickets.php:96 app/view/admin/tickets.php:107
-msgid "Time.ly Ticketing"
+#: app/view/admin/tickets.php:77 app/view/admin/tickets.php:93
+#: app/view/admin/tickets.php:104 app/view/admin/tickets.php:116
+msgid "Timely Ticketing"
 msgstr ""
 
 #: public/admin/box_ask_customer_review.php:175
 msgid "Time.ly team"
-msgstr ""
+msgstr "Echipa Time.ly"
 
 #: public/admin/box_ask_customer_review.php:176
 msgid "info@time.ly"
-msgstr ""
+msgstr "info@time.ly"
 
 #: public/admin/box_event_cost.php:53
 msgid "Time.ly Tickets"
-msgstr ""
+msgstr "Bilete Time.ly"
 
 #: public/admin/feed_row.php:93 public/admin/plugins/ics/import_feed.php:118
 msgid "Convert event's date/time to calendar's timezone"
-msgstr ""
+msgstr "Convertește ora și data evenimentului la fusul orar al calendarului"
 
 #: public/admin/box_event_cost.php:303
 msgid "Report:"
@@ -210,56 +222,56 @@ msgstr ""
 
 #: public/admin/plugins/ics/import_feed.php:139
 msgid "Update feed"
-msgstr ""
+msgstr "Actualizează fluxul"
 
 #: public/admin/plugins/suggested/display_feeds.php:17
 msgid "Find events matching:"
-msgstr ""
+msgstr "Găsește evenimente similare:"
 
 #: public/admin/plugins/suggested/display_feeds.php:22
 msgid "Located in:"
-msgstr ""
+msgstr "Localizat în"
 
 #: public/admin/plugins/suggested/display_feeds.php:29
 msgid "Search"
-msgstr ""
+msgstr "Caută"
 
 #: public/admin/plugins/suggested/display_feeds.php:40
 msgid " events found."
-msgstr ""
+msgstr "evenimente găsite"
 
 #: public/admin/plugins/suggested/display_feeds.php:42
 msgid "Update settings for the imported events in “My feeds” tab."
-msgstr ""
+msgstr "Actualizează setările evenimentelor importate in fila “Fluxurile mele”"
 
 #: public/admin/plugins/suggested/display_feeds.php:47
 msgid "Map"
-msgstr ""
+msgstr "Hartă"
 
 #: public/admin/plugins/suggested/display_feeds.php:50
 msgid "Both"
-msgstr ""
+msgstr "Ambele"
 
 #: public/admin/plugins/suggested/display_feeds.php:53
 msgid "List"
-msgstr ""
+msgstr "Listă"
 
 #: public/admin/plugins/suggested/display_feeds.php:72
 #: public/admin/plugins/suggested/feeds_list.php:4
 msgid "No events found."
-msgstr ""
+msgstr "Niciun eveniment găsit."
 
 #: public/admin/plugins/suggested/display_feeds.php:75
 msgid "Please, modify your search criteria and try again."
-msgstr ""
+msgstr "Te rugăm să modifici criteriile de căutare si să încerci din nou."
 
 #: public/admin/plugins/suggested/event_actions.php:5
 msgid "Import"
-msgstr ""
+msgstr "Importă"
 
 #: public/admin/plugins/suggested/event_actions.php:9
 msgid "Importing"
-msgstr ""
+msgstr "Se importă"
 
 #: app/model/api/api-ticketing.php:468
 msgid "We were unable to get the Event Details from Time.ly Ticketing"
@@ -269,41 +281,41 @@ msgstr ""
 msgid "Ticketing is currently not available for this website. Please, try again later."
 msgstr ""
 
-#: app/view/admin/settings.php:173
+#: app/view/admin/settings.php:178
 msgid "Please, Sign In to Timely Network."
 msgstr ""
 
-#: app/view/admin/settings.php:199
+#: app/view/admin/settings.php:204
 msgid "I confirm that I have read, understand and agree with the <a href=\"https://time.ly/tos\">terms of service</a>."
 msgstr ""
 
-#: app/view/admin/settings.php:202
+#: app/view/admin/settings.php:207
 msgid "<h4>Attention Required:</h4>If you choose to sign-out of the API Timely Network this will close all the created tickets and remove user access to them. In this case, on the event page, users will see the status “Event closed”."
 msgstr ""
 
-#: app/view/admin/tickets.php:75
-msgid "You need to sign up for a Timely Network account in order to use Ticketing or Import Feeds<br /><br />"
+#: app/view/admin/tickets.php:81
+msgid "You need to sign up for a Timely Network account in order to use Ticketing.<br /><br />"
 msgstr ""
 
-#: app/view/admin/tickets.php:78
+#: app/view/admin/tickets.php:84
 msgid "<a href=\"edit.php?post_type=ai1ec_event&page=all-in-one-event-calendar-settings\" class=\"ai1ec-btn ai1ec-btn-primary ai1ec-btn-lg\">Sign In to Timely Network</a>"
 msgstr ""
 
-#: app/view/admin/tickets.php:79
+#: app/view/admin/tickets.php:85
 msgid "<b>Signing up for a Timely Network account is currently unavailable. Please, try again later.</b>"
 msgstr ""
 
 #: lib/calendar-feed/ics.php:40
 msgid "My Feeds"
-msgstr ""
+msgstr "Fluxurile mele"
 
 #: lib/calendar-feed/ics.php:891
 msgid "Event imported"
-msgstr ""
+msgstr "Eveniment importat"
 
 #: lib/calendar-feed/suggested.php:24
 msgid "Discover Events"
-msgstr ""
+msgstr "Descoperă evenimente"
 
 #: lib/calendar-feed/suggested.php:103
 msgid "&laquo;"
@@ -319,7 +331,7 @@ msgstr ""
 
 #: app/controller/javascript.php:511
 msgid "Event was imported successfully."
-msgstr ""
+msgstr "Eveniment importat cu succes."
 
 #: app/controller/javascript.php:514
 msgid "An error occurred when importing event. Please, try later."
@@ -327,12 +339,12 @@ msgstr ""
 
 #: app/controller/javascript.php:556
 msgid "Information"
-msgstr ""
+msgstr "Informație"
 
 #: app/controller/javascript.php:577 app/model/api/api-ticketing.php:401
 #: public/admin/box_event_cost.php:280
 msgid "Open for sale"
-msgstr ""
+msgstr "Deschis pentru vânzare"
 
 #: app/controller/javascript.php:578
 msgid "You have sold tickets for this ticket type. Please change it's status to \"Canceled\" and make refunds to all users that purchased tickets."
@@ -344,19 +356,19 @@ msgstr ""
 
 #: app/model/api/api-feeds.php:131
 msgid "We were unable to import feed"
-msgstr ""
+msgstr "Nu s-a putut importa fluxul"
 
 #: app/model/api/api-feeds.php:154
 msgid "We were unable to get feed data"
-msgstr ""
+msgstr "Nu s-au putut accesa datele fluxului"
 
 #: app/model/api/api-feeds.php:286
 msgid "We were unable to subscribe feed"
-msgstr ""
+msgstr "Nu s-a putut abona la flux"
 
 #: app/model/api/api-feeds.php:316
 msgid "We were unable to unsubscribe feed"
-msgstr ""
+msgstr "Nu s-a putut dezabona de la flux"
 
 #: app/model/api/api-ticketing.php:120
 msgid "Tax and Invoice options are required."
@@ -364,21 +376,21 @@ msgstr ""
 
 #: app/model/api/api-ticketing.php:403 public/admin/box_event_cost.php:285
 msgid "Sale ended"
-msgstr ""
+msgstr "Vânzare încheiată"
 
 #: app/model/api/api-ticketing.php:405 public/admin/box_event_cost.php:289
 msgid "Canceled"
-msgstr ""
+msgstr "Anulat"
 
-#: app/model/settings.php:917
+#: app/model/settings.php:930
 msgid "Use this option if calendar is unresponsive. <a target=\"_blank\" href=\"https://time.ly/document/user-guide/troubleshooting/disable-gzip-compression/\">Read more</a> about the issue. (From version 2.1 onwards, gzip is disabled by default for maximum compatibility.)"
 msgstr ""
 
-#: app/model/settings.php:944
+#: app/model/settings.php:957
 msgid "Use advanced JS cache."
 msgstr ""
 
-#: app/model/settings.php:947
+#: app/model/settings.php:960
 msgid "Cache dynamically generated JS files. Improves performance."
 msgstr ""
 
@@ -388,7 +400,7 @@ msgstr ""
 
 #: app/view/admin/add-new-event.php:446
 msgid ", email: "
-msgstr ""
+msgstr ", email: "
 
 #: app/view/admin/add-new-event.php:450
 msgid "<span class=\"ai1ec-info-text\">The event was submitted by %s.</span>"
@@ -398,127 +410,127 @@ msgstr ""
 msgid "Browse All Add-ons"
 msgstr ""
 
-#: app/view/admin/tickets.php:112
+#: app/view/admin/tickets.php:121
 msgid "Please provide your PayPal details."
 msgstr ""
 
-#: app/view/admin/tickets.php:114
+#: app/view/admin/tickets.php:123
 msgid "PayPal"
-msgstr ""
+msgstr "PayPal"
 
-#: app/view/admin/tickets.php:115
+#: app/view/admin/tickets.php:124
 msgid "Preferred currency for tickets:"
-msgstr ""
+msgstr "Valută preferata pentru bilete:"
 
-#: app/view/admin/tickets.php:141
+#: app/view/admin/tickets.php:150
 msgid "United States Dollar"
-msgstr ""
+msgstr "Dolar SUA"
 
-#: app/view/admin/tickets.php:142
+#: app/view/admin/tickets.php:151
 msgid "Canadian Dollar"
-msgstr ""
+msgstr "Dolar canadian"
 
-#: app/view/admin/tickets.php:143
+#: app/view/admin/tickets.php:152
 msgid "Australian Dollar"
-msgstr ""
+msgstr "Dolar australian"
 
-#: app/view/admin/tickets.php:144
+#: app/view/admin/tickets.php:153
 msgid "Brazilian Real"
-msgstr ""
+msgstr "Real brazilian"
 
-#: app/view/admin/tickets.php:144 app/view/admin/tickets.php:152
+#: app/view/admin/tickets.php:153 app/view/admin/tickets.php:161
 msgid "Note: This currency is supported as a payment currency and a currency balance for in-country PayPal accounts only."
 msgstr ""
 
-#: app/view/admin/tickets.php:145
+#: app/view/admin/tickets.php:154
 msgid "Czech Koruna"
-msgstr ""
+msgstr "Coroană cehă"
 
-#: app/view/admin/tickets.php:146
+#: app/view/admin/tickets.php:155
 msgid "Danish Krone"
-msgstr ""
+msgstr "Coroană daneză"
 
-#: app/view/admin/tickets.php:147
+#: app/view/admin/tickets.php:156
 msgid "Euro"
-msgstr ""
+msgstr "Euro"
 
-#: app/view/admin/tickets.php:148
+#: app/view/admin/tickets.php:157
 msgid "Hong Kong Dollar"
-msgstr ""
+msgstr "Dolar Hong Kong "
 
-#: app/view/admin/tickets.php:149
+#: app/view/admin/tickets.php:158
 msgid "Hungarian Forint"
-msgstr ""
+msgstr "Forint maghiar"
 
-#: app/view/admin/tickets.php:149 app/view/admin/tickets.php:163
+#: app/view/admin/tickets.php:158 app/view/admin/tickets.php:172
 msgid "Note: Decimal amounts are not supported for this currency. Passing a decimal amount will throw an error."
 msgstr ""
 
-#: app/view/admin/tickets.php:150
+#: app/view/admin/tickets.php:159
 msgid "Israeli New Sheqel"
 msgstr ""
 
-#: app/view/admin/tickets.php:151
+#: app/view/admin/tickets.php:160
 msgid "Japanese Yen"
-msgstr ""
+msgstr "Yen japonez"
 
-#: app/view/admin/tickets.php:151
+#: app/view/admin/tickets.php:160
 msgid "Note: This currency does not support decimals. Passing a decimal amount will throw an error. 1,000,000"
 msgstr ""
 
-#: app/view/admin/tickets.php:152
+#: app/view/admin/tickets.php:161
 msgid "Malaysian Ringgit"
 msgstr ""
 
-#: app/view/admin/tickets.php:153
+#: app/view/admin/tickets.php:162
 msgid "Mexican Peso"
-msgstr ""
+msgstr "Peso mexican"
 
-#: app/view/admin/tickets.php:154
+#: app/view/admin/tickets.php:163
 msgid "Norwegian Krone"
-msgstr ""
+msgstr "Coroană norvegiană"
 
-#: app/view/admin/tickets.php:155
+#: app/view/admin/tickets.php:164
 msgid "New Zealand Dollar"
-msgstr ""
+msgstr "Dolar neo-zeelandez"
 
-#: app/view/admin/tickets.php:156
+#: app/view/admin/tickets.php:165
 msgid "Philippine Peso"
-msgstr ""
+msgstr "Peso philippinez"
 
-#: app/view/admin/tickets.php:157
+#: app/view/admin/tickets.php:166
 msgid "Polish Zloty"
-msgstr ""
+msgstr "Zlot polonez"
 
-#: app/view/admin/tickets.php:158
+#: app/view/admin/tickets.php:167
 msgid "Pound Sterling"
-msgstr ""
+msgstr "Liră sterlină"
 
-#: app/view/admin/tickets.php:159
+#: app/view/admin/tickets.php:168
 msgid "Russian Ruble"
-msgstr ""
+msgstr "Rublă rusească"
 
-#: app/view/admin/tickets.php:159
+#: app/view/admin/tickets.php:168
 msgid "For in-border payments (payments made within Russia), the Russian Ruble is the only accepted currency. If you use another currency for in-border payments, the transaction will fail"
 msgstr ""
 
-#: app/view/admin/tickets.php:160
+#: app/view/admin/tickets.php:169
 msgid "Singapore Dollar"
-msgstr ""
+msgstr "Dolar singaporez"
 
-#: app/view/admin/tickets.php:161
+#: app/view/admin/tickets.php:170
 msgid "Swedish Krona"
-msgstr ""
+msgstr "Coroană suedeză"
 
-#: app/view/admin/tickets.php:162
+#: app/view/admin/tickets.php:171
 msgid "Swiss Franc"
-msgstr ""
+msgstr "Franc elvețian"
 
-#: app/view/admin/tickets.php:163
+#: app/view/admin/tickets.php:172
 msgid "Taiwan New Dollar"
 msgstr ""
 
-#: app/view/admin/tickets.php:164
+#: app/view/admin/tickets.php:173
 msgid "Thai Baht"
 msgstr ""
 
@@ -580,23 +592,19 @@ msgstr ""
 
 #: public/admin/box_event_cost.php:379
 msgid "Free Event"
-msgstr ""
+msgstr "Eveniment gratuit"
 
 #: public/admin/box_event_cost.php:409
 msgid "Registration URL:"
-msgstr ""
+msgstr "Link pentru înregistrare:"
 
-#: public/admin/box_support.php:19
+#: public/admin/box_support.php:20
 msgid "Guide"
-msgstr ""
+msgstr "Ghid"
 
-#: public/admin/box_support.php:27
-msgid "Forum"
-msgstr ""
-
-#: public/admin/box_support.php:35
+#: public/admin/box_support.php:36
 msgid "Videos"
-msgstr ""
+msgstr "Video"
 
 #. Plugin URI of the plugin/theme
 msgid "https://wordpress.org/plugins/all-in-one-event-calendar/"
@@ -644,7 +652,7 @@ msgstr ""
 msgid "API URL: %s.<br/>Detail: %s"
 msgstr ""
 
-#: app/model/api/api-abstract.php:545
+#: app/model/api/api-abstract.php:542
 msgid "Error decoding the response"
 msgstr ""
 
@@ -1106,15 +1114,19 @@ msgstr "Păstrați categoriile și etichetele originale ale evenimentelor"
 msgid "On refresh, preserve previously imported events that are missing from the feed"
 msgstr "La împrospătare, păstrează evenimentele importate anterior care lipsesc din feed"
 
-#: public/admin/box_support.php:51
+#: public/admin/box_support.php:28
+msgid "Support"
+msgstr "Suport"
+
+#: public/admin/box_support.php:52
 msgid "Timely News"
 msgstr "Știri Timely"
 
-#: public/admin/box_support.php:55
+#: public/admin/box_support.php:56
 msgid "view all news"
 msgstr "vizualizează toate știrile"
 
-#: public/admin/box_support.php:103
+#: public/admin/box_support.php:131
 msgid "Follow @_Timely"
 msgstr "Urmează @_Timely"
 
@@ -1246,22 +1258,22 @@ msgstr "Vă rugăm să așteptați&#8230;"
 msgid "Apply"
 msgstr "Aplică"
 
-#: app/view/admin/settings.php:205 public/admin/box_repeat.php:116
+#: app/view/admin/settings.php:210 public/admin/box_repeat.php:116
 #: public/admin/plugins/ics/import_feed.php:127
 msgid "Cancel"
 msgstr "Renunță"
 
-#: public/admin/box_support.php:4
+#: public/admin/box_support.php:5
 msgid "Timely"
 msgstr "Timely"
 
-#: public/admin/box_support.php:11
+#: public/admin/box_support.php:12
 msgid "Timely’s All-in-One Event Calendar is a<br />revolutionary new way to find and share events."
 msgstr "All-in-One Event Calendar de la Timely este<br />un mod nou revoluționar de a găsi și împărtăși evenimente."
 
 #: public/admin/box_event_cost.php:271
 msgid "Status:"
-msgstr ""
+msgstr "Statut:"
 
 #: public/admin/box_event_cost.php:325
 msgid "Add New Ticket Type"
@@ -1345,7 +1357,7 @@ msgstr "Telefon:"
 
 #: public/admin/box_event_contact.php:61
 msgid "Website URL:"
-msgstr ""
+msgstr "Link site:"
 
 #: public/admin/box_event_cost.php:6
 msgid "Event cost and Tickets"
@@ -1357,7 +1369,7 @@ msgstr ""
 
 #: public/admin/box_event_cost.php:72
 msgid "Sign Up for Timely Network"
-msgstr ""
+msgstr "Înregistrează-te pe Timely Network"
 
 #: public/admin/box_event_cost.php:100
 msgid "Remove Ticket Type"
@@ -1373,61 +1385,61 @@ msgstr "Descriere:"
 
 #: public/admin/box_event_cost.php:134
 msgid "(Optional)"
-msgstr ""
+msgstr "(Opțional)"
 
 #: public/admin/box_event_cost.php:138
 msgid "Price:"
-msgstr ""
+msgstr "Preț:"
 
 #: public/admin/box_event_cost.php:152
 msgid "Limits:"
-msgstr ""
+msgstr "Limite:"
 
 #: public/admin/box_event_cost.php:155
 msgid "This fields are required."
-msgstr ""
+msgstr "Aceste câmpuri sunt obligatorii."
 
 #: public/admin/box_event_cost.php:180
 msgid "Quantity:"
-msgstr ""
+msgstr "Cantitate:"
 
 #: public/admin/box_event_cost.php:206
 msgid "Available:"
-msgstr ""
+msgstr "Disponibil:"
 
 #: public/admin/box_event_cost.php:218
 msgid "Immediately"
-msgstr ""
+msgstr "Imediat"
 
 #: public/admin/box_event_cost.php:231
 msgid "From:"
-msgstr ""
+msgstr "De la:"
 
 #: public/admin/box_event_cost.php:250
 msgid "Till:"
-msgstr ""
+msgstr "Până la:"
 
 #: public/admin/box_ask_customer_review.php:43
 #: public/admin/box_ask_customer_review.php:76
 msgid "No, thanks"
-msgstr ""
+msgstr "Nu, mulțumesc"
 
 #: public/admin/box_ask_customer_review.php:51
 #: public/admin/box_ask_customer_review.php:85
 msgid "Ok, sure!"
-msgstr ""
+msgstr "Ok, sigur!"
 
 #: public/admin/box_ask_customer_review.php:102
 msgid "Please provide some feedback"
-msgstr ""
+msgstr "Te rugăm să oferi un feedback"
 
 #: public/admin/box_ask_customer_review.php:109
 msgid "Message:"
-msgstr ""
+msgstr "Mesaj:"
 
 #: public/admin/box_ask_customer_review.php:122
 msgid "Name:"
-msgstr ""
+msgstr "Nume:"
 
 #: public/admin/box_ask_customer_review.php:137
 #: public/admin/box_event_contact.php:48
@@ -1436,27 +1448,27 @@ msgstr "E-mail:"
 
 #: public/admin/box_ask_customer_review.php:144
 msgid "E-mail is invalid."
-msgstr ""
+msgstr "E-mail invalid."
 
 #: public/admin/box_ask_customer_review.php:155
 msgid "Site URL:"
-msgstr ""
+msgstr "Link site:"
 
 #: public/admin/box_ask_customer_review.php:162
 msgid "Site URL is invalid."
-msgstr ""
+msgstr "Link site invalid."
 
 #: public/admin/box_ask_customer_review.php:174
 msgid "Thank you for being our customer,"
-msgstr ""
+msgstr "Îți mulțumim pentru că ești clientul nostru,"
 
 #: public/admin/box_ask_customer_review.php:182
 msgid "Sending..."
-msgstr ""
+msgstr "Trimitere..."
 
 #: public/admin/box_ask_customer_review.php:183
 msgid "Send Message"
-msgstr ""
+msgstr "Trimite mesaj"
 
 #: public/admin/box_event_children.php:12
 msgid "Base recurrence event"
@@ -1552,15 +1564,15 @@ msgstr "Ascunde acest widget pe pagina de calendar"
 
 #: public/admin/box_ask_customer_review.php:5
 msgid "Enjoying All-in-One Event Calendar?"
-msgstr ""
+msgstr "Îți place All-in-One Event Calendar?"
 
 #: public/admin/box_ask_customer_review.php:13
 msgid "Not really"
-msgstr ""
+msgstr "Nu tocmai"
 
 #: public/admin/box_ask_customer_review.php:20
 msgid "Yes!"
-msgstr ""
+msgstr "Da!"
 
 #: lib/recurrence/rule.php:398
 msgid "Every %d weeks"
@@ -1655,7 +1667,7 @@ msgstr "Eveniment părinte"
 
 #: lib/post/custom-type.php:55
 msgid "event"
-msgstr "eveniment"
+msgstr "event"
 
 #: lib/post/custom-type.php:85
 msgctxt "Event categories taxonomy"
@@ -1833,7 +1845,7 @@ msgstr "În prezent nu se pot încorpora mai mult de un calendar pe aceeași pag
 
 #: lib/import-export/ics.php:881
 msgid "Tickets: "
-msgstr ""
+msgstr "Bilete:"
 
 #: lib/html/element/setting/html.php:41
 msgid "Day view:"
@@ -2166,7 +2178,7 @@ msgstr "Ați activat Randarea la nivel de client (frontend) și folosiți o tem�
 
 #: app/view/event/single.php:98
 msgid "Tickets:"
-msgstr ""
+msgstr "Bilete:"
 
 #: app/view/event/single.php:99
 msgid "Free"
@@ -2212,11 +2224,11 @@ msgstr " – "
 
 #: app/view/event/time.php:166
 msgid ", and "
-msgstr ""
+msgstr ", și"
 
 #: cache/twig/dc/78/b950182efb8f436b144938fb0dc48cf395d7daabe20293234dbcf2b26545.php:38
 msgid "Excludes: "
-msgstr ""
+msgstr "Exclude: "
 
 #: cache/twig/dc/78/b950182efb8f436b144938fb0dc48cf395d7daabe20293234dbcf2b26545.php:49
 msgid "Repeats"
@@ -2251,7 +2263,7 @@ msgstr "Unde:"
 
 #: app/view/event/content.php:125
 msgid "Calendar"
-msgstr ""
+msgstr "Calendar"
 
 #: app/view/event/content.php:126
 msgid "View all events"
@@ -2309,7 +2321,7 @@ msgstr "j M, Y @ G:i"
 
 #: app/view/event/post.php:58
 msgid "Event draft updated. <a target=\"_blank\" href=\"%s\">Preview event</a>"
-msgstr ""
+msgstr "Schiță a evenimentului actualizată <a target=\"_blank\" href=\"%s\">Previzualizează eveniment</a>"
 
 #: app/view/event/single.php:89
 msgid "Add to Calendar"
@@ -2400,7 +2412,7 @@ msgstr "Nu există evenimente în viitorul apropiat."
 
 #: app/view/calendar/widget.php:371 app/view/event/time.php:132
 msgid "all-day"
-msgstr ""
+msgstr "toata ziua"
 
 #: app/view/calendar/widget.php:372
 msgid "View Calendar"
@@ -2408,15 +2420,15 @@ msgstr "Vezi Calendar"
 
 #: app/view/calendar/widget.php:375
 msgid "Add"
-msgstr "Adauga"
+msgstr "Adaugă"
 
 #: app/view/calendar/page.php:260
 msgid "Subscribe to filtered calendar"
-msgstr "Abonați-vă la calendarul filtrat"
+msgstr "Abonează-te la calendarul filtrat"
 
 #: app/view/calendar/page.php:261
 msgid "Subscribe"
-msgstr "Abonați-vă"
+msgstr "Abonează-te"
 
 #: app/view/calendar/page.php:262 app/view/event/single.php:93
 msgid "Get a Timely Calendar"
@@ -2424,15 +2436,15 @@ msgstr "Obține un Calendar Timely"
 
 #: app/view/calendar/subscribe-button.php:22
 msgid "Add to Timely Calendar"
-msgstr "Adăugați la Timely Calendar"
+msgstr "Adaugă la Timely Calendar"
 
 #: app/view/calendar/subscribe-button.php:23
 msgid "Add to Google"
-msgstr "Adăugați la Google"
+msgstr "Adaugă la Google"
 
 #: app/view/calendar/subscribe-button.php:24
 msgid "Add to Outlook"
-msgstr "Adăugați la Outlook"
+msgstr "Adaugă la Outlook"
 
 #: app/view/calendar/subscribe-button.php:25
 msgid "Add to Apple Calendar"
@@ -2440,7 +2452,7 @@ msgstr "Adaugă la Apple Calendar"
 
 #: app/view/calendar/subscribe-button.php:26
 msgid "Add to other calendar"
-msgstr "Adăugați la alt calendar"
+msgstr "Adaugă la alt calendar"
 
 #: app/view/calendar/subscribe-button.php:30
 msgid "Copy this URL for your own Timely calendar or click to add to your rich-text calendar"
@@ -2448,11 +2460,11 @@ msgstr "Copiați acest URL pentru calendarul dvoastră propriu Timely sau faceț
 
 #: app/view/calendar/subscribe-button.php:31
 msgid "Subscribe to this calendar in your Google Calendar"
-msgstr "Abonați-vă la acest calendar prin Google Calendar al dvoastră"
+msgstr "Abonează-te la acest calendar prin Google Calendar al dvoastră"
 
 #: app/view/calendar/subscribe-button.php:32
 msgid "Subscribe to this calendar in MS Outlook"
-msgstr "Abonați-vă la acest calendar în MS Outlook"
+msgstr "Abonează-te la acest calendar în MS Outlook"
 
 #: app/view/calendar/subscribe-button.php:33
 msgid "Subscribe to this calendar in Apple Calendar/iCal"
@@ -2496,46 +2508,46 @@ msgstr "La acest moment nu sunt evenimente viitoare de afișat."
 msgid "Read more"
 msgstr "Citește mai mult"
 
-#: app/view/admin/tickets.php:111
+#: app/view/admin/tickets.php:120
 msgid "Sales"
-msgstr ""
+msgstr "Vânzări"
 
-#: app/view/admin/tickets.php:113
+#: app/view/admin/tickets.php:122
 msgid "Cheque"
-msgstr ""
+msgstr "Cec"
 
 #: public/admin/box_eventbrite.php:103
 msgid "Paypal"
 msgstr "Paypal"
 
-#: app/view/admin/tickets.php:117
+#: app/view/admin/tickets.php:126
 msgid "Save Changes"
-msgstr ""
+msgstr "Salvează modificările"
 
-#: app/view/admin/tickets.php:118
+#: app/view/admin/tickets.php:127
 msgid "Date"
-msgstr ""
+msgstr "Dată"
 
-#: app/view/admin/tickets.php:119
+#: app/view/admin/tickets.php:128
 msgid "Event"
-msgstr ""
+msgstr "Eveniment"
 
-#: app/view/admin/tickets.php:120
+#: app/view/admin/tickets.php:129
 msgid "Purchaser"
-msgstr ""
+msgstr "Cumpărător"
 
-#: app/view/admin/tickets.php:121 app/view/calendar/view/abstract.php:107
+#: app/view/admin/tickets.php:130 app/view/calendar/view/abstract.php:107
 #: app/view/event/ticket.php:39
 msgid "Tickets"
 msgstr "Bilete"
 
-#: app/view/admin/tickets.php:124
+#: app/view/admin/tickets.php:133
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
-#: app/view/admin/settings.php:206 app/view/admin/tickets.php:125
+#: app/view/admin/settings.php:211 app/view/admin/tickets.php:134
 msgid "Sign Out"
-msgstr ""
+msgstr "Deconectează-te"
 
 #: app/view/admin/widget-creator.php:24 app/view/admin/widget-creator.php:25
 #: app/view/admin/widget-creator.php:47
@@ -2575,23 +2587,23 @@ msgstr "A apărut o eroare la încărcarea calendarului. Vă rugăm să contacta
 msgid "Calendar was unable to initialize %s view and has reverted to Agenda view. Please check if you have installed the latest versions of calendar add-ons."
 msgstr "Calendarul nu a putut inițializa vederea %s și a revenit la vederea Agendă. Vă rugăm să verificați dacă aveți instalate ultimele versiuni ale extensiilor pentru calendar."
 
-#: app/view/admin/settings.php:198
+#: app/view/admin/settings.php:203
 msgid "Phone Number:"
-msgstr ""
+msgstr "Număr de telefon:"
 
-#: app/view/admin/settings.php:207
+#: app/view/admin/settings.php:212
 msgid "Sign Up"
-msgstr ""
+msgstr "Înregistrează-te"
 
-#: app/view/admin/settings.php:208
+#: app/view/admin/settings.php:213
 msgid "Sign In"
-msgstr ""
+msgstr "Conectează-te"
 
-#: app/view/admin/settings.php:231
+#: app/view/admin/settings.php:236
 msgid "Save Settings"
 msgstr "Salvați opțiunile"
 
-#: app/view/admin/settings.php:238
+#: app/view/admin/settings.php:243
 msgid "If the form below is not working please follow <a href=\"%s\">this link</a>."
 msgstr "Dacă formularul de mai jos nu funcționează, vă rugăm să accesați <a href=\"%s\">acest link</a>."
 
@@ -2630,11 +2642,11 @@ msgstr "Calendar general"
 
 #: app/view/admin/theme-options.php:148
 msgid "Month/week/day view"
-msgstr "Vedere lunară/săptămânală/zilnică"
+msgstr "Vizualizare lunară/săptămânală/zilnică"
 
 #: app/view/admin/theme-options.php:151
 msgid "Agenda view"
-msgstr "Vedere tip Agendă"
+msgstr "Vizualizare  tip Agendă"
 
 #: app/view/admin/theme-options.php:169
 msgid "Save Options"
@@ -2689,7 +2701,7 @@ msgstr "Servicii externe"
 msgid "Cache Report"
 msgstr "Raport de Cache"
 
-#: app/view/admin/settings.php:184 app/view/admin/tickets.php:116
+#: app/view/admin/settings.php:189 app/view/admin/tickets.php:125
 #: public/admin/box_ask_customer_review.php:113
 #: public/admin/box_ask_customer_review.php:127
 #: public/admin/box_ask_customer_review.php:141
@@ -2697,43 +2709,43 @@ msgstr "Raport de Cache"
 #: public/admin/box_event_cost.php:118 public/admin/box_event_cost.php:141
 #: public/admin/box_event_cost.php:333 public/admin/box_event_cost.php:346
 msgid "This field is required."
-msgstr ""
+msgstr "Acest câmp este obligatoriu."
 
-#: app/view/admin/settings.php:185 app/view/event/ticket.php:25
+#: app/view/admin/settings.php:190 app/view/event/ticket.php:25
 msgid "Register"
-msgstr "Înregistrați-vă"
+msgstr "Înregistrează-te"
 
-#: app/view/admin/settings.php:186
+#: app/view/admin/settings.php:191
 msgid "Sign in"
-msgstr ""
-
-#: app/view/admin/settings.php:190
-msgid "Sign out"
-msgstr ""
-
-#: app/view/admin/settings.php:193
-msgid "Hide form"
-msgstr ""
-
-#: app/view/admin/settings.php:194
-msgid "Show form"
-msgstr ""
-
-#: app/view/admin/settings.php:192
-msgid "Full Name:"
-msgstr ""
+msgstr "Conectează-te"
 
 #: app/view/admin/settings.php:195
+msgid "Sign out"
+msgstr "Deconectează-te"
+
+#: app/view/admin/settings.php:198
+msgid "Hide form"
+msgstr "Ascunde formular"
+
+#: app/view/admin/settings.php:199
+msgid "Show form"
+msgstr "Arată formular:"
+
+#: app/view/admin/settings.php:197
+msgid "Full Name:"
+msgstr "Nume complet:"
+
+#: app/view/admin/settings.php:200
 msgid "Email:"
 msgstr "Email:"
 
-#: app/view/admin/settings.php:196
+#: app/view/admin/settings.php:201
 msgid "Password:"
-msgstr ""
+msgstr "Parolă:"
 
-#: app/view/admin/settings.php:197
+#: app/view/admin/settings.php:202
 msgid "Confirm Password:"
-msgstr ""
+msgstr "Confirmă parola:"
 
 #: app/view/admin/get-repeat-box.php:483
 msgid "fourth"
@@ -2789,7 +2801,7 @@ msgstr "<a href=\"%s\">Setări</a>"
 
 #: app/view/admin/nav.php:28
 msgid "<a href=\"%s\">Check for updates</a>"
-msgstr ""
+msgstr "<a href=\"%s\">Verifică pentru actualizări</a>"
 
 #: app/view/admin/organize.php:100
 msgid "Organize Events"
@@ -2800,7 +2812,7 @@ msgid "All-in-One Event Calendar: Settings"
 msgstr "All-in-One Event Calendar: Setări"
 
 #: app/view/admin/settings.php:68 app/view/admin/settings.php:69
-#: app/view/admin/tickets.php:110 lib/date/timezone.php:366
+#: app/view/admin/tickets.php:119 lib/date/timezone.php:366
 msgid "Settings"
 msgstr "Setări"
 
@@ -2908,19 +2920,19 @@ msgstr "ultimul"
 msgid "month(s)"
 msgstr "lună(luni)"
 
-#: app/model/settings.php:959
+#: app/model/settings.php:972
 msgid "<strong>Link CSS</strong> in <code>&lt;head&gt;</code> section when file cache is unavailable."
 msgstr "<strong>Pune link către CSS</strong> în secțiunea <code>&lt;head&gt;</code> când nu este disponibil cache al fișierelor."
 
-#: app/model/settings.php:962
+#: app/model/settings.php:975
 msgid "Use this option if file cache is unavailable and you would prefer to serve CSS as a link rather than have it output inline."
 msgstr "Utilizați această opțiune dacă fișierul cache este indisponibil și ați prefera mai degrabă să se servească CSS ca un link decât să fie redat în linie (inline)."
 
-#: app/model/settings.php:974
+#: app/model/settings.php:987
 msgid "Current <strong>robots.txt</strong> on this site"
 msgstr "Fișierul actual <strong>robots.txt</strong> de pe acest site"
 
-#: app/model/settings.php:978
+#: app/model/settings.php:991
 msgid ""
 "The Robot Exclusion Standard, also known as the Robots Exclusion Protocol or\n"
 "                        <code><a href=\"https://en.wikipedia.org/wiki/Robots.txt\" target=\"_blank\">robots.txt</a></code>\n"
@@ -2929,19 +2941,19 @@ msgid ""
 "                        You can change it manually by editing <code>robots.txt</code> in your root WordPress directory."
 msgstr ""
 
-#: app/model/settings.php:995
+#: app/model/settings.php:1008
 msgid "<strong>Publicize, promote, and share my events</strong> marked as public on the Timely network. (<a href=\"%s\" target=\"_blank\">Learn more &#187;</a>)"
 msgstr "<strong>Publicați, promovați și împărtășiți evenimentele mele</strong> marcate ca fiind publice în rețeaua Timely. (<a href=\"%s\" target=\"_blank\">Mai mult &#187;</a>)"
 
-#: app/model/settings.php:1018
+#: app/model/settings.php:1031
 msgid "Templates cache improves site performance"
 msgstr "Cache-ul șabloanelor îmbunătățește performanța site-ului"
 
-#: app/model/settings.php:1031
+#: app/model/settings.php:1044
 msgid "Display events in <strong>calendar time zone</strong>"
-msgstr ""
+msgstr "Afișează evenimentele în <strong>fusul orar al calendarului</strong>"
 
-#: app/model/settings.php:1034
+#: app/model/settings.php:1047
 msgid "If this box is checked events will appear in the calendar time zone with time zone information displayed on the event details page."
 msgstr ""
 
@@ -2983,7 +2995,7 @@ msgstr "Data/ora evenimentului"
 
 #: app/view/admin/all-events.php:21
 msgid "Ticket Types"
-msgstr ""
+msgstr "Tipuri de bilete"
 
 #: app/view/admin/all-events.php:128
 msgid "Show All "
@@ -2991,7 +3003,7 @@ msgstr "Arată tot"
 
 #: app/view/admin/all-events.php:141
 msgid "Show All Authors"
-msgstr ""
+msgstr "Afișează toți autorii"
 
 #: app/model/settings.php:761
 msgid "Strict compatibility content filtering"
@@ -3045,27 +3057,27 @@ msgstr "Afișați vechiul buton <strong>Postați Evenimentele Dvoastră</strong>
 msgid "Install the <a target=\"_blank\" href=\"https://time.ly/\">Interactive Frontend Extension</a> for the <strong>frontend Post Your Event form</strong>."
 msgstr ""
 
-#: app/model/settings.php:878
+#: app/model/settings.php:891
 msgid "Move calendar into this DOM element"
 msgstr "Mută calendarul în acest element DOM"
 
-#: app/model/settings.php:899
+#: app/model/settings.php:912
 msgid "<strong>Skip <tt>in_the_loop()</tt> check </strong> that protects against multiple calendar output"
 msgstr "<strong>Omiteți verificarea <tt>in_the_loop()</tt></strong> care protejează de afișarea multiplă a calendarului"
 
-#: app/model/settings.php:902
+#: app/model/settings.php:915
 msgid "Try enabling this option if your calendar does not appear on the calendar page. It is needed for compatibility with a small number of themes that call <tt>the_content()</tt> from outside of The Loop. Leave disabled otherwise."
 msgstr "Încercați să activați această opțiune în cazul în care calendarul nu apare pe pagina de calendar. Aceasta este necesară pentru compatibilitate cu un număr mic de teme care apelează <tt>the_content()</tt> din interiorul The Loop. Altfel, lăsați-o dezactivată."
 
-#: app/model/settings.php:914
+#: app/model/settings.php:927
 msgid "Disable <strong>gzip</strong> compression."
 msgstr "Dezactivaţi compresia <strong>gzip</strong>."
 
-#: app/model/settings.php:929
+#: app/model/settings.php:942
 msgid "Use frontend rendering."
 msgstr "Folosește redarea la nivel de client („frontend”)."
 
-#: app/model/settings.php:932
+#: app/model/settings.php:945
 msgid "Renders calendar views on the client rather than the server; can improve performance."
 msgstr "Creează vizualizările calendarului la nivel de client, nu pe server; aceasta poate îmbunătăți performanța."
 
@@ -3099,15 +3111,15 @@ msgstr "Se aplică doar la evenimentele care se întind pe o singură zi."
 
 #: app/model/settings.php:604
 msgid "Keep all events <strong>expanded</strong> in Agenda view"
-msgstr ""
+msgstr "Menține toate evenimentele <strong>desfășurate</strong> în modul de vizualizare Agendă"
 
 #: app/model/settings.php:616
 msgid "<strong>Show year</strong> in calendar date labels"
-msgstr ""
+msgstr "<strong>Afișează anul</strong> în etichetele cu data calendarului"
 
 #: app/model/settings.php:628
 msgid "<strong>Show location in event titles</strong> in calendar views"
-msgstr ""
+msgstr "<strong>Afișează locația în titlurile evenimentelor</strong> în vizualizarea calendarului"
 
 #: app/model/settings.php:640
 msgid "<strong>Exclude</strong> events from search results"
@@ -3155,7 +3167,7 @@ msgstr ""
 
 #: app/model/api/api-abstract.php:191
 msgid "%s.<br/>Detail: %s."
-msgstr ""
+msgstr "%s.<br/>Detaliu: %s."
 
 #: app/model/api/api-abstract.php:203
 msgid "API URL: %s.<br/>Detail: %s - %s"
@@ -3163,11 +3175,11 @@ msgstr ""
 
 #: app/model/api/api-abstract.php:211
 msgid "%s. Please reload this page to try again. If this error persists, please contact us at %s. In your report please include the information below.<br/>%s."
-msgstr ""
+msgstr "%s. Te rugăm să reîncarci pagina pentru a încerca din nou. Dacă eroarea persistă, te rugăm să ne contactezi la %s. Include în raport informațiile de mai jos. <br/>%s."
 
 #: app/model/api/api-abstract.php:218
 msgid "%s. Please try again. If this error persists, please contact us at %s. In your report please include the information below.<br/>%s."
-msgstr ""
+msgstr "%s. Te rugăm să încerci din nou. Dacă eroarea persistă, te rugăm să ne contactezi la %s. Include în raport informațiile de mai jos. <br/>%s."
 
 #: app/model/event/parent.php:186
 msgid "Edit &#8220;%s&#8221;"
@@ -3179,7 +3191,7 @@ msgstr "Eveniment de bază"
 
 #: app/model/review.php:169
 msgid "Feedback provided by user"
-msgstr ""
+msgstr "Feedback oferit de utilizator"
 
 #: app/model/review.php:171 public/admin/box_eventbrite.php:32
 msgid "Name"
@@ -3187,15 +3199,15 @@ msgstr "Nume"
 
 #: app/model/review.php:173
 msgid "E-mail"
-msgstr ""
+msgstr "E-mail"
 
 #: app/model/review.php:175
 msgid "Site URL"
-msgstr ""
+msgstr "Link site"
 
 #: app/model/review.php:177
 msgid "Message"
-msgstr ""
+msgstr "Mesaj"
 
 #: app/model/settings.php:401
 #: lib/html/element/setting/calendar-page-selector.php:50
@@ -3337,41 +3349,41 @@ msgstr ""
 
 #: app/controller/javascript.php:563
 msgid "Start:"
-msgstr ""
+msgstr "Început:"
 
 #: app/controller/javascript.php:564
 msgid "End:"
-msgstr ""
+msgstr "Încheiere:"
 
 #: app/controller/javascript.php:565 public/admin/box_event_cost.php:158
 msgid "Min:"
-msgstr ""
+msgstr "Minim:"
 
 #: app/controller/javascript.php:566 public/admin/box_event_cost.php:168
 msgid "Max:"
-msgstr ""
+msgstr "Maxim:"
 
 #: app/controller/javascript.php:567
 msgid "Attendees"
-msgstr ""
+msgstr "Participanți"
 
 #: app/controller/javascript.php:568
 msgid "Hide Attendees"
-msgstr ""
+msgstr "Ascunde participanți"
 
 #: app/controller/javascript.php:569
 msgid "Attendees List"
-msgstr ""
+msgstr "Lista de participanți"
 
 #: app/controller/javascript.php:570
 msgid "Guest Name"
-msgstr ""
+msgstr "Nume invitați"
 
-#: app/controller/javascript.php:571 app/view/admin/tickets.php:123
+#: app/controller/javascript.php:571 app/view/admin/tickets.php:132
 msgid "Status"
-msgstr ""
+msgstr "Statut"
 
-#: app/controller/javascript.php:572 app/view/admin/tickets.php:122
+#: app/controller/javascript.php:572 app/view/admin/tickets.php:131
 #: app/view/event/ticket.php:71
 msgid "Email"
 msgstr "Email"
@@ -3387,20 +3399,20 @@ msgstr "Editează"
 
 #: app/controller/javascript.php:575
 msgid "Code"
-msgstr ""
+msgstr "Cod"
 
 #: app/controller/javascript.php:576 public/admin/box_event_cost.php:189
 #: public/admin/box_event_cost.php:308
 msgid "Unlimited"
-msgstr ""
+msgstr "Nelimitat"
 
 #: app/controller/javascript.php:582
 msgid "Your message has been sent. Thank you for your feedback."
-msgstr ""
+msgstr "Mesajul a fost trimis. Mulțumim pentru feedback. "
 
 #: app/controller/javascript.php:583
 msgid "Your message has not been sent. Please try again or contact us."
-msgstr ""
+msgstr "Mesajul tău nu a fost trimis. Te rugăm să încerci încă o dată sau să ne contactezi. "
 
 #: app/controller/javascript.php:456
 msgid "Please enter a valid iCalendar URL."
@@ -3408,7 +3420,7 @@ msgstr "Introduceţi un URL iCalendar corect."
 
 #: app/controller/javascript.php:465
 msgid "Please enter a valid email address."
-msgstr "Te rugam introdu o adresa de email valida."
+msgstr "Te rugăm introdu o adresă de email validă."
 
 #: app/controller/javascript.php:467
 msgid "Choose Image"
@@ -3479,7 +3491,7 @@ msgid "Info"
 msgstr ""
 
 #: app/controller/extension-license.php:53 app/view/admin/add-ons.php:26
-#: app/view/admin/add-ons.php:27 public/admin/box_support.php:43
+#: app/view/admin/add-ons.php:27 app/view/admin/settings.php:156
 msgid "Add-ons"
 msgstr "Extensii"
 

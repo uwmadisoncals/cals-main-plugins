@@ -3,8 +3,8 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
-Tested up to: 4.8
-Stable tag: 2.5.15
+Tested up to: 4.9
+Stable tag: 2.5.16
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -82,6 +82,11 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
    with shortcode options or widget configuration.
    
 == Changelog ==
+
+= 2.5.16 =
+
+* Bug fix: Event deletion action executed when individual instance deleted from front-end
+* Updates: due to esc_sql function changes in WordPress 4.8.3
 
 = 2.5.15 =
 

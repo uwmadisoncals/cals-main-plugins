@@ -3,8 +3,9 @@ Contributors: shazahm1@hotmail.com
 Donate link: https://connections-pro.com/
 Tags: address book, business directory, chamber of commerce business directory, church directory, company business directory, contact directory, custom business directory, directory, directory plugin, listings directory, local business directory, link directory, member directory, staff directory
 Requires at least: 4.4
-Tested up to: 4.8
-Stable tag: 8.6.11
+Tested up to: 4.9
+Requires PHP: 5.3
+Stable tag: 8.6.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,15 +13,15 @@ An easy to use directory plugin to create an addressbook, business directory, me
 
 == Description ==
 
-[Homepage](https://connections-pro.com/) | [Showcase](https://connections-pro.com/showcase/) | [Documentation](https://connections-pro.com/documentation/contents/) | [Support](https://connections-pro.com/support/) | [Templates](https://connections-pro.com/templates/) | [Extensions](https://connections-pro.com/extensions/)
+[Showcase](https://connections-pro.com/showcase/) | [Documentation](https://connections-pro.com/documentation/contents/) | [Support](https://connections-pro.com/support/) | [Templates](https://connections-pro.com/templates/) | [Extensions](https://connections-pro.com/extensions/)
 
-Quite simply, Connections Business Directory is one of the [best business directory plugins available](https://wordpress.org/support/view/plugin-reviews/connections?filter=5) for WordPress. Its simplicity in design and function, vast array of unique features and versatility are the reasons more and more people are turning to Connections Business Directory for their directory needs. You can use Connections to create a simple address book, maintain a staff or member directory and run a business directory or link directory. Connections Business Directory was built bottom up to be as configurable as possible while providing the features you need. Read on to learn about some of the best features Connections Business Directory has to offer...
+Quite simply, Connections Business Directory is one of the [best business directory plugins available](https://wordpress.org/support/plugin/connections/reviews/?filter=5) for WordPress. Its simplicity in design and function, vast array of unique features and versatility are the reasons more and more people are turning to Connections Business Directory for their directory needs. You can use Connections to create a simple address book, maintain a staff or member directory and run a business directory or link directory. Connections Business Directory was built bottom up to be as configurable as possible while providing the features you need. Read on to learn about some of the best features Connections Business Directory has to offer...
 
 = Features =
 
 * **Seamless integration** with WordPress.
-* **[Highly rated support.](https://wordpress.org/support/view/plugin-reviews/connections?filter=5)**
-* [Continuously updated](https://wordpress.org/plugins/connections/changelog/) bringing you new features for free.
+* **[Highly rated support.](https://wordpress.org/support/plugin/connections/reviews/?filter=5)**
+* [Continuously updated](https://wordpress.org/plugins/connections/#developers) bringing you new features for free.
 * Dashboard admin page where you can see at a glance today's anniversaries and birthdays as well as upcoming anniversaries and birthdays of members in your directory.
 * Multiple entry types from which to choose; such as individual, organization and family. The family entry type is unique to Connections. This entry type allows you to group individuals together as a family which makes Connections ideally suited for creating a church directory.
 * You control which entries are viewable to the public and which entries are private, viewable for logged in users only. You can even have entries set as unlisted so only admins can view them.
@@ -48,8 +49,9 @@ Here are some great **free extensions** (with more on the way) that enhance your
 
 **Custom Fields**
 
-* [Business Hours](https://wordpress.org/plugins/connections-business-directory-hours/) :: Add the business open hours.
+* [Business Open Hours](https://wordpress.org/plugins/connections-business-directory-hours/) :: Add the business open hours.
 * [Local Time](https://wordpress.org/plugins/connections-business-directory-local-time/) :: Add the business local time.
+* [Facilities](https://wordpress.org/plugins/connections-business-directory-facilities/) :: Add the business facilities.
 * [Income Level](https://wordpress.org/plugins/connections-business-directory-income-levels/) :: Add an income level.
 * [Education Level](https://wordpress.org/plugins/connections-business-directory-education-levels/) :: Add an education level.
 * [Languages](https://wordpress.org/plugins/connections-business-directory-languages/) :: Add languages spoken.
@@ -86,7 +88,7 @@ Connections Business Directory comes with a couple templates to get you started 
 
 = Developer Friendly =
 
-* Open development on [Github](https://github.com/shazahm1/Connections).
+* Open development on [Github](https://github.com/Connections-Business-Directory/Connections).
 * Access to **180 action hooks** and over **300 filters** ... and counting.
 * Term API.
 * Custom Metabox and Fields API.
@@ -229,6 +231,23 @@ Yes this is possible but there is a special setup required to do so. It is recom
 == Changelog ==
 
 [Complete Changelog can be found here.](https://connections-pro.com/changelog/)
+
+= 8.6.12 11/01/2017 =
+* NEW: Introduce support for custom taxonomies.
+* NEW: Introduce the `cn_image_editors` filter.
+* NEW: Introduce the `cn_entry_directory_homepage` filter.
+* NEW: Introduce the `cn_image_link` and `cn_image_link-{type}` filters.
+* NEW: Introduce the `cn_entry_output_category_items` filter.
+* TWEAK: Some code cleanup of the output for social media networks icons.
+* TWEAK: Add some RTL CSS in its own CSS file to be conditionally loaded.
+* BUG: When exporting all, make sure to attempt to JSON decode the option column before access its value.
+* BUG: Drop the `slug` index on the connections_terms table.
+* BUG: Remove debug code from the CSV export all output.
+* BUG: Correct bug which could prevent the logo/photo URL from being exported.
+* OTHER: Add reference to the Local Time extension in the readme.txt file.
+* OTHER: Replace `http` with `https` for wordpress.org and connections-pro.com domain links.
+* DEV: phpDoc corrections.
+* DEV: Add curly brackets to a variable variable for better code clarity.
 
 = 8.6.11 09/01/2017 =
 * BUG: Fix to allow `0` minutes and seconds by improving check for existing key and ensure it is not false after parsing a datetime format before merging value.
@@ -693,24 +712,9 @@ Yes this is possible but there is a special setup required to do so. It is recom
 * OTHER: Remove several blank lines.
 * DEV: Fix some minor code alignment issues in cnSettingsAPI.
 
-= 8.5.16 06/03/2016 =
-* NEW: Introduce the `cn_entry_action_back_atts` filter.
-* TWEAK: Remove the on_click event handler attached to the back to directory link.
-* TWEAK: Pass the `home_id` and `force_home` shortcode options when creating the back to directory link.
-* TWEAK: Refactor cnTemplateParts::entryAction_Back method to introduce the `cn_entry_action_back_atts` filter.
-* TWEAK: Override the parseCSV core class to implement BOM stripping in the load_data() method.
-* TWEAK: Remove PHP4 style constructor in the Browser library.
-* BUG: Correct query bug in cnRetrieve::entries when querying entries by radius.
-* BUG: Add missing EOL when CN_MULTISITE_ENABLED is TRUE.
-* OTHER: Remove stray extra spaces.
-* DEV: phpDoc fixes.
-
 [Complete Changelog can be found here.](https://connections-pro.com/changelog/)
 
 == Upgrade Notice ==
-
-= 8.5.16 =
-It is recommended to backup before updating. Requires WordPress >= 4.2.
 
 = 8.5.17 =
 It is recommended to backup before updating. Requires WordPress >= 4.2.
@@ -794,4 +798,7 @@ It is recommended to backup before updating. Requires WordPress >= 4.4.
 It is recommended to backup before updating. Requires WordPress >= 4.4.
 
 = 8.6.11 =
+It is recommended to backup before updating. Requires WordPress >= 4.4.
+
+= 8.6.12 =
 It is recommended to backup before updating. Requires WordPress >= 4.4.
