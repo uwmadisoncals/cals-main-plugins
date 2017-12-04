@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick, pdf
-Version: 6.7.06
-Stable tag: 6.7.05
+Version: 6.7.08
+Stable tag: 6.7.07
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -126,6 +126,39 @@ If this happens, make sure (ask your hosting provider) that you have all the rig
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.7.08 =
+
+= Bug Fixes =
+
+* Fixed a problem when using imagemagick and the upload file contains spaces in the name.
+
+= New Features =
+
+* Added shortcode generator for shortcode [photo]. Including upload new photo. Requires enabling the use of shortcode [photo] in Table IX-L1.
+
+= Other Changes =
+
+* Added 'Albums only' to Table IX-E12: Search results display.
+* Changed defaults for max albums to 500 in Table IX-B6.3 and Table VII-B13. Note: The value in Table VII-B13 should be <= Table IX-B6.3.
+
+= 6.7.07 =
+
+= Bug Fixes =
+
+* Fixed a spurious missing switch to flat/collapsible table button on the Album Admin page.
+* Fixed a spurious error on local host systems.
+* Fixed a problem displaying the widget admin page and customize screen when the system has many albums ( >> 1000 ).
+
+= New Features =
+
+* New shortcode attribute button for type="slide" only. Example: [wppa type="slide" album="13" button="Show me the slideshow"][/wppa]
+This will hide the slideshow behind a button. Clicking the button will download the slideshow code to the browser. This is to reduce and speedup loading pages with slideshow(s).
+* You can now restrict frontend uploads to one or more user roles. See Table II-H2.1
+
+= Other Changes =
+
+* Added a dummy index.php to all subfolders and to folders creted by wppa.
 
 = 6.7.06 =
 

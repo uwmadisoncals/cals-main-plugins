@@ -18,7 +18,7 @@ class AAM_Core_Cache {
     /**
      * DB Cache option
      */
-    const CACHE_OPTION = 'cache';
+    const CACHE_OPTION = 'aam-cache';
     
     /**
      * Core config
@@ -94,12 +94,13 @@ class AAM_Core_Cache {
             $oquery = "DELETE FROM {$wpdb->options} WHERE `option_name` = %s";
             $wpdb->query($wpdb->prepare($oquery, 'aam_visitor_cache' ));
 
+            //clear all users cache
             $mquery = "DELETE FROM {$wpdb->usermeta} WHERE `meta_key` = %s";
-            $wpdb->query($wpdb->prepare($mquery, $wpdb->prefix . 'aam_cache' ));
+            $wpdb->query($wpdb->prepare($mquery, self::CACHE_OPTION));
         } else {
             $query  = "DELETE FROM {$wpdb->usermeta} WHERE (`user_id` = %d) AND ";
             $query .= "`meta_key` = %s";
-            $wpdb->query($wpdb->prepare($query, $user, $wpdb->prefix . 'aam_cache'));
+            $wpdb->query($wpdb->prepare($query, $user, self::CACHE_OPTION));
         }
         
         self::$cache = false;
@@ -119,7 +120,7 @@ class AAM_Core_Cache {
      */
     public static function save() {
         if (self::$updated) {
-            AAM::getUser()->updateOption(self::$cache, self::CACHE_OPTION);
+            update_user_meta(AAM::getUser()->ID, self::CACHE_OPTION, self::$cache);
         }
     }
     
@@ -134,7 +135,7 @@ class AAM_Core_Cache {
      */
     public static function bootstrap() {
         if (!AAM::isAAM()) {
-            $cache = AAM::getUser()->readOption(self::CACHE_OPTION);
+            $cache = get_user_meta(AAM::getUser(), self::CACHE_OPTION, true);
             self::$cache = (is_array($cache) ? $cache : array());
             
             add_action('shutdown', 'AAM_Core_Cache::save');

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.7.04
+* Version 6.7.07
 *
 */
 
@@ -3602,17 +3602,19 @@ function wppa_is_safari() {
 
 function wppa_chmod( $fso ) {
 
+	$fso = rtrim( $fso, '/' );
+
 	$perms = fileperms( $fso ) & 0777;
-	
+
 	if ( is_dir( $fso ) ) {
-		
+
 		// Check file permissions
 		if ( 0755 !== ( $perms & 0755 ) ) {
-			
+
 			// If not sufficient, try to change
 			@ chmod( $fso, 0755 );
 			clearstatcache();
-			
+
 			// If still no luck
 			if ( 0755 !== ( fileperms( $fso ) & 0755 ) ) {
 				wppa_log( 'Fso', sprintf( 'Unable to set filepermissions on %s from %o to 0755', $fso, $perms ) );
@@ -3621,17 +3623,28 @@ function wppa_chmod( $fso ) {
 				wppa_log( 'Fso', sprintf( 'Successfully set filepermissions on %s from %o to 0755', $fso, $perms ) );
 			}
 		}
+
+		// Verify existance of index.php
+		if ( ! is_file( $fso . '/index.php' ) ) {
+			@ copy( WPPA_PATH . '/index.php', $fso . '/index.php' );
+			if ( is_file( $fso . '/index.php' ) ) {
+				wppa_log( 'fso', 'Added: ' . $fso . '/index.php' );
+			}
+			else {
+				wppa_log( 'fso', 'Could not add ' . $fso . '/index.php' );
+			}
+		}
 	}
 
 	if ( is_file( $fso ) ) {
-		
+
 		// Check file permissions
 		if ( 0644 !== ( fileperms( $fso ) & 0644 ) ) {
-			
+
 			// If not sufficient, try to change
 			@ chmod( $fso, 0644 );
 			clearstatcache();
-			
+
 			// If still no luck
 			if ( 0644 !== ( fileperms( $fso ) & 0644 ) ) {
 				wppa_log( 'Fso', sprintf( 'Unable to set filepermissions on %s from %o to 0644', $fso, $perms ) );
@@ -4055,3 +4068,49 @@ function wppa_pdf_postprocess( $id ) {
 	wppa( 'is_pdf', false );
 }
 
+// Has the system 'many' albums?
+function wppa_has_many_albums() {
+global $wpdb;
+static $n_albums;
+
+	// Max specified? If not, return false
+	if ( ! wppa_opt( 'photo_admin_max_albums' ) ) {
+		return false;
+	}
+
+	// Find total number of albums, if not done before
+	if ( ! $n_albums ) {
+		$n_albums = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "`" );
+	}
+
+	// Decide if many
+	if ( $n_albums > wppa_opt( 'photo_admin_max_albums' ) ) {
+		return true;
+	}
+	return false;
+}
+
+// Return false if user is logged in, upload roles are specified and i do not have one of them
+function wppa_check_user_upload_role() {
+
+	// Not logged in, ok
+	if ( ! is_user_logged_in() ) {
+		return true;
+	}
+
+	// No roles specified: ok
+	if ( ! wppa_opt( 'user_opload_roles' ) ) {
+		return true;
+	}
+
+	// Roles specified
+	$roles = explode( ',', wppa_opt( 'user_opload_roles' ) );
+	foreach ( $roles as $role ) {
+		if ( current_user_can( $role ) ) {
+			return true;
+		}
+	}
+
+	// No matching role
+	return false;
+}

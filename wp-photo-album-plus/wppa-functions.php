@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.7.06
+* Version 6.7.08
 *
 */
 
@@ -754,8 +754,12 @@ global $wppa_session;
 		}
 	}
 
+	// Is it hidden behind an Ajax activating button?
+	if ( wppa( 'is_button' ) ) {
+		wppa_button_box();
+	}
 	// Is it url?
-	if ( wppa( 'is_url' ) ) {
+	elseif ( wppa( 'is_url' ) ) {
 		if ( wppa_photo_exists( wppa( 'single_photo' ) ) ) {
 			wppa_out( wppa_get_hires_url( wppa( 'single_photo' ) ) );
 		}
@@ -4251,6 +4255,7 @@ function wppa_user_upload() {
 global $wpdb;
 static $done;
 global $wppa_alert;
+global $wppa_upload_succes_id;
 
 	wppa_dbg_msg( 'Usr_upl entered' );
 
@@ -4376,6 +4381,9 @@ global $wppa_alert;
 							$uploaded_ids[] = $iret;
 							$done++;
 							wppa_set_last_album( $alb );
+
+							// Report phto id if from tinymce photo shortcode generator upload
+							$wppa_upload_succes_id = $iret;
 						}
 						else $fail++;
 					}
@@ -4389,6 +4397,9 @@ global $wppa_alert;
 								$f['type'] = $file['type'][$i];
 								$f['size'] = $file['size'][$i];
 								$iret = wppa_do_frontend_file_upload( $f, $alb );
+
+								// Report phto id if from tinymce photo shortcode generator upload
+								$wppa_upload_succes_id = $iret;
 								if ( $iret ) {
 									$uploaded_ids[] = $iret;
 									$done++;

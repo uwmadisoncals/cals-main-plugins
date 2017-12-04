@@ -142,12 +142,12 @@ class AAM_Core_Object_Menu extends AAM_Core_Object {
      * 
      * @access public
      */
-    public function has($menu) {
+    public function has($menu, $both = false) {
         //decode URL in case of any special characters like &amp;
         $decoded = htmlspecialchars_decode($menu);
         $options = $this->getOption();
         
-        return !empty($options[$decoded]);
+        return !empty($options[$decoded]) || ($both && !empty($options['menu-' . $decoded]));
     }
 
     /**

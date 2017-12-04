@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 6.7.06
+* Version 6.7.07
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -56,10 +56,20 @@ class AlbumWidget extends WP_Widget {
 
 		switch ( $parent ) {
 			case 'all':
-				$albums = $wpdb->get_results( 'SELECT * FROM `' . WPPA_ALBUMS . '` ' . wppa_get_album_order(), ARRAY_A );
+				if ( wppa_has_many_albums() ) {
+					$albums = array();
+				}
+				else {
+					$albums = $wpdb->get_results( 'SELECT * FROM `' . WPPA_ALBUMS . '` ' . wppa_get_album_order(), ARRAY_A );
+				}
 				break;
 			case 'last':
-				$albums = $wpdb->get_results( 'SELECT * FROM `' . WPPA_ALBUMS . '` ORDER BY `timestamp` DESC', ARRAY_A );
+				if ( wppa_has_many_albums() ) {
+					$albums = array();
+				}
+				else {
+					$albums = $wpdb->get_results( 'SELECT * FROM `' . WPPA_ALBUMS . '` ORDER BY `timestamp` DESC', ARRAY_A );
+				}
 				break;
 			default:
 				$albums = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM `' . WPPA_ALBUMS . '` WHERE `a_parent` = %s ' . wppa_get_album_order( $parent ), $parent ), ARRAY_A );
@@ -68,7 +78,10 @@ class AlbumWidget extends WP_Widget {
 		$widget_content = "\n".'<!-- WPPA+ album Widget start -->';
 
 		$count = 0;
-		if ( $albums ) foreach ( $albums as $album ) {
+		if ( wppa_has_many_albums() && in_array( $parent, array( 'all', 'last' ) ) ) {
+			$widget_content .= __( 'There are too many albums for this widget', 'wp-photo-album-plus' );
+		}
+		elseif ( $albums ) foreach ( $albums as $album ) {
 
 			if ( $count < $max ) {
 
@@ -353,10 +366,12 @@ class AlbumWidget extends WP_Widget {
 							false,
 						);
 
-		if ( $albs ) foreach( $albs as $alb ) {
-			$options[] 	= $alb['name'];
-			$values[] 	= $alb['id'];
-			$disabled[] = ! wppa_has_children( $alb['id'] );
+		if ( count( $albs ) <= wppa_opt( 'photo_admin_max_albums' ) ) {
+			if ( $albs ) foreach( $albs as $alb ) {
+				$options[] 	= $alb['name'];
+				$values[] 	= $alb['id'];
+				$disabled[] = ! wppa_has_children( $alb['id'] );
+			}
 		}
 
 		echo

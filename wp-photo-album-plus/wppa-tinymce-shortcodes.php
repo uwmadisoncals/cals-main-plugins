@@ -3,7 +3,7 @@
 * Pachkage: wp-photo-album-plus
 *
 *
-* Version 6.7.01
+* Version 6.7.07
 *
 */
 
@@ -70,10 +70,15 @@ function wppa_make_tinymce_dialog() {
 global $wpdb;
 
 	// Prepare albuminfo
-	$albums = $wpdb->get_results( "SELECT `id`, `name` FROM `".WPPA_ALBUMS."` ORDER BY `timestamp` DESC", ARRAY_A );
-	if ( wppa_switch( 'hier_albsel' ) ) {
-		$albums = wppa_add_paths( $albums );
-		$albums = wppa_array_sort( $albums, 'name' );
+	if ( wppa_has_many_albums() ) {
+		$albums = null;
+	}
+	else {
+		$albums = $wpdb->get_results( "SELECT `id`, `name` FROM `".WPPA_ALBUMS."` ORDER BY `timestamp` DESC", ARRAY_A );
+		if ( wppa_switch( 'hier_albsel' ) ) {
+			$albums = wppa_add_paths( $albums );
+			$albums = wppa_array_sort( $albums, 'name' );
+		}
 	}
 
 	// Prepare photoinfo
@@ -280,7 +285,15 @@ global $wpdb;
 			// Real albums
 			'<tr id="wppagallery-album-real-tr" style="display:none;" >'.
 				'<th><label for="wppagallery-album-real">'.__('The Album(s) to be used:', 'wp-photo-album-plus').'</label></th>'.
-				'<td>'.
+				'<td>';
+				if ( wppa_has_many_albums() ) {
+					$result .=
+					'<input id="wppagallery-album-real" style="max-width:400px;" name="album" onchange="wppaGalleryEvaluate()" />'.
+					'<br />'.
+					__('Enter one or more album numbers, seperated by commas', 'wp-photo-album-plus');
+				}
+				else {
+					$result .=
 					'<select id="wppagallery-album-real" style="max-width:400px;" name="album" multiple="multiple" onchange="wppaGalleryEvaluate()">';
 						if ( $albums ) {
 
@@ -296,24 +309,38 @@ global $wpdb;
 						else {
 							$result .= '<option value="0" >' . __('There are no albums yet', 'wp-photo-album-plus') . '</option>';
 						}
-					$result .= '</select>'.
+					$result .= '</select>';
+				}
+				$result .=
 				'</td>'.
-			'</tr>'.
-			'<tr id="wppagallery-album-real-search-tr" style="display:none;" >' .
-				'<th><label for="">'.__('Filter album:', 'wp-photo-album-plus').'</label></th>'.
-				'<td>'.
-					'<input id="wppagallery-album-real-search" type="text" onkeyup="wppaGalleryEvaluate()" />'.
-					'<br />'.
-					'<small>'.
-						__('Enter a (part of) the album name to limit the options in the selection box above.', 'wp-photo-album-plus').' '.
-					'</small>'.
-				'</td>'.
-			'</tr>'.
+			'</tr>';
+			if ( ! wppa_has_many_albums() ) {
+				$result .=
+				'<tr id="wppagallery-album-real-search-tr" style="display:none;" >' .
+					'<th><label for="">'.__('Filter album:', 'wp-photo-album-plus').'</label></th>'.
+					'<td>'.
+						'<input id="wppagallery-album-real-search" type="text" onkeyup="wppaGalleryEvaluate()" />'.
+						'<br />'.
+						'<small>'.
+							__('Enter a (part of) the album name to limit the options in the selection box above.', 'wp-photo-album-plus').' '.
+						'</small>'.
+					'</td>'.
+				'</tr>';
+			}
 
 			// Real albums optional
+			$result .=
 			'<tr id="wppagallery-album-realopt-tr" style="display:none;" >'.
 				'<th><label for="wppagallery-album-realopt">'.__('The Album(s) to be used:', 'wp-photo-album-plus').'</label></th>'.
-				'<td>'.
+				'<td>';
+				if ( wppa_has_many_albums() ) {
+					$result .=
+					'<input id="wppagallery-album-realopt" style="max-width:400px;" name="album" onchange="wppaGalleryEvaluate()" value="0" />'.
+					'<br />'.
+					__('Optinally enter one or more album numbers, seperated by commas, or 0 for all albums', 'wp-photo-album-plus');
+				}
+				else {
+					$result .=
 					'<select id="wppagallery-album-realopt" style="max-width:400px;" name="album" multiple="multiple" onchange="wppaGalleryEvaluate()">';
 						if ( $albums ) {
 
@@ -329,7 +356,9 @@ global $wpdb;
 						else {
 							$result .= '<option value="0" >' . __('There are no albums yet', 'wp-photo-album-plus') . '</option>';
 						}
-					$result .= '</select>'.
+					$result .= '</select>';
+				}
+				$result .=
 				'</td>'.
 			'</tr>'.
 

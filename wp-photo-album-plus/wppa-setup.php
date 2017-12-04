@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.7.04
+* Version 6.7.08
 *
 */
 
@@ -966,6 +966,7 @@ Hide Camera info
 						'wppa_user_upload_video_on' 	=> 'no',
 						'wppa_user_upload_audio_on' 	=> 'no',
 						'wppa_user_upload_login'		=> 'yes',
+						'wppa_user_opload_roles' 		=> '',
 						'wppa_ajax_upload'				=> 'yes',
 						'wppa_copyright_on'				=> 'yes',		// 19
 						'wppa_copyright_notice'			=> __('<span style="color:red" >Warning: Do not upload copyrighted material!</span>', 'wp-photo-album-plus'),	// 20
@@ -1440,7 +1441,7 @@ Hide Camera info
 						'wppa_void_dups' 				=> 'no',
 						'wppa_home_after_upload'		=> 'no',
 						'wppa_fe_alert' 				=> 'all',
-						'wppa_fe_upload_max_albums' 	=> '200', 	// VII-B13
+						'wppa_fe_upload_max_albums' 	=> '500', 	// VII-B13
 
 						'wppa_fe_create_ntfy' 			=> '', 	// VII-B1.3
 
@@ -1560,7 +1561,7 @@ Hide Camera info
 						'wppa_alt_type'					=> 'fullname',
 						'wppa_album_admin_pagesize' 	=> '0',
 						'wppa_photo_admin_pagesize'		=> '20',
-						'wppa_photo_admin_max_albums' 	=> '200',
+						'wppa_photo_admin_max_albums' 	=> '500',
 						'wppa_comment_admin_pagesize'	=> '10',
 						'wppa_jpeg_quality'				=> '95',
 						'wppa_geo_edit' 				=> 'no',

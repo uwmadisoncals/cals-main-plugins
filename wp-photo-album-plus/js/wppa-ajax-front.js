@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsAjaxVersion = '6.6.31';
+var wppaJsAjaxVersion = '6.7.07';
 
 var wppaRenderAdd = false;
 var wppaWaitForCounter = 0;
@@ -23,8 +23,8 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor, addHilite ) {
 	if ( wppaAutoColumnWidth[mocc] ) ajaxurl += '&resp=1';
 	if ( addHilite && _wppaCurIdx[mocc] && _wppaId[mocc][_wppaCurIdx[mocc]] ) ajaxurl += '&wppa-hilite=' + _wppaId[mocc][_wppaCurIdx[mocc]];
 
-	// Ajax possible ?
-	if ( wppaCanAjaxRender ) {
+	// Ajax possible, or no newurl defined ?
+	if ( wppaCanAjaxRender || ! newurl ) {
 
 		jQuery.ajax( { 	url: 		ajaxurl,
 						async: 		true,
@@ -46,7 +46,9 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor, addHilite ) {
 
 										else {
 
-											if ( wppaRenderModal ) {
+											// Do not render modal if behind button. When behind button, there is no newurl,
+											// so we test on the existence of newurl to see if it is behind button
+											if ( wppaRenderModal && newurl ) {
 
 												// Init dialog options
 												var opt = {
@@ -94,8 +96,12 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor, addHilite ) {
 												jQuery( '.ui-button' ).on( 'click', function() { _wppaStop( mocc ); } );
 											}
 
+											// Not modal or behind button
 											else {
 												jQuery( '#wppa-container-'+mocc ).html( result );
+
+												// If behind button: show hide buttton
+												jQuery( '#wppa-button-hide-'+mocc ).show();
 											}
 										}
 

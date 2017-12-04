@@ -226,14 +226,21 @@ class UpldrWidget extends WP_Widget {
 			<select class="widefat" multiple="multiple" onchange="wppaGetSelEnumToId( 'parentalbums-<?php echo $this->get_widget_id() ?>', '<?php echo $this->get_field_id('parent') ?>' )" id="<?php echo $this->get_field_id('parent-list'); ?>" name="<?php echo $this->get_field_name('parent-list'); ?>" >
 			<?php
 				// Prepare albuminfo
-				$albums = $wpdb->get_results( "SELECT `id`, `name` FROM `".WPPA_ALBUMS."`", ARRAY_A );
-				if ( wppa_switch( 'hier_albsel' ) ) {
-					$albums = wppa_add_paths( $albums );
+				if ( wppa_has_many_albums() ) {
+					$albums = array();
 				}
 				else {
-					foreach ( array_keys( $albums ) as $index ) $albums[$index]['name'] = __( stripslashes( $albums[$index]['name'] ) , 'wp-photo-album-plus');
+					$albums = $wpdb->get_results( "SELECT `id`, `name` FROM `" . WPPA_ALBUMS . "`", ARRAY_A );
 				}
-				$albums = wppa_array_sort( $albums, 'name' );
+				if ( ! empty( $albums ) ) {
+					if ( wppa_switch( 'hier_albsel' ) ) {
+						$albums = wppa_add_paths( $albums );
+					}
+					else {
+						foreach ( array_keys( $albums ) as $index ) $albums[$index]['name'] = __( stripslashes( $albums[$index]['name'] ) );
+					}
+					$albums = wppa_array_sort( $albums, 'name' );
+				}
 
 				// Please select
 				$sel = $instance['parent'] ? '' : 'selected="selected" ';

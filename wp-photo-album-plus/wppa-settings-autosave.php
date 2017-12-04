@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.7.04
+* Version 6.7.08
 *
 */
 
@@ -341,7 +341,17 @@ global $wp_version;
 			wppa_opt( 'tf_height_alt') < wppa_opt( 'thumbsize_alt' ) ) ) {
 				wppa_warning_message( __( 'A thumbframe width or height should not be smaller than a thumbnail size. Please correct the corresponding setting(s) in Table I-C' , 'wp-photo-album-plus') );
 			}
-
+			
+		// Check for 'many' albums
+		if ( wppa_opt( 'photo_admin_max_albums' ) ) { 	// Not OFF
+			$abs = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "` " );
+			if ( wppa_opt( 'photo_admin_max_albums' ) < $abs ) {
+				wppa_warning_message( 	__( 'This system contains more albums than the maximum set in Table IX-B6.3.', 'wp-photo-album-plus' ) . ' ' .
+										__( 'No problem, but some widgets may not work and some album selectionboxes will revert to a simple input field asking for an album id.', 'wp-photo-album-plus' ) . ' ' .
+										__( 'If you do not have pageload performance problems, you may increase the number in Table IX-B6.3.', 'wp-photo-album-plus' ) . ' ' .
+										__( 'If there are many empty albums, you can simply remove them by running the maintenance procedure in Table VIII-B7.', 'wp-photo-album-plus' ) );
+			}
+		}
 ?>
 		<!--<br /><a href="javascript:window.print();"><?php //_e('Print settings') ?></a><br />-->
 		<a style="cursor:pointer;" id="wppa-legon" onclick="jQuery('#wppa-legenda').css('display', ''); jQuery('#wppa-legon').css('display', 'none'); return false;" ><?php _e('Show legenda', 'wp-photo-album-plus') ?></a>
@@ -2742,6 +2752,27 @@ global $wp_version;
 							$clas = 'wppa_feup';
 							$tags = 'access,upload';
 							wppa_setting($slug, '2', $name, $desc, $html, $help, $clas, $tags);
+							
+							$name = __('User upload roles', 'wp-photo-album-plus');
+							$desc = __('Optionally limit access to selected userroles', 'wp-photo-album-plus');
+							$help = esc_js(__('This selection only applies when the previous item is ticked', 'wp-photo-album-plus'));
+							$slug = 'wppa_user_opload_roles';
+							$roles = $wp_roles->roles;
+							$opts = array();
+							$vals = array();
+							$opts[] = '-- '.__('Not limited', 'wp-photo-album-plus').' --';
+							$vals[] = '';
+							foreach (array_keys($roles) as $key) {
+								$role = $roles[$key];
+								$rolename = translate_user_role( $role['name'] );
+								$opts[] = $rolename;
+								$vals[] = $key;
+							}
+							$onch = '';
+							$html = wppa_select_m($slug, $opts, $vals, $onch, '', false, '', '220' );
+							$clas = 'wppa_feup';
+							$tags = 'access,upload';
+							wppa_setting($slug, '2.1', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('User upload Ajax', 'wp-photo-album-plus');
 							$desc = __('Shows the upload progression bar.', 'wp-photo-album-plus');
@@ -6398,7 +6429,7 @@ global $wp_version;
 							$values = array( '0', '3600', '86400', '604800', '2592000', '31449600');
 
 							$roles = $wp_roles->roles;
-							$roles['loggedout'] = '';
+							$roles['loggedout'] = array();
 							$roles['loggedout']['name'] = __('Logged out', 'wp-photo-album-plus');
 							unset ( $roles['administrator'] );
 							foreach (array_keys($roles) as $role) {
@@ -8924,8 +8955,12 @@ global $wp_version;
 							$desc = __('Select the way the search results should be displayed.', 'wp-photo-album-plus');
 							$help = esc_js(__('If you select anything different from "Albums and thumbnails", "Photos only" is assumed (Table IX-E6).', 'wp-photo-album-plus'));
 							$slug = 'wppa_search_display_type';
-							$opts = array( __('Albums and thumbnails', 'wp-photo-album-plus'), __('Slideshow', 'wp-photo-album-plus'), __('Slideonly slideshow', 'wp-photo-album-plus') );
-							$vals = array( 'content', 'slide', 'slideonly' );
+							$opts = array( 	__('Albums and thumbnails', 'wp-photo-album-plus'), 
+											__('Slideshow', 'wp-photo-album-plus'), 
+											__('Slideonly slideshow', 'wp-photo-album-plus'),
+											__('Albums only', 'wp-photo-album-plus')
+											);
+							$vals = array( 'content', 'slide', 'slideonly', 'albums' );
 							$html = wppa_select( $slug, $opts, $vals);
 							$clas = '';
 							$tags = 'system,search,layout';

@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.7.03';
+var wppaJsVersion = '6.7.08';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -1322,6 +1322,13 @@ function wppaDisplaySelectedFiles(id) {
 	}
 
 	jQuery('#'+id+'-display').val(result);
+}
+
+function wppaIsEmpty( str ) {
+	if ( typeof( str ) == 'undefined' ) return true;
+	if ( str == '' ) return true;
+	if ( str == false ) return true;
+	if ( str == 0 ) return true;
 }
 
 // Say we're in

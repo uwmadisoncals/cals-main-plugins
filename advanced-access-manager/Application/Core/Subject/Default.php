@@ -74,6 +74,14 @@ class AAM_Core_Subject_Default extends AAM_Core_Subject {
      * 
      * @return type
      */
+    public function getName() {
+        return __('All Users, Roles and Visitor', AAM_KEY);
+    }
+    
+    /**
+     * 
+     * @return type
+     */
     public static function getInstance() {
         if (is_null(self::$instance)) {
             self::$instance = new self;

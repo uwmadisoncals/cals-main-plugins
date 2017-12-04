@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.7.02
+* Version 6.7.07
 *
 */
 
@@ -444,23 +444,32 @@ function wppaTryScheduleAll( id ) {
 									__( 'Parent album:', 'wp-photo-album-plus' ) . ' ';
 									if ( wppa_extended_access() ) {
 										echo
-										'<select' .
-											' id="wppa-parsel"' .
-											' style="max-width:500px;"' .
-											' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'a_parent\', this )"' .
-											' >' .
-											wppa_album_select_a( array( 'checkaccess' => true,
-																		'exclude' => $id,
-																		'selected' => $a_parent,
-																		'addselected' => true,
-																		'addnone' => true,
-																		'addseparate' => true,
-																		'disableancestors' => true,
-																		'path' => wppa_switch( 'hier_albsel' ),
-																		'sort' => true,
+//										'<select' .
+//											' id="wppa-parsel"' .
+//											' style="max-width:500px;"' .
+//											' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'a_parent\', this )"' .
+//											' >' .
+											wppa_album_select_a( array( 'checkaccess' 		=> true,
+																		'exclude' 			=> $id,
+																		'selected' 			=> $a_parent,
+																		'addselected' 		=> true,
+																		'addnone' 			=> true,
+																		'addseparate' 		=> true,
+																		'disableancestors' 	=> true,
+																		'path' 				=> wppa_switch( 'hier_albsel' ),
+																		'sort' 				=> true,
+																		'tagopen' 			=> '<select' .
+																									' id="wppa-parsel"' .
+																									' style="max-width:300px;"' .
+																									' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'a_parent\', this )"' .
+																									' >',
+																		'tagid' 			=> 'wppa-parsel',
+																		'tagonchange' 		=> 'wppaAjaxUpdateAlbum( ' . $id . ', \'a_parent\', this )',
+																		'tagstyle' 			=> 'font-size:13px;height:20px;cursor:pointer;',
 																		)
-																) .
-											'</select>';
+																);
+//																.
+//											'</select>';
 									}
 									else {
 										echo
@@ -1210,10 +1219,10 @@ function wppaTryScheduleAll( id ) {
 						<input type="radio" name="wppa-del-photos" value="delete" checked="checked" /> <?php _e('Delete', 'wp-photo-album-plus'); ?><br />
 						<input type="radio" name="wppa-del-photos" value="move" /> <?php _e('Move to:', 'wp-photo-album-plus'); ?>
 						<select name="wppa-move-album">
-							<?php echo wppa_album_select_a( array(	'checkaccess' => true, 
-																	'path' => wppa_switch( 'hier_albsel'), 
-																	'selected' => '0', 
-																	'exclude' => $_REQUEST['edit_id'], 
+							<?php echo wppa_album_select_a( array(	'checkaccess' => true,
+																	'path' => wppa_switch( 'hier_albsel'),
+																	'selected' => '0',
+																	'exclude' => $_REQUEST['edit_id'],
 																	'addpleaseselect' => true,
 																	'sort' => true,
 																	) )
@@ -1290,7 +1299,7 @@ function wppaTryScheduleAll( id ) {
 				if ( $style == 'flat' ) { ?>
 					<input type="button" class="button-secundary" onclick="document.location='<?php echo wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;switchto=collapsible') ?>'" value="<?php _e('Switch to Collapsable table', 'wp-photo-album-plus'); ?>" />
 				<?php }
-				if ( $style == 'collapsible' ) { ?>
+				else /* if ( $style == 'collapsible' ) */ { ?>
 					<input type="button" class="button-secundary" onclick="document.location='<?php echo wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;switchto=flat') ?>'" value="<?php _e('Switch to Flat table', 'wp-photo-album-plus'); ?>" />
 					<input
 						type="button"

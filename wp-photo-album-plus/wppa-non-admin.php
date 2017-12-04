@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.6.28
+* Version 6.7.07
 *
 */
 
@@ -257,17 +257,17 @@ global $wppa_opt;
 		if ( ! is_dir( $tempdir ) ) @ wppa_mktree( $tempdir );
 		wppa_delete_obsolete_tempfiles();
 
-		$wppa_js_page_data_file = WPPA_UPLOAD_PATH.'/temp/wppa.'.$_SERVER['REMOTE_ADDR'].'.js';
+		$wppa_js_page_data_file = WPPA_UPLOAD_PATH . '/temp/wppa.' . sanitize_file_name( $_SERVER['REMOTE_ADDR'] ) . '.js';
 		$handle = fopen ( $wppa_js_page_data_file, 'wb' );
 
 		if ( $handle ) {
 			fwrite( $handle, '/* WPPA+ Generated Page dependant javascript */'."\n" );
+			fclose ( $handle );
 		}
 		else {
 			$wppa_js_page_data_file = '';
 			$footer = false;
 		}
-		fclose ( $handle );
 	}
 
 	// WPPA+ Javascript files.

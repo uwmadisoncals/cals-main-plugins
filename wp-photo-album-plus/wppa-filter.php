@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.7.01
+* Version 6.7.07
 *
 */
 
@@ -57,6 +57,7 @@ global $wppa_revno;
 		'parent' 	=> '',
 		'alt' 		=> '',
 		'timeout' 	=> '',
+		'button' 	=> '',
 	), $xatts );
 
 	// Init
@@ -113,6 +114,9 @@ global $wppa_revno;
 			$wppa['start_photo'] = $atts['photo'];
 			if ( $atts['timeout'] ) {
 				$wppa['in_widget_timeout'] = ( $atts['timeout'] == 'random' ? 'random' : strval( abs( intval( $atts['timeout'] ) ) ) );
+			}
+			if ( $atts['button'] ) {
+				$wppa['is_button'] = esc_attr( __( $atts['button'] ) );
 			}
 			break;
 		case 'slideonly':

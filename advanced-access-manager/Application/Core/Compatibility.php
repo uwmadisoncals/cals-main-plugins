@@ -22,6 +22,7 @@ class AAM_Core_Compatibility {
     public static function initExtensions() {
         //block deprecated extensions from loading
         define('AAM_UTILITIES', '99');
+        define('AAM_ROLE_FILTER', '99');
         define('AAM_POST_FILTER', '99');
         define('AAM_REDIRECT', '99');
         define('AAM_CONTENT_TEASER', '99');

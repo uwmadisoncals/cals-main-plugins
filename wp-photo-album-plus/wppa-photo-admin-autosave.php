@@ -2435,15 +2435,26 @@ function wppaSetConfirmMove( id ) {
 						<option value="wppa-bulk-owner" ><?php _e( 'Set owner to' , 'wp-photo-album-plus') ?></option>
 					<?php } ?>
 				</select>
-				<select name="wppa-bulk-album" id="wppa-bulk-album" style="display:none;" onchange="wppa_setCookie( 'wppa_bulk_album',this.value,365 );" >
-					<?php echo wppa_album_select_a( array( 	'checkaccess' 		=> true, 
-															'path' 				=> wppa_switch( 'hier_albsel' ), 
-															'exclude' 			=> $album, 
-															'selected' 			=> '0', 
-															'addpleaseselect' 	=> true,
-															'sort' 				=> true,
-															) ) ?>
-				</select>
+				<?php
+		//		<select name="wppa-bulk-album" id="wppa-bulk-album" style="display:none;" onchange="wppa_setCookie( 'wppa_bulk_album',this.value,365 );" >
+				echo wppa_album_select_a( array( 	'checkaccess' 		=> true,
+													'path' 				=> wppa_switch( 'hier_albsel' ),
+													'exclude' 			=> $album,
+													'selected' 			=> '0',
+													'addpleaseselect' 	=> true,
+													'sort' 				=> true,
+													'tagopen' 			=> '<select' .
+																				' name="wppa-bulk-album"' .
+																				' id="wppa-bulk-album"' .
+																				' style="display:none;"' .
+																				' onchange="wppa_setCookie( \'wppa_bulk_album\',this.value,365 );"' .
+																				' >',
+													'tagname' 			=> 'wppa-bulk-album',
+													'tagid' 			=> 'wppa-bulk-album',
+													'tagonchange' 		=> 'wppa_setCookie( \'wppa_bulk_album\',this.value,365 );',
+													'tagstyle' 			=> 'display:none;cursor:pointer;',
+													) );
+				?>
 				<select name="wppa-bulk-status" id="wppa-bulk-status" style="display:none;" onchange="wppa_setCookie( 'wppa_bulk_status',this.value,365 );" >
 					<option value="" ><?php _e( '- select a status -' , 'wp-photo-album-plus') ?></option>
 					<option value="pending" ><?php _e( 'Pending' , 'wp-photo-album-plus') ?></option>

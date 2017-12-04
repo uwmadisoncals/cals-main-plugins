@@ -73,6 +73,10 @@ class Widgets_On_Pages_Admin
             10,
             3
         );
+        // WYSIWYG Tiny MCE.
+        add_action( 'admin_head', array( $this, 'wop_add_my_tc_button' ) );
+        add_action( 'wp_ajax_twd_cpt_list', array( $this, 'twd_list_ajax' ) );
+        add_action( 'admin_footer', array( $this, 'twd_cpt_list' ) );
         if ( wop_fs()->is_not_paying() ) {
             // Auto Insert Turbo Sidebar PRO-feature Custom Meta.
             add_action( 'add_meta_boxes', array( $this, 'wop_add_free_custom_meta' ) );
@@ -137,6 +141,7 @@ class Widgets_On_Pages_Admin
             'Settings',
             'manage_options',
             $this->plugin_name,
+            // Note, this is the same as above to remove dupe link.
             array( $this, 'display_options_page' )
         );
         // Sub menu page -> Turbo Sidebar.
@@ -154,7 +159,7 @@ class Widgets_On_Pages_Admin
      *
      * @since    1.0.0
      */
-    public function wop_register_settings()
+    function wop_register_settings()
     {
         register_setting( 'wop_options', 'wop_options_field' );
     }
@@ -271,13 +276,12 @@ class Widgets_On_Pages_Admin
         ?>
 		<?php 
         echo  '<p id="wop-shortcode">' . $shortcode_id . '</p><button type="button" id="bq_copy_sc" value="Copy Shortcode" class="button-secondary" />Copy Shortcode</button>' ;
-        
+        echo  '<section><h3>' . esc_html__( 'Insert using the visual editor', 'widgets-on-pages' ) . '</h3>' ;
+        echo  '<p>' . esc_html__( 'Use the visual editor to add Turbo Sidebars.', 'widgets-on-pages' ) ;
         if ( wop_fs()->is_not_paying() ) {
-            echo  '<section><h3>' . esc_html__( 'Insert using the visual editor', 'widgets-on-pages' ) . '</h3>' ;
-            echo  '<p><a href="' . wop_fs()->get_upgrade_url() . '">' . esc_html__( 'Upgrade Now', 'widgets-on-pages' ) . '</a>' . esc_html__( ' to use the visual editor and arrange widgets in columns, too!', 'widgets-on-pages' ) ;
-            echo  '</section>' ;
+            echo  '<p><a href="' . wop_fs()->get_upgrade_url() . '">' . esc_html__( 'Upgrade Now', 'widgets-on-pages' ) . '</a>' . esc_html__( ' And you can arrange widgets in columns, too!', 'widgets-on-pages' ) ;
         }
-        
+        echo  '</section>' ;
         echo  __( '<h4>Template Tag</h4><p>Use this code to include the sidebar in your theme.</h4>', 'widgets-on-pages' ) ;
         $shortcode_id = esc_html( '<?php widgets_on_template("' . $post->post_title . '");?>' );
         echo  '<p id="wop-template-tag">' . $shortcode_id . '</p><button type="button" id="bq_copy_tt" value="Copy Shortcode" class="button-secondary" />Copy PHP</button>' ;
@@ -290,6 +294,7 @@ class Widgets_On_Pages_Admin
      */
     public function cpt_autoinsert_free_meta_box_markup()
     {
+        // Show our custom meta options.
         ?>
 		<div class='inside'>
 			<?php 
@@ -301,8 +306,7 @@ class Widgets_On_Pages_Admin
 		<div class='inside'>
 			<h3><?php 
         _e( 'Auto Insert', 'widgets-on-pages' );
-        ?>
-</h3>
+        ?></h3>
 			<p>
 				<input type="radio"  disabled /> Yes<br />
 				<input type="radio"  disabled/> No
@@ -312,8 +316,7 @@ class Widgets_On_Pages_Admin
 		<div class='inside'>
 			<h3><?php 
         _e( 'Position', 'widgets-on-pages' );
-        ?>
-</h3>
+        ?></h3>
 			<p>
 				<input type="radio" disabled /> Before Header<br />
 				<input type="radio" disabled /> After Header
@@ -332,8 +335,7 @@ class Widgets_On_Pages_Admin
 		<div class='inside'>
 			<h3><?php 
         _e( 'Show on Posts / Pages', 'widgets-on-pages' );
-        ?>
-</h3>
+        ?></h3>
 			<p>
 				<input type="radio" disabled /> Posts<br />
 				<input type="radio" disabled /> Pages<br />
@@ -344,16 +346,13 @@ class Widgets_On_Pages_Admin
 		<div class='inside'>
 			<h3><?php 
         _e( 'Layout Options', 'widgets-on-pages' );
-        ?>
-</h3>
+        ?></h3>
 			<p><?php 
         _e( 'Number of widget columms per screen size', 'widgets-on-pages' );
-        ?>
-</p>
+        ?></p>
 			<p><label><?php 
         _e( 'Small Screen', 'widgets-on-pages' );
-        ?>
-</label>
+        ?></label>
 				<select>
 				    <option value="1" selected>1</option>
 				    <option value="2">2</option>
@@ -363,8 +362,7 @@ class Widgets_On_Pages_Admin
 			</p>
 			<p><label><?php 
         _e( 'Medium Screen', 'widgets-on-pages' );
-        ?>
-</label>
+        ?></label>
 				<select>
 				    <option value="1">1</option>
 				    <option value="2">2</option>
@@ -374,8 +372,7 @@ class Widgets_On_Pages_Admin
 			</p>
 			<p><label><?php 
         _e( 'Large Screen', 'widgets-on-pages' );
-        ?>
-</label>
+        ?></label>
 				<select>
 				    <option value="1">1</option>
 				    <option value="2">2</option>
@@ -385,8 +382,7 @@ class Widgets_On_Pages_Admin
 			</p>
 			<p><label><?php 
         _e( 'Wide Screen', 'widgets-on-pages' );
-        ?>
-</label>
+        ?></label>
 				<select>
 				    <option value="1"></option>
 				    <option value="2"></option>
@@ -580,6 +576,143 @@ class Widgets_On_Pages_Admin
                 );
             }
         
+        }
+    
+    }
+    
+    /**
+     * Adds a button to the TinyMCE editor.
+     */
+    public function wop_add_my_tc_button()
+    {
+        global  $typenow ;
+        // Check user permissions.
+        if ( !current_user_can( 'edit_posts' ) && !current_user_can( 'edit_pages' ) ) {
+            return;
+        }
+        // Verify the post type.
+        if ( !in_array( $typenow, array( 'post', 'page' ) ) ) {
+            return;
+        }
+        // Check if WYSIWYG is enabled.
+        
+        if ( get_user_option( 'rich_editing' ) == 'true' ) {
+            add_filter( 'mce_external_plugins', array( $this, 'wop_add_tinymce_plugin' ) );
+            add_filter( 'mce_buttons', array( $this, 'wop_register_my_tc_button' ) );
+        }
+    
+    }
+    
+    /**
+     * Sets up the link from our button to our JS.
+     *
+     * @param  array $plugin_array Exsting plugin array.
+     * @return arry               Our updated plugin array.
+     */
+    public function wop_add_tinymce_plugin( $plugin_array )
+    {
+        $plugin_array['wop_tc_button'] = plugins_url( '/js/wop-tinymce-plugin.js', __FILE__ );
+        return $plugin_array;
+    }
+    
+    /**
+     * Add our TinyMCE button.
+     *
+     * @param  array $buttons Existing array of buttons.
+     * @return array          Updated array of buttons.
+     */
+    public static function wop_register_my_tc_button( $buttons )
+    {
+        array_push( $buttons, 'wop_tc_button' );
+        return $buttons;
+    }
+    
+    /**
+     * Function to fetch buttons
+     *
+     * @since  1.1.0
+     */
+    public function twd_list_ajax()
+    {
+        // Check for nonce.
+        check_ajax_referer( 'twd-nonce', 'security' );
+        $list = array();
+        $args = array(
+            'post_type'      => 'turbo-sidebar-cpt',
+            'posts_per_page' => 100,
+        );
+        $loop = new WP_Query( $args );
+        while ( $loop->have_posts() ) {
+            $loop->the_post();
+            
+            if ( is_numeric( $loop->post->post_name ) ) {
+                $name = 'Widgets on Pages ' . $loop->post->post_name;
+                $shortcode_id = $loop->post->post_name;
+                $id = 'wop-' . $loop->post->post_name;
+            } else {
+                $name = $loop->post->post_title;
+                $id = 'wop-' . $loop->post->post_name;
+                $shortcode_id = $loop->post->post_title;
+            }
+            
+            if ( '' != get_the_excerpt( $loop->post ) ) {
+                $id = 'wop-' . get_the_excerpt( $loop->post );
+            }
+            $list[] = array(
+                'text'  => $name,
+                'value' => $id,
+            );
+        }
+        echo  wp_send_json( $list ) ;
+        wp_die();
+        // This is required to terminate immediately and return a proper response.
+    }
+    
+    /**
+     * Function to output button list ajax script
+     *
+     * @since  1.1.0
+     */
+    public function twd_cpt_list()
+    {
+        // Create nonce.
+        global  $pagenow ;
+        
+        if ( 'admin.php' != $pagenow ) {
+            $nonce = wp_create_nonce( 'twd-nonce' );
+            $notPaying = false;
+            if ( wop_fs()->is_not_paying() ) {
+                $notPaying = true;
+            }
+            ?><script type="text/javascript">
+				jQuery( document ).ready( function( $ ) {
+					var data = {
+						'action'	: 'twd_cpt_list', // wp ajax action
+						'security'	: '<?php 
+            echo  $nonce ;
+            ?>' // nonce value created earlier
+					};
+					// Fire ajax.
+						jQuery.post( ajaxurl, data, function( response ) {
+							console.log("WOP", response);
+							// If nonce fails then not authorized else settings saved.
+							if( response === '-1' ){
+								// Do nothing.
+								console.log('error');
+							} else {
+								if (typeof(tinyMCE) != 'undefined') {
+									if (tinyMCE.activeEditor != null) {
+										tinyMCE.activeEditor.settings.cptPostsList = response;
+										tinyMCE.activeEditor.settings.notPaying = <?php 
+            echo  $notPaying ;
+            ?>;
+									}
+								}
+							}
+						});
+				});
+			</script>
+	<?php 
         }
     
     }

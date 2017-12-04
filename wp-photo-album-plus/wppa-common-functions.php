@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.7.05
+* Version 6.7.07
 *
 */
 
@@ -214,6 +214,7 @@ global $thumbs;
 		'no_ver' 					=> false,
 		'catbox' 					=> '',
 		'is_pdf' 					=> false,
+		'is_button' 				=> '',
 
 	);
 }
@@ -850,6 +851,9 @@ global $wppa;
 			case 'slideonly':
 				$wppa['is_slide'] = '1';
 				$wppa['is_slideonly'] = '1';
+				break;
+			case 'albums':
+				$wppa['albums_only'] = true;
 				break;
 			default:
 				break;
@@ -1642,8 +1646,22 @@ global $wpdb;
 											'checkarray' 		=> false,
 											'array' 			=> array(),
 											'optionclass' 		=> '',
+											'tagopen' 			=> '',
+											'tagname' 			=> '',
+											'tagid' 			=> '',
+											'tagonchange' 		=> '',
+											'multiple' 			=> false,
+											'tagstyle' 			=> '',
 											 ) );
 
+	// See if new format is used
+	if ( $args['tagopen'] ) {
+		$is_newformat = true;
+	}
+	else {
+		$is_newformat = false;
+	}
+	
 	// Provide default selection if no selected given
 	if ( $args['selected'] === '' ) {
         $args['selected'] = wppa_get_last_album();
@@ -1657,190 +1675,309 @@ global $wpdb;
 		$args['selected'] = '0';
 	}
 
-	// Get roughly the albums that might be in the selection
+	// Calculate roughly the expected number of albums to be in the selection and decide if the number is 'many'
+	$is_many = false;
 	if ( $args['checkarray'] && ! empty( $args['array'] ) ) {
-
-		// $albums = $args['array'];
-		$albums = array();
-
-		$temp = $wpdb->get_results( 	"SELECT `id`, `name` " .
-										"FROM `" . WPPA_ALBUMS . "` " .
-										"WHERE `id` IN (" . implode( ',', $args['array'] ) . ") " .
-										( $args['checkowner'] && wppa_switch( 'upload_owner_only' ) && ! wppa_user_is( 'administrator' ) ? "AND `owner` IN ( '--- public ---', '" . wppa_get_user() . "' ) " : "" ) .
-										wppa_get_album_order( $args['root'] ),
-										ARRAY_A
-									);
-
-		// To keep the preciously created sequence intact when an array is given, copy the data from $temp in the sequence of $args['array']
-		foreach( $args['array'] as $id ) {
-			foreach( $temp as $item ) {
-				if ( $item['id'] == $id ) {
-					$albums[] = $item;
-				}
-			}
+		$c = count( $args['array'] );
+		if ( wppa_opt( 'photo_admin_max_albums' ) && $c > wppa_opt( 'photo_admin_max_albums' ) ) {
+			$is_many = true;
 		}
 	}
+	elseif ( wppa_has_many_albums() ) {
+		$is_many = true;
+	}
+	
+	
+	// Process the many case
+	if ( $is_many ) {
+		
+		// Many newformat
+		if ( $is_newformat ) {
+			
+			$result =
+			'<input' .
+				' name="' . $args['tagname'] . '"' . 
+				( $args['tagid'] ? ' id="'  . $args['tagid'] . '"' : '' ) .
+				( $args['multiple'] ? '' : ' type="number"' ) .
+				' value="' . $args['selected'] . '"' .
+				' onchange="' . $args['tagonchange'] . '"' .
+				' style="' . $args['tagstyle'] . '"' .
+				' title="' . 
+					esc_attr( __( 'Enter album number', 'wp-photo-album-plus' ) );
+			
+					if ( $args['addnone'] ) 	$result .= esc_attr( "\n" . __( '0 for --- none ---' , 'wp-photo-album-plus' ) );
+					if ( $args['addall'] ) 		$result .= esc_attr( "\n" . __( '0 for --- all ---' , 'wp-photo-album-plus' ) );
+					if ( $args['addall'] ) 		$result .= esc_attr( "\n" . __( '-2 for --- generic ---' , 'wp-photo-album-plus' ) );
+					if ( $args['addowner'] ) 	$result .= esc_attr( "\n" . __( '-3 for --- owner/public ---' , 'wp-photo-album-plus' ) );
+					if ( $args['addmultiple'] ) $result .= esc_attr( "\n" . __( '-99 for --- multiple see below ---' , 'wp-photo-album-plus' ) );
+					if ( $args['addselbox'] ) 	$result .= esc_attr( "\n" . __( '0 for --- a selection box ---' , 'wp-photo-album-plus' ) );
+					if ( $args['addseparate'] ) $result .= esc_attr( "\n" . __( '-1 for --- separate ---' , 'wp-photo-album-plus' ) );
+			
+					$result .=
+					'"' .
+			' />' ;
+			
+			return $result;
+		}
+		
+		// Many old format
+		else {
+			$result = '';
+
+			$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
+			if ( $args['addpleaseselect'] ) $result .=
+				'<option value="0" disabled="disabled" '.$selected.' >' .
+					__( '- select an album -' , 'wp-photo-album-plus' ) .
+				'</option>';
+
+			$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
+			if ( $args['addnone'] ) $result .=
+				'<option value="0"'.$selected.' >' .
+					__( '--- none ---' , 'wp-photo-album-plus' ) .
+				'</option>';
+
+			$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
+			if ( $args['addall'] ) $result .=
+				'<option value="0"'.$selected.' >' .
+					__( '--- all ---' , 'wp-photo-album-plus' ) .
+				'</option>';
+
+			$selected = $args['selected'] == '-2' ? ' selected="selected"' : '';
+			if ( $args['addall'] ) $result .=
+				'<option value="-2"'.$selected.' >' .
+					__( '--- generic ---' , 'wp-photo-album-plus' ) .
+				'</option>';
+
+			$selected = $args['selected'] == '-3' ? ' selected="selected"' : '';
+			if ( $args['addowner'] ) $result .=
+				'<option value="-3"'.$selected.' >' .
+					__( '--- owner/public ---' , 'wp-photo-album-plus' ) .
+				'</option>';
+
+			$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
+			if ( $args['addblank'] ) $result .=
+				'<option value="0"'.$selected.' >' .
+				'</option>';
+
+			$selected = $args['selected'] == '-99' ? ' selected="selected"' : '';
+			if ( $args['addmultiple'] ) $result .=
+				'<option value="-99"'.$selected.' >' .
+					__( '--- multiple see below ---' , 'wp-photo-album-plus' ) .
+				'</option>';
+
+			$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
+			if ( $args['addselbox'] ) $result .=
+				'<option value="0"'.$selected.' >' .
+					__( '--- a selection box ---' , 'wp-photo-album-plus' ) .
+				'</option>';
+			$selected = $args['selected'] == '-1' ? ' selected="selected"' : '';
+			if ( $args['addseparate'] ) $result .=
+				'<option value="-1"' . $selected . '>' .
+					__( '--- separate ---' , 'wp-photo-album-plus' ) .
+				'</option>';
+			
+			return $result;
+		}
+	}
+	
+	// Continue processing Not many albums
 	else {
-		$albums = $wpdb->get_results( 	"SELECT `id`, `name` " .
-										"FROM `" . WPPA_ALBUMS . "` " .
-										( $args['checkowner'] && wppa_switch( 'upload_owner_only' ) && ! wppa_user_is( 'administrator' ) ? "WHERE `owner` IN ( '--- public ---', '" . wppa_get_user() . "' ) " : "" ) .
-										wppa_get_album_order( $args['root'] ),
-										ARRAY_A
-									);
+		
+		// Get roughly the albums that might be in the selection
+		if ( $args['checkarray'] && ! empty( $args['array'] ) ) {
 
-		// Must be sorted now...
-//		$args['sort'] = true;
-	}
+			// $albums = $args['array'];
+			$albums = array();
 
-	/* Can not add to cache because only "SELECT * " can be added
-	// Add to secondary cache
-	if ( $albums ) {
-		wppa_cache_album( 'add', $albums );
-	}
-	*/
+			$temp = $wpdb->get_results( 	"SELECT `id`, `name` " .
+											"FROM `" . WPPA_ALBUMS . "` " .
+											"WHERE `id` IN (" . implode( ',', $args['array'] ) . ") " .
+											( $args['checkowner'] && wppa_switch( 'upload_owner_only' ) && ! wppa_user_is( 'administrator' ) ? "AND `owner` IN ( '--- public ---', '" . wppa_get_user() . "' ) " : "" ) .
+											wppa_get_album_order( $args['root'] ),
+											ARRAY_A
+										);
 
-	if ( $albums ) {
-		// Filter for root
-		if ( $args['root'] ) {
-			$root = $args['root'];
-			switch ( $root ) {	// case '0': all, will be skipped as it returns false in 'if ( $args['root'] )'
-				case '-2':	// Generic only
-				foreach ( array_keys( $albums ) as $albidx ) {
-					if ( wppa_is_separate( $albums[$albidx]['id'] ) ) unset ( $albums[$albidx] );
+			// To keep the preciously created sequence intact when an array is given, copy the data from $temp in the sequence of $args['array']
+			foreach( $args['array'] as $id ) {
+				foreach( $temp as $item ) {
+					if ( $item['id'] == $id ) {
+						$albums[] = $item;
+					}
 				}
-				break;
-				case '-1':	// Separate only
-				foreach ( array_keys( $albums ) as $albidx ) {
-					if ( ! wppa_is_separate( $albums[$albidx]['id'] ) ) unset ( $albums[$albidx] );
-				}
-				break;
-				default:
-				foreach ( array_keys( $albums ) as $albidx ) {
-					if ( ! wppa_is_ancestor( $root, $albums[$albidx]['id'] ) ) unset ( $albums[$albidx] );
-				}
-				break;
 			}
 		}
-		// Filter for must have content
-		if ( $args['content'] ) {
-			foreach ( array_keys( $albums ) as $albidx ) {
-				if ( wppa_get_photo_count( $albums[$albidx]['id'] ) <= wppa_get_mincount() ) unset ( $albums[$albidx] );
+		else {
+			$albums = $wpdb->get_results( 	"SELECT `id`, `name` " .
+											"FROM `" . WPPA_ALBUMS . "` " .
+											( $args['checkowner'] && wppa_switch( 'upload_owner_only' ) && ! wppa_user_is( 'administrator' ) ? "WHERE `owner` IN ( '--- public ---', '" . wppa_get_user() . "' ) " : "" ) .
+											wppa_get_album_order( $args['root'] ),
+											ARRAY_A
+										);
+
+			// Must be sorted now...
+	//		$args['sort'] = true;
+		}
+
+		/* Can not add to cache because only "SELECT * " can be added
+		// Add to secondary cache
+		if ( $albums ) {
+			wppa_cache_album( 'add', $albums );
+		}
+		*/
+
+		if ( $albums ) {
+			// Filter for root
+			if ( $args['root'] ) {
+				$root = $args['root'];
+				switch ( $root ) {	// case '0': all, will be skipped as it returns false in 'if ( $args['root'] )'
+					case '-2':	// Generic only
+					foreach ( array_keys( $albums ) as $albidx ) {
+						if ( wppa_is_separate( $albums[$albidx]['id'] ) ) unset ( $albums[$albidx] );
+					}
+					break;
+					case '-1':	// Separate only
+					foreach ( array_keys( $albums ) as $albidx ) {
+						if ( ! wppa_is_separate( $albums[$albidx]['id'] ) ) unset ( $albums[$albidx] );
+					}
+					break;
+					default:
+					foreach ( array_keys( $albums ) as $albidx ) {
+						if ( ! wppa_is_ancestor( $root, $albums[$albidx]['id'] ) ) unset ( $albums[$albidx] );
+					}
+					break;
+				}
 			}
+			// Filter for must have content
+			if ( $args['content'] ) {
+				foreach ( array_keys( $albums ) as $albidx ) {
+					if ( wppa_get_photo_count( $albums[$albidx]['id'] ) <= wppa_get_mincount() ) unset ( $albums[$albidx] );
+				}
+			}
+			// Add paths
+			if ( $args['path'] ) {
+				$albums = wppa_add_paths( $albums );
+			}
+			// Or just translate
+			else foreach ( array_keys( $albums ) as $index ) {
+				$albums[$index]['name'] = __( stripslashes( $albums[$index]['name'] ) );
+			}
+			// Sort
+			if ( $args['sort'] ) $albums = wppa_array_sort( $albums, 'name' );
 		}
-		// Add paths
-		if ( $args['path'] ) {
-			$albums = wppa_add_paths( $albums );
+
+		// Output
+		$result = '';
+		
+		// New format
+		if ( $is_newformat ) {
+			$result .= $args['tagopen'];
 		}
-		// Or just translate
-		else foreach ( array_keys( $albums ) as $index ) {
-			$albums[$index]['name'] = __( stripslashes( $albums[$index]['name'] ) );
+
+		$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
+		if ( $args['addpleaseselect'] ) $result .=
+			'<option value="0" disabled="disabled" '.$selected.' >' .
+				__( '- select an album -' , 'wp-photo-album-plus' ) .
+			'</option>';
+
+		$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
+		if ( $args['addnone'] ) $result .=
+			'<option value="0"'.$selected.' >' .
+				__( '--- none ---' , 'wp-photo-album-plus' ) .
+			'</option>';
+
+		$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
+		if ( $args['addall'] ) $result .=
+			'<option value="0"'.$selected.' >' .
+				__( '--- all ---' , 'wp-photo-album-plus' ) .
+			'</option>';
+
+		$selected = $args['selected'] == '-2' ? ' selected="selected"' : '';
+		if ( $args['addall'] ) $result .=
+			'<option value="-2"'.$selected.' >' .
+				__( '--- generic ---' , 'wp-photo-album-plus' ) .
+			'</option>';
+
+		$selected = $args['selected'] == '-3' ? ' selected="selected"' : '';
+		if ( $args['addowner'] ) $result .=
+			'<option value="-3"'.$selected.' >' .
+				__( '--- owner/public ---' , 'wp-photo-album-plus' ) .
+			'</option>';
+
+		$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
+		if ( $args['addblank'] ) $result .=
+			'<option value="0"'.$selected.' >' .
+			'</option>';
+
+		$selected = $args['selected'] == '-99' ? ' selected="selected"' : '';
+		if ( $args['addmultiple'] ) $result .=
+			'<option value="-99"'.$selected.' >' .
+				__( '--- multiple see below ---' , 'wp-photo-album-plus' ) .
+			'</option>';
+
+		$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
+		if ( $args['addselbox'] ) $result .=
+			'<option value="0"'.$selected.' >' .
+				__( '--- a selection box ---' , 'wp-photo-album-plus' ) .
+			'</option>';
+
+		// In case multiple
+		if ( strpos( $args['selected'], ',' ) !== false ) {
+			$selarr = explode( ',', $args['selected'] );
 		}
-		// Sort
-		if ( $args['sort'] ) $albums = wppa_array_sort( $albums, 'name' );
-	}
-
-	// Output
-	$result = '';
-
-	$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
-	if ( $args['addpleaseselect'] ) $result .=
-		'<option value="0" disabled="disabled" '.$selected.' >' .
-			__( '- select an album -' , 'wp-photo-album-plus' ) .
-		'</option>';
-
-	$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
-	if ( $args['addnone'] ) $result .=
-		'<option value="0"'.$selected.' >' .
-			__( '--- none ---' , 'wp-photo-album-plus' ) .
-		'</option>';
-
-	$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
-	if ( $args['addall'] ) $result .=
-		'<option value="0"'.$selected.' >' .
-			__( '--- all ---' , 'wp-photo-album-plus' ) .
-		'</option>';
-
-	$selected = $args['selected'] == '-2' ? ' selected="selected"' : '';
-	if ( $args['addall'] ) $result .=
-		'<option value="-2"'.$selected.' >' .
-			__( '--- generic ---' , 'wp-photo-album-plus' ) .
-		'</option>';
-
-	$selected = $args['selected'] == '-3' ? ' selected="selected"' : '';
-	if ( $args['addowner'] ) $result .=
-		'<option value="-3"'.$selected.' >' .
-			__( '--- owner/public ---' , 'wp-photo-album-plus' ) .
-		'</option>';
-
-	$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
-	if ( $args['addblank'] ) $result .=
-		'<option value="0"'.$selected.' >' .
-		'</option>';
-
-	$selected = $args['selected'] == '-99' ? ' selected="selected"' : '';
-	if ( $args['addmultiple'] ) $result .=
-		'<option value="-99"'.$selected.' >' .
-			__( '--- multiple see below ---' , 'wp-photo-album-plus' ) .
-		'</option>';
-
-	$selected = $args['selected'] == '0' ? ' selected="selected"' : '';
-	if ( $args['addselbox'] ) $result .=
-		'<option value="0"'.$selected.' >' .
-			__( '--- a selection box ---' , 'wp-photo-album-plus' ) .
-		'</option>';
-
-	// In case multiple
-	if ( strpos( $args['selected'], ',' ) !== false ) {
-		$selarr = explode( ',', $args['selected'] );
-	}
-	else {
-		$selarr = array( $args['selected'] );
-	}
-
-	if ( $albums ) foreach ( $albums as $album ) {
-		if ( ( $args['disabled'] == $album['id'] ) ||
-			 ( $args['exclude'] == $album['id'] ) ||
-			 ( $args['checkupload'] && ! wppa_allow_uploads( $album['id'] ) ) ||
-			 ( $args['disableancestors'] && wppa_is_ancestor( $args['exclude'], $album['id'] ) )
-			 ) $disabled = ' disabled="disabled"'; else $disabled = '';
-		if ( in_array( $album['id'], $selarr, true ) && ! $disabled ) $selected = ' selected="selected"'; else $selected = '';
-
-		$ok = true; // Assume this will be in the list
-		if ( $args['checkaccess'] && ! wppa_have_access( $album['id'] ) ) {
-			$ok = false;
+		else {
+			$selarr = array( $args['selected'] );
 		}
-		/* This is in the query now
-		if ( $args['checkowner'] && wppa_switch( 'upload_owner_only' ) ) { 							// Need to check
-			if ( $album['owner'] != wppa_get_user() && $album['owner']  != '--- public ---' ) { 	// Not 'mine'
-				if ( ! wppa_user_is( 'administrator' ) ) {											// No admin
+
+		if ( $albums ) foreach ( $albums as $album ) {
+			if ( ( $args['disabled'] == $album['id'] ) ||
+				 ( $args['exclude'] == $album['id'] ) ||
+				 ( $args['checkupload'] && ! wppa_allow_uploads( $album['id'] ) ) ||
+				 ( $args['disableancestors'] && wppa_is_ancestor( $args['exclude'], $album['id'] ) )
+				 ) $disabled = ' disabled="disabled"'; else $disabled = '';
+			if ( in_array( $album['id'], $selarr, true ) && ! $disabled ) $selected = ' selected="selected"'; else $selected = '';
+
+			$ok = true; // Assume this will be in the list
+			if ( $args['checkaccess'] && ! wppa_have_access( $album['id'] ) ) {
+				$ok = false;
+			}
+			/* This is in the query now
+			if ( $args['checkowner'] && wppa_switch( 'upload_owner_only' ) ) { 							// Need to check
+				if ( $album['owner'] != wppa_get_user() && $album['owner']  != '--- public ---' ) { 	// Not 'mine'
+					if ( ! wppa_user_is( 'administrator' ) ) {											// No admin
+						$ok = false;
+					}
+				}
+			}
+			*/
+			/* This is in the query now
+			if ( $args['checkarray'] ) {
+				if ( ! in_array( $album['id'], $args['array'] ) ) {
 					$ok = false;
 				}
 			}
-		}
-		*/
-		/* This is in the query now
-		if ( $args['checkarray'] ) {
-			if ( ! in_array( $album['id'], $args['array'] ) ) {
-				$ok = false;
+			*/
+			if ( $selected && $args['addselected'] ) {
+				$ok = true;
+			}
+			if ( $ok ) {
+				if ( $args['addnumbers'] ) $number = ' ( '.$album['id'].' )'; else $number = '';
+				$result .= '<option class="' . $args['optionclass']. '" value="' . $album['id'] . '" ' . $selected . $disabled . '>' . $album['name'] . $number . '</option>';
 			}
 		}
-		*/
-		if ( $selected && $args['addselected'] ) {
-			$ok = true;
+
+		$selected = $args['selected'] == '-1' ? ' selected="selected"' : '';
+		if ( $args['addseparate'] ) $result .=
+			'<option value="-1"' . $selected . '>' .
+				__( '--- separate ---' , 'wp-photo-album-plus' ) .
+			'</option>';
+			
+		// New format
+		if ( $is_newformat ) {
+			$result .= '</select>';
 		}
-		if ( $ok ) {
-			if ( $args['addnumbers'] ) $number = ' ( '.$album['id'].' )'; else $number = '';
-			$result .= '<option class="' . $args['optionclass']. '" value="' . $album['id'] . '" ' . $selected . $disabled . '>' . $album['name'] . $number . '</option>';
-		}
+		
+		return $result;
 	}
-
-	$selected = $args['selected'] == '-1' ? ' selected="selected"' : '';
-	if ( $args['addseparate'] ) $result .=
-		'<option value="-1"' . $selected . '>' .
-			__( '--- separate ---' , 'wp-photo-album-plus' ) .
-		'</option>';
-
-	return $result;
 }
 
 function wppa_delete_obsolete_tempfiles() {

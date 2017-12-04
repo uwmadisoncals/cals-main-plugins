@@ -13,6 +13,7 @@ class SSLInsecureContentFixer {
 	public $network_options					= false;
 
 	protected $domain_exclusions			= false;
+	protected $process_only_site			= false;
 
 	/**
 	* static method for getting the instance of this singleton object
@@ -34,6 +35,7 @@ class SSLInsecureContentFixer {
 	private function __construct() {
 		$this->loadOptions();
 		$this->proxyFix();
+		$this->configureSiteOnly();
 
 		add_action('init', array($this, 'init'));
 
@@ -221,6 +223,12 @@ class SSLInsecureContentFixer {
 					}
 					break;
 
+				case 'HTTP_X_FORWARDED_SCHEME':
+					if (!empty($_SERVER['HTTP_X_FORWARDED_SCHEME']) && strtolower($_SERVER['HTTP_X_FORWARDED_SCHEME']) === 'https') {
+						$_SERVER['HTTPS'] = 'on';
+					}
+					break;
+
 				case 'detect_fail':
 					// only force-enable https if site is set to run fully on https
 					if (stripos(get_option('siteurl'), 'https://') === 0) {
@@ -240,6 +248,15 @@ class SSLInsecureContentFixer {
 			// @link https://github.com/woothemes/woocommerce/issues/8479
 			// @link https://superuser.com/a/943989/473190
 			unset($_SERVER['HTTP_HTTPS']);
+		}
+	}
+
+	/**
+	* if Ignore External Sites is selected, record the http site URL for this website
+	*/
+	protected function configureSiteOnly() {
+		if (!empty($this->options['site_only'])) {
+			$this->process_only_site = site_url('', 'http');
 		}
 	}
 
@@ -281,6 +298,10 @@ class SSLInsecureContentFixer {
 	* @return string
 	*/
 	public function fixContent_src_callback($matches) {
+		// support only fixing urls for this website
+		if ($this->process_only_site && stripos($matches[0], $this->process_only_site) !== 0) {
+			return $matches[0];
+		}
 		// allow content URL exclusions for selected domains
 		if (!empty($this->domain_exclusions)) {
 			foreach ($this->domain_exclusions as $domain) {

@@ -68,8 +68,7 @@ class Widgets_On_Pages_Public
             'large'  => '1',
             'wide'   => '1',
         ), $atts ) );
-        $str = '<div id=\'' . str_replace( ' ', '_', $id ) . '\' class=\'widgets_on_page wop_tiny' . $tiny . '  wop_small' . $small . '  wop_medium' . $medium . '  wop_large' . $large . '  wop_wide' . $wide . '\'>
-			<ul>';
+        $str = "<div id='" . str_replace( ' ', '_', $id ) . "' class='widgets_on_page wop_tiny" . $tiny . '  wop_small' . $small . '  wop_medium' . $medium . '  wop_large' . $large . '  wop_wide' . $wide . "'>\n\t\t\t<ul>";
         // Legacy bullshit.
         if ( is_numeric( $id ) ) {
             $id = 'wop-' . $id;

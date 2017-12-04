@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.6.30
+/* Version 6.7.08
 /* Various js routines used in admin pages
 */
 
@@ -2487,4 +2487,16 @@ function wppaAjaxUpdateTogo(slug) {
 					complete: 	function( xhr ) {
 								}
 				} );
+}
+
+// The js equivalence of php's NOT (!)
+function wppaIsEmpty( str ) {
+
+	if ( str == null ) return true;
+	if ( typeof( str ) == 'undefined' ) return true;
+	if ( str == '' ) return true;
+	if ( str == false ) return true;
+	if ( str == 0 ) return true;
+
+	return false;
 }

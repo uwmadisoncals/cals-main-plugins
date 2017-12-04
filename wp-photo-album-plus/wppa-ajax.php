@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.7.04
+* Version 6.7.08
 *
 */
 
@@ -661,6 +661,12 @@ global $wppa_log_file;
 			wppa_exit();
 			break;
 
+		case 'tinymcephotodialog':
+			$result = wppa_make_tinymce_photo_dialog();
+			echo $result;
+			wppa_exit();
+			break;
+
 		case 'bumpviewcount':
 			$nonce  = $_REQUEST['wppa-nonce'];
 			if ( wp_verify_nonce( $nonce, 'wppa-check' ) ) {
@@ -1190,6 +1196,9 @@ global $wppa_log_file;
 					break;
 				case 'a_parent':
 					$itemname = __( 'Parent album' , 'wp-photo-album-plus');
+					if ( $album == $value ) {
+						$value = '-1';
+					}
 					wppa_invalidate_treecounts( $album );	// Myself and my parents
 					wppa_invalidate_treecounts( $value );	// My new parent
 					break;
@@ -3201,6 +3210,11 @@ global $wppa_log_file;
 			}
 			wppa_user_upload();
 			echo wppa( 'out' );
+			global $wppa_upload_succes_id;
+			if ( isset( $_GET['fromtinymce'] ) && $wppa_upload_succes_id ) {
+				echo '||' . $wppa_upload_succes_id . '||';
+				echo wppa_get_myphotos_selection_body_for_tinymce( $wppa_upload_succes_id );
+			}
 			wppa_exit();
 			break;
 

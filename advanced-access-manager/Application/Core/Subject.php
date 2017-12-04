@@ -142,6 +142,22 @@ abstract class AAM_Core_Subject {
     public function getId() {
         return $this->_id;
     }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getName() {
+        return null;
+    }
+    
+    /**
+     * 
+     * @return int
+     */
+    public function getMaxLevel() {
+        return 0;
+    }
 
     /**
      * Get Subject

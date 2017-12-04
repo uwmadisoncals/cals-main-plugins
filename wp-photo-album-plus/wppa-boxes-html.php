@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.7.06
+* Version 6.7.07
 *
 */
 
@@ -1946,6 +1946,11 @@ function wppa_upload_box() {
 	if ( wppa_switch( 'user_upload_login' ) ) {
 		if ( ! is_user_logged_in() ) return;
 	}
+	
+	// Are roles specified and do i have one?
+	if ( ! wppa_check_user_upload_role() ) {
+		return;
+	}
 
 	// Have i access?
 	if ( $alb && ! wppa_is_enum( $alb ) ) {
@@ -2297,6 +2302,11 @@ static $albums_granted;
 		if ( ! is_user_logged_in() ) {
 			return '';
 		}
+	}
+
+	// Are roles specified and do i have one?
+	if ( ! wppa_check_user_upload_role() ) {
+		return;
 	}
 
 	// Login not required, but there are no public albums while user not logged in?
@@ -4661,3 +4671,91 @@ function wppa_get_responsive_widget_js_html( $mocc ) {
 	return $result;
 }
 
+// The shortcode is hidden behind an Ajax activating button
+// Currently implemented for:
+// type="slide"
+function wppa_button_box() {
+global $wppa_lang;
+
+	// No button box on feeds
+	if ( is_feed() ) return;
+
+	// Open container
+	wppa_container( 'open' );
+
+	// Init
+	$mocc = wppa( 'mocc' );
+	$result = '';
+
+	// The standard Ajax link
+	if ( wppa_switch( 'ajax_non_admin' ) ) {
+		$al = WPPA_URL.'/wppa-ajax-front.php?action=wppa&wppa-action=render';
+	}
+	else {
+		$al = admin_url( 'admin-ajax.php' ).'?action=wppa&wppa-action=render';
+	}
+	$al .= '&wppa-size=' . wppa_get_container_width();
+	$al .= '&wppa-moccur=' . $mocc;
+	$al .= '&wppa-occur=' . wppa( 'occur' );
+	if ( wppa_get_get( 'p' ) ) {
+		$al .= '&p=' . wppa_get_get( 'p' );
+	}
+	if ( wppa_get_get( 'page_id' ) ) {
+		$al .= '&page_id=' . wppa_get_get( 'page_id' );
+	}
+	$al .= '&wppa-fromp=' . get_the_ID();
+
+	if ( wppa_get_get( 'lang' ) ) {	// If lang in querystring: keep it
+		if ( strpos( $al, 'lang=' ) === false ) { 	// Not yet
+			$al .= '&lang=' . $wppa_lang;
+		}
+	}
+
+	// The shortcode type specific args
+	if ( wppa( 'is_slide' ) ) {
+		$al .= '&wppa-slide&wppa-album=' . wppa( 'start_album' );
+		if ( wppa( 'start_photo' ) ) {
+			$al .= '&wppa-photo=' . wppa( 'start_photo' );
+		}
+	}
+
+
+	// The container content
+	$result .=
+		'<input' .
+			' id="wppa-button-initial-' . $mocc . '"' .
+			' type="button"' .
+			' value="' . wppa( 'is_button' ) . '"' .
+			' onclick="wppaDoAjaxRender( ' . $mocc . ', \'' . $al . '\' )"' .
+		' />';
+
+	// Output
+	wppa_out( $result );
+
+	// Close container
+	wppa_container( 'close' );
+
+	// The Hide and show buttons
+	$result =
+		'<input' .
+			' id="wppa-button-show-' . $mocc . '"' .
+			' type="button"' .
+			' value="' . wppa( 'is_button' ) . '"' .
+			' onclick="jQuery( \'#wppa-container-' . $mocc . '\' ).show();' .
+					  'jQuery( \'#wppa-button-hide-' . $mocc . '\' ).show();' .
+					  'jQuery( this ).hide();' .
+					  '"' .
+			' style="display:none;"' .
+		' />' .
+		'<input' .
+			' id="wppa-button-hide-' . $mocc . '"' .
+			' type="button"' .
+			' value="' . esc_attr( __( 'Hide', 'wp-photo-album-plus' ) ) . '"' .
+			' onclick="jQuery( \'#wppa-container-' . $mocc . '\' ).hide();' .
+					  'jQuery( \'#wppa-button-show-' . $mocc . '\' ).show();' .
+					  'jQuery( this ).hide();' .
+					  '"' .
+			' style="display:none;"' .
+		' />';
+	wppa_out( $result );
+}

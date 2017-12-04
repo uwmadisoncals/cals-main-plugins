@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.7.02
+* Version 6.7.07
 *
 */
 
@@ -514,8 +514,10 @@ global $wppa_supported_audio_extensions;
 		if ( is_file( $file ) ) {
 			$ext = strtolower( substr( strrchr( $file, "." ), 1 ) );
 			if ( ! in_array( $ext, $allowed_types ) ) {
-				unlink( $file );
-				wppa_error_message( sprintf( __( 'File %s is of an unsupported filetype and has been removed.' , 'wp-photo-album-plus'), basename( wppa_sanitize_file_name( $file ) ) ) );
+				if ( basename( $file ) != 'index.php' ) {
+					unlink( $file );
+					wppa_error_message( sprintf( __( 'File %s is of an unsupported filetype and has been removed.' , 'wp-photo-album-plus'), basename( wppa_sanitize_file_name( $file ) ) ) );
+				}
 				$count++;
 			}
 

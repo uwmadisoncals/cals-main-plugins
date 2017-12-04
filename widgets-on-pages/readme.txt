@@ -3,10 +3,10 @@ Contributors: toddhalfpenny
 Donate link: https://datamad.co.uk/donate/
 Tags: widgets, widgets in page, widgets in post, sidebar, pages, post, shortcode, inline, widgetise, widgetize, theme
 Requires at least: 2.8
-Tested up to: 4.8.1
-Stable tag: 1.3
+Tested up to: 4.9
+Stable tag: 1.4
 
-The easiest and highest rated way to Add Widgets or Sidebars to Posts and Pages using shortcodes or template tags.
+The easiest and highest rated way to Add Widgets or Sidebars to Posts and Pages using Visual editor, shortcodes or template tags.
 
 == Description ==
 
@@ -22,10 +22,9 @@ Sidebars can be included in the post/page by using a shortcode like the followin
 
 > With the [PRO](https://datamad.co.uk/wordpress-plugins/widgets-on-pages/) version the widgets can be inserted simply with clicks-not-code using a wizard in the visual editor. This version also includes layout options to easily set the widgets in columns/grid presentation.
 >
-> Pro version also supports the configurable option to automatically add widgets to all your posts and/or pages. Choose the layout options and whether to add the sidebar and widgets before or after the content. Ideal for adding lists of related posts to the end of every post. Each post and page can also be individually excluded from the auto-inclsion of the widgets.
+> Pro version also supports the configurable option to automatically add widgets to all your posts and/or pages. Choose the layout options and whether to add the sidebar and widgets before or after the content. Ideal for adding lists of related posts to the end of every post. Each post and page can also be individually excluded from the auto-inclusion of the widgets.
 >
 > [Pro version](https://datamad.co.uk/wordpress-plugins/widgets-on-pages/) key features
-> * Visual editor widget inserts
 > * Responsive Horizontal/Column/Grid layout
 > * Auto insert in Header, Content, or Footer
 > * Priority Support
@@ -34,7 +33,7 @@ Sidebars can be included in the post/page by using a shortcode like the followin
 
 * Create a Turbo Sidebar, these are your special widget containers
 * Add widgets to the Turbo Sidebar in the same way as you do for normal sidebars
-* Add the Shortcode into your post or page where you'd like it to appear.
+* If using the visual editor use the Add Turbo Sidebar button to add the Shortcode into your post or page where you'd like it to appear.
 
 The sidebars can also be added to any theme, using template tags. This is an ace way to add widgets/sidebars to a theme's header and footer (or any other part of a theme).
 
@@ -101,12 +100,17 @@ This is a new feature, and is handled differently for various themes. Although t
 
 == Changelog ==
 
+= 1.4 =
+
+1. Free version now supports TinyMCE button to add widgets
+
+
 = 1.3 =
 
 1. Adding buttons to admin UI for copying/pasting the Shortcodes and Template Tags
 1. PRO - More Auto-Insert options. Can now auto-insert before/after header or footer, too.
 1. Updated main admin page to show video how to, following feedback from users.
-1. Fixed [issue](https://wordpress.org/support/topic/warning-call_user_func_array-expects-parameter-1-to-be-a-valid-callback-13/#post-9420083) with < PHP4. Introduced with the conditional showing of shortcode/template-tag meta boxes as part of v1.2
+1. Fixed [issue](https://wordpress.org/support/topic/warning-call_user_func_array-expects-parameter-1-to-be-a-valid-callback-13/#post-9420083) with < PHP5.5. Introduced with the conditional showing of shortcode/template-tag meta boxes as part of v1.2
 
 
 = 1.2.3 =

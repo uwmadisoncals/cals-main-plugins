@@ -11,7 +11,7 @@
  * Plugin Name:       Widgets On Pages
  * Plugin URI:        https://datamad.co.uk/wordpress-plugins/widgets-on-pages/
  * Description:       The easiest way to Add Widgets or Sidebars to Posts and Pages using shortcodes or template tags.
- * Version:           1.3.0
+ * Version:           1.4.0
  * Author:            Todd Halfpenny
  * Author URI:        http://toddhalfpenny.com/
  * License:           GPL-2.0+
@@ -85,7 +85,7 @@ if ( !function_exists( 'wop_fs' ) ) {
         die;
     }
     if ( !defined( 'WOP_PLUGIN_VERSION' ) ) {
-        define( 'WOP_PLUGIN_VERSION', '1.3.0' );
+        define( 'WOP_PLUGIN_VERSION', '1.4.0' );
     }
     /**
      * The code that runs during plugin activation.
