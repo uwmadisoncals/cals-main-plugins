@@ -667,6 +667,12 @@ global $wppa_log_file;
 			wppa_exit();
 			break;
 
+		case 'tinymcephotodialogfront':
+			$result = wppa_make_tinymce_photo_dialog( 'front' );
+			echo $result;
+			wppa_exit();
+			break;
+
 		case 'bumpviewcount':
 			$nonce  = $_REQUEST['wppa-nonce'];
 			if ( wp_verify_nonce( $nonce, 'wppa-check' ) ) {
@@ -1838,7 +1844,7 @@ global $wppa_log_file;
 								if ( $oldstatus == 'pending' ) {
 									if ( $value == 'publish' ) {
 										$owner 	= wppa_get_photo_item( $photo, 'owner' );
-										$user 	= get_user_by( 'login', $owner );
+										$user 	= wppa_get_user_by( 'login', $owner );
 										$to 	= $user->user_email;
 										$subj 	= __('Photo approved', 'wp-photo-album-plus');
 										$cont 	= sprintf( 	__('Your recently uploaded photo %s in album %s has been approved', 'wp-photo-album-plus'),

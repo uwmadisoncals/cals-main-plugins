@@ -155,7 +155,7 @@ if(isset($params['jstable']) && $params['jstable']==1):
                             </small>
                         </td>
                         <td class="hidden-sm hidden-xs"><?php echo $cats; ?></td>
-                        <td class="hidden-xs" data-order="<?php echo strtotime(get_the_date()); ?>"><?php echo get_the_date(); ?></td>
+                        <td class="hidden-xs" data-order="<?php echo get_the_time('U') ?>"><?php echo get_the_date(); ?></td>
                         <td><?php echo $download_link; ?></td>
                     </tr>
                 <?php } endwhile; ?>

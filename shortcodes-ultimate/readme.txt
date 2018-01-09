@@ -4,7 +4,7 @@ License: GPLv3
 Donate link: https://paypal.me/anovladimir
 Tags: shortcode, toggle, columns, button, slider, video, map, visual, responsive, shortcodes, youtube, vimeo, audio, mp3, tabs, jquery, box, accordion, toggle, pullquote, list, image, gallery, navigation, permalink, feed, rss, members, membership, guests, carousel, icons, rtl, multilingual
 Requires at least: 3.5
-Tested up to: 4.8
+Tested up to: 4.9
 Stable tag: trunk
 
 A comprehensive collection of visual components for your site
@@ -107,6 +107,13 @@ For help with premium add-ons, please [open new support ticket](https://getshort
 
 = 5.0.2 =
 * Fixed: an issue where RTL stylesheet won't displayed if custom CSS field is empty
+* Fixed: icon sizes at 'Dashboard - Available Shortcodes' page
+* Fixed: [expand] shortcode now works when loaded through AJAX
+* Fixed: border-radius on [box] shortcode
+* Fixed: compatibility with 'Plugin Organizer'
+* Updated: OwlCarousel jQuery plugin
+* Added: new attribute 'responsive' for table shortcode: [su_table responsive="no|yes"]
+* Added: new attribute 'playsinline' for youtube_advanced shortcode: [su_youtube_advanced playsinline="no|yes"]
 
 = 5.0.1 =
 * Fixed: serious security vulnerability, which allows attacker to run any code using filter in meta, post, or user shortcodes. Thanks to Robert L Mathews.

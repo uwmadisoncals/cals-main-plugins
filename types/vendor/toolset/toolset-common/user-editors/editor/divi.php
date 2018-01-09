@@ -17,6 +17,8 @@ class Toolset_User_Editors_Editor_Divi
 	protected $name = 'Divi Builder';
 	protected $option_name = '_toolset_user_editors_divi_template';
 
+	protected $logo_class = 'toolset-divi-logo-for-ct-button';
+
 	public function initialize() {
 		if ( apply_filters( 'wpv_filter_is_native_editor_for_cts', false ) ) {
 			add_action( 'edit_form_after_editor', array( $this, 'register_assets_for_backend_editor' ) );

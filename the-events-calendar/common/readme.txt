@@ -2,6 +2,16 @@
 
 == Changelog ==
 
+= [4.7.4] 2017-12-18 =
+
+* Fix - Fixed Event Cost field causing an error if it did not contain any numeric characters [95400]
+* Fix - Fixed the color of the license key validation messages [91890]
+* Fix - Added a safety check to avoid errors in the theme customizer when the search parameter is empty (props @afragen)
+
+= [4.7.3] 2017-12-07 =
+
+* Tweak - Tweaked Tribe Datepicker to prevent conflicts with third-party styles [94161]
+
 = [4.7.2] 2017-11-21 =
 
 * Feature - Added Template class which adds a few layers of filtering to any template file included

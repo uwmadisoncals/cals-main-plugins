@@ -808,34 +808,37 @@ class Toolset_Assets_Manager {
 		);
 		
 		global $pagenow;
+		$toolset_shortcode_i18n = array(
+			'action' => array(
+				'insert'  => __( 'Insert shortcode', 'wpv-views' ),
+				'create'  => __( 'Create shortcode', 'wpv-views' ),
+				'update'  => __( 'Update shortcode', 'wpv-views' ),
+				'close'   => __( 'Close', 'wpv-views' ),
+				'cancel'  => __( 'Cancel', 'wpv-views' ),
+				'back'    => __( 'Back', 'wpv-views' ),
+				'save'    => __( 'Save settings', 'wpv-views' ),
+				'loading' => __( 'Loading...', 'wpv-views' ),
+			),
+			'title' => array(
+				'generated' => __( 'Generated shortcode', 'wpv-views' ),
+			),
+			'validation' => array(
+				'mandatory'  => __( 'This option is mandatory ', 'wpv-views' ),
+				'number'     => __( 'Please enter a valid number', 'wpv-views' ),
+				'numberlist' => __( 'Please enter a valid comma separated number list', 'wpv-views' ),
+				'url'        => __( 'Please enter a valid URL', 'wpv-views' ),
+				
+			),
+			'ajaxurl' => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' )  ),
+			'pagenow' => $pagenow
+		);
+		
+		$toolset_shortcode_i18n = apply_filters( 'toolset_filter_shortcode_script_i18n', $toolset_shortcode_i18n );
 		
 		$this->localize_script(
 			self::SCRIPT_TOOLSET_SHORTCODE,
 			'toolset_shortcode_i18n',
-			array(
-				'action'	=> array(
-					'insert' => __( 'Insert shortcode', 'wpv-views' ),
-					'create' => __( 'Create shortcode', 'wpv-views' ),
-					'update' => __( 'Update shortcode', 'wpv-views' ),
-					'close' => __( 'Close', 'wpv-views' ),
-					'cancel' => __( 'Cancel', 'wpv-views' ),
-					'back' => __( 'Back', 'wpv-views' ),
-					'save' => __( 'Save settings', 'wpv-views' ),
-					'loading' => __( 'Loading...', 'wpv-views' ),
-				),
-				'title' => array(
-					'generated' => __( 'Generated shortcode', 'wpv-views' ),
-				),
-				'validation' => array(
-					'mandatory'		=> __( 'This option is mandatory ', 'wpv-views' ),
-					'number'		=> __( 'Please enter a valid number', 'wpv-views' ),
-					'numberlist'	=> __( 'Please enter a valid comma separated number list', 'wpv-views' ),
-					'url'			=> __( 'Please enter a valid URL', 'wpv-views' ),
-					
-				),
-				'ajaxurl'									=> admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' )  ),
-				'pagenow'									=> $pagenow
-			)
+			$toolset_shortcode_i18n
 		);
 
 		return apply_filters( 'toolset_add_registered_script', $this->scripts );

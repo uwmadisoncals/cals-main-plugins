@@ -34,7 +34,7 @@ class Toolset_Relationship_Query_Condition_Origin extends Toolset_Relationship_Q
 	 */
 	public function get_where_clause() {
 		return sprintf(
-			"relationship.origin = '%s'",
+			"relationships.origin = '%s'",
 			esc_sql( $this->origin )
 		);
 	}

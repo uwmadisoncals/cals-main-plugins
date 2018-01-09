@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.7.08
+* Version 6.7.10
 *
 */
 
@@ -1696,6 +1696,12 @@ global $wppa_session;
 	// Normal
 	else {
 
+		// Special case slideshow widget limit?
+		$lim = '';
+		if ( wppa( 'max_slides_in_ss_widget' ) ) {
+			$lim = " LIMIT " . wppa( 'max_slides_in_ss_widget' );
+		}
+
 		// Status
 		$status = "`status` <> 'pending' AND `status` <> 'scheduled'";
 		if ( ! is_user_logged_in() ) $status .= " AND `status` <> 'private'";
@@ -1708,14 +1714,17 @@ global $wppa_session;
 
 		// All albums ?
 		if ( wppa( 'start_album' ) == -2 ) {
+
 			if ( current_user_can( 'wppa_moderate' ) ) {
-				$query = "SELECT * FROM `" . WPPA_PHOTOS . "` " . wppa_get_photo_order( '0' );
+				$query = "SELECT * FROM `" . WPPA_PHOTOS . "` " . wppa_get_photo_order( '0' ) . $lim;
 			}
 			else {
 				$query = $wpdb->prepare( 	"SELECT * FROM `".WPPA_PHOTOS."` " .
 											"WHERE ( ( " . $status . " ) OR `owner` = %s ) " .
 											"AND `album` > '0' " .
-											wppa_get_photo_order( '0' ), wppa_get_user() );
+											wppa_get_photo_order( '0' ) .
+											$lim,
+											wppa_get_user() );
 			}
 		}
 
@@ -1724,12 +1733,15 @@ global $wppa_session;
 			if ( current_user_can( 'wppa_moderate' ) ) {
 				$query = 	"SELECT * FROM `" . WPPA_PHOTOS . "` " .
 							"WHERE `album` = " . wppa( 'start_album' ) . " " .
-							wppa_get_photo_order( wppa( 'start_album' ) );
+							wppa_get_photo_order( wppa( 'start_album' ) ) .
+							$lim;
 			}
 			else {
 				$query = $wpdb->prepare( 	"SELECT * FROM `" . WPPA_PHOTOS . "` " .
 											"WHERE ( ( " . $status . " ) OR `owner` = %s ) AND `album` = " . wppa( 'start_album' ) . " " .
-											wppa_get_photo_order( wppa( 'start_album' ) ), wppa_get_user() );
+											wppa_get_photo_order( wppa( 'start_album' ) ) .
+											$lim,
+											wppa_get_user() );
 			}
 		}
 
@@ -1739,12 +1751,15 @@ global $wppa_session;
 			if ( current_user_can( 'wppa_moderate' ) ) {
 				$query = 	"SELECT * FROM `" . WPPA_PHOTOS . "` " .
 							"WHERE " . $wherealbum . " " .
-							wppa_get_photo_order( '0' );
+							wppa_get_photo_order( '0' ) .
+							$lim;
 			}
 			else {
 				$query = $wpdb->prepare( 	"SELECT * FROM `" . WPPA_PHOTOS . "` " .
 											"WHERE ( ( " . $status . " ) OR `owner` = %s ) AND " . $wherealbum . " " .
-											wppa_get_photo_order( '0' ), wppa_get_user() );
+											wppa_get_photo_order( '0' ) .
+											$lim,
+											wppa_get_user() );
 			}
 		}
 	}
@@ -1908,11 +1923,13 @@ global $wpdb;
 		$invers = true;
 	}
 
-	// Do we need to get the count first to dicede if we get the full data and probably cache it ?
+	// Do we need to get the count first to decide if we get the full data and probably cache it ?
 	if ( $count_first || $invers ) {
 
-		// First get the count of the result
-		$count = $wpdb->get_var( str_replace( 'SELECT *', 'SELECT COUNT(*)', $query ) );
+		// Find count of the query result
+		$tempquery 	= str_replace( 'SELECT *', 'SELECT `id`', $query );
+		$wpdb->query( $tempquery );
+		$count 		= $wpdb->get_var( 'SELECT FOUND_ROWS()' );
 
 		// If less than 5000, get them and cache them
 		if ( $count <= 5000 && ! $invers ) {
@@ -1920,10 +1937,9 @@ global $wpdb;
 			$caching 	= true;
 		}
 
-		// If more than 2500, or inverse requested, get the ids only, and do not cache them
+		// If more than 5000, or inverse requested, use the ids only, and do not cache them
 		else {
-			$query 		= str_replace( 'SELECT *', 'SELECT `id`', $query );
-			$thumbs 	= $wpdb->get_results( $query , ARRAY_A );
+			$thumbs 	= $wpdb->get_results( $tempquery, ARRAY_A );
 			$caching 	= false;
 		}
 	}
@@ -1932,7 +1948,7 @@ global $wpdb;
 	else {
 		$thumbs 	= $wpdb->get_results( $query, ARRAY_A );
 		$caching 	= true;
-		$count 		= empty( $thumbs ) ? '0' : count( $thumbs );
+		$count 		= count( $thumbs );
 	}
 
 	// Inverse selection requested?
@@ -1968,7 +1984,8 @@ global $wpdb;
 	$time += microtime( true );
 	wppa_dbg_msg( 	'Get thumbs query took ' . $time . ' seconds. ' .
 					'Found: ' . $count . ' items. ' .
-					'Mem used=' . ceil( memory_get_peak_usage( true ) / ( 1024*1024 ) ) . ' Mb.'
+					'Mem used=' . ceil( memory_get_peak_usage( true ) / ( 1024*1024 ) ) . ' Mb. ' .
+					'Caching: ' . ( $caching ? 'yes' : 'no' )
 				);
 	if ( $caching ) {
 		wppa_cache_photo( 'add', $thumbs );
@@ -3039,12 +3056,13 @@ function wppa_get_container_width( $netto = false ) {
 	}
 	if ( $netto ) {
 	$result -= 12; // 2*padding
-	$result -= 2 * wppa_opt( 'bwidth' );
+	$result -= 2 * ( wppa_opt( 'bwidth' ) ? wppa_opt( 'bwidth' ) : '0' );
 	}
 	return $result;
 }
 
 function wppa_get_thumbnail_area_width() {
+
 	$result = wppa_get_container_width();
 	$result -= wppa_get_thumbnail_area_delta();
 	return $result;
@@ -3052,8 +3070,7 @@ function wppa_get_thumbnail_area_width() {
 
 function wppa_get_thumbnail_area_delta() {
 
-//	$result = 7 + 2 * wppa_opt( 'bwidth' );	// 7 = .thumbnail_area padding-left
-		$result = 12 + 2 * wppa_opt( 'bwidth' );	// experimental
+	$result = 12 + 2 * ( wppa_opt( 'bwidth' ) ? wppa_opt( 'bwidth' ) : 0 );
 	return $result;
 }
 
@@ -3386,7 +3403,7 @@ global $blog_id;
 			wppa_add_js_page_data( "\n" . 'wppaFullFrameDelta['.wppa( 'mocc' ).'] = '.$delta.';' );
 
 			// last minute change: script %%size != default colwidth
-			$temp = wppa_get_container_width() - ( 2*6 + 2*36 + 2*wppa_opt( 'bwidth' ) );
+			$temp = wppa_get_container_width() - ( 2*6 + 2*36 + ( wppa_opt( 'bwidth' ) ? 2*wppa_opt( 'bwidth' ) : 0 ) );
 			if ( wppa_in_widget() ) $temp = wppa_get_container_width() - ( 2*6 + 2*18 + 2*wppa_opt( 'bwidth' ) );
 			wppa_add_js_page_data( "\n" . 'wppaFilmStripLength['.wppa( 'mocc' ).'] = '.$temp.';' );
 
@@ -3397,9 +3414,11 @@ global $blog_id;
 			$temp = wppa_opt( 'tn_margin' ) / 2;
 			if ( wppa_in_widget() ) $temp /= 2;
 			wppa_add_js_page_data( "\n" . 'wppaFilmStripMargin['.wppa( 'mocc' ).'] = '.$temp.';' );
-			$temp = 2*6 + 2*42 + 2*wppa_opt( 'bwidth' );
-			if ( wppa_in_widget() ) $temp = 2*6 + 2*21 + 2*wppa_opt( 'bwidth' );
+			$temp = 2*6 + 2*42 + ( wppa_opt( 'bwidth' ) ? 2*wppa_opt( 'bwidth' ) : 0 );
+			if ( wppa_in_widget() ) $temp = 2*6 + 2*21 + ( wppa_opt( 'bwidth' ) ? 2*wppa_opt( 'bwidth' ) : 0 );
 			wppa_add_js_page_data( "\n" . 'wppaFilmStripAreaDelta['.wppa( 'mocc' ).'] = '.$temp.';' );
+			$temp = wppa_get_preambule();
+			wppa_add_js_page_data( "\n" . 'wppaPreambule['.wppa( 'mocc' ).'] = '.$temp.';' );
 			if ( wppa_in_widget() ) {
 				wppa_add_js_page_data( "\n" . 'wppaIsMini['.wppa( 'mocc' ).'] = true;' );
 			}
@@ -3416,6 +3435,8 @@ global $blog_id;
 			else {
 				wppa_add_js_page_data( "\n" . 'wppaSlideBlank['.wppa( 'mocc' ).'] = false;' );
 			}
+			// Slideshow widget always wraps around
+			wppa_add_js_page_data( "\n" . 'wppaSlideWrap['.wppa( 'mocc' ).'] = ' . ( wppa_switch( 'slide_wrap' ) || wppa_in_widget() == 'ss' ? 'true;' : 'false;' ) );
 
 			wppa_add_js_page_data( "\n" . 'wppaLightBox['.wppa( 'mocc' ).'] = "xxx";' );
 
@@ -3744,7 +3765,9 @@ function wppa_is_pagination() {
 
 function wppa_get_preambule() {
 
-	if ( ! wppa_switch( 'slide_wrap' ) ) return '0';
+	if ( ! wppa_switch( 'slide_wrap' ) && wppa( 'in_widget' ) != 'ss' ) {
+		return '0';
+	}
 	$result = is_numeric( wppa_opt( 'colwidth' ) ) ? wppa_opt( 'colwidth' ) : wppa_opt( 'fullsize' );
 	$result = ceil( ceil( $result / wppa_opt( 'thumbsize' ) ) / 2 ) + 2;
 	return $result;
@@ -3784,7 +3807,7 @@ function wppa_get_cover_width( $type, $numeric = false ) {
 	if ( $numeric ) {
 		$result = str_replace( 'width:', '', $result );
 		if ( strpos( $result, '%' ) ) {
-			$result = str_replace( '%', '', $result );
+			$result = str_replace( array( '%', ';'), '', $result );
 			$result = $result * wppa_opt( 'initial_colwidth' ) / '100';
 		}
 		else {
@@ -3885,7 +3908,7 @@ function wppa_get_text_frame_style( $photo_left, $type ) {
 function wppa_get_textframe_delta() {
 
 	$delta = wppa_opt( 'smallsize' );
-	$delta += ( 2 * ( 7 + wppa_opt( 'bwidth' ) + 4 ) + 5 + 2 );	// 2 * ( padding + border + photopadding ) + margin
+	$delta += ( 2 * ( 7 + ( wppa_opt( 'bwidth' ) ? wppa_opt( 'bwidth' ) : 0 ) + 4 ) + 5 + 2 );	// 2 * ( padding + border + photopadding ) + margin
 	return $delta;
 }
 
@@ -3923,7 +3946,7 @@ function wppa_get_box_width() {
 
 	$result = wppa_get_container_width();
 	$result -= 12;	// 2 * padding
-	$result -= 2 * wppa_opt( 'bwidth' );
+	$result -= 2 * ( wppa_opt( 'bwidth' ) ? wppa_opt( 'bwidth' ) : 0 );
 	return $result;
 }
 
@@ -4024,7 +4047,6 @@ function wppa_smx_photo( $stype ) {
 
 // returns aspect ratio ( w/h ), or 1 on error
 function wppa_get_ratio( $id ) {
-global $wpdb;
 
 	if ( ! wppa_is_int( $id ) ) return '1';	// Not 0 to prevent divide by zero
 
@@ -4321,7 +4343,7 @@ global $wppa_upload_succes_id;
 				if ( wppa_opt( 'fe_create_ntfy' ) ) {
 					$users = explode( ',', wppa_opt( 'fe_create_ntfy' ) );
 					if ( ! empty( $users ) ) foreach( $users as $usr ) {
-						$user = get_user_by( 'login', trim( $usr ) );
+						$user = wppa_get_user_by( 'login', trim( $usr ) );
 						if ( ! empty( $user ) ) {
 							$cont 	= 	array();
 							$cont[] = 	sprintf( __( 'User %s created album #%s with name %s.' ), '<b>' . wppa_get_user() . '</b>', $album, '<b>' . $albumname . '</b>' );
@@ -5268,7 +5290,7 @@ global $wpdb;
      */
     if ( 1 == get_option( 'comment_whitelist' ) ) {
         if ( $user != '' && $email != '' ) {
-            $comment_user = get_user_by( 'email', wp_unslash( $email ) );
+            $comment_user = wppa_get_user_by( 'email', wp_unslash( $email ) );
             if ( ! empty( $comment_user->ID ) ) {
                 $ok_to_comment =
 					$wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE user_id = %d AND comment_approved = '1'", $comment_user->ID ) ) +

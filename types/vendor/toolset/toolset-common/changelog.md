@@ -1,5 +1,20 @@
 # Toolset Common Library
 
+## 2.5.8
+* New admin notice about Types becoming commercial
+
+## 2.5.7
+* (toolsetcommon-305) Improve the database structure for relationships and associations.
+* (types-1213) Implement a mechanism for handling database integrity issues within the m2m API.
+* (types-1265) Introduce a QUERY_HAS_TRASHED_POSTS argument to Toolset_Association_Query
+* Many improvements to the m2m API, especially to the relationship query.
+* (toolsetcommon-328) Enforce cardinality limits when creating associations between two elements.
+* (toolsetcommon-330) Prevent upgrade routines from running repeatedly. Fix a m2m activation issue.
+* (toolsetcommon-249) The Toolset_Twig_Autoloader now bails out when it's possible to load the Twig_Environment class. 
+
+## 2.5.6
+* Fixed a but that prevented CRED attributes offered as select2 instances from getting their values in the final shortcode.
+
 ## 2.5.5
 * Released with Types 2.2.20 and Views 2.5.1
 * Fix the way we determine whether the m2m API should be enabled on fresh sites without post relationships by default (types-1252).

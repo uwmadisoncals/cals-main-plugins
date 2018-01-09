@@ -479,8 +479,14 @@ a.ddl-duplicate-anchor{cursor:pointer;}
 .ddl-setting-for-layouts-container-in-iframe .css-styling-controls{padding-top:0px;margin-top:0px;}
 .ddl-setting-for-layouts-container-in-iframe span.desc{padding-bottom:6px;padding-top:0px;width:555px!important;}
 input.css-id-control{width:555px!important;}
-.toolset-shortcode-gui-dialog-container{min-height:92px!important;max-height:370px!important;}
+/*
+@todo This should not be here, cotainers with specific size limitations should have a specific classname, not the generic Toolset dialogs ones.
+*/
+.toolset-ui-dialog:not(.toolset-ui-dialog-responsive) .toolset-shortcode-gui-dialog-container{min-height:92px!important;max-height:370px!important;}
 /*///////// OVERRIDES /////////////////*/
+/*
+@todo This should not be here, buttonpanes with specific styles should have a specific classname, not the generic Toolset dialogs ones.
+*/
 .ui-dialog-buttonpane{padding: 8px;}
 
 .ddl-youtube-video-cell span.px_box {

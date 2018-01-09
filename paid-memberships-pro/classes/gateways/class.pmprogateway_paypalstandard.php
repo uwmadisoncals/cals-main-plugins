@@ -598,11 +598,10 @@
 			if("sandbox" === $environment || "beta-sandbox" === $environment) {
 				$API_Endpoint = "https://api-3t.$environment.paypal.com/nvp";
 			}						
-			
-			$version = urlencode('72.0');
+            
             $nvp_args = array(
                 'METHOD' => $methodName_,
-                'VERSION' => $version,
+                'VERSION' => '72.0',
                 'bn' => PAYPAL_BN_CODE,
             );
 			
@@ -618,8 +617,6 @@
 			    $nvp_args['SIGNATURE'] = $API_Signature;
             }
             
-			// NVPRequest for submitting to server
-			// $nvpreq = "METHOD=" . urlencode($methodName_) . "&VERSION=" . urlencode($version) . "&PWD=" . urlencode($API_Password) . "&USER=" . urlencode($API_UserName) . "&SIGNATURE=" . urlencode($API_Signature) . "&bn=" . urlencode(PAYPAL_BN_CODE) . $nvpStr_;
 			$nvpreq = http_build_query( $nvp_args );
             $nvpreq = "{$nvpStr_}&{$nvpreq}";
             

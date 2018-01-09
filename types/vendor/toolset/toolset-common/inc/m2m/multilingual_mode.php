@@ -115,6 +115,9 @@ class Toolset_Relationship_Multilingual_Mode {
 
 	private function get_multilingual_mode() {
 
+		// Allways off since this functionality is about to be removed.
+		return self::MODE_OFF;
+
 		if( null === $this->current_multilingual_mode ) {
 
 			$stored_mode = $this->load_multilingual_mode_option();

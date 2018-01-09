@@ -25,9 +25,23 @@ class Toolset_Condition_Theme_Layouts_Support_Native_Available implements Toolse
 
 		// theme path (and child theme path if active)
 		$theme_paths = array_unique( array( get_template_directory(), get_stylesheet_directory() ) );
-		$search_pattern = '{' . implode( $theme_paths, ',' ) . '}/{index,single,archive}*.php';
+		$files_starting_with = array( 'index', 'single', 'archive' );
+		$search_pattern = '{' . implode( $theme_paths, ',' ) . '}/{' . implode( $files_starting_with, ',' ) . '}*.php';
 
-		foreach( glob( $search_pattern, GLOB_BRACE ) as $file ) {
+		if( defined( 'GLOB_BRACE' ) ) {
+			$template_files = glob( $search_pattern, GLOB_BRACE );
+		} else {
+			$template_files = array();
+			foreach( $theme_paths as $theme_path ) {
+				foreach( $files_starting_with as $file ) {
+					foreach( glob( $theme_path . '/' . $file . '*.php' ) as $found_file ) {
+						$template_files[] = $found_file;
+					}
+				}
+			}
+		}
+
+		foreach( $template_files as $file ) {
 			$file_content = @file_get_contents( $file );
 			if( is_string( $file_content ) && strpos( $file_content, 'the_ddlayout' ) !== false ) {
 				// native Layouts support!

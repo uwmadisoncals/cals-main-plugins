@@ -158,7 +158,7 @@ abstract class Types_Admin_Edit_Fields extends Types_Admin_Page
         $title = !empty( $form_data['name'] ) ? $form_data['name'] : __( 'Untitled', 'wpcf' );
         $title = sprintf(
             '<span class="wpcf-legend-update">%s</span> <span class="description">(%s)</span> <span class="wpcf_required_data">%s</span>',
-            $title,
+            stripslashes( $title ),
             $field_data['title'],
             $required
         );

@@ -120,6 +120,8 @@ class Toolset_Relationship_Database_Operations {
 	// Columns in the relationships table
 	const COLUMN_DOMAIN = '_domain';
 	const COLUMN_TYPES = '_types';
+	const COLUMN_CARDINALITY_MAX = 'cardinality_%s_max';
+	const COLUMN_CARDINALITY_MIN = 'cardinality_%s_min';
 
 
 	/**
@@ -137,6 +139,11 @@ class Toolset_Relationship_Database_Operations {
 			$role_name = $role->get_name();
 		} else {
 			$role_name = $role;
+		}
+
+		// Special cases
+		if( in_array( $column, array( self::COLUMN_CARDINALITY_MAX, self::COLUMN_CARDINALITY_MIN ) ) ) {
+			return sprintf( $column, $role_name );
 		}
 
 		return $role_name . $column;
@@ -335,24 +342,25 @@ class Toolset_Relationship_Database_Operations {
 	 * The usage of this method is strictly limited to the m2m API, always change the slug via
 	 * Toolset_Relationship_Definition_Repository::change_definition_slug().
 	 *
-	 * @param string $old_slug
-	 * @param string $new_slug
+	 * @param Toolset_Relationship_Definition $old_definition
+	 * @param Toolset_Relationship_Definition $new_definition
 	 *
 	 * @return Toolset_Result
 	 *
 	 * @since m2m
 	 */
-	public static function update_associations_on_definition_renaming( $old_slug, $new_slug ) {
-		global $wpdb;
+	public function update_associations_on_definition_renaming(
+		Toolset_Relationship_Definition $old_definition,
+		Toolset_Relationship_Definition $new_definition
+	) {
+		$associations_table = new Toolset_Relationship_Table_Name;
 
-		$associations_table = Toolset_Relationship_Table_Name::associations();
-
-		$rows_updated = $wpdb->update(
-			$associations_table,
-			array( 'relationship' => $new_slug ),
-			array( 'relationship' => $old_slug ),
-			'%s',
-			'%s'
+		$rows_updated = $this->wpdb->update(
+			$associations_table->association_table(),
+			array( 'relationship_id' => $new_definition->get_row_id() ),
+			array( 'relationship_id' => $old_definition->get_row_id() ),
+			'%d',
+			'%d'
 		);
 
 		$is_success = ( false !== $rows_updated );
@@ -361,12 +369,12 @@ class Toolset_Relationship_Database_Operations {
 		$is_success
 			? sprintf(
 			__( 'The association table has been updated with the new relationship slug "%s". %d rows have been updated.', 'wpcf' ),
-			$new_slug,
+			$new_definition->get_slug(),
 			$rows_updated
 		)
 			: sprintf(
 			__( 'There has been an error when updating the assocation table with the new relationship slug: %s', 'wpcf' ),
-			$wpdb->last_error
+			$this->wpdb->last_error
 		)
 		);
 
@@ -377,18 +385,18 @@ class Toolset_Relationship_Database_Operations {
 	/**
 	 * Delete all associations from a given relationship.
 	 *
-	 * @param string $relationship_slug
+	 * @param int $relationship_row_id
 	 *
 	 * @return Toolset_Result_Updated
 	 */
-	public function delete_associations_by_relationship( $relationship_slug ) {
+	public function delete_associations_by_relationship( $relationship_row_id ) {
 
 		$associations_table = $this->table_name->association_table();
 
 		$result = $this->wpdb->delete(
 			$associations_table,
-			array( 'relationship' => $relationship_slug ),
-			array( '%s' )
+			array( 'relationship_id' => $relationship_row_id ),
+			array( '%d' )
 		);
 
 		if( false === $result ) {
@@ -399,7 +407,7 @@ class Toolset_Relationship_Database_Operations {
 		} else {
 			return new Toolset_Result_Updated(
 				true, $result,
-				sprintf( __( 'Deleted all associations for the relationship %s', 'wpcf'), $relationship_slug )
+				sprintf( __( 'Deleted all associations for the relationship #%d', 'wpcf'), $relationship_row_id )
 			);
 		}
 	}
@@ -503,4 +511,38 @@ class Toolset_Relationship_Database_Operations {
 		return $rows;
 	}
 
+
+	/**
+	 * Update 'type' on 'toolset_type_sets'
+	 *
+	 * @param string $new_type
+	 * @param string $old_type
+	 *
+	 * @return Toolset_Result
+	 */
+	public function update_type_on_type_sets( $new_type, $old_type ) {
+		$rows_updated = $this->wpdb->update(
+			$this->table_name->type_set_table(),
+			array( 'type' => $new_type ),
+			array( 'type' => $old_type ),
+			'%s',
+			'%s'
+		);
+
+		$is_success = ( false !== $rows_updated );
+
+		$message = $is_success
+			? sprintf(
+				__( 'The type_sets table has been updated with the new type "%s". %d rows have been updated.', 'wpcf' ),
+				$new_type,
+				$rows_updated
+			)
+			: sprintf(
+				__( 'There has been an error when updating the type_sets table with the new type "%s": %s', 'wpcf' ),
+				$new_type,
+				$this->wpdb->last_error
+			);
+
+		return new Toolset_Result( $is_success, $message );
+	}
 }

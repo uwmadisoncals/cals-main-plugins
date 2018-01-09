@@ -33,7 +33,7 @@ Toolset.Gui.ListingViewModel = function(itemModels, defaults, itemSearchFunction
         var newDirection = (
             sortHelper.currentSortBy() === propertyName
                 ? sortHelper.currentSortDirection() * -1
-                : sortHelper.currentSortDirection()
+                : 1 // If it is not the current column it starts with ascending sorting.
         );
         sortHelper.sortItems(propertyName, newDirection);
     };

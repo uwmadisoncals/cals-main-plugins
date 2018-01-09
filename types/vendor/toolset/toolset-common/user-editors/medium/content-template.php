@@ -299,7 +299,14 @@ class Toolset_User_Editors_Medium_Content_Template
 					) {
 						continue;
 					}
-					$editor_switch_buttons[] = '<a class="button button-secondary js-wpv-ct-apply-user-editor" href="'.$admin_url.'&ct_editor_choice='.$editor->get_id().'">'.sprintf( __( 'Edit with %1$s', 'wpv-views' ), $editor->get_name() ).'</a>';
+					$editor_switch_buttons[] = sprintf(
+						'<a class="button button-secondary js-wpv-ct-apply-user-editor toolset-ct-button-logo %s" href="%s" title="%s">%s %s</a>',
+						sanitize_html_class( $editor->get_logo_class() ),
+						esc_url($admin_url . '&ct_editor_choice=' . $editor->get_id() ),
+						esc_attr( __( 'Edit with', 'wpv-views' ) . ' ' . $editor->get_name() ),
+						$editor->get_logo_image_svg() ? '<img src="' . esc_url( $this->constants->constant( 'TOOLSET_COMMON_URL' ) . '/res/images/third-party/logos/' . $editor->get_logo_image_svg() ) . '" />' : '',
+						esc_html( $editor->get_name() )
+					);
 				}
 			}
 

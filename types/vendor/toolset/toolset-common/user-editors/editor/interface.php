@@ -19,5 +19,6 @@ interface Toolset_User_Editors_Editor_Interface {
 	public function get_id();
 	public function get_name();
 	public function get_option_name();
+	public function get_logo_class();
 }
 

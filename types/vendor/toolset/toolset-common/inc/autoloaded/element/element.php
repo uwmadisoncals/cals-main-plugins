@@ -64,7 +64,7 @@ abstract class Toolset_Element implements IToolset_Element {
 
 		switch( $domain ) {
 
-			case Toolset_Field_Utils::DOMAIN_POSTS:
+			/*case Toolset_Field_Utils::DOMAIN_POSTS:
 
 				if( $object_source instanceof IToolset_Post ) {
 					// todo handle Toolset_Post where we should be returning Toolset_Post_Translation_Set
@@ -105,7 +105,7 @@ abstract class Toolset_Element implements IToolset_Element {
 				}
 
 				// No WPML, simply return the post object.
-				return self::get_untranslated_instance( $domain, $object_source );
+				return self::get_untranslated_instance( $domain, $object_source );*/
 
 
 			default:

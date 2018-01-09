@@ -31,10 +31,12 @@
  *     ->get_results();
  *
  * Note:
- * - If no is_active() condition is provided on the top level, is_active(true) is used. To get both
+ * - If no is_active() condition is used when constructing the query, is_active(true) is used. To get both
  *     active and non-active relationship definitions, you need to manually add is_active('*').
- * - If no has_active_post_types() condition is provided on the top level, has_active_post_types(true) is used
- *     for both parent and child role.
+ * - If no has_active_post_types() condition is used when constructing the query, has_active_post_types(true)
+ *     is used for both parent and child role.
+ * - This mechanism doesn't recognize where, how and if these conditions are actually applied, so even
+ *     $query->do_if( false, $query->is_active( true ) ) will disable the default is_active() condition.
  *
  * @since m2m
  */
@@ -68,6 +70,10 @@ class Toolset_Relationship_Query_V2 implements IToolset_Query {
 	private $condition_factory;
 
 
+	/** @var null|Toolset_Relationship_Query_Cardinality_Match_Factory */
+	private $_cardinality_match_factory;
+
+
 	/**
 	 * Toolset_Relationship_Query_V2 constructor.
 	 *
@@ -77,6 +83,7 @@ class Toolset_Relationship_Query_V2 implements IToolset_Query {
 	 * @param Toolset_Relationship_Database_Operations|null $database_operations_di
 	 * @param Toolset_Relationship_Query_Sql_Expression_Builder|null $expression_builder_di
 	 * @param Toolset_Relationship_Query_Condition_Factory|null $condition_factory_di
+	 * @param Toolset_Relationship_Query_Cardinality_Match_Factory|null $cardinality_match_factory_di
 	 */
 	public function __construct(
 		wpdb $wpdb_di = null,
@@ -84,7 +91,8 @@ class Toolset_Relationship_Query_V2 implements IToolset_Query {
 		Toolset_Relationship_Database_Unique_Table_Alias $unique_table_alias_di = null,
 		Toolset_Relationship_Database_Operations $database_operations_di = null,
 		Toolset_Relationship_Query_Sql_Expression_Builder $expression_builder_di = null,
-		Toolset_Relationship_Query_Condition_Factory $condition_factory_di = null
+		Toolset_Relationship_Query_Condition_Factory $condition_factory_di = null,
+		Toolset_Relationship_Query_Cardinality_Match_Factory $cardinality_match_factory_di = null
 	) {
 
 		if( null === $wpdb_di ) {
@@ -117,6 +125,8 @@ class Toolset_Relationship_Query_V2 implements IToolset_Query {
 				? new Toolset_Relationship_Query_Condition_Factory()
 				: $condition_factory_di
 		);
+
+		$this->_cardinality_match_factory = $cardinality_match_factory_di;
 	}
 
 
@@ -129,15 +139,6 @@ class Toolset_Relationship_Query_V2 implements IToolset_Query {
 	 */
 	public function add( IToolset_Relationship_Query_Condition $condition ) {
 		$this->conditions[] = $condition;
-
-		if( $condition instanceof Toolset_Relationship_Query_Condition_Is_Active ) {
-			$this->has_is_active_condition = true;
-		}
-
-		if( $condition instanceof Toolset_Relationship_Query_Condition_Has_Active_Types ) {
-			$this->has_is_post_type_active_condition = true;
-		}
-
 		return $this;
 	}
 
@@ -245,7 +246,7 @@ class Toolset_Relationship_Query_V2 implements IToolset_Query {
 	/**
 	 * Condition that the relationship involves a certain domain.
 	 *
-	 * @param string $domain_name 'posts'|'users'|'terms'
+	 * @param string $domain_name One of the Toolset_Element_Domain values.
 	 * @param IToolset_Relationship_Role_Parent_Child|null $in_role If null is provided, the type
 	 *    can be in both parent or child role for the condition to be true.
 	 *
@@ -297,6 +298,32 @@ class Toolset_Relationship_Query_V2 implements IToolset_Query {
 
 
 	/**
+	 * Condition that the relationship has a certain type and a domain in a given role.
+	 *
+	 * @param string $type
+	 * @param string $domain One of the Toolset_Element_Domain values.
+	 * @param IToolset_Relationship_Role_Parent_Child|null $in_role If null is provided, the type
+	 *    can be in both parent or child role for the condition to be true.
+	 *
+	 * @return IToolset_Relationship_Query_Condition
+	 * @since 2.5.6
+	 */
+	public function has_domain_and_type( $type, $domain, $in_role = null ) {
+		if( null === $in_role ) {
+			return $this->do_or(
+				$this->has_domain_and_type( $type, $domain, new Toolset_Relationship_Role_Parent() ),
+				$this->has_domain_and_type( $type, $domain, new Toolset_Relationship_Role_Child() )
+			);
+		}
+
+		return $this->do_and(
+			$this->condition_factory->has_domain( $domain, $in_role ),
+			$this->condition_factory->has_type( $type, $in_role )
+		);
+	}
+
+
+	/**
 	 * Condition that the relationship was migrated from the legacy implementation.
 	 *
 	 * @param bool $should_be_legacy
@@ -316,6 +343,7 @@ class Toolset_Relationship_Query_V2 implements IToolset_Query {
 	 * @return IToolset_Relationship_Query_Condition
 	 */
 	public function is_active( $should_be_active = true ) {
+		$this->has_is_active_condition = true;
 		return $this->condition_factory->is_active( $should_be_active );
 	}
 
@@ -326,17 +354,74 @@ class Toolset_Relationship_Query_V2 implements IToolset_Query {
 	 * @param bool $has_active_post_types
 	 * @param IToolset_Relationship_Role_Parent_Child|null $in_role
 	 *
-	 * @return IToolset_Relationship_Query_Condition|Toolset_Relationship_Query_Condition_Has_Active_Types
+	 * @return IToolset_Relationship_Query_Condition
 	 */
 	public function has_active_post_types( $has_active_post_types = true, IToolset_Relationship_Role_Parent_Child $in_role = null ) {
 		if( null === $in_role ) {
-			return $this->do_or(
+			return $this->do_and(
 				$this->has_active_post_types( $has_active_post_types, new Toolset_Relationship_Role_Parent() ),
 				$this->has_active_post_types( $has_active_post_types, new Toolset_Relationship_Role_Child() )
 			);
 		}
 
+		$this->has_is_post_type_active_condition = true;
 		return $this->condition_factory->has_active_post_types( $has_active_post_types, $in_role );
+	}
+
+
+	/**
+	 * Get a factory of cardinality constrains, which can be used as an argument for $this->has_cardinality().
+	 *
+	 * @return Toolset_Relationship_Query_Cardinality_Match_Factory
+	 */
+	public function cardinality() {
+		if( null === $this->_cardinality_match_factory ) {
+			$this->_cardinality_match_factory = new Toolset_Relationship_Query_Cardinality_Match_Factory();
+		}
+
+		return $this->_cardinality_match_factory;
+	}
+
+
+	/**
+	 * Condition that a relationship has a certain cardinality.
+	 *
+	 * Use methods on $this->cardinality() to obtain a valid argument for this method.
+	 *
+	 * @param IToolset_Relationship_Query_Cardinality_Match $cardinality_match Object
+	 *     that holds cardinality constraints.
+	 *
+	 * @return IToolset_Relationship_Query_Condition
+	 */
+	public function has_cardinality( IToolset_Relationship_Query_Cardinality_Match $cardinality_match ) {
+		return $this->condition_factory->has_cardinality( $cardinality_match );
+	}
+
+
+	/**
+	 * Choose a query condition depending on a boolean expression.
+	 *
+	 * @param bool $statement A boolean condition statement.
+	 * @param IToolset_Relationship_Query_Condition $if_branch Query condition that will be used
+	 *     if the statement is true.
+	 * @param IToolset_Relationship_Query_Condition|null $else_branch Query condition that will be
+	 *     used if the statement is false. If none is provided, a tautology is used (always true).
+	 *
+	 * @return IToolset_Relationship_Query_Condition
+	 * @since 2.5.6
+	 */
+	public function do_if(
+		$statement,
+		IToolset_Relationship_Query_Condition $if_branch,
+		IToolset_Relationship_Query_Condition $else_branch = null
+	) {
+		if( $statement ) {
+			return $if_branch;
+		} elseif( null !== $else_branch ) {
+			return $else_branch;
+		} else {
+			return $this->condition_factory->tautology();
+		}
 	}
 
 }

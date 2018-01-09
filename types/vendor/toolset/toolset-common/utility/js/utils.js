@@ -1480,6 +1480,12 @@ WPV_Toolset.Utils._template = function (template, data, settings) {
 };
 
 // override dialog whenever toolset is active and take possession
+/**
+ * @todo This should not be here:
+ * dialogs with specific classnames should get it directly.
+ * We should not be pre-setting all jQuery UI dialogs dialogClass setting,
+ * we are not good players here.
+ */
 if (jQuery && jQuery.ui && jQuery.ui.dialog) {
     jQuery.extend(jQuery.ui.dialog.prototype.options, {
         dialogClass: 'toolset-ui-dialog'

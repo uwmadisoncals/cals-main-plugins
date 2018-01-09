@@ -132,6 +132,11 @@ abstract class FieldFactory extends FieldAbstract
 	 */
     public function getTitle($_title = false)
     {
+    	if( isset( $this->_data['hide_field_title'] ) && $this->_data['hide_field_title'] ) {
+    		// option to hide the title is used
+    		return '';
+	    }
+
     	$title = isset( $this->_data['title'] ) && ! empty( $this->_data['title'] )
 		    ? $this->_data['title']
 		    : false;

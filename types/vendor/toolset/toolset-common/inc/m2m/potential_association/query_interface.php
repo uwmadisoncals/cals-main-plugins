@@ -39,4 +39,25 @@ interface IToolset_Potential_Association_Query extends IToolset_Query {
 	 */
 	public function get_found_elements();
 
+
+	/**
+	 * Check whether a specific single element can be associated.
+	 *
+	 * The relationship, target role and the other element are those provided in the constructor.
+	 *
+	 * @param IToolset_Element $association_candidate Element that wants to be associated.
+	 * @return Toolset_Result Result with an user-friendly message in case the association is denied.
+	 * @since 2.5.6
+	 */
+	public function check_single_element( IToolset_Element $association_candidate );
+
+
+	/**
+	 * Check whether the element provided in the constructor can accept any new association whatsoever.
+	 *
+	 * @return Toolset_Result Result with an user-friendly message in case the association is denied.
+	 * @since 2.5.6
+	 */
+	public function can_connect_another_element();
+
 }

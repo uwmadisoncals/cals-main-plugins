@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4
+class ComposerStaticInita469bff8809f0826cf254ebc61c9ca28
 {
     public static $files = array (
         'a52c1eba913b4ecdd3571194b37baea9' => __DIR__ . '/../..' . '/application/functions.php',
@@ -133,8 +133,10 @@ class ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4
         'IToolset_Post_Type_Registered' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/post_type/i_post_type_registered.php',
         'IToolset_Potential_Association_Query' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/potential_association/query_interface.php',
         'IToolset_Query' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/i_query.php',
-        'IToolset_Relationship_Definition' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/i_definition.php',
+        'IToolset_Relationship_Database_Issue' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/database/issue/interface.php',
+        'IToolset_Relationship_Definition' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/definition/interface.php',
         'IToolset_Relationship_Origin' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/origin/interface.php',
+        'IToolset_Relationship_Query_Cardinality_Match' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/cardinality_match/interface.php',
         'IToolset_Relationship_Query_Condition' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/i_condition.php',
         'IToolset_Relationship_Role' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_role/interface.php',
         'IToolset_Relationship_Role_Parent_Child' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_role/parent_child_interface.php',
@@ -205,6 +207,7 @@ class ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4
         'Toolset_DialogBoxes' => __DIR__ . '/..' . '/toolset/toolset-common/utility/dialogs/toolset.dialog-boxes.class.php',
         'Toolset_Element' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/element/element.php',
         'Toolset_Element_Domain' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/element/domain.php',
+        'Toolset_Element_Exception_Element_Doesnt_Exist' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/element/exception_element_doesnt_exist.php',
         'Toolset_Element_Factory' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/element/element_factory.php',
         'Toolset_ErrorHandler' => __DIR__ . '/..' . '/toolset/toolset-common/utility/utils.php',
         'Toolset_Export_Import_Screen' => __DIR__ . '/..' . '/toolset/toolset-common/inc/toolset.export.import.screen.class.php',
@@ -297,6 +300,7 @@ class ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4
         'Toolset_Regex' => __DIR__ . '/..' . '/toolset/toolset-common/expression-parser/parser.php',
         'Toolset_Relationship_Cardinality' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/cardinality.php',
         'Toolset_Relationship_Controller' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/controller.php',
+        'Toolset_Relationship_Database_Issue_Missing_Element' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/database/issue/missing_element.php',
         'Toolset_Relationship_Database_Operations' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/database/operations.php',
         'Toolset_Relationship_Database_Unique_Table_Alias' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/database/unique_table_alias.php',
         'Toolset_Relationship_Definition' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/definition/definition.php',
@@ -317,10 +321,15 @@ class ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4
         'Toolset_Relationship_Query' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/relationship_query.php',
         'Toolset_Relationship_Query_Base' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/query_base.php',
         'Toolset_Relationship_Query_Cache' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/query_cache.php',
+        'Toolset_Relationship_Query_Cardinality_Match_Conjunction' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/cardinality_match/conjunction.php',
+        'Toolset_Relationship_Query_Cardinality_Match_Factory' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/cardinality_match/factory.php',
+        'Toolset_Relationship_Query_Cardinality_Match_Operators' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/cardinality_match/operators.php',
+        'Toolset_Relationship_Query_Cardinality_Match_Single' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/cardinality_match/single.php',
         'Toolset_Relationship_Query_Condition' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/abstract.php',
         'Toolset_Relationship_Query_Condition_And' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/and.php',
         'Toolset_Relationship_Query_Condition_Factory' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition_factory.php',
         'Toolset_Relationship_Query_Condition_Has_Active_Types' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/has_active_types.php',
+        'Toolset_Relationship_Query_Condition_Has_Cardinality' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/has_cardinality.php',
         'Toolset_Relationship_Query_Condition_Has_Domain' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/has_domain.php',
         'Toolset_Relationship_Query_Condition_Is_Active' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/is_active.php',
         'Toolset_Relationship_Query_Condition_Is_Boolean_Flag' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/is_boolean_flag.php',
@@ -328,6 +337,7 @@ class ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4
         'Toolset_Relationship_Query_Condition_Operator' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/operator.php',
         'Toolset_Relationship_Query_Condition_Or' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/or.php',
         'Toolset_Relationship_Query_Condition_Origin' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/origin.php',
+        'Toolset_Relationship_Query_Condition_Tautology' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/tautology.php',
         'Toolset_Relationship_Query_Condition_Type' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/condition/type.php',
         'Toolset_Relationship_Query_Factory' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/query_factory.php',
         'Toolset_Relationship_Query_Sql_Expression_Builder' => __DIR__ . '/..' . '/toolset/toolset-common/inc/m2m/relationship_query/sql_expression_builder.php',
@@ -356,6 +366,7 @@ class ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4
         'Toolset_Shortcode_Attr_Item_Legacy' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/shortcode/attr/item/legacy.php',
         'Toolset_Shortcode_Attr_Item_M2M' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/shortcode/attr/item/m2m.php',
         'Toolset_Shortcode_Generator' => __DIR__ . '/..' . '/toolset/toolset-common/inc/toolset.shortcode.generator.class.php',
+        'Toolset_Shortcode_Transformer' => __DIR__ . '/..' . '/toolset/toolset-common/inc/toolset.shortcode.transformer.class.php',
         'Toolset_Stack' => __DIR__ . '/..' . '/toolset/toolset-common/expression-parser/parser.php',
         'Toolset_Style' => __DIR__ . '/..' . '/toolset/toolset-common/inc/toolset.assets.manager.class.php',
         'Toolset_Tokenizer' => __DIR__ . '/..' . '/toolset/toolset-common/expression-parser/parser.php',
@@ -368,6 +379,7 @@ class ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4
         'Toolset_Upgrade_Command_Factory' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/upgrade/command_factory.php',
         'Toolset_Upgrade_Command_M2M_V1_Database_Structure_Upgrade' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/upgrade/command/m2m_v1_database_structure_upgrade.php',
         'Toolset_Upgrade_Controller' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/upgrade/controller.php',
+        'Toolset_Upgrade_Executed_Commands' => __DIR__ . '/..' . '/toolset/toolset-common/inc/autoloaded/upgrade/executed_commands.php',
         'Toolset_User_Editors_Editor_Abstract' => __DIR__ . '/..' . '/toolset/toolset-common/user-editors/editor/abstract.php',
         'Toolset_User_Editors_Editor_Avada' => __DIR__ . '/..' . '/toolset/toolset-common/user-editors/editor/avada.php',
         'Toolset_User_Editors_Editor_Basic' => __DIR__ . '/..' . '/toolset/toolset-common/user-editors/editor/basic.php',
@@ -764,10 +776,10 @@ class ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit98453dc040b2a0c9d9e4e0ebe2a806a4::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInita469bff8809f0826cf254ebc61c9ca28::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInita469bff8809f0826cf254ebc61c9ca28::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInita469bff8809f0826cf254ebc61c9ca28::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInita469bff8809f0826cf254ebc61c9ca28::$classMap;
 
         }, null, ClassLoader::class);
     }

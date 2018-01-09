@@ -3,7 +3,7 @@
 Plugin Name: WP Google Maps
 Plugin URI: https://www.wpgmaps.com
 Description: The easiest to use Google Maps plugin! Create custom Google Maps with high quality markers containing locations, descriptions, images and links. Add your customized map to your WordPress posts and/or pages quickly and easily with the supplied shortcode. No fuss.
-Version: 6.4.06
+Version: 6.4.07
 Author: WP Google Maps
 Author URI: https://www.wpgmaps.com
 Text Domain: wp-google-maps
@@ -11,6 +11,10 @@ Domain Path: /languages
 */
 
 /* 
+ * 6.4.07 - 2018-01-08 - Low priority
+ * Added a deactivation survey to gain insight before moving to Version 7
+ * Tested on WP 4.9.1
+ * 
  * 6.4.06 - 2017-09-07 - Medium Priority
  * Bug Fix: Zoom level is not respected when saving
  * 
@@ -333,16 +337,29 @@ $wpgmza_tblname_poly = $wpdb->prefix . "wpgmza_polygon";
 $wpgmza_tblname_polylines = $wpdb->prefix . "wpgmza_polylines";
 $wpgmza_tblname_categories = $wpdb->prefix. "wpgmza_categories";
 $wpgmza_tblname_category_maps = $wpdb->prefix. "wpgmza_category_maps";
-$wpgmza_version = "6.4.06";
+$wpgmza_version = "6.4.07";
 $wpgmza_p_version = "6.13";
 $wpgmza_t = "basic";
 define("WPGMAPS", $wpgmza_version);
 define("WPGMAPS_DIR",plugin_dir_url(__FILE__));
 
-include ("base/includes/wp-google-maps-polygons.php");
-include ("base/includes/wp-google-maps-polylines.php");
-include ("base/classes/widget_module.class.php");
-include ("base/includes/deprecated.php");
+include ( "base/includes/wp-google-maps-polygons.php" );
+include ( "base/includes/wp-google-maps-polylines.php" );
+include ( "base/classes/widget_module.class.php" );
+include ( "base/includes/deprecated.php" );
+
+/* plugin deactivation checks */
+include ( "lib/codecabin/deactivate-feedback-form.php" );
+add_filter('codecabin_deactivate_feedback_form_plugins', function($plugins) {
+    global $wpgmza_version;
+    $plugins[] = (object)array(
+        'slug'      => 'wp-google-maps',
+        'version'   => WPGMAPS
+    );
+
+    return $plugins;
+});
+
 
 
 if (function_exists('wpgmaps_head_pro' )) {

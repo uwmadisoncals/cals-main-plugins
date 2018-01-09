@@ -7,7 +7,7 @@ Domain Path: /embedded/locale
 License: GPLv2
 Requires at least: 3.7
 Tested up to: 4.9
-Stable tag: 2.2.20
+Stable tag: 2.2.21
 
 The complete and reliable plugin for managing custom post types, custom taxonomies and custom fields.
 
@@ -157,6 +157,12 @@ Additionally, Types is the only plugin that lets you define parent/child relatio
 10. Bulk editing child content using Field Tables
 
 == Changelog ==
+
+= 2.2.21 =
+* Fixed a compatibility issue with Beaver Builder
+* Fixed an issue with extra backslashes when using quotes in field name
+* Removed the Toolset overlay while saving
+* Removed the dependency of GLOB_BRACE
 
 = 2.2.20 =
 * Fixed an issue that field title was not available on filter "wpt_field_options"

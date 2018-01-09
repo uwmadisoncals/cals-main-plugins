@@ -209,9 +209,6 @@ class WPCF_Types_Marketing_Messages extends WPCF_Types_Marketing
             $data[$key] = apply_filters('wpcf_marketing_message', $value, $data, $key );
             $data['state'] = $this->state;
         }
-        wp_register_script( 'types-modal', WPCF_EMBEDDED_RES_RELPATH.'/js/modal.js', array('toolset-colorbox'), WPCF_VERSION, true);
-        wp_localize_script( 'types-modal', 'types_modal', $data);
-        wp_enqueue_script('types-modal');
     }
 
     public function update_message($message = false)

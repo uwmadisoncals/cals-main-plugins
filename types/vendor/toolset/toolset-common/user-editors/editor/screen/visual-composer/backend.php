@@ -25,6 +25,8 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 	}
 
 	public function initialize() {
+	    $shortcode_transformer = new Toolset_Shortcode_Transformer();
+
 		add_action( 'init',												array( $this, 'register_assets' ), 50 );
 		add_action( 'admin_enqueue_scripts',							array( $this, 'admin_enqueue_assets' ), 50 );
 		
@@ -36,13 +38,13 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 
 		add_action( 'wpv_action_wpv_save_item', array( $this, 'save_vc_custom_css' ) );
 
-		add_filter( 'vc_btn_a_href', array( 'WPV_Frontend_Render_Filters', 'replace_shortcode_placeholders_with_brackets' ) );
+		add_filter( 'vc_btn_a_href', array( $shortcode_transformer, 'replace_shortcode_placeholders_with_brackets' ) );
 		add_filter( 'vc_btn_a_href', 'do_shortcode' );
 
-		add_filter( 'vc_btn_a_title', array( 'WPV_Frontend_Render_Filters', 'replace_shortcode_placeholders_with_brackets' ) );
+		add_filter( 'vc_btn_a_title', array( $shortcode_transformer, 'replace_shortcode_placeholders_with_brackets' ) );
 		add_filter( 'vc_btn_a_title', 'do_shortcode' );
 
-		add_filter( 'vc_raw_html_module_content', array( 'WPV_Frontend_Render_Filters', 'replace_shortcode_placeholders_with_brackets' ) );
+		add_filter( 'vc_raw_html_module_content', array( $shortcode_transformer, 'replace_shortcode_placeholders_with_brackets' ) );
 
 		// Post edit page integration
 		//add_action( 'edit_form_after_title',				array( $this, 'preventNested' ) );
@@ -86,7 +88,7 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 	 * called on action 'admin_init'
 	 */
 	public function setup() {
-		// Disable Visual Composers Frontend Editor
+		// Disable WPBakery Page Builder (former Visual Composer) Frontend Editor
 		vc_disable_frontend();
 
 		// Get backend editor object through VC_Manager (vc di container)
@@ -172,7 +174,7 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 				&& $ct_edit_page_screen_id === $screen_id
 		) {
 			// We need to enqueue the following style and script on the Content Template edit page but only when the
-			// template is built with Visual Composer.
+			// template is built with WPBakery Page Builder (former Visual Composer).
 			do_action( 'toolset_enqueue_scripts', array( 'toolset-user-editors-vc-script' ) );
 			do_action( 'toolset_enqueue_styles', array( 'toolset-user-editors-vc-editor-style' ) );
 		}
@@ -194,7 +196,7 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 				   . sprintf(
 						   __( '%1$sStop using %2$s for this Content Template%3$s', 'wpv-views' ),
 						   '<a href="' . esc_url( $admin_url ) . '&ct_editor_choice=basic">',
-						   'Visual Composer',
+                           $this->medium->get_manager()->get_active_editor()->get_name(),
 						   '</a>'
 				   )
 				   . '</p>';
@@ -283,11 +285,13 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 		$content_template_has_vc = ( get_post_meta( $content_template->ID, '_toolset_user_editors_editor_choice', true ) == $this->constants->constant( 'VC_SCREEN_ID' ) );
 		?>
 		<button 
-			class="button button-secondary js-wpv-ct-apply-user-editor js-wpv-ct-apply-user-editor-<?php echo esc_attr( $this->editor->get_id() ); ?>"
+			class="button button-secondary toolset-ct-button-logo js-wpv-ct-apply-user-editor js-wpv-ct-apply-user-editor-<?php echo esc_attr( $this->editor->get_id() ); ?>"
 			data-editor="<?php echo esc_attr( $this->editor->get_id() ); ?>"
+            title="<?php echo __( 'Edit with', 'wpv-views' ) . ' ' . $this->editor->get_name() ?>"
 			<?php disabled( $content_template_has_vc );?>
 		>
-			<?php echo $this->editor->get_name(); ?>
+            <img src="<?php echo $this->constants->constant( 'TOOLSET_COMMON_URL' ) . '/res/images/third-party/logos/' . $this->editor->get_logo_image_svg(); ?>" />
+			<?php echo esc_html( $this->editor->get_name() ); ?>
 		</button>
 		<?php
 	}
@@ -316,7 +320,7 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Backend
 	}
 
 	/**
-	 * Save Visual Composer Custom CSS upon content template save.
+	 * Save WPBakery Page Builder (former Visual Composer) Custom CSS upon content template save.
 	 *
 	 * @param   $content_template_id   The ID of the content template to save the custom CSS for.
 	 *

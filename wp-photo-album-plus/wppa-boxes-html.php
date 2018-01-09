@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.7.07
+* Version 6.7.09
 *
 */
 
@@ -167,7 +167,7 @@ global $wppa_session;
 		}
 	}
 
-	wppa_dbg_msg( 'Root='.$root.': '.wppa_get_album_name( $root ) );
+	wppa_dbg_msg( 'Root=' . $root . ': ' . ( $root > '0' ? wppa_get_album_name( $root ) : '' ) );
 
 	// Open the form
 	$result =
@@ -1946,7 +1946,7 @@ function wppa_upload_box() {
 	if ( wppa_switch( 'user_upload_login' ) ) {
 		if ( ! is_user_logged_in() ) return;
 	}
-	
+
 	// Are roles specified and do i have one?
 	if ( ! wppa_check_user_upload_role() ) {
 		return;
@@ -3025,8 +3025,8 @@ static $albums_granted;
 
 	// If ajax upload and from cover or thumbnail area, go display the thumbnails after upload
 	if ( $where == 'cover' || $where == 'thumb' ) {
-		$url_after_ajax_upload = wppa_get_permalink() . 'wppa-occur=' . wppa( 'occur' ) . '&wppa-cover=0&wppa-album=' . $alb;
-		$ajax_url_after_upload = str_replace( '&amp;', '&', wppa_get_ajaxlink() ) . 'wppa-occur=' . wppa( 'occur' ) . '&wppa-cover=0&wppa-album=' . $alb;
+		$url_after_ajax_upload = wppa_get_permalink() . 'wppa-occur=' . wppa( 'occur' ) . '&wppa-cover=0&wppa-album=' . ( is_array( $alb ) ? implode( '.', $alb ) : $alb );
+		$ajax_url_after_upload = str_replace( '&amp;', '&', wppa_get_ajaxlink() ) . 'wppa-occur=' . wppa( 'occur' ) . '&wppa-cover=0&wppa-album=' . ( is_array( $alb ) ? implode( '.', $alb ) : $alb );
 		$on_complete = 'wppaDoAjaxRender( ' . $occur . ', \'' . $ajax_url_after_upload . '\', \'' . $url_after_ajax_upload . '\' );';
 	}
 	else {

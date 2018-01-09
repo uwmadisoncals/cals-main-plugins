@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * exif and iptc common functions
-* version 6.7.02
+* version 6.7.12
 *
 *
 */
@@ -127,13 +127,13 @@ global $wppa_exif_cache;
 
 			$tag = $exifline['tag'];
 			if ( $prevtag == $tag ) {			// add a next item for this tag
-				$combined .= ', '.htmlspecialchars( strip_tags( $exifline['description'] ) );
+				$combined .= ', ' . wppa_format_exif( $tag, $exifline['description'] );
 			}
 			else { 							// first item of this tag
 				if ( $combined ) { 			// Process if required
 					$temp = str_replace( $prevtag, $combined, $temp );
 				}
-				$combined = htmlspecialchars( strip_tags( $exifline['description'] ) );
+				$combined = wppa_format_exif( $tag, $exifline['description'] );
 				$prevtag = $tag;
 			}
 		}
@@ -158,7 +158,7 @@ global $wppa_exif_cache;
 	// Remove untranslated
 	$pos = strpos($temp, 'E#');
 	while ( $pos !== false ) {
-		$tmp = substr($temp, 0, $pos).__('n.a.', 'wp-photo-album-plus').substr($temp, $pos+6);
+		$tmp = substr( $temp, 0, $pos ) . '<span title="' . esc_attr( __( 'No data', 'wp-photo-album-plus' ) ) . '">' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>' . substr( $temp, $pos+6 );
 		$temp = $tmp;
 		$pos = strpos($temp, 'E#');
 	}
@@ -167,210 +167,501 @@ global $wppa_exif_cache;
 	return $temp;
 }
 
-function wppa_format_exif($tag, $data) {
+function wppa_format_exif( $tag, $data ) {
+global $wppa_exif_error_output;
 
-	$result = $data;
-	switch ($tag) {
-/*
-E#0132		Date Time					Already formatted correctly
-E#013B		Photographer				Already formatted correctly
-E#8298		Copyright					Already formatted correctly
-			Location					Formatted into one line according to the 3 tags below:  2#092, 2#090, 2#095, 2#101
-										2#092		Sub location
-										2#090		City
-										2#095		State
-										2#101		Country
+	if ( $data ) {
+		switch ( $tag ) {
 
-E#0110		Camera						Already formatted correctly  Example: Canon EOS 50D
-aux:Lens	Lens						Already formatted correctly - See line 66 in sample photo exifdata.jpg attached  Example aux:Lens="EF300mm f/4L IS USM +1.4x"
-*/
-//	E#920A		Focal length				Must be formatted:  420/1 = 420 mm
-		case 'E#920A':
-			$temp = explode('/', $data);
-			if (isset($temp[1])) {
-				if (is_numeric($temp[1])) {
-					if ($temp[1] != 0) $result = round($temp[0]/$temp[1]).' mm.';
+			case 'E#0100': 	// Image width (pixels), Short or long, 1 item
+			case 'E#0101': 	// Image length (pixels), Short or long, 1 item
+
+				if ( ! wppa_is_valid_integer( $data ) ) {
+					return $wppa_exif_error_output;
 				}
-			}
-			break;
 
-//	E#9206		Subject distance			Must be formatted:  765/100 = 7,65 m.
-		case 'E#9206':
-			$temp = explode('/', $data);
-			if (isset($temp[1])) {
-				if (is_numeric($temp[1])) {
-					if ($temp[1] != 0) $result = round(100*$temp[0]/$temp[1])/"100".' m.';
+				$result = $data . ' ' . __( 'px.', 'wp-photo-album-plus' );
+				return $result;
+				break;
+
+// 	E#0110		Camera						Already formatted correctly  Example: Canon EOS 50D
+
+			case 'E#011A': 	// XResolution
+			case 'E#011B': 	// YResolution
+
+				if ( ! wppa_is_valid_rational( $data ) ) {
+					return $wppa_exif_error_output;
 				}
-			}
-			break;
 
-//	E#829A		Shutter Speed				Must be formatted:  1/125 = 1/125 s.
-		case 'E#829A':
-			if ($result) $result .= ' s.';
-			break;
+				// Format is valid
+				$temp = explode( '/', $data );
+				$x = $temp[0];
+				$y = $temp[1];
 
-//	E#829D		F-Stop						Must be formatted:  56/10 = f/5,6
-		case 'E#829D':
-			$temp = explode('/', $data);
-			if (isset($temp[1])) {
-				if (is_numeric($temp[1])) {
-					if ($temp[1] != 0) $result = 'f/'.(round(10*$temp[0]/$temp[1])/10);
+				$result = ( $x / $y );
+				return $result;
+				break;
+
+			case 'E#0128': 	// Resolution unit
+			case 'E#A210': 	// FocalPlaneResolutionUnit
+
+				if ( ! wppa_is_valid_integer( $data ) ) {
+					return $wppa_exif_error_output;
 				}
-			}
-			break;
-/*
-E#8827		ISO	Speed Rating			Already formatted correctly
-E#9204		Exposure bias				Already formatted correctly
 
-E#8822		Exposure program			Must be formatted according to table
-										0 = Not Defined
-										1 = Manual
-										2 = Program AE
-										3 = Aperture-priority AE
-										4 = Shutter speed priority AE
-										5 = Creative (Slow speed)
-										6 = Action (High speed)
-										7 = Portrait
-										8 = Landscape
-										9 = Bulb
-*/
-		case 'E#8822':
-			switch ($data) {
-				case '0': $result = __('Not Defined', 'wp-photo-album-plus'); break;
-				case '1': $result = __('Manual', 'wp-photo-album-plus'); break;
-				case '2': $result = __('Program AE', 'wp-photo-album-plus'); break;
-				case '3': $result = __('Aperture-priority AE', 'wp-photo-album-plus'); break;
-				case '4': $result = __('Shutter speed priority AE', 'wp-photo-album-plus'); break;
-				case '5': $result = __('Creative (Slow speed)', 'wp-photo-album-plus'); break;
-				case '6': $result = __('Action (High speed)', 'wp-photo-album-plus'); break;
-				case '7': $result = __('Portrait', 'wp-photo-album-plus'); break;
-				case '8': $result = __('Landscape', 'wp-photo-album-plus'); break;
-				case '9': $result = __('Bulb', 'wp-photo-album-plus'); break;
-			}
-			break;
-/*
-E#9204 		Exposure bias value
-*/
-		case 'E#9204':
-			if ( $data) $result = $data.' EV';
-			else $result = '';
-			break;
-/*
-E#9207		Metering mode				Must be formatted according to table
-										1 = Average
-										2 = Center-weighted average
-										3 = Spot
-										4 = Multi-spot
-										5 = Multi-segment
-										6 = Partial
-										255 = Other
-*/
-		case 'E#9207':
-			switch ($data) {
-				case '1': $result = __('Average', 'wp-photo-album-plus'); break;
-				case '2': $result = __('Center-weighted average', 'wp-photo-album-plus'); break;
-				case '3': $result = __('Spot', 'wp-photo-album-plus'); break;
-				case '4': $result = __('Multi-spot', 'wp-photo-album-plus'); break;
-				case '5': $result = __('Multi-segment', 'wp-photo-album-plus'); break;
-				case '6': $result = __('Partial', 'wp-photo-album-plus'); break;
-				case '255': $result = __('Other', 'wp-photo-album-plus'); break;
-			}
-			break;
-/*
-E#9209		Flash						Must be formatted according to table
-										0x0	= No Flash
-										0x1	= Fired
-										0x5	= Fired, Return not detected
-										0x7	= Fired, Return detected
-										0x8	= On, Did not fire
-										0x9	= On, Fired
-										0xd	= On, Return not detected
-										0xf	= On, Return detected
-										0x10	= Off, Did not fire
-										0x14	= Off, Did not fire, Return not detected
-										0x18	= Auto, Did not fire
-										0x19	= Auto, Fired
-										0x1d	= Auto, Fired, Return not detected
-										0x1f	= Auto, Fired, Return detected
-										0x20	= No flash function
-										0x30	= Off, No flash function
-										0x41	= Fired, Red-eye reduction
-										0x45	= Fired, Red-eye reduction, Return not detected
-										0x47	= Fired, Red-eye reduction, Return detected
-										0x49	= On, Red-eye reduction
-										0x4d	= On, Red-eye reduction, Return not detected
-										0x4f	= On, Red-eye reduction, Return detected
-										0x50	= Off, Red-eye reduction
-										0x58	= Auto, Did not fire, Red-eye reduction
-										0x59	= Auto, Fired, Red-eye reduction
-										0x5d	= Auto, Fired, Red-eye reduction, Return not detected
-										0x5f	= Auto, Fired, Red-eye reduction, Return detected
-*/
-		case 'E#9209':
-			// PHP7 '0x0' etc generates warning because octal strings are no longer suppported, but they are real strings here
-			switch ($data) {
-				case '0'.'x0':
-				case '0': $result = __('No Flash', 'wp-photo-album-plus'); break;
-				case '0'.'x1':
-				case '1': $result = __('Fired', 'wp-photo-album-plus'); break;
-				case '0'.'x5':
-				case '5': $result = __('Fired, Return not detected', 'wp-photo-album-plus'); break;
-				case '0'.'x7':
-				case '7': $result = __('Fired, Return detected', 'wp-photo-album-plus'); break;
-				case '0'.'x8':
-				case '8': $result = __('On, Did not fire', 'wp-photo-album-plus'); break;
-				case '0'.'x9':
-				case '9': $result = __('On, Fired', 'wp-photo-album-plus'); break;
-				case '0'.'xd':
-				case '13': $result = __('On, Return not detected', 'wp-photo-album-plus'); break;
-				case '0'.'xf':
-				case '15': $result = __('On, Return detected', 'wp-photo-album-plus'); break;
-				case '0'.'x10':
-				case '16': $result = __('Off, Did not fire', 'wp-photo-album-plus'); break;
-				case '0'.'x14':
-				case '20': $result = __('Off, Did not fire, Return not detected', 'wp-photo-album-plus'); break;
-				case '0'.'x18':
-				case '24': $result = __('Auto, Did not fire', 'wp-photo-album-plus'); break;
-				case '0'.'x19':
-				case '25': $result = __('Auto, Fired', 'wp-photo-album-plus'); break;
-				case '0'.'x1d':
-				case '29': $result = __('Auto, Fired, Return not detected', 'wp-photo-album-plus'); break;
-				case '0'.'x1f':
-				case '31': $result = __('Auto, Fired, Return detected', 'wp-photo-album-plus'); break;
-				case '0'.'x20':
-				case '32': $result = __('No flash function', 'wp-photo-album-plus'); break;
-				case '0'.'x30':
-				case '48': $result = __('Off, No flash function', 'wp-photo-album-plus'); break;
-				case '0'.'x41':
-				case '65': $result = __('Fired, Red-eye reduction', 'wp-photo-album-plus'); break;
-				case '0'.'x45':
-				case '69': $result = __('Fired, Red-eye reduction, Return not detected', 'wp-photo-album-plus'); break;
-				case '0'.'x47':
-				case '71': $result = __('Fired, Red-eye reduction, Return detected', 'wp-photo-album-plus'); break;
-				case '0'.'x49':
-				case '73': $result = __('On, Red-eye reduction', 'wp-photo-album-plus'); break;
-				case '0'.'x4d':
-				case '77': $result = __('Red-eye reduction, Return not detected', 'wp-photo-album-plus'); break;
-				case '0'.'x4f':
-				case '79': $result = __('On, Red-eye reduction, Return detected', 'wp-photo-album-plus'); break;
-				case '0'.'x50':
-				case '80': $result = __('Off, Red-eye reduction', 'wp-photo-album-plus'); break;
-				case '0'.'x58':
-				case '88': $result = __('Auto, Did not fire, Red-eye reduction', 'wp-photo-album-plus'); break;
-				case '0'.'x59':
-				case '89': $result = __('Auto, Fired, Red-eye reduction', 'wp-photo-album-plus'); break;
-				case '0'.'x5d':
-				case '93': $result = __('Auto, Fired, Red-eye reduction, Return not detected', 'wp-photo-album-plus'); break;
-				case '0'.'x5f':
-				case '95': $result = __('Auto, Fired, Red-eye reduction, Return detected', 'wp-photo-album-plus'); break;
-			}
-			break;
+				switch ( $data ) {
+					case 2:
+						$result = __( 'inches', 'wp-photo-album-plus' );
+						break;
+					case 3:
+						$result = __( 'centimeters', 'wp-photo-album-plus' );
+						break;
+					default:
+						$result = __( 'reserved', 'wp-photo-album-plus' );
+				}
+				return $result;
+				break;
 
-		default:
-			$result = $data;
+//	E#0132		Date Time					Already formatted correctly
+//	E#013B		Photographer				Already formatted correctly
+
+			case 'E#A20E':	// FocalPlaneXResolution
+			case 'E#A20F':	// FocalPlaneYResolution
+
+				if ( ! wppa_is_valid_rational( $data ) ) {
+					return $wppa_exif_error_output;
+				}
+
+				// Format is valid
+				$temp = explode( '/', $data );
+				$x = $temp[0];
+				$y = $temp[1];
+
+				$result = round( $x / $y );
+				return $result;
+				break;
+
+			case 'E#0213': 	// YCbCrPositioning
+
+				if ( ! wppa_is_valid_integer( $data ) ) {
+					return $wppa_exif_error_output;
+				}
+
+				switch ( $data ) {
+					case 1:
+						$result = __( 'centered', 'wp-photo-album-plus' );
+						break;
+					case 2:
+						$result = __( 'co-sited', 'wp-photo-album-plus' );
+						break;
+					default:
+						$result = __( 'reserved', 'wp-photo-album-plus' );
+				}
+
+				return $result;
+				break;
+
+			case 'E#9201': 	// Shutter speed value
+
+				if ( ! wppa_is_valid_rational( $data, true ) ) {
+					return $wppa_exif_error_output;
+				}
+
+				// Format is valid
+				$temp = explode( '/', $data );
+				$x = $temp[0];
+				$y = $temp[1];
+
+				$result = round( 10 * $x / $y ) / 10;
+				return $result;
+				break;
+
+
+	/*
+	E#8298		Copyright					Already formatted correctly
+				Location					Formatted into one line according to the 3 tags below:  2#092, 2#090, 2#095, 2#101
+											2#092		Sub location
+											2#090		City
+											2#095		State
+											2#101		Country
+
+	aux:Lens	Lens						Already formatted correctly - See line 66 in sample photo exifdata.jpg attached  Example aux:Lens="EF300mm f/4L IS USM +1.4x"
+	*/
+	//	E#920A		Focal length				Must be formatted:  420/1 = 420 mm
+			case 'E#920A':
+
+				if ( ! wppa_is_valid_rational( $data ) ) {
+					return $wppa_exif_error_output;
+				}
+
+				// Format is valid
+				$temp = explode( '/', $data );
+				$x = $temp[0];
+				$y = $temp[1];
+
+				$z = round( $x / $y );
+				if ( $z < 10 ) {
+					$result = round( $x * 10 / $y ) / 10 . ' mm.';
+				}
+				else {
+					$result = round( $x / $y ) . ' mm.';
+				}
+				return $result;
+				break;
+
+	//	E#9206		Subject distance			Must be formatted:  765/100 = 7,65 m.
+			case 'E#9206':
+				
+				// Invalid format?
+				if ( ! wppa_is_valid_rational( $data ) ) {
+					return $wppa_exif_error_output;
+				}
+				
+				// Format is valid
+				$temp = explode( '/', $data );
+				$x = $temp[0];
+				$y = $temp[1];
+			
+				if ( $x == 0 || $y == 0 ) {
+					$result = '<span title="' . esc_attr( __( 'Impossible data', 'wp-photo-album-plus' ) ) . ':' . $data . '" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+				}
+				else {
+					if ( $temp[1] != 0 ) {
+						$result = round( 100*$temp[0]/$temp[1] ) / 100;
+					}
+					if ( $result == -1 || $result > 10000 ) {
+						$result = '&infin;';
+					}
+					else {
+						$result .= ' m.';
+					}
+				}
+				
+				return $result;				
+				break;
+
+			case 'E#829A': 	// Exposure time
+
+				// Invalid format?
+				if ( ! wppa_is_valid_rational( $data ) ) {
+					return $wppa_exif_error_output;
+				}
+
+				// Format is valid
+				$temp = explode( '/', $data );
+				$x = $temp[0];
+				$y = $temp[1];
+
+				// 1 s.
+				if ( $x / $y == 1 ) {
+					$result = '1 s.';
+					return $result;
+				}
+
+				// Normal: 1/nn s.
+				if ( $x == 1 ) {
+					$result = $data . ' s.';
+					return $result;
+				}
+
+				// 'nn/1'
+				if ( $y == 1 ) {
+					$result = $x . ' s.';
+					return $result;
+				}
+
+				// Simplify nnn/mmm > 1
+				if ( ( $x / $y ) > 1 ) {
+					$result = sprintf( '%2.1f', $x / $y );
+					if ( substr( $result, -2 ) == '.0' ) { 	// Remove trailing '.0'
+						$result = substr( $result, 0, strlen( $result ) -2 ) . ' s.';
+					}
+					else {
+						$result .= ' s.';
+					}
+					return $result;
+				}
+
+				// Simplify nnn/mmm < 1
+				$v = $y / $x;
+				$z = round( $v ) / $v;
+				if ( 0.99 < $z && $z < 1.01 ) {
+					if ( round( $v ) == '1' ) {
+						$result = '1 s.';
+					}
+					else {
+						$result = '1/' . round( $v ) . ' s.';
+					}
+				}
+				else {
+					$z = $x / $y;
+					$i = 2;
+					$n = 0;
+					while ( $n < 2 && $i < strlen( $z ) ) {
+						if ( substr( $z, $i, 1 ) != '0' ) {
+							$n++;
+						}
+						$i++;
+					}
+					$result = substr( $z, 0, $i ) . ' s.';
+				}
+				return $result;
+				break;
+
+			case 'E#829D':	// F-Stop
+
+				// Invalid format?
+				if ( ! wppa_is_valid_rational( $data ) ) {
+					return $wppa_exif_error_output;
+				}
+
+				// Format is valid
+				$temp = explode( '/', $data );
+				$x = $temp[0];
+				$y = $temp[1];
+
+				// Bogus data?
+				if ( $x / $y > 100 ) {
+					$result = '<span title="' . esc_attr( __( 'Impossible data', 'wp-photo-album-plus' ) ) . ':' . $data . '"  >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+					return $result;
+				}
+
+				// Valid meaningful data
+				$result = 'f/' . ( round( 10 * $x / $y ) / 10 );
+				
+				return $result;
+				break;
+
+			case 'E#9202': 	// Aperture value
+			case 'E#9205': 	// Max aperture value
+
+				// Invalid format?
+				if ( ! wppa_is_valid_rational( $data ) ) {
+					return $wppa_exif_error_output;
+				}
+
+				// Format is valid
+				$temp = explode( '/', $data );
+				$x = $temp[0];
+				$y = $temp[1];
+
+				$result = round( 10 * $x / $y ) / 10;
+				
+				return $result;
+				break;
+
+	/*
+	E#8827		ISO	Speed Rating			Already formatted correctly
+	E#9204		Exposure bias				Already formatted correctly
+	*/
+
+			case 'E#8822': 	// Exposure program
+				switch ( $data ) {
+					case '0': $result = __('Not Defined', 'wp-photo-album-plus'); break;
+					case '1': $result = __('Manual', 'wp-photo-album-plus'); break;
+					case '2': $result = __('Program AE', 'wp-photo-album-plus'); break;
+					case '3': $result = __('Aperture-priority AE', 'wp-photo-album-plus'); break;
+					case '4': $result = __('Shutter speed priority AE', 'wp-photo-album-plus'); break;
+					case '5': $result = __('Creative (Slow speed)', 'wp-photo-album-plus'); break;
+					case '6': $result = __('Action (High speed)', 'wp-photo-album-plus'); break;
+					case '7': $result = __('Portrait', 'wp-photo-album-plus'); break;
+					case '8': $result = __('Landscape', 'wp-photo-album-plus'); break;
+					case '9': $result = __('Bulb', 'wp-photo-album-plus'); break;
+					default:
+						$result = '<span title="' . esc_attr( __( 'Unknown', 'wp-photo-album-plus' ) ) . ':' . $data . '" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+				}
+				return $result;
+				break;
+
+			case 'E#9204': 	// Exposure bias value
+				if ( $data ) $result = $data . ' EV';
+				else $result = '';
+				return $result;
+				break;
+
+			case 'E#9207':	// Metering mode
+				switch ( $data ) {
+					case '1': $result = __('Average', 'wp-photo-album-plus'); break;
+					case '2': $result = __('Center-weighted average', 'wp-photo-album-plus'); break;
+					case '3': $result = __('Spot', 'wp-photo-album-plus'); break;
+					case '4': $result = __('Multi-spot', 'wp-photo-album-plus'); break;
+					case '5': $result = __('Multi-segment', 'wp-photo-album-plus'); break;
+					case '6': $result = __('Partial', 'wp-photo-album-plus'); break;
+					case '255': $result = __('Other', 'wp-photo-album-plus'); break;
+					default:
+						$result = '<span title="' . esc_attr( __( 'Unknown', 'wp-photo-album-plus' ) ) . ':' . $data . '" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+				}
+				return $result;
+				break;
+
+			case 'E#9209':	// Flash
+				// PHP7 '0x0' etc generates warning because octal strings are no longer suppported, but they are real strings here
+				switch ( $data ) {
+					case '0'.'x0':
+					case '0': $result = __('No Flash', 'wp-photo-album-plus'); break;
+					case '0'.'x1':
+					case '1': $result = __('Fired', 'wp-photo-album-plus'); break;
+					case '0'.'x5':
+					case '5': $result = __('Fired, Return not detected', 'wp-photo-album-plus'); break;
+					case '0'.'x7':
+					case '7': $result = __('Fired, Return detected', 'wp-photo-album-plus'); break;
+					case '0'.'x8':
+					case '8': $result = __('On, Did not fire', 'wp-photo-album-plus'); break;
+					case '0'.'x9':
+					case '9': $result = __('On, Fired', 'wp-photo-album-plus'); break;
+					case '0'.'xd':
+					case '13': $result = __('On, Return not detected', 'wp-photo-album-plus'); break;
+					case '0'.'xf':
+					case '15': $result = __('On, Return detected', 'wp-photo-album-plus'); break;
+					case '0'.'x10':
+					case '16': $result = __('Off, Did not fire', 'wp-photo-album-plus'); break;
+					case '0'.'x14':
+					case '20': $result = __('Off, Did not fire, Return not detected', 'wp-photo-album-plus'); break;
+					case '0'.'x18':
+					case '24': $result = __('Auto, Did not fire', 'wp-photo-album-plus'); break;
+					case '0'.'x19':
+					case '25': $result = __('Auto, Fired', 'wp-photo-album-plus'); break;
+					case '0'.'x1d':
+					case '29': $result = __('Auto, Fired, Return not detected', 'wp-photo-album-plus'); break;
+					case '0'.'x1f':
+					case '31': $result = __('Auto, Fired, Return detected', 'wp-photo-album-plus'); break;
+					case '0'.'x20':
+					case '32': $result = __('No flash function', 'wp-photo-album-plus'); break;
+					case '0'.'x30':
+					case '48': $result = __('Off, No flash function', 'wp-photo-album-plus'); break;
+					case '0'.'x41':
+					case '65': $result = __('Fired, Red-eye reduction', 'wp-photo-album-plus'); break;
+					case '0'.'x45':
+					case '69': $result = __('Fired, Red-eye reduction, Return not detected', 'wp-photo-album-plus'); break;
+					case '0'.'x47':
+					case '71': $result = __('Fired, Red-eye reduction, Return detected', 'wp-photo-album-plus'); break;
+					case '0'.'x49':
+					case '73': $result = __('On, Red-eye reduction', 'wp-photo-album-plus'); break;
+					case '0'.'x4d':
+					case '77': $result = __('Red-eye reduction, Return not detected', 'wp-photo-album-plus'); break;
+					case '0'.'x4f':
+					case '79': $result = __('On, Red-eye reduction, Return detected', 'wp-photo-album-plus'); break;
+					case '0'.'x50':
+					case '80': $result = __('Off, Red-eye reduction', 'wp-photo-album-plus'); break;
+					case '0'.'x58':
+					case '88': $result = __('Auto, Did not fire, Red-eye reduction', 'wp-photo-album-plus'); break;
+					case '0'.'x59':
+					case '89': $result = __('Auto, Fired, Red-eye reduction', 'wp-photo-album-plus'); break;
+					case '0'.'x5d':
+					case '93': $result = __('Auto, Fired, Red-eye reduction, Return not detected', 'wp-photo-album-plus'); break;
+					case '0'.'x5f':
+					case '95': $result = __('Auto, Fired, Red-eye reduction, Return detected', 'wp-photo-album-plus'); break;
+					default:
+						$result = '<span title="' . esc_attr( __( 'Unknown', 'wp-photo-album-plus' ) ) . ':' . $data . '" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+				}
+
+				return $result;
+				break;
+
+			case 'E#A001': 	// ColorSpace
+
+				if ( ! wppa_is_valid_integer( $data ) ) {
+					return $wppa_exif_error_output;
+				}
+
+				switch ( $data ) {
+					case 1:
+						$result = __( 'sRGB', 'wp-photo-album-plus' );
+						break;
+					case 0xFFFF:
+						$result = __( 'Uncalibrated', 'wp-photo-album-plus' );
+						break;
+					default:
+						$result = __( 'reserved', 'wp-photo-album-plus' );
+				}
+
+				return $result;
+				break;
+
+			case 'E#A402': 	// ExposureMode
+
+				if ( ! wppa_is_valid_integer( $data ) ) {
+					return $wppa_exif_error_output;
+				}
+
+				switch ( $data ) {
+					case 0:
+						$result = __( 'Auto exposure', 'wp-photo-album-plus' );
+						break;
+					case 1:
+						$result = __( 'Manual exposure', 'wp-photo-album-plus' );
+						break;
+					case 2:
+						$result = __( 'Auto bracket', 'wp-photo-album-plus' );
+						break;
+					default:
+						$result = __( 'reserved', 'wp-photo-album-plus' );
+				}
+
+				return $result;
+				break;
+
+
+			// Unformatted
+			default:
+				$result = $data;
+				return $result;
+		}
+	}
+
+	// Empty data
+	else {
+		$result = '<span title="' . esc_attr( __( 'No data', 'wp-photo-album-plus' ) ) . '" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
 	}
 
 	return $result;
+}
+
+function wppa_is_valid_rational( $data, $signed = false ) {
+global $wppa_exif_error_output;
+
+	// Must contain a '/'
+	if ( strpos( $data, '/' ) == false ) {
+		$wppa_exif_error_output = '<span title="' . esc_attr( __( 'Missing /', 'wp-photo-album-plus' ) ) . ':' . $data . '" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+		return false;
+	}
+
+	// make array
+	$t = explode( '/', $data );
+
+	// Divide by zero?
+	if ( $t[1] == 0 ) {
+		$wppa_exif_error_output = '<span title="' . esc_attr( __( 'Divide by zero', 'wp-photo-album-plus' ) ) . ':' . $data . '" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+		return false;
+	}
+
+	// Signed while not permitted?
+	if ( ! $signed && ( $t[0] < 0 || $t[1] < 0 ) ) {
+		$wppa_exif_error_output = '<span title="' . esc_attr( __( 'Must be positive', 'wp-photo-album-plus' ) ) . ':' . $data . '" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+		return false;
+	}
+
+	// Ok.
+	return true;
+}
+
+function wppa_is_valid_integer( $data, $signed = false ) {
+global $wppa_exif_error_output;
+
+	// Must be integer
+	if ( ! wppa_is_int( $data ) ) {
+		$wppa_exif_error_output = '<span title="' . esc_attr( __( 'Invalid format', 'wp-photo-album-plus' ) ) . ':' . $data . '" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+		return false;
+	}
+
+	// Signed while not permitted?
+	if ( ! $signed && $data < 0 ) {
+		$wppa_exif_error_output = '<span title="' . esc_attr( __( 'Must be positive', 'wp-photo-album-plus' ) ) . ':' . $data . '" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+		return false;
+	}
+
+	// Ok.
+	return true;
 }
 
 function wppa_iptc_clean_garbage( $photo ) {

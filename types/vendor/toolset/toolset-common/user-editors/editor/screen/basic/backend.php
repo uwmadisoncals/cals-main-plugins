@@ -64,6 +64,13 @@ class Toolset_User_Editors_Editor_Screen_Basic_Backend
 	public function register_assets() {
 		
 		$toolset_assets_manager = Toolset_Assets_Manager::getInstance();
+
+		$toolset_assets_manager->register_style(
+			'toolset-user-editors-basic-style',
+			TOOLSET_COMMON_URL . '/user-editors/editor/screen/basic/backend.css',
+			array(),
+			TOOLSET_COMMON_VERSION
+		);
 		
 		$toolset_assets_manager->register_script(
 			'toolset-user-editors-basic-script',
@@ -100,12 +107,14 @@ class Toolset_User_Editors_Editor_Screen_Basic_Backend
 	public function admin_enqueue_assets() {
 		if ( $this->is_views_or_wpa_edit_page() ) {
 			do_action( 'toolset_enqueue_scripts', array( 'toolset-user-editors-basic-layout-template-script' ) );
+			do_action( 'toolset_enqueue_styles', array( 'toolset-user-editors-basic-style' ) );
 		}
 	}
 	
 	public function action_assets() {
 		
 		do_action( 'toolset_enqueue_scripts',	array( 'toolset-user-editors-basic-script' ) );
+		do_action( 'toolset_enqueue_styles', array( 'toolset-user-editors-basic-style' ) );
 		
 	}
 	

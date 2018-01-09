@@ -266,6 +266,8 @@ if ( file_exists( dirname(__FILE__) . '/editor-addon-generic.class.php') && !cla
                         $fields = wpcf_admin_fields_get_fields_by_group( $group['id'],
                                 'slug', true, false, true, 'wp-types-user-group',
                                 'wpcf-usermeta' );
+						// @since m2m wpcf_admin_fields_get_fields_by_group returns strings for repeatng fields groups
+						$fields = array_filter( $fields, 'is_array' );
 
                         if ( !empty( $fields ) ) {
                             foreach ( $fields as $field_id => $field ) {

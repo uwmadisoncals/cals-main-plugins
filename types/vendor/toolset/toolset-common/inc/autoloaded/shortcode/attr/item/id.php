@@ -16,14 +16,34 @@ class Toolset_Shortcode_Attr_Item_Id implements Toolset_Shortcode_Attr_Interface
 	 */
 	public function get( array $data ) {
 		if( ! $role_id = $this->handle_attr_synonyms( $data ) ) {
+			// no 'id' attribute used, means current post should be shown
 			global $post;
 
 			if ( is_object( $post ) && property_exists( $post, 'ID' ) ) {
 				$role_id = $post->ID;
 			}
+
+			return $this->return_single_id( $role_id );
 		}
 
-		return $this->return_single_id( $role_id );
+		$single_id = $this->return_single_id( $role_id );
+
+		if( ! $single_id
+             && ( // check if legacy attribute ('id' or 'post_id') is in use
+             	( isset( $data['id'] ) && ! empty( $data['id'] ) )
+                || ( isset( $data['post_id'] ) && ! empty( $data['post_id'] ) )
+			 )
+		) {
+			// 'id' attribute used, but no valid id given -> use current global post
+			// NOTE: we just keep this behaviour as legacy introduced it and we want to max backward compatibilty
+			global $post;
+
+			if ( is_object( $post ) && property_exists( $post, 'ID' ) ) {
+				$single_id = $post->ID;
+			}
+		}
+
+		return $this->return_single_id( $single_id );
 	}
 
 	/**

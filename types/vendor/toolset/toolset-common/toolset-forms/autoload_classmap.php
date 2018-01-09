@@ -24,6 +24,7 @@ return array(
 'WPToolset_Field_Numeric' => dirname( __FILE__ ) . '/classes/class.numeric.php',
 'WPToolset_Field_Password' => dirname( __FILE__ ) . '/classes/class.password.php',
 'WPToolset_Field_Phone' => dirname( __FILE__ ) . '/classes/class.phone.php',
+'WPToolset_Field_Post' => dirname( __FILE__ ) . '/classes/class.post.php',
 'WPToolset_Field_Radios' => dirname( __FILE__ ) . '/classes/class.radios.php',
 'WPToolset_Field_Recaptcha' => dirname( __FILE__ ) . '/classes/class.recaptcha.php',
 'WPToolset_Field_Recaptcha_v1' => dirname( __FILE__ ) . '/classes/class.recaptcha-v1.php',

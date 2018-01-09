@@ -122,22 +122,15 @@ class Toolset_Relationship_Definition_Translator {
 	/**
 	 * Load a single relationship definition from a definition array.
 	 *
-	 * @param array $database_row
+	 * @param object $database_row
 	 * @return null|Toolset_Relationship_Definition The relationship definition or null if it was not
 	 *     possible to load it (which means that the definition array was invalid).
 	 * @since m2m
 	 */
 	public function from_database_row( $database_row ) {
-
-		//try {
-			$definition_array = $this->from_database_row_to_definition_array( $database_row );
-			$definition = $this->definition_factory->create( $definition_array );
-			return $definition;
-		/*} catch( Exception $e ) {
-			// todo og the error somehow
-			return null;
-		}*/
-
+		$definition_array = $this->from_database_row_to_definition_array( $database_row );
+		$definition = $this->definition_factory->create( $definition_array );
+		return $definition;
 	}
 
 

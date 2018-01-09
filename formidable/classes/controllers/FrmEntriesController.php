@@ -5,7 +5,7 @@ class FrmEntriesController {
 	public static function menu() {
 		FrmAppHelper::force_capability( 'frm_view_entries' );
 
-		add_submenu_page('formidable', 'Formidable | ' . __( 'Entries', 'formidable' ), __( 'Entries', 'formidable' ), 'frm_view_entries', 'formidable-entries', 'FrmEntriesController::route' );
+		add_submenu_page( 'formidable', 'Formidable | ' . __( 'Entries', 'formidable' ), __( 'Entries', 'formidable' ), 'frm_view_entries', 'formidable-entries', 'FrmEntriesController::route' );
 
 		self::load_manage_entries_hooks();
 	}
@@ -96,7 +96,11 @@ class FrmEntriesController {
 
 		$action = FrmAppHelper::simple_get( 'frm_action', 'sanitize_title' );
 		if ( FrmAppHelper::is_admin_page( 'formidable-entries' ) && in_array( $action, array( '', 'list', 'destroy' ) ) ) {
-			add_screen_option( 'per_page', array( 'label' => __( 'Entries', 'formidable' ), 'default' => 20, 'option' => 'formidable_page_formidable_entries_per_page' ) );
+			add_screen_option( 'per_page', array(
+				'label'   => __( 'Entries', 'formidable' ),
+				'default' => 20,
+				'option'  => 'formidable_page_formidable_entries_per_page',
+			) );
         }
 
         return $columns;
@@ -120,16 +124,16 @@ class FrmEntriesController {
 							continue;
 						}
 						$columns[ $form_id . '_' . $sub_form_col->field_key . '-_-' . $form_col->id ] = FrmAppHelper::truncate( $sub_form_col->name, 35 );
-						unset($sub_form_col);
+						unset( $sub_form_col );
 					}
 				}
-				unset($sub_form_cols);
+				unset( $sub_form_cols );
 			} else {
 				$col_id = $form_col->field_key;
 				if ( $form_col->form_id != $form_id ) {
 					$col_id .= '-_-form' . $form_col->form_id;
 				}
-				
+
 				$has_separate_value = ! FrmField::is_option_empty( $form_col, 'separate_value' );
 				$is_post_status     = FrmField::is_option_true( $form_col, 'post_field' ) && $form_col->field_options['post_field'] == 'post_status';
 				if ( $has_separate_value && ! $is_post_status ) {
@@ -157,8 +161,8 @@ class FrmEntriesController {
 		}
 
         global $frm_vars;
-        //add a check so we don't create a loop
-        $frm_vars['prev_hidden_cols'] = ( isset($frm_vars['prev_hidden_cols']) && $frm_vars['prev_hidden_cols'] ) ? false : $prev_value;
+		//add a check so we don't create a loop
+		$frm_vars['prev_hidden_cols'] = ( isset( $frm_vars['prev_hidden_cols'] ) && $frm_vars['prev_hidden_cols'] ) ? false : $prev_value;
 
         return $check;
     }
@@ -170,10 +174,10 @@ class FrmEntriesController {
             return;
         }
 
-        global $frm_vars;
-        if ( ! isset($frm_vars['prev_hidden_cols']) || ! $frm_vars['prev_hidden_cols'] ) {
-            return; //don't continue if there's no previous value
-        }
+		global $frm_vars;
+		if ( ! isset( $frm_vars['prev_hidden_cols'] ) || ! $frm_vars['prev_hidden_cols'] ) {
+			return; //don't continue if there's no previous value
+		}
 
         foreach ( $meta_value as $mk => $mv ) {
             //remove blank values
@@ -182,8 +186,8 @@ class FrmEntriesController {
             }
         }
 
-        $cur_form_prefix = reset($meta_value);
-        $cur_form_prefix = explode('_', $cur_form_prefix);
+		$cur_form_prefix = reset( $meta_value );
+		$cur_form_prefix = explode( '_', $cur_form_prefix );
         $cur_form_prefix = $cur_form_prefix[0];
         $save = false;
 
@@ -202,7 +206,7 @@ class FrmEntriesController {
 
             $meta_value[] = $prev_hidden;
             $save = true;
-            unset($form_prefix);
+			unset( $form_prefix );
         }
 
 		if ( $save ) {
@@ -261,30 +265,25 @@ class FrmEntriesController {
 
 	public static function hidden_columns( $result ) {
 		$form_id = FrmForm::get_current_form_id();
-		$max_columns = 8;
 
 		$hidden = self::user_hidden_columns_for_form( $form_id, $result );
 
-		if ( ! empty( $hidden ) ) {
-			$max_columns = 11;
-			$result = $hidden;
-		}
-
 		global $frm_vars;
 		$i = isset( $frm_vars['cols'] ) ? count( $frm_vars['cols'] ) : 0;
+
+		if ( ! empty( $hidden ) ) {
+			$result = $hidden;
+			$i = $i - count( $result );
+			$max_columns = 11;
+		} else {
+			$max_columns = 8;
+		}
+
 		if ( $i <= $max_columns ) {
 			return $result;
 		}
 
-		if ( $form_id ) {
-			$result[] = $form_id . '_id';
-			$i--;
-		}
-
-		$result[] = $form_id . '_item_key';
-		$i--;
-
-		self::remove_excess_cols( compact( 'i', 'max_columns' ), $result );
+		self::remove_excess_cols( compact( 'i', 'max_columns', 'form_id' ), $result );
 
 		return $result;
 	}
@@ -316,16 +315,24 @@ class FrmEntriesController {
 	private static function remove_excess_cols( $atts, &$result ) {
 		global $frm_vars;
 
-		$cols = $frm_vars['cols'];
-		$cols = array_reverse( $cols, true );
+		$remove_first = array(
+			$atts['form_id'] . '_item_key' => '',
+			$atts['form_id'] . '_id'       => '',
+		);
+		$cols = $remove_first + array_reverse( $frm_vars['cols'], true );
+
 		$i = $atts['i'];
 
 		foreach ( $cols as $col_key => $col ) {
-			if ( $i > $atts['max_columns'] ) {
-				$result[] = $col_key;
+			if ( $i <= $atts['max_columns'] ) {
+				break;
 			}
 
-			$i--;
+			if ( empty( $result ) || ! in_array( $col_key, $result, true ) ) {
+				$result[] = $col_key;
+				$i--;
+			}
+
 			unset( $col_key, $col );
 		}
 	}
@@ -355,14 +362,14 @@ class FrmEntriesController {
         if ( $pagenum > $total_pages && $total_pages > 0 ) {
 			$url = add_query_arg( 'paged', $total_pages );
             if ( headers_sent() ) {
-                echo FrmAppHelper::js_redirect($url);
+				echo FrmAppHelper::js_redirect( $url );
             } else {
                 wp_redirect( esc_url_raw( $url ) );
             }
             die();
         }
 
-        if ( empty($message) && isset($_GET['import-message']) ) {
+		if ( empty( $message ) && isset( $_GET['import-message'] ) ) {
             $message = __( 'Your import is complete', 'formidable' );
         }
 
@@ -379,7 +386,7 @@ class FrmEntriesController {
 
     /* Back End CRUD */
 	public static function show( $id = 0 ) {
-        FrmAppHelper::permission_check('frm_view_entries');
+		FrmAppHelper::permission_check( 'frm_view_entries' );
 
         if ( ! $id ) {
 			$id = FrmAppHelper::get_param( 'id', 0, 'get', 'absint' );
@@ -389,7 +396,7 @@ class FrmEntriesController {
             }
         }
 
-        $entry = FrmEntry::getOne($id, true);
+		$entry = FrmEntry::getOne( $id, true );
 		if ( ! $entry ) {
 			echo '<div id="form_show_entry_page" class="wrap">' .
 				__( 'You are trying to view an entry that does not exist.', 'formidable' ) .
@@ -397,7 +404,7 @@ class FrmEntriesController {
 			return;
 		}
 
-        $data = maybe_unserialize($entry->description);
+		$data = maybe_unserialize( $entry->description );
 		if ( ! is_array( $data ) || ! isset( $data['referrer'] ) ) {
 			$data = array( 'referrer' => $data );
 		}
@@ -409,11 +416,11 @@ class FrmEntriesController {
     }
 
     public static function destroy() {
-        FrmAppHelper::permission_check('frm_delete_entries');
+		FrmAppHelper::permission_check( 'frm_delete_entries' );
 
 		$params = FrmForm::get_admin_params();
 
-        if ( isset($params['keep_post']) && $params['keep_post'] ) {
+		if ( isset( $params['keep_post'] ) && $params['keep_post'] ) {
             //unlink entry from post
             global $wpdb;
 			$wpdb->update( $wpdb->prefix . 'frm_items', array( 'post_id' => '' ), array( 'id' => $params['id'] ) );
@@ -579,7 +586,10 @@ class FrmEntriesController {
 		$atts = shortcode_atts( $defaults, $atts );
 
 		if ( $atts['default_email'] ) {
-			$shortcode_atts = array( 'format' => $atts['format'], 'plain_text' => $atts['plain_text'] );
+			$shortcode_atts = array(
+				'format'     => $atts['format'],
+				'plain_text' => $atts['plain_text'],
+			);
 			$entry_shortcode_formatter = FrmEntryFactory::entry_shortcode_formatter_instance( $atts['form_id'], $shortcode_atts );
 			$formatted_entry = $entry_shortcode_formatter->content();
 
@@ -599,9 +609,9 @@ class FrmEntriesController {
 	}
 
 	public static function entry_sidebar( $entry ) {
-        $data = maybe_unserialize($entry->description);
-        $date_format = get_option('date_format');
-        $time_format = get_option('time_format');
+		$data = maybe_unserialize( $entry->description );
+		$date_format = get_option( 'date_format' );
+		$time_format = get_option( 'time_format' );
 		if ( isset( $data['browser'] ) ) {
 			$browser = FrmEntriesHelper::get_browser( $data['browser'] );
 		}

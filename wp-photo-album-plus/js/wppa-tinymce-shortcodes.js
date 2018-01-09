@@ -2,7 +2,7 @@
 * Pachkage: wp-photo-album-plus
 *
 *
-* Version 6.7.07
+* Version 6.7.09
 *
 */
 
@@ -18,7 +18,7 @@ tinymce.PluginManager.add('wppagallery', function(editor, url) {
 			tb_show( 'WPPA+ Shortcode Generator', '#TB_inline?width=' + W + '&height=' + H + '&inlineId=wppagallery-form' );
 		}
 
-		editor.addButton('mygallery_button', {
+		editor.addButton('wppa_gallery_button', {
 			image: wppaImageDirectory+'albumnew32.png',
 			tooltip: 'WPPA+ Shortcode Generator',
 			onclick: openWppaShortcodeGenerator
@@ -140,9 +140,19 @@ function wppaGalleryEvaluate() {
 	var landing 		= '0';
 	var rootalbum 		= '0';
 	var admins 			= '';
+	var align 			= 'none';
+	var html 			= '';
+	
+	// Init colors of <select> tags
+	jQuery( 'select' ).css( 'color', '#700' );
+	jQuery( '#wppagallery-album-parent-parent' ).css( 'color', '#070' );
+	jQuery( '#wppagallery-align' ).css( 'color', '#070' );
 
 	// Type
 	topType = jQuery('#wppagallery-top-type').val();
+	if ( ! wppaIsEmpty( topType ) ) {
+		jQuery('#wppagallery-top-type').css('color', '#070');
+	}
 	switch ( topType ) {
 		case 'galerytype':
 			jQuery('#wppagallery-galery-type-tr').show();
@@ -150,11 +160,7 @@ function wppaGalleryEvaluate() {
 			needGalType = true;
 			needAlbum = true;
 			jQuery('#wppagallery-album-type-tr').show();
-			jQuery('#wppagallery-top-type').css('color', '#070');
-			if ( type == '' ) {
-				jQuery('#wppagallery-galery-type').css('color', '#700');
-			}
-			else {
+			if ( ! wppaIsEmpty( type ) ) {
 				jQuery('#wppagallery-galery-type').css('color', '#070');
 				galType = type;
 			}
@@ -165,11 +171,7 @@ function wppaGalleryEvaluate() {
 			needSlideType = true;
 			needAlbum = true;
 			jQuery('#wppagallery-album-type-tr').show();
-			jQuery('#wppagallery-top-type').css('color', '#070');
-			if ( type == '' ) {
-				jQuery('#wppagallery-slides-type').css('color', '#700');
-			}
-			else {
+			if ( ! wppaIsEmpty( type ) ) {
 				jQuery('#wppagallery-slides-type').css('color', '#070');
 				slideType = type;
 			}
@@ -179,17 +181,24 @@ function wppaGalleryEvaluate() {
 			type = jQuery('#wppagallery-single-type').val();
 			needPhoto = true;
 			jQuery('#wppagallery-photo-tr').show();
-			jQuery('#wppagallery-top-type').css('color', '#070');
+			if ( ! wppaIsEmpty( type ) ) {
+				jQuery('#wppagallery-single-type').css('color', '#070');
+			}
 			break;
 		case 'searchtype':
 			jQuery('#wppagallery-search-type-tr').show();
 			type = jQuery('#wppagallery-search-type').val();
 			needSearchType = true;
 			searchType = type;
+			if ( ! wppaIsEmpty( type ) ) {
+				jQuery('#wppagallery-search-type').css('color', '#070');
+			}
 			switch ( type ) {
 				case 'search':
 					jQuery('#wppagallery-search-tr').show();
-					if ( jQuery('#wppagallery-root').attr('checked') == 'checked' ) jQuery('#wppagallery-rootalbum-tr').show();
+					if ( jQuery('#wppagallery-root').prop('checked') ) {
+						jQuery('#wppagallery-rootalbum-tr').show();
+					}
 					rootalbum = jQuery('#wppagallery-rootalbum').val();
 					jQuery('#wppagallery-landing-tr').show();
 					landing = jQuery('#wppagallery-landing').val();
@@ -199,8 +208,8 @@ function wppaGalleryEvaluate() {
 				case 'tagcloud':
 				case 'multitag':
 					jQuery('#wppagallery-taglist-tr').show();
-					alltags = jQuery('#wppagallery-alltags').attr('checked');
-					if ( alltags != 'checked' ) {
+					alltags = jQuery('#wppagallery-alltags').prop('checked');
+					if ( ! alltags ) {
 						needTagList = true;
 						jQuery('#wppagallery-seltags').show();
 						t = jQuery('.wppagallery-taglist-tags');
@@ -215,12 +224,6 @@ function wppaGalleryEvaluate() {
 							i++;
 						}
 						taglist = wppaArrayToEnum( tagarr, ',' );
-						if ( taglist == '' ) {
-							jQuery('.wppagallery-tags').css('color', '#700');
-						}
-						else {
-							jQuery('.wppagallery-tags').css('color', '#070');
-						}
 					}
 					break;
 				case 'superview':
@@ -231,24 +234,20 @@ function wppaGalleryEvaluate() {
 					jQuery('#wppagallery-calendar-tr').show();
 					jQuery('#wppagallery-album-super-tr').show();	// Optional parent album
 					caltype = jQuery('#wppagallery-calendar-type').val();
-					reverse = jQuery('#wppagallery-calendar-reverse').attr('checked');
-					allopen = jQuery('#wppagallery-calendar-allopen').attr('checked');
+					reverse = jQuery('#wppagallery-calendar-reverse').prop('checked');
+					allopen = jQuery('#wppagallery-calendar-allopen').prop('checked');
 					parent  = jQuery('#wppagallery-album-super-parent').val();
 					break;
 				default:
-			}
-			jQuery('#wppagallery-top-type').css('color', '#070');
-			if ( type == '' ) {
-				jQuery('#wppagallery-search-type').css('color', '#700');
-			}
-			else {
-				jQuery('#wppagallery-search-type').css('color', '#070');
 			}
 			break;
 		case 'misceltype':
 			jQuery('#wppagallery-miscel-type-tr').show();
 			type = jQuery('#wppagallery-miscel-type').val();
 			needMiscType = true;
+			if ( ! wppaIsEmpty( type ) ) {
+				jQuery('#wppagallery-miscel-type').css('color', '#070');
+			}
 			switch ( type ) {
 				case 'generic':
 				case 'upload':
@@ -263,67 +262,58 @@ function wppaGalleryEvaluate() {
 					break;
 				default:
 			}
-			jQuery('#wppagallery-top-type').css('color', '#070');
-			if ( type == '' ) {
-				jQuery('#wppagallery-miscel-type').css('color', '#700');
-			}
-			else {
-				jQuery('#wppagallery-miscel-type').css('color', '#070');
-			}
 			break;
 		default:
-			jQuery('#wppagallery-top-type').css('color', '#700');
 	}
-	if ( type != null && type != '' ) {
+	if ( ! wppaIsEmpty( type ) ) {
 		shortcode += ' type="'+type+'"';
-	}
-	else {
 	}
 
 	// Album
 	if ( needAlbum ) {
 		albumType = jQuery('#wppagallery-album-type').val();
+		if ( ! wppaIsEmpty( albumType ) ) {
+			jQuery( '#wppagallery-album-type' ).css('color', '#070');
+		}
 		switch ( albumType ) {
 			case 'real':
 				jQuery('#wppagallery-album-real-tr').show();
 				jQuery('#wppagallery-album-real-search-tr').show();
-				// Not many albums
-				if ( jQuery('#wppagallery-album-real-search').val() ) {
-					var s = jQuery('#wppagallery-album-real-search').val().toLowerCase();
-					if ( s != '' ) {
-						albums = jQuery('.wppagallery-album-r');
-						if ( albums.length > 0 ) {
-							var i = 0;
-							while ( i < albums.length ) {
-								var a = albums[i].innerHTML.toLowerCase();
-								if ( a.search( s ) == -1 ) {
-									jQuery( albums[i] ).removeAttr( 'selected' );
-									jQuery( albums[i] ).hide();
+				
+				// WPPA has Not many albums, there is a quick select box. If used, ...val() is not empty,
+				if ( jQuery('#wppagallery-album-real-search') ) {
+					if ( jQuery('#wppagallery-album-real-search').val() ) {
+						var s = jQuery('#wppagallery-album-real-search').val().toLowerCase();
+						if ( ! wppaIsEmpty( s ) ) {
+							albums = jQuery('.wppagallery-album-r');
+							if ( albums.length > 0 ) {
+								var i = 0;
+								while ( i < albums.length ) {
+									var a = albums[i].innerHTML.toLowerCase();
+									if ( a.search( s ) == -1 ) {
+										jQuery( albums[i] ).removeAttr( 'selected' );
+										jQuery( albums[i] ).hide();
+									}
+									else {
+										jQuery( albums[i] ).show();
+									}
+									i++;
 								}
-								else {
-									jQuery( albums[i] ).show();
-								}
-								i++;
 							}
 						}
 					}
 					else {
 						jQuery('.wppagallery-album-r').show();
 					}
-					album = wppaGetSelectionEnumByClass('.wppagallery-album-r');
 				}
-				// Many albums
-				else {
-					album = jQuery('#wppagallery-album-real').val();
-					if ( album.indexOf(',') != -1 ) {
-						parr = album.split(',');
-						album = wppaArrayToEnum( parr, '.' );
-					}
-				}
-				if ( album != '' ) {
-					jQuery('#wppagallery-album-type').css('color', '#070');
-				}
+				
+				// Get the selected album(s)
+				album = jQuery('#wppagallery-album-real').val();
+				
+				// Make sure right delimiter
+				album = album.toString().replace( /,/g, '.' );
 				break;
+				
 			case 'virtual':
 
 				// Open the right selection box dependant of type is cover or not
@@ -339,7 +329,8 @@ function wppaGalleryEvaluate() {
 
 				// Now displatch on album identifier found
 				// and get the (optional) additional data
-				if ( album != '' ) {
+				if ( ! wppaIsEmpty( album ) ) {
+					jQuery('#wppagallery-album-virt').css('color', '#070');
 					switch ( album ) {
 						case '#topten':
 						case '#lasten':
@@ -350,7 +341,7 @@ function wppaGalleryEvaluate() {
 							// We use parent here for optional album(s), because album is already used for virtual album type
 							// Not many albums
 							if ( jQuery('.wppagallery-album-ropt').length > 0 ) {
-								parent = wppaGetSelectionEnumByClass('.wppagallery-album-ropt');
+								parent = wppaGetSelectionEnumByClass('.wppagallery-album-ropt', '.');
 							}
 							else {
 								parent = jQuery('#wppagallery-album-realopt').val();
@@ -367,7 +358,7 @@ function wppaGalleryEvaluate() {
 							jQuery('#wppagallery-phototags-tr').show();
 							jQuery('#wppagallery-tags-cats-tr').show();
 							andor = jQuery('[name=andor]:checked').val();
-							if ( ! andor ) jQuery('#wppagallery-or').attr( 'checked', 'checked' );
+							if ( ! andor ) jQuery('#wppagallery-or').prop( 'checked', true );
 							andor = jQuery('[name=andor]:checked').val();
 							if ( andor == 'or' ) sep = ';';
 							else sep = ',';
@@ -384,9 +375,6 @@ function wppaGalleryEvaluate() {
 								i++;
 							}
 							tags = wppaArrayToEnum( tagarr, sep );
-							if ( tags != '' ) {
-								jQuery('.wppagallery-phototags').css('color', '#070');
-							}
 							break;
 						case '#last':
 							jQuery('#wppagallery-album-parent-tr').show();
@@ -398,7 +386,7 @@ function wppaGalleryEvaluate() {
 							jQuery('#wppagallery-albumcat-tr').show();
 							jQuery('#wppagallery-tags-cats-tr').show();
 							andor = jQuery('[name=andor]:checked').val();
-							if ( ! andor ) jQuery('#wppagallery-or').attr( 'checked', 'checked' );
+							if ( ! andor ) jQuery('#wppagallery-or').prop( 'checked', true );
 							andor = jQuery('[name=andor]:checked').val();
 							if ( andor == 'or' ) sep = ';';
 							else sep = ',';
@@ -415,20 +403,17 @@ function wppaGalleryEvaluate() {
 								i++;
 							}
 							cats = wppaArrayToEnum( catarr, sep );
-							if ( cats != '' ) {
-								jQuery('#wppagallery-albumcat').css('color', '#070');
-							}
 							break;
 						case '#owner':
 						case '#upldr':
 							jQuery('#wppagallery-owner-tr').show();
-							jQuery('#wppagallery-owner').css('color', '#700');
 							needOwner = true;
 							owner = jQuery('#wppagallery-owner').val();
-							if ( owner != '' ) {
-								jQuery('#wppagallery-owner').css('color', '#070');
+							if ( ! wppaIsEmpty( owner ) ) {
+								jQuery( '#wppagallery-owner' ).css( 'color', '#070' );
 								jQuery('#wppagallery-owner-parent-tr').show();
-								parent = wppaGetSelectionEnumByClass('.wppagallery-album-p');
+								parent = wppaGetSelectionEnumByClass('.wppagallery-album-p', '.');
+								parent = parent.toString().replace( 'zero', '0' );
 							}
 							break;
 						case '#all':
@@ -445,29 +430,16 @@ function wppaGalleryEvaluate() {
 						( album != '#lasten' || parent != '' ) &&
 						( album != '#comten' || parent != '' ) &&
 						( album != '#featen' || parent != '' ) ) {
-						jQuery('#wppagallery-album-type').css('color', '#070');
 					}
 				}
 				break;
 			default:
-				jQuery('#wppagallery-album-type').css('color', '#700');
 				album = '';
 		}
 	}
 
-	// No album specified
-	if ( album == '' ) {
-		jQuery('#wppagallery-album-real').css('color', '#700');
-		jQuery('#wppagallery-album-virt').css('color', '#700');
-		jQuery('#wppagallery-album-virt-cover').css('color', '#700');
-	}
-
 	// Add album specs to shortcode
-	else {
-		jQuery('#wppagallery-album-real').css('color', '#070');
-		jQuery('#wppagallery-album-parent').css('color', '#070');
-		jQuery('#wppagallery-album-virt').css('color', '#070');
-		jQuery('#wppagallery-album-virt-cover').css('color', '#070');
+	if ( ! wppaIsEmpty( album ) ) {
 		shortcode += ' album="'+album;
 		if ( owner != '' ) 	shortcode += ','+owner;
 		if ( parent == '' && count != '' ) 	parent = '0';
@@ -490,17 +462,14 @@ function wppaGalleryEvaluate() {
 			shortcode += ' photo="'+id+'"';
 			jQuery('#wppagallery-photo').css('color', '#070');
 		}
-		else {
-			jQuery('#wppagallery-photo').css('color', '#700');
-		}
 	}
 
 	// Search options
 	if ( type == 'search' ) {
-		sub = jQuery('#wppagallery-sub').attr('checked');
-		root = jQuery('#wppagallery-root').attr('checked');
-		if ( sub == 'checked' ) shortcode += ' sub="1"';
-		if ( root == 'checked' ) {
+		sub = jQuery('#wppagallery-sub').prop('checked');
+		root = jQuery('#wppagallery-root').prop('checked');
+		if ( sub ) shortcode += ' sub="1"';
+		if ( root ) {
 			if ( rootalbum != '0' ) shortcode += ' root="#'+rootalbum+'"';
 			else  shortcode += ' root="1"';
 		}
@@ -533,19 +502,24 @@ function wppaGalleryEvaluate() {
 
 	// Size
 	var size = document.getElementById('wppagallery-size').value;
-	// Assume valid imput
-	jQuery('#wppagallery-size').css('color', '#070');
+	
 	// See if auto with fixed max
 	var temp = size.split(',');
 	if ( temp[1] ) {
 		if ( temp[0] == 'auto' && parseInt( temp[1] ) == temp[1] && temp[1] > 100 ) {
+			
 			// its ok, auto with a static max of size temp[1]
+			jQuery('#wppagallery-size').css('color', '#070');
 		}
 		else {
+			
+			// Not ok
 			size = 0;
 			jQuery('#wppagallery-size').css('color', '#700');
 		}
 	}
+	
+	// Numeric?
 	else {
 		if ( size != '' && size != 'auto' ) {
 			if ( parseInt(size) != size ) {
@@ -559,13 +533,16 @@ function wppaGalleryEvaluate() {
 		if ( size < 100 ) {
 			size = size / 100;
 		}
+		jQuery('#wppagallery-size').css('color', '#070');
 	}
+	
+	// Add size to shortcode
 	if ( size != 0 ) {
 		shortcode += ' size="'+size+'"';
 	}
 
 	// Align
-	var align = document.getElementById('wppagallery-align').value;
+	align = jQuery('#wppagallery-align').val();
 	if ( align != 'none' ) {
 		shortcode += ' align="'+align+'"';
 	}
@@ -583,8 +560,8 @@ function wppaGalleryEvaluate() {
 
 	// Display shortcode
 	shortcode = shortcode.replace(/"/g, '&quot;');
-	var html = '<input type="text" id="wppagallery-shortcode-preview" style="background-color:#ddd; width:100%; height:26px;" value="'+shortcode+'" />';
-	document.getElementById('wppagallery-shortcode-preview-container').innerHTML = html;
+	html = '<input type="text" id="wppagallery-shortcode-preview" style="background-color:#ddd; width:100%; height:26px;" value="'+shortcode+'" />';
+	jQuery('#wppagallery-shortcode-preview-container').html( html );
 
 	// Is shortcode complete?
 	shortcodeOk = 	( album != '' || ! needAlbum ) &&
@@ -631,7 +608,7 @@ function wppaTinyMcePhotoPreview( id ) {
 	}
 	else if ( id.indexOf('xxx') != -1 ) { 				// its a video
 		var idv = id.replace('xxx', '');
-		jQuery('#wppagallery-photo-preview').html('<video preload="metadata" style="max-width:600px; max-height:150px; margin-top:3px;" controls>'+
+		jQuery('#wppagallery-photo-preview').html('<video preload="metadata" style="max-width:400px; max-height:300px; margin-top:3px;" controls>'+
 													'<source src="'+wppaPhotoDirectory+idv+'mp4" type="video/mp4">'+
 													'<source src="'+wppaPhotoDirectory+idv+'ogg" type="video/ogg">'+
 													'<source src="'+wppaPhotoDirectory+idv+'ogv" type="video/ogg">'+

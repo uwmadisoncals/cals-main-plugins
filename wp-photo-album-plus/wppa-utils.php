@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.7.07
+* Version 6.7.09
 *
 */
 
@@ -443,22 +443,30 @@ global $wppa;
 		wppa_reset_occurrance();
 	}
 
-	// Valid key?
-	if ( isset( $wppa[$key] ) ) {
+	// Invalid key?
+	if ( ! isset( $wppa[$key] ) ) {
 
-		// Get old value
-		$oldval = $wppa[$key];
+		// If indesx not exists: fatal error
+		if ( ! in_array( $key, array_keys( $wppa ) ) ) {
+			wppa_log( 'Err', '$wppa[\'' . $key . '\'] is not defined in reset_occurrance', true );
+			return false;
+		}
 
-		// New value supplied?
-		if ( $newval !== 'nil' ) {
-			$wppa[$key] = $newval;
+		// Exists but NULL, Not fatal
+		else {
+			wppa_log( 'Err', '$wppa[\'' . $key . '\'] has value NULL', true );
+
+			// NULL is illegal, replace it by false, to prevent many equal errormessages
+			$wppa[$key] = false;
 		}
 	}
 
-	// Invalid key
-	else {
-		wppa_log( 'Err', '$wppa[\''.$key.'\'] is not defined in reset_occurrance', true );
-		return false;
+	// Existing key, Get old value
+	$oldval = $wppa[$key];
+
+	// New value supplied?
+	if ( $newval !== 'nil' ) {
+		$wppa[$key] = $newval;
 	}
 
 	return $oldval;
@@ -4113,4 +4121,28 @@ function wppa_check_user_upload_role() {
 
 	// No matching role
 	return false;
+}
+
+// Like wp_parse_args (args is array only), but it replaces NULL array elements also with the defaults.
+function wppa_parse_args( $args, $defaults ) {
+
+	// Remove NULL elements from $args
+	$r = (array) $args;
+
+	foreach( array_keys( $r ) as $key ) {
+
+		// This looks funny, but:
+		// a NULL element is regarded as being not set,
+		// but it would not be overwritten by the default value in the merge
+		if ( ! isset( $r[$key] ) ) {
+			unset( $r[$key] );
+		}
+	}
+
+	// Do the merge
+	if ( is_array( $defaults ) ) {
+		$r = array_merge( $defaults, $r );
+	}
+
+	return $r;
 }

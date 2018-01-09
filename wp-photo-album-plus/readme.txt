@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick, pdf
-Version: 6.7.08
-Stable tag: 6.7.07
+Version: 6.7.12
+Stable tag: 6.7.11
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -126,6 +126,63 @@ If this happens, make sure (ask your hosting provider) that you have all the rig
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.7.12 =
+
+= Bug Fixes =
+
+* Various minor fixes for PHP 7.1 compatibility.
+* Exif tags are now formatted when used as keywords.
+
+= Other Changes =
+
+* If Table IX-L5 is set to html, the html defaults to type sphoto.
+* Improved formatting of various exif tags.
+
+= 6.7.11 =
+
+= Bug Fixes =
+
+* Fixed a typo in bbpress compatibility code.
+* Uploads on the [photo] shortcode generator dialog box now work as expected.
+* Certain links did not work due to an internal counter bug. Fixed.
+
+= 6.7.10 =
+
+= Bug Fixes =
+
+* Various minor fixes for PHP 7.1 compatibility.
+
+= New Features =
+
+* The shortcode generator for shortcode [photo xxx] is now also available for front-end tinymce editors.
+See https://wppa.nl/docs-by-subject/advanced-topics/shortcode-photo/ for an explanation.
+ 
+= 6.7.09 =
+
+= Bug Fixes =
+
+* Slideshow widget bug fixes: 
+--- all albums --- did not work, fixed.
+On initial display of the activation screen, the default setting values were not shown. Fixed.
+Album selectionbox was not sorted. Fixed.
+Height could not be set to 0 (auto). Fixed.
+* Shortcode generator bug fixes:
+Fixed album enumeration delimiter; must be '.' rather than ','
+Fixed colors in selectionboxes (red: required selection missing or invalid input; green: selection/input is ok).
+Single image preview videos work correctly now.
+
+= New Features =
+
+* Slideshow widget new features: 
+Added checkbox 'Random' for random photo sequence. The sequence will change every pageload.
+Added checkbox 'Include subalbums'.
+
+= Other Changes =
+
+* Sildeshow widget other changes: 
+You can set a maximum number of slides, to prevent heavy pageloads, especially when --- all albums --- is used.
+The slideshow now always wraps around, regardless of the setting of Table IV-B8.
 
 = 6.7.08 =
 

@@ -87,22 +87,31 @@ class Toolset_Controller_Admin_Notices {
 
 		// If Types is active and any of the Commercial Plugins is active, but site is not registered,
 		// then display a notice to force user to register Toolset.
-		if ( $this->is_types_active ) {
-			$repository_id = 'toolset';
-			if (
-				! $this->is_development_environment()
-				&& class_exists( 'WP_Installer' )
-				&& ! WP_Installer()->repository_has_valid_subscription( $repository_id )
-				&& (
-					$this->is_views_active
-					|| $this->is_access_active
-					|| $this->is_cred_active
-					|| $this->is_layouts_active
-				)
-			) {
-				$this->commercial_plugin_installed_but_not_registered();
-			}
+		if ( $this->is_types_active && $this->is_commercial_active_but_not_registered() ) {
+			$this->commercial_plugin_installed_but_not_registered();
 		}
+	}
+
+	protected function is_commercial_active_but_not_registered( $abort_for_development_sites = true ) {
+		$repository_id = 'toolset';
+
+		if( $abort_for_development_sites && $this->is_development_environment() ) {
+			return false;
+		}
+
+		if( class_exists( 'WP_Installer' )
+		    && ! WP_Installer()->repository_has_valid_subscription( $repository_id )
+		    && (
+			    $this->is_views_active
+			    || $this->is_access_active
+			    || $this->is_cred_active
+			    || $this->is_layouts_active
+		    )
+		) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -140,13 +149,25 @@ class Toolset_Controller_Admin_Notices {
 			|| $current_screen_id == 'toolset_page_CRED_User_Forms'         // User Forms
 			|| $current_screen_id == 'toolset_page_dd_layouts'              // Layouts
 			|| $current_screen_id == 'toolset_page_dd_layout_CSS_JS'        // Layouts CSS JS
+			|| $current_screen_id == 'toplevel_page_toolset-dashboard'      // Dashboard
+			|| $current_screen_id == 'toolset_page_types-custom-fields'     // m2m Custom Fields
+			|| $current_screen_id == 'toolset_page_types-relationships'     // m2m Relationships
 			// || $current_screen_id == 'toolset_page_toolset-settings'        // Toolset Settings
 			// || $current_screen_id == 'toolset_page_toolset-export-import'   // Toolset Settings
 
 		) {
 			$this->notices_compilation_introduction();
-
 			$this->notice_wpml_version_doesnt_support_m2m();
+
+			if( $this->only_types_active() || $this->is_commercial_active_but_not_registered( false ) ) {
+				// notice: types free version support ends
+				if( $notice = $this->types_free_version_support_ends() ) {
+					if( $current_screen_id == 'toplevel_page_toolset-dashboard'
+					    && Toolset_Admin_Notices_Manager::is_notice_dismissed( $notice ) ) {
+						$this->types_free_version_support_ends_undissmisble();
+					}
+				};
+			}
 		}
 	}
 
@@ -198,6 +219,11 @@ class Toolset_Controller_Admin_Notices {
 
 		$this->notices_compilation_introduction();
 		$this->notice_wpml_version_doesnt_support_m2m();
+
+		if( $this->only_types_active() || $this->is_commercial_active_but_not_registered( false ) ) {
+			// notice: types free version support ends
+			$this->types_free_version_support_ends();
+		}
 	}
 
 	/**
@@ -320,6 +346,42 @@ class Toolset_Controller_Admin_Notices {
 
 		return $notice;
 	}
+
+
+	/**
+	 * @return Toolset_Admin_Notice_Dismissible
+	 */
+	protected function types_free_version_support_ends() {
+		if( class_exists( 'WP_Installer' )
+		    && WP_Installer()->repository_has_valid_subscription( 'toolset' ) ) {
+			return false;
+		}
+
+		$notice = new Toolset_Admin_Notice_Dismissible( 'types_free_version_support_ends', '', $this->constants );
+		$notice->set_content( $this->tpl_path . '/types-free-version-ends.phtml' );
+		Toolset_Admin_Notices_Manager::add_notice( $notice );
+
+		return $notice;
+	}
+
+	/**
+	 * @return Toolset_Admin_Notice_Undismissible
+	 */
+	protected function types_free_version_support_ends_undissmisble() {
+		if( class_exists( 'WP_Installer' )
+		    && WP_Installer()->repository_has_valid_subscription( 'toolset' ) ) {
+			return false;
+		}
+
+		$notice = new Toolset_Admin_Notice_Undismissible( 'types_free_version_support_ends_undissmisble', '', $this->constants );
+		$notice->set_template_path( $this->tpl_path . '/types-move-to-toolset.phtml' );
+		$notice->set_content( $this->tpl_path . '/types-free-version-ends.phtml' );
+		Toolset_Admin_Notices_Manager::add_notice( $notice );
+
+		return $notice;
+	}
+
+
 
 	/**
 	 * @return Toolset_Admin_Notice_Dismissible

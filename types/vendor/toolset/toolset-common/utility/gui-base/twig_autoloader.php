@@ -27,6 +27,7 @@
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @since 2.2
+ * @since 2.5.6 Autoloader bails out when it's possible to load the Twig_Environment class.
  */
 class Toolset_Twig_Autoloader {
 
@@ -49,6 +50,12 @@ class Toolset_Twig_Autoloader {
 			) {
 				return;
 			}
+		}
+
+		// Also resign if it's simply possible to load a Twig Environment class already.
+		// That probably means a composer autoloader is managing this.
+		if( class_exists( 'Twig_Environment', true ) ) {
+			return;
 		}
 
 		if ( PHP_VERSION_ID < 50300 ) {

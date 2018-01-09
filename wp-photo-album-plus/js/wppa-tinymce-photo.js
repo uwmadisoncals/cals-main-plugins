@@ -2,7 +2,7 @@
 * Pachkage: wp-photo-album-plus
 *
 *
-* Version 6.7.08
+* Version 6.7.09
 *
 */
 
@@ -16,9 +16,10 @@ tinymce.PluginManager.add('wppaphoto', function(editor, url) {
 			H = jQuery(window).height();
 			H = H - 120;
 			tb_show( 'WPPA+ Insert photo', '#TB_inline?width=' + W + '&height=' + H + '&inlineId=wppaphoto-form' );
+			wppaPhotoEvaluate();
 		}
 
-		editor.addButton('myphoto_button', {
+		editor.addButton('wppa_photo_button', {
 			image: wppaImageDirectory+'camera32.png',
 			tooltip: 'WPPA+ Insert photo',
 			onclick: openWppaPhotoShortcodeGenerator
@@ -30,7 +31,13 @@ tinymce.PluginManager.add('wppaphoto', function(editor, url) {
 jQuery(function(){
 
 	// creates a form to be displayed everytime the button is clicked
-	var xmlhttp = wppaGetXmlHttp();				// located in wppa-admin-scripts.js
+	var xmlhttp;
+	if ( window.XMLHttpRequest ) {		// code for IE7+, Firefox, Chrome, Opera, Safari
+		xmlhttp = new XMLHttpRequest();
+	}
+	else {								// code for IE6, IE5
+		xmlhttp=new ActiveXObject( "Microsoft.XMLHTTP" );
+	}
 
 	// wppa-ajax.php calls wppa_make_tinymce_dialog(); which is located in wppa-tinymce.php
 	var url = wppaAjaxUrl+'?action=wppa&wppa-action=tinymcephotodialog';
@@ -76,7 +83,7 @@ function wppaPhotoEvaluate() {
 
 	// Assume shortcode complete
 	var shortcodeOk = true;
-	var shortcode = '[photo';
+	var shortcode;
 	var myAll;
 
 	// Photo
@@ -94,15 +101,13 @@ function wppaPhotoEvaluate() {
 		id = id[0];
 		jQuery('#wppaphoto-photo-preview-tr').show();
 		wppaTinyMceBasicPhotoPreview( photo );
-		shortcode += ' '+id;
 		jQuery('#wppaphoto-'+myAll+'photo').css('color', '#070');
+		shortcode = '[photo ' + id + ']';
 	}
 	else {
 		jQuery('#wppaphoto-'+myAll+'photo').css('color', '#700');
+		shortcode = '';
 	}
-
-	// Close
-	shortcode += ']';
 
 	// Display shortcode
 	shortcode = shortcode.replace(/"/g, '&quot;');
@@ -130,7 +135,7 @@ function wppaTinyMceBasicPhotoPreview( id ) {
 	}
 	else if ( id.indexOf('xxx') != -1 ) { 				// its a video
 		var idv = id.replace('xxx', '');
-		jQuery('#wppaphoto-photo-preview').html('<video preload="metadata" style="max-width:600px; max-height:150px; margin-top:3px;" controls>'+
+		jQuery('#wppaphoto-photo-preview').html('<video preload="metadata" style="max-width:400px; max-height:300px; margin-top:3px;" controls>'+
 													'<source src="'+wppaPhotoDirectory+idv+'mp4" type="video/mp4">'+
 													'<source src="'+wppaPhotoDirectory+idv+'ogg" type="video/ogg">'+
 													'<source src="'+wppaPhotoDirectory+idv+'ogv" type="video/ogg">'+
@@ -150,48 +155,3 @@ function wppaDisplaySelectedFile(filetagid, displaytagid) {
 	jQuery('#'+displaytagid).val('Upload '+result);
 }
 
-// Ajax upload script
-jQuery(function() {
-
-	var options = {
-		beforeSend: function() {
-			jQuery("#progress").show();
-			jQuery("#bar").width('0%');
-			jQuery("#message").html("");
-			jQuery("#percent").html("");
-		},
-		uploadProgress: function(event, position, total, percentComplete) {
-			jQuery("#bar").width(percentComplete+'%');
-			if ( percentComplete < 95 ) {
-				jQuery("#percent").html(percentComplete+'%');
-			}
-			else {
-				jQuery("#percent").html(wppaTxtProcessing);
-			}
-		},
-		success: function() {
-			jQuery("#bar").width('100%');
-			jQuery("#percent").html(wppaTxtDone);
-		},
-		complete: function(response) {
-
-			var resparr = response.responseText.split( '||' );
-
-			// Non fatal error uploading?
-			if ( resparr.length == 1 ) {
-				jQuery("#message").html( '<span style="font-size: 10px;" >'+resparr[0]+'</span>' );
-			}
-			else {
-				jQuery( '#wppaphoto-myphoto' ).html( resparr[2] );
-			}
-			wppaPhotoEvaluate();
-
-		},
-		error: function() {
-			jQuery("#message").html( '<span style="color: red;" >'+wppaTxtErrUnable+'</span>' );
-		}
-	};
-
-	setTimeout(function(){jQuery("#wppa-uplform").ajaxForm(options)}, 1000);
-
-});

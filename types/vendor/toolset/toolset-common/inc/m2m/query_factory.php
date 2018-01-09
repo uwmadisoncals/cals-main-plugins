@@ -19,6 +19,17 @@ class Toolset_Relationship_Query_Factory {
 		return new Toolset_Relationship_Query( $args );
 	}
 
+
+	/**
+	 * @return Toolset_Relationship_Query_V2
+	 *
+	 * @return Toolset_Relationship_Query_V2
+	 */
+	public function relationships_v2() {
+		return new Toolset_Relationship_Query_V2();
+	}
+
+
 	/**
 	 * @param IToolset_Relationship_Definition $relationship
 	 * @param IToolset_Relationship_Role_Parent_Child $target_role Target role of the relationships (future role of
@@ -56,6 +67,13 @@ class Toolset_Relationship_Query_Factory {
 	}
 
 
-
+	/**
+	 * @param $args
+	 *
+	 * @return Toolset_Association_Query
+	 */
+	public function associations( $args ) {
+		return new Toolset_Association_Query( $args );
+	}
 
 }

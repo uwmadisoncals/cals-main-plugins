@@ -189,7 +189,7 @@
 	float: left;
 }
 
-.toolset-shortcode-gui-dialog-container .ui-tabs-vertical .ui-tabs-nav li { 
+.toolset-shortcode-gui-dialog-container .ui-tabs-vertical .ui-tabs-nav li {
 	clear: left;
 	width: 100%;
 	border: none;
@@ -206,7 +206,7 @@
 }
 
 .toolset-shortcode-gui-dialog-container .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active {
-	padding-bottom: 0; 
+	padding-bottom: 0;
 	padding-right: .1em;
 	border: none;
 	background: #ededed;
@@ -254,13 +254,13 @@
 .toolset-shortcode-gui-dialog-container h2 {
     margin-top: 5px;
 }
-.toolset-shortcode-gui-dialog-container .toolset-shortcode-gui-dialog-item-grouped {
+.toolset-shortcode-gui-dialog-container .toolset-shortcode-gui-dialog-item-group {
 	overflow: hidden;
 	clear: left;
 	margin: 0;
 	padding: 0;
 }
-	.toolset-shortcode-gui-dialog-container .toolset-shortcode-gui-dialog-item-grouped > li {
+	.toolset-shortcode-gui-dialog-container .toolset-shortcode-gui-dialog-item-group > li {
 		display: block;
 		float: left;
 		margin: 0;
@@ -270,7 +270,7 @@
 		margin: 0;
 		padding: 0 10px 0 0;
 	}
-		.toolset-shortcode-gui-dialog-container .toolset-shortcode-gui-dialog-item-grouped > li:last-child .toolset-shortcode-gui-attribute-wrapper {
+		.toolset-shortcode-gui-dialog-container .toolset-shortcode-gui-dialog-item-group > li:last-child .toolset-shortcode-gui-attribute-wrapper {
 			padding-right: 0;
 		}
 .toolset-shortcode-gui-dialog-container .toolset-shortcode-gui-attribute-wrapper h3,
@@ -284,7 +284,7 @@
 .toolset-shortcode-gui-dialog-container .toolset-shortcode-gui-attribute-wrapper label {
     display: block;
 }
-.toolset-shortcode-gui-dialog-container .toolset-shortcode-gui-attribute-wrapper span.toolset-shortcode-gui-attribute-pseudolabel, 
+.toolset-shortcode-gui-dialog-container .toolset-shortcode-gui-attribute-wrapper span.toolset-shortcode-gui-attribute-pseudolabel,
 .toolset-shortcode-gui-dialog-container .toolset-shortcode-gui-attribute-group span.toolset-shortcode-gui-attribute-pseudolabel {
 	display: block;
 	margin: 3px 5px;
@@ -309,4 +309,45 @@
 	float: right;
 	margin-left: 10px;
 	margin-right: 0
+}
+.toolset-shortcode-gui-dialog-container .toolset-advanced-setting {
+    background: #f6f6f6 none repeat scroll 0 0;
+    border-left: 3px solid #cdcdcd;
+    padding: 1px 10px 10px 20px;
+}
+.toolset-shortcode-gui-dialog-container .toolset-mightlong-list {
+    margin: 0;
+}
+.toolset-shortcode-gui-dialog-container  .toolset-mightlong-list > li {
+    min-height: 24px;
+    min-width: 45%;
+    float: left;
+    padding-right: 4%;
+    margin: 0 0 6px;
+}
+/*********************************************
+Toolset Confirmation Dialog
+
+ @since m2m
+
+ *********************************************/
+.toolset-confirmation-dialog {
+    display: flex;
+}
+.toolset-confirmation-dialog-icon {
+    padding: 17px 15px 20px;
+    box-sizing: border-box;
+}
+.toolset-confirmation-dialog-content {
+    padding: 15px;
+    box-sizing: border-box;
+}
+@media (min-width: 768px) {
+    .toolset-confirmation-dialog-icon {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+}
+.toolset-confirmation-dialog-content {
+
 }

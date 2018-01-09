@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a slideshow in the sidebar
-* Version 6.7.01
+* Version 6.7.09
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -17,10 +17,37 @@ class SlideshowWidget extends WP_Widget {
     function __construct() {
 		$widget_ops = array( 'classname' => 'slideshow_widget', 'description' => __( 'Display a slideshow', 'wp-photo-album-plus' ) );
 		parent::__construct( 'slideshow_widget', __( 'WPPA+ Sidebar Slideshow', 'wp-photo-album-plus' ), $widget_ops);
+		
+		// Fix non constant defaults
+		$this -> defaults['title'] = __( 'Sidebar Slideshow', 'wp-photo-album-plus' );
+		$this -> defaults['width'] = get_option( 'wppa_widget_width' );
+
     }
 
+	// Default settins. Can not use functions or calculations here. Only constants are allowed
+	var $defaults = array( 	'title' 	=> '',
+							'album' 	=> '-2',
+							'width' 	=> '0',
+							'height' 	=> '0',
+							'ponly' 	=> 'no',
+							'linkurl' 	=> '',
+							'linktitle' => '',
+							'subtext' 	=> '',
+							'supertext' => '',
+							'valign' 	=> 'center',
+							'timeout' 	=> '4',
+							'film' 		=> 'no',
+							'browse' 	=> 'no',
+							'name' 		=> 'no',
+							'numbar'	=> 'no',
+							'desc' 		=> 'no',
+							'maxslides' => '100',
+							'random' 	=> 'no',
+							'incsubs' 	=> 'no',
+							);
+
 	/** @see WP_Widget::widget */
-    function widget($args, $instance) {
+    function widget( $args, $instance ) {
 		global $wpdb;
 
 		require_once(dirname(__FILE__) . '/wppa-links.php');
@@ -33,35 +60,19 @@ class SlideshowWidget extends WP_Widget {
 
         extract( $args );
 
-		$instance = wp_parse_args( (array) $instance,
-									array( 	'title' 	=> __( 'Sidebar Slideshow', 'wp-photo-album-plus' ),
-											'album' 	=> '',
-											'width' 	=> wppa_opt( 'widget_width' ),
-											'height' 	=> round( wppa_opt( 'widget_width' ) * wppa_opt( 'maxheight' ) / wppa_opt( 'fullsize' ) ),
-											'ponly' 	=> 'no',
-											'linkurl' 	=> '',
-											'linktitle' => '',
-											'subtext' 	=> '',
-											'supertext' => '',
-											'valign' 	=> 'center',
-											'timeout' 	=> '4',
-											'film' 		=> 'no',
-											'browse' 	=> 'no',
-											'name' 		=> 'no',
-											'numbar'	=> 'no',
-											'desc' 		=> 'no'
-											) );
-
+		$instance 	= wppa_parse_args( (array) $instance, $this->defaults );
 		$title 		= apply_filters( 'widget_title', $instance['title'] );
 		$album 		= $instance['album'];
-		if ( $instance['height'] == '0' ) {
-			$instance['height'] = round( $instance['width'] * wppa_opt( 'maxheight' ) / wppa_opt( 'fullsize' ) );
-		}
 		$page 		= in_array( wppa_opt( 'slideonly_widget_linktype' ), wppa( 'links_no_page' ) ) ? '' :
 					  wppa_get_the_landing_page( 'slideonly_widget_linkpage', __( 'Widget landing page', 'wp-photo-album-plus' ) );
 
+		// Calculate the height if set to 0
+		if ( ! $instance['height'] ) {
+			$instance['height'] = round( wppa_opt( 'widget_width' ) * wppa_opt( 'maxheight' ) / wppa_opt( 'fullsize' ) );
+		}
+
 		// Do the widget if we know the album
-		if ( is_numeric( $album ) && wppa_album_exists( $album ) ) {
+		if ( is_numeric( $album ) && ( wppa_album_exists( $album ) || $album == '-2' ) ) {
 
 			// Open widget
 			echo $before_widget;
@@ -74,12 +85,13 @@ class SlideshowWidget extends WP_Widget {
 				// Show text above slideshow
 				if ( __( $instance['supertext'] ) ) {
 					echo
-					'<div style="padding-top:2px; padding-bottom:4px; text-align:center">' .
+					'<div style="padding-top:2px; padding-bottom:4px; text-align:center" >' .
 						__( $instance['supertext'] ) .
 					'</div>';
 				}
 
 				// Fill in runtime parameters to tune the slideshow
+				wppa_reset_occurrance();
 				if ( $instance['linkurl'] && wppa_opt( 'slideonly_widget_linktype' ) == 'widget' ) {
 					wppa( 'in_widget_linkurl', $instance['linkurl'] );
 					wppa( 'in_widget_linktitle', __( $instance['linktitle'] ) );
@@ -96,6 +108,13 @@ class SlideshowWidget extends WP_Widget {
 				wppa( 'name_on', wppa_checked( $instance['name'] ) );
 				wppa( 'numbar_on', wppa_checked( $instance['numbar'] ) );
 				wppa( 'desc_on', wppa_checked( $instance['desc'] ) );
+				wppa( 'max_slides_in_ss_widget', $instance['maxslides'] );
+				wppa( 'is_random', wppa_checked( $instance['random'] ) );
+
+				// Including subalbums?
+				if ( $album > '0' && wppa_checked( $instance['incsubs'] ) ) {
+					$album = wppa_alb_to_enum_children( $album );
+				}
 
 				// Open the slideshow container
 				echo
@@ -135,28 +154,16 @@ class SlideshowWidget extends WP_Widget {
     /** @see WP_Widget::update */
     function update( $new_instance, $old_instance ) {
 
-		$instance = $old_instance;
-		$instance['title'] 		= strip_tags( $new_instance['title'] );
-		$instance['album'] 		= $new_instance['album'];
-		$instance['width'] 		= $new_instance['width'];
-		$instance['height'] 	= $new_instance['height'];
-		$instance['ponly'] 		= $new_instance['ponly'];
-		$instance['linkurl'] 	= $new_instance['linkurl'];
-		$instance['linktitle'] 	= $new_instance['linktitle'];
-		$instance['supertext'] 	= $new_instance['supertext'];
-		$instance['subtext'] 	= $new_instance['subtext'];
-		if ( wppa_checked( $instance['ponly'] ) ) {
-			$instance['valign'] = 'fit';
-		}
-		else {
-			$instance['valign'] = $new_instance['valign'];
-		}
-		$instance['timeout'] 	= $new_instance['timeout'];
-		$instance['film'] 		= $new_instance['film'];
-		$instance['browse'] 	= $new_instance['browse'];
-		$instance['name'] 		= $new_instance['name'];
-		$instance['numbar'] 	= $new_instance['numbar'];
-		$instance['desc'] 		= $new_instance['desc'];
+		// Completize all parms
+		$instance = wppa_parse_args( $new_instance, $this->defaults );
+
+		// Sanitize certain args
+		$instance['title'] 		= strip_tags( $instance['title'] );
+		$instance['linkurl'] 	= $instance['linkurl'];
+		$instance['linktitle'] 	= strip_tags( $instance['linktitle'] );
+		$instance['supertext'] 	= force_balance_tags( $instance['supertext'] );
+		$instance['subtext'] 	= force_balance_tags( $instance['subtext'] );
+		$instance['linkurl'] 	= esc_url( $instance['linkurl'] );
 
         return $instance;
     }
@@ -165,24 +172,7 @@ class SlideshowWidget extends WP_Widget {
     function form( $instance ) {
 
 		// Defaults
-		$instance = wp_parse_args( (array) $instance,
-									array( 	'title' 	=> __( 'Sidebar Slideshow' , 'wp-photo-album-plus'),
-											'album' 	=> '',
-											'width' 	=> wppa_opt( 'widget_width' ),
-											'height' 	=> round( wppa_opt( 'widget_width' ) * wppa_opt( 'maxheight' ) / wppa_opt( 'fullsize' ) ),
-											'ponly' 	=> false,
-											'linkurl' 	=> '',
-											'linktitle' => '',
-											'subtext' 	=> '',
-											'supertext' => '',
-											'valign' 	=> 'center',
-											'timeout' 	=> '4',
-											'film' 		=> false,
-											'browse' 	=> false,
-											'name' 		=> false,
-											'numbar'	=> false,
-											'desc' 		=> false,
-											) );
+		$instance = wppa_parse_args( (array) $instance, $this->defaults );
 
 		// Title
 		echo
@@ -190,11 +180,46 @@ class SlideshowWidget extends WP_Widget {
 
 		// Album
 		$body =
-		'<option value="-2">' . __( '--- all ---', 'wp-photo-album-plus' ) . '</option>' .
-		wppa_album_select_a( array ( 'selected' => $instance['album'], 'path' => wppa_switch( 'hier_albsel' ) ) );
+		'<option value="-2"' . ( $instance['album'] == '-2' ? ' selected="selected"' : '' ) . ' >' . __( '--- all ---', 'wp-photo-album-plus' ) . '</option>' .
+		wppa_album_select_a( array (
+										'selected' 	=> $instance['album'],
+										'path' 		=> wppa_switch( 'hier_albsel' ),
+										'sort' 		=> true,
+										) );
 
 		echo
 		wppa_widget_selection_frame( $this, 'album', $body, __( 'Album', 'wp-photo-album-plus' ) );
+
+		// Including sub albums?
+		echo
+		wppa_widget_checkbox( 	$this,
+								'incsubs',
+								$instance['incsubs'],
+								__( 'Including subalbums', 'wp-photo-album-plus' )
+								);
+
+		// Max
+		$body =
+		'<option value="10" ' . ( $instance['maxslides'] == '10' ? 'selected="selected"' : '' ) . ' >10</option>' .
+		'<option value="25" ' . ( $instance['maxslides'] == '25' ? 'selected="selected"' : '' ) . ' >25</option>' .
+		'<option value="50" ' . ( $instance['maxslides'] == '50' ? 'selected="selected"' : '' ) . ' >50</option>' .
+		'<option value="75" ' . ( $instance['maxslides'] == '75' ? 'selected="selected"' : '' ) . ' >75</option>' .
+		'<option value="100" ' . ( $instance['maxslides'] == '100' ? 'selected="selected"' : '' ) . ' >100</option>' .
+		'<option value="150" ' . ( $instance['maxslides'] == '150' ? 'selected="selected"' : '' ) . ' >150</option>' .
+		'<option value="200" ' . ( $instance['maxslides'] == '200' ? 'selected="selected"' : '' ) . ' >200</option>' .
+		'<option value="250" ' . ( $instance['maxslides'] == '250' ? 'selected="selected"' : '' ) . ' >250</option>' .
+		'<option value="350" ' . ( $instance['maxslides'] == '350' ? 'selected="selected"' : '' ) . ' >350</option>' .
+		'<option value="500" ' . ( $instance['maxslides'] == '500' ? 'selected="selected"' : '' ) . ' >500</option>';
+		echo
+		wppa_widget_selection_frame( $this, 'maxslides', $body, __( 'Max slides', 'wp-photo-album-plus' ), false, __( 'High numbers may cause slow pageloads!', 'wp-photo-album-plus' ) );
+
+		// Random
+		echo
+		wppa_widget_checkbox( 	$this,
+								'random',
+								$instance['random'],
+								__( 'Random sequence', 'wp-photo-album-plus' )
+								);
 
 		// Sizes and alignment
 		echo
@@ -224,7 +249,7 @@ class SlideshowWidget extends WP_Widget {
 								'height',
 								$instance['height'],
 								__( 'Height in pixels', 'wp-photo-album-plus' ),
-								'50',
+								'0',
 								'500',
 								'',
 								'float'
@@ -235,7 +260,7 @@ class SlideshowWidget extends WP_Widget {
 			wppa_widget_checkbox( 	$this,
 									'ponly',
 									$instance['ponly'],
-									__( 'Portrait only:', 'wp-photo-album-plus' )
+									__( 'Portrait only', 'wp-photo-album-plus' )
 									);
 
 			// Vertical alignment
@@ -267,30 +292,39 @@ class SlideshowWidget extends WP_Widget {
 
 		echo
 		// Timeout
-		wppa_widget_number( $this, 'timeout', $instance['timeout'], __( 'Slideshow timeout in seconds', 'wp-photo-album-plus' ), '1', '60' ) .
+		wppa_widget_number( $this, 'timeout', $instance['timeout'], __( 'Slideshow timeout in seconds', 'wp-photo-album-plus' ), '1', '60' ) ;
 
 		// Linkurl
-		wppa_widget_input( 	$this,
-							'linkurl',
-							$instance['linkurl'],
-							__( 'Link to', 'wp-photo-album-plus' ),
-							__( 'If you want that a click on the image links to another web address, type the full url here.', 'wp-photo-album-plus' )
-							) .
+		if ( wppa_opt( 'slideonly_widget_linktype' ) == 'widget' ) {
+			echo
+			wppa_widget_input( 	$this,
+								'linkurl',
+								$instance['linkurl'],
+								__( 'Link to', 'wp-photo-album-plus' ),
+								__( 'If you want that a click on the image links to another web address, type the full url here.', 'wp-photo-album-plus' )
+								);
+		}
 
-		// Name
-		wppa_widget_checkbox( $this, 'name', $instance['name'], __( 'Show name', 'wp-photo-album-plus' ) ) .
+		// Additional boxes
+		echo
+		__( 'Slideshow options to display', 'wp-photo-album-plus' ) .
+		'<div style="padding:6px;border:1px solid lightgray;margin-top:2px;margin-bottom:1em;" >' .
 
-		// Description
-		wppa_widget_checkbox( $this, 'desc', $instance['desc'], __( 'Show description', 'wp-photo-album-plus' ) ) .
+			// Name
+			wppa_widget_checkbox( $this, 'name', $instance['name'], __( 'Show name', 'wp-photo-album-plus' ) ) .
 
-		// Filmstrip
-		wppa_widget_checkbox( $this, 'film', $instance['film'], __( 'Show filmstrip', 'wp-photo-album-plus' ) ) .
+			// Description
+			wppa_widget_checkbox( $this, 'desc', $instance['desc'], __( 'Show description', 'wp-photo-album-plus' ) ) .
 
-		// Browsebar
-		wppa_widget_checkbox( $this, 'browse', $instance['browse'], __( 'Show browsebar', 'wp-photo-album-plus' ) ) .
+			// Filmstrip
+			wppa_widget_checkbox( $this, 'film', $instance['film'], __( 'Show filmstrip', 'wp-photo-album-plus' ) ) .
 
-		// Numbar
-		wppa_widget_checkbox( $this, 'numbar', $instance['numbar'], __( 'Show number bar', 'wp-photo-album-plus' ) );
+			// Browsebar
+			wppa_widget_checkbox( $this, 'browse', $instance['browse'], __( 'Show browsebar', 'wp-photo-album-plus' ) ) .
+
+			// Numbar
+			wppa_widget_checkbox( $this, 'numbar', $instance['numbar'], __( 'Show number bar', 'wp-photo-album-plus' ) ) .
+		'</div>';
 
 		// qTranslate supported textfields
 		echo

@@ -1,3 +1,7 @@
+.fl-builder .wpv-dialog ul {
+    list-style-type: none;
+}
+
 #wpv-ct-preview-post {
     width: 170px;
     display: inline;

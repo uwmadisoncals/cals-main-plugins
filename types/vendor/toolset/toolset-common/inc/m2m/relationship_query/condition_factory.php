@@ -108,4 +108,27 @@ class Toolset_Relationship_Query_Condition_Factory {
 	}
 
 
+	/**
+	 * Condition that a relationship cardinality matches certain constraints.
+	 *
+	 * @param IToolset_Relationship_Query_Cardinality_Match $cardinality_match
+	 *
+	 * @return Toolset_Relationship_Query_Condition_Has_Cardinality
+	 */
+	public function has_cardinality( IToolset_Relationship_Query_Cardinality_Match $cardinality_match ) {
+		return new Toolset_Relationship_Query_Condition_Has_Cardinality( $cardinality_match );
+	}
+
+
+	/**
+	 * A condition that is always true.
+	 *
+	 * @since 2.5.6
+	 * @return Toolset_Relationship_Query_Condition_Tautology
+	 */
+	public function tautology() {
+		return new Toolset_Relationship_Query_Condition_Tautology();
+	}
+
+
 }

@@ -77,7 +77,7 @@ interface Toolset_User_Editors_Medium_Interface {
 
 	/**
 	 * Used by setup, to give the medium the user selection for editors
-	 * e.g. Setup generates editor selection 'Default | Visual Composer | Beaver'
+	 * e.g. Setup generates editor selection 'Default | WPBakery Page Builder (former Visual Composer) | Beaver'
 	 *      and gives it to Content Template which decides where to place
 	 *
 	 * @param $selection callable

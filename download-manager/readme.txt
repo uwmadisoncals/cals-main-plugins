@@ -153,6 +153,12 @@ Check download stats and get a push notification when someone downloads, install
 
 == Changelog ==
 
+= 2.9.61 =
+* Fixed a minor security issue with add-on installation
+
+= 2.9.60 =
+* Fixed date sorting issue with all downloads shortcode
+
 = 2.9.59 =
 * Compatibility update for WordPress 4.9
 * Improved page templates

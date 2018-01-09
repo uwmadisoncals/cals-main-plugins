@@ -3,7 +3,7 @@ Contributors: vasyltech
 Tags: access, role, user, capability, page access, post access, comments, security, login redirect, brute force attack, double authentication, membership, backend lockdown, wp-admin, 404, activity tracking
 Requires at least: 3.8
 Tested up to: 4.9.1
-Stable tag: 5.0.1
+Stable tag: 5.0.4
 
 The most powerful access management plugin for WordPress websites.
 
@@ -20,6 +20,7 @@ https://www.youtube.com/watch?v=yiOhjaacNJc
 * No ads or other promotional crap. The UI is clean and well crafted so you can focus only on what is important;
 * Some features are limited or available only with [premium extensions](https://aamplugin.com/store). AAM functionality is transparent and you will absolute know when you need to purchase our premium features;
 * No need to be a "paid" customer to get help. Request support via email or start chat with Google Hangout;
+* YES, we have some bad reviews however most of them where posted years ago and are unrelated to current AAM version. AAM is very powerful tool that can lock you out if mistake made.
 
 = The most popular features =
 
@@ -58,6 +59,28 @@ https://www.youtube.com/watch?v=yiOhjaacNJc
 11. Improve your website security
 
 == Changelog ==
+
+= 5.0.4 =
+* Fixed bug with caching. Significantly improved speed.
+* Fixed incompatibility issue with websites that have corrupted role list.
+* Fixed bug with role expiration timer when "Manage Backend Access" option is off.
+* Fixed incompatibility issue with plugins that use "the_title" filter.
+* Fixed bug with extension status
+* Removed registration step during plugin activation.
+
+= 5.0.3 =
+* Fixed bug with LIST option
+* Fixed bug with incompatible PHP 5.3 or lower
+
+= 5.0.2 =
+* Fixed bug with admin menu reported by Andrew
+* Fixed possible bug with theTitle filter
+* Fixed bug with custom HTML message for the access denied redirect rule
+* Fixed bug with ACCESS EXPIRATION option for Posts & Pages
+* Fixed bug with Multinetwork setup when super admin is not able to add new users
+* Fixed bug with extension statuses
+* Removed support for integration with ConfigPress plugin. Use ConfigPress extension instead
+* Added localization strings for Login widget & shortcode
 
 = 5.0.1 =
 * Fixed bug with extension updates status

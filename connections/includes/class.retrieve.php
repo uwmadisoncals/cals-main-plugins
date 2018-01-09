@@ -722,7 +722,8 @@ class cnRetrieve {
 					// Ensure the meta key does exist and is not empty before altering the query.
 					if ( isset( $meta[1] ) && ! empty( $meta[1] ) ) {
 
-						$atts['meta_query']['meta_query'][] = array( 'key' => $meta[1] );
+						isset( $k ) ? $k++ : $k = 0;
+						$atts = cnArray::add( $atts, "meta_query.meta_query.{$k}.key", $meta[1] );
 
 						if ( 1 < count( $atts['meta_query']['meta_query'] ) ) {
 
@@ -2791,6 +2792,8 @@ class cnRetrieve {
 	 * term matching when searching for posts. The list of English stopwords is
 	 * the approximate search engines list, and is translatable.
 	 *
+	 * @see WP_Query::parse_search_terms()
+	 *
 	 * @since 8.1
 	 *
 	 * @param array $terms Terms to check.
@@ -2828,6 +2831,8 @@ class cnRetrieve {
 	 * directly because it is a protected method in the WP_Query class.
 	 *
 	 * Retrieve stopwords used when parsing search terms.
+	 *
+	 * @see WP_Query::get_search_stopwords()
 	 *
 	 * @since 8.1
 	 *

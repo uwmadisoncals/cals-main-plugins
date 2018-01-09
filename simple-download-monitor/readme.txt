@@ -1,10 +1,10 @@
 === Simple Download Monitor ===
-Contributors: Tips and Tricks HQ, Ruhul Amin, josh401, mbrsolution, chesio
+Contributors: Tips and Tricks HQ, Ruhul Amin, josh401, mbrsolution, alexanderfoxc
 Donate link: https://www.tipsandtricks-hq.com
 Tags: download, downloads, count, counter, tracker, tracking, hits, logging, monitor, manager, files, media, digital, download monitor, download manager, downloadmanager, file manager, protect downloads, password, download category, file tree, ajax, download template, grid, documents, ip address
 Requires at least: 4.1.0
 Tested up to: 4.9
-Stable tag: 3.5.0
+Stable tag: 3.5.4
 License: GPLv2 or later
 
 Easily manage downloadable files and monitor downloads of your digital files from your WordPress site.
@@ -45,6 +45,7 @@ https://www.youtube.com/watch?v=utYIH0fILuQ
 * Option to upload a thumbnail image for each of your downloadable files.
 * Option to use a nice looking template to show your download now buttons.
 * Ability to search and sort your downloadable files in the admin dashboard.
+* Ability to create a search page and allow your visitors to search your downloads.
 * Track the number of downloads for each of your files.
 * Track the visitors country.
 * View the daily download counts of your items in a chart.
@@ -172,6 +173,20 @@ Yes
 For screenshots please visit the [download monitor plugin page](https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin)
 
 == Changelog ==
+
+= 3.5.4 =
+- Fixed stored-XSS bug. Thanks to d4wner.
+
+= 3.5.3 =
+- Added "Text Domain" and "Domain Path" to the File Header.
+
+= 3.5.2 =
+- Renamed the "langs" folder to "languages"
+
+= 3.5.1 = 
+- Added a few more user-agents check in the is_bot function.
+- Search shortcode has been improved so it performs the search using each keyword of a multi-word search phrase. It will ignore any word that are less than 4 characters long.
+- Includes some missing translation strings to the POT file.
 
 = 3.5.0 =
 - Added check for a couple of user-agents in the is_bot function.

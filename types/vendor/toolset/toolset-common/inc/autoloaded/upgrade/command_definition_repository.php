@@ -14,7 +14,7 @@ class Toolset_Upgrade_Command_Definition_Repository {
 		$upgrade_commands = array(
 			new Toolset_Upgrade_Command_Definition(
 				'Toolset_Upgrade_Command_M2M_V1_Database_Structure_Upgrade',
-				0
+				254002
 			)
 		);
 

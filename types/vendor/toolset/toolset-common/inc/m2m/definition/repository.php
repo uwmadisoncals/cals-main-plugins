@@ -17,13 +17,15 @@
 class Toolset_Relationship_Definition_Repository {
 
 
+	/** @var null|Toolset_Relationship_Definition_Repository */
 	private static $instance = null;
 
 
-
-
+	/**
+	 * @return Toolset_Relationship_Definition_Repository
+	 */
 	public static function get_instance() {
-		if( null == self::$instance ) {
+		if( null === self::$instance ) {
 			self::$instance = new self();
 			self::$instance->load_definitions();
 		}
@@ -45,6 +47,7 @@ class Toolset_Relationship_Definition_Repository {
 
 	/** @var Toolset_Relationship_Definition_Translator */
 	private $definition_translator;
+
 
 	public function __construct(
 		Toolset_Association_Repository $association_repository_di = null,
@@ -207,7 +210,7 @@ class Toolset_Relationship_Definition_Repository {
 	 */
 	public function get_definition_by_row_id( $row_id ) {
 		foreach( $this->definitions as $definition ) {
-			if( $row_id === $definition->get_row_id() ) {
+			if( (int) $row_id === (int) $definition->get_row_id() ) {
 				return $definition;
 			}
 		}
@@ -217,9 +220,7 @@ class Toolset_Relationship_Definition_Repository {
 
 
 	/**
-	 * Create a new definition and start managing it.
-	 *
-	 * Note that it doesn't save anything to database automatically.
+	 * Create a new definition, persist it in the database and start managing it.
 	 *
 	 * @param string $slug Valid (sanitized) relationship slug.
 	 * @param Toolset_Relationship_Element_Type $parent Parent entity type.
@@ -229,6 +230,7 @@ class Toolset_Relationship_Definition_Repository {
 	 *
 	 * @return IToolset_Relationship_Definition
 	 * @since m2m
+	 * @since 2.5.5 persists the relationship in the database.
 	 */
 	public function create_definition( $slug, $parent, $child, $allow_slug_adjustment = true ) {
 		if( $slug != sanitize_title( $slug ) ) {
@@ -260,11 +262,12 @@ class Toolset_Relationship_Definition_Repository {
 
 		$new_definition = new Toolset_Relationship_Definition( $definition_array );
 
-		$this->get_definition_persistence()->insert_definition( $new_definition );
+		// The definition will be augmented when inserting (with IDs)
+		$persisted_definition = $this->get_definition_persistence()->insert_definition( $new_definition );
 
-		$this->add_to_cache( $new_definition );
+		$this->add_to_cache( $persisted_definition );
 
-		return $new_definition;
+		return $persisted_definition;
 	}
 
 	/**
@@ -281,7 +284,7 @@ class Toolset_Relationship_Definition_Repository {
 	 */
 	public function create_definition_post_reference_field( $field_slug, $field_group_slug, $post_reference_type, $parent, $child ) {
 		return $this->create_definition(
-			$field_slug . '_' . $field_group_slug . '__' . $post_reference_type,
+			$field_slug,
 			$parent,
 			$child,
 			false
@@ -384,19 +387,14 @@ class Toolset_Relationship_Definition_Repository {
 		$previous_slug = $relationship_definition->get_slug();
 		$relationship_definition->set_slug( $new_slug );
 
-		// Update the storage
-		$this->remove_definition( $previous_slug, false );
+		// Remove old definition from cache
+		unset( $this->definitions[ $previous_slug ] );
+
+		// Add updated definition to cache
 		$this->add_to_cache( $relationship_definition );
+
+		// Store changes to db
 		$this->persist_definition( $relationship_definition );
-
-		// The association table needs an update as well
-		$association_update_result = Toolset_Relationship_Database_Operations::update_associations_on_definition_renaming(
-			$previous_slug, $new_slug
-		);
-
-		if( $association_update_result->is_error() ) {
-			return $association_update_result;
-		}
 
 		return new Toolset_Result(
 			true,

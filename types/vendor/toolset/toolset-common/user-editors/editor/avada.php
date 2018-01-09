@@ -18,6 +18,8 @@ class Toolset_User_Editors_Editor_Avada
 	protected $name = 'Fusion Builder';
 	protected $option_name = '_toolset_user_editors_avada_template';
 
+	protected $logo_class = 'dashicons-fusiona-logo';
+
 	public function initialize() {
 		if ( apply_filters( 'wpv_filter_is_native_editor_for_cts', false ) ) {
 			add_action( 'edit_form_after_editor', array( $this, 'register_assets_for_backend_editor' ) );

@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsSlideshowVersion = '6.7.01';
+var wppaJsSlideshowVersion = '6.7.09';
 
 // This is an entrypoint to load the slide data
 function wppaStoreSlideInfo(
@@ -554,8 +554,8 @@ function _wppaNextSlide_3( mocc ) {
 	if ( olIdx == nwIdx ) dir = 'none';
 	if ( olIdx == nwIdx - 1 ) dir = 'left';
 	if ( olIdx == nwIdx + 1 ) dir = 'right';
-	if ( olIdx == _wppaSlides[mocc].length - 1 && 0 == nwIdx && wppaSlideWrap ) dir = 'left';
-	if ( 0 == olIdx && nwIdx == _wppaSlides[mocc].length - 1 && wppaSlideWrap ) dir = 'right';
+	if ( olIdx == _wppaSlides[mocc].length - 1 && 0 == nwIdx && wppaSlideWrap[mocc] ) dir = 'left';
+	if ( 0 == olIdx && nwIdx == _wppaSlides[mocc].length - 1 && wppaSlideWrap[mocc] ) dir = 'right';
 
 	// Not known yet?
 	if ( 'nil' == dir ) {
@@ -756,7 +756,7 @@ function _wppaNextSlide_5( mocc ) {
 
 	// End of non wrapped show?
 	if ( _wppaSSRuns[mocc] &&
-		! wppaSlideWrap &&
+		! wppaSlideWrap[mocc] &&
 		( ( _wppaCurIdx[mocc] + 1 ) == _wppaSlides[mocc].length ) ) {
 			_wppaIsBusy[mocc] = false;
 			_wppaStop( mocc );	// stop
@@ -1189,7 +1189,7 @@ function _wppaAdjustFilmstrip( mocc ) {
 
 	if ( ! _wppaFilmNoMove[mocc] ) {
 		var xoffset;
-		xoffset = wppaFilmStripLength[mocc] / 2 - ( _wppaCurIdx[mocc] + 0.5 + wppaPreambule ) * wppaThumbnailPitch[mocc] - wppaFilmStripMargin[mocc];
+		xoffset = wppaFilmStripLength[mocc] / 2 - ( _wppaCurIdx[mocc] + 0.5 + wppaPreambule[mocc] ) * wppaThumbnailPitch[mocc] - wppaFilmStripMargin[mocc];
 		if ( wppaFilmShowGlue ) xoffset -= ( wppaFilmStripMargin[mocc] * 2 + 2 );	// Glue
 		jQuery( '#wppa-filmstrip-'+mocc ).stop().animate( {marginLeft: xoffset+'px'}, wppaAnimationSpeed);
 	}
@@ -1243,7 +1243,7 @@ function _wppaAdjustFilmstrip( mocc ) {
 function _wppaNext( mocc ) {
 
 	// Check for end of non wrapped show
-	if ( ! wppaSlideWrap && _wppaCurIdx[mocc] == ( _wppaSlides[mocc].length -1 ) ) return;
+	if ( ! wppaSlideWrap[mocc] && _wppaCurIdx[mocc] == ( _wppaSlides[mocc].length -1 ) ) return;
 	// Find next index
 	_wppaNxtIdx[mocc] = _wppaCurIdx[mocc] + 1;
 	if ( _wppaNxtIdx[mocc] == _wppaSlides[mocc].length ) _wppaNxtIdx[mocc] = 0;
@@ -1254,7 +1254,7 @@ function _wppaNext( mocc ) {
 function _wppaNextN( mocc, n ) {
 
 	// Check for end of non wrapped show
-	if ( ! wppaSlideWrap && _wppaCurIdx[mocc] >= ( _wppaSlides[mocc].length - n ) ) return;
+	if ( ! wppaSlideWrap[mocc] && _wppaCurIdx[mocc] >= ( _wppaSlides[mocc].length - n ) ) return;
 	// Find next index
 	_wppaNxtIdx[mocc] = _wppaCurIdx[mocc] + n;
 	while ( _wppaNxtIdx[mocc] >= _wppaSlides[mocc].length ) _wppaNxtIdx[mocc] -= _wppaSlides[mocc].length;
@@ -1265,7 +1265,7 @@ function _wppaNextN( mocc, n ) {
 function _wppaNextOnCallback( mocc ) {
 
 	// Check for end of non wrapped show
-	if ( ! wppaSlideWrap && _wppaCurIdx[mocc] == ( _wppaSlides[mocc].length -1 ) ) return;
+	if ( ! wppaSlideWrap[mocc] && _wppaCurIdx[mocc] == ( _wppaSlides[mocc].length -1 ) ) return;
 	// Check for skip rated after rating
 	if ( _wppaSkipRated[mocc] ) {
 		var now = _wppaCurIdx[mocc];
@@ -1293,7 +1293,7 @@ function _wppaNextOnCallback( mocc ) {
 function _wppaPrev( mocc ) {
 
 	// Check for begin of non wrapped show
-	if ( ! wppaSlideWrap && _wppaCurIdx[mocc] == 0 ) return;
+	if ( ! wppaSlideWrap[mocc] && _wppaCurIdx[mocc] == 0 ) return;
 	// Find previous index
 	_wppaNxtIdx[mocc] = _wppaCurIdx[mocc] - 1;
 	if ( _wppaNxtIdx[mocc] < 0 ) _wppaNxtIdx[mocc] = _wppaSlides[mocc].length - 1;
@@ -1304,7 +1304,7 @@ function _wppaPrev( mocc ) {
 function _wppaPrevN( mocc, n ) {
 
 	// Check for begin of non wrapped show
-	if ( ! wppaSlideWrap && _wppaCurIdx[mocc] < n ) return;
+	if ( ! wppaSlideWrap[mocc] && _wppaCurIdx[mocc] < n ) return;
 	// Find previous index
 	_wppaNxtIdx[mocc] = _wppaCurIdx[mocc] - n;
 	while ( _wppaNxtIdx[mocc] < 0 ) _wppaNxtIdx[mocc] += _wppaSlides[mocc].length;
@@ -1820,7 +1820,7 @@ function _wppaUbb( mocc,where,act ) {
 			if ( where == 'l' ) {	// wppaPrev( mocc );
 				idx = _wppaCurIdx[mocc] - 1;
 				if ( idx < 0 ) {
-					if ( ! wppaSlideWrap ) {
+					if ( ! wppaSlideWrap[mocc] ) {
 						return;
 					}
 					idx = _wppaSlides[mocc].length - 1;
@@ -1829,7 +1829,7 @@ function _wppaUbb( mocc,where,act ) {
 			if ( where == 'r' ) {	// wppaNext( mocc );
 				idx = _wppaCurIdx[mocc] + 1;
 				if ( idx == _wppaSlides[mocc].length ) {
-					if ( ! wppaSlideWrap ) {
+					if ( ! wppaSlideWrap[mocc] ) {
 						return;
 					}
 					idx = 0;

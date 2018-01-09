@@ -3,46 +3,46 @@
 * Pachkage: wp-photo-album-plus
 *
 *
-* Version 6.7.07
+* Version 6.7.09
 *
 */
 
 if ( ! defined( 'ABSPATH' ) )
     die( "Can't load this file directly" );
 
-class wppaGallery
-{
-    function __construct() {
-		add_action( 'init', array( $this, 'action_admin_init' ) ); // 'admin_init'
-	}
+add_action( 'admin_init', 'wppa_tinymce_gallery_action_init' );
 
-	function action_admin_init() {
-		// only hook up these filters if we're in the admin panel, and the current user has permission
-		// to edit posts or pages, and the feature is enabled
-		if ( wppa_user_is( 'administrator' ) || ( wppa_switch( 'enable_generator' ) && ( current_user_can( 'edit_posts' ) || current_user_can( 'edit_pages' ) ) ) ) {
-			add_filter( 'mce_buttons', array( $this, 'filter_mce_button' ) );
-			add_filter( 'mce_external_plugins', array( $this, 'filter_mce_plugin' ) );
-		}
-	}
+function wppa_tinymce_gallery_action_init() {
 
-	function filter_mce_button( $buttons ) {
-		// add a separation before our button.
-		array_push( $buttons, '|', 'mygallery_button' );
-		return $buttons;
-	}
+	// only hook up these filters if we're in the admin panel, and the current user has permission
+	// to edit posts or pages, and the feature is enabled
+	if ( wppa_user_is( 'administrator' ) || ( wppa_switch( 'enable_generator' ) && ( current_user_can( 'edit_posts' ) || current_user_can( 'edit_pages' ) ) ) ) {
 
-	function filter_mce_plugin( $plugins ) {
-		// this plugin file will work the magic of our button
-		$file = 'js/wppa-tinymce-shortcodes.js';
-		$plugins['wppagallery'] = plugin_dir_url( __FILE__ ) . $file;
-		return $plugins;
+		add_filter( 'mce_buttons', 'wppa_filter_mce_gallery_button' );
+		add_filter( 'mce_external_plugins', 'wppa_filter_mce_gallery_plugin' );
 	}
-
 }
 
-$wppagallery = new wppaGallery();
+function wppa_filter_mce_gallery_button( $buttons ) {
 
-add_action('admin_head', 'wppa_inject_js');
+	array_push( $buttons, ' ', 'wppa_gallery_button' );
+	return $buttons;
+}
+
+function wppa_filter_mce_gallery_plugin( $plugins ) {
+
+	// this plugin file will work the magic of our button
+	if ( is_file( WPPA_PATH . '/js/wppa-tinymce-shortcodes.min.js' ) ) {
+		$file = 'js/wppa-tinymce-shortcodes.min.js';
+	}
+	else {
+		$file = 'js/wppa-tinymce-shortcodes.js';
+	}
+	$plugins['wppagallery'] = plugin_dir_url( __FILE__ ) . $file;
+	return $plugins;
+}
+
+add_action( 'admin_head', 'wppa_inject_js' );
 
 function wppa_inject_js() {
 global $wppa_api_version;
@@ -119,7 +119,17 @@ global $wpdb;
 
 	// Make the html
 	$result =
-	'<style>#TB_ajaxContent {box-sizing:border-box; width:100% !important;}</style>'.
+	'<style>
+		#TB_ajaxContent {
+			box-sizing:border-box; width:100% !important;
+		}
+		#wppagallery-table select {
+			max-width:540px;
+		}
+		#wppagallery-table option {
+			color: #070;
+		}
+	</style>'.
 	'<div id="wppagallery-form">'.
 		'<style type="text/css">'.
 			'#wppagallery-table tr, #wppagallery-table th, #wppagallery-table td {'.
@@ -133,12 +143,12 @@ global $wpdb;
 				'<th><label for="wppagallery-top-type">'.__('Type of WPPA display:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
 					'<select id="wppagallery-top-type" name="type" onchange="wppaGalleryEvaluate()">'.
-						'<option value="" selected="selected" disabled="disabled" style="color:#700" >-- '.__('Please select a display type', 'wp-photo-album-plus').' --</option>'.
-						'<option value="galerytype" style="color:#070" >'.__('A gallery with covers and/or thumbnails', 'wp-photo-album-plus').'</option>'.
-						'<option value="slidestype" style="color:#070" >'.__('A slideshow', 'wp-photo-album-plus').'</option>'.
-						'<option value="singletype" style="color:#070" >'.__('A single image', 'wp-photo-album-plus').'</option>'.
-						'<option value="searchtype" style="color:#070" >'.__('A search/selection box', 'wp-photo-album-plus').'</option>'.
-						'<option value="misceltype" style="color:#070" >'.__('An other box type', 'wp-photo-album-plus').'</option>'.
+						'<option value="" selected="selected" disabled="disabled" style="color:#700 !important;" >-- '.__('Please select a display type', 'wp-photo-album-plus').' --</option>'.
+						'<option value="galerytype" >'.__('A gallery with covers and/or thumbnails', 'wp-photo-album-plus').'</option>'.
+						'<option value="slidestype" >'.__('A slideshow', 'wp-photo-album-plus').'</option>'.
+						'<option value="singletype" >'.__('A single image', 'wp-photo-album-plus').'</option>'.
+						'<option value="searchtype" >'.__('A search/selection box', 'wp-photo-album-plus').'</option>'.
+						'<option value="misceltype" >'.__('An other box type', 'wp-photo-album-plus').'</option>'.
 					'</select>'.
 				'</td>'.
 			'</tr>'.
@@ -148,11 +158,11 @@ global $wpdb;
 				'<th><label for="wppagallery-galery-type">'.__('Type of gallery display:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
 					'<select id="wppagallery-galery-type" name="type" onchange="wppaGalleryEvaluate()">'.
-						'<option value="" selected="selected" disabled="disabled" style="color:#700" >-- '.__('Please select a gallery type', 'wp-photo-album-plus').' --</option>'.
-						'<option value="cover" style="color:#070" >'.__('The cover(s) of specific album(s)', 'wp-photo-album-plus').'</option>'.
-						'<option value="content" style="color:#070" >'.__('The content of specific album(s)', 'wp-photo-album-plus').'</option>'.
-						'<option value="covers" style="color:#070" >'.__('The covers of the subalbums of specific album(s)', 'wp-photo-album-plus').'</option>'.
-						'<option value="thumbs" style="color:#070" >'.__('The thumbnails of specific album(s)', 'wp-photo-album-plus').'</option>'.
+						'<option value="" selected="selected" disabled="disabled" style="color:#700 !important;" >-- '.__('Please select a gallery type', 'wp-photo-album-plus').' --</option>'.
+						'<option value="cover" >'.__('The cover(s) of specific album(s)', 'wp-photo-album-plus').'</option>'.
+						'<option value="content" >'.__('The content of specific album(s)', 'wp-photo-album-plus').'</option>'.
+						'<option value="covers" >'.__('The covers of the subalbums of specific album(s)', 'wp-photo-album-plus').'</option>'.
+						'<option value="thumbs" >'.__('The thumbnails of specific album(s)', 'wp-photo-album-plus').'</option>'.
 					'</select>'.
 				'</td>'.
 			'</tr>'.
@@ -162,11 +172,11 @@ global $wpdb;
 				'<th><label for="wppagallery-slides-type">'.__('Type of slideshow:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
 					'<select id="wppagallery-slides-type" name="type" onchange="wppaGalleryEvaluate()">'.
-						'<option value="" selected="selected" disabled="disabled" style="color:#700" >-- '.__('Please select a slideshow type', 'wp-photo-album-plus').' --</option>'.
-						'<option value="slide" style="color:#070" >'.__('A fully featured slideshow', 'wp-photo-album-plus').'</option>'.
-						'<option value="slideonly" style="color:#070" >'.__('A slideshow without supporting boxes', 'wp-photo-album-plus').'</option>'.
-						'<option value="slideonlyf" style="color:#070" >'.__('A slideshow with a filmstrip only', 'wp-photo-album-plus').'</option>'.
-						'<option value="filmonly" style="color:#070" >'.__('A filmstrip only', 'wp-photo-album-plus').'</option>'.
+						'<option value="" selected="selected" disabled="disabled" style="color:#700 !important;" >-- '.__('Please select a slideshow type', 'wp-photo-album-plus').' --</option>'.
+						'<option value="slide" >'.__('A fully featured slideshow', 'wp-photo-album-plus').'</option>'.
+						'<option value="slideonly" >'.__('A slideshow without supporting boxes', 'wp-photo-album-plus').'</option>'.
+						'<option value="slideonlyf" >'.__('A slideshow with a filmstrip only', 'wp-photo-album-plus').'</option>'.
+						'<option value="filmonly" >'.__('A filmstrip only', 'wp-photo-album-plus').'</option>'.
 					'</select>'.
 				'</td>'.
 			'</tr>'.
@@ -176,11 +186,11 @@ global $wpdb;
 				'<th><label for="wppagallery-single-type">'.__('Type of single image:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
 					'<select id="wppagallery-single-type" name="type" onchange="wppaGalleryEvaluate()">'.
-						'<option value="" selected="selected" disabled="disabled" style="color:#700" >-- '.__('Please select a single image type', 'wp-photo-album-plus').' --</option>'.
-						'<option value="photo" style="color:#070" >'.__('A plain single photo', 'wp-photo-album-plus').'</option>'.
-						'<option value="mphoto" style="color:#070" >'.__('A single photo with caption', 'wp-photo-album-plus').'</option>'.
-						'<option value="xphoto" style="color:#070" >'.__('A single photo with extended caption', 'wp-photo-album-plus').'</option>'.
-						'<option value="slphoto" style="color:#070" >'.__('A single photo in the style of a slideshow', 'wp-photo-album-plus').'</option>'.
+						'<option value="" selected="selected" disabled="disabled" style="color:#700 !important;" >-- '.__('Please select a single image type', 'wp-photo-album-plus').' --</option>'.
+						'<option value="photo" >'.__('A plain single photo', 'wp-photo-album-plus').'</option>'.
+						'<option value="mphoto" >'.__('A single photo with caption', 'wp-photo-album-plus').'</option>'.
+						'<option value="xphoto" >'.__('A single photo with extended caption', 'wp-photo-album-plus').'</option>'.
+						'<option value="slphoto" >'.__('A single photo in the style of a slideshow', 'wp-photo-album-plus').'</option>'.
 					'</select>'.
 				'</td>'.
 			'</tr>'.
@@ -190,13 +200,13 @@ global $wpdb;
 				'<th><label for="wppagallery-search-type">'.__('Type of search:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
 					'<select id="wppagallery-search-type" name="type" onchange="wppaGalleryEvaluate()">'.
-						'<option value="" selected="selected" disabled="disabled" style="color:#700" >-- '.__('Please select a search type', 'wp-photo-album-plus').' --</option>'.
-						'<option value="search" style="color:#070" >'.__('A search box', 'wp-photo-album-plus').'</option>'.
-						'<option value="supersearch" style="color:#070" >'.__('A supersearch box', 'wp-photo-album-plus').'</option>'.
-						'<option value="tagcloud" style="color:#070" >'.__('A tagcloud box', 'wp-photo-album-plus').'</option>'.
-						'<option value="multitag" style="color:#070" >'.__('A multitag box', 'wp-photo-album-plus').'</option>'.
-						'<option value="superview" style="color:#070" >'.__('A superview box', 'wp-photo-album-plus').'</option>'.
-						'<option value="calendar" style="color:#070" >'.__('A calendar box', 'wp-photo-album-plus').'</option>'.
+						'<option value="" selected="selected" disabled="disabled" style="color:#700 !important;" >-- '.__('Please select a search type', 'wp-photo-album-plus').' --</option>'.
+						'<option value="search" >'.__('A search box', 'wp-photo-album-plus').'</option>'.
+						'<option value="supersearch" >'.__('A supersearch box', 'wp-photo-album-plus').'</option>'.
+						'<option value="tagcloud" >'.__('A tagcloud box', 'wp-photo-album-plus').'</option>'.
+						'<option value="multitag" >'.__('A multitag box', 'wp-photo-album-plus').'</option>'.
+						'<option value="superview" >'.__('A superview box', 'wp-photo-album-plus').'</option>'.
+						'<option value="calendar" >'.__('A calendar box', 'wp-photo-album-plus').'</option>'.
 					'</select>'.
 				'</td>'.
 			'</tr>'.
@@ -206,7 +216,7 @@ global $wpdb;
 				'<th><label for="wppagallery-miscel-type">'.__('Type miscellaneous:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
 					'<select id="wppagallery-miscel-type" name="type" onchange="wppaGalleryEvaluate()">'.
-						'<option value="" selected="selected" disabled="disabled" style="color:#700" >-- '.__('Please select a miscellaneous display', 'wp-photo-album-plus').' --</option>'.
+						'<option value="" selected="selected" disabled="disabled" style="color:#700 !important;" >-- '.__('Please select a miscellaneous display', 'wp-photo-album-plus').' --</option>'.
 						'<option value="generic">'.__('A generic albums display', 'wp-photo-album-plus').'</option>'.
 						'<option value="upload">'.__('An upload box', 'wp-photo-album-plus').'</option>'.
 						'<option value="landing">'.__('A landing page shortcode', 'wp-photo-album-plus').'</option>'.
@@ -229,7 +239,7 @@ global $wpdb;
 							$users = get_option( 'wppa_super_users', array() );
 							foreach( $users as $user ) {
 								$result .=
-								'<option value="'.$user.'" class="wppagallery-admin" style="color:#070" >'.$user.'</option>';
+								'<option value="'.$user.'" class="wppagallery-admin" >'.$user.'</option>';
 							}
 						$result .=
 					'</select>'.
@@ -241,7 +251,7 @@ global $wpdb;
 				'<th><label for="wppagallery-album-type">'.__('Kind of selection:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
 					'<select id="wppagallery-album-type" name="type" onchange="wppaGalleryEvaluate()">'.
-						'<option value="" selected="selected" disabled="disabled" style="color:#700" >-- '.__('Please select a type of selection to be used', 'wp-photo-album-plus').' --</option>'.
+						'<option value="" selected="selected" disabled="disabled" style="color:#700 !important;" >-- '.__('Please select a type of selection to be used', 'wp-photo-album-plus').' --</option>'.
 						'<option value="real">'.__('One or more wppa+ albums', 'wp-photo-album-plus').'</option>'.
 						'<option value="virtual">'.__('A special selection', 'wp-photo-album-plus').'</option>'.
 					'</select>'.
@@ -253,7 +263,7 @@ global $wpdb;
 				'<th><label for="wppagallery-album-virt">'.__('The selection to be used:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
 					'<select id="wppagallery-album-virt" name="album" class="wppagallery-album" onchange="wppaGalleryEvaluate()">'.
-						'<option value="" disabled="disabled" selected="selected" style="color:#700" >-- '.__('Please select a virtual album', 'wp-photo-album-plus').' --</option>'.
+						'<option value="" disabled="disabled" selected="selected" style="color:#700 !important;" >-- '.__('Please select a virtual album', 'wp-photo-album-plus').' --</option>'.
 						'<option value="#last" >'.__('The most recently modified album', 'wp-photo-album-plus').'</option>'.
 						'<option value="#topten" >'.__('The top rated photos', 'wp-photo-album-plus').'</option>'.
 						'<option value="#lasten" >'.__('The most recently uploaded photos', 'wp-photo-album-plus').'</option>'.
@@ -273,7 +283,7 @@ global $wpdb;
 				'<th><label for="wppagallery-album-virt-cover">'.__('The selection to be used:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
 					'<select id="wppagallery-album-virt-cover" name="album" class="wppagallery-album" onchange="wppaGalleryEvaluate()">'.
-						'<option value="" disabled="disabled" selected="selected" style="color:#700" >-- '.__('Please select a virtual album', 'wp-photo-album-plus').' --</option>'.
+						'<option value="" disabled="disabled" selected="selected" style="color:#700 !important;" >-- '.__('Please select a virtual album', 'wp-photo-album-plus').' --</option>'.
 						'<option value="#last" >'.__('The most recently modified album', 'wp-photo-album-plus').'</option>'.
 						'<option value="#owner" >'.__('Albums owned by a certain user', 'wp-photo-album-plus').'</option>'.
 						'<option value="#cat" >'.__('Albums tagged with certain categories', 'wp-photo-album-plus').'</option>'.
@@ -298,7 +308,7 @@ global $wpdb;
 						if ( $albums ) {
 
 							// Please select
-							$result .= '<option id="wppagallery-album-0" value="0" disabled="disabled" selected="selected" style="color:#700" >-- '.__('Please select one or more albums', 'wp-photo-album-plus').' --</option>';
+							$result .= '<option id="wppagallery-album-0" value="0" disabled="disabled" selected="selected" style="color:#700 !important;" >-- '.__('Please select one or more albums', 'wp-photo-album-plus').' --</option>';
 
 							// All standard albums
 							foreach ( $albums as $album ) {
@@ -307,7 +317,7 @@ global $wpdb;
 							}
 						}
 						else {
-							$result .= '<option value="0" >' . __('There are no albums yet', 'wp-photo-album-plus') . '</option>';
+							$result .= '<option value="0" style="color:#700;" >' . __('There are no albums yet', 'wp-photo-album-plus') . '</option>';
 						}
 					$result .= '</select>';
 				}
@@ -345,12 +355,12 @@ global $wpdb;
 						if ( $albums ) {
 
 							// Please select
-							$result .= '<option id="wppagallery-album-0" class="wppagallery-album-ropt" value="0" selected="selected" style="color:#070" >-- '.__('All albums', 'wp-photo-album-plus').' --</option>';
+							$result .= '<option id="wppagallery-album-0" class="wppagallery-album-ropt" value="0" selected="selected" >-- '.__('All albums', 'wp-photo-album-plus').' --</option>';
 
 							// All standard albums
 							foreach ( $albums as $album ) {
 								$id = $album['id'];
-								$result .= '<option class="wppagallery-album-ropt" style="color:#070" value="' . $id . '" >'.stripslashes( __( $album['name'] ) ) . ' (' . $id . ')</option>';
+								$result .= '<option class="wppagallery-album-ropt" value="' . $id . '" >'.stripslashes( __( $album['name'] ) ) . ' (' . $id . ')</option>';
 							}
 						}
 						else {
@@ -367,7 +377,7 @@ global $wpdb;
 				'<th><label for="wppagallery-owner">'.__('The album owner:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
 					'<select id="wppagallery-owner" name="owner" class="wppagallery-owner" onchange="wppaGalleryEvaluate()">'.
-						'<option value="" disabled="disabled" selected="selected" style="color:#700" >-- '.__('Please select a user', 'wp-photo-album-plus').' --</option>'.
+						'<option value="" disabled="disabled" selected="selected" style="color:#700 !important;" >-- '.__('Please select a user', 'wp-photo-album-plus').' --</option>'.
 						'<option value="#me" >-- '.__('The logged in visitor', 'wp-photo-album-plus').' --</option>';
 						$users = wppa_get_users();
 						if ( $users ) foreach ( $users as $user ) {
@@ -385,14 +395,14 @@ global $wpdb;
 			'<tr id="wppagallery-owner-parent-tr" style="display:none;" >'.
 				'<th><label for="wppagallery-owner-parent">'.__('Parent album:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
-					'<select id="wppagallery-owner-parent" style="color:#070;max-width:400px;" name="parentalbum" multiple="multiple" onchange="wppaGalleryEvaluate()">';
+					'<select id="wppagallery-owner-parent" style="color:#070 !important;max-width:400px;" name="parentalbum" multiple="multiple" onchange="wppaGalleryEvaluate()">';
 						if ( $albums ) {
 
 							// Please select
-							$result .= '<option value="" selected="selected" >-- '.__('No parent specification', 'wp-photo-album-plus').' --</option>';
+							$result .= '<option class="wppagallery-album-p" value="" selected="selected" >-- '.__('No parent specification', 'wp-photo-album-plus').' --</option>';
 
 							// Generic
-							$result .= '<option value="0" >-- '.__('The generic parent', 'wp-photo-album-plus').' --</option>';
+							$result .= '<option class="wppagallery-album-p" value="zero" >-- '.__('The generic parent', 'wp-photo-album-plus').' --</option>';
 
 							// All standard albums
 							foreach ( $albums as $album ) {
@@ -411,11 +421,11 @@ global $wpdb;
 			'<tr id="wppagallery-album-parent-tr" style="display:none;" >'.
 				'<th><label for="wppagallery-album-parent">'.__('Parent album:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
-					'<select id="wppagallery-album-parent-parent" style="color:#070;max-width:400px;" name="parentalbum" onchange="wppaGalleryEvaluate()">';
+					'<select id="wppagallery-album-parent-parent" style="color:#070 !important;max-width:400px;" name="parentalbum" onchange="wppaGalleryEvaluate()">';
 						if ($albums) {
 
 							// Please select
-							$result .= '<option id="wppagallery-album-0" value="0" selected="selected" style="color:#700" >-- '.__('The generic parent', 'wp-photo-album-plus').' --</option>';
+							$result .= '<option id="wppagallery-album-0" value="0" selected="selected" style="color:#700 !important;" >-- '.__('The generic parent', 'wp-photo-album-plus').' --</option>';
 
 							// All standard albums
 							foreach ( $albums as $album ) {
@@ -450,8 +460,8 @@ global $wpdb;
 			'<tr id="wppagallery-albumcat-tr" style="display:none;" >'.
 				'<th><label for="wppagallery-albumcat">'.__('The album cat(s):', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
-					'<select id="wppagallery-albumcat" style="color:#700;" onchange="wppaGalleryEvaluate()" multiple="multiple" >'.
-						'<option value="" disabled="disabled" selected="selected" style="color:#700" >'.__('--- please select category ---', 'wp-photo-album-plus').'</option>';
+					'<select id="wppagallery-albumcat" style="color:#700 !important;" onchange="wppaGalleryEvaluate()" multiple="multiple" >'.
+						'<option value="" disabled="disabled" selected="selected" style="color:#700 !important;" >'.__('--- please select category ---', 'wp-photo-album-plus').'</option>';
 						if ( $cats ) foreach ( array_keys( $cats ) as $cat ) {
 							$result .= '<option class="wppagallery-albumcat" value="'.$cat.'" >'.$cat.'</option>';
 						}
@@ -468,19 +478,35 @@ global $wpdb;
 						if ( $photos ) {
 
 							// Please select
-							$result .= '<option value="" disabled="disabled" selected="selected" style="color:#700" >-- '.__('Please select a photo', 'wp-photo-album-plus').' --</option>';
+							$result .= '<option value="" disabled="disabled" selected="selected" style="color:#700 !important;" >-- '.__('Please select a photo', 'wp-photo-album-plus').' --</option>';
 							$result .= '<option value="#potd" >-- '.__('The photo of the day', 'wp-photo-album-plus').' --</option>';
 
 							// Most recent 100 photos
 							foreach ( $photos as $photo ) {
+
 								$name = stripslashes(__($photo['name']));
 								if ( strlen($name) > '50') $name = substr($name, '0', '50').'...';
+
 								if ( get_option( 'wppa_file_system' ) == 'flat' ) {
-									$result .= '<option value="'.wppa_fix_poster_ext($photo['id'].'.'.$photo['ext'], $photo['id']).'" >'.$name.' ('.wppa_get_album_name($photo['album']).')'.'</option>';
+									$val = $photo['id'] . '.' . $photo['ext'];
 								}
 								else {
-									$result .= '<option value="'.wppa_fix_poster_ext(wppa_expand_id($photo['id']).'.'.$photo['ext'], $photo['id']).'" >'.$name.' ('.wppa_get_album_name($photo['album']).')'.'</option>';
+									$val = wppa_expand_id( $photo['id'] ) . '.' . $photo['ext'];
 								}
+
+								if ( wppa_has_audio( $photo['id'] ) && is_file( WPPA_UPLOAD_PATH . '/' . wppa_fix_poster_ext( $val, $photo['id'] ) ) ) {
+									$value = wppa_fix_poster_ext( $val );
+								}
+								else {
+									$value = $val;
+								}
+
+								$result .= 	'<option' .
+												' value="' . $value . '"' .
+												' >' .
+												$name .
+												' (' . wppa_get_album_name( $photo['album'] ) . ')' .
+											'</option>';
 							}
 							$result .=  '<option value="#last" >-- '.__('The most recently uploaded photo', 'wp-photo-album-plus').' --</option>'.
 										'<option value="#potd" >-- '.__('The photo of the day', 'wp-photo-album-plus').' --</option>';
@@ -509,8 +535,8 @@ global $wpdb;
 			'<tr id="wppagallery-phototags-tr" style="display:none;" >'.
 				'<th><label for="wppagallery-phototags">'.__('The photo tag(s):', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
-					'<select id="wppagallery-phototags" style="color:#700;" multiple="multiple" onchange="wppaGalleryEvaluate()">'.
-						'<option value="" disabled="disabled" selected="selected" style="color:#700" >'.__('--- please select tag(s) ---', 'wp-photo-album-plus').'</option>';
+					'<select id="wppagallery-phototags" style="color:#700 !important;;" multiple="multiple" onchange="wppaGalleryEvaluate()">'.
+						'<option value="" disabled="disabled" selected="selected" style="color:#700 !important;" >'.__('--- please select tag(s) ---', 'wp-photo-album-plus').'</option>';
 						if ( $tags ) foreach ( array_keys($tags) as $tag ) {
 							$result .= '<option class="wppagallery-phototags" value="'.$tag.'" >'.$tag.'</option>';
 						}
@@ -541,7 +567,7 @@ global $wpdb;
 			'<tr id="wppagallery-rootalbum-tr" style="display:none;" >'.
 				'<th><label>'.__('Search root:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
-					'<select id="wppagallery-rootalbum" style="color:#070" onchange="wppaGalleryEvaluate()" >'.
+					'<select id="wppagallery-rootalbum" onchange="wppaGalleryEvaluate()" >'.
 						'<option value="0" selected="selected" >'.__('--- default ---', 'wp-photo-album-plus').'</option>';
 						if ( $albums ) {
 
@@ -560,7 +586,7 @@ global $wpdb;
 			'<tr id="wppagallery-landing-tr" style="display:none;" >'.
 				'<th><label>'.__('Landing page:', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
-					'<select id="wppagallery-landing" style="color:#070" onchange="wppaGalleryEvaluate()" >'.
+					'<select id="wppagallery-landing" onchange="wppaGalleryEvaluate()" >'.
 						'<option value="0" selected="selected" >'.__('--- default ---', 'wp-photo-album-plus').'</option>';
 						if ( $pages ) {
 							foreach( $pages as $page ) {
@@ -583,13 +609,13 @@ global $wpdb;
 					'<input id="wppagallery-alltags" type="checkbox" checked="checked" name="alltags" onchange="wppaGalleryEvaluate()"/>'.__('Enable all tags', 'wp-photo-album-plus').'&nbsp;'.
 					'<select id="wppagallery-seltags" style="color:#070; display:none;" name="seltags" multiple="multiple" onchange="wppaGalleryEvaluate()">';
 						if ( $tags ) {
-							'<option value="" disabled="disabled" selected="selected" style="color:#700" >-- '.__('Please select the tags to show', 'wp-photo-album-plus').' --</option>';
+							'<option value="" disabled="disabled" selected="selected" style="color:#700 !important;" >-- '.__('Please select the tags to show', 'wp-photo-album-plus').' --</option>';
 							foreach( array_keys($tags) as $tag ) {
-								$result .= '<option class="wppagallery-taglist-tags" value="'.$tag.'"style="color:#700" >'.$tag.'</option>';
+								$result .= '<option class="wppagallery-taglist-tags" value="'.$tag.'" >'.$tag.'</option>';
 							}
 						}
 						else {
-							'<option value="" disabled="disabled" selected="selected" style="color:#700" >-- '.__('There are no tags', 'wp-photo-album-plus').' --</option>';
+							'<option value="" disabled="disabled" selected="selected" style="color:#700 !important;" >-- '.__('There are no tags', 'wp-photo-album-plus').' --</option>';
 						}
 						$result .= '</select>'.
 				'</td>'.
@@ -603,7 +629,7 @@ global $wpdb;
 						if ( $albums ) {
 
 							// Please select
-							$result .= '<option value="" selected="selected" style="color:#700" >-- '.__('The generic parent', 'wp-photo-album-plus').' --</option>';
+							$result .= '<option value="" selected="selected" >-- '.__('The generic parent', 'wp-photo-album-plus').' --</option>';
 
 							// All standard albums
 							foreach ( $albums as $album ) {

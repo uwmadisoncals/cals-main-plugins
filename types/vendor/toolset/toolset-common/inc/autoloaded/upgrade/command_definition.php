@@ -51,8 +51,8 @@ class Toolset_Upgrade_Command_Definition {
 	 *
 	 * @return bool
 	 */
-	public function should_run( $from_version, $to_version ) {
-		return ( $from_version < $this->upgrade_version && $this->upgrade_version <= $to_version );
+	public function should_run( $from_version, /** @noinspection PhpUnusedParameterInspection */ $to_version ) {
+		return ( $from_version < $this->upgrade_version );
 	}
 
 
@@ -63,6 +63,15 @@ class Toolset_Upgrade_Command_Definition {
 	 */
 	public function get_command() {
 		return $this->get_command_factory()->create( $this->command_class_name );
+	}
+
+
+	/**
+	 * @return string Unique command name.
+	 * @since 2.5.7
+	 */
+	public function get_command_name() {
+		return $this->command_class_name;
 	}
 
 

@@ -41,7 +41,18 @@ static $users;
 // Wrapper for get_user_by()
 function wppa_get_user_by( $key, $user ) {
 //	wppa_log( 'Obs', 'wppa_get_user_by called with args ' . $key . ', ' . $user, true );
-	return get_user_by( $key, $user );
+static $usercache;
+
+	// Done this one before?
+	if ( isset( $usercache[$key][$user] ) ) {
+//		wppa_log( 'Obs', 'wppa_get_user_by cache used for ' . $key . ', ' . $user );
+		return $usercache[$key][$user];
+	}
+	
+	$result = get_user_by( $key, $user );
+	$usercache[$key][$user] = $result;
+//	wppa_log( 'Obs', 'wppa_get_user_by new cache entry for ' . $key . ', ' . $user );
+	return $result;
 }
 
 // Get user

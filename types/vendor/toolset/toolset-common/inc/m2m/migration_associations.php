@@ -70,7 +70,14 @@ class Toolset_Relationship_Migration_Associations {
 			return new Toolset_Result( $e, $display_message );
 		}
 
-		if( ! $relationship_definition->can_associate( $parent, $child ) ) {
+		$potential_association_query_factory = new Toolset_Potential_Association_Query_Factory();
+		$potential_association = $potential_association_query_factory->create(
+			$relationship_definition,
+			new Toolset_Relationship_Role_Child(),
+			$parent
+		);
+
+		if( ! $potential_association->check_single_element( $child ) ) {
 			return new Toolset_Result(
 				false,
 				sprintf(

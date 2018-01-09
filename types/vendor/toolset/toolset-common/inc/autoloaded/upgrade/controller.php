@@ -35,6 +35,10 @@ class Toolset_Upgrade_Controller {
 	private $_command_definition_repository;
 
 
+	/** @var Toolset_Upgrade_Executed_Commands|null */
+	private $_executed_commands;
+
+
 	public static function get_instance() {
 		if( null == self::$instance ) {
 			self::$instance = new self();
@@ -43,7 +47,7 @@ class Toolset_Upgrade_Controller {
 		return self::$instance;
 	}
 
-	
+
 	public function initialize() {
 		if( $this->is_initialized ) {
 			return;
@@ -58,10 +62,12 @@ class Toolset_Upgrade_Controller {
 
 	public function __construct(
 		Toolset_Constants $constants_di = null,
-		Toolset_Upgrade_Command_Definition_Repository $command_definition_repository_di = null
+		Toolset_Upgrade_Command_Definition_Repository $command_definition_repository_di = null,
+		Toolset_Upgrade_Executed_Commands $executed_commands_di = null
 	) {
 		$this->constants = ( null === $constants_di ? new Toolset_Constants() : $constants_di );
 		$this->_command_definition_repository = $command_definition_repository_di;
+		$this->_executed_commands = $executed_commands_di;
 	}
 
 
@@ -150,18 +156,34 @@ class Toolset_Upgrade_Controller {
 
 		$command_definitions = $this->get_upgrade_commands();
 
-		foreach( $command_definitions as $command_definition ) {
-			if( $command_definition->should_run( $from_version, $to_version ) ) {
+		foreach ( $command_definitions as $command_definition ) {
+
+			if ( ! $command_definition->should_run( $from_version, $to_version ) ) {
+				continue;
+			}
+
+			if( $this->get_executed_commands()->was_executed( $command_definition->get_command_name() ) ) {
+				continue;
+			}
+
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+
+				$command = $command_definition->get_command();
+				$command->run();
+
+			} else {
 				// Ignore errors as we don't have a proper way to display any output from this yet.
 				try {
 					$command = $command_definition->get_command();
 					$command->run();
-				} catch(Throwable $e) {
+				} catch ( Throwable $e ) {
 					// PHP 7
-				} catch(Exception $e) {
+				} catch ( Exception $e ) {
 					// PHP 5
 				}
 			}
+
+			$this->get_executed_commands()->add_executed_command( $command_definition->get_command_name() );
 		}
 	}
 
@@ -180,6 +202,19 @@ class Toolset_Upgrade_Controller {
 		}
 
 		return $this->_command_definition_repository->get_commands();
+	}
+
+
+	/**
+	 * @return Toolset_Upgrade_Executed_Commands
+	 * @since 2.5.7
+	 */
+	public function get_executed_commands() {
+		if( null === $this->_executed_commands ) {
+			$this->_executed_commands = new Toolset_Upgrade_Executed_Commands();
+		}
+
+		return $this->_executed_commands;
 	}
 
 

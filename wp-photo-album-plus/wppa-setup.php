@@ -1723,6 +1723,7 @@ Hide Camera info
 						'wppa_cp_points_upload'			=> '0',
 						'wppa_use_scabn'				=> 'no',
 						'wppa_use_CMTooltipGlossary' 	=> 'no',
+						'wppa_photo_on_bbpress' 		=> 'no',
 
 						// K External services
 						'wppa_cdn_service'						=> '',
@@ -1749,6 +1750,7 @@ Hide Camera info
 						'wppa_photo_shortcode_type' 			=> 'mphoto',
 						'wppa_photo_shortcode_size' 			=> '350',
 						'wppa_photo_shortcode_align' 			=> 'center',
+						'wppa_photo_shortcode_fe_type' 			=> '-none-', 
 
 						// Photo of the day widget
 						'wppa_potd_title'			=> __('Photo of the day', 'wp-photo-album-plus'),

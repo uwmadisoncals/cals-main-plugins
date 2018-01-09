@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the slideshow high level functions
-* Version 6.7.02
+* Version 6.7.10
 *
 */
 
@@ -1313,7 +1313,7 @@ function wppa_slide_filmstrip( $opt = '' ) {
 
 	$conw = wppa_get_container_width();
 	if ( $conw < 1 ) $conw *= 640;
-	$w = $conw - ( 2*6 + 2*42 + 2*wppa_opt( 'bwidth' ) ); /* 2*padding + 2*arrows + 2*border */
+	$w = $conw - ( 2*6 + 2*42 + ( wppa_opt( 'bwidth' ) ? 2*wppa_opt( 'bwidth' ) : 0 ) ); /* 2*padding + 2*arrows + 2*border */
 	if ( wppa_in_widget() ) $w = $conw - ( 2*6 + 2*21 + 2*wppa_opt( 'bwidth' ) ); /* 2*padding + 2*arrow + 2*border */
 	$IE6 = 'width: '.$w.'px;';
 	$pagsiz = round( $w / ( wppa_opt( 'film_thumbsize' ) + wppa_opt( 'tn_margin' ) ) );

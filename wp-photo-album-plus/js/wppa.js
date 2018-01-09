@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.7.08';
+var wppaJsVersion = '6.7.09';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -25,7 +25,7 @@ var wppaSlideShowTimeOut = 2500;
 var wppaFadeInAfterFadeOut = false;
 var wppaTextFrameDelta = 0;
 var wppaBoxDelta = 0;
-var wppaPreambule;
+var wppaPreambule = [];
 var wppaHideWhenEmpty = false;
 var wppaThumbnailPitch = [];
 var wppaFilmStripLength = [];
@@ -70,7 +70,6 @@ var wppaAjaxUrl = '';
 var wppaLang = '';
 var wppaNextOnCallback = false;
 var wppaStarOpacity = 0.2;
-var wppaSlideWrap = true;
 var wppaLightBox = [];
 var wppaEmailRequired = 'required';
 var wppaSlideBorderWidth = 0;
@@ -150,6 +149,7 @@ var wppaPageArg = '';
 var wppaSlideshowNavigationType = 'icons';
 var wppaCoverImageResponsive = [];
 var wppaSearchBoxSelItems = [];
+var wppaSlideWrap = [];
 
 // 'Internal' variables ( private )
 var _wppaId = [];
@@ -1325,6 +1325,7 @@ function wppaDisplaySelectedFiles(id) {
 }
 
 function wppaIsEmpty( str ) {
+	if ( str == null ) return true;
 	if ( typeof( str ) == 'undefined' ) return true;
 	if ( str == '' ) return true;
 	if ( str == false ) return true;

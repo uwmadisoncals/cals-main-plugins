@@ -74,8 +74,16 @@ class Toolset_Shortcode_Attr_Item_Legacy extends Toolset_Shortcode_Attr_Item_Id 
 			return $this->chain_link->get( $data );
 		}
 
-		if( $requested_id = $this->service_relationship->legacy_find_parent_id_by_child_id_and_parent_slug( $post->ID, $role_slug ) ) {
-			return $this->return_single_id( $requested_id );
+		// find parent by using the slug (to support legacy use of the shortcode [types id="$parent_slug"])
+		$parents_with_specific_slug = $this->service_relationship->find_parents_by_child_id_and_parent_slug( $post->ID, $role_slug );
+
+		if( count( $parents_with_specific_slug ) > 1 ) {
+			// todo show a message to the admin that he should replace the old shortcode structure by the new
+			// as long as this message is not implemented we show the first found item (with the foreach after this if block).
+		}
+
+		foreach( $parents_with_specific_slug as $parent ) {
+			return $this->return_single_id( $parent->get_id() );
 		}
 
 		return $this->chain_link->get( $data );

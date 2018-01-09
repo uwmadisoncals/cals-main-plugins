@@ -117,11 +117,15 @@ abstract class Toolset_Relationship_Role {
 	 *
 	 * @param $first_element
 	 * @param $second_element
-	 * @param string $first_role Role of the first element (parent or child expected)
+	 * @param string|IToolset_Relationship_Role_Parent_Child $first_role Role of the first element (parent or child expected)
 	 *
 	 * @return array Two provided elements orderd as parent and child.
 	 */
 	public static function sort_elements( $first_element, $second_element, $first_role ) {
+
+		if( $first_role instanceof IToolset_Relationship_Role_Parent_Child ) {
+			$first_role = $first_role->get_name();
+		}
 
 		if( self::PARENT === $first_role ) {
 			return array( $first_element, $second_element );

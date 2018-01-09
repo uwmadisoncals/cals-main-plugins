@@ -60,8 +60,8 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 		$this->target_role = $target_role;
 		$this->args = $args;
 
-		if( $relationship->get_element_type( $target_role->get_name() )->get_domain() !== Toolset_Relationship_Element_Type::DOMAIN_POSTS ) {
-			throw new InvalidArgumentException( 'Target role has a wrong domain.' );
+		if( ! $relationship->get_element_type( $target_role->other()->get_name() )->is_match( $for_element ) ) {
+			throw new InvalidArgumentException( 'The element to connect with doesn\'t belong to the relationship definition provided.' );
 		}
 
 		$this->query_factory = ( null === $query_factory_di ? new Toolset_Relationship_Query_Factory() : $query_factory_di );
@@ -194,14 +194,147 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 	 *
 	 * The relationship, target role and the other element are those provided in the constructor.
 	 *
-	 * WIP
+	 * @param IToolset_Element $association_candidate Element that wants to be associated.
+	 * @return Toolset_Result Result with an user-friendly message in case the association is denied.
+	 * @since 2.5.6
 	 */
-	public function check_single_element() {
-		// todo move the logic from Toolset_Relationship_Definition here
+	public function check_single_element( IToolset_Element $association_candidate ) {
 
-		throw new RuntimeException( 'Not implemented.' );
+		if( ! $this->relationship->get_element_type( $this->target_role )->is_match( $association_candidate ) ) {
+			return new Toolset_Result( false, __( 'The element has a wrong type or a domain for this relationship.', 'wpcf' ) );
+		}
+
+		if( $this->relationship->is_distinct() && $this->is_element_already_associated( $association_candidate ) ) {
+			return new Toolset_Result( false,
+				__( 'These two elements are already associated and the relationship doesn\'t allow non-distinct associations.', 'wpcf' )
+			);
+		}
+
+		$cardinality_check_result = $this->check_cardinality_for_role( $this->for_element, $this->target_role->other() );
+		if( $cardinality_check_result->is_error() ) {
+			return $cardinality_check_result;
+		}
+
+		$cardinality_check_result = $this->check_cardinality_for_role( $association_candidate, $this->target_role );
+		if( $cardinality_check_result->is_error() ) {
+			return $cardinality_check_result;
+		}
+
+		// We also need to check $this->relationship->has_scope() when/if the scope support is implemented.
+
+		/** @var IToolset_Element[] $parent_and_child */
+		$parent_and_child = Toolset_Relationship_Role::sort_elements( $association_candidate, $this->for_element, $this->target_role );
+
+		/**
+		 * toolset_can_create_association
+		 *
+		 * Allows for forbidding an association between two elements to be created.
+		 * Note that it cannot be used to force-allow an association. The filter will be applied only if all
+		 * conditions defined by the relationship are met.
+		 *
+		 * @param bool $result
+		 * @param int $parent_id
+		 * @param int $child_id
+		 * @param string $relationship_slug
+		 * @since m2m
+		 */
+		$filtered_result = apply_filters(
+			'toolset_can_create_association',
+			true,
+			$parent_and_child[0]->get_id(),
+			$parent_and_child[1]->get_id(),
+			$this->relationship->get_slug()
+		);
+
+		if( true !== $filtered_result ) {
+			if( is_string( $filtered_result ) ) {
+				$message = esc_html( $filtered_result );
+			} else {
+				$message = __( 'The association was disabled by a third-party filter.', 'wpcf' );
+			}
+			return new Toolset_Result( false, $message );
+		}
+
+		return new Toolset_Result( true );
 	}
 
 
+	private function is_element_already_associated( IToolset_Element $element ) {
 
+		/** @var IToolset_Element[] $parent_and_child */
+		$parent_and_child = Toolset_Relationship_Role::sort_elements( $element, $this->for_element, $this->target_role );
+
+		$query = $this->query_factory->associations( array(
+			Toolset_Association_Query::QUERY_RELATIONSHIP_SLUG => $this->relationship->get_slug(),
+			Toolset_Association_Query::QUERY_PARENT_ID => $parent_and_child[0]->get_id(),
+			Toolset_Association_Query::QUERY_CHILD_ID => $parent_and_child[1]->get_id(),
+			Toolset_Association_Query::QUERY_LIMIT => 1,
+		) );
+
+		$results = $query->get_results();
+
+		return ( count( $results ) > 0 );
+	}
+
+
+	/**
+	 * @param IToolset_Element $element Element to check.
+	 * @param IToolset_Relationship_Role_Parent_Child $role Provided element's role in the relationship.
+	 *
+	 * @return Toolset_Result
+	 */
+	private function check_cardinality_for_role( IToolset_Element $element, IToolset_Relationship_Role_Parent_Child $role ) {
+		$maximum_limit = $this->relationship->get_cardinality()->get_limit( $role->other()->get_name(), Toolset_Relationship_Cardinality::MAX );
+
+		if( $maximum_limit !== Toolset_Relationship_Cardinality::INFINITY ) {
+			$association_count = $this->get_number_of_already_associated_elements( $role, $element );
+			if( $association_count >= $maximum_limit ) {
+				$message = sprintf(
+					__( 'The element %s has already the maximum allowed amount of associations (%d) as %s in the relationship %s.', 'wpcf' ),
+					$element->get_title(),
+					$maximum_limit, // this will be always a meaningful number - for INFINITY, this block is skipped entirely.
+					$this->relationship->get_role_name( $role ),
+					$this->relationship->get_display_name()
+				);
+				return new Toolset_Result( false, esc_html( $message  ) );
+			}
+		}
+
+		return new Toolset_Result( true );
+	}
+
+
+	private function get_number_of_already_associated_elements(
+		IToolset_Relationship_Role_Parent_Child $role, IToolset_Element $element
+	) {
+		$for_element_role_query = (
+			$role instanceof Toolset_Relationship_Role_Parent
+				? Toolset_Association_Query::QUERY_PARENT_ID
+				: Toolset_Association_Query::QUERY_CHILD_ID
+		);
+
+		$query = $this->query_factory->associations( array(
+			Toolset_Association_Query::QUERY_RELATIONSHIP_SLUG => $this->relationship->get_slug(),
+			$for_element_role_query => $element->get_id()
+		) );
+
+		$results = $query->get_results();
+
+		return count( $results );
+	}
+
+	/**
+	 * Check whether the element provided in the constructor can accept any new association whatsoever.
+	 *
+	 * @return Toolset_Result Result with an user-friendly message in case the association is denied.
+	 * @since 2.5.6
+	 */
+	public function can_connect_another_element() {
+		$cardinality_check_result = $this->check_cardinality_for_role( $this->for_element, $this->target_role->other() );
+		if( $cardinality_check_result->is_error() ) {
+			return $cardinality_check_result;
+		}
+
+		return new Toolset_Result( true );
+	}
 }

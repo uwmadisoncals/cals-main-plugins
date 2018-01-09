@@ -18,6 +18,7 @@ class Toolset_Field_Renderer_Toolset_Forms_Repeatable_Group extends Toolset_Fiel
 		$field_config = $this->get_toolset_forms_config();
 		if ( $this->hide_field_title ) {
 			$field_config['title'] = '';
+			$field_config['hide_field_title'] = true;
 		}
 
 		if ( $field_config['type'] == 'wysiwyg' ) {

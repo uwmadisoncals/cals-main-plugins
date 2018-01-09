@@ -161,7 +161,6 @@ class Toolset_Gui_Base {
 		$gui_base_classmap = array(
 			'Toolset_Twig_Dialog_Box_Factory' => "$base_path/twig_dialog_box_factory.php",
 			'Toolset_Twig_Dialog_Box' => "$base_path/twig_dialog_box.php",
-			'Toolset_Twig_Dialog_Box_Factory' => "$base_path/twig_dialog_box_factory.php",
 			'Toolset_Twig_Autoloader' => "$base_path/twig_autoloader.php",
 			'Toolset_Twig_Extensions' => "$base_path/twig_extensions.php"
 		);

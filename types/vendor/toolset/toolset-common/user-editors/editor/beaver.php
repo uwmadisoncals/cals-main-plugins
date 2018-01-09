@@ -15,6 +15,8 @@ class Toolset_User_Editors_Editor_Beaver
 	protected $name = '';
 	protected $option_name = '_toolset_user_editors_beaver_template';
 
+	protected $logo_image_svg = 'bb.svg';
+
 	/**
 	 * Toolset_User_Editors_Editor_Beaver constructor.
 	 *

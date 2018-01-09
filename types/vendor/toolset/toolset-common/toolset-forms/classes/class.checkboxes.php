@@ -70,7 +70,7 @@ class WPToolset_Field_Checkboxes extends FieldFactory {
 						$_options[ $option_key ]['#before'] = sprintf(
 							'<li class="%s"><label class="wpt-form-label wpt-form-checkbox-label">', implode( ' ', $classes )
 						);
-						$_options[ $option_key ]['#after'] = $option['title'] . '</label></li>';
+						$_options[ $option_key ]['#after'] = stripslashes( $option['title'] ) . '</label></li>';
 						$_options[ $option_key ]['#pattern'] = '<BEFORE><PREFIX><ELEMENT><ERROR><SUFFIX><DESCRIPTION><AFTER>';
 					} else {
 						$_options[ $option_key ]['#before'] = sprintf(

@@ -1883,7 +1883,7 @@ function wppa_do_filmthumb( $id, $idx, $do_for_feed = false, $glue = false ) {
 
 		$result .= '</div>';
 	}
-
+	
 	wppa_out( $result );
 }
 

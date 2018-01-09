@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.7.07
+* Version 6.7.10
 *
 */
 
@@ -21,6 +21,7 @@ require_once 'wppa-styles.php';
 require_once 'wppa-cart.php';
 require_once 'wppa-thumbnails.php';
 require_once 'wppa-picture.php';
+require_once 'wppa-tinymce-photo-front.php';
 
 /* LOAD STYLESHEET */
 add_action('wp_enqueue_scripts', 'wppa_add_style');
@@ -292,7 +293,7 @@ global $wppa_opt;
 					);
 
 	$js_dept1 = array( 'jquery', 'jquery-form', 'wppa-utils' );
-	if ( wppa_switch( 'ajax_render_modal' ) || wppa_opt( 'upload_edit' ) == 'new' ) {
+	if ( wppa_switch( 'ajax_render_modal' ) || wppa_opt( 'upload_edit' ) == 'new' || wppa_switch( 'photo_shortcode_enabled' ) ) {
 		$js_dept1[] = 'jquery-ui-dialog';
 	}
 
@@ -845,7 +846,6 @@ global $wppa_init_js_data;
 	wppaTextFrameDelta = '.wppa_get_textframe_delta().';
 	wppaBoxDelta = '.wppa_get_box_delta().';
 	wppaSlideShowTimeOut = '.wppa_opt( 'slideshow_timeout' ).';
-	wppaPreambule = '.wppa_get_preambule().';
 	wppaFilmShowGlue = '.( wppa_switch( 'film_show_glue') ? 'true' : 'false' ).';
 	wppaSlideShow = "'.__('Slideshow', 'wp-photo-album-plus').'";
 	wppaStart = "'.__('Start', 'wp-photo-album-plus').'";
@@ -885,7 +885,6 @@ global $wppa_init_js_data;
 	wppaLang = "'.$wppa_lang.'";
 	wppaNextOnCallback = '.( wppa_switch( 'next_on_callback') ? 'true' : 'false' ).';
 	wppaStarOpacity = '.str_replace(',', '.',( wppa_opt( 'star_opacity' )/'100' )).';
-	wppaSlideWrap = '.( wppa_switch( 'slide_wrap') ? 'true' : 'false' ).';
 	wppaEmailRequired = "'.wppa_opt( 'comment_email_required').'";
 	wppaSlideBorderWidth = '.$fbw.';
 	wppaAllowAjax = '.( wppa_switch( 'allow_ajax') ? 'true' : 'false' ).';
@@ -974,6 +973,43 @@ function wppa_set_shortcode_priority() {
 		add_filter( 'the_content', 'do_shortcode', $newpri );
 	}
 }
+
+
+/* We use bbPress */
+// editor bbpress in tinymce mode
+function wppa_enable_visual_editor_in_bbpress( $args = array() ) {
+
+	if ( wppa_switch( 'photo_on_bbpress' ) ) {
+		$args['tinymce'] = true;
+		$args['teeny'] = false;
+	}
+    return $args;
+}
+add_filter( 'bbp_after_get_the_content_parse_args', 'wppa_enable_visual_editor_in_bbpress' );
+
+// remove insert wp image button
+function wppa_remove_image_button_in_bbpress( $buttons ) {
+
+	if ( wppa_switch( 'photo_on_bbpress' ) ) {
+		if ( ( $key = array_search( 'image', $buttons ) ) !== false ) {
+			unset( $buttons[$key] );
+		}
+	}
+	return $buttons ;
+}
+add_filter( 'bbp_get_teeny_mce_buttons', 'wppa_remove_image_button_in_bbpress' );
+
+// enable processing shortcodes
+function wppa_enable_shortcodes_in_bbpress( $content ) {
+
+	if ( wppa_switch( 'photo_on_bbpress' ) ) {
+		$content = do_shortcode( $content );
+	}
+	return $content;
+}
+add_filter( 'bbp_get_topic_content', 'wppa_enable_shortcodes_in_bbpress', 1000 );
+add_filter( 'bbp_get_reply_content', 'wppa_enable_shortcodes_in_bbpress', 1000 );
+
 
 // This function contains strings for i18n from files not included
 // in the search for frontend required translatable strings

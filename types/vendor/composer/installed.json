@@ -217,12 +217,12 @@
     },
     {
         "name": "toolset/toolset-common",
-        "version": "2.5.5",
-        "version_normalized": "2.5.5.0",
+        "version": "2.5.8",
+        "version_normalized": "2.5.8.0",
         "source": {
             "type": "git",
             "url": "ssh://git@git.onthegosystems.com:10022/toolset/toolset-common.git",
-            "reference": "d4643145e2ab1e30c26b9f3ec1842d5f644e7c4e"
+            "reference": "afd2128b775ac8942402ea6c3ab0bbeb85e0dc0b"
         },
         "require": {
             "php": ">=5.2.0"
@@ -233,7 +233,7 @@
             "otgs/unit-tests-framework": "~1.2.0",
             "phpunit/php-token-stream": "<2.0"
         },
-        "time": "2017-11-14T09:28:59+00:00",
+        "time": "2017-12-07T11:25:32+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {

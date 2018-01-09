@@ -294,10 +294,12 @@ class Toolset_User_Editors_Editor_Screen_Beaver_Backend
 		$content_template_has_beaver = ( get_post_meta( $content_template->ID, '_toolset_user_editors_editor_choice', true ) == $this->constants->constant( 'BEAVER_SCREEN_ID' ) );
 		?>
 		<button 
-			class="button button-secondary js-wpv-ct-apply-user-editor js-wpv-ct-apply-user-editor-<?php echo esc_attr( $this->editor->get_id() ); ?>"
+			class="button button-secondary toolset-ct-button-logo js-wpv-ct-apply-user-editor js-wpv-ct-apply-user-editor-<?php echo esc_attr( $this->editor->get_id() ); ?>"
 			data-editor="<?php echo esc_attr( $this->editor->get_id() ); ?>"
+            title="<?php echo __( 'Edit with', 'wpv-views' ) . ' ' . $this->editor->get_name() ?>"
 			<?php disabled( $content_template_has_beaver );?>
 		>
+			<img src="<?php echo $this->constants->constant( 'TOOLSET_COMMON_URL' ) . '/res/images/third-party/logos/' . $this->editor->get_logo_image_svg(); ?>" />
 			<?php echo esc_html( $this->editor->get_name() ); ?>
 		</button>
 		<?php

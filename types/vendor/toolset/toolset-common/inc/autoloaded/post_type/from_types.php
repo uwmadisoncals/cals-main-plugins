@@ -194,7 +194,7 @@ class Toolset_Post_Type_From_Types implements IToolset_Post_Type_From_Types {
 			),
 			'slug' => '',
 			'description' => '',
-			'public' => true,
+			'public' => self::DEF_PUBLIC,
 			'capabilities' => array(),
 			'menu_position' => null,
 			'menu_icon' => '',
@@ -449,6 +449,7 @@ class Toolset_Post_Type_From_Types implements IToolset_Post_Type_From_Types {
 	 */
 	public function set_is_repeating_field_group( $value ) {
 		$this->set_flag_to_definition( self::DEF_IS_REPEATING_FIELD_GROUP, (bool) $value );
+		$this->set_is_public( false );
 	}
 
 

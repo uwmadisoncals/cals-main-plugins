@@ -142,7 +142,7 @@ class Toolset_Relationship_Element_Type {
 	/**
 	 * Determine whether an element matches this type.
 	 *
-	 * @param Toolset_Element $element
+	 * @param IToolset_Element $element
 	 * @return bool
 	 * @since m2m
 	 */
@@ -158,13 +158,10 @@ class Toolset_Relationship_Element_Type {
 
 		// If the domain matches, we'll check by the type (where applicable).
 		switch( $this->get_domain() ) {
-			case Toolset_Field_Utils::DOMAIN_POSTS:
-				/** @var Toolset_Post $post */
+			case Toolset_Element_Domain::POSTS:
+				/** @var IToolset_Post $post */
 				$post = $element;
 				return in_array( $post->get_type(), $this->get_types() );
-
-			case Toolset_Field_Utils::DOMAIN_USERS:
-			case Toolset_Field_Utils::DOMAIN_TERMS:
 			default:
 				throw new RuntimeException( 'Not implemented.' );
 		}

@@ -196,27 +196,83 @@ class Toolset_Relationship_Service {
 			return false;
 		}
 
+		$associations_parent = $this->find_associations_by_parent_id( $post_id );
+		$associations_child = $this->find_associations_by_child_id( $post_id );
+
+		return array_merge( $associations_parent, $associations_child );
+	}
+
+	/**
+	 * Find associations (IToolset_Associations[]) by parent id
+	 *
+	 * @param $id
+	 *
+	 * @return IToolset_Association[]
+	 */
+	private function find_associations_by_parent_id( $id ) {
 		$qry_args = array(
-			Toolset_Association_Query::QUERY_PARENT_ID   => $post_id,
-			Toolset_Association_Query::OPTION_RETURN     => Toolset_Association_Query::RETURN_ASSOCIATIONS
+			Toolset_Association_Query::QUERY_PARENT_ID => $id,
+			Toolset_Association_Query::OPTION_RETURN   => Toolset_Association_Query::RETURN_ASSOCIATIONS
 		);
 
 		$associations_parent = $this->query_association( $qry_args );
-		$associations_parent = is_array( $associations_parent )
+
+		return is_array( $associations_parent )
 			? $associations_parent
 			: array();
+	}
 
+	/**
+	 * Find associations (IToolset_Associations[]) by child id
+	 *
+	 * @param $id
+	 *
+	 * @return IToolset_Association[]
+	 */
+	private function find_associations_by_child_id( $id ) {
 		$qry_args = array(
-			Toolset_Association_Query::QUERY_CHILD_ID   => $post_id,
-			Toolset_Association_Query::OPTION_RETURN     => Toolset_Association_Query::RETURN_ASSOCIATIONS
+			Toolset_Association_Query::QUERY_CHILD_ID => $id,
+			Toolset_Association_Query::OPTION_RETURN  => Toolset_Association_Query::RETURN_ASSOCIATIONS
 		);
 
 		$associations_child = $this->query_association( $qry_args );
-		$associations_child = is_array( $associations_child )
+
+		return is_array( $associations_child )
 			? $associations_child
 			: array();
+	}
 
-		return array_merge( $associations_parent, $associations_child );
+	/**
+	 * Function to find parents (Toolset_Element[]) by child id and parent slug.
+	 *
+	 * @param $child_id
+	 * @param $parent_slug
+	 *
+	 * @return Toolset_Element[]
+	 */
+	public function find_parents_by_child_id_and_parent_slug( $child_id, $parent_slug ) {
+		if( ! $this->is_m2m_enabled() ) {
+			return false;
+		}
+
+		$associations = $this->find_associations_by_child_id( $child_id );
+		$associations_matched = array();
+
+		foreach( $associations as $association ) {
+			$parent = $association->get_element( Toolset_Relationship_Role::PARENT );
+			$parent_underlying_obj = $parent->get_underlying_object();
+
+			if( ! property_exists( $parent_underlying_obj, 'post_type' ) ) {
+				// only post elements supported
+				continue;
+			}
+
+			if( $parent_underlying_obj->post_type == $parent_slug ) {
+				$associations_matched[] = $parent;
+			}
+		}
+
+		return $associations_matched;
 	}
 
 	/**

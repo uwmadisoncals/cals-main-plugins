@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version 6.7.00
+* Version 6.7.09
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -53,6 +53,7 @@ require_once 'wppa-encrypt.php';
 require_once 'wppa-photo-files.php';
 require_once 'wppa-cron.php';
 require_once 'wppa-maintenance.php';
+require_once 'wppa-tinymce-common.php';
 
 /* Load cloudinary if configured and php version >= 5.3 */
 if ( PHP_VERSION_ID >= 50300 ) require_once 'wppa-cloudinary.php';

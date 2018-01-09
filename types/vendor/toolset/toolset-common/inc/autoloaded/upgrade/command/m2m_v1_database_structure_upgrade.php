@@ -52,6 +52,7 @@ class Toolset_Upgrade_Command_M2M_V1_Database_Structure_Upgrade implements ITool
 		$this->_database_operations = $relationship_database_operations_di;
 	}
 
+
 	/**
 	 * Run the command.
 	 *
@@ -63,6 +64,14 @@ class Toolset_Upgrade_Command_M2M_V1_Database_Structure_Upgrade implements ITool
 			// Nothing to do here: The tables will be created as soon as m2m is activated for the first time.
 			return new Toolset_Result( true );
 		}
+
+		if( $this->is_database_already_up_to_date() ) {
+			// Nothing to do here: This happens when Types is activated on a fresh site: It creates
+			// the tables according to the new structure but runs the upgrade routine at the same time.
+			return new Toolset_Result( true );
+		}
+
+		error_log( 'The routine Toolset_Upgrade_Command_M2M_V1_Database_Structure_Upgrade::run() is starting' );
 
 		$results = new Toolset_Result_Set();
 
@@ -82,8 +91,25 @@ class Toolset_Upgrade_Command_M2M_V1_Database_Structure_Upgrade implements ITool
 
 		$this->add_indexes_for_associations_table();
 
+		error_log( 'The routine Toolset_Upgrade_Command_M2M_V1_Database_Structure_Upgrade::run() has finished' );
+
 		return $results;
 	}
+
+
+	/**
+	 * If the type set table exists, it means that we're dealing with a more recent database structure than this
+	 * command aims to improve.
+	 *
+	 * @return bool
+	 */
+	private function is_database_already_up_to_date() {
+		$table_name = $this->get_type_set_table_name();
+		$query = $this->wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name );
+		$type_set_table_already_exists = ( $this->wpdb->get_var( $query ) == $table_name );
+		return $type_set_table_already_exists;
+	}
+
 
 	private function create_post_type_set_table() {
 

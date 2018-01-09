@@ -49,6 +49,7 @@ class Toolset_Field_Renderer_Toolset_Forms extends Toolset_Field_Renderer_Abstra
 
 		if( $this->hide_field_title ) {
 			$field_config['title'] = '';
+			$field_config['hide_field_title'] = true;
 		}
 
 		$value_in_intermediate_format = $this->field->get_value();

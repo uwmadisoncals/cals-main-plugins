@@ -162,7 +162,7 @@ if ( ! class_exists( 'Toolset_Utils', false ) ) {
 		 */
 		public static function is_integer( $value ) {
 			// http://stackoverflow.com/questions/2559923/shortest-way-to-check-if-a-variable-contains-positive-integer-using-php
-			return ( (int) $value == $value );
+			return ( (int) $value == $value && is_numeric( $value ) );
 		}
 
 

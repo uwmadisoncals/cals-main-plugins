@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: AAM\n"
-"POT-Creation-Date: 2017-12-03 15:15-0500\n"
+"POT-Creation-Date: 2017-12-17 18:56-0500\n"
 "PO-Revision-Date: \n"
 "Last-Translator: WPAAM <support@wpaam.com>\n"
 "Language-Team: WP AAM <vasyl@vasyltech.com>\n"
@@ -10,14 +10,19 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.4\n"
+"X-Generator: Poedit 2.0.5\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;preparePhrase\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: Application/Backend/Feature/Extension/Manager.php:106
+#: Application/Backend/Feature/Extension/Manager.php:60
+#, php-format
+msgid "To install extension manually, check %sthis article%s."
+msgstr ""
+
+#: Application/Backend/Feature/Extension/Manager.php:112
 msgid "Enter license key to update extension."
 msgstr ""
 
@@ -499,6 +504,7 @@ msgstr ""
 
 #: Application/Backend/View/PostOptionList.php:62
 #: Application/Backend/phtml/partial/post-advanced-settings.phtml:32
+#: Application/Frontend/phtml/login.phtml:13
 msgid "Password"
 msgstr ""
 
@@ -512,7 +518,7 @@ msgid "Access Expiration"
 msgstr ""
 
 #: Application/Backend/View/PostOptionList.php:69
-msgid "Expires:"
+msgid "Expires"
 msgstr ""
 
 #: Application/Backend/View/PostOptionList.php:72
@@ -591,6 +597,7 @@ msgid "AAM Secure Login Widget"
 msgstr ""
 
 #: Application/Backend/Widget/Login.php:80
+#: Application/Frontend/phtml/login.phtml:25
 msgid "Login"
 msgstr ""
 
@@ -625,12 +632,12 @@ msgid ""
 "more.%s"
 msgstr ""
 
-#: Application/Extension/Repository.php:307
+#: Application/Extension/Repository.php:322
 #, php-format
 msgid "Failed to create %s"
 msgstr ""
 
-#: Application/Extension/Repository.php:311
+#: Application/Extension/Repository.php:326
 #, php-format
 msgid "Directory %s is not writable"
 msgstr ""
@@ -789,9 +796,19 @@ msgstr ""
 msgid "Deactivate"
 msgstr ""
 
+#: Application/Backend/phtml/extensions.phtml:49
+#: Application/Backend/phtml/extensions.phtml:76
+msgid "extension is active"
+msgstr ""
+
 #: Application/Backend/phtml/extensions.phtml:53
 #: Application/Backend/phtml/extensions.phtml:80
 msgid "Activate"
+msgstr ""
+
+#: Application/Backend/phtml/extensions.phtml:53
+#: Application/Backend/phtml/extensions.phtml:80
+msgid "extension is inactive"
 msgstr ""
 
 #: Application/Backend/phtml/extensions.phtml:55
@@ -1637,4 +1654,16 @@ msgstr ""
 #: Application/Backend/phtml/widget/login-frontend.phtml:55
 #: Application/Frontend/phtml/login.phtml:42
 msgid "Log Out"
+msgstr ""
+
+#: Application/Frontend/phtml/login.phtml:7
+msgid "Username or Email Address"
+msgstr ""
+
+#: Application/Frontend/phtml/login.phtml:20
+msgid "Remember Me"
+msgstr ""
+
+#: Application/Frontend/phtml/login.phtml:31
+msgid "Lost your password?"
 msgstr ""

@@ -15,24 +15,24 @@ abstract class Toolset_Relationship_Driver_Base {
 	/** @var array Driver setup array provided by the relationship definition. */
 	private $setup;
 
+	/** @var null|Toolset_Potential_Association_Query_Factory */
+	private $_potential_association_query_factory;
 
 	/**
 	 * Toolset_Relationship_Driver_Base constructor.
 	 *
 	 * @param Toolset_Relationship_Definition $definition Relationship definition that is going to be using this driver.
 	 * @param array $setup Driver setup array provided by the relationship definition.
+	 * @param Toolset_Potential_Association_Query_Factory|null $pa_query_factory_di
 	 *
 	 * @since m2m
 	 */
-	public function __construct( $definition, $setup ) {
-
-		if ( ! $definition instanceof Toolset_Relationship_Definition ) {
-			throw new InvalidArgumentException();
-		}
-
+	public function __construct(
+		Toolset_Relationship_Definition $definition, $setup, Toolset_Potential_Association_Query_Factory $pa_query_factory_di = null
+	) {
 		$this->definition = $definition;
-
 		$this->setup = toolset_ensarr( $setup );
+		$this->_potential_association_query_factory = $pa_query_factory_di;
 	}
 
 
@@ -132,4 +132,16 @@ abstract class Toolset_Relationship_Driver_Base {
 		return ( $association instanceof Toolset_Association_Base && $association->get_driver() === $this );
 	}
 
+
+	/**
+	 * @return Toolset_Potential_Association_Query_Factory
+	 * @since 2.5.6
+	 */
+	protected function get_potential_association_query_factory() {
+		if( null === $this->_potential_association_query_factory ) {
+			$this->_potential_association_query_factory = new Toolset_Potential_Association_Query_Factory();
+		}
+
+		return $this->_potential_association_query_factory;
+	}
 }

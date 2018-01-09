@@ -458,6 +458,7 @@ class Toolset_Common_Bootstrap {
 		if ( ! $this->is_section_loaded( self::TOOLSET_SHORTCODE_GENERATOR ) ) {
 			$this->add_section_loaded( self::TOOLSET_SHORTCODE_GENERATOR );
 			require_once( TOOLSET_COMMON_PATH . '/inc/toolset.shortcode.generator.class.php' );
+			require_once( TOOLSET_COMMON_PATH . '/inc/toolset.shortcode.transformer.class.php' );
 			$this->apply_filters_on_sections_loaded( 'toolset_register_shortcode_generator_section' );
 		}
 	}

@@ -108,7 +108,8 @@ class Toolset_Association_Repository {
 			return null;
 		}
 
-		$relationship_definition = Toolset_Relationship_Definition_Repository::get_instance()->get_definition( $row->relationship );
+		$relationship_definition = Toolset_Relationship_Definition_Repository::get_instance()
+			->get_definition_by_row_id( $row->relationship_id );
 
 		if ( null === $relationship_definition ) {
 			return null;
@@ -221,7 +222,8 @@ class Toolset_Association_Repository {
 			}
 		}
 
-		return $this->get_database_operations()->delete_associations_by_relationship( $relationship_definition->get_slug() );
+		/** @var Toolset_Relationship_Definition $relationship_definition */
+		return $this->get_database_operations()->delete_associations_by_relationship( $relationship_definition->get_row_id() );
 	}
 
 

@@ -21,4 +21,10 @@
         } );
     } );
 
+
+    $( document ).on( 'click', '[data-toolset-admin-notices-toggle-visibility]', function() {
+        var elementSelectorString = $( this ).data( 'toolset-admin-notices-toggle-visibility' );
+        $( elementSelectorString ).toggle();
+    } )
+
 } ( jQuery ) );

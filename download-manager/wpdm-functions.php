@@ -1060,7 +1060,7 @@ function wpdm_array_splice_assoc(&$input, $offset, $length, $replacement) {
  * WPDM add-on installer
  */
 function wpdm_install_addon(){
-    if(isset($_REQUEST['addon']) && current_user_can(WPDM_ADMIN_CAP)){
+    if(isset($_REQUEST['addon']) && current_user_can(WPDM_ADMIN_CAP) && wp_verify_nonce($_REQUEST['__wpdmpinn'], $_REQUEST['addon'].NONCE_KEY)){
         include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
         include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
         include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
@@ -1076,10 +1076,7 @@ function wpdm_install_addon(){
                 delete_plugins(array($plugin_file));
             }
         }
-        if(strpos($_REQUEST['addon'], '.zip'))
-            $downloadlink = $_REQUEST['addon'];
-        else
-            $downloadlink = 'https://www.wpdownloadmanager.com/?wpdmdl='.$_REQUEST['addon'];
+        $downloadlink = 'https://www.wpdownloadmanager.com/?wpdmdl='.(int)$_REQUEST['addon'];
         $upgrader->install($downloadlink);
         die();
     } else {

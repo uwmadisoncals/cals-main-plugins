@@ -63,6 +63,10 @@
     text-shadow: 0 -1px 1px red, 1px 0 1px red, 0 1px 1px red, -1px 0 1px red !important;
 }
 
+/* Button in a row */
+.toolset-button-in-row + .toolset-button-in-row {
+    margin-left: 8px;
+}
 
 /* Override styling from basic.css in Types back to default. */
 body.wp-admin button.ui-corner-all.toolset-button-in-dialog {

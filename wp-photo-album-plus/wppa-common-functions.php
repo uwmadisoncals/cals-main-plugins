@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.7.07
+* Version 6.7.09
 *
 */
 
@@ -124,9 +124,8 @@ global $thumbs;
 		'comment_email' 			=> '',
 		'comment_text' 				=> '',
 		'no_default' 				=> false,
-		'in_widget_frame_height' 	=> '',
-		'in_widget_frame_width'		=> '',
-//		'user_uploaded'				=> false,
+		'in_widget_frame_height' 	=> '0',
+		'in_widget_frame_width'		=> '0',
 		'current_album'				=> '0',
 		'searchstring'				=> wppa_test_for_search(),
 		'searchresults'				=> '',
@@ -215,6 +214,8 @@ global $thumbs;
 		'catbox' 					=> '',
 		'is_pdf' 					=> false,
 		'is_button' 				=> '',
+		'max_slides_in_ss_widget' 	=> '',
+		'is_random' 				=> false,
 
 	);
 }
@@ -437,6 +438,12 @@ global $wppa;
 function wppa_get_photo_order( $id = '0', $no_random = false ) {
 global $wpdb;
 global $wppa;
+
+	// Random overrule?
+	if ( wppa( 'is_random' ) ) {
+		$result = " ORDER BY RAND(" . time() % 4711 . ")";
+		return $result;
+	}
 
 	// Album specified?
 	if ( wppa_is_int( $id ) && $id > '0' ) {
@@ -1661,7 +1668,7 @@ global $wpdb;
 	else {
 		$is_newformat = false;
 	}
-	
+
 	// Provide default selection if no selected given
 	if ( $args['selected'] === '' ) {
         $args['selected'] = wppa_get_last_album();
@@ -1686,25 +1693,25 @@ global $wpdb;
 	elseif ( wppa_has_many_albums() ) {
 		$is_many = true;
 	}
-	
-	
+
+
 	// Process the many case
 	if ( $is_many ) {
-		
+
 		// Many newformat
 		if ( $is_newformat ) {
-			
+
 			$result =
 			'<input' .
-				' name="' . $args['tagname'] . '"' . 
+				' name="' . $args['tagname'] . '"' .
 				( $args['tagid'] ? ' id="'  . $args['tagid'] . '"' : '' ) .
 				( $args['multiple'] ? '' : ' type="number"' ) .
 				' value="' . $args['selected'] . '"' .
 				' onchange="' . $args['tagonchange'] . '"' .
 				' style="' . $args['tagstyle'] . '"' .
-				' title="' . 
+				' title="' .
 					esc_attr( __( 'Enter album number', 'wp-photo-album-plus' ) );
-			
+
 					if ( $args['addnone'] ) 	$result .= esc_attr( "\n" . __( '0 for --- none ---' , 'wp-photo-album-plus' ) );
 					if ( $args['addall'] ) 		$result .= esc_attr( "\n" . __( '0 for --- all ---' , 'wp-photo-album-plus' ) );
 					if ( $args['addall'] ) 		$result .= esc_attr( "\n" . __( '-2 for --- generic ---' , 'wp-photo-album-plus' ) );
@@ -1712,14 +1719,14 @@ global $wpdb;
 					if ( $args['addmultiple'] ) $result .= esc_attr( "\n" . __( '-99 for --- multiple see below ---' , 'wp-photo-album-plus' ) );
 					if ( $args['addselbox'] ) 	$result .= esc_attr( "\n" . __( '0 for --- a selection box ---' , 'wp-photo-album-plus' ) );
 					if ( $args['addseparate'] ) $result .= esc_attr( "\n" . __( '-1 for --- separate ---' , 'wp-photo-album-plus' ) );
-			
+
 					$result .=
 					'"' .
 			' />' ;
-			
+
 			return $result;
 		}
-		
+
 		// Many old format
 		else {
 			$result = '';
@@ -1775,14 +1782,14 @@ global $wpdb;
 				'<option value="-1"' . $selected . '>' .
 					__( '--- separate ---' , 'wp-photo-album-plus' ) .
 				'</option>';
-			
+
 			return $result;
 		}
 	}
-	
+
 	// Continue processing Not many albums
 	else {
-		
+
 		// Get roughly the albums that might be in the selection
 		if ( $args['checkarray'] && ! empty( $args['array'] ) ) {
 
@@ -1867,7 +1874,7 @@ global $wpdb;
 
 		// Output
 		$result = '';
-		
+
 		// New format
 		if ( $is_newformat ) {
 			$result .= $args['tagopen'];
@@ -1970,17 +1977,18 @@ global $wpdb;
 			'<option value="-1"' . $selected . '>' .
 				__( '--- separate ---' , 'wp-photo-album-plus' ) .
 			'</option>';
-			
+
 		// New format
 		if ( $is_newformat ) {
 			$result .= '</select>';
 		}
-		
+
 		return $result;
 	}
 }
 
 function wppa_delete_obsolete_tempfiles() {
+
 	// To prevent filling up diskspace, divide lifetime by 2 and repeat removing obsolete files until count <= 10
 	$filecount = 101;
 	$lifetime = 3600;
@@ -1991,7 +1999,7 @@ function wppa_delete_obsolete_tempfiles() {
 			$timnow = time();
 			$expired = $timnow - $lifetime;
 			foreach ( $files as $file ) {
-				if ( is_file( $file ) ) {
+				if ( is_file( $file ) && basename( $file ) != 'index.php' ) {
 					$modified = filemtime( $file );
 					if ( $modified < $expired ) @ unlink( $file );
 					else $filecount++;

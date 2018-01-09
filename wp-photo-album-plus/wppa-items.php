@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version 6.6.30
+* Version 6.7.09
 *
 */
 
@@ -445,6 +445,7 @@ function wppa_get_album_name( $id, $xargs = array() ) { // $extended = false ) {
 	// Sanitize args
 	if ( ! is_numeric( $id ) ) {
 		wppa_dbg_msg( 'Invalid arg wppa_get_album_name(' . $id . ')', 'red' );
+		wppa_log( 'Err', 'Invalid arg wppa_get_album_name(' . $id . ')', true );
 		return '';
 	}
 

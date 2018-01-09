@@ -1,4 +1,10 @@
-.fusion-builder-modal-settings-container {
+/*
+ * We are pushing the Fusion Builder modals ("normal" and "nested columns" ones)
+ * one z-index level lower in order to have the "Toolset Shortcodes" admin bar button
+ * modal appear above them.
+ */
+.fusion-builder-modal-settings-container,
+.fusion_builder_row_inner .fusion-builder-row-content {
 	z-index: 99998 !important;
 }
 

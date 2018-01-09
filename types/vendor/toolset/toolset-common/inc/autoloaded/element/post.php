@@ -28,6 +28,7 @@ class Toolset_Post extends Toolset_Element implements IToolset_Post {
 	 *     determined first time it's needed).
 	 * @param null|Toolset_Field_Group_Post_Factory $group_post_factory DI for phpunit
 	 *
+	 * @throws Toolset_Element_Exception_Element_Doesnt_Exist
 	 * @since m2m
 	 */
 	protected function __construct( $object_source, $language_code = null, $group_post_factory = null ) {
@@ -39,8 +40,9 @@ class Toolset_Post extends Toolset_Element implements IToolset_Post {
 		}
 
 		if( ! $post instanceof WP_Post ) {
-			throw new InvalidArgumentException(
-				sprintf( __( 'Unable to load post "%s".', 'wpcf' ), esc_html( print_r( $object_source, true ) ) )
+			throw new Toolset_Element_Exception_Element_Doesnt_Exist(
+				Toolset_Element_Domain::POSTS,
+				$object_source
 			);
 		}
 

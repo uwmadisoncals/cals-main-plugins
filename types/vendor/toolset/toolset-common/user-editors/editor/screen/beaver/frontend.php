@@ -127,8 +127,27 @@ class Toolset_User_Editors_Editor_Screen_Beaver_Frontend
 					// Fake being in the loop.
 					$wp_query->in_the_loop = true;
 				}
+
+				// In Beaver Builder 2.0, when the FLBuilder::render_content method is used, Beaver Builder is getting the
+				// post ID by forcing globals, which means that they force the use of WP globals instead of checking their
+				// internal post ID.
+				// The WP globals contains the post currently rendered and not the Content Template, so we need to temporarily
+				// set the Content Template in the $wp_the_query (which they use) and then put the old post in its place
+				// after the content is rendered.
+				global $wp_the_query;
+				$wp_the_query_post = $wp_the_query->post;
+				if ( (int) $template_selected !== $wp_the_query_post->ID ) {
+					$ct_post = get_post( $template_selected );
+					$wp_the_query->post = $ct_post;
+				}
 				
 				$content = FLBuilder::render_content( $content );
+
+				// If the post inside the $wp_the_query global has been substituted by the Content Template, we are putting
+				// it back.
+				if ( $wp_the_query->post->ID !== $wp_the_query_post->ID ) {
+					$wp_the_query->post = $wp_the_query_post;
+				}
 
 				if ( $revert_in_the_loop ) {
 					$wp_query->in_the_loop = false;

@@ -26,7 +26,7 @@
 // ==================
 // = Plugin Version =
 // ==================
-define( 'AI1WMME_VERSION', '3.43' );
+define( 'AI1WMME_VERSION', '3.44' );
 
 // ===============
 // = Plugin Name =

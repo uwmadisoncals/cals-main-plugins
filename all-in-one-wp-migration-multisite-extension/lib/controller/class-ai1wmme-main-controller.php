@@ -248,14 +248,11 @@ class Ai1wmme_Main_Controller {
 			<p>
 				<?php
 				_e(
-					'All in One WP Migration is not activated. Please activate the plugin in order to use Multisite extension. You can get a copy of latest one here.',
+					'Multisite extension requires <a href="https://wordpress.org/plugins/all-in-one-wp-migration/" target="_blank">All-in-One WP Migration plugin</a> to be activated. ' .
+					'<a href="https://help.servmask.com/knowledgebase/install-instructions-for-multisite-extension/" target="_blank">Multisite extension install instructions</a>',
 					AI1WMME_PLUGIN_NAME
 				);
 				?>
-				<a href="https://wordpress.org/plugins/all-in-one-wp-migration/" class="ai1wm-label">
-					<i class="ai1wm-icon-notification"></i>
-					<?php _e( 'Get plugin', AI1WMME_PLUGIN_NAME ); ?>
-				</a>
 			</p>
 		</div>
 		<?php

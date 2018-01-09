@@ -301,4 +301,10 @@ abstract class Toolset_Admin_Notice_Abstract implements Toolset_Admin_Notice_Int
 			? false
 			: true;
 	}
+
+	public function set_template_path( $template_path ) {
+		if( file_exists( $template_path ) ) {
+			$this->template_file = $template_path;
+		}
+	}
 }

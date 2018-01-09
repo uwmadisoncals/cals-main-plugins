@@ -62,7 +62,7 @@ class Toolset_Relationship_Definition_Persistence {
 		$this->wpdb->update(
 			$this->table_name->relationship_table(),
 			$row,
-			array( 'slug' => $relationship_definition->get_slug() ),
+			array( 'id' => $relationship_definition->get_row_id() ),
 			$this->definition_translator->get_database_row_formats(),
 			'%s'
 		);
@@ -73,15 +73,41 @@ class Toolset_Relationship_Definition_Persistence {
 	 * Insert a new relationship definition record into the database.
 	 *
 	 * @param Toolset_Relationship_Definition $relationship_definition
+	 *
+	 * @return null|Toolset_Relationship_Definition
 	 */
 	public function insert_definition( Toolset_Relationship_Definition $relationship_definition ) {
 		$row = $this->definition_translator->to_database_row( $relationship_definition );
 		$row = $this->update_definition_type_sets( $relationship_definition, $row );
+
 		$this->wpdb->insert(
 			$this->table_name->relationship_table(),
 			$row,
 			$this->definition_translator->get_database_row_formats()
 		);
+
+		// Create a new relationship definition instance from the exact data that has been sent to the
+		// database (row ID and type set IDs).
+		$row['id'] = $this->wpdb->insert_id;
+		$row['parent_types_set_id'] = $row['parent_types'];
+		$row['child_types_set_id'] = $row['child_types'];
+
+		// Work around some differences caused between the data sent when updating relationship
+		// rows and data retrieved when querying (and appending the concatenated list of parent
+		// and child types).
+		$definition_array = $relationship_definition->get_definition_array();
+		$row['parent_types'] = implode(
+			Toolset_Relationship_Database_Operations::GROUP_CONCAT_DELIMITER,
+			$definition_array[ Toolset_Relationship_Definition::DA_PARENT_TYPE ][ Toolset_Relationship_Element_Type::DA_TYPES ]
+		);
+		$row['child_types'] = implode(
+			Toolset_Relationship_Database_Operations::GROUP_CONCAT_DELIMITER,
+			$definition_array[ Toolset_Relationship_Definition::DA_CHILD_TYPE ][ Toolset_Relationship_Element_Type::DA_TYPES ]
+		);
+
+		$updated_relationship_definition = $this->definition_translator->from_database_row( (object) $row );
+
+		return $updated_relationship_definition;
 	}
 
 

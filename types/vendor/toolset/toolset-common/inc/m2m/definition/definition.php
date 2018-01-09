@@ -114,15 +114,26 @@ class Toolset_Relationship_Definition implements IToolset_Relationship_Definitio
 	const OWNER_IS_CHILD = 'child';
 
 
+	/** @var Toolset_Potential_Association_Query_Factory */
+	private $potential_association_query_factory;
+
+
 	/**
 	 * Toolset_Relationship_Definition constructor.
 	 *
 	 * @param array $definition_array Valid definition array.
-	 * @throws InvalidArgumentException
+	 * @param Toolset_Potential_Association_Query_Factory|null $potential_association_query_factory_di
+	 *
 	 * @since m2m
 	 */
-	public function __construct( $definition_array ) {
+	public function __construct( $definition_array, Toolset_Potential_Association_Query_Factory $potential_association_query_factory_di = null ) {
 		$this->read_definition_array( $definition_array );
+
+		$this->potential_association_query_factory = (
+			null === $potential_association_query_factory_di
+				? new Toolset_Potential_Association_Query_Factory()
+				: $potential_association_query_factory_di
+		);
 	}
 
 
@@ -417,7 +428,7 @@ class Toolset_Relationship_Definition implements IToolset_Relationship_Definitio
 	 * @since m2m
 	 */
 	public function is_post( $element_role ) {
-		return ( Toolset_Field_Utils::DOMAIN_POSTS == $this->get_element_type( $element_role )->get_domain() );
+		return ( Toolset_Element_Domain::POSTS == $this->get_element_type( $element_role )->get_domain() );
 	}
 
 
@@ -554,10 +565,16 @@ class Toolset_Relationship_Definition implements IToolset_Relationship_Definitio
 	 * @return bool
 	 * @throws InvalidArgumentException
 	 * @since m2m
-	 *
-	 * todo consider returning Toolset_Result
+	 * @since 2.5.7 Deprecated.
+	 * @deprecated Use IToolset_Potential_Association_Query::check_single_element() instead.
 	 */
 	public function can_associate( $parent_or_elements, $child = null ) {
+
+		_doing_it_wrong(
+			__FUNCTION__,
+			'Toolset_Relationship_Definition::can_associate() is replaced by IToolset_Potential_Association_Query::check_single_element()',
+			'2.5.7'
+		);
 
 		if( $parent_or_elements instanceof Toolset_Element ) {
 			$elements = array(
@@ -570,45 +587,19 @@ class Toolset_Relationship_Definition implements IToolset_Relationship_Definitio
 			throw new InvalidArgumentException( 'Invalid argument - wrong element types in can_associate().');
 		}
 
-		if( ! $this->elements_match_relationship_types( $elements ) ) {
+		$potential_association = $this->potential_association_query_factory->create(
+			$this,
+			new Toolset_Relationship_Role_Child(),
+			$elements[ Toolset_Relationship_Role::PARENT ]
+		);
+
+		$result = $potential_association->check_single_element( $elements[ Toolset_Relationship_Role::CHILD ] );
+
+		if( ! $result->is_success() ) {
 			return false;
 		}
 
-		// In distinct relationships, we won't allow multiple associations between the same elements.
-		if( $this->is_distinct() ) {
-			// todo (we need the rel query for this)
-		}
-
-		// Check if the scope is maintained
-		if( $this->has_scope() ) {
-			$scope = $this->get_scope();
-			if ( ! $scope->can_associate( $elements ) ) {
-				return false;
-			}
-		}
-
-		/**
-		 * toolset_can_create_association
-		 *
-		 * Allows for forbidding an association between two elements to be created.
-		 * Note that it cannot be used to force-allow an association. The filter will be applied only if all
-		 * conditions defined by the relationship are met.
-		 *
-		 * @param bool $result
-		 * @param int $parent_id
-		 * @param int $child_id
-		 * @param string $relationship_slug
-		 * @since m2m
-		 */
-		$filtered_result = apply_filters(
-			'toolset_can_create_association',
-			true,
-			$elements[ Toolset_Relationship_Role::PARENT ]->get_id(),
-			$elements[ Toolset_Relationship_Role::CHILD ]->get_id(),
-			$this->get_slug()
-		);
-
-		return $filtered_result;
+		return true;
 	}
 
 
@@ -638,30 +629,6 @@ class Toolset_Relationship_Definition implements IToolset_Relationship_Definitio
 		$association = Toolset_Relationship_Database_Operations::create_association( $this, $parent, $child, 0 );
 
 		return $association;
-	}
-
-
-	/**
-	 * Make sure that both required elements are present and they match the domains and types allowed by the relationship
-	 * definition.
-	 *
-	 * @param Toolset_Element[] $elements Array of (two) elements indexed by element keys.
-	 * @return bool
-	 * @throws InvalidArgumentException
-	 * @since m2m
-	 */
-	private function elements_match_relationship_types( $elements ) {
-		foreach( Toolset_Relationship_Role::parent_child_role_names() as $element_role ) {
-			$element = toolset_getarr( $elements, $element_role, null );
-			if( ! $element instanceof Toolset_Element ) {
-				throw new InvalidArgumentException( 'Missing or invalid element instance.' );
-			}
-			if( ! $this->get_element_type( $element_role )->is_match( $element ) ) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 

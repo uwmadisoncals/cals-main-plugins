@@ -13,6 +13,9 @@ abstract class Toolset_User_Editors_Editor_Abstract
 	protected $name;
 	protected $option_name = '_toolset_user_editors_editor_default';
 
+	protected $logo_class;
+	protected $logo_image_svg;
+
 	/**
 	 * All possible screens.
 	 * @var Toolset_User_Editors_Editor_Screen_Interface[]
@@ -39,6 +42,14 @@ abstract class Toolset_User_Editors_Editor_Abstract
 
 	public function get_name() {
 		return $this->name;
+	}
+
+	public function get_logo_class() {
+		return $this->logo_class;
+	}
+
+	public function get_logo_image_svg() {
+		return $this->logo_image_svg;
 	}
 
 	public function set_name( $name ) {

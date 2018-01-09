@@ -37,6 +37,7 @@ class Toolset_Association_Query extends Toolset_Relationship_Query_Base {
 	const QUERY_LIMIT = 'limit';
 	const QUERY_SELECT_FIELDS = 'select_fields';
 	const QUERY_RELATIONSHIP_SLUG = 'relationship_slug';
+	const QUERY_RELATIONSHIP_ID = 'relationship_id';
 	const QUERY_PARENT_ID = 'parent_id';
 	const QUERY_CHILD_ID = 'child_id';
 	const QUERY_HAS_FIELDS = 'has_fields';
@@ -45,6 +46,7 @@ class Toolset_Association_Query extends Toolset_Relationship_Query_Base {
 	const QUERY_CHILD_DOMAIN = 'child_domain';
 	const QUERY_CHILD_QUERY = 'child_query';
 	const QUERY_LANGUAGE = 'language';
+	const QUERY_HAS_TRASHED_POSTS = 'has_trashed_posts';
 
 	const RETURN_ASSOCIATION_IDS = 'association_ids';
 	const RETURN_ASSOCIATIONS = 'associations';
@@ -72,6 +74,7 @@ class Toolset_Association_Query extends Toolset_Relationship_Query_Base {
 
 		// Default value of these needs to be null
 		$this->parse_query_arg( $query, self::QUERY_RELATIONSHIP_SLUG, 'strval' );
+		$this->parse_query_arg( $query, self::QUERY_RELATIONSHIP_ID, 'absint' );
 		$this->parse_query_arg( $query, self::QUERY_PARENT_ID, 'absint' );
 		$this->parse_query_arg( $query, self::QUERY_CHILD_ID, 'absint' );
 		$this->parse_query_arg( $query, self::QUERY_LIMIT, 'absint' );
@@ -82,7 +85,7 @@ class Toolset_Association_Query extends Toolset_Relationship_Query_Base {
 		$this->parse_query_arg( $query, self::QUERY_PARENT_QUERY, null ); // todo sanitize?
 		$this->parse_query_arg( $query, self::QUERY_CHILD_DOMAIN, null, null, array( Toolset_Field_Utils::DOMAIN_POSTS ) );
 		$this->parse_query_arg( $query, self::QUERY_CHILD_QUERY, null ); // todo sanitize?
-		$this->parse_query_arg( $query, self::QUERY_LANGUAGE, 'strval', '' );
+		$this->parse_query_arg( $query, self::QUERY_HAS_TRASHED_POSTS, 'boolval' );
 	}
 
 
@@ -168,6 +171,15 @@ class Toolset_Association_Query extends Toolset_Relationship_Query_Base {
 			);
 		}
 
+		if( $this->has_query_var( self::QUERY_RELATIONSHIP_ID ) ) {
+			$relationship_id = $this->get_query_var( self::QUERY_RELATIONSHIP_ID );
+
+			$where_clauses[] = $wpdb->prepare(
+				"association.relationship_id = %d",
+				$relationship_id
+			);
+		}
+
 		if( $this->has_query_var( self::QUERY_PARENT_ID ) ) {
 			$where_clauses[] = $wpdb->prepare(
 				"parent_id = %d",
@@ -175,6 +187,17 @@ class Toolset_Association_Query extends Toolset_Relationship_Query_Base {
 			);
 
 			$has_language_specific_query = true;
+		}
+
+		if( $this->has_query_var( self::QUERY_HAS_TRASHED_POSTS ) ) {
+			// Note: This is not very nice from the performance point of view, but it's only a hotfix.
+			// The query class will go through a refactoring very soon.
+			$join_clauses[] = " JOIN {$wpdb->posts} as wp_parent_post ON ( wp_parent_post.ID = association.parent_id ) ";
+			$join_clauses[] = " JOIN {$wpdb->posts} as wp_child_post ON ( wp_child_post.ID = association.child_id ) ";
+
+			$operator = ( $this->get_query_var( self::QUERY_HAS_TRASHED_POSTS ) ? '=' : '!=' );
+			$where_clauses[] = "wp_parent_post.post_status $operator 'trash'";
+			$where_clauses[] = "wp_child_post.post_status $operator 'trash'";
 		}
 
 		if( $this->has_query_var( self::QUERY_CHILD_ID ) ) {
@@ -759,14 +782,14 @@ class Toolset_Association_Query extends Toolset_Relationship_Query_Base {
 		add_filter( 'posts_pre_query', $dont_query_anyting, $very_late );
 
 		// Avoid WPML messing with the results because we already know in which language we want to query
-		$current_language = apply_filters( 'wpml_current_language', '' );
-		do_action( 'wpml_switch_language', 'all' );
+		//$current_language = apply_filters( 'wpml_current_language', '' );
+		//do_action( 'wpml_switch_language', 'all' );
 
 		// This will immediately run the query.
 		new WP_Query( $query_args );
 
 		// Switch back to the current language so that we don't break anything else down the road.
-		do_action( 'wpml_switch_language', $current_language );
+		//do_action( 'wpml_switch_language', $current_language );
 
 		// Clean up
 		remove_filter( 'posts_clauses', $catch_clauses, $very_late );

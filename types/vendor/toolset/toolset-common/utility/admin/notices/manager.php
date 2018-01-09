@@ -85,7 +85,7 @@ class Toolset_Admin_Notices_Manager {
 
 		if( array_key_exists( $notice->get_id(), self::$notices ) ) {
 			// abort, key already exists
-			error_log( 'Toolset_Admin_Notices_Manager Info: Notices with key "' . $notice->get_id() . '" already exists.' );
+			//error_log( 'Toolset_Admin_Notices_Manager Info: Notices with key "' . $notice->get_id() . '" already exists.' );
 
 			return false;
 		}

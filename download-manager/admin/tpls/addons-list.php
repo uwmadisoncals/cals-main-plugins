@@ -244,7 +244,8 @@ foreach($cats as $cat){
     $file = explode("/", $file);
     $file = end($file);
     $plugininfo = wpdm_plugin_data($file);
-    $linklabel = ($plugininfo)?'<span class="color-purple"><i class="fa fa-refresh"></i> Update</span>':'<span class="color-green"><i class="fa fa-plus-circle"></i> Install</span>';
+
+    $linklabel = ($plugininfo)?'<span class="color-purple"><i class="fa fa-refresh"></i> Re-Install</span>':'<span class="color-green"><i class="fa fa-plus-circle"></i> Install</span>';
  ?>
     <div class="col-md-3 all <?php echo implode(" ", $package->cats); ?>">
 
@@ -258,7 +259,7 @@ foreach($cats as $cat){
             <?php if($package->price>0){ ?>
                 <a class="btn-purchase" data-toggle="modal" data-backdrop="true" data-target="#addonmodal" href="#" rel="<?php echo $package->ID; ?>" style="border: 0;border-radius: 2px;"><i class="fa fa-shopping-cart"></i> &nbsp;Buy Now <span class="label label-success" style="font-size: 8pt;padding: 1px 5px;margin-top: 1px"><?php echo $package->currency.$package->price; ?></span> </a>
             <?php } else { ?>
-                <a class="btn-install" data-toggle="modal" data-addondir="<?php echo $file; ?>" rel="<?php echo $package->ID; ?>" data-backdrop="true" data-target="#addonmodal" href="#" style="border: 0;border-radius: 2px"><?php echo $linklabel; ?> <span class="label label-danger" style="font-size: 8pt;padding: 1px 5px;margin-top: 1px">Free</span> </a>
+                <a class="btn-install" data-toggle="modal" data-addondir="<?php echo $file; ?>" data-wpdmpinn="<?php echo wp_create_nonce($package->ID.NONCE_KEY); ?>" rel="<?php echo $package->ID; ?>" data-backdrop="true" data-target="#addonmodal" href="#" style="border: 0;border-radius: 2px"><?php echo $linklabel; ?> <span class="label label-danger" style="font-size: 8pt;padding: 1px 5px;margin-top: 1px">Free</span> </a>
             <?php } ?>
             <span class="note pull-left"><i class="fa fa-server" aria-hidden="true"></i> &nbsp;<?php echo $package->pinfo->version; ?></span>
         </div>
@@ -319,7 +320,7 @@ foreach($cats as $cat){
                 jQuery('.modal-dialog').css('width','500px');
                 jQuery('.modal-footer .btn-danger').html('Close');
                 jQuery('#modalcontents').css('padding','20px').css('background','#ffffff');
-                jQuery.post(ajaxurl,{action:'wpdm-install-addon', addon: e.relatedTarget.rel, dirname: jQuery(e.relatedTarget).data('addondir')}, function(res){
+                jQuery.post(ajaxurl,{action:'wpdm-install-addon', __wpdmpinn: jQuery(e.relatedTarget).data('wpdmpinn'), addon: e.relatedTarget.rel, dirname: jQuery(e.relatedTarget).data('addondir')}, function(res){
                     jQuery('#modalcontents').html(res.replace('Return to Plugin Installer',''));
                 });
             }

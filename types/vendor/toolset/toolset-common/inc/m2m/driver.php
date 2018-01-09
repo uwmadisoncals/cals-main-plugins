@@ -36,8 +36,15 @@ class Toolset_Relationship_Driver extends Toolset_Relationship_Driver_Base {
 		$child = Toolset_Element::get_untranslated_instance( $relationship_definition->get_child_domain(), $child_source );
 
 		// We need to make sure the association is allowed.
-		if ( ! $relationship_definition->can_associate( $parent, $child ) ) {
-			return new Toolset_Result( false, __( 'These two elements cannot be associated because they don\'t match the conditions for this relationship.', 'wpcf' ) );
+		$potential_association_query = $this->get_potential_association_query_factory()->create(
+			$this->get_relationship_definition(),
+			new Toolset_Relationship_Role_Child(),
+			$parent
+		);
+
+		$can_associate_check = $potential_association_query->check_single_element( $child );
+		if ( $can_associate_check->is_error() ) {
+			return $can_associate_check;
 		}
 
 		$intermediary_id = (int) toolset_getarr( $args, 'intermediary_id', 0 );

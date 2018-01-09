@@ -5,7 +5,7 @@ Tags: address book, business directory, chamber of commerce business directory, 
 Requires at least: 4.4
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 8.6.12
+Stable tag: 8.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -231,6 +231,45 @@ Yes this is possible but there is a special setup required to do so. It is recom
 == Changelog ==
 
 [Complete Changelog can be found here.](https://connections-pro.com/changelog/)
+
+= 8.8 12/22/2017 =
+* FEATURE: Add phone fieldset configuration options.
+* TWEAK: Ensure `jquery-form` is registered, seems some plugin/theme is unregistering this core WP script.
+* TWEAK: Tweak to ensure Say What text changes can be applied to address type labels.
+* TWEAK: cnOptions::getRegisteredAddressTypes()` should return all active and inactive address types.
+* TWEAK: Deprecated `cnOptions::getDefaultAddressValues() `should return `cnOptions::getAddressTypesOptions()`.
+* TWEAK: Minor CSS tweak to admin widget title, setting min height.
+* BUG: Fix PHP Warning: natsort() expects parameter 1 to be array, null given.
+
+= 8.7.1 12/13/2017 =
+* TWEAK: Use `strtolower()` instead of `mb_strtolower()`.
+* TWEAK: Use `strtoupper()` instead of `mb_strtoupper()`.
+* TWEAK: Do not use ternary shorthand, requires PHP > 5.3.
+* BUG: Update minified CSS/JS files.
+* BUG: Remove placeholder string in settings.
+* DEV: Add couple phpDoc references.
+
+= 8.7 12/12/2017 =
+* FEATURE: Introduce field configuration options for the Publish, Name and Address field sets.
+* NEW: Add United Kingdom counties to cnGEO.
+* NEW: Introduce `cnGEO::getRegionName()`.
+* NEW: Introduce cnCountries.
+* NEW: Introduce the WP REST API countries endpoint/routes.
+* NEW: Add support for sortable/repeatable checklist fields in the Settings API.
+* TWEAK: Increase CSS enqueue priority to load last.
+* TWEAK: Remove the Enfold theme comapatibility hack as it no longer seems necessary after changing the CSS load priority.
+* TWEAK: Ensure minheight of the search submit button is set to auto to try to override themes which insist on setting a global minheight on submit form fields.
+* TWEAK: Make img src URL protocol relative.
+* TWEAK: Make `cn_manage_{taxonomy}_custom_column` hook an action instead of filter.
+* TWEAK: Add methods to cnCountry to pull data from the Rinvex\Country library and update existing calls to it to make them compatible to the new country attributs structure.
+* TWEAK: Refactor cnGeo to utilize cnCountries, deprecating many of the region specific methods.
+* TWEAK: Make `cnGEO::getRegionName()` a public static method matching the est of the members in the class.
+* TWEAK: Do not show labels for hidden text inputs.
+* TWEAK: Add support for the data attribute in `cnHTML::input()`.
+* BUG: Check for page hook properties one ata time as they are added to the filter array ro prevent PHP warning notices from being generated on multisite.
+* BUG: Check to ensure varaiable is array before using in a foreach loop to prevent a PHP warning.
+* BUG: Correct `Illegal string offset` and `Cannot create references to/from string offsets` PHP errors when saving user meta.
+* DEV: Include the Rinvex\Country library.
 
 = 8.6.12 11/01/2017 =
 * NEW: Introduce support for custom taxonomies.
@@ -605,125 +644,10 @@ Yes this is possible but there is a special setup required to do so. It is recom
 * I18N: Update POT file.
 * I18N: Update MO files.
 
-= 8.5.19 07/07/2016 =
-* NEW: Update database schema to support address line 4, district and county fields.
-* NEW: Introduce cnOutput::excerpt().
-* NEW: Introduce cnFormatting::toCamelCase().
-* NEW: Introduce cnFunction::isDimensionalArray().
-* NEW: Introduce the `cn_address-pre_setup` filter.
-* NEW: Introduce the `cn_phone-pre_setup` filter.
-* NEW: Introduce the `cn_email-pre_setup` filter.
-* NEW: Introduce the `cn_im-pre_setup` filter.
-* NEW: Introduce the `cn_social_network-pre_setup` filter.
-* NEW: Introduce the `cn_link-pre_setup` filter.
-* NEW: Introduce the `cn_date-pre_setup` filter.
-* NEW: Add support to cnHTML::attribute() for the HTML5 `data` attribute.
-* NEW: Add support to cnHTML::select() for the the HTML5 `data` attribute.
-* TWEAK: Use https when reverse geocoding an address utilizing the Google Maps API.
-* TWEAK: Register the `cn-district` and `cn-county` query vars.
-* TWEAK: Add the rewrite rules for district and county.
-* TWEAK: Add support for district and county permalinks in cnURL::permalink().
-* TWEAK: Add settings for the district and county permalink base as well as the options to enable/disable their permalinks when displaying.
-* TWEAK: Add support for display/db sanitation option in cnSanitize::field().
-* TWEAK: Add support for adding/updating addess line 4, district and county in cnEntry.
-* TWEAK: Display the address line 4, district and county field in the Manage admin page.
-* TWEAK: Update cnOutput::getAddressBlock() to display address line 4, county and district.
-* TWEAK: Add support for the address district and country fields in cnRetrieve::entries() and cnRetrieve::addresses().
-* TWEAK: Add the district and county permalink base to the option on update.
-* TWEAK: Update the admin CSS to tweak the display of the address district and county fields when adding/editing an entry.
-* TWEAK: Add the Google Maps API browser API key to the query string if it was added in the settings.
-* TWEAK: When updating an entry, get addresses in the `db` context for proper sanitization.
-* TWEAK: Change how spacing is applied for the `readonly` attribute for the date picker.
-* TWEAK: Add `readonly` support to the quicktag field.
-* TWEAK: Remove pre WP 3.3 backwards compatibility for the rte field.
-* TWEAK: Add support for the `readonly` attribute in cnHTML::group().
-* TWEAK: Add support for registering a field as read only when registering a custom field.
-* BUG: Fix bug that always set the user to none when adding/editing a linked entry.
-* BUG: Add missing `attribute` type in `db` content in cnSanitize::field().
-* OTHER: Correct misspelling.
-* OTHER: Remove stray whitespace.
-* OTHER: Remove unnecessary break.
-* OTHER: Update EDD-SL Updater library.
-* I18N: Update POT file.
-* I18N: Update MO files.
-* DEV: phpDoc fix.
-
-= 8.5.18 06/24/2016 =
-* NEW: Introduce cnCategory::getCurrent().
-* NEW: Introduce cnSanitize::htmlClass().
-* NEW: Introduce cnFunction::escAttributeDeep().
-* NEW: Add readonly support to the datapicker custom field type.
-* NEW: Introduce cnTemplatePart::getCategoryParents().
-* NEW: Introduce cnTemplatePart::categoryBreadcrumb().
-* NEW: Introduce the `cn_term_list_class` filter.
-* NEW: Introduce the `cn_term_children_list_class` filter.
-* NEW: Introduce the `cn_term_list_item_class` filter.
-* NEW: Introduce the `cn_term_list_item` filter.
-* NEW: Introduce the `cn_output_name_default_atts` filter.
-* NEW: Introduce the `cn_output_family_default_atts` filter.
-* NEW: Introduce the `cn_output_atts_title` filter.
-* NEW: Introduce the `cn_output_atts_orgunit` filter.
-* NEW: Introduce the `cn_output_atts_contact_name` filter.
-* NEW: Introduce the `cn_output_atts_address` filter.
-* NEW: Introduce the `cn_output_atts_map` filter.
-* NEW: Introduce the `cn_output_atts_phone` filter.
-* NEW: Introduce the `cn_output_atts_email` filter.
-* NEW: Introduce the `cn_output_atts_im` filter.
-* NEW: Introduce the `cn_output_atts_socialmedia` filter.
-* NEW: Introduce the `cn_output_atts_link` filter.
-* NEW: Introduce the `cn_output_atts_date` filter.
-* NEW: Introduce the `cn_output_atts_notes` filter.
-* NEW: Introduce the `cn_output_atts_bio` filter.
-* TWEAK: Simplify `cnTemplatePart::categoryDescription()` utilizing `cnCategory::getCurrent()`.
-* TWEAK: The term count span should not be rendered if the show count option false.
-* TWEAK: Change the form id name for the add/edit categories admin form.
-* TWEAK: Add file, url, path and basename properties to the cnTerm_Meta_UI class.
-* TWEAK: Complete refactor of cnOutput::getCategoryBlock().
-* TWEAK: Add line_4, district and county to permitted valid field in cnEntry::setAddresses() as prep for when those fields are added.
-* BUG: Search results message should display full query string as first search term.
-* BUG: Correct the `cn_entry_part-($part}` filter name. It was using an unset variable rendering it useless.
-* BUG: Pass the search terms in the `cn_search_fulltext_terms` filters.
-* BUG: The page meta title should be returned unchanged when querying by multiple category IDs.
-* BUG: Correct capitalization of cnCategory::getID().
-* I18N: Update POT file.
-* I18N: Update MO file.
-* OTHER: Correct misspelling.
-* DEV: phpDoc fix.
-
-= 8.5.17 06/09/2016 =
-* NEW: Add support for a number field within the Settings API.
-* NEW: Introduce the `cn_root_rewrite_rule-landing` filter.
-* NEW: Introduce the `cn_root_rewrite_rule-view` filter.
-* NEW: Introduce the `cn_page_rewrite_rule-landing` filter.
-* NEW: Introduce the `cn_page_rewrite_rule-view` filter.
-* NEW: Introduce the `cn_cpt_rewrite_rule-landing` filter.
-* NEW: Introduce the `cn_cpt_rewrite_rule-view` filter.
-* NEW: Introduce the `cn_permalink-{type}` filter.
-* TWEAK: Use `sanitize_html_class()` rather than `esc_attr()` when outputting HTML class attributes.
-* TWEAK: Tweak to search which should give preference to full string results over individual terms within the string.
-* TWEAK: Allow `0` to be set as a default value of a setting.
-* TWEAK: Add support for the `force_home` and `home_id` parameters in cnTemplatePart::categoryLinkDescendant() to be passed when creating the category permalinks.
-* TWEAK: Remove use of the `$connections` global var in cnTemplateParts::categoryLinkDescendant().
-* TWEAK: Add support for the `force_home` and `home_id` parameters in cnTerm::permalink() to be passed when creating the category permalinks.
-* TWEAK: Add support for the `force_home` and `home_id` parameters in CN_Walker_Term_List::render() to be passed when creating the category permalinks.
-* BUG: Use proper capitalization for `get_the_ID()`.
-* I18N: Update POT file.
-* I18N: Update MO files.
-* OTHER: Remove several blank lines.
-* DEV: Fix some minor code alignment issues in cnSettingsAPI.
 
 [Complete Changelog can be found here.](https://connections-pro.com/changelog/)
 
 == Upgrade Notice ==
-
-= 8.5.17 =
-It is recommended to backup before updating. Requires WordPress >= 4.2.
-
-= 8.5.18 =
-It is recommended to backup before updating. Requires WordPress >= 4.2.
-
-= 8.5.19 =
-It is recommended to backup before updating. Requires WordPress >= 4.2.
 
 = 8.5.20 =
 It is recommended to backup before updating. Requires WordPress >= 4.2.
@@ -802,3 +726,12 @@ It is recommended to backup before updating. Requires WordPress >= 4.4.
 
 = 8.6.12 =
 It is recommended to backup before updating. Requires WordPress >= 4.4.
+
+= 8.7 =
+It is recommended to backup before updating. Requires WordPress >= 4.4.
+
+= 8.7.1 =
+It is recommended to backup before updating. Requires WordPress >= 4.4 and PHP >= 5.3. PHP version >= 7.1 recommended.
+
+= 8.8 =
+It is recommended to backup before updating. Requires WordPress >= 4.4 and PHP >= 5.3. PHP version >= 7.1 recommended.

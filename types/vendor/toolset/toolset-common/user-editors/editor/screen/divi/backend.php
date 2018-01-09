@@ -171,8 +171,9 @@ class Toolset_User_Editors_Editor_Screen_Divi_Backend
 		$content_template_has_divi = ( get_post_meta( $content_template->ID, '_toolset_user_editors_editor_choice', true ) == $this->constants->constant( 'DIVI_SCREEN_ID' ) );
 		?>
 		<button
-			class="button button-secondary js-wpv-ct-apply-user-editor js-wpv-ct-apply-user-editor-<?php echo esc_attr( $this->editor->get_id() ); ?>"
+			class="button button-secondary toolset-ct-button-logo js-wpv-ct-apply-user-editor js-wpv-ct-apply-user-editor-<?php echo esc_attr( $this->editor->get_id() ); ?>  <?php echo $this->editor->get_logo_class(); ?>"
 			data-editor="<?php echo esc_attr( $this->editor->get_id() ); ?>"
+            title="<?php echo __( 'Edit with', 'wpv-views' ) . ' ' . $this->editor->get_name() ?>"
 			<?php disabled( $content_template_has_divi ); ?>
 		>
 			<?php echo esc_html( $this->editor->get_name() ); ?>

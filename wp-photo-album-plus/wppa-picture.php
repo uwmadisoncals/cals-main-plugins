@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 6.6.18
+* Version 6.7.12
 *
 */
 
@@ -42,7 +42,7 @@ function wppa_get_picture_html( $args ) {
 	// Check existance of required args
 	foreach( array( 'id', 'type' ) as $item ) {
 		if ( ! $args[$item] ) {
-			wppa_dbg_msg( 'Missing ' . $item . ' in call to wppa_get_picture_html()', 'red', 'force' );
+			wppa_dbg_msg( 'Missing ' . $item . ' in call to wppa_get_picture_html()', 'red' );
 			return false;
 		}
 	}

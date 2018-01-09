@@ -46,7 +46,7 @@ class Toolset_Relationship_Controller {
 	/**
 	 * We need WPML to fire certain actions when it updates its icl_translations table.
 	 */
-	const MINIMAL_WPML_VERSION = '3.5.0';
+	const MINIMAL_WPML_VERSION = '3.9.0';
 
 
     private $is_autoloader_initialized = false;
@@ -181,6 +181,7 @@ class Toolset_Relationship_Controller {
 		 */
 		add_action( 'toolset_do_m2m_full_init', array( $this, 'initialize_full' ) );
 
+
 		// If the m2m feature is not enabled, nothing else should happen now.
 		if( ! $this->is_m2m_enabled() ) {
 			return;
@@ -201,7 +202,7 @@ class Toolset_Relationship_Controller {
 		 * @since m2m
 		 */
 		if( true == apply_filters( 'toolset_use_default_m2m_wpml_interoperability_manager', true ) ) {
-			add_action( 'wpml_translation_update', array( $this, 'on_wpml_translation_update' ), 10 );
+			// add_action( 'wpml_translation_update', array( $this, 'on_wpml_translation_update' ), 10 );
 		}
 
 		/**
@@ -215,6 +216,23 @@ class Toolset_Relationship_Controller {
 		 * @since m2m
 		 */
 		add_filter( 'toolset_relationship_query', array( $this, 'on_toolset_relationship_query' ), 10, 2 );
+
+		/**
+		 * On change of cpt slug.
+		 *
+		 * @since 2.5.6
+		 */
+		add_action( 'wpcf_post_type_renamed', array( $this, 'on_types_cpt_rename_slug' ), 10, 2 );
+
+		/**
+		 * toolset_report_m2m_integrity_issue
+		 *
+		 * Allow for reporting that there is some sort of data corruption in the database.
+		 *
+		 * @param IToolset_Relationship_Database_Issue $issue
+		 * @since 2.5.6
+		 */
+		add_action( 'toolset_report_m2m_integrity_issue', array( $this, 'report_integrity_issue' ) );
 	}
 
 
@@ -243,6 +261,31 @@ class Toolset_Relationship_Controller {
 		$this->initialize_full();
 		$query = new Toolset_Association_Query( $query_args );
 		return $query->get_results();
+	}
+
+
+	/**
+	 * Hooked into the wpcf_post_type_renamed action.
+	 * To update the slug in the relationship definition when the cpt slug is changed on the cpt edit page.
+	 *
+	 * @param $new_slug
+	 * @param $old_slug
+	 * @since 2.5.6
+	 */
+	public function on_types_cpt_rename_slug( $new_slug, $old_slug ) {
+		if( $new_slug === $old_slug ) {
+			// no change
+			return;
+		}
+
+		$this->initialize_full();
+
+		$database = new Toolset_Relationship_Database_Operations();
+		$result = $database->update_type_on_type_sets( $new_slug, $old_slug );
+
+		if( $result->is_error() ) {
+			error_log( $result->get_message() );
+		}
 	}
 
 
@@ -343,5 +386,21 @@ class Toolset_Relationship_Controller {
      */
     public function force_autoloader_initialization() {
         $this->initialize_autoloader();
+	}
+
+
+	/**
+	 * Handle the toolset_report_m2m_integrity_issue action by passing it over to a dedicated class.
+	 *
+	 * @param IToolset_Relationship_Database_Issue $issue
+	 *
+	 * @since 2.5.6
+	 */
+	public function report_integrity_issue( $issue ) {
+    	$this->initialize_full();
+
+    	if( $issue instanceof IToolset_Relationship_Database_Issue ) {
+    		$issue->handle();
+	    }
 	}
 }

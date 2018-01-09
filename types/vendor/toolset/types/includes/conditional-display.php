@@ -236,7 +236,7 @@ function wpcf_cd_admin_form_filter( $form, $data, $group = false )
                 '#type' => 'button',
                 '#before' => sprintf(
                     '<span class="js-wpcf-condition-preview">%s</span><span class="js-wpcf-condition-data"></span>',
-                    $current
+                    stripslashes( $current )
                 ),
                 '#value' => empty( $current ) ? __( 'Set condition(s)', 'wpcf' ) : __( 'Edit condition(s)', 'wpcf' ),
                 '#attributes' => array(
@@ -666,7 +666,7 @@ function wpcf_conditional_get_curent($data)
 
             $current .= sprintf(
                 '<li><span>%s %s %s</span></li>',
-                esc_html($all_types_fields[$condition['field']]['name']),
+                esc_html(stripslashes($all_types_fields[$condition['field']]['name'])),
                 esc_html($operation),
                 esc_html($value)
             );

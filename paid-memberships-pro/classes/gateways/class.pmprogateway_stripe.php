@@ -233,7 +233,7 @@
 		 * @since 1.8
 		 */
 		static function pmpro_payment_options($options)
-		{
+		{			
 			//get stripe options
 			$stripe_options = self::getGatewayOptions();
 
@@ -241,7 +241,7 @@
 			$options = array_merge($stripe_options, $options);
 
 			return $options;
-		}
+		}				
 
 		/**
 		 * Display fields for Stripe options.
@@ -258,18 +258,35 @@
 		</tr>
 		<tr class="gateway gateway_stripe" <?php if($gateway != "stripe") { ?>style="display: none;"<?php } ?>>
 			<th scope="row" valign="top">
-				<label for="stripe_secretkey"><?php _e('Secret Key', 'paid-memberships-pro' );?>:</label>
-			</th>
-			<td>
-				<input type="text" id="stripe_secretkey" name="stripe_secretkey" size="60" value="<?php echo esc_attr($values['stripe_secretkey'])?>" />
-			</td>
-		</tr>
-		<tr class="gateway gateway_stripe" <?php if($gateway != "stripe") { ?>style="display: none;"<?php } ?>>
-			<th scope="row" valign="top">
 				<label for="stripe_publishablekey"><?php _e('Publishable Key', 'paid-memberships-pro' );?>:</label>
 			</th>
 			<td>
 				<input type="text" id="stripe_publishablekey" name="stripe_publishablekey" size="60" value="<?php echo esc_attr($values['stripe_publishablekey'])?>" />
+				<?php
+					$public_key_prefix = substr($values['stripe_publishablekey'] , 0, 3);
+					if($public_key_prefix != 'pk_') {
+					?>
+					<br /><small class="pmpro_message pmpro_error"><?php _e('Your Publishable Key appears incorrect.', 'paid-memberships-pro');?></small>
+					<?php
+					}
+				?>
+			</td>
+		</tr>		
+		<tr class="gateway gateway_stripe" <?php if($gateway != "stripe") { ?>style="display: none;"<?php } ?>>
+			<th scope="row" valign="top">
+				<label for="stripe_secretkey"><?php _e('Secret Key', 'paid-memberships-pro' );?>:</label>
+			</th>
+			<td>
+				<input type="text" id="stripe_secretkey" name="stripe_secretkey" size="60" value="<?php echo esc_attr($values['stripe_secretkey'])?>" />
+				<?php
+					$secret_key_prefix = substr($values['stripe_secretkey'] , 0, 3);
+					//note the false here to disable this for now until we figure out a better check
+					if(false && $secret_key_prefix != 'sk_') {
+					?>
+					<br /><small class="pmpro_message pmpro_error"><?php _e('Your Secret Key appears incorrect.', 'paid-memberships-pro');?></small>
+					<?php
+					}
+				?>
 			</td>
 		</tr>
 		<tr class="gateway gateway_stripe" <?php if($gateway != "stripe") { ?>style="display: none;"<?php } ?>>

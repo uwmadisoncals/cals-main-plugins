@@ -89,7 +89,7 @@ abstract class Toolset_Relationship_Query_Base {
 	 * @return bool
 	 */
 	protected function has_query_var( $var_name ) {
-		return ( isset( $this->query_vars[ $var_name ] ) && null != $this->query_vars[ $var_name ] );
+		return ( isset( $this->query_vars[ $var_name ] ) && null !== $this->query_vars[ $var_name ] );
 	}
 
 

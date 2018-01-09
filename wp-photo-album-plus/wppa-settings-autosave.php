@@ -26,6 +26,11 @@ global $wppa_tags;
 global $wp_version;
 
 	// Start test area
+//$data = $wpdb->get_col("SELECT DISTINCT `description` FROM `".WPPA_EXIF."` WHERE `tag` = 'E#9206' ORDER BY `description`");
+//echo count( $data ).'<br />';
+//foreach( $data as $item ) {
+//	echo $item . ' -> ' . wppa_format_exif( 'E#9206', $item ) . '<br />';
+//}
 	// End test area
 
 	// Initialize
@@ -341,7 +346,7 @@ global $wp_version;
 			wppa_opt( 'tf_height_alt') < wppa_opt( 'thumbsize_alt' ) ) ) {
 				wppa_warning_message( __( 'A thumbframe width or height should not be smaller than a thumbnail size. Please correct the corresponding setting(s) in Table I-C' , 'wp-photo-album-plus') );
 			}
-			
+
 		// Check for 'many' albums
 		if ( wppa_opt( 'photo_admin_max_albums' ) ) { 	// Not OFF
 			$abs = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "` " );
@@ -2752,7 +2757,7 @@ global $wp_version;
 							$clas = 'wppa_feup';
 							$tags = 'access,upload';
 							wppa_setting($slug, '2', $name, $desc, $html, $help, $clas, $tags);
-							
+
 							$name = __('User upload roles', 'wp-photo-album-plus');
 							$desc = __('Optionally limit access to selected userroles', 'wp-photo-album-plus');
 							$help = esc_js(__('This selection only applies when the previous item is ticked', 'wp-photo-album-plus'));
@@ -8955,8 +8960,8 @@ global $wp_version;
 							$desc = __('Select the way the search results should be displayed.', 'wp-photo-album-plus');
 							$help = esc_js(__('If you select anything different from "Albums and thumbnails", "Photos only" is assumed (Table IX-E6).', 'wp-photo-album-plus'));
 							$slug = 'wppa_search_display_type';
-							$opts = array( 	__('Albums and thumbnails', 'wp-photo-album-plus'), 
-											__('Slideshow', 'wp-photo-album-plus'), 
+							$opts = array( 	__('Albums and thumbnails', 'wp-photo-album-plus'),
+											__('Slideshow', 'wp-photo-album-plus'),
 											__('Slideonly slideshow', 'wp-photo-album-plus'),
 											__('Albums only', 'wp-photo-album-plus')
 											);
@@ -9662,6 +9667,15 @@ global $wp_version;
 							$clas = '';
 							$tags = 'system';
 							wppa_setting($slug, '8', $name, $desc, $html, $help, $clas, $tags);
+							
+							$name = __('Shortcode [photo nnn] on bbPress', 'wp-photo-album-plus');
+							$desc = __('Enable the [photo] shortcode generator on bbPress frontend editors', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_photo_on_bbpress';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
 
 							}
 							wppa_setting_subheader( 'K', '1', __('External services related settings and actions.', 'wp-photo-album-plus'));
@@ -10017,7 +10031,26 @@ global $wp_version;
 							$tags = 'system';
 							wppa_setting($slug, '4', $name, $desc, $html, $help, $clas, $tags);
 
-
+							$name = __('Fe type', 'wp-photo-album-plus');
+							$desc = __('Frontend editor shortcode generator output type', 'wp-photo-album-plus');
+							$help = esc_js( __( 'If you want to use the shortcode generator in frontend tinymce editors, select if you want the shortcode or the html to be entered in the post'));
+							$help .= '\n\n'.esc_js('Select \'html\' if the inserted shortcode not is converted to the photo', 'wp-photo-album-plus');
+							$slug = 'wppa_photo_shortcode_fe_type';
+							$opts = array( 	__('--- none ---', 'wp-photo-album-plus'),
+											__('shortcode', 'wp-photo-album-plus'),
+											__('html', 'wp-photo-album-plus'),
+											__('img tag', 'wp-photo-album-plus'),
+											);
+							$vals = array(	'-none-',
+											'shortcode',
+											'html',
+											'img',
+											);
+							$html = wppa_select($slug, $opts, $vals);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '5', $name, $desc, $html, $help, $clas, $tags);
+											
 							}
 							?>
 

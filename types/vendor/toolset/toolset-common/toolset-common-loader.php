@@ -1,11 +1,11 @@
 <?php
 
 if( !defined('TOOLSET_VERSION') ){
-	define('TOOLSET_VERSION', '2.5.5');
+	define('TOOLSET_VERSION', '2.5.8');
 }
 
 if ( ! defined('TOOLSET_COMMON_VERSION' ) ) {
-    define( 'TOOLSET_COMMON_VERSION', '2.5.5' );
+    define( 'TOOLSET_COMMON_VERSION', '2.5.8' );
 }
 
 if ( ! defined('TOOLSET_COMMON_PATH' ) ) {
@@ -15,6 +15,16 @@ if ( ! defined('TOOLSET_COMMON_PATH' ) ) {
 if ( ! defined('TOOLSET_COMMON_DIR' ) ) {
     define( 'TOOLSET_COMMON_DIR', basename( TOOLSET_COMMON_PATH ) );
 }
+
+/**
+ * Last edit flag shared among Toolset plugins.
+ *
+ * @since 2.5.7 defined in Toolset Common (this is also redundantly defined in some plugins).
+ */
+if ( ! defined( 'TOOLSET_EDIT_LAST' ) ) {
+	define( 'TOOLSET_EDIT_LAST', '_toolset_edit_last' );
+}
+
 
 require_once( TOOLSET_COMMON_PATH . '/bootstrap.php' );
 
