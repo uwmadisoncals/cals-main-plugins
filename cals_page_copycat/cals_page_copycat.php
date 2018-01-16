@@ -2,9 +2,9 @@
 /*
 Plugin Name: CALS Page Copycat
 Description: Allows pages to copy the content of other on rendering.
-Version: 0.6
-Author: Vidal Quevedo
-Author URI: http://cals.wisc.edu
+Version: 0.7
+Author: Al Nemec
+Author URI: https://cals.wisc.edu
 */
 
 /*README
@@ -23,39 +23,6 @@ Example:
 -Parent 2
 --child d
 --child e(a) <--copies the content of child page "a", while still remaining a child of Parent 2 
-
-
-
-USES:
-
-
-INSTALLATION INSTUCTIONS: (last updated 10/19/10)
-
-What you will need:
-	1.- A valid Google CSE account
-	2.- A WP page to display search results
-
-1.- Google CSE
-	a.- Register for a Google CSE account at http://www.google.com/cse/. Follow the 3 basic steps to set up the search engine.
-	b.- Get the Search Engine's unique ID (Go to Google Custom Search home > Manage your existing search engines > [Your Engine's]
-		Control Panel
-	c.- Copy your Search Engine's Unique ID (e.g. '016039371683713681917:pyykxxxx-xx');
-	
-2.- Search Results page
-	a.- Login to Wordpress
-	b.- Go to Pages > Add New to add a new page for your search resuls. Give an identifiable title (e.g. "Search Results)
-	c.- Publish the page
-
-3.- Setting up the CALS Google CSE plugin
-	a.- Download plugin to your local plugins/ directory and upload it to your server
-	b.- Go to WP Admin > Plugins to activate the plugin
-	c.- Go to Settings > CALS Google Custom Search
-	d.- Paste the Search Engine Unique ID in the indicated field
-	e.- Select a Search Results Page where search results will be displayed. 
-
-
-NOTE ON CONFIGURING THE LOOK AND FEEL OF YOUR GOOGLE CSE IMPLEMENTATION
-The look and feel of the Search Form can be altered by adding new CSS rules to your style.css file in your WP theme. The Search Results, however, are more easily customized by using the available tools in the "Look and Feel" section of the Google CSE's Control Panel
 
 
 */
