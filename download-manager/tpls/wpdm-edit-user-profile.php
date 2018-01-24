@@ -1,4 +1,5 @@
 <?php
+if (!defined('ABSPATH')) die();
     global $current_user, $wpdb;
     $user = get_userdata($current_user->ID);
 

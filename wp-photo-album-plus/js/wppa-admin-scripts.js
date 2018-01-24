@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.7.08
+/* Version 6.8.00
 /* Various js routines used in admin pages
 */
 
@@ -1894,7 +1894,8 @@ function wppaMaintenanceProc(slug, intern, asCronJob ) {
 											if ( wppaAlwaysContinue == 0 ) {
 												if ( slug == 'wppa_remake' ||
 													 slug == 'wppa_regen_thumbs' ||
-													 slug == 'wppa_create_o1_files' ) {
+													 slug == 'wppa_create_o1_files' ||
+													 slug == 'wppa_recup' ) {
 													if ( confirm( 'Always continue after server error?' ) ) {
 														wppaAlwaysContinue = 1;
 													}

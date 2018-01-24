@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.7.07
+* Version 6.8.00
 *
 */
 
@@ -508,14 +508,16 @@ function wppa_add_photo_shortcode() {
 function wppa_photo_shortcodes( $xatts ) {
 global $wppa;
 global $wppa_postid;
+global $wpdb;
+static $seed;
 
 	// Init
 	wppa_reset_occurrance();
 
 	// Get and validate photo id
-	if ( isset( $xatts[0] ) && is_numeric( $xatts[0] ) ) {
+	if ( isset( $xatts[0] ) ) {
 		$photo = $xatts[0];
-		if ( ! wppa_photo_exists( $photo ) ) {
+		if ( is_numeric( $photo ) && ! wppa_photo_exists( $photo ) ) {
 			return sprintf( __( 'Photo %d does not exist', 'wp-photo-album-plus' ), $photo );
 		}
 	}
@@ -528,6 +530,36 @@ global $wppa_postid;
 		$wppa['occur'] = '0';					// Init this occurance
 		$wppa['fullsize'] = '';					// Reset at each post
 		$wppa_postid = get_the_ID();			// Remember the post id
+	}
+
+	// Random photo?
+	if ( $wppa_postid && $photo == 'random' ) {
+
+		if ( ! $seed ) {
+			$seed = time();
+		}
+		$seed = floor( $seed * 0.9 );
+
+		if ( wppa_opt( 'photo_shortcode_random_albums' ) != '-2' ) {
+			$albs  = str_replace( '.', ',', wppa_expand_enum( wppa_opt( 'photo_shortcode_random_albums' ) ) );
+			$photo = $wpdb->get_var( $wpdb->prepare( 	"SELECT `id` FROM `" . WPPA_PHOTOS . "` " .
+														"WHERE `album` IN (" . $albs . ") " .
+														"ORDER BY RAND(%d) LIMIT 1", $seed ) );
+		}
+		else {
+			$photo = $wpdb->get_var( $wpdb->prepare( 	"SELECT `id` FROM `" . WPPA_PHOTOS . "` " .
+														"ORDER BY RAND(%d) LIMIT 1", $seed ) );
+		}
+		if ( $photo ) {
+			if ( wppa_switch( 'photo_shortcode_random_fixed' ) ) {
+				$post_content = $wpdb->get_var( $wpdb->prepare( "SELECT `post_content` FROM `" . $wpdb->posts . "` WHERE `ID` = %d", $wppa_postid ) );
+				$post_content = preg_replace( '/\[photo random\]/', '[photo '.$photo.']', $post_content, 1, $done );
+				$wpdb->query( $wpdb->prepare( "UPDATE `" . $wpdb->posts . "` SET `post_content` = %s WHERE `ID` = %d", $post_content, $wppa_postid ) );
+			}
+		}
+		else {
+			return __( 'No random photo found', 'wp-photo-album-plus' );
+		}
 	}
 
 	// Get configuration settings

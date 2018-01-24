@@ -4,7 +4,7 @@ Donate link: https://www.tipsandtricks-hq.com
 Tags: download, downloads, count, counter, tracker, tracking, hits, logging, monitor, manager, files, media, digital, download monitor, download manager, downloadmanager, file manager, protect downloads, password, download category, file tree, ajax, download template, grid, documents, ip address
 Requires at least: 4.1.0
 Tested up to: 4.9
-Stable tag: 3.5.4
+Stable tag: 3.5.5
 License: GPLv2 or later
 
 Easily manage downloadable files and monitor downloads of your digital files from your WordPress site.
@@ -122,6 +122,11 @@ Example Shortcode Usage:
 
 You can check the download stats from the "Downloads->Logs" interface. It shows the number of downloads for each files, IP address of the user who downloaded it, date and time of the download.
 
+** 3rd Party or External Libraries/Services **
+
+The plugin uses the Google Charts library to show the download count charts in the admin interface (if you use the stats menu of the plugin). You can see more details about this library at the following URL:
+https://developers.google.com/chart/
+
 ** Detailed Usage Documentation **
 
 View more usage instructions on the [Download Monitor Plugin](https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin) page.
@@ -173,6 +178,11 @@ Yes
 For screenshots please visit the [download monitor plugin page](https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin)
 
 == Changelog ==
+
+= 3.5.5 =
+- Fixed a PHP warning.
+- Added sanitization to the input fields that needed it.
+- Listed the 3rd party libraries/services used in the readme file.
 
 = 3.5.4 =
 - Fixed stored-XSS bug. Thanks to d4wner.

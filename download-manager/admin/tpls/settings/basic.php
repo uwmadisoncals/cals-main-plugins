@@ -206,6 +206,7 @@
                             <li><label><input <?php if(in_array('wpdm-bootstrap-js', $wpdmss)) echo 'checked=checked'; ?> type="checkbox" value="wpdm-bootstrap-js" name="__wpdm_disable_scripts[]"> <?php _e("Bootstrap JS",'download-manager'); ?></label></li>
                             <li><label><input <?php if(in_array('wpdm-bootstrap-css', $wpdmss)) echo 'checked=checked'; ?> type="checkbox" value="wpdm-bootstrap-css" name="__wpdm_disable_scripts[]"> <?php _e("Bootstrap CSS",'download-manager'); ?></label></li>
                             <li><label><input <?php if(in_array('wpdm-font-awesome', $wpdmss)) echo 'checked=checked'; ?> type="checkbox" value="wpdm-font-awesome" name="__wpdm_disable_scripts[]"> <?php _e("Font Awesome",'download-manager'); ?></label></li>
+                            <li><label><input <?php if(in_array('wpdm-front', $wpdmss)) echo 'checked=checked'; ?> type="checkbox" value="wpdm-front" name="__wpdm_disable_scripts[]"> <?php _e("Front CSS","wpdmpro"); ?></label></li>
                         </ul>
                         <em><?php _e('Because, sometimes your theme may have those scripts/styles enqueued already','download-manager'); ?></em>
                     </fieldset>

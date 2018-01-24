@@ -81,8 +81,8 @@ class PackageLocks
         //wp_enqueue_script('wpdm-recaptcha', 'https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit');
         $force = str_replace("=", "", base64_encode("unlocked|" . date("Ymdh")));
         ?>
-        <script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit'></script>
-        <div  id="reCaptchaLock_<?php echo $package['ID']; ?>"></div>
+        <script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit' async defer></script>
+        <div class="__wpdm_loadrecap" id="reCaptchaLock_<?php echo $package['ID']; ?>"></div>
         <div id="msg_<?php echo $package['ID']; ?>"></div>
         <script type="text/javascript">
             var ctz = new Date().getMilliseconds();
@@ -97,14 +97,20 @@ class PackageLocks
                     }
                 });
             };
-            var widgetId2;
-            var onloadCallback = function() {
-                grecaptcha.render('reCaptchaLock_<?php echo $package['ID']; ?>', {
-                    'sitekey' : '<?php echo get_option('_wpdm_recaptcha_site_key'); ?>',
-                    'callback' : verifyCallback_<?php echo $package['ID']; ?>,
-                    'theme' : 'light'
-                });
-            };
+            if(onloadCallback == undefined) {
+                var onloadCallback = function () {
+                    jQuery('.__wpdm_loadrecap').each(function () {
+                        grecaptcha.render('reCaptchaLock_<?php echo $package['ID']; ?>', {
+                            'sitekey': '<?php echo get_option('_wpdm_recaptcha_site_key'); ?>',
+                            'callback': verifyCallback_<?php echo $package['ID']; ?>,
+                            'theme': 'light'
+                        });
+                    });
+                };
+            }
+
+
+
         </script>
 
         <?php

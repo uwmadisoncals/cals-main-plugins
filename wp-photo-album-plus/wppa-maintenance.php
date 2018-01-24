@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.7.04
+* Version 6.8.00
 *
 */
 
@@ -26,6 +26,7 @@ $wppa_all_maintenance_slugs = array( 	'wppa_remake_index_albums',
 										'wppa_regen_thumbs',
 										'wppa_rerate',
 										'wppa_recup',
+										'wppa_format_exif',
 										'wppa_file_system',
 										'wppa_cleanup',
 										'wppa_remake',
@@ -64,6 +65,7 @@ $wppa_cron_maintenance_slugs = array(	'wppa_remake_index_albums',
 										'wppa_regen_thumbs',
 										'wppa_rerate',
 										'wppa_recup',
+										'wppa_format_exif',
 										'wppa_cleanup_index',
 										'wppa_remake',
 										'wppa_rerate',
@@ -190,8 +192,8 @@ global $wppa_timestamp_start;
 
 				// Pre-Clear exif and iptc tables only if not cron
 				if ( ! wppa_is_cron() ) {
-					$wpdb->query( "DELETE FROM `" . WPPA_IPTC . "` WHERE `photo` <> '0'" );
-					$wpdb->query( "DELETE FROM `" . WPPA_EXIF . "` WHERE `photo` <> '0'" );
+					$wpdb->query( "TRUNCATE TABLE `" . WPPA_IPTC . "`" );
+					$wpdb->query( "TRUNCATE TABLE `" . WPPA_EXIF . "`" );
 				}
 				break;
 			case 'wppa_file_system':
@@ -258,7 +260,7 @@ global $wppa_timestamp_start;
 
 	if ( $lastid != '0' ) {
 		if (  wppa_is_cron() ) {
-			wppa_log( 'Cron', '{b}' . $slug . '{/b} continued. Allowed runtime: ' . ( $endtime - time() ) . 's. Cron id = ' . wppa_is_cron() );
+			wppa_log( 'Cron', '{b}' . $slug . '{/b} continued at item # ' . ( $lastid + 1 ) . '. Allowed runtime: ' . ( $endtime - time() ) . 's. Cron id = ' . wppa_is_cron() );
 		}
 	}
 
@@ -358,6 +360,7 @@ global $wppa_timestamp_start;
 		case 'wppa_regen_thumbs':
 		case 'wppa_rerate':
 		case 'wppa_recup':
+		case 'wppa_format_exif':
 		case 'wppa_file_system':
 		case 'wppa_cleanup':
 		case 'wppa_remake':
@@ -543,6 +546,10 @@ global $wppa_timestamp_start;
 						$a_ret = wppa_recuperate( $id );
 						if ( $a_ret['iptcfix'] ) $wppa_session[$slug.'_fixed']++;
 						if ( $a_ret['exiffix'] ) $wppa_session[$slug.'_fixed']++;
+						break;
+
+					case 'wppa_format_exif':
+						wppa_fix_exif_format( $id );
 						break;
 
 					case 'wppa_file_system':
@@ -1467,7 +1474,7 @@ global $wpdb;
 					if ( $image_type == IMAGETYPE_JPEG ) {
 
 						// Get exif data
-						$exif = exif_read_data( $file, 'EXIF' );
+						$exif = @ exif_read_data( $file, 'ANY_TAG' );
 
 						// Exif data found
 						if ( $exif ) {

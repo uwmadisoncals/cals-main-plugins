@@ -191,6 +191,7 @@ class Ai1wmme_Main_Controller {
 			add_filter( 'ai1wm_export', 'Ai1wmme_Export_Database::execute', 200 );
 
 			// Add import commands
+			add_filter( 'ai1wm_import', 'Ai1wmme_Import_Confirm::execute', 100 );
 			add_filter( 'ai1wm_import', 'Ai1wmme_Import_Blogs::execute', 150 );
 			add_filter( 'ai1wm_import', 'Ai1wmme_Import_Database::execute', 300 );
 			add_filter( 'ai1wm_import', 'Ai1wmme_Import_Users::execute', 310 );
@@ -201,6 +202,7 @@ class Ai1wmme_Main_Controller {
 			remove_filter( 'ai1wm_export', 'Ai1wm_Export_Database::execute', 200 );
 
 			// Remove import commands
+			remove_filter( 'ai1wm_import', 'Ai1wm_Import_Confirm::execute', 100 );
 			remove_filter( 'ai1wm_import', 'Ai1wm_Import_Blogs::execute', 150 );
 			remove_filter( 'ai1wm_import', 'Ai1wm_Import_Database::execute', 300 );
 			remove_filter( 'ai1wm_import', 'Ai1wm_Import_Done::execute', 350 );

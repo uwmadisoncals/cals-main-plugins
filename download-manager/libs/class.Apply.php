@@ -24,6 +24,7 @@ class Apply {
         add_action('init', array( $this, 'addWriteRules' ), 1, 0 );
         add_action('init', array($this, 'Login'));
         add_action('init', array($this, 'Register'));
+        add_action('init', array($this, 'wpdmIframe'));
         add_action('wp', array($this, 'updateProfile'));
         add_action('wp', array($this, 'Logout'));
         add_action('request', array($this, 'rssFeed'));
@@ -506,6 +507,13 @@ class Apply {
         global $wpdb;
         $wpdb->query('truncate table '.$wpdb->prefix.'ahm_download_stats');
         die('ok');
+    }
+
+    function wpdmIframe(){
+        if(isset($_REQUEST['__wpdmlo'])){
+            include wpdm_tpl_path("lock-options-iframe.php");
+            die();
+        }
     }
 
 

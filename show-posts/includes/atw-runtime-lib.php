@@ -145,7 +145,7 @@ function atw_posts_get_qargs( $args, $opts ) {
         unset( $qargs['post_slug'] );
     }
 
-    if ( !isset( $qargs['ignore_sticky_posts']) )   // igonre sticky posts by default
+    if ( !isset( $qargs['ignore_sticky_posts']) )   // ignore sticky posts by default
         $qargs['ignore_sticky_posts'] = 1;
 
     return $qargs;
@@ -369,7 +369,7 @@ function atw_posts_is_generic() {
 
 function atw_posts_theme_has_templates() {
     // see if the current theme has a content.php template
-	if (function_exists( 'twentysixteen_setup' ))
+	if (function_exists( 'twentysixteen_setup' )) // || function_exists( 'twentyseventeen_setup' ) )
 		return true;
     $templates = array();
     $templates[] = 'content.php';           // see if the theme has a content.php file, assume it works as expected...

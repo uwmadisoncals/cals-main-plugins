@@ -5,7 +5,7 @@ Plugin URI: http://WeaverTheme.com
 Description: Weaver Show Posts - Show  posts or custom posts within your Theme's pages or posts using a shortcode and a form-based interface.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 1.3.9
+Version: 1.3.13
 
 License: GPL
 
@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* CORE FUNCTIONS
 */
 
-define ( 'WEAVER_SHOWPOSTS_VERSION','1.3.9');
+define ( 'WEAVER_SHOWPOSTS_VERSION','1.3.13');
 define ( 'WEAVER_SHOWPOSTS_MINIFY','.min');		// '' for dev, '.min' for production
 define ( 'WEAVER_SHOWPOSTS_TEMPLATE', false);      // future feature
 
@@ -233,18 +233,18 @@ function atw_posts_emit_css() {
 
 add_action('wp_head', 'atw_posts_wp_head', 20);
 function atw_posts_wp_head() {
+	$css = atw_posts_getopt( 'custom_css' );
+	if ( ! $css )
+		return;
 ?>
-
 <style type="text/css">
 <?php
-    $css = "/* Weaver Show Posts Custom CSS */\n";
-	$css .= atw_posts_getopt( 'custom_css' );
+    $css = "/* Weaver Show Posts Custom CSS */\n" . $css;
 	$esc_css = esc_html( $css );
 	$content = str_replace( '&gt;', '>', $esc_css ); // put these back
     $content = str_replace( '&lt;', '<', $esc_css ); // put these back
 	echo $content;
 ?>
-
 </style>
 <?php
 }

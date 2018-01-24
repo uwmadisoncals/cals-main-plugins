@@ -121,11 +121,11 @@
         </div>
 
         <script>
-            jQuery(function(){
-                jQuery('#wpdm-activate-shop-link').on('click', function(){
-                    jQuery(this).html('Activating...')
-                    jQuery.post(ajaxurl,{action:'wpdm-activate-shop'}, function(res){
-                        jQuery('#wpdm-activate-shop-info').html(res);
+            jQuery(function($){
+                $('#wpdm-activate-shop-link').on('click', function(){
+                    $(this).html('Activating...')
+                    $.post(ajaxurl,{action:'wpdm-activate-shop'}, function(res){
+                        $('#wpdm-activate-shop-info').html(res);
                     });
                     return false;
                 });
@@ -148,16 +148,18 @@
 
 <script type="text/javascript">
 
-    jQuery(document).ready(function() {
+    jQuery(document).ready(function($) {
 
         // Uploading files
         var file_frame;
-        //jQuery( "#tabs" ).tabs();
-        //jQuery( "#eid" ).buttonset();
+        //$( "#tabs" ).tabs();
+        //$( "#eid" ).buttonset();
 
 
+        //package_size_row
 
-        jQuery('body').on('click','#img', function( event ){
+
+        $('body').on('click','#img', function( event ){
 
             event.preventDefault();
 
@@ -169,9 +171,9 @@
 
             // Create the media frame.
             file_frame = wp.media.frames.file_frame = wp.media({
-                title: jQuery( this ).data( 'uploader_title' ),
+                title: $( this ).data( 'uploader_title' ),
                 button: {
-                    text: jQuery( this ).data( 'uploader_button_text' ),
+                    text: $( this ).data( 'uploader_button_text' ),
                 },
                 multiple: false  // Set to true to allow multiple files to be selected
             });
@@ -180,10 +182,10 @@
             file_frame.on( 'select', function() {
                 // We set multiple to false so only get one image from the uploader
                 attachment = file_frame.state().get('selection').first().toJSON();
-                jQuery('#fpvw').val(attachment.url);
-                jQuery('#rmvp').remove();
-                jQuery('#img').html("<img src='"+attachment.url+"' style='max-width:100%'/><input type='hidden' name='file[preview]' value='"+attachment.url+"' >");
-                jQuery('#img').after('<a href="#"  id="rmvp"> <img align="left" src="<?php echo plugins_url('/download-manager/images/minus.png'); ?>" /> Remove Preview Image</a>');
+                $('#fpvw').val(attachment.url);
+                $('#rmvp').remove();
+                $('#img').html("<img src='"+attachment.url+"' style='max-width:100%'/><input type='hidden' name='file[preview]' value='"+attachment.url+"' >");
+                $('#img').after('<a href="#"  id="rmvp"> <img align="left" src="<?php echo plugins_url('/download-manager/images/minus.png'); ?>" /> Remove Preview Image</a>');
                 file_frame.close();
                 // Do something with attachment.id and/or attachment.url here
             });
@@ -193,78 +195,82 @@
         });
 
 
-        jQuery('body').on('click', ".cb-enable",function(){
-            var parent = jQuery(this).parents('.switch');
-            jQuery('.cb-disable',parent).removeClass('selected');
-            jQuery(this).addClass('selected');
-            jQuery('.checkbox',parent).attr('checked', true);
+        $('body').on('click', ".cb-enable",function(){
+            var parent = $(this).parents('.switch');
+            $('.cb-disable',parent).removeClass('selected');
+            $(this).addClass('selected');
+            $('.checkbox',parent).attr('checked', true);
         });
-        jQuery('body').on('click', ".cb-disable",function(){
-            var parent = jQuery(this).parents('.switch');
-            jQuery('.cb-enable',parent).removeClass('selected');
-            jQuery(this).addClass('selected');
-            jQuery('.checkbox',parent).attr('checked', false);
+        $('body').on('click', ".cb-disable",function(){
+            var parent = $(this).parents('.switch');
+            $('.cb-enable',parent).removeClass('selected');
+            $(this).addClass('selected');
+            $('.checkbox',parent).attr('checked', false);
         });
 
         var n = 0;
-//        jQuery(".wpdmlock").each(function(i) {
+//        $(".wpdmlock").each(function(i) {
 //            n++;
-//            jQuery(this).attr('id','wpdmlock-'+n).css('opacity',0).css('position','absolute').css('z-index',-100);
-//            if(jQuery(this).attr('checked'))
-//                jQuery(this).after('<label class="wpdm-label wpdm-checked" for="wpdmlock-'+n+'" ></label> ');
+//            $(this).attr('id','wpdmlock-'+n).css('opacity',0).css('position','absolute').css('z-index',-100);
+//            if($(this).attr('checked'))
+//                $(this).after('<label class="wpdm-label wpdm-checked" for="wpdmlock-'+n+'" ></label> ');
 //            else
-//                jQuery(this).after('<label class="wpdm-label wpdm-unchecked" for="wpdmlock-'+n+'" ></label> ');
+//                $(this).after('<label class="wpdm-label wpdm-unchecked" for="wpdmlock-'+n+'" ></label> ');
 //
 //        });
 
-        jQuery('body').on('click', '#rmvp',function(){
-            jQuery('#fpvw').val('');
-            jQuery('#mpim').slideUp().remove();
-            jQuery(this).fadeOut();
-            jQuery('#img').html('<img src="<?php echo plugins_url("/download-manager/images/add-image.gif"); ?>\" /> Add Main Preview Image<input type="hidden" name="file[preview]" value="" id="fpvw" />');
+        $('body').on('click', '#rmvp',function(){
+            $('#fpvw').val('');
+            $('#mpim').slideUp().remove();
+            $(this).fadeOut();
+            $('#img').html('<img src="<?php echo plugins_url("/download-manager/images/add-image.gif"); ?>\" /> Add Main Preview Image<input type="hidden" name="file[preview]" value="" id="fpvw" />');
             return false;
         });
-        jQuery('body').on('click', '.wpdm-label',function(){
-            //alert(jQuery(this).attr('class'));
-            if(jQuery(this).hasClass('wpdm-checked')) jQuery(this).addClass('wpdm-unchecked').removeClass('wpdm-checked');
-            else jQuery(this).addClass('wpdm-checked').removeClass('wpdm-unchecked');
+        $('body').on('click', '.wpdm-label',function(){
+            //alert($(this).attr('class'));
+            if($(this).hasClass('wpdm-checked')) $(this).addClass('wpdm-unchecked').removeClass('wpdm-checked');
+            else $(this).addClass('wpdm-checked').removeClass('wpdm-unchecked');
 
         });
 
 
-        jQuery(window).scroll(function(){
-            if(jQuery(window).scrollTop()>100)
-                jQuery('#action').addClass('action-float').removeClass('action');
+        $(window).scroll(function(){
+            if($(window).scrollTop()>100)
+                $('#action').addClass('action-float').removeClass('action');
             else
-                jQuery('#action').removeClass('action-float').addClass('action');
+                $('#action').removeClass('action-float').addClass('action');
         })
 
-        jQuery("#wpdm-settings select").chosen({no_results_text: ""});
+        $("#wpdm-settings select").chosen({no_results_text: ""});
 
-        jQuery('.handlediv').click(function(){
-            jQuery(this).parent().find('.inside').slideToggle();
+        $('.handlediv').click(function(){
+            $(this).parent().find('.inside').slideToggle();
         });
 
-        jQuery('.handle').click(function(){
+        $('.handle').click(function(){
             alert(2);
-            jQuery(this).parent().find('.inside').slideToggle();
+            $(this).parent().find('.inside').slideToggle();
         });
 
 
-        jQuery('.nopro').click(function(){
-            if(this.checked) jQuery('.wpdmlock').removeAttr('checked');
+        $('.nopro').click(function(){
+            if(this.checked) $('.wpdmlock').removeAttr('checked');
         });
 
-        jQuery('.wpdmlock').click(function(){
+        $('.wpdmlock').click(function(){
             if(this.checked) {
-                jQuery('#'+jQuery(this).attr('rel')).slideDown();
-                jQuery('.nopro').removeAttr('checked');
+                $('#'+$(this).attr('rel')).slideDown();
+                $('.nopro').removeAttr('checked');
             } else {
-                jQuery('#'+jQuery(this).attr('rel')).slideUp();
+                $('#'+$(this).attr('rel')).slideUp();
             }
         });
 
-        jQuery('.w3eden .info.fa').tooltip({html:true, placement: 'right'});
+        $('.w3eden .info.fa').tooltip({html:true, placement: 'right'});
+
+        $('#cfl').bind("DOMSubtreeModified",function(){
+             $('#package_size_row .form-control').val('');
+        });
 
 
 
@@ -284,7 +290,7 @@
 
 
     <?php /* if(is_array($file)&&get_post_meta($file['id'],'__wpdm_lock',true)!='') { ?>
-    jQuery('#<?php echo get_post_meta($file['id'],'__wpdm_lock',true); ?>').show();
+    $('#<?php echo get_post_meta($file['id'],'__wpdm_lock',true); ?>').show();
     <?php } */ ?>
 </script>
 

@@ -4146,3 +4146,7 @@ function wppa_parse_args( $args, $defaults ) {
 
 	return $r;
 }
+
+function wppa_is_divisible( $t, $n ) {
+	return ( round( $t / $n ) == ( $t / $n ) );
+}

@@ -2,7 +2,7 @@
 * Pachkage: wp-photo-album-plus
 *
 *
-* Version 6.7.09
+* Version 6.8.00
 *
 */
 
@@ -142,7 +142,7 @@ function wppaGalleryEvaluate() {
 	var admins 			= '';
 	var align 			= 'none';
 	var html 			= '';
-	
+
 	// Init colors of <select> tags
 	jQuery( 'select' ).css( 'color', '#700' );
 	jQuery( '#wppagallery-album-parent-parent' ).css( 'color', '#070' );
@@ -250,7 +250,14 @@ function wppaGalleryEvaluate() {
 			}
 			switch ( type ) {
 				case 'generic':
+					miscType = type;
+					break;
 				case 'upload':
+					miscType = type;
+					jQuery('#wppagallery-album-realopt-tr').show();
+					album = jQuery('#wppagallery-album-realopt').val();
+					album = album.toString().replace( /,/g, '.' );
+					break;
 				case 'landing':
 				case 'stereo':
 					miscType = type;
@@ -279,7 +286,7 @@ function wppaGalleryEvaluate() {
 			case 'real':
 				jQuery('#wppagallery-album-real-tr').show();
 				jQuery('#wppagallery-album-real-search-tr').show();
-				
+
 				// WPPA has Not many albums, there is a quick select box. If used, ...val() is not empty,
 				if ( jQuery('#wppagallery-album-real-search') ) {
 					if ( jQuery('#wppagallery-album-real-search').val() ) {
@@ -306,14 +313,14 @@ function wppaGalleryEvaluate() {
 						jQuery('.wppagallery-album-r').show();
 					}
 				}
-				
+
 				// Get the selected album(s)
 				album = jQuery('#wppagallery-album-real').val();
-				
+
 				// Make sure right delimiter
 				album = album.toString().replace( /,/g, '.' );
 				break;
-				
+
 			case 'virtual':
 
 				// Open the right selection box dependant of type is cover or not
@@ -502,23 +509,23 @@ function wppaGalleryEvaluate() {
 
 	// Size
 	var size = document.getElementById('wppagallery-size').value;
-	
+
 	// See if auto with fixed max
 	var temp = size.split(',');
 	if ( temp[1] ) {
 		if ( temp[0] == 'auto' && parseInt( temp[1] ) == temp[1] && temp[1] > 100 ) {
-			
+
 			// its ok, auto with a static max of size temp[1]
 			jQuery('#wppagallery-size').css('color', '#070');
 		}
 		else {
-			
+
 			// Not ok
 			size = 0;
 			jQuery('#wppagallery-size').css('color', '#700');
 		}
 	}
-	
+
 	// Numeric?
 	else {
 		if ( size != '' && size != 'auto' ) {
@@ -535,7 +542,7 @@ function wppaGalleryEvaluate() {
 		}
 		jQuery('#wppagallery-size').css('color', '#070');
 	}
-	
+
 	// Add size to shortcode
 	if ( size != 0 ) {
 		shortcode += ' size="'+size+'"';

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Frontend links
-* Version 6.7.06
+* Version 6.8.00
 *
 */
 
@@ -312,7 +312,7 @@ function wppa_convert_from_pretty( $uri ) {
 	$args = explode( '/', substr( $uri, $wppapos + 10 ) );
 
 	// process 'arguments'
-	if ( count($args > 0) ) {
+	if ( is_array( $args ) && count( $args ) > 0 ) {
 		$first = true;
 		$possible_conflicts = array( 'wppa-page=' );
 
@@ -462,6 +462,11 @@ function wppa_convert_to_pretty( $xuri, $no_names = false, $overrule = false ) {
 	// and this will destroy use and display searchstrings in wppa_session_start()
 	// Fix in 6.3.9
 	if ( strpos( $uri, 'searchstring' ) ) {
+		return $uri;
+	}
+
+	// Not in supersearch: FNumber: f/nn. Replaceing '/' by '%2F' does not work
+	if ( wppa( 'supersearch' ) ) {
 		return $uri;
 	}
 
@@ -1018,7 +1023,7 @@ function wppa_page_links( $npages = '1', $curpage = '1', $slide = false ) {
 	if ( wppa( 'src' ) && ! wppa( 'is_related' ) ) $extra_url .= '&amp;wppa-searchstring='.urlencode( wppa( 'searchstring' ) );
 
 	// Supersearch?
-	if ( wppa( 'supersearch' ) ) $extra_url .= '&amp;wppa-supersearch=' . urlencode( wppa( 'supersearch' ) );
+	if ( wppa( 'supersearch' ) ) $extra_url .= '&amp;wppa-supersearch=' . str_replace( '/', '%2F', urlencode( wppa( 'supersearch' ) ) );
 
 	// Related
 	if ( wppa( 'is_related' ) ) $extra_url .= '&amp;wppa-rel='.wppa( 'is_related' ).'&amp;wppa-relcount='.wppa( 'related_count' );
@@ -1762,7 +1767,7 @@ global $wpdb;
 		}
 
 		if ( wppa( 'supersearch' ) ) {
-			$result['url'] .= '&amp;wppa-supersearch=' . urlencode( wppa( 'supersearch' ) );
+			$result['url'] .= '&amp;wppa-supersearch=' . str_replace( '/', '%2F', urlencode( wppa( 'supersearch' ) ) );
 		}
 
 		if ( wppa( 'src' ) && ! wppa( 'is_related' ) && ! wppa_in_widget() ) {

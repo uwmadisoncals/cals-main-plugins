@@ -111,7 +111,7 @@ function atw_posts_select_filter() {
     echo '</select>';
 ?>
 
-    &nbsp;&nbsp;&larr; <input class="button" type="submit" onclick="return confirm('This will clear all current filter settings. The filter will also be deleted unless it is the Default filter. Are you sure?')"
+    &nbsp;&nbsp;&larr; <input class="button" type="submit" onclick="return confirm('This will clear all current filter settings. The filter will also be deleted unless it is the Default filter. Are you sure?');"
                            name="atw_posts_delete_filter" value="Clear/Delete Current Filter"/></td></tr>
     <tr><td>&nbsp;</td><td><span style="padding-left:20px;"></span></span><textarea cols=32 rows=1 placeholder="Enter name for new/duplicate filter" maxlength=64 name="filter_name"></textarea>
     &nbsp;&nbsp;&larr;&nbsp;<input class="button" type="submit" name="atw_posts_new_filter" value="Create New Filter"/>
@@ -278,15 +278,15 @@ function atw_posts_filter_basic() {
         <br />
         <strong>Display posts ordered by:</strong>
         <select name='orderby'>
-            <option value="date" <?php selected( $cur_order == 'date');?>>Date</option>
-            <option value="title" <?php selected( $cur_order == 'title');?>>Post Title</option>
-            <option value="modified" <?php selected( $cur_order == 'modified');?>>Last Modified Date</option>
-            <option value="rand" <?php selected( $cur_order == 'rand');?>>Random order</option>
-            <option value="comment_count" <?php selected( $cur_order == 'comment_count');?>>Number of comments</option>
-            <option value="author" <?php selected( $cur_order == 'author');?>>Author</option>
-            <option value="ID" <?php selected( $cur_order == 'ID');?>>Post ID</option>
+			<option value="date" <?php selected( $cur_order == 'date');?>>Date</option>
+			<option value="title" <?php selected( $cur_order == 'title');?>>Post Title</option>
+			<option value="modified" <?php selected( $cur_order == 'modified');?>>Last Modified Date</option>
+			<option value="rand" <?php selected( $cur_order == 'rand');?>>Random order</option>
+			<option value="comment_count" <?php selected( $cur_order == 'comment_count');?>>Number of comments</option>
+			<option value="author" <?php selected( $cur_order == 'author');?>>Author</option>
+			<option value="ID" <?php selected( $cur_order == 'ID');?>>Post ID</option>
 			<option value="menu_order" <?php selected( $cur_order == 'menu_order');?>>Menu/Custom Post Order</option>
-            <option value="none" <?php selected( $cur_order == 'none');?>>No order</option>
+			<option value="none" <?php selected( $cur_order == 'none');?>>No order</option>
         </select>
 
         <?php $cur_order = atw_posts_get_filter_opt('order'); ?>

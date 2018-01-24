@@ -1,5 +1,5 @@
 <?php
-
+if (!defined('ABSPATH')) die();
 /**
  * Warning!!!
  * Don't change any function from here

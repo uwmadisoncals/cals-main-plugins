@@ -22,7 +22,7 @@
     [txt=Create Date]
   </li>
   <li class="list-group-item [hide_empty:download_link_extended]">
-    [download_link_extended]
+    [download_link]
   </li>
 </ul>
         </div>

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version 6.7.05
+* Version 6.8.00
 *
 *
 */
@@ -289,17 +289,20 @@ function wppa_index_raw_to_words( $xtext, $no_skips = false, $minlen = '3', $no_
 }
 
 // Expand compressed string
-function wppa_index_string_to_array($string) {
+function wppa_index_string_to_array( $string ) {
+
 	// Anything?
 	if ( ! $string ) return array();
+
 	// Any ranges?
 	if ( ! strstr($string, '..') ) {
 		$result = explode(',', $string);
-		foreach( array_keys($result) as $key ) {
+		foreach( array_keys( $result ) as $key ) {
 			$result[$key] = strval($result[$key]);
 		}
 		return $result;
 	}
+
 	// Yes
 	$temp = explode(',', $string);
 	$result = array();
@@ -316,26 +319,14 @@ function wppa_index_string_to_array($string) {
 		}
 	}
 
-	foreach( array_keys($result) as $key ) {
-		$result[$key] = strval($result[$key]);
-	}
+	// Remove dups
+	$result = array_unique( $result );
+
+//	foreach( array_keys($result) as $key ) {
+//		$result[$key] = strval($result[$key]);
+//	}
 
 	return $result;
-}
-
-// Remove duplicates from array
-function wppa_index_array_remove_dups( $array ) {
-	$temp = $array;
-	sort( $temp, SORT_NUMERIC );
-	$array = array();
-	$oldval = false;
-	foreach ( array_keys( $temp ) as $key ) {
-		if ( $temp[$key] != $oldval ) {
-			$array[] = $temp[$key];
-			$oldval	 = $temp[$key];
-		}
-	}
-	return $array;
 }
 
 // Compress array ranges and convert to string
@@ -348,7 +339,10 @@ function wppa_index_array_to_string( $array ) {
 		}
 	}
 
-	sort( $array, SORT_NUMERIC );
+	// Remove dups and sort
+	$array = array_unique( $array, SORT_NUMERIC );
+
+	// Build string
 	$result = '';
 	$lastitem = '-1';
 	$isrange = false;
@@ -478,6 +472,10 @@ function wppa_index_get_raw_album( $id ) {
 		$words .= ' '.$album['cats'];
 	}
 
+	// Strip tags, but prevent cluttering
+	$words = str_replace( '<', ' <', $words );
+	$words = strip_tags( $words );
+
 	// Done!
 	return $words;
 }
@@ -499,5 +497,10 @@ global $wpdb;
 		}
 	}
 
+	// Strip tags, but prevent cluttering
+	$words = str_replace( '<', ' <', $words );
+	$words = strip_tags( $words );
+
+	// Done!
 	return $words;
 }

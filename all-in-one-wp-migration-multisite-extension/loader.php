@@ -46,6 +46,10 @@ require_once AI1WMME_EXPORT_PATH .
 
 require_once AI1WMME_IMPORT_PATH .
 			DIRECTORY_SEPARATOR .
+			'class-ai1wmme-import-confirm.php';
+
+require_once AI1WMME_IMPORT_PATH .
+			DIRECTORY_SEPARATOR .
 			'class-ai1wmme-import-blogs.php';
 
 require_once AI1WMME_IMPORT_PATH .

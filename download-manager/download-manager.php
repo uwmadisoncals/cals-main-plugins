@@ -4,7 +4,7 @@ Plugin Name: Download Manager
 Plugin URI: https://www.wpdownloadmanager.com/purchases/
 Description: Manage, Protect and Track File Downloads from your WordPress site
 Author: Shaon
-Version: 2.9.61
+Version: 2.9.62
 Author URI: https://www.wpdownloadmanager.com/
 Text Domain: download-manager
 Domain Path: /languages
@@ -17,7 +17,7 @@ namespace WPDM;
 if(!isset($_SESSION))
 @session_start();
 
-define('WPDM_Version','2.9.61');
+define('WPDM_Version','2.9.62');
 
 $content_dir = str_replace('\\','/',WP_CONTENT_DIR);
 
@@ -49,8 +49,6 @@ include(dirname(__FILE__)."/wpdm-core.php");
 
 
 ini_set('upload_tmp_dir',UPLOAD_DIR.'/cache/');
-
-if(!isset($_POST))    $_SESSION['download'] = 0;
 
 
 class WordPressDownloadManager{
@@ -265,15 +263,19 @@ class WordPressDownloadManager{
         }
 
 
-        if (!in_array('wpdm-bootstrap-css', $wpdmss))
+        if (!in_array('wpdm-bootstrap-css', $wpdmss)) {
             wp_enqueue_style('wpdm-bootstrap', plugins_url('/download-manager/assets/bootstrap/css/bootstrap.css'));
+        }
 
 
-        wp_enqueue_style('wpdm-front', plugins_url() . '/download-manager/assets/css/front.css');
+        if (!in_array('wpdm-front', $wpdmss)) {
+            wp_enqueue_style('wpdm-front', plugins_url() . '/download-manager/assets/css/front.css', 9999999999);
+        }
 
 
-        if (!in_array('wpdm-bootstrap-js', $wpdmss))
+        if (!in_array('wpdm-bootstrap-js', $wpdmss)) {
             wp_enqueue_script('wpdm-bootstrap', plugins_url('/download-manager/assets/bootstrap/js/bootstrap.min.js'), array('jquery'));
+        }
 
         wp_enqueue_script('frontjs', plugins_url('/download-manager/assets/js/front.js'), array('jquery'));
 

@@ -7,6 +7,12 @@ jQuery(function ($) {
         $(this).parent().find('.input-group-addon').removeClass('input-group-addon-active');
     });
 
+    $('body').on('click', '.wpdm-download-link.wpdm-download-locked', function (e) {
+        e.preventDefault();
+        hideLockFrame();
+        $('body').append("<iframe id='wpdm-lock-frame' style='left:0;top:0;width: 100%;height: 100%;z-index: 99999;position: fixed;background: transparent;border: 0;' src='"+wpdm_home_url+"?__wpdmlo="+$(this).data('package')+"'></iframe>");
+    });
+
     $('body').on('click', '.inddl', function () {
         var tis = this;
         $.post( wpdm_site_url, {
@@ -172,3 +178,7 @@ jQuery(function ($) {
     }
 
 });
+
+function hideLockFrame() {
+    jQuery('#wpdm-lock-frame').remove();
+}

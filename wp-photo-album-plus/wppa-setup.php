@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.7.08
+* Version 6.8.00
 *
 */
 
@@ -145,7 +145,7 @@ global $silent;
 					) DEFAULT CHARACTER SET utf8;";
 
 	$create_iptc = "CREATE TABLE " . WPPA_IPTC . " (
-					id bigint(20) NOT NULL,
+					id bigint(20) NOT NULL AUTO_INCREMENT,
 					photo bigint(20) NOT NULL,
 					tag tinytext NOT NULL,
 					description text NOT NULL,
@@ -155,17 +155,19 @@ global $silent;
 					) DEFAULT CHARACTER SET utf8;";
 
 	$create_exif = "CREATE TABLE " . WPPA_EXIF . " (
-					id bigint(20) NOT NULL,
+					id bigint(20) NOT NULL AUTO_INCREMENT,
 					photo bigint(20) NOT NULL,
 					tag tinytext NOT NULL,
 					description text NOT NULL,
 					status tinytext NOT NULL,
+					f_description text NOT NULL,
+					brand tinytext NOT NULL,
 					PRIMARY KEY  (id),
 					KEY photokey (photo)
 					) DEFAULT CHARACTER SET utf8;";
 
 	$create_index = "CREATE TABLE " . WPPA_INDEX . " (
-					id bigint(20) NOT NULL,
+					id bigint(20) NOT NULL AUTO_INCREMENT,
 					slug tinytext NOT NULL,
 					albums text NOT NULL,
 					photos text NOT NULL,
@@ -549,6 +551,17 @@ global $silent;
 			if ( get_option( 'wppa_upload_edit' ) == 'none' ) {
 				update_option( 'wppa_upload_edit', '-none-' );
 			}
+		}
+
+		if ( $old_rev <= '6800' ) {
+			$wpdb->query( "ALTER TABLE `" . WPPA_IPTC . "` MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT" );
+			$wpdb->query( "ALTER TABLE `" . WPPA_EXIF . "` MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT" );
+			$wpdb->query( "ALTER TABLE `" . WPPA_INDEX . "` MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT" );
+			delete_option( 'wppa_' . WPPA_IPTC . '_lastkey' );
+			delete_option( 'wppa_' . WPPA_EXIF . '_lastkey' );
+			delete_option( 'wppa_' . WPPA_INDEX . '_lastkey' );
+
+			wppa_schedule_maintenance_proc( 'wppa_format_exif' );
 		}
 	}
 
@@ -1475,6 +1488,7 @@ Hide Camera info
 						'wppa_rerate'				=> '',
 						'wppa_cleanup'				=> '',
 						'wppa_recup'				=> '',
+						'wppa_format_exif' 			=> '',
 						'wppa_file_system'			=> 'flat',
 						'wppa_remake' 				=> '',
 						'wppa_remake_orientation_only' 	=> 'no',
@@ -1750,7 +1764,9 @@ Hide Camera info
 						'wppa_photo_shortcode_type' 			=> 'mphoto',
 						'wppa_photo_shortcode_size' 			=> '350',
 						'wppa_photo_shortcode_align' 			=> 'center',
-						'wppa_photo_shortcode_fe_type' 			=> '-none-', 
+						'wppa_photo_shortcode_fe_type' 			=> '-none-',
+						'wppa_photo_shortcode_random_albums' 	=> '-2',
+						'wppa_photo_shortcode_random_fixed' 	=> 'no',
 
 						// Photo of the day widget
 						'wppa_potd_title'			=> __('Photo of the day', 'wp-photo-album-plus'),

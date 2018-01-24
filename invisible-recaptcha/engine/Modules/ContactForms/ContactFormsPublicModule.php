@@ -40,7 +40,7 @@ class ContactFormsPublicModule extends BasePublicModule
 				$submittedForm   = (array)$submittedForm;
 				$submittedForm['id']   = (!empty($submittedForm['id']) ? absint($submittedForm['id'])  : null);
 
-				if( $selfInstance->isGFormExcluded($submittedForm['id']) || class_exists('\Akismet') )
+				if( $selfInstance->isGFormExcluded($submittedForm['id']) )
 					return $isSpam;
 
 				return BasePublicModule::isRecaptchaValid() ? false : true;

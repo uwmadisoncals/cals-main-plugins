@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.7.09
+* Version 6.8.00
 *
 */
 
@@ -403,6 +403,7 @@ function wppa_supersearch_box() {
 function wppa_get_supersearch_html() {
 global $wpdb;
 global $wppa_session;
+global $wppa_supported_camara_brands;
 
 	// Init
 	$page 		= wppa_get_the_landing_page( 	'supersearch_linkpage',
@@ -441,12 +442,46 @@ global $wppa_session;
 	$albumtxt 	= $wpdb->get_results( $query, ARRAY_A );
 	$query 		= "SELECT `slug` FROM `".WPPA_INDEX."` WHERE `photos` <> '' ORDER BY `slug`";
 	$phototxt 	= $wpdb->get_results( $query, ARRAY_A );
+
+	// IPTC
 	$iptclist 	= wppa_switch( 'save_iptc' ) ?
 					$wpdb->get_results( "SELECT `tag`, `description` FROM `" . WPPA_IPTC .
 							"` WHERE `photo` = '0' AND `status` <> 'hide' ", ARRAY_A ) : array();
+
+	// Translate (for multilanguage qTranslate-able labels )
+	if ( ! empty( $iptclist ) ) {
+		foreach( array_keys( $iptclist ) as $idx ) {
+			$iptclist[$idx]['description'] = __( $iptclist[$idx]['description'] );
+		}
+	}
+
+	// Sort alphabetically
+	$iptclist = wppa_array_sort( $iptclist, 'description' );
+
+	// EXIF
 	$exiflist 	= wppa_switch( 'save_exif' ) ?
-					$wpdb->get_results( "SELECT `tag`, `description` FROM `" . WPPA_EXIF .
+					$wpdb->get_results( "SELECT `tag`, `description`, `status` FROM `" . WPPA_EXIF .
 							"` WHERE `photo` = '0' AND `status` <> 'hide' ", ARRAY_A ) : array();
+
+	// Translate (for multilanguage qTranslate-able labels), // or remove if no non-empty items
+//echo serialize($exiflist);
+	if ( ! empty( $exiflist ) ) {
+		foreach( array_keys( $exiflist ) as $idx ) {
+//			$exists = $wpdb->get_var( $wpdb->prepare( 	"SELECT * FROM `" . WPPA_EXIF . "` " .
+//														"WHERE `photo` <> '0' " .
+//														"AND `tag` = %s " .
+//														"AND `description` <> '' LIMIT 1", $exiflist[$idx]['tag'] ) );
+//			if ( ! $exists ) {
+//				unset( $exiflist[$idx] );
+//			}
+//			else {
+				$exiflist[$idx]['description'] = __( $exiflist[$idx]['description'] );
+//			}
+		}
+	}
+
+	// Sort alphabetically
+	$exiflist = wppa_array_sort( $exiflist, 'description' );
 
 	// Check for empty albums
 	if ( wppa_switch( 'skip_empty_albums' ) ) {
@@ -886,15 +921,44 @@ global $wppa_session;
 			' size="' . min( count( $exiflist ), '6' ) . '"' .
 			' >';
 			$reftag = str_replace( 'H', '#', $ss_data['2'] );
+
+			// Process all tags
+			$options_array = array();
 			foreach ( $exiflist as $item ) {
 				$tag = $item['tag'];
-				$sel = ( $reftag == $tag && $ss_data['0'] = 'p' && $ss_data['1'] == 'e' );
+
+				// Add brand specific tagname(s)
+				$brandfound = false;
+				foreach( $wppa_supported_camara_brands as $brand ) {
+					$brtagnam = trim( wppa_exif_tagname( hexdec( substr( $tag, 2, 4 ) ), $brand, 'brandonly' ), ': ' );
+					if ( $brtagnam ) {
+						$options_array[] = array( 'tag' => $tag . $brand, 'desc' => $brtagnam . ' (' . ucfirst( strtolower( $brand ) ) . ')' );
+						$brandfound = true;
+					}
+				}
+
+				// Add generic only if not undefined
+				$desc = __( $item['description'], 'wp-photo-album-plus' );
+				if ( substr( $desc, 0, 12 ) != 'UndefinedTag' ) {
+					$options_array[] = array( 'tag' => $tag, 'desc' => trim( __( $item['description'], 'wp-photo-album-plus' ), ': ' ) );
+				}
+			}
+
+			// Sort options
+			$options_array = wppa_array_sort( $options_array, 'desc' );
+
+			// Make the options html
+			foreach ( $options_array as $item ) {
+				$tag = $item['tag'];
+				$desc = $item['desc'];
+				$sel = ( $reftag == $tag && $ss_data['0'] == 'p' && $ss_data['1'] == 'e' );
+
 				$result .=
 				'<option' .
 					' value="' . $tag . '"' .
 					( $sel ? ' selected="selected"' : '' ) .
 					' >' .
-						__( $item['description'], 'wp-photo-album-plus' ) .
+					$desc . ':' .
 				'</option>';
 			}
 		$result .=
@@ -3801,6 +3865,8 @@ global $wppa_exif_cache;
 
 	$count = 0;
 
+	$brand = wppa_get_camera_brand( $photo );
+
 	// If in cache, use it
 	$exifdata = false;
 	if ( is_array( $wppa_exif_cache ) ) {
@@ -3867,7 +3933,7 @@ global $wppa_exif_cache;
 			}
 
 //			if ( ! isset( $wppa_exifdefaults[$exifline['tag']] ) ) continue;
-			$exifline['description'] = trim( $exifline['description'], "\x00..\x1F " );
+//			$exifline['description'] = trim( $exifline['description'], "\x00..\x1F " );
 
 			// Photo status is hide ?
 			if ( $exifline['status'] == 'hide' ) continue;
@@ -3876,7 +3942,7 @@ global $wppa_exif_cache;
 			if ( $exifline['status'] == 'default' && $default == 'hide' ) continue;
 
 			// P s is default and default is optional and field is empty
-			if ( $exifline['status'] == 'default' && $default == 'option' && ! $exifline['description'] ) continue;
+			if ( $exifline['status'] == 'default' && $default == 'option' && ! $exifline['f_description'] ) continue;
 
 			$count++;
 			$newtag = $exifline['tag'];
@@ -3887,10 +3953,14 @@ global $wppa_exif_cache;
 			else {
 				$result .= 	'<tr style="border-bottom:0 none; border-top:0 none; border-left: 0 none; border-right: 0 none;" >' .
 							'<td class="wppa-exif-label wppa-box-text wppa-td" style="'.wppa_wcs( 'wppa-box-text' ).wppa_wcs( 'wppa-td' ).'" >';
+
+				$label = wppa_exif_tagname( hexdec( '0x' . substr( $exifline['tag'], 2, 4 ) ), $brand ) . ':';
+
 				$result .= esc_js( __( $label ) );
+
 				$result .= '</td><td class="wppa-exif-value wppa-box-text wppa-td" style="'.wppa_wcs( 'wppa-box-text' ).wppa_wcs( 'wppa-td' ).'" >';
 			}
-			$result .= esc_js( wppa_sanitize_text( __( wppa_format_exif( $exifline['tag'], $exifline['description'] ), 'wp-photo-album-plus' ) ) );
+			$result .= esc_js( $exifline['f_description'] );
 			$oldtag = $newtag;
 		}
 		if ( $oldtag != '' ) $result .= '</td></tr>';	// Close last line

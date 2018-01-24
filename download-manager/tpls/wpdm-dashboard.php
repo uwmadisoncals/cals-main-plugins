@@ -1,5 +1,8 @@
-<?php global $current_user; ?>
-<link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+<?php
+if (!defined('ABSPATH')) die();
+
+global $current_user; ?>
+<link href='https://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
 <style type="text/css">
     .w3eden.user-dashboard{
         font-family: 'Varela Round', sans-serif;

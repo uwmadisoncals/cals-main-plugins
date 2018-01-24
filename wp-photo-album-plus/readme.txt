@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick, pdf
-Version: 6.7.12
-Stable tag: 6.7.11
+Version: 6.8.00
+Stable tag: 6.7.12
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -127,6 +127,28 @@ If this happens, make sure (ask your hosting provider) that you have all the rig
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
 
+= 6.8.00 =
+
+= Bug Fixes =
+
+* Various minor fixes for PHP 7.2 compatibility.
+* If the visitor does not have the rights to edit a photo at the front-end, there will not be a link or button to the edit page.
+* On the Import and Upload Photos admin pages one can now select a target album even when there are more albums than the setting in Table IX-B6.3.
+* The most recently uploaded photo had its viewcount bumped for every session when the [photo] shortcode was enabled. Fixed.
+* If you use qr codes and cache them (See Table IX-K1.4), the cache will be cleared regularly to prvent the generation of too many files.
+
+= New Features =
+
+* On the Album Admin -> Edit screen: the photo information now also shows the EXIF data, if available.
+* Shortcode [photo xxx] can now have 'random' as argument, e.g.: [photo random]. See Table IX-L for details.
+* On the shortcode generator, one can optionally select one or more albums for the upload box.
+
+= Other Changes =
+
+* Supersearch. Selection boxes are now sorted, exif values are formatted.
+Certain camera brand specific tags are now recognized and (partially) correct formatted.
+* Further improved formatting of various exif tags.
+
 = 6.7.12 =
 
 = Bug Fixes =
@@ -157,12 +179,12 @@ See for additional information: <a href="http://www.wppa.nl/changelog/" >The doc
 
 * The shortcode generator for shortcode [photo xxx] is now also available for front-end tinymce editors.
 See https://wppa.nl/docs-by-subject/advanced-topics/shortcode-photo/ for an explanation.
- 
+
 = 6.7.09 =
 
 = Bug Fixes =
 
-* Slideshow widget bug fixes: 
+* Slideshow widget bug fixes:
 --- all albums --- did not work, fixed.
 On initial display of the activation screen, the default setting values were not shown. Fixed.
 Album selectionbox was not sorted. Fixed.
@@ -174,13 +196,13 @@ Single image preview videos work correctly now.
 
 = New Features =
 
-* Slideshow widget new features: 
+* Slideshow widget new features:
 Added checkbox 'Random' for random photo sequence. The sequence will change every pageload.
 Added checkbox 'Include subalbums'.
 
 = Other Changes =
 
-* Sildeshow widget other changes: 
+* Sildeshow widget other changes:
 You can set a maximum number of slides, to prevent heavy pageloads, especially when --- all albums --- is used.
 The slideshow now always wraps around, regardless of the setting of Table IV-B8.
 

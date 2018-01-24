@@ -1,9 +1,8 @@
 <?php
-/**
- * Not Completed Yet!
- */
+
 
 namespace WPDM;
+
 
 class Package {
 
@@ -150,7 +149,7 @@ class Package {
         $post_vars['download_url'] = self::getDownloadURL($post_vars['ID'], '');
         $post_vars['download_link_popup'] =
         $post_vars['download_link_extended'] =
-        $post_vars['download_link'] = "<a class='wpdm-download-link wpdm-download-locked {$post_vars['btnclass']}' rel='nofollow' href='#' onclick=\"location.href='{$post_vars['download_url']}';return false;\">{$post_vars['link_label']}</a>";
+        $post_vars['download_link'] = "<a class='wpdm-download-link {$post_vars['btnclass']}' rel='nofollow' href='#' onclick=\"location.href='{$post_vars['download_url']}';return false;\">{$post_vars['link_label']}</a>";
 
 
         if (self::userDownloadLimitExceeded($post_vars['ID'])) {
@@ -198,7 +197,7 @@ class Package {
 
         else if(self::isLocked($post_vars)){
             $post_vars['download_url'] = '#';
-            $post_vars['download_link'] = self::activeLocks($post_vars);
+            $post_vars['download_link'] = "<a href='#' class='wpdm-download-link wpdm-download-locked {$post_vars['btnclass']}' data-package='{$post_vars['ID']}'>{$post_vars['link_label']}</a>"; //self::activeLocks($post_vars);
             $post_vars['download_link_extended'] = self::activeLocks($post_vars, array('embed' => 1));
             $post_vars['download_link_popup'] = self::activeLocks($post_vars, array('popstyle' => 'popup'));
         }
@@ -206,28 +205,34 @@ class Package {
         if(isset($data['terms_lock']) && $data['terms_lock'] != 0 && (!function_exists('wpdmpp_effective_price') || wpdmpp_effective_price($post_vars['ID']) ==0)){
             $data['terms_conditions'] = wpautop($data['terms_conditions']);
             $data['terms_title'] = !isset($data['terms_title']) || $data['terms_title'] == ''?__("Terms and Conditions",'download-manager'):$data['terms_title'];
-            $data['terms_check_label'] = !isset($data['terms_check_label']) || $data['terms_check_label'] == ''?__("You Must Agree With Terms and Conditions to Download",'download-manager'):$data['terms_check_label'];
-            $post_vars['download_link_popup'] = '<a href="#" data-toggle="modal" data-target="#termslockmodal">
-                                                  '.$post_vars['link_label'].'
+            $data['terms_check_label'] = !isset($data['terms_check_label']) || $data['terms_check_label'] == ''?__("I Agree",'download-manager'):$data['terms_check_label'];
+            if(!self::isLocked($post_vars)) {
+                $post_vars['download_link_popup'] = $post_vars['download_link'] = "<a href='#' class='wpdm-download-link wpdm-download-locked {$post_vars['btnclass']}' data-package='{$post_vars['ID']}'>{$post_vars['link_label']}</a>";
+                /*
+                $post_vars['download_link_popup'] = '<a href="#" data-toggle="modal" data-target="#termslockmodal">
+                                                  ' . $post_vars['link_label'] . '
                                                 </a>                                               
                                                 <div class="modal fade" id="termslockmodal" tabindex="-1" role="dialog" aria-labelledby="termslockmodalLabel">
                                                   <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
                                                       <div class="modal-header">
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                        <strong class="modal-title" id="termslockmodalLabel">'.$data['terms_title'].'</strong>
+                                                        <strong class="modal-title" id="termslockmodalLabel">' . $data['terms_title'] . '</strong>
                                                       </div>
                                                       <div class="modal-body" style="max-height:300px;overflow:auto;">
-                                                        '.$data['terms_conditions'].'
+                                                        ' . $data['terms_conditions'] . '
                                                       </div>
                                                       <div class="modal-footer text-left" style="text-align:left">                                                        
-                                                        '."<label><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'> {$data['terms_check_label']}</label>".'                                                        
+                                                        ' . "<label><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'> {$data['terms_check_label']}</label>" . '                                                        
                                                       </div>
-                                                      '."<div class='modal-footer  download_footer_{$post_vars['ID']}' style='display:none;'>{$post_vars['download_link_extended']}</div>".'
+                                                      ' . "<div class='modal-footer  download_footer_{$post_vars['ID']}' style='display:none;'>{$post_vars['download_link_extended']}</div>" . '
                                                     </div>
                                                   </div>
                                                 </div>';
-            $post_vars['download_link'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'><span><i class='fa fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer download_footer_{$post_vars['ID']}' style='display: none'>{$post_vars['download_link']}</div></div>";
+                */
+                //$post_vars['download_link_popup'] = $post_vars['download_link'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'><span><i class='fa fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer download_footer_{$post_vars['ID']}' style='display: none'>{$post_vars['download_link']}</div></div>";
+            }
+
             $post_vars['download_link_extended'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'><span><i class='fa fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$post_vars['ID']}' style='display:none;'>{$post_vars['download_link_extended']}</div></div>";
 
 
@@ -600,7 +605,7 @@ class Package {
         $package['access'] = wpdm_allowed_roles($package['ID']);
 
         if ($package['download_url'] != '#')
-            $package['download_link'] = "<a class='wpdm-download-link wpdm-download-locked {$btnclass}' rel='nofollow' href='#' onclick=\"location.href='{$package['download_url']}';return false;\"><i class='$wpdm_download_icon'></i>{$link_label}</a>";
+            $package['download_link'] = "<a class='wpdm-download-link {$btnclass}' rel='nofollow' href='#' onclick=\"location.href='{$package['download_url']}';return false;\"><i class='$wpdm_download_icon'></i>{$link_label}</a>";
         else
             $package['download_link'] = "<div class='alert alert-warning'><b>" . __('Download:','download-manager') . "</b><br/>{$link_label}</div>";
         $caps = array_keys($current_user->caps);
@@ -670,12 +675,8 @@ class Package {
                 if ($embed == 1)
                     $adata = "<div class='package-locks'>" . $data . "</div>";
                 else {
-                    $dataattrs = $popstyle == 'pop-over'? 'data-title="<button type=button id=\'close\' class=\'btn btn-link btn-xs pull-right po-close\' style=\'margin-top:-4px;margin-right:-10px\'><i class=\'fa fa-times text-danger\'></i></button> '.__('Download','download-manager').' ' . $package['title'] . '"' : 'data-toggle="modal" data-target="#pkg_' . $package['ID'] . "_" . $unqid . '"';
-                    $adata = '<a href="#pkg_' . $package['ID'] . "_" . $unqid . '" '.$dataattrs.' class="wpdm-download-link wpdm-download-locked ' . $popstyle . ' ' . $btnclass . '"><i class=\'' . $wpdm_download_lock_icon . '\'></i>' . $package['link_label'] . '</a>';
-                    if ($popstyle == 'pop-over')
-                        $adata .= '<div class="modal fade"><div class="row all-locks"  id="pkg_' . $package['ID'] . "_" . $unqid . '">' . $data . '</div></div>';
-                    else
-                        $adata .= '<div class="modal fade" role="modal" id="pkg_' . $package['ID'] . "_" . $unqid . '"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><strong style="margin:0px;font-size:12pt">' . __('Download') . '</strong></div><div class="modal-body">' . $data . '</div><div class="modal-footer text-right"><button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button></div></div></div></div>';
+
+                    $adata = '<a href="#pkg_' . $package['ID'] . "_" . $unqid . '"  data-package="'.$package['ID'].'" class="wpdm-download-link wpdm-download-locked ' . $popstyle . ' ' . $btnclass . '"><i class=\'' . $wpdm_download_lock_icon . '\'></i>' . $package['link_label'] . '</a>';
                 }
 
                 $data = $adata;

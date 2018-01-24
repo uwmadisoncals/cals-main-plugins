@@ -21,7 +21,7 @@ function atw_posts_admin_page() {
 ?>
 
 <div class="atw-wrap">
-    <h2>Weaver <?php echo $name;?> - Settings</h2>
+    <h2>Weaver <?php echo $name;?> - Settings <?php atw_donate_button(); ?></h2>
     <hr />
 
 <div id="tabwrap_plus" style="padding-left:5px;">
@@ -421,6 +421,17 @@ function atw_posts_save_showposts_opts() {
 // update atw_posts_get_filter_params in atw-runtime-lib...
 
 // #############
+
+function atw_donate_button() {
+
+	if ( true ) {
+		$img = WP_CONTENT_URL . '/plugins/show-posts/images/donate-button.png';
+	?>
+<div style="float:right;padding-right:30px;display:inline-block;"><div style="font-size:14px;font-weight:bold;display:inline-block;vertical-align: top;"><?php _e('Like <em>Weaver Show Posts</em>? Please', 'weaver-xtreme' /*adm*/); ?></div>&nbsp;&nbsp;<a href='//weavertheme.com/donate' target='_blank' alt='Please Donate' ><img src="<?php echo $img; ?>" alt="donate" style="max-height:28px;"/></a>
+</div>
+
+<?php }
+}
 
 
 

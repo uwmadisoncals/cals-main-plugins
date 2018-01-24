@@ -15,7 +15,7 @@
     font-weight: 700;
 }
 .w3eden .btn.wpdm-front h3.title {
-    font-family: 'Montserrat';
+    font-family: 'Montserrat', san-serif;
     margin: 10px 0 5px 10px;
     font-size: 14pt;
 }
@@ -425,13 +425,16 @@
     text-decoration: none !important;
 }
 .w3eden .popover {
-    min-width: 250px;
+    min-width: 365px;
 }
 .w3eden .all-locks {
     padding: 15px;
 }
 .w3eden td.actions {
     width: 100px;
+}
+.w3eden .btn-verify-captcha{
+    margin: 5px 0;
 }
 .w3eden .actions a.btn {
     border-radius: 2px;

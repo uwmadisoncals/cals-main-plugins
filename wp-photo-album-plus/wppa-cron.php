@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
-* Version 6.6.27
+* Version 6.8.00
 *
 *
 */
@@ -34,7 +34,20 @@ global $is_reschedule;
 
 	// Schedule cron job
 	if ( ! wp_next_scheduled( 'wppa_cron_event', array( $slug ) ) ) {
-		wp_schedule_single_event( time() + 30, 'wppa_cron_event', array( $slug ) );
+		if ( $is_reschedule || $from_settings_page ) {
+			$delay = 5;
+		}
+		else switch ( $slug ) {
+			case 'wppa_remake_index_photos':	// one hour
+				$delay = 3600;
+				break;
+			case 'wppa_cleanup_index':			// 3 hours
+				$delay = 10800;
+				break;
+			default:
+				$delay = 30;					// 30 sec.
+		}
+		wp_schedule_single_event( time() + $delay, 'wppa_cron_event', array( $slug ) );
 		$backtrace = debug_backtrace();
 		$args = '';
 		if ( is_array( $backtrace[1]['args'] ) ) {
@@ -223,6 +236,22 @@ global $wpdb;
 
 		// Store updated failed mails
 		update_option( 'wppa_failed_mails', $failed_mails );
+	}
+
+	// Cleanup iptc and exif
+	wppa_iptc_clean_garbage();
+	wppa_exif_clean_garbage();
+
+	// Cleanup qr cache
+	if ( is_dir( WPPA_UPLOAD_PATH . '/qr' ) ) {
+		$qrs = glob( WPPA_UPLOAD_PATH . '/qr/*.svg' );
+		if ( ! empty( $qrs ) ) {
+			$count = count( $qrs );
+			if ( $count > 250 ) {
+				foreach( $qrs as $qr ) @ unlink( $qr );
+				wppa_log( 'Cron', $count . ' qr cache files removed' );
+			}
+		}
 	}
 
 	wppa_log( 'Cron', '{b}wppa_cleanup{/b} completed.' );

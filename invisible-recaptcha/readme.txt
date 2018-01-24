@@ -3,8 +3,8 @@ Contributors: mihche
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XVC3TSGEJQP2U
 Tags: invisible reCaptcha, woocommerce invisible reCaptcha, contact form 7 invisible reCaptcha
 Requires at least: 4.0
-Tested up to: 4.7
-Stable tag: 1.1.0
+Tested up to: 4.9
+Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,16 +102,16 @@ See all [reCaptcha Language Codes](https://developers.google.com/recaptcha/docs/
 > **Note: This plugin requires PHP 5.3 or higher to be activated.**
 
 == Changelog ==
+= 1.2 =
+* Fixed Contact Form 7 issue [Cannot contact reCAPTCHA. Check your connection and try again](https://wordpress.org/support/topic/contact-form-7-error-message-everytime/)
+* Improved Gravity Forms protection
+
+= 1.1 =
 * Fixed PHP wrong Namespace issue
 * Fixed PHP warning when contact forms settings were saved for the first time
 * Moved Plugin Menu to Settings
-* Added Help Link to [Invisible reCaptcha Dedicated Support Forum](https://ultracommunity.com/forums/forum/invisible-recaptcha/)
-
-
-= 1.1 =
 * Fixed PHP warning when contact forms settings were saved for the first time
 * Moved Plugin Menu to Settings
-* Added Help Link to [Invisible reCaptcha Dedicated Support Forum](https://ultracommunity.com/forums/forum/invisible-recaptcha/)
 
 = 1.0.8 =
 * Added integration with [Ultra Community](https://wordpress.org/plugins/ultra-community/) Membership plugin

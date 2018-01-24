@@ -41,7 +41,7 @@ Also, you may use WordPress Download Manager as a complete e-Commerce Solution f
 *   Full Featured User Dashboard ( use short-code [wpdm_user_dashboard] )
 *   Custom front-end login / signup form short-code
 *   Custom oEmbed template
-*	DataTable support ( use short-code [wpdm-all-packages jstable=1 items_per_page=20] )
+*	Responsive DataTable support ( use short-code [wpdm_all_packages jstable=1 items_per_page=20] )
 *	Searching and Sorting Option
 *	Custom link label
 *	Short-code for download link
@@ -152,6 +152,12 @@ Check download stats and get a push notification when someone downloads, install
 13. Video Player
 
 == Changelog ==
+
+= 2.9.62 =
+* Auto-clear file size field after uploading new file or deleting current file
+* Added new parameter with all downloads shortcode to customize columns
+* Improved lock option display
+* Fixed issue with multiple reCaptcha on same page
 
 = 2.9.61 =
 * Fixed a minor security issue with add-on installation

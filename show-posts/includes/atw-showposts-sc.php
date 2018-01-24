@@ -368,8 +368,9 @@ function atw_show_content( $slider, $filter = '' ) {
     if (atw_trans_get('show') == 'title_featured') {
 
         if (get_post_thumbnail_id()) {
-            $image = wp_get_attachment_image_src( get_post_thumbnail_id( ), 'thumbnail' );        // (url, width, height)
-            $href = $image[0];
+            //$image = wp_get_attachment_image_src( get_post_thumbnail_id( ), 'thumbnail' );        // (url, width, height)
+            //$href = $image[0];
+			$href = get_permalink();
 ?>
 		<p class='atw-featured-image'><a href="<?php echo $href; ?>"><?php esc_url(the_post_thumbnail( 'thumbnail' )); ?></a></p>
 <?php
@@ -476,9 +477,9 @@ function atw_restore_the_content_filters( $key = false ) {
 function atw_show_post_content( $slider ) {
     // display a post - show thumbnail, link to full size image
     if ( !atw_trans_get('hide_featured_image') && get_post_thumbnail_id()) {
-        $image = wp_get_attachment_image_src( get_post_thumbnail_id( ), 'full' );        // (url, width, height)
-        $href = $image[0];
-        //$href = get_permalink();
+        //$image = wp_get_attachment_image_src( get_post_thumbnail_id( ), 'full' );        // (url, width, height)
+        //$href = $image[0];
+        $href = get_permalink();
 ?>
     <span class='atw-featured-image'><a href="<?php echo $href; ?>"><?php the_post_thumbnail( 'thumbnail' ); ?></a></span>
 <?php

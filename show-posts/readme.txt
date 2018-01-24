@@ -8,8 +8,8 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: weaver theme, settings, save, subthemes
 Text Domain: show-posts
 Requires at least: 4.2
-Tested up to: 4.6
-Stable tag: 1.3.9
+Tested up to: 4.9
+Stable tag: 1.3.13
 
 == Description ==
 
@@ -59,6 +59,21 @@ Please use the WordPress Plugins:Install page to install this plugin.
 
 
 == Changelog ==
+= 1.3.13 =
+* WP 4.9 compatibility update
+* Fix: Changed Featured Image links to point to single page view of post and not media lib image
+
+= 1.3.12 =
+* WP 4.8 compatibility update
+* Minor tweaks
+
+= 1.3.11 =
+* Minor optimization of custom CSS
+
+= 1.3.10 =
+* WP 4.7 compatibility tested to update
+* Minor fix
+
 = 1.3.9 =
 * Fix: Version number problems
 

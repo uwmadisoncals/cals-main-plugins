@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 6.6.30
+* Version 6.8.00
 *
 */
 
@@ -61,29 +61,28 @@ function wppa_create_index_entry( $args ) {
 global $wpdb;
 
 	$args = wp_parse_args( (array) $args, array (
-					'id'				=> '0',
+
 					'slug' 				=> '',
 					'albums' 			=> '',
 					'photos' 			=> ''
 					) );
 
-	if ( ! wppa_is_id_free( WPPA_INDEX, $args['id'] ) ) $args['id'] = wppa_nextkey( WPPA_INDEX );
+	// WPPA_INDEX is now AUTO_INCREMENT
 
-	$query = $wpdb->prepare("INSERT INTO `" . WPPA_INDEX . "` 	( 	`id`,
+	$query = $wpdb->prepare("INSERT INTO `" . WPPA_INDEX . "` 	(
 																	`slug`,
 																	`albums`,
 																	`photos`
 																)
-														VALUES ( %s, %s, %s, %s )",
-																$args['id'],
+														VALUES ( %s, %s, %s )",
+
 																$args['slug'],
 																$args['albums'],
 																$args['photos']
 														);
-	$iret = $wpdb->query($query);
+	$bret = $wpdb->query($query);
 
-	if ( $iret ) return $args['id'];
-	else return false;
+	return $bret;
 }
 
 // EXIF
@@ -91,35 +90,40 @@ function wppa_create_exif_entry( $args ) {
 global $wpdb;
 
 	$args = wp_parse_args( (array) $args, array (
-					'id' 				=> '0',
+
 					'photo' 			=> '0',
 					'tag' 				=> '',
 					'description' 		=> '',
-					'status' 			=> ''
+					'f_description' 	=> '',
+					'status' 			=> '',
+					'brand' 			=> '',
 					) );
 
-	if ( ! wppa_is_id_free( WPPA_EXIF, $args['id'] ) ) $args['id'] = wppa_nextkey( WPPA_EXIF );
+	// WPPA_EXIF is now AUTO_INCREMENT
 
 	$args['description'] = sanitize_text_field( $args['description'] );
 	$args['description'] = str_replace( array(chr(0),chr(1),chr(2),chr(3),chr(4),chr(5),chr(6),chr(7)), '', $args['description'] );
 
-	$query = $wpdb->prepare("INSERT INTO `" . WPPA_EXIF . "` 	( 	`id`,
+	$query = $wpdb->prepare("INSERT INTO `" . WPPA_EXIF . "` 	(
 																	`photo`,
 																	`tag`,
 																	`description`,
-																	`status`
+																	`f_description`,
+																	`status`,
+																	`brand`
 																)
-														VALUES ( %s, %s, %s, %s, %s )",
-																$args['id'],
+														VALUES ( %s, %s, %s, %s, %s, %s )",
+
 																$args['photo'],
 																$args['tag'],
 																$args['description'],
-																$args['status']
+																$args['f_description'],
+																$args['status'],
+																$args['brand']
 														);
-	$iret = $wpdb->query($query);
+	$bret = $wpdb->query($query);
 
-	if ( $iret ) return $args['id'];
-	else return false;
+	return $bret;
 }
 
 // IPTC
@@ -127,35 +131,34 @@ function wppa_create_iptc_entry( $args ) {
 global $wpdb;
 
 	$args = wp_parse_args( (array) $args, array (
-					'id' 				=> '0',
+
 					'photo' 			=> '0',
 					'tag' 				=> '',
 					'description' 		=> '',
 					'status' 			=> ''
 					) );
 
-	if ( ! wppa_is_id_free( WPPA_IPTC, $args['id'] ) ) $args['id'] = wppa_nextkey( WPPA_IPTC );
+	// WPPA_IPTC is now AUTO_INCREMENT
 
 	$args['description'] = sanitize_text_field( $args['description'] );
 	$args['description'] = str_replace( array(chr(0),chr(1),chr(2),chr(3),chr(4),chr(5),chr(6),chr(7)), '', $args['description'] );
 
-	$query = $wpdb->prepare("INSERT INTO `" . WPPA_IPTC . "` 	( 	`id`,
+	$query = $wpdb->prepare("INSERT INTO `" . WPPA_IPTC . "` 	(
 																	`photo`,
 																	`tag`,
 																	`description`,
 																	`status`
 																)
-														VALUES ( %s, %s, %s, %s, %s )",
-																$args['id'],
+														VALUES ( %s, %s, %s, %s )",
+
 																$args['photo'],
 																$args['tag'],
 																$args['description'],
 																$args['status']
 														);
-	$iret = $wpdb->query($query);
+	$bret = $wpdb->query($query);
 
-	if ( $iret ) return $args['id'];
-	else return false;
+	return $bret;
 }
 
 // Comments
@@ -500,3 +503,4 @@ global $wpdb;
 	if ( $exists ) return false;
 	return true;
 }
+

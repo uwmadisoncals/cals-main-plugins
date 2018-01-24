@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains user and capabilities related routines
-* Version 6.6.12
+* Version 6.8.0
 *
 */
 
@@ -48,7 +48,7 @@ static $usercache;
 //		wppa_log( 'Obs', 'wppa_get_user_by cache used for ' . $key . ', ' . $user );
 		return $usercache[$key][$user];
 	}
-	
+
 	$result = get_user_by( $key, $user );
 	$usercache[$key][$user] = $result;
 //	wppa_log( 'Obs', 'wppa_get_user_by new cache entry for ' . $key . ', ' . $user );
@@ -277,7 +277,7 @@ function wppa_is_user_superuser() {
 function wppa_may_user_fe_edit( $id ) {
 
 	// Feature enabled?
-	if ( wppa_opt( 'upload_edit' ) == 'none' ) return false;
+	if ( wppa_opt( 'upload_edit' ) == '-none-' ) return false;
 
 	// Blacklisted?
 	if ( wppa_is_user_blacklisted() ) return false;

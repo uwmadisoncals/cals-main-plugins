@@ -3,7 +3,7 @@
 * Pachkage: wp-photo-album-plus
 *
 *
-* Version 6.7.09
+* Version 6.8.00
 *
 */
 
@@ -495,7 +495,7 @@ global $wpdb;
 								}
 
 								if ( wppa_has_audio( $photo['id'] ) && is_file( WPPA_UPLOAD_PATH . '/' . wppa_fix_poster_ext( $val, $photo['id'] ) ) ) {
-									$value = wppa_fix_poster_ext( $val );
+									$value = wppa_fix_poster_ext( $val, $photo['id'] );
 								}
 								else {
 									$value = $val;

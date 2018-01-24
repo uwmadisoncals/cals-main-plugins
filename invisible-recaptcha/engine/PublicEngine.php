@@ -70,24 +70,28 @@ var renderInvisibleReCaptcha = function() {
         if (null === holder) continue;
 		holder.innerHTML = '';
 
-        (function(frm){
+         (function(frm){
 			var cf7SubmitElm = frm.querySelector('.wpcf7-submit');
             var holderId = grecaptcha.render(holder,{
                 'sitekey': '{$siteKey}', 'size': 'invisible', 'badge' : '{$badgePosition}',
                 'callback' : function (recaptchaToken) {
-					((null !== cf7SubmitElm) && (typeof jQuery != 'undefined')) ? jQuery(frm).submit() : HTMLFormElement.prototype.submit.call(frm);
+					if((null !== cf7SubmitElm) && (typeof jQuery != 'undefined')){jQuery(frm).submit();grecaptcha.reset(holderId);return;}
+					 HTMLFormElement.prototype.submit.call(frm);
                 },
                 'expired-callback' : function(){grecaptcha.reset(holderId);}
             });
 
-            frm.onsubmit = function (evt){evt.preventDefault();grecaptcha.execute(holderId);};
-
 			if(null !== cf7SubmitElm && (typeof jQuery != 'undefined') ){
-				jQuery(cf7SubmitElm).one('click', function(clickEvt){
+				jQuery(cf7SubmitElm).off('click').on('click', function(clickEvt){
 					clickEvt.preventDefault();
 					grecaptcha.execute(holderId);
 				});
 			}
+			else
+			{
+				frm.onsubmit = function (evt){evt.preventDefault();grecaptcha.execute(holderId);};
+			}
+
 
         })(form);
     }

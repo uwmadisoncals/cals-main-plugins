@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.7.10
+* Version 6.8.00
 *
 */
 
@@ -826,7 +826,7 @@ global $wppa_session;
 		}
 		else wppa_out( '<span style="color:red">ERROR: Missing function wppa_theme(), check the installation of WPPA+. Remove customized wppa_theme.php</span>' );
 		global $wppa_version;
-		$expected_version = '6-4-17-002';
+		$expected_version = '6-8-00-002';
 		if ( $wppa_version != $expected_version ) {
 			wppa_dbg_msg( 'WARNING: customized wppa-theme.php is out of rev. Expected version: ' . $expected_version . ' found: ' . $wppa_version, 'red' );
 		}
@@ -1542,10 +1542,17 @@ global $wppa_session;
 
 			// Exif
 			case 'e':
-				$etag 		= str_replace( 'H', '#', $ss_data['2'] );
+				$etag 		= substr( str_replace( 'H', '#', $ss_data['2'] ), 0, 6 );
+				$brand 		= substr( $ss_data[2], 6 );
 				$desc 		= $ss_data['3'];
-				$query 		= $wpdb->prepare( 	"SELECT * FROM `" . WPPA_EXIF . "` " .
-												"WHERE `tag` = %s AND `description` = %s", $etag, $desc );
+//				if ( $brand ) {
+					$query 		= $wpdb->prepare( 	"SELECT * FROM `" . WPPA_EXIF . "` " .
+													"WHERE `tag` = %s AND `f_description` = %s AND `brand` = %s", $etag, $desc, $brand );
+//				}
+//				else {
+//					$query 		= $wpdb->prepare( 	"SELECT * FROM `" . WPPA_EXIF . "` " .
+//													"WHERE `tag` = %s AND `f_description` = %s", $etag, $desc );
+//				}
 				$exiflines 	= $wpdb->get_results( $query, ARRAY_A );
 				$ids 		= '0';
 				if ( is_array( $exiflines ) ) foreach( $exiflines as $item ) {
@@ -2210,7 +2217,7 @@ static $user;
 	$dellink = '';
 	$choicelink = '';
 	if ( ! wppa( 'is_filmonly' ) && ! wppa( 'is_slideonly' ) ) {
-		if ( wppa_may_user_fe_edit( $id ) ) {
+		if ( wppa_may_user_fe_edit( $id ) && wppa_opt( 'upload_edit' ) != '-none-' ) {
 			$editlink = '
 				<input' .
 					' type="button"' .

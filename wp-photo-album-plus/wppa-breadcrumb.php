@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 6.7.02
+* Version 6.8.00
 *
 */
 
@@ -197,8 +197,16 @@ global $wppa_session;
 							$value .= ' ' . __('with iptc tag:', 'wp-photo-album-plus') . ' <b>' . __($label, 'wp-photo-album-plus') . '</b> ' . __('with content:', 'wp-photo-album-plus') .' <b>' . $ss_data['3'] . '</b>';
 							break;
 						case 'e':
-							$label = $wpdb->get_var( $wpdb->prepare( "SELECT `description` FROM `" . WPPA_EXIF . "` WHERE `tag` = %s AND `photo` = '0'", str_replace( 'H', '#', $ss_data['2'] ) ) );
-							$label = trim( $label, ':' );
+//							$label = $wpdb->get_var( $wpdb->prepare( "SELECT `description` FROM `" . WPPA_EXIF . "` WHERE `tag` = %s AND `photo` = '0'", str_replace( 'H', '#', $ss_data['2'] ) ) );
+							$tag 	= substr( $ss_data[2], 2, 4 );
+							$brand 	= substr( $ss_data[2], 6 );
+							if ( $brand ) {
+								$label 	= wppa_exif_tagname( hexdec( $tag ), $brand, 'brandonly' ) . ' ('. ucfirst( strtolower( $brand ) ) .')';
+							}
+							else {
+								$label 	= wppa_exif_tagname( hexdec( $tag ) );
+							}
+							$label 	= trim( $label, ':' );
 							$value .= ' ' . __('with exif tag:', 'wp-photo-album-plus') . ' <b>' . __($label, 'wp-photo-album-plus') . '</b> ' . __('with content:', 'wp-photo-album-plus') .' <b>' . $ss_data['3'] . '</b>';
 							break;
 					}

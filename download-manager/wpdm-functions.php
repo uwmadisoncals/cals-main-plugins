@@ -1,4 +1,5 @@
 <?php
+if (!defined('ABSPATH')) die();
 global $wpdm_message, $btnclass;
 
 
@@ -126,7 +127,7 @@ function DownloadLink(&$package, $embed = 0, $extras = array())
 	$package['access'] = wpdm_allowed_roles($package['ID']);
 
     if ($package['download_url'] != '#')
-        $package['download_link'] = "<a class='wpdm-download-link wpdm-download-locked {$btnclass}' rel='nofollow' href='#' onclick=\"location.href='{$package['download_url']}';return false;\"><i class='$wpdm_download_icon'></i>{$link_label}</a>";
+        $package['download_link'] = "<a class='wpdm-download-link {$btnclass}' rel='nofollow' href='#' onclick=\"location.href='{$package['download_url']}';return false;\"><i class='$wpdm_download_icon'></i>{$link_label}</a>";
     else
         $package['download_link'] = "<div class='alert alert-warning'><b>" . __('Download:','download-manager') . "</b><br/>{$link_label}</div>";
     $caps = array_keys($current_user->caps);
@@ -191,16 +192,12 @@ function DownloadLink(&$package, $embed = 0, $extras = array())
         }
 
         if ($lock === 'locked') {
-            $popstyle = isset($popstyle) && in_array($popstyle, array('popup', 'pop-over')) ? $popstyle : 'pop-over';
             if ($embed == 1)
                 $adata = "<div class='package-locks'>" . $data . "</div>";
             else {
-                $dataattrs = $popstyle == 'pop-over'? 'data-title="<button type=button id=\'close\' class=\'btn btn-link btn-xs pull-right po-close\' style=\'margin-top:-4px;margin-right:-10px\'><i class=\'fa fa-times text-danger\'></i></button> '.__('Download','download-manager').' ' . $package['title'] . '"' : 'data-toggle="modal" data-target="#pkg_' . $package['ID'] . "_" . $unqid . '"';
-                $adata = '<a href="#pkg_' . $package['ID'] . "_" . $unqid . '" '.$dataattrs.' class="wpdm-download-link wpdm-download-locked ' . $popstyle . ' ' . $btnclass . '"><i class=\'' . $wpdm_download_lock_icon . '\'></i>' . $package['link_label'] . '</a>';
-                if ($popstyle == 'pop-over')
-                    $adata .= '<div class="modal fade"><div class="row all-locks"  id="pkg_' . $package['ID'] . "_" . $unqid . '">' . $data . '</div></div>';
-                else
-                    $adata .= '<div class="modal fade" role="modal" id="pkg_' . $package['ID'] . "_" . $unqid . '"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><strong style="margin:0px;font-size:12pt">' . __('Download') . '</strong></div><div class="modal-body">' . $data . '</div><div class="modal-footer text-right"><button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button></div></div></div></div>';
+
+                $adata = '<a href="#pkg_' . $package['ID'] . "_" . $unqid . '" data-package="' . $package['ID'] . '"  class="wpdm-download-link wpdm-download-locked ' . ' ' . $btnclass . '"><i class=\'' . $wpdm_download_lock_icon . '\'></i>' . $package['link_label'] . '</a>';
+
             }
 
             $data = $adata;

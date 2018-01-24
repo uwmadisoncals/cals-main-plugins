@@ -1,4 +1,6 @@
-<div align="center"> 
+<?php
+if (!defined('ABSPATH')) die();
+?><div align="center">
 <form method="post" action="<?php the_permalink(); ?>forgotpass/" id="lostpasswordform" name="lostpasswordform" class="login-form">
 <input type="hidden" name="permalink" value="<?php the_permalink(); ?>" />
     <h2>Forgot Password?</h2>

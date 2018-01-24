@@ -1,4 +1,6 @@
-
+<?php
+if (!defined('ABSPATH')) die();
+?>
 <ul class="list-group package-file-list">
 <?php
 

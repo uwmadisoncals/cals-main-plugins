@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.7.08
+* Version 6.8.00
 *
 */
 
@@ -99,7 +99,7 @@ global $wppa_log_file;
 					}
 				}
 			}
-			$iptcdata 	= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . WPPA_IPTC ."` WHERE `photo` > '0' AND `tag` = %s ORDER BY `description`", $tag ), ARRAY_A );
+			$iptcdata 	= $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT `description` FROM `" . WPPA_IPTC ."` WHERE `photo` > '0' AND `tag` = %s ORDER BY `description`", $tag ), ARRAY_A );
 			$last 		= '';
 			$any 		= false;
 			if ( is_array( $iptcdata ) ) foreach( $iptcdata as $item ) {
@@ -122,7 +122,7 @@ global $wppa_log_file;
 				}
 			}
 			if ( ! $any ) {
-				$query = $wpdb->prepare( "DELETE FROM `" . WPPA_IPTC . "` WHERE `photo` = '0' AND `tag` = %s", $tag );
+				$query = $wpdb->prepare( "UPDATE `" . WPPA_IPTC . "` SET `status` = 'hide' WHERE `photo` = '0' AND `tag` = %s", $tag );
 				$wpdb->query( $query );
 //				wppa_log( 'dbg', $query );
 			}
@@ -130,9 +130,11 @@ global $wppa_log_file;
 			break;
 
 		case 'getssexiflist':
-			$tag 		= str_replace( 'H', '#', $_REQUEST['tag'] );
+			$tag 		= str_replace( 'H', '#', substr( $_REQUEST['tag'], 0, 6 ) );
+			$brand 		= substr( $_REQUEST['tag'], 6 );
 			$mocc 		= $_REQUEST['moccur'];
 			$oldvalue = '';
+
 			if ( strpos( $wppa_session['supersearch'], ',' ) !== false ) {
 				$ss_data = explode( ',', $wppa_session['supersearch'] );
 				if ( count( $ss_data ) == '4' ) {
@@ -145,16 +147,114 @@ global $wppa_log_file;
 					}
 				}
 			}
-			$exifdata 	= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . WPPA_EXIF ."` WHERE `photo` > '0' AND `tag` = %s ORDER BY `description`", $tag ), ARRAY_A );
-			$last 		= '';
+
+			if ( $brand ) {
+				$exifdata 	= $wpdb->get_results( $wpdb->prepare( 	"SELECT DISTINCT `f_description` " .
+																	"FROM `" . WPPA_EXIF ."` " .
+																	"WHERE `photo` > '0' " .
+																	"AND `tag` = %s " .
+																	"AND `brand` = %s " .
+																	"AND `f_description` <> %s " .
+																	"AND `f_description` <> '' " .
+																	"ORDER BY `f_description`", $tag, $brand, __( 'n.a.', 'wp-photo-album-plus' ) ), ARRAY_A );
+			}
+			else {
+				$exifdata 	= $wpdb->get_results( $wpdb->prepare( 	"SELECT DISTINCT `f_description` " .
+																	"FROM `" . WPPA_EXIF ."` " .
+																	"WHERE `photo` > '0' " .
+																	"AND `tag` = %s " .
+																	"AND `f_description` <> %s " .
+																	"AND `f_description` <> '' " .
+																	"ORDER BY `f_description`", $tag, __( 'n.a.', 'wp-photo-album-plus' ) ), ARRAY_A );
+			}
+
+			// Some exif data need sorting in a human understandable logical way.
+			switch ( $tag ) {
+/*
+				// FNumber
+				case 'E#829D':
+
+					foreach ( array_keys( $exifdata ) as $key ) {
+						$temp = $exifdata[$key]['f_description'];
+						if ( strpos( $temp, '.' ) === false ) { 	// If int, append .0
+							$temp .= '.0';
+						}
+						$temp = substr( $temp, 2 ); 				// Strip 'f/'
+						while ( strlen( $temp ) < 5 ) { 			// Add leading 0's
+							$temp = '0' . $temp;
+						}
+						$exifdata[$key]['sort'] = $temp;
+					}
+
+					$exifdata = wppa_array_sort( $exifdata, 'sort' );
+					break;
+
+				// Subject distance
+				case 'E#9206':
+
+					foreach ( array_keys( $exifdata ) as $key ) {
+						$temp = $exifdata[$key]['f_description'];
+						$temp = rtrim( $temp, ' m.' );
+						if ( strpos( $temp, '.' ) === false ) { 	// If int, append .0
+							$temp .= '.0';
+						}
+						while ( strlen( substr( $temp, strpos( $temp, '.' ) ) ) < 2 ) { 	// Make sure 2 decimal digits
+							$temp .= '0';
+						}
+						while ( strlen( $temp ) < 8 ) {
+							$temp = '0' . $temp; 					// Add leading 0's
+						}
+						$exifdata[$key]['sort'] = $temp;
+					}
+
+					$exifdata = wppa_array_sort( $exifdata, 'sort' );
+					break;
+*/
+				// Numerical values
+				case 'E#0102': 	// BitsPerSample
+				case 'E#829A': 	// ExposureTime
+				case 'E#829D':	// FNumber
+				case 'E#9202': 	// ApertureValue
+				case 'E#9203': 	// BrightnessValue
+				case 'E#9206': 	// SubjectDistance
+				case 'E#920A': 	// FocalLength
+				case 'E#A405': 	// FocalLengthIn35mmFilm
+
+					foreach ( array_keys( $exifdata ) as $key ) {
+						$temp = $exifdata[$key]['f_description'];
+						if ( $temp != __( 'n.a.', 'wp-photo-album-plus' ) ) {
+							$temp = trim( $temp, ' smf/.' );
+							if ( strpos( $temp, '/' ) ) {
+								$temp = explode( '/', $temp );
+								if ( $temp[1] != 0 ) {
+									$temp = $temp[0] / $temp[1];
+								}
+								else {
+									$temp = 999999;
+								}
+							}
+							$exifdata[$key]['sort'] = sprintf( '%020.12f', $temp );
+						}
+						else {
+							$exifdata[$key]['sort'] = $temp;
+						}
+					}
+
+					$exifdata = wppa_array_sort( $exifdata, 'sort' );
+					break;
+			}
+
+
 			$any 		= false;
-			if ( is_array( $exifdata ) ) foreach( $exifdata as $item ) {
-				$desc = sanitize_text_field( $item['description'] );
+			if ( ! empty( $exifdata ) ) foreach( $exifdata as $item ) {
+				$desc = sanitize_text_field( $item['f_description'] );
 				$desc = str_replace( array(chr(0),chr(1),chr(2),chr(3),chr(4),chr(5),chr(6),chr(7)), '', $desc );
 
-				if ( $desc != $last ) {
+				if ( $desc ) {
+
 					$sel = ( $oldvalue && $oldvalue == $desc ) ? 'selected="selected"' : '';
 					$ddesc = strlen( $desc ) > '32' ? substr( $desc, 0, 30 ) . '...' : $desc;
+
 					echo 	'<option' .
 								' value="' . esc_attr( $desc ) . '"' .
 								' class="wppa-exiflist-' . $mocc . '"' .
@@ -162,14 +262,14 @@ global $wppa_log_file;
 								' >' .
 									$ddesc .
 							'</option>';
-					$last = $desc;
 					$any = true;
 				}
 			}
+
+			// Cleanup possible unused label
 			if ( ! $any ) {
-				$query = $wpdb->prepare( "DELETE FROM `" . WPPA_EXIF . "` WHERE `photo` = '0' AND `tag` = %s", $tag );
+				$query = $wpdb->prepare( "UPDATE `" . WPPA_EXIF . "` SET `status` = 'hide' WHERE `photo` = '0' AND `tag` = %s", $tag );
 				$wpdb->query( $query );
-//				wppa_log( 'dbg', $query );
 			}
 			wppa_exit();
 			break;

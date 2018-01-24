@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.7.01
+* Version 6.8.00
 *
 */
 
@@ -467,6 +467,18 @@ function wppaTryScheduledel( id ) {
 	wppaPhotoStatusChange( id );
 	if ( jQuery( '#scheduledel-' + id ).attr( 'checked' ) != 'checked' ) {
 		_wppaAjaxUpdatePhoto( id, 'removescheduledel', 0, true );
+	}
+}
+
+function wppaToggleExif( id, count ) {
+
+	if ( jQuery( '#wppa-exif-' + id ).css( 'display' ) == 'none' ) {
+		jQuery( '#wppa-exif-' + id ).show();
+		jQuery( '#wppa-exif-button-' + id ).attr( 'value', '<?php _e( 'Hide', 'wp-photo-album-plus' ) ?> ' + count + ' <?php _e( 'EXIF items', 'wp-photo-album-plus' ) ?>' );
+	}
+	else {
+		jQuery( '#wppa-exif-' + id ).hide();
+		jQuery( '#wppa-exif-button-' + id ).attr( 'value', '<?php _e( 'Show', 'wp-photo-album-plus' ) ?> ' + count + ' <?php _e( 'EXIF items', 'wp-photo-album-plus' ) ?>' );
 	}
 }
 
@@ -1016,7 +1028,7 @@ function wppaTryScheduledel( id ) {
 										__( 'Filesize:', 'wp-photo-album-plus' ) . ' ' .
 										wppa_get_filesize( str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) );
 										$c++;
-										if ( $c == count( $is_video ) ) {
+										if ( is_array( $is_video ) && $c == count( $is_video ) ) {
 											echo '. ';
 										}
 										else {
@@ -1036,7 +1048,7 @@ function wppaTryScheduledel( id ) {
 										__( 'Filesize:', 'wp-photo-album-plus' ) . ' ' .
 										wppa_get_filesize( str_replace( 'xxx', $fmt, wppa_get_photo_path( $id, false ) ) );
 										$c++;
-										if ( $c == count( $is_video ) ) {
+										if ( is_array( $is_video ) && $c == count( $is_video ) ) {
 											echo '. ';
 										}
 										else {
@@ -2021,69 +2033,140 @@ function wppaTryScheduledel( id ) {
 					'</tbody>' .
 				'</table>';
 
-				echo	// Section 5
+				echo 	// Section 5
 				"\n" . '<!-- Section 5 -->';
 
-				// Comments
-				$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_COMMENTS."` WHERE `photo` = %s ORDER BY `timestamp` DESC", $id ), ARRAY_A );
-				if ( $comments && ! $quick ) {
-					echo
-					'<table' .
-						' class="wppa-table wppa-photo-table"' .
-						' style="width:100%;"' .
-						' >' .
-						'<thead>' .
-							'<tr style="font-weight:bold;" >' .
-								'<td style="padding:0 4px;" >#</td>' .
-								'<td style="padding:0 4px;" >User</td>' .
-								'<td style="padding:0 4px;" >Time since</td>' .
-								'<td style="padding:0 4px;" >Status</td>' .
-								'<td style="padding:0 4px;" >Comment</td>' .
-							'</tr>' .
-						'</thead>' .
-						'<tbody>';
-
-							foreach ( $comments as $comment ) {
-								echo '
-								<tr id="com-tr-' . $comment['id'] . '" >
-									<td style="padding:0 4px;" >'.$comment['id'].'</td>
-									<td style="padding:0 4px;" >'.$comment['user'].'</td>
-									<td style="padding:0 4px;" >'.wppa_get_time_since( $comment['timestamp'] ).'</td>';
-									if ( current_user_can( 'wppa_comments' ) || current_user_can( 'wppa_moderate' ) || ( wppa_get_user() == $photo['owner'] && wppa_switch( 'owner_moderate_comment' ) ) ) {
-										$p = ( $comment['status'] == 'pending' ) ? 'selected="selected" ' : '';
-										$a = ( $comment['status'] == 'approved' ) ? 'selected="selected" ' : '';
-										$s = ( $comment['status'] == 'spam' ) ? 'selected="selected" ' : '';
-										$t = ( $comment['status'] == 'trash' ) ? 'selected="selected" ' : '';
-										echo
-										'<td style="padding:0 4px;" >' .
-											'<select' .
-												' id="com-stat-' . $comment['id'] . '"' .
-												' style=""' .
-												' onchange="wppaAjaxUpdateCommentStatus( '.$id.', '.$comment['id'].', this.value );wppaSetComBgCol(' . $comment['id'] . ');"' .
-												' >' .
-												'<option value="pending" '.$p.'>'.__( 'Pending' , 'wp-photo-album-plus').'</option>' .
-												'<option value="approved" '.$a.'>'.__( 'Approved' , 'wp-photo-album-plus').'</option>' .
-												'<option value="spam" '.$s.'>'.__( 'Spam' , 'wp-photo-album-plus').'</option>' .
-												'<option value="trash" '.$t.'>'.__( 'Trash' , 'wp-photo-album-plus').'</option>' .
-											'</select >' .
-										'</td>';
-									}
-									else {
-										echo '<td style="padding:0 4px;" >';
-											if ( $comment['status'] == 'pending' ) _e( 'Pending' , 'wp-photo-album-plus');
-											elseif ( $comment['status'] == 'approved' ) _e( 'Approved' , 'wp-photo-album-plus');
-											elseif ( $comment['status'] == 'spam' ) _e( 'Spam' , 'wp-photo-album-plus');
-											elseif ( $comment['status'] == 'trash' ) _e( 'Trash' , 'wp-photo-album-plus');
-										echo '</td>';
-									}
-									echo '<td style="padding:0 4px;" >'.$comment['comment'].'</td>
-								</tr>' .
-								'<script>wppaSetComBgCol(' . $comment['id'] . ')</script>';
-							}
-
+				// Exif
+				if ( ! $quick ) {
+					$exifs = $wpdb->get_results( $wpdb->prepare( 	"SELECT * FROM `" . WPPA_EXIF . "` " .
+																	"WHERE `photo` = %s " .
+																	"ORDER BY `tag`, `id` ", $id ), ARRAY_A );
+					if ( ! empty( $exifs ) ) {
+						$brand = wppa_get_camera_brand( $id );
 						echo
-						'</tbody>' .
-					'</table>';
+						'<table><tbody><tr><td><input' .
+							' type="button"' .
+							' id="wppa-exif-button-' . $id . '"' .
+							' class="button-secundary"' .
+							' value="' . esc_attr( sprintf( __( 'Show %d EXIF items', 'wp-photo-album-plus' ), count( $exifs ) ) ) . '"' .
+							' onclick="wppaToggleExif( ' . $id . ', ' . count( $exifs ) . ' );"' .
+						' /></td></tr></tbody></table>' .
+						'<table' .
+							' id="wppa-exif-' . $id . '"' .
+							' class="wppa-table wppa-photo-table"' .
+							' style="clear:both;width:100%;display:none;"' .
+							' >' .
+							'<thead>' .
+								'<tr style="font-weight:bold;" >' .
+									'<td style="padding:0 4px;" >Exif tag</td>' .
+									'<td style="padding:0 4px;" >Brand</td>' .
+									'<td style="padding:0 4px;" >Description</td>' .
+									'<td style="padding:0 4px;max-width:30%;" >Raw value</td>' .
+									'<td style="padding:0 4px;max-width:30%;" >Formatted value</td>' .
+								'</tr>' .
+							'</thead>' .
+							'<tbody>';
+
+								foreach ( $exifs as $exif ) {
+									echo '
+									<tr id="exif-tr-' . $exif['id'] . '" >
+										<td style="padding:0 4px;" >'.$exif['tag'].'</td>';
+
+											if ( $brand && $exif['brand'] ) { 	 // * wppa_exif_tagname( hexdec( substr( $exif['tag'], 2, 4 ) ), $brand, 'brandonly' ) ) {
+												echo '
+												<td style="padding:0 4px;" >' . $brand . '</td>
+												<td style="padding:0 4px;" >' . wppa_exif_tagname( hexdec( substr( $exif['tag'], 2, 4 ) ), $brand, 'brandonly' ) . ':</td>';
+											}
+											else {
+												echo '
+												<td style="padding:0 4px;" ></td>
+												<td style="padding:0 4px;" >' . wppa_exif_tagname( hexdec( substr( $exif['tag'], 2, 4 ) ) ) . ':</td>';
+											}
+
+										echo '
+										<td style="padding:0 4px;" >'.$exif['description'].'</td>
+										<td style="padding:0 4px;" >' .
+											( $exif['f_description'] == __( 'n.a.', 'wp-photo-album-plus' ) ? wppa_format_exif( $exif['tag'], $exif['description'] ) : $exif['f_description'] ) .
+										'</td>
+									</tr>';
+
+								}
+
+							echo
+							'</tbody>' .
+						'</table>';
+
+
+					}
+				}
+
+				echo	// Section 6
+				"\n" . '<!-- Section 6 -->';
+
+				// Comments
+				if ( ! $quick ) {
+					$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . WPPA_COMMENTS."` " .
+																	"WHERE `photo` = %s " .
+																	"ORDER BY `timestamp` DESC ", $id ), ARRAY_A );
+					if ( ! empty( $comments ) ) {
+						echo
+						'<table' .
+							' class="wppa-table wppa-photo-table"' .
+							' style="width:100%;"' .
+							' >' .
+							'<thead>' .
+								'<tr style="font-weight:bold;" >' .
+									'<td style="padding:0 4px;" >#</td>' .
+									'<td style="padding:0 4px;" >User</td>' .
+									'<td style="padding:0 4px;" >Time since</td>' .
+									'<td style="padding:0 4px;" >Status</td>' .
+									'<td style="padding:0 4px;" >Comment</td>' .
+								'</tr>' .
+							'</thead>' .
+							'<tbody>';
+
+								foreach ( $comments as $comment ) {
+									echo '
+									<tr id="com-tr-' . $comment['id'] . '" >
+										<td style="padding:0 4px;" >'.$comment['id'].'</td>
+										<td style="padding:0 4px;" >'.$comment['user'].'</td>
+										<td style="padding:0 4px;" >'.wppa_get_time_since( $comment['timestamp'] ).'</td>';
+										if ( current_user_can( 'wppa_comments' ) || current_user_can( 'wppa_moderate' ) || ( wppa_get_user() == $photo['owner'] && wppa_switch( 'owner_moderate_comment' ) ) ) {
+											$p = ( $comment['status'] == 'pending' ) ? 'selected="selected" ' : '';
+											$a = ( $comment['status'] == 'approved' ) ? 'selected="selected" ' : '';
+											$s = ( $comment['status'] == 'spam' ) ? 'selected="selected" ' : '';
+											$t = ( $comment['status'] == 'trash' ) ? 'selected="selected" ' : '';
+											echo
+											'<td style="padding:0 4px;" >' .
+												'<select' .
+													' id="com-stat-' . $comment['id'] . '"' .
+													' style=""' .
+													' onchange="wppaAjaxUpdateCommentStatus( '.$id.', '.$comment['id'].', this.value );wppaSetComBgCol(' . $comment['id'] . ');"' .
+													' >' .
+													'<option value="pending" '.$p.'>'.__( 'Pending' , 'wp-photo-album-plus').'</option>' .
+													'<option value="approved" '.$a.'>'.__( 'Approved' , 'wp-photo-album-plus').'</option>' .
+													'<option value="spam" '.$s.'>'.__( 'Spam' , 'wp-photo-album-plus').'</option>' .
+													'<option value="trash" '.$t.'>'.__( 'Trash' , 'wp-photo-album-plus').'</option>' .
+												'</select >' .
+											'</td>';
+										}
+										else {
+											echo '<td style="padding:0 4px;" >';
+												if ( $comment['status'] == 'pending' ) _e( 'Pending' , 'wp-photo-album-plus');
+												elseif ( $comment['status'] == 'approved' ) _e( 'Approved' , 'wp-photo-album-plus');
+												elseif ( $comment['status'] == 'spam' ) _e( 'Spam' , 'wp-photo-album-plus');
+												elseif ( $comment['status'] == 'trash' ) _e( 'Trash' , 'wp-photo-album-plus');
+											echo '</td>';
+										}
+										echo '<td style="padding:0 4px;" >'.$comment['comment'].'</td>
+									</tr>' .
+									'<script>wppaSetComBgCol(' . $comment['id'] . ')</script>';
+								}
+
+							echo
+							'</tbody>' .
+						'</table>';
+					}
 				}
 
 				echo
@@ -2968,7 +3051,7 @@ global $wppa_search_stats;
 	$doit = false;
 
 	if ( current_user_can( 'wppa_admin' ) && current_user_can( 'wppa_moderate' ) ) $doit = true;
-	if ( wppa_opt( 'upload_edit' ) != 'none' ) $doit = true;
+	if ( wppa_opt( 'upload_edit' ) != '-none-' ) $doit = true;
 	if ( ! $doit ) {	// Should never get here. Only when url is manipulted manually.
 		die('Security check failure #309');
 	}
@@ -3010,7 +3093,7 @@ global $wppa_search_stats;
 			}
 
 			if ( $first ) {
-				$photo_array 	= wppa_index_array_remove_dups( wppa_index_string_to_array( trim( $photos, ',' ) ) );
+				$photo_array 	= wppa_index_string_to_array( trim( $photos, ',' ) );
 				$count 			= empty( $photo_array ) ? '0' : count( $photo_array );
 				$list 			= implode( ',', $photo_array );
 				if ( ! $list ) {
@@ -3031,7 +3114,7 @@ global $wppa_search_stats;
 				$first = false;
 			}
 			else {
-				$temp_array 	= wppa_index_array_remove_dups( wppa_index_string_to_array( trim( $photos, ',' ) ) );
+				$temp_array 	= wppa_index_string_to_array( trim( $photos, ',' ) );
 				$count 			= empty( $temp_array ) ? '0' : count( $temp_array );
 				$list 			= implode( ',', $temp_array );
 

@@ -3,7 +3,7 @@ Contributors: vasyltech
 Tags: access, role, user, capability, page access, post access, comments, security, login redirect, brute force attack, double authentication, membership, backend lockdown, wp-admin, 404, activity tracking
 Requires at least: 3.8
 Tested up to: 4.9.1
-Stable tag: 5.0.4
+Stable tag: 5.0.6
 
 The most powerful access management plugin for WordPress websites.
 
@@ -59,6 +59,15 @@ https://www.youtube.com/watch?v=yiOhjaacNJc
 11. Improve your website security
 
 == Changelog ==
+
+= 5.0.6 =
+* Fixed several minor PHP errors caused by legacy PHP versions and corrupted data
+* Another boost to the AAM performance
+* Normalized few AAM core filters and actions
+
+= 5.0.5 =
+* Enhanced Admin Menu feature
+* Extended AAM API. Preparing it for developers to use.
 
 = 5.0.4 =
 * Fixed bug with caching. Significantly improved speed.

@@ -1,4 +1,5 @@
 <?php
+if (!defined('ABSPATH')) die();
 global $current_user, $wpdb;
 ?><div class="row">
     <div class="col-md-4">

@@ -1,4 +1,6 @@
-<?php get_header(); the_post(); ?>   
+<?php
+if (!defined('ABSPATH')) die();
+get_header(); the_post(); ?>
       <div class="container">   
         <br>  
         <div class="row">

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.7.02
+* Version 6.8.00
 *
 */
 
@@ -558,15 +558,20 @@ global $wppa_session;
 					echo
 					'<p class="hideifupdate" >' .
 						__( 'Default album for import:', 'wp-photo-album-plus') .
-						'<select name="wppa-photo-album" id="wppa-photo-album" >' .
 							wppa_album_select_a( array( 	'path' 				=> wppa_switch( 'hier_albsel' ),
 															'selected' 			=> get_option( 'wppa-photo-album-import-'.wppa_get_user(), '0' ),
 															'addpleaseselect' 	=> true,
 															'checkowner' 		=> true,
 															'checkupload' 		=> true,
 															'sort' 				=> true,
+															'optionclass' 		=> '',
+															'tagopen' 			=> '<select name="wppa-photo-album" id="wppa-photo-album" >',
+															'tagname' 			=> 'wppa-photo-album',
+															'tagid' 			=> 'wppa-photo-album',
+															'tagonchange' 		=> '',
+															'multiple' 			=> false,
+															'tagstyle' 			=> '',
 														) ) .
-						'</select>' .
 						__( 'Photos that have (<em>name</em>)[<em>album</em>] will be imported by that <em>name</em> in that <em>album</em>.', 'wp-photo-album-plus') .
 					'</p>';
 
@@ -850,15 +855,20 @@ global $wppa_session;
 					echo
 					'<p class="hideifupdate" >' .
 						__( 'Album to import to:', 'wp-photo-album-plus') .
-						'<select name="wppa-video-album" id="wppa-video-album">' .
 							wppa_album_select_a( array( 	'path' 				=> wppa_switch( 'hier_albsel' ),
 															'selected' 			=> get_option( 'wppa-video-album-import-'.wppa_get_user(), '0' ),
 															'addpleaseselect'	=> true,
 															'checkowner' 		=> true,
 															'checkupload' 		=> true,
 															'sort'				=> true,
+															'optionclass' 		=> '',
+															'tagopen' 			=> '<select name="wppa-video-album" id="wppa-video-album" >',
+															'tagname' 			=> 'wppa-video-album',
+															'tagid' 			=> 'wppa-video-album',
+															'tagonchange' 		=> '',
+															'multiple' 			=> false,
+															'tagstyle' 			=> '',
 														) ) .
-						'</select>' .
 					'</p>';
 
 					// Header of video list
@@ -958,15 +968,20 @@ global $wppa_session;
 					echo
 					'<p class="hideifupdate" >' .
 						__( 'Album to import to:', 'wp-photo-album-plus') .
-						'<select name="wppa-audio-album" id="wppa-audio-album" >' .
 							wppa_album_select_a( array( 	'path' 				=> wppa_switch( 'hier_albsel' ),
 															'selected' 			=> get_option( 'wppa-audio-album-import-'.wppa_get_user(), '0' ),
 															'addpleaseselect' 	=> true,
 															'checkowner' 		=> true,
 															'checkupload' 		=> true,
 															'sort' 				=> true,
+															'optionclass' 		=> '',
+															'tagopen' 			=> '<select name="wppa-audio-album" id="wppa-audio-album" >',
+															'tagname' 			=> 'wppa-audio-album',
+															'tagid' 			=> 'wppa-audio-album',
+															'tagonchange' 		=> '',
+															'multiple' 			=> false,
+															'tagstyle' 			=> '',
 														) ) .
-						'</select>' .
 					'</p>';
 
 					// Header of audio list

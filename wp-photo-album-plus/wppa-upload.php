@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 6.7.03
+* Version 6.8.00
 *
 */
 
@@ -82,7 +82,7 @@ global $upload_album;
 					document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id=' . $upload_album . '&wppa_nonce=' . wp_create_nonce( 'wppa_nonce', 'wppa_nonce' ), 'js' ) ) ?>';
 				</script>
 			<?php }
-			elseif ( wppa_opt( 'upload_edit' ) != 'none' ) {
+			elseif ( wppa_opt( 'upload_edit' ) != '-none-' ) {
 				wppa_ok_message( __( 'Connecting to edit photos...' , 'wp-photo-album-plus' ) ); ?>
 				<script type="text/javascript">document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_edit_photo', 'js' ) ) ?>';</script>
 			<?php }
@@ -99,7 +99,7 @@ global $upload_album;
 					document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id=' . $upload_album . '&wppa_nonce=' . wp_create_nonce( 'wppa_nonce', 'wppa_nonce' ), 'js' ) ) ?>';
 				</script>
 			<?php }
-			elseif ( wppa_opt( 'upload_edit' ) != 'none' ) {
+			elseif ( wppa_opt( 'upload_edit' ) != '-none-' ) {
 				wppa_ok_message( __( 'Connecting to edit photos...' , 'wp-photo-album-plus' ) ); ?>
 				<script type="text/javascript">document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_edit_photo', 'js' ) ) ?>';</script>
 			<?php }
@@ -186,9 +186,16 @@ global $upload_album;
 						'<label for="wppa-album">' .
 							__( 'Album:' , 'wp-photo-album-plus') .
 						'</label>' .
-						'<select name="wppa-album" id="wppa-album-s" style="max-width:100%;" >' .
-							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true, 'sort' => true ) ) .
-						'</select>' .
+							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ),
+														'addpleaseselect' 	=> true,
+														'checkowner' 		=> true,
+														'checkupload' 		=> true,
+														'sort' 				=> true,
+														'tagopen'			=> '<select name="wppa-album" id="wppa-album-s" style="max-width:100%;" >',
+														'tagid' 			=> 'wppa-album-s',
+														'tagname' 			=> 'wppa-album',
+														'tagstyle' 			=> 'max-width:100%;',
+														) ) .
 					'</p>';
 					if ( wppa_switch( 'watermark_on' ) && ( wppa_switch( 'watermark_user' ) || current_user_can( 'wppa_settings' ) ) ) {
 						echo
@@ -328,9 +335,16 @@ global $upload_album;
 					'</script>' .
 					'<p>' .
 						'<label for="wppa-album">' . __( 'Album:' , 'wp-photo-album-plus' ) . '</label>' .
-						'<select name="wppa-album" id="wppa-album-s" style="max-width:100%;" >' .
-							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true, 'sort' => true ) ) .
-						'</select>' .
+							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ),
+														'addpleaseselect' => true,
+														'checkowner' => true,
+														'checkupload' => true,
+														'sort' => true,
+														'tagopen'			=> '<select name="wppa-album" id="wppa-album-s" style="max-width:100%;" >',
+														'tagid' 			=> 'wppa-album-s',
+														'tagname' 			=> 'wppa-album',
+														'tagstyle' 			=> 'max-width:100%;',
+														) ) .
 					'</p>';
 
 					// Watermark?
@@ -405,9 +419,16 @@ global $upload_album;
 					'</div>' .
 					'<p>' .
 						'<label for="wppa-album">' . __( 'Album:' , 'wp-photo-album-plus') . '</label>' .
-						'<select name="wppa-album" id="wppa-album-m" style="max-width:100%;" >' .
-							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'addpleaseselect' => true, 'checkowner' => true, 'checkupload' => true, 'sort' => true ) ) .
-						'</select>' .
+							wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ),
+														'addpleaseselect' 	=> true,
+														'checkowner' 		=> true,
+														'checkupload' 		=> true,
+														'sort' 				=> true,
+														'tagopen'			=> '<select name="wppa-album" id="wppa-album-m" style="max-width:100%;" >',
+														'tagid' 			=> 'wppa-album-m',
+														'tagname' 			=> 'wppa-album',
+														'tagstyle' 			=> 'max-width:100%;',
+														) ) .
 					'</p>';
 
 					// Watermark?

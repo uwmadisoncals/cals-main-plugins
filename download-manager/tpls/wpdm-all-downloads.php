@@ -1,10 +1,22 @@
 <?php
+if (!defined('ABSPATH')) die();
 global $btnclass;
 $p = serialize($params);
 $tid = md5($p);
 if(!isset($params['items_per_page'])) $params['items_per_page'] = 20;
+$cols = isset($params['cols'])?$params['cols']:'title,file_count,download_count|categories|update_date|download_link';
+$colheads = isset($params['colheads'])?$params['colheads']:'Title|Categories|Update Date|Download';
+$cols = explode("|", $cols);
+$colheads = explode("|", $colheads);
+foreach ($cols as $index => &$col){
+   $col = explode(",", $col);
+   $colheads[$index] = !isset($colheads[$index])?$col[0]:$colheads[$index];
+}
 
 $column_positions = array();
+
+//$coltemplate['title'] = $coltemplate['post_title'] = "%the_title%";
+$coltemplate['page_link'] = "<a class=\"package-title\" href=\"%s\">%s</a>";
 
 if(isset($params['jstable']) && $params['jstable']==1):
 
@@ -13,12 +25,21 @@ if(isset($params['jstable']) && $params['jstable']==1):
 
     ?>
     <script src="<?php echo WPDM_BASE_URL.'assets/js/jquery.dataTables.min.js' ?>"></script>
+    <script src="<?php echo WPDM_BASE_URL.'assets/js/dataTables.bootstrap.min.js' ?>"></script>
     <link href="<?php echo WPDM_BASE_URL.'assets/css/jquery.dataTables.min.css' ?>" rel="stylesheet" />
     <style>
         #wpdmmydls-<?php echo $tid; ?>{
             border-bottom: 1px solid #dddddd;
             border-top: 3px solid #bbb;
             font-size: 10pt;
+            min-width: 100%;
+        }
+        #wpdmmydls-<?php echo $tid; ?> .wpdm-download-link img{
+            box-shadow: none !important;
+            max-width: 100px;
+        }
+        .w3eden .pagination{
+            margin: 0 !important;
         }
         #wpdmmydls-<?php echo $tid; ?> th{
             background-color: #e8e8e8;
@@ -35,16 +56,51 @@ if(isset($params['jstable']) && $params['jstable']==1):
         #wpdmmydls-<?php echo $tid; ?> .package-title{
             color:#36597C;
             font-size: 11pt;
-            font-weight: 400;
+            font-weight: 700;
         }
+        #wpdmmydls-<?php echo $tid; ?> .small-txt{
+            margin-right: 7px;
+        }
+        #wpdmmydls-<?php echo $tid; ?> #categories{
+            max-width: 170px;
+        }
+        #wpdmmydls-<?php echo $tid; ?> #download_link{
+            max-width: 100px;
+        }
+        #wpdmmydls-<?php echo $tid; ?> .small-txt,
         #wpdmmydls-<?php echo $tid; ?> small{
             font-size: 9pt;
         }
+        .dataTables_wrapper .dataTables_paginate .paginate_button{
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        @media (max-width: 799px) {
+            #wpdmmydls-<?php echo $tid; ?> tr {
+                display: block;
+                border: 3px solid rgba(0,0,0,0.3) !important;
+                margin-bottom: 10px !important;
+                position: relative;
+            }
+            #wpdmmydls-<?php echo $tid; ?> thead{
+                display: none;
+            }
+            #wpdmmydls-<?php echo $tid; ?>,
+            #wpdmmydls-<?php echo $tid; ?> td:first-child {
+                border: 0 !important;
+            }
+            #wpdmmydls-<?php echo $tid; ?> td {
+                display: block;
+            }
+        }
+
 
     </style>
     <script>
         jQuery(function($){
-            $('#wpdmmydls-<?php echo $tid; ?>').dataTable({
+            var __dt = $('#wpdmmydls-<?php echo $tid; ?>').dataTable({
+                responsive: true,
                 "order": [[ <?php echo $datatable_col; ?>, "<?php echo $datatable_order; ?>" ]],
                 "language": {
                     "lengthMenu": "<?php _e("Display _MENU_ downloads per page",'download-manager')?>",
@@ -72,6 +128,7 @@ if(isset($params['jstable']) && $params['jstable']==1):
                 "iDisplayLength": <?php echo $params['items_per_page'] ?>,
                 "aLengthMenu": [[<?php echo $params['items_per_page']; ?>, 10, 25, 50, -1], [<?php echo $params['items_per_page']; ?>, 10, 25, 50, "<?php _e("All",'download-manager'); ?>"]]
             });
+
         });
     </script>
 <?php endif; ?>
@@ -81,10 +138,12 @@ if(isset($params['jstable']) && $params['jstable']==1):
         <table id="wpdmmydls-<?php echo $tid; ?>" class="table table-striped wpdm-all-packages-table">
             <thead>
             <tr>
-                <th class=""><?php _e('Title','download-manager'); ?></th>
-                <th class="hidden-sm hidden-xs"><?php _e('Categories','download-manager'); ?></th>
+                <?php foreach ($colheads as $ix => $colhead){ ?>
+                <th  id="<?php echo $cols[$ix][0]; ?>" class="<?php if($ix > 0) echo 'hidden-sm hidden-xs'; ?>"><?php _e($colhead,'download-manager'); ?></th>
+                <?php } ?>
+                <!-- th class="hidden-sm hidden-xs"><?php _e('Categories','download-manager'); ?></th>
                 <th class="hidden-xs"><?php _e('Create Date','download-manager'); ?></th>
-                <th style="width: 100px;"><?php _e('Download','download-manager'); ?></th>
+                <th style="width: 100px;"><?php _e('Download','download-manager'); ?></th -->
             </tr>
             </thead>
             <tbody>
@@ -137,26 +196,72 @@ if(isset($params['jstable']) && $params['jstable']==1):
                 $data['title'] = get_the_title();
                 if($ext=='') $ext = '_blank.png';
                 if($ext==basename($ext)) $ext = plugins_url("download-manager/assets/file-type-icons/".$ext);
-                $data['download_link'] = DownloadLink($data, 0, array('popstyle' => 'popup'));
+                $data['download_link'] = DownloadLink($data, 0);
                 $data = apply_filters("wpdm_after_prepare_package_data", $data);
                 $download_link = $data['download_link'];
                 if(isset($data['base_price']) && $data['base_price'] > 0 && function_exists('wpdmpp_currency_sign')) $download_link = "<a href='".$data['addtocart_url']."' class='btn btn-sm btn-info'>Buy ( ".$data['currency'].$data['effective_price']." )</a>";
                 if($download_link != 'blocked'){
                     ?>
 
-                    <tr>
-                        <td style="background-image: url('<?php echo $ext ; ?>');background-size: 32px;background-position: 5px 8px;background-repeat:  no-repeat;padding-left: 43px;line-height: normal;">
-                            <a class="package-title" href='<?php echo the_permalink(); ?>'><?php the_title(); ?></a><br/>
-                            <small><i class="fa fa-folder"></i> &nbsp; <?php echo count($data['files']); ?> <?php _e('files','download-manager'); ?> &nbsp;&nbsp;
-                                <i class="fa fa-download"></i> &nbsp; <?php echo isset($data['download_count'])?$data['download_count']:0; ?>
-                                <?php echo isset($data['download_count']) && $data['download_count'] > 1 ?  __('downloads','download-manager') : __('download','download-manager'); ?><br/>
-                                <span class="hidden-md hidden-lg"><?php echo $cats; ?></br></span>
-                                <span class="hidden-md hidden-lg hidden-sm"><?php echo get_the_date(); ?></span>
-                            </small>
+                    <tr class="__dt_row">
+                        <?php
+                        $tcols = $cols;
+                        array_shift($tcols);
+                        foreach ($cols as $colx => $cold){
+                            $dor = array('publish_date' => strtotime(get_the_date()), 'create_date' => strtotime(get_the_date()), 'update_date' => strtotime(get_the_modified_date('', get_the_ID())));
+                            ?>
+                        <td <?php if(in_array($cold[0], array('publish_date', 'update_date','create_date'))) { ?> data-order="<?php echo $dor[$cold[0]]; ?>" <?php } ?> class="__dt_col_<?php echo $colx; ?> __dt_col" <?php if($colx == 0) { ?>style="background-image: url('<?php echo $ext ; ?>');background-size: 40px;background-position: 5px 8px;background-repeat:  no-repeat;padding-left: 52px;line-height: normal;"<?php } ?>>
+                            <?php
+
+                            foreach ($cold as $cx => $c){
+                                $cxc = ($cx > 0)?'small-txt':'';
+                                switch ($c) {
+                                    case 'title':
+                                        echo "<a class=\"package-title\" href='".get_the_permalink(get_the_ID())."'>".get_the_title()."</a><br/>";
+                                        break;
+                                    case 'file_count':
+                                        if($cx > 0)
+                                            echo "<span class='__dt_file_count {$cxc}'><i class=\"fa fa-files-o\"></i> &nbsp;". count($data['files'])." " . __('file(s)','download-manager')."</span>";
+                                        else
+                                            echo "<span class=\"hidden-md hidden-lg td-mobile\">{$colheads[$colx]}: </span><span class='__dt_file_count {$cxc}'>".count($data['files'])."</span>";
+                                        break;
+                                    case 'download_count':
+                                        if($cx > 0)
+                                            echo "<span class='__dt_download_count {$cxc}'><i class=\"fa fa-download\"></i> &nbsp;". (isset($data['download_count'])?$data['download_count']:0)." ".(isset($data['download_count']) && $data['download_count'] > 1 ?  __('downloads','download-manager') : __('download','download-manager'))."</span>";
+                                        else
+                                            echo "<span class=\"hidden-md hidden-lg td-mobile\">{$colheads[$colx]}: </span><span class='__dt_download_count {$cxc}'>{$data['download_count']}</span>";
+                                        break;
+                                    case 'view_count':
+                                        if($cx > 0)
+                                            echo "<span class='__dt_view_count {$cxc}'><i class=\"fa fa-eye\"></i> &nbsp;". (isset($data['view_count'])?$data['view_count']:0)." ".(isset($data['view_count']) && $data['view_count'] > 1 ?  __('views','download-manager') : __('view','download-manager'))."</span>";
+                                        else
+                                            echo "<span class=\"hidden-md hidden-lg td-mobile\">{$colheads[$colx]}: </span><span class='__dt_view_count'>{$data['view_count']}</span>";
+                                        break;
+                                    case 'categories':
+                                        echo "<span class='__dt_categories {$cxc}'>".$cats."</span>";
+                                        break;
+                                    case 'update_date':
+                                        echo "<span class='__dt_update_date {$cxc}'>".get_the_modified_date('', get_the_ID())."</span>";
+                                        break;
+                                    case 'publish_date':
+                                        echo "<span class='__dt_publish_date {$cxc}'>".get_the_date()."</span>";
+                                        break;
+                                    case 'download_link':
+                                        echo $download_link;
+                                        break;
+                                    default:
+                                        echo $c;
+                                        break;
+
+
+                            }}
+                            if($colx == 0) echo '<div class="hidden-md hidden-lg td-mobile"></div>';
+                                        ?>
+
+
                         </td>
-                        <td class="hidden-sm hidden-xs"><?php echo $cats; ?></td>
-                        <td class="hidden-xs" data-order="<?php echo get_the_time('U') ?>"><?php echo get_the_date(); ?></td>
-                        <td><?php echo $download_link; ?></td>
+                        <?php }  ?>
+
                     </tr>
                 <?php } endwhile; ?>
             <?php if((!isset($params['jstable']) || $params['jstable']==0) && $total_files==0): ?>

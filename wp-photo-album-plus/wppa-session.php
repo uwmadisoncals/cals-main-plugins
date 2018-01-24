@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 6.7.01
+* Version 6.8.00
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -49,6 +49,9 @@ global $wppa_session;
 
 	// Get data if valid session exists
 	$data = $session ? $session['data'] : false;
+	if ( strlen( $data ) > 65000 ) { // data overflow, reset
+		$data = false;
+	}
 
 	// No valid session exists, start new
 	if ( $data === false ) {
@@ -80,14 +83,8 @@ global $wppa_session;
 
 	// Session exists, Update counter
 	else {
+		$wppa_session = unserialize( $data );
 		$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_SESSION . "` SET `count` = %s WHERE `id` = %s", $session['count'] + '1', $session['id'] ) );
-		$data_arr = unserialize( $data );
-		if ( is_array( $data_arr ) ) {
-			$wppa_session = $data_arr;
-		}
-		else {
-			$wppa_session = array();
-		}
 	}
 
 	// Get info for root and sub search

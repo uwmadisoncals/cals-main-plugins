@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version 6.7.08
+* Version 6.8.00
 *
 */
 
@@ -59,7 +59,7 @@ function wppa_add_admin() {
 	add_submenu_page( 'wppa_admin_menu',  __('Album Admin', 'wp-photo-album-plus'),			 __('Album Admin', 'wp-photo-album-plus').$upl_pending,'wppa_admin',        'wppa_admin_menu',      'wppa_admin' );
     add_submenu_page( 'wppa_admin_menu',  __('Upload Photos', 'wp-photo-album-plus'),           __('Upload Photos', 'wp-photo-album-plus'),          'wppa_upload',        'wppa_upload_photos',   'wppa_page_upload' );
 	// Uploader without album admin rights, but when the upload_edit switch set, may edit his own photos
-	if ( ! current_user_can('wppa_admin') && wppa_opt( 'upload_edit') != 'none' ) {
+	if ( ! current_user_can('wppa_admin') && wppa_opt( 'upload_edit') != '-none-' ) {
 		add_submenu_page( 'wppa_admin_menu',  __('Edit Photos', 'wp-photo-album-plus'), 		 __('Edit Photos', 'wp-photo-album-plus'), 		   'wppa_upload', 		 'wppa_edit_photo', 	 'wppa_edit_photo' );
 	}
 	add_submenu_page( 'wppa_admin_menu',  __('Import Photos', 'wp-photo-album-plus'),           __('Import Photos', 'wp-photo-album-plus'),          'wppa_import',        'wppa_import_photos',   'wppa_page_import' );
@@ -90,7 +90,12 @@ function wppa_admin_scripts() {
 global $wppa_api_version;
 	wp_register_script( 'wppa_upload_script', WPPA_URL.'/js/wppa-multifile-compressed.js', '', $wppa_api_version );
 	wp_enqueue_script( 'wppa_upload_script' );
-	wp_register_script( 'wppa_admin_script', WPPA_URL.'/js/wppa-admin-scripts.js', '', $wppa_api_version );
+	if ( is_file( WPPA_PATH.'/js/wppa-admin-scripts.min.js' ) ) {
+		wp_register_script( 'wppa_admin_script', WPPA_URL.'/js/wppa-admin-scripts.min.js', '', $wppa_api_version );
+	}
+	else {
+		wp_register_script( 'wppa_admin_script', WPPA_URL.'/js/wppa-admin-scripts.js', '', $wppa_api_version );
+	}
 	wp_enqueue_script( 'wppa_admin_script' );
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script( 'jquery-ui-sortable' );

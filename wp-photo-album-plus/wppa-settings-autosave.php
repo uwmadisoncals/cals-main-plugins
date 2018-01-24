@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.7.08
+* Version 6.8.00
 *
 */
 
@@ -24,13 +24,28 @@ global $wppa_revno;
 global $no_default;
 global $wppa_tags;
 global $wp_version;
+global $wppa_supported_camara_brands;
 
 	// Start test area
-//$data = $wpdb->get_col("SELECT DISTINCT `description` FROM `".WPPA_EXIF."` WHERE `tag` = 'E#9206' ORDER BY `description`");
-//echo count( $data ).'<br />';
-//foreach( $data as $item ) {
-//	echo $item . ' -> ' . wppa_format_exif( 'E#9206', $item ) . '<br />';
+//$photo = 254;
+//$exif = exif_read_data(wppa_get_source_path($photo),'ANY_TAG',true);
+//var_export($exif);
+//echo '<br />';
+//$t = 0x0000;
+//while ( $t < 0x10000 ) {
+//	$n = exif_tagname( $t );
+//	if ( $n ) echo sprintf( '%04x: %s<br />', $t, $n );
+//	$t++;
 //}
+//$exif = exif_read_data(wppa_get_source_path($photo));
+//var_export($exif);
+//if (is_file(wppa_get_source_path( 1632 ))) {
+//wppa_import_exif( 1632, wppa_get_source_path( 1632 ) );
+//wppa_fix_exif_format( 1632 );
+//echo 'done';
+//}
+//else {echo 'not found';}
+
 	// End test area
 
 	// Initialize
@@ -7205,6 +7220,19 @@ global $wp_version;
 							$tags = 'system,meta';
 							wppa_setting(false, '7', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Format exif', 'wp-photo-album-plus');
+							$desc = __('Format EXIF data', 'wp-photo-album-plus');
+							$help = '';
+							$slug2 = 'wppa_format_exif';
+							$html1 = wppa_cronjob_button( $slug2 );
+							$html2 = wppa_maintenance_button( $slug2 );
+							$html3 = wppa_status_field( $slug2 );
+							$html4 = wppa_togo_field( $slug2 );
+							$html = array($html1, $html2, $html3, $html4);
+							$clas = '';
+							$tags = 'system,meta';
+							wppa_setting(false, '7.1', $name, $desc, $html, $help, $clas, $tags);
+
 							$name = __('Remake Index Albums', 'wp-photo-album-plus');
 							$desc = __('Remakes the index database table for albums.', 'wp-photo-album-plus');
 							$help = '';
@@ -8191,8 +8219,8 @@ global $wp_version;
 							$desc = __('Max albums to show in album selectionbox.', 'wp-photo-album-plus');
 							$help = esc_js(__('If there are more albums in the system, display an input box asking for album id#', 'wp-photo-album-plus'));
 							$slug = 'wppa_photo_admin_max_albums';
-							$options = array( __('--- off ---', 'wp-photo-album-plus'), '10', '20', '50', '100', '200', '500', '1000');
-							$values = array('0', '10', '20', '50', '100', '200', '500', '1000');
+							$options = array( __( '--- off ---', 'wp-photo-album-plus'), '10', '20', '50', '100', '200', '500', '1000', '2000', '3000', '4000', '5000' );
+							$values = array( '0', '10', '20', '50', '100', '200', '500', '1000', '2000', '3000', '4000', '5000' );
 							$html = wppa_select($slug, $options, $values);
 							$clas = '';
 							$tags = 'system';
@@ -9667,7 +9695,7 @@ global $wp_version;
 							$clas = '';
 							$tags = 'system';
 							wppa_setting($slug, '8', $name, $desc, $html, $help, $clas, $tags);
-							
+
 							$name = __('Shortcode [photo nnn] on bbPress', 'wp-photo-album-plus');
 							$desc = __('Enable the [photo] shortcode generator on bbPress frontend editors', 'wp-photo-album-plus');
 							$help = '';
@@ -10050,7 +10078,41 @@ global $wp_version;
 							$clas = '';
 							$tags = 'system';
 							wppa_setting($slug, '5', $name, $desc, $html, $help, $clas, $tags);
-											
+
+							$name = __('Albums', 'wp-photo-album-plus');
+							$desc = __('Select album(s) for random photo', 'wp-photo-album-plus');
+							$help = esc_js( __( 'The albums to be used for the selection of a random photo for shortcode: [photo random]', 'wp-photo-album-plus'));
+							$slug = 'wppa_photo_shortcode_random_albums';
+							if ( wppa_has_many_albums() ) {
+								$html = wppa_input( $slug, '220', __('Enter album ids separated by commas','wp-photo-album-plus' ) );
+							}
+							else {
+								$albums = $wpdb->get_results( "SELECT `id`, `name` FROM `" . WPPA_ALBUMS . "`", ARRAY_A );
+								$albums = wppa_add_paths( $albums );
+								$albums = wppa_array_sort( $albums, 'name' );
+								$opts = array();
+								$vals = array();
+								$opts[] = __( '--- all ---', 'wp-photo-album-plus' );
+								$vals[] = '-2';
+								foreach( $albums as $album ) {
+									$opts[] = $album['name'];
+									$vals[] = $album['id'];
+								}
+								$html = wppa_select_m($slug, $opts, $vals, '', '', false, '', $max_width = '400' );
+							}
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '6', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Select photo once', 'wp-photo-album-plus');
+							$desc = __('The same random photo on every pageload', 'wp-photo-album-plus');
+							$help = esc_js(__('If ticked: the random photo is determined once at page/post creation time', 'wp-photo-album-plus'));
+							$help .= '\n\n'.esc_js(__('If unticked: every pageload a different photo', 'wp-photo-album-plus'));
+							$slug = 'wppa_photo_shortcode_random_fixed';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '7', $name, $desc, $html, $help, $clas, $tags);
 							}
 							?>
 
@@ -10144,7 +10206,7 @@ global $wp_version;
 							<tr>
 								<td><?php _e('#', 'wp-photo-album-plus') ?></td>
 								<td><?php _e('Tag', 'wp-photo-album-plus') ?></td>
-								<td></td>
+								<td><?php _e('Brand', 'wp-photo-album-plus') ?></td>
 								<td><?php _e('Description', 'wp-photo-album-plus') ?></td>
 								<td><?php _e('Status', 'wp-photo-album-plus') ?></td>
 								<td><?php _e('Help', 'wp-photo-album-plus') ?></td>
@@ -10167,11 +10229,27 @@ global $wp_version;
 								$i = '1';
 								foreach ( $labels as $label ) {
 									$name = $label['tag'];
+
 									$desc = '';
+									foreach ( $wppa_supported_camara_brands as $brand ) {
+										$lbl = wppa_exif_tagname( hexdec( '0x' . substr( $label['tag'], 2, 4 ) ), $brand, 'brandonly' );
+										if ( $lbl ) {
+											$desc .= '<br />' . $brand;
+										}
+									}
+
 									$help = '';
 									$slug1 = 'wppa_exif_label_'.$name;
 									$slug2 = 'wppa_exif_status_'.$name;
+
 									$html1 = wppa_edit($slug1, $label['description']);
+									foreach ( $wppa_supported_camara_brands as $brand ) {
+										$lbl = wppa_exif_tagname( hexdec( '0x' . substr( $label['tag'], 2, 4 ) ), $brand, 'brandonly' );
+										if ( $lbl ) {
+											$html1 .= '<br /><span style="clear:left;float:left;" >' . $lbl . ':</span>';
+										}
+									}
+
 									$options = array(__('Display', 'wp-photo-album-plus'), __('Hide', 'wp-photo-album-plus'), __('Optional', 'wp-photo-album-plus'));
 									$values = array('display', 'hide', 'option');
 									$html2 = wppa_select_e($slug2, $label['status'], $options, $values);
@@ -10785,7 +10863,7 @@ global $wppa_opt;
 	$slug = substr( $xslug, 5 );
 
 	if ( ! is_array( $options ) ) {
-		$html = __('There are no pages (yet) to link to.', 'wp-photo-album-plus');
+		$html = __('There is nothing to select.', 'wp-photo-album-plus');
 		return $html;
 	}
 
@@ -10827,7 +10905,7 @@ global $wppa_opt;
 	$slug = substr( $xslug, 5 );
 
 	if ( ! is_array( $options ) ) {
-		$html = __('There are no pages (yet) to link to.', 'wp-photo-album-plus');
+		$html = __('There is nothing to select.', 'wp-photo-album-plus');
 		return $html;
 	}
 
@@ -10846,7 +10924,8 @@ global $wppa_opt;
 	$idx = 0;
 	$cnt = count( $options );
 
-	$pages = explode(',', wppa_opt($slug) );
+	$pages = wppa_expand_enum( wppa_opt( $slug ) );
+	$pages = explode( '.', $pages );
 
 	while ( $idx < $cnt ) {
 
@@ -10879,7 +10958,7 @@ function wppa_select_e( $xslug, $curval, $options, $values, $onchange = '', $cla
 	$slug = substr( $xslug, 5 );
 
 	if ( ! is_array( $options ) ) {
-		$html = __('There are no pages (yet) to link to.', 'wp-photo-album-plus');
+		$html = __('There is nothing to select.', 'wp-photo-album-plus');
 		return $html;
 	}
 

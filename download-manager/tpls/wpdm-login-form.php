@@ -1,5 +1,5 @@
 <?php
-
+if (!defined('ABSPATH')) die();
 
 $regurl = get_option('__wpdm_register_url');
 if($regurl > 0)
@@ -9,7 +9,7 @@ if(isset($params['redirect'])) $log_redirect = esc_url($params['redirect']);
 if(isset($_GET['redirect_to'])) $log_redirect = esc_url($_GET['redirect_to']);
 
 $up = parse_url($log_redirect);
-if($up['host'] != $_SERVER['SERVER_NAME']) $log_redirect = $_SERVER['REQUEST_URI'];
+if(!isset($up['host']) || $up['host'] != $_SERVER['SERVER_NAME']) $log_redirect = $_SERVER['REQUEST_URI'];
 
 
 ?>
@@ -75,9 +75,9 @@ if($up['host'] != $_SERVER['SERVER_NAME']) $log_redirect = $_SERVER['REQUEST_URI
                 <div class="col-md-6"><small class="pull-right"><?php _e('Forgot Password?','download-manager'); ?> <a href="<?php echo site_url('/wp-login.php?action=lostpassword'); ?>"><?php _e('Request Reset','download-manager'); ?></a></small></div>
             </div>
             <div class="row">
-                <div class="col-md-<?php echo ($regurl != '')?7:12; ?>"><button type="submit" name="wp-submit" id="loginform-submit" class="btn btn-block btn-primary btn-lg"><i class="fa fa-key"></i> &nbsp; <?php _e('Login','download-manager'); ?></button></div>
+                <div class="col-md-<?php echo ($regurl != '')?7:12; ?>"><button type="submit" name="wp-submit" id="loginform-submit" class="btn btn-block btn-primary btn-lg"><i class="fa fa-key"></i> <?php _e('Login','download-manager'); ?></button></div>
                 <?php if($regurl != ''){ ?>
-                <div class="col-md-5"><a href="<?php echo $regurl; ?>" name="wp-submit" id="loginform-submit" class="btn btn-block btn-default btn-lg"><i class="fa fa-user-plus"></i> &nbsp; <?php _e('Register','download-manager'); ?></a></div>
+                <div class="col-md-5"><a href="<?php echo $regurl; ?>" name="wp-submit" id="loginform-submit" class="btn btn-block btn-default btn-lg"><i class="fa fa-user-plus"></i> <?php _e('Sign Up','download-manager'); ?></a></div>
                 <?php } ?>
             </div>
 

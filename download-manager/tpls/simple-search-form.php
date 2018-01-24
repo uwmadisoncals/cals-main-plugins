@@ -1,4 +1,6 @@
-<div class='w3eden'>
+<?php
+if (!defined('ABSPATH')) die();
+?><div class='w3eden'>
     <form id="srcp" style="margin-bottom: 10px">
         <input type="text" class="form-control input-lg" style="border-radius: 3px;background-position: 16px 11px;padding-left: 50px !important;" name="src" placeholder="<?php _e('Search Package','wpdmap'); ?>" id="src">
     </form>

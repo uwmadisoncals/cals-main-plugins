@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.7.07
+* Version 6.8.00
 *
 */
 
@@ -444,11 +444,6 @@ function wppaTryScheduleAll( id ) {
 									__( 'Parent album:', 'wp-photo-album-plus' ) . ' ';
 									if ( wppa_extended_access() ) {
 										echo
-//										'<select' .
-//											' id="wppa-parsel"' .
-//											' style="max-width:500px;"' .
-//											' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'a_parent\', this )"' .
-//											' >' .
 											wppa_album_select_a( array( 'checkaccess' 		=> true,
 																		'exclude' 			=> $id,
 																		'selected' 			=> $a_parent,
@@ -468,14 +463,13 @@ function wppaTryScheduleAll( id ) {
 																		'tagstyle' 			=> 'font-size:13px;height:20px;cursor:pointer;',
 																		)
 																);
-//																.
-//											'</select>';
+											'</select>';
 									}
 									else {
 										echo
 										'<select' .
 											' id="wppa-parsel"' .
-											' style="max-width:500px;"' .
+											' style="max-width:300px;"' .
 											' onchange="wppaAjaxUpdateAlbum( '. $id . ', \'a_parent\', this )"' .
 											' >' .
 											wppa_album_select_a( array( 'checkaccess' => true,
@@ -2040,7 +2034,7 @@ function wppa_search_edit( $collapsible = false ) {
 
 	$doit = false;
 	if ( current_user_can( 'wppa_admin' ) && current_user_can( 'wppa_moderate' ) ) $doit = true;
-	if ( wppa_opt( 'upload_edit' ) != 'none' ) $doit = true;
+	if ( wppa_opt( 'upload_edit' ) != '-none-' ) $doit = true;
 
 	if ( ! $doit ) return;
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.7.07
+* Version 6.8.00
 *
 */
 
@@ -345,7 +345,7 @@ global $wpdb;
 
 	$exiflines = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_EXIF."` WHERE `photo` = %s", $fromphoto ), ARRAY_A );
 	if ( $exiflines ) foreach ( $exiflines as $line ) {
-		$id = wppa_create_exif_entry( array( 'photo' => $tophoto, 'tag' => $line['tag'], 'description' => $line['description'], 'status' => $line['status'] ) );
+		$bret = wppa_create_exif_entry( array( 'photo' => $tophoto, 'tag' => $line['tag'], 'description' => $line['description'], 'status' => $line['status'] ) );
 	}
 }
 function wppa_copy_iptc( $fromphoto, $tophoto ) {
@@ -353,7 +353,7 @@ global $wpdb;
 
 	$iptclines = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_IPTC."` WHERE `photo` = %s", $fromphoto ), ARRAY_A );
 	if ( $iptclines ) foreach ( $iptclines as $line ) {
-		$id = wppa_create_iptc_entry( array( 'photo' => $tophoto, 'tag' => $line['tag'], 'description' => $line['description'], 'status' => $line['status'] ) );
+		$bret = wppa_create_iptc_entry( array( 'photo' => $tophoto, 'tag' => $line['tag'], 'description' => $line['description'], 'status' => $line['status'] ) );
 	}
 }
 
