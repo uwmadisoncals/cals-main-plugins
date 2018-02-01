@@ -1274,11 +1274,11 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
         if (isset($_REQUEST['apc']) && 'insert_file' == $_REQUEST['apc'] )
 
-          return str_replace(__('Insert into Post'), __('Use this File','apc'), $safe_text);
+          return str_replace(__('Insert into Post'), __('Use this File','cool-timeline'), $safe_text);
 
         else
 
-          return str_replace(__('Insert into Post'), __('Use this Image','apc'), $safe_text);
+          return str_replace(__('Insert into Post'), __('Use this Image','cool-timeline'), $safe_text);
 
       }
 
@@ -1326,7 +1326,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       do_action('admin_page_class_before_page');
 
-      echo '<div class="wrap">'."\n";
+      echo '<div class="wrap ctl_left_section">'."\n";
 
       echo '<form method="post" name="'.apply_filters('apc_form_name', 'admin_page_class',$this).'" class="'.apply_filters('apc_form_class', 'admin_page_class',$this).'" id="'.apply_filters('apc_form_id', 'admin_page_class',$this).'" action="" enctype="multipart/form-data">
 
@@ -1344,7 +1344,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
         <div class="ctl_save">'."".'
 
-          <input type="submit" style="margin-left: 25px;" value="'.esc_attr(__('Save Changes','apc')).'" name="Submit" class="'.apply_filters('admin_page_class_submit_class', 'btn-info').' btn"><br><br>
+          <input type="submit" style="margin-left: 25px;" value="'.esc_attr(__('Save Changes','cool-timeline')).'" name="Submit" class="'.apply_filters('admin_page_class_submit_class', 'btn-info').' btn"><br><br>
 
         </div>'."".'
 
@@ -1370,7 +1370,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
         }else{
 
-          echo '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button><strong>'.__('Settings saved.','apc').'</strong></div>'."\n";
+          echo '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button><strong>'.__('Settings saved.','cool-timeline').'</strong></div>'."\n";
 
         }
 
@@ -1546,7 +1546,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
         <div style="float:right;margin:32px 0 0 0">'."\n".'
 
-          <input type="submit" style="margin-left: 25px;" name="Submit" class="'.apply_filters('admin_page_class_submit_class', 'btn-info').' btn" value="'.esc_attr(__('Save Changes','apc')).'" />'."\n".'
+          <input type="submit" style="margin-left: 25px;" name="Submit" class="'.apply_filters('admin_page_class_submit_class', 'btn-info').' btn" value="'.esc_attr(__('Save Changes','cool-timeline')).'" />'."\n".'
 
           <br><br>
 
@@ -1562,7 +1562,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
     </div>'.'<div class="ctl_right_section">
 
-    <div class="ctl_pro_logo"> <a target="_blank" href="http://www.cooltimeline.com">
+    <div class="ctl_pro_logo"> <a target="_blank" href="https://www.cooltimeline.com">
 
     <img src="' . CTP_PLUGIN_URL . 'images/cooltimeline-logo.jpg"></a>
 
@@ -1578,10 +1578,10 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
   Please rate and review us,It helps us grow <br>and improve our services. </p>
 <p>Here’s the link:-</p>
 <p><a target="_blank" href="https://codecanyon.net/item/cool-timeline-pro-wordpress-timeline-plugin/reviews/17046256">Codecanyon</a></p>
-<p>  <a target="_blank" href="https://wordpress.org/support/plugin/cool-timeline/reviews/">Wordpress.org</a>
+<p>  <a target="_blank" href="https://wordpress.org/support/plugin/cool-timeline/reviews/">WordPress.org</a>
 </p>
 
-  <div><a target="_blank" href="https://codecanyon.net/item/cool-timeline-pro-wordpress-responsive-timeline-plugin/reviews/17046256"><img src="' . CTP_PLUGIN_URL . '/images/stars5.png"></a>
+  <div><a target="_blank" href="https://codecanyon.net/item/cool-timeline-pro-wordpress-responsive-timeline-plugin/reviews/17046256"><img src="https://res.cloudinary.com/cooltimeline/image/upload/v1504097450/stars5_gtc1rg.png"></a>
 
   </div>
 
@@ -1591,11 +1591,9 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
     <div>
 
-    <a target="_blank" href="http://www.cooltimeline.com">
+    <a target="_blank" href="https://www.cooltimeline.com">
 
-    <img src="' . CTP_PLUGIN_URL . '/images/7-cool-timeline-demos.png"></a> <a target="_blank" href="http://www.cooltimeline.com/documentation"><img src="' . CTP_PLUGIN_URL . '/images/view-docs.png"></a></div>
-
-    </div>';
+    <img src="https://res.cloudinary.com/cooltimeline/image/upload/v1503490189/website-images/cool-timeline-demos.png"></a> <a target="_blank" href="http://www.cooltimeline.com/documentation"><img src="https://res.cloudinary.com/cooltimeline/image/upload/v1505133065/view-docs_gudqwz.png"></a></div> </div>';
 
     do_action('admin_page_class_after_page');
 
@@ -2333,7 +2331,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       //$li   .= "<a title='" . __( 'Delete this image' ) . "' class='at-delete-file' href='#' rel='{$nonce}|{$post_id}|{$id}|{$attachment_id}'>" . __( 'Delete' ) . "</a>";
 
-      $li   .= "<a title='" . __( 'Delete this image','apc' ) . "' class='at-delete-file' href='#' rel='{$nonce}|{$post_id}|{$id}|{$attachment_id}'><img src='" . $this->SelfPath. "/images/delete-16.png' alt='" . __( 'Delete' ,'apc') . "' /></a>";
+      $li   .= "<a title='" . __( 'Delete this image','cool-timeline' ) . "' class='at-delete-file' href='#' rel='{$nonce}|{$post_id}|{$id}|{$attachment_id}'><img src='" . $this->SelfPath. "/images/delete-16.png' alt='" . __( 'Delete' ,'cool-timeline') . "' /></a>";
 
       $li   .= "<input type='hidden' name='{$id}[]' value='{$attachment_id}' />";
 
@@ -2523,7 +2521,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
     }else{
 
-      echo json_encode(array('message' => __( 'Cannot delete file. Something\'s wrong.','apc')));
+      echo json_encode(array('message' => __( 'Cannot delete file. Something\'s wrong.','cool-timeline')));
 
       die();
 
@@ -2933,7 +2931,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
         }
 
-        echo '" alt="'.__('Remove','apc').'" title="'.__('Remove','apc').'" id="remove-'.$field['id'].'"></div>';
+        echo '" alt="'.__('Remove','cool-timeline').'" title="'.__('Remove','cool-timeline').'" id="remove-'.$field['id'].'"></div>';
 
         $c = $c + 1;
 
@@ -2957,7 +2955,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
     }
 
-    echo '" alt="'.__('Add','apc').'" title="'.__('Add','apc').'" id="add-'.$jsid.'"><br/></div>';
+    echo '" alt="'.__('Add','cool-timeline').'" title="'.__('Add','cool-timeline').'" id="add-'.$jsid.'"><br/></div>';
 
 
 
@@ -3023,7 +3021,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
 
 
-    echo '" alt="'.__('Remove','apc').'" title="'.__('Remove','apc').'" id="remove-'.$jsid.'"></div>'."\n";
+    echo '" alt="'.__('Remove','cool-timeline').'" title="'.__('Remove','cool-timeline').'" id="remove-'.$jsid.'"></div>'."\n";
 
     $counter = 'countadd_'.$jsid;
 
@@ -3305,7 +3303,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
         <div class="plupload-upload-uic hide-if-no-js '.$m1.'" id="'.$id.'plupload-upload-ui">
 
-          <input id="'.$id.'plupload-browse-button" type="button" value="'.__('Select Files','apc').'" class="button" />
+          <input id="'.$id.'plupload-browse-button" type="button" value="'.__('Select Files','cool-timeline').'" class="button" />
 
           <span class="ajaxnonceplu" id="ajaxnonceplu'.wp_create_nonce($id . 'pluploadan').'"></span>';
 
@@ -3723,7 +3721,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
         $nonce = wp_create_nonce( 'at_ajax_delete' );
 
-        echo '<div style="margin-bottom: 10px"><strong>' . __('Uploaded files','apc') . '</strong></div>';
+        echo '<div style="margin-bottom: 10px"><strong>' . __('Uploaded files','cool-timeline') . '</strong></div>';
 
         echo '<ol class="at-upload">';
 
@@ -3731,7 +3729,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
           // if (wp_attachment_is_image($att)) continue; // what's image uploader for?
 
-          echo "<li>" . wp_get_attachment_link( $att, '' , false, false, ' ' ) . " (<a class='at-delete-file' href='#' rel='{$nonce}|{$post->ID}|{$field['id']}|{$att}'>" . __( 'Delete' ,'apc') . "</a>)</li>";
+          echo "<li>" . wp_get_attachment_link( $att, '' , false, false, ' ' ) . " (<a class='at-delete-file' href='#' rel='{$nonce}|{$post->ID}|{$field['id']}|{$att}'>" . __( 'Delete' ,'cool-timeline') . "</a>)</li>";
 
         }
 
@@ -3745,7 +3743,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       echo "<div class='at-file-upload-label'>";
 
-        echo "<strong>" . __( 'Upload new files' ,'apc') . "</strong>";
+        echo "<strong>" . __( 'Upload new files' ,'cool-timeline') . "</strong>";
 
       echo "</div>";
 
@@ -3757,7 +3755,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
         echo "</div><!-- End .file-input -->";
 
-        echo "<a class='at-add-file button' href='#'>" . __( 'Add more files','apc' ) . "</a>";
+        echo "<a class='at-add-file button' href='#'>" . __( 'Add more files','cool-timeline' ) . "</a>";
 
       echo "</div><!-- End .new-files -->";
 
@@ -3797,7 +3795,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       $html .= "<input type='hidden' name='".$field['id']."[src]' id='".$field['id']."[src]' value='".$meta['src']."' />"."\n";
 
-      $html .= "<input class='at-delete_image_button button' type='button' rel='".$field['id']."' value='".__('Delete Image','apc')."' />"."\n";
+      $html .= "<input class='at-delete_image_button button' type='button' rel='".$field['id']."' value='".__('Delete Image','cool-timeline')."' />"."\n";
 
     }else{
 
@@ -3807,7 +3805,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       $html .= "<input type='hidden' name='".$field['id']."[src]' id='".$field['id']."[src]' value='' />"."\n";
 
-      $html .= "<input class='at-mm-upload_image_button button' type='button' rel='".$field['id']."' value='".__('Upload Image','apc')."' />"."\n";
+      $html .= "<input class='at-mm-upload_image_button button' type='button' rel='".$field['id']."' value='".__('Upload Image','cool-timeline')."' />"."\n";
 
     }
 
@@ -3863,7 +3861,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       $html .= "<input type='hidden' name='".$field['id']."[src]' id='".$field['id']."[src]' value='".$meta['src']."' />";
 
-      $html .= "<input class='at-delete_image_button button' type='button' data-u='".$upload_type."' rel='".$field['id']."' value='".__('Delete Image','apc')."' />";
+      $html .= "<input class='at-delete_image_button button' type='button' data-u='".$upload_type."' rel='".$field['id']."' value='".__('Delete Image','cool-timeline')."' />";
 
     }else{
 
@@ -3873,7 +3871,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       $html .= "<input type='hidden' name='".$field['id']."[src]' id='".$field['id']."[src]' value='' />";
 
-      $html .= "<input class='at-upload_image_button button' type='button' data-u='".$upload_type."' rel='".$field['id']."' value='".__('Upload Image','apc')."' />";
+      $html .= "<input class='at-upload_image_button button' type='button' data-u='".$upload_type."' rel='".$field['id']."' value='".__('Upload Image','cool-timeline')."' />";
 
     }
 
@@ -4123,7 +4121,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       $html .= "<input class='at-color' type='text' name='".$field['id']."[color]' id='".$field['id']."[color]' value='".$meta['color'] ."' size='6' />"."\n";
 
-      $html .= "<input type='button' class='at-color-select button' rel='".$field['id']."[color]' value='" . __( 'Select a color' ,'apc') . "'/>"."\n";
+      $html .= "<input type='button' class='at-color-select button' rel='".$field['id']."[color]' value='" . __( 'Select a color' ,'cool-timeline') . "'/>"."\n";
 
       $html .= "<div style='display:none' class='at-color-picker' rel='".$field['id']."[color]'></div>"."\n";
 
@@ -4175,7 +4173,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       echo "<input class='at-color".(isset($field['class'])? " {$field['class']}": "")."' type='text' name='{$field['id']}' id='{$field['id']}' value='{$meta}' size='8' />";
 
-      echo "<input type='button' class='at-color-select button' rel='{$field['id']}' value='" . __( 'Select a color' ,'apc') . "'/>";
+      echo "<input type='button' class='at-color-select button' rel='{$field['id']}' value='" . __( 'Select a color' ,'cool-timeline') . "'/>";
 
       echo "<div style='display:none' class='at-color-picker' rel='{$field['id']}'></div>";
 
@@ -6705,11 +6703,11 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
         <div class="export_code">
 
-          <label for="export_code">'. __('Export Code','apc').'</label><br/>
+          <label for="export_code">'. __('Export Code','cool-timeline').'</label><br/>
 
           <textarea id="export_code"></textarea>
 
-          <input class="button" type="button" value="'. __('Get Export','apc').'" id="apc_export_b" />'.$this->create_export_download_link().'
+          <input class="button" type="button" value="'. __('Get Export','cool-timeline').'" id="apc_export_b" />'.$this->create_export_download_link().'
 
           <div class="export_status" style="display: none;"><img src="http://i.imgur.com/l4pWs.gif" alt="loading..."/></div>
 
@@ -6719,17 +6717,17 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       </div>
 
-      <div style="padding 10px;" class="apc_import"><h3>'.__('Import','apc').'</h3>
+      <div style="padding 10px;" class="apc_import"><h3>'.__('Import','cool-timeline').'</h3>
 
-        <p>'. __('To Import saved settings paste the Export output in to the Import Code box bellow and click Import.','apc').'</p>
+        <p>'. __('To Import saved settings paste the Export output in to the Import Code box bellow and click Import.','cool-timeline').'</p>
 
         <div class="import_code">
 
-          <label for="import_code">'. __('Import Code','apc').'</label><br/>
+          <label for="import_code">'. __('Import Code','cool-timeline').'</label><br/>
 
           <textarea id="import_code"></textarea>
 
-                  <input class="button" type="button"  value="'. __('Import','apc').'" id="apc_import_b" />
+                  <input class="button" type="button"  value="'. __('Import','cool-timeline').'" id="apc_import_b" />
 
           <div class="import_status" style="display: none;"><img src="http://i.imgur.com/l4pWs.gif" alt="loading..."/></div>
 
@@ -6761,9 +6759,9 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
         <div style="padding 10px;" class="apc_export">
          <div class="export_code">';
       if($ctl_can_migrate=="yes"){      
-    $ret .='<p>'.__('Migrate Stories From Free To Pro Version','apc').'</p><input class="button" type="button" value="'. __('Migrate content','apc').'" id="apc_migration_b" />';
+    $ret .='<p>'.__('Migrate Stories From Free To Pro Version','cool-timeline').'</p><input class="button" type="button" value="'. __('Migrate content','cool-timeline').'" id="apc_migration_b" />';
       }else{
-		$ret .='<label for="">'. __('No Stories(free version) is Available For Migration','apc').'</label>';
+		$ret .='<label for="">'. __('No Stories is Available For Migration','cool-timeline').'</label>';
        }
      $ret .='<div class="migration_results alert" style="display: none;">
 
@@ -6886,11 +6884,11 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       update_option($this->option_group,$import_code);
 
-      $re['success']= __('Setting imported, make sure you ','apc'). '<input class="button-primary" type="button"  value="'. __('Refresh this page','apc').'" id="apc_refresh_page_b" />';
+      $re['success']= __('Setting imported, make sure you ','cool-timeline'). '<input class="button-primary" type="button"  value="'. __('Refresh this page','cool-timeline').'" id="apc_refresh_page_b" />';
 
     }else{
 
-      $re['err'] = __('Could not import settings! (4)','apc');
+      $re['err'] = __('Could not import settings! (4)','cool-timeline');
 
     }
 
@@ -6931,15 +6929,16 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
                   update_post_meta($post->ID, 'ctl_story_year',$published_year);
                    $term_taxonomy_ids = wp_set_object_terms($post->ID,20,'ctl-stories', true );
                    }
+                    update_post_meta($post->ID, 'story_based_on','default');
                }
                 update_option("ctl-can-migrate","no");
-          $re['success']= __('You have successfully migrated content','apc');
+          $re['success']= __('You have successfully migrated content','cool-timeline');
 
      }else{
         $re['err'] = __('No any story found','apc');
        }
   }else{
-       $re['err'] = __('You cannot migrate any story','apc');
+       $re['err'] = __('You cannot migrate any story','cool-timeline');
      }
     
 
@@ -6974,7 +6973,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
     if ( !current_user_can('edit_themes') )
 
-        wp_die('<p>'.__('You do not have sufficient permissions to edit templates for this site.','apc').'</p>');
+        wp_die('<p>'.__('You do not have sufficient permissions to edit templates for this site.','cool-timeline').'</p>');
 
     
 
@@ -7024,7 +7023,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
     if ($echo === true)
 
-        echo '<a href="'.$export_url.'" target="_blank">'.__('Download Export','apc').'</a>';
+        echo '<a href="'.$export_url.'" target="_blank">'.__('Download Export','cool-timeline').'</a>';
 
     elseif ($echo == 'url')
 
@@ -7110,10 +7109,9 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
   public function load_textdomain(){
 
-    //In themes/plugins/mu-plugins directory
-
-    load_textdomain( 'apc', dirname(__FILE__) . '/lang/' . get_locale() .'.mo' );
-
+     //In themes/plugins/mu-plugins directory
+   load_textdomain( 'cool-timeline', dirname(dirname(__FILE__)) . '/languages/' . 'cool-timeline-'. get_locale() .'.mo' );
+   
   }
 
 
@@ -7164,7 +7162,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
           $this->errors[$field['id']]['name'] = $field['name'];
 
-          $this->errors[$field['id']]['m'][] = (isset($args['message'])? $args['message'] : __('Not Valid ','apc') . $type);
+          $this->errors[$field['id']]['m'][] = (isset($args['message'])? $args['message'] : __('Not Valid ','cool-timeline') . $type);
 
           $ret = false;
 
@@ -7200,7 +7198,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
       echo '<div class="alert alert-error"><button data-dismiss="alert" class="close" type="button">×</button>';
 
-      echo '<h4>'.__('Errors in saving changes', 'apc').'</h4>';
+      echo '<h4>'.__('Errors in saving changes', 'cool-timeline').'</h4>';
 
       foreach ($this->errors as $id => $arr) {
 
@@ -7250,7 +7248,7 @@ if ( ! class_exists( 'BF_Admin_Page_Class_Pro') ) :
 
     }
 
-    return __('Unkown Error','apc');
+    return __('Unkown Error','cool-timeline');
 
   }
 

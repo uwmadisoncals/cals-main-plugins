@@ -15,7 +15,7 @@
     font-weight: 700;
 }
 .w3eden .btn.wpdm-front h3.title {
-    font-family: 'Montserrat', san-serif;
+    font-family: 'Montserrat';
     margin: 10px 0 5px 10px;
     font-size: 14pt;
 }
@@ -31,6 +31,9 @@
 }
 .w3eden #loginform {
     margin-top: 20px;
+}
+.w3eden #loginform .alert{
+    border-radius: 0 !important;
 }
 .w3eden .btn.wpdm-category-list li {
     clear: both;
@@ -425,16 +428,13 @@
     text-decoration: none !important;
 }
 .w3eden .popover {
-    min-width: 365px;
+    min-width: 250px;
 }
 .w3eden .all-locks {
     padding: 15px;
 }
 .w3eden td.actions {
     width: 100px;
-}
-.w3eden .btn-verify-captcha{
-    margin: 5px 0;
 }
 .w3eden .actions a.btn {
     border-radius: 2px;
@@ -1436,119 +1436,85 @@
     margin: 0 !important;
 }
 .w3eden .alert{
-    border-radius: 2px;
+    border-radius: 4px;
+    padding: 10px 15px;
+    letter-spacing: 0.5px;
+    margin: 5px 0;
+    text-align: left;
 }
-.w3eden .alert.alert-info:before {
-    background: #5bc0de none repeat scroll 0 0;
-    border-bottom-left-radius: 3px;
-    border-top-left-radius: 3px;
-    color: #fff;
-    content: "\f05a";
-    font-family: FontAwesome;
-    font-size: 16pt;
+
+.w3eden .alert:before {
+    color: #fff !important;
+    font-family: Montserrat, "Helvetica Neue", sans-serif;
     height: 100%;
-    margin: -15px 0 0 -60px;
-    padding-top: 8px;
+    top: -22px;
     position: absolute;
-    text-align: center;
-    width: 45px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    content: attr(data-title);
+}
+.w3eden .alert.alert-sm:before{
+    display: none !important;
 }
 .w3eden .alert.alert-info {
-    background: #f5f5f5 !important;
+    background: rgba(91, 192, 222, 0.15) !important;
     position: relative;
-    padding-left: 60px !important;
     border: 0 !important;
+    border-top: 25px solid #5bc0de !important;
 }
 .w3eden .alert.alert-info,
 .w3eden .alert.alert-info * {
     color: #5bc0de !important;
 }
-.w3eden .alert.alert-success:before {
-    background: #2ecc71 none repeat scroll 0 0;
-    border-bottom-left-radius: 3px;
-    border-top-left-radius: 3px;
-    color: #fff;
-    content: "\f00c";
-    font-family: FontAwesome;
-    font-size: 18pt;
-    height: 100%;
-    left: 0;
-    top: 0;
-    line-height: 50px;
-    position: absolute;
-    text-align: center;
-    width: 50px;
-    text-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
-}
+
 .w3eden .alert.alert-success {
-    background: #f5f5f5 !important;
+    background: #2ECC711A !important;
     position: relative;
-    padding-left: 60px !important;
     border: 0 !important;
+    border-top: 25px solid #2ECC71 !important;
 }
 .w3eden .alert.alert-success,
 .w3eden .alert.alert-success *:not(.btn) {
     color: #63B76C !important;
 }
-.w3eden .alert.alert-danger:before {
-    background: #e74c3c none repeat scroll 0 0;
-    border-bottom-left-radius: 3px;
-    border-top-left-radius: 3px;
-    color: #fff;
-    content: "\f057";
-    font-family: FontAwesome;
-    font-size: 18pt;
-    height: 100%;
-    left: 0;
-    top: 0;
-    line-height: 50px;
-    position: absolute;
-    text-align: center;
-    width: 45px;
-}
+
 .w3eden .alert.alert-danger {
-    background: #f5f5f5 !important;
+    background: rgba(231, 76, 60, 0.12) !important;
     position: relative;
-    padding-left: 60px !important;
     border: 0 !important;
+    border-top: 25px solid #e74c3c !important;
 }
 .w3eden .alert.alert-danger,
 .w3eden .alert.alert-danger *:not(.btn) {
     color: #e74c3c !important;
 }
-.w3eden .alert-danger-alt{
-    background: rgba(231, 76, 60, 0.05);
-    border: 1px solid #e74c3c;
-    color: #e74c3c;
-    font-size: 10pt;
-    padding: 7px 15px;
-    margin: 0;
-}
-.w3eden .alert.alert-warning:before {
-    background: #e67e22 none repeat scroll 0 0;
-    border-bottom-left-radius: 3px;
-    border-top-left-radius: 3px;
-    color: #fff;
-    content: "\f071";
-    font-family: FontAwesome;
-    font-size: 16pt;
-    height: 100%;
-    margin: -15px 0 0 -60px;
-    padding-top: 8px;
-    position: absolute;
-    text-align: center;
-    width: 45px;
-}
+
 .w3eden .alert.alert-warning {
-    background: #f5f5f5 !important;
+    background: rgba(230, 126, 34, 0.15) !important;
     position: relative;
-    padding-left: 60px !important;
     border: 0 !important;
+    border-top: 25px solid #e67e22 !important;
 }
 .w3eden .alert.alert-warning,
 .w3eden .alert.alert-warning * {
     color: #e67e22 !important;
 }
+
+.w3eden .alert.alert-sm{
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    font-size: 9pt;
+    border-width: 1px !important;
+    border-top-width: 1px !important;
+    border-style: solid !important;
+
+}
+
+.w3eden .inline-block{
+    display: inline-block !important;
+}
+
 .w3eden .panel {
     box-shadow: none;
 }
@@ -1797,7 +1763,7 @@
 .w3eden .g-recaptcha > div > div {
     width: 100% !important;
 }
-.w3eden .panel-footer .page-numbers {
+.w3eden .panel-footer li.page-numbers {
     border: 1px solid;
     border-radius: 500px;
     display: inline-block;
@@ -1808,6 +1774,11 @@
     text-align: center;
     width: 20px;
 }
+.w3eden .panel-footer span.page-numbers.current {
+    font-weight: 900;
+    color: #444444;
+}
+
 .w3eden .btn .label-price:empty {
     display: none;
 }
@@ -1978,7 +1949,9 @@
 }
 .w3eden .w3eden.user-dashboard .pagination {
     padding: 0;
+    width: 100% !important;
 }
+
 .w3eden .panel.dashboard-panel h3 {
     font-family: Montserrat, serif;
     margin: 0;
@@ -2241,14 +2214,6 @@
     z-index: 999999999 !important;
     top: 50px;
     right: 20px;
-    border-radius: 6px !important;
-    color: #ffffff !important;
-    background: #DCE35B !important;
-    /* fallback for old browsers */
-    background: -webkit-linear-gradient(-60deg, #22A220, #96D526) !important;
-    /* Chrome 10-25, Safari 5.1-6 */
-    background: rgba(0, 0, 0, 0) linear-gradient(-60deg, #22A220, #96D526) !important;
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     max-width: 300px;
     -webkit-transition: all 0.2s ease;
     transition: all 0.2s ease;
@@ -2262,11 +2227,17 @@
     margin: 0 auto;
     overflow: hidden;
     padding: 40px;
-    border: 1px solid #cccccc;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+    border-top: 5px solid #1abc9c;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
     background: #ffffff;
     border-radius: 0;
     margin-bottom: 50px;
+}
+.w3eden div#wpdmreg{
+    border-top: 5px solid #2ecc71;
+}
+.w3eden div#wpdmlogin.lostpass{
+    border-top: 5px solid #35adf5;
 }
 .w3eden a.btn.btn-light,
 .w3eden button.btn.btn-light {
@@ -2458,6 +2429,14 @@
     background: #08BDF9;
     color: #ffffff;
 }
+.w3eden .btn.inddl[disabled]{
+    display: none !important;
+}
+
 .w3eden .package-locks .panel + .panel{
     margin-top: 5px;
+}
+
+.w3eden .panel.terms-panel .panel-footer .eden-checkbox{
+    font-weight: 700 !important;
 }

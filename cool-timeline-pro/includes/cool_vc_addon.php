@@ -9,7 +9,7 @@ if (!class_exists('CoolVCAddon')) {
         public function __construct()
         {
             // We safely integrate with VC with this hook
-            add_action( 'init', array(&$this, 'ctl_vc_addon' ) );
+            add_action( 'init', array($this, 'ctl_vc_addon' ) );
         }
 
         function ctl_vc_addon(){
@@ -24,7 +24,7 @@ if (!class_exists('CoolVCAddon')) {
 
                 if (!empty($terms) || !is_wp_error($terms)) {
                     foreach ($terms as $term) {
-                        $ctl_terms_l[$term->name] =$term->term_id ;
+                        $ctl_terms_l[$term->name] =$term->slug ;
                     }
                 }
                $date_formats= array(
@@ -38,6 +38,15 @@ if (!class_exists('CoolVCAddon')) {
                     __( "Y",'cool-timeline') => "Y",
                      __( "Custom",'cool-timeline') => "custom",
                     );
+                    $designs=  array(
+                                __( "Default",'cool-timeline' ) => "default",
+                                __( "Flat Design",'cool-timeline') => "design-2",
+                                __( "Classic Design",'cool-timeline') => "design-3",
+                                __( "Elegant Design",'cool-timeline') => "design-4",
+                                __( "Clean Design",'cool-timeline') => "design-5",
+                                 __( "Modern Design",'cool-timeline') => "design-6"
+                            );
+
               $animation_effects=array(
                                 __( "bounceInUp",'cool-timeline' ) => "bounceInUp",
                                 __( "bounceInDown",'cool-timeline') => "bounceInDown",
@@ -111,12 +120,7 @@ if (!class_exists('CoolVCAddon')) {
                             "class" => "",
                             "heading" => __( "Timeline Designs",'cool-timeline'),
                             "param_name" => "designs",
-                            "value" => array(
-                                __( "Default",'cool-timeline' ) => "default",
-                                __( "Flat Design",'cool-timeline') => "design-2",
-                                __( "Classic Design",'cool-timeline') => "design-3",
-                                __( "Elegant Design",'cool-timeline') => "design-4",
-                            ),
+                            "value" =>  $designs,
                             'save_always' => true,
                             "description" => __( 'Choose Timeline Designs (Check Vertical Designs & Horizontal Designs )
                        <br><a target="_blank" href="http://www.cooltimeline.com/cool-timeline-pro-vertical-designs">Vertical Timeline demos</a>
@@ -139,6 +143,30 @@ if (!class_exists('CoolVCAddon')) {
                             "description" => __( "This options is not for default desgin.",'cool-timeline' ),
                             "dependency" => array("element" => "type", "value" => array("content-timeline","horizontal"))
                         ),
+                         array(
+                            "type" => "dropdown",
+                            "class" => "",
+                            "heading" => __( "Autoplay Stories settings ?",'cool-timeline'),
+                            "param_name" => "autoplay",
+                            "value" => array(
+                            __("False",'cool-timeline') =>'false',
+                             __("True",'cool-timeline') =>'true',
+                           ),
+                           'save_always' => true,
+                           "dependency" => array("element" => "type", "value" => array("content-timeline","horizontal"))
+                        ),
+                          array(
+                            "type" => "textfield",
+                            "class" => "",
+                            "heading" => __("Timeline Starting from Story e.g(2)", 'cool-timeline'),
+                            "param_name" => "start-on",
+                            "value" => __(0,'cool-timeline'),
+                            'save_always' => true,
+                            "description" => __("", 'cool-timeline'),
+                             "dependency" => array("element" => "type", "value" => array("content-timeline","horizontal"))
+
+                        ),
+                
                         array(
                             "type" => "dropdown",
                             "class" => "",
@@ -159,7 +187,7 @@ if (!class_exists('CoolVCAddon')) {
                             "param_name" => "based",
                             "value" => array(
                                 __( "Default (Date Based)",'cool-timeline' ) => "default",
-                                __( "Label (Order Based)",'cool-timeline') => "custom",
+                                __( "Custom Order Number",'cool-timeline') => "custom",
                             ),
                             "description" => __( "Show either date or custom label/text along with timeline stories.",'cool-timeline' ),
                             'save_always' => true,
@@ -233,6 +261,35 @@ if (!class_exists('CoolVCAddon')) {
                             "description" => __( "",'cool-timeline' ),
                             'save_always' => true,
                         ),
+                          array(
+                            "type" => "dropdown",
+                            "class" => "",
+                            "heading" => __( "Pagination ?",'cool-timeline'),
+                            "param_name" => "pagination",
+                            "value" => array(
+                                __( "Default",'cool-timeline' ) => "default",
+                                __( "Ajax Load More",'cool-timeline') => "ajax_load_more"
+                              ),
+                            'save_always' => true,
+                              "description" => __( "",'cool-timeline' ),
+                            "dependency" => array("element" => "type", "value" => array("default"))
+
+                        ),
+                          array(
+                            "type" => "dropdown",
+                            "class" => "",
+                             "heading" => __( "Enable category filters ?",'cool-timeline'),
+                            "param_name" => "filters",
+                            "value" => array(
+                                 __( "No",'cool-timeline' ) => "no",
+                                __( "Yes",'cool-timeline') => "yes"
+                              ),
+                            'save_always' => true,
+                          //   "description" => __( " ",'cool-timeline' ),
+                            "dependency" => array("element" => "type", "value" => array("default")
+
+                                ),
+                             ),
                         array(
                             "type" => "dropdown",
                             "class" => "",
@@ -324,12 +381,7 @@ if (!class_exists('CoolVCAddon')) {
                             "class" => "",
                             "heading" => __( "Timeline Designs",'cool-timeline'),
                             "param_name" => "designs",
-                            "value" => array(
-                                __( "Default",'cool-timeline' ) => "default",
-                                __( "Flat Design",'cool-timeline') => "design-2",
-                                __( "Classic Design",'cool-timeline') => "design-3",
-                                __( "Elegant Design",'cool-timeline') => "design-4",
-                            ),
+                            "value" => $designs,
                             'save_always' => true,
                             "description" => __( 'Choose Timeline Designs (Check Vertical Designs & Horizontal Designs )
                        <br><a target="_blank" href="http://www.cooltimeline.com/cool-timeline-pro-vertical-designs">Vertical Timeline demos</a>
@@ -352,6 +404,29 @@ if (!class_exists('CoolVCAddon')) {
                             "description" => __( "*This Options Is Not For Default Design. (Check Demo Here)",'cool-timeline' ),
                             "dependency" => array("element" => "layout", "value" => array("horizontal"))
                         ),
+                         array(
+                            "type" => "dropdown",
+                            "class" => "",
+                            "heading" => __( "Autoplay Stories settings ?",'cool-timeline'),
+                            "param_name" => "autoplay",
+                            "value" => array(
+                            __("False",'cool-timeline') =>'false',
+                             __("True",'cool-timeline') =>'true',
+                           ),
+                           'save_always' => true,
+                           "dependency" => array("element" => "layout", "value" => array("horizontal"))
+                        ),
+                         array(
+                            "type" => "textfield",
+                            "class" => "",
+                            "heading" => __("Timeline Starting From Story e.g(2)", 'cool-timeline'),
+                            "param_name" => "start-on",
+                            "value" => __(0,'cool-timeline'),
+                            'save_always' => true,
+                            "description" => __("", 'cool-timeline'),
+                            "dependency" => array("element" => "layout", "value" => array("horizontal"))
+                             ),
+
                         array(
                             "type" => "dropdown",
                             "class" => "",
@@ -409,6 +484,37 @@ if (!class_exists('CoolVCAddon')) {
                             "description" => __('','cool-timeline' ),
                             'save_always' => true,
                         ),
+                         array(
+                            "type" => "dropdown",
+                            "class" => "",
+                            "heading" => __( "Pagination ?",'cool-timeline'),
+                            "param_name" => "pagination",
+                            "value" => array(
+                                __( "Default",'cool-timeline' ) => "default",
+                                __( "Ajax Load More",'cool-timeline') => "ajax_load_more"
+                              ),
+                            'save_always' => true,
+                             "description" => __( "Note:-Ajax Load More Is Not Available For Horizontal layout.",'cool-timeline' ),
+                            "dependency" => array("element" => "layout", "value" => array("default","one-side","compact")
+
+                                ),
+                             ),
+                         array(
+                            "type" => "dropdown",
+                            "class" => "",
+                             "heading" => __( "Enable category filters ?",'cool-timeline'),
+                            "param_name" => "filters",
+                            "value" => array(
+                                 __( "No",'cool-timeline' ) => "no",
+                                __( "Yes",'cool-timeline') => "yes"
+                              ),
+                            'save_always' => true,
+                             "description" => __( "Note:-Please add value in Taxonomy field before using it.",'cool-timeline' ),
+                            "dependency" => array("element" => "layout", "value" => array("default","one-side","compact")
+
+                                ),
+                             ),
+                         
                         array(
                             "type" => "dropdown",
                             "class" => "",
@@ -434,93 +540,6 @@ if (!class_exists('CoolVCAddon')) {
 
                     )
                 ));
-
-
-                /*
-                 * Social Timeline Shortcode
-                 */
-
-                vc_map(array(
-                    "name" => __("Cool Social Timeline ", 'cool-timeline'),
-                    "description" => __("Facebook Page Timeline", 'cool-timeline'),
-                    "base" => "cool-social-timeline",
-                    "class" => "",
-                    "controls" => "full",
-                   "icon" => plugins_url('../images/timeline-icon2-32x32.png', __FILE__), // or css class name which you can reffer in your css file later. Example: "cool-timeline_my_class"
-                    "category" => __('Cool Timeline', 'js_composer'),
-                    //'admin_enqueue_js' => array(plugins_url('assets/cool-timeline.js', __FILE__)), // This will load js file in the VC backend editor
-                    'admin_enqueue_css' => array(plugins_url('../css/cool_vc_extend_admin.css', __FILE__)), // This will load css file in the VC backend editor
-                    "params" => array(
-                        array(
-                            "type" => "textfield",
-                            //"holder" => "div",
-                            "class" => "",
-                            "value"=>"Please follow below mentioned instructions in order to use social timeline",
-                            "heading" => __( "", "my-text-domain" ),
-                            "param_name" => "cool-ss-ins", // Important: Only one textarea_html param per content element allowed and it should have "content" as a "param_name"
-                            "description" => __( "<strong>You need to have Facebook App ID & Secret Key in order to create Facebook page timeline. For this either watch our <a target=\"_blank\" href=\"http://www.cooltimeline.com/document/facebook-page-timeline/\">Video Tutorial</a></i> or follow these steps:-</strong>
-                                <ol><li> Go to -> <a target='_blank' href='https://developers.facebook.com'>https://developers.facebook.com</a>  -> Register as a developer</li>
-                                <li>Now create a new App.</li>
-                                <li> Complete the wizard & activate your app for public access.</li>
-                                <li>Once done, you will see the new App ID and Secret keys in the dashboard.</li>
-							", "my-text-domain" ),
-
-                        ),
-                        array(
-                            "type" => "textfield",
-                            "class" => "",
-                            "heading" => __("Facebook App Id", 'cool-timeline'),
-                            "param_name" => "fb-app-id",
-                            "value" => __('','cool-timeline'),
-                            'save_always' => true,
-                            "description" => __("Facebook App Id.", 'cool-timeline')
-                        ),
-                        array(
-                            "type" => "textfield",
-                            "class" => "",
-                            "heading" => __("Facbook APP secret Key", 'cool-timeline'),
-                            "param_name" => "fb-app-secret-key",
-                            "value" => __('','cool-timeline'),
-                            'save_always' => true,
-                            "description" => __("Facbook APP secret Key", 'cool-timeline')
-                        ),
-                        array(
-                            "type" => "textfield",
-                            "class" => "",
-                            "heading" => __("Facbook Page name", 'cool-timeline'),
-                            "param_name" => "fb-page-name",
-                            "value" => __('','cool-timeline'),
-                            'save_always' => true,
-                            "description" => __('Facbook Page name E.g <a target="_blank" href="https://diigo.com/097qi4">techcrunch</a>', 'cool-timeline')
-                        ),
-
-                        array(
-                            "type" => "dropdown",
-                            "class" => "",
-                            "heading" => __( "Timeline skin",'cool-timeline'),
-                            "param_name" => "skin",
-                            "value" => array(
-                                __( "Default",'cool-timeline' ) => "default",
-                                __( "Light",'cool-timeline') => "light",
-                                __( "dark",'cool-timeline') => "dark",
-                            ),
-                            "description" => __( "Create Light, Dark or Colorful Timeline..",'cool-timeline' ),
-                            'save_always' => true,
-                        ),
-                        array(
-                            "type" => "textfield",
-                            "class" => "",
-                            "heading" => __("Show number of posts", 'cool-timeline'),
-                            "param_name" => "show-posts",
-                            "value" => __(20,'cool-timeline'),
-                            'save_always' => true,
-                            "description" => __("Show number of posts desc.", 'cool-timeline')
-
-                        )
-                    )
-                ));
-
-
 
 
             }

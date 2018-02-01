@@ -12,8 +12,6 @@
 
  */
 
-
-
 /* =Common Rules for all fields.
 
 ----------------------------------------------- */
@@ -29,12 +27,6 @@
 .at-radio-label{ padding-right: 10px; }        
 
 .at-file-upload-label{ clear: both; margin: 5px 0px 5px 1px; }  
-
-
-
-
-
-
 
 /* =Form Fields
 
@@ -137,7 +129,9 @@ font-size:11px;
 ----------------------------------------------- */
 
 .wrap{background: none repeat scroll 0 0 #EAEEF3; border: 1px solid #CCCCCC; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); margin: 17px 0 40px 10px;width: 800px;border-radius: 6px 6px 6px 6px; float:left;}
-
+.wrap.ctl_left_section {
+    max-width: 66%;
+}
 .ctl_docs{
 
 	float:left;
@@ -152,13 +146,13 @@ font-size:11px;
 
 .footer_wrap{border-radius: 6px 6px 6px 6px;background: -moz-linear-gradient(center top , #E9EAEE,#FEFEFE) repeat scroll 0 0 transparent;  padding: 5px 20px 10px;}
 
-.panel_menu{float: left;width: 160px;}
+.panel_menu{float: left;width: 170px;}
 
 .clearboth{clear: both;}
 
 .f_row{border-bottom: 1px solid #F9F9F9;}
 
-.sections{background: none repeat scroll 0 0 #FFFFFF;float: left;margin-top: 1px;min-height: 520px;padding-bottom: 10px;width: 639px;}
+.sections{background: none repeat scroll 0 0 #FFFFFF;float: left;margin-top: 1px;min-height: 520px;padding-bottom: 10px;width: 629px;}
 
 .field{padding: 10px;border-bottom: 1px solid #E9EAEE;}
 
@@ -623,11 +617,17 @@ img.timeline_logo {
     padding: 4px 0px;
 
 }
+.ctl_left_section #tabs .panel_menu {
+    max-width: 25%;
+}
+.ctl_left_section #tabs .sections {
+    max-width: 75%;
+}
 
 .ctl_right_section {
 
 
-
+	max-width:25%;
     width: 300px;
 
     float: left;

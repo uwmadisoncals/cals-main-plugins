@@ -17,7 +17,7 @@ jQuery(document).ready(function($) {
   /*
   custom code 
   */
-
+                 //   $("#ctl_story_year").parents('tr').hide();
                   $('#re_').parents('tr').hide();
                     $("#ctl_video").parents('tr').hide();
                     $("#img_cont_size").parents('tr').hide();
@@ -65,6 +65,7 @@ jQuery(document).ready(function($) {
 
     $(".custom_based").parents('tr').hide();
     $(".date_based").parents('tr').hide();
+   
    $("#ctl_story_date").parents('tr').hide();
      if ($('.story_based_on:checked').val() == 'default') {  
          $(".date_based").parents('tr').show();

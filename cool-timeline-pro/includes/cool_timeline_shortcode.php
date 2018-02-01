@@ -1,42 +1,46 @@
 <?php
 
-if (!class_exists('CoolTimeline_Shortcode')) {
+if (!class_exists('CoolTimelineShortcode')) {
 
-    class CoolTimeline_Shortcode {
+    class CoolTimelineShortcode {
 
         /**
          * The Constructor
          */
         public function __construct() {
             // register actions
-            add_action('init', array(&$this, 'cooltimeline_register_shortcode'));
-            add_action('wp_enqueue_scripts', array(&$this, 'ctl_load_scripts_styles'));
-            new Cooltimeline_Styles();
+            add_action('init', array($this, 'cooltimeline_register_shortcode'));
+
+            add_action('wp_enqueue_scripts', array($this, 'ctl_load_assets'));
+          
+            add_action('wp_enqueue_scripts', array('CooltimelineStyles','ctl_custom_styles'));
+            add_action('wp_head', array('CooltimelineStyles', 'ctl_navigation_styles'));
 
             // Call actions and filters in after_setup_theme hook
-            add_action('after_setup_theme', array(&$this, 'ctl_pro_read_more'));
-            add_filter('excerpt_length', array(&$this, 'ctl_ex_len'), 999);
-            add_filter( 'body_class', array(&$this, 'ctl_body_class') );
+            add_action('after_setup_theme', array($this, 'ctl_pro_read_more'), 999);
+            add_filter('excerpt_length', array($this, 'ctl_ex_len'), 999);
+            add_filter( 'body_class', array($this, 'ctl_body_class') );
+
+            add_filter( 'the_content', array($this,'ctl_back_to_timeline'));
         }
       
+        /*
+          Register Shortcode for cooltimeline 
+         */
         function cooltimeline_register_shortcode() {
-            add_shortcode('cool-timeline', array(&$this, 'cooltimeline_view'));
+            add_shortcode('cool-timeline', array($this, 'cooltimeline_view'));
 
         }
-
+        /*
+          Timeline Views
+         */
         function cooltimeline_view($atts, $content = null) {
             $design_cls='';
             $attribute = shortcode_atts(array(
-                'class' => 'caption',
                 'show-posts' => '',
                 'order' => '',
-                'post-type'=>'',
                 'category' => 0,
-                'taxonomy'=>'',
-                'post-category'=>'',
-                'tags'=>'',
-            
-               'layout' => 'compact',
+                'layout' => 'default',
                 'designs'=>'',
                 'items'=>'',
                 'skin' =>'',
@@ -47,26 +51,51 @@ if (!class_exists('CoolTimeline_Shortcode')) {
                 'date-format'=>'',
                 'based'=>'default',
                 'story-content'=>'',
-                //new
-                'compact-ele-pos'=>'main-date'
+                'pagination'=>'default',
+                'compact-ele-pos'=>'main-date',
+                'filters'=>'no',
+                'autoplay'=>'false',
+                'start-on'=>0
                ), $atts);
+              
+             $pagination=$attribute['pagination'];
+               $type='';
+             if(isset($attribute['type'])&& !empty($attribute['type'])){
 
-             wp_enqueue_style('ctl_gfonts');
-             wp_enqueue_style('ctl_default_fonts');
-            wp_enqueue_style('ctl_prettyPhoto');
-            wp_enqueue_script('ctl_prettyPhoto');
-            
-             $layout=$attribute['layout'] ?$attribute['layout']:'default';
-             require('common-query.php');
-          
-           if( $attribute['type'] &&  $attribute['type']=="horizontal"){
-                wp_enqueue_style('ctl-styles-horizontal');
-              
-            
-                wp_enqueue_script('ctl-slick-js');
-                wp_enqueue_script('ctl_horizontal_scripts');
-              
-                wp_enqueue_style('ctl-styles-slick');
+                if($attribute['type']=="default"){
+                   $layout=$attribute['layout'];
+                    $type=$attribute['layout'];
+                  }else{
+                     $layout=$attribute['type'];
+                      $type=$attribute['type'];
+                  }
+                }else{
+                $layout=$attribute['layout'] ?$attribute['layout']:'default';
+                  }
+                $tm_active_design='';
+            if(isset($attribute['designs']))
+              {
+                $tm_active_design=$attribute['designs'];
+              }else{
+                 $tm_active_design='default';
+              }
+
+               //  Enqueue common required assets
+           wp_enqueue_style('ctl_gfonts');
+           wp_enqueue_style('ctl_default_fonts');
+           wp_enqueue_script('ctl_prettyPhoto');
+           wp_enqueue_style('ctl_pp_css');
+           wp_enqueue_style('ctl-font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+            clt_conditional_assets($layout,$type,$tm_active_design);
+        
+         require('common-query.php');
+                if(is_rtl()){
+                 wp_enqueue_style('rtl-styles');
+                 }
+
+           if($layout && $layout=="horizontal"){
+               
+             
                  $ctl_options_arr = get_option('cool_timeline_options');
               if($attribute['designs'])
               {
@@ -78,121 +107,18 @@ if (!class_exists('CoolTimeline_Shortcode')) {
               }
                $r_more= $ctl_options_arr['display_readmore']?$ctl_options_arr['display_readmore']:"yes";
                 $clt_hori_view='';
-             
-                  wp_enqueue_style('ctl-font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
-
+            
               require('views/horizontal-timeline.php');
 
                 return $clt_hori_view;
 
-            }
-          else if( $attribute['post-type'] && !empty( $attribute['post-type'])) {
-         if ($attribute['layout'] == 'horizontal') {
-            wp_enqueue_style('ctl-styles-horizontal');
-            wp_enqueue_script('ctl-slick-js');
-            wp_enqueue_script('ctl_horizontal_scripts');
-           wp_enqueue_style('ctl-styles-slick');
-            }else{
-              wp_enqueue_style('ctl_styles');
-              wp_enqueue_style('section-scroll');
-              wp_enqueue_script('section-scroll-js');
-              wp_enqueue_script('ctl_viewportchecker');
-              wp_enqueue_style('ctl_animate');
-              wp_enqueue_script('ctl_scripts');
-            }
-           
-        
-            wp_enqueue_style('ctl_flexslider_style');
-           // wp_enqueue_script('ctl_prettyPhoto');
-            wp_enqueue_script('ctl_jquery_flexslider');
-            wp_enqueue_style('ctl-font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
-             wp_enqueue_style('ctl_gfonts');
-             wp_enqueue_style('ctl_default_fonts');
+            }else {
+             if(($pagination=="ajax_load_more"|| $attribute['filters']=="yes")){
+               wp_localize_script( 'ctl-ajax-load-more', 'ctlloadmore',
+                 array( 'url' => admin_url( 'admin-ajax.php' ),'attribute'=>$attribute) );
+               }
 
-                if($attribute['layout']=='horizontal' ) {
-                    if ($attribute['designs']) {
-                        $design_cls = 'ht-' . $attribute['designs'];
-                        $design = $attribute['designs'];
-                    } else {
-                        $design_cls = 'ht-default';
-                        $design = 'default';
-                    }
-                }else if($attribute['layout']=='default' || $attribute['layout']=='one-side' || $attribute['layout']=='compact') {
-                    if ($attribute['designs']) {
-                        $design_cls = 'main-' . $attribute['designs'];
-                        $design = $attribute['designs'];
-                    } else {
-                        $design_cls = 'main-default';
-                        $design = 'default';
-                    }
-                }
-              
-                  $output='';
-                 require('views/content-timeline.php');
-
-              return $output;
-            }
-            else {
-                wp_enqueue_style('ctl_styles');
-              
-                wp_enqueue_style('ctl_flexslider_style');
-                wp_enqueue_style('section-scroll');
-               // wp_enqueue_script('ctl_prettyPhoto');
-                 wp_enqueue_script('ctl_scripts');
-                wp_enqueue_script('ctl_jquery_flexslider');
-                wp_enqueue_script('section-scroll-js');
-
-                wp_enqueue_script('ctl_viewportchecker');
-                wp_enqueue_style('ctl_animate');
-
-
-                wp_enqueue_style('ctl-font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
-
-         if($attribute['layout'] == "compact"){
-                  wp_enqueue_style('ctl-compact-tm');
-             if (! wp_script_is('c_masonry','enqueued' )) { 
-                  wp_enqueue_script('c_masonry');
-                 wp_add_inline_script( 'c_masonry',"
-                  ( function($) {
-                  $(window).load(function(){ 
-                 // masonry plugin call
-              $('.compact-wrapper .clt-compact-cont').each(function(index){
-               
-               $(this).masonry({itemSelector : '.timeline-mansory'});
-              });
-         $('.compact-wrapper .clt-compact-cont').find('.timeline-mansory').each(function(index){
-                var firstPos=$(this).position();
-                if($(this).next('.timeline-post').length>0){
-                    var secondPos=$(this).next().position();
-                    var gap=secondPos.top-firstPos.top;
-                     new_pos=secondPos.top+70;
-                      if(gap<=35){
-                    $(this).next().css({'top':new_pos+'px','margin-top':'0'});
-                      }
-                  }
-             var leftPos=$(this).position();
-               var id=$(this).attr('id');
-                if(leftPos.left<=0){
-                $(this).addClass('ctl-left');
-                }else{
-                  $(this).addClass('ctl-right');  
-                }
-             });
-        $('.clt-compact-preloader').each(function(index){
-            $(this).fadeOut('slow',function(){
-            $(this).hide();});
-              });
-          });
-
-        })(jQuery);
-          ");
-          }
-        }
-
-
-
-
-                if($attribute['designs'])
+           if($attribute['designs'])
                 {
                     $design_cls='main-'.$attribute['designs'];
                     $design=$attribute['designs'];
@@ -200,18 +126,8 @@ if (!class_exists('CoolTimeline_Shortcode')) {
                     $design_cls='main-default';
                     $design='default';
                   }
-                $output = '';
-                $ctl_html = '';
-                $ctl_format_html = '';
-                /*
-                 * Gerneral options
-                 */
-
-                //  $ctl_timeline_type = $ctl_options_arr['timeline_type'];
-                $ctl_title_text = $ctl_options_arr['title_text'];
-                $ctl_title_tag = $ctl_options_arr['title_tag'];
-
-                $ctl_animation='';
+                $output = ''; $ctl_html = ''; $ctl_format_html = '';
+                $ctl_animation='';$last_year='';  $alternate=0;
 
                 if (isset($attribute['animations'])) {
                     $ctl_animation=$attribute['animations'];
@@ -220,19 +136,13 @@ if (!class_exists('CoolTimeline_Shortcode')) {
                  }else{
                   $ctl_animation ='bounceInUp';
                      }
-
-       
-          if (isset($ctl_options_arr['user_avatar']['id'])) {
-                    $user_avatar = wp_get_attachment_image_src($ctl_options_arr['user_avatar']['id'], 'ctl_avatar');
-                }
-
+      
+             
                 /*
                  * images sizes
                  */
-                $ctl_post_per_page = $ctl_post_per_page ? $ctl_post_per_page : 10;
-                $ctl_avtar_html = '';
-                $timeline_id = '';
-                    $clt_icons='';
+    
+                $ctl_avtar_html = ''; $timeline_id = '';$clt_icons='';
 
                 if (isset($attribute['icons']) && $attribute['icons']=="YES"){
                     $clt_icons='icons_yes';
@@ -246,55 +156,85 @@ if (!class_exists('CoolTimeline_Shortcode')) {
                         }else{
                     $ctl_term = get_term_by('slug', $attribute['category'], 'ctl-stories');
                       }
-                  
-                    if ($ctl_term->name == "Timeline Stories") {
-                        $ctl_title_text = $ctl_title_text;
+                
+                    if (isset($ctl_term->name) && $ctl_term->name == "Timeline Stories") {
+                        $ctl_title_text =isset($ctl_options_arr['title_text'])? $ctl_options_arr['title_text'] : 'Timeline';
                     } else {
-                        $ctl_title_text = $ctl_term->name;
+                        $ctl_title_text = isset($ctl_term->name)?$ctl_term->name:"";
                     }
                     $catId = $attribute['category'];
                     $timeline_id = "timeline-$catId";
                 } else {
-                    $ctl_title_text = $ctl_title_text ? $ctl_title_text : 'Timeline';
+                    $ctl_title_text = isset($ctl_options_arr['title_text'])? $ctl_options_arr['title_text'] : 'Timeline';
                     $timeline_id = "timeline-".rand(1,10);
                 }
-                  if (isset($user_avatar[0]) && !empty($user_avatar[0])) {
-                        $ctl_avtar_html .= '<div class="avatar_container row"><span title="' . $ctl_title_text . '"><img  class=" center-block img-responsive img-circle" alt="' . $ctl_title_text . '" src="' . $user_avatar[0] . '"></span></div> ';
-                    }
-                $ctl_html_no_cont = '';
+                  
+             $ctl_html_no_cont = ''; $layout_wrp = '';
+                if($attribute['layout']=="compact"){
+                $compact_id="ctl-compact-pro-".rand(1,20);
 
-                $ctl_title_tag = $ctl_title_tag ? $ctl_title_tag : 'H2';
-                //$ctl_title_pos = $ctl_title_pos ? $ctl_title_pos : 'left';
-                $ctl_content_length ? $ctl_content_length : 100;
-               
-               
-                $layout_wrp = '';
-            $r_more= $ctl_options_arr['display_readmore']?$ctl_options_arr['display_readmore']:"yes";
-                require("views/default.php");
+                $ctl_html .='<div id="'.$compact_id.'" class="clt-compact-cont"><div class="center-line"></div>';
+            }
+
+             require("views/default.php");
               
-       $main_wrp_id='tm-'.$attribute['layout'].'-'.$attribute['designs'].'-'.rand(1,20);
-           
-    $output .='<! ========= Cool Timeline PRO '.CTLPV.' =========>';
-    
-     $output .= '<div  id="'. $main_wrp_id.'" class="cool_timeline cool-timeline-wrapper  ' . $layout_wrp . ' ' . $wrapper_cls .' '.$design_cls.'" data-pagination="' . $enable_navigation . '"  data-pagination-position="' . $navigation_position . '">';
-              $output .= $ctl_avtar_html;
-                if ($title_visibilty == "yes") {
-                    $output .= sprintf(__('<%s class="timeline-main-title center-block">%s</%s>', 'cool-timeline'), $ctl_title_tag, $ctl_title_text, $ctl_title_tag);
+              $ctl_html .= '<div  class="end-timeline clearfix"></div>';
+                if($attribute['layout']=="compact"){
+                    $ctl_html .='</div>';
                 }
-                 $output .= '<div class="cool-timeline ultimate-style ' . $layout_cls . ' ' . $wrp_cls . '">';
-                    $output .= '<div data-animations="'.$ctl_animation.'"  id="' . $timeline_id . '" class="cooltimeline_cont  clearfix '.$clt_icons.'">';
-              $output .= $ctl_html;
-                $output .= $ctl_html_no_cont;
-                $output .= '</div>
-			</div>
 
-    </div>  <!-- end
- ================================================== -->';
-                return $output;
+         $main_wrp_id='tm-'.$attribute['layout'].'-'.$attribute['designs'].'-'.rand(1,20);
+        $main_wrp_cls=array();
+        $main_wrp_cls[]="cool_timeline";
+        $main_wrp_cls[]="cool-timeline-wrapper";
+        $main_wrp_cls[]=$layout_wrp;
+        $main_wrp_cls[]=$wrapper_cls;
+        $main_wrp_cls[]=$design_cls;
+        $main_wrp_cls=apply_filters('ctl_wrapper_clasess',$main_wrp_cls);     
+    
+    $output .='<!========= Cool Timeline PRO '.CTLPV.' =========>';
+
+    $output .= '<div class="'.implode(" ",$main_wrp_cls).'" id="'. $main_wrp_id.'"  data-pagination="' . $enable_navigation . '"  data-pagination-position="' . $navigation_position . '">';
+     $output .=ctl_main_title($ctl_options_arr,$ctl_title_text,$ttype='default_timeline');
+      if($attribute['filters']=="yes"){
+            $output.=ctl_categories_filters($taxo="ctl-stories",$select_cat=$attribute['category'] ,$type="story-tm",$layout);
+         }
+     $output .= '<div class="cool-timeline ultimate-style ' . $layout_cls . ' ' . $wrp_cls . '">';
+
+     
+        $output .='<div  class="filter-preloaders"><img src="'.CTP_PLUGIN_URL.'/images/clt-compact-preloader.gif"></div>';
+  
+     $output .= '<div data-animations="'.$ctl_animation.'"  id="' . $timeline_id . '" class="cooltimeline_cont  clearfix '.$clt_icons.'">';
+      $output .= $ctl_html;
+     $output .= '</div>';
+
+        if($pagination=="ajax_load_more"){
+
+                if($ctl_loop->max_num_pages>1){
+             $output.='<button data-loading-text="<i class=\'fa fa-spinner fa-spin\'></i>'.__(' Loading','cool-timeline').'" data-max-num-pages="'.$ctl_loop->max_num_pages.'" 
+             data-timeline-type="'.$layout.'" class="ctl_load_more">'.__('Load More','cool-timeline').'</button>';
+                 }
+                }else{
+              if ($enable_pagination == "yes") {
+                  if (function_exists('ctl_pagination')) {
+                      $output .= ctl_pagination($ctl_loop->max_num_pages, "", $paged);
+                  }
+              }
+              }
+                 $output .= $ctl_html_no_cont;
+                $output .= '</div></div>  <!-- end
+================================================== -->';
+
+    $stories_styles='<style type="text/css">'.$story_styles.'</style>';
+                return $output.$stories_styles;
 
             }
 
         }
+
+        /*
+          Read more button for timeline stories
+         */
 
         function ctl_pro_read_more() {
 
@@ -342,15 +282,30 @@ if (!class_exists('CoolTimeline_Shortcode')) {
             return $length;
         }
 
+        function ctl_back_to_timeline( $content ) {   
+           
+        if(is_singular('cool_timeline') && is_single() ) {
+              $ctl_options_arr = get_option('cool_timeline_options');
+           if(isset($ctl_options_arr['ctl_goback']) && $ctl_options_arr['ctl_goback']==
+            "true"){
+                   $goback_text=isset($ctl_options_arr['ctl_goback_lbl'])?$ctl_options_arr['ctl_goback_lbl']:"Go Back";
+                     $url = htmlspecialchars($_SERVER['HTTP_REFERER']);
+                     $content.= '<a class="goback-to-timeline" href="'.esc_url($url).'">'.__($goback_text,'cool-timeline').'</a>'; 
+                    }
+                }
+                 return $content;
+         }
+
 
         /*
          * Include this plugin's public JS & CSS files on posts.
          */
 
-        function ctl_load_scripts_styles() {
+        function ctl_load_assets() {
              ctl_common_assets();
            }
 
+       
        function safe_strtotime($string, $format) {
             if ($string) {
                 $date = date_create($string);
@@ -368,6 +323,7 @@ if (!class_exists('CoolTimeline_Shortcode')) {
             }
         }
 
+        // add dyanmic classes on page body tag
         function ctl_body_class( $c ) {
             global $post;
             if( isset($post->post_content) && has_shortcode( $post->post_content, 'cool-timeline' ) ) {

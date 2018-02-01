@@ -330,6 +330,29 @@ class FileSystem
         return '<iframe src="https://docs.google.com/viewer?url='.urlencode($url).'&embedded=true" width="100%" height="600" style="border: none;"></iframe>';
     }
 
+    public static function fullPath($file, $pid){
+        $files = get_post_meta($pid, '__wpdm_files', true);
+        $file = array_shift($files);
+
+        if (file_exists(UPLOAD_DIR . $file))
+            $fullpath = UPLOAD_DIR . $file;
+        else if (file_exists($file))
+            $fullpath = $file;
+        else
+            $fullpath = '';
+
+        return $fullpath;
+    }
+
+    public static function mediaURL($pid, $fileID, $fileName = ''){
+        if($fileName == '') {
+            $files = get_post_meta($pid, '__wpdm_files', true);
+            $file = array_shift($files);
+            $fileName = wpdm_basename($file);
+        }
+        return home_url("/wpdm-media/{$pid}/{$fileName}");
+    }
+
 
 
 }

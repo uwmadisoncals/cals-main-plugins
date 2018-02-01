@@ -13,7 +13,8 @@ if(!isset($up['host']) || $up['host'] != $_SERVER['SERVER_NAME']) $log_redirect 
 
 
 ?>
-<div class="w3eden" id="wpdmlogin">
+<div class="w3eden">
+<div id="wpdmlogin" <?php if(wpdm_query_var('action') == 'lostpassword') echo 'class="lostpass"'; ?>>
 <?php if(isset($params['logo']) && $params['logo'] != ''){ ?>
     <div class="text-center wpdmlogin-logo">
         <img src="<?php echo $params['logo'];?>" />
@@ -49,8 +50,8 @@ if(!isset($up['host']) || $up['host'] != $_SERVER['SERVER_NAME']) $log_redirect 
             <input type="hidden" name="permalink" value="<?php the_permalink(); ?>" />
 
             <?php global $wp_query; if(isset($_SESSION['login_error'])&&$_SESSION['login_error']!='') {  ?>
-                <div class="error alert alert-danger" >
-                    <b><?php _e('Login Failed!','download-manager'); ?></b><br/>
+                <div class="error alert alert-danger" data-title="<?php _e('Login Failed!','download-manager'); ?>">
+
                     <?php echo preg_replace("/<a.*?<\/a>\?/i","",$_SESSION['login_error']); $_SESSION['login_error']=''; ?>
                 </div>
             <?php } ?>
@@ -92,12 +93,12 @@ if(!isset($up['host']) || $up['host'] != $_SERVER['SERVER_NAME']) $log_redirect 
             jQuery(function ($) {
                 var llbl = $('#loginform-submit').html();
                 $('#loginform').submit(function () {
-                    $('#loginform-submit').html("<i class='fa fa-spin fa-spinner'></i> Logging In...");
+                    $('#loginform-submit').html("<i class='fa fa-spin fa-spinner'></i> <?php _e('Logging In...','download-manager');?>");
                     $(this).ajaxSubmit({
                         success: function (res) {
                             if (!res.match(/success/)) {
                                 $('form .alert-danger').hide();
-                                $('#loginform').prepend("<div class='alert alert-danger'><b>Error!</b><br/>Login failed! Please re-check login info.</div>");
+                                $('#loginform').prepend("<div class='alert alert-danger' data-title='<?php _e('ERROR!','download-manager');?>'><?php _e('Login failed! Please re-check login info.','download-manager');?></div>");
                                 $('#loginform-submit').html(llbl);
                             } else {
                                 location.href = "<?php echo esc_attr(esc_url($log_redirect)); ?>";
@@ -114,5 +115,5 @@ if(!isset($up['host']) || $up['host'] != $_SERVER['SERVER_NAME']) $log_redirect 
             });
         </script>
 
-    <?php } ?></div>
+    <?php } ?></div></div>
 

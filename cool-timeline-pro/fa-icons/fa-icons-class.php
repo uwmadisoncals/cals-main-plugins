@@ -79,7 +79,7 @@
 
         <div class="fa-field-modal" id="fa-field-modal" style="display:none">
           <div class="fa-field-modal-close">&times;</div>
-          <h1 class="fa-field-modal-title"><?php _e( 'Select Font Awesome Icon', 'fa-field' ); ?></h1>
+          <h1 class="fa-field-modal-title"><?php _e( 'Select Font Awesome Icon', 'cool-timeline' ); ?></h1>
 
           <div class="fa-field-modal-icons">
             <?php if ( $this->icons ) : ?>
@@ -133,7 +133,7 @@
       //  $screens = get_post_types();
         $screens=array('cool_timeline');
         foreach ( $screens as $screen ) {
-          add_meta_box( 'fa_field', __( 'Select Post Icon', 'fa-field' ), array(
+          add_meta_box( 'fa_field', __( 'Select Story Icon', 'cool-timeline' ), array(
             $this,
             'ctl_populate_metabox'
           ), $screen, 'side','high' );
@@ -156,7 +156,7 @@
           <input type="hidden" name="fa_field_icon" id="fa_field_icon" value="<?php echo $icon; ?>">
           <?php wp_nonce_field( 'fa_field_icon', 'fa_field_icon_nonce' ); ?>
 
-          <button class="button-primary add-fa-icon"><?php _e( 'Add Icon', 'fa-field' ); ?></button>
+          <button class="button-primary add-fa-icon"><?php _e( 'Add Icon', 'cool-timeline' ); ?></button>
         </div>
 
       <?php

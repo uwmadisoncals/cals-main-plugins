@@ -1,13 +1,14 @@
 ( function() {
    tinymce.PluginManager.add( 'cool_timeline', function( editor, url ) {
-	   var layouts=[];
-	   layouts.push({"text":'Default Layout',"value":'default'});
-	   layouts.push({"text":'One Side Layout',"value":'one-side'});
- 	   layouts.push({"text":'Compact Layout',"value":'compact'});
-	   var skins=[];
-	   skins.push({"text":"default","value":"default"});
-	   skins.push({"text":"light","value":"light"});
-	   skins.push({"text":"dark","value":"dark"});
+	   var layouts=[{"text":'Default Layout',"value":'default'},
+	   {"text":'One Side Layout',"value":'one-side'},
+		{"text":'Compact Layout',"value":'compact'}
+	   ];
+	   var skins=[{"text":"default","value":"default"},
+	   {"text":"light","value":"light"},
+	   {"text":"dark","value":"dark"}
+	   ];
+
 	   var multi_items={
 		   "items":[
 			   {"text":"Select items","value":""},
@@ -15,13 +16,10 @@
 			   {"text":"2","value":"2"},
 			   {"text":"3","value":"3"},
 			   {"text":"4","value":"4"},
-				   ]
-	   };
+				   ] };
 
 	   var animations_eff={
-		   "animations":[
-
-			   {"text":"bounceInUp","value":"bounceInUp"},
+		   "animations":[ {"text":"bounceInUp","value":"bounceInUp"},
 			   {"text":"bounceInDown","value":"bounceInDown"},
 			   {"text":"bounceInLeft","value":"bounceInLeft"},
 			   {"text":"bounceInRight","value":"bounceInRight"},
@@ -37,7 +35,6 @@
 			   {"text":"flip","value":"flip"},
 			   {"text":"fadein","value":"fadein"},
 			   {"text":"rotatein","value":"rotatein"},
-
 			   {"text":"zoomIn","value":"zoomIn"},
 			   {"text":"None","value":"none"},
 				 ]};
@@ -61,29 +58,42 @@
 			   {"text":"Flat Design","value":"design-2"},
 			   {"text":"Classic Design","value":"design-3"},
 			   {"text":"Elegant Design","value":"design-4"},
+			   {"text":"Clean Design","value":"design-5"},
+			   {"text":"Modern Design","value":"design-6"}
 			 ]
 		 }
-		 var compact_ele_pos=[];
-	   compact_ele_pos.push({"text":"On top date/label below title","value":"main-date"});
-	   compact_ele_pos.push({"text":"On top title below date/label","value":"main-title"});
-	   var s_order=[];
-	   s_order.push({"text":"DESC","value":"DESC"});
-	   s_order.push({"text":"ASC","value":"ASC"});
-	    var s_cont=[];
-	   s_cont.push({"text":"Summary","value":"short"});
-	   s_cont.push({"text":"Full Text","value":"full"});
-	   var icons_options=[];
-	   icons_options.push({"text":"NO","value":"NO"});
-	   icons_options.push({"text":"YES","value":"YES"});
+		 var compact_ele_pos=[
+		 {"text":"On top date/label below title","value":"main-date"},
+		  {"text":"On top title below date/label","value":"main-title"}
+		 ];
+	
+	   var s_order=[{"text":"DESC","value":"DESC"},
+				{"text":"ASC","value":"ASC"}
+	   ];
+	    var ap_settings=[{"text":"False","value":"false"},
+				{"text":"True","value":"true"}
+	   ];
+	  var s_cont=[{"text":"Summary","value":"short"},
+	    {"text":"Full Text","value":"full"}
+	    ];
+	 
+	   var icons_options=[{"text":"NO","value":"NO"},
+	   {"text":"YES","value":"YES"}];
+	 
+	    var timeline_based_on=[{"text":"Default(Date Based)","value":"default"},
+	    {"text":"Custom Order","value":"custom"}
+	     ];
+	    var pagination=[{"text":"Default","value":"default"},
+						{"text":"Ajax Load More","value":"ajax_load_more"}
+						];
+	 	var filters=[{"text":"No","value":"no"},
+						{"text":"Yes","value":"yes"}];		
 
-	    var timeline_based_on=[];
-	   timeline_based_on.push({"text":"Default(Date Based)","value":"default"});
-	   timeline_based_on.push({"text":"Label (Order Based)","value":"custom"});
-
-	   var ctl_cats=JSON.parse(ctl_cat_obj.category);
-	   var categories=[];
-
-	   for( var cat in ctl_cats){
+if(typeof ctl_cat_obj != 'undefined' && typeof ctl_cat_obj.category != 'undefined') 
+{	
+	var ctl_cats=JSON.parse(ctl_cat_obj.category);
+	var categories=[];
+	for( var cat in ctl_cats){
 		   categories.push({"text":ctl_cats[cat],"value":cat});
 	   }
 	
@@ -92,7 +102,6 @@
 				text: false,
 				type: 'menubutton',
 				image: url + '/cooltimeline.png',
-		
 				menu: [
                 {
                     text: 'Vertical Timeline',
@@ -108,18 +117,19 @@
                                 label: 'Timeline categories',
                                 'values':categories
                             },
+                            {
+								type: 'listbox',
+								name: 'timeline_layout',
+								label: 'Timeline Layouts',
+								'values':layouts
+							},
 								{
 									type: 'listbox',
 									name: 'designs',
 									label: 'Timeline Designs',
 									'values':timeline_designs.designs
 								},
-							{
-								type: 'listbox',
-								name: 'timeline_layout',
-								label: 'Timeline Layouts',
-								'values':layouts
-							},
+							
 							{
 								type: 'listbox',
 								name: 'timeline_skin',
@@ -147,8 +157,8 @@
 								{
 									type: 'textbox',
 									name: 'number_of_posts',
-									label: 'Show number of posts',
-									value:20
+									label: 'Show number of Stories',
+									value:10
 								},
 								{
 										type: 'listbox',
@@ -170,13 +180,25 @@
 								},
 								{
 									type: 'listbox',
+									name: 'pagination',
+									label: 'Pagination ?',
+									values:pagination
+								},
+								{
+									type: 'listbox',
+									name: 'filters',
+									label: 'Enable category filters ?',
+									values:filters
+								},
+								{
+									type: 'listbox',
 									name: 'animations',
 									label: 'Animation Effects',
 									values:animations_eff.animations
 								}
 							],
                             onsubmit: function( e ) {
-                                editor.insertContent( '[cool-timeline layout="'+ e.data.timeline_layout+'"  designs="'+ e.data.designs +'" skin="'+ e.data.timeline_skin+'" category="' + e.data.category + '" show-posts="' + e.data.number_of_posts + '" order="' + e.data.stories_order + '" icons="' + e.data.ctl_icons + '" animations="' + e.data.animations + '" date-format="' + e.data.date_format + '" story-content="'+ e.data.story_content +'" based="'+ e.data.tm_bs_on +'" compact-ele-pos="'+ e.data.compact_ele_pos +'"]');
+                                editor.insertContent( '[cool-timeline layout="'+ e.data.timeline_layout+'"  designs="'+ e.data.designs +'" skin="'+ e.data.timeline_skin+'" category="' + e.data.category + '" show-posts="' + e.data.number_of_posts + '" order="' + e.data.stories_order + '" icons="' + e.data.ctl_icons + '" animations="' + e.data.animations + '" date-format="' + e.data.date_format + '" story-content="'+ e.data.story_content +'" based="'+ e.data.tm_bs_on +'" compact-ele-pos="'+ e.data.compact_ele_pos +'" pagination="'+ e.data.pagination +'" filters="'+ e.data.filters +'"]');
                             }
                         });
                     }
@@ -252,23 +274,35 @@
 									},
 									{
 										type: 'listbox',
+										name: 'autoplay',
+										label: 'Auto play settings?',
+										'values':ap_settings
+									},
+									{
+										type: 'textbox',
+										name: 'start_on',
+										label: 'Timeline Starting from Story e.g(2)',
+										value:0
+									},
+									{
+										type: 'listbox',
 										name: 'ctl_icons',
 										label: 'Icon',
 										'values':icons_options
 									}
 								],
 								onsubmit: function( e ) {
-									editor.insertContent( '[cool-timeline type="horizontal" category="' + e.data.category + '" skin="'+ e.data.timeline_skin+'"  designs="'+ e.data.designs +'" show-posts="' + e.data.number_of_posts + '" order="' + e.data.stories_order + '" items="' + e.data.items + '"  icons="' + e.data.ctl_icons + '" story-content="'+ e.data.story_content +'"  date-format="' + e.data.date_format + '" based="'+ e.data.tm_bs_on +'"]');
+									editor.insertContent( '[cool-timeline layout="horizontal" category="' + e.data.category + '" skin="'+ e.data.timeline_skin+'"  designs="'+ e.data.designs +'" show-posts="' + e.data.number_of_posts + '" order="' + e.data.stories_order + '" items="' + e.data.items + '"  icons="' + e.data.ctl_icons + '" story-content="'+ e.data.story_content +'"  date-format="' + e.data.date_format + '" based="'+ e.data.tm_bs_on +'" autoplay="'+ e.data.autoplay +'" start-on="'+ e.data.start_on +'"]');
 								}
 							});
 						}
 					},
 					{
-						text: 'Content Timeline(Blog)',
+						text: 'Vertical Content Timeline(Blog)',
 						onclick: function() {
 
 							editor.windowManager.open( {
-								title: 'Add Content Timeline Shortcode',
+								title: 'Add Vertical Content Timeline Shortcode',
 								body: [
 									{
 										type: 'textbox',
@@ -302,7 +336,6 @@
 										'values':[{"text":'Default Layout',"value":'default'},
 											{"text":'One Side Layout',"value":'one-side'},
 											{"text":'Compact Layout',"value":'compact'},
-											{"text":'Horizontal',"value":'horizontal'},
 										]
 									},
 									{
@@ -310,18 +343,6 @@
 										name: 'designs',
 										label: 'Timeline Designs',
 										'values':timeline_designs.designs
-									},
-								/*	{
-										type   : 'container',
-										name   : 'display-lbl',
-										label  : '',
-										html   : '<i>Display stories option is only for horizontal mode.This option is not for default design.</i>'
-									}, */
-									{
-										type: 'listbox',
-										name: 'items',
-										label: 'Display Stories in Horizontal(This option is not for default design)',
-										'values':multi_items.items
 									},
 									{
 										type: 'listbox',
@@ -345,7 +366,7 @@
 										type: 'textbox',
 										name: 'number_of_posts',
 										label: 'Show number of posts',
-										value:20
+										value:10
 									},
 									{
 										type: 'listbox',
@@ -359,84 +380,154 @@
 										label: 'Content Description?',
 										'values':s_cont
 									},
+									{
+									type: 'listbox',
+									name: 'pagination',
+									label: 'Pagination ?',
+									values:pagination
+								},
+								{
+									type: 'listbox',
+									name: 'filters',
+									label: 'Enable category filters ?(Add value in Taxonomy field before using it)',
+									values:filters
+								},
 								{
 										type: 'listbox',
 										name: 'animations',
 										label: 'Animation Effects',
 										'values':animations_eff.animations
 									}
-
-
 								],
 								onsubmit: function( e ) {
-									editor.insertContent( '[cool-content-timeline post-type="'+ e.data.post_type+'"  post-category="' + e.data.post_category + '" tags="' + e.data.tags + '" story-content="'+ e.data.story_content +'"  taxonomy="' + e.data.taxonomy_name + '" layout="'+ e.data.timeline_layout+'"  designs="'+ e.data.designs +'" skin="'+ e.data.timeline_skin+'" show-posts="' + e.data.number_of_posts + '" order="' + e.data.stories_order + '"  icons="' + e.data.ctl_icons + '" animations="' + e.data.animations + '"  items="' + e.data.items + '" date-format="' + e.data.date_format + '"]');
+									editor.insertContent( '[cool-content-timeline post-type="'+ e.data.post_type+'"  post-category="' + e.data.post_category + '" tags="' + e.data.tags + '" story-content="'+ e.data.story_content +'"  taxonomy="' + e.data.taxonomy_name + '" layout="'+ e.data.timeline_layout+'"  designs="'+ e.data.designs +'" skin="'+ e.data.timeline_skin+'" show-posts="' + e.data.number_of_posts + '" order="' + e.data.stories_order + '"  icons="' + e.data.ctl_icons + '" animations="' + e.data.animations + '"  date-format="' + e.data.date_format + '"  pagination="'+ e.data.pagination +'"  filters="'+ e.data.filters +'"]');
 								}
 							});
 						}
 					},
 					{
+		text: 'Horizontal Content Timeline(Blog)',
+		onclick: function() {
+
+			editor.windowManager.open( {
+				title: 'Add Horizontal Content Timeline Shortcode',
+				body: [
+					{
+					type: 'textbox',
+						name: 'post_type',
+						label: 'Content Post type',
+						value:'post'
+					},
+					{
+						type: 'textbox',
+						name: 'taxonomy_name',
+						label: 'Taxonomy Name',
+						value:'category'
+					},
+					{
+						type: 'textbox',
+						name: 'post_category',
+						label: 'Specific category(s) (Add category(s) slug - comma separated)',
+						value:''
+					},
+					{
+						type: 'textbox',
+						name: 'tags',
+						label: 'Specific tags(add tags slug)',
+						value:''
+					},
+					{
+						type: 'listbox',
+						name: 'designs',
+						label: 'Timeline Designs',
+						'values':timeline_designs.designs
+					},
+					{
+						type: 'listbox',
+						name: 'items',
+						label: 'Display Stories(This option is not for default design)',
+						'values':multi_items.items
+					},
+					{
+						type: 'listbox',
+						name: 'autoplay',
+						label: ' Autoplay settings?',
+						'values':ap_settings
+					},
+					{
+						type: 'textbox',
+						name: 'start_on',
+						label: 'Timeline Starting from Story e.g(2)',
+						value:0
+					},
+					{
+						type: 'listbox',
+						name: 'timeline_skin',
+						label: 'Timeline skins',
+						'values':skins
+					},
+					{
+						type: 'listbox',
+						name: 'stories_order',
+						label: 'Story Order',
+						'values':s_order
+					},
+					{
+					type: 'listbox',
+					name: 'date_format',
+					label: 'Date formats',
+					'values':date_formats.formats
+					},
+					{
+						type: 'textbox',
+						name: 'number_of_posts',
+						label: 'Show number of posts',
+						value:10
+					},
+					{
+						type: 'listbox',
+						name: 'ctl_icons',
+						label: 'Icon',
+						'values':icons_options
+					},
+					{
+						type: 'listbox',
+						name: 'story_content',
+						label: 'Content Description?',
+						'values':s_cont
+					},
+			
+				],
+				onsubmit: function( e ) {
+					editor.insertContent( '[cool-content-timeline post-type="'+ e.data.post_type+'"  post-category="' + e.data.post_category + '" tags="' + e.data.tags + '"  autoplay="' + e.data.autoplay + '" story-content="'+ e.data.story_content +'"  taxonomy="' + e.data.taxonomy_name + '" layout="horizontal"  designs="'+ e.data.designs +'" skin="'+ e.data.timeline_skin+'" show-posts="' + e.data.number_of_posts + '" order="' + e.data.stories_order + '"  start-on="' + e.data.start_on + '" icons="' + e.data.ctl_icons + '" items="' + e.data.items + '" date-format="' + e.data.date_format + '"]');
+				}
+			});
+		}
+	},
+					{
 						text: 'Facebook Page Timeline',
 						onclick: function() {
 
 							editor.windowManager.open( {
-								title: 'Add Facebook page feed in shortcode',
+								title: 'Add Facebook Page Feed Timeline',
 								body: [
 									{
 										type   : 'container',
 										name   : 'container',
 										label  : '',
-										html   : '<h1>You need to have Facebook App ID & Secret Key in order to create Facebook page timeline.<br> For this either watch our <i> <a target="_blank" href="http://www.cooltimeline.com/document/facebook-page-timeline/">Video Tutorial</a></i> or follow these steps:-</strong></h1><br>' +
-										'<ol>'+
-										'<li>Go to -> <a target="_blank" href="https://developers.facebook.com">https://developers.facebook.com</a> -> Register as a developer</li>'+
-										'<li>Apps -> Create a new App.</li>'+
-										'<li>Complete the wizard</li>'+
-										'<li>Once done you will see the new App ID and Secret keys in the dashboard.</li></ol>'
-									},
-									{
-										type: 'textbox',
-										name: 'fb_app_id',
-										label: 'Facebook App Id',
-										value:''
-									},
-									{
-										type: 'textbox',
-										name: 'fb_app_secret',
-										label: 'Facbook APP secret Key',
-										value:''
-									},
-									{
-										type: 'textbox',
-										name: 'fb_page_name',
-										label: 'Facbook Page name',
-										value:''
-									},
-									{
-										type: 'textbox',
-										name: 'number_of_posts',
-										label: 'Show number of posts',
-										value:20
-									},
-									{
-										type: 'listbox',
-										name: 'timeline_skin',
-										label: 'Timeline skin',
-										'values':skins
-									},
-								],
-								onsubmit: function( e ) {
-									editor.insertContent( '[cool-social-timeline type="social" fb-app-id="'+ e.data.fb_app_id+'" fb-app-secret-key="'+ e.data.fb_app_secret+'" fb-page-name="'+ e.data.fb_page_name+'"  show-posts="' + e.data.number_of_posts + '"  skin="'+ e.data.timeline_skin+'"]');
-								}
+										html   : '<h1>We have created brand new standalone version of Facbook Page feed timeline plugin. </h1><br>' +
+										'You can download it from WordPress.org using this link. <strong><a target="_blank" href="https://wordpress.org/plugins/cool-facebook-page-feed-timeline/">Facebook Page Feed Timeline</a></strong>'
+										}
+									
+								]
+							
 							});
 						}
 					}
            ]
 			});
-		editor.onSetContent.add(function(editor, o) {
-			  if ( editor.getContent().indexOf( '[cool-timeline]' ) > -1) {
-					editor.controlManager.setDisabled('cool_timeline_shortcode_button', true);
-				}
-		  });
-
+	
+	}
 	
 	});
 	

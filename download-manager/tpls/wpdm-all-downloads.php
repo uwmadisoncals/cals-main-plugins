@@ -196,7 +196,8 @@ if(isset($params['jstable']) && $params['jstable']==1):
                 $data['title'] = get_the_title();
                 if($ext=='') $ext = '_blank.png';
                 if($ext==basename($ext)) $ext = plugins_url("download-manager/assets/file-type-icons/".$ext);
-                $data['download_link'] = DownloadLink($data, 0);
+                $data['download_url'] = '';
+                $data['download_link'] = \WPDM\Package::downloadLink($data['ID']);//DownloadLink($data, 0);
                 $data = apply_filters("wpdm_after_prepare_package_data", $data);
                 $download_link = $data['download_link'];
                 if(isset($data['base_price']) && $data['base_price'] > 0 && function_exists('wpdmpp_currency_sign')) $download_link = "<a href='".$data['addtocart_url']."' class='btn btn-sm btn-info'>Buy ( ".$data['currency'].$data['effective_price']." )</a>";
@@ -250,7 +251,12 @@ if(isset($params['jstable']) && $params['jstable']==1):
                                         echo $download_link;
                                         break;
                                     default:
-                                        echo $c;
+                                        if(isset($data[$c])) {
+                                            if ($cx > 0)
+                                                echo "<span class='__dt_{$c} {$cxc}'>" . $data[$c] . "</span>";
+                                            else
+                                                echo $data[$c];
+                                        }
                                         break;
 
 
@@ -289,8 +295,8 @@ if(isset($params['jstable']) && $params['jstable']==1):
             'show_all' => false,
             'type' => 'list',
             'prev_next'    => True,
-            'prev_text' => '<i class="icon icon-angle-left"></i> Previous',
-            'next_text' => 'Next <i class="icon icon-angle-right"></i>',
+            'prev_text' => '<i class="fa fa-long-arrow-left"></i> '.__('Previous', 'download-manager'),
+            'next_text' => __('Next', 'download-manager').' <i class="fa fa-long-arrow-right"></i>',
         );
 
         if( $wp_rewrite->using_permalinks() )

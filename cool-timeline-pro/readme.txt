@@ -8,9 +8,9 @@ Tags:timelines, wp timeline,responsive timeline,timeline,time,simple timeline,ti
 
 Requires at least:4.0
 
-Stable tag:2.2
+Stable tag:2.6
 
-Tested up to:4.7.5
+Tested up to:4.8.3
 
 
 

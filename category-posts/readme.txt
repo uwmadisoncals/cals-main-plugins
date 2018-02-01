@@ -1,10 +1,10 @@
-=== Category Posts Widget ===
+﻿=== Category Posts Widget ===
 Contributors: mark-k, kometschuh, mkrdip
 Donate link: http://mkrdip.me/donate
 Tags: category, categories, posts, widget, posts widget, recent posts, category recent posts, shortcode, sidebar, excerpt, multiple widgets
 Requires at least: 2.8
 Tested up to: 4.9
-Stable tag: 4.8
+Stable tag: 4.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,7 +37,7 @@ We've also started creating free widget Add-ons for the Premium Widget here: [Wi
 * SVG icon support for post formats
 * Template to arrange the post details
 * Premade Templates
-* The Template text can a placeholder, text, HTML or HTML for icons
+* The Template text can be a placeholder, plain text, HTML or HTML for icons
 * New date format: Time since plublished
 * Filter by post status: Published, scheduled, private
 * New hover effect: SVG icon
@@ -111,11 +111,11 @@ Automatic installation is the easiest option as WordPress handles the file trans
 * Version 3.0 or later version uses WordPress 2.9's built in post thumbnail functionality.
 
 == Frequently Asked Questions ==
-= Template and post detail =
-Here You can control the [Post Detail parts](http://tiptoppress.com/category-posts-widget/documentation-4-8/#Post_details), which appears as part of the post item. All post detail will placed as placeholder. The text in the Template area can be a placeholder, text, HTML code or HTML code for icons.
+= Template, placeholder and post detail =
+Here You can control the [Post Detail parts](http://tiptoppress.com/category-posts-widget/documentation-4-8/#Post_details), which appears as part of the post item. All post detail will placed as placeholder. The text in the Template area can be a placeholder, plain text, HTML code or HTML code for icons.
 
-= SVG icons =
-For SVG icon HTML we recommend the WordPress Dashicons, which are included as default and can be used without any icon-font including [Dashicons](https://developer.wordpress.org/resource/dashicons/).
+= Use SVG icons =
+For SVG icon HTML we recommend the [WordPress Dashicons](https://developer.wordpress.org/resource/dashicons/), which are included as default and can be used without any icon-font including.
 
 = How Category Posts Widget work with SiteOrigin Page Builder =
 Please add the widget with shortcode [catposts] inside a editor widget which is placed to a SiteOrigin Page Builder row.
@@ -149,14 +149,22 @@ We know there are peopel how use PHP 5.2 [wordpress.org/about/stats](https://wor
 Check also the .htaccess file, if there is an entry for an older PHP version.
 
 == Screenshots ==
-1. SVG icons support and hover effects
-2. Template to arrange the post details
-3. Use shortcode [catposts] in the content and edit options in the customizer.
-4. The widget configuration dialog.
-5. Front end of the widget using a default WordPress Theme.
+1. Front end of the widget with SVG icon support for post formats, hover effects and the Template text-area.
+2. Template to arrange the post details with placeholders.
+3. Edit the widget options with the customizer.
+4. Use shortcode [catposts] in the content.
+5. The widget configuration dialog.
+6. Widget behaviour settings for each user.
 
 == Changelog ==
 [Read more on our blog ...](http://tiptoppress.com/category/category-posts-widget?utm_source=wordpress_org&utm_campaign=changelog_cpw&utm_medium=web)
+
+= 4.8.2 - January 30th 2018 =
+* Fixed Adding the widget with the customizer only the title is shown
+* Fixed Recognize "Empty lines" > Next line is a paragraph in the Template in widget areas
+
+= 4.8.1 - January 25th 2018 =
+* Fixed Recognize "Empty lines" > Next line is a paragraph in the Template
 
 = 4.8 - January 22th 2018 =
 * SVG icon support for post formats

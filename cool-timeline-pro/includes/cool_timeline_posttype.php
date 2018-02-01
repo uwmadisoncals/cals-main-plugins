@@ -1,29 +1,37 @@
 <?php
 
-if (!class_exists('CoolTimeline_Posttype')) {
+if (!class_exists('CoolTimelinePosttype')) {
 
-    class CoolTimeline_Posttype {
+    class CoolTimelinePosttype {
 
         /**
          * The Constructor
          */
         public function __construct() {
             // register actions
-            add_action('init', array(&$this, 'cooltimeline_custom_post_type'));
-            add_filter('manage_edit-cool_timeline_columns', array(&$this, 'add_new_cool_timeline_columns'));
-            add_action('manage_cool_timeline_posts_custom_column', array(&$this, 'custom_columns'), 10, 2);
-            add_action('init', array(&$this, 'ctl_taxonomy'), 0);
-             add_action('init', array(&$this, 'ctl_insert_category'), 0);
-            add_action('init', array(&$this, 'add_custom_rewrite_rule'));
-            add_action( 'save_post_cool_timeline',array(&$this,'mfields_set_default_object_terms' ),100 ,2);
-     
-            add_action( 'template_redirect',array(&$this,'ctl_template_redirect') );
+            add_action('init', array($this, 'cooltimeline_custom_post_type'));
 
-            add_filter('parse_query',array(&$this, 'tsm_convert_id_to_term_in_query'));
-            add_action('restrict_manage_posts',array(&$this, 'tsm_filter_post_type_by_taxonomy'));
+            if(is_admin()){
+            add_filter('manage_edit-cool_timeline_columns', array($this, 'add_new_cool_timeline_columns'));
+            add_action('manage_cool_timeline_posts_custom_column', array($this, 'custom_columns'), 10, 2);
+             add_action( 'wp_ajax_ctl_change_story_order',  array($this, 'ctl_change_story_order' ));
+             }
+
+            add_action('init', array($this, 'ctl_taxonomy'), 0);
+             add_action('init', array($this, 'ctl_insert_category'), 0);
+            add_action('init', array($this, 'add_custom_rewrite_rule'));
+            add_action( 'save_post_cool_timeline',array($this,'mfields_set_default_object_terms' ),100 ,2);
+     
+            add_action( 'template_redirect',array($this,'ctl_template_redirect') );
+
+            add_filter('parse_query',array($this, 'tsm_convert_id_to_term_in_query'));
+            add_action('restrict_manage_posts',array($this, 'tsm_filter_post_type_by_taxonomy'));
+            
+
         }
 
-// END public function __construct())
+        // END public function __construct())
+       
         // Register Custom Post Type
         function cooltimeline_custom_post_type() {
 
@@ -115,6 +123,7 @@ if (!class_exists('CoolTimeline_Posttype')) {
             register_taxonomy('ctl-stories', array('cool_timeline'), $args);
         }
 
+        // insert default category
         public function ctl_insert_category() {
         if(!term_exists( 'timeline-stories', 'ctl-stories' )){
          $r=   wp_insert_term(
@@ -145,77 +154,55 @@ if (!class_exists('CoolTimeline_Posttype')) {
             }
         }
 
+        // register custom column for timeline stories 
         function add_new_cool_timeline_columns($gallery_columns) {
             $new_columns['cb'] = '<input type="checkbox" />';
 
             $new_columns['title'] = _x('Story Title', 'column name', 'cool-timeline');
-            $new_columns['year'] = __('Story Year/Custom Order', 'column name', 'cool-timeline');
-            $new_columns['story_date'] = _x('Story Date/Custom Label', 'column name', 'cool-timeline');
-            $new_columns['category'] = _x('Story Category', 'column name', 'cool-timeline');
-            $new_columns['images'] = __('Story Format', 'cool-timeline');
-            $new_columns['date'] = _x('Published Date', 'column name', 'cool-timeline');
-
+           $new_columns['category'] = _x('Story Category', 'column name', 'cool-timeline');
+            $new_columns['year'] = __('Story Year', 'cool-timeline');
+            $new_columns['story_date'] = __('Story Date','cool-timeline');
+        
+           // $new_columns['images'] = __('Story Format', 'cool-timeline');
+            $new_columns['label'] = __('Story Custom Label','cool-timeline');
+            $new_columns['order'] = __('Story Custom Order','cool-timeline');
+          //  $new_columns['date'] = _x('Published Date', 'column name', 'cool-timeline');
             return $new_columns;
         }
 
+        // columns handler funciton
         function custom_columns($column, $post_id) {
          global   $post ;
+          $story_based_on = get_post_meta($post_id, 'story_based_on', true);
+          $story_format = get_post_meta($post_id, 'story_format', true);
+
             switch ($column) {
-                case "year":
-                   $story_based_on = get_post_meta($post_id, 'story_based_on', true);
-                     if($story_based_on=="custom"){
-                         $ctl_story_order = get_post_meta($post_id, 'ctl_story_order', true);
-                     echo"<p><strong>".$ctl_story_order."</strong></p>";
-                     }else{
+                 case "year":
+                    if( $story_based_on=="default"){
                      $posted_year = get_post_meta($post_id, 'ctl_story_year', true);
-                    echo"<p><strong>" . $posted_year . "</strong></p>";
-                      }
+                     echo"<p><strong>" . $posted_year . "</strong></p>";
+                     }
                      break;
+
                     case "story_date":
-                     $story_based_on = get_post_meta($post_id, 'story_based_on', true);
-                     if($story_based_on=="custom"){
+                     if( $story_based_on=="default"){
+                         $story_based_on = get_post_meta($post_id, 'story_based_on', true);
+                         $ctl_story_date = get_post_meta($post_id, 'ctl_story_date', true);
+                         echo"<p><strong>" . $ctl_story_date . "</strong></p>";
+                    }
+                    break;
+                  case "label":
+                  if($story_based_on=="custom"){
                          $ctl_story_lbl = get_post_meta($post_id, 'ctl_story_lbl', true);
                      echo"<p><strong>".$ctl_story_lbl."</strong></p>";
-                     }else{
-                         $ctl_story_date = get_post_meta($post_id, 'ctl_story_date', true);
-                     echo"<p><strong>" . $ctl_story_date . "</strong></p>";
-                      }
-                   
-                    break;
-                case "images":
-                    // - show thumb -
-
-                    $story_format = get_post_meta($post_id, 'story_format', true);
-                            
-                    if ($story_format == "video") {
-                        echo'<div class="video"><img width="150" height="150" src="' . CTP_PLUGIN_URL . '/images/youtube.png" alt="" /></div>';
-                    } else if ($story_format == "slideshow") {
-                        echo'<div class="slideshow"><img width="150" height="150" src="' . CTP_PLUGIN_URL . '/images/slideshow.png" alt="" /></div>';
-                    }else if($story_format == "default"){
-                     if ( has_post_thumbnail() ) {
-                        echo get_the_post_thumbnail( $post_id, array( 150, 150), array( 'class' => '' ) );
-                     }else{
-                        echo'<h3>Standard</h3>';
-                     
-                     }
                     }
-                    else {
-
-                        $post_image_id = get_post_thumbnail_id(get_the_ID());
-                        if ($post_image_id) {
-                            $thumbnail = wp_get_attachment_image_src($post_image_id, array(150, 150), false);
-                            if ($thumbnail)
-                                (string) $thumbnail = $thumbnail[0];
-                            echo '<img width="150" height="150" src="' . $thumbnail . '" alt="" />';
-                        }
+                  break;   
+                case "order":
+                  if($story_based_on=="custom"){
+                     $ctl_story_order = get_post_meta($post_id, 'ctl_story_order', true);
+                     echo'<div class="quick-order-update"><input size="5" value="'.$ctl_story_order.'" type="text" data-id="#pld-'.$post_id.'" name="clt_story_order" class="custom_story_order" data-post-id="'.$post_id.'"><img style="width:16px;display:none;margin-left:5px;" class="od_preloader" id="pld-'.$post_id.'" src="'.CTP_PLUGIN_URL.'images/order-preloader.gif"></div>';
                     }
-
-                    break;
-                case "content":
-                    echo $content = get_the_excerpt();
-                    break;
-
-
+                  break;
                 /* If displaying the 'genre' column. */
                 case 'category' :
 
@@ -246,6 +233,23 @@ if (!class_exists('CoolTimeline_Posttype')) {
                     break;
             }
         }
+
+    function ctl_change_story_order() {
+        $new_order = intval( $_POST['order'] );
+        $p_id = intval( $_POST['post_id'] );
+          if($new_order && $p_id){
+           $rs= update_post_meta($p_id, 'ctl_story_order', $new_order);
+          if($rs){
+            echo json_encode(array('success'=>'true'));
+          }else{
+            echo json_encode(array('success'=>'false'));
+          }
+      }else{
+            echo json_encode(array('success'=>'false'));
+          }
+          wp_die(); // this is required to terminate immediately and return a proper response
+    }
+
 
         function add_custom_rewrite_rule() {
 

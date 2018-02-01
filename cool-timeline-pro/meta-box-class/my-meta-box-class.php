@@ -512,10 +512,17 @@ class AT_Meta_Box {
    * @access public
    */
   public function show_field_begin( $field, $meta) {
+      $rcls='';
+     
     echo "<td class='at-field'".(($this->inGroup === true)? " valign='top'": "").">";
     if ( $field['name'] != '' || $field['name'] != FALSE ) {
-      echo "<div class='at-label'>";
-        echo "<label for='{$field['id']}'>{$field['name']}</label>";
+     
+       if($field['type']=="radio")
+      {
+         echo'<div class="ctl-switch-fields">';
+      }
+        echo "<div class='at-label'>";
+       echo "<span for='{$field['id']}'>{$field['name']}</span>";
       echo "</div>";
     }
   }
@@ -532,6 +539,11 @@ class AT_Meta_Box {
     //print description
     if ( isset($field['desc']) && $field['desc'] != '' )
       echo "<div class='desc-field'>{$field['desc']}</div>";
+
+    if($field['type']=="radio")
+      {
+         echo'</div>';
+      }
     echo "</td>";
   }
   
@@ -667,7 +679,8 @@ class AT_Meta_Box {
       
     $this->show_field_begin( $field, $meta );
       foreach ( $field['options'] as $key => $value ) {
-        echo "<input type='radio' ".( isset($field['style'])? "style='{$field['style']}' " : '' )." class='at-radio".( isset($field['class'])? ' ' . $field['class'] : '' )."' name='{$field['id']}' value='{$key}'" . checked( in_array( $key, $meta ), true, false ) . " /> <span class='at-radio-label'>{$value}</span>";
+        $fid=$field['id'].'-'.$key;
+        echo "<input id='{$fid}' type='radio' ".( isset($field['style'])? "style='{$field['style']}' " : '' )." class='at-radio".( isset($field['class'])? ' ' . $field['class'] : '' )."' name='{$field['id']}' value='{$key}'" . checked( in_array( $key, $meta ), true, false ) . " /> <label for='{$fid}' class='at-radio-label'>{$value}</label>";
       }
     $this->show_field_end( $field, $meta );
   }
@@ -801,7 +814,7 @@ class AT_Meta_Box {
       echo "<input class='at-color-iris".(isset($field['class'])? " {$field['class']}": "")."' type='text' name='{$field['id']}' id='{$field['id']}' value='{$meta}' size='8' />";  
     }else{
       echo "<input class='at-color".(isset($field['class'])? " {$field['class']}": "")."' type='text' name='{$field['id']}' id='{$field['id']}' value='{$meta}' size='8' />";
-      echo "<input type='button' class='at-color-select button' rel='{$field['id']}' value='" . __( 'Select a color' ,'apc') . "'/>";
+      echo "<input type='button' class='at-color-select button' rel='{$field['id']}' value='" . __( 'Select a color' ,'cool-timeline') . "'/>";
       echo "<div style='display:none' class='at-color-picker' rel='{$field['id']}'></div>";
     }
     $this->show_field_end($field, $meta);
@@ -1885,7 +1898,7 @@ class AT_Meta_Box {
    */
   public function load_textdomain(){
     //In themes/plugins/mu-plugins directory
-    load_textdomain( 'mmb', dirname(__FILE__) . '/lang/' . get_locale() .'.mo' );
+     load_textdomain( 'cool-timeline', dirname(dirname(__FILE__)) . '/languages/' . 'cool-timeline-'. get_locale() .'.mo' );
   }
 } // End Class
 endif; // End Check Class Exists

@@ -153,6 +153,15 @@ Check download stats and get a push notification when someone downloads, install
 
 == Changelog ==
 
+= 2.9.64 =
+* Added missing media streaming class on last update
+
+= 2.9.63 =
+* Fixed download popup display issue in mobile devices
+* Fixed an issue with video streaming
+* Added missing translations in login form template
+* Fixed missing columns data issue with all downloads table
+
 = 2.9.62 =
 * Auto-clear file size field after uploading new file or deleting current file
 * Added new parameter with all downloads shortcode to customize columns

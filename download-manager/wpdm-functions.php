@@ -261,6 +261,13 @@ function wpdm_getlink()
 
     if(isset($_POST['reCaptchaVerify'])){
         $ret = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', array('method' => 'POST', 'body' => array('secret' => get_option('_wpdm_recaptcha_secret_key'), 'response' => $_POST['reCaptchaVerify'], 'remoteip' => $_SERVER['REMOTE_ADDR'])));
+        if(is_wp_error($ret)){
+            header("Content-type: application/json");
+            $data['error'] = $ret->get_error_message();
+            $data['downloadurl'] = '';
+            echo json_encode($data);
+            die();
+        }
         $ret = json_decode($ret['body']);
         if($ret->success == 1){
             $_SESSION['_wpdm_unlocked_'.$file['ID']] = 1;
@@ -278,11 +285,11 @@ function wpdm_getlink()
 
 
     if ($plock == 1 && $password != $file['password'] && !strpos("__" . $file['password'], "[$password]")) {
-        $data['error'] = '<span class="color-red"><i class="fa fa-refresh"></i> '.__('Wrong Password! Try Again.','download-manager')."</span>";
+        $data['error'] = '<span class="color-red" style="font-size: 8pt"><i class="fa fa-refresh"></i> '.__('Wrong Password! Try Again.','download-manager')."</span>";
         $file = array();
     }
     if ($plock == 1 && $password == '') {
-        $data['error'] = '<span class="color-red"><i class="fa fa-refresh"></i> '.__('Wrong Password! Try Again.','download-manager')."</span>";
+        $data['error'] = '<span class="color-red" style="font-size: 8pt"><i class="fa fa-refresh"></i> '.__('Wrong Password! Try Again.','download-manager')."</span>";
         $file = array();
     }
     $ux = "";

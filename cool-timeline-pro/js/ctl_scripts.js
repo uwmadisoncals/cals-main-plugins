@@ -1,9 +1,8 @@
 jQuery('document').ready(function($){
 
- $(".cool_timeline").find("a[class^='ctl_prettyPhoto']").prettyPhoto({
-	 social_tools: false
-	 
- });
+	$(".cool_timeline").find("a[class^='ctl_prettyPhoto']").prettyPhoto({
+	 social_tools: false 
+	 });
 	$(".cool_timeline").find("a[rel^='ctl_prettyPhoto']").prettyPhoto({
 		social_tools: false
 	});
@@ -29,10 +28,10 @@ jQuery('document').ready(function($){
 	  $(".cool_timeline").find('.ctl_flexslider').flexslider({
 		animation:animation,
 		slideshow:slideshow,
+		rtl: true,
 		slideshowSpeed:animationSpeed,
-		  smoothHeight:true
-		
-	});
+		smoothHeight:true
+});
  
   var pagination= $(".cool_timeline").attr('data-pagination');
   var pagination_position= $(".cool_timeline").attr('data-pagination-position');
@@ -143,4 +142,3 @@ var Utils = new Utils();
 
 
 });
-
