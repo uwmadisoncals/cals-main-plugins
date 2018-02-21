@@ -1,5 +1,7 @@
 jQuery(function ($) {
 
+    $('.wpdm_hide.wpdm_remove_empty').remove();
+
     $('.input-group input').on('focus', function () {
         $(this).parent().find('.input-group-addon').addClass('input-group-addon-active');
     });

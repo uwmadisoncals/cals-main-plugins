@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.8.00
+* Version 6.8.01
 *
 */
 
@@ -90,7 +90,7 @@ global $wppa_timestamp_start;
 		return;
 	}
 
-
+/*
 	// Check for multiple maintenance procs
 	if ( ! wppa_switch( 'maint_ignore_concurrency_error' ) && ! wppa_is_cron() ) {
 
@@ -102,7 +102,7 @@ global $wppa_timestamp_start;
 			}
 		}
 	}
-
+*/
 	// Lock this proc
 	if ( wppa_is_cron() ) {
 		update_option( $slug.'_user', 'cron-job' );

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.8.00
+* Version 6.8.01
 *
 */
 
@@ -779,8 +779,6 @@ function wppaTryScheduleAll( id ) {
 									'<span class="description" >' .
 										__( 'Separate categories with commas.', 'wp-photo-album-plus' ) .
 									'</span>' .
-								'</td>' .
-								'<td>' .
 									'<select' .
 										' onchange="wppaAddCat( this.value, \'cats\' ); wppaAjaxUpdateAlbum( ' . $id . ', \'cats\', document.getElementById( \'cats\' ) )"' .
 										' >';
@@ -796,6 +794,8 @@ function wppaTryScheduleAll( id ) {
 										}
 									echo
 									'</select>' .
+								'</td>' .
+								'<td>' .
 								'</td>' .
 							'</tr>';
 

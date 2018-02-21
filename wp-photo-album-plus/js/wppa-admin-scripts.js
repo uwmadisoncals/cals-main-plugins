@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.8.00
+/* Version 6.8.01
 /* Various js routines used in admin pages
 */
 
@@ -268,17 +268,23 @@ function wppaToggleTable(table) {
 var wppaSubTabOn = new Array();
 
 function wppaToggleSubTable(table,subtable) {
+	
+	// Hide
 	if (wppaSubTabOn[table+'-'+subtable]) {
 		jQuery('.wppa-'+table+'-'+subtable).addClass('wppa-none');
+		jQuery('.wppa-'+table+'-'+subtable+'-help').css('display','none');
 		wppaSubTabOn[table+'-'+subtable] = false;
 		wppa_tablecookieoff(table+'-'+subtable);
 	}
+	
+	// Show
 	else {
 		jQuery('.wppa-'+table+'-'+subtable).removeClass('wppa-none');
+		jQuery('.wppa-'+table+'-'+subtable+'-h').css('display','');
 		wppaSubTabOn[table+'-'+subtable] = true;
 		wppa_tablecookieon(table+'-'+subtable);
 	}
-//alert("table+'-'+subtable = "+table+'-'+subtable+" wppaSubTabOn[table+'-'+subtable] = "+wppaSubTabOn[table+'-'+subtable]);
+
 }
 
 function wppaHideTable(table) {
@@ -1057,7 +1063,9 @@ function wppaAjaxDeletePhoto(photo, bef, aft) {
 				var str = wppaTrim(xmlhttp.responseText);
 				var ArrValues = str.split("||");
 				if ( ArrValues[0] == 'ER' ) {
-					alert(ArrValues[3]);
+					if ( ArrValues[3] ) {
+						alert(ArrValues[3] );
+					}
 					jQuery('#wppa-delete-'+photo).css('text-decoration','line-through');
 				}
 				else if (ArrValues[0] != '') {
@@ -1110,7 +1118,9 @@ function wppaAjaxUndeletePhoto(photo) {
 				var str = wppaTrim(xmlhttp.responseText);
 				var ArrValues = str.split("||");
 				if ( ArrValues[0] == 'ER' ) {
-					alert(ArrValues[3]);
+					if ( ArrValues[3] ) {
+						alert( ArrValues[3] );
+					}
 					jQuery('#wppa-delete-'+photo).css('text-decoration','line-through');
 				}
 				else if (ArrValues[0] != '') {
@@ -1764,7 +1774,7 @@ function wppaAjaxUpdateOptionCheckBox(slug, elem) {
 					case '0':	// No error
 						jQuery('#img_'+slug).attr('src',wppaImageDirectory+'tick.png');
 						jQuery('#img_'+slug).attr('title',ArrValues[2]);
-						if ( ArrValues[3] != '' ) alert(ArrValues[3]);
+						if ( ArrValues[3] ) alert(ArrValues[3]);
 						if ( _wppaRefreshAfter ) {
 							_wppaRefreshAfter = false;
 							document.location.reload(true);
@@ -1773,7 +1783,7 @@ function wppaAjaxUpdateOptionCheckBox(slug, elem) {
 					default:
 						jQuery('#img_'+slug).attr('src',wppaImageDirectory+'cross.png');
 						jQuery('#img_'+slug).attr('title','Error #'+ArrValues[1]+', message: '+ArrValues[2]+', status: '+xmlhttp.status);
-						if ( ArrValues[3] != '' ) alert(ArrValues[3]);
+						if ( ArrValues[3] ) alert(ArrValues[3]);
 						if ( _wppaRefreshAfter ) {
 							_wppaRefreshAfter = false;
 							document.location.reload(true);
@@ -1794,7 +1804,7 @@ function wppaAjaxUpdateOptionCheckBox(slug, elem) {
 	xmlhttp.send();
 }
 
-var wppaAlwaysContinue = 0;
+var wppaAlwaysContinue = 10;
 
 function wppaMaintenanceProc(slug, intern, asCronJob ) {
 
@@ -1885,28 +1895,17 @@ function wppaMaintenanceProc(slug, intern, asCronJob ) {
 								},
 
 					error: 		function( xhr, status, error ) {
-									wppaConsoleLog( 'wppaMaintenanceProc failed. Error = ' + error + ', status = ' + status, 'force' );
-									jQuery("#"+slug+"_status").html('Server error');
+									wppaConsoleLog( 'wppaMaintenanceProc failed. Slug = ' + $slug + ', Error = ' + error + ', status = ' + status, 'force' );
+									jQuery("#"+slug+"_status").html('Server error #'+(11-wppaAlwaysContinue));
 									var wppaContinue = false;
+									wppaAlwaysContinue--;
 									if ( wppaAlwaysContinue < 1 ) {
-										wppaContinue = confirm( 'Server error.\nDo you want to continue?' );
+										wppaContinue = confirm( '10 Server errors happened.\nDo you want to continue?' );
 										if ( wppaContinue ) {
-											if ( wppaAlwaysContinue == 0 ) {
-												if ( slug == 'wppa_remake' ||
-													 slug == 'wppa_regen_thumbs' ||
-													 slug == 'wppa_create_o1_files' ||
-													 slug == 'wppa_recup' ) {
-													if ( confirm( 'Always continue after server error?' ) ) {
-														wppaAlwaysContinue = 1;
-													}
-												}
-												else {
-													wppaAlwaysContinue = -1;
-												}
-											}
+											wppaAlwaysContinue = 10;
 										}
 									}
-									if ( wppaContinue || wppaAlwaysContinue == 1 ) {
+									if ( wppaContinue || wppaAlwaysContinue > 0 ) {
 										if ( slug == 'wppa_remake' ) {
 											wppaAjaxUpdateOptionValue( 'wppa_remake_skip_one', 0 );
 										}
@@ -2029,7 +2028,7 @@ function wppaAjaxUpdateOptionValue(slug, elem, multisel) {
 					case '0':	// No error
 						jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'tick.png' );
 //						document.getElementById('img_'+slug).src = wppaImageDirectory+'tick.png';
-						if ( ArrValues[3] != '' ) alert(ArrValues[3]);
+						if ( ArrValues[3] ) alert(ArrValues[3]);
 						if ( _wppaRefreshAfter ) {
 							_wppaRefreshAfter = false;
 							document.location.reload(true);
@@ -2038,7 +2037,7 @@ function wppaAjaxUpdateOptionValue(slug, elem, multisel) {
 					default:
 						jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'cross.png' );
 //						document.getElementById('img_'+slug).src = wppaImageDirectory+'cross.png';
-						if ( ArrValues[3] != '' ) alert(ArrValues[3]);
+						if ( ArrValues[3] ) alert(ArrValues[3]);
 				}
 				jQuery( '#img_'+slug ).attr( 'title', ArrValues[2] );
 //				document.getElementById('img_'+slug).title = ArrValues[2];

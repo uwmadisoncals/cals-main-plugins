@@ -9,7 +9,7 @@
 namespace WPDM\admin\menus;
 
 
-use WPDM\FileSystem;
+use \WPDM\libs\FileSystem;
 
 class Stats
 {

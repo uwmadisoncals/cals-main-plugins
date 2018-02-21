@@ -153,6 +153,25 @@ Check download stats and get a push notification when someone downloads, install
 
 == Changelog ==
 
+= 2.9.69 =
+* Fixed the issue with reCaptcha lock
+
+= 2.9.68 =
+* Fixed the issue with autoloader
+
+= 2.9.67 =
+* Fixed the warning "Illegal string offset..." with class.DownloadStats.php
+* Improved the default page template
+
+= 2.9.66 =
+* Fixed the issue with stats class
+
+= 2.9.65 =
+* Added new file type icons
+* Fixed the issue with download popup
+* Fixed the issue with autoload class
+* Fixed deprecated function issue in widget.php
+
 = 2.9.64 =
 * Added missing media streaming class on last update
 

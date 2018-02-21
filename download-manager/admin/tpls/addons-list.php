@@ -41,10 +41,16 @@
 
     }
 
-    .w3eden .btn{
-        border-radius: 0.2em !important;
+    .w3eden .panel-footer{
+        line-height: 22px;
     }
-    .well{ box-shadow: none !important; background: #FFFFFF !important; } .btn{ border: 0 !important; }
+    .w3eden .btn-group.btn-group-xs .btn{
+        font-size: 9px;
+        padding: 2px 7px;
+        line-height: 18px;
+        height: 22px;
+    }
+    .well{ box-shadow: none !important; background: #FFFFFF !important; }
 
     .w3eden .nav-pills a{
         background: #f5f5f5;
@@ -176,16 +182,6 @@
         outline: none !important;
     }
 
-    .w3eden .nav-pills li.active a,
-    .btn-primary,
-    .w3eden .panel-primary > .panel-heading{
-        background-image: linear-gradient(to bottom, #2081D5 0px, #1B6CB2 100%) !important;
-    }
-    .w3eden .panel-default > .panel-heading {
-        background-image: linear-gradient(to bottom, #F5F5F5 0px, #E1E1E1 100%);
-        background-repeat: repeat-x;
-    }
-
     #modalcontents .wrap h2{ display: none; }
 
     .list-group-item:hover{
@@ -245,7 +241,7 @@ foreach($cats as $cat){
     $file = end($file);
     $plugininfo = wpdm_plugin_data($file);
 
-    $linklabel = ($plugininfo)?'<span class="color-purple"><i class="fa fa-refresh"></i> Re-Install</span>':'<span class="color-green"><i class="fa fa-plus-circle"></i> Install</span>';
+    $linklabel = ($plugininfo)?'<i class="fa fa-refresh"></i> Re-Install':'<i class="fa fa-plus-circle"></i> Install';
  ?>
     <div class="col-md-3 all <?php echo implode(" ", $package->cats); ?>">
 
@@ -257,11 +253,15 @@ foreach($cats as $cat){
         </div>
         <div class="panel-footer text-right">
             <?php if($package->price>0){ ?>
-                <a class="btn-purchase" data-toggle="modal" data-backdrop="true" data-target="#addonmodal" href="#" rel="<?php echo $package->ID; ?>" style="border: 0;border-radius: 2px;"><i class="fa fa-shopping-cart"></i> &nbsp;Buy Now <span class="label label-success" style="font-size: 8pt;padding: 1px 5px;margin-top: 1px"><?php echo $package->currency.$package->price; ?></span> </a>
+            <div class="btn-group btn-group-xs">
+                <a class="btn btn-info btn-purchase" data-toggle="modal" data-backdrop="true" data-target="#addonmodal" href="#" rel="<?php echo $package->ID; ?>" style="border: 0;border-radius: 2px;"><i class="fa fa-shopping-cart"></i> &nbsp;Buy Now</a><span class="btn btn-inverse"><?php echo $package->currency.$package->price; ?></span>
+            </div>
             <?php } else { ?>
-                <a class="btn-install" data-toggle="modal" data-addondir="<?php echo $file; ?>" data-wpdmpinn="<?php echo wp_create_nonce($package->ID.NONCE_KEY); ?>" rel="<?php echo $package->ID; ?>" data-backdrop="true" data-target="#addonmodal" href="#" style="border: 0;border-radius: 2px"><?php echo $linklabel; ?> <span class="label label-danger" style="font-size: 8pt;padding: 1px 5px;margin-top: 1px">Free</span> </a>
+            <div class="btn-group btn-group-xs">
+                <a class="btn-install btn btn-success" data-toggle="modal" data-addondir="<?php echo $file; ?>" data-wpdmpinn="<?php echo wp_create_nonce($package->ID.NONCE_KEY); ?>" rel="<?php echo $package->ID; ?>" data-backdrop="true" data-target="#addonmodal" href="#"><?php echo $linklabel; ?></a><span class="btn btn-inverse">Free</span>
+            </div>
             <?php } ?>
-            <span class="note pull-left"><i class="fa fa-server" aria-hidden="true"></i> &nbsp;<?php echo $package->pinfo->version; ?></span>
+                <span class="note pull-left"><i class="fa fa-server" aria-hidden="true"></i> &nbsp;<?php echo $package->pinfo->version; ?></span>
         </div>
         </div>
 
@@ -329,7 +329,7 @@ foreach($cats as $cat){
                 jQuery('.modal-dialog').css('width','800px');
                 jQuery('.modal-footer').css('margin',0);
                 jQuery('.modal-footer .btn-danger').html('<i class="fa fa-spinner fa-spin"></i> Please Wait...');
-                jQuery('#modalcontents').css('padding',0).css('background','#f2f2f2').html("<iframe onload=\"jQuery('.modal-footer .btn-danger').html('Continue Shopping...');jQuery('#prcbtn').show();\" style='width: 100%;padding-top: 20px; background: #f2f2f2;height: 300px;border: 0' src='https://www.wpdownloadmanager.com/?addtocart="+e.relatedTarget.rel+"'></iframe>");
+                jQuery('#modalcontents').css('padding',0).css('background','#f2f2f2').html("<iframe onload=\"jQuery('.modal-footer .btn-danger').html('Continue Shopping...');jQuery('#adddding').hide();jQuery('#prcbtn, #adddd').show();\" style='width: 0;padding-top: 20px; background: #f2f2f2;height: 0px;border: 0' src='https://www.wpdownloadmanager.com/?addtocart="+e.relatedTarget.rel+"'></iframe><div style='padding: 50px;text-align: center;' id='adddding'>Adding Item To Cart...</div><div style='display: none;padding: 50px;text-align: center;' id='adddd'><i class='fa fa-check-circle'></i> Item Added To Cart.</div>");
             }
         })
 

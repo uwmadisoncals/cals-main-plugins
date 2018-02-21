@@ -24,7 +24,7 @@
     ?>
     <div id="w-icons">
         <?php
-        $img = array('jpg','gif','jpeg','png');
+        $img = array('jpg','gif','jpeg','png', 'svg');
         foreach($fileinfo as $index=>$value): $tmpvar = explode(".",$value['file']); $ext = strtolower(end($tmpvar)); if(in_array($ext,$img)): ?>
             <label>
                 <img class="wdmiconfile" id="<?php echo md5(plugins_url().'/'.$value['file']) ?>" src="<?php  echo plugins_url().'/'.$value['file'] ?>" alt="<?php echo $value['name'] ?>" style="padding:5px; margin:1px; float:left; border:#fff 2px solid;height: 32px;width:auto; " />

@@ -3,7 +3,7 @@
 /* Package: wp-photo-album-plus
 /*
 /* Various style computation routines
-/* Version 6.7.02
+/* Version 6.8.01
 /*
 */
 
@@ -30,8 +30,6 @@ global $wppa_dynamic_css_data;
 		: '' ) . '
 	' . ( wppa_opt( 'bradius' ) > '0' ?
 		'border-radius:' . wppa_opt( 'bradius' ) . 'px; -moz-border-radius:' .
-			wppa_opt( 'bradius' ) . 'px; -khtml-border-radius:' .
-			wppa_opt( 'bradius' ) . 'px; -webkit-border-radius:' .
 			wppa_opt( 'bradius' ) . 'px; ' :
 		'' ) . '
 	' . ( wppa_opt( 'box_spacing' ) ?
@@ -45,11 +43,7 @@ global $wppa_dynamic_css_data;
 		'border-style: solid; border-width:' . floor( ( wppa_opt( 'bwidth' ) + 2 ) / 3 ) . 'px; ' :
 		'' ) . '
 	' . ( wppa_opt( 'bradius' ) > '0' ?
-		'border-radius:' . floor( ( wppa_opt( 'bradius' ) + 2 ) / 3 ) . 'px; -moz-border-radius:' .
-			floor( ( wppa_opt( 'bradius' ) + 2 ) / 3 ) . 'px; -khtml-border-radius:' .
-			floor( ( wppa_opt( 'bradius' ) + 2 ) / 3 ) . 'px; -webkit-border-radius:' .
-			floor( ( wppa_opt( 'bradius' ) + 2 ) / 3 ) . 'px; ' :
-		'' ) . '
+		'border-radius:' . floor( ( wppa_opt( 'bradius' ) + 2 ) / 3 ) . 'px; ' : '' ) . '
 }';
 
 	$content .= '
@@ -709,9 +703,6 @@ function wppa_wcs( $class ) {
 			$opt = wppa_opt( 'bradius' );
 			if ( $opt > '0' ) {
 				$result .= 'border-radius:' . $opt . 'px; ';
-				$result .= '-moz-border-radius:' . $opt . 'px; ';
-				$result .= '-khtml-border-radius:' . $opt . 'px; ';
-				$result .= '-webkit-border-radius:' . $opt . 'px; ';
 			}
 			$opt = wppa_opt( 'box_spacing' );
 			if ( $opt != '' ) {
@@ -728,9 +719,6 @@ function wppa_wcs( $class ) {
 			if ( $opt > '0' ) {
 				$opt = floor( ( $opt + 2 ) / 3 );
 				$result .= 'border-radius:' . $opt . 'px; ';
-				$result .= '-moz-border-radius:' . $opt . 'px; ';
-				$result .= '-khtml-border-radius:' . $opt . 'px; ';
-				$result .= '-webkit-border-radius:' . $opt . 'px; ';
 			}
 			break;
 		case 'wppa-cover-box':

@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.8.00
+* Version 6.8.01
 *
 */
 
@@ -124,7 +124,6 @@ global $wppa_log_file;
 			if ( ! $any ) {
 				$query = $wpdb->prepare( "UPDATE `" . WPPA_IPTC . "` SET `status` = 'hide' WHERE `photo` = '0' AND `tag` = %s", $tag );
 				$wpdb->query( $query );
-//				wppa_log( 'dbg', $query );
 			}
 			wppa_exit();
 			break;
@@ -133,11 +132,20 @@ global $wppa_log_file;
 			$tag 		= str_replace( 'H', '#', substr( $_REQUEST['tag'], 0, 6 ) );
 			$brand 		= substr( $_REQUEST['tag'], 6 );
 			$mocc 		= $_REQUEST['moccur'];
-			$oldvalue = '';
+			$oldvalue 	= '';
+			$ss_data 	= array();
 
 			if ( strpos( $wppa_session['supersearch'], ',' ) !== false ) {
-				$ss_data = explode( ',', $wppa_session['supersearch'] );
-				if ( count( $ss_data ) == '4' ) {
+				$data = explode( ',', $wppa_session['supersearch'] );
+				if ( count( $data ) >= '4' ) {
+
+					// Value may contain commas
+					for ( $i=0; $i<3; $i++ ){
+						$ss_data[$i] = $data[$i];
+						unset( $data[$i] );
+					}
+					$ss_data[3] = implode( ',', $data );
+
 					if ( $ss_data['0'] == 'p' ) {
 						if ( $ss_data['1'] == 'e' ) {
 							if ( $ss_data['2'] == $_REQUEST['tag'] ) {
@@ -168,92 +176,52 @@ global $wppa_log_file;
 																	"ORDER BY `f_description`", $tag, __( 'n.a.', 'wp-photo-album-plus' ) ), ARRAY_A );
 			}
 
-			// Some exif data need sorting in a human understandable logical way.
-			switch ( $tag ) {
-/*
-				// FNumber
-				case 'E#829D':
+			// Make the data sortable.
+			foreach ( array_keys( $exifdata ) as $key ) {
+				$temp = $exifdata[$key]['f_description'];
+				$temp = trim( $temp, ' smf/.px' );
 
-					foreach ( array_keys( $exifdata ) as $key ) {
-						$temp = $exifdata[$key]['f_description'];
-						if ( strpos( $temp, '.' ) === false ) { 	// If int, append .0
-							$temp .= '.0';
-						}
-						$temp = substr( $temp, 2 ); 				// Strip 'f/'
-						while ( strlen( $temp ) < 5 ) { 			// Add leading 0's
-							$temp = '0' . $temp;
-						}
-						$exifdata[$key]['sort'] = $temp;
-					}
+				if ( strpos( $temp, '/' ) ) {
 
-					$exifdata = wppa_array_sort( $exifdata, 'sort' );
-					break;
-
-				// Subject distance
-				case 'E#9206':
-
-					foreach ( array_keys( $exifdata ) as $key ) {
-						$temp = $exifdata[$key]['f_description'];
-						$temp = rtrim( $temp, ' m.' );
-						if ( strpos( $temp, '.' ) === false ) { 	// If int, append .0
-							$temp .= '.0';
-						}
-						while ( strlen( substr( $temp, strpos( $temp, '.' ) ) ) < 2 ) { 	// Make sure 2 decimal digits
-							$temp .= '0';
-						}
-						while ( strlen( $temp ) < 8 ) {
-							$temp = '0' . $temp; 					// Add leading 0's
-						}
-						$exifdata[$key]['sort'] = $temp;
-					}
-
-					$exifdata = wppa_array_sort( $exifdata, 'sort' );
-					break;
-*/
-				// Numerical values
-				case 'E#0102': 	// BitsPerSample
-				case 'E#829A': 	// ExposureTime
-				case 'E#829D':	// FNumber
-				case 'E#9202': 	// ApertureValue
-				case 'E#9203': 	// BrightnessValue
-				case 'E#9206': 	// SubjectDistance
-				case 'E#920A': 	// FocalLength
-				case 'E#A405': 	// FocalLengthIn35mmFilm
-
-					foreach ( array_keys( $exifdata ) as $key ) {
-						$temp = $exifdata[$key]['f_description'];
-						if ( $temp != __( 'n.a.', 'wp-photo-album-plus' ) ) {
-							$temp = trim( $temp, ' smf/.' );
-							if ( strpos( $temp, '/' ) ) {
-								$temp = explode( '/', $temp );
-								if ( $temp[1] != 0 ) {
-									$temp = $temp[0] / $temp[1];
-								}
-								else {
-									$temp = 999999;
-								}
-							}
-							$exifdata[$key]['sort'] = sprintf( '%020.12f', $temp );
+					$t = explode( '/', $temp );
+					if ( count( $t ) == 2 && is_numeric( $t[0] ) && is_numeric( $t[1] ) ) {
+						$temp = $t;
+						if ( $temp[1] != 0 ) {
+							$temp = $temp[0] / $temp[1];
 						}
 						else {
-							$exifdata[$key]['sort'] = $temp;
+							$temp = 999999;
 						}
 					}
 
-					$exifdata = wppa_array_sort( $exifdata, 'sort' );
-					break;
+				}
+				if ( is_numeric( $temp ) ) {
+					$exifdata[$key]['sort'] = sprintf( '%020.12f', $temp );
+				}
+				else {
+					$exifdata[$key]['sort'] = $exifdata[$key]['f_description'];
+				}
 			}
 
+			// Sort
+			$exifdata = wppa_array_sort( $exifdata, 'sort' );
 
+			// Make the selectionbox content
 			$any 		= false;
 			if ( ! empty( $exifdata ) ) foreach( $exifdata as $item ) {
 				$desc = sanitize_text_field( $item['f_description'] );
 				$desc = str_replace( array(chr(0),chr(1),chr(2),chr(3),chr(4),chr(5),chr(6),chr(7)), '', $desc );
+				$desc = trim( $desc );
 
 				if ( $desc ) {
 
 					$sel = ( $oldvalue && $oldvalue == $desc ) ? 'selected="selected"' : '';
-					$ddesc = strlen( $desc ) > '32' ? substr( $desc, 0, 30 ) . '...' : $desc;
+					$ddesc = strlen( $desc ) > '42' ? substr( $desc, 0, 40 ) . '...' : $desc;
+					if ( wppa_is_valid_rational( $ddesc, false  ) ) {
+						$t = explode( '/', $ddesc );
+						$l = strlen( $ddesc );
+						$ddesc = '(' . sprintf( '%5.2f', $t[0]/$t[1] ) . ') ' . $ddesc;
+					}
 
 					echo 	'<option' .
 								' value="' . esc_attr( $desc ) . '"' .
@@ -695,7 +663,7 @@ global $wppa_log_file;
 				}
 
 				// Make the file
-				if ( wppa_switch( 'artmonkey_use_source' ) ) {
+				if ( wppa_switch( 'artmonkey_use_source' ) || strtolower( wppa_get_ext( $data['filename'] ) ) == 'pdf' ) {
 					if ( is_file ( wppa_get_source_path( $photo ) ) ) {
 						$source = wppa_get_source_path( $photo );
 					}
@@ -708,9 +676,10 @@ global $wppa_log_file;
 				}
 
 				// Fix the extension for mm items.
-				if ( $data['ext'] == 'xxx' ) {
+				if ( $data['ext'] == 'xxx' || strtolower( wppa_get_ext( $data['filename'] ) ) == 'pdf' ) {
 					$data['ext'] = wppa_get_ext( $source );
 				}
+
 				$dest 		= WPPA_UPLOAD_PATH.'/temp/'.$name.'.'.$data['ext'];
 				$zipfile 	= WPPA_UPLOAD_PATH.'/temp/'.$name.'.zip';
 				$tempdir 	= WPPA_UPLOAD_PATH.'/temp';

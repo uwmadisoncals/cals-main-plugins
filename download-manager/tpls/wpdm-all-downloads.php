@@ -174,16 +174,24 @@ if(isset($params['jstable']) && $params['jstable']==1):
             $total_files = $q->found_posts;
             while ($q->have_posts()): $q->the_post();
 
-                $ext = "_blank";
+                $ext = "unknown";
                 $data = wpdm_custom_data(get_the_ID());
                 if(isset($data['files'])&&count($data['files'])){
-                    $tmpavar = $data['files'];
-                    $tmpvar = array_shift($tmpavar);
-                    $tmpvar = explode(".", $tmpvar);
-                    $ext = count($tmpvar) > 1 ? end($tmpvar) : $ext;
+                    if(count($data['files']) == 1) {
+                        $tmpavar = $data['files'];
+                        $ffile = $tmpvar = array_shift($tmpavar);
+                        $tmpvar = explode(".", $tmpvar);
+                        $ext = count($tmpvar) > 1 ? end($tmpvar) : $ext;
+                        if(!file_exists(WPDM_BASE_DIR."assets/file-type-icons/".$ext.".svg")){
+                          $ext = "unknown";
+                          if(strstr($ffile, "youtu")) $ext = "video";
+                          else if(strstr($ffile, "://")) $ext = "link";
+                        }
+                    } else
+                        $ext = 'zip';
                 } else $data['files'] = array();
 
-                $ext = isset($data['icon']) && $data['icon'] != ''?$data['icon']:$ext.".png";
+                $ext = isset($data['icon']) && $data['icon'] != ''?$data['icon']:$ext.".svg";
 
                 $cats = wp_get_post_terms(get_the_ID(), 'wpdmcategory');
                 $fcats = array();
@@ -194,8 +202,9 @@ if(isset($params['jstable']) && $params['jstable']==1):
                 $cats = @implode(", ", $fcats);
                 $data['ID'] = $data['id'] = get_the_ID();
                 $data['title'] = get_the_title();
-                if($ext=='') $ext = '_blank.png';
-                if($ext==basename($ext)) $ext = plugins_url("download-manager/assets/file-type-icons/".$ext);
+                if($ext=='') $ext = 'unknown.svg';
+                if($ext==basename($ext) && file_exists(WPDM_BASE_DIR."assets/file-type-icons/".$ext)) $ext = plugins_url("download-manager/assets/file-type-icons/".$ext);
+                else $ext = plugins_url("download-manager/assets/file-type-icons/unknown.svg");
                 $data['download_url'] = '';
                 $data['download_link'] = \WPDM\Package::downloadLink($data['ID']);//DownloadLink($data, 0);
                 $data = apply_filters("wpdm_after_prepare_package_data", $data);

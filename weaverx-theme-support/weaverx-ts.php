@@ -5,12 +5,12 @@ Plugin URI: http://weavertheme.com/plugins
 Description: Weaver Xtreme Theme Support - a package of useful shortcodes and widgets that integrates closely with the Weaver Xtreme and Weaver Foundation themes.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 3.1.9
+Version: 3.1.11
 License: GPL V3
 
 Weaver Xtreme Theme Support
 
-Copyright (C) 2014-2016 Bruce E. Wampler - weaver@weavertheme.com
+Copyright (C) 2014-2018 Bruce E. Wampler - weaver@weavertheme.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
+1`	
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -43,7 +43,7 @@ function wvrx_is_user_logged_in() {
 
 if ( strpos( $theme, '/weaver-xtreme') !== false ) {		// only load if Weaver Xtreme is the theme
 
-define ('WVRX_TS_VERSION','3.1.9');
+define ('WVRX_TS_VERSION','3.1.11');
 define ('WVRX_TS_MINIFY','.min');		// '' for dev, '.min' for production
 define ('WVRX_TS_APPEARANCE_PAGE', false );
 
@@ -248,6 +248,4 @@ function wvrx_check_jetpack() {
         wvrx_ts_alert(__('**** IMPORTANT: The Jetpack Mobile theme is active. ****\nIt is NOT compatible with Weaver Xtreme, and will break the theme. Please deactivate it from the Jetpack control panel.\n\n**** This message will continue to be displayed until you deactivate the Jetpack Mobile Theme from the Jetpack settings panel. ****', 'weaverx-theme-support'));
     }
 }
-
-
 ?>

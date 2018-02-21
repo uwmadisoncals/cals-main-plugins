@@ -20,13 +20,15 @@ class Welcome
 
 
     function UI(){
+        update_option("__wpdm_welcome", WPDM_Version);
         remove_submenu_page( 'index.php', 'wpdm-welcome' );
         include(WPDM_BASE_DIR.'admin/tpls/welcome.php');
     }
 
     function welcomeRedirect($plugin)
     {
-        if($plugin=='download-manager/download-manager.php') {
+        $wv = get_option('__wpdm_welcome');
+        if($plugin=='download-manager/download-manager.php' && $wv !== WPDM_Version) {
             wp_redirect(admin_url('index.php?page=wpdm-welcome'));
             die();
         }

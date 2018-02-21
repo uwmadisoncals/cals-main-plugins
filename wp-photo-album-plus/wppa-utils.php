@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.7.09
+* Version 6.8.01
 *
 */
 
@@ -2234,6 +2234,7 @@ global $wpdb;
 			$data[$key]['totvalue'] 		+= $rating['value'];
 		}
 	}
+
 	foreach ( array_keys( $data ) as $key ) {
 		$thumb = wppa_cache_thumb( $key );
 		$data[$key]['meanrating'] = $data[$key]['totvalue'] / $data[$key]['ratingcount'];
@@ -2954,10 +2955,20 @@ function wppa_sanitize_text( $txt ) {
 }
 
 function wppa_is_mobile() {
-//return true; // debug
+// return true; // debug
 	$result = false;
 	$detect = new wppa_mobile_detect();
 	if ( $detect->isMobile() ) {
+		$result = true;
+	}
+	return $result;
+}
+
+function wppa_is_iphoneoripad() {
+// return true; // debug
+	$result = false;
+	$detect = new wppa_mobile_detect();
+	if ( $detect->isDevice( 'iphone' ) || $detect->isDevice( 'ipad' ) ) {
 		$result = true;
 	}
 	return $result;
@@ -4148,5 +4159,44 @@ function wppa_parse_args( $args, $defaults ) {
 }
 
 function wppa_is_divisible( $t, $n ) {
-	return ( round( $t / $n ) == ( $t / $n ) );
+
+	if ( ! is_numeric( $t ) || ! is_numeric( $n ) ) {
+		return false;
+	}
+	else {
+		return ( round( $t / $n ) == ( $t / $n ) );
+	}
+}
+
+function wppa_dump( $txt = '' ) {
+
+	// Init
+	$file = WPPA_PATH . '/wppa-dump.txt';
+
+	// Clear
+	if ( ! $txt && file_exists( $file ) ) {
+		unlink( $file );
+	}
+
+	// Open file
+	if ( file_exists( $file ) ) {
+		$mode = 'ab';
+	}
+	else {
+		$mode = 'wb';
+	}
+	$handle = fopen( $file, $mode );
+
+	// Write
+	if ( $handle ) {
+		if ( is_array( $txt ) ) {
+			$txt = var_export( $txt, true );
+		}
+		fwrite( $handle, $txt . "\n" );
+		fclose( $handle );
+	}
+}
+
+function wppa_is_pdf( $id ) {
+	return ( strtolower( wppa_get_ext( wppa_get_photo_item( $id, 'filename' ) ) ) == 'pdf' );
 }

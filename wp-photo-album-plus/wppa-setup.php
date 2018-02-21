@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.8.00
+* Version 6.8.01
 *
 */
 
@@ -561,7 +561,20 @@ global $silent;
 			delete_option( 'wppa_' . WPPA_EXIF . '_lastkey' );
 			delete_option( 'wppa_' . WPPA_INDEX . '_lastkey' );
 
-			wppa_schedule_maintenance_proc( 'wppa_format_exif' );
+			//	wppa_schedule_maintenance_proc( 'wppa_format_exif' );
+		}
+
+		// Fix exiflables that were undefined so far but have a known description by now
+		if ( $old_rev <= '6801' ) {
+			$exif_labels = $wpdb->get_results( "SELECT * FROM `" . WPPA_EXIF . "` WHERE `photo` = 0 AND `description` LIKE 'UndefinedTag%'", ARRAY_A );
+			if ( ! empty( $exif_labels ) ) foreach( $exif_labels as $label ) {
+				$newdesc = wppa_exif_tagname( $label['tag'] );
+				if ( $newdesc != $label['description'] ) {
+					$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_EXIF . "` SET `description` = %s WHERE `photo` = 0 AND `tag` = %s", $newdesc, $label['tag'] ) );
+					wppa_log( 'obs', 'There is a new desc for '.$label['tag'].' being: '.$newdesc );
+				}
+			}
+			wppa_schedule_maintenance_proc( 'wppa_recup' );
 		}
 	}
 
@@ -985,8 +998,10 @@ Hide Camera info
 						'wppa_copyright_notice'			=> __('<span style="color:red" >Warning: Do not upload copyrighted material!</span>', 'wp-photo-album-plus'),	// 20
 						'wppa_watermark_user'			=> 'no',
 						'wppa_name_user' 				=> 'yes',
+						'wppa_name_user_mandatory' 		=> 'no',
 						'wppa_apply_newphoto_desc_user'	=> 'no',
 						'wppa_desc_user' 				=> 'yes',
+						'wppa_desc_user_mandatory' 		=> 'no',
 						'wppa_fe_custom_fields' 		=> 'no',
 						'wppa_fe_upload_tags' 			=> 'no',
 						'wppa_up_tagselbox_on_1' 		=> 'yes',		// 18
@@ -1477,7 +1492,7 @@ Hide Camera info
 
 						// Table VIII: Actions
 						// A Harmless
-						'wppa_maint_ignore_concurrency_error' 	=> 'no', 	// 0.1
+//						'wppa_maint_ignore_concurrency_error' 	=> 'no', 	// 0.1
 						'wppa_maint_ignore_cron' 				=> 'no',	// 0.2
 						'wppa_setup' 							=> '', 		// 1
 						'wppa_backup' 				=> '',
@@ -1718,7 +1733,7 @@ Hide Camera info
 						'wppa_remake_add'				=> 'yes',
 						'wppa_save_iptc'				=> 'yes',
 						'wppa_save_exif'				=> 'yes',
-						'wppa_exif_max_array_size'		=> '10',
+//						'wppa_exif_max_array_size'		=> '10',
 						'wppa_chgsrc_is_restricted'		=> 'no',
 						'wppa_ext_status_restricted' 	=> 'no',
 						'wppa_desc_is_restricted' 		=> 'no',
@@ -2028,9 +2043,12 @@ static $user;
 		}
 	}
 
+	// Retrieve the users login name if not done already
 	if ( ! $owner ) {
 		$owner = wppa_get_user( 'login' );	// The current users login name
 	}
+
+	// Get all the parents of the current user albums if not done already
 	if ( ! is_array( $my_albs_parents ) ) {
 		$query = $wpdb->prepare( "SELECT DISTINCT `a_parent` FROM `" . WPPA_ALBUMS . "` WHERE `owner` = %s", $owner );
 		$my_albs_parents = $wpdb->get_col( $query );
@@ -2038,8 +2056,10 @@ static $user;
 			$my_albs_parents = array();
 		}
 	}
+
+	// Get the current users name as how the album should be named
 	if ( ! $user ) {
-		$user = wppa_get_user( wppa_opt( 'grant_name' ) );	// The current users name as how the album should be named
+		$user = wppa_get_user( wppa_opt( 'grant_name' ) );
 	}
 
 	// If a parent is given and it is not a grant parent, quit

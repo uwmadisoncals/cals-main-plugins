@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the best rated photos
-* Version 6.7.06
+* Version 6.8.01
 *
 */
 
@@ -44,6 +44,7 @@ class BestOfWidget extends WP_Widget {
 														'meanrat' 	=> 'yes',
 														'ratcount' 	=> 'yes',
 														'linktype' 	=> 'none',
+														'totvalue' 	=> '',
 														) );
 
  		$widget_title 	= apply_filters( 'widget_title', $instance['title'] );
@@ -58,6 +59,7 @@ class BestOfWidget extends WP_Widget {
 		$linktype 		= $instance['linktype'];
 		$size 			= wppa_opt( 'widget_width' );
 		$lineheight 	= wppa_opt( 'fontsize_widget_thumb' ) * 1.5;
+		$total 			= $instance['totvalue'] ? 'yes' : '';
 
 		$widget_content = "\n".'<!-- WPPA+ BestOf Widget start -->';
 
@@ -72,6 +74,7 @@ class BestOfWidget extends WP_Widget {
 														'linktype' 		=> $linktype,
 														'size' 			=> $size,
 														'lineheight' 	=> $lineheight,
+														'totvalue' 		=> $total,
 														) );
 
 		$widget_content .= '<div style="clear:both"></div>';
@@ -99,6 +102,7 @@ class BestOfWidget extends WP_Widget {
 		$instance['meanrat']	= $new_instance['meanrat'];
 		$instance['ratcount'] 	= $new_instance['ratcount'];
 		$instance['linktype'] 	= $new_instance['linktype'];
+		$instance['totvalue'] 	= $new_instance['totvalue'];
 
         return $instance;
     }
@@ -116,7 +120,8 @@ class BestOfWidget extends WP_Widget {
 														'maxratings'=> 'yes',
 														'meanrat' 	=> 'yes',
 														'ratcount' 	=> 'yes',
-														'linktype' 	=> 'none'
+														'linktype' 	=> 'none',
+														'totvalue' 	=> '',
 														) );
 
 		// WP Bug?
@@ -164,10 +169,12 @@ class BestOfWidget extends WP_Widget {
 		$options 	= array( 	__( 'Number of max ratings', 'wp-photo-album-plus' ),
 								__( 'Mean value', 'wp-photo-album-plus' ),
 								__( 'Number of votes', 'wp-photo-album-plus' ),
+								__( 'Sum of all ratings', 'wp-photo-album-plus' ),
 								);
 		$values 	= array( 	'maxratingcount',
 								'meanrating',
 								'ratingcount',
+								'totvalue',
 								);
 		echo
 		wppa_widget_selection( $this, 'sortby', $instance['sortby'], __( 'Sort by', 'wp-photo-album-plus' ), $options, $values, array(), '' ) .
@@ -179,7 +186,10 @@ class BestOfWidget extends WP_Widget {
 		wppa_widget_checkbox( $this, 'meanrat', $instance['meanrat'], __( 'Show mean rating', 'wp-photo-album-plus') ) .
 
 		// Number of ratings
-		wppa_widget_checkbox( $this, 'ratcount', $instance['ratcount'], __( 'Show number of ratings', 'wp-photo-album-plus') );
+		wppa_widget_checkbox( $this, 'ratcount', $instance['ratcount'], __( 'Show number of ratings', 'wp-photo-album-plus') ) .
+
+		// Total value
+		wppa_widget_checkbox( $this, 'totvalue', $instance['totvalue'], __( 'Show the sum of all ratings', 'wp-photo-album-plus' ) );
 
 		// Link to
 		$options 	= array( 	__( '--- none ---', 'wp-photo-album-plus' ),

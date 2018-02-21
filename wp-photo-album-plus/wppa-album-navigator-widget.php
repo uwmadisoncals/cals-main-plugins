@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display album names linking to content
-* Version 6.7.07
+* Version 6.8.01
 */
 
 class AlbumNavigatorWidget extends WP_Widget {
@@ -51,7 +51,7 @@ class AlbumNavigatorWidget extends WP_Widget {
 			$widget_content .= __( 'There are too many albums in the system for this widget', 'wp-photo-album-plus' );
 		}
 		else {
-			$widget_content .= '<div style="width:100%; overflow:hidden; position:relative; left: -12px;" >';
+//			$widget_content .= '<div style="width:100%; overflow:hidden; position:relative; left: -12px;" >';
 			if ( $parent == 'all' ) {
 				$widget_content .= $this->do_album_navigator( '0', $page, $skip, '' );
 				$widget_content .= $this->do_album_navigator( '-1', $page, $skip, '' );
@@ -63,7 +63,7 @@ class AlbumNavigatorWidget extends WP_Widget {
 			else {
 				$widget_content .= $this->do_album_navigator( $parent, $page, $skip, '' );
 			}
-			$widget_content .= '</div>';
+//			$widget_content .= '</div>';
 			$widget_content .= '<div style="clear:both"></div>';
 		}
 
@@ -186,17 +186,43 @@ class AlbumNavigatorWidget extends WP_Widget {
 				$treecount = wppa_get_treecounts_a( $a );
 				if ( $treecount['treealbums'] || $treecount['selfphotos'] > wppa_opt( 'min_thumbs' ) || ! $skip ) {
 					$result .= '
-						<li class="anw-'.$w.'-'.$p.$propclass.'" style="list-style:none; display:'.( $level == '1' ? '' : 'none' ).';">';
+						<li class="anw-'.$w.'-'.$p.$propclass.'" style="list-style:none;'.( $level == '1' ? '' : 'display:none;' ).'">';
 						if ( wppa_has_children($a) ) $result .= '
-							<div style="cursor:default;width:12px;float:left;text-align:center;font-weight:bold;" class="anw-'.$w.'-'.$a.'-" onclick="jQuery(\'.anw-'.$w.'-'.$a.'\').css(\'display\',\'\'); jQuery(\'.anw-'.$w.'-'.$a.'-\').css(\'display\',\'none\');" >'.( $a == $ca ? '&raquo;' : '+').'</div>
-							<div style="cursor:default;width:12px;float:left;text-align:center;font-weight:bold;display:none;" class="anw-'.$w.'-'.$a.'" onclick="jQuery(\'.anw-'.$w.'-'.$a.'-\').css(\'display\',\'\'); jQuery(\'.anw-'.$w.'-'.$a.'\').css(\'display\',\'none\'); jQuery(\'.p-'.$w.'-'.$a.'\').css(\'display\',\'none\');" >'.( $a == $ca ? '&raquo;' : '-').'</div>';
+							<div' .
+								' style="cursor:default;width:8px;float:left;position:relative;left:-8px;text-align:center;font-weight:bold;"' .
+								' class="anw-'.$w.'-'.$a.'-"' .
+								' onclick="' .
+									'jQuery(\'.anw-'.$w.'-'.$a.'\').css(\'display\',\'\');' .
+									'jQuery(\'.anw-'.$w.'-'.$a.'-\').css(\'display\',\'none\');' .
+								'" >' .
+								( $a == $ca ? '&raquo;' : '+') .
+							'</div>
+							<div' .
+								' style="cursor:default;width:8px;float:left;position:relative;left:-8px;text-align:center;font-weight:bold;display:none;"' .
+								' class="anw-'.$w.'-'.$a.'"' .
+								' onclick="' .
+									'jQuery(\'.anw-'.$w.'-'.$a.'-\').css(\'display\',\'\');' .
+									'jQuery(\'.anw-'.$w.'-'.$a.'\').css(\'display\',\'none\');' .
+									'jQuery(\'.p-'.$w.'-'.$a.'\').css(\'display\',\'none\');' .
+								'" >' .
+								( $a == $ca ? '&raquo;' : '-') .
+							'</div>';
 						else $result .= '
-							<span style="width:12px;" >&nbsp;' . ( $a == $ca ? '&raquo;' : '&nbsp;' ) . '</span>';
+							<div style="width:8px;float:left;position:relative;left:-8px;text-align:center;font-weight:bold;" >' . ( $a == $ca ? '&raquo;' : '&nbsp;' ) . '</div>';
 						$result .= '
-							<a href="'.wppa_encrypt_url(wppa_get_permalink( $page ).'&amp;wppa-album='.$a.'&amp;wppa-cover=0&amp;wppa-occur=1'.$slide).'">'.wppa_get_album_name( $a ).'</a>
+							<a' .
+								' href="'.wppa_encrypt_url(wppa_get_permalink( $page ).'&amp;wppa-album='.$a.'&amp;wppa-cover=0&amp;wppa-occur=1'.$slide).'"' .
+								' style="position:relative;left:-8px;"' .
+								' >' .
+								wppa_get_album_name( $a ) .
+							'</a>
 						</li>';
 					$newpropclass = $propclass . ' p-'.$w.'-'.$p;
-					$result .= '<li class="anw-'.$w.'-'.$p.$propclass.'" style="list-style:none;" >' . $this->do_album_navigator( $a, $page, $skip, $newpropclass, $extraclause ) . '</li>';
+
+					$next_level = $this->do_album_navigator( $a, $page, $skip, $newpropclass, $extraclause );
+					if ( $next_level ) {
+						$result .= '<li class="anw-'.$w.'-'.$a.$propclass.'" style="list-style:none;display:none;" >' . $next_level . '</li>';
+					}
 				}
 			}
 			$result .= '</ul>';

@@ -18,7 +18,7 @@ class FileList
 
 //    $files = \WPDM\Package::getFiles($file['ID']);
 //
-//    $template = new \WPDM\Template();
+//    $template = new \WPDM\libs\Template();
 //    return $template->Assign('files', $files)
 //        ->Assign('package_id', $file['ID'])
 //        ->Assign('fileinfo', $file['fileinfo'])
@@ -72,7 +72,7 @@ class FileList
                     $individual_file_actions = '';
                     $individual_file_actions = apply_filters("individual_file_action", $individual_file_actions, $file['ID'], $sfile, $fileID);
 
-                    $ind = \WPDM_Crypt::Encrypt($sfile);
+                    $ind = \WPDM\libs\Crypt::Encrypt($sfile);
                     $pc++;
 
                     if (!isset($fileinfo[$sfile]) || !@is_array($fileinfo[$sfile])) $fileinfo[$sfile] = array();
@@ -112,7 +112,7 @@ class FileList
 
                     $ind = str_replace($dir, "", $sfile);
 
-                    $ind = \WPDM_Crypt::Encrypt($sfile);
+                    $ind = \WPDM\libs\Crypt::Encrypt($sfile);
 
 
                     if (!isset($fileinfo[$sfile]) || !@is_array($fileinfo[$sfile])) $fileinfo[$sfile] = array();
@@ -208,7 +208,7 @@ class FileList
 
                 foreach ($allfiles as $fileID => $sfile) {
                     $fhtml .= "<div class='col-md-4 col-sm-6 col-xs-6'><div class='panel panel-default'>";
-                    $ind = \WPDM_Crypt::Encrypt($sfile);
+                    $ind = \WPDM\libs\Crypt::Encrypt($sfile);
 
                     if (!@is_array($fileinfo[$sfile])) $fileinfo[$sfile] = array();
                     if (!@is_array($fileinfo[$fileID])) $fileinfo[$fileID] = array();
@@ -258,7 +258,7 @@ class FileList
 
                 foreach ($dfiles as $ind => $sfile) {
 
-                    $ind = \WPDM_Crypt::Encrypt($sfile);
+                    $ind = \WPDM\libs\Crypt::Encrypt($sfile);
 
                     $fhtml .= "<div class='col-md-4 col-sm-6 col-xs-6'><div class='panel panel-default'>";
                     if (!isset($fileinfo[$sfile]) || !@is_array($fileinfo[$sfile])) $fileinfo[$sfile] = array();

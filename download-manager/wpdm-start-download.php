@@ -24,12 +24,12 @@ if (wpdm_is_download_limit_exceed($package['ID'])) wp_die(__('Download Limit Exc
 $files = \WPDM\Package::getFiles($package['ID']);
 $fileCount = count($files);
 
-$log = new WPDM_Stats();
+$log = new \WPDM\libs\DownloadStats();
 $oid = isset($_GET['oid']) ? esc_attr($_GET['oid']) : '';
 $indsc = 1;
 $indsc = isset($_GET['ind']) && get_option('__wpdm_ind_stats') == 0 ? 0 : 1;
 if ($indsc && !isset($_GET['nostat']))
-    $log->NewStat($package['ID'], $current_user->ID, $oid);
+    $log->newStat($package['ID'], $current_user->ID, $oid);
 
 if ($fileCount == 0 || trim($files[0]) == '') {
     if (isset($package['sourceurl']) && $package['sourceurl'] != '') {

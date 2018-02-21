@@ -8,12 +8,10 @@
 /*
 /* You may always look into a newer version of this file to see what new classes and id's come with an upgrade
 /*
-/* This is version 6.7.03
+/* This is version 6.8.01
 */
 
 .wppa-container, .wppa-cover-box, .wppa-thumb-area {
-	-moz-box-sizing:border-box;
-	-webkit-box-sizing:border-box;
 	box-sizing:border-box;
 }
 
@@ -48,8 +46,6 @@
 /* All boxes. Admin settings page defines border thickness and border radius */
 .wppa-box {
 	padding: 2px 6px 3px 6px;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing:border-box;
 	box-sizing: border-box;
 }
 .wppa-filmstrip-box {
@@ -386,8 +382,6 @@ border: 0;
 
 /* Fix for weaver II and theme 2013	*/
 #wppa-overlay-ic img, #wppa-overlay-ic video {
-    -webkit-box-sizing: content-box;
-    -moz-box-sizing: content-box;
     box-sizing: content-box;
 }
 
@@ -411,7 +405,6 @@ float:left;
 /* Fix for css3 transition that interferes with jQuery animation */
 #wppa-overlay-ic img, .wppa-popup a img, .wppa-popup img {
 transition: width 0s ease-in-out 0s, left 0s ease-in-out 0s, right 0s ease-in-out 0s;
--webkit-transition: width 0s ease-in-out 0s, left 0s ease-in-out 0s, right 0s ease-in-out 0s;
 }
 
 .wppa-fotomoto-checkout, .wppa-fotomoto-container {
@@ -482,4 +475,18 @@ display:none;
 }
 .wppa-searchsel-item .screen-reader-text {
 	display:none;
+}
+
+/* Frontend upload */
+.wppa-upload-table {
+	border:none;
+}
+.wppa-upload-th {
+	width:40%;
+	border:none;
+}
+.wppa-upload-td {
+	text-align:center;
+	width:60%;
+	border:none;
 }

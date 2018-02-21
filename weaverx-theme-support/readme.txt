@@ -9,8 +9,8 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: weaverx-theme-support
 Requires at least: 4.5
-Tested up to: 4.8
-Stable tag: 3.1.9
+Tested up to: 4.9
+Stable tag: 3.1.11
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -75,7 +75,13 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog ==
-- 3.1.9 =
+= 3.1.11 =
+* Added Per Post Body Class for Single Page View
+
+= 3.1.10 =
+* Update: WP 4.9 compatibility
+
+= 3.1.9 =
 * Fix: Recognize https: for vimeo link
 * Tweak: Added 'end=nnn' option for [ you_tube ] shortcode
 * Tweak: minor option wording change

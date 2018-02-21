@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.8.00
+* Version 6.8.01
 *
 */
 
@@ -1256,12 +1256,12 @@ function wppaToggleExif( id, count ) {
 
 										// If not done yet, get the album options html with the current album excluded
 										if ( ! isset( $album_select[$album] ) ) {
-											$album_select[$album] = wppa_album_select_a( array( 	'checkaccess' => true,
-																									'path' => wppa_switch( 'hier_albsel' ),
-																									'exclude' => $album,
-																									'selected' => '0',
-																									'addpleaseselect' => true,
-																									'sort' => true,
+											$album_select[$album] = wppa_album_select_a( array( 	'checkaccess' 		=> true,
+																									'path' 				=> wppa_switch( 'hier_albsel' ),
+																									'exclude' 			=> $album,
+																									'selected' 			=> '0',
+																									'addpleaseselect' 	=> true,
+																									'sort' 				=> true,
 																								)
 																						);
 										}
@@ -1270,7 +1270,7 @@ function wppaToggleExif( id, count ) {
 										__( 'Target album for copy/move:', 'wp-photo-album-plus' ) .
 										'<select' .
 											' id="target-' . $id . '"' .
-											' style="max-width:500px;"' .
+											' style="max-width:350px;"' .
 											' >' .
 											$album_select[$album] .
 										'</select>';
@@ -1767,16 +1767,12 @@ function wppaToggleExif( id, count ) {
 								'<span class="description" >' .
 									__( 'Separate tags with commas.', 'wp-photo-album-plus') .
 								'</span>' : '' ) .
-							'</td>';
-
-							echo
-							'<td>' .
 								'<select' .
 									' onchange="wppaAddTag( this.value, \'tags-' . $id . '\' ); wppaAjaxUpdatePhoto( ' . $id . ', \'tags\', document.getElementById( \'tags-' . $id . '\' ) )"' .
 									' >';
 									$taglist = wppa_get_taglist();
 									if ( is_array( $taglist ) ) {
-										echo '<option value="" >' . __( '- select -', 'wp-photo-album-plus' ) . '</option>';
+										echo '<option value="" >' . __( '- select to add -', 'wp-photo-album-plus' ) . '</option>';
 										foreach ( $taglist as $tag ) {
 											echo '<option value="' . $tag['tag'] . '" >' . $tag['tag'] . '</option>';
 										}
@@ -1789,10 +1785,8 @@ function wppaToggleExif( id, count ) {
 									}
 								echo
 								'</select>' .
-								'<br />' .
-								'<span class="description" >' .
-									__( 'Select to add', 'wp-photo-album-plus' ) .
-								'</span>' .
+							'</td>' .
+							'<td>' .
 							'</td>';
 						'</tr>';
 
@@ -2054,37 +2048,41 @@ function wppaToggleExif( id, count ) {
 						'<table' .
 							' id="wppa-exif-' . $id . '"' .
 							' class="wppa-table wppa-photo-table"' .
-							' style="clear:both;width:100%;display:none;"' .
+							' style="clear:both;width:99%;display:none;"' .
 							' >' .
 							'<thead>' .
 								'<tr style="font-weight:bold;" >' .
 									'<td style="padding:0 4px;" >Exif tag</td>' .
 									'<td style="padding:0 4px;" >Brand</td>' .
 									'<td style="padding:0 4px;" >Description</td>' .
-									'<td style="padding:0 4px;max-width:30%;" >Raw value</td>' .
-									'<td style="padding:0 4px;max-width:30%;" >Formatted value</td>' .
+									'<td style="padding:0 4px;" >Raw value</td>' .
+									'<td style="padding:0 4px;" >Formatted value</td>' .
 								'</tr>' .
 							'</thead>' .
 							'<tbody>';
 
 								foreach ( $exifs as $exif ) {
+									$desc = $exif['description'];
+									if ( is_serialized( $desc ) ) {
+										$desc = 'Array(' . count( unserialize( $desc ) ) . ')';
+									}
 									echo '
 									<tr id="exif-tr-' . $exif['id'] . '" >
 										<td style="padding:0 4px;" >'.$exif['tag'].'</td>';
 
-											if ( $brand && $exif['brand'] ) { 	 // * wppa_exif_tagname( hexdec( substr( $exif['tag'], 2, 4 ) ), $brand, 'brandonly' ) ) {
-												echo '
-												<td style="padding:0 4px;" >' . $brand . '</td>
-												<td style="padding:0 4px;" >' . wppa_exif_tagname( hexdec( substr( $exif['tag'], 2, 4 ) ), $brand, 'brandonly' ) . ':</td>';
-											}
-											else {
-												echo '
-												<td style="padding:0 4px;" ></td>
-												<td style="padding:0 4px;" >' . wppa_exif_tagname( hexdec( substr( $exif['tag'], 2, 4 ) ) ) . ':</td>';
-											}
+										if ( $brand && $exif['brand'] ) {
+											echo '
+											<td style="padding:0 4px;" >' . $brand . '</td>
+											<td style="padding:0 4px;" >' . wppa_exif_tagname( $exif['tag'], $brand, 'brandonly' ) . ':</td>';
+										}
+										else {
+											echo '
+											<td style="padding:0 4px;" ></td>
+											<td style="padding:0 4px;" >' . wppa_exif_tagname( $exif['tag'] ) . ':</td>';
+										}
 
 										echo '
-										<td style="padding:0 4px;" >'.$exif['description'].'</td>
+										<td style="padding:0 4px;" >'.$desc.'</td>
 										<td style="padding:0 4px;" >' .
 											( $exif['f_description'] == __( 'n.a.', 'wp-photo-album-plus' ) ? wppa_format_exif( $exif['tag'], $exif['description'] ) : $exif['f_description'] ) .
 										'</td>

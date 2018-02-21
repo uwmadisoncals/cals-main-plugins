@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2017 ServMask Inc.
+ * Copyright (C) 2014-2018 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ class Ai1wmme_Export_Database {
 
 		// Replace table prefix on columns
 		$mysql->set_table_prefix_columns( ai1wm_table_prefix() . 'options', array( 'option_name' ) )
-			  ->set_table_prefix_columns( ai1wm_table_prefix() . 'usermeta', array( 'meta_key' ) );
+			->set_table_prefix_columns( ai1wm_table_prefix() . 'usermeta', array( 'meta_key' ) );
 
 		// Network or sites
 		if ( isset( $params['options']['sites'] ) ) {
@@ -93,7 +93,7 @@ class Ai1wmme_Export_Database {
 
 				// Replace table prefix on columns
 				$mysql->set_table_prefix_columns( ai1wm_table_prefix( $site['BlogID'] ) . 'options', array( 'option_name' ) )
-					  ->set_table_prefix_columns( ai1wm_table_prefix( $site['BlogID'] ) . 'usermeta', array( 'meta_key' ) );
+					->set_table_prefix_columns( ai1wm_table_prefix( $site['BlogID'] ) . 'usermeta', array( 'meta_key' ) );
 			}
 
 			$usermeta = array();
@@ -201,9 +201,9 @@ class Ai1wmme_Export_Database {
 
 			// Set database options
 			$mysql->set_old_table_prefixes( $old_table_prefixes )
-				  ->set_new_table_prefixes( $new_table_prefixes )
-				  ->set_include_table_prefixes( $include_table_prefixes )
-				  ->set_exclude_table_prefixes( $exclude_table_prefixes );
+				->set_new_table_prefixes( $new_table_prefixes )
+				->set_include_table_prefixes( $include_table_prefixes )
+				->set_exclude_table_prefixes( $exclude_table_prefixes );
 
 		} else {
 
@@ -252,9 +252,9 @@ class Ai1wmme_Export_Database {
 
 			// Set database options
 			$mysql->set_old_table_prefixes( $old_table_prefixes )
-				  ->set_new_table_prefixes( $new_table_prefixes )
-				  ->set_include_table_prefixes( $include_table_prefixes )
-				  ->set_exclude_table_prefixes( $exclude_table_prefixes );
+				->set_new_table_prefixes( $new_table_prefixes )
+				->set_include_table_prefixes( $include_table_prefixes )
+				->set_exclude_table_prefixes( $exclude_table_prefixes );
 		}
 
 		// Exclude active sitewide plugins option

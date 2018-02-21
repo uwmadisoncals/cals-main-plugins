@@ -418,7 +418,12 @@
     color: #ffffff;
     margin: 4px;
 }
-.w3eden .wpdm_icon {
+.w3eden img {
+    box-shadow: none;
+}
+.w3eden img.wpdm_icon {
+    width: 48px;
+    max-width: 100%;
     box-shadow: none;
 }
 .w3eden .panel-body iframe {
@@ -2440,3 +2445,4 @@
 .w3eden .panel.terms-panel .panel-footer .eden-checkbox{
     font-weight: 700 !important;
 }
+

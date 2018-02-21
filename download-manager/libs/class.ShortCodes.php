@@ -1,5 +1,5 @@
 <?php
-namespace WPDM;
+namespace WPDM\libs;
 
 
 class ShortCodes
@@ -121,7 +121,7 @@ class ShortCodes
         if(!get_option('users_can_register')) return __('User registration is disabled','download-manager');
         if(isset($params['role'])) update_post_meta(get_the_ID(),'__wpdm_role', $params['role']);
         ob_start();
-        $regparams = \WPDM_Crypt::Encrypt($params);
+        $regparams = \WPDM\libs\Crypt::Encrypt($params);
         echo "<div class='w3eden' id='wpdmreg'>";
         require_once(wpdm_tpl_path('wpdm-reg-form.php'));
         echo "</div>";

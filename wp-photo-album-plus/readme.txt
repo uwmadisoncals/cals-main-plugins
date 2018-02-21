@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick, pdf
-Version: 6.8.00
-Stable tag: 6.7.12
+Version: 6.8.01
+Stable tag: 6.8.00
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -126,6 +126,27 @@ If this happens, make sure (ask your hosting provider) that you have all the rig
 == Changelog ==
 
 See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+
+= 6.8.01 =
+
+= Bug Fixes =
+
+* Fixed layout issues of the album navigator widget and the album / photo admin pages.
+
+= New Features =
+
+* GPS and File tags are now supported in the exif system.
+
+= Other Changes =
+
+* Added to the bestof widget: A checkbox to display the sum of the ratings (totvalue), and the option to sort by the sum of the ratings.
+* Bestof shortcode now also supports the display of the sum of the ratings (totvalue="yes"), and the sort option to sort by the sum of the ratings (sortby="totvalue").
+The full shortcode is now: [wppa type="bestof" page="nn" count="nn" display="photo|owner" period="thisweek|lastweek|lastmonth|thismonth|lastyear|thisyear" sortby="maxratingcount|meanrating|ratingcount|totvalue" maxratings="yes|no" meanrat="yes|no" ratcount="yes|no" totvalue="no|yes" linktype="none|owneralbums|ownerphotos|upldrphotos" fontsize="nn" lineheight="nn" height="nn"][/wppa]
+Note: For backward compatibility: the default for displaying the total value is no (totvalue="no") as opposed to the other display options.
+* Exif arrays are now stored as arrays as opposed to multiple items with the same tag id. This enables interpretation and formatting of array value tags.
+* Improved display of help text in settings and photo of the day settings admin pages.
+* Removed obsolete browser specific css.
+* Improved layout and behaviour of frontend upload dialog.
 
 = 6.8.00 =
 

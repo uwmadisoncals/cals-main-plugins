@@ -457,10 +457,22 @@ class wpdm_packageinfo_widget extends WP_Widget {
 
 }
 
-add_action('widgets_init', create_function('', 'return register_widget("wpdm_packageinfo_widget");'));
-add_action('widgets_init', create_function('', 'return register_widget("wpdm_categories_widget");'));
-add_action('widgets_init', create_function('', 'return register_widget("wpdm_topdls_widget");'));
-add_action('widgets_init', create_function('', 'return register_widget("wpdm_newpacks_widget");'));
-add_action('widgets_init', create_function('', 'return register_widget("wpdm_catpacks_widget");'));
-add_action('widgets_init', create_function('', 'return register_widget("wpdm_affiliate_widget");'));
+add_action('widgets_init', function(){
+    register_widget("wpdm_packageinfo_widget");
+});
+add_action('widgets_init', function(){
+    register_widget("wpdm_categories_widget");
+});
+add_action('widgets_init', function(){
+    register_widget("wpdm_topdls_widget");
+});
+add_action('widgets_init', function(){
+    register_widget("wpdm_newpacks_widget");
+});
+add_action('widgets_init', function(){
+    register_widget("wpdm_catpacks_widget");
+});
+add_action('widgets_init', function(){
+    register_widget("wpdm_affiliate_widget");
+});
 

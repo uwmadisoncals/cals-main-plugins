@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2017 ServMask Inc.
+ * Copyright (C) 2014-2018 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class Ai1wmme_Export_Enumerate {
 
 			// Exclude inactive themes
 			if ( isset( $params['options']['no_inactive_themes'] ) ) {
-				$all_themes = array();
+				$all_themes    = array();
 				$active_themes = array();
 
 				// Get all themes
@@ -103,7 +103,7 @@ class Ai1wmme_Export_Enumerate {
 
 			// Exclude inactive plugins
 			if ( isset( $params['options']['no_inactive_plugins'] ) ) {
-				$all_plugins = array();
+				$all_plugins    = array();
 				$active_plugins = array();
 
 				// Get all plugins
@@ -200,7 +200,7 @@ class Ai1wmme_Export_Enumerate {
 		}
 
 		// Create map file
-		$filemap = ai1wm_open( ai1wm_filemap_path( $params ) , 'w' );
+		$filemap = ai1wm_open( ai1wm_filemap_path( $params ), 'w' );
 
 		// Iterate over sites directory
 		foreach ( $include_filters as $path ) {

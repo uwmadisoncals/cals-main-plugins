@@ -68,7 +68,11 @@ $google_fonts = mt_add_google_fonts();
     </style>
     <script type="text/javascript" src="<?php echo MAINTENANCE_URI.'load/js/jquery.backstretch.min.js'; ?>"></script>
     <![endif]-->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=<?php echo $google_fonts[0].'+'.$google_fonts[1]; ?>">
+    <?php if ( !empty($google_fonts[1]) ) {
+        echo '<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=' . $google_fonts[1] . '|' . $google_fonts[0] . '">';
+    }
+    else echo '<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=' . $google_fonts[0] . '">';
+    ?>
 </head>
 
 <body <?php body_class('maintenance ' . $ebody_class); ?>>
@@ -116,14 +120,7 @@ $google_fonts = mt_add_google_fonts();
 <?php } ?>
 <?php do_action('load_options_style'); ?>
 <?php do_action('load_custom_scripts'); ?>
-<div id="outdated">
-    <h1><?php _e('Your browser is outdated.', 'maintenance') ?></h1>
-    <h4>
-        <?php _e('For a better experience, keep your browser up to date. Check ', 'maintenance');
-        echo '<a target="_blank" href="http://outdatedbrowser.com/">'.__('here', 'maintenance').'</a>';
-        _e(' for latest versions.', 'maintenance'); ?>
-    </h4>
-</div>
+
 
 
 </body>

@@ -16,7 +16,7 @@ class Package {
         return $this;
     }
 
-    function Prepare($ID = null, $template = null, $force = false)
+    function Prepare($ID = null, $template = null, $template_type = 'page')
     {
         global $post;
 
@@ -117,9 +117,9 @@ class Package {
                 $ifn = @end($ifn);
             }
             else
-                $ifn = '_blank';
+                $ifn = 'unknown';
 
-            $post_vars['icon'] = '<img class="wpdm_icon" alt="'.__('Icon','download-manager').'" src="' . plugins_url('download-manager/assets/file-type-icons/') . (@count($post_vars['files']) <= 1 ? $ifn : 'zip') . '.png" onError=\'this.src="' . plugins_url('download-manager/assets/file-type-icons/_blank.png') . '";\' />';
+            $post_vars['icon'] = '<img class="wpdm_icon" alt="'.__('Icon','download-manager').'" src="' . plugins_url('download-manager/assets/file-type-icons/') . (@count($post_vars['files']) <= 1 ? $ifn : 'zip') . '.svg" onError=\'this.src="' . plugins_url('download-manager/assets/file-type-icons/unknown.svg') . '";\' />';
         }
         else if (!strstr($post_vars['icon'], '//'))
             $post_vars['icon'] = '<img class="wpdm_icon" alt="'.__('Icon','download-manager').'"   src="' . plugins_url(str_replace('download-manager/file-type-icons/','download-manager/assets/file-type-icons/',$post_vars['icon'])) . '" />';
@@ -152,14 +152,14 @@ class Package {
         $post_vars['download_link'] = "<a class='wpdm-download-link {$post_vars['btnclass']}' rel='nofollow' href='#' onclick=\"location.href='{$post_vars['download_url']}';return false;\">{$post_vars['link_label']}</a>";
 
         $limit_over = 0;
-
+        $alert_size = ($template_type == 'link')?'alert-sm':'';
         if (self::userDownloadLimitExceeded($post_vars['ID'])) {
             $limit_over = 1;
             $post_vars['download_url'] = '#';
             $post_vars['link_label'] = __('Download Limit Exceeded','download-manager');
             $post_vars['download_link_popup'] =
             $post_vars['download_link_extended'] =
-            $post_vars['download_link'] = "<div class='alert alert-warning' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
+            $post_vars['download_link'] = "<div class='alert alert-warning {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
         }
 
         else if (isset($post_vars['expire_date']) && $post_vars['expire_date'] != "" && strtotime($post_vars['expire_date']) < time()) {
@@ -167,7 +167,7 @@ class Package {
             $post_vars['link_label'] = __('Download was expired on','download-manager') . " " . date_i18n(get_option('date_format')." h:i A", strtotime($post_vars['expire_date']));
             $post_vars['download_link'] =
             $post_vars['download_link_extended'] =
-            $post_vars['download_link_popup'] = "<div class='alert alert-warning' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
+            $post_vars['download_link_popup'] = "<div class='alert alert-warning {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
         }
 
         else if (isset($post_vars['publish_date']) && $post_vars['publish_date'] !='' && strtotime($post_vars['publish_date']) > time()) {
@@ -175,7 +175,7 @@ class Package {
             $post_vars['link_label'] = __('Download will be available from ','download-manager') . " " . date_i18n(get_option('date_format')." h:i A", strtotime($post_vars['publish_date']));
             $post_vars['download_link'] =
             $post_vars['download_link_extended'] =
-            $post_vars['download_link_popup'] = "<div class='alert alert-warning' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
+            $post_vars['download_link_popup'] = "<div class='alert alert-warning {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
         }
 
         else if(is_user_logged_in() && !self::userCanAccess($post_vars['ID'])){
@@ -183,7 +183,7 @@ class Package {
             $post_vars['link_label'] = stripslashes(get_option('wpdm_permission_msg'));
             $post_vars['download_link'] =
             $post_vars['download_link_extended'] =
-            $post_vars['download_link_popup'] = "<div class='alert alert-danger' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
+            $post_vars['download_link_popup'] = "<div class='alert alert-danger {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
         }
 
         else if(!is_user_logged_in() && count(self::AllowedRoles($post_vars['ID'])) > 0 && !self::userCanAccess($post_vars['ID'])){
@@ -419,7 +419,7 @@ class Package {
         $files = get_post_meta($ID, '__wpdm_files', true);
         $package_dir = self::Get($ID, 'package_dir');
         if($package_dir != '') {
-            $files += \WPDM\FileSystem::scanDir($package_dir);
+            $files += \WPDM\libs\FileSystem::scanDir($package_dir);
         }
         return $files;
     }
@@ -435,7 +435,7 @@ class Package {
         if(count($files) > 0) {
             if ($zipped == '' || !file_exists($zipped)) {
                 $zipped = UPLOAD_DIR . sanitize_file_name(get_the_title($ID)) . '-' . $ID . '.zip';
-                $zipped = \WPDM\FileSystem::zipFiles($files, $zipped);
+                $zipped = \WPDM\libs\FileSystem::zipFiles($files, $zipped);
                 return $zipped;
             }
         }
@@ -504,7 +504,7 @@ class Package {
 
         if(count($audios)>0){
             $audio = array_shift($audios);
-            $song = home_url("/?wpdmdl={$package['ID']}&ind=".\WPDM_Crypt::Encrypt($audio)."&play=".basename($audio));
+            $song = home_url("/?wpdmdl={$package['ID']}&ind=".\WPDM\libs\Crypt::Encrypt($audio)."&play=".basename($audio));
             $audiohtml = "<button data-player='wpdm-audio-player' data-song='{$song}' class='btn btn-lg btn-{$style} wpdm-btn-play wpdm-btn-play-lg'><i class='fa fa-play'></i></button>";
         }
 
@@ -534,8 +534,8 @@ class Package {
 
         $player_html = '';
         if(count($videos)>0) {
-            //$video = home_url("/?wpdmdl={$ID}&ind=".\WPDM_Crypt::Encrypt($videos[0])."&play=".basename($videos[0]));
-            $video = \WPDM\FileSystem::mediaURL($ID, 0, wpdm_basename($videos[0]));
+            //$video = home_url("/?wpdmdl={$ID}&ind=".\WPDM\libs\Crypt::Encrypt($videos[0])."&play=".basename($videos[0]));
+            $video = \WPDM\libs\FileSystem::mediaURL($ID, 0, wpdm_basename($videos[0]));
             $player_html = "<video id='__wpdm_videoplayer' class='thumbnail' width=\"{$width}\" controls><source src=\"{$video}\" type=\"video/mp4\">Your browser does not support HTML5 video.</video>";
         }
         $player_html = apply_filters("wpdm_video_player_html", $player_html, $ID, $file, $width);
@@ -649,7 +649,7 @@ class Package {
             //isset($package['password_lock']) && (int)$package['password_lock'] == 1 &&
             if ($package['password'] != '') {
                 $lock = 'locked';
-                $data = \WPDM\PackageLocks::AskPassword($package);
+                $data = \WPDM\libs\PackageLocks::AskPassword($package);
             }
 
 
@@ -657,7 +657,7 @@ class Package {
 
             if (isset($package['captcha_lock']) && (int)$package['captcha_lock'] == 1) {
                 $lock = 'locked';
-                $sociallock .=  \WPDM\PackageLocks::reCaptchaLock($package , true);
+                $sociallock .=  \WPDM\libs\PackageLocks::reCaptchaLock($package , true);
 
             }
 
@@ -717,13 +717,13 @@ class Package {
 //isset($package['password_lock']) && (int)$package['password_lock'] == 1 &&
         if ($package['password'] != '') {
             $lock = 'locked';
-            $data = \WPDM\PackageLocks::AskPassword($package);
+            $data = \WPDM\libs\PackageLocks::AskPassword($package);
         }
 
 
         if (isset($package['captcha_lock']) && (int)$package['captcha_lock'] == 1) {
             $lock = 'locked';
-            $captcha =  \WPDM\PackageLocks::reCaptchaLock($package , true);
+            $captcha =  \WPDM\libs\PackageLocks::reCaptchaLock($package , true);
             $data .= "<div class='panel panel-default'><div class='panel-heading'>".__("Verify CAPTCHA to Download",'download-manager')."</div><div class='panel-body wpdm-social-locks text-center'>{$captcha}</div></div>";
         }
 
@@ -923,7 +923,7 @@ class Package {
 
         if (!isset($vars['formatted'])) {
             $pack = new \WPDM\Package($vars['ID']);
-            $pack->Prepare();
+            $pack->Prepare(null, null, $type);
             $vars = $pack->PackageData;
         }
 
@@ -1073,17 +1073,20 @@ class Package {
         $ext = array();
         if (is_array($files)) {
             foreach ($files as $f) {
+                $_f = $f;
                 $f = trim($f);
                 $f = explode(".", $f);
-                $ext[] = end($f);
+                $_ext = end($f);
+                if($_ext == '') $_ext = 'unknown';
+                if($_ext == 'unknown' && strstr($_f, "://")) $_ext = 'web';
+                $ext[] = $_ext;
             }
         }
-
         $ext = array_unique($ext);
         $exico = '';
         foreach($ext as $exi){
-            if(file_exists(dirname(__FILE__).'/assets/file-type-icons/'.$exi.'.png'))
-                $exico .= "<img alt='{$exi}' title='{$exi}' class='ttip' style='width:16px;height:16px;' src='".plugins_url('download-manager/assets/file-type-icons/'.$exi.'.png')."' /> ";
+            if(file_exists(WPDM_BASE_DIR.'/assets/file-type-icons/'.$exi.'.svg'))
+                $exico .= "<img alt='{$exi}' title='{$exi}' class='ttip' style='width:16px;height:16px;' src='".plugins_url('download-manager/assets/file-type-icons/'.$exi.'.svg')."' /> ";
         }
         if($img) return $exico;
         return $ext;
@@ -1102,15 +1105,15 @@ class Package {
 
         if(!is_array($files)) return "";
         $ind = -1;
-        foreach($files as $i=>$sfile){
+        foreach($files as $i =>$sfile){
             $ifile = $sfile;
             $sfile = explode(".", $sfile);
-            if(in_array(end($sfile),array('pdf','doc','docx','xls','xlsx','ppt','pptx'))) { $ind = \WPDM_Crypt::Encrypt($ifile); break; }
+            if(in_array(end($sfile),array('pdf','doc','docx','xls','xlsx','ppt','pptx'))) { $ind = $i; break; }
         }
         if($ind==-1) return "";
         $url = wpdm_download_url($package, 'ind='.$ind);
         if(strpos($ifile, "://")) $url = $ifile;
-        return \WPDM\FileSystem::docPreview($url);
+        return \WPDM\libs\FileSystem::docPreview($url);
     }
 
 

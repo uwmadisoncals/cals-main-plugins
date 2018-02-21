@@ -5,12 +5,12 @@
  * Description: Extension for All in One WP Migration that enables multisite exports and imports
  * Author: ServMask
  * Author URI: https://servmask.com/
- * Version: 3.45
+ * Version: 3.46
  * Text Domain: all-in-one-wp-migration-multisite-extension
  * Domain Path: /languages
  * Network: True
  *
- * Copyright (C) 2014-2017 ServMask Inc.
+ * Copyright (C) 2014-2018 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

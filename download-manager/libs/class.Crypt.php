@@ -1,10 +1,12 @@
 <?php
 
 /**
- * Class WPDM_Crypt
+ * Class Crypt
  * from wpdm pro v4.1.9
  */
-class WPDM_Crypt
+namespace WPDM\libs;
+
+class Crypt
 {
 
     public static function Encrypt($text)

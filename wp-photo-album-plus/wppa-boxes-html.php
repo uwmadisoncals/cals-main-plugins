@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.8.00
+* Version 6.8.01
 *
 */
 
@@ -930,7 +930,7 @@ global $wppa_supported_camara_brands;
 				// Add brand specific tagname(s)
 				$brandfound = false;
 				foreach( $wppa_supported_camara_brands as $brand ) {
-					$brtagnam = trim( wppa_exif_tagname( hexdec( substr( $tag, 2, 4 ) ), $brand, 'brandonly' ), ': ' );
+					$brtagnam = trim( wppa_exif_tagname( $tag, $brand, 'brandonly' ), ': ' );
 					if ( $brtagnam ) {
 						$options_array[] = array( 'tag' => $tag . $brand, 'desc' => $brtagnam . ' (' . ucfirst( strtolower( $brand ) ) . ')' );
 						$brandfound = true;
@@ -2178,7 +2178,7 @@ function wppa_get_user_create_html( $alb, $width, $where = '', $mcr = false ) {
 				'jQuery( \'#_wppa-cr-'.str_replace('.','-',$alb).'-'.$mocc.'\' ).css( \'display\',\'block\' );'. 		// Show backlink
 				'_wppaDoAutocol( ' . $mocc . ' )'.													// Trigger autocol
 				'"' .
-			' style="float:left; cursor:pointer;"' .
+			' style="float:left;cursor:pointer;"' .
 			'> ' .
 			( $alb ? __( 'Create Sub Album', 'wp-photo-album-plus' ) : __( 'Create Album', 'wp-photo-album-plus' ) ) .
 		'</a>' .
@@ -2194,7 +2194,7 @@ function wppa_get_user_create_html( $alb, $width, $where = '', $mcr = false ) {
 				'jQuery( \'#_wppa-cr-'.str_replace('.','-',$alb).'-'.$mocc.'\' ).css( \'display\',\'none\' );'. 			// Hide backlink
 				'_wppaDoAutocol( ' . $mocc . ' )'.													// Trigger autocol
 				'"' .
-			' style="float:right; cursor:pointer;display:none;"' .
+			' style="float:right;cursor:pointer;display:none;padding-right:6px;"' .
 			' >' .
 			__( wppa_opt( 'close_text' ), 'wp-photo-album-plus' ) .
 		'</a>';
@@ -2295,6 +2295,7 @@ function wppa_user_upload_html( $alb, $width, $where = '', $mcr = false ) {
 
 function wppa_get_user_upload_html( $xalb, $width, $where = '', $mcr = false ) {
 global $wpdb;
+global $wppa_supported_photo_extensions;
 global $wppa_supported_video_extensions;
 global $wppa_supported_audio_extensions;
 static $seqno;
@@ -2508,6 +2509,9 @@ static $albums_granted;
 
 	// Make the HTML
 	$t = $mcr ? 'mcr-' : '';
+	$big = true;
+	if ( wppa( 'in_widget' ) ) $big = false;
+
 	$result .=
 		'<a' .
 			' id="wppa-up-'.str_replace('.','-',$yalb).'-'.$mocc.'"' .
@@ -2537,7 +2541,7 @@ static $albums_granted;
 				'jQuery( \'#_wppa-up-'.str_replace('.','-',$yalb).'-'.$mocc.'\' ).css( \'display\',\'none\' );'. 			// Hide backlink
 				'_wppaDoAutocol( ' . $mocc . ' )' .													// Trigger autocol
 				'"' .
-			' style="float:right; cursor:pointer;display:none;' .
+			' style="float:right; cursor:pointer;display:none;padding-right:6px;' .
 			'" >' .
 			__( wppa_opt( 'close_text' ), 'wp-photo-album-plus' ) .
 		'</a>' .
@@ -2563,10 +2567,17 @@ static $albums_granted;
 				' name="wppa-upload-album"' .
 				' value="'.$alb.'"' .
 			' />';
+
+		$head = '';
+		$body = '';
 	}
 
 	// Array given
 	else {
+
+		$head = __( 'Upload to album', 'wp-photo-album-plus' );
+		$body = '';
+
 		if ( ! is_array( $alb ) ) {
 			$alb = explode( '.', wppa_expand_enum( $alb ) );
 		}
@@ -2574,38 +2585,46 @@ static $albums_granted;
 		// Can an selection box be displayed?
 		if ( ! wppa_opt( 'fe_upload_max_albums' ) ||												// No limit on number of albums
 				wppa_opt( 'fe_upload_max_albums' ) > wppa_get_uploadable_album_count( $alb ) ) {	// Below max
-		$result .=
-			'<select' .
-				' id="wppa-upload-album-'.$mocc.'-'.$seqno.'"' .
-				' name="wppa-upload-album"' .
-				' style="float:left; max-width: 100%;"' .
-				' onchange="jQuery( \'#wppa-sel-'.$yalb.'-'.$mocc.'\' ).trigger( \'onchange\' )"' .
-				' >' .
-				wppa_album_select_a( array ( 	'addpleaseselect' 	=> true,
-												'checkowner' 		=> true,
-												'checkupload' 		=> true,
-												'path' 				=> wppa_switch( 'hier_albsel' ),
-												'checkarray' 		=> count( $alb ) > 1,
-												'array' 			=> $alb,
-									) ) .
-			'</select>' .
-			'<br />';
+			$body .=
+				'<select' .
+					' id="wppa-upload-album-'.$mocc.'-'.$seqno.'"' .
+					' name="wppa-upload-album"' .
+					' style="max-width: 100%;"' .
+					' onchange="jQuery( \'#wppa-sel-'.$yalb.'-'.$mocc.'\' ).trigger( \'onchange\' )"' .
+					' >' .
+					wppa_album_select_a( array ( 	'addpleaseselect' 	=> true,
+													'checkowner' 		=> true,
+													'checkupload' 		=> true,
+													'path' 				=> wppa_switch( 'hier_albsel' ),
+													'checkarray' 		=> count( $alb ) > 1,
+													'array' 			=> $alb,
+										) ) .
+				'</select>' .
+				'<div style="clear:both;" ></div>';
 		}
 
 		// No, there are too many albums
 		else {
-			$result .=
+			$body .=
 				'<input' .
 					' id="wppa-upload-album-'.$mocc.'-'.$seqno.'"' .
 					' type="number"' .
 					' placeholder="' . esc_attr( __( 'Enter album id', 'wp-photo-album-plus' ) ) . '"' .
 					' name="wppa-upload-album"' .
-					' style="float:left; max-width: 100%;"' .
+					' style="max-width: 100%;"' .
 					' onchange="jQuery( \'#wppa-sel-'.$yalb.'-'.$mocc.'\' ).trigger( \'onchange\' )"' .
-				' />' .
-				'<br />';
+				' />';
 		}
 	}
+
+	// If big, init table
+	if ( $big ) {
+		$result .= '<table class="wppa-upload-table" style="max-width:100%;" >';
+	}
+
+	// Album select
+	$result .= wppa_get_dlg_item( $head, $body, $big );
+
 
 	$one_only 	= wppa_switch( 'upload_one_only' );
 	$multiple 	= ! $one_only;
@@ -2624,49 +2643,28 @@ static $albums_granted;
 		$accept .= ',.pdf';
 	}
 
+
 	if ( $one_only ) {
 		if ( $on_camera ) {
-			if ( $may_video ) {
-				$value = esc_attr( __( 'Select Photo / Video / Camera', 'wp-photo-album-plus' ) );
-			}
-			else {
-				$value = esc_attr( __( 'Select Photo / Camera', 'wp-photo-album-plus' ) );
-			}
+			$head = esc_attr( __( 'Select File or Camera', 'wp-photo-album-plus' ) );
 		}
 		else {
-			if ( $may_video ) {
-				$value = esc_attr( __( 'Select Photo / Video', 'wp-photo-album-plus' ) );
-			}
-			else {
-				$value = esc_attr( __( 'Select Photo', 'wp-photo-album-plus' ) );
-			}
+			$head = esc_attr( __( 'Select File', 'wp-photo-album-plus' ) );
 		}
 	}
 	else {
 		if ( $on_camera ) {
-			if ( $may_video ) {
-				$value = esc_attr( __( 'Select Photos / Video / Camera', 'wp-photo-album-plus' ) );
-			}
-			else {
-				$value = esc_attr( __( 'Select Photos / Camera', 'wp-photo-album-plus' ) );
-			}
+			$head = esc_attr( __( 'Select File(s) or Camera', 'wp-photo-album-plus' ) );
 		}
 		else {
-			if ( $may_video ) {
-				$value = esc_attr( __( 'Select Photos / Video', 'wp-photo-album-plus' ) );
-			}
-			else {
-				$value = esc_attr( __( 'Select Photos', 'wp-photo-album-plus' ) );
-			}
+			$head = esc_attr( __( 'Select File(s)', 'wp-photo-album-plus' ) );
 		}
 	}
-	if ( wppa_can_pdf() ) {
-		$value .= ' / Pdf';
-	}
 
-	$result .=
+	$value = __( 'Browse...', 'wp-photo-album-plus' );
 
 	// Save the button text
+	$body =
 	'<script>var wppaUploadButtonText="' . esc_js( $value ) . '"</script>' .
 
 	// The (hidden) functional button
@@ -2685,26 +2683,52 @@ static $albums_granted;
 			'"' .
 	' />';
 
-	if ( $on_camera ) {
-		$result .= '<script>jQuery(\'#wppa-user-upload-' . $yalb . '-' . $mocc . '\').attr(\'capture\',\'capture\')</script>';
-	}
-
-	$result .=
-
 	// The displayed button
+	$body .=
 	'<input' .
 		' type="button"' .
-		' style="width:100%;margin-top:8px;margin-bottom:8px;padding-left:0;padding-right:0;"' .
+		' style="max-width:100%;width:auto;margin-top:8px;margin-bottom:8px;padding-left:6px;padding-right:6px;"' .
 		' id="wppa-user-upload-' . $yalb . '-' . $mocc . '-display"' .
 		' class="wppa-upload-button"' .
 		' value="' . $value . '"' .
-		' onclick="jQuery( \'#wppa-user-upload-' . $yalb . '-' . $mocc . '\' ).click();"' .
+		' onclick="' .
+			'jQuery(\'#wppa-user-upload-' . $yalb . '-' . $mocc . '\').removeAttr(\'capture\');' .
+			'jQuery( \'#wppa-user-upload-' . $yalb . '-' . $mocc . '\' ).click();' .
+			'"' .
 	'/>';
+	// The camera button for iphone and ipad, if Table II-H15 (Camera connect) is ticked.
+	if ( wppa_is_iphoneoripad() && $on_camera ) {
+		$body .=
+		'<input' .
+			' type="button"' .
+			' style="' .
+				'width:32px;' .
+				'margin-top:8px;' .
+				'margin-bottom:8px;' .
+				'margin-left:12px;' .
+				'padding-left:6px;' .
+				'padding-right:6px;' .
+				'background-image:url(\'' . wppa_get_imgdir() . 'camera16.png\');' .
+				'background-repeat:no-repeat;' .
+				'background-position:center;' .
+				'"' .
+			' id="wppa-user-upload-' . $yalb . '-' . $mocc . '-idisplay"' .
+			' class="wppa-upload-button"' .
+			' value="&nbsp;"' .
+			' onclick="' .
+				'jQuery(\'#wppa-user-upload-' . $yalb . '-' . $mocc . '\').attr(\'capture\',\'capture\');' .
+				'jQuery( \'#wppa-user-upload-' . $yalb . '-' . $mocc . '\' ).click();' .
+				'"' .
+		'/>';
+	}
 
 	// Explanation
-	if ( ! wppa_switch( 'upload_one_only' ) ) {
-		if ( $max ) {
-			$result .=
+	if ( wppa_switch( 'upload_one_only' ) ) {
+		$max = 1;
+	}
+//	if ( ! wppa_switch( 'upload_one_only' ) ) {
+//		if ( $max ) {
+			$body .=
 				'<div style="font-size:10px;" >' .
 					sprintf( _n( 	'You may upload %d photo', 'You may upload up to %d photos at once if your browser supports HTML-5 multiple file upload',
 									$max,
@@ -2713,14 +2737,14 @@ static $albums_granted;
 
 			if ( wppa_opt( 'upload_frontend_minsize' ) ) {
 				$minsize = wppa_opt( 'upload_frontend_minsize' );
-				$result .=
+				$body .=
 					'<div style="font-size:10px;" >' .
 						sprintf( __( 'Min photo size: %d pixels', 'wp-photo-album-plus' ), $minsize ) .
 					'</div>';
 			}
 			if ( wppa_opt( 'upload_frontend_maxsize' ) ) {
 				$maxsize = wppa_opt( 'upload_frontend_maxsize' );
-				$result .=
+				$body .=
 					'<div style="font-size:10px;" >' .
 						sprintf( __( 'Max photo size: %d pixels', 'wp-photo-album-plus' ), $maxsize ) .
 					'</div>';
@@ -2728,7 +2752,7 @@ static $albums_granted;
 			else {
 				$maxsize = wppa_check_memory_limit( false );
 				if ( is_array( $maxsize ) ) {
-					$result .=
+					$body .=
 						'<div style="font-size:10px;" >' .
 							sprintf( 	__( 'Max photo size: %d x %d (%2.1f MegaPixel)', 'wp-photo-album-plus' ),
 										$maxsize['maxx'], $maxsize['maxy'], $maxsize['maxp']/( 1024*1024 )
@@ -2736,20 +2760,41 @@ static $albums_granted;
 						'</div>';
 				}
 			}
-		}
-	}
+			$supp = $wppa_supported_photo_extensions;
+			$body .=
+			'<div style="font-size:10px;" >' .
+				__( 'You may upload files of type', 'wp-photo-album-plus' ) . ': .' .
+				implode( ', .', $wppa_supported_photo_extensions );
+				if ( $may_video ) {
+					$body .= ', ' . implode( ', .', $wppa_supported_video_extensions );
+				}
+				if ( $may_audio ) {
+					$body .= ', ' . implode( ', .', $wppa_supported_audio_extensions );
+				}
+				if ( wppa_switch( 'enable_pdf' ) && wppa_opt( 'image_magick' ) ) {
+					$body .= ', .pdf';
+				}
+			$body .=
+			'</div>';
+
+//		}
+//	}
 
 	// Copyright notice
 	if ( wppa_switch( 'copyright_on' ) ) {
-		$result .=
+		$body .=
 			'<div style="width:100%;clear:both;" >' .
-				__( wppa_opt( 'copyright_notice' ), 'wp-photo-album-plus' ) .
+				__( wppa_opt( 'copyright_notice' ) ) .
 			'</div>';
 	}
 
+	$result .= wppa_get_dlg_item( $head, $body, $big );
+
 	// Watermark
 	if ( wppa_switch( 'watermark_on' ) && ( wppa_switch( 'watermark_user' ) ) ) {
-		$result .=
+
+		$head = __( 'Watermark', 'wp-photo-album-plus' );
+		$body =
 			'<table' .
 				' class="wppa-watermark wppa-box-text"' .
 				' style="margin:0; border:0; '.wppa_wcs( 'wppa-box-text' ).'"' .
@@ -2800,70 +2845,89 @@ static $albums_granted;
 					'</tr>' .
 				'</tbody>' .
 			'</table>';
+
+		$result .= wppa_get_dlg_item( $head, $body, $big );
 	}
+
 
 	// Name
+	$head = __( 'Name', 'wp-photo-album-plus' );
+	if ( wppa_switch( 'name_user_mandatory' ) ) {
+		$head .= '<sup style="color:red;" >*</sup>';
+	}
+	$body = '';
 	if ( wppa_switch( 'name_user' ) ) {
-		switch ( wppa_opt( 'newphoto_name_method' ) ) {
-			case 'none':
-				$expl = '';
-				break;
-			case '2#005':
-				$expl =
-				__( 'If you leave this blank, iptc tag 005 (Graphic name) will be used as photoname if available, else the original filename will be used as photo name.',
-					'wp-photo-album-plus' );
-				break;
-			case '2#120':
-				$expl =
-				__( 'If you leave this blank, iptc tag 120 (Caption) will be used as photoname if available, else the original filename will be used as photo name.',
-				'wp-photo-album-plus' );
-				break;
-			case 'Photo w#id':
-				$expl =
-				__( 'If you leave this blank, "Photo photoid" will be used as photo name.',
-				'wp-photo-album-plus' );
-				break;
-
-			default:
-				$expl =
-				__( 'If you leave this blank, the original filename will be used as photo name.',
-				'wp-photo-album-plus' );
+		if ( wppa_switch( 'name_user_mandatory' ) ) {
+			$expl = '';
 		}
-		$result .=
-			'<h6>' .
-				__( 'Photo name', 'wp-photo-album-plus' ) .
-			'</h6>' .
-			'<div style="clear:left;font-size:10px;" >' .
-				$expl .
-			'</div>' .
+		else {
+			switch ( wppa_opt( 'newphoto_name_method' ) ) {
+				case 'none':
+					$expl = '';
+					break;
+				case '2#005':
+					$expl =
+					__( 'If you leave this blank, iptc tag 005 (Graphic name) will be used as photoname if available, else the original filename will be used as photo name.',
+						'wp-photo-album-plus' );
+					break;
+				case '2#120':
+					$expl =
+					__( 'If you leave this blank, iptc tag 120 (Caption) will be used as photoname if available, else the original filename will be used as photo name.',
+					'wp-photo-album-plus' );
+					break;
+				case 'Photo w#id':
+					$expl =
+					__( 'If you leave this blank, "Photo photoid" will be used as photo name.',
+					'wp-photo-album-plus' );
+					break;
+
+				default:
+					$expl =
+					__( 'If you leave this blank, the original filename will be used as photo name.',
+					'wp-photo-album-plus' );
+			}
+		}
+		$body .=
 			'<input' .
+				' id="wppa-name-user-' . $mocc . '-' . $seqno . '"' .
 				' type="text"' .
 				' class="wppa-box-text"' .
-				' style="border:1 px solid '.wppa_opt( 'bcolor_upload' ).';clear:left; padding:0; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
+				' style="border:1px solid '.wppa_opt( 'bcolor_upload' ).';clear:left; padding:0; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
 				' name="wppa-user-name"' .
-			' />';
+			' />' .
+			'<div style="clear:left;font-size:10px;" >' .
+				$expl .
+			'</div>';
 	}
+	$result .= wppa_get_dlg_item( $head, $body, $big );
 
 	// Description user fillable ?
 	if ( wppa_switch( 'desc_user' ) ) {
+
+		$head = __( 'Description', 'wp-photo-album-plus' );
+		if ( wppa_switch( 'desc_user_mandatory' ) ) {
+			$head .= '<sup style="color:red;" >*</sup>';
+		}
 		$desc = wppa_switch( 'apply_newphoto_desc_user' ) ? stripslashes( wppa_opt( 'newphoto_description' ) ) : '';
-		$result .=
-			'<h6>' .
-				__( 'Photo description', 'wp-photo-album-plus' ) .
-			'</h6>' .
+		$body =
 			'<textarea' .
+				' id="wppa-desc-user-' . $mocc . '-' . $seqno . '"' .
 				' class="wppa-user-textarea wppa-box-text"' .
-				' style="border:1 px solid '.wppa_opt( 'bcolor_upload' ).';clear:left; padding:0; height:120px; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
+				' style="border:1px solid '.wppa_opt( 'bcolor_upload' ).';clear:left; padding:0; height:120px; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
 				' name="wppa-user-desc"' .
 				' >' .
 				$desc .
 			'</textarea>';
+
+		$result .= wppa_get_dlg_item( $head, $body, $big );
 	}
 
 	// Predefined desc ?
 	elseif ( wppa_switch( 'apply_newphoto_desc_user' ) ) {
+
 		$result .=
 			'<input' .
+				' id="wppa-name-user-' . $mocc . '-' . $seqno . '"' .
 				' type="hidden"' .
 				' value="' . esc_attr( wppa_opt( 'newphoto_description' ) ) . '"' .
 				' name="wppa-user-desc"' .
@@ -2874,17 +2938,18 @@ static $albums_granted;
 	if ( wppa_switch( 'fe_custom_fields' ) ) {
 		for ( $i = '0'; $i < '10' ; $i++ ) {
 			if ( wppa_opt( 'custom_caption_'.$i ) ) {
-				$result .=
-					'<h6>'.
-							__( wppa_opt( 'custom_caption_'.$i ), 'wp-photo-album-plus' ) . ': ' .
-							( wppa_switch( 'custom_visible_'.$i ) ? '' : '&nbsp;<small><i>(&nbsp;'.__( 'hidden', 'wp-photo-album-plus' ).'&nbsp;)</i></small>' ) .
-					'</h6>' .
-					'<input' .
-						' type="text"' .
-						' class="wppa-box-text"' .
-						' style="border:1 px solid '.wppa_opt( 'bcolor_upload' ).';clear:left; padding:0; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
-						' name="wppa-user-custom-'.$i.'"' .
-					' />';
+
+				$head = __( wppa_opt( 'custom_caption_'.$i ) ) .
+						( wppa_switch( 'custom_visible_'.$i ) ? '' : '&nbsp;<small><i>(&nbsp;'.__( 'hidden', 'wp-photo-album-plus' ).'&nbsp;)</i></small>' );
+				$body =
+				'<input' .
+					' type="text"' .
+					' class="wppa-box-text"' .
+					' style="border:1px solid '.wppa_opt( 'bcolor_upload' ).';clear:left; padding:0; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
+					' name="wppa-user-custom-'.$i.'"' .
+				' />';
+
+				$result .= wppa_get_dlg_item( $head, $body, $big );
 			}
 		}
 	}
@@ -2896,82 +2961,89 @@ static $albums_granted;
 		$onc = 'wppaPrevTags(\'wppa-sel-'.$yalb.'-'.$mocc.'\', \'wppa-inp-'.$yalb.'-'.$mocc.'\', \'wppa-upload-album-'.$mocc.'-'.$seqno.'\', \'wppa-prev-'.$yalb.'-'.$mocc.'\')';
 
 		// Open the tag enter area
-		$result .= '<div style="clear:both;" >';
+//		$result .= '<div style="clear:both;" >';
 
 			// Selection boxes 1..3
 			for ( $i = '1'; $i < '4'; $i++ ) {
 				if ( wppa_switch( 'up_tagselbox_on_'.$i ) ) {
-					$result .=
-								'<h6>' .
-									__( wppa_opt( 'up_tagselbox_title_'.$i ) ,'wp-photo-album-plus' ) .
-								'</h6>' .
-								'<select' .
-									' id="wppa-sel-'.$yalb.'-'.$mocc.'-'.$i.'"' .
-									' name="wppa-user-tags-'.$i.'[]"' .
-									( wppa_switch( 'up_tagselbox_multi_'.$i ) ? ' multiple' : '' ) .
-									' onchange="'.$onc.'"' .
-									' >';
+
+					$head = __( wppa_opt( 'up_tagselbox_title_'.$i ) );
+					$head = trim( $head, ': ');
+					$body = '<select' .
+								' id="wppa-sel-'.$yalb.'-'.$mocc.'-'.$i.'"' .
+								' name="wppa-user-tags-'.$i.'[]"' .
+								( wppa_switch( 'up_tagselbox_multi_'.$i ) ? ' multiple' : '' ) .
+								' onchange="'.$onc.'"' .
+								' >';
+
 					if ( wppa_opt( 'up_tagselbox_content_'.$i ) ) {	// List of tags supplied
 						$tags = explode( ',', trim( wppa_opt( 'up_tagselbox_content_'.$i ), ',' ) );
-						$result .= '<option value="" >&nbsp;</option>';
+						$body .= '<option value="" >&nbsp;</option>';
 						if ( is_array( $tags ) ) foreach ( $tags as $tag ) {
-							$result .= '<option class="wppa-sel-'.$yalb.'-'.$mocc.'" value="'.urlencode($tag).'">'.$tag.'</option>';
+							$body .= '<option class="wppa-sel-'.$yalb.'-'.$mocc.'" value="'.urlencode($tag).'">'.$tag.'</option>';
 						}
 					}
 					else {											// All existing tags
 						$tags = wppa_get_taglist();
-						$result .= '<option value="" >&nbsp;</option>';
+						$body .= '<option value="" >&nbsp;</option>';
 						if ( is_array( $tags ) ) foreach ( $tags as $tag ) {
-							$result .= '<option class="wppa-sel-'.$yalb.'-'.$mocc.'" value="'.urlencode($tag['tag']).'">'.$tag['tag'].'</option>';
+							$body .= '<option class="wppa-sel-'.$yalb.'-'.$mocc.'" value="'.urlencode($tag['tag']).'">'.$tag['tag'].'</option>';
 						}
 					}
-					$result .= '</select><div style="clear:both;" ></div>';
+					$body .= '</select><div style="clear:both;" ></div>';
+
+					$result .= wppa_get_dlg_item( $head, $body, $big );
 				}
 			}
 
 			// New tags
 			if ( wppa_switch( 'up_tag_input_on' ) ) {
-				$result .= 	'<h6>' .
-								__( wppa_opt( 'up_tag_input_title' ), 'wp-photo-album-plus' ) .
-							'</h6>' .
-							'<input' .
-								' id="wppa-inp-'.$yalb.'-'.$mocc.'"' .
-								' type="text"' .
-								' class="wppa-box-text "' .
-								' style="padding:0; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
-								' name="wppa-new-tags"' .
-								' onchange="'.$onc.'"' .
-								' value="'.trim(wppa_opt('up_tagbox_new'), ',').'"' .
-							' />';
+
+				$head = __( wppa_opt( 'up_tag_input_title' ) );
+				$head = trim( $head, ': ');
+				$body = '<input' .
+							' id="wppa-inp-'.$yalb.'-'.$mocc.'"' .
+							' type="text"' .
+							' class="wppa-box-text "' .
+							' style="padding:0; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
+							' name="wppa-new-tags"' .
+							' onchange="'.$onc.'"' .
+							' value="'.trim(wppa_opt('up_tagbox_new'), ',').'"' .
+						' />';
+
+				$result .= wppa_get_dlg_item( $head, $body, $big );
 			}
 
 			// Preview area
 			if ( wppa_switch( 'up_tag_preview' ) ) {
-				$result .= 	'<h6>' .
-								__( 'Preview tags:', 'wp-photo-album-plus' ) .
-								' <small id="wppa-prev-'.$yalb.'-'.$mocc.'"></small>' .
-							'</h6>' .
-							'<script type="text/javascript" >jQuery( document ).ready(function() {'.$onc.'})</script>';
+				$head = __( 'Preview tags', 'wp-photo-album-plus' );
+				$body = '<span id="wppa-prev-'.$yalb.'-'.$mocc.'"></span>' .
+						'<script type="text/javascript" >jQuery( document ).ready(function() {'.$onc.'})</script>';
+
+				$result .= wppa_get_dlg_item( $head, $body, $big );
 			}
 
 		// Close tag enter area
-		$result .= '</div>';
+//		$result .= '</div>';
 	}
 
 /* The Blogit section */
 
 	if ( ( $where == 'widget' || $where == 'uploadbox' ) && current_user_can( 'edit_posts' ) && wppa_opt( 'blog_it' ) != '-none-' ) {
-		$result .=
-		'<div style="margin-top:6px;" >';
+//		$result .=
+//		'<div style="margin-top:6px;" >';
 
 			// Use can choose to blog it
 			if ( wppa_opt( 'blog_it' ) == 'optional' ) {
-				$result .=
+
+				$head =
 				'<input' .
 					' type="button"' .
 					' value="' . esc_attr( __( 'Blog it?', 'wp-photo-album-plus' ) ) . '"' .
 					' onclick="jQuery(\'#wppa-blogit-'.$yalb.'-'.$mocc.'\').trigger(\'click\')"' .
-				' />' .
+				' />';
+
+				$head .=
 				' <input' .
 					' type="checkbox"' .
 					' id="wppa-blogit-'.$yalb.'-'.$mocc.'"' .
@@ -2990,7 +3062,8 @@ static $albums_granted;
 
 			// Always blog
 			else {
-				$result .=
+
+				$head =
 				'<input' .
 					' type="checkbox"' .
 					' id="wppa-blogit-'.$yalb.'-'.$mocc.'"' .
@@ -2998,16 +3071,17 @@ static $albums_granted;
 					' style="display:none;"' .
 					' checked="checked"' .
 				' />';
-
 			}
 
-			$result .=
+			$body =
 			'<div' .
 				' id="blog-div-'.$yalb.'-'.$mocc.'"' .
 				( wppa_opt( 'blog_it' ) == 'optional' ? ' style="display:none;"' : '' ) .
-				' />' .
+				' >' .
+
+
 				'<h6>' .
-					__( 'Post title:', 'wp-photo-album-plus' ) .
+					__( 'Post title', 'wp-photo-album-plus' ) .
 				'</h6>' .
 				'<input' .
 					' id="wppa-blogit-title-'.$yalb.'-'.$mocc.'"' .
@@ -3017,45 +3091,57 @@ static $albums_granted;
 					' name="wppa-post-title"' .
 				' />' .
 				'<h6>' .
-					__( 'Text BEFORE the image:', 'wp-photo-album-plus' ) .
+					__( 'Text BEFORE the image', 'wp-photo-album-plus' ) .
 				'</h6>' .
 				'<textarea' .
 					' id="wppa-blogit-pretext-'.$yalb.'-'.$mocc.'"' .
 					' name="wppa-blogit-pretext"' .
 					' class=wppa-user-textarea wppa-box-text"' .
-					' style="border:1 px solid '.wppa_opt( 'bcolor_upload' ).';clear:left; padding:0; height:120px; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
+					' style="border:1px solid '.wppa_opt( 'bcolor_upload' ).';clear:left; padding:0; height:120px; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
 					' >' .
 				'</textarea>' .
 				'<h6>' .
-					__( 'Text AFTER the image:', 'wp-photo-album-plus' ) .
+					__( 'Text AFTER the image', 'wp-photo-album-plus' ) .
 				'</h6>' .
 				'<textarea' .
 					' id="wppa-blogit-posttext-'.$yalb.'-'.$mocc.'"' .
 					' name="wppa-blogit-posttext"' .
 					' class=wppa-user-textarea wppa-box-text"' .
-					' style="border:1 px solid '.wppa_opt( 'bcolor_upload' ).';clear:left; padding:0; height:120px; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
+					' style="border:1px solid '.wppa_opt( 'bcolor_upload' ).';clear:left; padding:0; height:120px; width:100%; '.wppa_wcs( 'wppa-box-text' ).'"' .
 					'>' .
 				'</textarea>' .
-			'</div>' .
-		'</div>';
+			'</div>';// .
+
+			$result .= wppa_get_dlg_item( $head, $body, $big );
+//		'</div>';
 
 	}
 
 
 /* start submit section */
 
-	// Onclick submit verify album is known
+	// Onclick submit verify required data is present
+	$vfy_album 	= 'if (jquery( \'#wppa-upload-album-' . $mocc . '-' . $seqno . '\' ).value == 0 ){alert( \''.esc_js( __( 'Please select an album and try again', 'wp-photo-album-plus' ) ).'\' );return false;}';
+	$vfy_name 	= 'if (jQuery( \'#wppa-name-user-' . $mocc . '-' . $seqno . '\' ).val() == \'\' ){alert( \''.esc_js(__( 'Please enter the name of the photo and try again', 'wp-photo-album-plus' )).'\');return false;}';
+	$vfy_desc 	= 'if (jQuery( \'#wppa-desc-user-' . $mocc . '-' . $seqno . '\' ).val() == \'\' ){alert( \''.esc_js(__( 'Please enter the description of the photo and try again', 'wp-photo-album-plus' )).'\');return false;}';
+	$vfy_postit = 'if (jQuery( \'#wppa-blogit-'. $yalb . '-' . $mocc . '\' ).prop( \'checked\' ) && jQuery( \'#wppa-blogit-title-' . $yalb . '-' . $mocc . '\' ).val() == \'\' ){alert( \''.esc_js(__( 'Please enter the title of the blogpost and try again', 'wp-photo-album-plus' )).'\');return false;}';
+	$go 		= 'jQuery(this).css(\'display\', \'none\');';
+
+	$onclick 	= ' onclick="';
 	if ( ! $alb ) {
-		$onclick = 	' onclick="if ( document.getElementById( \'wppa-upload-album-'.$mocc.'-'.$seqno.'\' ).value == 0 )' .
-					' {alert( \''.esc_js( __( 'Please select an album and try again', 'wp-photo-album-plus' ) ).'\' );return false;}"';
+		$onclick .= $vfy_album;
 	}
-	else {
-		$onclick = '';
-	}
+	if ( wppa_switch( 'name_user_mandatory' ) ) $onclick .= $vfy_name;
+	if ( wppa_switch( 'desc_user_mandatory' ) ) $onclick .= $vfy_desc;
+	if ( wppa_opt( 'blog_it' ) != '-none-' ) $onclick .= $vfy_postit;
+
+	$onclick .= $go . '"';
 
 	// The submit button
 	$value = wppa_opt( 'blog_it' ) == 'always' ? esc_attr( __( 'Upload and blog', 'wp-photo-album-plus' ) ) : esc_attr( __( 'Upload photo', 'wp-photo-album-plus' ) );
-	$result .=
+
+	$head = '';
+	$body =
 		'<div style="height:6px;;clear:both;" ></div>' .
 		'<input' .
 			' type="submit"' .
@@ -3069,7 +3155,7 @@ static $albums_granted;
 
 	// if ajax: progression bar
 	if ( $ajax_upload ) {
-		$result .=
+		$body .=
 			'<div' .
 				' id="progress-'.$yalb.'-'.$mocc.'"' .
 				' class="wppa-progress "' .
@@ -3081,11 +3167,20 @@ static $albums_granted;
 			'<div id="message-'.$yalb.'-'.$mocc.'" class="wppa-message" ></div>';
 	}
 
+	$result .= wppa_get_dlg_item( $head, $body, $big );
+
+
 /* End submit section */
 
+	// End table on wide dieplays
+	if ( $big ) {
+		$result .= '</table>';
+	}
 
 	// Done
 	$result .= '</form></div>';
+
+
 
 	// If ajax upload and from cover or thumbnail area, go display the thumbnails after upload
 	if ( $where == 'cover' || $where == 'thumb' ) {
@@ -3114,6 +3209,7 @@ static $albums_granted;
 							jQuery("#percent-'.$yalb.'-'.$mocc.'").html("");
 						},
 						uploadProgress: function(event, position, total, percentComplete) {
+							jQuery("#bar-'.$yalb.'-'.$mocc.'").css(\'backgroundColor\',\'#7F7\');
 							jQuery("#bar-'.$yalb.'-'.$mocc.'").width(percentComplete+\'%\');
 							if ( percentComplete < 95 ) {
 								jQuery("#percent-'.$yalb.'-'.$mocc.'").html(percentComplete+\'%\');
@@ -3128,11 +3224,20 @@ static $albums_granted;
 							jQuery(".wppa-upload-button").val(wppaUploadButtonText);
 						},
 						complete: function(response) {
-							jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="font-size: 10px;" >\'+response.responseText+\'</span>\' );'.
-							( $where == 'thumb' || $where == 'cover' ? $on_complete : '' ).'
+							if (response.responseText.indexOf(\''.__( 'Upload failed', 'wp-photo-album-plus' ).'\')!=-1) {
+								jQuery("#bar-'.$yalb.'-'.$mocc.'").css(\'backgroundColor\',\'#F77\');
+								jQuery("#percent-'.$yalb.'-'.$mocc.'").html(\''.__('Failed!', 'wp-photo-album-plus').'\');
+								jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="font-size: 10px;" >\'+response.responseText+\'</span>\' );
+							}
+							else {
+								jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="font-size: 10px;" >\'+response.responseText+\'</span>\' );' .
+								( $where == 'thumb' || $where == 'cover' ? $on_complete : '' ) . '
+							}
 						},
 						error: function() {
-							jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="color: red;" >'.__( 'ERROR: unable to upload files.', 'wp-photo-album-plus' ).'</span>\' );
+							jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="color: red;" >'.__( 'Server error.', 'wp-photo-album-plus' ).'</span>\' );
+							jQuery("#bar-'.$yalb.'-'.$mocc.'").css(\'backgroundColor\',\'#F77\');
+							jQuery("#percent-'.$yalb.'-'.$mocc.'").html(\''.__('Failed!', 'wp-photo-album-plus').'\');
 						}
 					};
 
@@ -3143,6 +3248,32 @@ static $albums_granted;
 
 	// Close wrapper
 //	$result .= '</div>';
+
+	return $result;
+}
+
+
+// Dialog item for fe upload dialog. Makes difference betwen slall layut (widget) and 'box'(shortcode) layout.
+function wppa_get_dlg_item( $head, $body, $big ) {
+
+	if ( ! $head && ! $body ) {
+		return '';
+	}
+
+	if ( $big ) {
+		$result = 	'<tr class="wppa-upload-tr" >
+						<th class="wppa-upload-th" >' .
+							$head .
+						'</th>
+						<td class="wppa-upload-td" >' .
+							$body .
+						'</td>
+					</tr>';
+	}
+	else {
+		$result = 	'<h6>' . $head . '</h6>' .
+					'<div>' . $body . '</div>';
+	}
 
 	return $result;
 }
@@ -3196,7 +3327,7 @@ function wppa_user_albumedit_html( $alb, $width, $where = '', $mcr = false ) {
 									'jQuery( \'#wppa-cats-' . str_replace('.','-',$alb) . '-' . wppa( 'mocc' ) . '\' ).css( \'display\',\'block\' );'.	// Show catogory
 									'jQuery( \'#_wppa-ea-'.str_replace('.','-',$alb).'-'.wppa( 'mocc' ).'\' ).css( \'display\',\'none\' );'. 			// Hide backlink
 									'_wppaDoAutocol( ' . wppa( 'mocc' ) . ' )'.													// Trigger autocol
-									'" style="float:right; cursor:pointer;display:none;">
+									'" style="float:right; cursor:pointer;display:none;padding-right:6px;">
 		' . __( wppa_opt( 'close_text' ), 'wp-photo-album-plus' ) .
 	'</a>';
 
@@ -3658,7 +3789,7 @@ global $wpdb;
 									'<textarea' .
 										' name="wppa-comment"' .
 										' id="wppa-comment-' . wppa( 'mocc' ) . '"' .
-										' style="height:60px; width:100%; "' .
+										' style="height:60px; width:98%; "' .
 										'>' .
 										esc_textarea( stripslashes( $txt ) ) .
 									'</textarea>' .
@@ -3954,7 +4085,7 @@ global $wppa_exif_cache;
 				$result .= 	'<tr style="border-bottom:0 none; border-top:0 none; border-left: 0 none; border-right: 0 none;" >' .
 							'<td class="wppa-exif-label wppa-box-text wppa-td" style="'.wppa_wcs( 'wppa-box-text' ).wppa_wcs( 'wppa-td' ).'" >';
 
-				$label = wppa_exif_tagname( hexdec( '0x' . substr( $exifline['tag'], 2, 4 ) ), $brand ) . ':';
+				$label = wppa_exif_tagname( $exifline['tag'], $brand ) . ':';
 
 				$result .= esc_js( __( $label ) );
 
@@ -4138,15 +4269,16 @@ function wppa_bestof_html( $args, $widget = true ) {
 													'size' 			=> wppa_opt( 'widget_width' ),
 													'fontsize' 		=> wppa_opt( 'fontsize_widget_thumb' ),
 													'lineheight' 	=> wppa_opt( 'fontsize_widget_thumb' ) * 1.5,
-													'height' 		=> '200'
+													'height' 		=> '200',
+													'totvalue' 		=> '',
 											 ) );
 
 	// Make args into seperate vars
 	extract ( $args );
 
 	// Validate args
-	if ( ! in_array( $sortby, array ( 'maxratingcount', 'meanrating', 'ratingcount' ) ) ) {
-		wppa_dbg_msg ( 'Invalid arg sortby "'.$sortby.'" must be "maxratingcount", "meanrating" or "ratingcount"', 'red', 'force' );
+	if ( ! in_array( $sortby, array ( 'maxratingcount', 'meanrating', 'ratingcount', 'totvalue' ) ) ) {
+		wppa_dbg_msg ( 'Invalid arg sortby "'.$sortby.'" must be "maxratingcount", "meanrating", "ratingcount" or "totvalue"', 'red', 'force' );
 	}
 	if ( ! in_array( $display, array ( 'photo', 'owner' ) ) ) {
 		wppa_dbg_msg ( 'Invalid arg display "'.$display.'" must be "photo" or "owner"', 'red', 'force' );
@@ -4183,6 +4315,7 @@ function wppa_bestof_html( $args, $widget = true ) {
 					if ( $maxratings == 'yes' ) $totalh += $lineheight;
 					if ( $meanrat == 'yes' ) 	$totalh += $lineheight;
 					if ( $ratcount == 'yes' ) 	$totalh += $lineheight;
+					if ( $totvalue == 'yes' ) 	$totalh += $lineheight;
 
 					if ( $widget ) $clear = 'clear:both; '; else $clear = '';
 					$result .= "\n" .
@@ -4267,16 +4400,21 @@ function wppa_bestof_html( $args, $widget = true ) {
 							$result .= sprintf( __( 'Photo by: %s', 'wp-photo-album-plus' ), $data[$id]['user'] ).'<br />';
 							if ( $maxratings 	== 'yes' ) {
 								$n = $data[$id]['maxratingcount'];
-								$result .= sprintf( _n( '%d max rating', '%d max ratings', $n, 'wp-photo-album-plus' ), $n ).'<br />';
+								$result .= sprintf( _n( '%d max rating', '%d max ratings', $n, 'wp-photo-album-plus' ), $n ) . '<br />';
 							}
 							if ( $ratcount 		== 'yes' ) {
 								$n = $data[$id]['ratingcount'];
-								$result .= sprintf( _n( '%d vote', '%d votes', 'wp-photo-album-plus'), $n ).'<br />';
+								$result .= sprintf( _n( '%d vote', '%d votes', 'wp-photo-album-plus'), $n ) . '<br />';
 							}
 							if ( $meanrat  		== 'yes' ) {
 								$m = $data[$id]['meanrating'];
-								$result .= sprintf( __( 'Rating: %4.2f.', 'wp-photo-album-plus' ), $m ).'<br />';
+								$result .= sprintf( __( 'Rating: %4.2f.', 'wp-photo-album-plus' ), $m ) . '<br />';
 							}
+							if ( $totvalue 		== 'yes' ) {
+								$t = $data[$id]['totvalue'];
+								$result .= sprintf( __( 'Total rating: %d', 'wp-photo-album-plus' ), $t ) . '<br />';
+							}
+
 						$result .= '</div>';
 						$result .= '<div style="clear:both" ></div>';
 
@@ -4339,6 +4477,10 @@ function wppa_bestof_html( $args, $widget = true ) {
 							if ( $meanrat  		== 'yes' ) {
 								$m = $data[$author]['meanrating'];
 								$result .= sprintf( __( 'Mean value: %4.2f.', 'wp-photo-album-plus' ), $m ).'<br />';
+							}
+							if ( $totvalue 		== 'yes' ) {
+								$t = $data[$author]['totvalue'];
+								$result .= sprintf( __( 'Total rating: %d', 'wp-photo-album-plus' ), $t ) . '<br />';
 							}
 
 				$result .= 	'</div>';

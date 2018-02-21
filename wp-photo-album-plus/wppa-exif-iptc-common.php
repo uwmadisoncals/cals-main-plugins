@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * exif and iptc common functions
-* version 6.8.00
+* version 6.8.01
 *
 *
 */
@@ -159,11 +159,14 @@ global $wppa_exif_cache;
 	}
 
 	// Remove untranslated
-	$pos = strpos($temp, 'E#');
-	while ( $pos !== false ) {
-		$tmp = substr( $temp, 0, $pos ) . '<span title="' . esc_attr( __( 'No data', 'wp-photo-album-plus' ) ) . '" style="cursor:pointer;" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>' . substr( $temp, $pos+6 );
-		$temp = $tmp;
-		$pos = strpos($temp, 'E#');
+	$groups = array( 'E#', 'F#', 'G#' );
+	foreach( $groups as $group ) {
+		$pos = strpos( $temp, $group );
+		while ( $pos !== false ) {
+			$tmp = substr( $temp, 0, $pos ) . '<span title="' . esc_attr( __( 'No data', 'wp-photo-album-plus' ) ) . '" style="cursor:pointer;" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>' . substr( $temp, $pos+6 );
+			$temp = $tmp;
+			$pos = strpos( $temp, $group );
+		}
 	}
 
 	// Return result
@@ -173,103 +176,128 @@ global $wppa_exif_cache;
 function wppa_format_exif( $tag, $data, $brand = '' ) {
 global $wppa_exif_error_output;
 
-	if ( $data !== '' ) {
+	if ( true || $data !== '' ) {
+
+		// If rational, simplify it.
+		if ( wppa_is_valid_rational( $data, false ) ) {
+			$data = wppa_simplify_rational( $data );
+		}
+
+		// If array, make it readable
+		if ( is_serialized( $data ) ) {
+			$data_arr = unserialize( $data );
+			$data = implode( ', ', $data_arr );
+		}
+		else {
+			$data_arr = null;
+		}
+
+		// Default:
+		$result = $data;
+
 		switch ( $tag ) {
 
 			case 'E#0001': 	// InteropIndex / CanonCameraSettings (Canon)
-				switch( $brand ) {
-					case 'CANON':	// CanonCameraSettings (Canon)
-						$result = $data;
-						return $result;
-						break;
-					default: 		// InteropIndex
-						switch( $data ) {
-							case 'R03': $result = __( 'R03 - DCF option file (Adobe RGB)', 'wp-photo-album-plus' ); break;
-							case 'R98': $result = __( 'R98 - DCF basic file (sRGB)', 'wp-photo-album-plus' ); break;
-							case 'THM': $result = __( 'THM - DCF thumbnail file', 'wp-photo-album-plus' ); break;
-							default: $result = __( 'Undefined', 'wp-photo-album-plus' );
-						}
-						return $result;
+				if ( $brand == 'CANON' ) {	// CanonCameraSettings (Canon)
+
 				}
-				break;
+				else { 	// InteropIndex
+					switch( $data ) {
+						case 'R03': $result = __( 'R03 - DCF option file (Adobe RGB)', 'wp-photo-album-plus' ); break;
+						case 'R98': $result = __( 'R98 - DCF basic file (sRGB)', 'wp-photo-album-plus' ); break;
+						case 'THM': $result = __( 'THM - DCF thumbnail file', 'wp-photo-album-plus' ); break;
+						default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+					}
+				}
+				return $result;
 
 			case 'E#0002': 	// CanonFocalLength / DeviceType
-				switch( $brand ) {
-					case 'SAMSUNG':	// DeviceType
-						switch( $data ) {
-							case 0x1000: $result = 'Compact Digital Camera'; break;
-							case 0x2000: $result = 'High-end NX Camera'; break;
-							case 0x3000: $result = 'HXM Video Camera'; break;
-							case 0x12000: $result = 'Cell Phone'; break;
-							case 0x300000: $result = 'SMX Video Camera'; break;
-							default: $result = $data;
-						}
-						return $result;
-						break;
-
-					default:
-						$result = $data;
-						return $data;
-						break;
+				if ( $brand == 'SAMSUNG' ) { 	// DeviceType
+					switch( $data ) {
+						case 0x1000: $result = 'Compact Digital Camera'; break;
+						case 0x2000: $result = 'High-end NX Camera'; break;
+						case 0x3000: $result = 'HXM Video Camera'; break;
+						case 0x12000: $result = 'Cell Phone'; break;
+						case 0x300000: $result = 'SMX Video Camera'; break;
+						default: $result = $data;
+					}
 				}
-				break;
+				if ( $brand == 'CANON' ) { 		// CanonFocalLength
+					if ( is_array( $data_arr ) && count( $data_arr ) == 4 ) {
+
+						// 0
+						$result = 'FocalType: ';
+						switch( $data_arr[0] ) {
+							case 0: $result .= 'Fixed'; break;
+							case 1: $result .= 'Zoom'; break;
+							default: $result .= '?';
+						}
+						$result .= ', ';
+
+						// 1
+						$result .= 'Length: ' . $data_arr[1] . ', ';
+
+						// 2
+						$result .= 'XSize: ' . $data_arr[2] . ', ';
+
+						// 3
+						$result .= 'YSize: ' . $data_arr[3];
+					}
+
+				}
+				return $result;
 
 			case 'E#0003': 	// CanonFlashInfo? / SamsungModelID
-				switch( $brand ) {
-					case 'SAMSUNG':	// SamsungModelID
-						switch( $data ) {
-							case 0x100101c: $result = 'NX10'; break;
-							case 0x1001226: $result = 'HMX-S15BP'; break;
-							case 0x1001233: $result = 'HMX-Q10'; break;
-							case 0x1001234: $result = 'HMX-H304'; break;
-							case 0x100130c: $result = 'NX100'; break;
-							case 0x1001327: $result = 'NX11'; break;
-							case 0x170104b: $result = 'ES65, ES67 / VLUU ES65, ES67 / SL50'; break;
-							case 0x170104e: $result = 'ES70, ES71 / VLUU ES70, ES71 / SL600'; break;
-							case 0x1701052: $result = 'ES73 / VLUU ES73 / SL605'; break;
-							case 0x1701055: $result = 'ES25, ES27 / VLUU ES25, ES27 / SL45'; break;
-							case 0x1701300: $result = 'ES28 / VLUU ES28'; break;
-							case 0x1701303: $result = 'ES74,ES75,ES78 / VLUU ES75,ES78'; break;
-							case 0x2001046: $result = 'PL150 / VLUU PL150 / TL210 / PL151'; break;
-							case 0x2001048: $result = 'PL100 / TL205 / VLUU PL100 / PL101'; break;
-							case 0x2001311: $result = 'PL120,PL121 / VLUU PL120,PL121'; break;
-							case 0x2001315: $result = 'PL170,PL171 / VLUUPL170,PL171'; break;
-							case 0x200131e: $result = 'PL210, PL211 / VLUU PL210, PL211'; break;
-							case 0x2701317: $result = 'PL20,PL21 / VLUU PL20,PL21'; break;
-							case 0x2a0001b: $result = 'WP10 / VLUU WP10 / AQ100'; break;
-							case 0x3000000: $result = 'Various Models (0x3000000)'; break;
-							case 0x3a00018: $result = 'Various Models (0x3a00018)'; break;
-							case 0x400101f: $result = 'ST1000 / ST1100 / VLUU ST1000 / CL65'; break;
-							case 0x4001022: $result = 'ST550 / VLUU ST550 / TL225'; break;
-							case 0x4001025: $result = 'Various Models (0x4001025)'; break;
-							case 0x400103e: $result = 'VLUU ST5500, ST5500, CL80'; break;
-							case 0x4001041: $result = 'VLUU ST5000, ST5000, TL240'; break;
-							case 0x4001043: $result = 'ST70 / VLUU ST70 / ST71'; break;
-							case 0x400130a: $result = 'Various Models (0x400130a)'; break;
-							case 0x400130e: $result = 'ST90,ST91 / VLUU ST90,ST91'; break;
-							case 0x4001313: $result = 'VLUU ST95, ST95'; break;
-							case 0x4a00015: $result = 'VLUU ST60'; break;
-							case 0x4a0135b: $result = 'ST30, ST65 / VLUU ST65 / ST67'; break;
-							case 0x5000000: $result = 'Various Models (0x5000000)'; break;
-							case 0x5001038: $result = 'Various Models (0x5001038)'; break;
-							case 0x500103a: $result = 'WB650 / VLUU WB650 / WB660'; break;
-							case 0x500103c: $result = 'WB600 / VLUU WB600 / WB610'; break;
-							case 0x500133e: $result = 'WB150 / WB150F / WB152 / WB152F / WB151'; break;
-							case 0x5a0000f: $result = 'WB5000 / HZ25W'; break;
-							case 0x6001036: $result = 'EX1'; break;
-							case 0x700131c: $result = 'VLUU SH100, SH100'; break;
-							case 0x27127002: $result = 'SMX-C20N'; break;
-							default: $result = $data;
-						}
-						return $result;
-						break;
+				if ( $brand == 'CANON' ) { 		// CanonFlashInfo?
 
-					default:
-						$result = $data;
-						return $data;
-						break;
 				}
-				break;
+				if ( $brand == 'SAMSUNG' ) { 	// SamsungModelID
+					switch( $data ) {
+						case 0x100101c: $result = 'NX10'; break;
+						case 0x1001226: $result = 'HMX-S15BP'; break;
+						case 0x1001233: $result = 'HMX-Q10'; break;
+						case 0x1001234: $result = 'HMX-H304'; break;
+						case 0x100130c: $result = 'NX100'; break;
+						case 0x1001327: $result = 'NX11'; break;
+						case 0x170104b: $result = 'ES65, ES67 / VLUU ES65, ES67 / SL50'; break;
+						case 0x170104e: $result = 'ES70, ES71 / VLUU ES70, ES71 / SL600'; break;
+						case 0x1701052: $result = 'ES73 / VLUU ES73 / SL605'; break;
+						case 0x1701055: $result = 'ES25, ES27 / VLUU ES25, ES27 / SL45'; break;
+						case 0x1701300: $result = 'ES28 / VLUU ES28'; break;
+						case 0x1701303: $result = 'ES74,ES75,ES78 / VLUU ES75,ES78'; break;
+						case 0x2001046: $result = 'PL150 / VLUU PL150 / TL210 / PL151'; break;
+						case 0x2001048: $result = 'PL100 / TL205 / VLUU PL100 / PL101'; break;
+						case 0x2001311: $result = 'PL120,PL121 / VLUU PL120,PL121'; break;
+						case 0x2001315: $result = 'PL170,PL171 / VLUUPL170,PL171'; break;
+						case 0x200131e: $result = 'PL210, PL211 / VLUU PL210, PL211'; break;
+						case 0x2701317: $result = 'PL20,PL21 / VLUU PL20,PL21'; break;
+						case 0x2a0001b: $result = 'WP10 / VLUU WP10 / AQ100'; break;
+						case 0x3000000: $result = 'Various Models (0x3000000)'; break;
+						case 0x3a00018: $result = 'Various Models (0x3a00018)'; break;
+						case 0x400101f: $result = 'ST1000 / ST1100 / VLUU ST1000 / CL65'; break;
+						case 0x4001022: $result = 'ST550 / VLUU ST550 / TL225'; break;
+						case 0x4001025: $result = 'Various Models (0x4001025)'; break;
+						case 0x400103e: $result = 'VLUU ST5500, ST5500, CL80'; break;
+						case 0x4001041: $result = 'VLUU ST5000, ST5000, TL240'; break;
+						case 0x4001043: $result = 'ST70 / VLUU ST70 / ST71'; break;
+						case 0x400130a: $result = 'Various Models (0x400130a)'; break;
+						case 0x400130e: $result = 'ST90,ST91 / VLUU ST90,ST91'; break;
+						case 0x4001313: $result = 'VLUU ST95, ST95'; break;
+						case 0x4a00015: $result = 'VLUU ST60'; break;
+						case 0x4a0135b: $result = 'ST30, ST65 / VLUU ST65 / ST67'; break;
+						case 0x5000000: $result = 'Various Models (0x5000000)'; break;
+						case 0x5001038: $result = 'Various Models (0x5001038)'; break;
+						case 0x500103a: $result = 'WB650 / VLUU WB650 / WB660'; break;
+						case 0x500103c: $result = 'WB600 / VLUU WB600 / WB610'; break;
+						case 0x500133e: $result = 'WB150 / WB150F / WB152 / WB152F / WB151'; break;
+						case 0x5a0000f: $result = 'WB5000 / HZ25W'; break;
+						case 0x6001036: $result = 'EX1'; break;
+						case 0x700131c: $result = 'VLUU SH100, SH100'; break;
+						case 0x27127002: $result = 'SMX-C20N'; break;
+						default: $result = '?';
+					}
+				}
+				return $result;
 
 			case 'E#0004': 	// CanonShotInfo / Quality (Nikon)
 			case 'E#0005': 	// CanonPanorama / WhiteBalance (Nikon)
@@ -280,379 +308,395 @@ global $wppa_exif_error_output;
 			case 'E#000A': 	// UnknownD30 (Canon)
 			case 'E#000B': 	// WhiteBalanceFineTune (Nikon)
 			case 'E#000C': 	// SerialNumber (Canon) / WB_RBLevels (Nikon)
-			case 'E#000D': 	// CanonCameraInfo / ProgramShift (Nikon)
-			case 'E#000E': 	// CanonFileLength / ExposureDifference (Nikon)
-			case 'E#000F': 	// CustomFunctions (Canon) / ISOSelection (Nikon)
-				$result = $data;
 				return $result;
-				break;
+
+			case 'E#000D': 	// CanonCameraInfo / ProgramShift (Nikon)
+				if ( $brand == 'CANON' ) {
+					str_replace( 'CanonCanon', 'Canon', $result );
+				}
+				return $result;
+
+			case 'E#000E': 	// CanonFileLength / ExposureDifference (Nikon)
+				if ( $brand == 'CANON' ) {
+					$result .= ' bytes.';
+				}
+				return $result;
+
+			case 'E#000F': 	// CustomFunctions (Canon) / ISOSelection (Nikon)
+				return $result;
 
 			case 'E#0010': 	// CanonModelID (Canon) / DataDump (Nikon)
-				switch( $brand ) {
-					case 'CANON':
-						$data = dechex( $data );
-						switch( $data ) {
-							case '1010000': $result	= 'PowerShot A30'; break;
-							case '1040000': $result	= 'PowerShot S300 / Digital IXUS 300 / IXY Digital 300'; break;
-							case '1060000': $result	= 'PowerShot A20'; break;
-							case '1080000': $result	= 'PowerShot A10'; break;
-							case '1090000': $result	= 'PowerShot S110 / Digital IXUS v / IXY Digital 200'; break;
-							case '1100000': $result	= 'PowerShot G2'; break;
-							case '1110000': $result	= 'PowerShot S40'; break;
-							case '1120000': $result	= 'PowerShot S30'; break;
-							case '1130000': $result	= 'PowerShot A40'; break;
-							case '1140000': $result	= 'EOS D30'; break;
-							case '1150000': $result	= 'PowerShot A100'; break;
-							case '1160000': $result	= 'PowerShot S200 / Digital IXUS v2 / IXY Digital 200a'; break;
-							case '1170000': $result	= 'PowerShot A200'; break;
-							case '1180000': $result	= 'PowerShot S330 / Digital IXUS 330 / IXY Digital 300a'; break;
-							case '1190000': $result	= 'PowerShot G3'; break;
-							case '1210000': $result	= 'PowerShot S45'; break;
-							case '1230000': $result	= 'PowerShot SD100 / Digital IXUS II / IXY Digital 30'; break;
-							case '1240000': $result	= 'PowerShot S230 / Digital IXUS v3 / IXY Digital 320'; break;
-							case '1250000': $result	= 'PowerShot A70'; break;
-							case '1260000': $result	= 'PowerShot A60'; break;
-							case '1270000': $result	= 'PowerShot S400 / Digital IXUS 400 / IXY Digital 400'; break;
-							case '1290000': $result	= 'PowerShot G5'; break;
-							case '1300000': $result	= 'PowerShot A300'; break;
-							case '1310000': $result	= 'PowerShot S50'; break;
-							case '1340000': $result	= 'PowerShot A80'; break;
-							case '1350000': $result	= 'PowerShot SD10 / Digital IXUS i / IXY Digital L'; break;
-							case '1360000': $result	= 'PowerShot S1 IS'; break;
-							case '1370000': $result	= 'PowerShot Pro1'; break;
-							case '1380000': $result	= 'PowerShot S70'; break;
-							case '1390000': $result	= 'PowerShot S60'; break;
-							case '1400000': $result	= 'PowerShot G6'; break;
-							case '1410000': $result	= 'PowerShot S500 / Digital IXUS 500 / IXY Digital 500'; break;
-							case '1420000': $result	= 'PowerShot A75'; break;
-							case '1440000': $result	= 'PowerShot SD110 / Digital IXUS IIs / IXY Digital 30a'; break;
-							case '1450000': $result	= 'PowerShot A400'; break;
-							case '1470000': $result	= 'PowerShot A310'; break;
-							case '1490000': $result	= 'PowerShot A85'; break;
-							case '1520000': $result	= 'PowerShot S410 / Digital IXUS 430 / IXY Digital 450'; break;
-							case '1530000': $result	= 'PowerShot A95'; break;
-							case '1540000': $result	= 'PowerShot SD300 / Digital IXUS 40 / IXY Digital 50'; break;
-							case '1550000': $result	= 'PowerShot SD200 / Digital IXUS 30 / IXY Digital 40'; break;
-							case '1560000': $result	= 'PowerShot A520'; break;
-							case '1570000': $result	= 'PowerShot A510'; break;
-							case '1590000': $result	= 'PowerShot SD20 / Digital IXUS i5 / IXY Digital L2'; break;
-							case '1640000': $result	= 'PowerShot S2 IS'; break;
-							case '1650000': $result	= 'PowerShot SD430 / Digital IXUS Wireless / IXY Digital Wireless'; break;
-							case '1660000': $result	= 'PowerShot SD500 / Digital IXUS 700 / IXY Digital 600'; break;
-							case '1668000': $result	= 'EOS D60'; break;
-							case '1700000': $result	= 'PowerShot SD30 / Digital IXUS i Zoom / IXY Digital L3'; break;
-							case '1740000': $result	= 'PowerShot A430'; break;
-							case '1750000': $result	= 'PowerShot A410'; break;
-							case '1760000': $result	= 'PowerShot S80'; break;
-							case '1780000': $result	= 'PowerShot A620'; break;
-							case '1790000': $result	= 'PowerShot A610'; break;
-							case '1800000': $result	= 'PowerShot SD630 / Digital IXUS 65 / IXY Digital 80'; break;
-							case '1810000': $result	= 'PowerShot SD450 / Digital IXUS 55 / IXY Digital 60'; break;
-							case '1820000': $result	= 'PowerShot TX1'; break;
-							case '1870000': $result	= 'PowerShot SD400 / Digital IXUS 50 / IXY Digital 55'; break;
-							case '1880000': $result	= 'PowerShot A420'; break;
-							case '1890000': $result	= 'PowerShot SD900 / Digital IXUS 900 Ti / IXY Digital 1000'; break;
-							case '1900000': $result	= 'PowerShot SD550 / Digital IXUS 750 / IXY Digital 700'; break;
-							case '1920000': $result	= 'PowerShot A700'; break;
-							case '1940000': $result	= 'PowerShot SD700 IS / Digital IXUS 800 IS / IXY Digital 800 IS'; break;
-							case '1950000': $result	= 'PowerShot S3 IS'; break;
-							case '1960000': $result	= 'PowerShot A540'; break;
-							case '1970000': $result	= 'PowerShot SD600 / Digital IXUS 60 / IXY Digital 70'; break;
-							case '1980000': $result	= 'PowerShot G7'; break;
-							case '1990000': $result	= 'PowerShot A530'; break;
-							case '2000000': $result	= 'PowerShot SD800 IS / Digital IXUS 850 IS / IXY Digital 900 IS'; break;
-							case '2010000': $result	= 'PowerShot SD40 / Digital IXUS i7 / IXY Digital L4'; break;
-							case '2020000': $result	= 'PowerShot A710 IS'; break;
-							case '2030000': $result	= 'PowerShot A640'; break;
-							case '2040000': $result	= 'PowerShot A630'; break;
-							case '2090000': $result	= 'PowerShot S5 IS'; break;
-							case '2100000': $result	= 'PowerShot A460'; break;
-							case '2120000': $result	= 'PowerShot SD850 IS / Digital IXUS 950 IS / IXY Digital 810 IS'; break;
-							case '2130000': $result	= 'PowerShot A570 IS'; break;
-							case '2140000': $result	= 'PowerShot A560'; break;
-							case '2150000': $result	= 'PowerShot SD750 / Digital IXUS 75 / IXY Digital 90'; break;
-							case '2160000': $result	= 'PowerShot SD1000 / Digital IXUS 70 / IXY Digital 10'; break;
-							case '2180000': $result	= 'PowerShot A550'; break;
-							case '2190000': $result	= 'PowerShot A450'; break;
-							case '2230000': $result	= 'PowerShot G9'; break;
-							case '2240000': $result	= 'PowerShot A650 IS'; break;
-							case '2260000': $result	= 'PowerShot A720 IS'; break;
-							case '2290000': $result	= 'PowerShot SX100 IS'; break;
-							case '2300000': $result	= 'PowerShot SD950 IS / Digital IXUS 960 IS / IXY Digital 2000 IS'; break;
-							case '2310000': $result	= 'PowerShot SD870 IS / Digital IXUS 860 IS / IXY Digital 910 IS'; break;
-							case '2320000': $result	= 'PowerShot SD890 IS / Digital IXUS 970 IS / IXY Digital 820 IS'; break;
-							case '2360000': $result	= 'PowerShot SD790 IS / Digital IXUS 90 IS / IXY Digital 95 IS'; break;
-							case '2370000': $result	= 'PowerShot SD770 IS / Digital IXUS 85 IS / IXY Digital 25 IS'; break;
-							case '2380000': $result	= 'PowerShot A590 IS'; break;
-							case '2390000': $result	= 'PowerShot A580'; break;
-							case '2420000': $result	= 'PowerShot A470'; break;
-							case '2430000': $result	= 'PowerShot SD1100 IS / Digital IXUS 80 IS / IXY Digital 20 IS'; break;
-							case '2460000': $result	= 'PowerShot SX1 IS'; break;
-							case '2470000': $result	= 'PowerShot SX10 IS'; break;
-							case '2480000': $result	= 'PowerShot A1000 IS'; break;
-							case '2490000': $result	= 'PowerShot G10'; break;
-							case '2510000': $result	= 'PowerShot A2000 IS'; break;
-							case '2520000': $result	= 'PowerShot SX110 IS'; break;
-							case '2530000': $result	= 'PowerShot SD990 IS / Digital IXUS 980 IS / IXY Digital 3000 IS'; break;
-							case '2540000': $result	= 'PowerShot SD880 IS / Digital IXUS 870 IS / IXY Digital 920 IS'; break;
-							case '2550000': $result	= 'PowerShot E1'; break;
-							case '2560000': $result	= 'PowerShot D10'; break;
-							case '2570000': $result	= 'PowerShot SD960 IS / Digital IXUS 110 IS / IXY Digital 510 IS'; break;
-							case '2580000': $result	= 'PowerShot A2100 IS'; break;
-							case '2590000': $result	= 'PowerShot A480'; break;
-							case '2600000': $result	= 'PowerShot SX200 IS'; break;
-							case '2610000': $result	= 'PowerShot SD970 IS / Digital IXUS 990 IS / IXY Digital 830 IS'; break;
-							case '2620000': $result	= 'PowerShot SD780 IS / Digital IXUS 100 IS / IXY Digital 210 IS'; break;
-							case '2630000': $result	= 'PowerShot A1100 IS'; break;
-							case '2640000': $result	= 'PowerShot SD1200 IS / Digital IXUS 95 IS / IXY Digital 110 IS'; break;
-							case '2700000': $result	= 'PowerShot G11'; break;
-							case '2710000': $result	= 'PowerShot SX120 IS'; break;
-							case '2720000': $result	= 'PowerShot S90'; break;
-							case '2750000': $result	= 'PowerShot SX20 IS'; break;
-							case '2760000': $result	= 'PowerShot SD980 IS / Digital IXUS 200 IS / IXY Digital 930 IS'; break;
-							case '2770000': $result	= 'PowerShot SD940 IS / Digital IXUS 120 IS / IXY Digital 220 IS'; break;
-							case '2800000': $result	= 'PowerShot A495'; break;
-							case '2810000': $result	= 'PowerShot A490'; break;
-							case '2820000': $result	= 'PowerShot A3100/A3150 IS'; break;
-							case '2830000': $result	= 'PowerShot A3000 IS'; break;
-							case '2840000': $result	= 'PowerShot SD1400 IS / IXUS 130 / IXY 400F'; break;
-							case '2850000': $result	= 'PowerShot SD1300 IS / IXUS 105 / IXY 200F'; break;
-							case '2860000': $result	= 'PowerShot SD3500 IS / IXUS 210 / IXY 10S'; break;
-							case '2870000': $result	= 'PowerShot SX210 IS'; break;
-							case '2880000': $result	= 'PowerShot SD4000 IS / IXUS 300 HS / IXY 30S'; break;
-							case '2890000': $result	= 'PowerShot SD4500 IS / IXUS 1000 HS / IXY 50S'; break;
-							case '2920000': $result	= 'PowerShot G12'; break;
-							case '2930000': $result	= 'PowerShot SX30 IS'; break;
-							case '2940000': $result	= 'PowerShot SX130 IS'; break;
-							case '2950000': $result	= 'PowerShot S95'; break;
-							case '2980000': $result	= 'PowerShot A3300 IS'; break;
-							case '2990000': $result	= 'PowerShot A3200 IS'; break;
-							case '3000000': $result	= 'PowerShot ELPH 500 HS / IXUS 310 HS / IXY 31S'; break;
-							case '3010000': $result	= 'PowerShot Pro90 IS'; break;
-							case '3010001': $result	= 'PowerShot A800'; break;
-							case '3020000': $result	= 'PowerShot ELPH 100 HS / IXUS 115 HS / IXY 210F'; break;
-							case '3030000': $result	= 'PowerShot SX230 HS'; break;
-							case '3040000': $result	= 'PowerShot ELPH 300 HS / IXUS 220 HS / IXY 410F'; break;
-							case '3050000': $result	= 'PowerShot A2200'; break;
-							case '3060000': $result	= 'PowerShot A1200'; break;
-							case '3070000': $result	= 'PowerShot SX220 HS'; break;
-							case '3080000': $result	= 'PowerShot G1 X'; break;
-							case '3090000': $result	= 'PowerShot SX150 IS'; break;
-							case '3100000': $result	= 'PowerShot ELPH 510 HS / IXUS 1100 HS / IXY 51S'; break;
-							case '3110000': $result	= 'PowerShot S100 (new)'; break;
-							case '3120000': $result	= 'PowerShot ELPH 310 HS / IXUS 230 HS / IXY 600F'; break;
-							case '3130000': $result	= 'PowerShot SX40 HS'; break;
-							case '3140000': $result	= 'IXY 32S'; break;
-							case '3160000': $result	= 'PowerShot A1300'; break;
-							case '3170000': $result	= 'PowerShot A810'; break;
-							case '3180000': $result	= 'PowerShot ELPH 320 HS / IXUS 240 HS / IXY 420F'; break;
-							case '3190000': $result	= 'PowerShot ELPH 110 HS / IXUS 125 HS / IXY 220F'; break;
-							case '3200000': $result	= 'PowerShot D20'; break;
-							case '3210000': $result	= 'PowerShot A4000 IS'; break;
-							case '3220000': $result	= 'PowerShot SX260 HS'; break;
-							case '3230000': $result	= 'PowerShot SX240 HS'; break;
-							case '3240000': $result	= 'PowerShot ELPH 530 HS / IXUS 510 HS / IXY 1'; break;
-							case '3250000': $result	= 'PowerShot ELPH 520 HS / IXUS 500 HS / IXY 3'; break;
-							case '3260000': $result	= 'PowerShot A3400 IS'; break;
-							case '3270000': $result	= 'PowerShot A2400 IS'; break;
-							case '3280000': $result	= 'PowerShot A2300'; break;
-							case '3330000': $result	= 'PowerShot G15'; break;
-							case '3340000': $result	= 'PowerShot SX50 HS'; break;
-							case '3350000': $result	= 'PowerShot SX160 IS'; break;
-							case '3360000': $result	= 'PowerShot S110 (new)'; break;
-							case '3370000': $result	= 'PowerShot SX500 IS'; break;
-							case '3380000': $result	= 'PowerShot N'; break;
-							case '3390000': $result	= 'IXUS 245 HS / IXY 430F'; break;
-							case '3400000': $result	= 'PowerShot SX280 HS'; break;
-							case '3410000': $result	= 'PowerShot SX270 HS'; break;
-							case '3420000': $result	= 'PowerShot A3500 IS'; break;
-							case '3430000': $result	= 'PowerShot A2600'; break;
-							case '3440000': $result	= 'PowerShot SX275 HS'; break;
-							case '3450000': $result	= 'PowerShot A1400'; break;
-							case '3460000': $result	= 'PowerShot ELPH 130 IS / IXUS 140 / IXY 110F'; break;
-							case '3470000': $result	= 'PowerShot ELPH 115/120 IS / IXUS 132/135 / IXY 90F/100F'; break;
-							case '3490000': $result	= 'PowerShot ELPH 330 HS / IXUS 255 HS / IXY 610F'; break;
-							case '3510000': $result	= 'PowerShot A2500'; break;
-							case '3540000': $result	= 'PowerShot G16'; break;
-							case '3550000': $result	= 'PowerShot S120'; break;
-							case '3560000': $result	= 'PowerShot SX170 IS'; break;
-							case '3580000': $result	= 'PowerShot SX510 HS'; break;
-							case '3590000': $result	= 'PowerShot S200 (new)'; break;
-							case '3600000': $result	= 'IXY 620F'; break;
-							case '3610000': $result	= 'PowerShot N100'; break;
-							case '3640000': $result	= 'PowerShot G1 X Mark II'; break;
-							case '3650000': $result	= 'PowerShot D30'; break;
-							case '3660000': $result	= 'PowerShot SX700 HS'; break;
-							case '3670000': $result	= 'PowerShot SX600 HS'; break;
-							case '3680000': $result	= 'PowerShot ELPH 140 IS / IXUS 150 / IXY 130'; break;
-							case '3690000': $result	= 'PowerShot ELPH 135 / IXUS 145 / IXY 120'; break;
-							case '3700000': $result	= 'PowerShot ELPH 340 HS / IXUS 265 HS / IXY 630'; break;
-							case '3710000': $result	= 'PowerShot ELPH 150 IS / IXUS 155 / IXY 140'; break;
-							case '3740000': $result	= 'EOS M3'; break;
-							case '3750000': $result	= 'PowerShot SX60 HS'; break;
-							case '3760000': $result	= 'PowerShot SX520 HS'; break;
-							case '3770000': $result	= 'PowerShot SX400 IS'; break;
-							case '3780000': $result	= 'PowerShot G7 X'; break;
-							case '3790000': $result	= 'PowerShot N2'; break;
-							case '3800000': $result	= 'PowerShot SX530 HS'; break;
-							case '3820000': $result	= 'PowerShot SX710 HS'; break;
-							case '3830000': $result	= 'PowerShot SX610 HS'; break;
-							case '3840000': $result	= 'EOS M10'; break;
-							case '3850000': $result	= 'PowerShot G3 X'; break;
-							case '3860000': $result	= 'PowerShot ELPH 165 HS / IXUS 165 / IXY 160'; break;
-							case '3870000': $result	= 'PowerShot ELPH 160 / IXUS 160'; break;
-							case '3880000': $result	= 'PowerShot ELPH 350 HS / IXUS 275 HS / IXY 640'; break;
-							case '3890000': $result	= 'PowerShot ELPH 170 IS / IXUS 170'; break;
-							case '3910000': $result	= 'PowerShot SX410 IS'; break;
-							case '3930000': $result	= 'PowerShot G9 X'; break;
-							case '3940000': $result	= 'EOS M5'; break;
-							case '3950000': $result	= 'PowerShot G5 X'; break;
-							case '3970000': $result	= 'PowerShot G7 X Mark II'; break;
-							case '3980000': $result	= 'EOS M100'; break;
-							case '3990000': $result	= 'PowerShot ELPH 360 HS / IXUS 285 HS / IXY 650'; break;
-							case '4010000': $result	= 'PowerShot SX540 HS'; break;
-							case '4020000': $result	= 'PowerShot SX420 IS'; break;
-							case '4030000': $result	= 'PowerShot ELPH 190 IS / IXUS 180 / IXY 190'; break;
-							case '4040000': $result	= 'PowerShot G1'; break;
-							case '4040001': $result	= 'IXY 180'; break;
-							case '4050000': $result	= 'PowerShot SX720 HS'; break;
-							case '4060000': $result	= 'PowerShot SX620 HS'; break;
-							case '4070000': $result	= 'EOS M6'; break;
-							case '4100000': $result	= 'PowerShot G9 X Mark II'; break;
-							case '4150000': $result	= 'PowerShot ELPH 185 / IXUS 185 / IXY 200'; break;
-							case '4160000': $result	= 'PowerShot SX430 IS'; break;
-							case '4170000': $result	= 'PowerShot SX730 HS'; break;
-							case '4180000': $result	= 'PowerShot G1 X Mark III'; break;
-							case '6040000': $result	= 'PowerShot S100 / Digital IXUS / IXY Digital'; break;
-							case '4007d673': $result = 'DC19/DC21/DC22'; break;
-							case '4007d674': $result = 'XH A1'; break;
-							case '4007d675': $result = 'HV10'; break;
-							case '4007d676': $result = 'MD130/MD140/MD150/MD160/ZR850'; break;
-							case '4007d777': $result = 'DC50'; break;
-							case '4007d778': $result = 'HV20'; break;
-							case '4007d779': $result = 'DC211'; break;
-							case '4007d77a': $result = 'HG10'; break;
-							case '4007d77b': $result = 'HR10'; break;
-							case '4007d77d': $result = 'MD255/ZR950'; break;
-							case '4007d81c': $result = 'HF11'; break;
-							case '4007d878': $result = 'HV30'; break;
-							case '4007d87c': $result = 'XH A1S'; break;
-							case '4007d87e': $result = 'DC301/DC310/DC311/DC320/DC330'; break;
-							case '4007d87f': $result = 'FS100'; break;
-							case '4007d880': $result = 'HF10'; break;
-							case '4007d882': $result = 'HG20/HG21'; break;
-							case '4007d925': $result = 'HF21'; break;
-							case '4007d926': $result = 'HF S11'; break;
-							case '4007d978': $result = 'HV40'; break;
-							case '4007d987': $result = 'DC410/DC411/DC420'; break;
-							case '4007d988': $result = 'FS19/FS20/FS21/FS22/FS200'; break;
-							case '4007d989': $result = 'HF20/HF200'; break;
-							case '4007d98a': $result = 'HF S10/S100'; break;
-							case '4007da8e': $result = 'HF R10/R16/R17/R18/R100/R106'; break;
-							case '4007da8f': $result = 'HF M30/M31/M36/M300/M306'; break;
-							case '4007da90': $result = 'HF S20/S21/S200'; break;
-							case '4007da92': $result = 'FS31/FS36/FS37/FS300/FS305/FS306/FS307'; break;
-							case '4007dca0': $result = 'EOS C300'; break;
-							case '4007dda9': $result = 'HF G25'; break;
-							case '4007dfb4': $result = 'XC10'; break;
-							case '80000001': $result = 'EOS-1D'; break;
-							case '80000167': $result = 'EOS-1DS'; break;
-							case '80000168': $result = 'EOS 10D'; break;
-							case '80000169': $result = 'EOS-1D Mark III'; break;
-							case '80000170': $result = 'EOS Digital Rebel / 300D / Kiss Digital'; break;
-							case '80000174': $result = 'EOS-1D Mark II'; break;
-							case '80000175': $result = 'EOS 20D'; break;
-							case '80000176': $result = 'EOS Digital Rebel XSi / 450D / Kiss X2'; break;
-							case '80000188': $result = 'EOS-1Ds Mark II'; break;
-							case '80000189': $result = 'EOS Digital Rebel XT / 350D / Kiss Digital N'; break;
-							case '80000190': $result = 'EOS 40D'; break;
-							case '80000213': $result = 'EOS 5D'; break;
-							case '80000215': $result = 'EOS-1Ds Mark III'; break;
-							case '80000218': $result = 'EOS 5D Mark II'; break;
-							case '80000219': $result = 'WFT-E1'; break;
-							case '80000232': $result = 'EOS-1D Mark II N'; break;
-							case '80000234': $result = 'EOS 30D'; break;
-							case '80000236': $result = 'EOS Digital Rebel XTi / 400D / Kiss Digital X'; break;
-							case '80000241': $result = 'WFT-E2'; break;
-							case '80000246': $result = 'WFT-E3'; break;
-							case '80000250': $result = 'EOS 7D'; break;
-							case '80000252': $result = 'EOS Rebel T1i / 500D / Kiss X3'; break;
-							case '80000254': $result = 'EOS Rebel XS / 1000D / Kiss F'; break;
-							case '80000261': $result = 'EOS 50D'; break;
-							case '80000269': $result = 'EOS-1D X'; break;
-							case '80000270': $result = 'EOS Rebel T2i / 550D / Kiss X4'; break;
-							case '80000271': $result = 'WFT-E4'; break;
-							case '80000273': $result = 'WFT-E5'; break;
-							case '80000281': $result = 'EOS-1D Mark IV'; break;
-							case '80000285': $result = 'EOS 5D Mark III'; break;
-							case '80000286': $result = 'EOS Rebel T3i / 600D / Kiss X5'; break;
-							case '80000287': $result = 'EOS 60D'; break;
-							case '80000288': $result = 'EOS Rebel T3 / 1100D / Kiss X50'; break;
-							case '80000289': $result = 'EOS 7D Mark II'; break;
-							case '80000297': $result = 'WFT-E2 II'; break;
-							case '80000298': $result = 'WFT-E4 II'; break;
-							case '80000301': $result = 'EOS Rebel T4i / 650D / Kiss X6i'; break;
-							case '80000302': $result = 'EOS 6D'; break;
-							case '80000324': $result = 'EOS-1D C'; break;
-							case '80000325': $result = 'EOS 70D'; break;
-							case '80000326': $result = 'EOS Rebel T5i / 700D / Kiss X7i'; break;
-							case '80000327': $result = 'EOS Rebel T5 / 1200D / Kiss X70'; break;
-							case '80000328': $result = 'EOS-1D X MARK II'; break;
-							case '80000331': $result = 'EOS M'; break;
-							case '80000346': $result = 'EOS Rebel SL1 / 100D / Kiss X7'; break;
-							case '80000347': $result = 'EOS Rebel T6s / 760D / 8000D'; break;
-							case '80000349': $result = 'EOS 5D Mark IV'; break;
-							case '80000350': $result = 'EOS 80D'; break;
-							case '80000355': $result = 'EOS M2'; break;
-							case '80000382': $result = 'EOS 5DS'; break;
-							case '80000393': $result = 'EOS Rebel T6i / 750D / Kiss X8i'; break;
-							case '80000401': $result = 'EOS 5DS R'; break;
-							case '80000404': $result = 'EOS Rebel T6 / 1300D / Kiss X80'; break;
-							case '80000405': $result = 'EOS Rebel T7i / 800D / Kiss X9i'; break;
-							case '80000406': $result = 'EOS 6D Mark II'; break;
-							case '80000408': $result = 'EOS 77D / 9000D'; break;
-							case '80000417': $result = 'EOS Rebel SL2 / 200D / Kiss X9'; break;
-
-							default:
-								$result = $data;
-						}
-						return $result;
-						break;
-					case 'NIKON':
-						$result = $data;
-						return $result;
-						break;
-					default:
-						$result = $data;
-						return $result;
+				if ( $brand == 'CANON' ) { 		// CanonModelID (Canon)
+					$data = dechex( $data );
+					switch( $data ) {
+						case '1010000': $result	= 'PowerShot A30'; break;
+						case '1040000': $result	= 'PowerShot S300 / Digital IXUS 300 / IXY Digital 300'; break;
+						case '1060000': $result	= 'PowerShot A20'; break;
+						case '1080000': $result	= 'PowerShot A10'; break;
+						case '1090000': $result	= 'PowerShot S110 / Digital IXUS v / IXY Digital 200'; break;
+						case '1100000': $result	= 'PowerShot G2'; break;
+						case '1110000': $result	= 'PowerShot S40'; break;
+						case '1120000': $result	= 'PowerShot S30'; break;
+						case '1130000': $result	= 'PowerShot A40'; break;
+						case '1140000': $result	= 'EOS D30'; break;
+						case '1150000': $result	= 'PowerShot A100'; break;
+						case '1160000': $result	= 'PowerShot S200 / Digital IXUS v2 / IXY Digital 200a'; break;
+						case '1170000': $result	= 'PowerShot A200'; break;
+						case '1180000': $result	= 'PowerShot S330 / Digital IXUS 330 / IXY Digital 300a'; break;
+						case '1190000': $result	= 'PowerShot G3'; break;
+						case '1210000': $result	= 'PowerShot S45'; break;
+						case '1230000': $result	= 'PowerShot SD100 / Digital IXUS II / IXY Digital 30'; break;
+						case '1240000': $result	= 'PowerShot S230 / Digital IXUS v3 / IXY Digital 320'; break;
+						case '1250000': $result	= 'PowerShot A70'; break;
+						case '1260000': $result	= 'PowerShot A60'; break;
+						case '1270000': $result	= 'PowerShot S400 / Digital IXUS 400 / IXY Digital 400'; break;
+						case '1290000': $result	= 'PowerShot G5'; break;
+						case '1300000': $result	= 'PowerShot A300'; break;
+						case '1310000': $result	= 'PowerShot S50'; break;
+						case '1340000': $result	= 'PowerShot A80'; break;
+						case '1350000': $result	= 'PowerShot SD10 / Digital IXUS i / IXY Digital L'; break;
+						case '1360000': $result	= 'PowerShot S1 IS'; break;
+						case '1370000': $result	= 'PowerShot Pro1'; break;
+						case '1380000': $result	= 'PowerShot S70'; break;
+						case '1390000': $result	= 'PowerShot S60'; break;
+						case '1400000': $result	= 'PowerShot G6'; break;
+						case '1410000': $result	= 'PowerShot S500 / Digital IXUS 500 / IXY Digital 500'; break;
+						case '1420000': $result	= 'PowerShot A75'; break;
+						case '1440000': $result	= 'PowerShot SD110 / Digital IXUS IIs / IXY Digital 30a'; break;
+						case '1450000': $result	= 'PowerShot A400'; break;
+						case '1470000': $result	= 'PowerShot A310'; break;
+						case '1490000': $result	= 'PowerShot A85'; break;
+						case '1520000': $result	= 'PowerShot S410 / Digital IXUS 430 / IXY Digital 450'; break;
+						case '1530000': $result	= 'PowerShot A95'; break;
+						case '1540000': $result	= 'PowerShot SD300 / Digital IXUS 40 / IXY Digital 50'; break;
+						case '1550000': $result	= 'PowerShot SD200 / Digital IXUS 30 / IXY Digital 40'; break;
+						case '1560000': $result	= 'PowerShot A520'; break;
+						case '1570000': $result	= 'PowerShot A510'; break;
+						case '1590000': $result	= 'PowerShot SD20 / Digital IXUS i5 / IXY Digital L2'; break;
+						case '1640000': $result	= 'PowerShot S2 IS'; break;
+						case '1650000': $result	= 'PowerShot SD430 / Digital IXUS Wireless / IXY Digital Wireless'; break;
+						case '1660000': $result	= 'PowerShot SD500 / Digital IXUS 700 / IXY Digital 600'; break;
+						case '1668000': $result	= 'EOS D60'; break;
+						case '1700000': $result	= 'PowerShot SD30 / Digital IXUS i Zoom / IXY Digital L3'; break;
+						case '1740000': $result	= 'PowerShot A430'; break;
+						case '1750000': $result	= 'PowerShot A410'; break;
+						case '1760000': $result	= 'PowerShot S80'; break;
+						case '1780000': $result	= 'PowerShot A620'; break;
+						case '1790000': $result	= 'PowerShot A610'; break;
+						case '1800000': $result	= 'PowerShot SD630 / Digital IXUS 65 / IXY Digital 80'; break;
+						case '1810000': $result	= 'PowerShot SD450 / Digital IXUS 55 / IXY Digital 60'; break;
+						case '1820000': $result	= 'PowerShot TX1'; break;
+						case '1870000': $result	= 'PowerShot SD400 / Digital IXUS 50 / IXY Digital 55'; break;
+						case '1880000': $result	= 'PowerShot A420'; break;
+						case '1890000': $result	= 'PowerShot SD900 / Digital IXUS 900 Ti / IXY Digital 1000'; break;
+						case '1900000': $result	= 'PowerShot SD550 / Digital IXUS 750 / IXY Digital 700'; break;
+						case '1920000': $result	= 'PowerShot A700'; break;
+						case '1940000': $result	= 'PowerShot SD700 IS / Digital IXUS 800 IS / IXY Digital 800 IS'; break;
+						case '1950000': $result	= 'PowerShot S3 IS'; break;
+						case '1960000': $result	= 'PowerShot A540'; break;
+						case '1970000': $result	= 'PowerShot SD600 / Digital IXUS 60 / IXY Digital 70'; break;
+						case '1980000': $result	= 'PowerShot G7'; break;
+						case '1990000': $result	= 'PowerShot A530'; break;
+						case '2000000': $result	= 'PowerShot SD800 IS / Digital IXUS 850 IS / IXY Digital 900 IS'; break;
+						case '2010000': $result	= 'PowerShot SD40 / Digital IXUS i7 / IXY Digital L4'; break;
+						case '2020000': $result	= 'PowerShot A710 IS'; break;
+						case '2030000': $result	= 'PowerShot A640'; break;
+						case '2040000': $result	= 'PowerShot A630'; break;
+						case '2090000': $result	= 'PowerShot S5 IS'; break;
+						case '2100000': $result	= 'PowerShot A460'; break;
+						case '2120000': $result	= 'PowerShot SD850 IS / Digital IXUS 950 IS / IXY Digital 810 IS'; break;
+						case '2130000': $result	= 'PowerShot A570 IS'; break;
+						case '2140000': $result	= 'PowerShot A560'; break;
+						case '2150000': $result	= 'PowerShot SD750 / Digital IXUS 75 / IXY Digital 90'; break;
+						case '2160000': $result	= 'PowerShot SD1000 / Digital IXUS 70 / IXY Digital 10'; break;
+						case '2180000': $result	= 'PowerShot A550'; break;
+						case '2190000': $result	= 'PowerShot A450'; break;
+						case '2230000': $result	= 'PowerShot G9'; break;
+						case '2240000': $result	= 'PowerShot A650 IS'; break;
+						case '2260000': $result	= 'PowerShot A720 IS'; break;
+						case '2290000': $result	= 'PowerShot SX100 IS'; break;
+						case '2300000': $result	= 'PowerShot SD950 IS / Digital IXUS 960 IS / IXY Digital 2000 IS'; break;
+						case '2310000': $result	= 'PowerShot SD870 IS / Digital IXUS 860 IS / IXY Digital 910 IS'; break;
+						case '2320000': $result	= 'PowerShot SD890 IS / Digital IXUS 970 IS / IXY Digital 820 IS'; break;
+						case '2360000': $result	= 'PowerShot SD790 IS / Digital IXUS 90 IS / IXY Digital 95 IS'; break;
+						case '2370000': $result	= 'PowerShot SD770 IS / Digital IXUS 85 IS / IXY Digital 25 IS'; break;
+						case '2380000': $result	= 'PowerShot A590 IS'; break;
+						case '2390000': $result	= 'PowerShot A580'; break;
+						case '2420000': $result	= 'PowerShot A470'; break;
+						case '2430000': $result	= 'PowerShot SD1100 IS / Digital IXUS 80 IS / IXY Digital 20 IS'; break;
+						case '2460000': $result	= 'PowerShot SX1 IS'; break;
+						case '2470000': $result	= 'PowerShot SX10 IS'; break;
+						case '2480000': $result	= 'PowerShot A1000 IS'; break;
+						case '2490000': $result	= 'PowerShot G10'; break;
+						case '2510000': $result	= 'PowerShot A2000 IS'; break;
+						case '2520000': $result	= 'PowerShot SX110 IS'; break;
+						case '2530000': $result	= 'PowerShot SD990 IS / Digital IXUS 980 IS / IXY Digital 3000 IS'; break;
+						case '2540000': $result	= 'PowerShot SD880 IS / Digital IXUS 870 IS / IXY Digital 920 IS'; break;
+						case '2550000': $result	= 'PowerShot E1'; break;
+						case '2560000': $result	= 'PowerShot D10'; break;
+						case '2570000': $result	= 'PowerShot SD960 IS / Digital IXUS 110 IS / IXY Digital 510 IS'; break;
+						case '2580000': $result	= 'PowerShot A2100 IS'; break;
+						case '2590000': $result	= 'PowerShot A480'; break;
+						case '2600000': $result	= 'PowerShot SX200 IS'; break;
+						case '2610000': $result	= 'PowerShot SD970 IS / Digital IXUS 990 IS / IXY Digital 830 IS'; break;
+						case '2620000': $result	= 'PowerShot SD780 IS / Digital IXUS 100 IS / IXY Digital 210 IS'; break;
+						case '2630000': $result	= 'PowerShot A1100 IS'; break;
+						case '2640000': $result	= 'PowerShot SD1200 IS / Digital IXUS 95 IS / IXY Digital 110 IS'; break;
+						case '2700000': $result	= 'PowerShot G11'; break;
+						case '2710000': $result	= 'PowerShot SX120 IS'; break;
+						case '2720000': $result	= 'PowerShot S90'; break;
+						case '2750000': $result	= 'PowerShot SX20 IS'; break;
+						case '2760000': $result	= 'PowerShot SD980 IS / Digital IXUS 200 IS / IXY Digital 930 IS'; break;
+						case '2770000': $result	= 'PowerShot SD940 IS / Digital IXUS 120 IS / IXY Digital 220 IS'; break;
+						case '2800000': $result	= 'PowerShot A495'; break;
+						case '2810000': $result	= 'PowerShot A490'; break;
+						case '2820000': $result	= 'PowerShot A3100/A3150 IS'; break;
+						case '2830000': $result	= 'PowerShot A3000 IS'; break;
+						case '2840000': $result	= 'PowerShot SD1400 IS / IXUS 130 / IXY 400F'; break;
+						case '2850000': $result	= 'PowerShot SD1300 IS / IXUS 105 / IXY 200F'; break;
+						case '2860000': $result	= 'PowerShot SD3500 IS / IXUS 210 / IXY 10S'; break;
+						case '2870000': $result	= 'PowerShot SX210 IS'; break;
+						case '2880000': $result	= 'PowerShot SD4000 IS / IXUS 300 HS / IXY 30S'; break;
+						case '2890000': $result	= 'PowerShot SD4500 IS / IXUS 1000 HS / IXY 50S'; break;
+						case '2920000': $result	= 'PowerShot G12'; break;
+						case '2930000': $result	= 'PowerShot SX30 IS'; break;
+						case '2940000': $result	= 'PowerShot SX130 IS'; break;
+						case '2950000': $result	= 'PowerShot S95'; break;
+						case '2980000': $result	= 'PowerShot A3300 IS'; break;
+						case '2990000': $result	= 'PowerShot A3200 IS'; break;
+						case '3000000': $result	= 'PowerShot ELPH 500 HS / IXUS 310 HS / IXY 31S'; break;
+						case '3010000': $result	= 'PowerShot Pro90 IS'; break;
+						case '3010001': $result	= 'PowerShot A800'; break;
+						case '3020000': $result	= 'PowerShot ELPH 100 HS / IXUS 115 HS / IXY 210F'; break;
+						case '3030000': $result	= 'PowerShot SX230 HS'; break;
+						case '3040000': $result	= 'PowerShot ELPH 300 HS / IXUS 220 HS / IXY 410F'; break;
+						case '3050000': $result	= 'PowerShot A2200'; break;
+						case '3060000': $result	= 'PowerShot A1200'; break;
+						case '3070000': $result	= 'PowerShot SX220 HS'; break;
+						case '3080000': $result	= 'PowerShot G1 X'; break;
+						case '3090000': $result	= 'PowerShot SX150 IS'; break;
+						case '3100000': $result	= 'PowerShot ELPH 510 HS / IXUS 1100 HS / IXY 51S'; break;
+						case '3110000': $result	= 'PowerShot S100 (new)'; break;
+						case '3120000': $result	= 'PowerShot ELPH 310 HS / IXUS 230 HS / IXY 600F'; break;
+						case '3130000': $result	= 'PowerShot SX40 HS'; break;
+						case '3140000': $result	= 'IXY 32S'; break;
+						case '3160000': $result	= 'PowerShot A1300'; break;
+						case '3170000': $result	= 'PowerShot A810'; break;
+						case '3180000': $result	= 'PowerShot ELPH 320 HS / IXUS 240 HS / IXY 420F'; break;
+						case '3190000': $result	= 'PowerShot ELPH 110 HS / IXUS 125 HS / IXY 220F'; break;
+						case '3200000': $result	= 'PowerShot D20'; break;
+						case '3210000': $result	= 'PowerShot A4000 IS'; break;
+						case '3220000': $result	= 'PowerShot SX260 HS'; break;
+						case '3230000': $result	= 'PowerShot SX240 HS'; break;
+						case '3240000': $result	= 'PowerShot ELPH 530 HS / IXUS 510 HS / IXY 1'; break;
+						case '3250000': $result	= 'PowerShot ELPH 520 HS / IXUS 500 HS / IXY 3'; break;
+						case '3260000': $result	= 'PowerShot A3400 IS'; break;
+						case '3270000': $result	= 'PowerShot A2400 IS'; break;
+						case '3280000': $result	= 'PowerShot A2300'; break;
+						case '3330000': $result	= 'PowerShot G15'; break;
+						case '3340000': $result	= 'PowerShot SX50 HS'; break;
+						case '3350000': $result	= 'PowerShot SX160 IS'; break;
+						case '3360000': $result	= 'PowerShot S110 (new)'; break;
+						case '3370000': $result	= 'PowerShot SX500 IS'; break;
+						case '3380000': $result	= 'PowerShot N'; break;
+						case '3390000': $result	= 'IXUS 245 HS / IXY 430F'; break;
+						case '3400000': $result	= 'PowerShot SX280 HS'; break;
+						case '3410000': $result	= 'PowerShot SX270 HS'; break;
+						case '3420000': $result	= 'PowerShot A3500 IS'; break;
+						case '3430000': $result	= 'PowerShot A2600'; break;
+						case '3440000': $result	= 'PowerShot SX275 HS'; break;
+						case '3450000': $result	= 'PowerShot A1400'; break;
+						case '3460000': $result	= 'PowerShot ELPH 130 IS / IXUS 140 / IXY 110F'; break;
+						case '3470000': $result	= 'PowerShot ELPH 115/120 IS / IXUS 132/135 / IXY 90F/100F'; break;
+						case '3490000': $result	= 'PowerShot ELPH 330 HS / IXUS 255 HS / IXY 610F'; break;
+						case '3510000': $result	= 'PowerShot A2500'; break;
+						case '3540000': $result	= 'PowerShot G16'; break;
+						case '3550000': $result	= 'PowerShot S120'; break;
+						case '3560000': $result	= 'PowerShot SX170 IS'; break;
+						case '3580000': $result	= 'PowerShot SX510 HS'; break;
+						case '3590000': $result	= 'PowerShot S200 (new)'; break;
+						case '3600000': $result	= 'IXY 620F'; break;
+						case '3610000': $result	= 'PowerShot N100'; break;
+						case '3640000': $result	= 'PowerShot G1 X Mark II'; break;
+						case '3650000': $result	= 'PowerShot D30'; break;
+						case '3660000': $result	= 'PowerShot SX700 HS'; break;
+						case '3670000': $result	= 'PowerShot SX600 HS'; break;
+						case '3680000': $result	= 'PowerShot ELPH 140 IS / IXUS 150 / IXY 130'; break;
+						case '3690000': $result	= 'PowerShot ELPH 135 / IXUS 145 / IXY 120'; break;
+						case '3700000': $result	= 'PowerShot ELPH 340 HS / IXUS 265 HS / IXY 630'; break;
+						case '3710000': $result	= 'PowerShot ELPH 150 IS / IXUS 155 / IXY 140'; break;
+						case '3740000': $result	= 'EOS M3'; break;
+						case '3750000': $result	= 'PowerShot SX60 HS'; break;
+						case '3760000': $result	= 'PowerShot SX520 HS'; break;
+						case '3770000': $result	= 'PowerShot SX400 IS'; break;
+						case '3780000': $result	= 'PowerShot G7 X'; break;
+						case '3790000': $result	= 'PowerShot N2'; break;
+						case '3800000': $result	= 'PowerShot SX530 HS'; break;
+						case '3820000': $result	= 'PowerShot SX710 HS'; break;
+						case '3830000': $result	= 'PowerShot SX610 HS'; break;
+						case '3840000': $result	= 'EOS M10'; break;
+						case '3850000': $result	= 'PowerShot G3 X'; break;
+						case '3860000': $result	= 'PowerShot ELPH 165 HS / IXUS 165 / IXY 160'; break;
+						case '3870000': $result	= 'PowerShot ELPH 160 / IXUS 160'; break;
+						case '3880000': $result	= 'PowerShot ELPH 350 HS / IXUS 275 HS / IXY 640'; break;
+						case '3890000': $result	= 'PowerShot ELPH 170 IS / IXUS 170'; break;
+						case '3910000': $result	= 'PowerShot SX410 IS'; break;
+						case '3930000': $result	= 'PowerShot G9 X'; break;
+						case '3940000': $result	= 'EOS M5'; break;
+						case '3950000': $result	= 'PowerShot G5 X'; break;
+						case '3970000': $result	= 'PowerShot G7 X Mark II'; break;
+						case '3980000': $result	= 'EOS M100'; break;
+						case '3990000': $result	= 'PowerShot ELPH 360 HS / IXUS 285 HS / IXY 650'; break;
+						case '4010000': $result	= 'PowerShot SX540 HS'; break;
+						case '4020000': $result	= 'PowerShot SX420 IS'; break;
+						case '4030000': $result	= 'PowerShot ELPH 190 IS / IXUS 180 / IXY 190'; break;
+						case '4040000': $result	= 'PowerShot G1'; break;
+						case '4040001': $result	= 'IXY 180'; break;
+						case '4050000': $result	= 'PowerShot SX720 HS'; break;
+						case '4060000': $result	= 'PowerShot SX620 HS'; break;
+						case '4070000': $result	= 'EOS M6'; break;
+						case '4100000': $result	= 'PowerShot G9 X Mark II'; break;
+						case '4150000': $result	= 'PowerShot ELPH 185 / IXUS 185 / IXY 200'; break;
+						case '4160000': $result	= 'PowerShot SX430 IS'; break;
+						case '4170000': $result	= 'PowerShot SX730 HS'; break;
+						case '4180000': $result	= 'PowerShot G1 X Mark III'; break;
+						case '6040000': $result	= 'PowerShot S100 / Digital IXUS / IXY Digital'; break;
+						case '4007d673': $result = 'DC19/DC21/DC22'; break;
+						case '4007d674': $result = 'XH A1'; break;
+						case '4007d675': $result = 'HV10'; break;
+						case '4007d676': $result = 'MD130/MD140/MD150/MD160/ZR850'; break;
+						case '4007d777': $result = 'DC50'; break;
+						case '4007d778': $result = 'HV20'; break;
+						case '4007d779': $result = 'DC211'; break;
+						case '4007d77a': $result = 'HG10'; break;
+						case '4007d77b': $result = 'HR10'; break;
+						case '4007d77d': $result = 'MD255/ZR950'; break;
+						case '4007d81c': $result = 'HF11'; break;
+						case '4007d878': $result = 'HV30'; break;
+						case '4007d87c': $result = 'XH A1S'; break;
+						case '4007d87e': $result = 'DC301/DC310/DC311/DC320/DC330'; break;
+						case '4007d87f': $result = 'FS100'; break;
+						case '4007d880': $result = 'HF10'; break;
+						case '4007d882': $result = 'HG20/HG21'; break;
+						case '4007d925': $result = 'HF21'; break;
+						case '4007d926': $result = 'HF S11'; break;
+						case '4007d978': $result = 'HV40'; break;
+						case '4007d987': $result = 'DC410/DC411/DC420'; break;
+						case '4007d988': $result = 'FS19/FS20/FS21/FS22/FS200'; break;
+						case '4007d989': $result = 'HF20/HF200'; break;
+						case '4007d98a': $result = 'HF S10/S100'; break;
+						case '4007da8e': $result = 'HF R10/R16/R17/R18/R100/R106'; break;
+						case '4007da8f': $result = 'HF M30/M31/M36/M300/M306'; break;
+						case '4007da90': $result = 'HF S20/S21/S200'; break;
+						case '4007da92': $result = 'FS31/FS36/FS37/FS300/FS305/FS306/FS307'; break;
+						case '4007dca0': $result = 'EOS C300'; break;
+						case '4007dda9': $result = 'HF G25'; break;
+						case '4007dfb4': $result = 'XC10'; break;
+						case '80000001': $result = 'EOS-1D'; break;
+						case '80000167': $result = 'EOS-1DS'; break;
+						case '80000168': $result = 'EOS 10D'; break;
+						case '80000169': $result = 'EOS-1D Mark III'; break;
+						case '80000170': $result = 'EOS Digital Rebel / 300D / Kiss Digital'; break;
+						case '80000174': $result = 'EOS-1D Mark II'; break;
+						case '80000175': $result = 'EOS 20D'; break;
+						case '80000176': $result = 'EOS Digital Rebel XSi / 450D / Kiss X2'; break;
+						case '80000188': $result = 'EOS-1Ds Mark II'; break;
+						case '80000189': $result = 'EOS Digital Rebel XT / 350D / Kiss Digital N'; break;
+						case '80000190': $result = 'EOS 40D'; break;
+						case '80000213': $result = 'EOS 5D'; break;
+						case '80000215': $result = 'EOS-1Ds Mark III'; break;
+						case '80000218': $result = 'EOS 5D Mark II'; break;
+						case '80000219': $result = 'WFT-E1'; break;
+						case '80000232': $result = 'EOS-1D Mark II N'; break;
+						case '80000234': $result = 'EOS 30D'; break;
+						case '80000236': $result = 'EOS Digital Rebel XTi / 400D / Kiss Digital X'; break;
+						case '80000241': $result = 'WFT-E2'; break;
+						case '80000246': $result = 'WFT-E3'; break;
+						case '80000250': $result = 'EOS 7D'; break;
+						case '80000252': $result = 'EOS Rebel T1i / 500D / Kiss X3'; break;
+						case '80000254': $result = 'EOS Rebel XS / 1000D / Kiss F'; break;
+						case '80000261': $result = 'EOS 50D'; break;
+						case '80000269': $result = 'EOS-1D X'; break;
+						case '80000270': $result = 'EOS Rebel T2i / 550D / Kiss X4'; break;
+						case '80000271': $result = 'WFT-E4'; break;
+						case '80000273': $result = 'WFT-E5'; break;
+						case '80000281': $result = 'EOS-1D Mark IV'; break;
+						case '80000285': $result = 'EOS 5D Mark III'; break;
+						case '80000286': $result = 'EOS Rebel T3i / 600D / Kiss X5'; break;
+						case '80000287': $result = 'EOS 60D'; break;
+						case '80000288': $result = 'EOS Rebel T3 / 1100D / Kiss X50'; break;
+						case '80000289': $result = 'EOS 7D Mark II'; break;
+						case '80000297': $result = 'WFT-E2 II'; break;
+						case '80000298': $result = 'WFT-E4 II'; break;
+						case '80000301': $result = 'EOS Rebel T4i / 650D / Kiss X6i'; break;
+						case '80000302': $result = 'EOS 6D'; break;
+						case '80000324': $result = 'EOS-1D C'; break;
+						case '80000325': $result = 'EOS 70D'; break;
+						case '80000326': $result = 'EOS Rebel T5i / 700D / Kiss X7i'; break;
+						case '80000327': $result = 'EOS Rebel T5 / 1200D / Kiss X70'; break;
+						case '80000328': $result = 'EOS-1D X MARK II'; break;
+						case '80000331': $result = 'EOS M'; break;
+						case '80000346': $result = 'EOS Rebel SL1 / 100D / Kiss X7'; break;
+						case '80000347': $result = 'EOS Rebel T6s / 760D / 8000D'; break;
+						case '80000349': $result = 'EOS 5D Mark IV'; break;
+						case '80000350': $result = 'EOS 80D'; break;
+						case '80000355': $result = 'EOS M2'; break;
+						case '80000382': $result = 'EOS 5DS'; break;
+						case '80000393': $result = 'EOS Rebel T6i / 750D / Kiss X8i'; break;
+						case '80000401': $result = 'EOS 5DS R'; break;
+						case '80000404': $result = 'EOS Rebel T6 / 1300D / Kiss X80'; break;
+						case '80000405': $result = 'EOS Rebel T7i / 800D / Kiss X9i'; break;
+						case '80000406': $result = 'EOS 6D Mark II'; break;
+						case '80000408': $result = 'EOS 77D / 9000D'; break;
+						case '80000417': $result = 'EOS Rebel SL2 / 200D / Kiss X9'; break;
+						default: $result = '?';
+					}
 				}
-				break;
+				if ( $brand == 'NIKON' ) { 		// DataDump (Nikon)
+
+				}
+				return $result;
 
 			case 'E#0011': 	// MovieInfo / OrientationInfo
-				switch( $brand ) {
-					case 'SAMSUNG': 	// OrientationInfo
+				if ( $brand == 'SAMSUNG' ) { 		// OrientationInfo
 
-						if ( ! wppa_is_valid_rational( $data ) ) {
-							return $wppa_exif_error_output;
-						}
+					if ( ! wppa_is_valid_rational( $data ) ) {
+						return $wppa_exif_error_output;
+					}
 
-						$temp = explode( '/', $data );
-						$x = $temp[0];
-						$y = $temp[1];
+					$temp = explode( '/', $data );
+					$x = $temp[0];
+					$y = $temp[1];
 
-						$result = ( $x / $y ) . ' ' . __( 'degrees', 'wp-photo-album-plus' );
-
-						return $result;
-						break;
-					default:
-						$result = $data;
-						return $result;
+					$result = ( $x / $y ) . ' ' . __( 'degrees', 'wp-photo-album-plus' );
 				}
-				break;
+				return $result;
 
 			case 'E#0012': 	// CanonAFInfo
+				if ( $brand == 'CANON' ) {
+					if ( is_array( $data_arr ) && count( $data_arr ) >= 12 ) {
+						$result = '';
+						$result .= 'NumAFPoints:' . $data_arr[0] . ', ';
+						$result .= 'ValidAFPoints:' . $data_arr[1] . ', ';
+						$result .= 'CanonImageWidth:' . $data_arr[2] . ', ';
+						$result .= 'CanonImageHeight:' . $data_arr[3] . ', ';
+						$result .= 'AFImageWidth:' . $data_arr[4] . ', ';
+						$result .= 'AFImageHeight:' . $data_arr[5] . ', ';
+						$result .= 'AFAreaWidths:' . $data_arr[6] . ', ';
+						$result .= 'AFAreaHeights:' . $data_arr[7] . ', ';
+						$result .= 'AFAreaXPositions:' . $data_arr[8] . ', ';
+						$result .= 'AFAreaYPositions:' . $data_arr[9] . ', ';
+						$result .= 'AFPointsInFocus:' . $data_arr[10] . ', ';
+						$result .= 'PrimaryAFPoint:' . $data_arr[11] . ', ';
+						if ( isset( $data_arr[12] ) ) {
+							$result .= 'PrimaryAFPoint:' . $data_arr[12] . ', ';
+						}
+						$result = trim( $result, ', ' );
+					}
+				}
+				return $result;
+
 			case 'E#0013': 	// ThumbnailImageValidArea
-				$result = $data;
 				return $result;
 
 			case 'E#0015': 	// SerialNumberFormat
@@ -675,8 +719,26 @@ global $wppa_exif_error_output;
 
 			case 'E#001A': 	// SuperMacro
 			case 'E#001C': 	// DateStampMode
+				return $result;
+
 			case 'E#001D': 	// MyColors
-				$result = $data;
+/*
+2 	MyColorMode 	int16u
+0 = Off
+1 = Positive Film
+2 = Light Skin Tone
+3 = Dark Skin Tone
+4 = Vivid Blue
+5 = Vivid Green
+6 = Vivid Red
+7 = Color Accent
+8 = Color Swap
+9 = Custom
+12 = Vivid
+13 = Neutral
+14 = Sepia
+15 = B&W
+*/
 				return $result;
 
 			case 'E#001E': 	// FirmwareRevision (Canon) / ColorSpace (Nikon)
@@ -727,16 +789,138 @@ global $wppa_exif_error_output;
 						$result = $data;
 						return $result;
 				}
+				return $result;
 
 			case 'E#0023': 	// Categories
+				if ( $brand == 'CANON' ) {
+					if ( $data_arr[0] == 8 ) {
+						if ( $data_arr[1] == 0 ) {
+							$result = __( 'none', 'wp-photo-album-plus' );
+						}
+						else {
+							$result = '';
+							$b = $data_arr[1];
+							if ( $b & 0x01 ) $result .= 'People, ';
+							if ( $b & 0x02 ) $result .= 'Scenery, ';
+							if ( $b & 0x04 ) $result .= 'Events, ';
+							if ( $b & 0x08 ) $result .= 'User 1, ';
+							if ( $b & 0x10 ) $result .= 'User 2, ';
+							if ( $b & 0x20 ) $result .= 'User 3, ';
+							if ( $b & 0x40 ) $result .= 'To Do, ';
+							$result = trim( $result, ', ' );
+						}
+					}
+				}
+				return $result;
+
 			case 'E#0024': 	// FaceDetect1
 			case 'E#0025': 	// FaceDetect2
+				return $result;
+
 			case 'E#0026': 	// CanonAFInfo2
+			case 'E#003C': 	// CanonAFInfo3
+				if ( $brand == 'CANON' ) {
+					if ( is_array( $data_arr ) && count( $data_arr ) >= 15 && $data_arr[1] >= 0 && $data_arr[1] <= 14 ) {
+						$result = 'AFAreaMode:';
+						switch( $data_arr[1] ) {
+							case 0: $result .= 'Off, '; break;
+							case 1: $result .= 'AF Point Expansion (surround), '; break;
+							case 2: $result .= 'Single-point AF, '; break;
+							case 4: $result .= 'Auto, '; break;
+							case 5: $result .= 'Face Detect AF, '; break;
+							case 6: $result .= 'Face + Tracking, '; break;
+							case 7: $result .= 'Zone AF, '; break;
+							case 8: $result .= 'AF Point Expansion (4 point), '; break;
+							case 9: $result .= 'Spot AF, '; break;
+							case 10: $result .= 'AF Point Expansion (8 point), '; break;
+							case 11: $result .= 'Flexizone Multi, '; break;
+							case 13: $result .= 'Flexizone Single, '; break;
+							case 14: $result .= 'Large Zone AF, '; break;
+							default: $result .= '?, ';
+						}
+						$result .= 'NumAFPoints:' . $data_arr[2] . ', ';
+						$result .= 'ValidAFPoints:' . $data_arr[3] . ', ';
+						$result .= 'CanonImageWidth:' . $data_arr[4] . ', ';
+						$result .= 'CanonImageHeight:' . $data_arr[5] . ', ';
+						$result .= 'AFImageWidth:' . $data_arr[6] . ', ';
+						$result .= 'AFImageHeight:' . $data_arr[7] . ', ';
+						$result .= 'AFAreaWidths:' . $data_arr[8] . ', ';
+						$result .= 'AFAreaHeights:' . $data_arr[9] . ', ';
+						$result .= 'AFAreaXPositions:' . $data_arr[10] . ', ';
+						$result .= 'AFAreaYPositions:' . $data_arr[11] . ', ';
+						$result .= 'AFPointsInFocus:' . $data_arr[12] . ', ';
+						$result .= 'AFPointsSelected:' . $data_arr[13] . ', ';
+						$result .= 'PrimaryAFPoint:' . $data_arr[14] . ', ';
+
+						$result = trim( $result, ', ' );
+					}
+				}
+				return $result;
+
 			case 'E#0027': 	// ContrastInfo
+/*
+4 	IntelligentContrast 	int16u
+0x0 = Off
+0x8 = On
+0xffff = n/a
+*/
 			case 'E#0028': 	// ImageUniqueID
 			case 'E#002F': 	// FaceDetect3
+				return $result;
+
 			case 'E#0035': 	// TimeInfo
-			case 'E#003C': 	// AFInfo3
+				if ( $brand == 'CANON' && is_array( $data_arr ) && count( $data_arr ) == 4 ) {
+					$result = 'Timezone:' . $data_arr[1] . ', ';
+					$result .= 'TimeZoneCity:';
+					switch ( $data_arr[2] ) {
+						case 0: $result .= 'n/a'; break;
+						case 1: $result .= 'Chatham Islands'; break;
+						case 2: $result .= 'Wellington'; break;
+						case 3: $result .= 'Solomon Islands'; break;
+						case 4: $result .= 'Sydney'; break;
+						case 5: $result .= 'Adelaide'; break;
+						case 6: $result .= 'Tokyo'; break;
+						case 7: $result .= 'Hong Kong'; break;
+						case 8: $result .= 'Bangkok'; break;
+						case 9: $result .= 'Yangon'; break;
+						case 10: $result .= 'Dhaka'; break;
+						case 11: $result .= 'Kathmandu'; break;
+						case 12: $result .= 'Delhi'; break;
+						case 13: $result .= 'Karachi'; break;
+						case 14: $result .= 'Kabul'; break;
+						case 15: $result .= 'Dubai'; break;
+						case 16: $result .= 'Tehran'; break;
+						case 17: $result .= 'Moscow'; break;
+						case 18: $result .= 'Cairo'; break;
+						case 19: $result .= 'Paris'; break;
+						case 20: $result .= 'London'; break;
+						case 21: $result .= 'Azores'; break;
+						case 22: $result .= 'Fernando de Noronha'; break;
+						case 23: $result .= 'Sao Paulo'; break;
+						case 24: $result .= 'Newfoundland'; break;
+						case 25: $result .= 'Santiago'; break;
+						case 26: $result .= 'Caracas'; break;
+						case 27: $result .= 'New York'; break;
+						case 28: $result .= 'Chicago'; break;
+						case 29: $result .= 'Denver'; break;
+						case 30: $result .= 'Los Angeles'; break;
+						case 31: $result .= 'Anchorage'; break;
+						case 32: $result .= 'Honolulu'; break;
+						case 33: $result .= 'Samoa'; break;
+						case 32766: $result .= '(not set)'; break;
+						default: $result .= '?';
+
+					}
+					$result .= ', DaylightSavings:';
+					if ( $data_arr[3] == 0 ) $result .= 'Off';
+					elseif( $data_arr[3] == 60 ) $result .= 'On';
+					else $result .= '?';
+				}
+				return $result;
+
+		//	case 'E#003C': 	// AFInfo3 // See E#0026
+		//		return $result;
+
 			case 'E#0081': 	// RawDataOffset
 			case 'E#0083': 	// OriginalDecisionDataOffset
 			case 'E#0090': 	// CustomFunctions1D
@@ -749,7 +933,47 @@ global $wppa_exif_error_output;
 			case 'E#0097': 	// DustRemovalData
 			case 'E#0098': 	// CropInfo
 			case 'E#0099': 	// CustomFunctions2
+				$result = $data;
+				return $result;
+
 			case 'E#009A': 	// AspectInfo
+				$result = $data;
+				if ( $brand == 'CANON' ) {
+					if ( is_array( $data_arr ) && count( $data_arr ) == 5 ) {
+						$aspects = array(
+											0 => '3:2',
+											1 => '1:1',
+											2 => '4:3',
+											7 => '16:9',
+											8 => '4:5',
+										);
+						$labels = array(
+											0 => 'AspectRatio',
+											1 => 'CroppedImageWidth',
+											2 => 'CroppedImageHeight',
+											3 => 'CroppedImageLeft',
+											4 => 'CroppedImageTop',
+										);
+						if ( in_array( $data_arr[0], array_keys( $aspects ) ) ) {
+							$result = $labels[0] . ': ' . $aspects[$data_arr[0]] . ', ';
+							for ( $i=1; $i<5; $i++ ) {
+								$result .= $labels[$i] . ': ';
+								if ( $data_arr[$i] >= 0 ) {
+									$result .= $data_arr[$i] . ', ';
+								}
+								else {
+									$result .= '?, ';
+								}
+							}
+						}
+						else {
+							$result = $labels[0] . ': ?:?, ';
+						}
+						$result = trim( $result, ', ' );
+					}
+				}
+				return $result;
+
 			case 'E#00A0': 	// ProcessingInfo
 			case 'E#00A1': 	// ToneCurveTable
 			case 'E#00A2': 	// SharpnessTable
@@ -1491,15 +1715,19 @@ global $wppa_exif_error_output;
 
 				if ( ! wppa_is_valid_rational( $data ) ) return $wppa_exif_error_output;
 
-				$result = wppa_simplify_ratio( $data );
+				$t = explode( '/', $data );
+				if ( $t[1] == '1' ) {
+					$result = $t[0];
+				}
+				else {
+					$result = $data;
+				}
 				return $result;
 				break;
 
 			case 'E#9201': 	// Shutter speed value
 
-				if ( ! wppa_is_valid_rational( $data, true ) ) {
-					return $wppa_exif_error_output;
-				}
+				if ( ! wppa_is_valid_rational( $data ) ) return $wppa_exif_error_output;
 
 				// Format is valid
 				$temp = explode( '/', $data );
@@ -1530,7 +1758,7 @@ global $wppa_exif_error_output;
 			case 'E#9204': 	// ExposureBiasValue
 
 				// Invalid format?
-				if ( ! wppa_is_valid_rational( $data, true ) ) {
+				if ( ! wppa_is_valid_rational( $data ) ) {
 					return $wppa_exif_error_output;
 				}
 
@@ -1562,7 +1790,7 @@ global $wppa_exif_error_output;
 			case 'E#9206': 	// Subject distance
 
 				// Invalid format?
-				if ( ! wppa_is_valid_rational( $data, true ) ) {
+				if ( ! wppa_is_valid_rational( $data ) ) {
 					return $wppa_exif_error_output;
 				}
 
@@ -1983,7 +2211,7 @@ global $wppa_exif_error_output;
 					return $result;
 				}
 
-				$result = wppa_simplify_ratio( $data );
+				$result = $data;
 				return $result;
 				break;
 
@@ -2373,6 +2601,243 @@ global $wppa_exif_error_output;
 				}
 				return $result;
 
+
+			// FILE
+			case 'F#0001': 	// FileName
+				$result = $data;
+				return $result;
+
+			case 'F#0002': 	// FileDateTime
+				$result = wppa_local_date( '', $data );
+				return $result;
+
+			case 'F#0003': 	// FileSize
+				$result = $data . ' Bytes';
+				return $result;
+
+			case 'F#0004': 	// FileType
+
+				if ( ! wppa_is_valid_integer( $data ) ) return $wppa_exif_error_output;
+
+				switch( $data ) {
+					case 1: $result = 'gif'; break;
+					case 2: $result = 'jpg'; break;
+					case 3: $result = 'png'; break;
+					default: $result = __( 'reserved', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'F#0005': 	// MimeType
+			case 'F#0006': 	// SectionsFound
+				$result = $data;
+				return $result;
+
+			// GPS
+			case 'G#0000': 	// GPSVersionID 	int8u[4]
+				$result = $data;
+				return $result;
+
+			case 'G#0001': 	// GPSLatitudeRef 	string[2]
+				switch( $data ) {
+					case 'N': $result = __( 'North', 'wp-photo-album-plus' ); break;
+					case 'S': $result = __( 'South', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#0002': 	// GPSLatitude 	rational64u[3]
+				for( $i = 0; $i < 3; $i++ ) {
+					if ( ! wppa_is_valid_rational( $data_arr[$i] ) ) return $wppa_exif_error_output;
+					$data_arr[$i] = wppa_simplify_rational( $data_arr[$i], true );
+				}
+				$result = $data_arr[0] . '&deg;' . $data_arr[1] . "'" . $data_arr[2] . '"';
+				return $result;
+
+			case 'G#0003': 	// GPSLongitudeRef 	string[2]
+				switch( $data ) {
+					case 'E': $result = __( 'East', 'wp-photo-album-plus' ); break;
+					case 'W': $result = __( 'West', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#0004': 	// GPSLongitude 	rational64u[3]
+				for( $i = 0; $i < 3; $i++ ) {
+					if ( ! wppa_is_valid_rational( $data_arr[$i] ) ) return $wppa_exif_error_output;
+					$data_arr[$i] = wppa_simplify_rational( $data_arr[$i], true );
+				}
+				$result = $data_arr[0] . '&deg;' . $data_arr[1] . "'" . $data_arr[2] . '"';
+				return $result;
+
+			case 'G#0005': 	// GPSAltitudeRef 	int8u
+				switch( $data ) {
+					case 0: $result = __( 'Above Sea Level', 'wp-photo-album-plus' ); break;
+					case 1: $result = __( 'Below Sea Level', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#0006': 	// GPSAltitude 	rational64u
+				if ( ! wppa_is_valid_rational( $data ) ) return $wppa_exif_error_output;
+				$result = wppa_simplify_rational( $data, true, 2 );
+				return $result;
+
+			case 'G#0007': 	// GPSTimeStamp 	rational64u[3] 	UTC time of GPS fix.
+				for( $i = 0; $i < 3; $i++ ) {
+					if ( ! wppa_is_valid_rational( $data_arr[$i] ) ) return $wppa_exif_error_output;
+					$data_arr[$i] = wppa_simplify_rational( $data_arr[$i], true );
+				}
+				$result = $data_arr[0] . ':' . $data_arr[1] . ':' . $data_arr[2];
+				return $result;
+
+			case 'G#0008': 	// GPSSatellites 	string
+				$result = $data;
+				return $result;
+
+			case 'G#0009': 	// GPSStatus 	string[2]
+				switch( $data ) {
+					case 'A': $result = __( 'Measurement Active', 'wp-photo-album-plus' ); break;
+					case 'V': $result = __( 'Measurement Void', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#000A': 	// GPSMeasureMode 	string[2]
+				switch( $data ) {
+					case '2': $result = __( '2-Dimensional Measurement', 'wp-photo-album-plus' ); break;
+					case '3': $result = __( '3-Dimensional Measurement', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#000B': 	// GPSDOP 	rational64u
+				if ( ! wppa_is_valid_rational( $data ) ) return $wppa_exif_error_output;
+				$result = wppa_simplify_rational( $data, true );
+				return $result;
+
+			case 'G#000C': 	// GPSSpeedRef 	string[2]
+				switch( $data ) {
+					case 'K': $result = __( 'km/h', 'wp-photo-album-plus' ); break;
+					case 'M': $result = __( 'mph', 'wp-photo-album-plus' ); break;
+					case 'N': $result = __( 'knots', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#000D': 	// GPSSpeed 	rational64u
+				if ( ! wppa_is_valid_rational( $data ) ) return $wppa_exif_error_output;
+				$result = wppa_simplify_rational( $data, true );
+				return $result;
+
+			case 'G#000E': 	// GPSTrackRef 	string[2]
+				switch( $data ) {
+					case 'M': $result = __( 'Magnetic North', 'wp-photo-album-plus' ); break;
+					case 'T': $result = __( 'True North', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#000F': 	// GPSTrack 	rational64u
+				if ( ! wppa_is_valid_rational( $data ) ) return $wppa_exif_error_output;
+				$result = wppa_simplify_rational( $data, true );
+				return $result;
+
+			case 'G#0010': 	// GPSImgDirectionRef 	string[2]
+				switch( $data ) {
+					case 'M': $result = __( 'Magnetic North', 'wp-photo-album-plus' ); break;
+					case 'T': $result = __( 'True North', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#0011': 	// GPSImgDirection 	rational64u
+				if ( ! wppa_is_valid_rational( $data ) ) return $wppa_exif_error_output;
+				$result = wppa_simplify_rational( $data, true );
+				return $result;
+
+			case 'G#0012': 	// GPSMapDatum 	string
+				$result = $data;
+				return $result;
+
+			case 'G#0013': 	// GPSDestLatitudeRef 	string[2]
+				switch( $data ) {
+					case 'N': $result = __( 'North', 'wp-photo-album-plus' ); break;
+					case 'S': $result = __( 'South', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#0014': 	// GPSDestLatitude 	rational64u[3]
+				for( $i = 0; $i < 3; $i++ ) {
+					if ( ! wppa_is_valid_rational( $data_arr[$i] ) ) return $wppa_exif_error_output;
+					$data_arr[$i] = wppa_simplify_rational( $data_arr[$i], true );
+				}
+				$result = $data_arr[0] . '&deg;' . $data_arr[1] . "'" . $data_arr[2] . '"';
+				return $result;
+
+			case 'G#0015': 	// GPSDestLongitudeRef 	string[2]
+				switch( $data ) {
+					case 'E': $result = __( 'East', 'wp-photo-album-plus' ); break;
+					case 'W': $result = __( 'West', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#0016': 	// GPSDestLongitude 	rational64u[3]
+				for( $i = 0; $i < 3; $i++ ) {
+					if ( ! wppa_is_valid_rational( $data_arr[$i] ) ) return $wppa_exif_error_output;
+					$data_arr[$i] = wppa_simplify_rational( $data_arr[$i], true );
+				}
+				$result = $data_arr[0] . '&deg;' . $data_arr[1] . "'" . $data_arr[2] . '"';
+				return $result;
+
+			case 'G#0017': 	// GPSDestBearingRef 	string[2]
+				switch( $data ) {
+					case 'M': $result = __( 'Magnetic North', 'wp-photo-album-plus' ); break;
+					case 'T': $result = __( 'True North', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#0018': 	// GPSDestBearing 	rational64u
+				if ( ! wppa_is_valid_rational( $data ) ) return $wppa_exif_error_output;
+				$result = wppa_simplify_rational( $data, true );
+				return $result;
+
+			case 'G#0019': 	// GPSDestDistanceRef 	string[2]
+				switch( $data ) {
+					case 'K': $result = __( 'Kilometers', 'wp-photo-album-plus' ); break;
+					case 'M': $result = __( 'Miles', 'wp-photo-album-plus' ); break;
+					case 'N': $result = __( 'Nautical Miles', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#001A': 	// GPSDestDistance 	rational64u
+				if ( ! wppa_is_valid_rational( $data ) ) return $wppa_exif_error_output;
+				$result = wppa_simplify_rational( $data, true );
+				return $result;
+
+			case 'G#001B': 	// GPSProcessingMethod 	undef
+			case 'G#001C': 	// GPSAreaInformation 	undef
+			case 'G#001D': 	// GPSDateStamp 	string[11]
+				$result = $data;
+				return $result;
+
+			case 'G#001E': 	// GPSDifferential 	int16u
+				switch( $data ) {
+					case 0: $result = __( 'No Correction', 'wp-photo-album-plus' ); break;
+					case 1: $result = __( 'Differential Corrected', 'wp-photo-album-plus' ); break;
+					default: $result = __( 'Undefined', 'wp-photo-album-plus' );
+				}
+				return $result;
+
+			case 'G#001F': 	// GPSHPositioningError 	rational64u
+				if ( ! wppa_is_valid_rational( $data ) ) return $wppa_exif_error_output;
+				$result = wppa_simplify_rational( $data, true );
+				return $result;
+
+
 			// Unformatted
 			default:
 				$result = $data;
@@ -2388,27 +2853,27 @@ global $wppa_exif_error_output;
 	return $result;
 }
 
-function wppa_is_valid_rational( $data, $signed = false ) {
+function wppa_is_valid_rational( $data, $complain = true ) {
 global $wppa_exif_error_output;
 
 	// Must contain a '/'
 	if ( strpos( $data, '/' ) == false ) {
-		$wppa_exif_error_output = '<span title="' . esc_attr( __( 'Missing /', 'wp-photo-album-plus' ) ) . ':' . $data . '" style="cursor:pointer;" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+		if ( $complain ) $wppa_exif_error_output = '<span title="' . esc_attr( __( 'Missing /', 'wp-photo-album-plus' ) ) . ':' . $data . '" style="cursor:pointer;" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
 		return false;
 	}
 
 	// make array
 	$t = explode( '/', $data );
 
-	// Divide by zero?
-	if ( $t[1] == 0 ) {
-		$wppa_exif_error_output = '<span title="' . esc_attr( __( 'Divide by zero', 'wp-photo-album-plus' ) ) . ':' . $data . '" style="cursor:pointer;" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+	// Numeric?
+	if ( ! is_numeric( $t[0] ) || ! is_numeric ( $t[1] ) ) {
+		if ( $complain ) $wppa_exif_error_output = '<span title="' . esc_attr( __( 'Not rational', 'wp-photo-album-plus' ) ) . ':' . $data . '" style="cursor:pointer;" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
 		return false;
 	}
 
-	// Signed while not permitted?
-	if ( ! $signed && ( $t[0] < 0 || $t[1] < 0 ) ) {
-		$wppa_exif_error_output = '<span title="' . esc_attr( __( 'Must be positive', 'wp-photo-album-plus' ) ) . ':' . $data . '" style="cursor:pointer;" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+	// Divide by zero?
+	if ( $t[1] == 0 ) {
+		if ( $complain ) $wppa_exif_error_output = '<span title="' . esc_attr( __( 'Divide by zero', 'wp-photo-album-plus' ) ) . ':' . $data . '" style="cursor:pointer;" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
 		return false;
 	}
 
@@ -2419,7 +2884,7 @@ global $wppa_exif_error_output;
 
 	// Unlikely value?
 	if ( $t[0] / $t[1] > 100000 || abs( $t[0] / $t[1] ) < 0.00001 ) {
-		$wppa_exif_error_output = '<span title="' . esc_attr( __( 'Unlikely value', 'wp-photo-album-plus' ) ) . ':' . $data . '" style="cursor:pointer;" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
+		if ( $complain ) $wppa_exif_error_output = '<span title="' . esc_attr( __( 'Unlikely value', 'wp-photo-album-plus' ) ) . ':' . $data . '" style="cursor:pointer;" >' . __( 'n.a.', 'wp-photo-album-plus' ) . '</span>';
 		return false;
 	}
 
@@ -2427,12 +2892,21 @@ global $wppa_exif_error_output;
 	return true;
 }
 
-function wppa_simplify_ratio( $data ) {
+function wppa_simplify_rational( $data, $divide = false, $dec = 0 ) {
 
 	// make array
 	$t = explode( '/', $data );
 	$x = $t[0];
 	$y = $t[1];
+
+	// Divide result?
+		if ( $divide ) {
+		$result = $x / $y;
+		if ( $dec ) {
+			$result = sprintf( '%4.' . $dec . 'f', $result );
+		}
+		return $result;
+	}
 
 	// Is already simplified to the max?
 	if ( $x == 1 ) {
@@ -2442,7 +2916,7 @@ function wppa_simplify_ratio( $data ) {
 
 	// Result is zero?
 	if ( $x == 0 ) {
-		$result = '0';
+		$result = $data;
 		return $result;
 	}
 
@@ -2452,8 +2926,8 @@ function wppa_simplify_ratio( $data ) {
 		return $result;
 	}
 
-	/* to be continued */
-	$prime = array(2,3,5,7,11,13,17);
+	// Continue simplifying
+	$prime = array(2,3,5,7,11,13,17,19,23,29,31);
 	foreach( $prime as $p ) {
 		while ( wppa_is_divisible( $x, $p ) && wppa_is_divisible( $y, $p ) ) {
 			$x = $x / $p;
@@ -2462,7 +2936,6 @@ function wppa_simplify_ratio( $data ) {
 	}
 	$result = $x . '/' . $y;
 
-	$result = $data;
 	return $result;
 }
 
@@ -2539,7 +3012,7 @@ global $wpdb;
 		foreach( $exifs as $exif ) {
 
 			$f_description 	= strip_tags( wppa_format_exif( $exif['tag'], $exif['description'], $brand ) );
-			$tagbrand 		= ( trim( wppa_exif_tagname( hexdec( substr( $exif['tag'], 2, 4 ) ), $brand, 'brandonly' ), ': ' ) ? $brand : '' );
+			$tagbrand 		= trim( wppa_exif_tagname( $exif['tag'], $brand, 'brandonly' ), ': ' ) ? $brand : '';
 
 			// If f_description or thabrand changed: update
 			if ( $f_description != $exif['f_description'] || $tagbrand != $exif['brand'] ) {
@@ -2729,7 +3202,7 @@ global $wppa;
 
 	// Get exif data
 	if ( ! function_exists( 'exif_read_data' ) ) return false;	// Not supported by the server
-	$exif = @ exif_read_data( $file, 'EXIF' );
+	$exif = @ exif_read_data( $file, 'ANY_TAG' );
 	if ( ! is_array( $exif ) ) return false;			// No data present
 
 	// There is exif data for this image.
@@ -2782,7 +3255,7 @@ global $wppa;
 			$status = 'display';
 			if ( substr( $s, 0, 12 ) == 'UndefinedTag' ) {
 				$status = 'option';
-				$desc = wppa_exif_tagname( hexdec( substr( $tag, 2, 4 ) ) );
+				$desc = wppa_exif_tagname( $tag );
 				if ( substr( $desc, 0, 12 ) != 'UndefinedTag' ) {
 					$status = 'display';
 				}
@@ -2793,7 +3266,10 @@ global $wppa;
 
 		// Now add poto specific data item
 		// If its an array...
-		if ( is_array( $exif[$s] ) ) { // continue;
+		if ( is_array( $exif[$s] ) ) {
+
+
+			/*
 
 			$c = count ( $exif[$s] );
 			$max = wppa_opt( 'exif_max_array_size' );
@@ -2809,16 +3285,32 @@ global $wppa;
 				if ( ! $bret ) wppa_log( 'War', 'Could not add EXIF tag '.$tag.' for photo '.$photo );
 
 			}
+			*/
+/*
+			$max = wppa_opt( 'exif_max_array_size' );
+			if ( $max != 0 && count( $exif[$s] ) > $max ) {
+				$temp = array_slice( $exif[$s], 0, $max, true );
+			}
+			else {
+				$temp = $exif[$s];
+			}
+*/
+			$desc = serialize( $exif[$s] );
+//			wppa_dump( $id . ':' . $tag );
+//			wppa_dump( var_export( $temp, true ) );
 		}
 		// Its not an array
 		else {
 
-			$photo 	= $id;
 			$desc 	= $exif[$s];
-			$status = 'default';
-			$bret = wppa_create_exif_entry( array( 'photo' => $photo, 'tag' => $tag, 'description' => $desc, 'status' => $status ) );
-			if ( ! $bret ) {} /* wppa_log( 'Warning 3', 'Could not add EXIF tag '.$tag.' for photo '.$photo.', desc = '.$desc ); */ // Is junk, dont care
+
 		}
+
+		$photo 	= $id;
+		$status = 'default';
+		$bret = wppa_create_exif_entry( array( 'photo' => $photo, 'tag' => $tag, 'description' => $desc, 'status' => $status ) );
+		if ( ! $bret ) {} /* wppa_log( 'Warning 3', 'Could not add EXIF tag '.$tag.' for photo '.$photo.', desc = '.$desc ); */ // Is junk, dont care
+
 	}
 
 	wppa_fix_exif_format( $id );
@@ -2827,8 +3319,10 @@ global $wppa;
 // Convert exif tagname as found by exif_read_data() to E#XXXX, Inverse of exif_tagname();
 function wppa_exif_tag( $tagname ) {
 static $wppa_inv_exiftags;
+static $wppa_inv_gpstags;
+static $wppa_inv_filetags;
 
-	// Setup inverted matrix
+	// Setup inverted matrix standard tags
 	if ( ! is_array( $wppa_inv_exiftags ) ) {
 		$key = 0;
 		while ( $key < 65536 ) {
@@ -2841,15 +3335,73 @@ static $wppa_inv_exiftags;
 		}
 	}
 
+	// Setup inverted matrix filetags
+	if ( ! is_array( $wppa_inv_filetags ) ) {
+		$wppa_inv_filetags = array(
+									'FileName' 		=> 0x0001,
+									'FileDateTime'	=> 0x0002,
+									'FileSize' 		=> 0x0003,
+									'FileType' 		=> 0x0004,
+									'MimeType' 		=> 0x0005,
+									'SectionsFound' => 0x0006,
+									);
+	}
+
+	// Setup inverted matrix GPS tags
+	if ( ! is_array( $wppa_inv_gpstags ) ) {
+		$wppa_inv_gpstags = array(
+									'GPSVersionID' 			=> 0x0000,	// int8u[4]
+									'GPSLatitudeRef' 		=> 0x0001, 	// string[2] 'N' = North 'S' = South
+									'GPSLatitude' 			=> 0x0002, 	// rational64u[3]
+									'GPSLongitudeRef' 		=> 0x0003, 	// string[2] 'E' = East 'W' = West
+									'GPSLongitude' 			=> 0x0004, 	// rational64u[3]
+									'GPSAltitudeRef' 		=> 0x0005, 	// int8u 0 = Above Sea Level 1 = Below Sea Level
+									'GPSAltitude' 			=> 0x0006,	// rational64u
+									'GPSTimeStamp' 			=> 0x0007, 	// rational64u[3]
+									'GPSSatellites' 		=> 0x0008, 	// string
+									'GPSStatus' 			=> 0x0009, 	// string[2] 	'A' = Measurement Active 'V' = Measurement Void
+									'GPSMeasureMode' 		=> 0x000a, 	// string[2] 	2 = 2-Dimensional Measurement 3 = 3-Dimensional Measurement
+									'GPSDOP' 				=> 0x000b, 	// rational64u
+									'GPSSpeedRef' 			=> 0x000c, 	// string[2] 	'K' = km/h 'M' = mph 'N' = knots
+									'GPSSpeed' 				=> 0x000d, 	// rational64u
+									'GPSTrackRef' 			=> 0x000e, 	// string[2] 	'M' = Magnetic North 'T' = True North
+									'GPSTrack' 				=> 0x000f, 	// rational64u
+									'GPSImgDirectionRef' 	=> 0x0010, 	// string[2] 	'M' = Magnetic North 'T' = True North
+									'GPSImgDirection' 		=> 0x0011, 	// rational64u
+									'GPSMapDatum' 			=> 0x0012, 	// string
+									'GPSDestLatitudeRef' 	=> 0x0013, 	// string[2] 	'N' = North 'S' = South
+									'GPSDestLatitude' 		=> 0x0014, 	// rational64u[3]
+									'GPSDestLongitudeRef' 	=> 0x0015, 	// string[2] 	'E' = East 'W' = West
+									'GPSDestLongitude' 		=> 0x0016, 	// rational64u[3]
+									'GPSDestBearingRef' 	=> 0x0017, 	// string[2] 	'M' = Magnetic North 'T' = True North
+									'GPSDestBearing' 		=> 0x0018, 	// rational64u
+									'GPSDestDistanceRef' 	=> 0x0019, 	// string[2] 	'K' = Kilometers 'M' = Miles 'N' = Nautical Miles
+									'GPSDestDistance' 		=> 0x001a, 	// rational64u
+									'GPSProcessingMethod' 	=> 0x001b, 	// undef 	(values of "GPS", "CELLID", "WLAN" or "MANUAL" by the EXIF spec.)
+									'GPSAreaInformation' 	=> 0x001c, 	// undef
+									'GPSDateStamp' 			=> 0x001d, 	// string[11] 	(Format is YYYY:mm:dd)
+									'GPSDifferential' 		=> 0x001e, 	// int16u 	0 = No Correction 1 = Differential Corrected
+									'GPSHPositioningError' 	=> 0x001f, 	// rational64u
+									);
+	}
+
 	// Search
-	if ( isset( $wppa_inv_exiftags[$tagname] ) ) return sprintf( 'E#%04X',$wppa_inv_exiftags[$tagname] );
+	if ( isset( $wppa_inv_exiftags[$tagname] ) ) {
+		return sprintf( 'E#%04X', $wppa_inv_exiftags[$tagname] );
+	}
+	elseif ( isset( $wppa_inv_filetags[$tagname] ) ) {
+		return sprintf( 'F#%04X', $wppa_inv_filetags[$tagname] );
+	}
+	elseif ( isset( $wppa_inv_gpstags[$tagname] ) ) {
+		return sprintf( 'G#%04X', $wppa_inv_gpstags[$tagname] );
+	}
 	elseif ( strlen( $tagname ) == 19 ) {
 		if ( substr( $tagname, 0, 12 ) == 'UndefinedTag' ) return 'E#'.substr( $tagname, -4 );
 	}
 	else return '';
 }
 
-// Wrapper around exif_tagname(), convert 0xXXXX to TagName
+// Wrapper around exif_tagname(), convert E#XXXX, F# XXXX or G#XXXX to TagName
 function wppa_exif_tagname( $tag, $brand = '', $brandonly = false ) {
 global $wpdb;
 static $canontags;
@@ -2857,193 +3409,198 @@ static $nikontags;
 static $samsungtags;
 static $editabletags;
 static $commontags;
+static $gpstags;
+static $filetags;
 
+if ( strlen($tag) != 6 ) {
+	wppa_log('Err', 'wppa_exif_tagname() called with tag = '.$tag, true);
+}
 	// Fill $canontags if not done yet
 	if ( empty( $canontags ) ) {
 		$canontags = array(
-							0x0001 => 'CanonCameraSettings',
-							0x0002 => 'CanonFocalLength',
-							0x0003 => 'CanonFlashInfo?',
-							0x0004 => 'CanonShotInfo',
-							0x0005 => 'CanonPanorama',
-							0x0006 => 'CanonImageType',
-							0x0007 => 'CanonFirmwareVersion',
-							0x0008 => 'FileNumber',
-							0x0009 => 'OwnerName',
-							0x000a => 'UnknownD30',
-							0x000c => 'SerialNumber',
-							0x000d => 'CanonCameraInfo',
-							0x000e => 'CanonFileLength',
-							0x000f => 'CustomFunctions',
-							0x0010 => 'CanonModelID',
-							0x0011 => 'MovieInfo',
-							0x0012 => 'CanonAFInfo',
-							0x0013 => 'ThumbnailImageValidArea',
-							0x0015 => 'SerialNumberFormat',
-							0x001a => 'SuperMacro',
-							0x001c => 'DateStampMode',
-							0x001d => 'MyColors',
-							0x001e => 'FirmwareRevision',
-							0x0023 => 'Categories',
-							0x0024 => 'FaceDetect1',
-							0x0025 => 'FaceDetect2',
-							0x0026 => 'CanonAFInfo2',
-							0x0027 => 'ContrastInfo',
-							0x0028 => 'ImageUniqueID',
-							0x002f => 'FaceDetect3',
-							0x0035 => 'TimeInfo',
-							0x003c => 'AFInfo3',
-							0x0081 => 'RawDataOffset',
-							0x0083 => 'OriginalDecisionDataOffset',
-							0x0090 => 'CustomFunctions1D',
-							0x0091 => 'PersonalFunctions',
-							0x0092 => 'PersonalFunctionValues',
-							0x0093 => 'CanonFileInfo',
-							0x0094 => 'AFPointsInFocus1D',
-							0x0095 => 'LensModel',
-							0x0096 => 'SerialInfo',
-							0x0097 => 'DustRemovalData',
-							0x0098 => 'CropInfo',
-							0x0099 => 'CustomFunctions2',
-							0x009a => 'AspectInfo',
-							0x00a0 => 'ProcessingInfo',
-							0x00a1 => 'ToneCurveTable',
-							0x00a2 => 'SharpnessTable',
-							0x00a3 => 'SharpnessFreqTable',
-							0x00a4 => 'WhiteBalanceTable',
-							0x00a9 => 'ColorBalance',
-							0x00aa => 'MeasuredColor',
-							0x00ae => 'ColorTemperature',
-							0x00b0 => 'CanonFlags',
-							0x00b1 => 'ModifiedInfo',
-							0x00b2 => 'ToneCurveMatching',
-							0x00b3 => 'WhiteBalanceMatching',
-							0x00b4 => 'ColorSpace',
-							0x00b6 => 'PreviewImageInfo',
-							0x00d0 => 'VRDOffset',
-							0x00e0 => 'SensorInfo',
-							0x4001 => 'ColorData',
-							0x4002 => 'CRWParam?',
-							0x4003 => 'ColorInfo',
-							0x4005 => 'Flavor?',
-							0x4008 => 'PictureStyleUserDef',
-							0x4009 => 'PictureStylePC',
-							0x4010 => 'CustomPictureStyleFileName',
-							0x4013 => 'AFMicroAdj',
-							0x4015 => 'VignettingCorr',
-							0x4016 => 'VignettingCorr2',
-							0x4018 => 'LightingOpt',
-							0x4019 => 'LensInfo',
-							0x4020 => 'AmbienceInfo',
-							0x4021 => 'MultiExp',
-							0x4024 => 'FilterInfo',
-							0x4025 => 'HDRInfo',
-							0x4028 => 'AFConfig',
+							'E#0001' => 'CanonCameraSettings',
+							'E#0002' => 'CanonFocalLength',
+							'E#0003' => 'CanonFlashInfo?',
+							'E#0004' => 'CanonShotInfo',
+							'E#0005' => 'CanonPanorama',
+							'E#0006' => 'CanonImageType',
+							'E#0007' => 'CanonFirmwareVersion',
+							'E#0008' => 'FileNumber',
+							'E#0009' => 'OwnerName',
+							'E#000A' => 'UnknownD30',
+							'E#000C' => 'SerialNumber',
+							'E#000D' => 'CanonCameraInfo',
+							'E#000E' => 'CanonFileLength',
+							'E#000F' => 'CustomFunctions',
+							'E#0010' => 'CanonModelID',
+							'E#0011' => 'MovieInfo',
+							'E#0012' => 'CanonAFInfo',
+							'E#0013' => 'ThumbnailImageValidArea',
+							'E#0015' => 'SerialNumberFormat',
+							'E#001A' => 'SuperMacro',
+							'E#001C' => 'DateStampMode',
+							'E#001D' => 'MyColors',
+							'E#001E' => 'FirmwareRevision',
+							'E#0023' => 'Categories',
+							'E#0024' => 'FaceDetect1',
+							'E#0025' => 'FaceDetect2',
+							'E#0026' => 'CanonAFInfo2',
+							'E#0027' => 'ContrastInfo',
+							'E#0028' => 'ImageUniqueID',
+							'E#002F' => 'FaceDetect3',
+							'E#0035' => 'TimeInfo',
+							'E#003C' => 'AFInfo3',
+							'E#0081' => 'RawDataOffset',
+							'E#0083' => 'OriginalDecisionDataOffset',
+							'E#0090' => 'CustomFunctions1D',
+							'E#0091' => 'PersonalFunctions',
+							'E#0092' => 'PersonalFunctionValues',
+							'E#0093' => 'CanonFileInfo',
+							'E#0094' => 'AFPointsInFocus1D',
+							'E#0095' => 'LensModel',
+							'E#0096' => 'SerialInfo',
+							'E#0097' => 'DustRemovalData',
+							'E#0098' => 'CropInfo',
+							'E#0099' => 'CustomFunctions2',
+							'E#009A' => 'AspectInfo',
+							'E#00A0' => 'ProcessingInfo',
+							'E#00A1' => 'ToneCurveTable',
+							'E#00A2' => 'SharpnessTable',
+							'E#00A3' => 'SharpnessFreqTable',
+							'E#00A4' => 'WhiteBalanceTable',
+							'E#00A9' => 'ColorBalance',
+							'E#00AA' => 'MeasuredColor',
+							'E#00AE' => 'ColorTemperature',
+							'E#00B0' => 'CanonFlags',
+							'E#00B1' => 'ModifiedInfo',
+							'E#00B2' => 'ToneCurveMatching',
+							'E#00B3' => 'WhiteBalanceMatching',
+							'E#00B4' => 'ColorSpace',
+							'E#00B6' => 'PreviewImageInfo',
+							'E#00D0' => 'VRDOffset',
+							'E#00E0' => 'SensorInfo',
+							'E#4001' => 'ColorData',
+							'E#4002' => 'CRWParam?',
+							'E#4003' => 'ColorInfo',
+							'E#4005' => 'Flavor?',
+							'E#4008' => 'PictureStyleUserDef',
+							'E#4009' => 'PictureStylePC',
+							'E#4010' => 'CustomPictureStyleFileName',
+							'E#4013' => 'AFMicroAdj',
+							'E#4015' => 'VignettingCorr',
+							'E#4016' => 'VignettingCorr2',
+							'E#4018' => 'LightingOpt',
+							'E#4019' => 'LensInfo',
+							'E#4020' => 'AmbienceInfo',
+							'E#4021' => 'MultiExp',
+							'E#4024' => 'FilterInfo',
+							'E#4025' => 'HDRInfo',
+							'E#4028' => 'AFConfig',
 		);
 	}
 
 	// Fill $nikontags if not done yet
 	if ( empty( $nikontags ) ) {
 		$nikontags = array(
-							0x0001 => 'MakerNoteVersion',
-							0x0002 => 'ISO',
-							0x0003 => 'ColorMode',
-							0x0004 => 'Quality',
-							0x0005 => 'WhiteBalance',
-							0x0006 => 'Sharpness',
-							0x0007 => 'FocusMode',
-							0x0008 => 'FlashSetting',
-							0x0009 => 'FlashType',
-							0x000b => 'WhiteBalanceFineTune',
-							0x000c => 'WB_RBLevels',
-							0x000d => 'ProgramShift',
-							0x000e => 'ExposureDifference',
-							0x000f => 'ISOSelection',
-							0x0010 => 'DataDump',
-							0x0011 => 'PreviewIFD',
-							0x0012 => 'FlashExposureComp',
-							0x0013 => 'ISOSetting',
-							0x0014 => 'ColorBalanceA',
-							0x0016 => 'ImageBoundary',
-							0x0017 => 'ExternalFlashExposureComp',
-							0x0018 => 'FlashExposureBracketValue',
-							0x0019 => 'ExposureBracketValue',
-							0x001a => 'ImageProcessing',
-							0x001b => 'CropHiSpeed',
-							0x001c => 'ExposureTuning',
-							0x001d => 'SerialNumber',
-							0x001e => 'ColorSpace',
-							0x001f => 'VRInfo',
-							0x0020 => 'ImageAuthentication',
-							0x0021 => 'FaceDetect',
-							0x0022 => 'ActiveD-Lighting',
-							0x0023 => 'PictureControlData',
-							0x0024 => 'WorldTime',
-							0x0025 => 'ISOInfo',
-							0x002a => 'VignetteControl',
-							0x002b => 'DistortInfo',
-							0x002c => 'UnknownInfo',
-							0x0032 => 'UnknownInfo2',
-							0x0035 => 'HDRInfo',
-							0x0039 => 'LocationInfo',
-							0x003d => 'BlackLevel',
-							0x004f => 'ColorTemperatureAuto',
-							0x0080 => 'ImageAdjustment',
-							0x0081 => 'ToneComp',
-							0x0082 => 'AuxiliaryLens',
-							0x0083 => 'LensType',
-							0x0084 => 'Lens',
-							0x0085 => 'ManualFocusDistance',
-							0x0086 => 'DigitalZoom',
-							0x0087 => 'FlashMode',
-							0x0088 => 'AFInfo',
-							0x0089 => 'ShootingMode',
-							0x008b => 'LensFStops',
-							0x008c => 'ContrastCurve',
-							0x008d => 'ColorHue',
-							0x008f => 'SceneMode',
-							0x0090 => 'LightSource',
-							0x0091 => 'ShotInfo',
-							0x0092 => 'HueAdjustment',
-							0x0093 => 'NEFCompression',
-							0x0094 => 'Saturation',
-							0x0095 => 'NoiseReduction',
-							0x0096 => 'NEFLinearizationTable',
-							0x0097 => 'ColorBalance',
-							0x0099 => 'RawImageCenter',
-							0x009a => 'SensorPixelSize',
-							0x009c => 'SceneAssist',
-							0x009e => 'RetouchHistory',
-							0x00a0 => 'SerialNumber',
-							0x00a2 => 'ImageDataSize',
-							0x00a5 => 'ImageCount',
-							0x00a6 => 'DeletedImageCount',
-							0x00a7 => 'ShutterCount',
-							0x00a8 => 'FlashInfo',
-							0x00a9 => 'ImageOptimization',
-							0x00aa => 'Saturation',
-							0x00ab => 'VariProgram',
-							0x00ac => 'ImageStabilization',
-							0x00ad => 'AFResponse',
-							0x00b0 => 'MultiExposure',
-							0x00b1 => 'HighISONoiseReduction',
-							0x00b3 => 'ToningEffect',
-							0x00b6 => 'PowerUpTime',
-							0x00b7 => 'AFInfo2',
-							0x00b8 => 'FileInfo',
-							0x00b9 => 'AFTune',
-							0x00bb => 'RetouchInfo',
-							0x00bd => 'PictureControlData',
-							0x00c3 => 'BarometerInfo',
-							0x0e00 => 'PrintIM',
-							0x0e01 => 'NikonCaptureData',
-							0x0e09 => 'NikonCaptureVersion',
-							0x0e0e => 'NikonCaptureOffsets',
-							0x0e10 => 'NikonScanIFD',
-							0x0e13 => 'NikonCaptureEditVersions',
-							0x0e1d => 'NikonICCProfile',
-							0x0e1e => 'NikonCaptureOutput',
-							0x0e22 => 'NEFBitDepth',
+							'E#0001' => 'MakerNoteVersion',
+							'E#0002' => 'ISO',
+							'E#0003' => 'ColorMode',
+							'E#0004' => 'Quality',
+							'E#0005' => 'WhiteBalance',
+							'E#0006' => 'Sharpness',
+							'E#0007' => 'FocusMode',
+							'E#0008' => 'FlashSetting',
+							'E#0009' => 'FlashType',
+							'E#000B' => 'WhiteBalanceFineTune',
+							'E#000C' => 'WB_RBLevels',
+							'E#000D' => 'ProgramShift',
+							'E#000E' => 'ExposureDifference',
+							'E#000F' => 'ISOSelection',
+							'E#0010' => 'DataDump',
+							'E#0011' => 'PreviewIFD',
+							'E#0012' => 'FlashExposureComp',
+							'E#0013' => 'ISOSetting',
+							'E#0014' => 'ColorBalanceA',
+							'E#0016' => 'ImageBoundary',
+							'E#0017' => 'ExternalFlashExposureComp',
+							'E#0018' => 'FlashExposureBracketValue',
+							'E#0019' => 'ExposureBracketValue',
+							'E#001A' => 'ImageProcessing',
+							'E#001B' => 'CropHiSpeed',
+							'E#001C' => 'ExposureTuning',
+							'E#001D' => 'SerialNumber',
+							'E#001E' => 'ColorSpace',
+							'E#001F' => 'VRInfo',
+							'E#0020' => 'ImageAuthentication',
+							'E#0021' => 'FaceDetect',
+							'E#0022' => 'ActiveD-Lighting',
+							'E#0023' => 'PictureControlData',
+							'E#0024' => 'WorldTime',
+							'E#0025' => 'ISOInfo',
+							'E#002A' => 'VignetteControl',
+							'E#002B' => 'DistortInfo',
+							'E#002C' => 'UnknownInfo',
+							'E#0032' => 'UnknownInfo2',
+							'E#0035' => 'HDRInfo',
+							'E#0039' => 'LocationInfo',
+							'E#003D' => 'BlackLevel',
+							'E#004F' => 'ColorTemperatureAuto',
+							'E#0080' => 'ImageAdjustment',
+							'E#0081' => 'ToneComp',
+							'E#0082' => 'AuxiliaryLens',
+							'E#0083' => 'LensType',
+							'E#0084' => 'Lens',
+							'E#0085' => 'ManualFocusDistance',
+							'E#0086' => 'DigitalZoom',
+							'E#0087' => 'FlashMode',
+							'E#0088' => 'AFInfo',
+							'E#0089' => 'ShootingMode',
+							'E#008B' => 'LensFStops',
+							'E#008C' => 'ContrastCurve',
+							'E#008D' => 'ColorHue',
+							'E#008F' => 'SceneMode',
+							'E#0090' => 'LightSource',
+							'E#0091' => 'ShotInfo',
+							'E#0092' => 'HueAdjustment',
+							'E#0093' => 'NEFCompression',
+							'E#0094' => 'Saturation',
+							'E#0095' => 'NoiseReduction',
+							'E#0096' => 'NEFLinearizationTable',
+							'E#0097' => 'ColorBalance',
+							'E#0099' => 'RawImageCenter',
+							'E#009A' => 'SensorPixelSize',
+							'E#009C' => 'SceneAssist',
+							'E#009E' => 'RetouchHistory',
+							'E#00A0' => 'SerialNumber',
+							'E#00A2' => 'ImageDataSize',
+							'E#00A5' => 'ImageCount',
+							'E#00A6' => 'DeletedImageCount',
+							'E#00A7' => 'ShutterCount',
+							'E#00A8' => 'FlashInfo',
+							'E#00A9' => 'ImageOptimization',
+							'E#00AA' => 'Saturation',
+							'E#00AB' => 'VariProgram',
+							'E#00AC' => 'ImageStabilization',
+							'E#00AD' => 'AFResponse',
+							'E#00B0' => 'MultiExposure',
+							'E#00B1' => 'HighISONoiseReduction',
+							'E#00B3' => 'ToningEffect',
+							'E#00B6' => 'PowerUpTime',
+							'E#00B7' => 'AFInfo2',
+							'E#00B8' => 'FileInfo',
+							'E#00B9' => 'AFTune',
+							'E#00BB' => 'RetouchInfo',
+							'E#00BD' => 'PictureControlData',
+							'E#00C3' => 'BarometerInfo',
+							'E#0E00' => 'PrintIM',
+							'E#0E01' => 'NikonCaptureData',
+							'E#0E09' => 'NikonCaptureVersion',
+							'E#0E0E' => 'NikonCaptureOffsets',
+							'E#0E10' => 'NikonScanIFD',
+							'E#0E13' => 'NikonCaptureEditVersions',
+							'E#0E1D' => 'NikonICCProfile',
+							'E#0E1E' => 'NikonCaptureOutput',
+							'E#0E22' => 'NEFBitDepth',
 
 		);
 	}
@@ -3051,58 +3608,58 @@ static $commontags;
 	// Fill $samsungtags
 	if ( empty( $samsungtags ) ) {
 		$samsungtags = array(
-							0x0001 => 'MakerNoteVersion',
-							0x0002 => 'DeviceType',
-							0x0003 => 'SamsungModelID',
-							0x0011 => 'OrientationInfo',
-							0x0020 => 'SmartAlbumColor',
-							0x0021 => 'PictureWizard',
-							0x0030 => 'LocalLocationName',
-							0x0031 => 'LocationName',
-							0x0035 => 'PreviewIFD',
-							0x0040 => 'RawDataByteOrder',
-							0x0041 => 'WhiteBalanceSetup',
-							0x0043 => 'CameraTemperature',
-							0x0050 => 'RawDataCFAPattern',
-							0x0100 => 'FaceDetect',
-							0x0120 => 'FaceRecognition',
-							0x0123 => 'FaceName',
-							0xa001 => 'FirmwareName',
-							0xa003 => 'LensType',
-							0xa004 => 'LensFirmware',
-							0xa005 => 'InternalLensSerialNumber',
-							0xa010 => 'SensorAreas',
-							0xa011 => 'ColorSpace',
-							0xa012 => 'SmartRange',
-							0xa013 => 'ExposureCompensation',
-							0xa014 => 'ISO',
-							0xa018 => 'ExposureTime',
-							0xa019 => 'FNumber',
-							0xa01a => 'FocalLengthIn35mmFormat',
-							0xa020 => 'EncryptionKey',
-							0xa021 => 'WB_RGGBLevelsUncorrected',
-							0xa022 => 'WB_RGGBLevelsAuto',
-							0xa023 => 'WB_RGGBLevelsIlluminator1',
-							0xa024 => 'WB_RGGBLevelsIlluminator2',
-							0xa025 => 'HighlightLinearityLimit',
-							0xa028 => 'WB_RGGBLevelsBlack',
-							0xa030 => 'ColorMatrix',
-							0xa031 => 'ColorMatrixSRGB',
-							0xa032 => 'ColorMatrixAdobeRGB',
-							0xa033 => 'CbCrMatrixDefault',
-							0xa034 => 'CbCrMatrix',
-							0xa035 => 'CbCrGainDefault',
-							0xa036 => 'CbCrGain',
-							0xa040 => 'ToneCurveSRGBDefault',
-							0xa041 => 'ToneCurveAdobeRGBDefault',
-							0xa042 => 'ToneCurveSRGB',
-							0xa043 => 'ToneCurveAdobeRGB',
-							0xa048 => 'RawData?',
-							0xa050 => 'Distortion?',
-							0xa051 => 'ChromaticAberration?',
-							0xa052 => 'Vignetting?',
-							0xa053 => 'VignettingCorrection?',
-							0xa054 => 'VignettingSetting?',
+							'E#0001' => 'MakerNoteVersion',
+							'E#0002' => 'DeviceType',
+							'E#0003' => 'SamsungModelID',
+							'E#0011' => 'OrientationInfo',
+							'E#0020' => 'SmartAlbumColor',
+							'E#0021' => 'PictureWizard',
+							'E#0030' => 'LocalLocationName',
+							'E#0031' => 'LocationName',
+							'E#0035' => 'PreviewIFD',
+							'E#0040' => 'RawDataByteOrder',
+							'E#0041' => 'WhiteBalanceSetup',
+							'E#0043' => 'CameraTemperature',
+							'E#0050' => 'RawDataCFAPattern',
+							'E#0100' => 'FaceDetect',
+							'E#0120' => 'FaceRecognition',
+							'E#0123' => 'FaceName',
+							'E#A001' => 'FirmwareName',
+							'E#A003' => 'LensType',
+							'E#A004' => 'LensFirmware',
+							'E#A005' => 'InternalLensSerialNumber',
+							'E#A010' => 'SensorAreas',
+							'E#A011' => 'ColorSpace',
+							'E#A012' => 'SmartRange',
+							'E#A013' => 'ExposureCompensation',
+							'E#A014' => 'ISO',
+							'E#A018' => 'ExposureTime',
+							'E#A019' => 'FNumber',
+							'E#A01A' => 'FocalLengthIn35mmFormat',
+							'E#A020' => 'EncryptionKey',
+							'E#A021' => 'WB_RGGBLevelsUncorrected',
+							'E#A022' => 'WB_RGGBLevelsAuto',
+							'E#A023' => 'WB_RGGBLevelsIlluminator1',
+							'E#A024' => 'WB_RGGBLevelsIlluminator2',
+							'E#A025' => 'HighlightLinearityLimit',
+							'E#A028' => 'WB_RGGBLevelsBlack',
+							'E#A030' => 'ColorMatrix',
+							'E#A031' => 'ColorMatrixSRGB',
+							'E#A032' => 'ColorMatrixAdobeRGB',
+							'E#A033' => 'CbCrMatrixDefault',
+							'E#A034' => 'CbCrMatrix',
+							'E#A035' => 'CbCrGainDefault',
+							'E#A036' => 'CbCrGain',
+							'E#A040' => 'ToneCurveSRGBDefault',
+							'E#A041' => 'ToneCurveAdobeRGBDefault',
+							'E#A042' => 'ToneCurveSRGB',
+							'E#A043' => 'ToneCurveAdobeRGB',
+							'E#A048' => 'RawData?',
+							'E#A050' => 'Distortion?',
+							'E#A051' => 'ChromaticAberration?',
+							'E#A052' => 'Vignetting?',
+							'E#A053' => 'VignettingCorrection?',
+							'E#A054' => 'VignettingSetting?',
 
 		);
 	}
@@ -3118,468 +3675,515 @@ static $commontags;
 
 	if ( empty( $commontags ) ) {
 		$commontags = array(
-							0x0001 => 'InteropIndex',
-							0x0002 => 'InteropVersion',
-							0x000b => 'ProcessingSoftware',
-							0x00fe => 'SubfileType',
-							0x00ff => 'OldSubfileType',
-							0x0100 => 'ImageWidth',
-							0x0101 => 'ImageHeight',
-							0x0102 => 'BitsPerSample',
-							0x0103 => 'Compression',
-							0x0106 => 'PhotometricInterpretation',
-							0x0107 => 'Thresholding',
-							0x0108 => 'CellWidth',
-							0x0109 => 'CellLength',
-							0x010a => 'FillOrder',
-							0x010d => 'DocumentName',
-							0x010e => 'ImageDescription',
-							0x010f => 'Make',
-							0x0110 => 'Model',
-							0x0111 => 'StripOffsets',
-							0x0112 => 'Orientation',
-							0x0115 => 'SamplesPerPixel',
-							0x0116 => 'RowsPerStrip',
-							0x0117 => 'StripByteCounts',
-							0x0118 => 'MinSampleValue',
-							0x0119 => 'MaxSampleValue',
-							0x011a => 'XResolution',
-							0x011b => 'YResolution',
-							0x011c => 'PlanarConfiguration',
-							0x011d => 'PageName',
-							0x011e => 'XPosition',
-							0x011f => 'YPosition',
-							0x0120 => 'FreeOffsets',
-							0x0121 => 'FreeByteCounts',
-							0x0122 => 'GrayResponseUnit',
-							0x0123 => 'GrayResponseCurve',
-							0x0124 => 'T4Options',
-							0x0125 => 'T6Options',
-							0x0128 => 'ResolutionUnit',
-							0x0129 => 'PageNumber',
-							0x012c => 'ColorResponseUnit',
-							0x012d => 'TransferFunction',
-							0x0131 => 'Software',
-							0x0132 => 'ModifyDate',
-							0x013b => 'Artist',
-							0x013c => 'HostComputer',
-							0x013d => 'Predictor',
-							0x013e => 'WhitePoint',
-							0x013f => 'PrimaryChromaticities',
-							0x0140 => 'ColorMap',
-							0x0141 => 'HalftoneHints',
-							0x0142 => 'TileWidth',
-							0x0143 => 'TileLength',
-							0x0144 => 'TileOffsets',
-							0x0145 => 'TileByteCounts',
-							0x0146 => 'BadFaxLines',
-							0x0147 => 'CleanFaxData',
-							0x0148 => 'ConsecutiveBadFaxLines',
-							0x014a => 'SubIFD',
-							0x014c => 'InkSet',
-							0x014d => 'InkNames',
-							0x014e => 'NumberofInks',
-							0x0150 => 'DotRange',
-							0x0151 => 'TargetPrinter',
-							0x0152 => 'ExtraSamples',
-							0x0153 => 'SampleFormat',
-							0x0154 => 'SMinSampleValue',
-							0x0155 => 'SMaxSampleValue',
-							0x0156 => 'TransferRange',
-							0x0157 => 'ClipPath',
-							0x0158 => 'XClipPathUnits',
-							0x0159 => 'YClipPathUnits',
-							0x015a => 'Indexed',
-							0x015b => 'JPEGTables',
-							0x015f => 'OPIProxy',
-							0x0190 => 'GlobalParametersIFD',
-							0x0191 => 'ProfileType',
-							0x0192 => 'FaxProfile',
-							0x0193 => 'CodingMethods',
-							0x0194 => 'VersionYear',
-							0x0195 => 'ModeNumber',
-							0x01b1 => 'Decode',
-							0x01b2 => 'DefaultImageColor',
-							0x01b3 => 'T82Options',
-							0x01b5 => 'JPEGTables',
-							0x0200 => 'JPEGProc',
-							0x0201 => 'ThumbnailOffset',
-							0x0202 => 'ThumbnailLength',
-							0x0203 => 'JPEGRestartInterval',
-							0x0205 => 'JPEGLosslessPredictors',
-							0x0206 => 'JPEGPointTransforms',
-							0x0207 => 'JPEGQTables',
-							0x0208 => 'JPEGDCTables',
-							0x0209 => 'JPEGACTables',
-							0x0211 => 'YCbCrCoefficients',
-							0x0212 => 'YCbCrSubSampling',
-							0x0213 => 'YCbCrPositioning',
-							0x0214 => 'ReferenceBlackWhite',
-							0x022f => 'StripRowCounts',
-							0x02bc => 'ApplicationNotes',
-							0x03e7 => 'USPTOMiscellaneous',
-							0x1000 => 'RelatedImageFileFormat',
-							0x1001 => 'RelatedImageWidth',
-							0x1002 => 'RelatedImageHeight',
-							0x4746 => 'Rating',
-							0x4747 => 'XP_DIP_XML',
-							0x4748 => 'StitchInfo',
-							0x4749 => 'RatingPercent',
-							0x7000 => 'SonyRawFileType',
-							0x7032 => 'VignettingCorrParams',
-							0x7035 => 'ChromaticAberrationCorrParams',
-							0x7037 => 'DistortionCorrParams',
-							0x800d => 'ImageID',
-							0x80a3 => 'WangTag1',
-							0x80a4 => 'WangAnnotation',
-							0x80a5 => 'WangTag3',
-							0x80a6 => 'WangTag4',
-							0x80b9 => 'ImageReferencePoints',
-							0x80ba => 'RegionXformTackPoint',
-							0x80bb => 'WarpQuadrilateral',
-							0x80bc => 'AffineTransformMat',
-							0x80e3 => 'Matteing',
-							0x80e4 => 'DataType',
-							0x80e5 => 'ImageDepth',
-							0x80e6 => 'TileDepth',
-							0x8214 => 'ImageFullWidth',
-							0x8215 => 'ImageFullHeight',
-							0x8216 => 'TextureFormat',
-							0x8217 => 'WrapModes',
-							0x8218 => 'FovCot',
-							0x8219 => 'MatrixWorldToScreen',
-							0x821a => 'MatrixWorldToCamera',
-							0x827d => 'Model2',
-							0x828d => 'CFARepeatPatternDim',
-							0x828e => 'CFAPattern2',
-							0x828f => 'BatteryLevel',
-							0x8290 => 'KodakIFD',
-							0x8298 => 'Copyright',
-							0x829a => 'ExposureTime',
-							0x829d => 'FNumber',
-							0x82a5 => 'MDFileTag',
-							0x82a6 => 'MDScalePixel',
-							0x82a7 => 'MDColorTable',
-							0x82a8 => 'MDLabName',
-							0x82a9 => 'MDSampleInfo',
-							0x82aa => 'MDPrepDate',
-							0x82ab => 'MDPrepTime',
-							0x82ac => 'MDFileUnits',
-							0x830e => 'PixelScale',
-							0x8335 => 'AdventScale',
-							0x8336 => 'AdventRevision',
-							0x835c => 'UIC1Tag',
-							0x835d => 'UIC2Tag',
-							0x835e => 'UIC3Tag',
-							0x835f => 'UIC4Tag',
-							0x83bb => 'IPTC-NAA',
-							0x847e => 'IntergraphPacketData',
-							0x847f => 'IntergraphFlagRegisters',
-							0x8480 => 'IntergraphMatrix',
-							0x8481 => 'INGRReserved',
-							0x8482 => 'ModelTiePoint',
-							0x84e0 => 'Site',
-							0x84e1 => 'ColorSequence',
-							0x84e2 => 'IT8Header',
-							0x84e3 => 'RasterPadding',
-							0x84e4 => 'BitsPerRunLength',
-							0x84e5 => 'BitsPerExtendedRunLength',
-							0x84e6 => 'ColorTable',
-							0x84e7 => 'ImageColorIndicator',
-							0x84e8 => 'BackgroundColorIndicator',
-							0x84e9 => 'ImageColorValue',
-							0x84ea => 'BackgroundColorValue',
-							0x84eb => 'PixelIntensityRange',
-							0x84ec => 'TransparencyIndicator',
-							0x84ed => 'ColorCharacterization',
-							0x84ee => 'HCUsage',
-							0x84ef => 'TrapIndicator',
-							0x84f0 => 'CMYKEquivalent',
-							0x8546 => 'SEMInfo',
-							0x8568 => 'AFCP_IPTC',
-							0x85b8 => 'PixelMagicJBIGOptions',
-							0x85d7 => 'JPLCartoIFD',
-							0x85d8 => 'ModelTransform',
-							0x8602 => 'WB_GRGBLevels',
-							0x8606 => 'LeafData',
-							0x8649 => 'PhotoshopSettings',
-							0x8769 => 'ExifOffset',
-							0x8773 => 'ICC_Profile',
-							0x877f => 'TIFF_FXExtensions',
-							0x8780 => 'MultiProfiles',
-							0x8781 => 'SharedData',
-							0x8782 => 'T88Options',
-							0x87ac => 'ImageLayer',
-							0x87af => 'GeoTiffDirectory',
-							0x87b0 => 'GeoTiffDoubleParams',
-							0x87b1 => 'GeoTiffAsciiParams',
-							0x87be => 'JBIGOptions',
-							0x8822 => 'ExposureProgram',
-							0x8824 => 'SpectralSensitivity',
-							0x8825 => 'GPSInfo',
-							0x8827 => 'ISO',
-							0x8828 => 'Opto-ElectricConvFactor',
-							0x8829 => 'Interlace',
-							0x882a => 'TimeZoneOffset',
-							0x882b => 'SelfTimerMode',
-							0x8830 => 'SensitivityType',
-							0x8831 => 'StandardOutputSensitivity',
-							0x8832 => 'RecommendedExposureIndex',
-							0x8833 => 'ISOSpeed',
-							0x8834 => 'ISOSpeedLatitudeyyy',
-							0x8835 => 'ISOSpeedLatitudezzz',
-							0x885c => 'FaxRecvParams',
-							0x885d => 'FaxSubAddress',
-							0x885e => 'FaxRecvTime',
-							0x8871 => 'FedexEDR',
-							0x888a => 'LeafSubIFD',
-							0x9000 => 'ExifVersion',
-							0x9003 => 'DateTimeOriginal',
-							0x9004 => 'CreateDate',
-							0x9009 => 'GooglePlusUploadCode',
-							0x9010 => 'OffsetTime',
-							0x9011 => 'OffsetTimeOriginal',
-							0x9012 => 'OffsetTimeDigitized',
-							0x9101 => 'ComponentsConfiguration',
-							0x9102 => 'CompressedBitsPerPixel',
-							0x9201 => 'ShutterSpeedValue',
-							0x9202 => 'ApertureValue',
-							0x9203 => 'BrightnessValue',
-							0x9204 => 'ExposureCompensation',
-							0x9205 => 'MaxApertureValue',
-							0x9206 => 'SubjectDistance',
-							0x9207 => 'MeteringMode',
-							0x9208 => 'LightSource',
-							0x9209 => 'Flash',
-							0x920a => 'FocalLength',
-							0x920b => 'FlashEnergy',
-							0x920c => 'SpatialFrequencyResponse',
-							0x920d => 'Noise',
-							0x920e => 'FocalPlaneXResolution',
-							0x920f => 'FocalPlaneYResolution',
-							0x9210 => 'FocalPlaneResolutionUnit',
-							0x9211 => 'ImageNumber',
-							0x9212 => 'SecurityClassification',
-							0x9213 => 'ImageHistory',
-							0x9214 => 'SubjectArea',
-							0x9215 => 'ExposureIndex',
-							0x9216 => 'TIFF-EPStandardID',
-							0x9217 => 'SensingMethod',
-							0x923a => 'CIP3DataFile',
-							0x923b => 'CIP3Sheet',
-							0x923c => 'CIP3Side',
-							0x923f => 'StoNits',
-							0x927c => 'MakerNote',
-							0x9286 => 'UserComment',
-							0x9290 => 'SubSecTime',
-							0x9291 => 'SubSecTimeOriginal',
-							0x9292 => 'SubSecTimeDigitized',
-							0x932f => 'MSDocumentText',
-							0x9330 => 'MSPropertySetStorage',
-							0x9331 => 'MSDocumentTextPosition',
-							0x935c => 'ImageSourceData',
-							0x9400 => 'AmbientTemperature',
-							0x9401 => 'Humidity',
-							0x9402 => 'Pressure',
-							0x9403 => 'WaterDepth',
-							0x9404 => 'Acceleration',
-							0x9405 => 'CameraElevationAngle',
-							0x9c9b => 'XPTitle',
-							0x9c9c => 'XPComment',
-							0x9c9d => 'XPAuthor',
-							0x9c9e => 'XPKeywords',
-							0x9c9f => 'XPSubject',
-							0xa000 => 'FlashpixVersion',
-							0xa001 => 'ColorSpace',
-							0xa002 => 'ExifImageWidth',
-							0xa003 => 'ExifImageHeight',
-							0xa004 => 'RelatedSoundFile',
-							0xa005 => 'InteropOffset',
-							0xa010 => 'SamsungRawPointersOffset',
-							0xa011 => 'SamsungRawPointersLength',
-							0xa101 => 'SamsungRawByteOrder',
-							0xa102 => 'SamsungRawUnknown?',
-							0xa20b => 'FlashEnergy',
-							0xa20c => 'SpatialFrequencyResponse',
-							0xa20d => 'Noise',
-							0xa20e => 'FocalPlaneXResolution',
-							0xa20f => 'FocalPlaneYResolution',
-							0xa210 => 'FocalPlaneResolutionUnit',
-							0xa211 => 'ImageNumber',
-							0xa212 => 'SecurityClassification',
-							0xa213 => 'ImageHistory',
-							0xa214 => 'SubjectLocation',
-							0xa215 => 'ExposureIndex',
-							0xa216 => 'TIFF-EPStandardID',
-							0xa217 => 'SensingMethod',
-							0xa300 => 'FileSource',
-							0xa301 => 'SceneType',
-							0xa302 => 'CFAPattern',
-							0xa401 => 'CustomRendered',
-							0xa402 => 'ExposureMode',
-							0xa403 => 'WhiteBalance',
-							0xa404 => 'DigitalZoomRatio',
-							0xa405 => 'FocalLengthIn35mmFormat',
-							0xa406 => 'SceneCaptureType',
-							0xa407 => 'GainControl',
-							0xa408 => 'Contrast',
-							0xa409 => 'Saturation',
-							0xa40a => 'Sharpness',
-							0xa40b => 'DeviceSettingDescription',
-							0xa40c => 'SubjectDistanceRange',
-							0xa420 => 'ImageUniqueID',
-							0xa430 => 'OwnerName',
-							0xa431 => 'SerialNumber',
-							0xa432 => 'LensInfo',
-							0xa433 => 'LensMake',
-							0xa434 => 'LensModel',
-							0xa435 => 'LensSerialNumber',
-							0xa480 => 'GDALMetadata',
-							0xa481 => 'GDALNoData',
-							0xa500 => 'Gamma',
-							0xafc0 => 'ExpandSoftware',
-							0xafc1 => 'ExpandLens',
-							0xafc2 => 'ExpandFilm',
-							0xafc3 => 'ExpandFilterLens',
-							0xafc4 => 'ExpandScanner',
-							0xafc5 => 'ExpandFlashLamp',
-							0xbc01 => 'PixelFormat',
-							0xbc03 => 'Uncompressed',
-							0xbc04 => 'ImageType',
-							0xbc80 => 'ImageWidth',
-							0xbc81 => 'ImageHeight',
-							0xbc82 => 'WidthResolution',
-							0xbc83 => 'HeightResolution',
-							0xbcc0 => 'ImageOffset',
-							0xbcc1 => 'ImageByteCount',
-							0xbcc2 => 'AlphaOffset',
-							0xbcc3 => 'AlphaByteCount',
-							0xbcc4 => 'ImageDataDiscard',
-							0xbcc5 => 'AlphaDataDiscard',
-							0xc427 => 'OceScanjobDesc',
-							0xc428 => 'OceApplicationSelector',
-							0xc429 => 'OceIDNumber',
-							0xc42a => 'OceImageLogic',
-							0xc44f => 'Annotations',
-							0xc4a5 => 'PrintIM',
-							0xc573 => 'OriginalFileName',
-							0xc580 => 'USPTOOriginalContentType',
-							0xc5e0 => 'CR2CFAPattern',
-							0xc612 => 'DNGVersion',
-							0xc613 => 'DNGBackwardVersion',
-							0xc614 => 'UniqueCameraModel',
-							0xc615 => 'LocalizedCameraModel',
-							0xc616 => 'CFAPlaneColor',
-							0xc617 => 'CFALayout',
-							0xc618 => 'LinearizationTable',
-							0xc619 => 'BlackLevelRepeatDim',
-							0xc61a => 'BlackLevel',
-							0xc61b => 'BlackLevelDeltaH',
-							0xc61c => 'BlackLevelDeltaV',
-							0xc61d => 'WhiteLevel',
-							0xc61e => 'DefaultScale',
-							0xc61f => 'DefaultCropOrigin',
-							0xc620 => 'DefaultCropSize',
-							0xc621 => 'ColorMatrix1',
-							0xc622 => 'ColorMatrix2',
-							0xc623 => 'CameraCalibration1',
-							0xc624 => 'CameraCalibration2',
-							0xc625 => 'ReductionMatrix1',
-							0xc626 => 'ReductionMatrix2',
-							0xc627 => 'AnalogBalance',
-							0xc628 => 'AsShotNeutral',
-							0xc629 => 'AsShotWhiteXY',
-							0xc62a => 'BaselineExposure',
-							0xc62b => 'BaselineNoise',
-							0xc62c => 'BaselineSharpness',
-							0xc62d => 'BayerGreenSplit',
-							0xc62e => 'LinearResponseLimit',
-							0xc62f => 'CameraSerialNumber',
-							0xc630 => 'DNGLensInfo',
-							0xc631 => 'ChromaBlurRadius',
-							0xc632 => 'AntiAliasStrength',
-							0xc633 => 'ShadowScale',
-							0xc640 => 'RawImageSegmentation',
-							0xc65a => 'CalibrationIlluminant1',
-							0xc65b => 'CalibrationIlluminant2',
-							0xc65c => 'BestQualityScale',
-							0xc65d => 'RawDataUniqueID',
-							0xc660 => 'AliasLayerMetadata',
-							0xc68b => 'OriginalRawFileName',
-							0xc68c => 'OriginalRawFileData',
-							0xc68d => 'ActiveArea',
-							0xc68e => 'MaskedAreas',
-							0xc68f => 'AsShotICCProfile',
-							0xc690 => 'AsShotPreProfileMatrix',
-							0xc691 => 'CurrentICCProfile',
-							0xc692 => 'CurrentPreProfileMatrix',
-							0xc6bf => 'ColorimetricReference',
-							0xc6c5 => 'SRawType',
-							0xc6d2 => 'PanasonicTitle',
-							0xc6d3 => 'PanasonicTitle2',
-							0xc6f3 => 'CameraCalibrationSig',
-							0xc6f4 => 'ProfileCalibrationSig',
-							0xc6f5 => 'ProfileIFD',
-							0xc6f6 => 'AsShotProfileName',
-							0xc6f7 => 'NoiseReductionApplied',
-							0xc6f8 => 'ProfileName',
-							0xc6f9 => 'ProfileHueSatMapDims',
-							0xc6fa => 'ProfileHueSatMapData1',
-							0xc6fb => 'ProfileHueSatMapData2',
-							0xc6fc => 'ProfileToneCurve',
-							0xc6fd => 'ProfileEmbedPolicy',
-							0xc6fe => 'ProfileCopyright',
-							0xc714 => 'ForwardMatrix1',
-							0xc715 => 'ForwardMatrix2',
-							0xc716 => 'PreviewApplicationName',
-							0xc717 => 'PreviewApplicationVersion',
-							0xc718 => 'PreviewSettingsName',
-							0xc719 => 'PreviewSettingsDigest',
-							0xc71a => 'PreviewColorSpace',
-							0xc71b => 'PreviewDateTime',
-							0xc71c => 'RawImageDigest',
-							0xc71d => 'OriginalRawFileDigest',
-							0xc71e => 'SubTileBlockSize',
-							0xc71f => 'RowInterleaveFactor',
-							0xc725 => 'ProfileLookTableDims',
-							0xc726 => 'ProfileLookTableData',
-							0xc740 => 'OpcodeList1',
-							0xc741 => 'OpcodeList2',
-							0xc74e => 'OpcodeList3',
-							0xc761 => 'NoiseProfile',
-							0xc763 => 'TimeCodes',
-							0xc764 => 'FrameRate',
-							0xc772 => 'TStop',
-							0xc789 => 'ReelName',
-							0xc791 => 'OriginalDefaultFinalSize',
-							0xc792 => 'OriginalBestQualitySize',
-							0xc793 => 'OriginalDefaultCropSize',
-							0xc7a1 => 'CameraLabel',
-							0xc7a3 => 'ProfileHueSatMapEncoding',
-							0xc7a4 => 'ProfileLookTableEncoding',
-							0xc7a5 => 'BaselineExposureOffset',
-							0xc7a6 => 'DefaultBlackRender',
-							0xc7a7 => 'NewRawImageDigest',
-							0xc7a8 => 'RawToPreviewGain',
-							0xc7b5 => 'DefaultUserCrop',
-							0xea1c => 'Padding',
-							0xea1d => 'OffsetSchema',
-							0xfde8 => 'OwnerName',
-							0xfde9 => 'SerialNumber',
-							0xfdea => 'Lens',
-							0xfe00 => 'KDC_IFD',
-							0xfe4c => 'RawFile',
-							0xfe4d => 'Converter',
-							0xfe4e => 'WhiteBalance',
-							0xfe51 => 'Exposure',
-							0xfe52 => 'Shadows',
-							0xfe53 => 'Brightness',
-							0xfe54 => 'Contrast',
-							0xfe55 => 'Saturation',
-							0xfe56 => 'Sharpness',
-							0xfe57 => 'Smoothness',
-							0xfe58 => 'MoireFilter',
+							'E#0001' => 'InteropIndex',
+							'E#0002' => 'InteropVersion',
+							'E#000B' => 'ProcessingSoftware',
+							'E#00FE' => 'SubfileType',
+							'E#00FF' => 'OldSubfileType',
+							'E#0100' => 'ImageWidth',
+							'E#0101' => 'ImageHeight',
+							'E#0102' => 'BitsPerSample',
+							'E#0103' => 'Compression',
+							'E#0106' => 'PhotometricInterpretation',
+							'E#0107' => 'Thresholding',
+							'E#0108' => 'CellWidth',
+							'E#0109' => 'CellLength',
+							'E#010A' => 'FillOrder',
+							'E#010D' => 'DocumentName',
+							'E#010E' => 'ImageDescription',
+							'E#010F' => 'Make',
+							'E#0110' => 'Model',
+							'E#0111' => 'StripOffsets',
+							'E#0112' => 'Orientation',
+							'E#0115' => 'SamplesPerPixel',
+							'E#0116' => 'RowsPerStrip',
+							'E#0117' => 'StripByteCounts',
+							'E#0118' => 'MinSampleValue',
+							'E#0119' => 'MaxSampleValue',
+							'E#011A' => 'XResolution',
+							'E#011B' => 'YResolution',
+							'E#011C' => 'PlanarConfiguration',
+							'E#011D' => 'PageName',
+							'E#011E' => 'XPosition',
+							'E#011F' => 'YPosition',
+							'E#0120' => 'FreeOffsets',
+							'E#0121' => 'FreeByteCounts',
+							'E#0122' => 'GrayResponseUnit',
+							'E#0123' => 'GrayResponseCurve',
+							'E#0124' => 'T4Options',
+							'E#0125' => 'T6Options',
+							'E#0128' => 'ResolutionUnit',
+							'E#0129' => 'PageNumber',
+							'E#012C' => 'ColorResponseUnit',
+							'E#012D' => 'TransferFunction',
+							'E#0131' => 'Software',
+							'E#0132' => 'ModifyDate',
+							'E#013B' => 'Artist',
+							'E#013C' => 'HostComputer',
+							'E#013D' => 'Predictor',
+							'E#013E' => 'WhitePoint',
+							'E#013F' => 'PrimaryChromaticities',
+							'E#0140' => 'ColorMap',
+							'E#0141' => 'HalftoneHints',
+							'E#0142' => 'TileWidth',
+							'E#0143' => 'TileLength',
+							'E#0144' => 'TileOffsets',
+							'E#0145' => 'TileByteCounts',
+							'E#0146' => 'BadFaxLines',
+							'E#0147' => 'CleanFaxData',
+							'E#0148' => 'ConsecutiveBadFaxLines',
+							'E#014A' => 'SubIFD',
+							'E#014C' => 'InkSet',
+							'E#014D' => 'InkNames',
+							'E#014E' => 'NumberofInks',
+							'E#0150' => 'DotRange',
+							'E#0151' => 'TargetPrinter',
+							'E#0152' => 'ExtraSamples',
+							'E#0153' => 'SampleFormat',
+							'E#0154' => 'SMinSampleValue',
+							'E#0155' => 'SMaxSampleValue',
+							'E#0156' => 'TransferRange',
+							'E#0157' => 'ClipPath',
+							'E#0158' => 'XClipPathUnits',
+							'E#0159' => 'YClipPathUnits',
+							'E#015A' => 'Indexed',
+							'E#015B' => 'JPEGTables',
+							'E#015F' => 'OPIProxy',
+							'E#0190' => 'GlobalParametersIFD',
+							'E#0191' => 'ProfileType',
+							'E#0192' => 'FaxProfile',
+							'E#0193' => 'CodingMethods',
+							'E#0194' => 'VersionYear',
+							'E#0195' => 'ModeNumber',
+							'E#01B1' => 'Decode',
+							'E#01B2' => 'DefaultImageColor',
+							'E#01B3' => 'T82Options',
+							'E#01B5' => 'JPEGTables',
+							'E#0200' => 'JPEGProc',
+							'E#0201' => 'ThumbnailOffset',
+							'E#0202' => 'ThumbnailLength',
+							'E#0203' => 'JPEGRestartInterval',
+							'E#0205' => 'JPEGLosslessPredictors',
+							'E#0206' => 'JPEGPointTransforms',
+							'E#0207' => 'JPEGQTables',
+							'E#0208' => 'JPEGDCTables',
+							'E#0209' => 'JPEGACTables',
+							'E#0211' => 'YCbCrCoefficients',
+							'E#0212' => 'YCbCrSubSampling',
+							'E#0213' => 'YCbCrPositioning',
+							'E#0214' => 'ReferenceBlackWhite',
+							'E#022F' => 'StripRowCounts',
+							'E#02BC' => 'ApplicationNotes',
+							'E#03E7' => 'USPTOMiscellaneous',
+							'E#1000' => 'RelatedImageFileFormat',
+							'E#1001' => 'RelatedImageWidth',
+							'E#1002' => 'RelatedImageHeight',
+							'E#4746' => 'Rating',
+							'E#4747' => 'XP_DIP_XML',
+							'E#4748' => 'StitchInfo',
+							'E#4749' => 'RatingPercent',
+							'E#7000' => 'SonyRawFileType',
+							'E#7032' => 'VignettingCorrParams',
+							'E#7035' => 'ChromaticAberrationCorrParams',
+							'E#7037' => 'DistortionCorrParams',
+							'E#800D' => 'ImageID',
+							'E#80A3' => 'WangTag1',
+							'E#80A4' => 'WangAnnotation',
+							'E#80A5' => 'WangTag3',
+							'E#80A6' => 'WangTag4',
+							'E#80B9' => 'ImageReferencePoints',
+							'E#80BA' => 'RegionXformTackPoint',
+							'E#80BB' => 'WarpQuadrilateral',
+							'E#80BC' => 'AffineTransformMat',
+							'E#80E3' => 'Matteing',
+							'E#80E4' => 'DataType',
+							'E#80E5' => 'ImageDepth',
+							'E#80E6' => 'TileDepth',
+							'E#8214' => 'ImageFullWidth',
+							'E#8215' => 'ImageFullHeight',
+							'E#8216' => 'TextureFormat',
+							'E#8217' => 'WrapModes',
+							'E#8218' => 'FovCot',
+							'E#8219' => 'MatrixWorldToScreen',
+							'E#821A' => 'MatrixWorldToCamera',
+							'E#827D' => 'Model2',
+							'E#828D' => 'CFARepeatPatternDim',
+							'E#828E' => 'CFAPattern2',
+							'E#828F' => 'BatteryLevel',
+							'E#8290' => 'KodakIFD',
+							'E#8298' => 'Copyright',
+							'E#829A' => 'ExposureTime',
+							'E#829D' => 'FNumber',
+							'E#82A5' => 'MDFileTag',
+							'E#82A6' => 'MDScalePixel',
+							'E#82A7' => 'MDColorTable',
+							'E#82A8' => 'MDLabName',
+							'E#82A9' => 'MDSampleInfo',
+							'E#82AA' => 'MDPrepDate',
+							'E#82AB' => 'MDPrepTime',
+							'E#82AC' => 'MDFileUnits',
+							'E#830E' => 'PixelScale',
+							'E#8335' => 'AdventScale',
+							'E#8336' => 'AdventRevision',
+							'E#835C' => 'UIC1Tag',
+							'E#835D' => 'UIC2Tag',
+							'E#835E' => 'UIC3Tag',
+							'E#835F' => 'UIC4Tag',
+							'E#83BB' => 'IPTC-NAA',
+							'E#847E' => 'IntergraphPacketData',
+							'E#847F' => 'IntergraphFlagRegisters',
+							'E#8480' => 'IntergraphMatrix',
+							'E#8481' => 'INGRReserved',
+							'E#8482' => 'ModelTiePoint',
+							'E#84E0' => 'Site',
+							'E#84E1' => 'ColorSequence',
+							'E#84E2' => 'IT8Header',
+							'E#84E3' => 'RasterPadding',
+							'E#84E4' => 'BitsPerRunLength',
+							'E#84E5' => 'BitsPerExtendedRunLength',
+							'E#84E6' => 'ColorTable',
+							'E#84E7' => 'ImageColorIndicator',
+							'E#84E8' => 'BackgroundColorIndicator',
+							'E#84E9' => 'ImageColorValue',
+							'E#84EA' => 'BackgroundColorValue',
+							'E#84EB' => 'PixelIntensityRange',
+							'E#84EC' => 'TransparencyIndicator',
+							'E#84ED' => 'ColorCharacterization',
+							'E#84EE' => 'HCUsage',
+							'E#84EF' => 'TrapIndicator',
+							'E#84F0' => 'CMYKEquivalent',
+							'E#8546' => 'SEMInfo',
+							'E#8568' => 'AFCP_IPTC',
+							'E#85B8' => 'PixelMagicJBIGOptions',
+							'E#85D7' => 'JPLCartoIFD',
+							'E#85D8' => 'ModelTransform',
+							'E#8602' => 'WB_GRGBLevels',
+							'E#8606' => 'LeafData',
+							'E#8649' => 'PhotoshopSettings',
+							'E#8769' => 'ExifOffset',
+							'E#8773' => 'ICC_Profile',
+							'E#877F' => 'TIFF_FXExtensions',
+							'E#8780' => 'MultiProfiles',
+							'E#8781' => 'SharedData',
+							'E#8782' => 'T88Options',
+							'E#87AC' => 'ImageLayer',
+							'E#87AF' => 'GeoTiffDirectory',
+							'E#87B0' => 'GeoTiffDoubleParams',
+							'E#87B1' => 'GeoTiffAsciiParams',
+							'E#87BE' => 'JBIGOptions',
+							'E#8822' => 'ExposureProgram',
+							'E#8824' => 'SpectralSensitivity',
+							'E#8825' => 'GPSInfo',
+							'E#8827' => 'ISO',
+							'E#8828' => 'Opto-ElectricConvFactor',
+							'E#8829' => 'Interlace',
+							'E#882A' => 'TimeZoneOffset',
+							'E#882B' => 'SelfTimerMode',
+							'E#8830' => 'SensitivityType',
+							'E#8831' => 'StandardOutputSensitivity',
+							'E#8832' => 'RecommendedExposureIndex',
+							'E#8833' => 'ISOSpeed',
+							'E#8834' => 'ISOSpeedLatitudeyyy',
+							'E#8835' => 'ISOSpeedLatitudezzz',
+							'E#885C' => 'FaxRecvParams',
+							'E#885D' => 'FaxSubAddress',
+							'E#885E' => 'FaxRecvTime',
+							'E#8871' => 'FedexEDR',
+							'E#888A' => 'LeafSubIFD',
+							'E#9000' => 'ExifVersion',
+							'E#9003' => 'DateTimeOriginal',
+							'E#9004' => 'CreateDate',
+							'E#9009' => 'GooglePlusUploadCode',
+							'E#9010' => 'OffsetTime',
+							'E#9011' => 'OffsetTimeOriginal',
+							'E#9012' => 'OffsetTimeDigitized',
+							'E#9101' => 'ComponentsConfiguration',
+							'E#9102' => 'CompressedBitsPerPixel',
+							'E#9201' => 'ShutterSpeedValue',
+							'E#9202' => 'ApertureValue',
+							'E#9203' => 'BrightnessValue',
+							'E#9204' => 'ExposureCompensation',
+							'E#9205' => 'MaxApertureValue',
+							'E#9206' => 'SubjectDistance',
+							'E#9207' => 'MeteringMode',
+							'E#9208' => 'LightSource',
+							'E#9209' => 'Flash',
+							'E#920A' => 'FocalLength',
+							'E#920B' => 'FlashEnergy',
+							'E#920C' => 'SpatialFrequencyResponse',
+							'E#920D' => 'Noise',
+							'E#920E' => 'FocalPlaneXResolution',
+							'E#920F' => 'FocalPlaneYResolution',
+							'E#9210' => 'FocalPlaneResolutionUnit',
+							'E#9211' => 'ImageNumber',
+							'E#9212' => 'SecurityClassification',
+							'E#9213' => 'ImageHistory',
+							'E#9214' => 'SubjectArea',
+							'E#9215' => 'ExposureIndex',
+							'E#9216' => 'TIFF-EPStandardID',
+							'E#9217' => 'SensingMethod',
+							'E#923A' => 'CIP3DataFile',
+							'E#923B' => 'CIP3Sheet',
+							'E#923C' => 'CIP3Side',
+							'E#923F' => 'StoNits',
+							'E#927C' => 'MakerNote',
+							'E#9286' => 'UserComment',
+							'E#9290' => 'SubSecTime',
+							'E#9291' => 'SubSecTimeOriginal',
+							'E#9292' => 'SubSecTimeDigitized',
+							'E#932F' => 'MSDocumentText',
+							'E#9330' => 'MSPropertySetStorage',
+							'E#9331' => 'MSDocumentTextPosition',
+							'E#935C' => 'ImageSourceData',
+							'E#9400' => 'AmbientTemperature',
+							'E#9401' => 'Humidity',
+							'E#9402' => 'Pressure',
+							'E#9403' => 'WaterDepth',
+							'E#9404' => 'Acceleration',
+							'E#9405' => 'CameraElevationAngle',
+							'E#9C9B' => 'XPTitle',
+							'E#9C9C' => 'XPComment',
+							'E#9C9D' => 'XPAuthor',
+							'E#9C9E' => 'XPKeywords',
+							'E#9C9F' => 'XPSubject',
+							'E#A000' => 'FlashpixVersion',
+							'E#A001' => 'ColorSpace',
+							'E#A002' => 'ExifImageWidth',
+							'E#A003' => 'ExifImageHeight',
+							'E#A004' => 'RelatedSoundFile',
+							'E#A005' => 'InteropOffset',
+							'E#A010' => 'SamsungRawPointersOffset',
+							'E#A011' => 'SamsungRawPointersLength',
+							'E#A101' => 'SamsungRawByteOrder',
+							'E#A102' => 'SamsungRawUnknown?',
+							'E#A20B' => 'FlashEnergy',
+							'E#A20C' => 'SpatialFrequencyResponse',
+							'E#A20D' => 'Noise',
+							'E#A20E' => 'FocalPlaneXResolution',
+							'E#A20F' => 'FocalPlaneYResolution',
+							'E#A210' => 'FocalPlaneResolutionUnit',
+							'E#A211' => 'ImageNumber',
+							'E#A212' => 'SecurityClassification',
+							'E#A213' => 'ImageHistory',
+							'E#A214' => 'SubjectLocation',
+							'E#A215' => 'ExposureIndex',
+							'E#A216' => 'TIFF-EPStandardID',
+							'E#A217' => 'SensingMethod',
+							'E#A300' => 'FileSource',
+							'E#A301' => 'SceneType',
+							'E#A302' => 'CFAPattern',
+							'E#A401' => 'CustomRendered',
+							'E#A402' => 'ExposureMode',
+							'E#A403' => 'WhiteBalance',
+							'E#A404' => 'DigitalZoomRatio',
+							'E#A405' => 'FocalLengthIn35mmFormat',
+							'E#A406' => 'SceneCaptureType',
+							'E#A407' => 'GainControl',
+							'E#A408' => 'Contrast',
+							'E#A409' => 'Saturation',
+							'E#A40A' => 'Sharpness',
+							'E#A40B' => 'DeviceSettingDescription',
+							'E#A40C' => 'SubjectDistanceRange',
+							'E#A420' => 'ImageUniqueID',
+							'E#A430' => 'OwnerName',
+							'E#A431' => 'SerialNumber',
+							'E#A432' => 'LensInfo',
+							'E#A433' => 'LensMake',
+							'E#A434' => 'LensModel',
+							'E#A435' => 'LensSerialNumber',
+							'E#A480' => 'GDALMetadata',
+							'E#A481' => 'GDALNoData',
+							'E#A500' => 'Gamma',
+							'E#AFC0' => 'ExpandSoftware',
+							'E#AFC1' => 'ExpandLens',
+							'E#AFC2' => 'ExpandFilm',
+							'E#AFC3' => 'ExpandFilterLens',
+							'E#AFC4' => 'ExpandScanner',
+							'E#AFC5' => 'ExpandFlashLamp',
+							'E#BC01' => 'PixelFormat',
+							'E#BC03' => 'Uncompressed',
+							'E#BC04' => 'ImageType',
+							'E#BC80' => 'ImageWidth',
+							'E#BC81' => 'ImageHeight',
+							'E#BC82' => 'WidthResolution',
+							'E#BC83' => 'HeightResolution',
+							'E#BCC0' => 'ImageOffset',
+							'E#BCC1' => 'ImageByteCount',
+							'E#BCC2' => 'AlphaOffset',
+							'E#BCC3' => 'AlphaByteCount',
+							'E#BCC4' => 'ImageDataDiscard',
+							'E#BCC5' => 'AlphaDataDiscard',
+							'E#C427' => 'OceScanjobDesc',
+							'E#C428' => 'OceApplicationSelector',
+							'E#C429' => 'OceIDNumber',
+							'E#C42A' => 'OceImageLogic',
+							'E#C44F' => 'Annotations',
+							'E#C4A5' => 'PrintIM',
+							'E#C573' => 'OriginalFileName',
+							'E#C580' => 'USPTOOriginalContentType',
+							'E#C5E0' => 'CR2CFAPattern',
+							'E#C612' => 'DNGVersion',
+							'E#C613' => 'DNGBackwardVersion',
+							'E#C614' => 'UniqueCameraModel',
+							'E#C615' => 'LocalizedCameraModel',
+							'E#C616' => 'CFAPlaneColor',
+							'E#C617' => 'CFALayout',
+							'E#C618' => 'LinearizationTable',
+							'E#C619' => 'BlackLevelRepeatDim',
+							'E#C61A' => 'BlackLevel',
+							'E#C61B' => 'BlackLevelDeltaH',
+							'E#C61C' => 'BlackLevelDeltaV',
+							'E#C61D' => 'WhiteLevel',
+							'E#C61E' => 'DefaultScale',
+							'E#C61F' => 'DefaultCropOrigin',
+							'E#C620' => 'DefaultCropSize',
+							'E#C621' => 'ColorMatrix1',
+							'E#C622' => 'ColorMatrix2',
+							'E#C623' => 'CameraCalibration1',
+							'E#C624' => 'CameraCalibration2',
+							'E#C625' => 'ReductionMatrix1',
+							'E#C626' => 'ReductionMatrix2',
+							'E#C627' => 'AnalogBalance',
+							'E#C628' => 'AsShotNeutral',
+							'E#C629' => 'AsShotWhiteXY',
+							'E#C62A' => 'BaselineExposure',
+							'E#C62B' => 'BaselineNoise',
+							'E#C62C' => 'BaselineSharpness',
+							'E#C62D' => 'BayerGreenSplit',
+							'E#C62E' => 'LinearResponseLimit',
+							'E#C62F' => 'CameraSerialNumber',
+							'E#C630' => 'DNGLensInfo',
+							'E#C631' => 'ChromaBlurRadius',
+							'E#C632' => 'AntiAliasStrength',
+							'E#C633' => 'ShadowScale',
+							'E#C640' => 'RawImageSegmentation',
+							'E#C65A' => 'CalibrationIlluminant1',
+							'E#C65B' => 'CalibrationIlluminant2',
+							'E#C65C' => 'BestQualityScale',
+							'E#C65D' => 'RawDataUniqueID',
+							'E#C660' => 'AliasLayerMetadata',
+							'E#C68B' => 'OriginalRawFileName',
+							'E#C68C' => 'OriginalRawFileData',
+							'E#C68D' => 'ActiveArea',
+							'E#C68E' => 'MaskedAreas',
+							'E#C68F' => 'AsShotICCProfile',
+							'E#C690' => 'AsShotPreProfileMatrix',
+							'E#C691' => 'CurrentICCProfile',
+							'E#C692' => 'CurrentPreProfileMatrix',
+							'E#C6Bf' => 'ColorimetricReference',
+							'E#C6C5' => 'SRawType',
+							'E#C6D2' => 'PanasonicTitle',
+							'E#C6D3' => 'PanasonicTitle2',
+							'E#C6F3' => 'CameraCalibrationSig',
+							'E#C6F4' => 'ProfileCalibrationSig',
+							'E#C6F5' => 'ProfileIFD',
+							'E#C6F6' => 'AsShotProfileName',
+							'E#C6F7' => 'NoiseReductionApplied',
+							'E#C6F8' => 'ProfileName',
+							'E#C6F9' => 'ProfileHueSatMapDims',
+							'E#C6FA' => 'ProfileHueSatMapData1',
+							'E#C6FB' => 'ProfileHueSatMapData2',
+							'E#C6FC' => 'ProfileToneCurve',
+							'E#C6FD' => 'ProfileEmbedPolicy',
+							'E#C6FE' => 'ProfileCopyright',
+							'E#C714' => 'ForwardMatrix1',
+							'E#C715' => 'ForwardMatrix2',
+							'E#C716' => 'PreviewApplicationName',
+							'E#C717' => 'PreviewApplicationVersion',
+							'E#C718' => 'PreviewSettingsName',
+							'E#C719' => 'PreviewSettingsDigest',
+							'E#C71A' => 'PreviewColorSpace',
+							'E#C71B' => 'PreviewDateTime',
+							'E#C71C' => 'RawImageDigest',
+							'E#C71D' => 'OriginalRawFileDigest',
+							'E#C71E' => 'SubTileBlockSize',
+							'E#C71F' => 'RowInterleaveFactor',
+							'E#C725' => 'ProfileLookTableDims',
+							'E#C726' => 'ProfileLookTableData',
+							'E#C740' => 'OpcodeList1',
+							'E#C741' => 'OpcodeList2',
+							'E#C74E' => 'OpcodeList3',
+							'E#C761' => 'NoiseProfile',
+							'E#C763' => 'TimeCodes',
+							'E#C764' => 'FrameRate',
+							'E#C772' => 'TStop',
+							'E#C789' => 'ReelName',
+							'E#C791' => 'OriginalDefaultFinalSize',
+							'E#C792' => 'OriginalBestQualitySize',
+							'E#C793' => 'OriginalDefaultCropSize',
+							'E#C7A1' => 'CameraLabel',
+							'E#C7A3' => 'ProfileHueSatMapEncoding',
+							'E#C7A4' => 'ProfileLookTableEncoding',
+							'E#C7A5' => 'BaselineExposureOffset',
+							'E#C7A6' => 'DefaultBlackRender',
+							'E#C7A7' => 'NewRawImageDigest',
+							'E#C7A8' => 'RawToPreviewGain',
+							'E#C7B5' => 'DefaultUserCrop',
+							'E#EA1C' => 'Padding',
+							'E#EA1D' => 'OffsetSchema',
+							'E#FDE8' => 'OwnerName',
+							'E#FDE9' => 'SerialNumber',
+							'E#FDEA' => 'Lens',
+							'E#FE00' => 'KDC_IFD',
+							'E#FE4C' => 'RawFile',
+							'E#FE4D' => 'Converter',
+							'E#FE4E' => 'WhiteBalance',
+							'E#FE51' => 'Exposure',
+							'E#FE52' => 'Shadows',
+							'E#FE53' => 'Brightness',
+							'E#FE54' => 'Contrast',
+							'E#FE55' => 'Saturation',
+							'E#FE56' => 'Sharpness',
+							'E#FE57' => 'Smoothness',
+							'E#FE58' => 'MoireFilter',
 
+		);
+	}
+
+	if ( empty( $gpstags ) ) {
+		$gpstags = array( 	'G#0000' => 'GPSVersionID',
+							'G#0001' => 'GPSLatitudeRef',
+							'G#0002' => 'GPSLatitude',
+							'G#0003' => 'GPSLongitudeRef',
+							'G#0004' => 'GPSLongitude',
+							'G#0005' => 'GPSAltitudeRef',
+							'G#0006' => 'GPSAltitude',
+							'G#0007' => 'GPSTimeStamp',
+							'G#0008' => 'GPSSatellites',
+							'G#0009' => 'GPSStatus',
+							'G#000A' => 'GPSMeasureMode',
+							'G#000B' => 'GPSDOP',
+							'G#000C' => 'GPSSpeedRef',
+							'G#000D' => 'GPSSpeed',
+							'G#000E' => 'GPSTrackRef',
+							'G#000F' => 'GPSTrack',
+							'G#0010' => 'GPSImgDirectionRef',
+							'G#0011' => 'GPSImgDirection',
+							'G#0012' => 'GPSMapDatum',
+							'G#0013' => 'GPSDestLatitudeRef',
+							'G#0014' => 'GPSDestLatitude',
+							'G#0015' => 'GPSDestLongitudeRef',
+							'G#0016' => 'GPSDestLongitude',
+							'G#0017' => 'GPSDestBearingRef',
+							'G#0018' => 'GPSDestBearing',
+							'G#0019' => 'GPSDestDistanceRef',
+							'G#001A' => 'GPSDestDistance',
+							'G#001B' => 'GPSProcessingMethod',
+							'G#001C' => 'GPSAreaInformation',
+							'G#001D' => 'GPSDateStamp',
+							'G#001e' => 'GPSDifferential',
+							'G#001F' => 'GPSHPositioningError',
+
+		);
+	}
+
+	if ( empty( $filetags ) ) {
+		$filetags = array( 	'F#0001' => 'FileName',
+							'F#0002' => 'FileDateTime',
+							'F#0003' => 'FileSize',
+							'F#0004' => 'FileType',
+							'F#0005' => 'MimeType',
+							'F#0006' => 'SectionsFound',
 		);
 	}
 
@@ -3627,12 +4231,27 @@ static $commontags;
 		}
 	}
 
+	// Not found? Try gpstags
+	if ( ! $result ) {
+		if ( isset( $gpstags[$tag] ) ) {
+			$result = $gpstags[$tag];
+		}
+	}
+
+	// Not found? Try filetags
+	if ( ! $result ) {
+		if ( isset( $filetags[$tag] ) ) {
+			$result = $filetags[$tag];
+		}
+	}
+
 	// Not found? Find generic tag name
 	if ( ! $result ) {
-		$result = exif_tagname( $tag );
+		$hextag = hexdec( substr( $tag, 2,4 ) );
+		$result = exif_tagname( $hextag );
 		if ( ! $result ) {
-			wppa_log( 'dbg', 'exif_tagname found nothing for ' . sprintf( '0x%04X', $tag ) );
-			$result = sprintf( 'UndefinedTag:0x%04X', $tag );
+			wppa_log( 'dbg', 'exif_tagname found nothing for ' . $tag );
+			$result = sprintf( 'UndefinedTag:0x%04X', $hextag );
 		}
 	}
 

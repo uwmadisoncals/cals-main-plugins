@@ -77,7 +77,7 @@ class wppa_mobile_detect {
         return $this->isMobile;
     }
 
-    protected function isDevice($device) {
+    public function isDevice($device) {
         $var    = "is" . ucfirst($device);
         $return = $this->$var === null ? (bool) preg_match("/" . $this->devices[$device] . "/i", $this->userAgent) : $this->$var;
 

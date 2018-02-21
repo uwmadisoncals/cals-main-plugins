@@ -1027,6 +1027,11 @@ Include the {}\'s. Don\'t use class names if rules apply to whole post, but do i
 	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_post_class", true)); ?>" />&nbsp;
 	<?php _e('Add Classes to this post','weaver-xtreme-plus' /*adm*/); ?>
 <br />
+<input type="text" size="24" id="bodyclass" name="_pp_bodyclass"
+		value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_bodyclass", true)); ?>" />
+
+	<?php _e('<em>Per Post body Class</em> - CSS class name to add to HTML &lt;body&gt; block when this post is displayed on Single Page.','weaverx-theme-support' /*adm*/); ?>
+	<br />
 <?php
 	// Weaver X Plus options for making horizontal bar layouts
 	echo '<small>';

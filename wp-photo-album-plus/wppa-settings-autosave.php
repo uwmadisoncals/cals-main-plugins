@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.8.00
+* Version 6.8.01
 *
 */
 
@@ -27,24 +27,6 @@ global $wp_version;
 global $wppa_supported_camara_brands;
 
 	// Start test area
-//$photo = 254;
-//$exif = exif_read_data(wppa_get_source_path($photo),'ANY_TAG',true);
-//var_export($exif);
-//echo '<br />';
-//$t = 0x0000;
-//while ( $t < 0x10000 ) {
-//	$n = exif_tagname( $t );
-//	if ( $n ) echo sprintf( '%04x: %s<br />', $t, $n );
-//	$t++;
-//}
-//$exif = exif_read_data(wppa_get_source_path($photo));
-//var_export($exif);
-//if (is_file(wppa_get_source_path( 1632 ))) {
-//wppa_import_exif( 1632, wppa_get_source_path( 1632 ) );
-//wppa_fix_exif_format( 1632 );
-//echo 'done';
-//}
-//else {echo 'not found';}
 
 	// End test area
 
@@ -456,6 +438,18 @@ global $wppa_supported_camara_brands;
 			<input type="button" style="display:none;" class="wppa-quick" onclick="jQuery('.-wppa-quick').css('display','inline');jQuery('.wppa-quick').css('display','none')" value="<?php _e('Close quick setup', 'wp-photo-album-plus') ?>" />
 			<?php } ?>
 
+			<input 	type="button"
+					style="float:right;"
+					value="<?php _e( 'Show all settings and helptext', 'wp-photo-album-plus' ) ?> "
+					class="button-secundary"
+					onclick="jQuery('.wppa-setting-help').css('display','');
+							jQuery( '.wppa-none' ).removeClass('wppa-none');
+							for( i=1;i<15;i++ ) { jQuery('#wppa_table_'+i).css('display', 'inline');}
+							jQuery( '.wppa-setting' ).css('display','');
+							jQuery( '.wppa-h' ).css( 'display', 'none' );
+							"
+			/>
+
 			<?php
 				if ( get_option( 'wppa_prevrev' ) == '100' && get_option('wppa_i_done') != 'done' ) {
 					?>
@@ -696,7 +690,7 @@ global $wppa_supported_camara_brands;
 							$opts = array('', __('yes', 'wp-photo-album-plus'), __('no', 'wp-photo-album-plus'));
 							$vals = array('', 'yes', 'no');
 							$html = wppa_select($slug, $opts, $vals);
-							wppa_setting($slug, '14', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting($slug, '15', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Done?', 'wp-photo-album-plus');
 							$desc = __('If you are ready answering these questions, select <b>yes</b>', 'wp-photo-album-plus');
@@ -2834,11 +2828,12 @@ global $wppa_supported_camara_brands;
 							$name = __('User name', 'wp-photo-album-plus');
 							$desc = __('Uploading users may overrule the default name.', 'wp-photo-album-plus');
 							$help = esc_js(__('If checked, the default photo name as defined in Table IX-D13 may be overruled by the user.', 'wp-photo-album-plus'));
-							$slug = 'wppa_name_user';
-							$html = wppa_checkbox($slug);
+							$slug1 = 'wppa_name_user';
+							$slug2 = 'wppa_name_user_mandatory';
+							$html = wppa_checkbox( $slug1 ) . '<span style="float:left;" >' . __( 'Mandatory', 'wp-photo-album-plus' ) . ':</span>' . wppa_checkbox( $slug2 );
 							$clas = 'wppa_feup';
 							$tags = 'upload';
-							wppa_setting($slug, '7', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting($slug1, '7', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Apply Newphoto desc user', 'wp-photo-album-plus');
 							$desc = __('Give each new frontend uploaded photo a standard description.', 'wp-photo-album-plus');
@@ -2853,8 +2848,9 @@ global $wppa_supported_camara_brands;
 							$name = __('User desc', 'wp-photo-album-plus');
 							$desc = __('Uploading users may overrule the default description.', 'wp-photo-album-plus');
 							$help = '';
-							$slug = 'wppa_desc_user';
-							$html = wppa_checkbox($slug);
+							$slug1 = 'wppa_desc_user';
+							$slug2 = 'wppa_desc_user_mandatory';
+							$html = wppa_checkbox( $slug1 ) . '<span style="float:left;" >' . __( 'Mandatory', 'wp-photo-album-plus' ) . ':</span>' . wppa_checkbox( $slug2 );
 							$clas = 'wppa_feup';
 							$tags = 'upload';
 							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
@@ -5220,7 +5216,7 @@ global $wppa_supported_camara_brands;
 								<td><?php _e('Link type', 'wp-photo-album-plus') ?></td>
 								<td><?php _e('Link page', 'wp-photo-album-plus') ?></td>
 								<td><?php _e('New tab', 'wp-photo-album-plus') ?></td>
-								<th scope="col" title="<?php _e('Photo specific link overrules', 'wp-photo-album-plus') ?>" style="cursor: default"><?php _e('PSO', 'wp-photo-album-plus') ?></td>
+								<td title="<?php _e('Photo specific link overrules', 'wp-photo-album-plus') ?>" style="cursor: pointer"><?php _e('PSO', 'wp-photo-album-plus') ?></td>
 								<td><?php _e('Help', 'wp-photo-album-plus') ?></td>
 							</tr>
 						</thead>
@@ -6283,7 +6279,7 @@ global $wppa_supported_camara_brands;
 								<td><?php _e('Link type', 'wp-photo-album-plus') ?></td>
 								<td><?php _e('Link page', 'wp-photo-album-plus') ?></td>
 								<td><?php _e('New tab', 'wp-photo-album-plus') ?></td>
-								<th scope="col" title="<?php _e('Photo specific link overrules', 'wp-photo-album-plus') ?>" style="cursor: default"><?php _e('PSO', 'wp-photo-album-plus') ?></td>
+								<td title="<?php _e('Photo specific link overrules', 'wp-photo-album-plus') ?>" style="cursor: pointer"><?php _e('PSO', 'wp-photo-album-plus') ?></td>
 								<td><?php _e('Help', 'wp-photo-album-plus') ?></td>
 							</tr>
 						</tfoot>
@@ -7080,7 +7076,7 @@ global $wppa_supported_camara_brands;
 
 						wppa_setting_subheader('A', '4', __('Harmless and reverseable actions', 'wp-photo-album-plus'));
 
-							$name = __('Ignore concurrency', 'wp-photo-album-plus');
+/*							$name = __('Ignore concurrency', 'wp-photo-album-plus');
 							$desc = __('Ignore the prevention of concurrent actions.', 'wp-photo-album-plus');
 							$help = esc_js(__('This setting is meant to recover from deadlock situations only. Use with care!', 'wp-photo-album-plus'));
 							$slug = 'wppa_maint_ignore_concurrency_error';
@@ -7092,7 +7088,7 @@ global $wppa_supported_camara_brands;
 							$clas = '';
 							$tags = 'system';
 							wppa_setting(false, '0.1', $name, $desc, $html, $help, $clas, $tags);
-
+*/
 							$name = __('Postpone cron', 'wp-photo-album-plus');
 							$desc = __('Temporary do no background processes.', 'wp-photo-album-plus');
 							$help = esc_js(__('This setting is meant to be used a.o. during bulk import/upload. Use with care!', 'wp-photo-album-plus'));
@@ -7104,7 +7100,7 @@ global $wppa_supported_camara_brands;
 							$html = array($html1, $html2, $html3, $html4);
 							$clas = '';
 							$tags = 'system';
-							wppa_setting(false, '0.2', $name, $desc, $html, $help, $clas, $tags);
+							wppa_setting(false, '0', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Setup', 'wp-photo-album-plus');
 							$desc = __('Re-initialize plugin.', 'wp-photo-album-plus');
@@ -9509,7 +9505,7 @@ global $wppa_supported_camara_brands;
 							$clas = '';
 							$tags = 'system,meta';
 							wppa_setting($slug, '8', $name, $desc, $html, $help, $clas, $tags);
-
+/*
 							$name = __('Max EXIF tag array size', 'wp-photo-album-plus');
 							$desc = __('Truncate array tags to ...', 'wp-photo-album-plus');
 							$help = esc_js(__('A value of 0 disables this feature', 'wp-photo-album-plus'));
@@ -9518,7 +9514,7 @@ global $wppa_supported_camara_brands;
 							$clas = '';
 							$tags = 'system,meta';
 							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
-
+*/
 							$name = __('Import Create page', 'wp-photo-album-plus');
 							$desc = __('Create wp page that shows the album when a directory to album is imported.', 'wp-photo-album-plus');
 							$help = esc_js(__('As soon as an album is created when a directory is imported, a wp page is made that displays the album content.', 'wp-photo-album-plus'));
@@ -10232,7 +10228,7 @@ global $wppa_supported_camara_brands;
 
 									$desc = '';
 									foreach ( $wppa_supported_camara_brands as $brand ) {
-										$lbl = wppa_exif_tagname( hexdec( '0x' . substr( $label['tag'], 2, 4 ) ), $brand, 'brandonly' );
+										$lbl = wppa_exif_tagname( $label['tag'], $brand, 'brandonly' );
 										if ( $lbl ) {
 											$desc .= '<br />' . $brand;
 										}
@@ -10244,7 +10240,7 @@ global $wppa_supported_camara_brands;
 
 									$html1 = wppa_edit($slug1, $label['description']);
 									foreach ( $wppa_supported_camara_brands as $brand ) {
-										$lbl = wppa_exif_tagname( hexdec( '0x' . substr( $label['tag'], 2, 4 ) ), $brand, 'brandonly' );
+										$lbl = wppa_exif_tagname( $label['tag'], $brand, 'brandonly' );
 										if ( $lbl ) {
 											$html1 .= '<br /><span style="clear:left;float:left;" >' . $lbl . ':</span>';
 										}
@@ -10539,23 +10535,54 @@ function wppa_settings_box_header($id, $title) {
 function wppa_setting_subheader($lbl, $col, $txt, $cls = '') {
 global $wppa_subtable;
 global $wppa_table;
+global $wppa_totcols;
 
 	$wppa_subtable = $lbl;
-	$colspan = $col + 3;
+	$colspan = $col + 2;
+	$wppa_totcols = $col + 4;
 	echo 	'<tr class="'.$cls.'" style="background-color:#f0f0f0;" >'.
 				'<td style="color:#333;"><b>'.$lbl.'</b></td>'.
-				'<td title="Click to toggle subtable" onclick="wppaToggleSubTable(\''.$wppa_table.'\',\''.$wppa_subtable.'\');" colspan="'.$colspan.'" style="color:#333; cursor:pointer;" ><em><b>'.$txt.'</b></em></td>'.
+				'<td' .
+					' title="Click to toggle subtable"' .
+					' onclick="wppaToggleSubTable(\''.$wppa_table.'\',\''.$wppa_subtable.'\');"' .
+					' colspan="'.$colspan.'"' .
+					' style="color:#333; cursor:pointer;"' .
+					' >' .
+					'<em>' .
+						'<b>' .
+							$txt .
+						'</b>' .
+					'</em>' .
+				'</td>' .
+				'<td>' .
+					'<input' .
+						' type="button"' .
+						' class="wppa-' . $wppa_table . '-' . $wppa_subtable . ' wppa-' . $wppa_table . '-' . $wppa_subtable . '-h wppa-none' . ' wppa-h"' .
+						' style="font-size: 11px; height:20px; padding:0; cursor: pointer;"' .
+						' title="'.__('Click for help', 'wp-photo-album-plus').'"' .
+						' onclick="' .
+							'jQuery( \'.wppa-' . $wppa_table . '-' . $wppa_subtable . '\' ).css( \'display\', \'\' );' .
+							'jQuery( \'.wppa-' . $wppa_table . '-' . $wppa_subtable . '-help\' ).css( \'display\', \'\' );' .
+							'jQuery( this ).css( \'display\', \'none\' );' .
+							'jQuery( \'.wppa-' . $wppa_table . '-' . $wppa_subtable . '-h\' ).css( \'display\', \'none\' );' .
+							'"' .
+						' value="&nbsp;?&nbsp;"' .
+					' />' .
+				'</td>' .
 			'</tr>';
 }
 
 
-function wppa_setting( $slug, $num, $name, $desc, $html, $help, $cls = '', $tags = '-' ) {
+function wppa_setting( $slug, $xnum, $name, $desc, $html, $help, $cls = '', $tags = '-' ) {
 global $wppa_status;
 global $wppa_defaults;
 global $wppa_table;
 global $wppa_subtable;
 global $no_default;
 global $wppa_opt;
+global $wppa_totcols;
+
+	$num = str_replace( array( ',', '.'), '', $xnum );
 
 	if ( is_array($slug) ) $slugs = $slug;
 	else {
@@ -10567,13 +10594,13 @@ global $wppa_opt;
 		$htmls = false;
 		if ( $html ) $htmls[] = $html;
 	}
-	if ( strpos($num, ',') !== false ) {
-		$nums = explode(',', $num);
+	if ( strpos($xnum, ',') !== false ) {
+		$nums = explode(',', $xnum);
 		$nums[0] = substr($nums[0], 1);
 	}
 	else {
 		$nums = false;
-		if ( $num ) $nums[] = $num;
+		if ( $xnum ) $nums[] = $xnum;
 	}
 
 	// Convert tags to classes
@@ -10581,17 +10608,17 @@ global $wppa_opt;
 
 	// Build the html
 	$result = "\n";
-	$result .= '<tr id="'.$wppa_table.$wppa_subtable.$num.'" class="wppa-'.$wppa_table.'-'.$wppa_subtable.' '.$cls.$tagcls.' wppa-none" style="color:#333;">';
-	$result .= '<td>'.$num.'</td>';
+	$result .= '<tr id="'.$wppa_table.$wppa_subtable.$num.'" class="wppa-setting wppa-'.$wppa_table.'-'.$wppa_subtable.' '.$cls.$tagcls.' wppa-none" style="color:#333;">';
+	$result .= '<td>'.$xnum.'</td>';
 	$result .= '<td>'.$name.'</td>';
 	$result .= '<td><small>'.$desc.'</small></td>';
 	if ( $htmls ) foreach ( $htmls as $html ) {
 		$result .= '<td>'.$html.'</td>';
 	}
 
-	if ( $help || ( defined( 'WP_DEBUG') && WP_DEBUG ) ) {
+	if ( $help ) { //|| ( defined( 'WP_DEBUG') && WP_DEBUG ) ) {
 		$is_dflt = true;
-		$hlp = esc_js($name).':\n\n'.$help;
+		$hlp = /* esc_js($name).':\n\n'. */ $help;
 		if ( ! $no_default ) {
 			if ( $slugs ) {
 				$hlp .= '\n\n'.__('The default for this setting is:', 'wp-photo-album-plus');
@@ -10611,13 +10638,35 @@ global $wppa_opt;
 				}
 			}
 		}
-		$result .= '<td><input type="button" style="font-size: 11px; height:20px; padding:0; cursor: pointer;" title="'.__('Click for help', 'wp-photo-album-plus').'" onclick="alert('."'".$hlp."'".')" value="&nbsp;' . ( $is_dflt ? '?' : '!' ) . '&nbsp;"></td>';
+		$result .=
+		'<td>' .
+			'<input' .
+				' type="button"' .
+				' style="font-size: 11px; height:20px; padding:0; cursor: pointer;"' .
+				' class="wppa-h wppa-' . $wppa_table . '-' . $wppa_subtable . '-h"' .
+				' title="'.__('Click for help', 'wp-photo-album-plus').'"' .
+				' onclick="' .
+					'jQuery( \'#' . $wppa_table.$wppa_subtable.$num.'-help\' ).css(\'display\',\'\');' .
+					'jQuery( this ).css( \'display\', \'none\' );' .
+					'"' .
+				' value="&nbsp;' . ( $is_dflt ? '?' : '!' ) . '&nbsp;"' .
+			' />' .
+		'</td>';
 	}
 	else {
 		$result .= '<td></td>';//$hlp = __('No help available');
 	}
 
 	$result .= '</tr>';
+
+	if ( $help ) {
+		$result .=
+		'<tr id="'.$wppa_table.$wppa_subtable.$num.'-help" class="wppa-setting-help wppa-'.$wppa_table.'-'.$wppa_subtable.'-help " style="display:none;" >' .
+			'<td></td>' . // num
+			'<td></td>' . // name
+			'<td colspan="' . ( $wppa_totcols - 2 ) . '" style="color:#000077;" ><small><i>' . stripslashes( str_replace( '\n', ' ',  $hlp ) ) . '</i></small></td>' .
+		'</tr>';
+	}
 
 	echo $result;
 

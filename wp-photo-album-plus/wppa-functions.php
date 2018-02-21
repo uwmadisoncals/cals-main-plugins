@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.8.00
+* Version 6.8.01
 *
 */
 
@@ -2169,11 +2169,16 @@ static $user;
 	if ( ( ! wppa( 'is_slideonly' ) || wppa( 'name_on' ) ) && ! wppa( 'is_filmonly' ) ) {
 		$name = esc_js( wppa_get_photo_name( $id ) );
 		if ( ! $name ) $name = '&nbsp;';
-		$fullname = wppa_get_photo_name( $id, array( 	'addowner' 	=> wppa_switch( 'show_full_owner' ),
-														'addmedal' 	=> true,
-														'escjs' 	=> true,
-														'showname' 	=> wppa_switch( 'show_full_name' ),
-													) );
+		if ( wppa_is_pdf( $id ) ) {
+			$fullname = esc_js( wppa_get_photo_item( $id, 'filename' ) );
+		}
+		else {
+			$fullname = wppa_get_photo_name( $id, array( 	'addowner' 	=> wppa_switch( 'show_full_owner' ),
+															'addmedal' 	=> true,
+															'escjs' 	=> true,
+															'showname' 	=> wppa_switch( 'show_full_name' ),
+														) );
+		}
 		if ( ! $fullname ) $fullname = '&nbsp;';
 	}
 
@@ -4380,6 +4385,7 @@ global $wppa_upload_succes_id;
 
 	// Do Upload
 	if ( $may_upload ) {
+		$upload_message = '';
 		$blogged = false;
 		if ( wppa_get_post( 'wppa-upload-album' ) ) {	// Upload photo
 			$nonce = wppa_get_post( 'nonce' );
@@ -4444,6 +4450,8 @@ global $wppa_upload_succes_id;
 
 				// Init alert text with possible results from wppa_do_frontend_file_upload()
 				$alert = $wppa_alert;
+				$upload_message = $alert;
+				$blog_failed = false;
 
 				if ( $done ) {
 
@@ -4471,54 +4479,75 @@ global $wppa_upload_succes_id;
 						if ( $post_id > 0 ) {
 							$blogged = true;
 						}
+						else {
+							$blg_failed = true;
+						}
 					}
 
 					// Alert text for upload
+					$m = ' ' . esc_js( sprintf( _n( '%d photo successfully uploaded', '%d photos successfully uploaded', $done, 'wp-photo-album-plus' ), $done ) ) . '.';
 					if ( wppa_opt( 'fe_alert' ) == 'upcre' || wppa_opt( 'fe_alert' ) == 'all' ) {
-						$alert .= ' ' . esc_js( sprintf( _n( '%d photo successfully uploaded', '%d photos successfully uploaded', $done, 'wp-photo-album-plus' ), $done ) ) . '.';
+						$alert .= $m;
 					}
+					$upload_message .= $m;
+
 
 					// ADD POINTS
 					$points = wppa_opt( 'cp_points_upload' ) * $done;
 					$bret = wppa_add_credit_points( $points, __( 'Photo upload' ,'wp-photo-album-plus' ) );
 
 					// Alert text for points
+					$m = ' ' . esc_js( sprintf( __( '%s points added' ,'wp-photo-album-plus' ), $points ) ) . '.';
 					if ( $bret && wppa_opt( 'fe_alert' ) != '-none-' ) {
-						$alert .= ' ' . esc_js( sprintf( __( '%s points added' ,'wp-photo-album-plus' ), $points ) ) . '.';
+						$alert .= $m;
+					}
+					elseif( $bret ) {
+						$upload_message .= $m;
 					}
 
 					// Alert text for blogged
+					if ( $status == 'pending' ) {
+						$m = ' ' . __( 'Your post is awaiting moderation.', 'wp-photo-album-plus' );
+					}
+					else {
+						$m = ' ' . __( 'Your post is published.', 'wp-photo-album-plus' );
+					}
 					if ( $blogged && ( wppa_opt( 'fe_alert' ) == 'blog' || wppa_opt( 'fe_alert' ) == 'all' ) ) {
-						if ( $status == 'pending' ) {
-							$alert .= ' ' . esc_js( __( 'Your post is awaiting moderation.', 'wp-photo-album-plus' ) );
-						}
-						else {
-							$alert .= ' ' . esc_js( __( 'Your post is published.', 'wp-photo-album-plus' ) );
-						}
+						$alert .= $m;
+						$upload_message .= $m;
+					}
+
+					if ( $blog_failed ) {
+						$m = ' ' . __( 'Blog failed', 'wp-photo-album-plus' );
+						$alert .= $m;
+						$upload_message .= $m;
 					}
 				}
 
 				// Alert text for failed upload
 				if ( $fail ) {
 					if ( ! $done ) {
-						$alert .= ' ' . __( 'Upload failed', 'wp-photo-album-plus' ) . '.';
+						$m = ' ' . __( 'Upload failed', 'wp-photo-album-plus' ) . '.';
 					}
 					else {
-						$alert .= ' ' . sprintf( _n( '%d upload failed', '%d uploads failed', $fail, 'wp-photo-album-plus' ), $fail ) . '.';
+						$m = ' ' . sprintf( _n( '%d upload failed', '%d uploads failed', $fail, 'wp-photo-album-plus' ), $fail ) . '.';
 					}
-
+					$alert .= $m;
+					$upload_message .= $m;
 				}
 
 				// Clean alert text
 				$alert = trim( $alert );
 
+				// Output if fe upload ajax
+				if ( wppa_switch( 'ajax_upload' ) && wppa_browser_can_html5() ) {
+					echo $upload_message;
+				}
+
 				// Alert only when requested or fail
 				if ( wppa_opt( 'fe_alert' ) != '-none-' || $fail ) {
 					wppa_alert( $alert, $reload );
 				}
-//				elseif( ! $blogged ) {
-//					wppa_alert( '', $reload );
-//				}
 
 				// Redirect to blogpost
 				if ( $blogged ) {
@@ -5063,6 +5092,8 @@ function wppa_get_lbtitle( $type, $id ) {
 	$do_desc 		= wppa_switch( 'ovl_'.$type.'_desc' );
 	$do_sm 			= wppa_switch( 'share_on_lightbox' );
 
+	$dl_name = wppa_is_pdf( $id ) ? wppa_get_photo_item( $id, 'filename' ) : wppa_get_photo_name( $id, array( 'addowner' => wppa_switch( 'ovl_add_owner' ), 'showname' => wppa_switch( 'ovl_'.$type.'_name' ) ) );
+
 	$result = '';
 	if ( $do_download ) {
 		if ( wppa_opt( 'art_monkey_display' ) == 'button' ) {
@@ -5072,8 +5103,7 @@ function wppa_get_lbtitle( $type, $id ) {
 							' style="cursor:pointer; margin-bottom:0px; max-width:500px;"' .
 							' class="wppa-download-button wppa-ovl-button"' .
 							' onclick="' . ( wppa_is_safari() && ( wppa_opt( 'art_monkey_link' ) == 'file' ) ? 'wppaWindowReference = window.open();' : '' ) . 'wppaAjaxMakeOrigName( ' . wppa( 'mocc' ) . ', \'' . wppa_encrypt_photo($id) .'\' );"' .
-							' value="' . rtrim( __( 'Download' , 'wp-photo-album-plus') . ' ' .
-										 wppa_get_photo_name( $id, array( 'addowner' => wppa_switch( 'ovl_add_owner' ), 'showname' => wppa_switch( 'ovl_'.$type.'_name' ) ) ) ) .
+							' value="' . rtrim( __( 'Download' , 'wp-photo-album-plus') . ' ' . $dl_name ) .
 							'"' .
 						' />';
 		}
@@ -5083,8 +5113,7 @@ function wppa_get_lbtitle( $type, $id ) {
 							' style="cursor:pointer;"' .
 							' onclick="' . ( wppa_is_safari() && ( wppa_opt( 'art_monkey_link' ) == 'file' ) ? 'wppaWindowReference = window.open();' : '' ) . 'wppaAjaxMakeOrigName( '.wppa( 'mocc' ).', \''.wppa_encrypt_photo($id).'\' );"' .
 							' >' .
-							rtrim( __( 'Download' , 'wp-photo-album-plus') . ' ' .
-							wppa_get_photo_name( $id, array( 'addowner' => wppa_switch( 'ovl_add_owner' ), 'showname' => wppa_switch( 'ovl_'.$type.'_name' ) ) ) ) .
+							rtrim( __( 'Download' , 'wp-photo-album-plus') . ' ' . $dl_name ) .
 						'</a>';
 		}
 	}

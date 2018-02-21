@@ -116,35 +116,39 @@ function add_custom_scripts() {
     $mt_options  = mt_get_plugin_options(true);
     $js_options = array('body_bg' => '', 'gallery_array' => array(), 'blur_intensity' => 0, 'font_link' => '');
 
-//    wp_register_script( '_backstretch', 	MAINTENANCE_URI  .'load/js/jquery.backstretch.min.js', 'jquery');
     wp_register_script( '_frontend', 		MAINTENANCE_URI  .'load/js/jquery.frontend.js', 'jquery');
-//		wp_register_script( '_blur',			MAINTENANCE_URI  .'load/js/jquery.blur.min.js', 'jquery');
 
     // IE scripts
     wp_register_script( 'jquery_ie', 	$wp_scripts->registered['jquery-core']->src);
-//		wp_register_script( 'jquery_migrate_ie', 	$wp_scripts->registered['/jquery-migrate']->src);
-//		wp_register_script( '_placeholder_ie', 	MAINTENANCE_URI  .'load/js/jquery.placeholder.js');
-//		wp_register_script( '_frontend_ie', 	MAINTENANCE_URI  .'load/js/jquery.frontend.ie.js');
 
     wp_script_add_data('jquery_ie', 'conditional', 'lte IE 10');
-//		wp_script_add_data('jquery_migrate_ie', 'conditional', 'lte IE 10');
-//		wp_script_add_data('_placeholder_ie', 'conditional', 'lte IE 10');
-//		wp_script_add_data('_frontend_ie', 'conditional', 'lte IE 10');
 
     if(class_exists('WPCF7')) {
         wp_register_script( '_cf7scripts',	MAINTENANCE_URI  .'../contact-form-7/includes/js/scripts.js');
-        $_wpcf7 = array(
+        $wpcf7 = array(
+            'apiSettings' => array(
+                'root' => esc_url_raw( rest_url( 'contact-form-7/v1' ) ),
+                'namespace' => 'contact-form-7/v1',
+            ),
             'recaptcha' => array(
                 'messages' => array(
-                    'empty' => __( 'Please verify that you are not a robot.',
-                        'contact-form-7' ) ) ) );
+                    'empty' =>
+                        __( 'Please verify that you are not a robot.', 'contact-form-7' ),
+                ),
+            ),
+        );
+
         if ( defined( 'WP_CACHE' ) && WP_CACHE ) {
-            $_wpcf7['cached'] = 1;
+            $wpcf7['cached'] = 1;
         }
+
         if ( wpcf7_support_html5_fallback() ) {
-            $_wpcf7['jqueryUi'] = 1;
+            $wpcf7['jqueryUi'] = 1;
         }
-        wp_localize_script( '_cf7scripts', '_wpcf7', $_wpcf7 );
+
+        wp_localize_script( '_cf7scripts', 'wpcf7', $wpcf7 );
+
+//        do_action( 'wpcf7_enqueue_scripts' );
     }
 
 
@@ -204,11 +208,8 @@ function get_page_title($error_message = null) {
         $options_title = strip_tags(stripslashes($mt_options['page_title']));
     }
 
-//    if ($error_message != '') {
-//        $title =  $options_title . ' - ' . $error_message;
-//    } else {
-        $title =  $options_title;
-//    }
+    $title =  $options_title;
+
     echo "<title>$title</title>";
 }
 
@@ -277,8 +278,8 @@ function get_logo_box() {
     if ( !empty($mt_options['logo_width']) ) { $logo_w = $mt_options['logo_width']; }
     if ( !empty($mt_options['logo_height']) ) { $logo_h = $mt_options['logo_height']; }
     if ( !empty($mt_options['logo']) || !empty($mt_options['retina_logo']) ) {
-        $logo = wp_get_attachment_image_src( $mt_options['logo']);
-        $retina_logo = wp_get_attachment_image_src( $mt_options['retina_logo']);
+        $logo = wp_get_attachment_image_src( $mt_options['logo'], 'full', true);
+        $retina_logo = wp_get_attachment_image_src( $mt_options['retina_logo'], 'full', true);
         if (!empty($logo)) {
             $image_link = esc_url_raw($logo[0]);
         }
@@ -299,12 +300,6 @@ function get_logo_box() {
         ?>
         <div class="logo-box" rel="home">
             <img src="<?php echo $image_link; ?>" srcset="<?php echo $image_link_retina; ?> 2x" width="<?php echo $logo_w; ?>" <?php echo (!empty($logo_h))?'height="'.$logo_h.'"':''; ?> alt="logo">
-<!--            <picture class="logo">-->
-<!--                --><?php //if($image_link_retina) { ?>
-<!--                    <source srcset="--><?php //echo $image_link_retina; ?><!-- 2x" width="--><?php //echo $logo_w; ?><!--" --><?php //echo (!empty($logo_h))?'height="'.$logo_h.'"':''; ?><!-->
-<!--                --><?php //} ?>
-<!--                <img src="--><?php //echo $image_link; ?><!--" width="--><?php //echo $logo_w; ?><!--" --><?php //echo (!empty($logo_h))?'height="'.$logo_h.'"':''; ?><!-- alt="logo">-->
-<!--            </picture>-->
         </div>
         <?php
     } else {
@@ -316,17 +311,29 @@ add_action ('logo_box', 'get_logo_box', 10);
 
 function get_content_section() {
     $mt_options  = mt_get_plugin_options(true);
+    if (!empty($mt_options['body_font_subset'])) {
+        $current_subset = esc_attr($mt_options['body_font_subset']);
+        $font_weight = (string)((int)$current_subset);
+        $font_style = str_replace($font_weight, '', $current_subset);
+    }
+	
+	if (empty($font_style) || $font_style == 'regular') {
+		$font_style = 'normal';
+	}
+	if (empty($font_weight)) {
+		$font_weight = 'normal';
+	}
     $out_content = null;
     if (!empty($mt_options['heading'])) {
-        $out_content .= '<h2 class="heading font-center">' . wp_kses_post(stripslashes($mt_options['heading'])) .'</h2>';
+        $out_content .= '<h2 class="heading font-center" style="font-weight:'.$font_weight.';font-style:'.$font_style.'">' . wp_kses_post(stripslashes($mt_options['heading'])) .'</h2>';
     }
 
     if (!empty($mt_options['description'])) {
         $description_content = wpautop(wp_kses_post(stripslashes($mt_options['description'])), true);
-        $out_content .= '<div class="description">' . $description_content .'</div>';
+        $out_content .= '<div class="description" style="font-weight:'.$font_weight.';font-style:'.$font_style.'">' . $description_content .'</div>';
     } else {
         $site_description = get_bloginfo('description');
-        $out_content .= '<div class="description"><h3>' . $site_description .'</h3></div>';
+        $out_content .= '<div class="description" style="font-weight:'.$font_weight.';font-style:'.$font_style.'"><h3>' . $site_description .'</h3></div>';
     }
 
     echo $out_content;
@@ -335,10 +342,23 @@ add_action('content_section', 'get_content_section', 10);
 
 function get_footer_section() {
     $mt_options  = mt_get_plugin_options(true);
+    if (!empty($mt_options['body_font_subset'])) {
+        $current_subset = esc_attr($mt_options['body_font_subset']);
+        $font_weight = (string)((int)$current_subset);
+        $font_style = str_replace($font_weight, '', $current_subset);
+    }
+	
+	if (empty($font_style) || $font_style == 'regular') {
+		$font_style = 'normal';
+	}
+	if (empty($font_weight)) {
+		$font_weight = 'normal';
+	}
+	
     $out_ftext   = null;
 
     if (isset($mt_options['footer_text']) && !empty($mt_options['footer_text'])) {
-        $out_ftext .= wp_kses_post(stripslashes($mt_options['footer_text']));
+        $out_ftext .= '<div style="font-weight:'.$font_weight.';font-style:'.$font_style.'">' . wp_kses_post(stripslashes($mt_options['footer_text'])) . '</div>';
     }
     echo $out_ftext;
 }

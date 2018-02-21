@@ -15,7 +15,7 @@ function wpdm_zip_package($package){
  */
 function wpdm_download_data($filename, $content)
 {
-    \WPDM\FileSystem::downloadData($filename, $content);
+    \WPDM\libs\FileSystem::downloadData($filename, $content);
 }
 
 
@@ -27,7 +27,7 @@ function wpdm_download_data($filename, $content)
  */
 function wpdm_cache_remote_file($url, $filename = '')
 {
-    return \WPDM\FileSystem::copyURL($url, $filename);
+    return \WPDM\libs\FileSystem::copyURL($url, $filename);
 }
 
 /**
@@ -38,7 +38,7 @@ function wpdm_cache_remote_file($url, $filename = '')
  */
 function wpdm_zip_files($files, $zipname){
 
-    return \WPDM\FileSystem::zipFiles($files, $zipname);
+    return \WPDM\libs\FileSystem::zipFiles($files, $zipname);
 }
 
 /**
@@ -54,7 +54,7 @@ function wpdm_download_file($filepath, $filename, $speed = 0, $resume_support = 
 {
 
     if(isset($_GET['play'])) $extras['play'] = esc_attr($_GET['play']);
-     \WPDM\FileSystem::donwloadFile($filepath, $filename, $speed, $resume_support, $extras);
+     \WPDM\libs\FileSystem::donwloadFile($filepath, $filename, $speed, $resume_support, $extras);
 
 }
 
@@ -162,7 +162,7 @@ function DownloadLink(&$package, $embed = 0, $extras = array())
 
         if ( $package['password'] != '') {
             $lock = 'locked';
-            $data = \WPDM\PackageLocks::AskPassword($package);
+            $data = \WPDM\libs\PackageLocks::AskPassword($package);
         }
 
 
@@ -170,7 +170,7 @@ function DownloadLink(&$package, $embed = 0, $extras = array())
 
         if (isset($package['captcha_lock']) && (int)$package['captcha_lock'] == 1) {
             $lock = 'locked';
-            $sociallock .=  \WPDM\PackageLocks::reCaptchaLock($package , true);
+            $sociallock .=  \WPDM\libs\PackageLocks::reCaptchaLock($package , true);
 
         }
 
@@ -246,8 +246,8 @@ function wpdm_verify_email($email){
 function wpdm_getlink()
 {
     global $wpdb;
-    if (!isset($_POST['id'])) return;
-    $id = (int)$_POST['id'];
+    if (!isset($_POST['__wpdm_ID'])) return;
+    $id = (int)$_POST['__wpdm_ID'];
     $password = isset($_POST['password']) ? addslashes($_POST['password']) : '';
     $file = get_post($id, ARRAY_A);
     //$file['ID'] = $file['ID'];
@@ -732,7 +732,7 @@ function wpdm_basename($file){
 
 function wpdm_dynamic_thumb($path, $size)
 {
-    return \WPDM\FileSystem::imageThumbnail($path, $size[0], $size[1]);
+    return \WPDM\libs\FileSystem::imageThumbnail($path, $size[0], $size[1]);
 }
 
 
@@ -1156,7 +1156,7 @@ function wpdm_pdf_preview($pid, $w, $h, $echo = true){
  * @usage Generates thumbnail from PDF file. [ From v4.1.3 ]
  */
 function wpdm_pdf_thumbnail($pdf, $id){
-    return \WPDM\FileSystem::pdfThumbnail($pdf, $id);
+    return \WPDM\libs\FileSystem::pdfThumbnail($pdf, $id);
 }
 
 /**

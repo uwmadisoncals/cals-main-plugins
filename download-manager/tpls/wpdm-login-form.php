@@ -38,7 +38,7 @@ if(!isset($up['host']) || $up['host'] != $_SERVER['SERVER_NAME']) $log_redirect 
     <?php endif; ?>
     <?php if(is_user_logged_in()){
 
-        do_action("wpdm_user_logged_in","<div class='alert alert-success'>".__("You are already logged in.",'download-manager')."<br style='clear:both;display:block;margin-top:5px'/> <a class='btn btn-xs btn-primary' href='".get_permalink(get_option('__wpdm_user_dashboard'))."'>".__("Go To Dashboard",'download-manager')."</a>  <a class='btn btn-xs btn-danger' href='".wp_logout_url()."'>".__("Logout",'download-manager')."</a></div>");
+        do_action("wpdm_user_logged_in","".__("You are already logged in.",'download-manager')."<br style='clear:both;display:block;margin-top:10px'/> <a class='btn btn-xs btn-primary btn-dashboard-link' href='".get_permalink(get_option('__wpdm_user_dashboard'))."'>".__("Go To Dashboard",'download-manager')."</a>  <a class='btn btn-xs btn-danger' href='".wp_logout_url()."'>".__("Logout",'download-manager')."</a>");
 
     } else {
 

@@ -3,7 +3,7 @@
 * Pachkage: wp-photo-album-plus
 *
 * admin photo of the day widget
-* version 6.7.01
+* version 6.8.01
 *
 */
 
@@ -565,7 +565,7 @@ global $wppa_opt;
 		$result .= '<td></td>';
 	}
 
-	if ( $help || ( defined( 'WP_DEBUG') && WP_DEBUG ) ) {
+	if ( $help ) { //|| ( defined( 'WP_DEBUG') && WP_DEBUG ) ) {
 		$is_dflt = true;
 		$hlp = esc_js($name).':\n\n'.$help;
 		if ( ! $no_default ) {
@@ -587,13 +587,35 @@ global $wppa_opt;
 				}
 			}
 		}
-		$result .= '<td><input type="button" style="font-size: 11px; height:20px; padding:0; cursor: pointer;" title="'.__('Click for help', 'wp-photo-album-plus').'" onclick="alert('."'".$hlp."'".')" value="&nbsp;' . ( $is_dflt ? '?' : '!' ) . '&nbsp;"></td>';
+
+		$result .=
+		'<td>' .
+			'<input' .
+				' type="button"' .
+				' style="font-size: 11px; height:20px; padding:0; cursor: pointer;"' .
+				' title="'.__('Click for help', 'wp-photo-album-plus').'"' .
+				' onclick="' .
+					'jQuery( \'#' . $wppa_table.$wppa_subtable.$num.'-help\' ).css(\'display\',\'\');' .
+					'jQuery( this ).css( \'display\', \'none\' );' .
+					'"' .
+				' value="&nbsp;?&nbsp;"' .
+			' />' .
+		'</td>';
 	}
 	else {
 		$result .= '<td></td>';//$hlp = __('No help available');
 	}
 
 	$result .= '</tr>';
+
+	if ( $help ) {
+		$result .=
+		'<tr id="'.$wppa_table.$wppa_subtable.$num.'-help" class="wppa-setting-help wppa-'.$wppa_table.'-'.$wppa_subtable.'-help " style="display:none;" >' .
+			'<td></td>' . // num
+			'<td></td>' . // name
+			'<td colspan="3" style="color:#000077;" ><small><i>' . stripslashes( str_replace( '\n', ' ',  $hlp ) ) . '</i></small></td>' .
+		'</tr>';
+	}
 
 	echo $result;
 

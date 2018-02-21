@@ -1,6 +1,7 @@
 <?php
+namespace WPDM\libs;
 
-class WPDM_MediaHandler {
+class MediaHandler {
 
     function __construct(){
 
@@ -10,7 +11,7 @@ class WPDM_MediaHandler {
 
     function PlayAudio(){
         if(isset($_REQUEST['wpdm_play_audio']))
-            $url = WPDM_Crypt::Decrypt($_REQUEST['wpdm_play_audio']);
+            $url = \WPDM\libs\Crypt::Decrypt($_REQUEST['wpdm_play_audio']);
             echo do_shortcode('[audio');
         die();
     }

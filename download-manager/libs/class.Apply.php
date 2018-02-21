@@ -159,7 +159,7 @@ class Apply {
         global $wp_query, $wpdb;
         if (!isset($_POST['wpdm_reg'])) return;
 
-        $shortcode_params = \WPDM_Crypt::Decrypt($_REQUEST['phash']);
+        $shortcode_params = \WPDM\libs\Crypt::Decrypt($_REQUEST['phash']);
 
         if(isset($shortcode_params['captcha']) && $shortcode_params['captcha'] == 'true') {
             if(isset($_REQUEST['g-recaptcha-response'])) {
@@ -338,7 +338,7 @@ class Apply {
             $media = explode("/", $media[1]);
             list($ID, $file) = $media;
             $files = \WPDM\Package::getFiles($ID);
-            $file = \WPDM\FileSystem::fullPath($file, $ID);
+            $file = \WPDM\libs\FileSystem::fullPath($file, $ID);
             $stream = new \WPDM\libs\StreamMedia($file);
             $stream->start();
             die();

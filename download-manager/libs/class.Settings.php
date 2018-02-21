@@ -1,7 +1,7 @@
 <?php
 
 
-namespace WPDM;
+namespace WPDM\libs;
 
 class Settings
 {

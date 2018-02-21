@@ -1,6 +1,6 @@
 <?php
 
-namespace WPDM;
+namespace WPDM\libs;
 
 global $gp1c, $tbc;
 
@@ -31,7 +31,7 @@ class PackageLocks
             <div class="panel-body" id="wpdmdlp_<?php echo  $unqid . '_' . $package['ID']; ?>">
                 <div id="msg_<?php echo $package['ID']; ?>" style="display:none;"><button type="button" class="btn btn-lg btn-info btn-block" disabled="disabled"><?php _e('Processing...','download-manager'); ?></button></div>
                 <form id="wpdmdlf_<?php echo $unqid . '_' . $package['ID']; ?>" method=post action="<?php echo home_url('/'); ?>" style="margin-bottom:0px;">
-                    <input type=hidden name="id" value="<?php echo $package['ID']; ?>" />
+                    <input type=hidden name="__wpdm_ID" value="<?php echo $package['ID']; ?>" />
                     <input type=hidden name="dataType" value="json" />
                     <input type=hidden name="execute" value="wpdm_getlink" />
                     <input type=hidden name="action" value="wpdm_ajax_call" />
@@ -55,7 +55,7 @@ class PackageLocks
                                 jQuery("#wpdmdlf_<?php echo  $unqid . '_' . $package['ID']; ?>").hide();
                                 jQuery("#msg_<?php echo  $package['ID']; ?>").html("verifying...").css("cursor","pointer").show().click(function(){ jQuery(this).hide();jQuery("#wpdmdlf_<?php echo  $unqid . '_' . $package['ID']; ?>").show(); });
                                 if(res.downloadurl!=""&&res.downloadurl!=undefined) {
-                                    location.href=res.downloadurl;
+                                    window.open(res.downloadurl);
                                     jQuery("#wpdmdlf_<?php echo  $unqid . '_' . $package['ID']; ?>").html("<a style='color:#ffffff !important' class='wpdm-download-button btn btn-success btn-lg btn-block' href='"+res.downloadurl+"'><?php _e('Download','download-manager'); ?></a>");
                                     jQuery("#msg_<?php echo  $package['ID']; ?>").hide();
                                     jQuery("#wpdmdlf_<?php echo  $unqid . '_' . $package['ID']; ?>").show();
@@ -88,7 +88,7 @@ class PackageLocks
             var ctz = new Date().getMilliseconds();
             var siteurl = "<?php echo home_url('/?nocache='); ?>"+ctz,force="<?php echo $force; ?>";
             var verifyCallback_<?php echo $package['ID']; ?> = function(response) {
-                jQuery.post(siteurl,{id:<?php echo $package['ID'];?>,dataType:'json',execute:'wpdm_getlink',force:force,social:'c',reCaptchaVerify:response,action:'wpdm_ajax_call'},function(res){
+                jQuery.post(siteurl,{__wpdm_ID:<?php echo $package['ID'];?>,dataType:'json',execute:'wpdm_getlink',force:force,social:'c',reCaptchaVerify:response,action:'wpdm_ajax_call'},function(res){
                     if(res.downloadurl!='' && res.downloadurl !== undefined && res !== undefined ) {
                     location.href=res.downloadurl;
                     jQuery('#reCaptchaLock_<?php echo $package['ID']; ?>').html('<a href="'+res.downloadurl+'" class="wpdm-download-button btn btn-success btn-lg btn-block"><?php _e('Download','download-manager'); ?></a>');
