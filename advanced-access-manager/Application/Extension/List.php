@@ -19,7 +19,7 @@ class AAM_Extension_List {
                 'title'       => 'Complete Package',
                 'id'          => 'AAM_COMPLETE_PACKAGE',
                 'type'        => 'commercial',
-                'description' => 'Get the complete list of all available premium extensions in one package. Any new premium extensions in the future will be available with updates for no additional cost.',
+                'description' => 'Get the complete list of all available premium extensions in one package. Any new premium extensions in the future will be available for no additional cost.',
                 'url'         => 'https://aamplugin.com/complete-package',
                 'version'     => (defined('AAM_COMPLETE_PACKAGE') ? constant('AAM_COMPLETE_PACKAGE') : null)
             ),
@@ -27,7 +27,7 @@ class AAM_Extension_List {
                 'title'       => 'Plus Package',
                 'id'          => 'AAM_PLUS_PACKAGE',
                 'type'        => 'commercial',
-                'description' => 'The best selling extension that has the most advanced content management features for WordPress CMS. Manage accsss to any post, page, custom post type, category, custom hierarchical taxonomy or define the default access to all.',
+                'description' => 'The best selling extension with the most advanced content management features for the WordPress CMS. Manage granular access to any post, page, custom post type, category, custom hierarchical taxonomy or define the default access to all your content for all users, roles and visitors.',
                 'url'         => 'https://aamplugin.com/extension/plus-package',
                 'version'     => (defined('AAM_PLUS_PACKAGE') ? constant('AAM_PLUS_PACKAGE') : null)
             ),
@@ -35,7 +35,7 @@ class AAM_Extension_List {
                 'title'       => 'IP Check',
                 'id'          => 'AAM_IP_CHECK',
                 'type'        => 'commercial',
-                'description' => 'This extension was designed to manage access to your entire website based on visitor\'s geo-location, refered host or IP address.',
+                'description' => 'Manage access to your entire website based on visitor\'s geo-location, refered host or IP address.',
                 'url'         => 'https://aamplugin.com/extension/ip-check',
                 'version'     => (defined('AAM_IP_CHECK') ? constant('AAM_IP_CHECK') : null)
             ),
@@ -52,10 +52,11 @@ class AAM_Extension_List {
                 'id'          => 'AAM_ECOMMERCE',
                 'type'        => 'commercial',
                 'new'         => true,
-                'description' => 'Start selling access to your website content. This extension gives ability to define the list of E-Commerce products that you can bind with any content on your website. The properly configured AAM Payment widget allows any authenticated user to purchase access with credit/debig card or PayPal. Braintree and Stripe gateways are used to handle actual purchase.',
+                'description' => 'Start selling access to your website content. This extension gives you the ability to define list of E-Commerce products that you can bind with any content on your website. The properly configured AAM Payment widget allows any authenticated user to purchase access with credit/debig card or PayPal. Braintree and Stripe gateways are used to handle payment transactions.',
                 'url'         => 'https://aamplugin.com/extension/ecommerce',
                 'version'     => (defined('AAM_ECOMMERCE') ? constant('AAM_ECOMMERCE') : null)
             ),
+            // TODO: Remove in Dec 2018
             'AAM_PAYMENT' => array(
                 'title'       => 'Payment',
                 'id'          => 'AAM_PAYMENT',
@@ -69,24 +70,25 @@ class AAM_Extension_List {
                 'id'          => 'AAM_MULTISITE',
                 'type'        => 'GNU',
                 'license'     => 'AAMMULTISITE',
-                'description' => 'Convenient way to navigate between different sites in the Network Admin Panel.',
+                'description' => 'Convenient way to navigate between different sites in the Network Admin Panel. This is the open source solution and you can find it on the <a href="https://github.com/aamplugin/multisite-extension" target="_blank">Github here</a>.',
                 'version'     => (defined('AAM_MULTISITE') ? constant('AAM_MULTISITE') : null)
-            ),
-            'AAM_CONFIGPRESS' => array(
-                'title'       => 'ConfigPress',
-                'id'          => 'AAM_CONFIGPRESS',
-                'type'        => 'GNU',
-                'license'     => 'AAMCONFIGPRESS',
-                'description' => 'Extension to manage AAM core functionality with advanced configuration settings.',
-                'version'     => (defined('AAM_CONFIGPRESS') ? constant('AAM_CONFIGPRESS') : null)
             ),
             'AAM_USER_ACTIVITY' => array(
                 'title'       => 'User Activities',
                 'id'          => 'AAM_USER_ACTIVITY',
                 'type'        => 'GNU',
                 'license'     => 'AAMUSERACTIVITY',
-                'description' => 'Track any kind of user or visitor activity on your website. <a href="https://aamplugin.com/help/how-to-track-any-wordpress-user-activity" target="_blank">Read more.</a>',
+                'description' => 'Track any kind of user or visitor activity on your website. <a href="https://aamplugin.com/help/how-to-track-any-wordpress-user-activity" target="_blank">Read more.</a> This is the open source solution and you can find it on the <a href="https://github.com/aamplugin/user-activity-extension" target="_blank">Github here</a>.',
                 'version'     => (defined('AAM_USER_ACTIVITY') ? constant('AAM_USER_ACTIVITY') : null)
+            ),
+            'AAM_SOCIAL_LOGIN' => array(
+                'title'       => 'Social Login',
+                'id'          => 'AAM_SOCIAL_LOGIN',
+                'type'        => 'GNU',
+                'tag'         => 'ALPHA', 
+                'license'     => 'AAMSOCIALLOGIN',
+                'description' => 'Login to your website with social networks like Facebook, Twitter, Instagram etc. This is the open source solution and you can find it on the <a href="https://github.com/aamplugin/social-login-extension" target="_blank">Github here</a>.',
+                'version'     => (defined('AAM_SOCIAL_LOGIN') ? constant('AAM_SOCIAL_LOGIN') : null)
             ),
         );
     }

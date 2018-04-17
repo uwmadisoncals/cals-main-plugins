@@ -237,7 +237,7 @@ final class AAM_Core_API {
 
             if (!empty($type) && ($type == 'login')) {
                 $redirect = add_query_arg(
-                        array('aam-redirect' => 'login'), 
+                        array('reason' => 'restricted'), 
                         wp_login_url(AAM_Core_Request::server('REQUEST_URI'))
                 );
             } elseif (!empty($type) && ($type != 'default')) {
@@ -314,7 +314,9 @@ final class AAM_Core_API {
         }
         
         if (function_exists('get_plugin_data')) {
-            $data    = get_plugin_data(dirname(__FILE__) . '/../../aam.php');
+            $data = get_plugin_data(
+                    realpath(dirname(__FILE__) . '/../../aam.php')
+            );
             $version = (isset($data['Version']) ? $data['Version'] : null);
         }
         

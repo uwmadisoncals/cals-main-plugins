@@ -101,6 +101,7 @@
                 dom: 'ftrip',
                 pagingType: 'simple',
                 processing: true,
+                stateSave: true,
                 serverSide: false,
                 ajax: {
                     url: aamLocal.ajaxurl,
@@ -572,6 +573,7 @@
                 autoWidth: false,
                 ordering: false,
                 dom: 'ftrip',
+                stateSave: true,
                 pagingType: 'simple',
                 serverSide: true,
                 processing: true,
@@ -586,7 +588,7 @@
                     }
                 },
                 columnDefs: [
-                    {visible: false, targets: [0, 1, 4]}
+                    {visible: false, targets: [0, 1, 4, 5]}
                 ],
                 language: {
                     search: '_INPUT_',
@@ -651,59 +653,85 @@
                                     'title': aam.__('Manage User')
                                 })).prop('disabled', (isCurrent(data[0]) ? true: false));
                                 break;
-
+                                
+                            case 'ttl':
+                                if (!aam.isUI()) {
+                                    $(container).append($('<i/>', {
+                                        'class': 'aam-row-action icon-clock text-' + (data[5] ? 'danger' : 'warning')
+                                    }).bind('click', function () {
+                                        $('#edit-user-expiration-btn').attr('data-user-id', data[0]);
+                                        $('#reset-user-expiration-btn').attr('data-user-id', data[0]);
+                                        
+                                        if (data[5]) {
+                                            $('#reset-user-expiration-btn').removeClass('hidden');
+                                            var settings = data[5].split('|');
+                                            $('#user-expires').val(settings[0]);
+                                            $('#action-after-expiration').val(settings[1]);
+                                        } else {
+                                            $('#reset-user-expiration-btn').addClass('hidden');
+                                            $('#user-expires, #action-after-expiration').val('');
+                                        }
+                                        
+                                        $('#edit-user-expiration-modal').modal('show');
+                                    }).attr({
+                                        'data-toggle': "tooltip",
+                                        'title': aam.__('User Expiration')
+                                    }));
+                                }
+                                break;
+                                
                             case 'edit':
                                 if (!aam.isUI()) {
-                                $(container).append($('<i/>', {
-                                    'class': 'aam-row-action icon-pencil text-info'
-                                }).bind('click', function () {
-                                    window.open(
-                                            aamLocal.url.editUser + '?user_id=' + data[0], '_blank'
-                                            );
-                                }).attr({
-                                    'data-toggle': "tooltip",
-                                    'title': aam.__('Edit User')
-                                }));
-                            }
+                                    $(container).append($('<i/>', {
+                                        'class': 'aam-row-action icon-pencil text-info'
+                                    }).bind('click', function () {
+                                        window.open(
+                                                aamLocal.url.editUser + '?user_id=' + data[0], '_blank'
+                                                );
+                                    }).attr({
+                                        'data-toggle': "tooltip",
+                                        'title': aam.__('Edit User')
+                                    }));
+                                }
                                 break;
 
                             case 'lock':
                                 if (!aam.isUI()) {
-                                $(container).append($('<i/>', {
-                                    'class': 'aam-row-action icon-lock-open-alt text-warning'
-                                }).bind('click', function () {
-                                    blockUser(data[0], $(this));
-                                }).attr({
-                                    'data-toggle': "tooltip",
-                                    'title': aam.__('Lock User')
-                                }));
-                            }
+                                    $(container).append($('<i/>', {
+                                        'class': 'aam-row-action icon-lock-open-alt text-warning'
+                                    }).bind('click', function () {
+                                        blockUser(data[0], $(this));
+                                    }).attr({
+                                        'data-toggle': "tooltip",
+                                        'title': aam.__('Lock User')
+                                    }));
+                                }
                                 break;
 
                             case 'unlock':
                                 if (!aam.isUI()) {
-                                $(container).append($('<i/>', {
-                                    'class': 'aam-row-action icon-lock text-danger'
-                                }).bind('click', function () {
-                                    blockUser(data[0], $(this));
-                                }).attr({
-                                    'data-toggle': "tooltip",
-                                    'title': aam.__('Unlock User')
-                                }));
-                            }
+                                    $(container).append($('<i/>', {
+                                        'class': 'aam-row-action icon-lock text-danger'
+                                    }).bind('click', function () {
+                                        blockUser(data[0], $(this));
+                                    }).attr({
+                                        'data-toggle': "tooltip",
+                                        'title': aam.__('Unlock User')
+                                    }));
+                                }
                                 break;
 
                             case 'switch':
                                 if (!aam.isUI()) {
-                                $(container).append($('<i/>', {
-                                    'class': 'aam-row-action icon-exchange text-success'
-                                }).bind('click', function () {
-                                    switchToUser(data[0], $(this));
-                                }).attr({
-                                    'data-toggle': "tooltip",
-                                    'title': aam.__('Switch To User')
-                                }));
-                            }
+                                    $(container).append($('<i/>', {
+                                        'class': 'aam-row-action icon-exchange text-success'
+                                    }).bind('click', function () {
+                                        switchToUser(data[0], $(this));
+                                    }).attr({
+                                        'data-toggle': "tooltip",
+                                        'title': aam.__('Switch To User')
+                                    }));
+                                }
                                 break;
 
                             default:
@@ -717,6 +745,74 @@
                     }
                     $('td:eq(1)', row).html(container);
                 }
+            });
+            
+            //edit role button
+            $('#edit-user-expiration-btn').bind('click', function () {
+                var _this = this;
+
+                $.ajax(aamLocal.ajaxurl, {
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'aam',
+                        sub_action: 'Subject_User.saveExpiration',
+                        _ajax_nonce: aamLocal.nonce,
+                        user: $(_this).attr('data-user-id'),
+                        expires: $('#user-expires').val(),
+                        after: $('#action-after-expiration').val()
+                    },
+                    beforeSend: function () {
+                        $(_this).text(aam.__('Saving...')).attr('disabled', true);
+                    },
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            $('#user-list').DataTable().ajax.reload();
+                        } else {
+                            aam.notification('danger', response.reason);
+                        }
+                    },
+                    error: function () {
+                        aam.notification('danger', aam.__('Application error'));
+                    },
+                    complete: function () {
+                        $('#edit-user-expiration-modal').modal('hide');
+                        $(_this).text(aam.__('Save')).attr('disabled', false);
+                    }
+                });
+            });
+            
+            //reset user button
+            $('#reset-user-expiration-btn').bind('click', function () {
+                var _this = this;
+
+                $.ajax(aamLocal.ajaxurl, {
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'aam',
+                        sub_action: 'Subject_User.saveExpiration',
+                        _ajax_nonce: aamLocal.nonce,
+                        user: $(_this).attr('data-user-id')
+                    },
+                    beforeSend: function () {
+                        $(_this).text(aam.__('Reseting...')).attr('disabled', true);
+                    },
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            $('#user-list').DataTable().ajax.reload();
+                        } else {
+                            aam.notification('danger', response.reason);
+                        }
+                    },
+                    error: function () {
+                        aam.notification('danger', aam.__('Application error'));
+                    },
+                    complete: function () {
+                        $('#edit-user-expiration-modal').modal('hide');
+                        $(_this).text(aam.__('Reset')).attr('disabled', false);
+                    }
+                });
             });
 
             //add setSubject hook
@@ -915,7 +1011,7 @@
 
                     //reset button
                     $('#menu-reset').bind('click', function () {
-                        aam.reset('menu');
+                        aam.reset('menu', $(this));
                     });
                 }
             }
@@ -1036,7 +1132,7 @@
 
                     //reset button
                     $('#metabox-reset').bind('click', function () {
-                        aam.reset('metabox');
+                        aam.reset('metabox', $(this));
                     });
 
                     $('input[type="checkbox"]', '#metabox-list').each(function () {
@@ -1348,7 +1444,7 @@
 
                     //reset button
                     $('#capability-reset').bind('click', function () {
-                        aam.reset('capability');
+                        aam.reset('capability', $(this));
                     });
                 }
             }
@@ -1752,11 +1848,21 @@
                                 subject: aam.getSubject().type,
                                 subjectId: aam.getSubject().id
                             },
+                            beforeSend: function() {
+                                var label = $('#post-reset').text();
+                                $('#post-reset').attr('data-original-label', label);
+                                $('#post-reset').text(aam.__('Resetting...'));
+                            },
                             success: function (response) {
                                 if (response.status === 'success') {
                                     $('#post-overwritten').addClass('hidden');
                                     $.aam.loadAccessForm(type, id);
                                 }
+                            },
+                            complete: function() {
+                                $('#post-reset').text(
+                                    $('#post-reset').attr('data-original-label')
+                                );
                             }
                         });
                     });
@@ -1890,7 +1996,7 @@
                     });
 
                     $('#redirect-reset').bind('click', function () {
-                        aam.reset('redirect');
+                        aam.reset('redirect', $(this));
                     });
                 }
             }
@@ -1963,7 +2069,7 @@
                     });
                     
                     $('#login-redirect-reset').bind('click', function () {
-                        aam.reset('loginRedirect');
+                        aam.reset('loginRedirect', $(this));
                     });
                 }
             }
@@ -2030,7 +2136,7 @@
                     });
                     
                     $('#logout-redirect-reset').bind('click', function () {
-                        aam.reset('logoutRedirect');
+                        aam.reset('logoutRedirect', $(this));
                     });
                 }
             }
@@ -2099,6 +2205,155 @@
                             //save redirect type
                             save($(this).attr('name'), $(this).val());
                         });
+                    });
+                }
+            }
+
+            aam.addHook('init', initialize);
+
+        })(jQuery);
+        
+        /**
+         * API Routes Interface
+         * 
+         * @param {jQuery} $
+         * 
+         * @returns {void}
+         */
+        (function ($) {
+
+            /**
+             * 
+             * @param {type} type
+             * @param {type} route
+             * @param {type} method
+             * @param {type} value
+             * @param {type} btn
+             * @returns {undefined}
+             */
+            function save(type, route, method, value, btn) {
+                //show indicator
+                $(btn).attr('class', 'aam-row-action icon-spin4 animate-spin');
+                
+                $.ajax(aamLocal.ajaxurl, {
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        action: 'aam',
+                        sub_action: 'Main_Route.save',
+                        _ajax_nonce: aamLocal.nonce,
+                        subject: aam.getSubject().type,
+                        subjectId: aam.getSubject().id,
+                        type: type,
+                        route: route,
+                        method: method,
+                        value: value
+                    },
+                    success: function (response) {
+                        if (response.status === 'failure') {
+                            aam.notification('danger', response.error);
+                            updateBtn(btn, value ? 0 : 1);
+                        } else {
+                            $('#aam-route-overwrite').removeClass('hidden');
+                            updateBtn(btn, value);
+                        }
+                    },
+                    error: function () {
+                        updateBtn(btn, value ? 0 : 1);
+                        aam.notification('danger', aam.__('Application error'));
+                    }
+                });
+            }
+            
+            /**
+             * 
+             * @param {type} btn
+             * @param {type} value
+             * @returns {undefined}
+             */
+            function updateBtn(btn, value) {
+                if (value) {
+                    $(btn).attr('class', 'aam-row-action text-danger icon-check');
+                } else {
+                    $(btn).attr('class', 'aam-row-action text-muted icon-check-empty');
+                }
+            }
+            
+            /**
+             * 
+             * @returns {undefined}
+             */
+            function initialize() {
+                if ($('#route-content').length) {
+                    //initialize the role list table
+                    $('#route-list').DataTable({
+                        autoWidth: false,
+                        ordering: false,
+                        pagingType: 'simple',
+                        serverSide: false,
+                        ajax: {
+                            url: aamLocal.ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'aam',
+                                sub_action: 'Main_Route.getTable',
+                                _ajax_nonce: aamLocal.nonce,
+                                subject: aam.getSubject().type,
+                                subjectId: aam.getSubject().id
+                            }
+                        },
+                        columnDefs: [
+                            {visible: false, targets: [0]},
+                            {className: 'text-center', targets: [1]}
+                        ],
+                        language: {
+                            search: '_INPUT_',
+                            searchPlaceholder: aam.__('Search Route'),
+                            info: aam.__('_TOTAL_ route(s)'),
+                            infoFiltered: '',
+                            infoEmpty: aam.__('Nothing to show'),
+                            lengthMenu: '_MENU_'
+                        },
+                        createdRow: function (row, data) {
+                            // decorate the method
+                            var method = $('<span/>', {
+                                'class': 'aam-api-method ' + data[1].toLowerCase()
+                            }).text(data[1]);
+                            
+                            $('td:eq(0)', row).html(method);
+                            
+                            var actions = data[3].split(',');
+
+                            var container = $('<div/>', {'class': 'aam-row-actions'});
+                            $.each(actions, function (i, action) {
+                                switch (action) {
+                                    case 'unchecked':
+                                        $(container).append($('<i/>', {
+                                            'class': 'aam-row-action text-muted icon-check-empty'
+                                        }).bind('click', function () {
+                                            save(data[0], data[2], data[1], 1, this);
+                                        }));
+                                        break;
+
+                                    case 'checked':
+                                        $(container).append($('<i/>', {
+                                            'class': 'aam-row-action text-danger icon-check'
+                                        }).bind('click', function () {
+                                            save(data[0], data[2], data[1], 0, this);
+                                        }));
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                            });
+                            $('td:eq(2)', row).html(container);
+                        }
+                    });
+
+                    //reset button
+                    $('#route-reset').bind('click', function () {
+                        aam.reset('route', $(this));
                     });
                 }
             }
@@ -2316,14 +2571,14 @@
 
 
         /**
-         * Utilities Interface
+         * Settings Interface
          * 
          * @param {type} $
          * 
          * @returns {undefined}
          */
         (function ($) {
-
+            
             /**
              * 
              * @param {type} param
@@ -2382,7 +2637,10 @@
                             },
                             success: function(response) {
                                 if (response.status === 'success') {
-                                    aam.notification('success', aam.__('All settings were cleared successfully'));
+                                    aam.notification(
+                                        'success', 
+                                        aam.__('All settings has been cleared successfully')
+                                    );
                                 } else {
                                     aam.notification('danger', response.reason);
                                 }
@@ -2413,7 +2671,10 @@
                             },
                             success: function(response) {
                                 if (response.status === 'success') {
-                                    aam.notification('success', aam.__('The cache was cleared successfully'));
+                                    aam.notification(
+                                        'success', 
+                                        aam.__('The cache has been cleared successfully')
+                                    );
                                 } else {
                                     aam.notification('danger', response.reason);
                                 }
@@ -2525,6 +2786,35 @@
             }
 
             aam.addHook('init', initialize);
+            
+            //ConfigPress hook
+            aam.addHook('menu-feature-click', function(feature) {
+                if (feature === 'configpress' 
+                        && !$('#configpress-editor').next().hasClass('CodeMirror')) {
+                    var editor = CodeMirror.fromTextArea(
+                        document.getElementById("configpress-editor"), {}
+                    );
+
+                    editor.on("blur", function(){
+                        $.ajax(aamLocal.ajaxurl, {
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                action: 'aam',
+                                sub_action: 'Settings_ConfigPress.save',
+                                _ajax_nonce: aamLocal.nonce,
+                                config: editor.getValue()
+                            },
+                            error: function () {
+                                aam.notification(
+                                    'danger', 
+                                    aam.__('Application error')
+                                );
+                            }
+                        });
+                    });
+                } 
+            });
 
         })(jQuery);
         
@@ -2872,7 +3162,7 @@
      * @param {type} object
      * @returns {undefined}
      */
-    AAM.prototype.reset = function(object) {
+    AAM.prototype.reset = function(object, btn) {
         $.ajax(aamLocal.ajaxurl, {
             type: 'POST',
             data: {
@@ -2883,11 +3173,19 @@
                 subjectId: this.getSubject().id,
                 object: object
             },
+            beforeSend: function() {
+                var label = btn.text();
+                btn.attr('data-original-label', label);
+                btn.text(aam.__('Resetting...'));
+            },
             success: function () {
                 aam.fetchContent('main');
             },
             error: function () {
                 aam.notification('danger', aam.__('Application error'));
+            },
+            complete: function() {
+                btn.text(btn.attr('data-original-label'));
             }
         });
     };

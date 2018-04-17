@@ -36,6 +36,7 @@ class AAM_Backend_View {
         AAM_Backend_Feature_Main_Menu::register();
         AAM_Backend_Feature_Main_Metabox::register();
         AAM_Backend_Feature_Main_Capability::register();
+        AAM_Backend_Feature_Main_Route::register();
         AAM_Backend_Feature_Main_Post::register();
         AAM_Backend_Feature_Main_Redirect::register();
         AAM_Backend_Feature_Main_LoginRedirect::register();
@@ -45,6 +46,7 @@ class AAM_Backend_View {
         AAM_Backend_Feature_Settings_Core::register();
         AAM_Backend_Feature_Settings_Content::register();
         AAM_Backend_Feature_Settings_Tools::register();
+        AAM_Backend_Feature_Settings_ConfigPress::register();
         
         //feature registration hook
         do_action('aam-feature-registration-action');
