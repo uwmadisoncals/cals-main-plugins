@@ -5,7 +5,7 @@ function rvm_add_styles( )
 {
             //wp_register_style( 'rvm_jvectormap_css', RVM_CSS_PLUGIN_DIR . '/jquery-jvectormap-1.2.4.css' );    
             wp_register_style( 'rvm_jvectormap_css', RVM_CSS_PLUGIN_DIR . '/jquery-jvectormap-2.0.3.css' , '2.0.3' );
-            wp_register_style( 'rvm_settings_css', RVM_CSS_PLUGIN_DIR . '/rvm_settings.css', '', '1.5' );
+            wp_register_style( 'rvm_settings_css', RVM_CSS_PLUGIN_DIR . '/rvm_settings.css', '', '1.6' );
 }
 
 // Make the style available just for plugin settings page
@@ -109,8 +109,14 @@ function rvm_add_scripts( )
             wp_register_script( 'rvm_general_js', RVM_JS_PLUGIN_DIR . '/rvm_general.js', array(
                          'jquery' 
             ), '', true );
+            wp_register_script( 'rvm_custom_posts_js', RVM_JS_PLUGIN_DIR . '/rvm_custom_posts.js', array(
+                         'jquery' 
+            ), '', true );
+            wp_register_script( 'rvm_admin_js', RVM_JS_PLUGIN_DIR . '/rvm_admin.js', array(
+                         'jquery' 
+            ), '', true );
             //Localize in javascript rvm_general_js
-            wp_localize_script( 'rvm_general_js', 'objectL10n', array(
+            wp_localize_script( 'rvm_custom_posts_js', 'objectL10n', array(
                          'loading' => __( 'Loading...', RVM_TEXT_DOMAIN ),
                         'marker_name' => __( 'Name', RVM_TEXT_DOMAIN ),
                         'marker_lat' => __( 'Latitude', RVM_TEXT_DOMAIN ),
@@ -123,7 +129,18 @@ function rvm_add_scripts( )
                         'marker_dim_placeholder' => __( 'e.g. 591.20', RVM_TEXT_DOMAIN ),
                         'marker_popup_placeholder' => __( 'e.g. Rome precipitation (mm) long term averages', RVM_TEXT_DOMAIN ),
                         'unzip_custom_map' => __( 'Unzip custom map', RVM_TEXT_DOMAIN ),
-                        'unzipping' => __( 'Installing...', RVM_TEXT_DOMAIN ),
+                        'unzipping' => __( 'Installing Map...', RVM_TEXT_DOMAIN ),
+                        'registering' => __( 'Registering...', RVM_TEXT_DOMAIN ),
+                        'no_map_selected' => __( 'Oops, seems someone needs to select a map first, correct?', RVM_TEXT_DOMAIN ),
+                        //set the path for javascript files
+                        'images_js_path' => RVM_IMG_PLUGIN_DIR //path for images to be called from javascript  
+            ) );
+
+            //Localize in javascript rvm_admin_js
+            wp_localize_script( 'rvm_admin_js', 'objectL10n', array(
+                        'unzipping' => __( 'Installing Marker Module...', RVM_TEXT_DOMAIN ),
+                        'registering' => __( 'Registering...', RVM_TEXT_DOMAIN ),
+                        'no_marker_module_selected' => __( 'Oops, seems someone needs to select a marker module first, correct?', RVM_TEXT_DOMAIN ),
                         //set the path for javascript files
                         'images_js_path' => RVM_IMG_PLUGIN_DIR //path for images to be called from javascript  
             ) );
@@ -135,6 +152,7 @@ function rvm_add_settings_scripts( $hook )
             if ( 'post.php' == $hook || 'post-new.php' == $hook ) {
                         wp_enqueue_script( 'jquery' );
                         wp_enqueue_script( 'rvm_general_js' );
+                        wp_enqueue_script( 'rvm_custom_posts_js' );
                         wp_enqueue_script( 'rvm_jquery-jvectormap-js' );
                         wp_enqueue_script( 'wp-color-picker' );
                         wp_enqueue_media(); //for media uploader
@@ -145,6 +163,14 @@ function rvm_add_settings_scripts( $hook )
                                     remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
                         }
             } //'post.php' == $hook || 'post-new.php' == $hook
+}
+// Add scripts just for admin settings page
+add_action( 'admin_print_scripts-settings_page_rvm_options_page', 'rvm_add_admin_settings_scripts' );
+function rvm_add_admin_settings_scripts( ) {
+                wp_enqueue_media(); //for media uploader
+                wp_enqueue_script( 'rvm_general_js' );
+                wp_enqueue_script( 'rvm_admin_js' );
+                wp_enqueue_style( 'rvm_settings_css' );  
 }
 // Make the scripts available for public pages
 add_action( 'wp_enqueue_scripts', 'rvm_add_pub_scripts' );

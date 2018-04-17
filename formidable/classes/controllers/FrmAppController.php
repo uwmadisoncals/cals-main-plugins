@@ -177,7 +177,7 @@ class FrmAppController {
 <div class="update-nag frm-update-to-pro">
 	<?php echo FrmAppHelper::kses( $tip['tip'] ); ?>
 	<span><?php echo FrmAppHelper::kses( $tip['call'] ); ?></span>
-	<a href="<?php echo esc_url( FrmAppHelper::make_affiliate_url('https://formidableforms.com?banner=1&tip=' . absint( $tip['num'] ) ) ); ?>" class="button">Upgrade to Pro</a>
+	<a href="<?php echo esc_url( FrmAppHelper::make_affiliate_url( 'https://formidableforms.com?banner=1&tip=' . absint( $tip['num'] ) ) ); ?>" class="button">Upgrade to Pro</a>
 </div>
 <?php
 		}
@@ -291,7 +291,7 @@ class FrmAppController {
 		$version = FrmAppHelper::plugin_version();
 		FrmAppHelper::load_admin_wide_js( false );
 
-		wp_register_script( 'formidable_admin', FrmAppHelper::plugin_url() . '/js/formidable_admin.js', array(
+		$dependecies = array(
 			'formidable_admin_global',
 			'formidable',
 			'jquery',
@@ -300,7 +300,13 @@ class FrmAppController {
 			'jquery-ui-sortable',
 			'bootstrap_tooltip',
 			'bootstrap-multiselect',
-		), $version, true );
+		);
+
+		if ( FrmAppHelper::is_admin_page( 'formidable-styles' ) ) {
+			$dependecies[] = 'wp-color-picker';
+		}
+
+		wp_register_script( 'formidable_admin', FrmAppHelper::plugin_url() . '/js/formidable_admin.js', $dependecies, $version, true );
 		wp_register_style( 'formidable-admin', FrmAppHelper::plugin_url() . '/css/frm_admin.css', array(), $version );
         wp_register_script( 'bootstrap_tooltip', FrmAppHelper::plugin_url() . '/js/bootstrap.min.js', array( 'jquery' ), '3.3.4' );
 		wp_register_style( 'formidable-grids', FrmAppHelper::plugin_url() . '/css/frm_grids.css', array(), $version );
@@ -358,9 +364,12 @@ class FrmAppController {
         load_plugin_textdomain( 'formidable', false, FrmAppHelper::plugin_folder() . '/languages/' );
     }
 
-    /**
-     * Filter shortcodes in text widgets
-     */
+	/**
+	 * Filter shortcodes in text widgets
+	 *
+	 * @deprecated 2.5.4
+	 * @codeCoverageIgnore
+	 */
 	public static function widget_text_filter( $content ) {
 		_deprecated_function( __METHOD__, '2.5.4' );
 		$regex = '/\[\s*(formidable|display-frm-data|frm-stats|frm-graph|frm-entry-links|formresults|frm-search)\s+.*\]/';
@@ -369,6 +378,9 @@ class FrmAppController {
 
 	/**
 	 * Deprecated in favor of wpmu_upgrade_site
+	 *
+	 * @deprecated 2.3
+	 * @codeCoverageIgnore
 	 */
 	public static function front_head() {
 		_deprecated_function( __FUNCTION__, '2.3' );
@@ -430,8 +442,8 @@ class FrmAppController {
 	public static function api_install() {
 		if ( self::needs_update() ) {
 			$running = get_option( 'frm_install_running' );
-			if ( false === $running ) {
-				update_option( 'frm_install_running', true );
+			if ( false === $running || $running < strtotime( '-5 minutes' ) ) {
+				update_option( 'frm_install_running', time(), 'no' );
 				self::install();
 				delete_option( 'frm_install_running' );
 			}
@@ -450,6 +462,10 @@ class FrmAppController {
 		wp_die();
 	}
 
+	/**
+	 * @deprecated 3.0.04
+	 * @codeCoverageIgnore
+	 */
     public static function activation_install() {
 		_deprecated_function( __METHOD__, '3.0.04', 'FrmAppController::install' );
         FrmDb::delete_cache_and_transient( 'frm_plugin_version' );
@@ -457,13 +473,13 @@ class FrmAppController {
         self::install();
     }
 
-    public static function install( $old_db_version = false ) {
+    public static function install() {
         $frmdb = new FrmMigrate();
-        $frmdb->upgrade( $old_db_version );
+        $frmdb->upgrade();
     }
 
     public static function uninstall() {
-		FrmAppHelper::permission_check('administrator');
+		FrmAppHelper::permission_check( 'administrator' );
         check_ajax_referer( 'frm_ajax', 'nonce' );
 
 		$frmdb = new FrmMigrate();
@@ -485,7 +501,12 @@ class FrmAppController {
         return $tables;
     }
 
-    // Routes for wordpress pages -- we're just replacing content here folks.
+	/**
+	 * Routes for wordpress pages -- we're just replacing content
+	 *
+	 * @deprecated 3.0
+	 * @codeCoverageIgnore
+	 */
 	public static function page_route( $content ) {
 		_deprecated_function( __METHOD__, '3.0' );
 		global $post;
@@ -498,7 +519,7 @@ class FrmAppController {
 	}
 
     public static function deauthorize() {
-		FrmAppHelper::permission_check('frm_change_settings');
+		FrmAppHelper::permission_check( 'frm_change_settings' );
         check_ajax_referer( 'frm_ajax', 'nonce' );
 
         delete_option( 'frmpro-credentials' );
@@ -523,6 +544,10 @@ class FrmAppController {
 		return $text;
 	}
 
+	/**
+	 * @deprecated 1.07.05
+	 * @codeCoverageIgnore
+	 */
     public static function get_form_shortcode( $atts ) {
         _deprecated_function( __FUNCTION__, '1.07.05', 'FrmFormsController::get_form_shortcode()' );
         return FrmFormsController::get_form_shortcode( $atts );

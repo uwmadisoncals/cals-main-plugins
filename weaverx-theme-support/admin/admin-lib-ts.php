@@ -20,8 +20,10 @@ function weaverx_process_options_themes() {
 	if (weaverx_submitted('save_mytheme')) {	// invoked from Save/Restore tab
 		weaverx_save_msg(__("Current settings saved in WordPress database.", 'weaver-xtreme' /*adm*/));
 		global $weaverx_opts_cache;
-		if (!$weaverx_opts_cache)
-			$weaverx_opts_cache = get_option( apply_filters('weaverx_options','weaverx_settings') ,array());
+		if (!$weaverx_opts_cache) {
+			$func_opt = WEAVER_GET_OPTION;
+			$weaverx_opts_cache = $func_opt( apply_filters('weaverx_options',WEAVER_SETTINGS_NAME) ,array());
+		}
 		if (current_user_can( 'manage_options' )) {
 			$compressed = array_filter( $weaverx_opts_cache, 'strlen'); // filter out all null options (strlen == 0)
 			update_option(apply_filters('weaverx_options','weaverx_settings_backup'),$compressed);

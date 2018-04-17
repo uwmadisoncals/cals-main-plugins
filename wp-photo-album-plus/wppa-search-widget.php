@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the search widget
-* Version 6.7.03
+* Version 6.8.07
 *
 */
 
@@ -22,12 +22,6 @@ class SearchPhotos extends WP_Widget {
 		global $widget_content;
 		global $wpdb;
 
-		require_once( dirname( __FILE__ ) . '/wppa-links.php' );
-		require_once( dirname( __FILE__ ) . '/wppa-styles.php' );
-		require_once( dirname( __FILE__ ) . '/wppa-functions.php' );
-		require_once( dirname( __FILE__ ) . '/wppa-thumbnails.php' );
-		require_once( dirname( __FILE__ ) . '/wppa-boxes-html.php' );
-		require_once( dirname( __FILE__ ) . '/wppa-slideshow.php' );
 		wppa_initialize_runtime();
 
 		wppa( 'mocc', wppa( 'mocc' ) + 1 );
@@ -44,7 +38,13 @@ class SearchPhotos extends WP_Widget {
 											'landingpage' 	=> '0',
 											'catbox' 		=> false,
 											'selboxes' 		=> false,
+											'logonly' 		=> 'no',
 											) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
 
  		$widget_title = apply_filters( 'widget_title', $instance['title'] );
 
@@ -55,6 +55,7 @@ class SearchPhotos extends WP_Widget {
 			echo $before_title . $widget_title . $after_title;
 		}
 
+		echo '<span data-wppa="yes" ></span>';
 		echo wppa_get_search_html( 	$instance['label'],
 									wppa_checked( $instance['sub'] ),
 									wppa_checked( $instance['root'] ),
@@ -80,8 +81,9 @@ class SearchPhotos extends WP_Widget {
 		$instance['sub']   			= isset( $new_instance['sub'] ) ? $new_instance['sub'] : false;
 		$instance['album'] 			= $new_instance['album'];
 		$instance['landingpage']	= $new_instance['landingpage'];
-		$instance['catbox'] 		= $new_instance['catbox'];
-		$instance['selboxes'] 		= $new_instance['selboxes'];
+		$instance['catbox'] 		= isset( $new_instance['catbox'] ) ? $new_instance['catbox'] : false;
+		$instance['selboxes'] 		= isset( $new_instance['selboxes'] ) ? $new_instance['selboxes'] : false;
+		$instance['logonly'] 		= $new_instance['logonly'];
 
         return $instance;
     }
@@ -101,6 +103,7 @@ class SearchPhotos extends WP_Widget {
 												'landingpage' 	=> '',
 												'catbox' 		=> false,
 												'selboxes' 		=> false,
+												'logonly' 		=> 'no',
 												) );
 
 		// Title
@@ -216,6 +219,10 @@ class SearchPhotos extends WP_Widget {
 								'widefat',
 								__( 'The default page will be created automatically', 'wp-photo-album-plus' )
 								);
+
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
 
     }
 

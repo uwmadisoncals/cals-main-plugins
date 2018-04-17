@@ -11,7 +11,7 @@
  * Plugin Name:       Connections Business Directory
  * Plugin URI:        https://connections-pro.com/
  * Description:       A business directory and address book manager.
- * Version:           8.12
+ * Version:           8.17
  * Author:            Steven A. Zahm
  * Author URI:        http://connections-pro.com/
  * License:           GPL-2.0+
@@ -36,6 +36,12 @@ if ( ! class_exists( 'connectionsLoad' ) ) {
 	final class connectionsLoad {
 
 		/**
+		 * The plugin version.
+		 * @since 8.16
+		 */
+		const VERSION = '8.17';
+
+		/**
 		 * Stores the instance of this class.
 		 *
 		 * @access private
@@ -46,6 +52,38 @@ if ( ! class_exists( 'connectionsLoad' ) ) {
 		private static $instance;
 
 		/**
+		 * @var string The absolute path this this file.
+		 *
+		 * @access private
+		 * @since  8.16
+		 */
+		private static $file = '';
+
+		/**
+		 * @var string The URL to the plugin's folder.
+		 *
+		 * @access private
+		 * @since  8.16
+		 */
+		private static $pluginURL = '';
+
+		/**
+		 * @var string The absolute path to this plugin's folder.
+		 *
+		 * @access private
+		 * @since  8.16
+		 */
+		private static $path = '';
+
+		/**
+		 * @var string The basename of the plugin.
+		 *
+		 * @access private
+		 * @since  8.16
+		 */
+		private static $basename = '';
+
+		/**
 		 * @access private
 		 * @since  8.5.26
 		 *
@@ -54,12 +92,12 @@ if ( ! class_exists( 'connectionsLoad' ) ) {
 		private $api;
 
 		/**
-		 * @access private
+		 * @access public
 		 * @since  unknown
 		 *
 		 * @var cnUser
 		 */
-		public $currentUser;
+		public $currentUser, $user;
 
 		/**
 		 * @access public
@@ -167,8 +205,13 @@ if ( ! class_exists( 'connectionsLoad' ) ) {
 
 				self::$instance = new connectionsLoad;
 
-				require_once plugin_dir_path( __FILE__ ) . 'includes/class.constants.php';
-				cnConstants::define( __FILE__ );
+				self::$file       = __FILE__;
+				self::$pluginURL  = plugin_dir_url( __FILE__ );
+				self::$path       = plugin_dir_path( __FILE__ );
+				self::$basename   = plugin_basename( __FILE__ );
+
+				require_once self::$path . 'includes/class.constants.php';
+				cnConstants::define();
 
 				require_once CN_PATH . 'includes/class.dependency.php';
 				cnDependency::register();
@@ -197,7 +240,7 @@ if ( ! class_exists( 'connectionsLoad' ) ) {
 				 *       domain will be merged into it. The purpose is to allow the extensions to use strings known to
 				 *       in the core plugin to reuse those strings and benefit if they are already translated.
 				 */
-				cnText_Domain::create( 'connections' )->addAction( -1 );
+				cnText_Domain::register( 'connections', -1 );
 
 				// Register the core action/filter hooks.
 				self::hooks();
@@ -206,6 +249,7 @@ if ( ! class_exists( 'connectionsLoad' ) ) {
 				self::$instance->settings    = cnSettingsAPI::getInstance();
 				self::$instance->pageHook    = new stdClass();
 				self::$instance->currentUser = new cnUser();
+				self::$instance->user        = &self::$instance->currentUser;
 				self::$instance->retrieve    = new cnRetrieve();
 				self::$instance->term        = new cnTerms();
 				self::$instance->template    = new cnTemplatePart();
@@ -229,6 +273,51 @@ if ( ! class_exists( 'connectionsLoad' ) ) {
 			return self::$instance;
 		}
 
+		/**
+		 * Gets the basename of a plugin.
+		 *
+		 * @access public
+		 * @since  8.16
+		 *
+		 * @return string
+		 */
+		public function pluginBasename() {
+
+			return self::$basename;
+		}
+
+		/**
+		 * Get the absolute directory path (with trailing slash) for the plugin.
+		 *
+		 * @access public
+		 * @since  8.16
+		 *
+		 * @return string
+		 */
+		public function pluginPath() {
+
+			return self::$path;
+		}
+
+		/**
+		 * Get the URL directory path (with trailing slash) for the plugin.
+		 *
+		 * @access public
+		 * @since  8.16
+		 *
+		 * @return string
+		 */
+		public function pluginURL() {
+
+			return self::$pluginURL;
+		}
+
+		/**
+		 * Register the plugin's hooks.
+		 *
+		 * @access private
+		 * @since  unknown
+		 */
 		private static function hooks() {
 
 			// Include the Template Customizer files.
@@ -290,7 +379,7 @@ if ( ! class_exists( 'connectionsLoad' ) ) {
 			 * NOTE: Set priority 99 so the filter will hopefully run last to help prevent other plugins
 			 *       which do not hook into `set-screen-option` properly from breaking Connections.
 			 */
-			add_filter( 'set-screen-option', array( 'cnAdminFunction', 'managePageLimitSave' ), 99, 3 );
+			add_filter( 'set-screen-option', array( 'cnAdminFunction', 'setManageScreenOptions' ), 99, 3 );
 
 			// Init the class.
 			add_action( 'init', array( 'cnSEO', 'hooks' ) );

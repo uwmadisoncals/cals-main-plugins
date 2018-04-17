@@ -3,7 +3,7 @@
 * Pachkage: wp-photo-album-plus
 *
 *
-* Version 6.8.00
+* Version 6.8.06
 *
 */
 
@@ -114,7 +114,7 @@ global $wpdb;
 	$admins = array();
 
 	if ( wppa_user_is( 'administrator' ) ) {
-		$users = get_users( array( 'role' => 'administrator' ) );
+		$admins = get_users( array( 'role' => 'administrator' ) );
 	}
 
 	// Make the html
@@ -232,7 +232,7 @@ global $wpdb;
 				'<td>'.
 					'<select id="wppagallery-admins" name="admins" style="color:#070;" multiple="multiple" onchange="wppaGalleryEvaluate()">'.
 						'<option value="" selected="selected" style="color:#070;" >-- '.__('All', 'wp-photo-album-plus').' --</option>';
-							foreach( $users as $user ) {
+							foreach( $admins as $user ) {
 								$result .=
 								'<option value="'.$user->data->user_login.'" class="wppagallery-admin" style="color:#070;" >'.$user->data->user_login.'</option>';
 							}

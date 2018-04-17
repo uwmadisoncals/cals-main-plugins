@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the best rated photos
-* Version 6.8.01
+* Version 6.8.07
 *
 */
 
@@ -21,14 +21,7 @@ class BestOfWidget extends WP_Widget {
     function widget( $args, $instance ) {
 		global $wpdb;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
-
         wppa( 'in_widget', 'bestof' );
 		wppa_bump_mocc();
 
@@ -45,7 +38,13 @@ class BestOfWidget extends WP_Widget {
 														'ratcount' 	=> 'yes',
 														'linktype' 	=> 'none',
 														'totvalue' 	=> '',
+														'logonly' 	=> 'no',
 														) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
 
  		$widget_title 	= apply_filters( 'widget_title', $instance['title'] );
 		$page 			= in_array( $instance['linktype'], wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page( 'bestof_widget_linkpage', __( 'Best Of Photos', 'wp-photo-album-plus' ) );
@@ -77,7 +76,7 @@ class BestOfWidget extends WP_Widget {
 														'totvalue' 		=> $total,
 														) );
 
-		$widget_content .= '<div style="clear:both"></div>';
+		$widget_content .= '<div style="clear:both" data-wppa="yes" ></div>';
 		$widget_content .= "\n".'<!-- WPPA+ BestOf Widget end -->';
 
 		echo "\n" . $before_widget;
@@ -103,6 +102,7 @@ class BestOfWidget extends WP_Widget {
 		$instance['ratcount'] 	= $new_instance['ratcount'];
 		$instance['linktype'] 	= $new_instance['linktype'];
 		$instance['totvalue'] 	= $new_instance['totvalue'];
+		$instance['logonly'] 	= $new_instance['logonly'];
 
         return $instance;
     }
@@ -122,6 +122,7 @@ class BestOfWidget extends WP_Widget {
 														'ratcount' 	=> 'yes',
 														'linktype' 	=> 'none',
 														'totvalue' 	=> '',
+														'logonly' 	=> 'no',
 														) );
 
 		// WP Bug?
@@ -211,6 +212,9 @@ class BestOfWidget extends WP_Widget {
 		echo
 		wppa_widget_selection( $this, 'linktype', $instance['linktype'], __( 'Link to', 'wp-photo-album-plus' ), $options, $values, array(), '' );
 
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
     }
 
 } // class BestOfWidget

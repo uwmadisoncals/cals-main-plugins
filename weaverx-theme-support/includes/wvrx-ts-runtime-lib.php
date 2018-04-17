@@ -40,7 +40,7 @@ function wvrx_ts_theme_support_addon() {
 <div class="a-plus">
 	<p><strong style="font-size:110%;"><?php
 	if ($is_xtreme) _e('You have Weaver Xtreme Theme Support installed.','weaverx-theme-support' /*adm*/);
-	else  _e('You have Weaver Xtreme (Foundation) Theme Support installed.','weaverx-theme-support' /*adm*/);
+
 	echo ' (V ' . WVRX_TS_VERSION . ')'; ?></strong><br />
 	<?php _e('This section shows the shortcodes and widgets available with Weaver Xtreme (and Foundation) Theme Support.
 Click the<span style="color:red; vertical-align: middle; margin-left:.25em;" class="dashicons dashicons-editor-help"></span> button to open help entry.','weaverx-theme-support' /*adm*/); ?></p>

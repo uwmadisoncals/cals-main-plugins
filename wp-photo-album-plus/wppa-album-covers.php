@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version 6.7.02
+* Version 6.8.05
 *
 */
 
@@ -805,7 +805,7 @@ global $wpdb;
 
 // A single coverphoto
 // Output goes directly to wppa_out()
-function wppa_the_coverphoto( $albumid, $image, $src, $photo_pos, $photolink, $title, $imgattr_a, $events ) {
+function wppa_the_coverphoto( $albumid, $image, $src, $photo_pos, $photolink, $title, $imgattr_a = array(), $events ) {
 global $wpdb;
 
 	if ( ! $image ) {
@@ -816,9 +816,11 @@ global $wpdb;
 		$src = wppa_fix_poster_ext( $src, $image['id'] );
 	}
 
-	$imgattr   = $imgattr_a['style'];
-	$imgwidth  = $imgattr_a['width'];
-	$imgheight = $imgattr_a['height'];
+	$imgattr   = isset( $imgattr_a['style'] ) ? $imgattr_a['style'] : '';
+	$imgwidth  = isset( $imgattr_a['width'] ) ? $imgattr_a['width'] : '';
+	if ( ! $imgwidth ) $imgwidth = '0';
+	$imgheight = isset( $imgattr_a['height'] ) ? $imgattr_a['height'] : '';
+	if ( ! $imgheight ) $imgheight = '0';
 	$frmwidth  = $imgwidth + '10';	// + 2 * 1 border + 2 * 4 padding
 
 	// Find the photo frame style

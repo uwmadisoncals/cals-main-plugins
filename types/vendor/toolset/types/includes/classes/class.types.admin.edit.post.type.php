@@ -1127,7 +1127,7 @@ class Types_Admin_Edit_Post_Type extends Types_Admin_Page
                      * update post meta "_wp_types_group_post_types"
                      */
                     $sql = $wpdb->prepare(
-                        "select meta_id, meta_value from {$wpdb->postmeta} where meta_key = %%s",
+                        "select meta_id, meta_value from {$wpdb->postmeta} where meta_key = %s",
                         '_wp_types_group_post_types'
                     );
                     $all_meta = $wpdb->get_results($sql, OBJECT_K);

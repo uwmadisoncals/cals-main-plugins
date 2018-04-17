@@ -257,7 +257,7 @@ global $wppa_session;
 		$count++;
 
 		$wpdb->query("UPDATE `".$table."` SET `views` = ".$count." WHERE `id` = ".$id);
-		wppa_dbg_msg('Bumped viewcount for '.$type.' '.$id.' to '.$count, 'red');
+		wppa_log( 'dbg', 'Bumped viewcount for '.$type.' '.$id.' to '.$count );
 
 		// If 'wppa_owner_to_name'
 		if ( $type == 'photo' ) {
@@ -270,8 +270,6 @@ global $wppa_session;
 			wppa_mark_treecounts( $alb );
 		}
 	}
-
-	wppa_save_session();
 }
 
 function wppa_get_upldr_cache() {

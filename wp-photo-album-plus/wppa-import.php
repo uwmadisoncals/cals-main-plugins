@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.8.00
+* Version 6.8.02
 *
 */
 
@@ -71,6 +71,13 @@ global $wppa_session;
 	}
 	if ( isset( $_POST['wppa-audio-album'] ) ) {
 		update_option( 'wppa-audio-album-import-'.wppa_get_user(), strval( intval( $_POST['wppa-audio-album'] ) ) );
+	}
+
+	// Link from album admin overrules last album
+	if ( isset( $_GET['wppa-set-album'] ) ) {
+		update_option( 'wppa-photo-album-import-'.wppa_get_user(), strval( intval( $_GET['wppa-set-album'] ) ) );
+		update_option( 'wppa-video-album-import-'.wppa_get_user(), strval( intval( $_GET['wppa-set-album'] ) ) );
+		update_option( 'wppa-audio-album-import-'.wppa_get_user(), strval( intval( $_GET['wppa-set-album'] ) ) );
 	}
 
 	// Verify last albums still exist
@@ -591,12 +598,12 @@ global $wppa_session;
 					}
 
 					// Delay
-					$delays = array( '1', '2', '5', '10', '20', '50', '100' );
+					$delays = array( '0', '1', '2', '5', '10', '20', '50', '100' );
 					echo
 					__( 'Delay', 'wp-photo-album-plus' ) .
 					'<select id="wppa-delay" >';
 					foreach ( $delays as $d ) {
-						echo '<option value="' . ( $d * 1000 ) . '" >' . $d . '</option>';
+						echo '<option value="' . ( $d * 1000 ) . '" ' . ( $d == '1' ? 'selected="selected" ' : '' ) . '>' . $d . '</option>';
 					}
 					echo
 					'</select> s. ' .

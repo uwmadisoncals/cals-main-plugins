@@ -10,7 +10,7 @@
  *
  * @author Srdjan
  */
-if ( !class_exists('WPToolset_Types') ){   
+if ( !class_exists('WPToolset_Types') ){
 class WPToolset_Types
 {
     static $is_user_meta = false;
@@ -324,14 +324,14 @@ class WPToolset_Types
             // Update the conditional values according to what's being saved.
             foreach ( $_post_wpcf as $field_slug => $field_value ) {
                 // Get field by slug
-                $field = wpcf_fields_get_field_by_slug( $field_slug );
-                if ( empty( $field ) ) {
+                $field_aux = wpcf_fields_get_field_by_slug( $field_slug );
+                if ( empty( $field_aux ) ) {
                     continue;
                 }
 
-                $field_value = apply_filters( 'wpcf_fields_type_' . $field['type'] . '_value_save', $field_value, $field, null );
+                $field_value = apply_filters( 'wpcf_fields_type_' . $field_aux['type'] . '_value_save', $field_value, $field_aux, null );
 
-                $cond_values[$field['meta_key']] = $field_value;
+                $cond_values[$field_aux['meta_key']] = $field_value;
             }
         }
 
@@ -413,7 +413,7 @@ class WPToolset_Types
 
             // Get field settings
             $c_field = self::getConfig( $c_field_id );
-            
+
             // If it's Types field
             if ( !empty( $c_field ) ) {
 

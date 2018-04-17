@@ -91,6 +91,10 @@ class FrmFieldsController {
         return $field;
     }
 
+	/**
+	 * @deprecated 3.0
+	 * @codeCoverageIgnore
+	 */
 	public static function edit_name( $field = 'name', $id = '' ) {
 		_deprecated_function( __FUNCTION__, '3.0' );
 
@@ -175,6 +179,9 @@ class FrmFieldsController {
 	/**
 	 * Load a single field in the form builder along with all needed variables
 	 *
+	 * @deprecated 3.0
+	 * @codeCoverageIgnore
+	 *
 	 * @param int $field_id
 	 * @param array $values
 	 * @param int $form_id
@@ -210,6 +217,9 @@ class FrmFieldsController {
 	 * @param int $form_id
 	 */
 	public static function load_single_field( $field_object, $values, $form_id = 0 ) {
+		global $frm_vars;
+		$frm_vars['is_admin'] = true;
+
 		if ( is_numeric( $field_object ) ) {
 			$field_object = FrmField::getOne( $field_object );
 		} elseif ( is_array( $field_object ) ) {
@@ -234,6 +244,7 @@ class FrmFieldsController {
 			$disabled_fields = FrmAppHelper::pro_is_installed() ? array() : $pro_field_selection;
 
 			if ( ! isset( $field ) && is_object( $field_object ) ) {
+				$field_object->parent_form_id = isset( $values['id'] ) ? $values['id'] : $field_object->form_id;
 				$field = FrmFieldsHelper::setup_edit_vars( $field_object );
 			}
 
@@ -296,10 +307,18 @@ class FrmFieldsController {
 		wp_die();
     }
 
+	/**
+	 * @deprecated 2.3
+	 * @codeCoverageIgnore
+	 */
     public static function edit_option() {
 		_deprecated_function( __FUNCTION__, '2.3' );
     }
 
+	/**
+	 * @deprecated 2.3
+	 * @codeCoverageIgnore
+	 */
     public static function delete_option() {
 		_deprecated_function( __FUNCTION__, '2.3' );
     }
@@ -511,7 +530,7 @@ class FrmFieldsController {
             return;
         }
 
-        if ( FrmAppHelper::is_admin_page('formidable' ) ) {
+		if ( FrmAppHelper::is_admin_page( 'formidable' ) ) {
             return;
         }
 

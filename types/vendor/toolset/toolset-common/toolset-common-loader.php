@@ -1,11 +1,11 @@
 <?php
 
 if( !defined('TOOLSET_VERSION') ){
-	define('TOOLSET_VERSION', '2.5.8');
+	define('TOOLSET_VERSION', '2.6.2');
 }
 
 if ( ! defined('TOOLSET_COMMON_VERSION' ) ) {
-    define( 'TOOLSET_COMMON_VERSION', '2.5.8' );
+    define( 'TOOLSET_COMMON_VERSION', '2.6.2' );
 }
 
 if ( ! defined('TOOLSET_COMMON_PATH' ) ) {
@@ -25,6 +25,16 @@ if ( ! defined( 'TOOLSET_EDIT_LAST' ) ) {
 	define( 'TOOLSET_EDIT_LAST', '_toolset_edit_last' );
 }
 
+
+if( ! defined( 'TOOLSET_COMMON_VENDOR_PATH' ) ) {
+
+	/**
+	 * Vendor directory that holds the composer dependencies of the currently loaded Toolset Common instance.
+	 *
+	 * @since 2.5.7
+	 */
+	define( 'TOOLSET_COMMON_VENDOR_PATH', dirname( dirname( TOOLSET_COMMON_PATH ) ) );
+}
 
 require_once( TOOLSET_COMMON_PATH . '/bootstrap.php' );
 

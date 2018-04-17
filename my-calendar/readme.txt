@@ -4,7 +4,7 @@ Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
 Tested up to: 4.9
-Stable tag: 2.5.16
+Stable tag: 2.5.17
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -16,15 +16,15 @@ My Calendar does WordPress event management with richly customizable ways to dis
 
 Easy to use for anybody, My Calendar provides enormous flexibility for designers and developers needing a custom calendar.
 
-*   [Buy My Calendar Pro](https://www.joedolson.com/my-calendar/pro/), the premium extension for My Calendar
-*   [Use My Tickets](https://wordpress.org/plugins/my-tickets/) and sell tickets for My Calendar events
-* 	[Buy the User's Guide](http://www.joedolson.com/my-calendar/users-guide/) for extensive help with set up and use.
+*	[Buy My Calendar Pro](https://www.joedolson.com/my-calendar/pro/), the premium extension for My Calendar
+*	[Use My Tickets](https://wordpress.org/plugins/my-tickets/) and sell tickets for My Calendar events
+*	[Buy the User's Guide](http://www.joedolson.com/my-calendar/users-guide/) for extensive help with set up and use.
 
 = Features: =
 
 *	Calendar grid and list views of events
-* 	Monthly, weekly, or daily view.
-* 	Mini-calendar for compact displays (as widget or as shortcode)
+*	Monthly, weekly, or daily view.
+*	Mini-calendar for compact displays (as widget or as shortcode)
 *	Widgets: today's events, upcoming events, compact calendar, event search
 *	Custom templates for event output
 *	Limit views by categories, location, author, or host
@@ -32,15 +32,15 @@ Easy to use for anybody, My Calendar provides enormous flexibility for designers
 *	Editable CSS styles and JavaScript behaviors
 *	Schedule a variety of recurring events.
 *	Edit occurrences of recurring events
-* 	Rich permissions handling to restrict access to parts of My Calendar
-* 	Email notification to administrator when events are scheduled or reserved
-* 	Post to Twitter when events are created with [WP to Twitter](http://wordpress.org/extend/plugins/wp-to-twitter/)
+*	Rich permissions handling to restrict access to parts of My Calendar
+*	Email notification to administrator when events are scheduled or reserved
+*	Post to Twitter when events are created with [WP to Twitter](http://wordpress.org/extend/plugins/wp-to-twitter/)
 *	Location Manager for frequently used venues
-*   Fetch events from a remote database. (Sharing events in a network of sites.)
-*   Import events from [Kieran O'Shea's Calendar plugin](http://wordpress.org/extend/plugins/calendar/)
-* 	Integrated Help to guide in use of shortcodes and template tags
-* 	Shortcode Generator to create customized views of My Calendar
-*   [Developer Documentation](http://www.joedolson.com/doc-category/my-calendar-3/)
+*	Fetch events from a remote database. (Sharing events in a network of sites.)
+*	Import events from [Kieran O'Shea's Calendar plugin](http://wordpress.org/extend/plugins/calendar/)
+*	Integrated Help to guide in use of shortcodes and template tags
+*	Shortcode Generator to create customized views of My Calendar
+*	[Developer Documentation](http://www.joedolson.com/doc-category/my-calendar-3/)
 
 > = What's in My Calendar Pro? =
 > 
@@ -82,6 +82,12 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
    with shortcode options or widget configuration.
    
 == Changelog ==
+
+= 2.5.17 =
+
+* Security: Authenticated XSS vulnerability resolved.
+* Remove 'create_function' for PHP 7.2 compatibility.
+* Updated: Upgrade Notice output.
 
 = 2.5.16 =
 
@@ -912,4 +918,4 @@ The search feature in My Calendar is pretty basic; but buying My Calendar Pro gi
 
 == Upgrade Notice ==
 
-* 2.5.0 Major update! New features, many bug fixes and improvements.
+* 2.5.17 Critical update! Authenticated XSS issue resolved.

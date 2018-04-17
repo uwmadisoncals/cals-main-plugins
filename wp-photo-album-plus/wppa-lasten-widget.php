@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the last uploaded photos
-* Version 6.7.01
+* Version 6.8.07
 */
 
 class LasTenWidget extends WP_Widget {
@@ -19,12 +19,6 @@ class LasTenWidget extends WP_Widget {
 		global $wpdb;
 		global $wppa_opt;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
 		wppa( 'in_widget', 'lasten' );
@@ -39,7 +33,14 @@ class LasTenWidget extends WP_Widget {
 														'timesince' => 'yes',
 														'display' => 'thumbs',
 														'includesubs' => 'no',
+														'logonly' => 'no',
 														) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
+
 		$widget_title 	= apply_filters('widget_title', $instance['title'] );
 		$page 			= in_array( wppa_opt( 'lasten_widget_linktype' ), wppa( 'links_no_page' ) ) ?
 							'' :
@@ -92,7 +93,7 @@ class LasTenWidget extends WP_Widget {
 				$q = "SELECT * FROM `".WPPA_PHOTOS."` WHERE (".$newtime.") AND `album` IN ( ".$album." ) AND ( `status` <> 'pending' AND `status` <> 'scheduled' ) ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
 			}
 			else {
-				$q = "SELECT * FROM `".WPPA_PHOTOS."` WHERE (".$newtime.") AND `status` <> 'pending' AND `status` <> 'scheduled' ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
+				$q = "SELECT * FROM `".WPPA_PHOTOS."` WHERE (".$newtime.") AND `album` > 0 AND `status` <> 'pending' AND `status` <> 'scheduled' ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
 			}
 		}
 		else {
@@ -100,7 +101,7 @@ class LasTenWidget extends WP_Widget {
 				$q = "SELECT * FROM `".WPPA_PHOTOS."` WHERE `album` IN ( ".$album." ) AND ( `status` <> 'pending' AND `status` <> 'scheduled' ) ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
 			}
 			else {
-				$q = "SELECT * FROM `".WPPA_PHOTOS."` WHERE `status` <> 'pending' AND `status` <> 'scheduled' ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
+				$q = "SELECT * FROM `".WPPA_PHOTOS."` WHERE `album` > 0 AND `status` <> 'pending' AND `status` <> 'scheduled' ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
 			}
 		}
 
@@ -122,7 +123,11 @@ class LasTenWidget extends WP_Widget {
 
 			// Make the HTML for current picture
 			if ( $display == 'thumbs' ) {
-				$widget_content .= "\n".'<div class="wppa-widget" style="width:'.$maxw.'px; height:'.$maxh.'px; margin:4px; display:inline; text-align:center; float:left;">';
+				$widget_content .= '
+				<div class="wppa-widget"' .
+					' style="width:'.$maxw.'px; height:'.$maxh.'px; margin:4px; display:inline; text-align:center; float:left;"' .
+					' data-wppa="yes"' .
+					' >';
 			}
 			else {
 				$widget_content .= "\n".'<div class="wppa-widget" >';
@@ -174,7 +179,8 @@ class LasTenWidget extends WP_Widget {
 		if ( $instance['album'] != '-99' ) $instance['albumenum'] = '';
 		$instance['timesince'] 		= $new_instance['timesince'];
 		$instance['display'] 		= $new_instance['display'];
-		$instance['includesubs'] 	= $new_instance['includesubs'];
+		$instance['includesubs'] 	= isset( $new_instance['includesubs'] ) ? $new_instance['includesubs'] : false;
+		$instance['logonly'] 		= $new_instance['logonly'];
 
         return $instance;
     }
@@ -190,6 +196,7 @@ class LasTenWidget extends WP_Widget {
 															'timesince' 	=> 'yes',
 															'display' 		=> 'thumbs',
 															'includesubs' 	=> 'no',
+															'logonly' 		=> 'no',
 															) );
 
 		// Title
@@ -232,6 +239,10 @@ class LasTenWidget extends WP_Widget {
 		// Time since
 		echo
 		wppa_widget_checkbox( $this, 'timesince', $instance['timesince'], __( 'Show time since', 'wp-photo-album-plus' ) );
+
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
 
 		echo
 		'<p>' .

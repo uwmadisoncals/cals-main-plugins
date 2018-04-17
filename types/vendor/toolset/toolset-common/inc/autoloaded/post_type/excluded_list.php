@@ -10,6 +10,7 @@ class Toolset_Post_Type_Exclude_List {
 	private static $initial_list = array(
 		'cred-form',
 		'cred-user-form',
+		'cred_rel_form',
 		'custom_css',
 		'customize_changeset',
 		'dd_layouts',

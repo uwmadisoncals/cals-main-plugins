@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.7.10
+* Version 6.8.06
 *
 */
 
@@ -11,15 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 
 /* API FILTER and FUNCTIONS */
 require_once 'wppa-filter.php';
-require_once 'wppa-slideshow.php';
-require_once 'wppa-functions.php';
 require_once 'wppa-breadcrumb.php';
 require_once 'wppa-album-covers.php';
-require_once 'wppa-links.php';
-require_once 'wppa-boxes-html.php';
-require_once 'wppa-styles.php';
 require_once 'wppa-cart.php';
-require_once 'wppa-thumbnails.php';
 require_once 'wppa-picture.php';
 require_once 'wppa-tinymce-photo-front.php';
 
@@ -93,7 +87,7 @@ global $wpdb;
 	}
 	else {
 		$imgurl = '';
-		echo '<!-- WPPA+ No Photo id -->';
+//		echo '<!-- WPPA+ No Photo id -->';
 	}
 
 	if ( $id ) {
@@ -171,11 +165,7 @@ echo '
 	// To make sure we are on a page that contains at least [wppa] we check for Get var 'wppa-album'.
 	// This also narrows the selection of featured photos to those that exist in the current album.
 	$done = array();
-	$album = '';
-	if ( isset( $_REQUEST['album'] ) ) $album = $_REQUEST['album'];
-	elseif ( isset( $_REQUEST['wppa-album'] ) ) $album = $_REQUEST['wppa-album'];
-	$album = strip_tags( $album );
-	if ( strlen( $album == 12 ) ) $album = wppa_get_get( 'album' );
+	$album = wppa_get_get( 'album' );
 
 	if ( $album ) {
 		if ( wppa_switch( 'meta_page' ) ) {
@@ -214,6 +204,55 @@ echo '
 				}
 			}
 			echo("\n<!-- WPPA+ END Featured photos on this site -->\n");
+		}
+	}
+
+	// No photo id and no album known yet. Also: not all featured.
+	// Examine the page (if any) on an album id in the shortcode
+	elseif ( wppa_switch( 'og_tags_on' ) ) {
+		$page = get_the_ID();
+		if ( $page ) {
+			$page_content = $wpdb->get_var( "SELECT `post_content` FROM `" . $wpdb->prefix . 'posts' . "` WHERE `ID` = " . $page );
+			if ( strpos( $page_content, '[wppa' ) !== false ) {
+				$a_pos = strpos( $page_content, 'album="' );
+				$album = substr( $page_content, $a_pos + 7, 20 );
+				$album = substr( $album, 0, strpos( $album, '"' ) );
+				if ( is_numeric( $album ) ) {
+
+					$title  = wppa_get_album_name( $album );
+					$desc 	= strip_tags( wppa_get_album_desc( $album ) );
+					$url 	= ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+					$url 	= wppa_convert_to_pretty( $url, false, true );
+					$site   = get_bloginfo('name');
+					$id 	= wppa_get_coverphoto_id( $album );
+					$mime 	= wppa_get_mime_type( $id );
+
+					echo '
+<!-- WPPA+ meta tags -->
+<meta name="title" content="' . $title . '" />
+<meta name="description" content="' . $desc . '" />
+<!-- WPPA+ Og Share data -->
+<meta property="og:site_name" content="' . esc_attr( sanitize_text_field( $site ) ) . '" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="' . $url . '" />
+<meta property="og:title" content="' . esc_attr( sanitize_text_field( $title ) ) . '" />';
+if ( $desc ) {
+	echo '
+<meta property="og:description" content="' . esc_attr( sanitize_text_field( $desc ) ) . '" />';
+}
+if ( $id ) {
+	echo '
+<meta property="og:image" content="' . wppa_get_photo_url( $id ) . '" />
+<meta property="og:image:type" content="' . $mime . '" />
+<meta property="og:image:width" content="' . wppa_get_photox( $id ) . '" />
+<meta property="og:image:height" content="' . wppa_get_photoy( $id ) . '" />';
+}
+echo '
+<!-- WPPA+ End Og Share data -->
+';
+
+				}
+			}
 		}
 	}
 
@@ -745,26 +784,7 @@ global $wppa_dynamic_css_data;
 
 	// init.js failed?
 	if ( $wppa_init_js_data ) echo $wppa_init_js_data;
-/* Obsolete?
-	// Patch for chrome or Edge?
-	// Test for chrome needs also test for NOT Edge, because browser signature of Edge also reports that it is chrome(-like)
-	if ( false && isset($_SERVER["HTTP_USER_AGENT"] ) ) {
-		echo '
 
-<!-- WPPA+ Kickoff -->
-<!-- Browser detected = '.wppa_decode_uri_component(strip_tags($_SERVER["HTTP_USER_AGENT"])).' -->';
-		if ( strstr($_SERVER["HTTP_USER_AGENT"], 'Chrome') && ! strstr($_SERVER["HTTP_USER_AGENT"], 'Edge') && wppa_switch( 'ovl_chrome_at_top') ) echo '
-<style type="text/css">
-	#wppa-overlay-ic { padding-top: 5px !important; }
-	#wppa-overlay-qt-img { top: 5px !important; }
-</style>';
-		if ( strstr($_SERVER["HTTP_USER_AGENT"], 'Edge') ) echo '
-<style type="text/css">
-	#wppa-overlay-ic { padding-top: 0px !important; }
-	#wppa-overlay-qt-img { top: 5px !important; }
-</style>';
-	}
-*/
 	// Inline styles?
 	if ( wppa_switch( 'inline_css') ) {
 		echo '
@@ -773,8 +793,64 @@ global $wppa_dynamic_css_data;
 		if ( ! wppa_switch( 'ovl_fs_icons' ) ) {
 			echo '#wppa-norms-btn, #wppa-fulls-btn { display:none; }';
 		}
-		echo wppa_opt( 'custom_style' ).'
+		echo wppa_opt( 'custom_style' ) . '
 </style>';
+	}
+
+	// Browser dependant css
+	if ( wppa_is_edge() ) {
+		if ( wppa_opt( 'custom_style_edge' ) ) {
+			echo '
+<!-- WPPA+ Custom styles Edge -->
+<style type="text/css" >
+' . wppa_opt( 'custom_style_edge' ) . '
+</style>';
+		}
+	}
+	elseif ( wppa_is_chrome() ) {
+		if ( wppa_opt( 'custom_style_chrome' ) ) {
+			echo '
+<!-- WPPA+ Custom styles Chrome -->
+<style type="text/css" >
+' . wppa_opt( 'custom_style_chrome' ) . '
+</style>';
+		}
+	}
+	elseif ( wppa_is_firefox() ) {
+		if ( wppa_opt( 'custom_style_firefox' ) ) {
+			echo '
+<!-- WPPA+ Custom styles Firefox -->
+<style type="text/css" >
+' . wppa_opt( 'custom_style_firefox' ) . '
+</style>';
+		}
+	}
+	elseif ( wppa_is_safari() ) {
+		if ( wppa_opt( 'custom_style_safari' ) ) {
+			echo '
+<!-- WPPA+ Custom styles Safari -->
+<style type="text/css" >
+' . wppa_opt( 'custom_style_safari' ) . '
+</style>';
+		}
+	}
+	elseif ( wppa_is_ie() ) {
+		if ( wppa_opt( 'custom_style_ie' ) ) {
+			echo '
+<!-- WPPA+ Custom styles IE -->
+<style type="text/css" >
+' . wppa_opt( 'custom_style_ie' ) . '
+</style>';
+		}
+	}
+	elseif ( wppa_is_opera() ) {
+		if ( wppa_opt( 'custom_style_opera' ) ) {
+			echo '
+<!-- WPPA+ Custom styles Opera -->
+<style type="text/css" >
+' . wppa_opt( 'custom_style_opera' ) . '
+</style>';
+		}
 	}
 
 	// Pinterest js

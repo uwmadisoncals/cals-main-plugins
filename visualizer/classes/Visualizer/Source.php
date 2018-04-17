@@ -221,6 +221,12 @@ abstract class Visualizer_Source {
 						);
 					}
 					break;
+				case 'string':
+					// condition introduced for Issue with non-English text #240 where languages such as Hebrew get messed up.
+					if ( function_exists( 'mb_detect_encoding' ) && mb_detect_encoding( $data[ $i ] ) !== 'UTF-8' ) {
+						$data[ $i ] = utf8_encode( $data[ $i ] );
+					}
+					break;
 			}
 		}
 

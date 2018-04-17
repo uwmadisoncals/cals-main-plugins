@@ -69,11 +69,18 @@ ToolsetCommon.UserEditor.BeaverBuilderFrontendEditor = function( $ ) {
             }
         } );
     } );
+
+	self.preventExraContainerPreventClickPropagation = function() {
+        $( 'body' ).on( 'click', '.js-toolset-editors-frontend-editor-extra .js-toolset-editors-frontend-editor-extra-content', function( e ) {
+            e.stopPropagation();
+        });
+    };
 	
 	self.init = function() {
-		self.extraContainer.insertBefore( '.fl-builder-bar-actions' );
+        self.extraContainer.insertBefore( '.fl-builder-bar-actions' );
 		self.extraContainer.show();
 		FLBuilder._updateLayout();
+		self.preventExraContainerPreventClickPropagation();
     };
 	
 	self.init();

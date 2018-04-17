@@ -190,7 +190,7 @@ class Segment extends Model {
       '(SELECT segments.id, segments.name, COUNT(relation.subscriber_id) as subscribers ' .
       'FROM ' . MP_SUBSCRIBER_SEGMENT_TABLE . ' relation ' .
       'LEFT JOIN ' . self::$_table . ' segments ON segments.id = relation.segment_id ' .
-      'LEFT JOIN ' . MP_SUBSCRIBERS_TABLE . ' subscribers ON subscribers.id = relation.subscriber_id ' .
+      'INNER JOIN ' . MP_SUBSCRIBERS_TABLE . ' subscribers ON subscribers.id = relation.subscriber_id ' .
       'WHERE relation.segment_id IS NOT NULL ' .
       'AND subscribers.deleted_at IS NULL ' .
       'GROUP BY segments.id) ' .
@@ -249,9 +249,14 @@ class Segment extends Model {
   }
 
   static function getAnalytics() {
-    return Segment::select_expr('type, count(*) as count')
-      ->whereNull('deleted_at')
-      ->groupBy('type')
-      ->findArray();
+    $analytics = Segment::select_expr('type, count(*) as count')
+                        ->whereNull('deleted_at')
+                        ->groupBy('type')
+                        ->findArray();
+    $result = array();
+    foreach($analytics as $segment) {
+      $result[$segment['type']] = $segment['count'];
+    }
+    return $result;
   }
 }

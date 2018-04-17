@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
-* Version 6.8.00
+* Version 6.8.07
 *
 *
 */
@@ -38,14 +38,14 @@ global $is_reschedule;
 			$delay = 5;
 		}
 		else switch ( $slug ) {
-			case 'wppa_remake_index_photos':	// one hour
+			case 'wppa_cleanup_index':			// 1 hour
 				$delay = 3600;
 				break;
-			case 'wppa_cleanup_index':			// 3 hours
-				$delay = 10800;
+			case 'wppa_remake_index_albums':
+				$delay = 180;
 				break;
 			default:
-				$delay = 30;					// 30 sec.
+				$delay = 10;
 		}
 		wp_schedule_single_event( time() + $delay, 'wppa_cron_event', array( $slug ) );
 		$backtrace = debug_backtrace();
@@ -159,7 +159,25 @@ global $wpdb;
 		return;
 	}
 
+	ob_start();
+
 	wppa_log( 'Cron', '{b}wppa_cleanup{/b} started.' );
+
+	// Start renew crypt processes if configured socket_accept
+	if ( wppa_opt( 'crypt_albums_every' ) ) {
+		$last = get_option( 'wppa_crypt_albums_lasttimestamp', '0' );
+		if ( $last + wppa_opt( 'crypt_albums_every' ) * 3600 < time() ) {
+			wppa_schedule_maintenance_proc( 'wppa_crypt_albums' );
+			update_option( 'wppa_crypt_albums_lasttimestamp', time() );
+		}
+	}
+	if ( wppa_opt( 'crypt_photos_every' ) ) {
+		$last = get_option( 'wppa_crypt_photos_lasttimestamp', '0' );
+		if ( $last + wppa_opt( 'crypt_photos_every' ) * 3600 < time() ) {
+			wppa_schedule_maintenance_proc( 'wppa_crypt_photos' );
+			update_option( 'wppa_crypt_photos_lasttimestamp', time() );
+		}
+	}
 
 	// Cleanup session db table
 	$lifetime 	= 3600;			// Sessions expire after one hour
@@ -196,10 +214,6 @@ global $wpdb;
 
 	// Re-create permalink htaccess file
 	wppa_create_pl_htaccess();
-
-	// Cleanup index
-//	wppa_index_compute_skips();
-//	wppa_schedule_maintenance_proc( 'wppa_cleanup_index' );
 
 	// Retry failed mails
 	if ( wppa_opt( 'retry_mails' ) ) {
@@ -256,9 +270,88 @@ global $wpdb;
 
 	wppa_log( 'Cron', '{b}wppa_cleanup{/b} completed.' );
 
-	// Redo after 5 minutes
-//	wp_schedule_single_event( time() + 300, 'wppa_cleanup' );
-//	wppa_log( 'Cron', '{b}wppa_cleanup{/b} re-scheduled' );
+	$outbuf = ob_get_clean();
+	if ( $outbuf ) {
+		wppa_log( 'dbg', 'Cron unexpected output: ' . $outbuf );
+	}
+}
+
+// Selectively clear caches
+add_action( 'wppa_clear_cache', 'wppa_do_clear_cache' );
+
+function wppa_schedule_clear_cache( $time = 10 ) {
+
+	// Are we temp disbled?
+	if ( wppa_switch( 'maint_ignore_cron' ) ) {
+		return;
+	}
+
+	// If a cron job is scheduled in the far future and we need it earlier, cancel the existing
+	$next_scheduled = wp_next_scheduled( 'wppa_clear_cache' );
+	if ( $time == 10 && is_numeric( $next_scheduled ) && $next_scheduled > ( time() + $time ) ) {
+
+		wp_unschedule_event( $next_scheduled, 'wppa_clear_cache' );
+		$did_unschedule = true;
+	}
+	else {
+		$did_unschedule = false;
+	}
+
+	// Schedule new event
+	if ( ! wp_next_scheduled( 'wppa_clear_cache' ) ) {
+
+		wp_schedule_single_event( time() + $time, 'wppa_clear_cache' );
+
+		wppa_log( 'Cron', '{b}wppa_clear_cache{/b} ' . ( $did_unschedule ? 're-' : '' ) . 'scheduled for run in ' . $time . ' sec.' );
+	}
+}
+
+// call the actusl cache deleting proc, and indicate only delete cache files with text 'data-wppa="yes"'
+function wppa_do_clear_cache() {
+
+	$relroot = trim( wppa_opt( 'cache_root' ), '/' );
+	if ( ! $relroot ) {
+		$relroot = 'cache';
+	}
+	$root = WPPA_CONTENT_PATH . '/' . $relroot;
+	if ( is_dir( $root ) ) {
+
+		wppa_log( 'Cron', '{b}wppa_clear_cache{/b} started.' );
+		_wppa_do_clear_cache( $root );
+		wppa_log( 'Cron', '{b}wppa_clear_cache{/b} completed.' );
+	}
+}
+function _wppa_do_clear_cache( $dir ) {
+
+	$needle = 'data-wppa="yes"';
+	$fsos = glob( $dir . '/*' );
+	if ( is_array( $fsos ) ) foreach ( $fsos as $fso ) {
+		$name = basename( $fso );
+		if ( $name == '.' || $name == '..' ) {}
+		elseif ( is_dir( $fso ) ) {
+			_wppa_do_clear_cache( $fso );
+		}
+		else {
+			$file = fopen( $fso, 'rb' );
+			if ( $file ) {
+				$size = filesize( $fso );
+				if ( $size ) {
+					$haystack = fread( $file, $size );
+					if ( strpos( $haystack, $needle ) !== false ) {
+						fclose( $file );
+						unlink( $fso );
+						wppa_log( 'fso', 'Cron removed cachefile: {b}' . str_replace( WPPA_CONTENT_PATH, '', $fso ) . '{/b}' );
+					}
+					else {
+						fclose( $file );
+					}
+				}
+				else {
+					fclose( $file );
+				}
+			}
+		}
+	}
 }
 
 // Activate treecount update proc
@@ -273,7 +366,9 @@ function wppa_schedule_treecount_update() {
 
 	// Schedule cron job
 	if ( ! wp_next_scheduled( 'wppa_update_treecounts' ) ) {
-		wp_schedule_single_event( time() + 10, 'wppa_update_treecounts' );
+		$time = 10;
+		wp_schedule_single_event( time() + $time, 'wppa_update_treecounts' );
+		wppa_log( 'Cron', '{b}wppa_update_treecounts{/b} scheduled for run in ' . $time . ' sec.' );
 	}
 }
 
@@ -284,6 +379,8 @@ global $wpdb;
 	if ( wppa_switch( 'maint_ignore_cron' ) ) {
 		return;
 	}
+
+	wppa_log( 'Cron', '{b}wppa_update_treecounts{/b} started.' );
 
 	$start = time();
 
@@ -300,6 +397,10 @@ global $wpdb;
 			exit();
 		}
 	}
+
+	wppa_log( 'Cron', '{b}wppa_update_treecounts{/b} completed.' );
+
+	wppa_schedule_clear_cache( 600 );
 }
 
 function wppa_re_animate_cron() {
@@ -318,5 +419,4 @@ global $wppa_cron_maintenance_slugs;
 			wppa_log( 'Cron', '{b}' . $slug . '{/b} re-animated at item {b}#' . $last . '{/b}' );
 		}
 	}
-
 }

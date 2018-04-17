@@ -7,9 +7,10 @@ Author: Joseph C Dolson
 Author URI: http://www.joedolson.com
 Text Domain: my-calendar
 Domain Path: lang
-Version: 2.5.16
+Requires PHP: 5.3
+Version: 2.5.17
 */
-/*  Copyright 2009-2017  Joe Dolson (email : joe@joedolson.com)
+/*  Copyright 2009-2018  Joe Dolson (email : joe@joedolson.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 } // Exit if accessed directly
 
 global $mc_version, $wpdb;
-$mc_version = '2.5.16';
+$mc_version = '2.5.17';
 
 register_activation_hook( __FILE__, 'mc_plugin_activated' );
 register_deactivation_hook( __FILE__, 'mc_plugin_deactivated' );
@@ -95,11 +96,18 @@ function mc_load_textdomain() {
 add_action( 'admin_menu', 'my_calendar_menu' );
 add_action( 'wp_head', 'my_calendar_wp_head' );
 add_action( 'delete_user', 'mc_deal_with_deleted_user' );
-add_action( 'widgets_init', create_function( '', 'return register_widget("my_calendar_today_widget");' ) );
-add_action( 'widgets_init', create_function( '', 'return register_widget("my_calendar_upcoming_widget");' ) );
-add_action( 'widgets_init', create_function( '', 'return register_widget("my_calendar_mini_widget");' ) );
-add_action( 'widgets_init', create_function( '', 'return register_widget("my_calendar_simple_search");' ) );
-add_action( 'widgets_init', create_function( '', 'return register_widget("my_calendar_filters");' ) );
+add_action( 'widgets_init', 'mc_register_widgets' );
+/**
+ * Register all My Calendar widgets
+ */
+function mc_register_widgets() {
+	register_widget( 'My_Calendar_Today_Widget' );
+	register_widget( 'My_Calendar_Upcoming_Widget' );
+	register_widget( 'My_Calendar_Mini_Widget' );
+	register_widget( 'My_Calendar_Simple_Search' );
+	register_widget( 'My_Calendar_Filters' );
+}
+
 add_action( 'init', 'my_calendar_add_feed' );
 add_action( 'admin_menu', 'my_calendar_admin_js' );
 add_action( 'wp_footer', 'mc_footer_js' );

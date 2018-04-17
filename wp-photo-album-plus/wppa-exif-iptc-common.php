@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * exif and iptc common functions
-* version 6.8.01
+* version 6.8.04
 *
 *
 */
@@ -185,8 +185,13 @@ global $wppa_exif_error_output;
 
 		// If array, make it readable
 		if ( is_serialized( $data ) ) {
-			$data_arr = unserialize( $data );
-			$data = implode( ', ', $data_arr );
+			$data_arr = @unserialize( $data ); 	// This may cause Out of memory error
+			if ( is_array( $data_arr ) ) {
+				$data = implode( ', ', $data_arr );
+			}
+			else {
+				$data_arr = null;
+			}
 		}
 		else {
 			$data_arr = null;
@@ -3324,14 +3329,19 @@ static $wppa_inv_filetags;
 
 	// Setup inverted matrix standard tags
 	if ( ! is_array( $wppa_inv_exiftags ) ) {
-		$key = 0;
-		while ( $key < 65536 ) {
-			$tag = exif_tagname( $key );
-			if ( $tag != '' ) {
-				$wppa_inv_exiftags[$tag] = $key;
+		if ( function_exists( 'exif_tagname' ) ) {
+			$key = 0;
+			while ( $key < 65536 ) {
+				$tag = @ exif_tagname( $key );
+				if ( $tag != '' ) {
+					$wppa_inv_exiftags[$tag] = $key;
+				}
+				$key++;
+				if ( ! $key ) break;	// 16 bit server wrap around ( do they still exist??? )
 			}
-			$key++;
-			if ( ! $key ) break;	// 16 bit server wrap around ( do they still exist??? )
+		}
+		else {
+			$wppa_inv_exiftags = array();
 		}
 	}
 
@@ -4247,10 +4257,15 @@ if ( strlen($tag) != 6 ) {
 
 	// Not found? Find generic tag name
 	if ( ! $result ) {
-		$hextag = hexdec( substr( $tag, 2,4 ) );
-		$result = exif_tagname( $hextag );
+		$hextag = hexdec( substr( $tag, 2, 4 ) );
+		if ( function_exists( 'exif_tagname' ) ) {
+			$result = @ exif_tagname( $hextag );
+		}
+		else {
+			$result = '';
+		}
 		if ( ! $result ) {
-			wppa_log( 'dbg', 'exif_tagname found nothing for ' . $tag );
+//			wppa_log( 'dbg', 'exif_tagname found nothing for ' . $tag, true );
 			$result = sprintf( 'UndefinedTag:0x%04X', $hextag );
 		}
 	}
@@ -4353,7 +4368,7 @@ global $wpdb;
 
 	// Try source path
 	$src = wppa_get_source_path( $id );
-	if ( $src ) {
+	if ( file_exists( $src ) ) {
 		$exifs = @ exif_read_data( $src, 'EXIF' );
 		if ( $exifs ) {
 			if ( isset( $exifs['Make'] ) ) {

@@ -1,7 +1,37 @@
 # Toolset Common Library
 
+## 2.6.2
+* Various minor bugfixes.
+* (toolsetcommon-290) First version of the public relationship API for both legacy and m2m relationships.
+* (types-1436) Removed a notice about Types becoming commercial if there's no Types 2.2.* version or below active.
+
+## 2.6.1
+* Fixed an issue regarding the Gutenberg integration with the extension of the Custom HTML block.
+* Fixed a link to documentation about relationships and WPML.
+* Removed a final keyword on some classes.
+
+## 2.6.0
+* Released with Types 2.3-b3, Views 2.6-b2 and CRED 2.0-b1
+* Breaking change in the Toolset_Ajax implementation and subclassing mechanism.
+
+## 2.5.10
+* (toolsetcommon-315) Added a WHIP package warning about dropping the PHP 5.2 support.
+* (toolsetcommon-361) Types custom fields can't be saved
+* (toolsetcommon-334) Introduce a new, more flexible version of the association query class.
+* (toolsetcommon-345) Delete the intermediary post when an association is deleted.
+* (toolsetcommon-346, toolsetcommon-349, toolsetcommon-355, toolsetcommon-370, toolsetcommon-359) Heavy changes to the m2m API to bring WPML support.
+* (toolsetcommon-368) Create intermediary posts even if there are no association fields
+* (toolsetcommon-351) Make sure that the translation mode of a post type involved in a relationship cannot be changed
+* (types-1376) Fixed: Post Type API does not update relationships when post type slug is changed.
+* (types-1413) Fixed: Bug when creating an association with a translatable IPT in a non-default language.
+
+## 2.5.9
+* Released with Views 2.5.2, CRED 1.9.4 and Layouts 2.2
+* (types-1339) Prevent PHP errors when offering to display data from a legacy Types relationship when the parent side post type no longer exists.
+
 ## 2.5.8
-* New admin notice about Types becoming commercial
+* New admin notice about Types becoming commercial.
+* (toolsetcommon-339) Extend the relationship query with a mechanism to obtain the total number of found rows.
 
 ## 2.5.7
 * (toolsetcommon-305) Improve the database structure for relationships and associations.
@@ -10,7 +40,7 @@
 * Many improvements to the m2m API, especially to the relationship query.
 * (toolsetcommon-328) Enforce cardinality limits when creating associations between two elements.
 * (toolsetcommon-330) Prevent upgrade routines from running repeatedly. Fix a m2m activation issue.
-* (toolsetcommon-249) The Toolset_Twig_Autoloader now bails out when it's possible to load the Twig_Environment class. 
+* (toolsetcommon-249) The Toolset_Twig_Autoloader now bails out when it's possible to load the Twig_Environment class.
 
 ## 2.5.6
 * Fixed a but that prevented CRED attributes offered as select2 instances from getting their values in the final shortcode.
@@ -92,7 +122,7 @@
 - Only include the jQuery datepicker stylesheet on demand when the current page contains a datepicker from Toolset.
 - Include the user editors in the common bootstrap class.
 - toolsetcommon-127, toolsetcommon-55: Include knockout.js
-- toolsetcommon-139: Clean up Toolset_Assets_Manager and define constants for asset handles 
+- toolsetcommon-139: Clean up Toolset_Assets_Manager and define constants for asset handles
 - toolsetcommon-144: Added Toolset_Admin_Notices_Manager
 - toolsetcommon-137: Make the toolset-forms classes autoloaded.
 - toolsetcommon-72: Implemented a classmap-based autoloader for all Toolset plugins.
@@ -105,7 +135,7 @@
 
 ## 2.2.9
 
-- Fix a validation issue for file, audio, video and embed fields affecting Types. 
+- Fix a validation issue for file, audio, video and embed fields affecting Types.
   Allow URLs with non-latin characters, but only for URLs that point to attachments
   from the Media Library (validated by WordPress media upload mechanism) (types-1013).
 - Improve the validation for non-required Skype fields (toolsetcommon-128).
@@ -118,7 +148,7 @@
 - Extend WPToolset_Cake_Validation with the "url2" validation as a counterpart to the validation method in JQuery UI (types-988).
 
 ## 2.2.5 (November 5, 2016)
- 
+
 - Thorough check for security vulnerabilities.
 
 ## 2.2.4 (November 2, 2016)
@@ -140,9 +170,9 @@
 - Added an internal Toolset compatibility class
 
 ## 2.2.1 (August 25, 2016)
- 
+
 - Avoid translating the Toolset top level admin menu label
-	
+
 ## 2.2 (August 24, 2016)
 
 - Added compatibility classes for Relevanssi and Beaver Builder
@@ -168,11 +198,11 @@
 - Fixed various bugs
 
 ## 1.9.2 (March 17, 2016)
-  
+
 - Fixed issue in validation messages on Amazon S3
 
 ## 1.9.1 (March 15, 2016)
-  
+
 - Added control to filter array to prevent exceptions
 - Prevented error when object does not have property or key is not set in array filter callback
 - Fixed glitch in validation library
@@ -180,7 +210,7 @@
 - Fixed search terms with language translation
 
 ## 1.9 (February 15, 2016)
-  
+
 - Tagged for Types 1.9, Views 1.12, CRED 1.5, Layouts 1.5 and Access 1.2.8
 - Updated parser.php constructors for PHP7 compatibility.
 - Updated the adodb time library for PHP7 compatibility.
@@ -188,7 +218,7 @@
 - New utils.
 
 ## 1.8 (November 10, 2015)
-  
+
 - Tagged for Views 1.11.1, Types 1.8.9 and CRED 1.4.2
 - Improved the media manager script.
 - Added helper functions for dealing with $_GET, $_POST and arrays.
@@ -197,23 +227,23 @@
 - Improved usermeta fields management in CRED forms.
 
 ## 1.7 (October 30, 2015)
-  
+
 - Tagged for Views 1.11 and Layouts 1.4
 
 ## 1.6.2 (September 25, 2015)
- 
+
 - Tagged for CRED 1.4, Types 1.8.2
 
 ## 1.6.1 (August 17, 2015)
-  
+
 - Tagged for Composer Types 1.8, Views 1.10, CRED 1.4 and Layouts 1.3
 
 ## 1.6 (June 11, 2015)
-  
+
 - Tagged for Types 1.7, Views 1.9 and Layouts 1.2
 
 ## 1.5 (Apr 1, 2015)
-  
+
 - Tagged for Types 1.6.6, Views 1.8, CRED 1.3.6 and Layouts 1.1.
 - Fixed issue when there is more than one CRED form on a page with the same taxonomy.
 - Fixed a little problem with edit skype button modal window - was too narrow.
@@ -224,16 +254,16 @@ https://wp-types.com/forums/topic/populate-select-field-in-wpcf-um-group/
 - Updated CakePHP validation URL method to allow new TLD's.
 
 ## 1.4 (Feb 2 2015)
-  
+
 - Tagged for Views 1.7, Types 1.6.5, CRED 1.3.5 and Layouts 1.0 beta1
 - Updated Installer to 1.5
 
 ## 1.3.1 (Dec 16 2014)
-  
+
 - Tagged for Views 1.7 beta1 and Layouts 1.0 beta1
 - Fixed issue about Editor addon and ACF compatibility
 - Fixed issue about branding loader
 
 ## 1.3 (Dec 15 2014)
-  
+
 - Tagged for Views 1.7 beta1 and Layouts 1.0 beta1

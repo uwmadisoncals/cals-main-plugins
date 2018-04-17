@@ -304,17 +304,24 @@ function my_calendar_write_js() {
 	}
 }
 
+
 add_action( 'in_plugin_update_message-my-calendar/my-calendar.php', 'mc_plugin_update_message' );
+/**
+ * Display notices from  WordPress.org about updated versions.
+ */
 function mc_plugin_update_message() {
 	global $mc_version;
 	define( 'MC_PLUGIN_README_URL', 'http://svn.wp-plugins.org/my-calendar/trunk/readme.txt' );
-	$response = wp_remote_get( MC_PLUGIN_README_URL, array( 'user-agent' => 'WordPress/My Calendar' . $mc_version . '; ' . get_bloginfo( 'url' ) ) );
+	$response = wp_remote_get(
+		MC_PLUGIN_README_URL,
+		array(
+			'user-agent' => 'WordPress/My Calendar' . $mc_version . '; ' . get_bloginfo( 'url' ),
+		)
+	);
 	if ( ! is_wp_error( $response ) || is_array( $response ) ) {
 		$data = $response['body'];
 		$bits = explode( '== Upgrade Notice ==', $data );
-		echo '<div id="mc-upgrade"><p><strong style="color:#c22;">Upgrade Notes:</strong> ' . nl2br( trim( $bits[1] ) ) . '</p></div>';
-	} else {
-		printf( __( '<br /><strong>Note:</strong> Please review the <a class="thickbox" href="%1$s">changelog</a> before upgrading.', 'my-calendar' ), 'plugin-install.php?tab=plugin-information&amp;plugin=my-calendar&amp;TB_iframe=true&amp;width=640&amp;height=594' );
+		echo '</div><div id="mc-upgrade" class="notice inline notice-warning"><ul><li><strong style="color:#c22;">Upgrade Notes:</strong> ' . str_replace( '* ', '', nl2br( trim( $bits[1] ) ) ) . '</li></ul>';
 	}
 }
 

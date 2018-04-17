@@ -33,10 +33,10 @@ function rvm_map_shortcode( $attr ) // $attr manages the shortcode parameter - [
                                     $map_border_color = get_post_meta( $map_id, '_rvm_mbe_map_bordercolor', true );
                                     $map_border_width = get_post_meta( $map_id, '_rvm_mbe_border_width', true );
                                     $map_regions_mouseover_colour = get_post_meta( $map_id, '_rvm_mbe_regions_mouseover_colour', true );
-                                    $map_regions_mouseover_colour_opacity = get_post_meta( $map_id, '_rvm_mbe_regions_mouseover_colour_opacity', true );                                    
-                                    //$map_region_link_target = get_post_meta( $map_id, '_rvm_mbe_select_target', true );
-                                    //$map_delete_padding = get_post_meta( $map_id, '_rvm_mbe_map_delete_padding', true );   
-                                    $map_enable_link_target = get_post_meta( $map_id, '_rvm_mbe_enable_link_target', true );                                                                     
+                                    $map_regions_mouseover_colour_opacity = get_post_meta( $map_id, '_rvm_mbe_regions_mouseover_colour_opacity', true );                                  
+                                    $map_enable_link_target = get_post_meta( $map_id, '_rvm_mbe_enable_link_target', true ); 
+
+                                    $rvm_mbe_map_marker_custom_icon = get_post_meta( $map_id, '_rvm_mbe_custom_marker_icon_path', true );
                                     $rvm_mbe_map_marker_bg_color = get_post_meta( $map_id, '_rvm_mbe_map_marker_bg_color', true );
                                     $rvm_mbe_map_marker_border_color = get_post_meta( $map_id, '_rvm_mbe_map_marker_border_color', true );
                                     $rvm_mbe_map_marker_dim_min = get_post_meta( $map_id, '_rvm_mbe_map_marker_dim_min', true );
@@ -58,6 +58,8 @@ function rvm_map_shortcode( $attr ) // $attr manages the shortcode parameter - [
                                     $map_regions_mouseover_colour  =  !empty( $map_regions_mouseover_colour ) ? $map_regions_mouseover_colour : RVM_MAP_MOUSE_HOVER_OVER_COLOUR;
                                     $map_regions_mouseover_colour_opacity  =  (  is_numeric( $map_regions_mouseover_colour_opacity ) && ( $map_regions_mouseover_colour_opacity <1 || $map_regions_mouseover_colour_opacity > 0 )  ) ? $map_regions_mouseover_colour_opacity : RVM_MAP_MOUSE_HOVER_OVER_COLOUR_OPACITY;                                    
                                     $map_enable_link_target = !empty( $map_enable_link_target ) && $map_enable_link_target == 'checked'   ? '_blank ' : '';                                    
+                                    $rvm_mbe_map_marker_custom_icon = !empty( $rvm_mbe_map_marker_custom_icon ) || ( $rvm_mbe_map_marker_custom_icon != 'default' ) ? $rvm_mbe_map_marker_custom_icon : ''; 
+                 
                                     $rvm_mbe_map_marker_bg_color = !empty( $rvm_mbe_map_marker_bg_color ) ? $rvm_mbe_map_marker_bg_color : RVM_MARKER_BG_COLOUR;
                                     $rvm_mbe_map_marker_border_color = !empty( $rvm_mbe_map_marker_border_color ) ? $rvm_mbe_map_marker_border_color : RVM_MARKER_BORDER_COLOUR;
                                     $rvm_mbe_map_marker_dim_min = !empty( $rvm_mbe_map_marker_dim_min ) ? $rvm_mbe_map_marker_dim_min : RVM_MARKER_DIM_MIN_VALUE;
@@ -387,7 +389,20 @@ function rvm_map_shortcode( $attr ) // $attr manages the shortcode parameter - [
                                                         $output .= 'if( markers[index].weburl ) { window.open( markers[index].weburl, "' . $map_enable_link_target . '" ) ; } }';
                                     }
                                             
-                                    $output .= ', markerStyle: {initial: { fill: "' . $rvm_mbe_map_marker_bg_color . '", stroke: "' . $rvm_mbe_map_marker_border_color .'" }}' ;  
+                                    //Display custom marker icon
+                                    $rvm_marker_module_dir_url_array = rvm_set_absolute_upload_dir_url();
+                                    $rvm_options = rvm_retrieve_options();
+                                	if ( rvm_check_custom_marker_icon_available( $rvm_mbe_map_marker_custom_icon ) && !empty( $rvm_options[ 'rvm_custom_icon_marker_module_path_verified' ] ) ) {
+                                		$output .= ', markerStyle: { initial: { image: "' . $rvm_marker_module_dir_url_array[0] . $rvm_mbe_map_marker_custom_icon . '"}}';// Set an image as marker icon 
+
+                                	}
+                                	//Or default marker icon
+                                	else {
+                                		$output .= ', markerStyle: {initial: { fill: "' . $rvm_mbe_map_marker_bg_color . '", stroke: "' . $rvm_mbe_map_marker_border_color .'" }}' ;
+                                	}
+                                    
+
+                                     
                                     
                                     /**
                                          * END  : DISPLAY MARKERS
@@ -445,7 +460,9 @@ function rvm_map_shortcode( $attr ) // $attr manages the shortcode parameter - [
                                          */
                                          
                         } //if( !empty( $postid ) )        
-            } //if( isset( $attr ) ) 
+            } //if( isset( $attr ) )
+
+
             return $output;
 } //function rvm_map_shortcode( $attr )
 ?>

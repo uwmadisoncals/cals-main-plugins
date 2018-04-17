@@ -46,9 +46,12 @@ class Package {
         $author = get_user_by('id', $post_vars['post_author']);
         $post_vars['author_name'] = $author->display_name;
         $post_vars['author_profile_url'] = get_author_posts_url($post_vars['post_author']);
+        $post_vars['avatar_url'] = get_avatar_url($author->user_email);
+        $post_vars['author_package_count'] = count_user_posts( $post_vars['post_author'] , "wpdmpro"  );
+
 
         //Featured Image
-        $src = wp_get_attachment_image_src(get_post_thumbnail_id($ID), 'full', false, '');
+        $src = wp_get_attachment_image_src(get_post_thumbnail_id($ID), 'full', false);
 
         $post_vars['preview'] = $src['0'];
 
@@ -882,6 +885,21 @@ class Package {
     }
 
     /**
+     * @param $ID
+     * @param int $usageLimit
+     * @param int $expirePeriod seconds
+     * @return string
+     */
+    static function expirableDownloadLink($ID, $usageLimit = 10, $expirePeriod = 999999){
+        $key = uniqid();
+        $exp = array('use' => $usageLimit, 'expire' => time()+$expirePeriod);
+        update_post_meta($ID, "__wpdmkey_".$key, $exp);
+        $_SESSION['_wpdm_unlocked_'.$ID] = 1;
+        $download_url = self::getDownloadURL($ID, "_wpdmkey={$key}");
+        return $download_url;
+    }
+
+    /**
      * @usage Generate download url for public/open downloads, the url will not work for the packages with lock option
      * @param $ID
      * @param $ext
@@ -901,9 +919,18 @@ class Package {
         return $packageURL;
     }
 
-
-
-
+    /**
+     * @param $ID
+     * @param $Key
+     * @return bool
+     */
+    public static function validateMasterKey($ID, $Key){
+        if($Key === '') return false;
+        $masterKey = get_post_meta($ID, '__wpdm_masterkey');
+        if($masterKey === '') return false;
+        if($masterKey === $Key) return true;
+        return false;
+    }
 
     /**
      * @usage Fetch link/page template and return generated html

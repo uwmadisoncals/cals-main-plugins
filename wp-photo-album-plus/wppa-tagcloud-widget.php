@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the tagcloud widget
-* Version 6.7.01
+* Version 6.8.07
 *
 */
 
@@ -19,12 +19,6 @@ class TagcloudPhotos extends WP_Widget {
     function widget($args, $instance) {
 		global $widget_content;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
 		wppa( 'in_widget', 'tagcloud' );
@@ -32,8 +26,14 @@ class TagcloudPhotos extends WP_Widget {
 
         extract( $args );
 
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Photo Tag Cloud', 'wp-photo-album-plus' ), 'tags' => array() ) );
-        if ( empty( $instance['tags'] ) ) $instance['tags'] = array();
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Photo Tag Cloud', 'wp-photo-album-plus' ), 'tags' => array(), 'logonly' => 'no' ) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
+
+		if ( empty( $instance['tags'] ) ) $instance['tags'] = array();
 
  		$widget_title = apply_filters('widget_title', $instance['title']);
 
@@ -42,7 +42,13 @@ class TagcloudPhotos extends WP_Widget {
 
 		if ( !empty( $widget_title ) ) { echo $before_title . $widget_title . $after_title; }
 
-		echo '<div class="wppa-tagcloud-widget" >'.wppa_get_tagcloud_html(implode(',', $instance['tags']), wppa_opt( 'tagcloud_min'), wppa_opt( 'tagcloud_max') ).'</div>';
+		echo '
+		<div' .
+			' class="wppa-tagcloud-widget"' .
+			' data-wppa="yes"' .
+			' >' .
+			wppa_get_tagcloud_html( implode( ',', $instance['tags'] ), wppa_opt( 'tagcloud_min' ), wppa_opt( 'tagcloud_max' ) ) .
+		'</div>';
 
 		echo '<div style="clear:both"></div>';
 		echo $after_widget;
@@ -55,6 +61,8 @@ class TagcloudPhotos extends WP_Widget {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['tags'] = $new_instance['tags'];
+		$instance['logonly'] = $new_instance['logonly'];
+
         return $instance;
     }
 
@@ -62,7 +70,7 @@ class TagcloudPhotos extends WP_Widget {
     function form( $instance ) {
 
 		//Defaults
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Photo Tag Cloud', 'wp-photo-album-plus' ), 'tags' => '' ) );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Photo Tag Cloud', 'wp-photo-album-plus' ), 'tags' => '', 'logonly' => 'no' ) );
 		$title = $instance['title'];
 		$stags = $instance['tags'];
 		if ( ! $stags ) $stags = array();
@@ -91,7 +99,11 @@ class TagcloudPhotos extends WP_Widget {
 		}
 		echo '<p style="word-break:break-all;" >' . __( 'Currently selected tags', 'wp-photo-album-plus' ) . ': <br /><b>' . $s . '</b></p>';
 
-    }
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
+
+	}
 
 } // class TagcloudPhotos
 

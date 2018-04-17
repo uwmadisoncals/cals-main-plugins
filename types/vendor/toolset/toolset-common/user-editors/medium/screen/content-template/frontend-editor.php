@@ -192,15 +192,7 @@ class Toolset_User_Editors_Medium_Screen_Content_Template_Frontend_Editor
 				? ' selected="selected"'
 				: '';
 
-			echo '<span class="fl-builder-bar-title js-toolset-editors-frontend-editor-extra" style="display:none;border-left:solid 1px #ccc;padding-bottom:6px;font-size:13px;">';
-			echo '<i class="icon icon-toolset-logo" style="color: #F05A29; font-size: 30px; vertical-align: middle;"></i>';
-			echo '<span>';
-			
-			echo __( 'Preview this Content Template with:', 'wpv-views' );
-
-			echo ' <select id="wpv-ct-preview-post">';
-			echo '<option value="0"' . $selected . '>'.__( 'No post', 'wpv-views' ).'</option>';
-
+			$options = '';
 			foreach( $preview_posts as $single_post ) {
 				$selected = $preview_post == $single_post['ID']
 					? ' selected="selected"'
@@ -208,14 +200,26 @@ class Toolset_User_Editors_Medium_Screen_Content_Template_Frontend_Editor
 				if ( ! empty( $selected ) ) {
 					$preview_post_offered = true;
 				}
-				echo '<option value="' . $single_post['ID'] . '"' . $selected . '>'.$single_post['post_title'].'</option>';
+				$options .= '<option value="' . $single_post['ID'] . '"' . $selected . '>'.$single_post['post_title'].'</option>';
 			}
-			echo '</select>';
-			
-			echo '</span>';
-			
-			echo '</span>';
-			
+
+			$output = 	'<span class="fl-builder-bar-title toolset-editors-frontend-editor-extra js-toolset-editors-frontend-editor-extra">' .
+							'<span class="toolset-editors-frontend-editor-extra-content js-toolset-editors-frontend-editor-extra-content">' .
+								'<span class="toolset-editors-frontend-editor-extra-content-icon-container">' .
+									'<i class="icon icon-toolset-logo"></i>' .
+								'</span>' .
+								'<span>' .
+									__( 'Preview this Content Template with:', 'wpv-views' ) .
+								'</span>' .
+								'<select id="wpv-ct-preview-post">' .
+									'<option value="0"' . $selected . '>'.__( 'No post', 'wpv-views' ).'</option>' .
+									$options .
+								'</select>' .
+							'</span>' .
+						'</span>';
+
+			echo $output;
+
 			if ( ! $preview_post_offered ) {
 				$this->store_preview_post_id( $post->ID, 0 );
 			}

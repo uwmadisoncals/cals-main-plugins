@@ -114,7 +114,7 @@
 </div>
 <?php if(!file_exists(dirname(WPDM_BASE_DIR).'/wpdm-premium-packages/wpdm-premium-packages.php')){  ?>
     <div class="w3eden" id="wpdm-activate-shop"><br/>
-        <div  class="alert alert-warning" id="wpdm-activate-shop-info" style="background-image: none !important;">
+        <div  class="alert alert-warning" id="wpdm-activate-shop-info" style="background-image: none !important;border-radius:0 !important;margin:0;background:#d7b75d33;border:0;text-align:center;">
 
             Planning to sell your digital products? <a style="font-weight: 900" href="#" id="wpdm-activate-shop-link">Activate Digital Store Option</a>
 

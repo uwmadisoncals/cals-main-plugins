@@ -3,7 +3,7 @@
 /* Package: wp-photo-album-plus
 /*
 /* Various style computation routines
-/* Version 6.8.01
+/* Version 6.8.02
 /*
 */
 
@@ -247,13 +247,6 @@ global $wppa_dynamic_css_data;
 	' . ( wppa_opt( 'bgcolor_adminschoice' ) ? 'background-color:' . wppa_opt( 'bgcolor_adminschoice' ) . '; ' : '' ) . '
 	' . ( wppa_opt( 'bcolor_adminschoice' ) ? 'border-color:' . wppa_opt( 'bcolor_adminschoice' ) . '; ' : '' ) . '
 }';
-
-/*
-	$content .= '
-.wppa-arrow {
-	' . ( wppa_opt( 'arrow_color' ) ? 'color:' . wppa_opt( 'arrow_color' ) . '; ' : '' ) . '
-}';
-*/
 
 	// Add miscellaneous styles
 	if ( ! wppa_switch( 'ovl_fs_icons' ) ) {

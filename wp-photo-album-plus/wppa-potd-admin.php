@@ -3,7 +3,7 @@
 * Pachkage: wp-photo-album-plus
 *
 * admin photo of the day widget
-* version 6.8.01
+* version 6.8.03
 *
 */
 
@@ -345,6 +345,22 @@ global $wppa_defaults;
 				$slug = 'wppa_potd_preview';
 				$html = wppa_checkbox($slug, $onch);
 				wppa_setting($slug, '13', $name, $desc, $html, $help);
+
+				$name = __('Log potd', 'wp-photo-album-plus');
+				$desc = __('Keep track of the potd history', 'wp-photo-album-plus');
+				$help = '';
+				$slug = 'wppa_potd_log';
+				$html = wppa_checkbox($slug);
+				wppa_setting($slug, '14', $name, $desc, $html, $help);
+
+				$name = __('Log potd max', 'wp-photo-album-plus');
+				$desc = __('Max length of the potd history (items)', 'wp-photo-album-plus');
+				$help = '';
+				$slug = 'wppa_potd_log_max';
+				$opts = array( '5', '10', '15', '20', '30', '50', '100' );
+				$html = wppa_select($slug, $opts, $opts);
+				wppa_setting($slug, '15', $name, $desc, $html, $help);
+
 
 			// Cose table body
 			echo

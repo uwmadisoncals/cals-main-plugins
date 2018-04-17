@@ -235,12 +235,17 @@ class SSP_Frontend {
 			$player_style = get_option( 'ss_podcasting_player_style' );
 			
 			if( $show_player ) {
-				$meta .= '<div class="podcast_player">' . $this->media_player( $file, $episode_id, $player_style ) . '</div>';
+
+				if ( ! ssp_check_if_podcast_has_shortcode( $episode_id, 'ss_player' ) ) {
+					$meta .= '<div class="podcast_player">' . $this->media_player( $file, $episode_id, $player_style ) . '</div>';
+
+					if ( apply_filters( 'ssp_show_episode_details', true, $episode_id, $context ) ) {
+						$meta .= $this->episode_meta_details( $episode_id, $context );
+					}
+
+				}
 			}
-			
-			if ( apply_filters( 'ssp_show_episode_details', true, $episode_id, $context ) ) {
-				$meta .= $this->episode_meta_details( $episode_id, $context );
-			}
+
 		}
 
 		$meta = apply_filters( 'ssp_episode_meta', $meta, $episode_id, $context );
@@ -337,7 +342,8 @@ class SSP_Frontend {
 		 * Option 2: if the episode belongs to a series, which has an image that is square, then use that
 		 */
 		$series_id = false;
-		
+		$series_image = '';
+
 		$series = get_the_terms( $episode_id, 'series' );
 		if ( $series ) {
 			$series_id = ( ! empty( $series ) && isset( $series[0] ) ) ? $series[0]->term_id : false;
@@ -416,7 +422,23 @@ class SSP_Frontend {
 		
 		return compact( 'src', 'width', 'height' );
 	}
-	
+
+
+	/**
+	 * Return media player for a given file. Used to enable other checks or to prevent the player from loading
+	 * @param string $srcFile
+	 * @param int $episode_id
+	 * @param string $player_size
+	 *
+	 * @return string
+	 */
+	public function media_player( $srcFile = '', $episode_id = 0, $player_size = "large" ) {
+		// check if the ss_player shortcode has been used in the episode already
+		if ( ! ssp_check_if_podcast_has_shortcode( $episode_id, 'ss_player' ) ) {
+			return $this->load_media_player( $srcFile, $episode_id, $player_size );
+		}
+	}
+
 	/**
 	 * Load media player for given file
 	 * @param  string  $srcFile        Source of file
@@ -424,7 +446,15 @@ class SSP_Frontend {
 	 * @param  string $player_size mini or large
 	 * @return string              Media player HTML on success, empty string on failure
 	 */
-	public function media_player ( $srcFile = '', $episode_id = 0, $player_size = "large" ) {
+	public function load_media_player($srcFile = '', $episode_id = 0, $player_size){
+
+		/**
+		 * Check if this player is being loaded via the AMP for WordPress plugin and if so, force the standard player
+		 * https://wordpress.org/plugins/amp/
+		 */
+		if ( function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) {
+			$player_size = 'mini';
+		}
 
 		global $largePlayerInstanceNumber;
 		$largePlayerInstanceNumber++;
@@ -477,9 +507,9 @@ class SSP_Frontend {
 						?>
 						<div class="ssp-player ssp-player-large" id="ssp_player_id_<?php echo $largePlayerInstanceNumber; ?>"<?php echo $player_background_colour ? ' style="background: ' . $player_background_colour . ';"' : 'background: #333;' ;?>>
 							<?php if( apply_filters( 'ssp_show_album_art', true, get_the_ID() ) ) { ?>
-							<div class="ssp-album-art-container">
-								<div class="ssp-album-art" style="background: url( <?php echo apply_filters( 'ssp_album_art_cover', $albumArt['src'], get_the_ID() ); ?> ) center center no-repeat; -webkit-background-size: cover;background-size: cover;"></div>
-							</div>
+								<div class="ssp-album-art-container">
+									<div class="ssp-album-art" style="background: url( <?php echo apply_filters( 'ssp_album_art_cover', $albumArt['src'], get_the_ID() ); ?> ) center center no-repeat; -webkit-background-size: cover;background-size: cover;"></div>
+								</div>
 							<?php }; ?>
 							<div style="overflow: hidden">
 								<div class="ssp-player-inner" style="overflow: hidden;">
@@ -487,19 +517,15 @@ class SSP_Frontend {
 										<div style="width: 80%; float:left;">
 											<h3 class="ssp-player-title episode-title">
 												<?php
-													echo apply_filters( 'ssp_podcast_title', get_the_title( $episode_id ), get_the_ID() );
-													if( $series = get_the_terms( $episode_id, 'series' ) ){
-														echo ( !empty( $series ) && isset( $series[0] ) ) ? '<br><span class="ssp-player-series">' . substr( $series[0]->name, 0, 35) . ( strlen( $series[0]->name ) > 35 ? '...' : '' ) . '</span>' : '';
-													}
+												echo apply_filters( 'ssp_podcast_title', get_the_title( $episode_id ), get_the_ID() );
+												if( $series = get_the_terms( $episode_id, 'series' ) ){
+													echo ( !empty( $series ) && isset( $series[0] ) ) ? '<br><span class="ssp-player-series">' . substr( $series[0]->name, 0, 35) . ( strlen( $series[0]->name ) > 35 ? '...' : '' ) . '</span>' : '';
+												}
 												?>
 											</h3>
 										</div>
-										<div class="ssp-download-episode" style="overflow: hidden;text-align:right;">
-											<?php if( apply_filters( 'ssp_player_show_logo', true ) ) { ?>
-												<img class="<?php echo apply_filters( 'ssp_player_logo_class', 'ssp-player-branding' ); ?>" src="<?php echo apply_filters( 'ssp_player_logo_src', SSP_PLUGIN_URL . '/assets/svg/castos_logo_white.svg' ); ?>" width="<?php echo apply_filters( 'ssp_player_logo_width', 68 ); ?>" />
-											<?php }; ?>
-										</div>
-										<div>&nbsp;</div>
+										<div class="ssp-download-episode" style="overflow: hidden;text-align:right;"></div>
+										<div>&nbsp</div>
 										<div class="ssp-media-player">
 											<div class="ssp-custom-player-controls">
 												<div class="ssp-play-pause" id="ssp-play-pause">
@@ -521,7 +547,7 @@ class SSP_Frontend {
 
 														<div class="ssp-back-thirty-container">
 															<div class="ssp-back-thirty-control" id="ssp-back-thirty">
-																<i class="icon icon-replay">&nbsp;</i>
+																<i class="ssp-icon icon-replay">&nbsp;</i>
 															</div>
 														</div>
 
@@ -533,7 +559,7 @@ class SSP_Frontend {
 
 														<div class="ssp-download-container">
 															<div class="ssp-download-control">
-																<a class="ssp-episode-download" href="<?php echo $this->get_episode_download_link( $episode_id, 'download' ); ?>" target="_blank"><i class="icon icon-cloud-download">&nbsp;</i></a>
+																<a class="ssp-episode-download" href="<?php echo $this->get_episode_download_link( $episode_id, 'download' ); ?>" target="_blank"><i class="ssp-icon icon-cloud-download">&nbsp;</i></a>
 															</div>
 														</div>
 
@@ -577,7 +603,7 @@ class SSP_Frontend {
 										progressColor: '<?php echo $player_wave_form_progress_colour ? $player_wave_form_progress_colour : "#28c0e1"; ?>',
 										barWidth: 3,
 										barHeight: 15,
-										height: 2,
+										height: 8,
 										hideScrollbar: true,
 										skipLength: 30,
 										backend: 'MediaElement'
@@ -698,7 +724,7 @@ class SSP_Frontend {
 
 					break;
 
-					case 'video':
+				case 'video':
 
 					// Use featured image as video poster
 					if( $episode_id && has_post_thumbnail( $episode_id ) ) {
@@ -709,7 +735,7 @@ class SSP_Frontend {
 					}
 
 					$player = wp_video_shortcode( $params );
-				break;
+					break;
 			}
 
 			// Allow filtering so that alternative players can be used
@@ -1741,6 +1767,7 @@ class SSP_Frontend {
 			'podcast_episode',
 			'podcast_playlist',
 			'ss_podcast',
+			'ss_player',
 		);
 
 		foreach ( $shortcodes as $shortcode ) {

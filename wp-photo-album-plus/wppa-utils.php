@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.8.01
+* Version 6.8.07
 *
 */
 
@@ -1368,8 +1368,13 @@ global $wpdb;
 		}
 	}
 
-	// Delete sourcefile
-	wppa_delete_source( $photoinfo['filename'], $album);
+	// If still a photo with the same name exists in the original album, do not delete tge source
+	$still_exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_PHOTOS . "` WHERE `filename` = %s AND `album` = %s", $photoinfo['filename'], $album ) );
+	if ( ! $still_exists ) {
+
+		// Delete sourcefile
+		wppa_delete_source( $photoinfo['filename'], $album );
+	}
 
 	// Delete fullsize image
 	$file = wppa_get_photo_path( $photo );
@@ -1633,21 +1638,24 @@ global $wppa_log_file;
 		case 'c':
 			switch ( $u ) {
 				case 'r':
-					$type = '{span style="color:blue;" }Cron{/span}';
 					if ( ! wppa_switch( 'log_cron' ) ) {
 						return;
 					}
+					$type = '{span style="color:blue;" }Cron{/span}';
 					break;
 				case 'o':
-					$type = '{span style="color:cyan;" }Com{/span}';
 					if ( ! wppa_switch( 'log_comments' ) ) {
 						return;
 					}
+					$type = '{span style="color:cyan;" }Com{/span}';
 					break;
 			}
 			break;
 		case 'd':
-			$type = '{span style="color:orange;" }Dbg{/span}';
+			if ( ! wppa_switch( 'log_debug' ) ) {
+				return;
+			}
+			$type = '{span style="color:gray;" }Dbg{/span}';
 			break;
 		case 'e':
 			$type = '{span style="color:red;" }Err{/span}';
@@ -1655,10 +1663,10 @@ global $wppa_log_file;
 		case 'f':
 			switch ( $u ) {
 				case 's':
-					$type = '{span style="color:blue;" }Fso{/span}';
 					if ( ! wppa_switch( 'log_fso' ) ) {
 						return;
 					}
+					$type = '{span style="color:blue;" }Fso{/span}';
 					break;
 				case 'i':
 					$type = 'Fix';
@@ -1672,7 +1680,7 @@ global $wppa_log_file;
 			$type = 'Upl';
 			break;
 		case 'w':
-			$type = '{span style="color:yellow;" }War{/span}';
+			$type = '{span style="color:orange;" }War{/span}';
 			break;
 		default:
 			$type = 'Misc';
@@ -1709,7 +1717,7 @@ global $wppa_log_file;
 	// Write log message
 	$msg = strip_tags( $msg );
 
-	@ fwrite( $file, '{b}'.$type.'{/b}: on:'.wppa_local_date(get_option('date_format', "F j, Y,").' '.get_option('time_format', "g:i a"), time()).': '.wppa_get_user().': '.$msg."\n" );
+	@ fwrite( $file, '{b}'.$type.'{/b}: on:'.wppa_local_date( 'd.m.Y H:i:s', time()).': '.wppa_get_user().': '.$msg."\n" );
 
 	// Log current url and stacktrace 12 levels if trace requested
 	if ( $trace || $type == 'Dbg' ) {
@@ -1717,7 +1725,7 @@ global $wppa_log_file;
 	}
 	if ( $trace ) {
 		ob_start();
-		debug_print_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 12 );
+		debug_print_backtrace( 0, 12 );//DEBUG_BACKTRACE_IGNORE_ARGS, 12 );
 		$trace = ob_get_contents();
 		ob_end_clean();
 		@ fwrite( $file, $trace."\n" );
@@ -2974,6 +2982,43 @@ function wppa_is_iphoneoripad() {
 	return $result;
 }
 
+function wppa_is_chrome() {
+	return ( get_browser_name() == 'Chrome' );
+}
+
+function wppa_is_firefox() {
+	return ( get_browser_name() == 'Firefox' );
+}
+
+function wppa_is_edge() {
+	return ( get_browser_name() == 'Edge' );
+}
+
+function wppa_is_ie() {
+	return ( get_browser_name() == 'Internet Explorer' );
+}
+
+function wppa_is_safari() {
+	return ( get_browser_name() == 'Safari' );
+}
+
+function wppa_is_opera() {
+	return ( get_browser_name() == 'Opera' );
+}
+
+function get_browser_name() {
+	$user_agent = isset ( $_SERVER["HTTP_USER_AGENT"] ) ? $_SERVER["HTTP_USER_AGENT"] : '';
+	if ( $user_agent ) {
+		if (strpos($user_agent, 'Opera') || strpos($user_agent, 'OPR/')) return 'Opera';
+		elseif (strpos($user_agent, 'Edge')) return 'Edge';
+		elseif (strpos($user_agent, 'Chrome')) return 'Chrome';
+		elseif (strpos($user_agent, 'Safari')) return 'Safari';
+		elseif (strpos($user_agent, 'Firefox')) return 'Firefox';
+		elseif (strpos($user_agent, 'MSIE') || strpos($user_agent, 'Trident/7')) return 'Internet Explorer';
+    }
+    return 'Other';
+}
+
 // Like wp_nonce_field
 // To prevent duplicate id's, we externally add an id number ( e.g. album ) and internally the mocc number.
 function wppa_nonce_field( $action = -1, $name = "_wpnonce", $referer = true , $echo = true, $wppa_id = '0' ) {
@@ -3595,30 +3640,6 @@ function wppa_get_mime_type( $id ) {
 	return $result;
 }
 
-function wppa_is_ie() {
-
-	$result = false;
-	if ( isset ( $_SERVER["HTTP_USER_AGENT"] ) ) {
-		if ( strpos( $_SERVER["HTTP_USER_AGENT"], 'Trident' ) !== false ) {
-			$result = true;
-		}
-	}
-
-	return $result;
-}
-
-function wppa_is_safari() {
-
-	$result = false;
-	if ( isset ( $_SERVER["HTTP_USER_AGENT"] ) ) {
-		if ( strpos( $_SERVER["HTTP_USER_AGENT"], 'Safari' ) !== false ) {
-			$result = true;
-		}
-	}
-
-	return $result;
-}
-
 function wppa_chmod( $fso ) {
 
 	$fso = rtrim( $fso, '/' );
@@ -4039,10 +4060,10 @@ function wppa_pdf_preprocess( &$file, $alb, $i = false ) {
 		if ( wppa_is_windows() ) {
 
 			// On windows the filename[pageno] must be enclosed in "", on unix in ''
-			wppa_image_magick( 'convert  -density 300 "' . $src . $file['name'] . '[0]" ' . $src . $jpg, null, $result );
+			wppa_image_magick( 'convert  -density 300 "' . $src . $file['name'] . '[0]" ' . $src . $jpg );//, null, $result );
 		}
 		else {
-			wppa_image_magick( "convert  -density 300 '" . $src . $file['name'] . "[0]' " . $src . $jpg, null, $result );
+			wppa_image_magick( "convert  -density 300 '" . $src . $file['name'] . "[0]' " . $src . $jpg );//, null, $result );
 		}
 	}
 	else {
@@ -4050,10 +4071,10 @@ function wppa_pdf_preprocess( &$file, $alb, $i = false ) {
 		if ( wppa_is_windows() ) {
 
 			// On windows the filename[pageno] must be enclosed in "", on unix in ''
-			wppa_image_magick( 'convert  -density 300 "' . $src . $file['name'][$i] . '[0]" ' . $src . $jpg, null, $result );
+			wppa_image_magick( 'convert  -density 300 "' . $src . $file['name'][$i] . '[0]" ' . $src . $jpg );//, null, $result );
 		}
 		else {
-			wppa_image_magick( "convert  -density 300 '" . $src . $file['name'][$i] . "[0]' " . $src . $jpg, null, $result );
+			wppa_image_magick( "convert  -density 300 '" . $src . $file['name'][$i] . "[0]' " . $src . $jpg );//, null, $result );
 		}
 	}
 

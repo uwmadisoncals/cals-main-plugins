@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use MailPoet\API\JSON\Endpoint as APIEndpoint;
 use MailPoet\API\JSON\Error as APIError;
 use MailPoet\Config\AccessControl;
+use MailPoet\Cron\Workers\SendingQueue\Tasks\Newsletter as NewsletterQueueTask;
 use MailPoet\Listing;
 use MailPoet\Models\Newsletter;
 use MailPoet\Models\NewsletterOption;
@@ -19,6 +20,7 @@ use MailPoet\Newsletter\Renderer\Renderer;
 use MailPoet\Newsletter\Scheduler\Scheduler;
 use MailPoet\Newsletter\Url as NewsletterUrl;
 use MailPoet\WP\Hooks;
+use MailPoet\WP\Functions as WPFunctions;
 
 if(!defined('ABSPATH')) exit;
 
@@ -48,6 +50,8 @@ class Newsletters extends APIEndpoint {
   }
 
   function save($data = array()) {
+    $data = Hooks::applyFilters('mailpoet_api_newsletters_save_before', $data);
+
     $segments = array();
     if(isset($data['segments'])) {
       $segments = $data['segments'];
@@ -59,8 +63,6 @@ class Newsletters extends APIEndpoint {
       $options = $data['options'];
       unset($data['options']);
     }
-
-    $data = Hooks::applyFilters('mailpoet_api_newsletters_save_before', $data);
 
     $newsletter = Newsletter::createOrUpdate($data);
     $errors = $newsletter->getErrors();
@@ -105,8 +107,8 @@ class Newsletters extends APIEndpoint {
         $newsletter->schedule = Scheduler::processPostNotificationSchedule($newsletter);
         $next_run_date = Scheduler::getNextRunDate($newsletter->schedule);
         // find previously scheduled jobs and reschedule them using the new "next run" date
-        SendingQueue::where('newsletter_id', $newsletter->id)
-          ->where('status', SendingQueue::STATUS_SCHEDULED)
+        SendingQueue::findTaskByNewsletterId($newsletter->id)
+          ->where('tasks.status', SendingQueue::STATUS_SCHEDULED)
           ->findResultSet()
           ->set('scheduled_at', $next_run_date)
           ->save();
@@ -123,7 +125,8 @@ class Newsletters extends APIEndpoint {
       } else {
         $queue->newsletter_rendered_body = null;
         $queue->newsletter_rendered_subject = null;
-        $queue->save();
+        $newsletterQueueTask = new NewsletterQueueTask();
+        $newsletterQueueTask->preProcessNewsletter($newsletter, $queue);
       }
     }
 
@@ -166,12 +169,15 @@ class Newsletters extends APIEndpoint {
     // if there are past due notifications, reschedule them for the next send date
     if($newsletter->type === Newsletter::TYPE_NOTIFICATION && $status === Newsletter::STATUS_ACTIVE) {
       $next_run_date = Scheduler::getNextRunDate($newsletter->schedule);
-      $newsletter->queue()
-        ->whereLte('scheduled_at', Carbon::createFromTimestamp(current_time('timestamp')))
-        ->where('status', SendingQueue::STATUS_SCHEDULED)
-        ->findResultSet()
-        ->set('scheduled_at', $next_run_date)
-        ->save();
+      $queue = $newsletter->queue()->findOne();
+      if($queue) {
+        $queue->task()
+          ->whereLte('scheduled_at', Carbon::createFromTimestamp(WPFunctions::currentTime('timestamp')))
+          ->where('status', SendingQueue::STATUS_SCHEDULED)
+          ->findResultSet()
+          ->set('scheduled_at', $next_run_date)
+          ->save();
+      }
     }
 
     return $this->successResponse(
@@ -371,7 +377,7 @@ class Newsletters extends APIEndpoint {
           ->withSegments(true)
           ->withSendingQueue()
           ->withStatistics();
-      } else if($newsletter->type === Newsletter::TYPE_WELCOME) {
+      } else if($newsletter->type === Newsletter::TYPE_WELCOME || $newsletter->type === Newsletter::TYPE_AUTOMATIC) {
         $newsletter
           ->withOptions()
           ->withTotalSent()
@@ -402,7 +408,7 @@ class Newsletters extends APIEndpoint {
         $queue
       );
 
-      $data[] = $newsletter->asArray();
+      $data[] = Hooks::applyFilters('mailpoet_api_newsletters_listing_item', $newsletter->asArray());
     }
 
     return $this->successResponse($data, array(
@@ -411,7 +417,7 @@ class Newsletters extends APIEndpoint {
       'groups' => $listing_data['groups'],
       'mta_log' => Setting::getValue('mta_log'),
       'mta_method' => Setting::getValue('mta.method'),
-      'current_time' => current_time('mysql')
+      'current_time' => WPFunctions::currentTime('mysql')
     ));
   }
 

@@ -2,7 +2,7 @@
 /* wppa-widget-functions.php
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.7.01
+/* Version 6.8.03
 /*
 */
 
@@ -316,6 +316,7 @@ static $potd;
 
 	if ( $id ) {
 		$result = wppa_cache_photo( $id );
+		wppa_log_potd( $id );
 	}
 	else {
 		$result = false;
@@ -505,4 +506,36 @@ function wppa_checked( $arg ) {
 	}
 
 	return $result;
+}
+
+function wppa_log_potd( $id ) {
+
+	// Feature enabled?
+	if ( wppa_switch( 'potd_log' ) ) {
+
+		// Get existig history
+		$his = get_option( 'wppa_potd_log_data', array() );
+
+		// If history exists and last one is current id, quit
+		if ( ! empty( $his ) ) {
+			if ( $his[0]['id'] == $id ) {
+				return;
+			}
+		}
+
+		// Compose current entry
+		$now = array( 'id' => $id, 'tm' => time() );
+
+		// Log current potd at the beginning of the existing array
+		$cnt = array_unshift( $his, $now );
+
+		// Truncate array if larger than max
+		$max = wppa_opt( 'potd_log_max' );
+		if ( $cnt > $max ) {
+			$his = array_slice( $his, 0, $max );
+		}
+
+		// Save result
+		update_option( 'wppa_potd_log_data', $his );
+	}
 }

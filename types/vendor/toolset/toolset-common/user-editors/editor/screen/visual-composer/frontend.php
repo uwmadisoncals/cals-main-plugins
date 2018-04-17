@@ -69,26 +69,34 @@ class Toolset_User_Editors_Editor_Screen_Visual_Composer_Frontend
 	 * @since 2.5.7
 	 */
 	public function maybe_get_shortcode_from_assigned_ct_id( $shortcode, $page_id, $grid_id ) {
-		$page_id = intval( $page_id );
-		$template_selected = get_post_meta( $page_id, '_views_template', true );
 		if (
-			! empty( $template_selected )
-			&& intval( $template_selected ) > 0
+			class_exists( 'WPBMap' )
+			&& class_exists( 'WPBakeryShortCode_VC_Basic_Grid' )
+			&& method_exists( 'WPBMap', 'getShortCode' )
+			&& method_exists( 'WPBakeryShortCode_VC_Basic_Grid', 'findPostShortcodeById' )
 		) {
-			$page_id = $template_selected;
-		}
+			$page_id = intval( $page_id );
 
-		$post_meta = get_post_meta( (int) $page_id, '_vc_post_settings' );
+			$template_selected = get_post_meta( $page_id, '_views_template', true );
 
-		$shortcode = '';
-
-		if ( is_array( $post_meta ) ) {
-			foreach ( $post_meta as $meta ) {
-				if ( isset( $meta['vc_grid_id'] ) && ! empty( $meta['vc_grid_id']['shortcodes'] ) && isset( $meta['vc_grid_id']['shortcodes'][ $grid_id ] ) ) {
-					$shortcode = $meta['vc_grid_id']['shortcodes'][ $grid_id ];
-					break;
-				}
+			if (
+				! empty( $template_selected )
+				&& intval( $template_selected ) > 0
+			) {
+				$page_id = $template_selected;
 			}
+
+			remove_filter( 'vc_basic_grid_find_post_shortcode', array( $this, 'maybe_get_shortcode_from_assigned_ct_id' ) );
+
+			$ct_post_meta = get_post_meta( (int) $page_id, '_vc_post_settings', true );
+
+			$settings = WPBMap::getShortCode( $ct_post_meta['vc_grid_id']['shortcodes'][ $grid_id ]['tag'] );
+
+			$vc_basic_grid = new WPBakeryShortCode_VC_Basic_Grid( $settings );
+
+			$shortcode = $vc_basic_grid->findPostShortcodeById( $page_id, $grid_id );
+
+			add_filter( 'vc_basic_grid_find_post_shortcode', array( $this, 'maybe_get_shortcode_from_assigned_ct_id' ) );
 		}
 
 		return $shortcode;

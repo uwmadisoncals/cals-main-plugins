@@ -668,10 +668,14 @@ function wpdm_embed_category($params = array('id' => '', 'operator' => 'IN' , 'i
     $hasdesc = $desc !=''?'has-desc':'';
     if ($toolbar || get_option('__wpdm_cat_tb') == 1) {
         if($toolbar != 'skinny') {
+            $icon = \WPDM\libs\CategoryHandler::icon($trm->term_id);
+            $iconw = $desc != ''?64:32;
+            if($icon != '') $icon = "<div class='pull-left'><img class='category-icon category-{$trm->term_id}' style='max-width: {$iconw}px' src='{$icon}' alt='{$trm->name}' /></div>";
             $toolbar = <<<TBR
                  <div class="panel panel-default category-panel {$hasdesc}">
                    <div class="panel-body">
                    <div class="media">                    
+                   $icon
                    <div class="media-body">
                    <h3 style="margin: 0">$cats</h3>
                    $desc

@@ -68,12 +68,12 @@ function wpcf_embedded_admin_init_hook() {
     );
 
 	register_post_type(
-		TYPES_TERM_META_FIELD_GROUP_CPT_NAME,
-		array(
-			'public' => false,
-			'label' => 'Types Term Groups',
-			'can_export' => false,
-		)
+    TYPES_TERM_META_FIELD_GROUP_CPT_NAME,
+    array(
+    	'public' => false,
+    	'label' => 'Types Term Groups',
+    	'can_export' => false,
+    )
 	);
 
     add_filter( 'icl_custom_fields_to_be_copied',
@@ -95,7 +95,7 @@ function wpcf_embedded_admin_init_hook() {
 
 /**
  * Add meta boxes hook.
- * 
+ *
  * @param type $post_type
  * @param type $post
  */
@@ -108,9 +108,9 @@ function wpcf_admin_add_meta_boxes( $post_type, $post ) {
 
 /**
  * save_post hook.
- * 
+ *
  * @param type $post_ID
- * @param type $post 
+ * @param type $post
  */
 function wpcf_admin_save_post_hook( $post_ID, $post ) {
     require_once WPCF_EMBEDDED_INC_ABSPATH . '/fields.php';
@@ -120,7 +120,7 @@ function wpcf_admin_save_post_hook( $post_ID, $post ) {
 
 /**
  * Save attachment hook.
- * 
+ *
  * @param type $attachment_id
  */
 function wpcf_admin_add_attachment_hook( $attachment_id )
@@ -131,7 +131,7 @@ function wpcf_admin_add_attachment_hook( $attachment_id )
 
 /**
  * Save attachment hook.
- * 
+ *
  * @param type $attachment_id
  */
 function wpcf_admin_save_attachment_hook( $attachment_id ) {
@@ -161,12 +161,12 @@ function wpcf_admin_fields_postfields_styles(){
     $groups = wpcf_admin_post_get_post_groups_fields( wpcf_admin_get_edited_post() );
 
     if ( !empty( $groups ) ) {
-		echo '<style type="text/css">';
+    echo '<style type="text/css">';
         foreach ( $groups as $group ) {
             echo str_replace( "}", "}\n",
                     wpcf_admin_get_groups_admin_styles_by_group( $group['id'] ) );
         }
-		echo '</style>';
+    echo '</style>';
     }
 }
 
@@ -182,12 +182,12 @@ function wpcf_admin_fields_userfields_styles(){
     $groups = wpcf_admin_usermeta_get_groups_fields();
 
     if ( !empty( $groups ) ) {
-		echo '<style type="text/css">';
+    echo '<style type="text/css">';
         foreach ( $groups as $key => $group ) {
             echo str_replace( "}", "}\n",
                     wpcf_admin_get_groups_admin_styles_by_group( $group['id'] ) );
         }
-		echo '</style>';
+    echo '</style>';
     }
 }
 
@@ -195,7 +195,7 @@ function wpcf_admin_fields_userfields_styles(){
 
 /**
  * Initiates/returns specific form.
- * 
+ *
  * @staticvar array $wpcf_forms
  * @param string $id
  * @param array $form
@@ -206,7 +206,7 @@ function wpcf_form( $id, $form = array() ) {
 	static $wpcf_forms = array();
 
 	if ( isset( $wpcf_forms[ $id ] ) ) {
-		return $wpcf_forms[ $id ];
+    return $wpcf_forms[ $id ];
 	}
 
 	require_once WPCF_EMBEDDED_ABSPATH . '/classes/forms.php';
@@ -222,10 +222,10 @@ function wpcf_form( $id, $form = array() ) {
 
 /**
  * Renders form elements.
- * 
+ *
  * @staticvar string $form
  * @param array $elements
- * @return array 
+ * @return array
  * @deprecated Please avoid using Enlimbo forms for new code. Consider using Twig templates instead.
  */
 function wpcf_form_simple( $elements ) {
@@ -239,10 +239,10 @@ function wpcf_form_simple( $elements ) {
 
 /**
  * Validates form elements (simple).
- * 
+ *
  * @staticvar string $form
  * @param type $elements
- * @return type 
+ * @return type
  * @deprecated Please avoid using Enlimbo forms for new code. Consider using Twig templates instead.
  */
 function wpcf_form_simple_validate( &$elements ) {
@@ -257,11 +257,11 @@ function wpcf_form_simple_validate( &$elements ) {
 
 /**
  * Stores JS validation rules.
- * 
+ *
  * @staticvar array $validation
  * @param type $element
  * @return array
- * @deprecated Please avoid using Enlimbo forms for new code. Consider using Twig templates instead. 
+ * @deprecated Please avoid using Enlimbo forms for new code. Consider using Twig templates instead.
  */
 function wpcf_form_add_js_validation( $element ) {
     static $validation = array();
@@ -275,7 +275,7 @@ function wpcf_form_add_js_validation( $element ) {
 
 /**
  * Renders JS validation rules.
- * 
+ *
  * @global type $wpcf
  * @param type $selector Can be CSS class or element ID
  * @param type $echo
@@ -318,9 +318,9 @@ function wpcf_custom_fields_to_be_copied( $copied_fields, $original_post_id ) {
 
 /**
  * Holds validation messages.
- * 
+ *
  * @param type $method
- * @return type 
+ * @return type
  */
 function wpcf_admin_validation_messages( $method = false, $sprintf = '' ) {
     $messages = array(
@@ -337,7 +337,7 @@ function wpcf_admin_validation_messages( $method = false, $sprintf = '' ) {
         'maxlength' => sprintf( __( 'Maximum of %s characters exceeded.', 'wpcf' ), strval( $sprintf ) ),
         'minlength' => sprintf( __( 'Minimum of %s characters has not been reached.', 'wpcf' ), strval( $sprintf ) ),
         /**
-         * see 
+         * see
          * https://support.skype.com/en/faq/FA10858/what-is-a-skype-name-and-how-do-i-find-mine
          */
         'skype' => __( 'Letters, numbers, dashes, underscores, commas and periods only please.', 'wpcf' ),
@@ -384,10 +384,22 @@ function wpcf_admin_message_sanitize( $message )
 function wpcf_admin_message( $message, $class = 'updated', $mode = 'action' )
 {
     if ( 'action' == $mode ) {
-        add_action( 'admin_notices',
-            create_function( '$a=1, $class=\'' . $class . '\', $message=\''
-                    . htmlentities( $message, ENT_QUOTES ) . '\'',
-                        '$screen = get_current_screen(); if (!$screen->is_network) echo "<div class=\"message $class\"><p>" . wpcf_admin_message_sanitize ($message) . "</p></div>";' ) );
+        // 5.2 support for Types pre m2m.
+        // TODO: remove this after PHP5.2 support dropping.
+        if (version_compare(phpversion(), '5.3', '<')) {
+            add_action( 'admin_notices',
+                create_function( '$a=1, $class=\'' . $class . '\', $message=\''
+                    	. htmlentities( $message, ENT_QUOTES ) . '\'',
+                        	'$screen = get_current_screen(); if (!$screen->is_network) echo "<div class=\"message $class\"><p>" . wpcf_admin_message_sanitize ($message) . "</p></div>";' ) );
+        } else {
+            add_action( 'admin_notices', function() use ($class, $message) {
+                $message = htmlentities( $message, ENT_QUOTES );
+                $screen = get_current_screen();
+                if ( ! $screen->is_network ) {
+                    echo '<div class="message ' . $class . '"><p>' . wpcf_admin_message_sanitize ($message) . '</p></div>';
+                }
+            } );
+        }
     } elseif ( 'echo' == $mode ) {
         printf(
             '<div class="message %s is-dismissible"><p>%s</p> <button type="button" class="notice-dismiss">
@@ -426,7 +438,7 @@ function wpcf_show_admin_messages($mode = 'action')
 
 /**
  * Stores admin notices if redirection is performed.
- * 
+ *
  * @param string $message
  * @param string $class
  */
@@ -455,11 +467,11 @@ function wpcf_admin_message_store( $message, $class = 'updated', $keep_id = fals
 
 /**
  * Admin notice with dismiss button.
- * 
+ *
  * @param type $ID
  * @param string $message
  * @param type $store
- * @return boolean 
+ * @return boolean
  */
 function wpcf_admin_message_dismiss( $ID, $message, $store = true ) {
     $dismissed = get_option( 'wpcf_dismissed_messages', array() );
@@ -480,7 +492,7 @@ function wpcf_admin_message_dismiss( $ID, $message, $store = true ) {
 
 /**
  * Checks if message is dismissed.
- * 
+ *
  * @param type $message_id
  * @return boolean
  */
@@ -491,8 +503,8 @@ function wpcf_message_is_dismissed( $message_id ) {
 
 /**
  * Adds dismissed message to record.
- * 
- * @param type $ID 
+ *
+ * @param type $ID
  */
 function wpcf_admin_message_set_dismissed( $ID ) {
     $messages = get_option( 'wpcf_dismissed_messages', array() );
@@ -504,8 +516,8 @@ function wpcf_admin_message_set_dismissed( $ID ) {
 
 /**
  * Removes dismissed message from record.
- * 
- * @param type $ID 
+ *
+ * @param type $ID
  */
 function wpcf_admin_message_restore_dismissed( $ID ) {
     $messages = get_option( 'wpcf_dismissed_messages', array() );
@@ -518,8 +530,8 @@ function wpcf_admin_message_restore_dismissed( $ID ) {
 
 /**
  * Saves cookie.
- * 
- * @param type $data 
+ *
+ * @param type $data
  */
 function wpcf_cookies_add( $data ) {
     if ( isset( $_COOKIE['wpcf'] ) ) {
@@ -530,7 +542,7 @@ function wpcf_cookies_add( $data ) {
 
 /**
  * Renders page head.
- * 
+ *
  * @see WPCF_Template::ajax_header()
  * @global type $pagenow
  * @param type $title
@@ -599,7 +611,7 @@ function wpcf_admin_ajax_head( $title = '' ) {
 
         /**
          * Renders page footer
-         * 
+         *
          * @see WPCF_Template::ajax_footer()
          */
         function wpcf_admin_ajax_footer() {
@@ -631,8 +643,8 @@ function wpcf_admin_ajax_head( $title = '' ) {
 
 /**
  * Renders JS settings.
- * 
- * @return type 
+ *
+ * @return type
  */
 function wpcf_admin_render_js_settings() {
     $settings = wpcf_admin_add_js_settings( 'get' );
@@ -680,9 +692,9 @@ function wpcf_get_post_meta_field_names() {
 
 /**
  * Forces 'Insert into post' link when called from our WYSIWYG.
- * 
+ *
  * @param array $args
- * @return boolean 
+ * @return boolean
  */
 function wpcf_get_media_item_args_filter( $args ) {
     if ( strpos( $_SERVER['SCRIPT_NAME'], '/media-upload.php' ) === false ) {
@@ -697,8 +709,8 @@ function wpcf_get_media_item_args_filter( $args ) {
 
 /**
  * Gets post.
- * 
- * @return type 
+ *
+ * @return type
  */
 function wpcf_admin_get_edited_post() {
     // Global $post_ID holds post IDs for new posts too.
@@ -713,10 +725,35 @@ function wpcf_admin_get_edited_post() {
         $post_id = 0;
     }
     if ( $post_id ) {
-        return get_post( $post_id );
-    } else {
-        return array();
+        if( $post = get_post( $post_id ) ) {
+            return $post;
+        }
     }
+
+    // check for repeatable field gropu item
+	if( $post = wpcf_admin_get_repeatable_group_item_by_request() ) {
+    return $post;
+    }
+
+    // nothing found
+    return array();
+}
+
+
+/**
+ * When requesting a repeatable field group we put on the item loop each item
+ * to $_REQUEST['repeatable_group_item_post'] to make it work with Enlimbo
+ *
+ * @return WP_Post|false
+ *
+ * @since m2m
+ */
+function wpcf_admin_get_repeatable_group_item_by_request() {
+	if( isset( $_REQUEST['repeatable_group_item_post'] ) && $_REQUEST['repeatable_group_item_post'] instanceof WP_Post ) {
+    return $_REQUEST['repeatable_group_item_post'];
+	}
+
+	return false;
 }
 
 /**
@@ -735,16 +772,16 @@ add_filter( 'wpcf_filter_wpcf_admin_get_current_edited_post', 'wpcf_admin_get_cu
 function wpcf_admin_get_current_edited_post( $current_post = null ) {
 	$current_post = wpcf_admin_get_edited_post();
 	if ( empty( $current_post ) ) {
-		return null;
+    return null;
 	}
 	return $current_post;
 }
 
 /**
  * Gets post type.
- * 
+ *
  * @param type $post
- * @return boolean 
+ * @return boolean
  */
 function wpcf_admin_get_edited_post_type( $post = null ) {
     if ( !empty( $post->ID ) ) {

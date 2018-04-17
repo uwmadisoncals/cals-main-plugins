@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a slideshow in the sidebar
-* Version 6.7.09
+* Version 6.8.07
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -17,7 +17,7 @@ class SlideshowWidget extends WP_Widget {
     function __construct() {
 		$widget_ops = array( 'classname' => 'slideshow_widget', 'description' => __( 'Display a slideshow', 'wp-photo-album-plus' ) );
 		parent::__construct( 'slideshow_widget', __( 'WPPA+ Sidebar Slideshow', 'wp-photo-album-plus' ), $widget_ops);
-		
+
 		// Fix non constant defaults
 		$this -> defaults['title'] = __( 'Sidebar Slideshow', 'wp-photo-album-plus' );
 		$this -> defaults['width'] = get_option( 'wppa_widget_width' );
@@ -44,6 +44,7 @@ class SlideshowWidget extends WP_Widget {
 							'maxslides' => '100',
 							'random' 	=> 'no',
 							'incsubs' 	=> 'no',
+							'logonly' 	=> 'no',
 							);
 
 	/** @see WP_Widget::widget */
@@ -65,6 +66,11 @@ class SlideshowWidget extends WP_Widget {
 		$album 		= $instance['album'];
 		$page 		= in_array( wppa_opt( 'slideonly_widget_linktype' ), wppa( 'links_no_page' ) ) ? '' :
 					  wppa_get_the_landing_page( 'slideonly_widget_linkpage', __( 'Widget landing page', 'wp-photo-album-plus' ) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
 
 		// Calculate the height if set to 0
 		if ( ! $instance['height'] ) {
@@ -118,7 +124,9 @@ class SlideshowWidget extends WP_Widget {
 
 				// Open the slideshow container
 				echo
-				'<div style="padding-top:2px; padding-bottom:4px;" >';
+				'<div' .
+					' style="padding-top:2px; padding-bottom:4px;" ' .
+					' data-wppa="yes" >';
 
 					// The very slideshow
 					echo wppa_albums( $album, 'slideonly', $instance['width'], 'center' );
@@ -341,6 +349,11 @@ class SlideshowWidget extends WP_Widget {
 			wppa_widget_input( $this, 'subtext', $instance['subtext'], __( 'Text below photos', 'wp-photo-album-plus' ) ) .
 
 		'</div>';
+
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
+
 
     }
 

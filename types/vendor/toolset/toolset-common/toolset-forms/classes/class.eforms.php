@@ -100,6 +100,7 @@ class Enlimbo_Forms {
 				$this->form_settings['use_bootstrap'] = array_key_exists('use_bootstrap', $cred_cred_settings) && $cred_cred_settings['use_bootstrap'];
 			}
 		}
+
 	}
 
 	/**
@@ -398,6 +399,10 @@ class Enlimbo_Forms {
 				}
 				$element['#attributes']['data-wpt-validate'] = esc_html( self::json_encode( apply_filters( 'wptoolset_forms_field_js_validation_data_' . $this->_id, $element['#validate'] ) ) );
 				$element['#attributes']['data-wpt-field-title'] = esc_js( $custom_field_title );
+
+				// add Parsley elements
+				$element = $this->addParsleyDataAttributes($element);
+
 			}
 			if ( $element['#type'] == 'radios' && ! empty( $element['#options'] ) ) {
 				foreach ( $element['#options'] as &$option ) {
@@ -421,6 +426,64 @@ class Enlimbo_Forms {
 			return $this->{$method}( $element );
 		}
 	}
+
+	/**
+	 * Check element validation options and call method that will set correct
+	 * parsley data attributes for validation
+	 * @param $element
+	 *
+	 * @return array
+	 */
+	private function addParsleyDataAttributes($element){
+
+		if ( isset( $element['#validate'] ) ) {
+			foreach( $element['#validate'] as $key => $value ){
+				$element = $this->parsleyValidationBuild( $key, $element );
+			}
+		}
+
+		return $element;
+	}
+
+	/**
+	 * Set necessary data attributes for Parsley validation
+	 * @param $what_to_validate
+	 * @param $element
+	 *
+	 * @return array
+	 */
+	private function parsleyValidationBuild( $what_to_validate, $element ){
+
+		if( ! isset( $what_to_validate ) || ! is_array( $element ) ){
+			return $element;
+		}
+
+		switch( $what_to_validate ){
+			case 'required';
+				$element['#attributes']['required'] = 'true';
+				$element['#attributes']['data-parsley-required-message'] = $element['#validate'][ $what_to_validate ]['message'];
+				break;
+
+			case 'number':
+				$element['#attributes']['data-parsley-type'] = 'number';
+				$element['#attributes']['data-parsley-number-message'] = $element['#validate'][ $what_to_validate ]['message'];
+				break;
+
+			case 'url':
+				$element['#attributes']['data-parsley-type'] = 'url';
+				$element['#attributes']['data-parsley-url-message'] = $element['#validate'][ $what_to_validate ]['message'];
+				break;
+
+			case 'email':
+				$element['#attributes']['data-parsley-type'] = 'email';
+				$element['#attributes']['data-parsley-email-message'] = $element['#validate'][ $what_to_validate ]['message'];
+				break;
+		}
+
+
+		return $element;
+	}
+
 
 	/**
 	 * Sets other element attributes.
@@ -454,10 +517,6 @@ class Enlimbo_Forms {
 			if ('hidden' != $element['#type']) {
 				$classes[] = $element['#type'];
 			}
-		}
-
-		if ( 'hidden' != $element['#type'] ) {
-			$classes[] = $element['#type'];
 		}
 
 		if ( isset( $element['#attributes'] ) && ! empty( $element['#attributes'] )

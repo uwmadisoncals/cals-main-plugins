@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains user and capabilities related routines
-* Version 6.8.0
+* Version 6.8.05
 *
 */
 
@@ -292,7 +292,21 @@ function wppa_may_user_fe_edit( $id ) {
 	switch( wppa_opt( 'upload_edit_users') ) {
 
 		case 'owner':
-			if ( wppa_get_user() == wppa_get_photo_owner( $id ) ) return true;
+			if ( wppa_get_user() == wppa_get_photo_owner( $id ) ) {
+				if ( wppa_opt( 'upload_edit_period' ) ) {
+					$up = wppa_get_photo_item( $id, 'timestamp' );
+					$to = $up + wppa_opt( 'upload_edit_period' );
+					if ( time() < $to ) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				}
+				else {
+					return true;
+				}
+			}
 			break;
 
 	}
@@ -312,7 +326,19 @@ function wppa_may_user_fe_delete( $id ) {
 	// If owner and owners may delete?
 	if ( wppa_get_user() == wppa_get_photo_owner( $id ) ) {
 		if ( wppa_switch( 'upload_delete' ) ) {
-			return true;
+			if ( wppa_opt( 'upload_delete_period' ) ) {
+				$up = wppa_get_photo_item( $id, 'timestamp' );
+				$to = $up + wppa_opt( 'upload_delete_period' );
+				if ( time() < $to ) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+			else {
+				return true;
+			}
 		}
 	}
 

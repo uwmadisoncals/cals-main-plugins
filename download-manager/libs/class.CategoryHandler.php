@@ -3,13 +3,39 @@ namespace WPDM\libs;
 
 class CategoryHandler {
 
-    public static function  GetAllowedRoles( $term_id ){
-        $MetaData = get_option( "__wpdmcategory" );
-        $MetaData = maybe_unserialize($MetaData);
-        return isset($MetaData[$term_id]) && is_array($MetaData[$term_id]['access'])?$MetaData[$term_id]['access']:array();
+    function __construct() {
+
     }
 
-    public static function CategoryParents($cid, $offset = 1){
+
+    public static function  getAllowedRoles( $term_id ){
+        $MetaData = get_option( "__wpdmcategory" );
+        $MetaData = maybe_unserialize($MetaData);
+        $roles = isset($MetaData[$term_id], $MetaData[$term_id]['access']) && is_array($MetaData[$term_id]['access'])?$MetaData[$term_id]['access']:array();
+        $roles = apply_filters("wpdm_categoryhandler_getallowedroles", $roles, $term_id);
+        return $roles;
+    }
+
+    function parentRoles($cid){
+        if(!$cid) return array();
+        $roles = array();
+        $parents = \WPDM\libs\CategoryHandler::categoryParents($cid, 0);
+        foreach ($parents as $catid) {
+            $MetaData = get_option( "__wpdmcategory" );
+            $MetaData = maybe_unserialize($MetaData);
+            $croles = isset($MetaData[$catid], $MetaData[$catid]['access']) && is_array($MetaData[$catid]['access'])?$MetaData[$catid]['access']:array();
+            $roles += $croles;
+        }
+        return array_unique($roles);
+    }
+
+    public static function  icon( $term_id ){
+        $MetaData = get_option( "__wpdmcategory" );
+        $MetaData = maybe_unserialize($MetaData);
+        return isset($MetaData[$term_id]['icon'])?$MetaData[$term_id]['icon']:'';
+    }
+
+    public static function categoryParents($cid, $offset = 1){
         $CategoryBreadcrumb = array();
         if($cid > 0) {
             $cat = get_term($cid, 'wpdmcategory');
@@ -29,7 +55,12 @@ class CategoryHandler {
 
     }
 
-    public static function CategoryBreadcrumb($cid, $offset = 1){
+    public static function userHasAccess($term_id){
+        global $current_user;
+        $roles = self::GetAllowedRoles($term_id);
+    }
+
+    public static function categoryBreadcrumb($cid, $offset = 1){
         $CategoryBreadcrumb = array();
         if($cid > 0) {
             $cat = get_term($cid, 'wpdmcategory');
@@ -41,12 +72,13 @@ class CategoryHandler {
                 $parent = $cat->parent;
             }
             if($offset)
-            array_pop($CategoryBreadcrumb);
+                array_pop($CategoryBreadcrumb);
             $CategoryBreadcrumb = array_reverse($CategoryBreadcrumb);
         }
         echo "<a href='#' class='folder' data-cat='0'>Home</a>&nbsp; <i class='fa fa-angle-right'></i> &nbsp;".implode("&nbsp; <i class='fa fa-angle-right'></i> &nbsp;", $CategoryBreadcrumb);
 
     }
+
 
 
 

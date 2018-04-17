@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version 6.7.09
+* Version 6.8.07
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -28,6 +28,7 @@ require_once 'wppa-bestof-widget.php';
 require_once 'wppa-album-navigator-widget.php';
 require_once 'wppa-stereo-widget.php';
 require_once 'wppa-admins-choice-widget.php';
+require_once 'wppa-stats-widget.php';
 
 /* COMMON FUNCTIONS */
 require_once 'wppa-common-functions.php';
@@ -54,6 +55,14 @@ require_once 'wppa-photo-files.php';
 require_once 'wppa-cron.php';
 require_once 'wppa-maintenance.php';
 require_once 'wppa-tinymce-common.php';
+
+/* Required for widget displays at back-end */
+require_once 'wppa-links.php';
+require_once 'wppa-styles.php';
+require_once 'wppa-functions.php';
+require_once 'wppa-thumbnails.php';
+require_once 'wppa-boxes-html.php';
+require_once 'wppa-slideshow.php';
 
 /* Load cloudinary if configured and php version >= 5.3 */
 if ( PHP_VERSION_ID >= 50300 ) require_once 'wppa-cloudinary.php';
@@ -362,3 +371,21 @@ function wppa_donate_link($links, $file) {
 	}
 	return $links;
 }
+
+function wppa_check_scabn_compatibility() {
+	if ( wppa_switch( 'use_scabn' ) ) {
+		$msg = '';
+		if ( ! function_exists( 'scabn_check_wppa' ) ) {
+			$msg = __( 'You must install plugin <a href="https://wppa.nl/wp-content/uploads/simple-cart-buy-now-for-wppa.zip" ><b>simple-cart-buy-now-for-wppa</b></a> for the shopping cart functionality in wppa', 'wp-photo-album-plus' );
+			if ( class_exists( 'wfCart' ) ) {
+				$msg .= '<br>' . __( 'Plugin <b>simple-cart-buy-now</b> is no longer compatible with wppa', 'wp-photo-album-plus' );
+				$msg .= '<br>' . __( 'Note: you can not have both shopping plugins active at the same time.', 'wp-photo-album-plus' );
+				$msg .= '<br>' . __( 'The new version will work outside wppa as long as wppa is activated.', 'wp-photo-album-plus' );
+			}
+		}
+		if ( $msg ) {
+			wppa_warning_message( $msg );
+		}
+	}
+}
+add_action( 'admin_notices', 'wppa_check_scabn_compatibility' );

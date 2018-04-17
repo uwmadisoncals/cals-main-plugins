@@ -120,7 +120,9 @@ abstract class Toolset_Field_Definition extends Toolset_Field_Definition_Abstrac
 		if( $this->get_is_required() && !empty( $display_name ) ) {
 			$display_name .= '&#42;';
 		}
-		return $display_name;
+		
+		// we need to get rid of auto added slashes (WP Core adds them)
+		return stripslashes( $display_name );
 	}
 
 
@@ -577,6 +579,13 @@ abstract class Toolset_Field_Definition extends Toolset_Field_Definition_Abstrac
 		$this->set_data_key_safely( 'repetitive', ( $is_repetitive ? 1 : 0 ) );
 		return $this->update_self();
 	}
+
+
+	/**
+	 * @return string Domain where this field belongs to.
+	 * @since 2.5.8
+	 */
+	public abstract function get_domain();
 
 
 	/**

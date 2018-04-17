@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.8.01
+* Version 6.8.06
 *
 */
 
@@ -170,7 +170,7 @@ global $silent;
 					id bigint(20) NOT NULL AUTO_INCREMENT,
 					slug tinytext NOT NULL,
 					albums text NOT NULL,
-					photos text NOT NULL,
+					photos mediumtext NOT NULL,
 					PRIMARY KEY  (id),
 					KEY slugkey (slug(20))
 					) DEFAULT CHARACTER SET utf8;";
@@ -566,15 +566,17 @@ global $silent;
 
 		// Fix exiflables that were undefined so far but have a known description by now
 		if ( $old_rev <= '6801' ) {
-			$exif_labels = $wpdb->get_results( "SELECT * FROM `" . WPPA_EXIF . "` WHERE `photo` = 0 AND `description` LIKE 'UndefinedTag%'", ARRAY_A );
-			if ( ! empty( $exif_labels ) ) foreach( $exif_labels as $label ) {
-				$newdesc = wppa_exif_tagname( $label['tag'] );
-				if ( $newdesc != $label['description'] ) {
-					$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_EXIF . "` SET `description` = %s WHERE `photo` = 0 AND `tag` = %s", $newdesc, $label['tag'] ) );
-					wppa_log( 'obs', 'There is a new desc for '.$label['tag'].' being: '.$newdesc );
+			if ( function_exists( 'exif_tagname' ) && function_exists( 'exif_read_data' ) ) {
+				$exif_labels = $wpdb->get_results( "SELECT * FROM `" . WPPA_EXIF . "` WHERE `photo` = 0 AND `description` LIKE 'UndefinedTag%'", ARRAY_A );
+				if ( ! empty( $exif_labels ) ) foreach( $exif_labels as $label ) {
+					$newdesc = wppa_exif_tagname( $label['tag'] );
+					if ( $newdesc != $label['description'] ) {
+						$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_EXIF . "` SET `description` = %s WHERE `photo` = 0 AND `tag` = %s", $newdesc, $label['tag'] ) );
+						wppa_log( 'obs', 'There is a new desc for '.$label['tag'].' being: '.$newdesc );
+					}
 				}
+				wppa_schedule_maintenance_proc( 'wppa_recup' );
 			}
-			wppa_schedule_maintenance_proc( 'wppa_recup' );
 		}
 	}
 
@@ -1171,6 +1173,12 @@ Hide Camera info
 						'wppa_defer_javascript' 		=> 'no',
 						'wppa_inline_css' 				=> 'yes',
 						'wppa_custom_style' 			=> '',
+						'wppa_custom_style_chrome' 		=> '',
+						'wppa_custom_style_firefox' 	=> '',
+						'wppa_custom_style_safari' 		=> '',
+						'wppa_custom_style_edge' 		=> '',
+						'wppa_custom_style_ie' 			=> '',
+						'wppa_custom_style_opera' 		=> '',
 						'wppa_use_custom_style_file' 	=> 'no',
 						'wppa_js_css_optional' 			=> 'no',
 						'wppa_enable_pdf' 				=> 'no', 	// IV-A30
@@ -1268,6 +1276,7 @@ Hide Camera info
 						'wppa_comment_smiley_picker'	=> 'no',
 						'wppa_mail_upl_email' 			=> 'yes',
 						'wppa_comment_clickable' 		=> 'no',
+						'wppa_comment_need_db_agree' 	=> 'no',
 
 						// G Overlay
 						'wppa_ovl_opacity'				=> '80',
@@ -1445,6 +1454,7 @@ Hide Camera info
 						'wppa_mail_on_approve' 			=> 'no',
 						'wppa_upload_edit'				=> '-none-',
 						'wppa_upload_edit_users' 		=> 'admin',
+						'wppa_upload_edit_period' 		=> '0',
 						'wppa_upload_edit_theme_css' 	=> 'no',
 						'wppa_fe_edit_name' 			=> 'yes',
 						'wppa_fe_edit_desc' 			=> 'yes',
@@ -1452,6 +1462,7 @@ Hide Camera info
 						'wppa_fe_edit_button' 			=> __( 'Edit', 'wp-photo-album-plus' ),
 						'wppa_fe_edit_caption' 			=> __( 'Edit photo information', 'wp-photo-album-plus' ),
 						'wppa_upload_delete' 			=> 'no',
+						'wppa_upload_delete_period' 	=> '0',
 						'wppa_owner_moderate_comment' 	=> 'no',
 						'wppa_upload_notify' 			=> 'no',
 						'wppa_upload_backend_notify'	=> 'no',
@@ -1484,6 +1495,8 @@ Hide Camera info
 						'wppa_loggedout_upload_limit_count'		=> '0',
 						'wppa_loggedout_upload_limit_time' 		=> '0',
 
+						'wppa_role_limit_per_album' 			=> 'no',
+
 						'wppa_blacklist_user' 		=> '',
 						'wppa_un_blacklist_user' 	=> '',
 						'wppa_photo_owner_change' 	=> 'no',
@@ -1512,7 +1525,9 @@ Hide Camera info
 						'wppa_errorlog_purge' 		=> '',
 						'wppa_comp_sizes' 			=> '',
 						'wppa_crypt_photos' 		=> '',
+						'wppa_crypt_photos_every' 	=> '0',
 						'wppa_crypt_albums' 		=> '',
+						'wppa_crypt_albums_every' 	=> '0',
 						'wppa_create_o1_files' 				=> '',
 						'wppa_create_o1_files_skip_one' 	=> '',
 						'wppa_owner_to_name_proc' 			=> '',
@@ -1616,11 +1631,13 @@ Hide Camera info
 						'wppa_log_ajax' 				=> 'no', 	// A9.2
 						'wppa_log_comments' 			=> 'no', 	// A9.3
 						'wppa_log_fso' 					=> 'no', 	// A9.4
+						'wppa_log_debug' 				=> 'no', 	// A9.5
 						'wppa_moderate_bulk' 			=> 'no', 	// B20
 						'wppa_retry_mails' 				=> '0', 	// A10
 						'wppa_minimum_tags' 			=> '', 		// A11
 
 						'wppa_login_url' 				=> site_url( 'wp-login.php', 'login' ), 	// A
+						'wppa_cache_root' 				=> 'cache',
 
 
 						// IX D New
@@ -1797,11 +1814,13 @@ Hide Camera info
 						'wppa_potd_include_subs' 	=> 'no',
 						'wppa_potd_status_filter'	=> 'none',
 						'wppa_potd_inverse' 		=> 'no',
-						'wppa_potd_method'		=> '4', 	// Change every
-						'wppa_potd_period'		=> '24',	// Day
+						'wppa_potd_method'			=> '4', 	// Change every
+						'wppa_potd_period'			=> '24',	// Day
 						'wppa_potd_offset' 			=> '0',
 						'wppa_potd_photo'			=> '',
 						'wppa_potd_preview' 		=> 'no',
+						'wppa_potd_log' 			=> 'no',
+						'wppa_potd_log_max' 		=> '5',
 
 
 						'wppa_widget_width'			=> '200',	// Do we use this somewhere still?
@@ -2016,8 +2035,16 @@ static $user;
 
 				// Album ids are and expanded enumeration sep by , in the setting
 				$grant_parents = explode( ',', wppa_opt( 'grant_parent' ) );
-				if ( ! is_array( $grant_parents ) ) {
-					$grant_parents = array( '0' );
+				if ( empty( $grant_parents ) ) {
+					// Selection box method chosen, but no album(s) selected
+					return array();
+				}
+				else {
+					foreach( array_keys( $grant_parents ) as $key ) {
+						if ( $grant_parents[$key] == 'zero' ) {
+							$grant_parents[$key] = '0';
+						}
+					}
 				}
 				break;
 
@@ -2028,7 +2055,10 @@ static $user;
 													"FROM `" . WPPA_ALBUMS . "` " .
 													"WHERE `cats` LIKE '%," . wppa_opt( 'grant_parent' ) . ",%'"
 												);
-
+				if ( empty( $grant_parents ) ) {
+					// Selection set to category, but no albums exist with that category
+					return array();
+				}
 				break;
 
 			case 'indexsearch':
@@ -2038,6 +2068,10 @@ static $user;
 										);
 
 				$grant_parents = explode( '.', wppa_expand_enum( $temp ) );
+				if ( empty( $grant_parents ) ) {
+					// Selection set to indexsearch but no albums found matching the search criteria
+					return array();
+				}
 				break;
 
 		}
@@ -2063,12 +2097,12 @@ static $user;
 	}
 
 	// If a parent is given and it is not a grant parent, quit
-	if ( $xparent && ! in_array( $xparent, $grant_parents ) ) {
+	if ( $xparent !== false && ! in_array( $xparent, $grant_parents ) ) {
 		return false;
 	}
 
 	// If a parent is given, it will now be a grant parent (see directly above), only create the granted album inside this parent.
-	if ( $xparent ) {
+	if ( $xparent !== false ) {
 		$parents = array( $xparent );
 	}
 	// Else create granted albums for all grant parents
@@ -2084,7 +2118,7 @@ static $user;
 	foreach( $parents as $parent ) {
 
 		// Create only grant album if: parent is either -1 or existing
-		if ( $parent == '-1' || wppa_album_exists( $parent ) ) {
+		if ( $parent == '-1' || $parent == '0' || wppa_album_exists( $parent ) ) {
 			if ( ! in_array( $parent, $my_albs_parents, true ) ) {
 
 				// make an album for this user

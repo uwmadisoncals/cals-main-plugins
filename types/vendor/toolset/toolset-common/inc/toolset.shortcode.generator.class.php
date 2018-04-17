@@ -43,11 +43,6 @@ abstract class Toolset_Shortcode_Generator {
 		
 		add_action( 'toolset_action_require_shortcodes_templates', array( $this, 'print_shortcodes_templates' ) );
 		
-		add_action( 'wp_ajax_toolset_select2_suggest_posts_by_title',        array( $this, 'toolset_select2_suggest_posts_by_title' ) );
-		add_action( 'wp_ajax_nopriv_toolset_select2_suggest_posts_by_title', array( $this, 'toolset_select2_suggest_posts_by_title' ) );
-		add_action( 'wp_ajax_toolset_select2_suggest_users',                 array( $this, 'toolset_select2_suggest_users' ) );
-		add_action( 'wp_ajax_nopriv_toolset_select2_suggest_users',          array( $this, 'toolset_select2_suggest_users' ) );
-		
 		add_filter( 'toolset_filter_shortcode_script_i18n', array( $this, 'extend_script_i18n' ) );
 	}
 	
@@ -307,7 +302,7 @@ abstract class Toolset_Shortcode_Generator {
 				#>
 				<ul class="toolset-shortcode-gui-dialog-item-group js-toolset-shortcode-gui-dialog-item-group">
 					<# _.each( data.fields, function( fieldData, fieldAttribute ) { #>
-						<li style="width:<# print( columnsWidth ); #>%;float:left;">
+						<li style="width:<# print( columnsWidth ); #>%;min-height:1px;float:left;">
 							<#
 							fieldData = _.defaults( fieldData, { shortcode: data.shortcode, templates: data.templates } );
 							fieldData = _.defaults( fieldData, { defaultValue: '', required: false, hidden: false, placeholder: '' } );
@@ -323,6 +318,11 @@ abstract class Toolset_Shortcode_Generator {
 				<# } #>
 			</div>
 		</script>
+		<script type="text/html" id="tmpl-toolset-shortcode-attribute-information">
+			<div id="{{{data.shortcode}}}-{{{data.attribute}}}" class="toolset-alert toolset-alert-info">
+				{{{data.content}}}
+			</div>
+		</script>
 		<script type="text/html" id="tmpl-toolset-shortcode-attribute-text">
 			<input id="{{{data.shortcode}}}-{{{data.attribute}}}" data-type="text" class="js-shortcode-gui-field large-text<# if ( data.required ) { #> js-toolset-shortcode-gui-required<# } #>" value="{{{data.defaultForceValue}}}" placeholder="{{{data.placeholder}}}" type="text">
 		</script>
@@ -333,13 +333,13 @@ abstract class Toolset_Shortcode_Generator {
 						<label>
 							<input name="{{{data.shortcode}}}-{{{data.attribute}}}" value="{{{optionKey}}}" class="js-shortcode-gui-field" type="radio"<# if ( optionKey == data.defaultForceValue ) { #> checked="checked"<# } #>>
 							{{{optionLabel}}}
-						</lanel>
+						</label>
 					</li>
 				<# }); #>
 			</ul>
 		</script>
 		<script type="text/html" id="tmpl-toolset-shortcode-attribute-select">
-			<select id="{{{data.shortcode}}}-{{{data.attribute}}}" class="js-shortcode-gui-field">
+			<select id="{{{data.shortcode}}}-{{{data.attribute}}}" class="js-shortcode-gui-field<# if ( data.required ) { #> js-toolset-shortcode-gui-required<# } #>">
 				<# _.each( data.options, function( optionLabel, optionKey ) { #>
 					<option value="{{{optionKey}}}"<# if ( optionKey == data.defaultForceValue ) { #> selected="selected"<# } #>>
 						{{{optionLabel}}}
@@ -375,19 +375,18 @@ abstract class Toolset_Shortcode_Generator {
 		
 		<script type="text/html" id="tmpl-toolset-shortcode-content">
 			<# 
-				data = _.defaults( data, { defaultValue: '', required: false, hidden: false, placeholder: '' } ); 
-				data = _.defaults( data, { defaultForceValue: data.defaultValue } ); 
+				data = _.defaults( data, { defaultValue: '', required: false, hidden: false, placeholder: '' } );
+				data = _.defaults( data, { defaultForceValue: data.defaultValue } );
 			#>
 			<div class="toolset-shortcode-gui-attribute-wrapper js-toolset-shortcode-gui-content-wrapper" <# if ( data.hidden ) { #> style="display:none"<# } #>>
-				<# if ( _.has( data, 'label' ) ) { #>
-					<h3>{{{data.label}}}</h3>
-				<# } #>
-				<textarea id="toolset-shortcode-gui-content-{{{data.shortcode}}}" type="text" class="large-text js-toolset-shortcode-gui-content"><# {{{data.defaultValue}}} #></textarea>
+				<textarea id="toolset-shortcode-gui-content-{{{data.shortcode}}}" type="text" class="large-text js-toolset-shortcode-gui-content">{{{data.defaultValue}}}</textarea>
 				<# if ( _.has( data, 'description' ) ) { #>
 					<p class="description">{{{data.description}}}</p>
 				<# } #>
 			</div>
 		</script>
+		
+		<?php $toolset_ajax = Toolset_Ajax::get_instance(); ?>
 		
 		<script type="text/html" id="tmpl-toolset-shortcode-attribute-postSelector">
 			<ul id="{{{data.shortcode}}}-{{{data.attribute}}}">
@@ -449,7 +448,7 @@ abstract class Toolset_Shortcode_Generator {
 					<li class="toolset-shortcode-gui-item-selector-option toolset-shortcode-gui-item-selector-has-related js-toolset-shortcode-gui-item-selector-has-related">
 						<label for="toolset-shortcode-gui-item-selector-post-id-related">
 							<input type="radio" class="js-toolset-shortcode-gui-item-selector" id="toolset-shortcode-gui-item-selector-post-id-related" name="toolset_shortcode_gui_object_id" value="related" />
-							<?php echo __( 'The parent of the current post in another post type, set by Types relationship', 'wpv-views' ); ?>
+							<?php echo __( 'The parent of the current post in another post type, set by a Types relationship', 'wpv-views' ); ?>
 						</label>
 						<div class="toolset-shortcode-gui-item-selector-is-related js-toolset-shortcode-gui-item-selector-is-related" style="display:none">
 							<ul class="toolset-advanced-setting tolset-mightlong-list" style="padding-top:15px;margin:5px 0 10px;">
@@ -461,11 +460,11 @@ abstract class Toolset_Shortcode_Generator {
 									<?php echo sprintf( '<label for="toolset-shortcode-gui-item-selector-post-relationship-id-%s">', $slug ); ?>
 									<?php echo sprintf(
 										'<input type="radio" name="related_object" id="toolset-shortcode-gui-item-selector-post-relationship-id-%s" value="$%s" %s />',
-										$slug,
-										$slug,
-										$first ? 'checked="checked"' : ''
+										esc_attr( $slug ),
+										esc_attr( $slug ),
+										checked( $first, true, false )
 									); ?>
-									<?php echo $custom_post_types_relations[ $slug ]['labels']['singular_name']; ?>
+									<?php echo esc_html( $custom_post_types_relations[ $slug ]['labels']['singular_name'] ); ?>
 									</label>
 								</li>
 								<?php
@@ -481,30 +480,65 @@ abstract class Toolset_Shortcode_Generator {
 			} else {
 				// m2m relationships
 				// Make sure m2m classes are registered in the autoloader
+				do_action( 'toolset_do_m2m_full_init' );
 				$current_post_type_relationships = $this->get_m2m_current_post_type_relationships( $current_post_type );
 				
-				if ( ! empty( $current_post_type_relationships ) ) {
+				if ( ! empty( $current_post_type_relationships[ Toolset_Relationship_Origin_Wizard::ORIGIN_KEYWORD ] ) ) {
 					?>
 					<li class="toolset-shortcode-gui-item-selector-option toolset-shortcode-gui-item-selector-has-related js-toolset-shortcode-gui-item-selector-has-related">
 						<label for="toolset-shortcode-gui-item-selector-post-id-related">
 							<input type="radio" class="js-toolset-shortcode-gui-item-selector" id="toolset-shortcode-gui-item-selector-post-id-related" name="toolset_shortcode_gui_object_id" value="related" />
-							<?php echo __( 'The parent of the current post in another post type, set by Types relationship', 'wpv-views' ); ?>
+							<?php echo __( 'A post related to the current post, set by a Types relationship', 'wpv-views' ); ?>
 						</label>
 						<div class="toolset-shortcode-gui-item-selector-is-related js-toolset-shortcode-gui-item-selector-is-related" style="display:none">
 							<ul class="toolset-advanced-setting toolset-mightlong-list" style="padding-top:15px;margin:5px 0 10px;">
 							<?php
 							$first = true;
-							foreach ( $current_post_type_relationships as $relationship_data  ) {
+							foreach ( $current_post_type_relationships[ Toolset_Relationship_Origin_Wizard::ORIGIN_KEYWORD ] as $relationship_data  ) {
 								?>
 								<li>
 									<?php echo sprintf( '<label for="toolset-shortcode-gui-item-selector-post-relationship-id-%s">', $relationship_data['id'] ); ?>
 									<?php echo sprintf(
 										'<input type="radio" name="related_object" id="toolset-shortcode-gui-item-selector-post-relationship-id-%s" value="%s" %s />',
-										$relationship_data['id'],
-										$relationship_data['value'],
-										$first ? 'checked="checked"' : ''
+										esc_attr( $relationship_data['id'] ),
+										esc_attr( $relationship_data['value'] ),
+										checked( $first, true, false )
 									); ?>
-									<?php echo $relationship_data['name']; ?>
+									<?php echo esc_html( $relationship_data['name'] ); ?>
+									</label>
+								</li>
+								<?php
+								$first = false;
+							}
+							?>
+							</ul>
+						</div>
+					</li>
+					<?php
+				}
+				
+				if ( ! empty( $current_post_type_relationships[ Toolset_Relationship_Origin_Post_Reference_Field::ORIGIN_KEYWORD ] ) ) {
+					?>
+					<li class="toolset-shortcode-gui-item-selector-option toolset-shortcode-gui-item-selector-has-related js-toolset-shortcode-gui-item-selector-has-related">
+						<label for="toolset-shortcode-gui-item-selector-post-id-referenced">
+							<input type="radio" class="js-toolset-shortcode-gui-item-selector" id="toolset-shortcode-gui-item-selector-post-id-referenced" name="toolset_shortcode_gui_object_id" value="referenced" />
+							<?php echo __( 'A post related to the current post, set by a Types post reference field', 'wpv-views' ); ?>
+						</label>
+						<div class="toolset-shortcode-gui-item-selector-is-related js-toolset-shortcode-gui-item-selector-is-related" style="display:none">
+							<ul class="toolset-advanced-setting toolset-mightlong-list" style="padding-top:15px;margin:5px 0 10px;">
+							<?php
+							$first = true;
+							foreach ( $current_post_type_relationships[ Toolset_Relationship_Origin_Post_Reference_Field::ORIGIN_KEYWORD ] as $relationship_data  ) {
+								?>
+								<li>
+									<?php echo sprintf( '<label for="toolset-shortcode-gui-item-selector-post-relationship-id-%s">', $relationship_data['id'] ); ?>
+									<?php echo sprintf(
+										'<input type="radio" name="referenced_object" id="toolset-shortcode-gui-item-selector-post-relationship-id-%s" value="%s" %s />',
+										esc_attr( $relationship_data['id'] ),
+										esc_attr( $relationship_data['value'] ),
+										checked( $first, true, false )
+									); ?>
+									<?php echo esc_html( $relationship_data['name'] ); ?>
 									</label>
 								</li>
 								<?php
@@ -525,8 +559,16 @@ abstract class Toolset_Shortcode_Generator {
 						<input type="radio" class="js-toolset-shortcode-gui-item-selector" id="toolset-shortcode-gui-item-selector-post-id" name="toolset_shortcode_gui_object_id" value="object_id" />
 						<?php _e( 'A specific post', 'wpv-views' ); ?>
 					</label>
-					<div class="toolset-shortcode-gui-item-selector-is-related js-toolset-shortcode-gui-item-selector-is-related" style="display:none">
-						<input type="text" id="toolset-shortcode-gui-item-selector-post-id-object_id" class="js-toolset-shortcode-gui-item-selector_object_id js-toolset-shortcode-gui-attribute-has-placeholder" name="specific_object_id" placeholder="<?php echo esc_attr( __( 'Enter a post ID, eg 15', 'wpv-views' ) ); ?>" />
+					<div class="toolset-advanced-setting toolset-shortcode-gui-item-selector-is-related js-toolset-shortcode-gui-item-selector-is-related" style="display:none;padding-top:10px;">
+						<select id="toolset-shortcode-gui-item-selector-post-id-object_id" 
+							class="js-toolset-shortcode-gui-item-selector_object_id js-toolset-shortcode-gui-field-ajax-select2" 
+							name="specific_object_id" 
+							data-action="<?php echo esc_attr( $toolset_ajax->get_action_js_name( Toolset_Ajax::CALLBACK_SELECT2_SUGGEST_POSTS_BY_TITLE ) ); ?>" 
+							data-prefill="<?php echo esc_attr( $toolset_ajax->get_action_js_name( Toolset_Ajax::CALLBACK_GET_POST_BY_ID ) ); ?>" 
+							data-nonce="<?php echo wp_create_nonce( Toolset_Ajax::CALLBACK_SELECT2_SUGGEST_POSTS_BY_TITLE ); ?>" 
+							data-prefill-nonce="<?php echo wp_create_nonce( Toolset_Ajax::CALLBACK_GET_POST_BY_ID ); ?>" 
+							data-placeholder="<?php echo esc_attr( __( 'Search for a post by title', 'wpv-views' ) ); ?>">
+						</select>
 					</div>
 				</li>
 			</ul>
@@ -553,8 +595,16 @@ abstract class Toolset_Shortcode_Generator {
 						<input type="radio" class="js-toolset-shortcode-gui-item-selector" id="toolset-shortcode-gui-item-selector-user-id" name="toolset_shortcode_gui_object_id" value="object_id" />
 						<?php _e( 'A specific user', 'wpv-views' ); ?>
 					</label>
-					<div class="toolset-shortcode-gui-item-selector-is-related js-toolset-shortcode-gui-item-selector-is-related" style="display:none">
-						<input type="text" id="toolset-shortcode-gui-item-selector-user-id-object_id" class="js-toolset-shortcode-gui-item-selector_object_id js-toolset-shortcode-gui-attribute-has-placeholder" name="specific_object_id" placeholder="<?php echo esc_attr( __( 'Enter an user ID, eg 2', 'wpv-views' ) ); ?>" />
+					<div class="toolset-advanced-setting toolset-shortcode-gui-item-selector-is-related js-toolset-shortcode-gui-item-selector-is-related" style="display:none;padding-top:10px;">
+						<select id="toolset-shortcode-gui-item-selector-user-id-object_id" 
+							class="js-toolset-shortcode-gui-item-selector_object_id js-toolset-shortcode-gui-field-ajax-select2" 
+							name="specific_object_id" 
+							data-action="<?php echo esc_attr( $toolset_ajax->get_action_js_name( Toolset_Ajax::CALLBACK_SELECT2_SUGGEST_USERS ) ); ?>" 
+							data-prefill="<?php echo esc_attr( $toolset_ajax->get_action_js_name( Toolset_Ajax::CALLBACK_GET_USER_BY_ID ) ); ?>" 
+							data-nonce="<?php echo wp_create_nonce( Toolset_Ajax::CALLBACK_SELECT2_SUGGEST_USERS ); ?>" 
+							data-prefill-nonce="<?php echo wp_create_nonce( Toolset_Ajax::CALLBACK_GET_USER_BY_ID ); ?>" 
+							data-placeholder="<?php echo esc_attr( __( 'Search for a user', 'wpv-views' ) ); ?>">
+						</select>
 					</div>
 				</li>
 			</ul>
@@ -570,9 +620,9 @@ abstract class Toolset_Shortcode_Generator {
 							isset( $_GET['page'] )
 							&& in_array( $_GET['page'], array( 'views-editor', 'view-archives-editor' ) )
 						) {
-							_e( 'Edit current post in the loop', 'wp-cred' );
+							_e( 'The current post in the loop', 'wp-cred' );
 						} else {
-							_e( 'Edit current post', 'wp-cred' );
+							_e( 'The current post', 'wp-cred' );
 						}
 						?>
 					</label>
@@ -580,9 +630,16 @@ abstract class Toolset_Shortcode_Generator {
 				<li class="js-toolset-shortcode-gui-item-selector-has-related">
 					<label>
 						<input type="radio" name="{{{data.shortcode}}}-select-target-post" class="toolset-shortcode-gui-item-selector js-toolset-shortcode-gui-item-selector" value="object_id" />
-						<?php _e( 'Edit another post', 'wp-cred' ); ?>
+						<?php _e( 'Another post', 'wp-cred' ); ?>
 						<div class="toolset-shortcode-gui-item-selector-is-related js-toolset-shortcode-gui-item-selector-is-related" style="display:none">
-							<select id="toolset-shortcode-gui-item-selector-object_id" class="js-toolset-shortcode-gui-item-selector_object_id js-toolset-shortcode-gui-field-ajax-select2" data-action="toolset_select2_suggest_posts_by_title" data-nonce="" data-placeholder="<?php echo esc_attr( 'Search for posts by title', 'wpv-views' ); ?>">
+							<select id="toolset-shortcode-gui-item-selector-post-id-object_id" 
+								class="js-toolset-shortcode-gui-item-selector_object_id js-toolset-shortcode-gui-field-ajax-select2" 
+								name="specific_object_id" 
+								data-action="<?php echo esc_attr( $toolset_ajax->get_action_js_name( Toolset_Ajax::CALLBACK_SELECT2_SUGGEST_POSTS_BY_TITLE ) ); ?>" 
+								data-prefill="<?php echo esc_attr( $toolset_ajax->get_action_js_name( Toolset_Ajax::CALLBACK_GET_POST_BY_ID ) ); ?>" 
+								data-nonce="<?php echo wp_create_nonce( Toolset_Ajax::CALLBACK_SELECT2_SUGGEST_POSTS_BY_TITLE ); ?>" 
+								data-prefill-nonce="<?php echo wp_create_nonce( Toolset_Ajax::CALLBACK_GET_POST_BY_ID ); ?>" 
+								data-placeholder="<?php echo esc_attr( __( 'Search for a post by title', 'wpv-views' ) ); ?>">
 							</select>
 						</div>
 					</label>
@@ -594,15 +651,22 @@ abstract class Toolset_Shortcode_Generator {
 				<li>
 					<label>
 						<input type="radio" name="{{{data.shortcode}}}-select-target-user" class="toolset-shortcode-gui-item-selector js-toolset-shortcode-gui-item-selector" value="current" checked="checked" />
-						<?php _e( 'Edit current logged in user', 'wp-cred' ); ?>
+						<?php _e( 'The current logged in user', 'wp-cred' ); ?>
 					</label>
 				</li>
 				<li class="js-toolset-shortcode-gui-item-selector-has-related">
 					<label>
 						<input type="radio" name="{{{data.shortcode}}}-select-target-user" class="toolset-shortcode-gui-item-selector js-toolset-shortcode-gui-item-selector" value="object_id" />
-						<?php _e( 'Edit another user', 'wp-cred' ); ?>
+						<?php _e( 'Another user', 'wp-cred' ); ?>
 						<div class="toolset-shortcode-gui-item-selector-is-related js-toolset-shortcode-gui-item-selector-is-related" style="display:none">
-							<select id="toolset-shortcode-gui-item-selector-object_id" class="js-toolset-shortcode-gui-item-selector_object_id js-toolset-shortcode-gui-field-ajax-select2" data-action="toolset_select2_suggest_users" data-nonce="" data-placeholder="<?php echo esc_attr( 'Search for users', 'wpv-views' ); ?>">
+							<select id="toolset-shortcode-gui-item-selector-user-id-object_id" 
+								class="js-toolset-shortcode-gui-item-selector_object_id js-toolset-shortcode-gui-field-ajax-select2" 
+								name="specific_object_id" 
+								data-action="<?php echo esc_attr( $toolset_ajax->get_action_js_name( Toolset_Ajax::CALLBACK_SELECT2_SUGGEST_USERS ) ); ?>" 
+								data-prefill="<?php echo esc_attr( $toolset_ajax->get_action_js_name( Toolset_Ajax::CALLBACK_GET_USER_BY_ID ) ); ?>" 
+								data-nonce="<?php echo wp_create_nonce( Toolset_Ajax::CALLBACK_SELECT2_SUGGEST_USERS ); ?>" 
+								data-prefill-nonce="<?php echo wp_create_nonce( Toolset_Ajax::CALLBACK_GET_USER_BY_ID ); ?>" 
+								data-placeholder="<?php echo esc_attr( __( 'Search for a user', 'wpv-views' ) ); ?>">
 							</select>
 						</div>
 					</label>
@@ -685,7 +749,11 @@ abstract class Toolset_Shortcode_Generator {
 					&& is_array( $cptr_data['post_relationship']['belongs'] )
 				) {
 					$this_belongs = array_keys( $cptr_data['post_relationship']['belongs'] );
-					$current_post_type_parents = array_merge( $current_post_type_parents, $this_belongs );
+					foreach ( $this_belongs as $this_belongs_candidate ) {
+						if ( isset( $custom_post_types_relations[ $this_belongs_candidate ] ) ) {
+							$current_post_type_parents[] = $this_belongs_candidate;
+						}
+					}
 				}
 			}
 		} else if (
@@ -728,6 +796,9 @@ abstract class Toolset_Shortcode_Generator {
 	/**
 	 * Get Types one-to-many and one-to-one relationships for a given post type, or all the existing otherwise.
 	 *
+	 * For post reference fields relationships, make sure we alwars offer to insert the parent post data, 
+	 * as they do support relationships between the same post type, hence the relationship ends get blurred.
+	 *
 	 * @paran $current_post_type string|null
 	 *
 	 * @return array
@@ -735,13 +806,11 @@ abstract class Toolset_Shortcode_Generator {
 	 * @since m2m
 	 */
 	public function get_m2m_current_post_type_relationships( $current_post_type ) {
-		$current_post_type_relationships = array();
+		$current_post_type_relationships = array(
+			Toolset_Relationship_Origin_Wizard::ORIGIN_KEYWORD => array(),
+			Toolset_Relationship_Origin_Post_Reference_Field::ORIGIN_KEYWORD => array()
+		);
 		
-		if ( ! apply_filters( 'toolset_is_m2m_enabled', false ) ) {
-			return $current_post_type_relationships;
-		}
-		
-		do_action( 'toolset_do_m2m_full_init' );
 		$query = new Toolset_Relationship_Query_V2();
 		
 		// Note that we can not use $query->do_if() because it actually runs both branches 
@@ -753,7 +822,10 @@ abstract class Toolset_Shortcode_Generator {
 						$query->do_and(
 							$query->has_type( $current_post_type->name, new Toolset_Relationship_Role_Child() ),
 							$query->has_cardinality( $query->cardinality()->one_to_many() ),
-							$query->origin( Toolset_Relationship_Origin_Wizard::ORIGIN_KEYWORD )
+							$query->do_or(
+								$query->origin( Toolset_Relationship_Origin_Wizard::ORIGIN_KEYWORD ),
+								$query->origin( Toolset_Relationship_Origin_Post_Reference_Field::ORIGIN_KEYWORD )
+							)
 						),
 						$query->has_cardinality( $query->cardinality()->one_to_one() )
 					)
@@ -763,7 +835,10 @@ abstract class Toolset_Shortcode_Generator {
 			$relationship_definitions = $query
 				->add(
 					$query->do_and(
-						$query->origin( Toolset_Relationship_Origin_Wizard::ORIGIN_KEYWORD ),
+						$query->do_or(
+							$query->origin( Toolset_Relationship_Origin_Wizard::ORIGIN_KEYWORD ),
+							$query->origin( Toolset_Relationship_Origin_Post_Reference_Field::ORIGIN_KEYWORD )
+						),
 						$query->do_or(
 							$query->has_cardinality( $query->cardinality()->one_to_many() ),
 							$query->has_cardinality( $query->cardinality()->one_to_one() )
@@ -787,130 +862,29 @@ abstract class Toolset_Shortcode_Generator {
 
 			$parents = $relationship_definition->get_parent_type()->get_types();
 			$parent = $parents[0];
+			$origin = $relationship_definition->get_origin();
 
-			$current_post_type_relationships[] = array(
+			$current_post_type_relationships[ $origin->get_origin_keyword() ][] = array(
 				'name' => $relationship_definition->get_display_name(),
 				'slug' => $relationship_definition->get_slug(),
 				'value' => '@' . $relationship_definition->get_slug() . '.'
-					. $relationship_definition->get_role_name(
-						Toolset_Relationship_Role::other( $given_post_type_role )
+					. ( Toolset_Relationship_Origin_Wizard::ORIGIN_KEYWORD === $origin->get_origin_keyword()
+						? $relationship_definition->get_role_name(
+							Toolset_Relationship_Role::other( $given_post_type_role )
+						)
+						: Toolset_Relationship_Role::PARENT
 					),
 				'id' => $relationship_definition->get_slug() . '-' . $parent,
-				'role_name' => $relationship_definition->get_role_name(
-					Toolset_Relationship_Role::other( $given_post_type_role )
+				'role_name' => ( Toolset_Relationship_Origin_Wizard::ORIGIN_KEYWORD === $origin->get_origin_keyword()
+					? $relationship_definition->get_role_name(
+						Toolset_Relationship_Role::other( $given_post_type_role )
+					)
+					: Toolset_Relationship_Role::PARENT
 				)
 			);
 		}
 		
 		return $current_post_type_relationships;
-	}
-	
-	public function toolset_select2_suggest_posts_by_title() {
-		if ( ! isset( $_POST['s'] ) ) {
-			$output = array(
-				'message' => __( 'Wrong or missing query.', 'wpv-views' ),
-			);
-			wp_send_json_error( $output );
-		}
-		
-		global $wpdb;
-		
-		if ( method_exists( $wpdb, 'esc_like' ) ) { 
-			$s = '%' . $wpdb->esc_like( $_POST['s'] ) . '%'; 
-		} else { 
-			$s = '%' . like_escape( esc_sql( $_POST['s'] ) ) . '%'; 
-		}
-		
-		$toolset_post_type_exclude = new Toolset_Post_Type_Exclude_List();
-		$toolset_post_type_exclude_list = $toolset_post_type_exclude->get();
-		$toolset_post_type_exclude_list_string = "'" . implode( "', '", $toolset_post_type_exclude_list ) . "'";
-		
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT ID, post_type, post_title 
-				FROM {$wpdb->posts} 
-				WHERE post_title LIKE %s 
-				AND post_status = %s 
-				AND post_type NOT IN ( {$toolset_post_type_exclude_list_string} ) 
-				LIMIT 0, 15",
-				$s,
-				'publish'
-			)
-		);
-		
-		if ( 
-			isset( $results ) 
-			&& ! empty( $results ) 
-		) {
-			$output = array();
-			if ( is_array( $results ) ) {
-				foreach ( $results as $result ) {
-					$output[] = array(
-						'text' => $result->post_title . ' (' . $result->post_type . ')',
-						'id' => $result->ID,
-					);
-				}
-				wp_send_json_success( $output );
-			}
-		} else {
-			$output = array(
-				'message' => __( 'Error while retrieving result.', 'wpv-views' ),
-			);
-			wp_send_json_error( $output );
-		}
-	}
-	
-	public function toolset_select2_suggest_users() {
-		if ( ! isset( $_POST['s'] ) ) {
-			$output = array(
-				'message' => __( 'Wrong or missing query.', 'wpv-views' ),
-			);
-			wp_send_json_error( $output );
-		}
-		
-		global $wpdb;
-		
-		
-		if ( method_exists( $wpdb, 'esc_like' ) ) { 
-			$s = '%' . $wpdb->esc_like( $_POST['s'] ) . '%'; 
-		} else { 
-			$s = '%' . like_escape( esc_sql( $_POST['s'] ) ) . '%'; 
-		} 
-		
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT ID, display_name 
-				FROM {$wpdb->users} 
-				WHERE display_name LIKE %s 
-				OR user_login LIKE %s 
-				OR user_nicename LIKE %s
-				LIMIT 0, 15",
-				$s,
-				$s,
-				$s
-			)
-		);
-		
-		if ( 
-			isset( $results ) 
-			&& ! empty( $results ) 
-		) {
-			$output = array();
-			if ( is_array( $results ) ) {
-				foreach ( $results as $result ) {
-					$output[] = array(
-						'text' => $result->display_name,
-						'id' => $result->ID,
-					);
-				}
-				wp_send_json_success( $output );
-			}
-		} else {
-			$output = array(
-				'message' => __( 'Error while retrieving result.', 'wpv-views' ),
-			);
-			wp_send_json_error( $output );
-		}
 	}
 
 	/**

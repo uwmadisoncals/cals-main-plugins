@@ -244,6 +244,14 @@ ToolsetCommon.BootstrapCssComponentsGrids = function( $ ) {
 							.find( '.js-code-editor-toolbar > ul' );
 				appendGridButtonIfMissing( toolbarList, toolbarButton );
 				break;
+			case 'cred_association_form_content':
+				// CRED association forms editor
+				var toolbarButton = $( button ),
+					toolbarList = editor
+						.closest( '#association_form_content' )
+							.find( '.js-cred-content-editor-toolbar' );
+				appendGridButtonIfMissing( toolbarList, toolbarButton );
+				break;
 			case 'content':
 				// CRED main editors
 				if (

@@ -36,6 +36,12 @@ $available_editors = array(
 	),
 );
 
+if ( version_compare( WPV_VERSION, '2.6-b1', '>' ) ) {
+	$available_editors['Toolset_User_Editors_Editor_Gutenberg'] = array(
+		'backend' => 'Toolset_User_Editors_Editor_Screen_Gutenberg_Backend',
+	);
+}
+
 foreach ( $available_editors as $editor_main_class => $editor_screen_classes ) {
 	$editor = new $editor_main_class( $medium );
 	if ( method_exists( $editor,'initialize' ) ) {

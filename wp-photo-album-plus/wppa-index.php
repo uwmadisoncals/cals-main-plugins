@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version 6.8.00
+* Version 6.8.04
 *
 *
 */
@@ -295,36 +295,67 @@ function wppa_index_string_to_array( $string ) {
 	if ( ! $string ) return array();
 
 	// Any ranges?
-	if ( ! strstr($string, '..') ) {
-		$result = explode(',', $string);
-		foreach( array_keys( $result ) as $key ) {
-			$result[$key] = strval($result[$key]);
-		}
-		return $result;
-	}
+	if ( strstr( $string, '..' ) ) {
+		$temp = explode(',', $string);
+		$result = array();
+		foreach ( $temp as $t ) {
 
-	// Yes
-	$temp = explode(',', $string);
-	$result = array();
-	foreach ( $temp as $t ) {
-		if ( ! strstr($t, '..') ) $result[] = intval($t);
-		else {
-			$range = explode('..', $t);
-			$from = $range['0'];
-			$to = $range['1'];
-			while ( $from <= $to ) {
-				$result[] = strval($from);
-				$from++;
+			// Single value
+			if ( ! strstr( $t, '..' ) ) {
+				$result[] = $t;
+			}
+
+			// Range
+			else {
+				$range = explode( '..', $t );
+				$from = $range['0'];
+				$to = $range['1'];
+				if ( $from >= $to ) {
+					wppa_log( 'err', 'Illegal range: ' . $t, true );
+					$result[] = $range['0'];
+					$result[] = $range['1'];
+				}
+				else while ( $from <= $to ) {
+					$result[] = strval($from);
+					$from++;
+				}
 			}
 		}
 	}
 
-	// Remove dups
-	$result = array_unique( $result );
+	// No
+	else {
+		$result = explode(',', $string);
+	}
 
-//	foreach( array_keys($result) as $key ) {
-//		$result[$key] = strval($result[$key]);
-//	}
+	// Sort
+	if ( ! sort( $result, SORT_NUMERIC ) ) {
+		wppa_log( 'err', 'Sort index failed' );
+	}
+
+	// Remove dups
+	// $result = array_unique( $result );
+	// array_unique() may cause 'Not enough space' errors
+	// assuming array is not descending ( E[n+1] >= E[n] )
+	$i = 0;
+	$j = 1;
+	$c = count( $result );
+	$t = $c - 1;
+	while ( $i < $t ) {
+		while ( $result[$j] === $result[$i] ) {
+			$result[$j] = 0;
+			$j++;
+		}
+		$j++;
+		$i = $j - 1;
+	}
+	$i = 0;
+	while ( $i < $c ) {
+		if ( $result[$i] === 0 ) {
+			unset( $result[$i] );
+		}
+		$i++;
+	}
 
 	return $result;
 }

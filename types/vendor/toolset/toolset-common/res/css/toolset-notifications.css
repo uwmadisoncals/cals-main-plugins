@@ -240,6 +240,16 @@ span.toolset-alert {
 /* TOOLSET POINTERS */
 /* ---------------- */
 
+.wp-toolset-pointer-trigger {
+	cursor: pointer;
+	color: #0073aa;
+	vertical-align: middle;
+}
+
+.wp-toolset-pointer-content {
+	display: none;
+}
+
 .wp-toolset-pointer .wp-pointer-content {
 	border: 1px solid #EF6223;
 	background: #e9e9e9;

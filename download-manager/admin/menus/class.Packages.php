@@ -38,7 +38,7 @@ class Packages
         $cdata = get_post_custom($post);
         foreach ($cdata as $k => $v) {
             $tk = str_replace("__wpdm_", "", $k);
-            if (!isset($_POST['file'][$tk]) && $tk !== $k && $k != "masterkey") {
+            if (!isset($_POST['file'][$tk]) && $tk !== $k && $tk != "masterkey") {
                 delete_post_meta($post, $k);
             }
 

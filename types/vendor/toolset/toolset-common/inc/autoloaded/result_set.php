@@ -15,6 +15,10 @@
  */
 class Toolset_Result_Set {
 
+
+	const DEFAULT_SEPARATOR = '; ';
+
+
 	/** @var array Mixed array of Toolset_Result and Toolset_Result_Set instances. */
 	private $results = array();
 
@@ -199,11 +203,12 @@ class Toolset_Result_Set {
 	/**
 	 * Turn the whole result set into a (simplified) result.
 	 *
+	 * @param string $separator
 	 * @return Toolset_Result
 	 * @since 2.3
 	 */
-	public function aggregate() {
-		return new Toolset_Result( $this->is_complete_success(), $this->concat_messages() );
+	public function aggregate( $separator = self::DEFAULT_SEPARATOR ) {
+		return new Toolset_Result( $this->is_complete_success(), $this->concat_messages( $separator ) );
 	}
 
 }

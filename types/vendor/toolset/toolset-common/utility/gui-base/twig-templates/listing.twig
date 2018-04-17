@@ -160,16 +160,16 @@
 
 {% endblock %}
 
-{% macro columnHeader(displayName, isSortable, slug) %}
+{% macro columnHeader(displayName, isSortable, slug, classNames, sortType = 'alpha') %}
     {% if isSortable == true %}
-        <td scope="col" class="manage-column">
+        <td scope="col" class="manage-column {{ classNames }}">
             <a class="sort-column" data-bind="click: function() {onSort('{{ slug }}')}">
                 {{ displayName }}
-                <i data-bind="attr: { class: sortIconClass('{{ slug }}') }" ></i>
+                <i data-bind="attr: { class: sortIconClass('{{ slug }}', '{{ sortType }}') }" ></i>
             </a>
         </td>
     {% else %}
-        <td scope="col" class="manage-column">
+        <td scope="col" class="manage-column {{ classNames }}">
             {{ displayName }}
         </td>
     {% endif %}

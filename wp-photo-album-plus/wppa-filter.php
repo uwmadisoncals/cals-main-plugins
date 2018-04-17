@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.8.00
+* Version 6.8.05
 *
 */
 
@@ -476,6 +476,9 @@ if ( get_option( 'wppa_enable_shortcode_wppa_set', 'no' ) == 'yes' ) {
 
 // Add filter for the use of our lightbox implementation for non wppa+ images
 add_filter( 'the_content', 'wppa_lightbox_global' );
+
+// Add filter for wpForo posts
+add_filter( 'wpforo_content_after', 'wppa_lightbox_global' );
 
 function wppa_lightbox_global( $content ) {
 

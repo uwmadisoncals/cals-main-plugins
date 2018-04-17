@@ -10,7 +10,7 @@
  *
  * @since m2m
  */
-class Toolset_Post_Type_From_Types implements IToolset_Post_Type_From_Types {
+class Toolset_Post_Type_From_Types extends Toolset_Post_Type_Abstract implements IToolset_Post_Type_From_Types {
 
 	/** @var string Post type slug */
 	private $slug;
@@ -50,6 +50,11 @@ class Toolset_Post_Type_From_Types implements IToolset_Post_Type_From_Types {
 
 	const DEF_PUBLIC = 'public';
 
+	const DEF_DISABLED = 'disabled';
+
+	// Do not rename this value, it's hardcoded in Types (because of timing issues).
+	const DEF_NEEDS_FLUSH_REWRITE_RULES = '_needs_flush_rewrite_rules';
+
 
 	/**
 	 * Toolset_Post_Type_From_Types constructor.
@@ -59,11 +64,16 @@ class Toolset_Post_Type_From_Types implements IToolset_Post_Type_From_Types {
 	 * @param IToolset_Post_Type_Registered|null $registered_post_type If the post type is registered on the site,
 	 *     this must not be null.
 	 * @param Toolset_Constants|null $constants_di
+	 * @param Toolset_WPML_Compatibility|null $wpml_compatibility_di
 	 */
 	public function __construct(
-		$slug, $definition, IToolset_Post_Type_Registered $registered_post_type = null,
-		Toolset_Constants $constants_di = null
+		$slug, $definition,
+		IToolset_Post_Type_Registered $registered_post_type = null,
+		Toolset_Constants $constants_di = null,
+		Toolset_WPML_Compatibility $wpml_compatibility_di = null
 	) {
+		parent::__construct( $wpml_compatibility_di );
+
 		$this->slug = $slug;
 
 		/**
@@ -443,12 +453,39 @@ class Toolset_Post_Type_From_Types implements IToolset_Post_Type_From_Types {
 
 
 	/**
+	 * @inheritdoc
+	 * @return bool
+	 */
+	public function is_disabled() {
+		return (
+			'1' === toolset_getarr( $this->definition, self::DEF_DISABLED, '', array( '1', '' ) )
+		);
+	}
+
+
+	/**
+	 * Set the 'disabled' option of the post type.
+	 *
+	 * @param bool $value
+	 */
+	public function set_is_disabled( $value ) {
+		if( $value ){
+			$this->definition[ self::DEF_DISABLED ] = '1';
+		} else {
+			unset( $this->definition[ self::DEF_DISABLED ] );
+		}
+	}
+
+	/**
 	 * Set the flag indicating whether this post type acts as a repeating field group.
 	 *
 	 * @param bool $value
 	 */
 	public function set_is_repeating_field_group( $value ) {
 		$this->set_flag_to_definition( self::DEF_IS_REPEATING_FIELD_GROUP, (bool) $value );
+		if ( $value ) {
+			$this->definition['supports'] = array( 'post_title', 'author', 'custom-fields', 'revisions' );
+		}
 		$this->set_is_public( false );
 	}
 

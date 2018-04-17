@@ -257,7 +257,7 @@ function mc_create_tags( $event, $context = 'filters' ) {
 	
 	$e['date_utc']     = date_i18n( apply_filters( 'mc_date_format', $date_format, 'template_begin_ts' ), $event->ts_occur_begin );
 	$e['date_end_utc'] = date_i18n( apply_filters( 'mc_date_format', $date_format, 'template_end_ts' ), $event->ts_occur_end );
-		$notime = mc_notime_label( $event );
+		$notime = esc_html( mc_notime_label( $event ) );
 	$e['time']         = ( date( 'H:i:s', strtotime( $real_begin_date ) ) == '00:00:00' ) ? $notime : date( get_option( 'mc_time_format' ), strtotime( $real_begin_date ) );
 	$e['time24']       = ( date( 'G:i', strtotime( $real_begin_date ) ) == '00:00' ) ? $notime : date( get_option( 'mc_time_format' ), strtotime( $real_begin_date ) );
 	$endtime           = ( $event->event_end == '23:59:59' ) ? '00:00:00' : date( 'H:i:s', strtotime( $real_end_date ) );

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display qr code
-* Version 6.8.00
+* Version 6.8.07
 */
 
 
@@ -20,17 +20,18 @@ class wppaQRWidget extends WP_Widget {
 		global $wpdb;
 		global $widget_content;
 
- 		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
-		wppa_initialize_runtime();
+ 		wppa_initialize_runtime();
 
 		extract( $args );
 
- 		$title 			= apply_filters('widget_title', empty( $instance['title'] ) ? __( 'QR Widget' , 'wp-photo-album-plus' ) : $instance['title']);
+		$instance = wp_parse_args( (array) 	$instance, array( 	'title' => __( 'QR Widget' , 'wp-photo-album-plus' ), 'logonly' => 'no' ) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
+
+ 		$title 			= apply_filters( 'widget_title', $instance['title'] );
 		$qrsrc 			= 'http' . ( is_ssl() ? 's' : '' ) . '://api.qrserver.com/v1/create-qr-code/' .
 							'?format=svg' .
 							'&size='. wppa_opt( 'qr_size' ).'x'.wppa_opt( 'qr_size' ) .
@@ -43,7 +44,7 @@ class wppaQRWidget extends WP_Widget {
 
 		// Make the html
 		$widget_content =
-		'<div style="text-align:center;" >' .
+		'<div style="text-align:center;" data-wppa="yes" >' .
 			'<img id="wppa-qr-img" src="' . $qrsrc . '" title="' . esc_attr( $_SERVER['SCRIPT_URI'] ) . '" alt="' . __('QR code', 'wp-photo-album-plus') . '" />' .
 		'</div>' .
 		'<div style="clear:both" ></div>';
@@ -77,6 +78,7 @@ class wppaQRWidget extends WP_Widget {
     function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags( $new_instance['title'] );
+		$instance['logonly'] = $new_instance['logonly'];
 
         return $instance;
     }
@@ -85,11 +87,15 @@ class wppaQRWidget extends WP_Widget {
     function form( $instance ) {
 
 		// Defaults
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'QR Widget' , 'wp-photo-album-plus') ) );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'QR Widget' , 'wp-photo-album-plus'), 'logonly' => 'no' ) );
 
 		// Title
 		echo
 		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
+
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
 
 		// Explanation
 		echo

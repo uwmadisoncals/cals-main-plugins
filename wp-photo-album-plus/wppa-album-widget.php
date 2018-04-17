@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 6.7.07
+* Version 6.8.07
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -20,16 +20,9 @@ class AlbumWidget extends WP_Widget {
     function widget( $args, $instance ) {
 		global $wpdb;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
-
 		// For widget display at backend: wppa_get_coverphoto_id()
 		require_once( dirname( __FILE__ ) . '/wppa-album-covers.php' );
-		
+
 		wppa_initialize_runtime();
 
 		wppa( 'in_widget', 'alb' );
@@ -41,10 +34,16 @@ class AlbumWidget extends WP_Widget {
 													'title' 	=> __( 'Photo Albums' , 'wp-photo-album-plus'),		// Widget title
 													'parent' 	=> 'none',	// Parent album
 													'name' 		=> 'no',		// Display album name?
-													'skip' 		=> 'yes'		// Skip empty albums
+													'skip' 		=> 'yes',		// Skip empty albums
+													'logonly'	=> 'no',
 							//						'count' 	=> wppa_opt( 'album_widget_count' ),	// to be added
 							//						'size' 		=> wppa_opt( 'album_widget_size' )
 													) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
 
 		$widget_title = apply_filters( 'widget_title', $instance['title'] );
 
@@ -144,8 +143,9 @@ class AlbumWidget extends WP_Widget {
 							'text-align:center;' .
 							'float:left;' .
 							'overflow:hidden;' .
-							'"
-						>';
+						'"' .
+						' data-wppa="yes"' .
+						' >';
 
 					if ( $link ) {
 						if ( $link['is_url'] ) {	// Is a href
@@ -318,10 +318,11 @@ class AlbumWidget extends WP_Widget {
     /** @see WP_Widget::update */
     function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
-		$instance['title'] 	= strip_tags( $new_instance['title'] );
-		$instance['parent'] = $new_instance['parent'];
-		$instance['name'] 	= $new_instance['name'];
-		$instance['skip'] 	= $new_instance['skip'];
+		$instance['title'] 		= strip_tags( $new_instance['title'] );
+		$instance['parent'] 	= $new_instance['parent'];
+		$instance['name'] 		= $new_instance['name'];
+		$instance['skip'] 		= $new_instance['skip'];
+		$instance['logonly'] 	= $new_instance['logonly'];
 
         return $instance;
     }
@@ -335,7 +336,9 @@ class AlbumWidget extends WP_Widget {
 															'title' => __( 'Thumbnail Albums', 'wp-photo-album-plus' ),
 															'parent' => '0',
 															'name' => 'no',
-															'skip' => 'yes' ) );
+															'skip' => 'yes',
+															'logonly' => 'no',
+															) );
 
 		// Widget title
 		echo
@@ -382,6 +385,9 @@ class AlbumWidget extends WP_Widget {
 
 		// Skip empty albums?
 		wppa_widget_checkbox( $this, 'skip', $instance['skip'], __( 'Skip "empty" albums', 'wp-photo-album-plus' ) ) .
+
+		// Loggedin only
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) ) .
 
 		'<p>' .
 			__( 'You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus') .

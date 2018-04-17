@@ -7,8 +7,8 @@ class FrmMigrate {
 	public $entry_metas;
 
 	public function __construct() {
-		if ( ! defined('ABSPATH') ) {
-			die('You are not allowed to call this page directly.');
+		if ( ! defined( 'ABSPATH' ) ) {
+			die( 'You are not allowed to call this page directly.' );
 		}
 
 		global $wpdb;
@@ -18,7 +18,7 @@ class FrmMigrate {
 		$this->entry_metas    = $wpdb->prefix . 'frm_item_metas';
 	}
 
-	public function upgrade( $old_db_version = false ) {
+	public function upgrade() {
 		do_action( 'frm_before_install' );
 
 		global $wpdb, $frm_vars;
@@ -37,6 +37,8 @@ class FrmMigrate {
 
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
+			$old_db_version = get_option( 'frm_db_version' );
+
 			$this->create_tables();
 			$this->migrate_data( $old_db_version );
 
@@ -51,7 +53,7 @@ class FrmMigrate {
 			}
 		}
 
-		do_action('frm_after_install');
+		do_action( 'frm_after_install' );
 
 		$frm_vars['doing_upgrade'] = false;
 
@@ -165,13 +167,18 @@ class FrmMigrate {
 				global $wpdb;
 				$wpdb->query( $q . $charset_collate );
 			}
-            unset($q);
+			unset( $q );
         }
     }
 
 	private function maybe_create_contact_form() {
 		$template_id = FrmForm::get_id_by_key( 'contact' );
 		if ( $template_id ) {
+			$form_exists = FrmForm::get_id_by_key( 'contact-form' );
+			if ( $form_exists ) {
+				return;
+			}
+
 			$form_id = FrmForm::duplicate( $template_id, false, true );
 			if ( $form_id ) {
 				$values = array(
@@ -200,7 +207,7 @@ class FrmMigrate {
 			return;
 		}
 
-		$migrations = array( 6, 11, 16, 17, 23, 25, 86 );
+		$migrations = array( 16, 11, 16, 17, 23, 25, 86 );
 		foreach ( $migrations as $migration ) {
 			if ( FrmAppHelper::$db_version >= $migration && $old_db_version < $migration ) {
 				$function_name = 'migrate_to_' . $migration;
@@ -212,7 +219,7 @@ class FrmMigrate {
     public function uninstall() {
 		if ( ! current_user_can( 'administrator' ) ) {
             $frm_settings = FrmAppHelper::get_settings();
-            wp_die($frm_settings->admin_permission);
+			wp_die( $frm_settings->admin_permission );
         }
 
         global $wpdb, $wp_roles;
@@ -222,8 +229,8 @@ class FrmMigrate {
 		$wpdb->query( 'DROP TABLE IF EXISTS ' . $this->entries );
 		$wpdb->query( 'DROP TABLE IF EXISTS ' . $this->entry_metas );
 
-        delete_option('frm_options');
-        delete_option('frm_db_version');
+		delete_option( 'frm_options' );
+		delete_option( 'frm_db_version' );
 
         //delete roles
         $frm_roles = FrmAppHelper::frm_capabilities();
@@ -231,11 +238,11 @@ class FrmMigrate {
         foreach ( $frm_roles as $frm_role => $frm_role_description ) {
             foreach ( $roles as $role => $details ) {
                 $wp_roles->remove_cap( $role, $frm_role );
-                unset($role, $details);
-    		}
-    		unset($frm_role, $frm_role_description);
+				unset( $role, $details );
+			}
+			unset( $frm_role, $frm_role_description );
 		}
-		unset($roles, $frm_roles);
+		unset( $roles, $frm_roles );
 
 		// delete actions, views, and styles
 
@@ -257,7 +264,7 @@ class FrmMigrate {
 
 		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $wpdb->options . ' WHERE option_name LIKE %s OR option_name LIKE %s', '_transient_timeout_frm_form_fields_%', '_transient_frm_form_fields_%' ) );
 
-        do_action('frm_after_uninstall');
+		do_action( 'frm_after_uninstall' );
         return true;
     }
 
@@ -469,8 +476,8 @@ class FrmMigrate {
 				continue;
 			}
 
-            // Format form options
-            $form_options = maybe_unserialize($form->options);
+			// Format form options
+			$form_options = maybe_unserialize( $form->options );
 
             // Migrate settings to actions
             FrmXMLHelper::migrate_form_settings_to_actions( $form_options, $form->id );
@@ -480,7 +487,7 @@ class FrmMigrate {
     private function migrate_to_11() {
         global $wpdb;
 
-        $forms = FrmDb::get_results( $this->forms, array(), 'id, options');
+		$forms = FrmDb::get_results( $this->forms, array(), 'id, options' );
 
         $sending = __( 'Sending', 'formidable' );
 		$img = FrmAppHelper::plugin_url() . '/images/ajax_loader.gif';
@@ -491,13 +498,13 @@ class FrmMigrate {
 <img class="frm_ajax_loading" src="$img" alt="$sending" style="visibility:hidden;" />
 </div>
 DEFAULT_HTML;
-        unset($sending, $img);
+		unset( $sending, $img );
 
-        $new_default_html = FrmFormsHelper::get_default_html('submit');
+		$new_default_html = FrmFormsHelper::get_default_html( 'submit' );
         $draft_link = FrmFormsHelper::get_draft_link();
 		foreach ( $forms as $form ) {
-            $form->options = maybe_unserialize($form->options);
-            if ( ! isset($form->options['submit_html']) || empty($form->options['submit_html']) ) {
+			$form->options = maybe_unserialize( $form->options );
+			if ( ! isset( $form->options['submit_html'] ) || empty( $form->options['submit_html'] ) ) {
                 continue;
             }
 
@@ -508,46 +515,7 @@ DEFAULT_HTML;
 				$form->options['submit_html'] = preg_replace( '~\<\/div\>(?!.*\<\/div\>)~', $draft_link . "\r\n</div>", $form->options['submit_html'] );
 				$wpdb->update( $this->forms, array( 'options' => serialize( $form->options ) ), array( 'id' => $form->id ) );
             }
-            unset($form);
+			unset( $form );
         }
-    }
-
-    private function migrate_to_6() {
-        global $wpdb;
-
-		$no_save = array_merge( FrmField::no_save_fields(), array( 'form', 'hidden', 'user_id' ) );
-		$fields = FrmDb::get_results( $this->fields, array( 'type NOT' => $no_save ), 'id, field_options' );
-
-        $default_html = <<<DEFAULT_HTML
-<div id="frm_field_[id]_container" class="form-field [required_class] [error_class]">
-    <label class="frm_pos_[label_position]">[field_name]
-        <span class="frm_required">[required_label]</span>
-    </label>
-    [input]
-    [if description]<div class="frm_description">[description]</div>[/if description]
-</div>
-DEFAULT_HTML;
-
-        $old_default_html = <<<DEFAULT_HTML
-<div id="frm_field_[id]_container" class="form-field [required_class] [error_class]">
-    <label class="frm_pos_[label_position]">[field_name]
-        <span class="frm_required">[required_label]</span>
-    </label>
-    [input]
-    [if description]<p class="frm_description">[description]</p>[/if description]
-</div>
-DEFAULT_HTML;
-
-        $new_default_html = FrmFieldsHelper::get_default_html('text');
-        foreach ( $fields as $field ) {
-            $field->field_options = maybe_unserialize($field->field_options);
-			$html = FrmField::get_option( $field, 'custom_html' );
-			if ( $html == $default_html || $html == $old_default_html ) {
-                $field->field_options['custom_html'] = $new_default_html;
-				$wpdb->update( $this->fields, array( 'field_options' => maybe_serialize( $field->field_options ) ), array( 'id' => $field->id ) );
-            }
-            unset($field);
-        }
-        unset($default_html, $old_default_html, $fields);
     }
 }

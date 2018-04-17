@@ -240,12 +240,13 @@ class Toolset_Post_Type_Repository {
 		//     wpcf_custom_types_register_translation( $post_type, $definition );
 		// }
 
-		// Note: this has to run on the next page load
-		// flush_rewrite_rules();
-
 		$custom_types = get_option( self::POST_TYPES_OPTION_NAME, array() );
 
 		$post_type_definition = $post_type->get_definition();
+
+		// Signal Types to run flush_rewrite_rules() after registering the post type.
+		$post_type_definition[ Toolset_Post_Type_From_Types::DEF_NEEDS_FLUSH_REWRITE_RULES ] = true;
+
 		$custom_types[ $post_type->get_slug() ] = $post_type_definition;
 
 		update_option( self::POST_TYPES_OPTION_NAME, $custom_types, true );
@@ -369,6 +370,9 @@ class Toolset_Post_Type_Repository {
 				$old_slug
 			)
 		);
+
+		// announce to Types that a post type has been renamed
+		do_action( 'wpcf_post_type_renamed', $new_slug, $old_slug );
 
 		if( $wpdb->last_error ) {
 			throw new RuntimeException( 'The posts could not be updated: ' . $wpdb->last_error );

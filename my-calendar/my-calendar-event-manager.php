@@ -1870,7 +1870,7 @@ function mc_list_events() {
 								if ( $event->event_endtime != "23:59:59" ) {
 									$eventTime = date_i18n( get_option( 'mc_time_format' ), mc_strtotime( $event->event_time ) );
 								} else {
-									$eventTime = mc_notime_label( $event );
+									$eventTime = esc_html( mc_notime_label( $event ) );
 								}
 								$date_format = ( get_option( 'mc_date_format' ) == '' ) ? get_option( 'date_format' ) : get_option( 'mc_date_format' );
 								$begin       = date_i18n( $date_format, mc_strtotime( $event->event_begin ) );

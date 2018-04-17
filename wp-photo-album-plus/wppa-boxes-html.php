@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.8.01
+* Version 6.8.05
 *
 */
 
@@ -132,7 +132,7 @@ function wppa_get_search_html( $label = '', $sub = false, $rt = false, $force_ro
 global $wppa_session;
 
 	$wppa_session['has_searchbox'] = true;
-	wppa_save_session();
+//	wppa_save_session();
 
 	if ( ! $page ) {
 		$page 		= wppa_get_the_landing_page( 	'search_linkpage',
@@ -2440,7 +2440,14 @@ static $albums_granted;
 	// The result is: $alb is either an album id, or an array of album ids. Always with upload access.
 
 	// Find max files for the user
-	$allow_me = wppa_allow_user_uploads();
+	if ( wppa_is_int( $xalb ) ) {
+		$a = $xalb;
+	}
+	else {
+		$a = '';
+	}
+	$allow_me = wppa_allow_user_uploads( $a );
+
 	if ( ! $allow_me ) {
 		if ( wppa_switch( 'show_album_full' ) ) {
 			$result .=
@@ -2589,6 +2596,7 @@ static $albums_granted;
 				'<select' .
 					' id="wppa-upload-album-'.$mocc.'-'.$seqno.'"' .
 					' name="wppa-upload-album"' .
+					' class="wppa-upload-album-'.$mocc.'"' .
 					' style="max-width: 100%;"' .
 					' onchange="jQuery( \'#wppa-sel-'.$yalb.'-'.$mocc.'\' ).trigger( \'onchange\' )"' .
 					' >' .
@@ -2749,6 +2757,7 @@ static $albums_granted;
 						sprintf( __( 'Max photo size: %d pixels', 'wp-photo-album-plus' ), $maxsize ) .
 					'</div>';
 			}
+			/*
 			else {
 				$maxsize = wppa_check_memory_limit( false );
 				if ( is_array( $maxsize ) ) {
@@ -2760,6 +2769,7 @@ static $albums_granted;
 						'</div>';
 				}
 			}
+			*/
 			$supp = $wppa_supported_photo_extensions;
 			$body .=
 			'<div style="font-size:10px;" >' .
@@ -2829,7 +2839,8 @@ static $albums_granted;
 							' >' .
 							__( 'Position:', 'wp-photo-album-plus' ) .
 						'</td>' .
-						( $small ? '</tr><tr>' : '' ) .
+					'</tr>' .
+					'<tr>' .
 						'<td' .
 							' class="wppa-box-text wppa-td"' .
 							' style="width: '.$width.';'.wppa_wcs( 'wppa-box-text' ).wppa_wcs( 'wppa-td' ).'"' .
@@ -2909,6 +2920,12 @@ static $albums_granted;
 			$head .= '<sup style="color:red;" >*</sup>';
 		}
 		$desc = wppa_switch( 'apply_newphoto_desc_user' ) ? stripslashes( wppa_opt( 'newphoto_description' ) ) : '';
+
+		// Do NOT show newphoto des if it contains html
+		if ( $desc != strip_tags( $desc ) ) {
+			$desc = '';
+		}
+
 		$body =
 			'<textarea' .
 				' id="wppa-desc-user-' . $mocc . '-' . $seqno . '"' .
@@ -3795,6 +3812,20 @@ global $wpdb;
 									'</textarea>' .
 								'</td>' .
 							'</tr>' .
+							'<tr>' .
+								'<td>' .
+								'</td>' .
+								'<td>' .
+									( wppa_switch( 'comment_need_db_agree' ) ?
+									'<input type="checkbox" id="db-agree-' . wppa( 'mocc' ) . '" name="db-agree" style="float:left;" >' .
+									' ' .
+									'<label for="db-agree-' . wppa( 'mocc' ) . '" style="float:left;" >' .
+										'&nbsp;' .
+										sprintf( __( 'I agree that the information above will be stored in a database along with my %s', 'wp-photo-album-plus' ),
+												is_user_logged_in() ? __( 'login name', 'wp-photo-album-plus' ) : __( 'ip address', 'wp-photo-album-plus' ) ) .
+									'</label>' : '' ) .
+								'</td>' .
+							'</tr>' .
 						'</tbody>' .
 					'</table>' .
 				'</form>' .
@@ -4237,9 +4268,9 @@ global $wpdb;
 }
 
 // The bestof box
-function wppa_bestof_box ( $args ) {
+function wppa_bestof_box( $args ) {
 
-	wppa_container ( 'open' );
+	wppa_container( 'open' );
 	wppa_out( 	'<div' .
 					' id="wppa-bestof-' . wppa( 'mocc' ) . '"' .
 					' class="wppa-box wppa-bestof"' .
@@ -4250,7 +4281,7 @@ function wppa_bestof_box ( $args ) {
 					'</div>' .
 				'</div>'
 			);
-	wppa_container ( 'close' );
+	wppa_container( 'close' );
 }
 
 // The Bestof html
@@ -4286,7 +4317,9 @@ function wppa_bestof_html( $args, $widget = true ) {
 	if ( ! in_array( $period, array ( 'lastweek', 'thisweek', 'lastmonth', 'thismonth', 'lastyear', 'thisyear' ) ) ) {
 		wppa_dbg_msg ( 'Invalid arg period "'.$period.'" must be "lastweek", "thisweek", "lastmonth", "thismonth", "lastyear" or "thisyear"', 'red', 'force' );
 	}
-	if ( ! $widget ) $size = $height;
+	if ( ! $widget ) {
+		$size = $height;
+	}
 
 	$result = '';
 
@@ -4309,7 +4342,7 @@ function wppa_bestof_html( $args, $widget = true ) {
 					}
 					else {
 						$maxh 		= $size;
-						$maxw 		= round ( $maxh * $imgsize['0'] / $imgsize['1'] );
+						$maxw 		= $size; // round ( $maxh * $imgsize['0'] / $imgsize['1'] );
 					}
 					$totalh 		= $maxh + $lineheight;
 					if ( $maxratings == 'yes' ) $totalh += $lineheight;
@@ -4320,8 +4353,13 @@ function wppa_bestof_html( $args, $widget = true ) {
 					if ( $widget ) $clear = 'clear:both; '; else $clear = '';
 					$result .= "\n" .
 								'<div' .
-									' class="wppa-widget"' .
-									' style="'.$clear.'width:'.$maxw.'px; height:'.$totalh.'px; margin:4px; display:inline; text-align:center; float:left;"'.
+									' class="' . ( $widget ? 'wppa-widget' : 'thumbnail-frame-' . wppa( 'mocc' ) ) . '"' .
+									' style="' .
+										$clear .
+										'width:' . $maxw . 'px;height:' . $totalh . 'px;' .
+										( $widget ? 'margin:4px;display:inline;' : 'margin-top:3px;margin-bottom:3px;margin-left:' . wppa_opt( 'tn_margin' ) . 'px;' ) .
+										'text-align:center;float:left;' .
+										'"'.
 									' >';
 
 						// The medal if at the top
@@ -4380,12 +4418,34 @@ function wppa_bestof_html( $args, $widget = true ) {
 							$result .= '<a href="'.wppa_convert_to_pretty( $href ).'" title="'.$title.'" >';
 						}
 
+						// Compute image top margin for box version
+						$tx = wppa_get_thumbx( $id );
+						$ty = wppa_get_thumby( $id );
+						$tm = '0';
+						if ( $tx > $ty ) {
+							$totm = ( $tx - $ty ) * ( $maxh / $tx );
+							switch( wppa_opt( 'valign' ) ) {
+								case 'center':
+									$tm = round( $totm / 2 );
+									break;
+								case 'bottom':
+									$tm = $totm;
+									break;
+								default:
+									$tm = 0;
+							}
+						}
+
 						// The image
-						$result .= 	'<img' .
-										' style="height:'.$maxh.'px; width:'.$maxw.'px;"' .
-										' src="' . wppa_get_photo_url( $id, true, '', $maxw, $maxh ) . '"' .
-										' ' . wppa_get_imgalt( $id ) .
-										' />';
+						$result .=
+						'<div style="height:' . $maxh . 'px;width:' . $maxw . 'px;" >' .
+							'<img' .
+								( $widget ? ' style="height:' . $maxh . 'px; width:' . $maxw . 'px;"' :
+											' style="max-height:' . $maxh . 'px; max-width:' . $maxw . 'px;margin-top:' . $tm . 'px;"' ) .
+								' src="' . wppa_get_photo_url( $id, true, '', $maxw, $maxh ) . '"' .
+								' ' . wppa_get_imgalt( $id ) .
+							' />' .
+						'</div>';
 
 						// The /link
 						if ( $linktype != 'none' ) {

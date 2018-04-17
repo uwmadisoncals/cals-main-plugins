@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version 6.7.02
+* Version 6.8.04
 *
 */
 
@@ -524,6 +524,9 @@ global $wpdb;
 	else {
 
 		// Open the subtext container
+		if ( ! $imgmarginbottom ) {
+			$imgmarginbottom = '0';
+		}
 		$margtop = wppa_switch( 'align_thumbtext' ) ? '' : 'margin-top:'.-$imgmarginbottom.'px;';
 		$subtextcontheight = $frameheight - max( $imgwidth,$imgheight );
 		if ( ! wppa_switch( 'align_thumbtext' ) ) $subtextcontheight += $imgmarginbottom;
@@ -1883,7 +1886,7 @@ function wppa_do_filmthumb( $id, $idx, $do_for_feed = false, $glue = false ) {
 
 		$result .= '</div>';
 	}
-	
+
 	wppa_out( $result );
 }
 

@@ -168,7 +168,7 @@ global $current_user; ?>
                     if(isset($params['flaturl']) && $params['flaturl'] == 0 && $page_id != '')
                         $menu_url = get_permalink(get_the_ID()).'?udb_page='.$page_id;
                     ?>
-                    <a class="list-group-item <?php echo $udb_page == $page_id?'selected':'';?>" href="<?php echo $menu_url; ?>"><?php echo $menu_item['name']; ?></a>
+                    <a class="list-group-item <?php echo $udb_page == $page_id?'selected':''; ?>" href="<?php echo $menu_url; ?>"><?php echo $menu_item['name']; ?></a>
                 <?php } ?>
 
             </div>

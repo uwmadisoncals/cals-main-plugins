@@ -63,6 +63,10 @@ class Toolset_Relationship_Service {
 		$child_id,
 		$parent_slug = null
 	) {
+		if( ! $this->is_m2m_enabled() ) {
+			return false;
+		}
+
 		$qry_args = array(
 			Toolset_Association_Query::QUERY_RELATIONSHIP_SLUG => $relationship->get_slug(),
 			Toolset_Association_Query::QUERY_CHILD_ID          => $child_id,
@@ -90,6 +94,10 @@ class Toolset_Relationship_Service {
 		$parent_id,
 		$child_slug = null
 	) {
+		if( ! $this->is_m2m_enabled() ) {
+			return false;
+		}
+
 		$qry_args = array(
 			Toolset_Association_Query::QUERY_RELATIONSHIP_SLUG => $relationship->get_slug(),
 			Toolset_Association_Query::QUERY_PARENT_ID         => $parent_id,
@@ -113,6 +121,10 @@ class Toolset_Relationship_Service {
 	 *
 	 */
 	public function find_intermediary_by_relationship_and_child_id( IToolset_Relationship_Definition $relationship, $post_id ) {
+		if( ! $this->is_m2m_enabled() ) {
+			return false;
+		}
+
 		$qry_args = array(
 			Toolset_Association_Query::QUERY_RELATIONSHIP_SLUG => $relationship->get_slug(),
 			Toolset_Association_Query::QUERY_CHILD_ID          => $post_id,
@@ -132,6 +144,10 @@ class Toolset_Relationship_Service {
 	 *
 	 */
 	public function find_intermediary_by_relationship_and_parent_id( IToolset_Relationship_Definition $relationship, $post_id ) {
+		if( ! $this->is_m2m_enabled() ) {
+			return false;
+		}
+
 		$qry_args = array(
 			Toolset_Association_Query::QUERY_RELATIONSHIP_SLUG => $relationship->get_slug(),
 			Toolset_Association_Query::QUERY_PARENT_ID         => $post_id,
@@ -170,9 +186,13 @@ class Toolset_Relationship_Service {
 	 * @internal param string $child_slug
 	 */
 	public function find_children_ids_by_parent_id( $parent_id, $children_args = array() ) {
+		if( ! $this->is_m2m_enabled() ) {
+			return false;
+		}
+
 		$children_args = wp_parse_args( $children_args, array(
 			'post_type' => 'any',
-			'post_status' => 'published',
+			'post_status' => 'publish',
 			'numberposts' => -1,
 			'suppress_filters' => 0,
 		) );
@@ -193,7 +213,7 @@ class Toolset_Relationship_Service {
 	 */
 	public function find_associations_by_id( $post_id ) {
 		if( ! $this->is_m2m_enabled() ) {
-			return false;
+			return array();
 		}
 
 		$associations_parent = $this->find_associations_by_parent_id( $post_id );
@@ -252,7 +272,7 @@ class Toolset_Relationship_Service {
 	 */
 	public function find_parents_by_child_id_and_parent_slug( $child_id, $parent_slug ) {
 		if( ! $this->is_m2m_enabled() ) {
-			return false;
+			return array();
 		}
 
 		$associations = $this->find_associations_by_child_id( $child_id );
@@ -285,6 +305,10 @@ class Toolset_Relationship_Service {
 	 * @return bool|int
 	 */
 	public function legacy_find_parent_id_by_child_id_and_parent_slug( $child_id, $parent_slug ) {
+		if( ! $this->is_m2m_enabled() ) {
+			return false;
+		}
+
 		$parent_slug = sanitize_title( $parent_slug );
 
 		$option_key = '_wpcf_belongs_' . $parent_slug . '_id';

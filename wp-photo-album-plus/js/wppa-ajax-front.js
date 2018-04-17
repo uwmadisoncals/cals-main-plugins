@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsAjaxVersion = '6.7.07';
+var wppaJsAjaxVersion = '6.8.05';
 
 var wppaRenderAdd = false;
 var wppaWaitForCounter = 0;
@@ -969,6 +969,9 @@ function wppaAjaxComment( mocc, id ) {
 				}
 				if ( typeof ( jQuery( "#wppa-returnurl-"+mocc ).val() ) != 'undefined' ) {
 					data += '&returnurl='+encodeURIComponent(jQuery( "#wppa-returnurl-"+mocc ).val());
+				}
+				if ( jQuery( "#db-agree-" + mocc ).prop( 'checked' ) ) {
+					data += '&db-agree=yes';
 				}
 
 	// Do the ajax commit

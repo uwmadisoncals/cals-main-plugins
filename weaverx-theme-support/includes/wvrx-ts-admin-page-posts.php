@@ -1,22 +1,742 @@
 <?php
 /* Display per page and per post options.
- *
- *  __ added - 12/10/14
- *
- *  IMPORTANT! - this code and the Weaver Plus plugin need to be maintained in parallel!
+ *  IMPORTANT - there are dependencies with the Weaver Xtreme Plugin
  */
 
 if ( !defined('ABSPATH')) exit; // Exit if accessed directly
 // Admin panel that gets added to the page edit page for per page options
 
 
-//if ( ! defined('WEAVER_XPLUS_VERSION')  || version_compare( WEAVER_XPLUS_VERSION, '2.1.90', '>=') ) {
-
-
 function wvrx_ts_isp_true($val) {
 	if ($val) return true;
 	return false;
 }
+
+function wvrx_ts_page_extras() {				// ------------------------------- Display Per Page Options on WP Page editor -------------------
+	global $post;
+	$func_opt = WEAVER_GET_OPTION;
+	$opts = $func_opt( apply_filters('weaverx_options','weaverx_settings') , array());	// need to fetch Weaver Xtreme options
+
+	if ( !( current_user_can('edit_themes')
+		|| (current_user_can('edit_theme_options') && !isset($opts['_hide_mu_admin_per']))	// multi-site regular admin
+		|| (current_user_can('edit_pages') && !isset($opts['_hide_editor_per']))	// Editor
+		|| (current_user_can('edit_posts') && !isset($opts['_hide_author_per'])))    // Author/Contributor
+	) {
+		if (isset($opts['_show_per_post_all']) && $opts['_show_per_post_all'])
+			echo '<p>' .
+__('You can enable Weaver Xtreme Per Page Options for Custom Post Types on the Weaver Xtreme:Advanced Options:Admin Options tab.','weaverx-theme-support' /*adm*/) .
+		'</p>';
+		else
+			echo '<p>' . __('Weaver Xtreme Per Page Options not available for your User Role.','weaverx-theme-support' /*adm*/) . '</p>';
+
+		return;	// don't show per post panel
+	   }
+
+	echo("<div style=\"line-height:150%;border: 1px solid $888;list-style-type: none;\"><p>\n");
+	if (get_the_ID() == get_option( 'page_on_front' ) ) { ?>
+<div style="padding:2px; border:2px solid yellow; background:#FF8;">
+<?php _e('Information: This page has been set to serve as your front page in the <em>Dashboard:Settings:Reading</em> \'Front page:\' option.','weaverx-theme-support' /*adm*/); ?>
+</div><br />
+<?php
+	}
+
+	if (get_the_ID() == get_option( 'page_for_posts' ) ) { ?>
+<div style="padding:2px; border:2px solid red; background:#FAA;">
+<?php _e('<strong>WARNING!</strong>
+You have the <em>Dashboard:Settings:Reading Posts page:</em> option set to this page.
+You may intend to do this, but note this means that <em>only</em> this page\'s Title will be used
+on the default WordPress blog page, and any content you may have entered above is <em>not</em> used.
+If you want this page to serve as your blog page, and enable Weaver Xtreme Per Page options,
+including the option of using the Page with Posts page template,
+then the <em>Settings:Reading:Posts page</em> selection <strong>must</strong> be set to
+the <em>&mdash; Select &mdash;</em> default value.','weaverx-theme-support' /*adm*/); ?>
+</div><br />
+<?php
+		return;
+	}
+
+	$updir = wp_upload_dir();
+	$dir = trailingslashit($updir['basedir']) . 'weaverx-subthemes/editor-style-wvrx.css';
+
+	if (!@file_exists( $dir ))  { ?>
+<div style="padding:2px; border:2px solid red; background:#FAA;">
+<?php _e('<strong>Note!</strong>
+Please open the <em>Appearance:Weaver Xtreme Admin:Main Options</em> page and <em>Save Settings</em> to enable full editor theme match styling.','weaverx-theme-support' /*adm*/); ?>
+</div><br />
+<?php
+	}
+
+	echo '<strong>' . __('Page Templates','weaverx-theme-support' /*adm*/) . '</strong>';
+	weaverx_help_link('help.html#PageTemplates',__('Help for Weaver Xtreme Page Templates','weaverx-theme-support' /*adm*/));
+	echo '<span style="float:right;">(' . __('This Page\'s ID: ','weaverx-theme-support' /*adm*/); the_ID() ; echo ')</span>';
+	weaverx_html_br();
+	_e('Please click the (?) for more information about all the Weaver Xtreme Page Templates.','weaverx-theme-support' /*adm*/);
+	if ( WVRX_TS_PAGEBUILDERS && ! ! get_post_meta( get_the_ID(), '_elementor_edit_mode', true ) )
+	{
+		weaverx_html_br();
+		_e('<strong>NOTE:</strong> This page has been created with <em>Elementor</em>. You may want to consider using the <em>For Your Page Builder Plugin</em> Page Template to display this page.', 'weaver-core-theme-support');
+	}
+
+	$template = !empty($post->page_template) ? $post->page_template : "Default Template";
+	$raw_template = in_array($template, array('paget-raw.php'));
+
+	weaverx_html_br();
+
+	wrvx_ts_showtabs($raw_template, $template);
+?>
+	<div style="clear:both;"></div>
+	<input type='hidden' id='post_meta' name='post_meta' value='post_meta'/>
+	</div>
+<?php
+}
+
+function wrvx_ts_showtabs( $raw_template = false, $template = 'default' ) {
+?>
+<div id="tabwrap-per-page" style="padding-left:4px;">
+<div id="tab-container-page" style="border:1px solid #888;padding: 2px 1% 2px 1%; width:97.9%;" class='yetiisub'>
+	<ul id="tab-container-page-nav" style="border-bottom:2px solid #999;" class='yetiisub'>
+	<?php
+	wvrx_ts_elink('#pp-visibility' , __('Per Page Options affecting element visibility.', 'weaver-xtreme' /*adm*/), __('Visibility', 'weaver-xtreme' /*adm*/),'<li>','</li>');
+	wvrx_ts_elink('#pp-layout' , __('Settings for Per Page Layout', 'weaver-xtreme' /*adm*/), __('Layout', 'weaver-xtreme' /*adm*/),'<li>', '</li>');
+	wvrx_ts_elink('#pp-content' , __('Settings to control content display.', 'weaver-xtreme' /*adm*/), __('Content', 'weaver-xtreme' /*adm*/),'<li>', '</li>');
+	wvrx_ts_elink('#pp-misc' , __('Misc per page options', 'weaver-xtreme' /*adm*/), __('Misc Options', 'weaver-xtreme' /*adm*/),'<li>', '</li>');
+	wvrx_ts_elink('#pp-pwp' , __('Settings for Page with Posts.', 'weaver-xtreme' /*adm*/), __('Page with Posts','weaver-xtreme'  /*adm*/),'<li>', '</li>');
+	 if (WVRX_TS_PAGEBUILDERS) wvrx_ts_elink('#pp-builder' , __('Settings for Page Builders.', 'weaver-xtreme' /*adm*/), __('Page Builders','weaver-xtreme'  /*adm*/),'<li>', '</li>');
+	wvrx_ts_elink('#pp-xplus' , __('Per Page settings from Weaver Xtreme Plus.', 'weaver-xtreme' /*adm*/), __('Xtreme Plus', 'weaver-xtreme' /*adm*/),'<li>', '</li>');
+	?>
+	</ul>
+
+	<div id="pp-visibility" class="tab_mainopt" >  <!-- ******************* visibility ********************* -->
+		<?php
+		wvrx_ts_page_visibility( $raw_template );
+		?>
+	</div>											<!-- ******************* /visibility ********************* -->
+
+	<div id="pp-layout" class="tab_mainopt" >		<!-- ******************* layout ********************* -->
+		<?php
+		wvrx_ts_pg_layout( $raw_template );
+		?>
+	</div>											<!-- ******************* /layout ********************* -->
+
+
+	<div id="pp-content" class="tab_mainopt" >		<!-- ******************* content ********************* -->
+		<?php
+		wvrx_ts_page_content( $raw_template );
+		?>
+	</div>											<!-- ******************* /content ********************* -->
+
+	<div id="pp-misc" class="tab_mainopt" >			<!-- ******************* misc ********************* -->
+	<?php wvrx_ts_page_misc_opts( $raw_template ); ?>
+	</div>											<!-- ******************* /misc ********************* -->
+
+
+	<div id="pp-pwp" class="tab_mainopt" > 			<!-- ******************* PWP ********************* -->
+	<?php wvrx_ts_page_with_posts_opts( $raw_template, $template ); ?>
+	</div>											<!-- ******************* /PWP ********************* -->
+<?php if (WVRX_TS_PAGEBUILDERS) : ?>
+	<div id="pp-builder" class="tab_mainopt" > 			<!-- ******************* PWP ********************* -->
+	<?php wvrx_ts_page_builder_opts( $raw_template ); ?>
+	</div>											<!-- ******************* /PWP ********************* -->
+<?php endif; ?>
+
+	<div id="pp-xplus" class="tab_mainopt" >		<!-- ******************* X-Plus ********************* -->
+	<?php wvrx_ts_page_xtreme_plus( $raw_template );?>
+	</div>											<!-- ******************* X-Plus ********************* -->
+
+
+</div> <!-- #tab-container-page -->
+</div>	<!-- #tabwrap-per-page -->
+
+<script type="text/javascript">
+	var tabberMainOpts = new Yetii({
+	id: 'tab-container-page',
+	tabclass: 'tab_mainopt',
+	persist: true
+	});
+</script>
+<?php
+}
+
+function wvrx_ts_elink( $href, $title, $label, $before='', $after='') {
+	echo $before . '<a href="' . esc_url($href) . '" title="' . $title . '">' . $label . '</a>' . $after;
+}
+
+function wvrx_ts_page_visibility( $raw_template = false ) {
+	global $post;
+
+	echo '<span style="font-weight:bold;font-size:140%;">' . __('Visibility','weaverx-theme-support' /*adm*/) . '</span>';
+	weaverx_help_link('help.html#optsperpage', __('Help for Per Page Options','weaverx-theme-support' /*adm*/)) ;
+
+	weaverx_html_br();
+	if ( $raw_template) {
+		_e('Not options when using the RAW Page Template', 'weaverx-theme-support');
+		return;
+	}
+
+	_e('These settings let you hide various elements on a per page basis.','weaverx-theme-support' /*adm*/);
+
+	wvrx_ts_page_title( __('Header Area Visibility','weaverx-theme-support' /*adm*/),80,1);
+
+	wvrx_ts_page_checkbox('_pp_hide_header',__('Hide Entire Header','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_hide_site_title',__('Hide Site Title/Tagline','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_hide_header_image',__('Hide Standard Header Image','weaverx-theme-support' /*adm*/), 33, 1);
+
+	wvrx_ts_page_checkbox('_pp_hide_header_html',__('Hide Header HTML Area','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_hide_customlogo',__('Hide Custom Logo','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_hide_headersearch',__('Hide Header Search','weaverx-theme-support' /*adm*/), 33,1);
+
+	wvrx_ts_page_checkbox('_pp_hide_menus',__('Hide Header Menus','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_hide_mini_menu',__('Hide Header Mini Menu','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_header-widget-area',__('Hide Header Widget Area','weaverx-theme-support' /*adm*/),33,2);
+
+
+	wvrx_ts_page_title( __('Footer Area Visibility','weaverx-theme-support' /*adm*/),80,1);
+
+	wvrx_ts_page_checkbox('_pp_hide_footer',__('Hide Entire Footer','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_hide_footer_html',__('Hide Footer HTML Area','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_footer-widget-area',__('Hide Footer Widget Area','weaverx-theme-support' /*adm*/),33,2);
+
+
+	wvrx_ts_page_title( __('Content Area Visibility','weaverx-theme-support' /*adm*/),80,1);
+
+	wvrx_ts_page_checkbox('_pp_hide_page_infobar',__('Hide Info Bar on this page','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_hide_page_title',__('Hide Page Title','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_full_browser_height',__('Force full browser height','weaverx-theme-support' /*adm*/),33,2);
+
+
+	wvrx_ts_page_title( __('Page Widget Areas Visibility','weaverx-theme-support' /*adm*/),80,1);
+
+	wvrx_ts_page_checkbox('_pp_primary-widget-area',__('Hide Primary Sidebar','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_secondary-widget-area',__('Hide Secondary Sidebar','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_sitewide-top-widget-area',__('Hide Sitewide Top Area','weaverx-theme-support' /*adm*/),33,1);
+
+	wvrx_ts_page_checkbox('_pp_sitewide-bottom-widget-area',__('Hide Sitewide Bottom Area','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_top-widget-area',__('Hide Pages Top Area','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_bottom-widget-area',__('Hide Pages Bottom Area','weaverx-theme-support' /*adm*/),33,2);
+
+}
+
+
+function wvrx_ts_pg_layout( $raw_template = false ) {		// ------------------------------- Page Layout -------------------
+	global $post;
+
+	echo '<span style="font-weight:bold;font-size:140%;">' . __('Layout','weaverx-theme-support' /*adm*/) . '</span><br/>';
+	_e('These settings let you control layout on a per page basis.','weaverx-theme-support' /*adm*/);
+
+	weaverx_html_br(2);
+	if ( $raw_template) {
+		_e('Not options when using the RAW Page Template', 'weaverx-theme-support');
+		return;
+	}
+
+
+	wvrx_ts_page_title( __('Featured Image','weaverx-theme-support' /*adm*/),80,1);
+
+	$opts3 = array(  'id' => '_pp_fi_location',
+		'info' => __('How to display Page FI on this page','weaverx-theme-support' /*adm*/),
+		'value' => array(
+			array('val' => '', 'desc' => __('Default Blog FI','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'content-top', 'desc' => __('With Content - top','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'content-bottom', 'desc' => __('With Content - bottom','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'title-before', 'desc' => __('With Title','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'title-banner', 'desc' => __('Banner above Title','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'header-image', 'desc' => __('Header Image Replacement','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'post-before', 'desc' => __('Beside Page, no wrap', 'weaver-xtreme' /*adm*/) ),
+			array('val' => 'post-bg', 'desc' => __('As BG Image, Tile', 'weaver-xtreme' /*adm*/) ),
+			array('val' => 'post-bg-cover', 'desc' => __('As BG Image, Cover', 'weaver-xtreme' /*adm*/) ),
+			array('val' => 'post-bg-parallax', 'desc' => __('As BG Image, Parallax', 'weaver-xtreme' /*adm*/) ),
+			array('val' => 'hide', 'desc' => __('Hide FI for this Post','weaverx-theme-support' /*adm*/) )
+			)
+		);
+	wvrx_ts_pp_select_id($opts3);
+
+?>
+<br />
+<input type="text" size="30" id='_pp_fi_link' name='_pp_fi_link'
+	value="<?php echo esc_textarea(get_post_meta($post->ID, '_pp_fi_link', true)); ?>" />
+<?php _e('<em>Featured Image Link</em> - Full URL to override default link target from FI','weaverx-theme-support' /*adm*/); ?>
+	<br style="clear:both;" />
+<br />
+
+<?php
+	wvrx_ts_page_title( __('Full Width - Extend Areas to Full Width Display','weaverx-theme-support' /*adm*/),80,1);
+	wvrx_ts_page_checkbox('_pp_header_full',__('Full Width Header','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_container_full',__('Full Width Container','weaverx-theme-support' /*adm*/));
+	wvrx_ts_page_checkbox('_pp_footer_full',__('Full Width Footer','weaverx-theme-support' /*adm*/),33,2);
+
+
+	wvrx_ts_page_title( __('Content Columns','weaverx-theme-support' /*adm*/),80,1);
+	wvrx_ts_page_cols();
+	wvrx_ts_page_title( __('Sidebars &amp; Widgets','weaverx-theme-support' /*adm*/),80,1);
+	wvrx_ts_page_layout();
+?>
+<br />
+	<input type="text" size="4" id="_pp_sidebar_width" name="_pp_sidebar_width"
+	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_sidebar_width", true)); ?>" />
+	<?php _e('% &nbsp;- <em>Sidebar Width</em> - Per Page Sidebar width (applies to all layouts)','weaverx-theme-support' /*adm*/); ?> <br /><br />
+<?php
+}
+
+
+function wvrx_ts_page_content( $raw_template = false ) {		// ------------------------------- Page Content -------------------
+	global $post;
+
+	echo '<span style="font-weight:bold;font-size:140%;">' . __('Per Page Content Replacemant','weaverx-theme-support' /*adm*/) . '</span><br/>';
+	_e('These settings let you replace widget areas, as well as HTML content in the header and footer.','weaverx-theme-support' /*adm*/);
+	weaverx_html_br(2);
+	if ( $raw_template) {
+		_e('Not options when using the RAW Page Template', 'weaverx-theme-support');
+		return;
+	}
+	if (WVRX_TS_PAGEBUILDERS) :
+	wvrx_ts_page_title( __('Header / Footer HTML Content','weaverx-theme-support' /*adm*/),80,2);
+	_e('Specify Per Page Header / Footer HTML content. If you provide just a page or post id number, the HTML area will be filled with the content of the page or post. This is especially usefule for content created with a page builder plugin.','weaverx-theme-support' /*adm*/);
+	weaverx_html_br();
+	_e('Header HTML: ','weaverx-theme-support' /*adm*/);
+?>
+	&nbsp;<textarea class="wvrx-edit" placeholder=" " name="_pp_header_html" rows=1 style="width: 75%"><?php echo(get_post_meta($post->ID, "_pp_header_html", true)); ?></textarea>
+
+<?php
+	weaverx_html_br();
+	_e('Footer HTML: ','weaverx-theme-support' /*adm*/);
+?>
+	&nbsp;&nbsp;<textarea class="wvrx-edit" placeholder=" " name="_pp_footer_html" rows=1 style="width: 75%"><?php echo(get_post_meta($post->ID, "_pp_footer_html", true)); ?></textarea>
+
+<?php
+endif;
+	weaverx_html_br(2);
+	wvrx_ts_page_title( __('Widget Area Replacements','weaverx-theme-support' /*adm*/),80,1);
+?>
+	<p>
+<?php _e('Select extra widget areas to replace the default widget areas for this page.
+To add areas to the widget area lists below, you <strong>must</strong> first define extra widget areas on the bottom of the <em>Main Options &rarr; Sidebars &amp; Layout</em> tab.','weaverx-theme-support' /*adm*/); ?>
+	</p>
+<?php
+	wvrx_ts_pp_replacement( __('Primary Sidebar','weaverx-theme-support' /*adm*/) , 'primary-widget-area' );
+	wvrx_ts_pp_replacement( __('Secondary Sidebar','weaverx-theme-support' /*adm*/) , 'secondary-widget-area' );
+
+	wvrx_ts_pp_replacement( __('Header Widget Area','weaverx-theme-support' /*adm*/) , 'header-widget-area' );
+	wvrx_ts_pp_replacement( __('Footer Widget Area','weaverx-theme-support' /*adm*/) , 'footer-widget-area' );
+
+	wvrx_ts_pp_replacement( __('Sitewide Top Widget Area','weaverx-theme-support' /*adm*/) , 'sitewide-top-widget-area' );
+	wvrx_ts_pp_replacement( __('Sitewide Bottom Widget Area','weaverx-theme-support' /*adm*/) , 'sitewide-bottom-widget-area' );
+
+	wvrx_ts_pp_replacement( __('Pages Top Widget Area','weaverx-theme-support' /*adm*/) , 'page-top-widget-area' );
+	wvrx_ts_pp_replacement( __('Pages Bottom Widget Area','weaverx-theme-support' /*adm*/) , 'page-bottom-widget-area' );
+?>
+<div style="clear:both;"></div>
+<?php
+}
+
+function wvrx_ts_page_misc_opts( $raw_template = false ) {		// ------------------------------- Misc Options -------------------
+	global $post;
+	echo '<span style="font-weight:bold;font-size:140%;">' . __('Misc Menu, Editor, and CSS Options','weaverx-theme-support' /*adm*/) . '</span><br/>';
+
+	//wvrx_ts_page_title( __('Misc Menu, Editor, and CSS Options','weaverx-theme-support' /*adm*/),80,1);
+
+	wvrx_ts_page_checkbox('_pp_hide_on_menu',__('Hide Page on the default Primary Menu','weaverx-theme-support' /*adm*/),90,1);
+
+	wvrx_ts_page_checkbox('_pp_stay_on_page',__('Menu "Placeholder" page. Useful for top-level menu item - don\'t go anywhere when menu item is clicked.','weaverx-theme-support' /*adm*/),90,1);
+
+	wvrx_ts_page_checkbox('_pp_hide_visual_editor',__('Disable Visual Editor for this page. Useful if you enter simple HTML or other code.','weaverx-theme-support' /*adm*/),90,1);
+
+	if (weaverx_allow_multisite()) {
+		wvrx_ts_page_checkbox('_pp_raw_html',__('Allow Raw HTML and scripts. Disables auto paragraph, texturize, and other processing.','weaverx-theme-support' /*adm*/),90,1);
+	}
+?>
+<p>
+	<input type="text" size="25" id="bodyclass" name="_pp_bodyclass"
+		value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_bodyclass", true)); ?>" />
+
+	<?php _e('<em>Per Page body Class</em> - CSS class name to add to HTML &lt;body&gt; block. Allows Per Page custom styling.','weaverx-theme-support' /*adm*/); ?>
+</p>
+<?php
+	if ( $raw_template) {
+		echo '<p>';
+				_e('<strong>You are using the RAW page template.</strong><br /><ol>
+		<li>Check the "Allow Raw HTML" option above to prevent WP processing of your content for this page. If you leave it
+		unchecked, you will get the WP paragraph and texturize processing.</li>
+		<li>You can add custom HTML code to include in the &lt;head&gt; block by defining a Custom Field named <em>page-head-code</em>
+		and including that HTML code in the Value for that field.</li></ol>', 'weaverx-theme-support');
+				echo '</p>';
+	}
+}
+
+
+
+function wvrx_ts_page_with_posts_opts( $raw_template, $template ) {		// ------------------------------- Page with Post Options -------------------
+	global $post;
+?>
+<span style="font-weight:bold;font-size:120%;">
+<?php
+	_e('Settings for "Page with Posts" Template','weaverx-theme-support' /*adm*/); echo "</span>";
+	weaverx_help_link('help.html#PerPostTemplate',__('Help for Page with Posts Template','weaverx-theme-support' /*adm*/) );
+
+	$template = !empty($post->page_template) ? $post->page_template : "Default Template";
+	if (in_array($template, apply_filters('weaverx_paget_posts', array('paget-posts.php'))) ) {
+	?>
+	<p>
+<?php _e('These settings are optional, and can filter which posts are displayed when you use the "Page with Posts" template.
+Use commas to separate items in lists.
+The settings will be combined for the final filtered list of posts displayed.
+(If you make mistakes in your settings, it won\'t be apparent until you display the page.)','weaverx-theme-support' /*adm*/); ?>
+</p>
+
+	<input type="text" size="30" id="_pp_category" name="_pp_category"
+	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_category", true)); ?>" />
+	<?php _e('<em>Category</em> - Enter list of category slugs of posts to include. (-slug will exclude specified category)','weaverx-theme-support' /*adm*/); ?>
+	<br />
+
+	<input type="text" size="30" id="_pp_tag" name="_pp_tag"
+	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_tag", true)); ?>" />
+	<?php _e("<em>Tags</em> - Enter list of tag slugs of posts to include.",'weaverx-theme-support' /*adm*/); ?> <br />
+
+	<input type="text" size="30" id="_pp_onepost" name="_pp_onepost"
+	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_onepost", true)); ?>" />
+	<?php _e("<em>Single Post</em> - Enter post slug of a single post to display. (Use [show_posts] filter to include specific list of posts.)",'weaverx-theme-support' /*adm*/); ?> <br />
+
+	<input type="text" size="30" id="_pp_orderby" name="_pp_orderby"
+	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_orderby", true)); ?>" />
+	<?php _e("<em>Order by</em> - Enter method to order posts by: author, date, title, or rand.",'weaverx-theme-support' /*adm*/); ?> <br />
+
+	<input type="text" size="30" id="_pp_sort_order" name="_pp_sort_order"
+	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_sort_order", true)); ?>" />
+	<?php _e("<em>Sort order</em> - Enter ASC or DESC for sort order.",'weaverx-theme-support' /*adm*/); ?> <br />
+
+	<input type="text" size="30" id="_pp_posts_per_page" name="_pp_posts_per_page"
+	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_posts_per_page", true)); ?>" />
+	<?php _e("<em>Posts per Page</em> - Enter maximum number of posts per page.",'weaverx-theme-support' /*adm*/); ?> <br />
+
+	<input type="text" size="30" id="_pp_author" name="_pp_author"
+	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_author", true)); ?>" />
+	<?php _e('<em>Author</em> - Enter author (use username, including spaces), or list of author IDs','weaverx-theme-support' /*adm*/); ?> <br />
+
+	<input type="text" size="30" id="_pp_post_type" name="_pp_post_type"
+	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_post_type", true)); ?>" />
+	<?php _e('<em>Custom Post Type</em> - Enter slug of one custom post type to display','weaverx-theme-support' /*adm*/); ?> <br />
+
+	<?php wvrx_ts_pwp_atw_show_post_filter(); ?>
+
+	<?php wvrx_ts_pwp_type(); ?><br />
+	<?php wvrx_ts_pwp_cols(); ?><br />
+	<input type="text" size="5" id="_pp_fullposts" name="_pp_fullposts"
+	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_fullposts", true)); ?>" />
+	<?php _e("<em>Don't excerpt 1st <em>\"n\"</em> Posts</em> - Display the non-excerpted post for the first \"n\" posts.",'weaverx-theme-support' /*adm*/); ?>
+	<br />
+
+	<input type="text" size="5" id="_pp_hide_n_posts" name="_pp_hide_n_posts"
+	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_hide_n_posts", true)); ?>" />
+	<?php echo "<em><span class=\"dashicons dashicons-visibility\"></span>" .
+__("Hide first \"n\" posts</em> - Start with post n+1.
+Useful with plugin that will display first n posts using a shortcode. (e.g., Post slider)",'weaverx-theme-support' /*adm*/) ; ?>
+
+	<br /><br />
+
+	<?php wvrx_ts_page_checkbox('_pp_hide_infotop',__('Hide top info line','weaverx-theme-support' /*adm*/), 40); ?>
+	<?php wvrx_ts_page_checkbox('_pp_hide_infobottom',__('Hide bottom info line','weaverx-theme-support' /*adm*/), 40, 1); ?>
+	<?php wvrx_ts_page_checkbox('_pp_hide_sticky',__('No special treatment for Sticky Posts','weaverx-theme-support' /*adm*/), 40); ?>
+
+	<div style="clear:both;"></div>
+
+<?php
+	} else {	// NOT a page with posts
+?>	<p>
+<?php _e('<strong>Note:</strong> After you choose the "Page with Posts" template from the <em>Template</em>
+option in the <em>Page Attributes</em> box, <strong>and</strong> <em>Publish</em> or <em>Save Draft</em>,
+settings for "Page with Posts" will be displayed here. Current page template:','weaverx-theme-support' /*adm*/);
+echo $template; ?>
+	</p>
+
+
+<?php
+	}
+}
+
+if (WVRX_TS_PAGEBUILDERS) :
+function wvrx_ts_page_builder_opts() {
+
+	global $post;
+
+	echo '<span style="font-weight:bold;font-size:140%;">' . __('Page Builder Header/Footer Replacemant','weaverx-theme-support' /*adm*/) . '</span><br/>';
+	_e('These settings let you replace the header or footer areas with content from a page builder page. They override the global replacement settings.','weaverx-theme-support' /*adm*/);
+	weaverx_html_br(2);
+
+	// HEADER ----------------
+
+	wvrx_ts_page_title( __('Header Area Replacement','weaverx-theme-support' /*adm*/),80,1);
+?>
+	<p>
+<?php
+		$cur = get_post_meta(get_the_ID(), '_pp_pb_header_hide_menus', true);
+?>
+
+		<select id="_pp_pb_header_hide_menus" name="_pp_pb_header_hide_menus">
+			<option value='' <?php echo $cur == '' ? ' selected="selected"' : '';?>><?php _e('Global Visibility','weaverx-theme-support'); ?></option>
+			<option value='hide' <?php echo $cur == 'hide' ? ' selected="selected"' : '';?>><?php _e('Hide Menus','weaverx-theme-support'); ?></option>
+			<option value='show' <?php echo $cur == 'show' ? ' selected="selected"' : '';?>><?php _e('Show Menus','weaverx-theme-support'); ?></option>
+		</select>
+		<?php _e('<em>Hide or Show Menus</em> - Select how to display menus with Header Replacement.','weaverx-theme-support'); ?>
+		</p>
+
+<input type="text" size="10" id='_pp_fi_link' name='_pp_fi_link'
+	value="<?php echo esc_textarea(get_post_meta($post->ID, '_pp_pb_header_replace_page_id', true)); ?>" />
+	<?php _e("Specify any page or post ID to serve as header replacement. Overrides list selection below.",'weaverx-theme-support' /*adm*/); ?>
+	<br style="clear:both;" />
+
+<?php
+if ( defined( 'ELEMENTOR_VERSION' ) ) :				// only provide if elementor is active
+	// Elementor selection
+	$pargs = array (
+			'post_type' => 'page'
+		);
+	$posts = get_pages($pargs);
+?>
+	<p>
+		<?php _e('<em>Select an Elementor Page.</em> (Override this selection in Page/Post field above to select Page OR Post by ID.)','weaverx-theme-support'); ?><br />
+		<select id="_pp_elementor_header_replacement" name="_pp_elementor_header_replacement">
+			<option value=''>&nbsp;</option>
+	<?php
+			$cur = get_post_meta(get_the_ID(), '_pp_elementor_header_replacement', true);
+			foreach ( $posts as $cur_post) {
+				if ( ! ! get_post_meta( $cur_post->ID, '_elementor_edit_mode', true ) ) {
+					$selected = $cur == $cur_post->ID ? ' selected="selected"' : '';
+					echo '<option'. $selected .' value="' . $cur_post->ID .'">'. substr( $cur_post->post_title, 0, 60) .'</option>';		// make the title fit, more or less
+				}
+			}
+	?>
+		</select>
+		</p>
+<?php
+endif;
+	$posts = '';
+if ( defined( 'SITEORIGIN_PANELS_VERSION' ) ) :		// only provide if siteorigins is active
+
+	// SiteOrigin selection
+	$pargs = array(
+			'post_type' => 'page'
+		);
+	$posts = get_pages($pargs);
+?>
+		<p>
+		<?php _e('<em>Select a SiteOrigin Page Builder Page.</em> (Override this selection in Page/Post field above to select Page OR Post by ID.)','weaverx-theme-support'); ?><br />
+		<select id="_pp_siteorigin_header_replacement" name="_pp_siteorigin_header_replacement">
+			<option value=''>&nbsp;</option>
+	<?php
+			$cur = $cur = get_post_meta(get_the_ID(), '_pp_siteorigin_header_replacement', true);;
+			foreach ( $posts as $cur_post) {
+				if ( ! ! get_post_meta( $cur_post->ID, 'panels_data', true ) ) {
+					$selected = $cur == $cur_post->ID ? ' selected="selected"' : '';
+					echo '<option'. $selected .' value="' . $cur_post->ID .'">'. substr( $cur_post->post_title, 0, 60) .'</option>';		// make the title fit, more or less
+				}
+			}
+	?>
+		</select>
+		</p>
+<?php
+endif; // SiteOrigin
+
+	if ( !defined( 'ELEMENTOR_VERSION' ) && !defined( 'SITEORIGIN_PANELS_VERSION' ) ) {
+		echo '<p>';
+		_e('Sorry, Weaver can only list page builder pages from Elementor or SiteOrigin Page Builder. Please install and activate one of those plugins.','weaver-xtreme');
+		echo '</p>';
+	}
+
+	// FOOTER -----------------
+
+	weaverx_html_br(1);
+	wvrx_ts_page_title( __('Footer Area Replacement','weaverx-theme-support' /*adm*/),80,1);
+
+
+if ( defined( 'ELEMENTOR_VERSION' ) ) :				// only provide if elementor is active
+	// Elementor selection
+	$pargs = array(
+			'post_type' => 'page'
+		);
+	$posts = get_pages($pargs);
+?>
+	<p>
+		<?php _e('<em>Select an Elementor Page.</em> (Override this selection in Page/Post field above to select Page OR Post by ID.)','weaverx-theme-support'); ?><br />
+		<select id="_pp_elementor_footer_replacement" name="_pp_elementor_footer_replacement">
+			<option value=''>&nbsp;</option>
+	<?php
+			$cur = get_post_meta(get_the_ID(), '_pp_elementor_footer_replacement', true);
+			foreach ( $posts as $cur_post) {
+				if ( ! ! get_post_meta( $cur_post->ID, '_elementor_edit_mode', true ) ) {
+					$selected = $cur == $cur_post->ID ? ' selected="selected"' : '';
+					echo '<option'. $selected .' value="' . $cur_post->ID .'">'. substr( $cur_post->post_title, 0, 60) .'</option>';		// make the title fit, more or less
+				}
+			}
+	?>
+		</select>
+		</p>
+<?php
+endif;
+	$posts = '';
+if ( defined( 'SITEORIGIN_PANELS_VERSION' ) ) :		// only provide if siteorigins is active
+
+	// SiteOrigin selection
+	$pargs = array(
+			'post_type' => 'page'
+		);
+	$posts = get_pages($pargs);
+?>
+		<p>
+		<?php _e('<em>Select a SiteOrigin Page Builder Page.</em> (Override this selection in Page/Post field above to select Page OR Post by ID.)','weaverx-theme-support'); ?><br />
+		<select id="_pp_siteorigin_footer_replacement" name="_pp_siteorigin_footer_replacement">
+			<option value=''>&nbsp;</option>
+	<?php
+			foreach ( $posts as $cur_post) {
+				$cur = get_post_meta(get_the_ID(), '_pp_siteorigin_footer_replacement', true);
+				if ( ! ! get_post_meta( $cur_post->ID, 'panels_data', true ) ) {
+					$selected = $cur == $cur_post->ID ? ' selected="selected"' : '';
+					echo '<option'. $selected .' value="' . $cur_post->ID .'">'. substr( $cur_post->post_title, 0, 60) .'</option>';		// make the title fit, more or less
+				}
+			}
+	?>
+		</select>
+		</p>
+<?php
+endif; // SiteOrigin
+	if ( !defined( 'ELEMENTOR_VERSION' ) && !defined( 'SITEORIGIN_PANELS_VERSION' ) ) {
+		echo '<p>';
+		_e('Sorry, Weaver can only list page builder pages from Elementor or SiteOrigin Page Builder. Please install and activate one of those plugins.','weaver-xtreme');
+		echo '</p>';
+	}
+	echo '<div style="clear:both;"></div>';
+}
+endif;
+
+
+function wvrx_ts_page_xtreme_plus( $raw_template ) {		// ------------------------------- Weaver Xtreme Plus -------------------
+	global $post;
+	echo '<h3>Weaver Xtreme Plus Per Page Options  (&starf;Plus)</h3>';
+	echo '<strong>' . __('Per Page Style','weaver-xtreme-plus') . '</strong> (&starf;Plus)' /*a*/ ;
+
+	do_action('wvrx_ts_xp_perpage_style', $raw_template);
+}
+
+
+
+function wvrx_ts_emit_script_style() {
+	// emit script and style for tabs
+?>
+<script>
+// TABS - put in front to make show faster
+
+jQuery(document).ready(function($) {		// self-defining function - for tabs shortcode
+    // Tabs
+	$('.wvr-tabs-nav').delegate('span:not(.wvr-tabs-current)', 'click', function() {
+		$(this).addClass('wvr-tabs-current').siblings().removeClass('wvr-tabs-current')
+		.parents('.wvr-tabs').find('.wvr-tabs-pane').hide().eq($(this).index()).show();
+	});
+	$('.wvr-tabs-pane').hide();
+	$('.wvr-tabs-nav span:first-child').addClass('wvr-tabs-current');
+	$('.wvr-tabs-panes .wvr-tabs-pane:first-child').show();
+
+});
+</script>
+<style type="text/css">
+	/* Tabs */
+.wvr-tabs,
+.wvr-tabs2,
+.wvr-tabs3 {
+    box-sizing:         border-box;
+    margin: 0 0 1.5em 0;
+    background:transparent;
+}
+
+.wvr-tabs-style .wvr-tabs-nav,
+.wvr-tabs-style .wvr-tabs-nav2
+.wvr-tabs-style .wvr-tabs-nav3 {    /* top "bar" behind tabs */
+	padding: 0px 20px 0px 0px;
+	margin: 0;
+	height: 24px;
+	background-color: transparent;
+}
+
+.wvr-tabs-style .wvr-tabs-nav span,
+.wvr-tabs-style .wvr-tabs-nav span2,
+.wvr-tabs-style .wvr-tabs-nav span3 {   /* bg color of a tab */
+	display: block;
+	float: left;
+	padding: 0 8px;
+	height: 24px;
+	line-height: 24px;
+	margin-right: 1px;
+	cursor: pointer;
+	border-top: 1px solid #888;         /* border-color */
+	border-right: 1px solid #888;
+	border-left: 1px solid #888;
+	background: #ccc;                   /* tab-bg */
+	position:relative;
+	z-index:		1;
+}
+
+.wvr-tabs-style .wvr-tabs-nav span.wvr-tabs-current,
+.wvr-tabs-style2 .wvr-tabs-nav2 span.wvr-tabs-current2,
+.wvr-tabs-style3 .wvr-tabs-nav3 span.wvr-tabs-current3 {
+	position:relative;
+	z-index:		3;
+}
+
+.wvr-tabs-style .wvr-tabs-nav span.wvr-tabs-current,
+.wvr-tabs-style .wvr-tabs-nav span:hover,
+.wvr-tabs-style2 .wvr-tabs-nav2 span.wvr-tabs-current2,
+.wvr-tabs-style2 .wvr-tabs-nav2 span:hover,
+.wvr-tabs-style3 .wvr-tabs-nav3 span.wvr-tabs-current3,
+.wvr-tabs-style3 .wvr-tabs-nav3 span:hover {
+    background: #eee;                               /* tab-current-color */
+}
+
+.wvr-tabs-nav span,
+.wvr-tabs-nav span2,
+.wvr-tabs-nav span3 {
+	box-sizing:			border-box;
+}
+
+span.wvr-tabs-current,
+span.wvr-tabs-current2,
+span.wvr-tabs-current3 {
+	box-sizing:			content-box;
+}
+
+.wvr-tabs-style .wvr-tabs-pane,
+.wvr-tabs-style3 .wvr-tabs-pane3,
+.wvr-tabs-style3 .wvr-tabs-pane3 {
+	padding: 			15px;
+    border: 			1px solid #888;        /* border-color */
+    min-height:			50px;               /* pane-min-height */
+    background-color:	transparent;        /* pane-bg */
+	position:			relative;
+	z-index:			2;
+}
+
+.wvr-tabs-panes,
+.wvr-tabs-panes2,
+.wvr-tabs-panes3 {
+	position:			relative;
+	z-index:			2;
+}		/* add line to tab */
+
+.wvr-tabs-panes .wvr-tabs-hide,
+.wvr-tabs-panes2 .wvr-tabs-hide2,
+.wvr-tabs-panes3 .wvr-tabs-hide3 {
+	display: none;
+
+}
+
+.wvr-tabs-nav,
+.wvr-tabs-nav2,
+.wvr-tabs-nav3 {
+	position:			relative;
+	z-index:			3;
+}
+</style>
+<?php
+}
+
+
+
 
 function wvrx_ts_page_color($opt, $msg) {		// used by XPlus
 	global $post;
@@ -45,6 +765,18 @@ function wvrx_ts_page_checkbox($opt, $msg, $width = 33, $br = 0) {
 ?>
 	<div style="float:left;width:<?php echo $width; ?>"><?php wvrx_ts_simple_checkbox($opt,$msg);
 	echo '</div>';
+	for ($i = 0 ; $i < $br ; $i++)
+		echo '<br class="page_checkbox" style="clear:both;" />';
+
+}
+
+function wvrx_ts_page_title($msg, $width = 33, $br = 0) {
+	if ( $width != 'auto')
+		$width = "{$width}%";
+?>
+	<div style="float:left;font-weight:bold;font-style:italic;width:<?php echo $width; ?>">
+	<?php
+	echo $msg . '</div>';
 	for ($i = 0 ; $i < $br ; $i++)
 		echo '<br class="page_checkbox" style="clear:both;" />';
 
@@ -218,315 +950,14 @@ function wvrx_ts_pwp_cols() {
 }
 
 
-
-function wvrx_ts_page_extras() {
-	global $post;
-	$opts = get_option( apply_filters('weaverx_options','weaverx_settings') , array());	// need to fetch Weaver Xtreme options
-
-	if ( !( current_user_can('edit_themes')
-		|| (current_user_can('edit_theme_options') && !isset($opts['_hide_mu_admin_per']))	// multi-site regular admin
-		|| (current_user_can('edit_pages') && !isset($opts['_hide_editor_per']))	// Editor
-		|| (current_user_can('edit_posts') && !isset($opts['_hide_author_per'])))    // Author/Contributor
-	) {
-		if (isset($opts['_show_per_post_all']) && $opts['_show_per_post_all'])
-			echo '<p>' .
-__('You can enable Weaver Xtreme Per Page Options for Custom Post Types on the Weaver Xtreme:Advanced Options:Admin Options tab.','weaverx-theme-support' /*adm*/) .
-		'</p>';
-		else
-			echo '<p>' . __('Weaver Xtreme Per Page Options not available for your User Role.','weaverx-theme-support' /*adm*/) . '</p>';
-
-		return;	// don't show per post panel
-	   }
-
-	echo("<div style=\"line-height:150%;\"><p>\n");
-	if (get_the_ID() == get_option( 'page_on_front' ) ) { ?>
-<div style="padding:2px; border:2px solid yellow; background:#FF8;">
-<?php _e('Information: This page has been set to serve as your front page in the <em>Dashboard:Settings:Reading</em> \'Front page:\' option.','weaverx-theme-support' /*adm*/); ?>
-</div><br />
-<?php
-	}
-
-	if (get_the_ID() == get_option( 'page_for_posts' ) ) { ?>
-<div style="padding:2px; border:2px solid red; background:#FAA;">
-<?php _e('<strong>WARNING!</strong>
-You have the <em>Dashboard:Settings:Reading Posts page:</em> option set to this page.
-You may intend to do this, but note this means that <em>only</em> this page\'s Title will be used
-on the default WordPress blog page, and any content you may have entered above is <em>not</em> used.
-If you want this page to serve as your blog page, and enable Weaver Xtreme Per Page options,
-including the option of using the Page with Posts page template,
-then the <em>Settings:Reading:Posts page</em> selection <strong>must</strong> be set to
-the <em></em>&mdash; Select &mdash;</em> default value.','weaverx-theme-support' /*adm*/); ?>
-</div><br />
-<?php
-		return;
-	}
-
-	$updir = wp_upload_dir();
-	$dir = trailingslashit($updir['basedir']) . 'weaverx-subthemes/editor-style-wvrx.css';
-
-	if (!@file_exists( $dir ))  { ?>
-<div style="padding:2px; border:2px solid red; background:#FAA;">
-<?php _e('<strong>Note!</strong>
-Please open the <em>Appearance:Weaver Xtreme Admin:Main Options</em> page and <em>Save Settings</em> to enable full editor theme match styling.','weaverx-theme-support' /*adm*/); ?>
-</div><br />
-<?php
-	}
-
-	echo '<strong>' . __('Page Templates','weaverx-theme-support' /*adm*/) . '</strong>';
-	weaverx_help_link('help.html#PageTemplates',__('Help for Weaver Xtreme Page Templates','weaverx-theme-support' /*adm*/));
-	echo '<span style="float:right;">(' . __('This Page\'s ID: ','weaverx-theme-support' /*adm*/); the_ID() ; echo ')</span>';
-	weaverx_html_br();
-	_e('Please click the (?) for more information about all the Weaver Xtreme Page Templates.','weaverx-theme-support' /*adm*/);
-	weaverx_html_br();
-
-	$template = !empty($post->page_template) ? $post->page_template : "Default Template";
-	$raw_template = in_array($template, array('paget-raw.php'));
-
-	echo '<br /><strong>' . __('Per Page Options','weaverx-theme-support' /*adm*/) . '</strong>';
-	weaverx_help_link('help.html#optsperpage', __('Help for Per Page Options','weaverx-theme-support' /*adm*/)) ;
-
-	weaverx_html_br();
+//================================================================ Per Post Options ========================================================
 
 
-	if (!$raw_template) {
-	_e('These settings let you hide various elements on a per page basis.','weaverx-theme-support' /*adm*/);
-	weaverx_html_br();
-
-
-	wvrx_ts_page_checkbox('_pp_hide_site_title',__('Hide Site Title/Tagline','weaverx-theme-support' /*adm*/));
-	wvrx_ts_page_checkbox('_pp_hide_header_image',__('Hide Standard Header Image','weaverx-theme-support' /*adm*/));
-	wvrx_ts_page_checkbox('_pp_hide_header',__('Hide Entire Header','weaverx-theme-support' /*adm*/), 33, 1);
-
-	wvrx_ts_page_checkbox('_pp_hide_menus',__('Hide Menus','weaverx-theme-support' /*adm*/));
-	wvrx_ts_page_checkbox('_pp_hide_page_infobar',__('Hide Info Bar on this page','weaverx-theme-support' /*adm*/));
-	wvrx_ts_page_checkbox('_pp_hide_footer',__('Hide Entire Footer','weaverx-theme-support' /*adm*/),33,1);
-
-	wvrx_ts_page_checkbox('_pp_hide_page_title',__('Hide Page Title','weaverx-theme-support' /*adm*/));
-	wvrx_ts_page_checkbox('_pp_full_browser_height',__('Force full browser height','weaverx-theme-support' /*adm*/),33,2);
-
-	wvrx_ts_page_cols();
-	} // not raw
-
-	_e('<h4>Per Page Menu Options</h4>','weaverx-theme-support');
-	wvrx_ts_page_checkbox('_pp_hide_on_menu',__('Hide Page on the default Primary Menu','weaverx-theme-support' /*adm*/),90,1);
-
-	wvrx_ts_page_checkbox('_pp_stay_on_page',__('Menu "Placeholder" page. Useful for top-level menu item - don\'t go anywhere when menu item is clicked.','weaverx-theme-support' /*adm*/),90,1);
-
-	_e('<h4>Per Page Visual Editor Options</h4>', 'weaverx-theme-support');
-	wvrx_ts_page_checkbox('_pp_hide_visual_editor',__('Disable Visual Editor for this page. Useful if you enter simple HTML or other code.','weaverx-theme-support' /*adm*/),90,1);
-
-	if (weaverx_allow_multisite()) {
-		wvrx_ts_page_checkbox('_pp_raw_html',__('Allow Raw HTML and scripts. Disables auto paragraph, texturize, and other processing.','weaverx-theme-support' /*adm*/),90,1);
-	}
-
-	if (!$raw_template) {
-?>
-	<p><strong><?php _e('Sidebars &amp; Widgets','weaverx-theme-support' /*adm*/); ?></strong></p>
-
-<?php
-	wvrx_ts_page_layout();
-?>
-<br />
-	<input type="text" size="4" id="_pp_sidebar_width" name="_pp_sidebar_width"
-	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_sidebar_width", true)); ?>" />
-	<?php _e('% &nbsp;- <em>Sidebar Width</em> - Per Page Sidebar width (applies to all layouts)','weaverx-theme-support' /*adm*/); ?> <br /><br />
-<?php
-
-	wvrx_ts_page_checkbox('_pp_primary-widget-area',__('Hide Primary Sidebar','weaverx-theme-support' /*adm*/),40);
-	wvrx_ts_page_checkbox('_pp_secondary-widget-area',__('Hide Secondary Sidebar','weaverx-theme-support' /*adm*/),40,1);
-
-	wvrx_ts_page_checkbox('_pp_sitewide-top-widget-area',__('Hide Sitewide Top Area','weaverx-theme-support' /*adm*/),40);
-	wvrx_ts_page_checkbox('_pp_sitewide-bottom-widget-area',__('Hide Sitewide Bottom Area','weaverx-theme-support' /*adm*/),40,1);
-
-	wvrx_ts_page_checkbox('_pp_top-widget-area',__('Hide Pages Top Area','weaverx-theme-support' /*adm*/),40);
-	wvrx_ts_page_checkbox('_pp_bottom-widget-area',__('Hide Pages Bottom Area','weaverx-theme-support' /*adm*/),40,1);
-
-	wvrx_ts_page_checkbox('_pp_header-widget-area',__('Hide Header Area','weaverx-theme-support' /*adm*/),40);
-	wvrx_ts_page_checkbox('_pp_footer-widget-area',__('Hide Footer Area','weaverx-theme-support' /*adm*/),40,1);
-?>
-
-	<p><strong><?php _e('Widget Area Replacements','weaverx-theme-support' /*adm*/); ?></strong></p>
-	<p>
-<?php _e('Select extra widget areas to replace the default widget areas for this page.
-To add areas to the widget area lists below, you <strong>must</strong> first define extra widget areas on the bottom of the <em>Main Options &rarr; Sidebars &amp; Layout</em> tab.','weaverx-theme-support' /*adm*/); ?>
-	</p>
-<?php
-	wvrx_ts_pp_replacement( __('Primary Sidebar','weaverx-theme-support' /*adm*/) , 'primary-widget-area' );
-	wvrx_ts_pp_replacement( __('Secondary Sidebar','weaverx-theme-support' /*adm*/) , 'secondary-widget-area' );
-
-	wvrx_ts_pp_replacement( __('Header Widget Area','weaverx-theme-support' /*adm*/) , 'header-widget-area' );
-	wvrx_ts_pp_replacement( __('Footer Widget Area','weaverx-theme-support' /*adm*/) , 'footer-widget-area' );
-
-	wvrx_ts_pp_replacement( __('Sitewide Top Widget Area','weaverx-theme-support' /*adm*/) , 'sitewide-top-widget-area' );
-	wvrx_ts_pp_replacement( __('Sitewide Bottom Widget Area','weaverx-theme-support' /*adm*/) , 'sitewide-bottom-widget-area' );
-
-	wvrx_ts_pp_replacement( __('Pages Top Widget Area','weaverx-theme-support' /*adm*/) , 'page-top-widget-area' );
-	wvrx_ts_pp_replacement( __('Pages Bottom Widget Area','weaverx-theme-support' /*adm*/) , 'page-bottom-widget-area' );
-?>
-	<br style="clear:both;" /><p><strong><?php _e('Featured Image','weaverx-theme-support' /*adm*/); ?></strong></p>
-<?php
-	$opts3 = array(  'id' => '_pp_fi_location',
-		'info' => __('How to display Page FI on this page','weaverx-theme-support' /*adm*/),
-		'value' => array(
-			array('val' => '', 'desc' => __('Default Blog FI','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'content-top', 'desc' => __('With Content - top','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'content-bottom', 'desc' => __('With Content - bottom','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'title-before', 'desc' => __('With Title','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'title-banner', 'desc' => __('Banner above Title','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'header-image', 'desc' => __('Header Image Replacement','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'post-before', 'desc' => __('Beside Page, no wrap', 'weaver-xtreme' /*adm*/) ),
-			array('val' => 'post-bg', 'desc' => __('As BG Image, Tile', 'weaver-xtreme' /*adm*/) ),
-			array('val' => 'post-bg-cover', 'desc' => __('As BG Image, Cover', 'weaver-xtreme' /*adm*/) ),
-			array('val' => 'post-bg-parallax', 'desc' => __('As BG Image, Parallax', 'weaver-xtreme' /*adm*/) ),
-			array('val' => 'hide', 'desc' => __('Hide FI for this Post','weaverx-theme-support' /*adm*/) )
-			)
-		);
-	wvrx_ts_pp_select_id($opts3);
-?>
-<br />
-<input type="text" size="30" id='_pp_fi_link' name='_pp_fi_link'
-	value="<?php echo esc_textarea(get_post_meta($post->ID, '_pp_fi_link', true)); ?>" />
-<?php _e('<em>Featured Image Link</em> - Full URL to override default link target from FI','weaverx-theme-support' /*adm*/); ?>
-	<br style="clear:both;" />
-	<hr />
-	<input type="text" size="15" id="bodyclass" name="_pp_bodyclass"
-		value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_bodyclass", true)); ?>" />
-
-	<?php _e('<em>Per Page body Class</em> - CSS class name to add to HTML &lt;body&gt; block. Allows Per Page custom styling.','weaverx-theme-support' /*adm*/); ?>
-	<br />
-</p>
-<?php
-	}	// not raw - break for XPlus
-
-
-	if (!$raw_template) {			// resume raw handling
-?>
-<div  style="border:1px solid black; padding:0 1em 1em 1em;">
-<p>
-<span style="font-weight:bold;font-size:120%;">
-<?php
-
-	_e('Settings for "Page with Posts" Template','weaverx-theme-support' /*adm*/); echo "</span>";
-	weaverx_help_link('help.html#PerPostTemplate',__('Help for Page with Posts Template','weaverx-theme-support' /*adm*/) );
-
-	$template = !empty($post->page_template) ? $post->page_template : "Default Template";
-	if (in_array($template, apply_filters('weaverx_paget_posts', array('paget-posts.php'))) ) {
-	?>
-	<p>
-<?php _e('These settings are optional, and can filter which posts are displayed when you use the "Page with Posts" template.
-Use commas to separate items in lists.
-The settings will be combined for the final filtered list of posts displayed.
-(If you make mistakes in your settings, it won\'t be apparent until you display the page.)','weaverx-theme-support' /*adm*/); ?>
-</p>
-
-	<input type="text" size="30" id="_pp_category" name="_pp_category"
-	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_category", true)); ?>" />
-	<?php _e('<em>Category</em> - Enter list of category slugs of posts to include. (-slug will exclude specified category)','weaverx-theme-support' /*adm*/); ?>
-	<br />
-
-	<input type="text" size="30" id="_pp_tag" name="_pp_tag"
-	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_tag", true)); ?>" />
-	<?php _e("<em>Tags</em> - Enter list of tag slugs of posts to include.",'weaverx-theme-support' /*adm*/); ?> <br />
-
-	<input type="text" size="30" id="_pp_onepost" name="_pp_onepost"
-	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_onepost", true)); ?>" />
-	<?php _e("<em>Single Post</em> - Enter post slug of a single post to display. (Use [show_posts] filter to include specific list of posts.)",'weaverx-theme-support' /*adm*/); ?> <br />
-
-	<input type="text" size="30" id="_pp_orderby" name="_pp_orderby"
-	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_orderby", true)); ?>" />
-	<?php _e("<em>Order by</em> - Enter method to order posts by: author, date, title, or rand.",'weaverx-theme-support' /*adm*/); ?> <br />
-
-	<input type="text" size="30" id="_pp_sort_order" name="_pp_sort_order"
-	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_sort_order", true)); ?>" />
-	<?php _e("<em>Sort order</em> - Enter ASC or DESC for sort order.",'weaverx-theme-support' /*adm*/); ?> <br />
-
-	<input type="text" size="30" id="_pp_posts_per_page" name="_pp_posts_per_page"
-	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_posts_per_page", true)); ?>" />
-	<?php _e("<em>Posts per Page</em> - Enter maximum number of posts per page.",'weaverx-theme-support' /*adm*/); ?> <br />
-
-	<input type="text" size="30" id="_pp_author" name="_pp_author"
-	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_author", true)); ?>" />
-	<?php _e('<em>Author</em> - Enter author (use username, including spaces), or list of author IDs','weaverx-theme-support' /*adm*/); ?> <br />
-
-	<input type="text" size="30" id="_pp_post_type" name="_pp_post_type"
-	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_post_type", true)); ?>" />
-	<?php _e('<em>Custom Post Type</em> - Enter slug of one custom post type to display','weaverx-theme-support' /*adm*/); ?> <br />
-
-	<?php wvrx_ts_pwp_atw_show_post_filter(); ?>
-
-	<?php wvrx_ts_pwp_type(); ?><br />
-	<?php wvrx_ts_pwp_cols(); ?><br />
-	<input type="text" size="5" id="_pp_fullposts" name="_pp_fullposts"
-	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_fullposts", true)); ?>" />
-	<?php _e("<em>Don't excerpt 1st <em>\"n\"</em> Posts</em> - Display the non-excerpted post for the first \"n\" posts.",'weaverx-theme-support' /*adm*/); ?>
-	<br />
-
-	<input type="text" size="5" id="_pp_hide_n_posts" name="_pp_hide_n_posts"
-	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_hide_n_posts", true)); ?>" />
-	<?php echo "<em><span class=\"dashicons dashicons-visibility\"></span>" .
-__("Hide first \"n\" posts</em> - Start with post n+1.
-Useful with plugin that will display first n posts using a shortcode. (e.g., Post slider)",'weaverx-theme-support' /*adm*/) ; ?>
-
-	<br /><br />
-
-	<?php wvrx_ts_page_checkbox('_pp_hide_infotop',__('Hide top info line','weaverx-theme-support' /*adm*/), 40); ?>
-	<?php wvrx_ts_page_checkbox('_pp_hide_infobottom',__('Hide bottom info line','weaverx-theme-support' /*adm*/), 40, 1); ?>
-	<?php wvrx_ts_page_checkbox('_pp_hide_sticky',__('No special treatment for Sticky Posts','weaverx-theme-support' /*adm*/), 40); ?>
-</p>
-</div>
-<?php
-	} else {	// NOT a page with posts
-?>	<p>
-<?php _e('<strong>Note:</strong> After you choose the "Page with Posts" template from the <em>Template</em>
-option in the <em>Page Attributes</em> box, <strong>and</strong> <em>Publish</em> or <em>Save Draft</em>,
-settings for "Page with Posts" will be displayed here. Current page template:','weaverx-theme-support' /*adm*/);
-echo $template; ?>
-	</p>
-	</div>
-
-<?php
-	}
-	} else { // raw page template handling
-		echo '<p>';
-		_e('<strong>You are using the RAW page template.</strong><br /><ol>
-<li>Check the "Allow Raw HTML" option above to prevent WP processing of your content for this page. If you leave it
-unchecked, you will get the WP paragraph and texturize processing.</li>
-<li>You can add custom HTML code to include in the &lt;head&gt; block by defining a Custom Field named <em>page-head-code</em>
-and including that HTML code in the Value for that field.</li></ol>', 'weaverx-theme-support');
-		echo '</p>';
-	}
-
-	echo '<br /><br /><div style="clear:both;border:2px solid #aaa;padding:0 1em .5em 1em;">';
-	echo '<h3>Weaver Xtreme Plus Per Page Options  (&starf;Plus)</h3>';
-	echo '<strong>' . __('Per Page Style','weaver-xtreme-plus') . '</strong> (&starf;Plus)' /*a*/ ;
-
-	do_action('wvrx_ts_xp_perpage_style', $raw_template);
-
-	echo '</div>';
-
-
-?>
-	<div style="clear:both;"></div>
-	<input type='hidden' id='post_meta' name='post_meta' value='post_meta'/>
-	</div>
-<?php
-}
-
-function wvrx_ts_post_extras_pt() {
-	// special handling for non-Weaver Custom Post Types
-	$opts = get_option( apply_filters('weaverx_options','weaverx_settings') , array());
-	if ((isset($opts['_show_per_post_all']) && $opts['_show_per_post_all']) || function_exists('atw_slider_plugins_loaded') )
-		wvrx_ts_post_extras();
-	else {
-		echo '<p>' .
-__('You can enable Weaver Xtreme Per Post Options for Custom Post Types on the Weaver Xtreme:Advanced Options:Admin Options tab.','weaverx-theme-support' /*adm*/) .
-		'</p>';
-	}
-}
 
 function wvrx_ts_post_extras() {
 	global $post;
-	$opts = get_option( apply_filters('weaverx_options','weaverx_settings') , array());	// need to fetch Weaver Xtreme options
+	$func_opt = WEAVER_GET_OPTION;
+	$opts = get_option( apply_filters('weaverx_options',WEAVER_SETTINGS_NAME) , array());	// need to fetch Weaver Xtreme options
 	if ( !( current_user_can('edit_themes')
 		|| (current_user_can('edit_theme_options') && !isset($opts['_hide_mu_admin_per']))	// multi-site regular admin
 		|| (current_user_can('edit_pages') && !isset($opts['_hide_editor_per']))	// Editor
@@ -536,7 +967,7 @@ function wvrx_ts_post_extras() {
 		return;	// don't show per post panel
 	   }
 ?>
-<div style="line-height:150%;">
+<div style="line-height:150%;border: 1px solid $888;list-style-type: none;">
 <p>
 <?php
 	$updir = wp_upload_dir();
@@ -557,6 +988,79 @@ Please open the <em>Appearance:Weaver Xtreme Admin:Main Options</em> page and <e
 	_e('These settings let you control display of this individual post. Many of these options override global options set on the Weaver Xtreme admin tabs.','weaverx-theme-support' /*adm*/);
 	weaverx_html_br();
 
+	wrvx_ts_show_post_tabs();
+
+?>
+<p>
+	<?php echo('<strong>Post Format</strong>');
+	weaverx_help_link('help.html#gallerypost', __('Help for Per Post Format','weaverx-theme-support' /*adm*/));
+	weaverx_html_br();
+	_e('Weaver Xtreme supports Post Formats. Click the ? for more info. Post Formats are set in the "Formats" option box.','weaverx-theme-support' /*adm*/);
+	weaverx_html_br();
+?>
+
+</p>
+	<input type='hidden' id='post_meta' name='post_meta' value='post_meta'/>
+	<div style="clear:both;"></div>
+</div>
+<?php
+}
+
+function wrvx_ts_show_post_tabs( ) {
+?>
+<div id="tabwrap-per-post" style="padding-left:4px;">
+<div id="tab-container-post" style="border:1px solid #888;padding: 2px 1% 2px 1%; width:97.9%;" class='yetiisub'>
+	<ul id="tab-container-post-nav" style="border-bottom:2px solid #999;" class='yetiisub'>
+	<?php
+	wvrx_ts_elink('#pp-post-blog' , __('Per Post options when displayed in blog or archive.', 'weaver-xtreme' /*adm*/), __('Post Blog/Archive Options', 'weaver-xtreme' /*adm*/),'<li>','</li>');
+	wvrx_ts_elink('#pp-post-single' , __('Per Post options for single page view.', 'weaver-xtreme' /*adm*/), __('Post Single Page Options', 'weaver-xtreme' /*adm*/),'<li>', '</li>');
+	wvrx_ts_elink('#pp-post-misc' , __('Misc per post options', 'weaver-xtreme' /*adm*/), __('Misc Options', 'weaver-xtreme' /*adm*/),'<li>', '</li>');
+	wvrx_ts_elink('#pp-post-xplus' , __('Per Post settings from Weaver Xtreme Plus.', 'weaver-xtreme' /*adm*/), __('Xtreme Plus', 'weaver-xtreme' /*adm*/),'<li>', '</li>');
+	?>
+	</ul>
+
+	<div id="pp-post-blog" class="tab_mainopt" >  <!-- ******************* blog/archive ********************* -->
+		<?php
+		weaverx_ts_post_blog_opts( );
+		?>
+	</div>											<!-- ******************* /blog-archive ********************* -->
+
+	<div id="pp-post-single" class="tab_mainopt" >		<!-- ******************* single page ********************* -->
+		<?php
+		weaverx_ts_post_single_opts( );
+		?>
+	</div>											<!-- ******************* /single page ********************* -->
+
+	<div id="pp-misc" class="tab_mainopt" >			<!-- ******************* misc ********************* -->
+	<?php weaverx_ts_post_misc_opts(  ); ?>
+	</div>											<!-- ******************* /misc ********************* -->
+
+
+	<div id="pp-post-xplus" class="tab_mainopt" >		<!-- ******************* X-Plus ********************* -->
+	<?php weaverx_ts_post_xplus_opts(  );?>
+	</div>											<!-- ******************* X-Plus ********************* -->
+
+
+</div> <!-- #tab-container-post -->
+</div>	<!-- #tabwrap-per-post -->
+
+<script type="text/javascript">
+	var tabberMainOpts = new Yetii({
+	id: 'tab-container-post',
+	tabclass: 'tab_mainopt',
+	persist: true
+	});
+</script>
+<?php
+}
+
+
+function weaverx_ts_post_blog_opts() {
+?>
+<strong><?php _e('Per Post Options when displayed on Blog or Archive-like view','weaverx-theme-support' /*adm*/); ?></strong><br /><br />
+
+<?php
+
 	wvrx_ts_page_checkbox('_pp_force_post_excerpt',__('Display post as excerpt','weaverx-theme-support' /*adm*/), 40);
 	wvrx_ts_page_checkbox('_pp_force_post_full',__('Display as full post where normally excerpted','weaverx-theme-support' /*adm*/),55,1);
 
@@ -572,18 +1076,40 @@ Please open the <em>Appearance:Weaver Xtreme Admin:Main Options</em> page and <e
 	wvrx_ts_page_checkbox('_pp_masonry_span2',__('For <em>Masonry</em> multi-columns: make this post span two columns.','weaverx-theme-support' /*adm*/),90,1);
 
 	wvrx_ts_page_checkbox('_pp_post_add_link',__('Show a "link to single page" icon at bottom of post - useful with compact posts','weaverx-theme-support' /*adm*/),90);
-	echo '<br style="clear:both;"/>';
+	?>
+<br style="clear:both;" /><strong><p>
+<?php _e('<em>Post Blog/Archive View:</em> Featured Image','weaverx-theme-support' /*adm*/); ?></strong></p>
+<?php
+	$opts3 = array(  'id' => '_pp_post_fi_location',
+		'info' => __('Override <em>Post</em> setting for where to display FI (for both excerpt and full content)','weaverx-theme-support' /*adm*/),
+		'value' => array(
+			array('val' => '', 'desc' => __('Default Blog FI','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'content-top', 'desc' => __('With Content - top','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'content-bottom', 'desc' => __('With Content - bottom','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'title-before', 'desc' => __('With Title','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'title-banner', 'desc' => __('Banner above Title','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'header-image', 'desc' => __('Header Image Replacement','weaverx-theme-support' /*adm*/) ),
+			array('val' => 'post-before', 'desc' => __('Beside Post, no wrap', 'weaver-xtreme' /*adm*/) ),
+			array('val' => 'post-bg', 'desc' => __('As BG Image, Tile', 'weaver-xtreme' /*adm*/) ),
+			array('val' => 'post-bg-cover', 'desc' => __('As BG Image, Cover', 'weaver-xtreme' /*adm*/) ),
+			array('val' => 'post-bg-parallax', 'desc' => __('As BG Image, Parallax', 'weaver-xtreme' /*adm*/) ),
+			array('val' => 'hide', 'desc' => __('Hide FI for this Post','weaverx-theme-support' /*adm*/) )
+			)
+		);
+	wvrx_ts_pp_select_id($opts3);
 
+	echo '<div style="clear:both;" /></div>';
 
+}
 
-?>
-<br />
-<p><strong><?php _e('<em>Single Page View:</em> Sidebars','weaverx-theme-support' /*adm*/); ?></strong></p>
+function weaverx_ts_post_single_opts() {
+	global $post;
+	?>
+<strong><?php _e('<em>Single Page View:</em> Sidebars','weaverx-theme-support' /*adm*/); ?></strong><br /><br />
 
 <?php
 	wvrx_ts_page_layout('post');
 ?>
-<br />
 	<input type="text" size="4" id="_pp_category" name="_pp_sidebar_width"
 	value="<?php echo esc_textarea(get_post_meta($post->ID, "_pp_sidebar_width", true)); ?>" />
 	<?php _e("% &nbsp;- <em>Sidebar Width</em> - Post Single View Sidebar width (applies to all layouts)",'weaverx-theme-support' /*adm*/); ?> <br /><br />
@@ -616,29 +1142,7 @@ To add areas to the widget area lists below, you <strong>must</strong> first def
 
 	wvrx_ts_pp_replacement( 'Sitewide Top Widget Area' , 'sitewide-top-widget-area' );
 	wvrx_ts_pp_replacement( 'Sitewide Bottom Widget Area' , 'sitewide-bottom-widget-area' );
-?>
-<br style="clear:both;" /><p><strong><?php _e('<em>Post Blog/Archive View:</em> Featured Image','weaverx-theme-support' /*adm*/); ?></strong></p>
-<?php
-	$opts3 = array(  'id' => '_pp_post_fi_location',
-		'info' => __('Override <em>Post</em> setting for where to display FI (for both excerpt and full content)','weaverx-theme-support' /*adm*/),
-		'value' => array(
-			array('val' => '', 'desc' => __('Default Blog FI','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'content-top', 'desc' => __('With Content - top','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'content-bottom', 'desc' => __('With Content - bottom','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'title-before', 'desc' => __('With Title','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'title-banner', 'desc' => __('Banner above Title','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'header-image', 'desc' => __('Header Image Replacement','weaverx-theme-support' /*adm*/) ),
-			array('val' => 'post-before', 'desc' => __('Beside Post, no wrap', 'weaver-xtreme' /*adm*/) ),
-			array('val' => 'post-bg', 'desc' => __('As BG Image, Tile', 'weaver-xtreme' /*adm*/) ),
-			array('val' => 'post-bg-cover', 'desc' => __('As BG Image, Cover', 'weaver-xtreme' /*adm*/) ),
-			array('val' => 'post-bg-parallax', 'desc' => __('As BG Image, Parallax', 'weaver-xtreme' /*adm*/) ),
-			array('val' => 'hide', 'desc' => __('Hide FI for this Post','weaverx-theme-support' /*adm*/) )
-			)
-		);
-	wvrx_ts_pp_select_id($opts3);
-
-
-?>
+	?>
 <br style="clear:both;" /><p><strong><?php _e('<em>Single Page View:</em> Featured Image','weaverx-theme-support' /*adm*/); ?></strong></p>
 <?php
 	$opts3 = array(  'id' => '_pp_fi_location',
@@ -664,7 +1168,17 @@ To add areas to the widget area lists below, you <strong>must</strong> first def
 	value="<?php echo esc_textarea(get_post_meta($post->ID, '_pp_fi_link', true)); ?>" />
 	<?php _e("<em>Featured Image Link</em> - Full URL to override default link target from FI",'weaverx-theme-support' /*adm*/); ?>
 	<br style="clear:both;" />
-	</p><p>
+	<br />
+
+<?php
+	echo '<div style="clear:both;"/></div>';
+}
+
+
+function weaverx_ts_post_misc_opts() {
+	?>
+
+<p>
 	<strong><?php _e('Post Editor Options','weaverx-theme-support' /*adm*/); ?></strong>
 
 <?php
@@ -676,7 +1190,13 @@ To add areas to the widget area lists below, you <strong>must</strong> first def
 	?>
 </p>
 <?php
-echo '<div style="clear:both;border:2px solid #aaa;padding:0 1em .5em 1em;">';
+
+}
+
+
+function weaverx_ts_post_xplus_opts() {
+
+	echo '<div style="clear:both;">';
 	echo('<h3>Weaver Xtreme Plus Per Post Options  (&starf;Plus)</h3><strong>Per Post Style</strong>' /*a*/ );
 	weaverx_help_link('help.html#perpoststyle', __('Help for Per Post Style','weaverx-theme-support' /*adm*/ ));
 	echo '<br />' .
@@ -688,20 +1208,10 @@ __('Weaver Xtreme Plus supports optional per post CSS style rules.','weaverx-the
 
 	do_action('weaverxplus_add_per_post');
 	echo '</div>';
-?>
-<p>
-	<?php echo('<strong>Post Format</strong>');
-	weaverx_help_link('help.html#gallerypost', __('Help for Per Post Format','weaverx-theme-support' /*adm*/));
-	weaverx_html_br();
-	_e('Weaver Xtreme supports Post Formats. Click the ? for more info. Post Formats are set in the "Formats" option box.','weaverx-theme-support' /*adm*/);
-	weaverx_html_br();
-?>
 
-</p>
-	<input type='hidden' id='post_meta' name='post_meta' value='post_meta'/>
-</div>
-<?php
 }
+
+
 
 
 function wvrx_ts_save_post_fields($post_id) {
@@ -721,7 +1231,12 @@ function wvrx_ts_save_post_fields($post_id) {
 	'_pp_hide_page_infobar', '_pp_hide_n_posts','_pp_fullposts', '_pp_pwp_masonry','_pp_pwp_compact','_pp_pwp_compact_posts',
 	'_primary-widget-area', '_secondary-widget-area', '_header-widget-area', '_footer-widget-area', '_sitewide-top-widget-area',
 	'_sitewide-bottom-widget-area', '_page-top-widget-area', '_page-bottom-widget-area', '_pp_full_browser_height',
-	'_pp_page_cols',
+	'_pp_page_cols', '_pp_header_full', '_pp_container_full', '_pp_footer_full','_pp_hide_footer_html','_pp_hide_header_html',
+	'_pp_hide_customlogo', '_pp_hide_mini_menu' , '_pp_hide_headersearch', '_pp_header_html', '_pp_footer_html',
+	'_pp_elementor_header_replacement', '_pp_elementor_footer_replacement', '_pp_siteorigin_header_replacement', '_pp_elementor_footer_replacement',
+	'_pp_pb_header_hide_menus','_pp_pb_header_replace_page_id','_pp_pb_footer_replace_page_id',
+
+
 	// Plus options
 	'_pp_bgcolor','_pp_color','_pp_bg_fullwidth', '_pp_lr_padding', '_pp_tb_padding', '_pp_margin', '_pp_post_class',
 	'_pp_bgimg', '_pp_mobile_bgimg', '_pp_parallax_height', '_pp_use_parallax', '_pp_parallax_not_wide',
@@ -1106,11 +1621,12 @@ Weaver Xtreme Plus supports code and HTML insertion for some areas of the Post S
 }
 
 
+
 //-----------------------------------
 
 
 
-// ---- functions for XP only
+// ---- functions for XPlus only
 
 function wvrx_ts_xp_text_option( $postid, $optid, $msg, $before = '', $after = '' ) {
 	$val = esc_textarea(get_post_meta($postid, $optid, true));

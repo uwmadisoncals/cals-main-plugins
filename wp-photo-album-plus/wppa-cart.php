@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the interface to SCABN
-* Version 6.5.00
+* Version 6.8.02
 *
 */
 
@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 // $thumb MUST contain the current photo info
 function wppa_add_to_cart( $atts ) {
 global $post;
+global $wppa_session;
 
 	if ( ! class_exists( 'wfCart' ) ) {
 		wppa_dbg_msg('Plugin <i>Simple Cart and BuyNow</i> must be activated to use thus featue.', 'red', 'force');
@@ -25,7 +26,7 @@ global $post;
 
 	extract( shortcode_atts( array(
 		'name'  		=> wppa_get_photo_name( $thumb['id'] ),
-		'price' 		=> 0.01,
+		'price' 		=> '0.01',
 		'qty_field' 	=> '',
 		'b_title'		=> __('Buy now', 'wp-photo-album-plus'),
 		'options'		=> '',
@@ -35,7 +36,7 @@ global $post;
 		'weight'		=> ''
 	), $atts ) );
 
-	$cart =& $_SESSION['wfcart']; // load the cart from the session
+	$cart = $wppa_session['wfcart']; // load the cart from the session
 	$scabn_options = get_option('scabn_options');
 	$currency = apply_filters('scabn_display_currency_symbol',NULL);
 
@@ -54,6 +55,8 @@ global $post;
 		$action_url = wppa_convert_to_pretty( $action_url );
 		$item_url 	= wppa_convert_to_pretty( $item_url );
 	}
+
+	$action_url = wppa_convert_from_pretty( $action_url );
 
 	$output  = '
 	<div class="wppa-addtocart">

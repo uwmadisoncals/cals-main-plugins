@@ -2,12 +2,13 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick, pdf
-Version: 6.8.01
-Stable tag: 6.8.00
+Version: 6.8.07
+Stable tag: 6.8.06
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
 Tested up to: 4.9
+Requires PHP: 5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,8 +71,6 @@ Translations:
 
 = Requirements =
 
-* The plugin requires at least wp version 3.1.
-* The server should run PHP version 5.5 or later.
 * The theme should have a call to wp_head() in its header.php file and wp_footer() in its footer.php file.
 * The theme should load enqueued scripts in the header if the scripts are enqueued without the $in_footer switch (like wppa.js and jQuery).
 * The theme should not prevent this plugin from loading the jQuery library in its default wp manner, i.e. the library jQuery in safe mode (uses jQuery() and not $()).
@@ -125,265 +124,41 @@ If this happens, make sure (ask your hosting provider) that you have all the rig
 
 == Changelog ==
 
-See for additional information: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
+See for the full changelog: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
 
-= 6.8.01 =
+== Upgrade Notice ==
 
-= Bug Fixes =
+= 6.8.07 =
 
-* Fixed layout issues of the album navigator widget and the album / photo admin pages.
+* This version addresses various minor bug fixes and enhancements, and a new widget: Statistics.
 
-= New Features =
+= 6.8.06 =
 
-* GPS and File tags are now supported in the exif system.
+* This version addresses various minor bug fixes and improved cache handling.
 
-= Other Changes =
+= 6.8.05 =
 
-* Added to the bestof widget: A checkbox to display the sum of the ratings (totvalue), and the option to sort by the sum of the ratings.
-* Bestof shortcode now also supports the display of the sum of the ratings (totvalue="yes"), and the sort option to sort by the sum of the ratings (sortby="totvalue").
-The full shortcode is now: [wppa type="bestof" page="nn" count="nn" display="photo|owner" period="thisweek|lastweek|lastmonth|thismonth|lastyear|thisyear" sortby="maxratingcount|meanrating|ratingcount|totvalue" maxratings="yes|no" meanrat="yes|no" ratcount="yes|no" totvalue="no|yes" linktype="none|owneralbums|ownerphotos|upldrphotos" fontsize="nn" lineheight="nn" height="nn"][/wppa]
-Note: For backward compatibility: the default for displaying the total value is no (totvalue="no") as opposed to the other display options.
-* Exif arrays are now stored as arrays as opposed to multiple items with the same tag id. This enables interpretation and formatting of array value tags.
-* Improved display of help text in settings and photo of the day settings admin pages.
-* Removed obsolete browser specific css.
-* Improved layout and behaviour of frontend upload dialog.
+* This version addresses various minor bug fixes and feture requests.
 
-= 6.8.00 =
+= 6.8.04 =
 
-= Bug Fixes =
+* This version addresses various display issues and a few fixes of bugs that seldom affected the plugins behaviour.
 
-* Various minor fixes for PHP 7.2 compatibility.
-* If the visitor does not have the rights to edit a photo at the front-end, there will not be a link or button to the edit page.
-* On the Import and Upload Photos admin pages one can now select a target album even when there are more albums than the setting in Table IX-B6.3.
-* The most recently uploaded photo had its viewcount bumped for every session when the [photo] shortcode was enabled. Fixed.
-* If you use qr codes and cache them (See Table IX-K1.4), the cache will be cleared regularly to prvent the generation of too many files.
+== Screenshots ==
 
-= New Features =
-
-* On the Album Admin -> Edit screen: the photo information now also shows the EXIF data, if available.
-* Shortcode [photo xxx] can now have 'random' as argument, e.g.: [photo random]. See Table IX-L for details.
-* On the shortcode generator, one can optionally select one or more albums for the upload box.
-
-= Other Changes =
-
-* Supersearch. Selection boxes are now sorted, exif values are formatted.
-Certain camera brand specific tags are now recognized and (partially) correct formatted.
-* Further improved formatting of various exif tags.
-
-= 6.7.12 =
-
-= Bug Fixes =
-
-* Various minor fixes for PHP 7.1 compatibility.
-* Exif tags are now formatted when used as keywords.
-
-= Other Changes =
-
-* If Table IX-L5 is set to html, the html defaults to type sphoto.
-* Improved formatting of various exif tags.
-
-= 6.7.11 =
-
-= Bug Fixes =
-
-* Fixed a typo in bbpress compatibility code.
-* Uploads on the [photo] shortcode generator dialog box now work as expected.
-* Certain links did not work due to an internal counter bug. Fixed.
-
-= 6.7.10 =
-
-= Bug Fixes =
-
-* Various minor fixes for PHP 7.1 compatibility.
-
-= New Features =
-
-* The shortcode generator for shortcode [photo xxx] is now also available for front-end tinymce editors.
-See https://wppa.nl/docs-by-subject/advanced-topics/shortcode-photo/ for an explanation.
-
-= 6.7.09 =
-
-= Bug Fixes =
-
-* Slideshow widget bug fixes:
---- all albums --- did not work, fixed.
-On initial display of the activation screen, the default setting values were not shown. Fixed.
-Album selectionbox was not sorted. Fixed.
-Height could not be set to 0 (auto). Fixed.
-* Shortcode generator bug fixes:
-Fixed album enumeration delimiter; must be '.' rather than ','
-Fixed colors in selectionboxes (red: required selection missing or invalid input; green: selection/input is ok).
-Single image preview videos work correctly now.
-
-= New Features =
-
-* Slideshow widget new features:
-Added checkbox 'Random' for random photo sequence. The sequence will change every pageload.
-Added checkbox 'Include subalbums'.
-
-= Other Changes =
-
-* Sildeshow widget other changes:
-You can set a maximum number of slides, to prevent heavy pageloads, especially when --- all albums --- is used.
-The slideshow now always wraps around, regardless of the setting of Table IV-B8.
-
-= 6.7.08 =
-
-= Bug Fixes =
-
-* Fixed a problem when using imagemagick and the upload file contains spaces in the name.
-
-= New Features =
-
-* Added shortcode generator for shortcode [photo]. Including upload new photo. Requires enabling the use of shortcode [photo] in Table IX-L1.
-
-= Other Changes =
-
-* Added 'Albums only' to Table IX-E12: Search results display.
-* Changed defaults for max albums to 500 in Table IX-B6.3 and Table VII-B13. Note: The value in Table VII-B13 should be <= Table IX-B6.3.
-
-= 6.7.07 =
-
-= Bug Fixes =
-
-* Fixed a spurious missing switch to flat/collapsible table button on the Album Admin page.
-* Fixed a spurious error on local host systems.
-* Fixed a problem displaying the widget admin page and customize screen when the system has many albums ( >> 1000 ).
-
-= New Features =
-
-* New shortcode attribute button for type="slide" only. Example: [wppa type="slide" album="13" button="Show me the slideshow"][/wppa]
-This will hide the slideshow behind a button. Clicking the button will download the slideshow code to the browser. This is to reduce and speedup loading pages with slideshow(s).
-* You can now restrict frontend uploads to one or more user roles. See Table II-H2.1
-
-= Other Changes =
-
-* Added a dummy index.php to all subfolders and to folders creted by wppa.
-
-= 6.7.06 =
-
-= Bug Fixes =
-
-* Fixed hanging lightbox on old versions of Internet Explorer.
-* Album widget frontend display on backend failed due to undefined function wppa_get_coverphoto_id(). Fixed.
-* At frontend upload: selected photo tags lost accented characters. Fixed.
-* Fixed an un-well formed numeric value error in php 7.
-
-= New Features =
-
-* Added activity widget on wp desktop
-* Added link to lightbox single image on the BestOf widget.
-
-= Other Changes =
-
-* For clarity: The texts 'Awaiting moderation' and 'Scheduled for XXXX' are now also displayed for the owner of the photo and users with moderate rights where it applies.
-
-= 6.7.05 =
-
-= Bug Fixes =
-
-* Album selectionboxes on the album admin page have alphabetically sorted content again.
-
-= New Features =
-
-* Negate option in search. Enter token1 !token2 to get all albums/photos that match token1 but do not match token2.
-
-= 6.7.04 =
-
-= Bug Fixes =
-
-* Fixed a filesystem rights issue.
-* Table IV-A18: cretae .htaccess file now works as expected.
-
-= Other Changes =
-
-* Fixed photo search form for mis-behaving themes like weaver ii.
-* Logging of filesystem events. Table IX-A9.4.
-
-= 6.7.03 =
-
-= Bug Fixes =
-
-* Album sequence in Upload page was odd since 6.7.01. Fixed.
-
-= New Features =
-
-* The category selection box from the widget is now also available in the search box, see Table IX-E19.
-* Up to 3 selectionboxes can be configured with lists of pre-defined search tokens. See Table IX-E20.x and the widget activation screen.
-
-= 6.7.02 =
-
-= Bug Fixes =
-
-* Various minor fixes that caused warnings but without any functional effect.
-* Now passes PHP 7 compatibility check without any errors or warnings.
-* Album sequence in Import page was odd since 6.7.01. Fixed.
-
-= New Features =
-
-* Table I-G5: Fullscreen button size, to set the size of the fullscreen and exit buttons on lightbox.
-* You can secify the order number of the landing shortcode (occ) on the search landing page. This makes it possible to have the search box shortcode first, and the landing page shortcode second (occ=2). Table IX-E1.
-
-= Other Changes =
-
-* If your theme shows a magnifier glass on the search input, the Search Photos dialog will do the same.
-
-= 6.7.01 =
-
-= Bug Fixes =
-
-* Under some circumstances the audiobar under slideshow was mis-aligned. Fixed.
-* Many textual fixes (mainly typos).
-
-= New Features =
-
-* Table IX-A11: Minimum tags. These tags exist even when there are no photos that have one or more of these tags.
-* Table IX-A12: Login link. Change this if you have a custom login page and you have ticked Table IV-F1: Commenting login or Table IV-E1: Rating login.
-
-= Other Changes =
-
-* Widgets have been revised to make the activation screens more consistent in usage and appearance.
-
-= 6.7.00 =
-
-= Bug Fixes =
-
-* Many textual fixes, thanx to Stefan Eggers who has completed the german translations.
-* Fixed a rounding issue in the calculation of wppa container width when the width in the shortcode was set to a fraction, causing intermittent layout issues.
-
-= New Features =
-
-* New shortcode attribute **timeout** for slideshows (type="slide", type="slideonly", type="slideonlyf"). Usage: [wppa type="slide" album="13" timeout="2000"][/wppa] for 2000ms. (2s.) timeout.
-[wppa type="slide" album="13" timeout="random"][/wppa] for a random timeout between 2 and 7 times the animation speed.
-* Completed translations for the German language, by Stefan Eggers
-
-= 6.6.x =
-
-* See <a href="https://wppa.nl/changelog/changelog-6-6-x/" >changelog-6-6-x/</a>
-
-= 6.5.x =
-
-* See <a href="https://wppa.nl/changelog/changelog-6-5-x/" >changelog-6-5-x/</a>
-
-= 6.4.x =
-
-* See <a href="https://wppa.nl/changelog/changelog-6-4-x/" >changelog-6-4-x/</a>
-
-= 6.3.x =
-
-* See <a href="https://wppa.nl/changelog/changelog-6-3-x/" >changelog-6-3-x/</a>
-
-= 6.2.x =
-
-* See <a href="https://wppa.nl/changelog/changelog-6-2-x/" >changelog-6-2-x/</a>
-
-= 6.1.x =
-
-* See <a href="https://wppa.nl/changelog/changelog-6-1-x/" >changelog-6-1-x/</a>
-
-= 6.0.x =
-
-* See <a href="https://wppa.nl/changelog/changelog-6-1-x/#6.0.0" >changelog-6-0-x/</a>
+1. Typical display of album covers
+2. Typical display of thumbnails as seen by the owner of the photos and the administrator
+3. Upper part of a slideshow
+4. Lower part of a slideshow, including filmstrip, rating and comment sections and exif data. all included optional features
+5. Album admin: the table of albums
+6. Album admin: the album specifications edit screen
+7. Album admin: edit photo information screen
+8. Bulk edit photo information screen
+9. Photo sequence editor screen
+10. Comment admin and moderation screen
+11. Photo of the day configuration screen
+12. Embedded lightbox example
+13. The quick setup screen
 
 == About and Credits ==
 
@@ -392,4 +167,4 @@ This will hide the slideshow behind a button. Clicking the button will download 
 
 == Licence ==
 
-WP Photo Album is released under the GNU GPL licence. ( http://www.gnu.org/copyleft/gpl.html ))
+WP Photo Album is released under the GNU GPL licence. ( http://www.gnu.org/copyleft/gpl.html )

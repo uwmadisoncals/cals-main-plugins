@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.8.01
+* Version 6.8.05
 *
 */
 
@@ -21,7 +21,7 @@ global $wppa_log_file;
 	wppa( 'out', '' );
 	$wppa_session['page']--;
 	$wppa_session['ajax']++;
-	wppa_save_session();
+//	wppa_save_session();
 
 	// ALTHOUGH IF WE ARE HERE AS FRONT END VISITOR, is_admin() is true.
 	// So, $wppa_opt switches are 'yes' or 'no' and not true or false.
@@ -358,13 +358,24 @@ global $wppa_log_file;
 				require_once 'wppa-non-admin.php';
 			}
 
+			// If db agree required, see if it is present
+			$doit = true;
+			if ( wppa_switch( 'comment_need_db_agree' ) ) {
+				if ( ! isset( $_REQUEST['db-agree'] ) ) {
+					echo
+					'<script type="text/javascript">' .
+						'alert( "' . esc_js( __( 'Your comment needs your agreement for database storage', 'wp-photo-album-plus' ) ) . '" )' .
+					'</script>';
+					$doit = false;
+				}
+			}
+
 			wppa( 'mocc', $_REQUEST['moccur'] );
 			wppa( 'comment_photo', isset( $_REQUEST['photo-id'] ) ? $_REQUEST['photo-id'] : '0' );
 			wppa( 'comment_id', isset( $_REQUEST['comment-edit'] ) ? $_REQUEST['comment-edit'] : '0' );
 
 			$comment_allowed = ( ! wppa_switch( 'comment_login' ) || is_user_logged_in() );
-			if ( wppa_switch( 'show_comments' ) && $comment_allowed ) {
-//				if ( wppa_switch( 'search_comments' ) ) wppa_index_remove( 'photo', $_REQUEST['photo-id'] );
+			if ( wppa_switch( 'show_comments' ) && $comment_allowed && $doit ) {
 				wppa_do_comment( $_REQUEST['photo-id'] );		// Process the comment
 				if ( wppa_switch( 'search_comments' ) ) wppa_index_update( 'photo', $_REQUEST['photo-id'] );
 			}
@@ -428,39 +439,31 @@ global $wppa_log_file;
 			wppa_exit();
 
 		case 'remove':
-			if ( isset( $_REQUEST['photo-id'] ) ) {	// Remove photo
+
+			// Remove photo
+			if ( isset( $_REQUEST['photo-id'] ) ) {
 				if ( strlen( $_REQUEST['photo-id'] ) == 12 ) {
 					$photo = wppa_decrypt_photo( $_REQUEST['photo-id'] );
 				}
 				else {
 					$photo = $_REQUEST['photo-id'];
 				}
-				if ( wppa_may_user_fe_edit( $photo ) ) { // Frontend edit may also delete
+				if ( wppa_may_user_fe_delete( $photo ) ) {
 					wppa_delete_photo( $photo );
 					echo 'OK||'.__( 'Photo removed' , 'wp-photo-album-plus');
 					wppa_exit();
 				}
 			}
-			if ( ! current_user_can( 'wppa_moderate' ) && ! current_user_can( 'wppa_comments' ) ) {
-				_e( 'You do not have the rights to moderate photos this way' , 'wp-photo-album-plus');
-				wppa_exit();
-			}
-			if ( isset( $_REQUEST['photo-id'] ) ) {	// Remove photo
-				if ( strlen( $_REQUEST['photo-id'] ) == 12 ) {
-					$photo = wppa_decrypt_photo( $_REQUEST['photo-id'] );
-				}
-				else {
-					$photo = $_REQUEST['photo-id'];
-				}
-				if ( ! current_user_can( 'wppa_moderate' ) ) {
-					_e( 'Security check failure' , 'wp-photo-album-plus');
+
+			// Remove comment
+			elseif ( isset( $_REQUEST['comment-id'] ) ) {
+
+				// Am i allowed to do this?
+				if ( ! current_user_can( 'wppa_moderate' ) && ! current_user_can( 'wppa_comments' ) ) {
+					_e( 'You do not have the rights to moderate photos this way' , 'wp-photo-album-plus');
 					wppa_exit();
 				}
-				wppa_delete_photo( $photo );
-				echo 'OK||'.__( 'Photo removed' , 'wp-photo-album-plus');
-				wppa_exit();
-			}
-			if ( isset( $_REQUEST['comment-id'] ) ) {	// Remove comment
+
 				$photo = $wpdb->get_var( $wpdb->prepare( "SELECT `photo` FROM `" . WPPA_COMMENTS . "` WHERE `id` = %s", $_REQUEST['comment-id'] ) );
 				$iret = $wpdb->query( $wpdb->prepare( "DELETE FROM `".WPPA_COMMENTS."` WHERE `id`= %s", $_REQUEST['comment-id'] ) );
 				if ( $iret ) {
@@ -472,6 +475,8 @@ global $wppa_log_file;
 				else _e( 'Could not remove comment' , 'wp-photo-album-plus');
 				wppa_exit();
 			}
+
+			// Remove request issued, but it is not a photo and not a comment
 			_e( 'Unexpected error' , 'wp-photo-album-plus');
 			wppa_exit();
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version 6.7.09
+* Version 6.8.05
 *
 */
 
@@ -328,12 +328,12 @@ function wppa_get_photo_desc( $id, $xargs = array() ) {
 		wppa_do_geo( $id, $thumb['location'] );
 	}
 
-	// Other keywords
-	$desc = wppa_translate_photo_keywords( $id, $desc );
-
 	// Shortcodes
 	if ( $args['doshortcodes'] ) $desc = do_shortcode( $desc );	// Do shortcodes if wanted
 	else $desc = strip_shortcodes( $desc );					// Remove shortcodes if not wanted
+
+	// Other keywords
+	$desc = wppa_translate_photo_keywords( $id, $desc );
 
 	$desc = wppa_html( $desc );				// Enable html
 	$desc = balanceTags( $desc, true );		// Balance tags
@@ -354,9 +354,10 @@ function wppa_translate_photo_keywords( $id, $text ) {
 	$result = $text;
 
 	// Is there any 'w#' ?
-	if ( strpos($result, 'w#') !== false ) {
+	if ( strpos( $result, 'w#' ) !== false ) {
 		$thumb = wppa_cache_thumb( $id );
-		// Keywords
+
+		// General keywords
 		$result = str_replace( 'w#albumname', wppa_get_album_name( $thumb['album'] ), $result );
 		$result = str_replace( 'w#albumid', $thumb['album'], $result );
 		$keywords = array('name', 'filename', 'owner', 'id', 'tags', 'views', 'album');
@@ -368,12 +369,21 @@ function wppa_translate_photo_keywords( $id, $text ) {
 			if ( $replacement == '' ) $replacement = '&lsaquo;'.__( 'none' , 'wp-photo-album-plus').'&rsaquo;';
 			$result = str_replace( 'w#'.$keyword, $replacement, $result );
 		}
-		$result = str_replace( 'w#url', wppa_get_lores_url( $id ), $result );
-		$result = str_replace( 'w#hrurl', esc_attr( wppa_get_hires_url( $id ) ), $result );
-		$result = str_replace( 'w#tnurl', wppa_get_tnres_url( $id ), $result );
-		$result = str_replace( 'w#pl', wppa_get_source_pl( $id ), $result );
-		$result = str_replace( 'w#rating', wppa_get_rating_by_id( $id, 'nolabel' ), $result );
 
+		// Urls
+		$w_url 		= wppa_get_lores_url( $id );
+		$result 	= str_replace( 'w#url', $w_url, $result );
+		$w_hrurl 	= wppa_get_hires_url( $id );
+		$result 	= str_replace( 'w#hrurl', $w_hrurl, $result );
+		$w_tnurl 	= wppa_get_tnres_url( $id );
+		$result 	= str_replace( 'w#tnurl', $w_tnurl, $result );
+		$w_pl 		= wppa_get_source_pl( $id );
+		$result 	= str_replace( 'w#pl', $w_pl, $result );
+
+		// Rating
+		$result 	= str_replace( 'w#rating', wppa_get_rating_by_id( $id, 'nolabel' ), $result );
+
+		// Owner
 		$user = wppa_get_user_by( 'login', $thumb['owner'] );
 		if ( $user ) {
 			$result = str_replace( 'w#displayname', $user->display_name, $result );
@@ -597,9 +607,6 @@ function wppa_get_album_desc( $id, $xargs = array() ) {
 	// Unescape
 	$desc = stripslashes( $desc );
 
-	// Album keywords
-	$desc = wppa_translate_album_keywords( $id, $desc, $args['translate'] );
-
 	// Optionally translate
 	if ( $args['translate'] ) {
 
@@ -624,6 +631,9 @@ function wppa_get_album_desc( $id, $xargs = array() ) {
 
 	// Convert links and mailto:
 	$desc = make_clickable( $desc );
+
+	// Album keywords
+	$desc = wppa_translate_album_keywords( $id, $desc, $args['translate'] );
 
 	// CMTooltipGlossary on board?
 	$desc = wppa_filter_glossary( $desc );

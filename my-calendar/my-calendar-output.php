@@ -42,7 +42,7 @@ function mc_time_html( $event, $type, $current_date ) {
 			}
 		}
 	} else {
-		$notime = mc_notime_label( $event );	
+		$notime = esc_html( mc_notime_label( $event ) );
 		$time .= "<span class='event-time'>";
 		$time .= ( $notime == "N/A" ) ? "<abbr title='" . __( 'Not Applicable', 'my-calendar' ) . "'>" . __( 'N/A', 'my-calendar' ) . "</abbr>\n" : $notime;
 		$time .= "</span></p>";

@@ -1,10 +1,10 @@
 === RVM - Responsive Vector Maps ===
 Contributors: Enrico Urbinati
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40responsivemapsplugin%2ecom&lc=IT&item_name=responsive%20Vector%20Maps%20Plugin&item_number=rvm%2dplugin%2dwordpress%2drepo&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
-Tags: responsive maps, svg, maps, country maps, France map, Germany map, Italy map, Netherlands map, Norway map, Poland map, Portugal map, Spain map, Sweden map, Switzerland map, United Kingdom map, customisable maps, vector maps, svg map, linkable map, USA map, Belgium map, html tooltip     
+Tags: responsive maps, svg, maps, country maps, France map, Germany map, Italy map, Netherlands map, Norway map, Poland map, Portugal map, Spain map, Sweden map, Switzerland map, United Kingdom map, customizable maps, vector maps, svg map, linkable map, USA map, Belgium map, html tooltip,country maps, continent maps, city maps, region maps, clickable maps, linkable maps, professional maps      
 Requires at least: 3.6
-Tested up to: 4.7.3
-Stable tag: 5.1
+Tested up to: 4.9.5
+Stable tag: 5.3.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,23 +22,21 @@ You can use maps in sidebars as widgets or just in the post content using shortc
 
 = Features = 
 
-* Responsive: maps will adapt their width to any device
-* Maps live on your server
-* Cross-browser compatibility using ( yes, works even on IE7 - use SVG / RVML )
-* High quality image: vector maps never loose quality
-* No extra http request: maps are in your wordpress uploads
-* Many default maps available: France ( regions ), Germany, Italy, Netherlands, Norway, Poland, Portugal, Spain, Sweden, Switzerland, United Kingdom, Europe, USA, Belgium and whole World ( with clickable countries ).
+* Responsive: Maps will adapt their width to any device
+* High quality image: Vector maps never loose quality
+* Cross-browser compatibility using ( yes, works even on IE7 )
 * More then 100  downloadable maps available on [responsivemapsplugin.com](http://www.responsivemapsplugin.com/expand-your-horizons/) 
 * Chance to install dynamic maps with all kind of svg ( not only geographical maps ! )
 * Mouseover tooltip effect
-* Subdivisions ( Country, Regions, Provinces, Districts etc...): customise background colours, links and html popup ( tooltip )
-* Markers: add your linkable markers on the map using latitude and longitude. Chance to have html popup, dimension ( marker radius ) and min/max radius dimension scale
-* Customisable look and feel
+* Subdivisions: Customize background colours, links and html popup ( tooltip )
+* Markers: Add your linkable markers on the map using latitude and longitude. Chance to have html popup, dimension ( marker radius ) and min/max radius dimension scale
+* Pinpoints: Use your favourite images as icons for markers' pinpoints  
+* Customizable look and feel
 * Preview functionality: WYSAWYG while creating/editing your map
-* Shortcodes: use generated shortcodes in your posts
-* Widget: maps can be used in widget area too 
+* Shortcodes: Use generated shortcodes in your posts
+* Widget: Maps can be used in widget area too 
 * Zoom capabilities
-* Width: a specific width can be set while creating/editing your map or adding **width** parameter to the shortcode
+* Many default maps available: France ( regions ), Germany, Italy, Netherlands, Norway, Poland, Portugal, Spain, Sweden, Switzerland, United Kingdom, Europe, USA, Belgium and whole World ( with clickable countries ).
 
 
 == Installation ==
@@ -53,7 +51,7 @@ You can use maps in sidebars as widgets or just in the post content using shortc
 
 = Can I customize map and canvas colours ? =
 
-Yes, these are possible layout customisations:
+Yes, these are possible layout customizations:
  
 1. Canvas colour
 2. Map colour
@@ -66,7 +64,7 @@ Yes, these are possible layout customisations:
 
 = Can I customize map region links ? =
 
-Yes, it's possible to customise links for each region/area displayed in the map. When creating a new map or editing an existing one, you will have chance to
+Yes, it's possible to customize links for each region/area displayed in the map. When creating a new map or editing an existing one, you will have chance to
 assign url to each area/region of the map. Default areas/regions have just a tooltip mouseover effect displaying area/region name.
 Actually is possible to add a custom html tooltip in a secure way.
 
@@ -89,6 +87,11 @@ an additional **width** parameter to the shortcode within a specific post. Your 
 5. The result... finally! We see a widget sidebar and a content map ( Notice we used two different shortcode/ID for Italy map )
 
 == Changelog ==
+
+= 5.3.1 =
+* Fix : map width and padding accept <10 values
+* New feature : customize markers' image for map pinpoints installing the Custom Icon Marker Module
+* Improvements : css updates
 
 = 5.1 =
 * Fix : when clicking on publish an error message appeared if switched from custom map to default one
@@ -137,7 +140,7 @@ an additional **width** parameter to the shortcode within a specific post. Your 
 
 = 2.6 =
 * Release on April 2015
-* ( World Map ) Fix on Niger country not picking up customisation
+* ( World Map ) Fix on Niger country not picking up customization
 * Fix Portugal aspect ratio
 * Added rvm-map-container class to map container div ( less conflicts and more consistency )
 * Minor css fix ( map container now has min-width: 100% and box-sizing: border-box; )
@@ -165,7 +168,7 @@ an additional **width** parameter to the shortcode within a specific post. Your 
 = 2.0 =
 * Release on November 2014
 * Markers added: use long/lat for markers to display on the map
-* Regions/countries colour customisable
+* Regions/countries colour customizable
 * Completely redesigned: tabbed navigation through main settings, regions/countries and markers
 * Improved data storing: use of data series for regions/counties codes
 

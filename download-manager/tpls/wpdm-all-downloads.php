@@ -202,6 +202,12 @@ if(isset($params['jstable']) && $params['jstable']==1):
                 $cats = @implode(", ", $fcats);
                 $data['ID'] = $data['id'] = get_the_ID();
                 $data['title'] = get_the_title();
+                $author = get_user_by('id', get_the_author_meta('ID'));
+                $data['author_name'] = $author->display_name;
+                $data['author_profile_url'] = get_author_posts_url($author->ID);
+                $data['avatar_url'] = get_avatar_url($author->user_email);
+                $data['author_pic'] = "<img style='width: 32px' class='ttip' src='{$data['avatar_url']}' alt='{$data['author_name']}' title='{$data['author_name']}' />"; //get_avatar($author->user_email, 32, '', $author->display_name);
+                $data['author_package_count'] = count_user_posts( $author->ID , "wpdmpro"  );
                 if($ext=='') $ext = 'unknown.svg';
                 if($ext==basename($ext) && file_exists(WPDM_BASE_DIR."assets/file-type-icons/".$ext)) $ext = plugins_url("download-manager/assets/file-type-icons/".$ext);
                 else $ext = plugins_url("download-manager/assets/file-type-icons/unknown.svg");
@@ -227,6 +233,9 @@ if(isset($params['jstable']) && $params['jstable']==1):
                                 $cxc = ($cx > 0)?'small-txt':'';
                                 switch ($c) {
                                     case 'title':
+                                        echo "<strong>".get_the_title()."</strong><br/>";
+                                        break;
+                                    case 'page_link':
                                         echo "<a class=\"package-title\" href='".get_the_permalink(get_the_ID())."'>".get_the_title()."</a><br/>";
                                         break;
                                     case 'file_count':

@@ -113,7 +113,7 @@ class Toolset_Relationship_Cardinality {
 	private function validiate_limits() {
 
 		foreach( $this->limits as $element_role => $element_limits ) {
-			Toolset_Association_Base::validate_element_role( $element_role );
+			Toolset_Association::validate_element_role( $element_role );
 
 			$min = toolset_getarr( $element_limits, self::MIN, self::INVALID_VALUE );
 			$max = toolset_getarr( $element_limits, self::MAX, self::INVALID_VALUE );
@@ -157,7 +157,7 @@ class Toolset_Relationship_Cardinality {
 	 * @since m2m
 	 */
 	public function get_limit( $element_role, $limit_key = self::MAX ) {
-		Toolset_Association_Base::validate_element_role( $element_role );
+		Toolset_Association::validate_element_role( $element_role );
 		self::validate_limit_name( $limit_key );
 
 		return $this->limits[ $element_role ][ $limit_key ];

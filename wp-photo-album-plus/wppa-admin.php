@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version 6.8.00
+* Version 6.8.03
 *
 */
 
@@ -230,14 +230,21 @@ global $wpdb;
 	// Recently uploaded photos
 	echo '<h3>' . __( 'Recently uploaded photos', 'wp-photo-album-plus' ) . '</h3>';
 	$photos = $wpdb->get_results( "SELECT * FROM `" . WPPA_PHOTOS . "` ORDER BY `timestamp` DESC LIMIT 5", ARRAY_A );
+
 	if ( ! empty( $photos ) ) {
 		echo
 		'<table>';
 		foreach( $photos as $photo ) {
+			if ( wppa_user_is( 'administrator' ) ) {
+				$href = get_admin_url() . 'admin.php?page=wppa_moderate_photos&photo=' . $photo['id'] . '&just-edit';
+			}
+			else {
+				$href = wppa_get_photo_url( $photo['id'] );
+			}
 			echo
 			'<tr>' .
 				'<td>' .
-					'<a href="' . wppa_get_photo_url( $photo['id'] ) . '" target="_blank" >' .
+					'<a href="' . $href . '" target="_blank" >' .
 						'<img src="' . wppa_get_thumb_url( $photo['id'] ) . '" style="max-width:50px;max-height:50px;" /> ' .
 					'</a>' .
 				'</td>' .
@@ -257,7 +264,7 @@ global $wpdb;
 					'<br />' .
 					wppa_local_date( '', $photo['timestamp'] ) .
 				'</td>' .
-			'</tr />';
+			'</tr>';
 		}
 		echo
 		'</table>';
@@ -274,14 +281,21 @@ global $wpdb;
 	echo '<h3>' . __( 'Recent comments on photos', 'wp-photo-album-plus' ) . '</h3>';
 	$comments = $wpdb->get_results( "SELECT * FROM `" . WPPA_COMMENTS . "` ORDER BY `timestamp` DESC LIMIT 5", ARRAY_A );
 	if ( ! empty( $comments ) ) {
+
 		echo
 		'<table>';
 		foreach( $comments as $comment ) {
 			$photo = wppa_cache_photo( $comment['photo'] );
+			if ( wppa_user_is( 'administrator' ) ) {
+				$href = get_admin_url() . 'admin.php?page=wppa_moderate_photos&photo=' . $photo['id'] . '&just-edit';
+			}
+			else {
+				$href = wppa_get_photo_url( $photo['id'] );
+			}
 			echo
 			'<tr>' .
 				'<td>' .
-					'<a href="' . wppa_get_photo_url( $photo['id'] ) . '" target="_blank" >' .
+					'<a href="' . $href . '" target="_blank" >' .
 						'<img src="' . wppa_get_thumb_url( $photo['id'] ) . '" style="max-width:50px;max-height:50px;" /> ' .
 					'</a>' .
 				'</td>' .
@@ -299,7 +313,7 @@ global $wpdb;
 					sprintf(	__( 'by %s', 'wp-photo-album-plus' ),
 								'<b>' . $usr . '</b>' ) .
 					'<br />' .
-					wppa_local_date( '', $photo['timestamp'] ) .
+					wppa_local_date( '', $comment['timestamp'] ) .
 				'</td>' .
 			'</tr>';
 		}
@@ -313,4 +327,68 @@ global $wpdb;
 		'</p>';
 	}
 
+}
+
+// Photo of the day history
+if ( get_option( 'wppa_potd_log', 'no' ) == 'yes' ) {
+	add_action( 'do_meta_boxes', 'wppa_potdlog' );
+}
+function wppa_potdlog() {
+	if ( function_exists( 'wp_add_dashboard_widget' ) ) {
+		wp_add_dashboard_widget( 'wppa-potdlog', __( 'Photo of the day history', 'wp-photo-album-plus' ), 'wppa_show_potd_log' );
+	}
+}
+function wppa_show_potd_log() {
+
+	// Get data
+	$his = get_option( 'wppa_potd_log_data', array() );
+	if ( ! empty( $his ) ) {
+		echo
+		'<table>';
+		foreach( $his as $item ) {
+			if ( wppa_photo_exists( $item['id'] ) ) {
+				$photo = wppa_cache_photo( $item['id'] );
+				$time  = $item['tm'];
+				if ( wppa_user_is( 'administrator' ) ) {
+					$href = get_admin_url() . 'admin.php?page=wppa_moderate_photos&photo=' . $photo['id'] . '&just-edit';
+				}
+				else {
+					$href = wppa_get_photo_url( $photo['id'] );
+				}
+				echo
+				'<tr style="border-bottom:1px solid #444;" >' .
+					'<td>' .
+						'<a href="' . $href . '" target="_blank" >' .
+							'<img src="' . wppa_get_thumb_url( $photo['id'] ) . '" style="max-width:50px;max-height:50px;" /> ' .
+						'</a>' .
+					'</td>' .
+					'<td>' .
+						__( 'First displayed at', 'wp-photo-album-plus' ) . ': ' . wppa_local_date( '', $time ) . '<br />' .
+						__( 'Name', 'wp-photo-album-plus' ) . ': ' . wppa_get_photo_name( $photo['id'] ) . '<br />' .
+						__( 'Description', 'wp-photo-album-plus' ) . ':<br />' .
+						wppa_get_photo_desc( $photo['id'] ) .
+					'</td>' .
+				'</tr>';
+			}
+			else {
+				echo
+				'<tr style="border-bottom:1px solid #444;" >' .
+					'<td>' .
+						sprintf( __( 'Photo %d has been removed' ), $item['id'] ) .
+					'</td>' .
+					'<td>' .
+						__( 'First displayed at', 'wp-photo-album-plus' ) . ': ' . wppa_local_date( '', $item['tm'] ) . '<br />' .
+					'</td>' .
+				'</tr>';
+			}
+		}
+		echo
+		'</table>';
+	}
+	else {
+		echo
+		'<p>' .
+			__( 'There is no photo of the day history', 'wp-photo-album-plus' ) .
+		'</p>';
+	}
 }

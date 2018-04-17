@@ -5,7 +5,7 @@ Plugin URI: http://weavertheme.com/plugins
 Description: Weaver Xtreme Theme Support - a package of useful shortcodes and widgets that integrates closely with the Weaver Xtreme and Weaver Foundation themes.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 3.1.11
+Version: 3.2.3
 License: GPL V3
 
 Weaver Xtreme Theme Support
@@ -21,7 +21,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-1`	
+
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -35,17 +35,24 @@ function wvrx_ts_alert($msg) {
 	echo "<script> alert('" . esc_html($msg) . "'); </script>";
 }
 
-function wvrx_is_user_logged_in() {
-	$user = wp_get_current_user();
+if ( function_exists( 'weavercore_ts_installed' ) ) {
 
-	return $user->exists();
-}
+	add_action( 'admin_notices', 'wvrx_ts_fail_xtreme_ts' );
+
+} else
 
 if ( strpos( $theme, '/weaver-xtreme') !== false ) {		// only load if Weaver Xtreme is the theme
 
-define ('WVRX_TS_VERSION','3.1.11');
+define ('WVRX_TS_VERSION','3.2.3');
 define ('WVRX_TS_MINIFY','.min');		// '' for dev, '.min' for production
-define ('WVRX_TS_APPEARANCE_PAGE', false );
+define ('WVRX_TS_PAGEBUILDERS', false);  // currently not safely implemented - will be in Weaver 4.0
+
+if ( !defined('WEAVER_GET_OPTION')) define ('WEAVER_GET_OPTION', 'get_option');
+if ( !defined('WEAVER_DELETE_OPTION')) define ('WEAVER_DELETE_OPTION', 'delete_option');
+if ( !defined('WEAVER_UPDATE_OPTION')) define ('WEAVER_UPDATE_OPTION', 'update_option');
+
+if ( !defined('WEAVER_SETTINGS_NAME')) define ('WEAVER_SETTINGS_NAME', 'weaverx_settings');
+
 
 
 function wvrx_ts_installed() {
@@ -63,10 +70,8 @@ function wvrx_ts_enqueue_scripts() {	// action definition
 
     // add plugin CSS here, too.
 
-	// these are now in Weaver Xtreme 3.1 so don't need double loading
+	// need new admin styling for Gutenberg
 
-    //wp_register_style('wvrx-ts-style-sheet',wvrx_ts_plugins_url('weaverx-ts-style', WVRX_TS_MINIFY.'.css'),null,WVRX_TS_VERSION,'all');
-    //wp_enqueue_style('wvrx-ts-style-sheet');
 }
 
 add_action('wp_enqueue_scripts', 'wvrx_ts_enqueue_scripts' );
@@ -75,7 +80,6 @@ add_action('wp_enqueue_scripts', 'wvrx_ts_enqueue_scripts' );
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-runtime-lib.php'); // NOW - load the basic library
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-widgets.php'); 		// widgets runtime library
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-shortcodes.php'); // load the shortcode definitions
-// future development: require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-per-page-customizer.php');
 
 // load traditional Weaver Xtreme Options
 
@@ -99,7 +103,8 @@ function wvrx_ts_add_page_fields() {
 	add_meta_box('post-box', __('Weaver Xtreme Options For This Post' . $per_post_label,
 								'weaverx-theme-support'), 'wvrx_ts_post_extras_load', 'post', 'normal', 'high');
 	global $post;
-	$opts = get_option( apply_filters('weaverx_options','weaverx_settings') , array());	// need to fetch Weaver Xtreme options
+	$func_opt = WEAVER_GET_OPTION;
+	$opts = $func_opt( apply_filters('weaverx_options',WEAVER_SETTINGS_NAME) , array());	// need to fetch Weaver Xtreme options
 
 	$i = 1;
 	$args=array( 'public'   => true, '_builtin' => false );
@@ -115,11 +120,37 @@ require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-admin-page-posts.php');	//
 }
 
 function wvrx_ts_page_extras_load() {
+	wvrx_ts_load_pp_scripts();
 	wvrx_ts_page_extras();
 }
 
 function wvrx_ts_post_extras_load() {
+	wvrx_ts_load_pp_scripts();
 	wvrx_ts_post_extras();
+}
+
+function wvrx_ts_post_extras_pt() {
+	// special handling for non-Weaver Custom Post Types
+	$func_opt = WEAVER_GET_OPTION;
+	$opts = $func_opt( apply_filters('weaverx_options',WEAVER_SETTINGS_NAME) , array());
+	if ((isset($opts['_show_per_post_all']) && $opts['_show_per_post_all']) || function_exists('atw_slider_plugins_loaded') ) {
+		wvrx_ts_load_pp_scripts();
+		wvrx_ts_post_extras();
+	} else {
+		echo '<p>' .
+__('You can enable Weaver Xtreme Per Post Options for Custom Post Types on the Weaver Xtreme:Advanced Options:Admin Options tab.','weaverx-theme-support' /*adm*/) .
+		'</p>';
+	}
+}
+
+function wvrx_ts_load_pp_scripts() {
+	// I know, this is non-standard - does not use enqueue style/script, but it is necessary to avoid conflicts with Weaver themes.
+	$p_url = plugins_url('/admin/assets/yetii/', __FILE__);
+	$vers = WVRX_TS_VERSION;
+	$min = WVRX_TS_MINIFY;
+	echo "<link rel='stylesheet' id='wvrx-ts-style'  href='{$p_url}yetii-weaver{$min}.css?ver={$vers}' type='text/css' media='all' />\n";
+	echo "<script type='text/javascript' src='{$p_url}yetii{$min}.js?ver={$vers}'></script>\n";
+
 }
 
 //} // x-plus installed - as of V3, this is no longer needed
@@ -130,7 +161,6 @@ add_action('weaverx_child_show_extrathemes','wvrx_ts_child_show_extrathemes_acti
 function wvrx_ts_child_show_extrathemes_action() {
 	return;
 // old code found in version before 2.0.4
-
 }
 
 add_action('weaverx_child_process_options','wvrx_ts_child_process_options');
@@ -228,9 +258,9 @@ function wvrx_ts_scan_section($what) {
 				if (in_array($name, $post_fields) ) {
 					$val = $val_array[0];					// easier to work with
 					if ($type == 'page') {
-						echo "<li><strong><em>{$tlink}</em></strong> " . __('has Per Page settings.','weaverx-axtreme') . "</li>\n";
+						echo "<li><strong><em>{$tlink}</em></strong> " . __('has Per Page settings.','weaverx-xtreme') . "</li>\n";
 					} else {
-						echo "<li><strong><em>{$tlink}</em></strong> " . __('has Per Post settings.','weaverx-axtreme') . "</li>\n";
+						echo "<li><strong><em>{$tlink}</em></strong> " . __('has Per Post settings.','weaverx-xtreme') . "</li>\n";
 					}
 					break;
 				}
@@ -247,5 +277,12 @@ function wvrx_check_jetpack() {
     if ( method_exists( 'Jetpack', 'is_module_active' ) && Jetpack::is_module_active( 'minileven' ) && is_admin() ) {
         wvrx_ts_alert(__('**** IMPORTANT: The Jetpack Mobile theme is active. ****\nIt is NOT compatible with Weaver Xtreme, and will break the theme. Please deactivate it from the Jetpack control panel.\n\n**** This message will continue to be displayed until you deactivate the Jetpack Mobile Theme from the Jetpack settings panel. ****', 'weaverx-theme-support'));
     }
+}
+
+// failure actions
+function wvrx_ts_fail_xtreme_ts() {
+	$message = esc_html__( 'You already have "Weaver Core Theme Support Plugin" installed and activated. You cannot activate both theme support plugins at the same time. "Weaver Xtreme Theme Support Plugin" is currently NOT ACTIVE.', 'weaverx-theme-support' );
+	$html_message = sprintf( '<div class="error"><strong>%s</strong></div>', wpautop( $message ) );
+	echo wp_kses_post( $html_message );
 }
 ?>

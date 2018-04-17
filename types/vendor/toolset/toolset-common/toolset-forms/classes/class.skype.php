@@ -18,7 +18,8 @@ class WPToolset_Field_Skype extends WPToolset_Field_Textfield {
 	public function init() {
 		add_action( 'admin_footer', array( $this, 'editButtonTemplate' ) );
 		add_action( 'wp_footer', array( $this, 'editButtonTemplate' ) );
-
+		// In related content meta boxes, 'admin_footer' is executed before this class, so this hook is needed.
+		add_action( 'toolset_related_content_footer', array( $this, 'editButtonTemplate' ) );
 		wp_register_script(
 			'skype-uri-buttom', '//www.skypeassets.com/i/scom/js/skype-uri.js'
 		);
@@ -127,7 +128,6 @@ class WPToolset_Field_Skype extends WPToolset_Field_Textfield {
 	}
 
 	public function editButtonTemplate() {
-
 		static $edit_button_template_template_already_loaded;
 
 		if ( $edit_button_template_template_already_loaded ) {

@@ -219,63 +219,72 @@
 
 <div class="wrap w3eden">
 
-<?php if(is_array($cats)){ ?>
-<div class="container-fluid">
-<div class="row" id="addonlist" style="margin-top: -15px">
-    <div class="col-md-12"><div class="panel panel-default" style="margin-top: 30px">
-            <div class="panel-heading"><h3 style="font-size: 13pt;font-weight: 600;letter-spacing: 1px;line-height: 30px"><i class="fa fa-plug color-purple"></i> &nbsp;<?php _e('WPDM Add-Ons','download-manager'); ?></h3></div>
-            <div class="panel-body"><ul class="nav nav-pills" id="filter-mods"><li class="active"><a href="#all" rel="all">All Add-Ons</a></li>
+    <?php if(is_array($cats)){ ?>
+    <div class="container-fluid">
+        <div class="row" id="addonlist" style="margin-top: -15px">
+            <div class="col-md-12"><div class="panel panel-default" style="margin-top: 30px">
+                    <div class="panel-heading"><h3 style="font-size: 13pt;font-weight: 600;letter-spacing: 1px;line-height: 30px"><i class="fa fa-plug color-purple"></i> &nbsp;<?php _e('WPDM Add-Ons','download-manager'); ?></h3></div>
+                    <div class="panel-body"><ul class="nav nav-pills" id="filter-mods"><li class="active"><a href="#all" rel="all">All Add-Ons</a></li>
 
-<?php
-foreach($cats as $cat){
-    echo "<li><a href='#' rel='{$cat->slug}'>{$cat->name}</a></li>";
-}
-?>
-</ul></div></div></div>
+                            <?php
+                            foreach($cats as $cat){
+                                echo "<li><a href='#' rel='{$cat->slug}'>{$cat->name}</a></li>";
+                            }
+                            ?>
+                        </ul></div></div></div>
 
-<div row'>
-<?php foreach($data->post_extra as $package){
-    $files = (array)$package->files;
-    $file = str_replace(".zip", "",array_shift($files));
-    $file = explode("/", $file);
-    $file = end($file);
-    $plugininfo = wpdm_plugin_data($file);
+            <div row'>
+            <?php
 
-    $linklabel = ($plugininfo)?'<i class="fa fa-refresh"></i> Re-Install':'<i class="fa fa-plus-circle"></i> Install';
- ?>
-    <div class="col-md-3 all <?php echo implode(" ", $package->cats); ?>">
+            foreach($data as $package){
+                //wppmdd($package);
+                $files = (array)$package->files;
+                $file = str_replace(".zip", "",array_shift($files));
+                $file = explode("/", $file);
+                $file = end($file);
+                $plugininfo = wpdm_plugin_data($file);
 
-    <div class="addonlist panel panel-default">
-        <div class="panel-body">
-            <b><a target="_blank" title="<?php echo $package->title; ?>" class="ttip" href="<?php echo $package->link; ?>"><?php echo $package->title;?></a></b>
+                $linklabel = ($plugininfo)?'<i class="fa fa-refresh"></i> Re-Install':'<i class="fa fa-plus-circle"></i> Install';
+                ?>
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 all <?php echo implode(" ", (array)$package->categories); ?>">
 
+                    <div class="addonlist panel panel-default">
+                        <div class="panel-body" style="height: 90px">
+                            <div class="media">
+                                <div class="pull-left">
+                                    <img style="width: 64px" src="<?php echo $package->thumbnail; ?>" alt="Thumb" />
+                                </div>
+                                <div class="media-body">
+                                    <b><a target="_blank" title="<?php echo $package->post_title; ?>" class="ttip" href="<?php echo $package->link; ?>"><?php echo $package->post_title;?></a></b><br/>
+                                    <?php echo $package->excerpt; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer text-right">
+                            <?php if($package->price>0){ ?>
+                                <div class="btn-group btn-group-xs">
+                                    <a class="btn btn-info btn-purchase" data-toggle="modal" data-backdrop="true" data-target="#addonmodal" href="#" rel="<?php echo $package->ID; ?>" style="border: 0;border-radius: 2px;"><i class="fa fa-shopping-cart"></i> &nbsp;Buy Now</a><span class="btn btn-inverse"><?php echo $package->currency.$package->price; ?></span>
+                                </div>
+                            <?php } else { ?>
+                                <div class="btn-group btn-group-xs">
+                                    <a class="btn-install btn btn-success" data-toggle="modal" data-addondir="<?php echo $file; ?>" data-wpdmpinn="<?php echo wp_create_nonce($package->ID.NONCE_KEY); ?>" rel="<?php echo $package->ID; ?>" data-backdrop="true" data-target="#addonmodal" href="#"><?php echo $linklabel; ?></a><span class="btn btn-inverse">Free</span>
+                                </div>
+                            <?php } ?>
+                            <span class="note pull-left"><i class="fa fa-server" aria-hidden="true"></i> &nbsp;<?php echo $package->version; ?></span>
+                        </div>
+                    </div>
+
+
+                </div>
+                <?php
+            }
+            ?>
 
         </div>
-        <div class="panel-footer text-right">
-            <?php if($package->price>0){ ?>
-            <div class="btn-group btn-group-xs">
-                <a class="btn btn-info btn-purchase" data-toggle="modal" data-backdrop="true" data-target="#addonmodal" href="#" rel="<?php echo $package->ID; ?>" style="border: 0;border-radius: 2px;"><i class="fa fa-shopping-cart"></i> &nbsp;Buy Now</a><span class="btn btn-inverse"><?php echo $package->currency.$package->price; ?></span>
-            </div>
-            <?php } else { ?>
-            <div class="btn-group btn-group-xs">
-                <a class="btn-install btn btn-success" data-toggle="modal" data-addondir="<?php echo $file; ?>" data-wpdmpinn="<?php echo wp_create_nonce($package->ID.NONCE_KEY); ?>" rel="<?php echo $package->ID; ?>" data-backdrop="true" data-target="#addonmodal" href="#"><?php echo $linklabel; ?></a><span class="btn btn-inverse">Free</span>
-            </div>
-            <?php } ?>
-                <span class="note pull-left"><i class="fa fa-server" aria-hidden="true"></i> &nbsp;<?php echo $package->pinfo->version; ?></span>
-        </div>
-        </div>
-
-
-        </div>
-<?php
-}
-?>
-
-</div>
-</div>
-
     </div>
-    <?php } else {
+
+</div>
+<?php } else {
     unset($_SESSION['wpdm_addon_store_data']);
     unset($_SESSION['wpdm_addon_store_cats']);
     ?>
@@ -283,33 +292,33 @@ foreach($cats as $cat){
     <div class="alert alert-danger" style="margin: 20px"><?php _e('Failed to connect with server!','download-manager'); ?></div>
 
 <?php } ?>
-    <div class="modal fade" id="addonmodal" tabindex="-1" role="dialog" aria-labelledby="addonmodalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">Add-On Installer</h4>
-                </div>
-                <div class="modal-body" id="modalcontents">
-                    <i class="fa fa-spinner fa-spin"></i> Please Wait...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                    <a type="button" id="prcbtn" target="_blank" href="https://www.wpdownloadmanager.com/cart/" class="btn btn-success" style="display: none" onclick="jQuery('#addonmodal').modal('hide')">Checkout</a>
-                </div>
+<div class="modal fade" id="addonmodal" tabindex="-1" role="dialog" aria-labelledby="addonmodalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Add-On Installer</h4>
+            </div>
+            <div class="modal-body" id="modalcontents">
+                <i class="fa fa-spinner fa-spin"></i> Please Wait...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <a type="button" id="prcbtn" target="_blank" href="https://www.wpdownloadmanager.com/cart/" class="btn btn-success" style="display: none" onclick="jQuery('#addonmodal').modal('hide')">Checkout</a>
             </div>
         </div>
     </div>
-    </div>
+</div>
+</div>
 
 <script>
     jQuery(function(){
         jQuery('.nav-pills a').click(function(){
-                jQuery('#addonlist .all').fadeOut();
-                jQuery('.'+this.rel).fadeIn();
-                jQuery('#prcbtn').hide();
-                jQuery('.nav-pills li').removeClass('active');
-                jQuery(this).parent().addClass('active');
+            jQuery('#addonlist .all').fadeOut();
+            jQuery('.'+this.rel).fadeIn();
+            jQuery('#prcbtn').hide();
+            jQuery('.nav-pills li').removeClass('active');
+            jQuery(this).parent().addClass('active');
         });
 
         jQuery(".btn-install, .btn-purchase").click(function(){

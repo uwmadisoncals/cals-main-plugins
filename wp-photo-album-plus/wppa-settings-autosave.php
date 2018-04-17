@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.8.01
+* Version 6.8.07
 *
 */
 
@@ -320,6 +320,10 @@ global $wppa_supported_camara_brands;
 		// Check for trivial requirements
 		if ( ! function_exists('wppa_imagecreatefromjpeg') ) {
 			wppa_error_message(__('There is a serious misconfiguration in your servers PHP config. Function wppa_imagecreatefromjpeg() does not exist. You will encounter problems when uploading photos and not be able to generate thumbnail images. Ask your hosting provider to add GD support with a minimal version 1.8.', 'wp-photo-album-plus'));
+		}
+
+		if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON == true ) {
+			wppa_error_message(__("Please remove 'define( 'DISABLE_WP_CRON', true );' from wp-config.php", 'wp-photo-album-plus' ) );
 		}
 
 		// Check for pending actions
@@ -1496,11 +1500,11 @@ global $wppa_supported_camara_brands;
 							wppa_setting($slug, '5', $name, $desc, $html, $help, $clas, $tags);
 
 							}
-						wppa_setting_subheader( 'H', '1', __( 'Video related size settings' , 'wp-photo-album-plus') );
+						wppa_setting_subheader( 'H', '1', __( 'Video related size settings' , 'wp-photo-album-plus'), 'wppa-video' );
 							{
 							$name = __('Default width', 'wp-photo-album-plus');
 							$desc = __('The width of most videos', 'wp-photo-album-plus');
-							$help = esc_js('This setting can be overruled for individual videos on the photo admin pages.');
+							$help = esc_js(__('This setting can be overruled for individual videos on the photo admin pages.', 'wp-photo-album-plus'));
 							$slug = 'wppa_video_width';
 							$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus'));
 							$clas = 'wppa-video';
@@ -1509,7 +1513,7 @@ global $wppa_supported_camara_brands;
 
 							$name = __('Default height', 'wp-photo-album-plus');
 							$desc = __('The height of most videos', 'wp-photo-album-plus');
-							$help = esc_js('This setting can be overruled for individual videos on the photo admin pages.');
+							$help = esc_js(__('This setting can be overruled for individual videos on the photo admin pages.', 'wp-photo-album-plus'));
 							$slug = 'wppa_video_height';
 							$html = wppa_input($slug, '40px', '', __('pixels', 'wp-photo-album-plus'));
 							$clas = 'wppa-video';
@@ -3761,6 +3765,60 @@ global $wppa_supported_camara_brands;
 							$tags = 'system,layout';
 							wppa_setting($slug, '15', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Custom style Chrome', 'wp-photo-album-plus');
+							$desc = __('Enter browser specific custom style specs here', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_custom_style_chrome';
+							$html = wppa_textarea($slug, $name);
+							$clas = '';
+							$tags = 'system,layout';
+							wppa_setting($slug, '15.1', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Custom style Firefox', 'wp-photo-album-plus');
+							$desc = __('Enter browser specific custom style specs here', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_custom_style_firefox';
+							$html = wppa_textarea($slug, $name);
+							$clas = '';
+							$tags = 'system,layout';
+							wppa_setting($slug, '15.2', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Custom style Safari', 'wp-photo-album-plus');
+							$desc = __('Enter browser specific custom style specs here', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_custom_style_safari';
+							$html = wppa_textarea($slug, $name);
+							$clas = '';
+							$tags = 'system,layout';
+							wppa_setting($slug, '15.4', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Custom style Edge', 'wp-photo-album-plus');
+							$desc = __('Enter browser specific custom style specs here', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_custom_style_edge';
+							$html = wppa_textarea($slug, $name);
+							$clas = '';
+							$tags = 'system,layout';
+							wppa_setting($slug, '15.5', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Custom style IE', 'wp-photo-album-plus');
+							$desc = __('Enter browser specific custom style specs here', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_custom_style_ie';
+							$html = wppa_textarea($slug, $name);
+							$clas = '';
+							$tags = 'system,layout';
+							wppa_setting($slug, '15.6', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Custom style Opera', 'wp-photo-album-plus');
+							$desc = __('Enter browser specific custom style specs here', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_custom_style_opera';
+							$html = wppa_textarea($slug, $name);
+							$clas = '';
+							$tags = 'system,layout';
+							wppa_setting($slug, '15.7', $name, $desc, $html, $help, $clas, $tags);
+
 							$name = __('Use customized style file', 'wp-photo-album-plus');
 							$desc = __('This feature is highly discouraged.', 'wp-photo-album-plus');
 							$help = '';
@@ -3832,7 +3890,7 @@ global $wppa_supported_camara_brands;
 							$onchange = 'wppaCheckCheck( \''.$slug.'\', \'wppa-video\' )';
 							$html = wppa_checkbox($slug, $onchange);
 							$clas = '';
-							$tags = 'system';
+							$tags = 'system,video';
 							wppa_setting($slug, '22', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Enable Audio', 'wp-photo-album-plus');
@@ -4825,6 +4883,15 @@ global $wppa_supported_camara_brands;
 							$tags = 'comment,layout';
 							wppa_setting($slug, '11', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Comment db agreement', 'wp-photo-album-plus');
+							$desc = __('User needs to tick a checkbox to agree db storage', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_comment_need_db_agree';
+							$html = wppa_checkbox($slug);
+							$clas = 'wppa_comment_';
+							$tags = 'comment,layout';
+							wppa_setting($slug, '12', $name, $desc, $html, $help, $clas, $tags);
+
 							}
 						wppa_setting_subheader( 'G', '1', __( 'Lightbox related settings. These settings have effect only when Table IX-J3 is set to wppa' , 'wp-photo-album-plus') );
 							{
@@ -4852,8 +4919,8 @@ global $wppa_supported_camara_brands;
 							$desc = __('The fade-in time of the lightbox images', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_ovl_anim';
-							$options = array(__('--- off ---', 'wp-photo-album-plus'), '200 ms.', '400 ms.', '800 ms.', '1.2 s.', '2 s.', '4 s.');
-							$values = array('10', '200', '400', '800', '1200', '2000', '4000');
+							$options = array(__('--- off ---', 'wp-photo-album-plus'), '200 ms.', '300 ms.', '400 ms.', '800 ms.', '1.2 s.', '2 s.', '4 s.');
+							$values = array('10', '200', '300', '400', '800', '1200', '2000', '4000');
 							$html = wppa_select($slug, $options, $values);
 							$clas = '';
 							$tags = 'lightbox';
@@ -6435,6 +6502,18 @@ global $wppa_supported_camara_brands;
 							$tags = 'access,album';
 							wppa_setting($slug, '3', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Fe limts per album', 'wp-photo-album-plus');
+							$desc = __('The following limits apply to individual albums', 'wp-photo-album-plus');
+							$help = __('If this box is ticked, users can upload the limit on every album they have fe upload rights to', 'wp-photo-album-plus');
+							$help .= '<br />'.__('If this box is unticked, the limits apply to all the users uploads in the system regardless of the album(s)');
+							$slug = 'wppa_role_limit_per_album';
+							$html1 = wppa_checkbox($slug);
+							$html2 = '';
+							$html = array( $html1, $html2 );
+							$clas = '';
+							$tags = 'access,upload';
+							wppa_setting($slug, '4', $name, $desc, $html, $help, $clas, $tags);
+
 							// User upload limits
 							$options = array( 	__('for ever', 'wp-photo-album-plus'),
 												__('per hour', 'wp-photo-album-plus'),
@@ -6773,6 +6852,25 @@ global $wppa_supported_camara_brands;
 							$tags = 'access,system,upload';
 							wppa_setting($slug, '2.2', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Fe Edit period', 'wp-photo-album-plus');
+							$desc = __('The time since upload the user can edit photo info', 'wp-photo-album-plus');
+							$help = __('Frontend Edit should be set in order to have effect', 'wp-photo-album-plus');
+							$help .= '. ' . __('This limit does not apply for administrators and superusers', 'wp-photo-album-plus');
+							$slug = 'wppa_upload_edit_period';
+							$opts = array(	__('15 minutes', 'wp-photo-album-plus'),
+											__('one hour', 'wp-photo-album-plus'),
+											__('three hours', 'wp-photo-album-plus'),
+											__('one day', 'wp-photo-album-plus'),
+											__('for ever', 'wp-photo-album-plus'),
+											);
+							$vals = array(	900, 3600, 10800, 86400, 0 );
+							$html1 = wppa_select($slug, $opts, $vals);
+							$html2 = '';
+							$html = array( $html1, $html2 );
+							$clas = '';
+							$tags = 'access,system,upload';
+							wppa_setting($slug, '2.2.1', $name, $desc, $html, $help, $clas, $tags);
+
 							$name = __('Fe Edit Theme CSS', 'wp-photo-album-plus');
 							$desc = __('The front-end edit photo dialog uses the theme CSS.', 'wp-photo-album-plus');
 							$help = esc_js(__('This setting has effect when Table VII D2.1 is set to \'classic\' only.', 'wp-photo-album-plus'));
@@ -6831,6 +6929,25 @@ global $wppa_supported_camara_brands;
 							$clas = '';
 							$tags = 'access,system,upload';
 							wppa_setting($slug, '2.7', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Fe Delete period', 'wp-photo-album-plus');
+							$desc = __('The time since upload the user can delete the photo', 'wp-photo-album-plus');
+							$help = __('Frontend Delete should be set in order to have effect', 'wp-photo-album-plus');
+							$help .= '. ' . __('This limit does not apply for administrators and superusers', 'wp-photo-album-plus');
+							$slug = 'wppa_upload_delete_period';
+							$opts = array(	__('15 minutes', 'wp-photo-album-plus'),
+											__('one hour', 'wp-photo-album-plus'),
+											__('three hours', 'wp-photo-album-plus'),
+											__('one day', 'wp-photo-album-plus'),
+											__('for ever', 'wp-photo-album-plus'),
+											);
+							$vals = array(	900, 3600, 10800, 86400, 0 );
+							$html1 = wppa_select($slug, $opts, $vals);
+							$html2 = '';
+							$html = array( $html1, $html2 );
+							$clas = '';
+							$tags = 'access,system,upload';
+							wppa_setting($slug, '2.8', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Uploader Moderate Comment', 'wp-photo-album-plus');
 							$desc = __('The owner of the photo can moderate the photos comments.', 'wp-photo-album-plus');
@@ -7351,7 +7468,7 @@ global $wppa_supported_camara_brands;
 							$desc = __('Renew album encrcryption codes.', 'wp-photo-album-plus');
 							$help = '';
 							$slug2 = 'wppa_crypt_albums';
-							$html1 = '';
+							$html1 = wppa_cronjob_button( $slug2 );
 							$html2 = wppa_maintenance_button( $slug2 );
 							$html3 = wppa_status_field( $slug2 );
 							$html4 = wppa_togo_field( $slug2 );
@@ -7360,11 +7477,27 @@ global $wppa_supported_camara_brands;
 							$tags = 'system';
 							wppa_setting(false, '13', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Renew album crypt every', 'wp-photo-album-plus');
+							$desc = __('Renew cryptic codes periodically', 'wp-photo-album-plus');
+							$help = __('The periodic times are an approximation', 'wp-photo-album-plus');
+							$slug = 'wppa_crypt_albums_every';
+							$opts = array( 	__('--- off ---', 'wp-photo-album-plus'),
+											__('hour', 'wp-photo-album-plus'),
+											__('day', 'wp-photo-album-plus'),
+											__('week', 'wp-photo-album-plus'),
+											__('month', 'wp-photo-album-plus'),
+											);
+							$vals = array( '0', '1', '24', '168', '720' );
+							$html = wppa_select( $slug, $opts, $vals ) . '<td></td><td></td><td></td>';
+							$clas = '';
+							$tags = 'system';
+							wppa_setting(false, '13.1', $name, $desc, $html, $help, $clas, $tags);
+
 							$name = __('Renew photo crypt', 'wp-photo-album-plus');
 							$desc = __('Renew photo encrcryption codes.', 'wp-photo-album-plus');
 							$help = '';
 							$slug2 = 'wppa_crypt_photos';
-							$html1 = '';
+							$html1 = wppa_cronjob_button( $slug2 );
 							$html2 = wppa_maintenance_button( $slug2 );
 							$html3 = wppa_status_field( $slug2 );
 							$html4 = wppa_togo_field( $slug2 );
@@ -7372,6 +7505,22 @@ global $wppa_supported_camara_brands;
 							$clas = '';
 							$tags = 'system';
 							wppa_setting(false, '14', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Renew photo crypt every', 'wp-photo-album-plus');
+							$desc = __('Renew cryptic codes periodically', 'wp-photo-album-plus');
+							$help = __('The periodic times are an approximation', 'wp-photo-album-plus');
+							$slug = 'wppa_crypt_photos_every';
+							$opts = array( 	__('--- off ---', 'wp-photo-album-plus'),
+											__('hour', 'wp-photo-album-plus'),
+											__('day', 'wp-photo-album-plus'),
+											__('week', 'wp-photo-album-plus'),
+											__('month', 'wp-photo-album-plus'),
+											);
+							$vals = array( '0', '1', '24', '168', '720' );
+							$html = wppa_select( $slug, $opts, $vals ) . '<td></td><td></td><td></td>';
+							$clas = '';
+							$tags = 'system';
+							wppa_setting(false, '14.1', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Create orietation sources', 'wp-photo-album-plus');
 							$desc = __('Creates correctly oriented pseudo source file.', 'wp-photo-album-plus');
@@ -8103,6 +8252,15 @@ global $wppa_supported_camara_brands;
 							$tags = 'system';
 							wppa_setting($slug, '9.4', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Log Debug messages', 'wp-photo-album-plus');
+							$desc = __('Keep track of debug messages.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_log_debug';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '9.5', $name, $desc, $html, $help, $clas, $tags);
+
 							$name = __('Retry failed mails', 'wp-photo-album-plus');
 							$desc = __('Select number of retries for failed mails', 'wp-photo-album-plus');
 							$help = esc_js(__('Retries occur at the background every hour', 'wp-photo-album-plus'));
@@ -8131,6 +8289,14 @@ global $wppa_supported_camara_brands;
 							$tags = 'system';
 							wppa_setting($slug, '12', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Cache root', 'wp-photo-album-plus');
+							$desc = __('The root folder of your caching plugin', 'wp-photo-album-plus') . ': <span style="float:right;" >' . WPPA_CONTENT_PATH . '/</span>';
+							$help = __('If you have a caching plugin, make sure this setting points to the root folder where the cache files are stored', 'wp-photo-album-plus');
+							$slug = 'wppa_cache_root';
+							$html = wppa_input($slug, '300px');
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '13', $name, $desc, $html, $help, $clas, $tags);
 							}
 						wppa_setting_subheader( 'B', '1', __( 'WPPA+ Admin related miscellaneous settings' , 'wp-photo-album-plus') );
 							{
@@ -8682,7 +8848,7 @@ global $wppa_supported_camara_brands;
 									$help = esc_js(__('You may select multiple albums. All logged in visitors will get their own sub-album in each granted parent.', 'wp-photo-album-plus'));
 									$slug = 'wppa_grant_parent';
 									$opts = array( __('--- none ---', 'wp-photo-album-plus'), __('--- separate ---', 'wp-photo-album-plus') );
-									$vals = array( '0', '-1');
+									$vals = array( 'zero', '-1');
 									$albs = $wpdb->get_results( "SELECT `id`, `name` FROM`" . WPPA_ALBUMS . "` ORDER BY `name`", ARRAY_A );
 									if ( $albs ) {
 										foreach ( $albs as $alb ) {
@@ -8690,7 +8856,7 @@ global $wppa_supported_camara_brands;
 											$vals[] = $alb['id'];
 										}
 									}
-									$html = wppa_select_m($slug, $opts, $vals, '', '', true);
+									$html = wppa_select_m($slug, $opts, $vals);//, '', '', true);
 									$clas = '';
 									$tags = 'system,album';
 									wppa_setting($slug, '11.1', $name, $desc, $html, $help, $clas, $tags);
@@ -10582,7 +10748,7 @@ global $no_default;
 global $wppa_opt;
 global $wppa_totcols;
 
-	$num = str_replace( array( ',', '.'), '', $xnum );
+	$num = str_replace( array( ',', '.'), '_', $xnum );
 
 	if ( is_array($slug) ) $slugs = $slug;
 	else {
@@ -11070,7 +11236,7 @@ function wppa_color_box( $xslug ) {
 
 }
 
-function wppa_doit_button( $label = '', $key = '', $sub = '', $height = '16', $fontsize = '11' ) {
+function wppa_doit_button( $label = '', $key = '', $sub = '', $height = '18', $fontsize = '11' ) {
 	if ( $label == '' ) $label = __('Do it!', 'wp-photo-album-plus');
 
 	$result = '<input type="submit" class="button-primary" style="float:left; font-size:'.$fontsize.'px; height:'.$height.'px; margin: 0 4px; padding: 0px; line-height:12px;"';
@@ -11086,7 +11252,7 @@ function wppa_doit_button( $label = '', $key = '', $sub = '', $height = '16', $f
 function wppa_popup_button( $slug ) {
 
 	$label 	= __('Show!', 'wp-photo-album-plus');
-	$result = '<input type="button" class="button-secundary" style="float:left; border-radius:3px; font-size: 11px; height: 18px; margin: 0 4px; padding: 0px;" value="'.$label.'"';
+	$result = '<input type="button" class="button-secundary" style="float:left; border-radius:3px; font-size: 11px; height: 18px; margin: 0 4px; padding: 0px;" value="&nbsp;'.esc_attr($label).'&nbsp;"';
 	$result .= ' onclick="wppaAjaxPopupWindow(\''.$slug.'\')" />';
 
 	return $result;
@@ -11095,7 +11261,7 @@ function wppa_popup_button( $slug ) {
 function wppa_ajax_button( $label = '', $slug, $elmid = '0', $no_confirm = false ) {
 	if ( $label == '' ) $label = __('Do it!', 'wp-photo-album-plus');
 
-	$result = '<input type="button" class="button-secundary" style="float:left; border-radius:3px; font-size: 11px; height: 18px; margin: 0 4px; padding: 0px;" value="'.$label.'"';
+	$result = '<input type="button" class="button-secundary" style="float:left; border-radius:3px; font-size: 11px; height: 18px; margin: 0 4px; padding: 0px;" value="&nbsp;'.esc_attr($label).'&nbsp;"';
 	$result .= ' onclick="';
 	if ( ! $no_confirm ) $result .= 'if (confirm(\''.__('Are you sure?', 'wp-photo-album-plus').'\')) ';
 	if ( $elmid ) {
@@ -11136,7 +11302,7 @@ function wppa_cronjob_button( $slug ) {
 					' type="button"' .
 					' class="button-secundary"' .
 					' style="float:left;border-radius:3px;font-size:11px;height:18px;margin: 0 4px;padding:0px;' . ( $crashed ? 'color:red;': '' ) . '"' .
-					' value="' . esc_attr( $label ) . '"';
+					' value="&nbsp;' . esc_attr( $label ) . '&nbsp;"';
 	if ( ! $locked ) {
 		$result .= ' onclick="if ( jQuery(\'#'.$slug.'_status\').html() != \'\' || confirm(\'Are you sure ?\') ) wppaMaintenanceProc(\''.$slug.'\', false, true);" />';
 	}
@@ -11163,7 +11329,7 @@ function wppa_maintenance_button( $slug ) {
 		$locked = false;
 	}
 
-	$result = '<input id="'.$slug.'_button" type="button" class="button-secundary" style="float:left; border-radius:3px; font-size: 11px; height: 18px; margin: 0 4px; padding: 0px;" value="'.$label.'"';
+	$result = '<input id="'.$slug.'_button" type="button" class="button-secundary" style="float:left; border-radius:3px; font-size: 11px; height: 18px; margin: 0 4px; padding: 0px;" value="&nbsp;'.esc_attr($label).'&nbsp;"';
 	if ( ! $locked ) {
 		$result .= ' onclick="if ( jQuery(\'#'.$slug.'_status\').html() != \'\' || confirm(\'Are you sure ?\') ) wppaMaintenanceProc(\''.$slug.'\', false);" />';
 	}

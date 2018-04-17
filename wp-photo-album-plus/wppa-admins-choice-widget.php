@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the admins-choice widget
-* Version 6.7.01
+* Version 6.8.07
 *
 */
 
@@ -32,7 +32,12 @@ class AdminsChoice extends WP_Widget {
 
         extract( $args );
 
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Admins Choice', 'wp-photo-album-plus' ) ) );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Admins Choice', 'wp-photo-album-plus' ), 'logonly' => 'no' ) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
 
  		$widget_title = apply_filters( 'widget_title', $instance['title'] );
 
@@ -49,7 +54,7 @@ class AdminsChoice extends WP_Widget {
 		}
 		else {
 			echo
-			'<div class="wppa-admins-choice-widget" >' .
+			'<div class="wppa-admins-choice-widget" data-wppa="yes" >' .
 				wppa_get_admins_choice_html( false ) .
 			'</div>';
 		}
@@ -65,6 +70,7 @@ class AdminsChoice extends WP_Widget {
 
 		$instance = $old_instance;
 		$instance['title'] = strip_tags( $new_instance['title'] );
+		$instance['logonly'] = $new_instance['logonly'];
         return $instance;
     }
 
@@ -80,11 +86,16 @@ class AdminsChoice extends WP_Widget {
 		}
 
 		// Defaults
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Admins Choice', 'wp-photo-album-plus' ) ) );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Admins Choice', 'wp-photo-album-plus' ), 'logonly' => 'no' ) );
 
 		// Title
 		echo
 		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
+
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
+
     }
 
 } // class AdminsChoice

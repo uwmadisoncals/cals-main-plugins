@@ -69,7 +69,7 @@ Use [Premium Package – Complete Digital Store Solution](https://www.wpdownload
 *   Sales Tax
 *   Save Cart and Checkout Later
 *   Email Saved Cart
-*   Product & Price variations
+*   Product & Price Variations ( License Based Pricing / Sell Extra Gigs with Product )
 *   Promotional Pricing for Your Digital Products
 *   "Pay As You Want" pricing
 *   Invoice Generation
@@ -150,8 +150,20 @@ Check download stats and get a push notification when someone downloads, install
 11. Order Details ( Admin )
 12. Invoice
 13. Video Player
+14. Shortcode Generator
+15. Quick Add Panel
 
 == Changelog ==
+
+= 2.9.71 =
+* Added new option to use category icon/image
+* Improved fields ( title, page_link ) with all downloads table
+* Fixed compatibility issue with Form Lock Add-on
+
+= 2.9.70 =
+* Updated add-on manager
+* Added new fields ( author_name, author_pic ) for all downloads table
+* Fixed issue with master key reset
 
 = 2.9.69 =
 * Fixed the issue with reCaptcha lock

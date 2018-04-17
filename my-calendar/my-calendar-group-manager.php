@@ -1082,7 +1082,7 @@ function mc_list_groups() {
 			<td><?php
 				$date_format = ( get_option( 'mc_date_format' ) == '' ) ? get_option( 'date_format' ) : get_option( 'mc_date_format' );
 				$begin       = date_i18n( $date_format, strtotime( $event->event_begin ) );
-				echo "$begin, $eventTime"; ?>
+				echo esc_html( "$begin, $eventTime" ); ?>
 				<div class="recurs">
 					<strong><?php _e( 'Recurs', 'my-calendar' ); ?></strong>
 					<?php

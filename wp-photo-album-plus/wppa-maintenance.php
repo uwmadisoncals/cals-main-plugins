@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.8.01
+* Version 6.8.05
 *
 */
 
@@ -72,6 +72,8 @@ $wppa_cron_maintenance_slugs = array(	'wppa_remake_index_albums',
 										'wppa_comp_sizes',
 										'wppa_add_gpx_tag',
 										'wppa_add_hd_tag',
+										'wppa_crypt_photos',
+										'wppa_crypt_albums',
 
 									);
 
@@ -90,6 +92,16 @@ global $wppa_timestamp_start;
 		return;
 	}
 
+	// If we do clean index by cron and remake index still active, reschedule and give up
+	if ( wppa_is_cron() && $slug == 'wppa_cleanup_index' ) {
+		if ( get_option( 'wppa_remake_index_photos_user', false ) || get_option( 'wppa_remake_index_albums_user', false ) ) {
+			wppa_log( 'cron', '{b}' . $slug . '{/b} delayed' );
+			wppa_schedule_maintenance_proc( $slug );
+			update_option( 'wppa_cleanup_index_status', 'Delayed' );
+			return;
+		}
+	}
+
 /*
 	// Check for multiple maintenance procs
 	if ( ! wppa_switch( 'maint_ignore_concurrency_error' ) && ! wppa_is_cron() ) {
@@ -103,6 +115,11 @@ global $wppa_timestamp_start;
 		}
 	}
 */
+	// Open output buffering if cron
+	if ( wppa_is_cron() ) {
+		ob_start();
+	}
+
 	// Lock this proc
 	if ( wppa_is_cron() ) {
 		update_option( $slug.'_user', 'cron-job' );
@@ -152,7 +169,7 @@ global $wppa_timestamp_start;
 		$wppa_session[$slug.'_skipped'] = '0';
 	}
 
-	wppa_save_session();
+//	wppa_save_session();
 
 	// Pre-processing needed?
 	if ( $lastid == '0' ) {
@@ -255,7 +272,7 @@ global $wppa_timestamp_start;
 				break;
 
 		}
-		wppa_save_session();
+//		wppa_save_session();
 	}
 
 	if ( $lastid != '0' ) {
@@ -843,7 +860,9 @@ global $wppa_timestamp_start;
 			}
 			else {	// Nothing to do, Done anyway
 				$lastid = $topid;
-				wppa_log( wppa_is_cron() ? 'Cron' : 'Obs', 'Maintenance proc {b}' . $slug . '{/b} Done!' );
+				if ( ! wppa_is_cron() ) {
+					wppa_log( 'Obs', 'Maintenance proc {b}' . $slug . '{/b} Done!' );
+				}
 			}
 			break;	// End process photos
 
@@ -1070,7 +1089,6 @@ global $wppa_timestamp_start;
 			case 'wppa_append_to_photodesc':
 			case 'wppa_remove_from_photodesc':
 				wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
-//				update_option( 'wppa_remake_index_photos_status', __('Required', 'wp-photo-album-plus') );
 				break;
 			case 'wppa_regen_thumbs':
 				wppa_bump_thumb_rev();
@@ -1086,8 +1104,7 @@ global $wppa_timestamp_start;
 			case 'wppa_edit_tag':
 				wppa_clear_taglist();
 				if ( wppa_switch( 'search_tags' ) ) {
-				wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
-//					update_option( 'wppa_remake_index_photos_status', __('Required', 'wp-photo-album-plus') );
+					wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
 				}
 				$reload = 'reload';
 				break;
@@ -1111,18 +1128,20 @@ global $wppa_timestamp_start;
 
 	}
 
-	wppa_save_session();
-
 	if ( wppa_is_cron() ) {
 		if ( get_option( $slug . '_ad_inf' ) == 'yes' ) {
 			wppa_schedule_maintenance_proc( $slug );
 		}
-		return;
+
+		// Log any unexpected output
+		$outbuf = ob_get_clean();
+		if ( $outbuf ) {
+			wppa_log( 'dbg', 'Cron ' . $slug . ' unexpected output: ' . $outbuf );
+		}
 	}
 	else {
 		return $errtxt.'||'.$slug.'||'.$status.'||'.$togo.'||'.$reload;
 	}
-
 }
 
 function wppa_do_maintenance_popup( $slug ) {
@@ -1169,6 +1188,7 @@ global $wppa_log_file;
 				<table>
 					<thead>
 						<tr>
+							<th><span style="float:left;" >Id</span></th>
 							<th><span style="float:left;" >Word</span></th>
 							<th style="max-width:400px;" ><span style="float:left;" >Albums</span></th>
 							<th><span style="float:left;" >Photos</span></th>
@@ -1180,6 +1200,7 @@ global $wppa_log_file;
 				foreach ( $indexes as $index ) {
 					$result .= '
 						<tr>
+							<td>'.$index['id'].'</td>
 							<td>'.$index['slug'].'</td>
 							<td style="max-width:400px; word-wrap: break-word;" >'.$index['albums'].'</td>
 							<td>'.$index['photos'].'</td>
@@ -1328,11 +1349,18 @@ global $wppa_log_file;
 												implode( ',', array_keys($data[$key]) ) .
 												')<br />';
 											}
+											elseif ( is_object( $data[$key] ) ) {
+												$temp = var_export( $data[$key], true );
+										//		$temp = str_replace( "\n", '<br />', $temp );
+										//		$temp = str_replace( "\t", '&nbsp;&nbsp;', $temp );
+												$result .= '['.$key.'] => ' . $temp;
+											}
 											else {
 												$result .= '['.$key.'] => '.$data[$key].'<br />';
 											}
 										}
 									}
+
 						$result .= '
 								</td>
 								<td style="border-bottom:1px solid gray;" >';

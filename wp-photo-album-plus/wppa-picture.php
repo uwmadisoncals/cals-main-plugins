@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 6.7.12
+* Version 6.8.05
 *
 */
 
@@ -139,7 +139,7 @@ function wppa_get_picture_html( $args ) {
 			$result .=
 			'<a' .
 				' href="' . $link['url'] . '"' .
-				( $lbtitle ? ' ' . wppa( 'lbtitle' ) . '="'.$lbtitle.'"' : '' ) .
+				( $lbtitle ? ' ' . wppa( 'lbtitle' ) . '="'.esc_attr($lbtitle).'"' : '' ) .
 				( $videobody ? ' data-videohtml="' . $videobody . '"' : '' ) .
 				( $audiobody ? ' data-audiohtml="' . $audiobody . '"' : '' ) .
 				( $videox ? ' data-videonatwidth="' . $videox . '"' : '' ) .

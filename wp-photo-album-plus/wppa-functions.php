@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.8.01
+* Version 6.8.06
 *
 */
 
@@ -154,7 +154,7 @@ global $wppa_session;
 		if ( wppa_get_get( 'superview' ) ) {
 			$wppa_session['superview'] = wppa( 'is_slide' ) ? 'slide': 'thumbs';
 			$wppa_session['superalbum'] = wppa( 'start_album' );
-			wppa_save_session();
+//			wppa_save_session();
 			wppa( 'photos_only', true );
 		}
 		wppa( 'is_upldr', wppa_get_get( 'upldr' ) );
@@ -172,7 +172,7 @@ global $wppa_session;
 		}
 		wppa( 'supersearch', strip_tags( wppa_get_get( 'supersearch' ) ) );
 		$wppa_session['supersearch'] = wppa( 'supersearch' );
-		wppa_save_session();
+//		wppa_save_session();
 		if ( wppa( 'supersearch' ) ) {
 			$ss_info = explode( ',', wppa( 'supersearch' ) );
 			if ( $ss_info['0'] == 'a' ) {
@@ -227,7 +227,7 @@ global $wppa_session;
 		}
 		if ( wppa( 'bestof' ) ) {
 			$args = wppa( 'bestof_args' );
-			wppa_bestof_box ( $args );
+			wppa_bestof_box( $args );
 			$out = wppa( 'out' );
 			wppa_reset_occurrance();
 			return $out;
@@ -711,13 +711,13 @@ global $wppa_session;
 				$wppa_session['search_root'] = strval( intval( $_REQUEST['wppa-forceroot'] ) );
 				wppa( 'is_rootsearch', true );
 				wppa( 'start_album', strval( intval( $_REQUEST['wppa-forceroot'] ) ) );
-				wppa_save_session();
+//				wppa_save_session();
 			}
 
 			// No rootsearch, forget previous root
 			if ( ! wppa( 'is_rootsearch' ) ) {
 				$wppa_session['search_root'] = '0';
-				wppa_save_session();
+//				wppa_save_session();
 			}
 
 			wppa_dbg_msg( 'Forceroot='.(isset( $_REQUEST['wppa-forceroot'] )?$_REQUEST['wppa-forceroot']:'none').', is_rootsearch='.wppa('is_rootsearch').', start_album='.wppa('start_album'), 'red');
@@ -733,7 +733,7 @@ global $wppa_session;
 
 			// Update session with new searchroot
 			$wppa_session['search_root'] = wppa( 'start_album' );
-			wppa_save_session();
+//			wppa_save_session();
 
 		}
 
@@ -746,7 +746,7 @@ global $wppa_session;
 		if ( ! wppa( 'src' )  ) {
 			$wppa_session['use_searchstring'] = '';
 			$wppa_session['display_searchstring'] = '';
-			wppa_save_session();
+//			wppa_save_session();
 			wppa_add( 'src_script', "\n" . 'jQuery(document).ready(function(){wppaClearSubsearch()});' );
 		}
 		else { // Enable subbox
@@ -2657,7 +2657,7 @@ global $wppa_done;
 			wppa( 'comment_photo', $id );
 			wppa( 'comment_text', $comment );
 
-			// Clear ( super )cache
+			// Clear cache
 			wppa_clear_cache();
 		}
 		else {
@@ -3191,6 +3191,7 @@ global $blog_id;
 			wppa_out( 	'<div' .
 							' id="wppa-modal-container-'.wppa( 'mocc' ).'"' .
 							' style="position:relative;z-index:100000;"' .
+							' data-wppa="yes"' .
 							' >' .
 						'</div>'
 			);
@@ -4097,7 +4098,14 @@ function wppa_is_photo_modified( $id ) {
 
 	$thumb = wppa_cache_thumb( $id );
 
+	$cretime = $thumb['timestamp'];
 	$modtime = $thumb['modified'];
+	
+	// A photo is regarded NOT to be modified if the datetime modified is within 2 seconds after creation
+	if ( $modtime <= ( $cretime + 2 ) ) {
+		return false;
+	}
+	
 	$timnow = time();
 	$isnew = ( ( $timnow - $modtime ) < wppa_opt( 'max_photo_modtime' ) );
 
@@ -4449,9 +4457,10 @@ global $wppa_upload_succes_id;
 				$reload = wppa_switch( 'home_after_upload' ) && $done ? 'home' : false;
 
 				// Init alert text with possible results from wppa_do_frontend_file_upload()
-				$alert = $wppa_alert;
+				$alert 			= $wppa_alert;
 				$upload_message = $alert;
-				$blog_failed = false;
+				$blog_failed 	= false;
+				$status 		= '';
 
 				if ( $done ) {
 
@@ -4506,21 +4515,23 @@ global $wppa_upload_succes_id;
 					}
 
 					// Alert text for blogged
-					if ( $status == 'pending' ) {
-						$m = ' ' . __( 'Your post is awaiting moderation.', 'wp-photo-album-plus' );
-					}
-					else {
-						$m = ' ' . __( 'Your post is published.', 'wp-photo-album-plus' );
-					}
-					if ( $blogged && ( wppa_opt( 'fe_alert' ) == 'blog' || wppa_opt( 'fe_alert' ) == 'all' ) ) {
-						$alert .= $m;
-						$upload_message .= $m;
-					}
+					if ( $blogged or $blog_failed ) {
+						if ( $status == 'pending' ) {
+							$m = ' ' . __( 'Your post is awaiting moderation.', 'wp-photo-album-plus' );
+						}
+						else {
+							$m = ' ' . __( 'Your post is published.', 'wp-photo-album-plus' );
+						}
+						if ( $blogged && ( wppa_opt( 'fe_alert' ) == 'blog' || wppa_opt( 'fe_alert' ) == 'all' ) ) {
+							$alert .= $m;
+							$upload_message .= $m;
+						}
 
-					if ( $blog_failed ) {
-						$m = ' ' . __( 'Blog failed', 'wp-photo-album-plus' );
-						$alert .= $m;
-						$upload_message .= $m;
+						if ( $blog_failed ) {
+							$m = ' ' . __( 'Blog failed', 'wp-photo-album-plus' );
+							$alert .= $m;
+							$upload_message .= $m;
+						}
 					}
 				}
 
@@ -4623,7 +4634,7 @@ global $wppa_alert;
 	$album = wppa_cache_album( $alb );
 
 	// Legal here?
-	if ( ! wppa_allow_uploads( $alb ) || ! wppa_allow_user_uploads() ) {
+	if ( ! wppa_allow_uploads( $alb ) || ! wppa_allow_user_uploads( $alb ) ) {
 		$wppa_alert .= esc_js( __( 'Max uploads reached' , 'wp-photo-album-plus') ) . '.';
 		return false;
 	}
@@ -4765,7 +4776,7 @@ global $wppa_alert;
 			return false;
 		}
 	}
-
+/*
 	// Check for max memory needed to rocess image?
 	$mayupload = wppa_check_memory_limit( '', $imgsize[0], $imgsize[1] );
 	if ( $mayupload === false ) {
@@ -4775,7 +4786,7 @@ global $wppa_alert;
 			return false;
 		}
 	}
-
+*/
 	// Find extension from mimetype
 	switch( $imgsize[2] ) { 	// mime type
 		case 1: $ext = 'gif'; break;
@@ -4794,6 +4805,9 @@ global $wppa_alert;
 	// Sanitize input
 	$name 		= wppa_sanitize_photo_name( $name );
 	$desc 		= balanceTags( wppa_get_post( 'user-desc' ), true );
+	if ( ! $desc && wppa_switch( 'apply_newphoto_desc' ) ) {
+		$desc = wppa_opt( 'newphoto_description' );
+	}
 
 	// If BlogIt! and no descrption given, use name field - this is for the shortcode used: typ"mphoto"
 	if ( ! $desc && isset( $_POST['wppa-blogit'] ) ) {

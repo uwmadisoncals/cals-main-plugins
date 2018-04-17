@@ -219,32 +219,47 @@ class Settings
             delete_option('__wpdm_suname');
             delete_option('__wpdm_supass');
             delete_option('__wpdm_purchased_items');
+            delete_option('__wpdm_freeaddons');
+            delete_option('__wpdm_core_update_check');
+            unset($_SESSION['__wpdm_download_url']);
             die('<script>location.href="edit.php?post_type=wpdmpro&page=settings&tab=plugin-update";</script>Refreshing...');
         }
 
         if(isset($_POST['__wpdm_suname']) && $_POST['__wpdm_suname'] != ''){
             update_option('__wpdm_suname',$_POST['__wpdm_suname']);
             update_option('__wpdm_supass',$_POST['__wpdm_supass']);
-            die('<script>location.href=location.href;</script>Refreshing...');
+            delete_option('__wpdm_purchased_items');
+            delete_option('__wpdm_freeaddons');
+            delete_option('__wpdm_core_update_check');
+            unset($_SESSION['__wpdm_download_url']);
+            $access_token = wpdm_access_token();
+            if($access_token != '') {
+                $purchased_items = remote_get('https://www.wpdownloadmanager.com/?wpdmppaction=getpurchaseditems&wpdm_access_token=' . $access_token);
+                $ret = json_decode($purchased_items);
+                update_option('__wpdm_purchased_items', $purchased_items);
+                die('<script>location.href=location.href;</script>Login successful. Refreshing...');
+            }  else{
+                die('Error: Invalid Login!');
+            }
+
         }
 
         if(get_option('__wpdm_suname') != '') {
             $purchased_items = get_option('__wpdm_purchased_items', false);
             if(!$purchased_items || wpdm_query_var('newpurchase') != '' ) {
-                $purchased_items = remote_get('https://www.wpdownloadmanager.com/?wpdmppaction=getpurchaseditems&user=' . get_option('__wpdm_suname') . '&pass=' . get_option('__wpdm_supass'));
+                $purchased_items = remote_get('https://www.wpdownloadmanager.com/?wpdmppaction=getpurchaseditems&wpdm_access_token=' . wpdm_access_token());
                 update_option('__wpdm_purchased_items', $purchased_items);
             }
             $purchased_items = json_decode($purchased_items);
-
-            if (isset($purchased_items->error)){ delete_option('__wpdm_suname'); delete_option('__wpdm_purchased_items'); }
+            if (isset($purchased_items->error)){ delete_option('__wpdm_suname');  delete_option('__wpdm_purchased_items'); }
             if (isset($purchased_items->error)) $purchased_items->error = str_replace("[redirect]", admin_url("edit.php?post_type=wpdmpro&page=settings&tab=plugin-update"), $purchased_items->error);
-
         }
         if(get_option('__wpdm_freeaddons') == '' || wpdm_query_var('newpurchase') != '' || 1) {
             $freeaddons = remote_get('https://www.wpdownloadmanager.com/?wpdm_api_req=getPackageList&cat_id=1148');
             update_option('__wpdm_freeaddons', $freeaddons);
         }
         $freeaddons = json_decode(get_option('__wpdm_freeaddons'));
+
         include(WPDM_BASE_DIR . 'admin/tpls/settings/addon-update.php');
     }
 

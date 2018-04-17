@@ -133,13 +133,16 @@ global $upload_album;
 			$max_files = '15';
 		}
 		$max_size = ini_get( 'upload_max_filesize' );
+		$max_tot_size = ini_get( 'post_max_size' );
 /* debug */
 // $max_size = '2G';
 /**/
-		$max_size_mbytes = substr( $max_size, 0, strlen( $max_size ) - 1 );
-		if ( substr( $max_size, -1 ) == 'G' ) { // May upload gigabytes!!
-			$max_size_mbytes *= 1024;
+		$max_tot_size_mbytes = substr( $max_tot_size, 0, strlen( $max_tot_size ) - 1 );
+		if ( substr( $max_tot_size, -1 ) == 'G' ) { // May upload gigabytes!!
+			$max_tot_size_mbytes *= 1024;
 		}
+		$max_size_mbytes = substr( $max_size, 0, strlen( $max_size ) - 1 );
+		$max_size_bytes = $max_size_mbytes * 1024 * 1024;
 		$max_time = ini_get( 'max_input_time' );
 		if ( $max_time < '1' ) $max_time = __( 'unknown', 'wp-photo-album-plus' );
 
@@ -242,7 +245,7 @@ global $upload_album;
 					'border-color:#e6db55;' .
 					'"' .
 				' >' .
-				sprintf( __( '<b>Notice:</b> your server allows you to upload <b>%s</b> files of maximum total <b>%s</b> bytes and allows <b>%s</b> seconds to complete.' , 'wp-photo-album-plus' ), $max_files_txt, $max_size, $max_time ) .
+				sprintf( __( '<b>Notice:</b> your server allows you to upload <b>%s</b> files of maximum <b>%s</b> bytes each and total <b>%s</b> bytes and allows <b>%s</b> seconds to complete.' , 'wp-photo-album-plus' ), $max_files_txt, $max_size, $max_tot_size, $max_time ) .
 				' ' .
 				__( 'If your request exceeds these limitations, it will fail, probably without an errormessage.' , 'wp-photo-album-plus' ) .
 				' ' .
@@ -288,7 +291,7 @@ global $upload_album;
 					'</div>' .
 					'<script type="text/javascript">' .
 						'function showit() {' .
-							'var maxsize = parseInt( \'' . $max_size_mbytes . '\' ) * 1024 * 1024;' .
+							'var maxsize = parseInt( \'' . $max_tot_size_mbytes . '\' ) * 1024 * 1024;' .
 							'var maxcount = parseInt( \'' . $max_files_txt . '\' );' .
 							'var totsize = 0;' .
 							'var files = document.getElementById( \'my_files\' ).files;' .
@@ -303,9 +306,9 @@ global $upload_album;
 									'for ( var i=0;i<files.length;i++ ) {' .
 										'tekst += "<tr>";' .
 											'tekst += "<td>" + files[i].name + "</td>";' .
-											'tekst += "<td>" + files[i].size + "</td>";' .
+											'tekst += "<td id=\'file"+i+"size\' >" + files[i].size + "</td>";' .
 											'totsize += files[i].size;' .
-											'tekst += "<td>" + files[i].type + "</td>";' .
+											'tekst += "<td>" + ( files[i].size > ' . $max_size_bytes . ' ? "<span style=\'color:red\' >' . __( 'Too big!' , 'wp-photo-album-plus') . '</span>" : files[i].type ) + "</td>";' .
 										'tekst += "</tr>";' .
 									'}' .
 									'tekst += "<tr><td><hr /></td><td><hr /></td><td><hr /></td></tr>";' .

@@ -26,11 +26,75 @@
     cursor: pointer;
 }
 
-/*
-    Spinner image before the page is fully loaded.
+/* should be moved to toolset-global.css */
+.clearfix:before,
+.clearfix:after {
+    display: table;
+    content: " ";
+}
+.clearfix:after {
+    clear: both;
+}
 
-    Center horizontally and vertically.
-*/
+body[class*="toolset_page"] a,
+.toolset-listing-wrapper a {
+    cursor: pointer;
+}
+
+/* Red buttons. To be combined with button-primary. */
+.wp-core-ui  .toolset-danger-button {
+    background: #aa0000;
+    border-color: #900000 #650000 #650000;
+    -webkit-box-shadow: 0 1px 0 #650000;
+    box-shadow: 0 1px 0 #650000;
+    color: #fff;
+    text-decoration: none;
+    text-shadow: 0 -1px 1px #900000, 1px 0 1px #900000, 0 1px 1px #900000, -1px 0 1px #900000;
+}
+.wp-core-ui  .toolset-danger-button:hover,
+.wp-core-ui  .toolset-danger-button:focus {
+    background: #c30101;
+    border-color: #650000;
+    color: #fff;
+}
+
+
+.wp-core-ui .button-primary-toolset {
+    background: #F05A28;;
+    border-color: #d84326;
+    -webkit-box-shadow: 0 1px 0 #d84326;
+    box-shadow: 0 1px 0 #d84326;
+    color: #fff;
+    text-decoration: none;
+    text-shadow: 0 -1px 1px #d84326, 1px 0 1px #d84326, 0 1px 1px #d84326, -1px 0 1px #d84326;
+}
+
+.wp-core-ui .button-primary-toolset:hover,
+.wp-core-ui .button-primary-toolset:focus,
+.wp-core-ui .button-primary-toolset:active {
+    background: #d6410f;
+    border-color: #ab340c;
+    -webkit-box-shadow: 0 1px 0 #ab340c;
+    box-shadow: 0 1px 0 #ab340c;
+    color: #fff;
+}
+
+.wp-core-ui .button-primary-toolset:active {
+    -webkit-box-shadow: inset 0 2px 5px -3px rgba(0, 0, 0, .5), 0 1px 0 #ab340c;
+    box-shadow: inset 0 2px 5px -3px rgba(0, 0, 0, .5), 0 1px 0 #ab340c;
+}
+
+.wp-core-ui .button-primary-toolset[disabled],
+.wp-core-ui .button-primary-toolset:disabled,
+.wp-core-ui .button-primary-toolset.disabled {
+    opacity: .65;
+}
+
+
+
+/*/should be moved to toolset-global.css*/
+
+
 #toolset-page-content .toolset-page-spinner {
     height: 400px;
     position: relative;
@@ -40,11 +104,9 @@
     overflow: auto;
     margin: auto;
     position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    top: 0; left: 0; bottom: 0; right: 0;
 }
+
 
 /* Handle too long dialog titles. */
 .ui-dialog-title {
@@ -67,6 +129,7 @@
 .toolset-button-in-row + .toolset-button-in-row {
     margin-left: 8px;
 }
+
 
 /* Override styling from basic.css in Types back to default. */
 body.wp-admin button.ui-corner-all.toolset-button-in-dialog {
@@ -196,3 +259,13 @@ table.toolset-field-table tbody td:first-child {
     display: none;
 }
 
+/**
+ * Listing first columns
+ */
+.wp-list-table td > span[data-bind*="displayName"] {
+    color: #0073aa;
+    cursor: pointer;
+}
+.wp-list-table td > span[data-bind*="displayName"]:hover {
+    color: #00a0d2;
+}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * ask the album / display you want
-* Version 6.7.01
+* Version 6.8.07
 */
 
 
@@ -20,12 +20,6 @@ class WppaSuperView extends WP_Widget {
 		global $wpdb;
 		global $widget_content;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
         extract( $args );
@@ -33,7 +27,13 @@ class WppaSuperView extends WP_Widget {
 														'title' => __( 'Super View', 'wp-photo-album-plus' ),
 														'root'	=> '0',
 														'sort'	=> true,
+														'logonly' => 'no',
 														) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
 
  		$widget_title 	= apply_filters( 'widget_title', $instance['title'] );
 		$album_root 	= $instance['root'];
@@ -42,7 +42,7 @@ class WppaSuperView extends WP_Widget {
 		wppa( 'in_widget', 'superview' );
 		wppa_bump_mocc();
 
-		$widget_content = wppa_get_superview_html( $album_root, $sort );
+		$widget_content = '<span data-wppa="yes" ></span>' . wppa_get_superview_html( $album_root, $sort );
 
 		wppa( 'in_widget', false );
 
@@ -55,6 +55,7 @@ class WppaSuperView extends WP_Widget {
 		$instance['title'] 	= strip_tags($new_instance['title']);
 		$instance['root'] 	= $new_instance['root'];
 		$instance['sort']	= $new_instance['sort'];
+		$instance['logonly'] = $new_instance['logonly'];
 
         return $instance;
     }
@@ -65,7 +66,8 @@ class WppaSuperView extends WP_Widget {
 		//Defaults
 		$instance = wp_parse_args( (array) $instance, array( 	'title' => __( 'Super View' , 'wp-photo-album-plus' ),
 																'root' 	=> '0',
-																'sort'	=> true
+																'sort'	=> true,
+																'logonly' => 'no',
 															) );
 
 		// Title
@@ -86,7 +88,11 @@ class WppaSuperView extends WP_Widget {
 								__( 'If unticked, the album sort method for the album or system will be used', 'wp-photo-album-plus' )
 								);
 
-    }
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
+
+	}
 
 } // class WppaSuperView
 

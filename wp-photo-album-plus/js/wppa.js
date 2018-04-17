@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.7.09';
+var wppaJsVersion = '6.8.02';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -612,6 +612,9 @@ function _wppaDoAutocol( mocc ) {
 			jQuery( ".wppa-searchsel-item-"+mocc ).css( 'width', ( 100 / wppaSearchBoxSelItems[mocc] ) + '%' );
 		}
 	}
+	
+	// Upload dialog album selectionbox
+	jQuery( ".wppa-upload-album-"+mocc ).css( 'maxWidth', 0.6 * w );
 
 }
 

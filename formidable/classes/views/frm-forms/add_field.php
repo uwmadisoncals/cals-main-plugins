@@ -61,7 +61,7 @@ if ( in_array( $field['type'], array( 'select', 'radio', 'checkbox' ) ) ) {
 	<?php
 
 	if ( isset( $field['post_field'] ) && $field['post_field'] === 'post_category' ) {
-		echo '<p class="howto">' . FrmFieldsHelper::get_term_link( $field['taxonomy'] ) . '</p>';
+		echo '<p class="howto" id="frm_has_hidden_options_' . esc_attr( $field['id'] ) . '">' . FrmFieldsHelper::get_term_link( $field['taxonomy'] ) . '</p>';
 	} elseif ( ! isset( $field['post_field'] ) || ! in_array( $field['post_field'], array( 'post_category' ) ) ) {
 ?>
         <div id="frm_add_field_<?php echo esc_attr( $field['id'] ); ?>">
@@ -188,7 +188,13 @@ if ( $display['options'] ) {
 								<option value=""<?php selected( $field['label'], '' ); ?>>
 									<?php esc_html_e( 'Default', 'formidable' ) ?>
 								</option>
-								<?php foreach ( FrmStylesHelper::get_sigle_label_postitions() as $pos => $pos_label ) { ?>
+								<?php foreach ( FrmStylesHelper::get_single_label_positions() as $pos => $pos_label ) { ?>
+									<?php
+									if ( ! $display['clear_on_focus'] && 'inside' === $pos ) {
+										// don't allow inside labels for fields without placeholders
+										continue;
+									}
+									?>
 									<option value="<?php echo esc_attr( $pos ) ?>"<?php selected( $field['label'], $pos ); ?>>
 										<?php echo esc_html( $pos_label ) ?>
 									</option>
@@ -273,7 +279,7 @@ if ( $display['options'] ) {
 					include( FrmAppHelper::plugin_path() . '/classes/views/frm-fields/back-end/html-content.php' );
 				}
 
-				do_action( 'frm_' . $field['type'] . '_field_options_form', $field, $display, $values );
+				$field_obj->show_options( $field, $display, $values );
 				do_action( 'frm_field_options_form', $field, $display, $values );
 
 				if ( $display['required'] || $display['invalid'] || $display['unique'] || $display['conf_field'] ) {

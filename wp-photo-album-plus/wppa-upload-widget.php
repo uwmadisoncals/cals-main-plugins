@@ -4,7 +4,7 @@
 *
 * A wppa widget to upload photos
 *
-* Version 6.7.01
+* Version 6.8.07
 */
 
 class WppaUploadWidget extends WP_Widget {
@@ -17,19 +17,20 @@ class WppaUploadWidget extends WP_Widget {
 	function widget( $args, $instance ) {
 		global $wpdb;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
 		extract($args);
 		$instance = wp_parse_args( (array) $instance,
 									array( 	'title' 	=> __( 'Upload Photos', 'wp-photo-album-plus' ),
-											'album' 	=> '0'
+											'album' 	=> '0',
+											'logonly' => 'no',
 										));
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
+
  		$title = apply_filters( 'widget_title', $instance['title'] );
 		$album = $instance['album'];
 
@@ -63,6 +64,7 @@ class WppaUploadWidget extends WP_Widget {
 			' id="wppa-container-' . $mocc . '"' .
 			' class="wppa-upload-widget"' .
 			' style="margin-top:2px;margin-left:2px;"' .
+			' data-wppa="yes"' .
 			' >' .
 			$js .
 			$create .
@@ -84,12 +86,14 @@ class WppaUploadWidget extends WP_Widget {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags( $new_instance['title'] );
 		$instance['album'] = strval( intval( $new_instance['album'] ) );
+		$instance['logonly'] = $new_instance['logonly'];
+
 		return $instance;
 	}
 
 	function form( $instance ) {
 
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Upload Photos', 'wp-photo-album-plus' ), 'album' => '0' ) );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Upload Photos', 'wp-photo-album-plus' ), 'album' => '0', 'logonly' => 'no' ) );
 
 		// Widget title
 		echo
@@ -99,6 +103,10 @@ class WppaUploadWidget extends WP_Widget {
 		$body = wppa_album_select_a( array( 'path' => wppa_switch( 'hier_albsel' ), 'selected' => $instance['album'], 'addselbox' => true ) );
 		echo
 		wppa_widget_selection_frame( $this, 'album', $body, __( 'Album', 'wp-photo-album-plus' ) );
+
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
 
 	}
 }

@@ -214,8 +214,27 @@ Please upgrade your version of WP Google Maps to version 6.0.27 as it includes m
 
 == Changelog ==
 
-= 6.4.09 - 2018-01-15 - Medium priority =
-* Removed the plugin deactivation survey as there are PHP compatibility issues. Will have to retest and add this back at a later stage.
+= 7.0.02 - 2018-04-15 =
+* Added option to select FontAwesome version
+* Fixed bug with circle data array
+
+= 7.0.01 - 2018-04-11 - Medium Priority =
+* Switched to WebFont / CSS FontAwesome 5 for compatibility reasons
+* Fixed JS error in for ... in loop when adding methods to Array prototype
+* Fixed FontAwesome CSS being enqueued as script
+* Added functionality to fit map to bounds when editing shapes
+
+= 7.0.00 - 2018-04-04 =
+* Added arbitrary radii control to Maps -> Settings -> Store Locator
+* Added modern store locator look and feel
+* Added modern store locator radius
+* Added custom JS field in Maps -> Settings -> Advanced
+* Added spatial types to marker table
+* Added Google API Error handler and alert
+* Added code to display custom fields in infowindow when Pro is installed
+* Fresh install "My First Map" defaults to modern store locator and radius
+* Relaxed theme data parsing
+* Disabled Street View, zoom controls, pan controls and map type controls on fresh installs
 
 = 6.4.08 - 2018-01-14 - Medium priority =
 * Update Google Maps API versions to include 3.30 and 3.31

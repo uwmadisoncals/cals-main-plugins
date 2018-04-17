@@ -17,8 +17,6 @@ class FrmFieldRadio extends FrmFieldType {
 	 */
 	protected $holds_email_values = true;
 
-	protected $is_tall = true;
-
 	protected function input_html() {
 		return $this->multiple_input_html();
 	}
@@ -34,7 +32,7 @@ class FrmFieldRadio extends FrmFieldType {
 	}
 
 	protected function extra_field_opts() {
-		$form_id = $this->get_field_column('form_id');
+		$form_id = $this->get_field_column( 'form_id' );
 		return array(
 			'align' => FrmStylesController::get_style_val( 'radio_align', ( empty( $form_id ) ? 'default' : $form_id ) ),
 		);

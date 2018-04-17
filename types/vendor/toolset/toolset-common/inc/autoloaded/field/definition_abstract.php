@@ -3,7 +3,7 @@
 /**
  * Abstract of a field definition (common interface and code for generic and Types field definitions).
  */
-abstract class Toolset_Field_Definition_Abstract {
+abstract class Toolset_Field_Definition_Abstract implements Toolset_Field_Definition_Interface {
 
 	/**
 	 * @return string Field definition slug.

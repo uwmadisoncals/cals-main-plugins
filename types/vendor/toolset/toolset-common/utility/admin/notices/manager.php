@@ -52,12 +52,12 @@ class Toolset_Admin_Notices_Manager {
 	 *
 	 * @param string $content
 	 *
-	 * @return Toolset_Admin_Notice
+	 * @return Toolset_Admin_Notice_Interface|bool
 	 */
 	public static function add_notice( $notice, $content = '' ) {
 		if( ! is_admin() ) {
 			// no frontend support for ADMIN notices
-			return;
+			return false;
 		}
 
 		if( ! is_string( $notice ) && ! $notice instanceof Toolset_Admin_Notice_Interface ) {
@@ -96,11 +96,20 @@ class Toolset_Admin_Notices_Manager {
 		return $notice;
 	}
 
+
 	/**
 	 * called on WordPress hook 'admin_notices'
 	 */
 	public static function show_notices() {
+
+		/**
+		 * toolset-admin-notices-manager-show-notices
+		 *
+		 * @deprecated Use toolset_admin_notices_manager_show_notices instead.
+		 */
 		$notices = apply_filters( 'toolset-admin-notices-manager-show-notices', self::$notices );
+
+		$notices = apply_filters( 'toolset_admin_notices_manager_show_notices', $notices );
 
 		if( empty( $notices ) ) {
 			return;

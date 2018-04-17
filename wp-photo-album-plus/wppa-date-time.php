@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * date and time related functions
-* Version 6.6.22
+* Version 6.8.07
 *
 */
 
@@ -191,16 +191,13 @@ function wppa_local_date( $format, $timestamp = false ) {
 	$tzstring = get_option( 'timezone_string' );
 	if ( empty( $tzstring ) ) {
 
-		// Create a UTC+- zone if no timezone string exists
+		// Correct $time according to gmt_offset
 		$current_offset = get_option( 'gmt_offset', 0 );
-		if ( 0 == $current_offset ) {
-			$tzstring = 'UTC';
-		}
-		elseif ($current_offset < 0 ) {
-			$tzstring = 'UTC' . $current_offset;
-		}
-		else {
-			$tzstring = 'UTC+' . $current_offset;
+		
+		$tzstring = 'UTC';
+		
+		if ( is_numeric( $current_offset ) ) {
+			$time += $current_offset * 3600;
 		}
 	}
 

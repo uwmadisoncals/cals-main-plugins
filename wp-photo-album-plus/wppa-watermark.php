@@ -2,7 +2,7 @@
 /* wppa-watermark.php
 *
 * Functions used for the application of watermarks
-* Version 6.7.01
+* Version 6.8.02
 *
 */
 
@@ -416,10 +416,18 @@ function wppa_add_watermark( $id ) {
 	$file = wppa_get_photo_path( $id );
 
 	if ( ! is_file( $file ) ) return false;	// File gone
+
 	$photosize = getimagesize( $file );
 	if ( ! is_array( $photosize ) ) {
 		return false;	// Not a valid photo
 	}
+
+	// Enough memory?
+	if ( ! wppa_can_resize( $file, 0, false ) ) {
+		wppa_log( 'War', 'Too little memory to add watermark on ' . $file );
+		return false;
+	}
+
 	switch ( $photosize[2] ) {
 		case 1: $tempimage = imagecreatefromgif( $file );
 			$photoimage = imagecreatetruecolor( $photosize[0], $photosize[1] );

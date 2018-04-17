@@ -183,6 +183,7 @@ class cnOutput extends cnEntry {
 
 					if ( $customSize ) {
 
+						/** @var array|WP_Error $image */
 						$image = $this->getImageMeta(
 							array(
 								'type'      => 'photo',
@@ -1526,59 +1527,17 @@ class cnOutput extends cnEntry {
 
 		$atts['id'] = $this->getId();
 
-		$rows      = array();
-		$addresses = $this->getEmailAddresses( $atts, $cached );
-		$search    = array( '%label%', '%address%', '%icon%', '%separator%' );
-		$iconSizes = array( 16, 24, 32, 48, 64 );
+		$out = $this->emailAddresses->filterBy( 'type', $atts['type'] )
+		                            ->filterBy( 'preferred', $atts['preferred'] )
+		                            ->filterBy( 'visibility', Connections_Directory()->currentUser->canView() )
+		                            ->take( $atts['limit'] )
+		                            ->escapeFor( 'display' )
+		                            ->render( 'hcard', array( 'atts' => $atts, 'entry' => $this ), TRUE, TRUE );
 
-		if ( empty( $addresses ) ) return '';
+		// The filters need to be reset so additional calls to get email addresses with different params return expected results.
+		$this->emailAddresses->resetFilters();
 
-		// Replace the 'Name Tokens' with the entry's name.
-		$name = $this->getName(
-			array(
-				'format' => empty( $atts['title'] ) ? '%first% %last% %type% email.' : $atts['title']
-			)
-		);
-
-		/*
-		 * Ensure the supplied size is valid, if not reset to the default value.
-		 */
-		in_array( $atts['size'], $iconSizes ) ? $iconSize = $atts['size'] : $iconSize = 32;
-
-		foreach ( $addresses as $email ) {
-
-			$replace = array();
-
-			// Replace the 'Email Tokens' with the email info.
-			$title = str_ireplace( array( '%type%', '%name%' ), array( $email->type, $email->name ), $name );
-
-			$replace[] = ( empty( $email->name ) ) ? '' : '<span class="email-name">' . $email->name . '</span>';
-			$replace[] = ( empty( $email->address ) ) ? '' : '<span class="email-address"><a class="value" title="' . $title . '" href="mailto:' . $email->address . '">' . $email->address . '</a></span>';
-
-			/** @noinspection HtmlUnknownTarget */
-			$replace[] = ( empty( $email->address ) ) ? '' : '<span class="email-icon"><a class="value" title="' . $title . '" href="mailto:' . $email->address . '"><img src="' . CN_URL . 'assets/images/icons/mail/mail_' . $iconSize . '.png" height="' . $iconSize . '" width="' . $iconSize . '"/></a></span>';
-			$replace[] = '<span class="cn-separator">' . $atts['separator'] . '</span>';
-
-			$row = "\t" . '<span class="email cn-email-address' . ( $email->preferred ? ' cn-preferred cn-email-address-preferred' : '' ) . '">';
-
-			$row .= str_ireplace(
-				$search,
-				$replace,
-				empty( $atts['format'] ) ? ( empty( $defaults['format'] ) ? '%label%%separator% %address%' : $defaults['format'] ) : $atts['format']
-			);
-
-			// Set the hCard Email Address Type.
-			$row .= '<span class="type" style="display: none;">INTERNET</span>';
-
-			$row .= '</span>';
-
-			$rows[] = apply_filters( 'cn_output_email_address', cnString::replaceWhatWith( $row, ' ' ), $email, $this, $atts );
-		}
-
-		$block = '<span class="email-address-block">' . PHP_EOL . implode( PHP_EOL, $rows ) . PHP_EOL . '</span>';
-
-		// This filter is required to allow the ROT13 encryption plugin to function.
-		$block = apply_filters( 'cn_output_email_addresses', $block, $addresses, $this, $atts );
+		$block = cnString::replaceWhatWith( $out, ' ' );
 
 		$html = $atts['before'] . $block . $atts['after'] . PHP_EOL;
 
@@ -1624,6 +1583,7 @@ class cnOutput extends cnEntry {
 		$defaults = array(
 			'preferred' => NULL,
 			'type'      => NULL,
+			'limit'     => NULL,
 			'format'    => '',
 			'separator' => ':',
 			'before'    => '',
@@ -1643,69 +1603,21 @@ class cnOutput extends cnEntry {
 
 		$atts['id'] = $this->getId();
 
-		$out = '';
-		$networks = $this->getIm( $atts , $cached );
-		$search = array( '%label%' , '%id%' , '%separator%' );
+		$out = $this->im->filterBy( 'type', $atts['type'] )
+		                ->filterBy( 'preferred', $atts['preferred'] )
+		                ->filterBy( 'visibility', Connections_Directory()->currentUser->canView() )
+		                ->take( $atts['limit'] )
+		                ->escapeFor( 'display' )
+		                ->render( 'hcard', array( 'atts' => $atts, 'entry' => $this ), TRUE, TRUE );
 
-		if ( empty( $networks ) ) return '';
+		// The filters need to be reset so additional calls to get messenger IDs with different params return expected results.
+		$this->im->resetFilters();
 
-		$out .= '<span class="im-network-block">' . PHP_EOL;
+		$block = cnString::replaceWhatWith( $out, ' ' );
 
-		foreach ( $networks as $network ) {
-			$replace = array();
+		$html = $atts['before'] . $block . $atts['after'] . PHP_EOL;
 
-			$out .= "\t" . '<span class="im-network cn-im-network' . ( $network->preferred ? ' cn-preferred cn-im-network-preferred' : '' ) . '">';
-
-			( empty( $network->name ) ) ? $replace[] = '' : $replace[] = '<span class="im-name">' . $network->name . '</span>';
-
-			switch ( $network->type ) {
-				case 'aim':
-					$replace[] = empty( $network->id ) ? '' : '<a class="url im-id" href="aim:goim?screenname=' . $network->id . '">' . $network->id . '</a>';
-					break;
-
-				case 'yahoo':
-					$replace[] = empty( $network->id ) ? '' : '<a class="url im-id" href="ymsgr:sendIM?' . $network->id . '">' . $network->id . '</a>';
-					break;
-
-				case 'jabber':
-					$replace[] = empty( $network->id ) ? '' : '<span class="im-id">' . $network->id . '</span>';
-					break;
-
-				case 'messenger':
-					$replace[] = empty( $network->id ) ? '' : '<a class="url im-id" href="msnim:chat?contact=' . $network->id . '">' . $network->id . '</a>';
-					break;
-
-				case 'skype':
-					$replace[] = empty( $network->id ) ? '' : '<a class="url im-id" href="skype:' . $network->id . '?chat">' . $network->id . '</a>';
-					break;
-
-				case 'icq':
-					$replace[] = empty( $network->id ) ? '' : '<a class="url im-id" type="application/x-icq" href="http://www.icq.com/people/cmd.php?uin=' . $network->id . '&action=message">' . $network->id . '</a>';
-					break;
-
-				default:
-					$replace[] = empty( $network->id ) ? '' : '<span class="im-id">' . $network->id . '</span>';
-					break;
-			}
-
-			$replace[] = '<span class="cn-separator">' . $atts['separator'] . '</span>';
-
-			$out .= str_ireplace(
-				$search,
-				$replace,
-				empty( $atts['format'] ) ? ( empty( $defaults['format'] ) ? '%label%%separator% %id%' : $defaults['format'] ) : $atts['format']
-			);
-
-			$out .= '</span>' . PHP_EOL;
-		}
-
-		$out .= '</span>' . PHP_EOL;
-
-		$out = cnString::replaceWhatWith( $out, ' ' );
-
-		$out = $atts['before'] . $out . $atts['after'] . PHP_EOL;
-
-		return $this->echoOrReturn( $atts['return'], $out );
+		return $this->echoOrReturn( $atts['return'], $html );
 	}
 
 	/**

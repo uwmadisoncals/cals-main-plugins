@@ -5,7 +5,7 @@ class FrmEntryValidate {
         FrmEntry::sanitize_entry_post( $values );
         $errors = array();
 
-        if ( ! isset($values['form_id']) || ! isset($values['item_meta']) ) {
+		if ( ! isset( $values['form_id'] ) || ! isset( $values['item_meta'] ) ) {
             $errors['form'] = __( 'There was a problem with your submission. Please try again.', 'formidable' );
             return $errors;
         }
@@ -66,7 +66,7 @@ class FrmEntryValidate {
         );
         $args = wp_parse_args( $args, $defaults );
 
-        if ( empty($args['parent_field_id']) ) {
+		if ( empty( $args['parent_field_id'] ) ) {
 			$value = isset( $values['item_meta'][ $args['id'] ] ) ? $values['item_meta'][ $args['id'] ] : '';
         } else {
             // value is from a nested form
@@ -79,15 +79,15 @@ class FrmEntryValidate {
 		self::maybe_clear_value_for_default_blank_setting( $posted_field, $value );
 
 		// Reset arrays with only one value if it's not a field where array keys need to be preserved
-		if ( is_array($value) && count( $value ) == 1 && isset( $value[0] ) ) {
-			$value = reset($value);
+		if ( is_array( $value ) && count( $value ) == 1 && isset( $value[0] ) ) {
+			$value = reset( $value );
 		}
 
 		if ( ! is_array( $value ) ) {
 			$value = trim( $value );
 		}
 
-        if ( $posted_field->required == '1' && ! is_array( $value ) && trim( $value ) == '' ) {
+        if ( $posted_field->required == '1' && FrmAppHelper::is_empty_value( $value ) ) {
 			$errors[ 'field' . $args['id'] ] = FrmFieldsHelper::get_error_msg( $posted_field, 'blank' );
         } else if ( $posted_field->type == 'text' && ! isset( $_POST['item_name'] ) ) {
             $_POST['item_name'] = $value;
@@ -134,6 +134,10 @@ class FrmEntryValidate {
 		}
 	}
 
+	/**
+	 * @deprecated 3.0
+	 * @codeCoverageIgnore
+	 */
 	public static function validate_url_field( &$errors, $field, $value, $args ) {
 		_deprecated_function( __FUNCTION__, '3.0', 'FrmFieldType::validate' );
 
@@ -144,6 +148,10 @@ class FrmEntryValidate {
 		self::validate_field_types( $errors, $field, $value, $args );
 	}
 
+	/**
+	 * @deprecated 3.0
+	 * @codeCoverageIgnore
+	 */
 	public static function validate_email_field( &$errors, $field, $value, $args ) {
 		_deprecated_function( __FUNCTION__, '3.0', 'FrmFieldType::validate' );
 
@@ -154,6 +162,10 @@ class FrmEntryValidate {
 		self::validate_field_types( $errors, $field, $value, $args );
 	}
 
+	/**
+	 * @deprecated 3.0
+	 * @codeCoverageIgnore
+	 */
 	public static function validate_number_field( &$errors, $field, $value, $args ) {
 		_deprecated_function( __FUNCTION__, '3.0', 'FrmFieldType::validate' );
 
@@ -177,9 +189,8 @@ class FrmEntryValidate {
 	}
 
 	public static function phone_format( $field ) {
-		$default_format = '^((\+\d{1,3}(-|.| )?\(?\d\)?(-| |.)?\d{1,5})|(\(?\d{2,6}\)?))(-|.| )?(\d{3,4})(-|.| )?(\d{4})(( x| ext)\d{1,5}){0,1}$';
 		if ( FrmField::is_option_empty( $field, 'format' ) ) {
-			$pattern = $default_format;
+			$pattern = self::default_phone_format();
 		} else {
 			$pattern = FrmField::get_option( $field, 'format' );
 		}
@@ -193,6 +204,13 @@ class FrmEntryValidate {
 
 		$pattern = '/' . $pattern . '/';
 		return $pattern;
+	}
+
+	/**
+	 * @since 3.01
+	 */
+	private static function default_phone_format() {
+		return '^((\+\d{1,3}(-|.| )?\(?\d\)?(-| |.)?\d{1,5})|(\(?\d{2,6}\)?))(-|.| )?(\d{3,4})(-|.| )?(\d{4})(( x| ext)\d{1,5}){0,1}$';
 	}
 
 	/**
@@ -231,6 +249,10 @@ class FrmEntryValidate {
 		return $pattern;
 	}
 
+	/**
+	 * @deprecated 3.0
+	 * @codeCoverageIgnore
+	 */
 	public static function validate_recaptcha( &$errors, $field, $args ) {
 		_deprecated_function( __FUNCTION__, '3.0', 'FrmFieldType::validate' );
 
@@ -280,7 +302,7 @@ class FrmEntryValidate {
 
 	private static function is_akismet_spam( $values ) {
 		global $wpcom_api_key;
-		return ( is_callable('Akismet::http_post') && ( get_option('wordpress_api_key') || $wpcom_api_key ) && self::akismet( $values ) );
+		return ( is_callable( 'Akismet::http_post' ) && ( get_option( 'wordpress_api_key' ) || $wpcom_api_key ) && self::akismet( $values ) );
 	}
 
 	private static function is_akismet_enabled_for_user( $form_id ) {
@@ -289,7 +311,7 @@ class FrmEntryValidate {
 	}
 
     public static function blacklist_check( $values ) {
-        if ( ! apply_filters('frm_check_blacklist', true, $values) ) {
+		if ( ! apply_filters( 'frm_check_blacklist', true, $values ) ) {
             return false;
         }
 
@@ -348,7 +370,7 @@ class FrmEntryValidate {
 		$datas['user_agent'] = FrmAppHelper::get_server_value( 'HTTP_USER_AGENT' );
 		$datas['referrer'] = isset( $_SERVER['HTTP_REFERER'] ) ? FrmAppHelper::get_server_value( 'HTTP_REFERER' ) : false;
 		$datas['blog_lang'] = get_locale();
-		$datas['blog_charset'] = get_option('blog_charset');
+		$datas['blog_charset'] = get_option( 'blog_charset' );
 
 		if ( akismet_test_mode() ) {
 			$datas['is_test'] = 'true';

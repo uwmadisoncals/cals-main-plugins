@@ -601,7 +601,7 @@ array( 'name' => __('Header Other options', 'weaver-xtreme'), 'type' => 'break')
 <div class="options-intro-menu"> <a href="#header-area"><?php _e('Header Area', 'weaver-xtreme' /*adm*/); ?></a> |
 <a href="#header-image"><?php _e('Header Image', 'weaver-xtreme' /*adm*/); ?></a> |
 <a href="#header-video"><?php _e('Header Video', 'weaver-xtreme' /*adm*/); ?></a> |
-<a href="#site-titletagline"><?php _e('Site Title/Tagline', 'weaver-xtreme' /*adm*/); ?></a> |
+<a href="#site-title-tagline"><?php _e('Site Title/Tagline', 'weaver-xtreme' /*adm*/); ?></a> |
 <a href="#header-widget-area"><?php _e('Header Widget Area', 'weaver-xtreme' /*adm*/); ?></a>|
 <a href="#header-html"><?php _e('Header HTML', 'weaver-xtreme' /*adm*/); ?></a>
 </div>

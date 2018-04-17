@@ -243,6 +243,11 @@ By default, Weaver Xtreme Plus will use the style-weaverxt.css file. &diams;', '
 <?php
 	}
 ?>
+<h3><?php _e('Disable Schema.org Structured Data', 'weaver-xtreme' /*adm*/);?></h3>
+
+	<label><input type="checkbox" name="<?php weaverx_sapi_main_name('_no_schemea'); ?>" id="_no_schemea" <?php checked(weaverx_getopt_checked( '_no_schemea' )); ?> />
+<?php _e('Disable adding Schema.org structured data. (We do not recommend removing this SEO feature.) &diams;', 'weaver-xtreme' /*adm*/);?>
+	</label><br /><br />
 
 <h3><?php _e('Include Widget Areas in Print', 'weaver-xtreme' /*adm*/);?></h3>
 

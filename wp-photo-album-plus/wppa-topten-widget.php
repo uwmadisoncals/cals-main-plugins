@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the top rated photos
-* Version 6.7.01
+* Version 6.8.07
 */
 
 class TopTenWidget extends WP_Widget {
@@ -18,12 +18,6 @@ class TopTenWidget extends WP_Widget {
     function widget($args, $instance) {
 		global $wpdb;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
         wppa( 'in_widget', 'topten' );
@@ -43,9 +37,16 @@ class TopTenWidget extends WP_Widget {
 														'includesubs' => 'yes',
 														'medalsonly' => 'no',
 														'showowner' => 'no',
-														'showalbum' => 'no'
+														'showalbum' => 'no',
+														'logonly' => 'no',
 														) );
- 		$widget_title 	= apply_filters('widget_title', $instance['title'] );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
+
+		$widget_title 	= apply_filters('widget_title', $instance['title'] );
 		$page 			= in_array( wppa_opt( 'topten_widget_linktype' ), wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page('topten_widget_linkpage', __('Top Ten Photos', 'wp-photo-album-plus'));
 		$albumlinkpage 	= wppa_get_the_landing_page('topten_widget_album_linkpage', __('Top Ten Photo album', 'wp-photo-album-plus'));
 		$max  			= wppa_opt( 'topten_count' );
@@ -157,10 +158,26 @@ class TopTenWidget extends WP_Widget {
 			$thumb = $image;
 			// Make the HTML for current picture
 			if ( $display == 'thumbs' ) {
-				$widget_content .= "\n".'<div class="wppa-widget" style="width:'.$maxw.'px; height:'.$maxh.'px; margin:4px; display:inline; text-align:center; float:left;">';
+				$widget_content .= '
+					<div' .
+						' class="wppa-widget"' .
+						' style="' .
+							'width:' . $maxw . 'px;' .
+							'height:' . $maxh . 'px;' .
+							'margin:4px;' .
+							'display:inline;' .
+							'text-align:center;' .
+							'float:left;' .
+							'"' .
+						' data-wppa="yes"' .
+						' >';
 			}
 			else {
-				$widget_content .= "\n".'<div class="wppa-widget" >';
+				$widget_content .= '
+					<div' .
+						' class="wppa-widget"' .
+						' data-wppa="yes"' .
+						' >';
 			}
 			if ( $image ) {
 				$no_album = !$album;
@@ -298,6 +315,7 @@ class TopTenWidget extends WP_Widget {
 		$instance['medalsonly'] 	= $new_instance['medalsonly'];
 		$instance['showalbum'] 		= $new_instance['showalbum'];
 		$instance['showowner'] 		= $new_instance['showowner'];
+		$instance['logonly'] 		= $new_instance['logonly'];
 
         return $instance;
     }
@@ -317,7 +335,8 @@ class TopTenWidget extends WP_Widget {
 														'includesubs' => 'yes',
 														'medalsonly' => 'no',
 														'showowner' => 'no',
-														'showalbum' => 'no'
+														'showalbum' => 'no',
+														'logonly' => 'no',
 
 														) );
 
@@ -382,6 +401,10 @@ class TopTenWidget extends WP_Widget {
 
 		echo
 		'</div>';
+
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
 
 		echo
 		'<p>' .

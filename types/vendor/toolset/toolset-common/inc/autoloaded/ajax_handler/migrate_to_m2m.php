@@ -26,14 +26,21 @@ class Toolset_Ajax_Handler_Migrate_To_M2M extends Toolset_Ajax_Handler_Abstract 
 	/** @var Toolset_Relationship_Controller */
 	private $relationship_controller;
 
-	/** @var null|Toolset_Relationship_Migration */
+	/** @var null|Toolset_Relationship_Migration_Controller */
 	private $migration_controller;
 
 
+	/**
+	 * Toolset_Ajax_Handler_Migrate_To_M2M constructor.
+	 *
+	 * @param Toolset_Ajax $ajax_manager
+	 * @param Toolset_Relationship_Controller|null $di_relationship_controller
+	 * @param Toolset_Relationship_Migration_Controller|null $di_migration_controller
+	 */
 	public function __construct(
 		$ajax_manager,
 		Toolset_Relationship_Controller $di_relationship_controller = null,
-		Toolset_Relationship_Migration $di_migration_controller = null
+		Toolset_Relationship_Migration_Controller $di_migration_controller = null
 	) {
 		parent::__construct( $ajax_manager );
 
@@ -49,7 +56,7 @@ class Toolset_Ajax_Handler_Migrate_To_M2M extends Toolset_Ajax_Handler_Abstract 
 
 	private function get_migration_controller() {
 		if( null === $this->migration_controller ) {
-			$this->migration_controller = new Toolset_Relationship_Migration();
+			$this->migration_controller = new Toolset_Relationship_Migration_Controller();
 		}
 		return $this->migration_controller;
 	}
@@ -73,6 +80,7 @@ class Toolset_Ajax_Handler_Migrate_To_M2M extends Toolset_Ajax_Handler_Abstract 
 		$migration_controller = $this->get_migration_controller();
 
 		$step_number = (int) toolset_getarr( $_POST, 'step', 0 );
+		$options = toolset_ensarr( toolset_getarr( $_POST, 'options' ) );
 
 		// If this is set to false, the migration process halts (there will not be another AJAX call)
 		$continue = true;
@@ -100,11 +108,9 @@ class Toolset_Ajax_Handler_Migrate_To_M2M extends Toolset_Ajax_Handler_Abstract 
 		switch ( $current_phase ) {
 
 			case self::PHASE_DBDELTA: {
-
 				$continue = $this->phase_dbdelta( $step_number , $migration_controller, $results, $next_phase );
-
-						break;
-					}
+				break;
+			}
 
 			case self::PHASE_DEFINITION_MIGRATION: {
 				// Second step - (re)create relationship definitions.
@@ -130,8 +136,15 @@ class Toolset_Ajax_Handler_Migrate_To_M2M extends Toolset_Ajax_Handler_Abstract 
 
 				$migration_step = $step_number - $steps_before_association_migration;
 				$offset = $items_per_step * $migration_step;
+				$create_default_language_if_missing = ( 'create' === toolset_getarr( $options, 'posts_without_default_translation' ) );
+				$copy_post_content_when_creating = (bool) toolset_getarr( $options, 'copy_content_when_creating_posts' );
 
-				$data_migration_result = $migration_controller->migrate_associations( $offset, $items_per_step );
+				$data_migration_result = $migration_controller->migrate_associations(
+					$offset, $items_per_step, $create_default_language_if_missing, $copy_post_content_when_creating
+				);
+
+				// Always add the original result, as it may contain additional information, even in case of success.
+				$results->add( $data_migration_result );
 
 				// Decide if we have to continue.
 				if ( $data_migration_result instanceof Toolset_Result_Updated
@@ -151,9 +164,6 @@ class Toolset_Ajax_Handler_Migrate_To_M2M extends Toolset_Ajax_Handler_Abstract 
 						$next_phase = self::PHASE_FINISH;
 					}
 
-				} else {
-					// Fail or a result without count of updated items.
-					$results->add( $data_migration_result );
 				}
 
 				break;
@@ -172,14 +182,16 @@ class Toolset_Ajax_Handler_Migrate_To_M2M extends Toolset_Ajax_Handler_Abstract 
 
 		$this->ajax_finish(
 			array(
-				'message' => $results->concat_messages( "\n" ),
+				'message' => $results->concat_messages( "\n> " ),
 				'continue' => $continue,
 				'previous_phase' => $current_phase,
 				'is_complete_success' => $results->is_complete_success(),
 				'ajax_arguments' => array(
 					'step' => $step_number + 1,
 					'phase' => $next_phase,
-					'first_phase_step' => $steps_before_association_migration
+					'first_phase_step' => $steps_before_association_migration,
+					// pass the unchanged options so that they're available for all migration steps
+					'options' => $options
 				)
 			),
 			true // the call is a success, it doesn't say anything about the actual operation
@@ -193,7 +205,7 @@ class Toolset_Ajax_Handler_Migrate_To_M2M extends Toolset_Ajax_Handler_Abstract 
 	 * This involves changing database structure.
 	 *
 	 * @param int $step_number Current step of this phase.
-	 * @param Toolset_Relationship_Migration $migration_controller
+	 * @param Toolset_Relationship_Migration_Controller $migration_controller
 	 * @param Toolset_Result_Set $results
 	 * @param int $next_phase The ID of the phase that should follow after this step. Must be set to current phase initially.
 	 *

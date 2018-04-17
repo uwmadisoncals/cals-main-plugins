@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the multitag widget
-* Version 6.7.09
+* Version 6.8.07
 *
 */
 
@@ -20,6 +20,7 @@ class MultitagPhotos extends WP_Widget {
 	var $defaults = array( 	'title' 	=> '',
 							'cols' 		=> '2',
 							'tags' 		=> '',
+							'logonly' 	=> 'no',
 							);
 
 	/** @see WP_Widget::widget */
@@ -29,19 +30,18 @@ class MultitagPhotos extends WP_Widget {
 		wppa( 'in_widget', 'multitag' );
 		wppa_bump_mocc();
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
         extract( $args );
 
 		$instance = wppa_parse_args( (array) $instance, $this -> defaults );
 
- 		$widget_title = apply_filters( 'widget_title', $instance['title'] );
+ 		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
+
+		$widget_title = apply_filters( 'widget_title', $instance['title'] );
 
 		// Display the widget
 		echo $before_widget;
@@ -50,8 +50,11 @@ class MultitagPhotos extends WP_Widget {
 
 		$tags = is_array( $instance['tags'] ) ? implode( ',', $instance['tags'] ) : '';
 
-		echo '<div class="wppa-multitag-widget" >' . wppa_get_multitag_html( $instance['cols'], $tags ) . '</div>';
-		echo '<div style="clear:both"></div>';
+		echo '
+		<div class="wppa-multitag-widget" data-wppa="yes" >' .
+			wppa_get_multitag_html( $instance['cols'], $tags ) .
+		'</div>';
+		echo '<div style="clear:both" ></div>';
 		echo $after_widget;
 
 		wppa( 'in_widget', false );
@@ -66,6 +69,7 @@ class MultitagPhotos extends WP_Widget {
 		// Sanitize
 		$instance['title'] 	= strip_tags( $instance['title'] );
 		$instance['cols'] 	= min( max( '1', $instance['cols'] ), '6' );
+		$instance['logonly'] = $new_instance['logonly'];
 
         return $instance;
     }
@@ -109,6 +113,11 @@ class MultitagPhotos extends WP_Widget {
 				$s .
 			'</b>' .
 		'</p>';
+
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
+
     }
 
 } // class MultitagPhotos

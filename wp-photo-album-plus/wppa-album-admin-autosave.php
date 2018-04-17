@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.8.01
+* Version 6.8.05
 *
 */
 
@@ -1098,23 +1098,38 @@ function wppaTryScheduleAll( id ) {
 										' />';
 									}
 
+									$a = wppa_allow_uploads( $id );
+									if ( $a ) {
+										$full = false;
+									}
+									else {
+										$full = true;
+									}
+									
 									// Goto Upload
 									if ( current_user_can( 'wppa_upload' ) ) {
-										$a = wppa_allow_uploads( $id );
-										if ( $a ) {
-											$full = false;
-										}
-										else {
-											$full = true;
-										}
+										
 										$onc = ( $full ?
 													'alert(\''.__('Change the upload limit or remove photos to enable new uploads.', 'wp-photo-album-plus').'\')' :
 													'document.location = \''.wppa_dbg_url(get_admin_url()).'/admin.php?page=wppa_upload_photos&wppa-set-album='.$id.'\''
 												);
 										$val = ( $full ?
 													__( 'Album is full', 'wp-photo-album-plus' ) :
-													__( 'Upload to this album', 'wp-photo-album-plus' ) .  ( $a > '0' ? ' ' . sprintf( __( '(max %d)', 'wp-photo-album-plus' ), $a ) : '' )
+													__( 'Upload to this album', 'wp-photo-album-plus' ) . ( $a > '0' ? ' ' . sprintf( __( '(max %d)', 'wp-photo-album-plus' ), $a ) : '' )
 												);
+										echo
+										'<input' .
+											' type="button"' .
+											' onclick="' . $onc . '"' .
+											' value="' . $val .'"' .
+										' />';
+									}
+
+									// Goto Import
+									if ( current_user_can( 'wppa_import' ) && ! $full ) {
+
+										$onc = 'document.location = \''.wppa_dbg_url(get_admin_url()).'/admin.php?page=wppa_import_photos&wppa-set-album='.$id.'\'';
+										$val = __( 'Import to this album', 'wp-photo-album-plus' ) . ( $a > '0' ? ' ' . sprintf( __( '(max %d)', 'wp-photo-album-plus' ), $a ) : '' );
 										echo
 										'<input' .
 											' type="button"' .
@@ -1264,11 +1279,12 @@ function wppaTryScheduleAll( id ) {
 		}
 
 		if ( wppa_extended_access() ) {
-			if ( isset($_REQUEST['switchto']) ) update_option('wppa_album_table_'.wppa_get_user(), $_REQUEST['switchto']);
+			if ( isset($_REQUEST['switchto'] ) ) {
+				update_option( 'wppa_album_table_'.wppa_get_user(), $_REQUEST['switchto'] );
+			}
 			$style = get_option('wppa_album_table_'.wppa_get_user(), 'flat');
 		}
 		else $style = 'flat';
-
 		// The Manage Album page
 ?>
 		<div class="wrap">
@@ -1289,7 +1305,7 @@ function wppaTryScheduleAll( id ) {
 				echo '</form>';
 			}
 			// The switch to button(s)
-			if ( wppa_extended_access() ) {
+//			if ( wppa_extended_access() ) {
 				if ( $style == 'flat' ) { ?>
 					<input type="button" class="button-secundary" onclick="document.location='<?php echo wppa_dbg_url(get_admin_url().'admin.php?page=wppa_admin_menu&amp;switchto=collapsible') ?>'" value="<?php _e('Switch to Collapsable table', 'wp-photo-album-plus'); ?>" />
 				<?php }
@@ -1322,7 +1338,8 @@ function wppaTryScheduleAll( id ) {
 						value="<?php _e('Close all', 'wp-photo-album-plus'); ?>"
 					/>
 				<?php }
-			} ?>
+//			}
+			?>
 
 			<br />
 			<?php // The table of existing albums
@@ -1528,6 +1545,14 @@ global $wpdb;
 				<td ><?php _e('Quick', 'wp-photo-album-plus'); ?></td>
 				<td ><?php _e('Bulk', 'wp-photo-album-plus'); ?></td>
 				<td ><?php _e('Seq', 'wp-photo-album-plus'); ?></td>
+				<?php
+				if ( current_user_can( 'wppa_upload' ) ) {
+					echo '<td >' . __('Upload', 'wp-photo-album-plus') . '</td>';
+				}
+				if ( current_user_can( 'wppa_import' ) ) {
+					echo '<td >' . __('Import', 'wp-photo-album-plus') . '</td>';
+				}
+				?>
 				<td ><?php _e('Delete', 'wp-photo-album-plus'); ?></td>
 				<?php if ( wppa_can_create_album() ) echo '<td >'.__('Create', 'wp-photo-album-plus').'</td>'; ?>
 			</tr>
@@ -1536,11 +1561,11 @@ global $wpdb;
 			<?php $alt = ' class="alternate" '; ?>
 
 			<?php
-//				foreach ($albums as $album) if(wppa_have_access($album)) {
 				$idx = '0';
-				foreach (array_keys($seq) as $s) {
+				foreach ( array_keys( $seq ) as $s ) {
 					$album = $albums[$s];
-					if (wppa_have_access($album)) {
+
+					if ( wppa_have_access( $album ) && ( wppa_user_is( 'administrator' ) || $album['owner'] != '--- public ---' ) ) {
 						$counts = wppa_get_treecounts_a($album['id'], true);
 						$pendcount = $counts['pendselfphotos'];
 //						$pendcount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE album=%s AND status=%s", $album['id'], 'pending'));
@@ -1560,12 +1585,20 @@ global $wpdb;
 							<?php $nm = $counts['pendselfphotos']; ?>
 							<?php $ns = $counts['scheduledselfphotos']; ?>
 							<td><?php echo $na.'/'.$np.'/'.$nm.'/'.$ns; ?></td>
-							<?php if ( $album['owner'] != '--- public ---' || wppa_user_is('administrator') ) { ?>
+
 								<?php $url = wppa_ea_url($album['id']) ?>
 								<td><a href="<?php echo($url) ?>" class="wppaedit"><?php _e('Edit', 'wp-photo-album-plus'); ?></a></td>
 								<td><a href="<?php echo($url.'&amp;quick') ?>" class="wppaedit"><?php _e('Quick', 'wp-photo-album-plus'); ?></a></td>
 								<td><a href="<?php echo($url.'&amp;bulk#manage-photos') ?>" class="wppaedit"><?php _e('Bulk', 'wp-photo-album-plus'); ?></a></td>
 								<td><a href="<?php echo($url.'&amp;seq') ?>" class="wppaedit"><?php _e('Seq', 'wp-photo-album-plus'); ?></a></td>
+								<?php
+								if ( current_user_can( 'wppa_upload' ) ) {
+									echo '<td ><a href="' . get_admin_url().'/admin.php?page=wppa_upload_photos&wppa-set-album='.$album['id'] . '" class="wppaedit" >' . __('Upload', 'wp-photo-album-plus') . '</a></td>';
+								}
+								if ( current_user_can( 'wppa_import' ) ) {
+									echo '<td ><a href="' . get_admin_url().'/admin.php?page=wppa_import_photos&wppa-set-album='.$album['id'] . '" class="wppaedit" >' . __('Import', 'wp-photo-album-plus') . '</a></td>';
+								}
+								?>
 
 								<?php $url = wppa_ea_url($album['id'], 'del') ?>
 								<td><a href="<?php echo($url) ?>" class="wppadelete"><?php _e('Delete', 'wp-photo-album-plus'); ?></a></td>
@@ -1579,10 +1612,8 @@ global $wpdb;
 										echo '<td><a href="'.$url.'" class="wppacreate">'.__('Create', 'wp-photo-album-plus').'</a></td>';
 									}
 								}
-							}
-							else { ?>
-							<td></td><td></td><?php if ( wppa_can_create_album() ) echo '<td></td' ?>
-							<?php } ?>
+
+							?>
 						</tr>
 						<?php if ($alt == '') { $alt = ' class="alternate" '; } else { $alt = '';}
 					}
@@ -1666,6 +1697,14 @@ global $wpdb;
 				<td ><?php _e('Quick', 'wp-photo-album-plus'); ?></td>
 				<td ><?php _e('Bulk', 'wp-photo-album-plus'); ?></td>
 				<td ><?php _e('Seq', 'wp-photo-album-plus'); ?></td>
+				<?php
+				if ( current_user_can( 'wppa_upload' ) ) {
+					echo '<td >' . __('Upload', 'wp-photo-album-plus') . '</td>';
+				}
+				if ( current_user_can( 'wppa_import' ) ) {
+					echo '<td >' . __('Import', 'wp-photo-album-plus') . '</td>';
+				}
+				?>
 				<td ><?php _e('Delete', 'wp-photo-album-plus'); ?></td>
 				<?php if ( wppa_can_create_album() ) echo '<td >'.__('Create', 'wp-photo-album-plus').'</td>'; ?>
 			</tr>
@@ -1901,6 +1940,14 @@ global $wpdb;
 				<td ><?php _e('Quick', 'wp-photo-album-plus'); ?></td>
 				<td ><?php _e('Bulk', 'wp-photo-album-plus'); ?></td>
 				<td ><?php _e('Seq', 'wp-photo-album-plus'); ?></td>
+				<?php
+				if ( current_user_can( 'wppa_upload' ) ) {
+					echo '<td >' . __('Upload', 'wp-photo-album-plus') . '</td>';
+				}
+				if ( current_user_can( 'wppa_import' ) ) {
+					echo '<td >' . __('Import', 'wp-photo-album-plus') . '</td>';
+				}
+				?>
 				<td ><?php _e('Delete', 'wp-photo-album-plus'); ?></td>
 				<?php if ( wppa_can_create_album() ) echo '<td >'.__('Create', 'wp-photo-album-plus').'</td>'; ?>
 			</tr>
@@ -1910,7 +1957,11 @@ global $wpdb;
 			<?php wppa_do_albumlist('0', '0', $albums, $seq); ?>
 			<?php if ( $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_ALBUMS."` WHERE `a_parent` = '-1'" ) > 0 ) { ?>
 				<tr>
-					<td colspan="19" ><em><?php _e('The following albums are ---separate--- and do not show up in the generic album display', 'wp-photo-album-plus'); ?></em></td>
+					<td colspan="<?php echo ( '19' + ( current_user_can( 'wppa_upload' ) ? '1' : '0' ) + ( current_user_can( 'wppa_import' ) ? '1' : '0' ) ) ?>" >
+						<em>
+							<?php _e('The following albums are ---separate--- and do not show up in the generic album display', 'wp-photo-album-plus'); ?>
+						</em>
+					</td>
 				</tr>
 				<?php wppa_do_albumlist('-1', '0', $albums, $seq); ?>
 			<?php }
@@ -1997,6 +2048,14 @@ global $wpdb;
 				<td ><?php _e('Quick', 'wp-photo-album-plus'); ?></td>
 				<td ><?php _e('Bulk', 'wp-photo-album-plus'); ?></td>
 				<td ><?php _e('Seq', 'wp-photo-album-plus'); ?></td>
+				<?php
+				if ( current_user_can( 'wppa_upload' ) ) {
+					echo '<td >' . __('Upload', 'wp-photo-album-plus') . '</td>';
+				}
+				if ( current_user_can( 'wppa_import' ) ) {
+					echo '<td >' . __('Import', 'wp-photo-album-plus') . '</td>';
+				}
+				?>
 				<td ><?php _e('Delete', 'wp-photo-album-plus'); ?></td>
 				<?php if ( wppa_can_create_album() ) echo '<td >'.__('Create', 'wp-photo-album-plus').'</td>'; ?>
 			</tr>
@@ -2040,10 +2099,11 @@ function wppa_search_edit( $collapsible = false ) {
 
 	$result =
 	'<tr>' .
-		'<td colspan="' . ( $collapsible ? 19 : 13 ) . '" >' .
+		'<td colspan="' . ( ( $collapsible ? '19' : '13' ) + ( current_user_can( 'wppa_upload' ) ? '1' : '0' ) + ( current_user_can( 'wppa_import' ) ? '1' : '0' ) ) . '" >' .
 			'<em>' .
 				__( 'Search for photos to edit', 'wp-photo-album-plus' ) .
 			'</em>' .
+			' ' .
 			'<small>' .
 				__( 'Enter search words seperated by commas. Photos will meet all search words by their names, descriptions, translated keywords and/or tags.', 'wp-photo-album-plus' ) .
 			'</small>' .
@@ -2090,6 +2150,7 @@ function wppa_search_edit( $collapsible = false ) {
 			'</a>' .
 		'</td>' .
 		'<td></td><td></td><td></td>' .
+		'<td colspan="' . ( ( current_user_can( 'wppa_upload' ) ? '1' : '0' ) + ( current_user_can( 'wppa_import' ) ? '1' : '0' ) ) . '"></td>' .
 	'</tr>';
 
 	echo $result;
@@ -2195,15 +2256,16 @@ global $wpdb;
 	echo $result;
 }
 
-function wppa_do_albumlist($parent, $nestinglevel, $albums, $seq) {
+function wppa_do_albumlist( $parent, $nestinglevel, $albums, $seq ) {
 global $wpdb;
 
 	$alt = true;
 
-		foreach (array_keys($seq) as $s) {			// Obey the global sequence
+		foreach ( array_keys( $seq ) as $s ) {			// Obey the global sequence
 			$album = $albums[$s];
 			if ( $album['a_parent'] == $parent ) {
-				if (wppa_have_access($album)) {
+				if ( wppa_have_access( $album ) ) {
+
 					$counts = wppa_get_treecounts_a($album['id'], true);
 					$pendcount = $counts['pendselfphotos'];
 					$schedulecount = $counts['scheduledselfphotos'];
@@ -2222,7 +2284,6 @@ global $wpdb;
 						if ( $alt ) $class .= ' alternate';
 						$style = '';
 						if ( $pendcount ) $style .= 'background-color:#ffdddd; ';
-					//	if ( $haschildren ) $style .= 'font-weight:bold; ';
 						if ( $parent != '0' && $parent != '-1' ) $style .= 'display:none; ';
 						$onclickon = 'jQuery(\'.wppa-alb-on-'.$album['id'].'\').css(\'display\',\'\'); jQuery(\'#alb-arrow-on-'.$album['id'].'\').css(\'display\',\'none\'); jQuery(\'#alb-arrow-off-'.$album['id'].'\').css(\'display\',\'\');';
 						$onclickoff = 'jQuery(\'.wppa-alb-off-'.$album['id'].'\').css(\'display\',\'none\'); jQuery(\'#alb-arrow-on-'.$album['id'].'\').css(\'display\',\'\'); jQuery(\'#alb-arrow-off-'.$album['id'].'\').css(\'display\',\'none\'); checkArrows();';
@@ -2263,13 +2324,21 @@ global $wpdb;
 							<?php $nm = $counts['pendselfphotos']; ?>
 							<?php $ns = $counts['scheduledselfphotos']; ?>
 							<td><?php echo $na.'/'.$np.'/'.$nm.'/'.$ns; ?></td>
+
 							<?php if ( $album['owner'] != '--- public ---' || wppa_user_is('administrator') ) { ?>
 								<?php $url = wppa_ea_url($album['id']) ?>
 								<td><a href="<?php echo($url) ?>" class="wppaedit"><?php _e('Edit', 'wp-photo-album-plus'); ?></a></td>
 								<td><a href="<?php echo($url.'&amp;quick') ?>" class="wppaedit"><?php _e('Quick', 'wp-photo-album-plus'); ?></a></td>
 								<td><a href="<?php echo($url.'&amp;bulk#manage-photos') ?>" class="wppaedit"><?php _e('Bulk', 'wp-photo-album-plus'); ?></a></td>
 								<td><a href="<?php echo($url.'&amp;seq') ?>" class="wppaedit"><?php _e('Seq', 'wp-photo-album-plus'); ?></a></td>
-
+								<?php
+								if ( current_user_can( 'wppa_upload' ) ) {
+									echo '<td ><a href="' . get_admin_url().'/admin.php?page=wppa_upload_photos&wppa-set-album='.$album['id'] . '" class="wppaedit" >' . __('Upload', 'wp-photo-album-plus') . '</a></td>';
+								}
+								if ( current_user_can( 'wppa_import' ) ) {
+									echo '<td ><a href="' . get_admin_url().'/admin.php?page=wppa_import_photos&wppa-set-album='.$album['id'] . '" class="wppaedit" >' . __('Import', 'wp-photo-album-plus') . '</a></td>';
+								}
+								?>
 								<?php $url = wppa_ea_url($album['id'], 'del') ?>
 								<td><a href="<?php echo($url) ?>" class="wppadelete"><?php _e('Delete', 'wp-photo-album-plus'); ?></a></td>
 								<?php if ( wppa_can_create_album() ) {
@@ -2283,9 +2352,13 @@ global $wpdb;
 									}
 								}
 							}
-							else { ?>
-							<td></td><td></td><?php if ( wppa_can_create_album() ) echo '<td></td' ?>
-							<?php } ?>
+							else {
+								if ( wppa_can_create_album() ) echo '<td></td>';
+								if ( current_user_can( 'wppa_upload' ) ) echo '<td></td>';
+								if ( current_user_can( 'wppa_import' ) ) echo '<td></td>';
+								echo '<td></td><td></td><td></td><td></td><td></td>';
+							} ?>
+
 						</tr>
 						<?php if ($alt == '') { $alt = ' class="alternate" '; } else { $alt = '';}
 						if ( $haschildren ) wppa_do_albumlist($album['id'], $nestinglevel+'1', $albums, $seq);
@@ -2352,6 +2425,7 @@ global $wpdb;
 	wppa_delete_album_source( $id );
 	wppa_index_remove( 'album', $id );
 	wppa_clear_catlist();
+	wppa_clear_cache();
 
 	$msg = __( 'Album Deleted.' , 'wp-photo-album-plus');
 	if ( wppa( 'ajax' ) ) {

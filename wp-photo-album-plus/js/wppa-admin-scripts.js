@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.8.01
+/* Version 6.8.07
 /* Various js routines used in admin pages
 */
 
@@ -167,11 +167,11 @@ function wppaInitSettings() {
 	wppaCheckAutoPage();
 	wppaCheckGps();
 	wppaCheckFontPreview();
-	wppaCheckCheck( 'enable_video', 'wppa-video' );
-	wppaCheckCheck( 'custom_fields', 'custfields' );
-	wppaCheckCheck( 'album_custom_fields', 'albumcustfields' );
-	wppaCheckCheck( 'new_mod_label_is_text', 'nmtxt' );
-	wppaCheckCheck( 'coverphoto_responsive', 'cvpr' );
+	wppaCheckCheck( 'wppa_enable_video', 'wppa-video' );
+	wppaCheckCheck( 'wppa_custom_fields', 'custfields' );
+	wppaCheckCheck( 'wppa_album_custom_fields', 'albumcustfields' );
+	wppaCheckCheck( 'wppa_new_mod_label_is_text', 'nmtxt' );
+	wppaCheckCheck( 'wppa_coverphoto_responsive', 'cvpr' );
 	wppaCheckSmWidgetLink();
 
 	var tab = new Array('O','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII');
@@ -316,9 +316,10 @@ function wppaFollow( id, clas ) {
 	}
 }
 
-function wppaCheckCheck( slug, clas ) {
+function wppaCheckCheck( xslug, clas ) {
 //wppaConsoleLog( 'CheckCheck slug = '+slug, 'force' );
 
+	var slug = xslug.substring(5);
 	var on = document.getElementById( slug ).checked;
 	if ( on ) {
 		jQuery( '.'+clas ).css( 'display', '' );
@@ -1321,7 +1322,7 @@ function _wppaAjaxUpdatePhoto( photo, actionslug, value, refresh, bef, aft ) {
 								'&value=' + wppaEncode( value ),
 					async: 		true,
 					type: 		'POST',
-					timeout: 	10000,
+					timeout: 	60000,
 					beforeSend: function( xhr ) {
 
 									// Show spinner
@@ -1581,7 +1582,7 @@ function _wppaAjaxUpdateAlbum( album, actionslug, value, isTmce, refresh ) {
 								'&value=' + wppaEncode( value ),
 					async: 		true,
 					type: 		'POST',
-					timeout: 	10000,
+					timeout: 	60000,
 					beforeSend: function( xhr ) {
 
 									// Show spinner

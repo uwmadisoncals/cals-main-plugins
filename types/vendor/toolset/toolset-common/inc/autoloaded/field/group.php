@@ -38,7 +38,7 @@ abstract class Toolset_Field_Group {
 	/**
 	 * @var WP_Post Post object that represents the field group.
 	 */
-	private $post;
+	protected $post;
 
 
 	/** @var Toolset_Post_Type_Repository|null */
@@ -513,7 +513,7 @@ abstract class Toolset_Field_Group {
 		if ( $type_input instanceof IToolset_Post_Type ) {
 			$post_type_slug = $type_input->get_slug();
 			$post_type = $type_input;
-		} elseif( is_string( $type_input ) ) {
+		} elseif( is_string( $type_input ) || is_int( $type_input )) {
 			$post_type_slug = $type_input;
 			$post_type = null;
 		} else {

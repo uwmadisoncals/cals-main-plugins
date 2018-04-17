@@ -3,7 +3,7 @@
 // Conatins lightbox modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaLightboxVersion = '6.7.06';
+var wppaLightboxVersion = '6.8.05';
 
 // Global inits
 var wppaNormsBtnOpac 		= 0.75;
@@ -43,7 +43,7 @@ function wppaDoOnOrientationChange( e ) {
 
 	// Full screen and still in?
 	if ( wppaOvlMode != 'normal' && document.getElementById( 'wppa-overlay-img' ) ) {
-		setTimeout( 'wppaOvlShow( ' + wppaOvlIdx + ' )', 100 );
+		setTimeout( 'wppaOvlShow( ' + wppaOvlIdx + ' )', 10 );
 		return;
 	}
 }
@@ -139,7 +139,7 @@ wppaConsoleLog( 'wppaOvlFull' );
 		} else if ( elem.webkitRequestFullscreen ) {
 			elem.webkitRequestFullscreen();
 		}
-		setTimeout( function(){wppaOvlShow( wppaOvlIdx )}, 500 );
+		setTimeout( function(){wppaOvlShow( wppaOvlIdx )}, 50 );
 	}
 
 	// Cancel fullscreen. This is browser dependant
@@ -153,7 +153,7 @@ wppaConsoleLog( 'wppaOvlFull' );
 		}
 	}
 
-	setTimeout( function(){wppaShowFsButtons(0.75)}, 300 );
+	setTimeout( function(){wppaShowFsButtons(0.75)}, 30 );
 
 	// Remove legenda
 	jQuery( '#wppa-ovl-legenda-1' ).html( '' );
@@ -182,9 +182,9 @@ wppaConsoleLog( 'wppaOvlNorm' );
 		return;
 	}
 
-	setTimeout( function(){wppaShowFsButtons(0.75)}, 300 );
+	setTimeout( function(){wppaShowFsButtons(0.75)}, 30 );
 
-	setTimeout( function(){wppaOvlShow(wppaOvlIdx)}, 500 );
+	setTimeout( function(){wppaOvlShow(wppaOvlIdx)}, 50 );
 }
 
 // Prepare the display of the lightbox overlay.
@@ -312,7 +312,7 @@ wppaConsoleLog( 'wppaOvlShow arg=' + arg );
 	}
 
 	// Now start the actual function
-	setTimeout( function(){ _wppaOvlShow( wppaOvlIdx )}, 100 );
+	setTimeout( function(){ _wppaOvlShow( wppaOvlIdx )}, 1 );
 
 }
 
@@ -326,7 +326,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 
 	// Show spinner
 	if ( wppaOvlFirst ) {
-		jQuery( "#wppa-ovl-spin" ).fadeIn( 1500 );
+		jQuery( "#wppa-ovl-spin" ).fadeIn( 500 );
 	}
 
 	// Find handy switches
@@ -341,7 +341,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 		wppaConsoleLog( 'Preloading ' + ( idx + 1 ) + '/' + wppaOvlUrls.length + ' (current)' );
 		if ( ! wppaIsIe && ! wppaOvlImgs[idx].complete ) {
 			wppaConsoleLog( 'Retrying preload current image' );
-			setTimeout( '_wppaOvlShow(' + idx + ')', 100 );
+			setTimeout( '_wppaOvlShow(' + idx + ')', 10 );
 			return;
 		}
 	}
@@ -512,9 +512,9 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 //		wppaReplaceSvg();
 
 		wppaOvlIsVideo = wppaIsVideo;
-		setTimeout( 'wppaOvlFormatFull()', 10 );
+		setTimeout( 'wppaOvlFormatFull()', 1 );
 		if ( wppaIsVideo || wppaHasAudio ) {
-			setTimeout( 'wppaOvlUpdateFsId()', 2000 );
+			setTimeout( 'wppaOvlUpdateFsId()', 20 );
 		}
 		else {
 			wppaOvlFsPhotoId = 0;
@@ -906,7 +906,7 @@ wppaConsoleLog( 'wppaOvlSize' );
 
 	// Done?
 	if ( ! done ) {
-		setTimeout( function(){ wppaOvlSize(wppaOvlAnimSpeed) }, speed + 100 );
+		setTimeout( function(){ wppaOvlSize(wppaOvlAnimSpeed) }, speed + 10 );
 		wppaConsoleLog( 'Not done '+wppaOvlIdx+' saved='+wppaSavedImageWidth+', wid='+wid+', cw='+cw+', nw='+nw+
 							', img complete='+document.getElementById( 'wppa-overlay-img' ).complete );
 	}
@@ -939,7 +939,7 @@ wppaConsoleLog( 'wppaOvlFormatFull '+wppaOvlMode );
 		if ( ! wppaIsIe && ( ! img || ! img.complete ) ) {
 
 			// Wait for load complete
-			setTimeout( 'wppaOvlFormatFull()', 100 );
+			setTimeout( 'wppaOvlFormatFull()', 10 );
 			return;
 		}
 		natWidth 	= img.naturalWidth;
@@ -1111,7 +1111,7 @@ wppaConsoleLog( 'wppaOvlRun, running='+wppaOvlRunning );
 
 	// Wait until playing audio or video ends
 	if ( wppaOvlVideoPlaying || wppaOvlAudioPlaying ) {
-		setTimeout( 'wppaOvlRun()', 500 );
+		setTimeout( 'wppaOvlRun()', 50 );
 		return;
 	}
 
@@ -1121,7 +1121,7 @@ wppaConsoleLog( 'wppaOvlRun, running='+wppaOvlRunning );
 		if ( elm ) {
 			if ( ! wppaIsIe && ! elm.complete ) {
 				wppaConsoleLog( 'Wait during run' );
-				setTimeout( 'wppaOvlRun()', 500 );
+				setTimeout( 'wppaOvlRun()', 50 );
 				return;
 			}
 		}
@@ -1238,6 +1238,18 @@ wppaConsoleLog( 'wppaOvlOnClick' );
 function wppaInitOverlay() {
 wppaConsoleLog( 'wppaInitOverlay' );
 
+	// First find subtitles for non-wppa images
+	jQuery( '.wp-caption' ).each( function() { 
+		var div 		= jQuery( this );
+		var title 		= div.find( 'IMG[alt]' ).attr( 'alt' ) || '';
+		var description = div.find( '.wp-caption-text' ).html() || ''; 
+		var a 			= div.find( 'a' );
+		var lbtitle 	= title + '<br>' + description;
+		if ( ! a.attr( 'data-lbtitle' ) ) {
+			a.attr( 'data-lbtitle', lbtitle ); 
+		}
+	});
+	
 	if ( wppaOvlMode == '' ) {
 		wppaOvlMode = wppaOvlModeInitial;
 	}
@@ -1323,10 +1335,10 @@ function wppaOvlResize() {
 wppaConsoleLog( 'wppaOvlResize' );
 
 	// After resizing, the number of lines may have changed
-	setTimeout( 'wppaOvlSize( '+wppaOvlAnimSpeed+' )', 100 );
+	setTimeout( 'wppaOvlSize( '+wppaOvlAnimSpeed+' )', 10 );
 
 	if ( wppaOvlAudioStart && ! wppaOvlAudioPlaying ) {
-		setTimeout( 'wppaOvlStartAudio()', 1000 );
+		setTimeout( 'wppaOvlStartAudio()', 100 );
 	}
 }
 

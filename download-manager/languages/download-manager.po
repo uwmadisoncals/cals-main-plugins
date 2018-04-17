@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Download Manager Pro v2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-25 11:32+0600\n"
-"PO-Revision-Date: 2018-01-25 11:32+0600\n"
+"POT-Creation-Date: 2018-03-12 13:30+0600\n"
+"PO-Revision-Date: 2018-03-12 13:30+0600\n"
 "Last-Translator: \n"
 "Language-Team: Shaon <proshaon@yahoo.com>\n"
 "Language: en_BD\n"
@@ -13,7 +13,7 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Generator: Poedit 2.0.3\n"
+"X-Generator: Poedit 2.0.6\n"
 "X-Poedit-SearchPath-0: .\n"
 
 #: admin/class.WordPressDownloadManagerAdmin.php:147
@@ -25,11 +25,11 @@ msgstr ""
 msgid "Attach File"
 msgstr ""
 
-#: admin/menus/class.Addons.php:22
+#: admin/menus/class.Addons.php:21
 msgid "Add-Ons &lsaquo; Download Manager"
 msgstr ""
 
-#: admin/menus/class.Addons.php:22
+#: admin/menus/class.Addons.php:21
 msgid "Add-Ons"
 msgstr ""
 
@@ -72,11 +72,11 @@ msgstr ""
 msgid "History"
 msgstr ""
 
-#: admin/tpls/addons-list.php:230
+#: admin/tpls/addons-list.php:226
 msgid "WPDM Add-Ons"
 msgstr ""
 
-#: admin/tpls/addons-list.php:283
+#: admin/tpls/addons-list.php:292
 msgid "Failed to connect with server!"
 msgstr ""
 
@@ -272,60 +272,60 @@ msgid "Free Add-ons"
 msgstr ""
 
 #: admin/tpls/settings/addon-update.php:42
-#: admin/tpls/settings/addon-update.php:86
+#: admin/tpls/settings/addon-update.php:87
 msgid "Product Name"
 msgstr ""
 
 #: admin/tpls/settings/addon-update.php:43
-#: admin/tpls/settings/addon-update.php:87
+#: admin/tpls/settings/addon-update.php:88
 msgid "Active(v)"
 msgstr ""
 
 #: admin/tpls/settings/addon-update.php:44
-#: admin/tpls/settings/addon-update.php:88
+#: admin/tpls/settings/addon-update.php:89
 msgid "Latest(v)"
 msgstr ""
 
 #: admin/tpls/settings/addon-update.php:45
-#: admin/tpls/settings/addon-update.php:89 libs/class.FileList.php:96
+#: admin/tpls/settings/addon-update.php:90 libs/class.FileList.php:96
 #: libs/class.FileList.php:98 libs/class.FileList.php:134
 #: libs/class.FileList.php:136 libs/class.FileList.php:201
 #: libs/class.FileList.php:248 libs/class.FileList.php:303
-#: libs/class.Package.php:69 libs/class.Package.php:147
-#: libs/class.Package.php:585 libs/class.Package.php:610
-#: libs/class.Package.php:677 libs/class.Package.php:760
-#: libs/class.Package.php:785 libs/class.Package.php:812
-#: libs/class.Package.php:1149 libs/class.PackageLocks.php:59
+#: libs/class.Package.php:72 libs/class.Package.php:150
+#: libs/class.Package.php:589 libs/class.Package.php:614
+#: libs/class.Package.php:681 libs/class.Package.php:764
+#: libs/class.Package.php:789 libs/class.Package.php:816
+#: libs/class.Package.php:1156 libs/class.PackageLocks.php:59
 #: libs/class.PackageLocks.php:94 tpls/lock-options-iframe.php:204
 #: tpls/wpdm-all-downloads.php:146 wpdm-functions.php:100
 #: wpdm-functions.php:125 wpdm-functions.php:191
 msgid "Download"
 msgstr ""
 
-#: admin/tpls/settings/addon-update.php:68
-#: admin/tpls/settings/addon-update.php:109
+#: admin/tpls/settings/addon-update.php:69
+#: admin/tpls/settings/addon-update.php:110
 msgid "Install"
-msgstr ""
-
-#: admin/tpls/settings/addon-update.php:70
-#: admin/tpls/settings/addon-update.php:111
-msgid "Update"
 msgstr ""
 
 #: admin/tpls/settings/addon-update.php:71
 #: admin/tpls/settings/addon-update.php:112
+msgid "Update"
+msgstr ""
+
+#: admin/tpls/settings/addon-update.php:72
+#: admin/tpls/settings/addon-update.php:113
 msgid "Updated"
 msgstr ""
 
-#: admin/tpls/settings/addon-update.php:73
+#: admin/tpls/settings/addon-update.php:74
 msgid "Expired"
 msgstr ""
 
-#: admin/tpls/settings/addon-update.php:127 tpls/wpdm-reg-form.php:135
+#: admin/tpls/settings/addon-update.php:128 tpls/wpdm-reg-form.php:135
 msgid "Please Wait..."
 msgstr ""
 
-#: admin/tpls/settings/addon-update.php:129
+#: admin/tpls/settings/addon-update.php:130
 msgid "Success!"
 msgstr ""
 
@@ -657,51 +657,51 @@ msgstr ""
 msgid "New Category Name"
 msgstr ""
 
-#: libs/class.Apply.php:173 wpdm-functions.php:279
+#: libs/class.Apply.php:174 wpdm-functions.php:279
 msgid "Captcha Verification Failed!"
 msgstr ""
 
-#: libs/class.Apply.php:181 libs/class.Apply.php:182
+#: libs/class.Apply.php:182 libs/class.Apply.php:183
 msgid "Error: User registration is disabled!"
 msgstr ""
 
-#: libs/class.Apply.php:192
+#: libs/class.Apply.php:193
 msgid "Username is Empty!"
 msgstr ""
 
-#: libs/class.Apply.php:201
+#: libs/class.Apply.php:202
 msgid "Invalid Email Address!"
 msgstr ""
 
-#: libs/class.Apply.php:267
+#: libs/class.Apply.php:268
 msgid "Email already exists."
 msgstr ""
 
-#: libs/class.Apply.php:276
+#: libs/class.Apply.php:277
 msgid "User already exists."
 msgstr ""
 
-#: libs/class.Apply.php:388
+#: libs/class.Apply.php:403
 msgid "You don't have permission to download this file"
 msgstr ""
 
-#: libs/class.Apply.php:395
+#: libs/class.Apply.php:410
 msgid "Download link is expired. Please get new download link."
 msgstr ""
 
-#: libs/class.Apply.php:397
+#: libs/class.Apply.php:412
 msgid "Download link is expired or not valid. Please get new download link."
 msgstr ""
 
-#: libs/class.Apply.php:404
+#: libs/class.Apply.php:419
 msgid "Stock Limit Reached"
 msgstr ""
 
-#: libs/class.Apply.php:410
+#: libs/class.Apply.php:425
 msgid "Invalid download link."
 msgstr ""
 
-#: libs/class.Apply.php:504
+#: libs/class.Apply.php:519
 msgid "Price"
 msgstr ""
 
@@ -777,67 +777,67 @@ msgstr ""
 msgid "ID missing!"
 msgstr ""
 
-#: libs/class.Package.php:122 libs/class.Package.php:125
-#: libs/class.Package.php:127
+#: libs/class.Package.php:125 libs/class.Package.php:128
+#: libs/class.Package.php:130
 msgid "Icon"
 msgstr ""
 
-#: libs/class.Package.php:130 libs/class.Package.php:137
+#: libs/class.Package.php:133 libs/class.Package.php:140
 msgid "Thumbnail"
 msgstr ""
 
-#: libs/class.Package.php:159 libs/class.Package.php:594
-#: libs/class.Package.php:794 wpdm-functions.php:109 wpdm-start-download.php:23
+#: libs/class.Package.php:162 libs/class.Package.php:598
+#: libs/class.Package.php:798 wpdm-functions.php:109 wpdm-start-download.php:23
 msgid "Download Limit Exceeded"
 msgstr ""
 
-#: libs/class.Package.php:162 libs/class.Package.php:170
-#: libs/class.Package.php:178 libs/class.Package.php:186
+#: libs/class.Package.php:165 libs/class.Package.php:173
+#: libs/class.Package.php:181 libs/class.Package.php:189
 msgid "DOWNLOAD ERROR"
 msgstr ""
 
-#: libs/class.Package.php:167 libs/class.Package.php:598
-#: libs/class.Package.php:798 wpdm-functions.php:113
+#: libs/class.Package.php:170 libs/class.Package.php:602
+#: libs/class.Package.php:802 wpdm-functions.php:113
 msgid "Download was expired on"
 msgstr ""
 
-#: libs/class.Package.php:175 libs/class.Package.php:605
-#: libs/class.Package.php:806 wpdm-functions.php:120
+#: libs/class.Package.php:178 libs/class.Package.php:609
+#: libs/class.Package.php:810 wpdm-functions.php:120
 msgid "Download will be available from "
 msgstr ""
 
-#: libs/class.Package.php:209
+#: libs/class.Package.php:212
 msgid "Terms and Conditions"
 msgstr ""
 
-#: libs/class.Package.php:210
+#: libs/class.Package.php:213
 msgid "I Agree"
 msgstr ""
 
-#: libs/class.Package.php:442
+#: libs/class.Package.php:445
 msgid "No File Attached!"
 msgstr ""
 
-#: libs/class.Package.php:600 libs/class.Package.php:607
-#: libs/class.Package.php:617 wpdm-functions.php:115 wpdm-functions.php:122
+#: libs/class.Package.php:604 libs/class.Package.php:611
+#: libs/class.Package.php:621 wpdm-functions.php:115 wpdm-functions.php:122
 #: wpdm-functions.php:132
 msgid "Download:"
 msgstr ""
 
-#: libs/class.Package.php:699 wpdm-functions.php:213
+#: libs/class.Package.php:703 wpdm-functions.php:213
 msgid "Download limit exceeded!"
 msgstr ""
 
-#: libs/class.Package.php:726
+#: libs/class.Package.php:730
 msgid "Verify CAPTCHA to Download"
 msgstr ""
 
-#: libs/class.Package.php:801 libs/class.Package.php:809
-#: libs/class.Package.php:819
+#: libs/class.Package.php:805 libs/class.Package.php:813
+#: libs/class.Package.php:823
 msgid "DOWNLOAD ERROR:"
 msgstr ""
 
-#: libs/class.Package.php:876
+#: libs/class.Package.php:880
 msgid "Limit Over!"
 msgstr ""
 
@@ -859,17 +859,21 @@ msgid "Submit"
 msgstr ""
 
 #: libs/class.Pagination.php:64 tpls/wpdm-all-downloads.php:121
-#: tpls/wpdm-all-downloads.php:298
+#: tpls/wpdm-all-downloads.php:313
 msgid "Previous"
 msgstr ""
 
 #: libs/class.Pagination.php:65 tpls/wpdm-all-downloads.php:120
-#: tpls/wpdm-all-downloads.php:299
+#: tpls/wpdm-all-downloads.php:314
 msgid "Next"
 msgstr ""
 
 #: libs/class.ShortCodes.php:121
 msgid "User registration is disabled"
+msgstr ""
+
+#: libs/class.StreamMedia.php:34
+msgid "Failed To Open File!"
 msgstr ""
 
 #: libs/class.UserDashboard.php:16
@@ -1058,27 +1062,27 @@ msgstr ""
 msgid "Create Date"
 msgstr ""
 
-#: tpls/wpdm-all-downloads.php:225
+#: tpls/wpdm-all-downloads.php:240
 msgid "file(s)"
 msgstr ""
 
-#: tpls/wpdm-all-downloads.php:231
+#: tpls/wpdm-all-downloads.php:246
 msgid "downloads"
 msgstr ""
 
-#: tpls/wpdm-all-downloads.php:231
+#: tpls/wpdm-all-downloads.php:246
 msgid "download"
 msgstr ""
 
-#: tpls/wpdm-all-downloads.php:237
+#: tpls/wpdm-all-downloads.php:252
 msgid "views"
 msgstr ""
 
-#: tpls/wpdm-all-downloads.php:237
+#: tpls/wpdm-all-downloads.php:252
 msgid "view"
 msgstr ""
 
-#: tpls/wpdm-all-downloads.php:277
+#: tpls/wpdm-all-downloads.php:292
 msgid "No Packages Found"
 msgstr ""
 

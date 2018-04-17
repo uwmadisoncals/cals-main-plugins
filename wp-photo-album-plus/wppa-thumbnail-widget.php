@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail photos
-* Version 6.7.01
+* Version 6.8.07
 */
 
 class ThumbnailWidget extends WP_Widget {
@@ -19,12 +19,6 @@ class ThumbnailWidget extends WP_Widget {
 
 		global $wpdb;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
 		wppa( 'in_widget', 'tn' );
@@ -40,10 +34,15 @@ class ThumbnailWidget extends WP_Widget {
 														'name' 		=> 'no',
 														'display' 	=> 'thumbs',
 														'sortby' 	=> wppa_get_photo_order('0'),
-														'limit' 	=> wppa_opt( 'thumbnail_widget_count' )
+														'limit' 	=> wppa_opt( 'thumbnail_widget_count' ),
+														'logonly' 	=> 'no',
 														) );
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
+
 		$widget_title 	= apply_filters( 'widget_title', $instance['title'] );
-//		$widget_title 	= apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance, $this->id_base );
 
 		$widget_link	= $instance['link'];
 		$page 			= in_array( wppa_opt( 'thumbnail_widget_linktype' ), wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page('thumbnail_widget_linkpage', __('Thumbnail photos', 'wp-photo-album-plus'));
@@ -90,10 +89,19 @@ class ThumbnailWidget extends WP_Widget {
 
 			// Make the HTML for current picture
 			if ( $display == 'thumbs' ) {
-				$widget_content .= "\n".'<div class="wppa-widget" style="width:'.$maxw.'px; height:'.$maxh.'px; margin:4px; display:inline; text-align:center; float:left;">';
+				$widget_content .= '
+					<div' .
+						' class="wppa-widget"' .
+						' style="width:'.$maxw.'px; height:'.$maxh.'px; margin:4px; display:inline; text-align:center; float:left;"' .
+						' data-wppa="yes"' .
+						' >';
 			}
 			else {
-				$widget_content .= "\n".'<div class="wppa-widget" >';
+				$widget_content .= '
+					<div' .
+						' class="wppa-widget"' .
+						' data-wppa="yes"' .
+						' >';
 			}
 			if ($image) {
 				$link       = wppa_get_imglnk_a('tnwidget', $image['id']);
@@ -155,6 +163,7 @@ class ThumbnailWidget extends WP_Widget {
 		$instance['linktitle']	= $new_instance['linktitle'];
 		$instance['sortby'] 	= $new_instance['sortby'];
 		$instance['limit']		= strval(intval($new_instance['limit']));
+		$instance['logonly'] 	= $new_instance['logonly'];
 
         return $instance;
     }
@@ -171,7 +180,8 @@ class ThumbnailWidget extends WP_Widget {
 															'name' 		=> 'no',
 															'display' 	=> 'thumbs',
 															'sortby' 	=> wppa_get_photo_order('0'),
-															'limit' 	=> wppa_opt( 'thumbnail_widget_count' )
+															'limit' 	=> wppa_opt( 'thumbnail_widget_count' ),
+															'logonly' 	=> 'no',
 															) );
 
 		// Title
@@ -226,6 +236,10 @@ class ThumbnailWidget extends WP_Widget {
 		// Names under thumbs
 		echo
 		wppa_widget_checkbox( $this, 'name', $instance['name'], __( 'Show photo names under thumbnails', 'wp-photo-album-plus' ) );
+
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
 
 		echo
 		'<p>' .

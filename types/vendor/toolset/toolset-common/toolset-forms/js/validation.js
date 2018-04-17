@@ -59,9 +59,12 @@ var wptValidation = (function ($) {
             var _value = $(element).val();
 
             // check if dependency is met
+            // Last commits includes "required" parameter so this condition is not necessary.
+            /*
             if (!this.depend(param, element)) {
                 return "dependency-mismatch";
             }
+            */
             switch (element.nodeName.toLowerCase()) {
                 case 'select':
                     return _value && $.trim(_value).length > 0;
@@ -316,6 +319,7 @@ var wptValidation = (function ($) {
 
     function _applyRules(rules, selector, container) {
         var element = $(selector, $(container));
+
         if (element.length > 0) {
             if (isIgnored(element)) {
                 element.rules('remove');

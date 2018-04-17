@@ -595,7 +595,18 @@ function connectionsShowViewPage( $action = NULL ) {
 					echo '<tr id="row-' , $entry->getId() , '" class="parent-row' . $statusClass .'">';
 					echo "<th class='check-column' scope='row'><input type='checkbox' value='" . $entry->getId() . "' name='id[]'/></th> \n";
 					echo '<td>';
-					$entry->getImage( array( 'image' => 'photo', 'height' => 54, 'width' => 80, 'zc' => 2, 'fallback' => array( 'type' => 'block', 'string' => __( 'No Photo Available', 'connections' ) ) ) );
+					$entry->getImage(
+						array(
+							'image'    => $instance->user->getScreenOption( 'manage', 'thumbnail', 'photo' ),
+							'height'   => 54,
+							'width'    => 80,
+							'zc'       => 2,
+							'fallback' => array(
+								'type'   => 'block',
+								'string' => __( 'No Image Available', 'connections' ),
+							),
+						)
+					);
 					echo '</td>';
 					echo '<td  colspan="2">';
 					if ( $setAnchor ) echo $setAnchor;
@@ -658,7 +669,7 @@ function connectionsShowViewPage( $action = NULL ) {
 
 					echo "</td> \n";
 					echo '<td >';
-						echo '<strong>' . __( 'On', 'connections' ) . ':</strong> ' . $entry->getFormattedTimeStamp( 'm/d/Y g:ia' ) . '<br />';
+						echo '<strong>' . __( 'On', 'connections' ) . ':</strong> ' . $entry->getFormattedTimeStamp() . '<br />';
 						echo '<strong>' . __( 'By', 'connections' ) . ':</strong> ' . $entry->getEditedBy() . '<br />';
 						echo '<strong>' . __( 'Visibility', 'connections' ) . ':</strong> ' . $entry->displayVisibilityType() . '<br />';
 
@@ -731,34 +742,8 @@ function connectionsShowViewPage( $action = NULL ) {
 					echo '<td>';
 
 					$entry->phoneNumbers->render( 'admin' );
-
-					$emailAddresses = $entry->getEmailAddresses();
-
-					if ( ! empty( $emailAddresses ) ) {
-						echo '<div class="email-addresses">';
-
-						foreach ( $emailAddresses as $email ) {
-							( $email->preferred ) ? $preferred = '*' : $preferred = '';
-
-							echo '<span class="email"><strong>' , $email->name , ':</strong> <a href="mailto:' , $email->address , '">' , $email->address , '</a>' , $preferred , '</span>';
-						}
-
-						echo '</div>';
-					}
-
-					$imIDs = $entry->getIm();
-
-					if ( ! empty( $imIDs )  ) {
-						echo '<div class="im-ids">';
-
-						foreach ( $imIDs as $im ) {
-							( $im->preferred ) ? $preferred = '*' : $preferred = '';
-
-							echo '<span class="im"><strong>' , $im->name , ':</strong> ' , $im->id , $preferred , '</span>';
-						}
-
-						echo '</div>';
-					}
+					$entry->emailAddresses->render( 'admin' );
+					$entry->im->render( 'admin' );
 
 					$socialNetworks = $entry->getSocialMedia();
 
@@ -803,10 +788,10 @@ function connectionsShowViewPage( $action = NULL ) {
 					echo ( $entry->getNotes() ) ? '<strong>' . __( 'Notes', 'connections' ) . ':</strong> ' . $entry->getNotes() : '&nbsp;';
 					echo "</td> \n";
 					echo '<td>
-												<span style="display: block;"><strong>' . __( 'Entry ID', 'connections' ) . ':</strong> ' . $entry->getId() . '</span>' . '
-												<span style="display: block;"><strong>' . __( 'Entry Slug', 'connections' ) . ':</strong> ' . $entry->getSlug() . '</span>' . '
-												<span style="display: block;"><strong>' . __( 'Date Added', 'connections' ) . ':</strong> ' . $entry->getDateAdded( 'm/d/Y g:ia' ) . '</span>
-												<span style="display: block;"><strong>' . __( 'Added By', 'connections' ) . ':</strong> ' . $entry->getAddedBy() . '</span>';
+						  <span style="display: block;"><strong>' . __( 'Entry ID', 'connections' ) . ':</strong> ' . $entry->getId() . '</span>' . '
+						  <span style="display: block;"><strong>' . __( 'Entry Slug', 'connections' ) . ':</strong> ' . $entry->getSlug() . '</span>' . '
+						  <span style="display: block;"><strong>' . __( 'Date Added', 'connections' ) . ':</strong> ' . $entry->getDateAdded() . '</span>
+						  <span style="display: block;"><strong>' . __( 'Added By', 'connections' ) . ':</strong> ' . $entry->getAddedBy() . '</span>';
 					echo '<span style="display: block;"><strong>' . __( 'Image Linked', 'connections' ) . ':</strong> ' . ( ( ! $entry->getImageLinked() ) ? __( 'No', 'connections' ) : __( 'Yes', 'connections' ) ) . '</span>';
 					echo '<span style="display: block;"><strong>' . __( 'Display', 'connections' ) . ':</strong> ' . ( ( $entry->getImageLinked() && $entry->getImageDisplay() ) ? __( 'Yes', 'connections' ) : __( 'No', 'connections' ) ) . '</span>';
 					echo "</td> \n";

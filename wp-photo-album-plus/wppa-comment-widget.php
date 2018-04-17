@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the recent commets on photos
-* Version 6.7.01
+* Version 6.8.07
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -20,12 +20,6 @@ class wppaCommentWidget extends WP_Widget {
     function widget($args, $instance) {
 		global $wpdb;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
 		// Hide widget if not logged in and login required to see comments
@@ -36,7 +30,17 @@ class wppaCommentWidget extends WP_Widget {
         extract( $args );
 		wppa( 'in_widget', 'com' );
 		wppa_bump_mocc();
-		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __( 'Comments on photos', 'wp-photo-album-plus' ) ) );
+
+		$instance 		= wp_parse_args( 	(array) $instance,
+											array( 	'title' => __( 'Comments on photos', 'wp-photo-album-plus' ),
+													'logonly' => 'no',
+													) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
+
 		$page 			= in_array( wppa_opt( 'comment_widget_linktype' ), wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page( 'comment_widget_linkpage', __( 'Recently commented photos', 'wp-photo-album-plus' ) );
 		$max  			= wppa_opt( 'comten_count' );
 		$widget_title 	= apply_filters( 'widget_title', $instance['title'] );
@@ -48,7 +52,12 @@ class wppaCommentWidget extends WP_Widget {
 		if ( $photo_ids ) foreach( $photo_ids as $id ) {
 
 			// Make the HTML for current comment
-			$widget_content .= "\n".'<div class="wppa-widget" style="width:' . $maxw . 'px; height:' . $maxh . 'px; margin:4px; display:inline; text-align:center; float:left;">';
+			$widget_content .= '
+			<div' .
+				' class="wppa-widget"' .
+				' style="width:' . $maxw . 'px; height:' . $maxh . 'px; margin:4px; display:inline; text-align:center; float:left;"' .
+				' data-wppa="yes"' .
+				' >';
 
 			$image = wppa_cache_thumb( $id );
 
@@ -107,6 +116,7 @@ class wppaCommentWidget extends WP_Widget {
 
 		$instance = $old_instance;
 		$instance['title'] = strip_tags( $new_instance['title'] );
+		$instance['logonly'] = $new_instance['logonly'];
 
         return $instance;
     }
@@ -115,19 +125,22 @@ class wppaCommentWidget extends WP_Widget {
     function form( $instance ) {
 
 		//Defaults
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Comments on Photos', 'wp-photo-album-plus' ) ) );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Comments on Photos', 'wp-photo-album-plus' ), 'logonly' => 'no' ) );
 
 		// Title
 		echo
 		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
+
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
 
 		echo
 		'<p>' .
 			__( 'You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus' ) .
 			' ' . __( 'Table I-F3 and 4', 'wp-photo-album-plus' ) .
 		'</p>';
-
-    }
+	}
 
 } // class wppaCommentWidget
 

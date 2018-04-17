@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a list of users linking to their photos
-* Version 6.7.01
+* Version 6.8.07
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -20,12 +20,6 @@ class UpldrWidget extends WP_Widget {
     function widget($args, $instance) {
 		global $wpdb;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
         wppa( 'in_widget', 'upldr' );
@@ -37,8 +31,15 @@ class UpldrWidget extends WP_Widget {
 														'title' 	=> __( 'Uploader Photos', 'wp-photo-album-plus' ),
 														'sortby' 	=> 'name',
 														'ignore' 	=> 'admin',
-														'parent' 	=> ''
+														'parent' 	=> '',
+														'logonly' 	=> 'no',
 														) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
+
  		$widget_title 		= apply_filters( 'widget_title', $instance['title'] );
 		$page 				= in_array( 'album', wppa( 'links_no_page' ) ) ? '' : wppa_get_the_landing_page('upldr_widget_linkpage', __('User uploaded photos', 'wp-photo-album-plus'));
 		$ignorelist			= explode(',', $instance['ignore']);
@@ -125,7 +126,7 @@ class UpldrWidget extends WP_Widget {
 
 		// Create widget content
 		$widget_content = "\n".'<!-- WPPA+ Upldr Widget start -->';
-		$widget_content .= '<div class="wppa-upldr" >';
+		$widget_content .= '<div class="wppa-upldr" data-wppa="yes" >';
 		if ( $showownercount ) {
 			$widget_content .= sprintf( _n( 'Number of contributors: %d', 'Number of contributors: %d', $total_ownercount, 'wp-photo-album-plus' ), $total_ownercount ) . '<br />';
 		}
@@ -173,6 +174,7 @@ class UpldrWidget extends WP_Widget {
 		$instance['parent'] 		= $new_instance['parent'];
 		$instance['showownercount'] = $new_instance['showownercount'];
 		$instance['showphotocount'] = $new_instance['showphotocount'];
+		$instance['logonly'] 		= $new_instance['logonly'];
 
 		wppa_flush_upldr_cache( 'widgetid', $this->get_widget_id() );
 
@@ -190,7 +192,8 @@ class UpldrWidget extends WP_Widget {
 														'ignore' 			=> 'admin',
 														'parent' 			=> '',
 														'showownercount' 	=> '',
-														'showphotocount' 	=> ''
+														'showphotocount' 	=> '',
+														'logonly' 			=> 'no',
 														) );
 
 		// Title
@@ -267,7 +270,11 @@ class UpldrWidget extends WP_Widget {
 		echo
 		wppa_widget_checkbox( $this, 'showphotocount', $instance['showphotocount'], __( 'Show count of photos', 'wp-photo-album-plus' ) );
 
-    }
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
+
+	}
 
 	function get_widget_id() {
 		$widgetid = substr( $this->get_field_name( 'txt' ), strpos( $this->get_field_name( 'txt' ), '[' ) + 1 );

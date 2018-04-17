@@ -10,6 +10,7 @@ use MailPoet\Models\Subscriber;
 use MailPoet\Newsletter\Links\Links;
 use MailPoet\Statistics\Track\Clicks;
 use MailPoet\Statistics\Track\Opens;
+use MailPoet\Tasks\Sending as SendingTask;
 
 if(!defined('ABSPATH')) exit;
 
@@ -49,6 +50,9 @@ class Track {
       return false;
     }
     $data->queue = SendingQueue::findOne($data->queue_id);
+    if($data->queue) {
+      $data->queue = SendingTask::createFromQueue($data->queue);
+    }
     $data->subscriber = Subscriber::findOne($data->subscriber_id);
     $data->newsletter = (!empty($data->queue->newsletter_id)) ?
       Newsletter::findOne($data->queue->newsletter_id) :
@@ -65,7 +69,9 @@ class Track {
     if(!$data->subscriber || !$data->queue || !$data->newsletter) return false;
     $subscriber_token_match =
       Subscriber::verifyToken($data->subscriber->email, $data->subscriber_token);
-    if(!$subscriber_token_match) return false;
+    if(!$subscriber_token_match) {
+      $this->terminate(403);
+    }
     // return if this is a WP user previewing the newsletter
     if($data->subscriber->isWPUser() && $data->preview) {
       return $data;
@@ -74,5 +80,11 @@ class Track {
     return ($data->queue->isSubscriberProcessed($data->subscriber->id)) ?
       $data :
       false;
+  }
+
+  private function terminate($code) {
+    status_header($code);
+    get_template_part((string)$code);
+    exit;
   }
 }

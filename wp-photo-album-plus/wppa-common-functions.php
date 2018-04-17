@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.8.00
+* Version 6.8.03
 *
 */
 
@@ -266,7 +266,7 @@ static $randseed_modified;
 		}
 	}
 
-	wppa_save_session();
+//	wppa_save_session();
 
 	return $randseed;
 }
@@ -842,7 +842,7 @@ global $wppa;
 			global $wppa_session;
 			$wppa_session['use_searchstring'] = $str;
 			$wppa_session['display_searchstring'] = $str;
-			wppa_save_session();
+//			wppa_save_session();
 		}
 		$result = $str;
 	}
@@ -913,41 +913,53 @@ static $tables;
 function wppa_clear_cache( $force = false ) {
 global $cache_path;
 
+	// Schedule a cron job. This is the normal operation
+	if ( ! $force ) {
+		wppa_schedule_clear_cache();
+		return;
+	}
+	
+	// At activation, ($force = true) the entire cache must be cleared once.
+
 	// If wp-super-cache is on board, clear cache
 	if ( function_exists( 'prune_super_cache' ) ) {
 		prune_super_cache( $cache_path . 'supercache/', true );
 		prune_super_cache( $cache_path, true );
+		wppa_log('obs', 'Super cache cleared');
 	}
 
 	// W3 Total cache
 	if ( function_exists( 'w3tc_pgcache_flush' ) ) {
 		w3tc_pgcache_flush();
+		wppa_log('obs', 'w3tc pgcache cleared');
 	}
 
 	// SG_CachePress
-	/*
 	if ( class_exists( 'SG_CachePress_Supercacher' ) ) {
 		$c = new SG_CachePress_Supercacher();
-		@ $c->purge_cache();
+		if ( $c->purge_cache ) {
+			$c->purge_cache();
+			wppa_log('obs', 'SG CachePress Supercacher cache cleared');
+		}
 	}
-	*/
 
 	// Quick cache
 	if ( isset($GLOBALS['quick_cache']) ) {
 		$GLOBALS['quick_cache']->clear_cache();
+		wppa_log('obs', 'Quick cache cleared');
 	}
 
 	// Comet cache
 	if ( class_exists( 'comet_cache' ) ) {
 		comet_cache::clear();
-		wppa_log('dbg', 'comet_cache cleared');
+		wppa_log('obs', 'Comet cache cleared');
 	}
 
-	// At a setup or update operation
-	// Manually remove the content of wp-content/cache/
+	// Last resort: Manually remove the content of wp-content/cache/
 	if ( $force ) {
-		if ( is_dir( WPPA_CONTENT_PATH.'/cache/' ) ) {
-			wppa_tree_empty( WPPA_CONTENT_PATH.'/cache' );
+		if ( is_dir( WPPA_CONTENT_PATH . '/cache/' ) ) {
+			wppa_tree_empty( WPPA_CONTENT_PATH . '/cache' );
+			wppa_log('obs', 'Generic cache cleared');
 		}
 	}
 }
@@ -992,9 +1004,14 @@ global $wppa;
 	}
 }
 
-// Return the allowed number to upload in an album. -1 = unlimited
+// Return the allowed number to upload in an album. -1 = unlimited ( the limit on the album info screen, possibly set by Table IX-D6 )
 function wppa_allow_uploads( $alb = '0' ) {
 global $wpdb;
+static $result_cache;
+
+	if ( isset( $result_cache[$alb] ) ) {
+		return $result_cache[$alb];
+	}
 
 	if ( ! $alb ) return '-1';//'0';
 
@@ -1020,34 +1037,64 @@ global $wpdb;
 	if ( $curcount >= $limit_max ) $result = '0';	// No more allowed
 	else $result = $limit_max - $curcount;
 
+	$result_cache[$alb] = $result;
+
 	return $result;
 }
 
 // Return the allowed number of uploads for a certain user. -1 = unlimited
-function wppa_allow_user_uploads() {
+// If album <> 0 and 'role_limit_per_album' is set, look at the album, not global
+function wppa_allow_user_uploads( $album = false ) {
 global $wpdb;
 
 	// Get the limits
-	$limits = wppa_get_user_upload_limits();
-
-	$temp = explode( '/', $limits );
+	$limits 	= wppa_get_user_upload_limits();
+	$temp 		= explode( '/', $limits );
 	$limit_max  = isset( $temp[0] ) ? $temp[0] : '0';
 	$limit_time = isset( $temp[1] ) ? $temp[1] : '0';
 
-	if ( ! $limit_max ) return '-1';		// Unlimited max
+	// Unlimited max
+	if ( ! $limit_max ) return '-1';
 
+	// If the userlimits are per album and no album given, return the limit_max if not zero, else -1
+	if ( wppa_switch( 'role_limit_per_album' ) && ! $album ) {
+		if ( $limit_max > 0 ) {
+			return $limit_max;
+		}
+		else {
+			return '-1';
+		}
+	}
+
+	// Make the album clause
+	if ( wppa_switch( 'role_limit_per_album' ) && $album ) {
+		$album_clause = sprintf( " AND `album` = %d", $album );
+	}
+	else {
+		$album_clause = "";
+	}
+
+	// Get the user
 	$user = wppa_get_user( 'login' );
+
+	// Get the currently uploaded photos
 	if ( ! $limit_time ) {					// For ever
-		$curcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `owner` = %s", $user ) );
+		$curcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `owner` = %s" . $album_clause, $user ) );
 	}
 	else {									// Time criterium in place
 		$timnow = time();
 		$timthen = $timnow - $limit_time;
-		$curcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `owner` = %s AND `timestamp` > %s", $user, $timthen ) );
+		$curcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `owner` = %s AND `timestamp` > %s" . $album_clause, $user, $timthen ) );
+wppa_log('obs', $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `owner` = %s AND `timestamp` > %s", $user, $timthen ) . ' returns:' . $curcount );
 	}
 
-	if ( $curcount >= $limit_max ) $result = '0';	// No more allowed
-	else $result = $limit_max - $curcount;
+	// Compute the allowed number of photos
+	if ( $curcount >= $limit_max ) {
+		$result = '0';	// No more allowed
+	}
+	else {
+		$result = $limit_max - $curcount;
+	}
 
 	return $result;
 }
@@ -1081,6 +1128,79 @@ global $wp_roles;
 
 function wppa_alfa_id( $id = '0' ) {
 	return str_replace( array( '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' ), array( 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j' ), $id );
+}
+
+// Checks if there is enough memory for an image to be resized to a given size
+// @1: string - path to target file
+// @2: int - size in pixels of the largest edge of the target image
+// Returns bool
+function wppa_can_resize( $file, $size, $log_error = true ) {
+//ini_set('memory_limit', '32M');
+	$bytes_per_pixel = 4.6;
+
+	// If file does not exists, log error and return true
+	if ( ! file_exists( $file ) ) {
+		wppa_log( 'err', 'wppa_can_resize() called with non existing file: ' . $file );
+		return true;
+	}
+
+	// get memory limit
+	$memory_limit = 0;
+	$memory_limini = wppa_convert_bytes( ini_get( 'memory_limit' ) );
+	$memory_limcfg = wppa_convert_bytes( get_cfg_var( 'memory_limit' ) );
+
+	// find the smallest not being <= zero
+	if ( $memory_limini > 0 && $memory_limcfg > 0 ) {
+		$memory_limit = min( $memory_limini, $memory_limcfg );
+	}
+	elseif ( $memory_limini > 0 ) {
+		$memory_limit = $memory_limini;
+	}
+	elseif ( $memory_limcfg > 0 ) {
+		$memory_limit = $memory_limcfg;
+	}
+
+	// If no data, assume yes
+	if ( ! $memory_limit ) {
+		return true;
+	}
+
+	// Calculate the free memory
+	$free_memory = $memory_limit - memory_get_usage( true );
+
+	// Substract filesize
+	$free_memory -= filesize( $file );
+
+	// Compute required memorysize
+	$imagesize = getimagesize( $file );
+	$source_pixels = $imagesize[0] * $imagesize[1];
+	if ( $size ) {
+		if ( $imagesize[0] > $imagesize[1] ) {
+			$target_pixels = $size * $size * $imagesize[1] / $imagesize[0];
+		}
+		else {
+			$target_pixels = $size * $size * $imagesize[0] / $imagesize[1];
+		}
+	}
+	else {
+		$target_pixels = 0;
+	}
+	$required_memorysize = ( $source_pixels + $target_pixels ) * $bytes_per_pixel;
+
+	// Does it fit?
+	if ( $required_memorysize <= $free_memory ) {
+		return true;
+	}
+	elseif ( $log_error ) {
+		if ( $size ) {
+			wppa_log( 'War', 'Too little memory to resize ' . $file . ' (' . $imagesize[0] . 'x' . $imagesize[1] . ' px) to ' . $size );
+		}
+		else {
+			wppa_log( 'War', 'Too little memory to manipulate ' . $file . ' (' . $imagesize[0] . 'x' . $imagesize[1] . ' px)' );
+		}
+		return false;
+	}
+	return false;
 }
 
 // Thanx to the maker of nextgen, but greatly improved
@@ -1139,6 +1259,9 @@ function wppa_check_memory_limit( $verbose = true, $x = '0', $y = '0' ) {
 	// Calculate max size
 	$maxpixels = ( $free_memory / $factor ) - $resizedpixels;
 
+	// Safety margin
+	$maxpixels = round( $maxpixels * 0.95 );
+
 	// If obviously faulty: quit silently
 	if ( $maxpixels < 0 ) return '';
 
@@ -1150,8 +1273,16 @@ function wppa_check_memory_limit( $verbose = true, $x = '0', $y = '0' ) {
 	else {	// Request for tel me what is the limit
 		$maxx = sqrt( $maxpixels / 12 ) * 4;
 		$maxy = sqrt( $maxpixels / 12 ) * 3;
+		$maxxhd = sqrt( $maxpixels / 144 ) * 16;
+		$maxyhd = sqrt( $maxpixels / 144 ) * 9;
 		if ( $verbose ) {		// Make it a string
-			$result = '<br />'.sprintf(  __( 'Based on your server memory limit you should not upload images larger then <strong>%d x %d (%2.1f MP)</strong>' , 'wp-photo-album-plus'), $maxx, $maxy, $maxpixels / ( 1024 * 1024 ) );
+			$result = '<br />'.sprintf(  __( 'Based on your server memory limit you should not upload images larger then <b>%2.1f</b> Mega pixels' , 'wp-photo-album-plus'), $maxpixels / ( 1024 * 1024 ) );
+			$result .= '<br />'.sprintf( __( 'E.g. not bigger than approx %s x %s pixels (4:3) or %s x %s (16:9)', 'wp-photo-album-plus' ), 
+										'<b>' . ( round( $maxx / 25 ) * 25 ) . '</b>', 
+										'<b>' . ( round( $maxy / 25 ) * 25 ) . '</b>',
+										'<b>' . ( round( $maxxhd / 25 ) * 25 ) . '</b>', 
+										'<b>' . ( round( $maxyhd / 25 ) * 25 ) . '</b>'
+										);
 		}
 		else {					// Or an array
 			$result['maxx'] = $maxx;
@@ -1322,7 +1453,7 @@ global $wpdb;
 
 	// See if selection is valid
 	if ( ( $args['selected'] == $args['exclude'] ) ||
-		 ( $args['checkupload'] && ! wppa_allow_uploads( $args['selected'] ) ) ||
+		 ( $args['checkupload'] && ( ! wppa_allow_uploads( $args['selected'] ) || ! wppa_allow_user_uploads( $args['selected'] ) ) ) ||
 		 ( $args['disableancestors'] && wppa_is_ancestor( $args['exclude'], $args['selected'] ) )
 	   ) {
 		$args['selected'] = '0';
@@ -1582,9 +1713,13 @@ global $wpdb;
 		}
 
 		if ( $albums ) foreach ( $albums as $album ) {
+			$lim = '-1'; 	// Assume no limit on album
+			if ( wppa_switch( 'role_limit_per_album' ) ) {
+				$lim = wppa_allow_user_uploads( $album['id'] );
+			}
 			if ( ( $args['disabled'] == $album['id'] ) ||
 				 ( $args['exclude'] == $album['id'] ) ||
-				 ( $args['checkupload'] && ! wppa_allow_uploads( $album['id'] ) ) ||
+				 ( $args['checkupload'] && ( ! wppa_allow_uploads( $album['id'] ) || ! $lim ) ) ||
 				 ( $args['disableancestors'] && wppa_is_ancestor( $args['exclude'], $album['id'] ) )
 				 ) $disabled = ' disabled="disabled"'; else $disabled = '';
 			if ( in_array( $album['id'], $selarr, true ) && ! $disabled ) $selected = ' selected="selected"'; else $selected = '';
@@ -1593,28 +1728,31 @@ global $wpdb;
 			if ( $args['checkaccess'] && ! wppa_have_access( $album['id'] ) ) {
 				$ok = false;
 			}
-			/* This is in the query now
-			if ( $args['checkowner'] && wppa_switch( 'upload_owner_only' ) ) { 							// Need to check
-				if ( $album['owner'] != wppa_get_user() && $album['owner']  != '--- public ---' ) { 	// Not 'mine'
-					if ( ! wppa_user_is( 'administrator' ) ) {											// No admin
-						$ok = false;
-					}
-				}
-			}
-			*/
-			/* This is in the query now
-			if ( $args['checkarray'] ) {
-				if ( ! in_array( $album['id'], $args['array'] ) ) {
-					$ok = false;
-				}
-			}
-			*/
+
 			if ( $selected && $args['addselected'] ) {
 				$ok = true;
 			}
 			if ( $ok ) {
-				if ( $args['addnumbers'] ) $number = ' ( '.$album['id'].' )'; else $number = '';
-				$result .= '<option class="' . $args['optionclass']. '" value="' . $album['id'] . '" ' . $selected . $disabled . '>' . $album['name'] . $number . '</option>';
+				if ( $args['addnumbers'] ) {
+					$number = ' (' . $album['id'] . ')';
+				}
+				else {
+					$number = '';
+				}
+				if ( $lim > '0' ) {
+					$limt = ' (max ' . $lim . ')';
+				}
+				else {
+					$limt = '';
+				}
+				$result .=
+				'<option' .
+					' class="' . $args['optionclass']. '"' .
+					' value="' . $album['id'] . '"' .
+					' ' . $selected . $disabled .
+					'>' .
+					$album['name'] . $number . $limt .
+				'</option>';
 			}
 		}
 

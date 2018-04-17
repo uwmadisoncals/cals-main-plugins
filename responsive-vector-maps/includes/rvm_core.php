@@ -221,6 +221,26 @@ function rvm_fields_array( )
                         '' 
             );
             // Markers fields
+            $fields[ 'rvm_mbe_custom_marker_icon_path' ] = array(
+                         'rvm_mbe_custom_marker_icon_path',
+                        'text',
+                        '',
+                        '',
+                        7,
+                        7,
+                        1,
+                        'markers' 
+            );
+            $fields[ 'rvm_mbe_custom_marker_icon_path_hidden' ] = array(
+                         'rvm_mbe_custom_marker_icon_path_hidden',
+                        'hidden',
+                        '',
+                        '',
+                        7,
+                        7,
+                        1,
+                        'markers' 
+            );
             $fields[ 'rvm_mbe_map_marker_bg_color' ] = array(
                          'rvm_mbe_map_marker_bg_color',
                         'text',
@@ -653,7 +673,7 @@ function rvm_mb_function( $post )
                                     //Check if custom map is still in original upload subdir: if not do not show it in drop down
                                     if ( !rvm_is_map_in_download_dir_yet( $rvm_custom_map_dir_path , $rvm_custom_map_name ) ) {
                                                 $output .= '<div>' ;
-                                                $output .= '<p class="rvm_cm_messages"><img  src="' . RVM_IMG_PLUGIN_DIR . '/warning-icon.png" alt="check" /><span>' .  __( 'It seems custom map is not in upload dir anymore', RVM_TEXT_DOMAIN ) . '</span></p>';
+                                                $output .= '<p class="rvm_messages"><img  src="' . RVM_IMG_PLUGIN_DIR . '/warning-icon.png" alt="check" /><span>' .  __( 'It seems custom map is not in upload dir anymore', RVM_TEXT_DOMAIN ) . '</span></p>';
                                                 $output .= '<p>' . __( '<strong>Please, do not click on "Update"</strong> ', RVM_TEXT_DOMAIN )   . '</p>' ;
                                                 $output .= '<p>' . __( 'This is the path where custom map should be :  ', RVM_TEXT_DOMAIN ) . $rvm_custom_map_dir_path  . '</p>';
                                                 $output .= '<p>' . __( 'Please remove this map from posts / pages / widgets ', RVM_TEXT_DOMAIN )  . '</p>' ;
@@ -811,6 +831,13 @@ function rvm_mb_function( $post )
                                                             $output_markers_bg_colour = '<label for="' . $field[ 0 ] . '" ' . RVM_LABEL_CLASS . '>' . $field[ 2 ] . '</label>';
                                                             $output_markers_bg_colour .= '<input class="rvm_color_picker" type="' . $field[ 1 ] . '" name="' . $field[ 0 ] . '" value="' . esc_attr( $field_value ) . '" />';
                                                 } // $field[ 0 ] == 'rvm_mbe_map_marker_bg_color'
+                                                if ( $field[ 0 ] == 'rvm_mbe_custom_marker_icon_path' ) {
+                                                            /*if ( empty( $field_value ) ) {
+                                                                        $field_value = 'default';
+                                                            } //empty($field_value)*/
+                                                            $output_markers_custom_icon_path = '<label for="' . $field[ 0 ] . '" >' . $field[ 2 ] . '</label>';
+                                                            $output_markers_custom_icon_path .= '<input id="' . $field[ 0 ] . '" type="' . $field[ 1 ] . '" name="' . $field[ 0 ] . '" value="" />';
+                                                } // $field[ 0 ] == 'rvm_mbe_custom_marker_icon_path'
                                                 if ( $field[ 0 ] == 'rvm_mbe_map_marker_border_color' ) {
                                                             if ( empty( $field_value ) ) {
                                                                         $field_value = RVM_MARKER_BORDER_COLOUR;
@@ -819,6 +846,16 @@ function rvm_mb_function( $post )
                                                             $output_markers_border_colour .= '<input class="rvm_color_picker" type="' . $field[ 1 ] . '" name="' . $field[ 0 ] . '" value="' . esc_attr( $field_value ) . '" />';
                                                 } //$field[ 0 ] == 'rvm_mbe_map_marker_border_color'
                                     } //$field[1] == 'text'
+                                    if ( $field[ 1 ] == 'hidden' ) {
+                                                if ( $field[ 0 ] == 'rvm_mbe_custom_marker_icon_path_hidden' ) {
+                                                    $field_value  = get_post_meta( $post->ID, '_rvm_mbe_custom_marker_icon_path', true );
+                                                            /*if ( empty( $field_value ) ) {
+                                                                        $field_value = 'default';
+                                                            } //empty($field_value)*/
+                                                            $output_markers_custom_icon_path_hidden = '<label for="' . $field[ 0 ] . '" >' . $field[ 2 ] . '</label>';
+                                                            $output_markers_custom_icon_path_hidden .= '<input id="' . $field[ 0 ] . '" type="' . $field[ 1 ] . '" name="' . $field[ 0 ] . '" value="'. esc_attr( $field_value ) .'" />';
+                                                } // $field[ 0 ] == 'rvm_mbe_custom_marker_icon_path_hidden'
+                                    }
                                     if ( $field[ 1 ] == 'select' ) {
                                                 if ( $field[ 0 ] == 'rvm_mbe_map_marker_dim_min' ) {
                                                             $output_marker_dim_min = '<p id="rvm_dim_min_value_wrapper"><label for="' . $field[ 0 ] . '" ' . RVM_LABEL_CLASS . '>' . $field[ 2 ] . '</label>';
@@ -841,7 +878,7 @@ function rvm_mb_function( $post )
                                     } //if( $field[ 1 ] == 'select' )
                         } //if( $field[ 7 ] == 'markers' )
             } //foreach( $array_fields as $field )
-            //$output .= '<input type="hidden"  id="rvm_mbe_post_id" value="' .  $post->ID. '" />' ;
+            $output .= '<input type="hidden"  id="rvm_mbe_post_id" value="' .  $post->ID. '" />' ;
             
            
              /**************** Custom Maps input field *****************/
@@ -905,12 +942,13 @@ function rvm_mb_function( $post )
                         /**************** End: Regions *****************/
                         
                         
+
                         /**************** Start: Markers *****************/
                         
                         @include_once RVM_INC_PLUGIN_DIR . '/rvm_markers.php';
                         
-                        /**************** End: Markers *****************/
-                        
+                        /**************** End: Markers *****************/             
+
                         
                         $output .= '<div id="rvm_shortcode" class="updated"><p>' . __( 'Copy and paste following shortcode to display this map whenever you like ( only once per post/sidebar per page ) :', RVM_TEXT_DOMAIN ) . ' <strong><span id="rvm_shortcode_to_copy">[rvm_map mapid="' . $post->ID . '"]</span></strong> .</p></div>';
                         $output .= '<div class="updated"><p>' . __( 'In order to see the map using the "View post" link of this page, please <strong>copy and paste</strong> the shortcode into the editor and save the post. If you get a 404 just go to "Settings" > "Permalinks" and save again your settings', RVM_TEXT_DOMAIN ) . '.</p></div>';
@@ -945,9 +983,9 @@ function rvm_mb_save_meta( $post_id )
                                                 || $field[ 0 ] == 'rvm_mbe_enable_link_target'  ) {
                                                             $_POST[ $field[ 0 ] ] = 'checked';
                                                 } //$field[0] == 'rvm_mbe_zoom'
-                                               if ( ( $field[ 0 ] == 'rvm_mbe_width' || $field[ 0 ] == 'rvm_mbe_map_padding'  )  && !preg_match( '/^[0-9]+\.?[0-9]+(px|%|rem|em)$/', $_POST[ $field[ 0 ] ] ) ) {
+                                               if ( ( $field[ 0 ] == 'rvm_mbe_width' || $field[ 0 ] == 'rvm_mbe_map_padding'  )  && !preg_match( '/^[0-9]*\.?[0-9]*(px|%|rem|em)$/', $_POST[ $field[ 0 ] ] ) ) {
                                                             $_POST[ $field[ 0 ] ] = "";
-                                                } //$field[ 0 ] == 'rvm_mbe_width' || $field[ 0 ] == 'rvm_mbe_map_padding'
+                                                } //$field[ 0 ] == 'rvm_mbe_width' || $field[ 0 ] == 'rvm_mbe_width' || $field[ 0 ] == 'rvm_mbe_map_padding'
                                                 if ( $field[ 0 ] == 'rvm_mbe_border_width' && !is_numeric(  $_POST[ $field[ 0 ] ] )  ) {
                                                             $_POST[ $field[ 0 ] ] = 1;
                                                 } //$field[0] == 'rvm_mbe_border_width'
@@ -964,6 +1002,15 @@ function rvm_mb_save_meta( $post_id )
                                                             $_POST[ 'rvm_mbe_map_marker_dim_min' ] = RVM_MARKER_DIM_MIN_VALUE;
                                                             $_POST[ 'rvm_mbe_map_marker_dim_max' ] = RVM_MARKER_DIM_MAX_VALUE;
                                                 } //f( isset( $_POST[ 'rvm_mbe_map_marker_dim_min' ] ) && isset( $_POST[ 'rvm_mbe_map_marker_dim_max' ] ) && ( $_POST[ 'rvm_mbe_map_marker_dim_min' ] > $_POST[ 'rvm_mbe_map_marker_dim_max' ] ) )
+
+			                                    if ( isset( $_POST[ 'rvm_mbe_custom_marker_icon_path' ] ) && $field[ 0 ] == 'rvm_mbe_custom_marker_icon_path' && !empty( $_POST[ 'rvm_mbe_custom_marker_icon_path' ] )) {
+														$_POST[ $field[ 0 ] ] = rvm_retrieve_marker_icon_name( $_POST[ 'rvm_mbe_custom_marker_icon_path' ] );
+			                                    }
+
+                                                else if ( empty( $_POST[ 'rvm_mbe_custom_marker_icon_path' ] ) && $field[ 0 ] == 'rvm_mbe_custom_marker_icon_path' && isset( $_POST[ 'rvm_mbe_custom_marker_icon_path_hidden' ] ) && !empty( $_POST[ 'rvm_mbe_custom_marker_icon_path_hidden' ] )) {
+                                                        $_POST[ $field[ 0 ] ] = rvm_retrieve_marker_icon_name( $_POST[ 'rvm_mbe_custom_marker_icon_path_hidden' ] );
+                                                }
+
                                                 update_post_meta( $post_id, '_' . $field[ 0 ], strip_tags( $_POST[ $field[ 0 ] ] ) );
                                     } // if( isset( $_POST[ $field[ 0 ] ] )
                                     else if ( $field[ 0 ] == 'rvm_mbe_zoom'  
@@ -991,7 +1038,7 @@ function rvm_mb_save_meta( $post_id )
                         /****************  End: Save region fields to DB *****************/
                         
                         
-                        /****************  Start marker fields save to DB *****************/
+                        /****************  Start serialized marker fields save to DB *****************/
                         
                         if ( isset( $_POST[ 'rvm_marker_name' ] ) ) {
                                     if ( !empty( $_POST[ 'rvm_marker_name' ] ) ) {
@@ -1043,6 +1090,7 @@ function rvm_mb_save_meta( $post_id )
                                     else {
                                                 update_post_meta( $post_id, '_rvm_marker_popup', '' );
                                     }
+                                    
                         } //if( isset( $_POST[ 'rvm_marker_name' ] ) )
                         else { // if nothing is sent reset all data 
                                     delete_post_meta( $post_id, '_rvm_marker_name' );
@@ -1053,7 +1101,7 @@ function rvm_mb_save_meta( $post_id )
                                     delete_post_meta( $post_id, '_rvm_marker_popup' );
                         }
                         
-                        /****************  End: Save marker fields to DB *****************/
+                        /****************  End: Save serialized marker fields to DB *****************/
                         
                         
             } //if( isset( $_POST[ 'rvm_mbe_select_map' ] ) && $_POST[ 'rvm_mbe_select_map' ] != 'select_country'  )

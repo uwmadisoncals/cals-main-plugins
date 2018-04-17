@@ -282,26 +282,20 @@ class cnRegisterSettings {
 		$sections[] = array(
 			'plugin_id' => 'connections',
 			'tab'       => 'field-configuration',
-			'id'        => 'fieldset-link',
+			'id'        => 'fieldset-messenger',
 			'position'  => 60,
-			'title'     => __( 'Link Fieldset' , 'connections' ),
-			'callback'  => create_function(
-				'',
-				'echo \'' . esc_html__( 'Coming soon!', 'connections' ) . '\';'
-			),
+			'title'     => __( 'Instant Messaging Fieldset' , 'connections' ),
+			'callback'  => '',
 			'page_hook' => $settings
 		);
 
 		$sections[] = array(
 			'plugin_id' => 'connections',
 			'tab'       => 'field-configuration',
-			'id'        => 'messenger',
+			'id'        => 'fieldset-link',
 			'position'  => 70,
-			'title'     => __( 'Instant Messaging Fieldset' , 'connections' ),
-			'callback'  => create_function(
-				'',
-				'echo \'' . esc_html__( 'Coming soon!', 'connections' ) . '\';'
-			),
+			'title'     => __( 'Link Fieldset' , 'connections' ),
+			'callback'  => '',
 			'page_hook' => $settings
 		);
 
@@ -1400,7 +1394,304 @@ class cnRegisterSettings {
 			'section'   => 'fieldset-email',
 			'title'     => __( 'Per Email Visibility', 'connections' ),
 			'desc'      => __(
-				'Enable this option to set per email address visibility. When disabled, all email addresess will default to public. Changing this option will not effect the visibility status of previously saved email addresses.',
+				'Enable this option to set per email address visibility. When disabled, all email addresses will default to public. Changing this option will not effect the visibility status of previously saved email addresses.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'checkbox',
+			'default'   => 1,
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'repeatable',
+			'position'  => 10,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-messenger',
+			'title'     => __( 'Repeatable', 'connections' ),
+			'desc'      => __(
+				'Make the Instant Messenger fieldset repeatable to allow multiple instant messaging ID\'s to be added to a single entry.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'checkbox',
+			'default'   => 1,
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'count',
+			'position'  => 20,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-messenger',
+			'title'     => '',
+			'desc'      => __(
+				'The minimum number of Instant Messenger fieldsets to display.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'number',
+			'size'      => 'small',
+			'default'   => 0,
+		);
+
+		// Grab the phone types.
+		$imTypes = cnOptions::getCoreMessengerTypes();
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'messenger-types',
+			'position'  => 30,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-messenger',
+			'title'     => __( 'Messenger Type Options', 'connections' ),
+			'desc'      => __(
+				'Choose which instant messenger types are displayed as options. Drag and drop to change the display order. The top active item will be the default selected type when adding a new messenger ID. Deactivating an instant messenger type will not effect previously saved entries. Add custom instant messenger types by clicking the "Add" button. Custom instant messenger types can be removed but only if no messenger ID\'s are saved with that type. The "core" instant messenger types can not be removed. A "Remove" button will display for instant messenger types which can be safely removed.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'sortable_input-repeatable',
+			'options'   => array(
+				'items'    => $imTypes,
+				// Any types registered via the `cn_instant_messenger_options` need to be set as required.
+				'required' => array_keys( apply_filters( 'cn_instant_messenger_options', array() ) ),
+			),
+			'default'   => array(
+				'order'  => array_keys( $imTypes ),
+				// Any types registered via the `cn_instant_messenger_options` filter should be set as active (enabled).
+				// The `cn_instant_messenger_options` filter is applied in case a user has removed types using the filter.
+				// This ensure they default to inactive (disabled).
+				'active' => array_keys( apply_filters( 'cn_instant_messenger_options', $imTypes ) ),
+			),
+			// Only need to add this once per image size, otherwise it would be run for each field.
+			'sanitize_callback' => array( 'cnRegisterSettings', 'sanitizeMessengerFieldsetSettings' )
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'permit-preferred',
+			'position'  => 40,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-messenger',
+			'title'     => __( 'Preferred Messenger ID', 'connections' ),
+			'desc'      => __(
+				'Enable this option to set a preferred instant messenger service when adding an instant messenger ID to an entry. Disabling this option will not effect existing instant messenger ID\'s which have been set as preferred. When editing an entry with a preferred instant messenger ID with this option disabled, the preferred setting of the instant messenger ID will be removed.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'checkbox',
+			'default'   => 1,
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'permit-visibility',
+			'position'  => 50,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-messenger',
+			'title'     => __( 'Per Instant Messenger Visibility', 'connections' ),
+			'desc'      => __(
+				'Enable this option to set per instant messenger ID visibility. When disabled, all instant messenger ID\'s will default to public. Changing this option will not effect the visibility status of previously saved instant messenger ID\'s.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'checkbox',
+			'default'   => 1,
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'repeatable',
+			'position'  => 10,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-link',
+			'title'     => __( 'Repeatable', 'connections' ),
+			'desc'      => __(
+				'Make the Link fieldset repeatable to allow multiple links to be added to a single entry.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'checkbox',
+			'default'   => 1,
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'count',
+			'position'  => 20,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-link',
+			'title'     => '',
+			'desc'      => __(
+				'The minimum number of Instant Messenger fieldsets to display.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'number',
+			'size'      => 'small',
+			'default'   => 0,
+		);
+
+		// Grab the link types.
+		$linkTypes = cnOptions::getCoreLinkTypes();
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'link-types',
+			'position'  => 30,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-link',
+			'title'     => __( 'Link Type Options', 'connections' ),
+			'desc'      => __(
+				'Choose which link types are displayed as options. Drag and drop to change the display order. The top active item will be the default selected type when adding a new link. Deactivating a link type will not effect previously saved entries. Add custom link types by clicking the "Add" button. Custom link types can be removed but only if no links are saved with that type. The "core" link types can not be removed. A "Remove" button will display for link types which can be safely removed.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'sortable_input-repeatable',
+			'options'   => array(
+				'items'    => $linkTypes,
+				// Any types registered via the `cn_link_options` need to be set as required.
+				'required' => array_keys( apply_filters( 'cn_link_options', array() ) ),
+			),
+			'default'   => array(
+				'order'  => array_keys( $linkTypes ),
+				// Any types registered via the `cn_link_options` filter should be set as active (enabled).
+				// The `cn_link_options` filter is applied in case a user has removed types using the filter.
+				// This ensure they default to inactive (disabled).
+				'active' => array_keys( apply_filters( 'cn_link_options', $linkTypes ) ),
+			),
+			// Only need to add this once per image size, otherwise it would be run for each field.
+			'sanitize_callback' => array( 'cnRegisterSettings', 'sanitizeLinkFieldsetSettings' )
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'permit-preferred',
+			'position'  => 40,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-link',
+			'title'     => __( 'Preferred Link', 'connections' ),
+			'desc'      => __(
+				'Enable this option to set a preferred link when adding a link to an entry. Disabling this option will not effect existing links which have been set as preferred. When editing an entry with a preferred link with this option disabled, the preferred setting of the link will be removed.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'checkbox',
+			'default'   => 1,
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'permit-visibility',
+			'position'  => 50,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-link',
+			'title'     => __( 'Per Link Visibility', 'connections' ),
+			'desc'      => __(
+				'Enable this option to set per link visibility. When disabled, links will default to public. Changing this option will not effect the visibility status of previously saved links.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'checkbox',
+			'default'   => 1,
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'default-target',
+			'position'  => 60,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-link',
+			'title'     => __( 'Default Target', 'connections' ),
+			'desc'      => __(
+				'Choose the default selected option for whether a link should open in a new window/tab or the same window/tab.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'select',
+			'options'   => array(
+				'new'  => __( 'New Window', 'connections' ),
+				'same' => __( 'Same Window', 'connections' ),
+			),
+			'default'   => 'new',
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'follow-link',
+			'position'  => 70,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-link',
+			'title'     => __( 'Follow Link', 'connections' ),
+			'desc'      => __(
+				'Whether or not search engines should follow the link.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'select',
+			'options'   => array(
+				'nofollow' => __( 'Do Not Follow', 'connections' ),
+				'dofollow' => __( 'Follow', 'connections' ),
+			),
+			'default'   => 'nofollow',
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'permit-target',
+			'position'  => 80,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-link',
+			'title'     => __( 'Per Link Target', 'connections' ),
+			'desc'      => __(
+				'Enable this option to set the per link target when adding a link to an entry. When this option is disabled, the default link target will be assigned to the link being added.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'checkbox',
+			'default'   => 1,
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'permit-follow',
+			'position'  => 90,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-link',
+			'title'     => __( 'Per Link Follow', 'connections' ),
+			'desc'      => __(
+				'Enable this option to set the per link follow when adding a link to an entry. When this option is disabled, the Follow Link default will be assigned to the link being added.',
+				'connections'
+			),
+			'help'      => '',
+			'type'      => 'checkbox',
+			'default'   => 1,
+		);
+
+		$fields[] = array(
+			'plugin_id' => 'connections',
+			'id'        => 'permit-assign',
+			'position'  => 100,
+			'page_hook' => $settings,
+			'tab'       => 'field-configuration',
+			'section'   => 'fieldset-link',
+			'title'     => __( 'Per Link Assign Image', 'connections' ),
+			'desc'      => __(
+				'Enable this option to set the per link image assignment when adding a link to an entry.',
 				'connections'
 			),
 			'help'      => '',
@@ -2504,6 +2795,62 @@ class cnRegisterSettings {
 	}
 
 	/**
+	 * Callback function to sanitize the messenger fieldset settings.
+	 *
+	 * @access private
+	 * @since  8.16
+	 * @static
+	 *
+	 * @param array $settings
+	 *
+	 * @return array
+	 */
+	public static function sanitizeMessengerFieldsetSettings( $settings ) {
+
+		$active = cnArray::get( $settings, 'messenger-types.active', array() );
+
+		// If no email types have been selected, force select the top type.
+		if ( empty( $active ) ) {
+
+			$types    = cnArray::get( $settings, 'messenger-types.type' );
+			$keys     = array_flip( $types );
+			$active[] = array_shift( $keys );
+		}
+
+		cnArray::set( $settings, 'messenger-types.active', $active );
+
+		return $settings;
+	}
+
+	/**
+	 * Callback function to sanitize the link fieldset settings.
+	 *
+	 * @access private
+	 * @since  8.17
+	 * @static
+	 *
+	 * @param array $settings
+	 *
+	 * @return array
+	 */
+	public static function sanitizeLinkFieldsetSettings( $settings ) {
+
+		$active = cnArray::get( $settings, 'link-types.active', array() );
+
+		// If no link types have been selected, force select the top type.
+		if ( empty( $active ) ) {
+
+			$types    = cnArray::get( $settings, 'link-types.type' );
+			$keys     = array_flip( $types );
+			$active[] = array_shift( $keys );
+		}
+
+		cnArray::set( $settings, 'link-types.active', $active );
+
+		return $settings;
+	}
+
+	/**
 	 * Callback for the `cn_settings_field-sortable_input-repeatable-item` filter.
 	 *
 	 * Do not display the "Remove" button if the address type is currently in use/associated with an address.
@@ -2544,6 +2891,14 @@ class cnRegisterSettings {
 
 			case 'email-types':
 				$callable = array( 'cnOptions', 'getEmailTypesInUse' );
+				break;
+
+			case 'messenger-types':
+				$callable = array( 'cnOptions', 'getMessengerTypesInUse' );
+				break;
+
+			case 'link-types':
+				$callable = array( 'cnOptions', 'getLinkTypesInUse' );
 				break;
 		}
 

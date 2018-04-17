@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version 6.6.24
+* Version 6.8.04
 *
 */
 
@@ -25,6 +25,7 @@ global $wpdb;
 	if ( ! wppa_cache_album( $args['id'] ) ) return false;
 	$id = $args['id'];
 
+	$need_re_index = false;
 	foreach ( array_keys( $args ) as $itemname ) {
 		$itemvalue = $args[$itemname];
 		$doit = false;
@@ -36,11 +37,13 @@ global $wpdb;
 			case 'name':
 				$itemvalue = wppa_strip_tags( $itemvalue, 'all' );
 				$doit = true;
+				$need_re_index = true;
 				break;
 			case 'description':
 				$itemvalue = balanceTags( $itemvalue, true );
 				$itemvalue = wppa_strip_tags( $itemvalue, 'script&style' );
 				$doit = true;
+				$need_re_index = true;
 				break;
 			case 'modified':
 				if ( ! $itemvalue ) {
@@ -51,6 +54,7 @@ global $wpdb;
 			case 'cats':
 				$itemvalue = wppa_sanitize_tags( $itemvalue );
 				$doit = true;
+				$need_re_index = true;
 				break;
 			case 'scheduledtm':
 				$doit = true;
@@ -65,6 +69,7 @@ global $wpdb;
 				break;
 			case 'custom':
 				$doit = true;
+				$need_re_index = true;
 				break;
 
 			default:
@@ -80,7 +85,10 @@ global $wpdb;
 	}
 
 	// Update index
-	wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
+	if ( $need_re_index ) {
+		wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
+		wppa_clear_cache();
+	}
 
 	return true;
 
@@ -124,6 +132,7 @@ global $wpdb;
 		$args['modified'] = time();
 	}
 
+	$need_re_index = false;
 	foreach ( array_keys( $args ) as $itemname ) {
 		$itemvalue = $args[$itemname];
 		$doit = false;
@@ -135,11 +144,13 @@ global $wpdb;
 			case 'name':
 				$itemvalue = wppa_strip_tags( $itemvalue, 'all' );
 				$doit = true;
+				$need_re_index = true;
 				break;
 			case 'description':
 				$itemvalue = balanceTags( $itemvalue, true );
 				$itemvalue = wppa_strip_tags( $itemvalue, 'script&style' );
 				$doit = true;
+				$need_re_index = true;
 				break;
 			case 'timestamp':
 			case 'modified':
@@ -160,6 +171,7 @@ global $wpdb;
 			case 'tags':
 				$itemvalue = wppa_sanitize_tags( $itemvalue );
 				$doit = true;
+				$need_re_index = true;
 				break;
 			case 'thumbx':
 			case 'thumby':
@@ -176,19 +188,25 @@ global $wpdb;
 			case 'filename':
 				$itemvalue = wppa_sanitize_file_name( $itemvalue );
 				$doit = true;
+				$need_re_index = true;
 				break;
-			case 'custom':
 			case 'stereo':
 				$doit = true;
+				break;
+			case 'custom':
+				$doit = true;
+				$need_re_index = true;
 				break;
 			case 'crypt':
 				$doit = true;
 				break;
 			case 'owner':
 				$doit = true;
+				$need_re_index = true;
 				break;
 			case 'album':
 				$doit = true;
+				$need_re_index = true;
 				break;
 			case 'magickstack':
 				$doit = true;
@@ -207,7 +225,10 @@ global $wpdb;
 	}
 
 	// Update index
-	wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+	if ( $need_re_index ) {
+		wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
+		wppa_clear_cache();
+	}
 
 	return true;
 }

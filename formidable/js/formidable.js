@@ -150,25 +150,6 @@ function frmFrontFormJS(){
 		return errors;
 	}
 
-	function fieldValueChanged(e){
-		/*jshint validthis:true */
-
-		var field_id = frmFrontForm.getFieldId( this, false );
-		if ( ! field_id || typeof field_id === 'undefined' ) {
-			return;
-		}
-
-		if ( e.frmTriggered && e.frmTriggered == field_id ) {
-			return;
-		}
-
-		jQuery(document).trigger( 'frmFieldChanged', [ this, field_id, e ] );
-
-		if ( e.selfTriggered !== true ) {
-			maybeValidateChange( field_id, this );
-		}
-	}
-
 	function maybeValidateChange( field_id, field ) {
 		if ( jQuery(field).closest('form').hasClass('frm_js_validate') ) {
 			validateField( field_id, field );
@@ -336,7 +317,7 @@ function frmFrontFormJS(){
 	}
 
 	function hasInvisibleRecaptcha( object ) {
-		if ( typeof frmProForm === 'undefined' || frmProForm.goingToPreviousPage( object ) ) {
+		if ( typeof frmProForm !== 'undefined' && frmProForm.goingToPreviousPage( object ) ) {
 			return false;
 		}
 
@@ -427,7 +408,9 @@ function frmFrontFormJS(){
 					}
 					var formID = jQuery(object).find('input[name="form_id"]').val();
 					response.content = response.content.replace(/ frm_pro_form /g, ' frm_pro_form frm_no_hide ');
-					jQuery(object).closest( '.frm_forms' ).replaceWith( response.content );
+					var replaceContent = jQuery( object ).closest( '.frm_forms' );
+					removeAddedScripts( replaceContent, formID );
+					replaceContent.replaceWith( response.content );
 
 					addUrlParam(response);
 
@@ -524,6 +507,14 @@ function frmFrontFormJS(){
 			jQuery(document).trigger( 'frmFormComplete', [ object, response ] );
 		} else {
 			jQuery(document).trigger( 'frmPageChanged', [ object, response ] );
+		}
+	}
+
+	function removeAddedScripts( formContainer, formID ) {
+		var endReplace = jQuery( '.frm_end_ajax_' + formID );
+		if ( endReplace.length ) {
+			formContainer.nextUntil( '.frm_end_ajax_' + formID ).remove();
+			endReplace.remove();
 		}
 	}
 
@@ -796,7 +787,7 @@ function frmFrontFormJS(){
 
 			jQuery(document.getElementById('frm_resend_email')).click(resendEmail);
 
-			jQuery(document).on('change', '.frm-show-form input[name^="item_meta"], .frm-show-form select[name^="item_meta"], .frm-show-form textarea[name^="item_meta"]', fieldValueChanged );
+			jQuery(document).on('change', '.frm-show-form input[name^="item_meta"], .frm-show-form select[name^="item_meta"], .frm-show-form textarea[name^="item_meta"]', frmFrontForm.fieldValueChanged );
 			jQuery(document).on('change keyup', '.frm-show-form .frm_inside_container input, .frm-show-form .frm_inside_container select, .frm-show-form .frm_inside_container textarea', maybeShowLabel);
 
 			jQuery(document).on('click', 'a[data-frmconfirm]', confirmClick);
@@ -1003,6 +994,25 @@ function frmFrontFormJS(){
 					}
 					return false;
 				}
+			}
+		},
+
+		fieldValueChanged: function(e){
+			/*jshint validthis:true */
+
+			var field_id = frmFrontForm.getFieldId( this, false );
+			if ( ! field_id || typeof field_id === 'undefined' ) {
+				return;
+			}
+
+			if ( e.frmTriggered && e.frmTriggered == field_id ) {
+				return;
+			}
+
+			jQuery(document).trigger( 'frmFieldChanged', [ this, field_id, e ] );
+
+			if ( e.selfTriggered !== true ) {
+				maybeValidateChange( field_id, this );
 			}
 		},
 

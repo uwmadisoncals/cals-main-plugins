@@ -25,11 +25,19 @@ final class Types_Asset_Manager extends Toolset_Assets_Manager {
 	const SCRIPT_ADDITIONAL_VALIDATION_RULES = 'wpcf-form-validation-additional';
 
 
+
+	private static $types_instance;
+
+
 	/**
 	 * @return Types_Asset_Manager
 	 */
 	static public function get_instance() {
-		return parent::getInstance();
+		if( null === self::$types_instance ) {
+			self::$types_instance = new self();
+		}
+
+		return self::$types_instance;
 	}
 	
 	

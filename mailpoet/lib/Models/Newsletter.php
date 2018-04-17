@@ -2,6 +2,7 @@
 namespace MailPoet\Models;
 use Carbon\Carbon;
 use MailPoet\Newsletter\Renderer\Renderer;
+use MailPoet\Tasks\Sending as SendingTask;
 use MailPoet\Util\Helpers;
 use MailPoet\Util\Security;
 use MailPoet\WP\Emoji;
@@ -10,6 +11,7 @@ if(!defined('ABSPATH')) exit;
 
 class Newsletter extends Model {
   public static $_table = MP_NEWSLETTERS_TABLE;
+  const TYPE_AUTOMATIC = 'automatic';
   const TYPE_STANDARD = 'standard';
   const TYPE_WELCOME = 'welcome';
   const TYPE_NOTIFICATION = 'notification';
@@ -107,12 +109,24 @@ class Newsletter extends Model {
         'SET `deleted_at` = NOW() ' .
         'WHERE `parent_id` = ' . $this->id
       );
+      ScheduledTask::rawExecute(
+        'UPDATE `' . ScheduledTask::$_table . '` t ' .
+        'JOIN `' . SendingQueue::$_table . '` q ON t.`id` = q.`task_id` ' .
+        'SET t.`deleted_at` = NOW() ' .
+        'WHERE q.`newsletter_id` IN (' . join(',', array_merge(Helpers::flattenArray($children), array($this->id))) . ')'
+      );
       SendingQueue::rawExecute(
         'UPDATE `' . SendingQueue::$_table . '` ' .
         'SET `deleted_at` = NOW() ' .
         'WHERE `newsletter_id` IN (' . join(',', array_merge(Helpers::flattenArray($children), array($this->id))) . ')'
       );
     } else {
+      ScheduledTask::rawExecute(
+        'UPDATE `' . ScheduledTask::$_table . '` t ' .
+        'JOIN `' . SendingQueue::$_table . '` q ON t.`id` = q.`task_id` ' .
+        'SET t.`deleted_at` = NOW() ' .
+        'WHERE q.`newsletter_id` = ' . $this->id
+      );
       SendingQueue::rawExecute(
         'UPDATE `' . SendingQueue::$_table . '` ' .
         'SET `deleted_at` = NOW() ' .
@@ -133,12 +147,24 @@ class Newsletter extends Model {
           'SET `deleted_at` = NOW() ' .
           'WHERE `parent_id` IN (' . join(',', Helpers::flattenArray($ids)) . ')'
         );
+        ScheduledTask::rawExecute(
+          'UPDATE `' . ScheduledTask::$_table . '` t ' .
+          'JOIN `' . SendingQueue::$_table . '` q ON t.`id` = q.`task_id` ' .
+          'SET t.`deleted_at` = NOW() ' .
+          'WHERE q.`newsletter_id` IN (' . join(',', array_merge(Helpers::flattenArray($children), $ids)) . ')'
+        );
         SendingQueue::rawExecute(
           'UPDATE `' . SendingQueue::$_table . '` ' .
           'SET `deleted_at` = NOW() ' .
           'WHERE `newsletter_id` IN (' . join(',', array_merge(Helpers::flattenArray($children), $ids)) . ')'
         );
       } else {
+        ScheduledTask::rawExecute(
+          'UPDATE `' . ScheduledTask::$_table . '` t ' .
+          'JOIN `' . SendingQueue::$_table . '` q ON t.`id` = q.`task_id` ' .
+          'SET t.`deleted_at` = NOW() ' .
+          'WHERE q.`newsletter_id` IN (' . join(',', Helpers::flattenArray($ids)) . ')'
+        );
         SendingQueue::rawExecute(
           'UPDATE `' . SendingQueue::$_table . '` ' .
           'SET `deleted_at` = NOW() ' .
@@ -156,9 +182,17 @@ class Newsletter extends Model {
     if($children) {
       $children = Helpers::flattenArray($children);
       $this->children()->deleteMany();
+      SendingQueue::getTasks()
+        ->whereIn('queues.newsletter_id', array_merge($children, array($this->id)))
+        ->findResultSet()
+        ->delete();
       SendingQueue::whereIn('newsletter_id', array_merge($children, array($this->id)))->deleteMany();
       NewsletterSegment::whereIn('newsletter_id', array_merge($children, array($this->id)))->deleteMany();
     } else {
+      SendingQueue::getTasks()
+        ->where('queues.newsletter_id', $this->id)
+        ->findResultSet()
+        ->delete();
       $this->queue()->deleteMany();
       $this->segmentRelations()->deleteMany();
     }
@@ -173,9 +207,17 @@ class Newsletter extends Model {
       if($children) {
         $children = Helpers::flattenArray($children);
         Newsletter::whereIn('parent_id', $ids)->deleteMany();
+        SendingQueue::getTasks()
+          ->whereIn('queues.newsletter_id', array_merge($children, $ids))
+          ->findResultSet()
+          ->delete();
         SendingQueue::whereIn('newsletter_id', array_merge($children, $ids))->deleteMany();
         NewsletterSegment::whereIn('newsletter_id', array_merge($children, $ids))->deleteMany();
       } else {
+        SendingQueue::getTasks()
+          ->whereIn('queues.newsletter_id', $ids)
+          ->findResultSet()
+          ->delete();
         SendingQueue::whereIn('newsletter_id', $ids)->deleteMany();
         NewsletterSegment::whereIn('newsletter_id', $ids)->deleteMany();
       }
@@ -193,12 +235,24 @@ class Newsletter extends Model {
         'SET `deleted_at` = null ' .
         'WHERE `parent_id` = ' . $this->id
       );
+      ScheduledTask::rawExecute(
+        'UPDATE `' . ScheduledTask::$_table . '` t ' .
+        'JOIN `' . SendingQueue::$_table . '` q ON t.`id` = q.`task_id` ' .
+        'SET t.`deleted_at` = null ' .
+        'WHERE q.`newsletter_id` IN (' . join(',', array_merge(Helpers::flattenArray($children), array($this->id))) . ')'
+      );
       SendingQueue::rawExecute(
         'UPDATE `' . SendingQueue::$_table . '` ' .
         'SET `deleted_at` = null ' .
         'WHERE `newsletter_id` IN (' . join(',', array_merge(Helpers::flattenArray($children), array($this->id))) . ')'
       );
     } else {
+      ScheduledTask::rawExecute(
+        'UPDATE `' . ScheduledTask::$_table . '` t ' .
+        'JOIN `' . SendingQueue::$_table . '` q ON t.`id` = q.`task_id` ' .
+        'SET t.`deleted_at` = null ' .
+        'WHERE q.`newsletter_id` = ' . $this->id
+      );
       SendingQueue::rawExecute(
         'UPDATE `' . SendingQueue::$_table . '` ' .
         'SET `deleted_at` = null ' .
@@ -223,12 +277,24 @@ class Newsletter extends Model {
           ->findResultSet()
           ->set('deleted_at', null)
           ->save();
+        SendingQueue::getTasks()
+          ->whereIn('queues.newsletter_id', Helpers::flattenArray($children))
+          ->whereNotNull('tasks.deleted_at')
+          ->findResultSet()
+          ->set('deleted_at', null)
+          ->save();
         SendingQueue::whereIn('newsletter_id', Helpers::flattenArray($children))
           ->whereNotNull('deleted_at')
           ->findResultSet()
           ->set('deleted_at', null)
           ->save();
       } else {
+        SendingQueue::getTasks()
+          ->whereIn('queues.newsletter_id', $ids)
+          ->whereNotNull('tasks.deleted_at')
+          ->findResultSet()
+          ->set('deleted_at', null)
+          ->save();
         SendingQueue::whereIn('newsletter_id', $ids)
           ->whereNotNull('deleted_at')
           ->findResultSet()
@@ -408,23 +474,11 @@ class Newsletter extends Model {
   }
 
   function getQueue($columns = '*') {
-    return SendingQueue::select($columns)
-      ->where('newsletter_id', $this->id)
-      ->orderByDesc('updated_at')
-      ->findOne();
+    return SendingTask::getByNewsletterId($this->id);
   }
 
   function withSendingQueue() {
-    $queue = $this->getQueue(array(
-      'id',
-      'newsletter_id',
-      'newsletter_rendered_subject',
-      'status',
-      'count_processed',
-      'count_total',
-      'scheduled_at',
-      'created_at'
-    ));
+    $queue = $this->getQueue();
     if($queue === false) {
       $this->queue = false;
     } else {
@@ -445,9 +499,9 @@ class Newsletter extends Model {
 
   function withTotalSent() {
     // total of subscribers who received the email
-    $this->total_sent = (int)SendingQueue::where('newsletter_id', $this->id)
-      ->where('status', SendingQueue::STATUS_COMPLETED)
-      ->sum('count_processed');
+    $this->total_sent = (int)SendingQueue::findTaskByNewsletterId($this->id)
+      ->where('tasks.status', SendingQueue::STATUS_COMPLETED)
+      ->sum('queues.count_processed');
     return $this;
   }
 
@@ -480,8 +534,9 @@ class Newsletter extends Model {
       } else {
         $row = $statisticsExpr
           ->join(MP_SENDING_QUEUES_TABLE, array("queue_id", "=", "qt.id"), "qt")
+          ->join(MP_SCHEDULED_TASKS_TABLE, array("qt.task_id", "=", "tasks.id"), "tasks")
           ->where(array(
-            "qt.status" => SendingQueue::STATUS_COMPLETED,
+            "tasks.status" => SendingQueue::STATUS_COMPLETED,
             "stat.newsletter_id" => $this->id,
           ))->findOne();
       }
@@ -511,10 +566,14 @@ class Newsletter extends Model {
         'queues.newsletter_id = newsletters.id',
         'queues'
       )
-      ->where('queues.status', SendingQueue::STATUS_COMPLETED)
-      ->whereGte('queues.processed_at', Carbon::now()->subMonths(3))
+      ->join(
+        MP_SCHEDULED_TASKS_TABLE,
+        'queues.task_id = tasks.id',
+        'tasks'
+      )
+      ->where('tasks.status', SendingQueue::STATUS_COMPLETED)
+      ->whereGte('tasks.processed_at', Carbon::now()->subMonths(3))
       ->count();
-
 
     return array(
       'welcome_newsletters_count' => $welcome_newsletters_count,
@@ -532,6 +591,7 @@ class Newsletter extends Model {
 
   static function filters($data = array()) {
     $type = isset($data['params']['type']) ? $data['params']['type'] : null;
+    $group = (isset($data['params']['group'])) ? $data['params']['group'] : null;
 
     // newsletter types without filters
     if(in_array($type, array(
@@ -549,7 +609,7 @@ class Newsletter extends Model {
 
     foreach($segments as $segment) {
       $newsletters = $segment->newsletters()
-        ->filter('filterType', $type)
+        ->filter('filterType', $type, $group)
         ->filter('groupBy', $data);
 
       $newsletters_count = $newsletters->count();
@@ -585,7 +645,8 @@ class Newsletter extends Model {
     // filter by type
     $type = isset($data['params']['type']) ? $data['params']['type'] : null;
     if($type !== null) {
-      $orm->filter('filterType', $type);
+      $group = (isset($data['params']['group'])) ? $data['params']['group'] : null;
+      $orm->filter('filterType', $type, $group);
     }
 
     // filter by parent id
@@ -631,6 +692,7 @@ class Newsletter extends Model {
 
   static function groups($data = array()) {
     $type = isset($data['params']['type']) ? $data['params']['type'] : null;
+    $group = (isset($data['params']['group'])) ? $data['params']['group'] : null;
 
     // newsletter types without groups
     if(in_array($type, array(
@@ -644,7 +706,7 @@ class Newsletter extends Model {
         'name' => 'all',
         'label' => __('All', 'mailpoet'),
         'count' => Newsletter::getPublished()
-          ->filter('filterType', $type)
+          ->filter('filterType', $type, $group)
           ->count()
       )
     );
@@ -656,7 +718,7 @@ class Newsletter extends Model {
             'name' => self::STATUS_DRAFT,
             'label' => __('Draft', 'mailpoet'),
             'count' => Newsletter::getPublished()
-              ->filter('filterType', $type)
+              ->filter('filterType', $type, $group)
               ->filter('filterStatus', self::STATUS_DRAFT)
               ->count()
           ),
@@ -664,7 +726,7 @@ class Newsletter extends Model {
             'name' => self::STATUS_SCHEDULED,
             'label' => __('Scheduled', 'mailpoet'),
             'count' => Newsletter::getPublished()
-              ->filter('filterType', $type)
+              ->filter('filterType', $type, $group)
               ->filter('filterStatus', self::STATUS_SCHEDULED)
               ->count()
           ),
@@ -672,7 +734,7 @@ class Newsletter extends Model {
             'name' => self::STATUS_SENDING,
             'label' => __('Sending', 'mailpoet'),
             'count' => Newsletter::getPublished()
-              ->filter('filterType', $type)
+              ->filter('filterType', $type, $group)
               ->filter('filterStatus', self::STATUS_SENDING)
               ->count()
           ),
@@ -680,7 +742,7 @@ class Newsletter extends Model {
             'name' => self::STATUS_SENT,
             'label' => __('Sent', 'mailpoet'),
             'count' => Newsletter::getPublished()
-              ->filter('filterType', $type)
+              ->filter('filterType', $type, $group)
               ->filter('filterStatus', self::STATUS_SENT)
               ->count()
           )
@@ -689,12 +751,13 @@ class Newsletter extends Model {
 
       case self::TYPE_WELCOME:
       case self::TYPE_NOTIFICATION:
+      case self::TYPE_AUTOMATIC:
         $groups = array_merge($groups, array(
           array(
             'name' => self::STATUS_ACTIVE,
             'label' => __('Active', 'mailpoet'),
             'count' => Newsletter::getPublished()
-              ->filter('filterType', $type)
+              ->filter('filterType', $type, $group)
               ->filter('filterStatus', self::STATUS_ACTIVE)
               ->count()
           ),
@@ -702,7 +765,7 @@ class Newsletter extends Model {
             'name' => self::STATUS_DRAFT,
             'label' => __('Not active', 'mailpoet'),
             'count' => Newsletter::getPublished()
-              ->filter('filterType', $type)
+              ->filter('filterType', $type, $group)
               ->filter('filterStatus', self::STATUS_DRAFT)
               ->count()
           )
@@ -714,7 +777,7 @@ class Newsletter extends Model {
       'name' => 'trash',
       'label' => __('Trash', 'mailpoet'),
       'count' => Newsletter::getTrashed()
-        ->filter('filterType', $type)
+        ->filter('filterType', $type, $group)
         ->count()
     );
 
@@ -758,14 +821,34 @@ class Newsletter extends Model {
     return $orm;
   }
 
-  static function filterType($orm, $type = false) {
+  static function filterType($orm, $type = false, $group = false) {
     if(in_array($type, array(
       self::TYPE_STANDARD,
       self::TYPE_WELCOME,
+      self::TYPE_AUTOMATIC,
       self::TYPE_NOTIFICATION,
       self::TYPE_NOTIFICATION_HISTORY
     ))) {
-      $orm->where('type', $type);
+      if($type === self::TYPE_AUTOMATIC && $group) {
+        $orm = $orm->join(
+          NewsletterOptionField::$_table,
+          array(
+            'option_fields.newsletter_type', '=', self::$_table . '.type',
+            'option_fields.name', '=', 'group'
+          ),
+          'option_fields'
+        )
+        ->join(
+          NewsletterOption::$_table,
+          array(
+            'options.newsletter_id', '=', self::$_table . '.id'
+          ),
+          'options'
+        )
+        ->whereRaw('`options`.`option_field_id` = `option_fields`.`id`')
+        ->where('options.value', $group);
+      }
+      $orm = $orm->where(self::$_table . '.type', $type);
     }
     return $orm;
   }
@@ -773,14 +856,14 @@ class Newsletter extends Model {
   static function listingQuery($data = array()) {
     $query = self::select(
       array(
-        'id',
-        'subject',
-        'hash',
-        'type',
-        'status',
-        'sent_at',
-        'updated_at',
-        'deleted_at'
+        self::$_table . '.id',
+        self::$_table . '.subject',
+        self::$_table . '.hash',
+        self::$_table . '.type',
+        self::$_table . '.status',
+        self::$_table . '.sent_at',
+        self::$_table . '.updated_at',
+        self::$_table . '.deleted_at'
       )
     );
     if($data['sort_by'] === 'sent_at') {
@@ -862,10 +945,15 @@ class Newsletter extends Model {
         'queues.newsletter_id = newsletters.id',
         'queues'
       )
-      ->where('queues.status', SendingQueue::STATUS_COMPLETED)
+      ->join(
+        MP_SCHEDULED_TASKS_TABLE,
+        'queues.task_id = tasks.id',
+        'tasks'
+      )
+      ->where('tasks.status', SendingQueue::STATUS_COMPLETED)
       ->whereNull('newsletters.deleted_at')
-      ->select('queues.processed_at')
-      ->orderByDesc('queues.processed_at');
+      ->select('tasks.processed_at')
+      ->orderByDesc('tasks.processed_at');
 
     if(!empty($segment_ids)) {
       $orm->join(

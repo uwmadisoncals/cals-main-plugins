@@ -4,7 +4,7 @@
 *
 * A text widget that interpretes wppa shortcodes
 *
-* Version 6.7.01
+* Version 6.8.07
 */
 
 class WppaGpWidget extends WP_Widget {
@@ -16,12 +16,6 @@ class WppaGpWidget extends WP_Widget {
 
 	function widget( $args, $instance ) {
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
 		extract( $args );
@@ -52,7 +46,14 @@ class WppaGpWidget extends WP_Widget {
 		$text = do_shortcode( $text );
 		$text = apply_filters( 'widget_text', $text );	// If shortcode at wppa filter priority, insert result. See wppa-filter.php
 
-		echo '<div class="wppa-gp-widget" style="margin-top:2px; margin-left:2px;" >' . $text . '</div>';
+		echo '
+		<div' .
+			' class="wppa-gp-widget"' .
+			' style="margin-top:2px; margin-left:2px;"' .
+			' data-wppa="yes"' .
+			' >' .
+			$text .
+		'</div>';
 		echo '<div style="clear:both"></div>';
 
 		// Close widget
@@ -91,7 +92,7 @@ class WppaGpWidget extends WP_Widget {
 		wppa_widget_checkbox( $this, 'filter', $instance['filter'], __( 'Automatically add paragraphs', 'wp-photo-album-plus' ) ) .
 
 		// Logged in only?
-		wppa_widget_checkbox( $this, 'loggedinonly', $instance['loggedinonly'], __( 'Show to logged in users only', 'wp-photo-album-plus' ) );
+		wppa_widget_checkbox( $this, 'loggedinonly', $instance['loggedinonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
 
 	}
 }

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the featured photos
-* Version 6.7.01
+* Version 6.8.07
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -21,19 +21,19 @@ class FeaTenWidget extends WP_Widget {
 		global $wpdb;
 		global $wppa_opt;
 
- 		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
-		wppa_initialize_runtime();
+ 		wppa_initialize_runtime();
 
 		extract( $args );
 		wppa( 'in_widget', 'featen' );
 		wppa_bump_mocc();
 
-		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __( 'Featured photos', 'wp-photo-album-plus' ), 'album' => '' ) );
+		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __( 'Featured photos', 'wp-photo-album-plus' ), 'album' => '', 'logonly' => 'no' ) );
+
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
+
  		$widget_title	= apply_filters( 'widget_title', $instance['title'] );
 		$page 			= in_array( wppa_opt( 'featen_widget_linktype' ), wppa( 'links_no_page' ) ) ?
 							'' :
@@ -112,6 +112,7 @@ class FeaTenWidget extends WP_Widget {
 				'<div' .
 					' class="wppa-widget"' .
 					' style="width:' . $maxw . 'px;height:' . $maxh . 'px;margin:4px;display:inline;text-align:center;float:left;"' .
+					' data-wppa="yes"' .
 					' >';
 
 			if ( $image ) {
@@ -177,8 +178,9 @@ class FeaTenWidget extends WP_Widget {
     function update( $new_instance, $old_instance ) {
 
 		$instance = $old_instance;
-		$instance['title'] = strip_tags( $new_instance['title'] );
-		$instance['album'] = $new_instance['album'];
+		$instance['title'] 		= strip_tags( $new_instance['title'] );
+		$instance['album'] 		= $new_instance['album'];
+		$instance['logonly'] 	= $new_instance['logonly'];
 
         return $instance;
     }
@@ -187,7 +189,7 @@ class FeaTenWidget extends WP_Widget {
     function form( $instance ) {
 
 		//Defaults
-		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Featured Photos', 'wp-photo-album-plus' ), 'album' => '0' ) );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Featured Photos', 'wp-photo-album-plus' ), 'album' => '0', 'logonly' => 'no' ) );
 
 		$album = $instance['album'];
 
@@ -203,13 +205,18 @@ class FeaTenWidget extends WP_Widget {
 		echo
 		wppa_widget_selection_frame( $this, 'album', $body, __( 'Album', 'wp-photo-album-plus' ) );
 
-		// Explanation
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
+
+ 		// Explanation
 		echo
 		'<p>' .
 			__( 'You can set the sizes in this widget in the <b>Photo Albums -> Settings</b> admin page.', 'wp-photo-album-plus' ) .
 			' ' . __( 'Table I-F11 and 12', 'wp-photo-album-plus' ) .
 		'</p>';
-    }
+
+   }
 
 } // class FeaTenWidget
 

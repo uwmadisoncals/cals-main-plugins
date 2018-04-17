@@ -5,7 +5,7 @@ Tags: address book, business directory, chamber of commerce business directory, 
 Requires at least: 4.4
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 8.12
+Stable tag: 8.17
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,7 @@ Here are some great **free extensions** (with more on the way) that enhance your
 **Custom Fields**
 
 * [Business Open Hours](https://wordpress.org/plugins/connections-business-directory-hours/) :: Add the business open hours.
+* [Certifications](https://wordpress.org/plugins/connections-business-directory-certifications/) :: Create and assign certifications to individuals in your directory.
 * [Local Time](https://wordpress.org/plugins/connections-business-directory-local-time/) :: Add the business local time.
 * [Facilities](https://wordpress.org/plugins/connections-business-directory-facilities/) :: Add the business facilities.
 * [Income Level](https://wordpress.org/plugins/connections-business-directory-income-levels/) :: Add an income level.
@@ -232,6 +233,85 @@ Yes this is possible but there is a special setup required to do so. It is recom
 == Changelog ==
 
 [Complete Changelog can be found here.](https://connections-pro.com/changelog/)
+
+= 8.17 04/13/2018 =
+* FEATURE: Add link fieldset configuration options.
+* TWEAK: Change class constant access syntax to be compatible with php5.3.
+* TWEAK: Minor tweak to logic to ensure the preferred array value does not create a new messenger ID object when updating from array.
+* TWEAK: Create instance of cnPhone instead of stdClass when creating a new phone number object when creating a "dummy" placeholder object for the phone fieldset.
+* TWEAK: Create instance of cnEmail_Address instead of stdClass when creating a new email address object when creating a "dummy" placeholder object for the email fieldset.
+* TWEAK: Set the `cnEntry::getLinks()` default value for type to query to NULL instead of the registered core types so all links will be queried vs. only the registered types.
+* TWEAK: Change default date format of `cnEntry::getFormattedTimeStamp()` to use the WordPress default date format set by the user in the settings.
+* TWEAK: When saving/updating an entry, the added date time and updated date time should be saved in UTC.
+* TWEAK: Update various spots in the code to account that the last updated and date added timestamps are in UTC so they will properly be cconverted into the current user's timezone.
+* TWEAK: Change `cnEntry::getDateAdded()` to use the user's defined date format from the WP settings.
+* TWEAK: Add time to `cnEntry::getFormattedTimeStamp()` default date format. Default to user's defined date time format from the WP settings.
+* TWEAK: Add time to `cnEntry::getDateAdded()` default date format. Default to user's defined date time format from the WP settings.
+* TWEAK: Remove the hardcoded date time formats used on the Manage admin page so they will display in the users defined date time format in the WP settings.
+* TWEAK: Ensure `cnEntry::getBio()` and `cnEntry::getNotes()` only return strings.
+* BUG: Correct PHP index not found notice.
+* BUG: The messenger fieldset was not updated to honor the fieldset settings!
+* BUG: Version should be string.
+* OTHER: Remove extra spaces.
+* OTHER: Remove todo in cnEntry.
+* OTHER: Remove extra tabs and align `span` tags.
+* OTHER: Remove trailing spaces.
+* OTHER: Remove extra spaces.
+* I18N: Correct string so it can be translated.
+* DEV: phpDoc corrections.
+* DEV: Remove some commented out debug code.
+
+= 8.16 03/30/2018 =
+* FEATURE: Introduce the Instant Messenger Fieldset configuration options.
+* NEW: Introduce `cnEntry_Messenger_IDs` and `cnMessenger` objects.
+* NEW: Introduce `cnText_Domain::register()`.
+* TWEAK: Add abstract constructor to `cnEntry_Collection_Item`.
+* TWEAK: Add method `create()` to `cnEntry_Collection_Item`.
+* TWEAK: Remove method `create()` from `cnPhone` and `cnEmail` to remove code duplication.
+* TWEAK: Refactor `cnEntry::getIm()` and `cnEntry::setIm()` to utilize the `cnEntry_Messenger_IDs` object.
+* TWEAK:Refactor `cnEntry_Output::getImBlock()` to utilize the `cnEntry_Messenger_IDs` objects `render()` method using templates.
+* TWEAK: Add VERSION constant to the core plugin class to store the plugin version.
+* TWEAK: Use class VERSION constant to set the global version constant for the plugin version.
+* TWEAK: Deprecate `cnText_Domain::create()`.
+* TWEAK: Use `cnText_Domain::register()` instead of `cnText_Domain::create()`.
+* TWEAK: Add a few class variables and helper methods to get the plugin path, url and basename.
+* TWEAK: Use the helper methods to set the global constants for the plugin path, url and basename.
+* BUG: Phone number was being sanitized as a street address, corrected so it is sanitized as a phone number.
+* OTHER: Correct misspelling.
+* DEV: Correct inline documentation.
+* DEV: phpDoc corrections.
+* DEV: Correct code indents.
+* DEV: Add phpDoc block to `ConnectionsLoad::hooks()`.
+
+= 8.15 03/24/2018 =
+* BUG: Ensure `cnEntry_Email_Addresses` is properly initialized when adding new entry.
+
+= 8.14 03/23/2018 =
+* NEW: Introduce `cnEntry_Email_Addresses` and `cnEmail_Address`.
+* TWEAK: Use `array_replace()` instead of `array_merge()` when setting the order of a sortable settings input list.
+* TWEAK: Refactor `cnEntry::getEmailAddresses()` and `cnEntry::setEmailAddresses()` to utilize `cnEntry_Email_Addresses` and `cnEmail_Adress`.
+* TWEAK: Refactor `cnEntry_Output::getEmailAddressBlock()` to utilize `cnEntry_Email_Addresses::render()`.
+* TWEAK: Update manage admin page to utilize the new email addresses template.
+* BUG: Ensure integer is passed to `gmdate()`.
+* BUG: The method `cnRetrieve::entries()` is not static, but was called statically.
+* OTHER: Add the new Certifications add on to the readme.txt file.
+* OTHER: Correct the version changelog section.
+* DEV: Correct phpdoc alignment.
+* DEV: phpDoc corrections.
+
+= 8.13 03/09/2018 =
+* FEATURE: Add new option to the Connections : Manage admin page Screen Option to allow the user to choose between the entry logo or photo as the thumbail.
+* NEW: Introduce `cnUser::getMeta()` and `cnUser::setMeta()`.
+* NEW: Introduce `cnUser::getScreenOptions()` and `cnUser::setScreenOptions()`.
+* NEW: Introduce `cnUser::getScreenOption()` and `cnUser::setScreenOption()`.
+* TWEAK: Refactor `cnUser::getFilterPage()` and `cnUser::setFilterPage()` to use `cnUser::getScreenOption()` and  `cnUser::setScreenOption()` respectively and then deprecate those methods.
+* TWEAK: Add `connectionsLoad::$user` as reference to `connectionsLoad::$currentUser`.
+* OTHER: Update the Screen Options library from version 1.3 to 1.4.
+* OTHER: Update Chosen library from 1.7.0 to 1.8.3.
+* I18N: Update POT file.
+* I18N: Update MO files.
+* DEV: Update package.json.
+* DEV: phpDoc corrections.
 
 = 8.12 02/19/2018 =
 * NEW: Introduce several new timezone helper methods in cnDate.
@@ -532,117 +612,9 @@ Yes this is possible but there is a special setup required to do so. It is recom
 * REST API: More work done to support the entry endpoint for the REST API.
 * PHPUnit: Add framework to support unit testing to help ensure even more stable build releases.
 
-= 8.5.30 11/29/2016 =
-* TWEAK: Revert form action to not include the form action.
-* BUG: Ensure enhanced select renders the placeholder values correctly when viewing on a mobile device.
-* BUG: Enable search for the Address Line 4, District and Country fields.
-* OTHER: Correct method capitalization.
-* DEV: Correct inline code doc punctuation.
-* I18N: Update POT file.
-* I18N: Update MO files.
-
-= 8.5.29 11/10/2016 =
-* NEW: Add filter to the `document_title_parts` filter to properly set the browser tab/window title if `wp_title()` is not being used by the theme.
-* TWEAK: Remove the $cached terms params in the Term REST endpoint.
-* TWEAK: Suppress potential PHP notice from being thrown by `unserialize()` in `cnEntry::getAddresses()`.
-* TWEAK: Ensure the home page URL always has a trailing slash in the callback function for the `page_link` filter.
-* TWEAK: Add readonly support to cnHML::select() by making the actualy select field disabled and adding a new hidden input with the same name and value.
-* TWEAK: Only add the search form action attribute if the directory permalink is being added.
-* TWEAK: Force date format in datepicker because, since WP 4.4, WP sets a default format based on the date format set on the General Settings admin page. Those formats are not compatible with the expected date format to be saved.
-* TWEAK: Remove unnecessary trailing semi-colon from datepicker init function call.
-* TWEAK: Remove usage of deprecated $connections global var from cnEntry::getDates().
-* TWEAK: Set the form action attribute to default to the `home_id` shortcode default so searches are always from the directory root page.
-* TWEAK: Add a saving bool parameter to the cnRetrieve class for addresses, phone numbers and such to allow addresses and such to be queried regardless of current logged user permissions.
-* TWEAK: Update the entries address, phone, etc.. object caches on updates. This is to ensure the ID of each address, phone, etc.. is updated to reflect the ID in the database vs. leaving it as `0`.
-* TWEAK: Convert the WP default date format WP jQuery UI datepicker compatible format.
-* BUG: Update the `[upcoming_list]` shortcode so it will function correctly with templates which support the Template Customizer.
-* BUG: Fix the display of the changelog of add-ons.
-* DEV: phpDoc Block corrections.
-* I18N: Update POT file.
-* I18N: Update MO files.
-
-= 8.5.28 10/12/2016 =
-* NEW: Introduce the `connections_page_connections_settings-{tab_name}` action hook.
-* NEW: Introduce the `cn_pre_handle_404_retrieve_atts` filter hook.
-* NEW: Introduce cnLicense_Status.
-* TWEAK: Improve the page load time of the Plugins admin page by batching together license checks into a single HTTP request.
-* TWEAK: Set option group name one instead of repeating the logic several times in cnSettingsAPI::form().
-* TWEAK: Add support for the `invalid_item_id` error status reported by EDD-SL.
-* TWEAK: Register all item licenses with cnLicense_Status.
-* TWEAK: Remove unused `cnLicense::status()` method.
-* TWEAK: Remove use of transients made obsolete by cnLicense_Status.
-* BUG: Reset the `category_exclude` shortcode option if querying entry by slug.
-* BUG: The `connections_license_data` should not be autoloaded.
-* BUG: The basename and slug array values do not need to be set as defaults because they are auto created from file path and item name.
-* DEV: phpDoc block fixes.
-
-= 8.5.27 10/08/2016 =
-* NEW: Introduce the `cn_search_like_shortword` filter.
-* NEW: Introduce cnPlugin_Updater class.
-* TWEAK: Switch from using EDD_SL_Plugin_Updater to cnPlugin_Updater..
-* TWEAK: Update WordPress API to 2.0-beta15
-* TWEAK: Tweak the term slug sanitize_callback to use the `WP_REST_Controller::sanitize_slug()` callback.
-* TWEAK: Remove unnecessary break statements in a switch.
-* TWEAK: Ensure trailing slash in cnLicense::license() request.
-* BUG: Ensure changelog section existing before trying to parse it.
-* BUG: The upgrade notice is a string, not an array.
-* OTHER: Correct misspelling.
-* OTHER: Update copyright year in cnLicense.
-* DEV: phpDoc fixes.
-
-= 8.5.26 09/16/2016 =
-* NEW: Add a new CSV export config option to export categories as child_of the defined parent category into their own csv column.
-* NEW: Add support for the WP REST API. This is alpha status and only supports the directory categories.
-* TWEAK: Add the `cn-left` and `cn-right` class to the Default Entry Card template for easier selection.
-* TWEAK: Add status codes to return value of cnLicense::statusMessage().
-* TWEAK: Register settings license field once per item instead of once for all items so `cnLicense::field()` will be unique per item instead of last item activated.
-* TWEAK: Optimize `cnLicense::field()` by removing duplicate code by utilizing `cnLicense::statusMessage()`.
-* TWEAK: Delete license transient on activate/delete.
-* TWEAK: Update admin CSS with updates styles for the Settings admin page, Licenses tab.
-* TWEAK: Refactor `cnSettingsAPI::form()`, basic code cleanup.
-* TWEAK: Trigger 404 if entry not found instead of displaying a "no results" message.
-* TWEAK: Add try/catch to `cnOutput::getDateBlock()` to prevent fatal PHP errors when init'ing `DateTime()` with an invalid date format.
-* TWEAK: Reset the min/max-width CSS values on the search input on the frontend to fix some of the odd global defaults that themes set.
-* BUG: Remove include `wp-load.php` in WordFence Falcon Cache compatibility callback which caused fatal PHP errors.
-* BUG: Remove `px` unit from the social media network icon img tags as that is not valid markup.
-* BUG: Change `cn-category-%d` from an `id` to a `class` because it can be output on the page more than once.
-* BUG: Add missing `$orderBy` var to `cn_term_clauses` filter.
-* BUG: Fix a couple undefined variable PHP notices being generated by cnvCard.
-* BUG: Remove unnecessary `ob_clean()` call in cnvCard.
-* OTHER: Correct misspellings.
-* DEV: phpDoc fixes.
-* DEV: Stub some phpDoc in cnvCard.
-* DEV: Clean up some code alignment issues in cnvCard.
-* DEV: Add the WP REST API to the vendors folder.
-
-
-= 8.5.25 09/07/2016 =
-* BUG: Do not try to get term ancestor hierarchy if the term is a root parent.
-* COMPATIBILITY: Convert NOWDOC block to HEREDOC block for PHP5.2.x holdouts.
-* COMPATIBILITY: Add action which should flush the Wordfence Falcon Cache when an entry/term is added/updated/deleted.
-* TWEAK: Pass WP_Error codes results from `wp_remote_get()` during license status check so they can be displayed.
-
 [Complete Changelog can be found here.](https://connections-pro.com/changelog/)
 
 == Upgrade Notice ==
-
-= 8.5.25 =
-It is recommended to backup before updating. Requires WordPress >= 4.2.
-
-= 8.5.26 =
-It is recommended to backup before updating. Requires WordPress >= 4.2.
-
-= 8.5.27 =
-It is recommended to backup before updating. Requires WordPress >= 4.2.
-
-= 8.5.28 =
-It is recommended to backup before updating. Requires WordPress >= 4.2.
-
-= 8.5.29 =
-It is recommended to backup before updating. Requires WordPress >= 4.3.
-
-= 8.5.30 =
-It is recommended to backup before updating. Requires WordPress >= 4.3.
 
 = 8.5.31 =
 It is recommended to backup before updating. Requires WordPress >= 4.3.
@@ -708,4 +680,19 @@ It is recommended to backup before updating. Requires WordPress >= 4.4 and PHP >
 It is recommended to backup before updating. Requires WordPress >= 4.4 and PHP >= 5.3. PHP version >= 7.1 recommended.
 
 = 8.12 =
+It is recommended to backup before updating. Requires WordPress >= 4.4 and PHP >= 5.3. PHP version >= 7.1 recommended.
+
+= 8.13 =
+It is recommended to backup before updating. Requires WordPress >= 4.4 and PHP >= 5.3. PHP version >= 7.1 recommended.
+
+= 8.14 =
+It is recommended to backup before updating. Requires WordPress >= 4.4 and PHP >= 5.3. PHP version >= 7.1 recommended.
+
+= 8.15 =
+It is recommended to backup before updating. Requires WordPress >= 4.4 and PHP >= 5.3. PHP version >= 7.1 recommended.
+
+= 8.16 =
+It is recommended to backup before updating. Requires WordPress >= 4.4 and PHP >= 5.3. PHP version >= 7.1 recommended.
+
+= 8.17 =
 It is recommended to backup before updating. Requires WordPress >= 4.4 and PHP >= 5.3. PHP version >= 7.1 recommended.

@@ -1289,7 +1289,7 @@ WPV_Toolset.Utils.versionCompare = function (left, right) {
  * Get a query argument value from a URL.
  *
  * @param {string} name Argument name.
- * @param {string} url Source URL. Optional. If missing, current page URL will be used.
+ * @param {string} [url] Source URL. Optional. If missing, current page URL will be used.
  * @returns {string|null}
  * @since 2.1
  * @link http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
@@ -1374,7 +1374,7 @@ WPV_Toolset.Utils.Spinner = {
         return jQuery('<span class="spinner"></span>');
     },
     show: function (spinner, show) {
-        if (typeof(show) == 'undefined') {
+        if (typeof(show) === 'undefined') {
             show = true;
         }
 
@@ -1437,7 +1437,7 @@ WPV_Toolset.Utils.Ajax = {
      */
     call: function (data, successCallback, failCallback) {
 
-        if (typeof(failCallback) == 'undefined') {
+        if (typeof(failCallback) === 'undefined') {
             failCallback = successCallback;
         }
 

@@ -62,4 +62,26 @@ interface IToolset_Post_Type_From_Types extends IToolset_Post_Type {
 	 * @param string $new_value
 	 */
 	public function set_slug( $new_value );
+
+
+	/**
+	 * Set the 'public' option of the post type.
+	 *
+	 * @param bool $value
+	 */
+	public function set_is_public( $value );
+
+
+	/**
+	 * Set the 'disabled' option of the post type.
+	 *
+	 * @param bool $value
+	 */
+	public function set_is_disabled( $value );
+
+
+	/**
+	 * @return bool Corresponds with the disabled status of the post type.
+	 */
+	public function is_disabled();
 }

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.8.01
+* Version 6.8.02
 *
 */
 
@@ -53,18 +53,30 @@ function _wppa_moderate_photos() {
 		$photo = $_GET['photo'];
 	}
 	else $photo = '';
+	
+	$just_edit = isset( $_GET['just-edit'] );
 
-	echo
-	'<div class="wrap">' .
-		'<h2>' . __( 'Moderate photos' , 'wp-photo-album-plus') . '</h2>';
-		if ( wppa_switch( 'moderate_bulk' ) ) {
-			wppa_album_photos_bulk( 'moderate' );
-		}
-		else {
-			wppa_album_photos( '', $photo, '', true );
-		}
-	echo
+	if ( $photo && $just_edit && wppa_user_is( 'administrator' ) ) {
+		echo 
+		'<div class="wrap">' .
+			'<h2>' . __( 'Edit photo', 'wp-photo-album-plus' ) . '</h2>';
+			wppa_album_photos( '', $photo, '', false );
+		echo
+		'</div>';
+	}
+	else {
+		echo
+		'<div class="wrap">' .
+			'<h2>' . __( 'Moderate photos' , 'wp-photo-album-plus') . '</h2>';
+			if ( wppa_switch( 'moderate_bulk' ) ) {
+				wppa_album_photos_bulk( 'moderate' );
+			}
+			else {
+				wppa_album_photos( '', $photo, '', true );
+			}
+		echo
 	'</div>';
+	}
 }
 
 // The photo edit list. Also used in wppa-album-admin-autosave.php
@@ -558,7 +570,7 @@ function wppaToggleExif( id, count ) {
 							 'botlft' => __( 'bottom - left' , 'wp-photo-album-plus'), 'botcen' => __( 'bottom - center' , 'wp-photo-album-plus'), 'botrht' => __( 'bottom - right' , 'wp-photo-album-plus'), );
 
 			// Album for moderate
-			if ( $modalbum != $album ) {
+			if ( $modalbum != $album && ! isset( $_GET['just-edit'] ) ) {
 				echo '<h3>' . sprintf( 	__( 'Edit/Moderate photos from album %s by %s', 'wp-photo-album-plus' ),
 										'<i>' . wppa_get_album_name( $album ) . '</i>',
 										'<i>' . wppa_get_album_item( $album, 'owner' ) . '</i>' ) . '</h3>';
@@ -952,7 +964,7 @@ function wppaToggleExif( id, count ) {
 								if ( is_file( $sp ) ) {
 									$ima = getimagesize( $sp );
 									echo
-									$ima['0'] . ' x ' . $ima['1'] . ' px, ' .
+									$ima['0'] . ' x ' . $ima['1'] . ' (' . sprintf('%4.2fMp', ( $ima['0'] * $ima['1'] ) / ( 1024 * 1024 ) ) . ') ' .
 									wppa_get_filesize( $sp ) . '. ';
 								}
 								else {
@@ -1970,7 +1982,7 @@ function wppaToggleExif( id, count ) {
 										__( 'Permalink', 'wp-photo-album-plus' ) . ':' .
 									'</td>' .
 									'<td>' .
-										'<a href="' . $spl . '" target="_blank" >' . $spl . '</a>' .
+										'<a href="' . esc_attr( $spl ) . '" target="_blank" >' . $spl . '</a>' .
 									'</td>' .
 									'<td>' .
 									'</td>' .
@@ -1985,7 +1997,7 @@ function wppaToggleExif( id, count ) {
 									__( 'Hi resolution url', 'wp-photo-album-plus') . ':' .
 								'</td>' .
 								'<td>' .
-									'<a href="' . $hru . '" target="_blank" >' . $hru . '</a>' .
+									'<a href="' . esc_attr( $hru ) . '" target="_blank" >' . $hru . '</a>' .
 								'</td>' .
 								'<td>' .
 								'</td>' .
@@ -2000,7 +2012,7 @@ function wppaToggleExif( id, count ) {
 										__( 'Display file url', 'wp-photo-album-plus') . ':' .
 									'</td>' .
 									'<td>' .
-										'<a href="' . $lru . '" target="_blank" >' . $lru . '</a>' .
+										'<a href="' . esc_attr( $lru ) . '" target="_blank" >' . $lru . '</a>' .
 									'</td>' .
 									'<td>' .
 									'</td>' .
@@ -2016,7 +2028,7 @@ function wppaToggleExif( id, count ) {
 										__( 'Thumbnail file url', 'wp-photo-album-plus' ) . ':' .
 									'</td>' .
 									'<td>' .
-										'<a href="' . $tnu . '" target="_blank" >' . $tnu . '</a>' .
+										'<a href="' . esc_attr( $tnu ) . '" target="_blank" >' . $tnu . '</a>' .
 									'</td>' .
 									'<td>' .
 									'</td>' .
@@ -2052,11 +2064,11 @@ function wppaToggleExif( id, count ) {
 							' >' .
 							'<thead>' .
 								'<tr style="font-weight:bold;" >' .
-									'<td style="padding:0 4px;" >Exif tag</td>' .
-									'<td style="padding:0 4px;" >Brand</td>' .
-									'<td style="padding:0 4px;" >Description</td>' .
-									'<td style="padding:0 4px;" >Raw value</td>' .
-									'<td style="padding:0 4px;" >Formatted value</td>' .
+									'<td style="padding:0 4px;" >' . __( 'Exif tag', 'wp-photo-album-plus' ) . '</td>' .
+									'<td style="padding:0 4px;" >' . __( 'Brand', 'wp-photo-album-plus' ) . '</td>' .
+									'<td style="padding:0 4px;" >' . __( 'Description', 'wp-photo-album-plus' ) . '</td>' .
+									'<td style="padding:0 4px;" >' . __( 'Raw value', 'wp-photo-album-plus' ) . '</td>' .
+									'<td style="padding:0 4px;" >' . __( 'Formatted value', 'wp-photo-album-plus' ) . '</td>' .
 								'</tr>' .
 							'</thead>' .
 							'<tbody>';

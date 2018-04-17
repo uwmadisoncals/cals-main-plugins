@@ -1,3 +1,16 @@
+= 1.8.10 =
+* Removed wrongly added dependencies and repositories
+
+= 1.8.8 =
+* Fixed some conflicts
+
+= 1.8.7 =
+* Updated version numbers to all files
+
+= 1.8.6 =
+* Bug fix: When Windows file paths were longer than 256 chars updating of plugins wasn't possible
+* Bug fix: PHP 7.2 warnings
+
 = 1.8.2 =
 * Bug fix: registration warning was shown for free plugins
 

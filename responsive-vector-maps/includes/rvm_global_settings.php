@@ -38,6 +38,7 @@ function rvm_admin_init(){
         ,''
         //,'rvm_validate_options' non need of validation at the moment
     ) ;
+    
     add_settings_section(//Main settings 
         'rvm_main_settings', //id
         __( 'Main settings', RVM_TEXT_DOMAIN ), //title
@@ -50,39 +51,63 @@ function rvm_admin_init(){
             'Disable wp_emoji', //title
             'rvm_settings_field', //callback
             'rvm_options_page',//page
-            'rvm_main_settings'//section
-        ) ;
+            'rvm_main_settings',//section
+            array( // The $args
+            	'rvm_option_dequeue_wp_emoji',// Should match Option ID
+            	'checkbox' 
+        	) 
+    ) ;
+    
+    add_settings_field(            
+            'rvm_option_custom_marker_icon_module_path', //id
+            'Install module for custom marker icon', //title
+            'rvm_settings_field', //callback
+            'rvm_options_page',//page
+            'rvm_main_settings',//section
+            array( // The $args
+            	'rvm_option_custom_marker_icon_module_path',// Should match Option ID
+            	'text' 
+        	)
+    ) ;
         
 }
 
 // Add forms to options page
-function rvm_section_main() {
-    echo '<p>In case you may notice issues related to wp_emoji enable following checkbox. It\'s well documented this script has problems with svg ( vector images ) on which RVM relies on.</p>';
-}
-
 
 // Add fields to options page
-function rvm_settings_field() {
+function rvm_settings_field( $args ) {
     
+    $output = '';
     // Retrieve options
     $rvm_options = rvm_retrieve_options();  
-    $rvm_option_dequeue_wp_emoji =  !empty( $rvm_options[ 'rvm_option_dequeue_wp_emoji' ] ) ? 'checked="checked"' : '' ;
     
-    echo '<input  ' .  $rvm_option_dequeue_wp_emoji  . ' type="checkbox" name="rvm_options[rvm_option_dequeue_wp_emoji]" id="rvm_option_dequeue_wp_emoji" />';
+    if ( $args[ 1 ] == 'checkbox' ) {
+    	$rvm_option_dequeue_wp_emoji =  !empty( $rvm_options[ $args[ 0 ] ] ) ? 'checked="checked"' : '' ;    
+    	$output .= '<input  ' .  $rvm_option_dequeue_wp_emoji  . ' type="' . $args[ 1 ] . '" name="rvm_options['.$args[ 0 ].']" id="'.$args[ 0 ].'" />' . __('(<span>In case you may notice issues related to wp_emoji enable following checkbox. It\'s well documented this script has problems with svg ( vector images ) on which RVM relies on.</span>)', RVM_TEXT_DOMAIN );
+    }
+
+    else {
+    	$rvm_option_custom_marker_icon =  !empty( $rvm_options[ $args[ 0 ] ] ) ? $rvm_options[ $args[ 0 ] ] : '' ;
+    	$output .= '<input type="' . $args[ 1 ] . '" name="' . $args[ 0 ] . '" id="'.$args[ 0 ].'" class="rvm_input" value="" /><input id="rvm_custom_marker_icon_module_uploader_button" class="rvm_custom_marker_icon_module_uploader_button rvm_media_uploader button-primary" name="rvm_mbe_custom_marker_icon_uploader_button" value="' . __( 'Select Marker Module', RVM_TEXT_DOMAIN ) . '" type="submit"> <input id="rvm_custom_marker_icon_module_unzipper_button" class="rvm_custom_marker_icon_module_unzipper_button button-primary" name="rvm_mbe_custom_marker_icon_module_unzipper_button" value="' . __( 'Install Marker Module', RVM_TEXT_DOMAIN ) . '" type="submit">';
+
+        if ( !empty( $rvm_options[ 'rvm_custom_icon_marker_module_path_verified' ] ) && ( $rvm_options['rvm_custom_icon_marker_module_path_verified'] != 'default' ) ) {
+                $output .= '<p id="rvm_marker_global_settings_message" class="rvm_messages rvm_success_messages">' . __( 'Marker Module installed', RVM_TEXT_DOMAIN ) . '</p>';
+        }
+
+        //Hidden field to save eventual marker module path in DB. All options needs to be saved always, otherwise they will be overwritten
+        $output .= '<div id="rvm_custom_marker_icon_module_unzip_progress"><input type="hidden" value="' . $rvm_options[ 'rvm_custom_icon_marker_module_path_verified' ] . '"  name="rvm_options[rvm_custom_icon_marker_module_path_verified]" id="rvm_custom_icon_marker_module_path_verified" /></div>';
+    }
     
     // All options need to be declared here, otherwise WP will get rid in DB of non declared value 
     $rvm_version = !empty( $rvm_options[ 'ver' ] ) ? $rvm_options[ 'ver' ] : RVM_VERSION ;
-    echo '<input type="hidden" value="' . $rvm_version . '" id="rvm_version" name="rvm_options[ver]"/>';
-
+    $output .= '<input type="hidden" value="' . $rvm_version . '" id="rvm_version" name="rvm_options[ver]"/>';
     
+    echo $output;
 }
 
 // Add forms to options page
 function rvm_options_form() {
  
-    
-    // Include of checkin and checkout select
-  
     ?>
     
     <div class="wrap">

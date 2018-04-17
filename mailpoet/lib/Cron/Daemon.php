@@ -1,6 +1,7 @@
 <?php
 namespace MailPoet\Cron;
 use MailPoet\Cron\Workers\Scheduler as SchedulerWorker;
+use MailPoet\Cron\Workers\SendingQueue\Migration as MigrationWorker;
 use MailPoet\Cron\Workers\SendingQueue\SendingQueue as SendingQueueWorker;
 use MailPoet\Cron\Workers\Bounce as BounceWorker;
 use MailPoet\Cron\Workers\KeyCheck\PremiumKeyCheck as PremiumKeyCheckWorker;
@@ -29,6 +30,9 @@ class Daemon {
 
   function run() {
     ignore_user_abort(true);
+    if(strpos(@ini_get('disable_functions'), 'set_time_limit') === false) {
+      set_time_limit(0);
+    }
     if(!$this->request_data) {
       $error = __('Invalid or missing request data.', 'mailpoet');
     } else {
@@ -49,6 +53,7 @@ class Daemon {
     $daemon['token'] = $this->token;
     CronHelper::saveDaemon($daemon);
     try {
+      $this->executeMigrationWorker();
       $this->executeScheduleWorker();
       $this->executeQueueWorker();
       $this->executeSendingServiceKeyCheckWorker();
@@ -98,6 +103,11 @@ class Daemon {
   function executeBounceWorker() {
     $bounce = new BounceWorker($this->timer);
     return $bounce->process();
+  }
+
+  function executeMigrationWorker() {
+    $migration = new MigrationWorker($this->timer);
+    return $migration->process();
   }
 
   function callSelf() {

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the top rated photos
-* Version 6.7.01
+* Version 6.8.07
 */
 
 class wppaStereoWidget extends WP_Widget {
@@ -18,12 +18,6 @@ class wppaStereoWidget extends WP_Widget {
     function widget( $args, $instance ) {
 		global $wpdb;
 
-		require_once(dirname(__FILE__) . '/wppa-links.php');
-		require_once(dirname(__FILE__) . '/wppa-styles.php');
-		require_once(dirname(__FILE__) . '/wppa-functions.php');
-		require_once(dirname(__FILE__) . '/wppa-thumbnails.php');
-		require_once(dirname(__FILE__) . '/wppa-boxes-html.php');
-		require_once(dirname(__FILE__) . '/wppa-slideshow.php');
 		wppa_initialize_runtime();
 
         wppa( 'in_widget', 'stereo' );
@@ -31,8 +25,12 @@ class wppaStereoWidget extends WP_Widget {
 
 		extract( $args );
 
-		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __('Stereo Photo Settings', 'wp-photo-album-plus') ) );
+		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __('Stereo Photo Settings', 'wp-photo-album-plus'), 'logonly' => 'no' ) );
 
+		// Logged in only and logged out?
+		if ( wppa_checked( $instance['logonly'] ) && ! is_user_logged_in() ) {
+			return;
+		}
 
  		$widget_title 	= apply_filters('widget_title', $instance['title'] );
 
@@ -40,7 +38,7 @@ class wppaStereoWidget extends WP_Widget {
 
 		$widget_content .= wppa_get_stereo_html();
 
-		$widget_content .= '<div style="clear:both"></div>';
+		$widget_content .= '<div style="clear:both;" data-wppa="yes" ></div>';
 		$widget_content .= "\n".'<!-- WPPA+ stereo Widget end -->';
 
 		echo "\n" . $before_widget;
@@ -54,6 +52,7 @@ class wppaStereoWidget extends WP_Widget {
     function update($new_instance, $old_instance) {
 		$instance = $old_instance;
 		$instance['title'] 			= strip_tags( $new_instance['title'] );
+		$instance['logonly'] = $new_instance['logonly'];
 
         return $instance;
     }
@@ -62,12 +61,15 @@ class wppaStereoWidget extends WP_Widget {
     function form($instance) {
 
 		//Defaults
-		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __( 'Stereo Photo Settings', 'wp-photo-album-plus ' ) ) );
+		$instance 		= wp_parse_args( (array) $instance, array( 'title' => __( 'Stereo Photo Settings', 'wp-photo-album-plus ' ), 'logonly' => 'no' ) );
 
 		// Title
 		echo
 		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
 
+		// Loggedin only
+		echo
+		wppa_widget_checkbox( $this, 'logonly', $instance['logonly'], __( 'Show to logged in visitors only', 'wp-photo-album-plus' ) );
     }
 
 } // class wppaStereoWidget

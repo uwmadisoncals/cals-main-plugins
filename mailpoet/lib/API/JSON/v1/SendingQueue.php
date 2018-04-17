@@ -5,13 +5,11 @@ namespace MailPoet\API\JSON\v1;
 use MailPoet\API\JSON\Endpoint as APIEndpoint;
 use MailPoet\API\JSON\Error as APIError;
 use MailPoet\Config\AccessControl;
-use MailPoet\Mailer\Mailer;
 use MailPoet\Models\Newsletter;
 use MailPoet\Models\SendingQueue as SendingQueueModel;
-use MailPoet\Models\Subscriber;
 use MailPoet\Newsletter\Scheduler\Scheduler;
 use MailPoet\Segments\SubscribersFinder;
-use MailPoet\Util\Helpers;
+use MailPoet\Tasks\Sending as SendingTask;
 
 if(!defined('ABSPATH')) exit;
 
@@ -38,7 +36,7 @@ class SendingQueue extends APIEndpoint {
 
     // check that the sending method has been configured properly
     try {
-      new Mailer(false);
+      new \MailPoet\Mailer\Mailer(false);
     } catch(\Exception $e) {
       return $this->errorResponse(array(
         $e->getCode() => $e->getMessage()
@@ -46,20 +44,25 @@ class SendingQueue extends APIEndpoint {
     }
 
     // add newsletter to the sending queue
-    $queue = SendingQueueModel::whereNull('status')
-    ->where('newsletter_id', $newsletter->id)
-    ->findOne();
+    $queue = SendingQueueModel::joinWithTasks()
+      ->where('queues.newsletter_id', $newsletter->id)
+      ->whereNull('tasks.status')
+      ->findOne();
 
     if(!empty($queue)) {
       return $this->errorResponse(array(
         APIError::NOT_FOUND => __('This newsletter is already being sent.', 'mailpoet')
       ));
     }
-    $queue = SendingQueueModel::where('newsletter_id', $newsletter->id)
-      ->where('status', SendingQueueModel::STATUS_SCHEDULED)
+
+    $scheduled_queue = SendingQueueModel::joinWithTasks()
+      ->where('queues.newsletter_id', $newsletter->id)
+      ->where('tasks.status', SendingQueueModel::STATUS_SCHEDULED)
       ->findOne();
-    if(!$queue) {
-      $queue = SendingQueueModel::create();
+    if($scheduled_queue) {
+      $queue = SendingTask::createFromQueue($scheduled_queue);
+    } else {
+      $queue = SendingTask::create();
       $queue->newsletter_id = $newsletter->id;
     }
 
@@ -69,29 +72,19 @@ class SendingQueue extends APIEndpoint {
 
       // set queue status
       $queue->status = SendingQueueModel::STATUS_SCHEDULED;
-      $queue->scheduled_at = Scheduler::formatDatetimeString(
-        $newsletter->scheduledAt
-      );
-      $queue->subscribers = null;
-      $queue->count_total = $queue->count_to_process = 0;
+      $queue->scheduled_at = Scheduler::formatDatetimeString($newsletter->scheduledAt);
     } else {
       $segments = $newsletter->segments()->findArray();
       $finder = new SubscribersFinder();
-      $subscribers = $finder->getSubscribersByList($segments);
-      $subscribers = Helpers::flattenArray($subscribers);
-      if(!count($subscribers)) {
+      $subscribers_count = $finder->addSubscribersToTaskFromSegments($queue->task(), $segments);
+      if(!$subscribers_count) {
         return $this->errorResponse(array(
           APIError::UNKNOWN => __('There are no subscribers in that list!', 'mailpoet')
         ));
       }
+      $queue->updateCount();
       $queue->status = null;
       $queue->scheduled_at = null;
-      $queue->subscribers = serialize(
-        array(
-          'to_process' => $subscribers
-        )
-      );
-      $queue->count_total = $queue->count_to_process = count($subscribers);
 
       // set newsletter status
       $newsletter->setStatus(Newsletter::STATUS_SENDING);

@@ -75,7 +75,10 @@ var wptSkype = (function($) {
          */
         var $button = $('#wpt-skype-edit-button-popup-preview-button');
         $('#wpt-skype-preview', $button).html('');
-        var participants = $('.js-wpt-skypename-popup', $popup).val();
+        var $skypeNamePopup = $('.js-wpt-skypename-popup', $popup);
+        var participants = $skypeNamePopup.length
+            ? $skypeNamePopup.val()
+            : '';
 
         /**
          * setup values

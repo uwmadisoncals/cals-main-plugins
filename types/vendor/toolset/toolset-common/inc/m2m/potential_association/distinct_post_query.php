@@ -13,11 +13,11 @@
  */
 class Toolset_Relationship_Distinct_Post_Query {
 
-	/** @var Toolset_Relationship_Definition */
+	/** @var IToolset_Relationship_Definition */
 	private $relationship;
 
-	/** @var int */
-	private $for_element_id;
+	/** @var IToolset_Element */
+	private $for_element;
 
 	/** @var IToolset_Relationship_Role_Parent_Child */
 	private $target_role;
@@ -28,27 +28,33 @@ class Toolset_Relationship_Distinct_Post_Query {
 	/** @var null|wpdb */
 	private $_wpdb;
 
+	/** @var Toolset_WPML_Compatibility */
+	private $wpml_service;
+
 
 	/**
 	 * Toolset_Relationship_Distinct_Post_Query constructor.
 	 *
-	 * @param Toolset_Relationship_Definition $relationship
+	 * @param IToolset_Relationship_Definition $relationship
 	 * @param IToolset_Relationship_Role_Parent_Child $target_role Target role of the relationships (future role of
 	 *     the posts that are being queried)
-	 * @param int $for_element_id ID of the element to check against.
+	 * @param IToolset_Element $for_element ID of the element to check against.
 	 * @param Toolset_Relationship_Table_Name|null $table_names_di
 	 * @param wpdb|null $wpdb_di
+	 * @param Toolset_WPML_Compatibility|null $wpml_service_di
 	 */
 	public function __construct(
-		Toolset_Relationship_Definition $relationship,
+		IToolset_Relationship_Definition $relationship,
 		IToolset_Relationship_Role_Parent_Child $target_role,
-		$for_element_id,
+		IToolset_Element $for_element,
 		Toolset_Relationship_Table_Name $table_names_di = null,
-		wpdb $wpdb_di = null
+		wpdb $wpdb_di = null,
+		Toolset_WPML_Compatibility $wpml_service_di = null
 	) {
 		$this->relationship = $relationship;
-		$this->for_element_id = $for_element_id;
+		$this->for_element = $for_element;
 		$this->target_role = $target_role;
+		$this->wpml_service = $wpml_service_di ?: Toolset_WPML_Compatibility::get_instance();
 
 		$this->_table_names = $table_names_di;
 		$this->_wpdb = $wpdb_di;
@@ -69,8 +75,12 @@ class Toolset_Relationship_Distinct_Post_Query {
 		}
 
 		add_filter( 'posts_join', array( $this, 'add_join_clauses' ) );
-
 		add_filter( 'posts_where', array( $this, 'add_where_clauses' ) );
+
+		// WPML in the back-end filters strictly by the current language by default,
+		// but we need it to include default language posts, too, if the translation to the current language
+		// doesn't exist. This needs to behave consistently in all contexts.
+		add_filter( 'wpml_should_use_display_as_translated_snippet', '__return_true' );
 	}
 
 
@@ -83,8 +93,9 @@ class Toolset_Relationship_Distinct_Post_Query {
 		}
 
 		remove_filter( 'posts_join', array( $this, 'add_join_clauses' ) );
-
 		remove_filter( 'posts_where', array( $this, 'add_where_clauses' ) );
+
+		remove_filter( 'wpml_should_use_display_as_translated_snippet', '__return_true' );
 	}
 
 
@@ -115,6 +126,9 @@ class Toolset_Relationship_Distinct_Post_Query {
 	 *
 	 * Otherwise, those columns will be NULL, because we're doing a LEFT JOIN here.
 	 *
+	 * If WPML is active, we also do the same comparison for the default language version of the
+	 * queried post, if it exists.
+	 *
 	 * @param string $join
 	 *
 	 * @return string
@@ -132,8 +146,30 @@ class Toolset_Relationship_Distinct_Post_Query {
 				AND toolset_associations.{$for_element_column} = %d    
 			) ",
 			$this->relationship->get_row_id(),
-			$this->for_element_id
+			$this->for_element->get_default_language_id()
 		);
+
+		if( $this->wpml_service->is_wpml_active_and_configured() ) {
+			$icl_translations = $this->get_wpdb()->prefix . 'icl_translations';
+			$default_language = esc_sql( $this->wpml_service->get_default_language() );
+			$join .= $this->get_wpdb()->prepare(
+				" LEFT JOIN {$icl_translations} AS element_lang_info ON (
+					{$posts_table_name}.ID = element_lang_info.element_id
+					AND element_lang_info.element_type LIKE %s
+				) LEFT JOIN {$icl_translations} AS default_lang_translation ON (
+					element_lang_info.trid = default_lang_translation.trid
+					AND default_lang_translation.language_code = %s
+				) LEFT JOIN {$association_table} AS default_lang_association ON (
+					default_lang_association.relationship_id = %d
+					AND default_lang_translation.element_id = default_lang_association.{$target_element_column}
+					AND default_lang_association.{$for_element_column} = %d
+				) ",
+				'post_%',
+				$default_language,
+				$this->relationship->get_row_id(),
+				$this->for_element->get_default_language_id()
+			);
+		}
 
 		return $join;
 	}
@@ -146,6 +182,9 @@ class Toolset_Relationship_Distinct_Post_Query {
 	 * column with $for_element: That means there's no association between the queried
 	 * post and $for_element, and we can offer the post as a result.
 	 *
+	 * If WPML is active, we also have to check that there's no default language translation
+	 * of the queried post that would be part of such an association.
+	 *
 	 * @param string $where
 	 *
 	 * @return string
@@ -153,6 +192,11 @@ class Toolset_Relationship_Distinct_Post_Query {
 	public function add_where_clauses( $where ) {
 		$for_element_column = $this->target_role->other() . '_id';
 		$where .= " AND ( toolset_associations.{$for_element_column} IS NULL ) ";
+
+		if( $this->wpml_service->is_wpml_active_and_configured() ) {
+			$where .= " AND ( default_lang_association.{$for_element_column} IS NULL ) ";
+		}
+
 		return $where;
 	}
 
