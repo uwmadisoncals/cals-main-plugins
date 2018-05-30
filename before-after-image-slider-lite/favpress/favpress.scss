@@ -1,0 +1,29 @@
+#image_comparator_modal {
+  .favpress-sc-menu {
+    display: none;
+  }
+  .favpress-sc-wrapper .favpress-sc-main {
+    padding-left: 0px;
+  }
+  h3.hndle.favpress-sc-element-heading {
+    display: none;
+  }
+  li.favpress-sc-element.postbox.has-options {
+    border: 0px;
+  }
+  &.reveal-modal .favpress-sc-scroll-container {
+    overflow-y: auto;
+  }
+  .favpress-sc-cancel.button {
+    display: none;
+  }
+  form.favpress-sc-element-form.favpress-hide.inside {
+    height: inherit;
+    width: 100% !important;
+    clip: inherit;
+  }
+}
+
+#qt_content_image_comparator {
+  display: none;
+}

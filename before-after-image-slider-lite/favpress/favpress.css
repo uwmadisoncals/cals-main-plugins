@@ -1,0 +1,21 @@
+#image_comparator_modal .favpress-sc-menu {
+  display: none; }
+#image_comparator_modal .favpress-sc-wrapper .favpress-sc-main {
+  padding-left: 0px; }
+#image_comparator_modal h3.hndle.favpress-sc-element-heading {
+  display: none; }
+#image_comparator_modal li.favpress-sc-element.postbox.has-options {
+  border: 0px; }
+#image_comparator_modal.reveal-modal .favpress-sc-scroll-container {
+  overflow-y: auto; }
+#image_comparator_modal .favpress-sc-cancel.button {
+  display: none; }
+#image_comparator_modal form.favpress-sc-element-form.favpress-hide.inside {
+  height: inherit;
+  width: 100% !important;
+  clip: inherit; }
+
+#qt_content_image_comparator {
+  display: none; }
+
+/*# sourceMappingURL=favpress.css.map */
