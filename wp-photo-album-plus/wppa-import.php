@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.8.02
+* Version 6.8.09
 *
 */
 
@@ -23,9 +23,6 @@ global $wppa_session;
 	// Init
 	$ngg_opts 	= get_option( 'ngg_options', false );
 	$user 		= wppa_get_user();
-
-	// Check database
-	wppa_check_database( true );
 
 	// Update watermark settings for the user if new values supplied
 	if ( wppa_switch( 'watermark_on' ) && ( wppa_switch( 'watermark_user' ) || current_user_can( 'wppa_settings' ) ) ) {
@@ -244,6 +241,7 @@ global $wppa_session;
 	// The form
 	echo
 	'<form' .
+		' id="wppa-import-form"' .
 		' action="' . wppa_dbg_url( get_admin_url() . 'admin.php?page=wppa_import_photos' ) . '"' .
 		' method="post"' .
 		' >';
@@ -257,18 +255,30 @@ global $wppa_session;
 				wp_nonce_field( '$wppa_nonce', WPPA_NONCE, true, false ) .
 				__( 'Select Local or Remote', 'wp-photo-album-plus' ) .
 				( $disabled = $can_remote ? '' : 'disabled="disabled"' ) .
-				'<select name="wppa-local-remote" >' .
+				'<select' .
+					' name="wppa-local-remote"' .
+					' onchange="jQuery(\'#rem-rem-0\').show();jQuery(\'#wppa-import-set-source\').trigger(\'click\');"' .
+					' >' .
 					'<option value="local" ' . ( $source_type == 'local' ? 'selected="selected"' : '' ) . '>' . __( 'Local', 'wp-photo-album-plus') . '</option>' .
 					'<option value="remote" ' . $disabled . ( $source_type == 'remote' ? 'selected="selected"' : '' ) . '>' . __( 'Remote' ,'wp-photo-album-plus' ) . '</option>' .
-				'</select>';
+				'</select>' .
+				'<span id="rem-rem-0" style="display:none;" >' .
+					' ' . __( 'Working, please wait...', 'wp-photo-album-plus') .
+				'</span>';
+;
+
 				if ( $can_remote ) {
+
 					echo
 						'<input' .
+							' id="wppa-import-set-source"' .
 							' type="submit"' .
 							' class="button-secundary"' .
 							' name="wppa-import-set-source"' .
-							' value="' . __( 'Set Local/Remote' ,'wp-photo-album-plus') . '"' .
+//							' value="' . __( 'Set Local/Remote' ,'wp-photo-album-plus') . '"' .
+							' style="display:none;"' .
 						'/>';
+
 				}
 				else {
 					if ( ! ini_get( 'allow_url_fopen' ) ) {
@@ -291,15 +301,25 @@ global $wppa_session;
 				if ( $source_type == 'local' ) {
 					wppa_update_option( 'wppa_import_root', ABSPATH . basename( content_url() ) ); // Provider may have changed disk
 					echo
-					'<select name="wppa-source" >' .
+					'<select' .
+					' name="wppa-source"' .
+					' onchange="jQuery(\'#rem-rem\').show();jQuery(\'#wppa-import-set-source-dir\').trigger(\'click\');"' .
+					' >' .
 						wppa_abs_walktree( wppa_opt( 'import_root' ), $source ) .
 					'</select>' .
+
 					'<input' .
+						' id="wppa-import-set-source-dir"' .
 						' type="submit"' .
 						' class="button-secundary"' .
 						' name="wppa-import-set-source-dir"' .
-						' value="' . __( 'Set source directory', 'wp-photo-album-plus') . '"' .
-					' />';
+//						' value="' . __( 'Set source directory', 'wp-photo-album-plus') . '"' .
+						' style="display:none;"' .
+					' />' .
+					'<span id="rem-rem" style="display:none;" >' .
+						' ' . __( 'Working, please wait...', 'wp-photo-album-plus') .
+					'</span>';
+
 				}
 
 				// Remote: url
@@ -312,6 +332,7 @@ global $wppa_session;
 							' style="width:100%"' .
 							' name="wppa-source-remote"' .
 							' value="' . $source . '"' .
+							' onchange="jQuery(\'#wppa-import-set-source-url\').trigger(\'click\');"' .
 						' />' .
 						'<br />';
 					}
@@ -322,6 +343,7 @@ global $wppa_session;
 							' style="width:50%"' .
 							' name="wppa-source-remote"' .
 							' value="' . $source . '"' .
+							' onchange="jQuery(\'#wppa-import-set-source-url\').trigger(\'click\');"' .
 						' />';
 					}
 					echo
@@ -331,17 +353,22 @@ global $wppa_session;
 						' style="width:50px;"' .
 						' name="wppa-import-remote-max"' .
 						' value="' . $remote_max . '"' .
+						' onchange="jQuery(\'#wppa-import-set-source-url\').trigger(\'click\');"' .
 					' />' .
+
 					'<input' .
+						' id="wppa-import-set-source-url"' .
 						' type="submit"' .
 						' onclick="jQuery( \'#rem-rem\' ).css( \'display\',\'inline\' ); return true;"' .
 						' class="button-secundary"' .
 						' name="wppa-import-set-source-url"' .
-						' value="' . __( 'Find remote photos', 'wp-photo-album-plus' ) . '"' .
+//						' value="' . __( 'Find remote photos', 'wp-photo-album-plus' ) . '"' .
+						' style="display:none;"' .
 					' />' .
 					'<span id="rem-rem" style="display:none;" >' .
-						__( 'Working, please wait...', 'wp-photo-album-plus') .
+						' ' . __( 'Working, please wait...', 'wp-photo-album-plus') .
 					'</span>' .
+
 					'<br />' .
 					__( 'You can enter either a web page address like <i>http://mysite.com/mypage/</i> or a full url to an image file like <i>http://mysite.com/wp-content/uploads/wppa/4711.jpg</i>', 'wp-photo-album-plus' );
 				}
@@ -748,7 +775,7 @@ global $wppa_session;
 											'&nbsp;&nbsp;' .
 											__( 'Zoom previews', 'wp-photo-album-plus' ) .
 										'</b>' .
-										'<script type="text/javascript">if ( wppa_getCookie(\'zoompreview\') == true ) { jQuery(\'#wppa-zoom\').attr(\'checked\', \'checked\') }</script>' .
+										'<script type="text/javascript" >if ( wppa_getCookie(\'zoompreview\') == true ) { jQuery(\'#wppa-zoom\').attr(\'checked\', \'checked\') }</script>' .
 									'</td>';
 								}
 							echo
@@ -1233,7 +1260,7 @@ global $wppa_session;
 			// The submit button
 			?>
 			<p>
-				<script type="text/javascript">
+				<script type="text/javascript" >
 					function wppaVfyAlbum() {
 						var csvs = jQuery( '.wppa-csv' );
 						if ( jQuery( '#wppa-update' ).attr( 'checked' ) != 'checked' ) {
@@ -1284,7 +1311,9 @@ global $wppa_session;
 						return true;
 					}
 				</script>
+				<?php if ( $albumcount || $dircount || $zipcount || $csvcount ) { ?>
 				<input type="submit" onclick="return wppaCheckInputVars()" class="button-primary" id="submit" name="wppa-import-submit" value="<?php _e( 'Import', 'wp-photo-album-plus' ); ?>" />
+				<?php } ?>
 				<script type="text/javascript" >
 					var wppaImportRuns = false;
 					var wppaTimer;
@@ -1380,9 +1409,9 @@ global $wppa_session;
 						jQuery( '#wppa-spinner' ).css( 'display', 'none' );
 					}
 				</script>
-				<?php if ( ( $photocount || $videocount || $audiocount ) && ! $albumcount && ! $dircount && ! $zipcount ) { ?>
-				<input id="wppa-start-ajax" type="button" onclick="if ( wppaVfyAlbum() ) { wppaImportRuns = true;wppaDoAjaxImport() }" class="button-secundary" value="<?php esc_attr( _e( 'Start Ajax Import', 'wp-photo-album-plus' ) ) ?>" />
-				<input id="wppa-stop-ajax" style="display:none;" type="button" onclick="wppaStopAjaxImport()" class="button-secundary" value="<?php esc_attr( _e( 'Stop Ajax Import', 'wp-photo-album-plus' ) ) ?>" />
+				<?php if ( ( $photocount || $videocount || $audiocount ) && ! $albumcount && ! $dircount && ! $zipcount && ! $csvcount ) { ?>
+				<input id="wppa-start-ajax" type="button" onclick="if ( wppaVfyAlbum() ) { wppaImportRuns = true;wppaDoAjaxImport() }" class="button-primary" value="<?php esc_attr( _e( 'Start Import', 'wp-photo-album-plus' ) ) ?>" />
+				<input id="wppa-stop-ajax" style="display:none;" type="button" onclick="wppaStopAjaxImport()" class="button-primary" value="<?php esc_attr( _e( 'Stop Import', 'wp-photo-album-plus' ) ) ?>" />
 				<?php } ?>
 			</p>
 			</form>
@@ -1436,7 +1465,7 @@ global $wppa_session;
 
 	if ( wppa( 'continue' ) ) {
 		wppa_warning_message( __( 'Trying to continue...', 'wp-photo-album-plus') );
-		echo '<script type="text/javascript">document.location=\''.get_admin_url().'admin.php?page=wppa_import_photos&continue&nonce='.wp_create_nonce( 'dirimport' ).'\';</script>';
+		echo '<script type="text/javascript" >document.location=\''.get_admin_url().'admin.php?page=wppa_import_photos&continue&nonce='.wp_create_nonce( 'dirimport' ).'\';</script>';
 	}
 
 	echo '<br /><br />';

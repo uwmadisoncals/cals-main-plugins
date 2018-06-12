@@ -28,7 +28,7 @@ class AAM_Backend_Feature_Settings_Tools extends AAM_Backend_Feature_Abstract {
      */
     public function export() {
         $exporter = new AAM_Core_Exporter(AAM_Core_Config::get(
-                        'export', array('system' => 'roles,utilities,configpress')
+            'feature.export', array('system' => 'roles,utilities,configpress')
         ));
 
         return json_encode(array(
@@ -36,7 +36,7 @@ class AAM_Backend_Feature_Settings_Tools extends AAM_Backend_Feature_Abstract {
             'content' => base64_encode(json_encode($exporter->run()))
         ));
     }
-
+    
     /**
      * 
      * @return type
@@ -74,6 +74,8 @@ class AAM_Backend_Feature_Settings_Tools extends AAM_Backend_Feature_Abstract {
 
         $mquery = "DELETE FROM {$wpdb->usermeta} WHERE `meta_key` LIKE %s";
         $wpdb->query($wpdb->prepare($mquery, $wpdb->prefix . 'aam%'));
+        
+        $this->clearCache();
 
         return json_encode(array('status' => 'success'));
     }
@@ -83,7 +85,7 @@ class AAM_Backend_Feature_Settings_Tools extends AAM_Backend_Feature_Abstract {
      * @return type
      */
     public function clearCache() {
-        AAM_Core_Cache::clear();
+        AAM_Core_API::clearCache();
 
         return json_encode(array('status' => 'success'));
     }

@@ -1,9 +1,9 @@
 === Portfolio Slideshow ===
-Contributors: ggwicz, daltonrooney 
+Contributors: ggwicz, daltonrooney
 Tags: slideshow, slider, slides, gallery, portfolio, shortcodes, responsive, images, photos, photographs, jquery, cycle, mobile, iphone
 Requires at least: 4.3
-Tested up to: 4.6
-Stable tag: 1.12.0
+Tested up to: 4.9.5
+Stable tag: 1.12.1
 
 Add a clean, responsive JavaScript slideshow to your site.
 
@@ -45,7 +45,7 @@ A: Upload your photos to the post or page using the "Add Slides" metabox. You ca
 
 Then, simply add the shortcode `[portfolio_slideshow]` where you want the slideshow to appear in the page, and publish the post. Nice!
 
-One common mistake is to insert the images into the post using the content editor. This is not necessary – the plugin detects all images attached to the post and creates the slideshow automatically. 
+One common mistake is to insert the images into the post using the content editor. This is not necessary – the plugin detects all images attached to the post and creates the slideshow automatically.
 
 = Q: Does the plugin support images that are not uploaded via the media uploader? =
 
@@ -89,51 +89,56 @@ Version 1.12.0 is the first update of Portfolio Slideshow in almost a year—it 
 
 == Changelog ==
 
+= 1.12.1 =
+
+* Fix — Fixed a "non well-formed numeric value" PHP notice that would arise in the system info page.
+* Tweak — Bumped "Tested up to" version number.
+
 = 1.12.0 =
-* FIX: Make the "help" icon link in slides meta box go to a new page instead of leaving the current one.
-* TWEAK: Temporarily remove the "updated URL with Slide IDs" option.
-* TWEAK: Remove references to some pager features that don't yet exist.
-* TWEAK: Remove references to some lightbox features that don't yet exist.
-* TWEAK: Remove some internal references to the old Portfolio Slideshow website.
+* Fix — Made the "help" icon link in slides meta box go to a new page instead of leaving the current one.
+* Tweak — Temporarily removed the "updated URL with Slide IDs" option.
+* Tweak — Removed references to some pager features that don't yet exist.
+* Tweak — Removed references to some lightbox features that don't yet exist.
+* Tweak — Removed some internal references to the old Portfolio Slideshow website.
 
 = 1.11.1 =
 
-* TWEAK: Safer translatable strings.
-* FIX: Ditched custom Underscores templating in place of safer and more widely-supported wp.template()
-* FIX: Fixed errors with missing "slide URL" attachment fields.
+* Fix — Ditched custom Underscores templating in place of safer and more widely-supported wp.template()
+* Fix — Fixed errors with missing "slide URL" attachment fields.
+* Tweak — Safer translatable strings.
 
 = 1.11.0 =
 
-* NEW: Restored full support for PHP 5.2 and higher!
-* NEW: Added "System Info" tab for use in support requests.
-* NEW: Made documentation translatable.
-* NEW: Added more documentation links for faster/more specific navigation.
-* TWEAK: Some JS cleanup to being laying the groundwork for the few releases of improvements.
-* TWEAK: added "support" and "settings" quick links to Plugins page.
-* TWEAK: Moved screenshots and some other assets to wp.org repo /assets folder â€“Â makes for a smaller plugin file and thus, hopefully, faster updates.
-* TWEAK: Reduced number of variables created in view includes.
-* TWEAK: Code cleanup in some of the views. 
-* FIX: Fixed the "Slide URL" attachment field to ensure it saves.
-* FIX: Repaired functionality of the `openurl` and `target` attributes.
-* FIX: Fixed some max-width CSS to ensure images don't pop out of their container.
-* FIX: Fixed bug that prevented `centered="true"` shortcode attribute from working.
-* FIX: Relocated and renamed many files for a more organized plugin structure to lay a foundation for future changes (heavily inspired by The Events Calendar).
-* FIX: Fixed a broken placeholder image src.
-* FIX: removal of references to erroneous plugin versions.
-* FIX: escape some translated strings that weren't.
-* REMOVAL: Removed unused function `portfolio_slideshow_is_plugin_active()`.
-* REMOVAL: Removed unused function `portfolio_slideshow_get_image_sizes()`.
-* REMOVAL: Removed unused function `portfolio_slideshow_sanitize_text_field_deep()`.
-* REMOVAL: Removed unused file `ps-custom-post-type.js`.
-* REMOVAL: Removed unused file `ps-custom-post-type.css`.
-* REMOVAL: remove all references to "fluid" / "allowfluid" option.
+* New — Restored full support for PHP 5.2 and higher!
+* New — Added "System Info" tab for use in support requests.
+* New — Made documentation translatable.
+* New — Added more documentation links for faster/more specific navigation.
+* Tweak — Some JS cleanup to being laying the groundwork for the few releases of improvements.
+* Tweak — added "support" and "settings" quick links to Plugins page.
+* Tweak — Moved screenshots and some other assets to wp.org repo /assets folder â€“Â makes for a smaller plugin file and thus, hopefully, faster updates.
+* Tweak — Reduced number of variables created in view includes.
+* Tweak — Code cleanup in some of the views.
+* Fix — Fixed the "Slide URL" attachment field to ensure it saves.
+* Fix — Repaired functionality of the `openurl` and `target` attributes.
+* Fix — Fixed some max-width CSS to ensure images don't pop out of their container.
+* Fix — Fixed bug that prevented `centered="true"` shortcode attribute from working.
+* Fix — Relocated and renamed many files for a more organized plugin structure to lay a foundation for future changes (heavily inspired by The Events Calendar).
+* Fix — Fixed a broken placeholder image src.
+* Fix — removal of references to erroneous plugin versions.
+* Fix — escape some translated strings that weren't.
+* Removal — Removed unused function `portfolio_slideshow_is_plugin_active()`.
+* Removal — Removed unused function `portfolio_slideshow_get_image_sizes()`.
+* Removal — Removed unused function `portfolio_slideshow_sanitize_text_field_deep()`.
+* Removal — Removed unused file `ps-custom-post-type.js`.
+* Removal — Removed unused file `ps-custom-post-type.css`.
+* Removal — remove all references to "fluid" / "allowfluid" option.
 
 = 1.10.0 =
 
-* FIX: A few fixes to address the retrieval of slides, which should mean your pre-1.9.9 slideshows will work fine in many more cases than with the 1.9.9 release itself.
-* FIX: Fixed some "Undefined Index" PHP notices with a few slideshow arguments.
-* FIX: Removal of unnecessary "protected" access on several class methods and properties.
-* FIX: Removal of a handful of unnecessary JavaScript and CSS files that could cause 404 errors on pages if loaded.
+* Fix — A few fixes to address the retrieval of slides, which should mean your pre-1.9.9 slideshows will work fine in many more cases than with the 1.9.9 release itself.
+* Fix — Fixed some "Undefined Index" PHP notices with a few slideshow arguments.
+* Fix — Removal of unnecessary "protected" access on several class methods and properties.
+* Fix — Removal of a handful of unnecessary JavaScript and CSS files that could cause 404 errors on pages if loaded.
 
 = 1.9.9 =
 

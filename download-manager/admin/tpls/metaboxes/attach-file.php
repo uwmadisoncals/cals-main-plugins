@@ -120,7 +120,7 @@
                         jQuery('#filelist').append(
                             '<div class="file" id="' + file.id + '"><b>' +
 
-                            file.name + '</b> (<span>' + plupload.formatSize(0) + '</span>/' + plupload.formatSize(file.size) + ') ' +
+                            file.name.replace(/</ig, "&lt;") + '</b> (<span>' + plupload.formatSize(0) + '</span>/' + plupload.formatSize(file.size) + ') ' +
                             '<div class="progress progress-success progress-striped active"><div class="bar fileprogress"></div></div></div>');
                     });
 

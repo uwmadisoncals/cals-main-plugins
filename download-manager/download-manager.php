@@ -4,7 +4,7 @@ Plugin Name: Download Manager
 Plugin URI: https://www.wpdownloadmanager.com/purchases/
 Description: Manage, Protect and Track File Downloads from your WordPress site
 Author: Shahjada
-Version: 2.9.71
+Version: 2.9.74
 Author URI: https://www.wpdownloadmanager.com/
 Text Domain: download-manager
 Domain Path: /languages
@@ -17,7 +17,7 @@ namespace WPDM;
 if(!isset($_SESSION) && !strstr($_SERVER['REQUEST_URI'], 'wpdm-media/') && !isset($_REQUEST['wpdmdl']))
     @session_start();
 
-define('WPDM_Version','2.9.71');
+define('WPDM_Version','2.9.74');
 
 $content_dir = str_replace('\\','/',WP_CONTENT_DIR);
 
@@ -246,7 +246,7 @@ class WordPressDownloadManager{
         //if((is_object($post) && has_shortcode($post->post_content,'wpdm_frontend')) || get_post_type()=='wpdmpro' )
 
         if (!in_array('wpdm-font-awesome', $wpdmss))
-            wp_enqueue_style('font-awesome', WPDM_BASE_URL.'assets/font-awesome/css/font-awesome.min.css');
+            wp_enqueue_style('font-awesome', WPDM_BASE_URL.'assets/fontawesome/css/fontawesome.min.css');
 
 
         if(is_object($post) && ( has_shortcode($post->post_content,'wpdm_frontend') || has_shortcode($post->post_content,'wpdm-package-form') || has_shortcode($post->post_content,'wpdm_user_dashboard') || has_shortcode($post->post_content,'wpdm-file-browser') ) ){

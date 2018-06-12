@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.8.00
+* Version 6.8.09
 *
 */
 
@@ -152,7 +152,6 @@ global $wpdb;
 						$modified_time = $photo['modified'];
 						if ( $modified_time < $start_time ) {
 							wppa_update_single_photo( $file, $photo['id'], $filename );
-//							$wpdb->query( $wpdb->prepare( 'UPDATE `'.WPPA_PHOTOS.'` SET `modified` = %s WHERE `id` = %s', time(), $photo['id'] ) );
 							$count++;
 						}
 						if ( wppa_is_time_up( $count ) ) {
@@ -162,7 +161,6 @@ global $wpdb;
 					else {	// No photo yet
 						if ( wppa_switch( 'remake_add' ) ) {
 							wppa_insert_photo( $file, $album['id'], $filename );
-						//	$wpdb->query( $wpdb->prepare( 'UPDATE `'.WPPA_PHOTOS.'` SET `modified` = %s WHERE `id` = %s', time(), $photo['id'] ) );
 							$count++;
 						}
 					}
@@ -173,6 +171,7 @@ global $wpdb;
 			}
 		}
 	}
+
 	// Do it with a single photo
 	elseif ( $pid ) {
 		$photo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $pid ), ARRAY_A );
@@ -423,13 +422,13 @@ global $wpdb;
 			break;
 		case 'flip':
 			if ( ! imageflip( $source, IMG_FLIP_VERTICAL ) ) {
-				return $err;;
+				return $err;
 			}
 			$rotate = $source;
 			break;
 		case 'flop':
 			if ( ! imageflip( $source, IMG_FLIP_HORIZONTAL ) ) {
-				return $err;;
+				return $err;
 			}
 			$rotate = $source;
 			break;
@@ -543,163 +542,6 @@ global $wppa_supported_audio_extensions;
 		}
 	}
 	return $count;
-}
-
-function wppa_check_database( $verbose = false ) {
-global $wpdb;
-static $everything_ok;
-
-	if ( $everything_ok === true ) {
-		return true;
-	}
-
-	$any_error = false;
-	// Check db tables
-	// This is to test if dbdelta did his job in adding tables and columns
-	$tn = array( WPPA_ALBUMS, WPPA_PHOTOS, WPPA_RATING, WPPA_COMMENTS, WPPA_IPTC, WPPA_EXIF, WPPA_INDEX );
-	$flds = array( 	WPPA_ALBUMS => array( 	'id' => 'bigint( 20 ) NOT NULL',
-											'name' => 'text NOT NULL',
-											'description' => 'text NOT NULL',
-											'a_order' => 'smallint( 5 ) unsigned NOT NULL',
-											'main_photo' => 'bigint( 20 ) NOT NULL',
-											'a_parent' => 'bigint( 20 ) NOT NULL',
-											'p_order_by' => 'int unsigned NOT NULL',
-											'cover_linktype' => 'tinytext NOT NULL',
-											'cover_linkpage' => 'bigint( 20 ) NOT NULL',
-											'owner' => 'text NOT NULL',
-											'timestamp' => 'tinytext NOT NULL',
-											'upload_limit' => 'tinytext NOT NULL',
-											'alt_thumbsize' => 'tinytext NOT NULL',
-											'default_tags' => 'tinytext NOT NULL',
-											'cover_type' => 'tinytext NOT NULL',
-											'suba_order_by' => 'tinytext NOT NULL'
-										 ),
-					WPPA_PHOTOS => array( 	'id' => 'bigint( 20 ) NOT NULL',
-											'album' => 'bigint( 20 ) NOT NULL',
-											'ext' => 'tinytext NOT NULL',
-											'name' => 'text NOT NULL',
-											'description' => 'longtext NOT NULL',
-											'p_order' => 'smallint( 5 ) unsigned NOT NULL',
-											'mean_rating' => 'tinytext NOT NULL',
-											'linkurl' => 'text NOT NULL',
-											'linktitle' => 'text NOT NULL',
-											'linktarget' => 'tinytext NOT NULL',
-											'owner' => 'text NOT NULL',
-											'timestamp' => 'tinytext NOT NULL',
-											'status' => 'tinytext NOT NULL',
-											'rating_count' => "bigint( 20 ) default '0'",
-											'tags' => 'tinytext NOT NULL',
-											'alt' => 'tinytext NOT NULL',
-											'filename' => 'tinytext NOT NULL',
-											'modified' => 'tinytext NOT NULL',
-											'location' => 'tinytext NOT NULL'
-										 ),
-					WPPA_RATING => array( 	'id' => 'bigint( 20 ) NOT NULL',
-											'photo' => 'bigint( 20 ) NOT NULL',
-											'value' => 'smallint( 5 ) NOT NULL',
-											'user' => 'text NOT NULL'
-										 ),
-					WPPA_COMMENTS => array(
-											'id' => 'bigint( 20 ) NOT NULL',
-											'timestamp' => 'tinytext NOT NULL',
-											'photo' => 'bigint( 20 ) NOT NULL',
-											'user' => 'text NOT NULL',
-											'ip' => 'tinytext NOT NULL',
-											'email' => 'text NOT NULL',
-											'comment' => 'text NOT NULL',
-											'status' => 'tinytext NOT NULL'
-										 ),
-					WPPA_IPTC => array(
-											'id' => 'bigint( 20 ) NOT NULL',
-											'photo' => 'bigint( 20 ) NOT NULL',
-											'tag' => 'tinytext NOT NULL',
-											'description' => 'text NOT NULL',
-											'status' => 'tinytext NOT NULL'
-										 ),
-					WPPA_EXIF => array(
-											'id' => 'bigint( 20 ) NOT NULL',
-											'photo' => 'bigint( 20 ) NOT NULL',
-											'tag' => 'tinytext NOT NULL',
-											'description' => 'text NOT NULL',
-											'status' => 'tinytext NOT NULL'
-										 ),
-					WPPA_INDEX => array(
-											'id' => 'bigint( 20 ) NOT NULL',
-											'slug' => 'tinytext NOT NULL',
-											'albums' => 'text NOT NULL',
-											'photos' => 'text NOT NULL'
-										 )
-				 );
-	$errtxt = '';
-	$idx = 0;
-	while ( $idx < 7 ) {
-		// Test existence of table
-		$ext = wppa_table_exists( $tn[$idx] );
-		if ( ! $ext ) {
-			if ( $verbose ) wppa_error_message( __( 'Unexpected error:' , 'wp-photo-album-plus').' '.__( 'Missing database table:' , 'wp-photo-album-plus').' '.$tn[$idx], 'red', 'force' );
-			$any_error = true;
-		}
-		// Test columns
-		else {
-			$tablefields = $wpdb->get_results( "DESCRIBE {$tn[$idx]};", "ARRAY_A" );
-			// unset flags for found fields
-			foreach ( $tablefields as $field ) {
-				if ( isset( $flds[$tn[$idx]][$field['Field']] ) ) unset( $flds[$tn[$idx]][$field['Field']] );
-			}
-			// Fields left?
-			if ( is_array( $flds[$tn[$idx]] ) ) foreach ( array_keys( $flds[$tn[$idx]] ) as $field ) {
-				$errtxt .= '<tr><td>'.$tn[$idx].'</td><td>'.$field.'</td><td>'.$flds[$tn[$idx]][$field].'</td></tr>';
-			}
-		}
-		$idx++;
-	}
-	if ( $errtxt ) {
-		$fulltxt = 'The latest update failed to update the database tables required for wppa+ to function properly<br /><br />';
-		$fulltxt .= 'Make sure you have the rights to issue SQL commands like <i>"ALTER TABLE tablename ADD COLUMN columname datatype"</i> and run the action on <i>Table VIII-A1</i> on the Photo Albums -> Settings admin page.<br /><br />';
-		$fulltxt .= 'The following table lists the missing columns:';
-		$fulltxt .= '<br /><table id="wppa-err-table"><thead style="font-weight:bold;"><tr><td>Table name</td><td>Column name</td><td>Data type</td></thead>';
-		$fulltxt .= $errtxt;
-		$fulltxt .= '</table><b>';
-		if ( $verbose ) wppa_error_message( $fulltxt, 'red', 'force' );
-		$any_error = true;
-	}
-	// Check directories
-	$dn = array( dirname(WPPA_DEPOT_PATH), WPPA_UPLOAD_PATH, WPPA_UPLOAD_PATH.'/thumbs', WPPA_UPLOAD_PATH.'/temp', WPPA_UPLOAD_PATH.'/fonts', WPPA_DEPOT_PATH );
-	$idx = 0;
-	while ( $idx < 6 ) {
-		if ( ! file_exists( $dn[$idx] ) ) {	// First try to repair
-			wppa_mktree( $dn[$idx] );
-		}
-		else {
-			wppa_chmod( $dn[$idx] );		// there are always people who destruct things
-		}
-
-		if ( ! file_exists( $dn[$idx] ) ) {	// Test again
-			if ( $verbose ) wppa_error_message( __( 'Unexpected error:' , 'wp-photo-album-plus').' '.__( 'Missing directory:' , 'wp-photo-album-plus').' '.$dn[$idx], 'red', 'force' );
-			$any_error = true;
-		}
-		elseif ( ! is_writable( $dn[$idx] ) ) {
-			if ( $verbose ) wppa_error_message( __( 'Unexpected error:' , 'wp-photo-album-plus').' '.__( 'Directory is not writable:' , 'wp-photo-album-plus').' '.$dn[$idx], 'red', 'force' );
-			$any_error = true;
-		}
-		elseif ( ! is_readable( $dn[$idx] ) ) {
-			if ( $verbose ) wppa_error_message( __( 'Unexpected error:' , 'wp-photo-album-plus').' '.__( 'Directory is not readable:' , 'wp-photo-album-plus').' '.$dn[$idx], 'red', 'force' );
-			$any_error = true;
-		}
-		$idx++;
-	}
-
-	// Report errors
-	if ( $any_error ) {
-		if ( $verbose ) wppa_error_message( __( 'Please de-activate and re-activate the plugin. If this problem persists, ask your administrator.' , 'wp-photo-album-plus'), 'red', 'force' );
-	}
-
-	// No errors, save result
-	else {
-		$everything_ok = true;
-	}
-
-	return ! $any_error;	// True = no error
 }
 
 function wppa_admin_page_links( $curpage, $pagesize, $count, $link, $extra = '' ) {

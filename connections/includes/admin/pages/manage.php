@@ -98,8 +98,6 @@ function connectionsShowViewPage( $action = NULL ) {
 
 		case 'copy_entry':
 
-			echo '<div class="wrap">';
-
 			echo '<h1>Connections : ' , __( 'Copy Entry', 'connections' ) , '</h1>';
 
 			/*
@@ -256,8 +254,6 @@ function connectionsShowViewPage( $action = NULL ) {
 
 			$page = $instance->currentUser->getFilterPage( 'manage' );
 			$offset = ( $page->current - 1 ) * $page->limit;
-
-			echo '<div class="wrap">';
 
 			echo '<h1>Connections : ' , __( 'Manage', 'connections' ) , ' <a class="button add-new-h2" href="admin.php?page=connections_add">' , __( 'Add New', 'connections' ) , '</a></h1>';
 
@@ -759,19 +755,7 @@ function connectionsShowViewPage( $action = NULL ) {
 						echo '</div>';
 					}
 
-					$links = $entry->getLinks();
-
-					if ( ! empty( $links ) ) {
-						echo '<div class="links">';
-
-						foreach ( $links as $link ) {
-							( $link->preferred ) ? $preferred = '*' : $preferred = '';
-
-							echo '<span class="link"><strong>' , $link->name , ':</strong> <a target="_blank" href="' , $link->url , '">' , $link->url , '</a>' , $preferred , '</span>';
-						}
-
-						echo '</div>';
-					}
+					$entry->links->render( 'admin' );
 
 					echo "</td> \n";
 

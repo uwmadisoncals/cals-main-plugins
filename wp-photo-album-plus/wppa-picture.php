@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 6.8.05
+* Version 6.8.08
 *
 */
 
@@ -118,7 +118,7 @@ function wppa_get_picture_html( $args ) {
 
 	}
 	if ( $link['is_lightbox'] ) {
-		$style .= 'cursor:url( ' . wppa_get_imgdir() . wppa_opt( 'magnifier' ) . ' ),pointer;';
+//		$style .= 'cursor:' . wppa_wait() . ';'; //url( ' . wppa_get_imgdir() . wppa_opt( 'magnifier' ) . ' ),pointer;';
 		$title = wppa_zoom_in( $id );
 	}
 
@@ -149,6 +149,8 @@ function wppa_get_picture_html( $args ) {
 				' class="thumb-img"' .
 				' id="a-' . $id . '-' . wppa( 'mocc' ) . '"' .
 				' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
+				' style="cursor:' . wppa_wait() . ';"' .
+				' onclick="return false;"' .
 				' >';
 		}
 

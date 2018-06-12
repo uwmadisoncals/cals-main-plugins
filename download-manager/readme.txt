@@ -119,9 +119,10 @@ Check download stats and get a push notification when someone downloads, install
 * [WPDM for iOS](https://www.wpdownloadmanager.com/download/wpdm-ios/) - Check download and sales stats directly from your iPhone or iPad
 
 = Free Themes =
-* [Verse - Theme For Digital Shop](https://www.wpdownloadmanager.com/download/verse-wordpress-theme-for-digital-shop/)
+* [Verse - Theme For Selling Digital Products](https://www.wpdownloadmanager.com/download/verse-wordpress-theme-for-digital-shop/)
+* [Swift - Theme For Selling Digital Products](https://www.wpdownloadmanager.com/download/swift-wordpress-theme-for-selling-digital-products/)
 * [Expo - Specially Optimized for WordPress Download Manager](https://www.wpdownloadmanager.com/download/expo/)
-* [WPDM 2015](https://www.wpdownloadmanager.com/download/wpdm-twenty-fifteen/)  - Twenty Fifteen Child Theme for WordPress Download Manager
+* [More Free Themes...](https://www.wpdownloadmanager.com/downloads/free-themes/)
 
 = More Themes & Add-ons =
 * [Add-ons](https://www.wpdownloadmanager.com/downloads/add-ons/) - 100+ add-ons
@@ -154,6 +155,19 @@ Check download stats and get a push notification when someone downloads, install
 15. Quick Add Panel
 
 == Changelog ==
+
+= 2.9.74 =
+* Moved privacy settings to a separate settings tab
+* Added option to delete download history when users close accounts
+* Added option to empty cache dir
+
+= 2.9.73 =
+* Added new option to skip from download stats for GDPR compliance
+
+= 2.9.72 =
+* Fixed an issue with file name sanitization
+* Fixed an issue with video play
+* Updated font awesome
 
 = 2.9.71 =
 * Added new option to use category icon/image

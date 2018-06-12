@@ -117,9 +117,9 @@ a:focus, a:active{ box-shadow: none !important; }
     border-bottom-left-radius: 3px;
     border-top-left-radius: 3px;
     color: #fff;
-    content: "\f00c";
-    font-family: FontAwesome;
-    font-size: 13pt;
+    content: "\f14a";
+    font-family: "Font Awesome\ 5 Free";
+    font-size: 14pt;
     height: 100%;
     margin: -15px 0 0 -60px;
     padding-top: 15px;
@@ -148,7 +148,15 @@ a:focus, a:active{ box-shadow: none !important; }
 }
 
 .wpdm-th-icon{
-    font-size: 0.8em;border: 1px solid;border-radius: 500px;height: 18px;width: 18px;display: inline-block;text-align: center;vertical-align:middle;line-height: 17px;
+    font-size: 0.8em;
+    border: 1px solid;
+    border-radius: 500px;
+    height: 18px;
+    width: 18px;
+    display: inline-block;
+    text-align: center;
+    vertical-align:middle;
+    line-height: 17px;
 }
 .w3eden .panel fieldset label{
     font-weight: normal;
@@ -165,7 +173,11 @@ a:focus, a:active{ box-shadow: none !important; }
 }
 
 .form-control.input-sm.input-tplid{
-    text-align: center;font-weight: bold; background: #fff;cursor: alias;font-family: monospace;
+    text-align: center;
+    font-weight: bold;
+    background: #fff;
+    cursor: alias;
+    font-family: monospace;
 }
 
 .wpdm-scode{
@@ -419,8 +431,32 @@ a:focus, a:active{ box-shadow: none !important; }
     box-shadow: 0 0 5px rgba(0, 141, 255, 0.3) !important;
 }
 
+#wpdm-wrapper-panel .settings-tabs li:not(.active) a .fas,
+#wpdm-wrapper-panel .settings-tabs li:not(.active) a .far,
+#wpdm-wrapper-panel .settings-tabs li:not(.active) a .fab,
 #wpdm-wrapper-panel .settings-tabs li:not(.active) a .fa {
     color: #1191f9;
+}
+#wpdm-wrapper-panel .settings-tabs li:not(.active) a .fas.fa-user-shield{
+    color: #e20b43;
+}
+
+#wpdm-wrapper-panel .settings-tabs li:not(.active) a#privacy{
+    color: #e20b43;
+}
+
+.w3eden #wpdm-wrapper-panel .nav-pills li.active a#privacy {
+    border: 1px solid #e20b43;
+    background-image: linear-gradient(to left, #ff4d08 0px, #ae210b 100%) !important;
+}
+
+.w3eden .panel.panel-danger{
+    border: 1px solid #e20b43;
+}
+.w3eden .panel.panel-danger .panel-heading{
+    background-image: linear-gradient(to left, #ff4d08 0px, #ae210b 100%) !important;
+    border-bottom:  1px solid #e20b43;
+    color: #ffffff;
 }
 
 #wpdm-wrapper-panel .settings-tabs a:hover{
@@ -856,4 +892,10 @@ a:focus, a:active{ box-shadow: none !important; }
 .list-group .list-group-item{
     margin-top: -1px !important;
     font-weight: 400 !important;
+}
+.wpdmpro_page_settings .updated{
+    display: none !important;
+}
+i.sinc{
+    width: 16px !important;
 }

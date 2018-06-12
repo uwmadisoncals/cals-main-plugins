@@ -14,6 +14,7 @@ use MailPoet\Models\Subscriber;
 use MailPoet\Newsletter\Scheduler\Scheduler;
 use MailPoet\Segments\BulkAction;
 use MailPoet\Segments\SubscribersListings;
+use MailPoet\Subscribers\Source;
 use MailPoet\Subscription\Throttling as SubscriptionThrottling;
 use MailPoet\WP\Hooks;
 
@@ -93,7 +94,7 @@ class Subscribers extends APIEndpoint {
 
     if(!empty($recaptcha['enabled']) && empty($data['recaptcha'])) {
       return $this->badRequest(array(
-        APIError::BAD_REQUEST => __('Please check the captcha.', 'mailpoet')
+        APIError::BAD_REQUEST => __('Please check the CAPTCHA.', 'mailpoet')
       ));
     }
 
@@ -107,13 +108,13 @@ class Subscribers extends APIEndpoint {
       ));
       if(is_wp_error($res)) {
         return $this->badRequest(array(
-          APIError::BAD_REQUEST => __('Error while validating the captcha.', 'mailpoet')
+          APIError::BAD_REQUEST => __('Error while validating the CAPTCHA.', 'mailpoet')
         ));
       }
       $res = json_decode(wp_remote_retrieve_body($res));
       if(empty($res->success)) {
         return $this->badRequest(array(
-          APIError::BAD_REQUEST => __('Error while validating the captcha.', 'mailpoet')
+          APIError::BAD_REQUEST => __('Error while validating the CAPTCHA.', 'mailpoet')
         ));
       }
     }
@@ -169,7 +170,7 @@ class Subscribers extends APIEndpoint {
       }
 
       return $this->successResponse(
-        Subscriber::findOne($subscriber->id)->asArray(),
+        array(),
         $meta
       );
     }
@@ -189,6 +190,11 @@ class Subscribers extends APIEndpoint {
 
     if(!empty($errors)) {
       return $this->badRequest($errors);
+    }
+
+    if($subscriber->isNew()) {
+      $subscriber = Source::setSource($subscriber, Source::ADMINISTRATOR);
+      $subscriber->save();
     }
 
     if(!empty($data['segments'])) {

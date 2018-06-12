@@ -76,7 +76,9 @@ class Settings
 
         $stabs = apply_filters("add_wpdm_settings_tab", $stabs);
 
-        $stabs['plugin-update'] = array('id' => 'plugin-update','icon'=>'fa fa-refresh',  'link' => 'edit.php?post_type=wpdmpro&page=settings&tab=plugin-update', 'title' => 'Updates', 'callback' => array($this, 'pluginUpdate'));
+        $stabs['plugin-update'] = array('id' => 'plugin-update','icon'=>'fas fa-sync',  'link' => 'edit.php?post_type=wpdmpro&page=settings&tab=plugin-update', 'title' => 'Updates', 'callback' => array($this, 'pluginUpdate'));
+        $stabs['privacy'] = array('id' => 'privacy','icon'=>'fas fa-user-shield',  'link' => 'edit.php?post_type=wpdmpro&page=settings&tab=privacy', 'title' => 'Privacy', 'callback' => array($this, 'privacy'));
+
 
     }
 
@@ -263,6 +265,19 @@ class Settings
         include(WPDM_BASE_DIR . 'admin/tpls/settings/addon-update.php');
     }
 
+    function Privacy(){
+        if (wpdm_query_var('task') == 'wdm_save_settings' && wpdm_query_var('section') == 'privacy') {
+            foreach ($_POST as $key => $value){
+                if(strstr($key, '_wpdm_')){
+                    $value = is_array($value)?wpdm_sanitize_array($value):sanitize_text_field($value);
+                    update_option($key, $value);
+                }
+            }
+            _e("Privacy Settings Saved Successfully", "download-manager");
+            die();
+        }
+        include(WPDM_BASE_DIR . 'admin/tpls/settings/privacy.php');
+    }
 
 
 }

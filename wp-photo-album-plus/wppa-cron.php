@@ -352,6 +352,9 @@ function _wppa_do_clear_cache( $dir ) {
 			}
 		}
 	}
+	
+	// Also delete tempfiles
+	wppa_delete_obsolete_tempfiles();
 }
 
 // Activate treecount update proc

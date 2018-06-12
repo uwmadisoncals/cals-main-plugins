@@ -4,7 +4,7 @@
 <div style="clear: both;"></div>
     <form method="post" id="wdm_settings_form" style="margin-top:35px;">
  <div class="panel panel-default" id="wpdm-wrapper-panel">
-     <div class="panel-heading"><button type="submit" class="btn btn-default pull-right" style="font-weight: 600"><i class="sinc fa fa-save color-green"></i> <?php _e("Save Settings",'download-manager'); ?></button><h3 class="h"><i class="fa fa-cogs color-purple"></i>&nbsp;&nbsp;<?php _e("Download Manager Settings",'download-manager'); ?></h3>
+     <div class="panel-heading"><button type="submit" class="btn btn-default pull-right" style="font-weight: 600"><i class="sinc fa fa-hdd color-green"></i> <?php _e("Save Settings",'download-manager'); ?></button><h3 class="h"><i class="fa fa-cogs color-purple"></i>&nbsp;&nbsp;<?php _e("Download Manager Settings",'download-manager'); ?></h3>
 
      </div>
      <div class="panel-heading" style="background: #f5f5f5 !important;border: 0;border-radius: 0;border-bottom: 1px solid #eeeeee;margin-top: 53px">
@@ -32,7 +32,7 @@ call_user_func($stabs[$tab]['callback']); ?>
 </div> <br>
 <br>
 
-         <button type="submit" class="btn btn-info btn-lg"><i class="sinc fa fa-save"></i> &nbsp;<?php _e("Save Settings",'download-manager'); ?></button>
+         <button type="submit" class="btn btn-info btn-lg"><i class="sinc fa fa-hdd"></i> &nbsp;<?php _e("Save Settings",'download-manager'); ?></button>
 
 <br>
  
@@ -96,7 +96,7 @@ jQuery(document).ready(function(){
     
     jQuery('#wdm_settings_form').submit(function(){
 
-        jQuery('.sinc').removeClass('fa-save').addClass('fa-spinner fa-spin');
+        jQuery('.sinc').removeClass('fa-hdd').addClass('fa-sun fa-spin');
 
        jQuery(this).ajaxSubmit({
         url:ajaxurl,
@@ -109,7 +109,7 @@ jQuery(document).ready(function(){
           jQuery('#msgst').html('<i class="fa fa-check-circle"></i> '+responseText).slideDown();
           //setTimeout("jQuery('#message').slideUp()",4000);
           jQuery('.wpdm-ssb').removeClass('wpdm-spin');
-          jQuery('.sinc').removeClass('fa-spinner fa-spin').addClass('fa-save');
+          jQuery('.sinc').removeClass('fa-sun fa-spin').addClass('fa-hdd');
           jQuery('#wdms_loading').removeClass('wpdm-spin');
         }   
        });

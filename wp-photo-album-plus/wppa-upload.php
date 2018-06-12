@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 6.8.00
+* Version 6.8.09
 *
 */
 
@@ -78,13 +78,13 @@ global $upload_album;
 		if ( isset( $_POST['wppa-go-edit-multiple'] ) ) {
 			if ( current_user_can( 'wppa_admin' ) ) {
 				wppa_ok_message( __( 'Connecting to edit album...' , 'wp-photo-album-plus' ) ); ?>
-				<script type="text/javascript">
+				<script type="text/javascript" >
 					document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id=' . $upload_album . '&wppa_nonce=' . wp_create_nonce( 'wppa_nonce', 'wppa_nonce' ), 'js' ) ) ?>';
 				</script>
 			<?php }
 			elseif ( wppa_opt( 'upload_edit' ) != '-none-' ) {
 				wppa_ok_message( __( 'Connecting to edit photos...' , 'wp-photo-album-plus' ) ); ?>
-				<script type="text/javascript">document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_edit_photo', 'js' ) ) ?>';</script>
+				<script type="text/javascript" >document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_edit_photo', 'js' ) ) ?>';</script>
 			<?php }
 		}
 	}
@@ -95,13 +95,13 @@ global $upload_album;
 		if ( isset( $_POST['wppa-go-edit-single'] ) ) {
 			if ( current_user_can( 'wppa_admin' ) ) {
 				wppa_ok_message( __( 'Connecting to edit album...' , 'wp-photo-album-plus' ) ); ?>
-				<script type="text/javascript">
+				<script type="text/javascript" >
 					document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_admin_menu&tab=edit&edit_id=' . $upload_album . '&wppa_nonce=' . wp_create_nonce( 'wppa_nonce', 'wppa_nonce' ), 'js' ) ) ?>';
 				</script>
 			<?php }
 			elseif ( wppa_opt( 'upload_edit' ) != '-none-' ) {
 				wppa_ok_message( __( 'Connecting to edit photos...' , 'wp-photo-album-plus' ) ); ?>
-				<script type="text/javascript">document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_edit_photo', 'js' ) ) ?>';</script>
+				<script type="text/javascript" >document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_edit_photo', 'js' ) ) ?>';</script>
 			<?php }
 		}
 	}
@@ -112,7 +112,7 @@ global $upload_album;
 		if ( isset( $_POST['wppa-go-import'] ) && $err == '0' ) {
 			wppa_ok_message( __( 'Connecting to your depot...' , 'wp-photo-album-plus' ) );
 			update_option( 'wppa_import_source_'.$user, WPPA_DEPOT_PATH ); ?>
-			<script type="text/javascript">document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_import_photos&zip='.$target, 'js' ) ) ?>';</script>
+			<script type="text/javascript" >document.location = '<?php echo( wppa_dbg_url( get_admin_url().'admin.php?page=wppa_import_photos&zip='.$target, 'js' ) ) ?>';</script>
 		<?php }
 	}
 
@@ -134,9 +134,7 @@ global $upload_album;
 		}
 		$max_size = ini_get( 'upload_max_filesize' );
 		$max_tot_size = ini_get( 'post_max_size' );
-/* debug */
-// $max_size = '2G';
-/**/
+
 		$max_tot_size_mbytes = substr( $max_tot_size, 0, strlen( $max_tot_size ) - 1 );
 		if ( substr( $max_tot_size, -1 ) == 'G' ) { // May upload gigabytes!!
 			$max_tot_size_mbytes *= 1024;
@@ -289,7 +287,7 @@ global $upload_album;
 							__( 'Selected Files:' , 'wp-photo-album-plus' ) .
 						'</h3>' .
 					'</div>' .
-					'<script type="text/javascript">' .
+					'<script type="text/javascript" >' .
 						'function showit() {' .
 							'var maxsize = parseInt( \'' . $max_tot_size_mbytes . '\' ) * 1024 * 1024;' .
 							'var maxcount = parseInt( \'' . $max_files_txt . '\' );' .
@@ -479,7 +477,7 @@ global $upload_album;
 					}
 				echo
 				'</form>' .
-				'<script type="text/javascript">' .
+				'<script type="text/javascript" >' .
 //				'<!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->' .
 					'var multi_selector = new MultiSelector( document.getElementById( \'files_list\' ), ' . $max_files . ');' .
 //				'<!-- Pass in the file element -->' .

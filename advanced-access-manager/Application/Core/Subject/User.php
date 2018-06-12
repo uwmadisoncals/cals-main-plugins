@@ -19,7 +19,7 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
      * Subject UID: USER
      */
     const UID = 'user';
-
+    
     /**
      * AAM Capability Key
      *
@@ -48,13 +48,8 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
             if (!empty($expired)) {
                 $parts = explode('|', $expired);
                 if ($parts[0] <= date('Y-m-d H:i:s')) {
-                    $this->expireUser($parts[1]);
+                    $this->triggerExpiredUserAction($parts);
                 }
-            }
-            
-            //check if user is locked
-            if ($this->user_status == 1) {
-                wp_logout();
             }
             
             //check if user's role expired
@@ -68,28 +63,34 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
     /**
      * Expire user
      * 
-     * @param string $action
+     * @param array $config
      * 
      * @return void
      * 
      * @access 
      */
-    public function expireUser($action) {
-        switch($action) {
+    public function triggerExpiredUserAction($config) {
+        switch($config[1]) {
             case 'lock':
                 $this->block();
+                break;
+            
+            case 'change-role':
+                if (AAM_Core_API::getRoles()->is_role($config[2])) {
+                    $this->getSubject()->set_role($config[2]);
+                    delete_user_option($this->getSubject()->ID, 'aam_user_expiration');
+                }
                 break;
 
             case 'delete':
                 require_once(ABSPATH . 'wp-admin/includes/user.php' );
                 wp_delete_user(
-                    $this->getId(), AAM_Core_Config::get('core.reasign.user')
+                    $this->getId(), AAM_Core_Config::get('core.reasign.ownership.user')
                 );
                 wp_logout();
                 break;
 
             default:
-                do_action('aam-expired-user-action', $this);
                 break;
         }
     }
@@ -366,14 +367,6 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
      */
     public function getMaxLevel() {
         return AAM_Core_API::maxLevel($this->allcaps);
-    }
-    
-    /**
-     * 
-     * @return boolean
-     */
-    public function isUser() {
-        return true;
     }
     
 }

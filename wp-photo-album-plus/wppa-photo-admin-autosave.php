@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.8.02
+* Version 6.8.08
 *
 */
 
@@ -53,11 +53,11 @@ function _wppa_moderate_photos() {
 		$photo = $_GET['photo'];
 	}
 	else $photo = '';
-	
+
 	$just_edit = isset( $_GET['just-edit'] );
 
 	if ( $photo && $just_edit && wppa_user_is( 'administrator' ) ) {
-		echo 
+		echo
 		'<div class="wrap">' .
 			'<h2>' . __( 'Edit photo', 'wp-photo-album-plus' ) . '</h2>';
 			wppa_album_photos( '', $photo, '', false );
@@ -2813,7 +2813,7 @@ function wppaSetConfirmMove( id ) {
 							<!-- Remark -->
 							<td id="photostatus-<?php echo $photo['id'] ?>" style="width:25%;" >
 								<?php _e( 'Not modified' , 'wp-photo-album-plus') ?>
-								<script type="text/javascript">wppaPhotoStatusChange( <?php echo $photo['id'] ?> )</script>
+								<script type="text/javascript" >wppaPhotoStatusChange( <?php echo $photo['id'] ?> )</script>
 							</td>
 						</tr>
 						<?php } ?>

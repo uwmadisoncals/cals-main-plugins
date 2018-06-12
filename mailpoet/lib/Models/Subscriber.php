@@ -2,6 +2,7 @@
 namespace MailPoet\Models;
 use MailPoet\Mailer\Mailer;
 use MailPoet\Newsletter\Scheduler\Scheduler;
+use MailPoet\Subscribers\Source;
 use MailPoet\Util\Helpers;
 use MailPoet\Subscription;
 
@@ -182,6 +183,8 @@ class Subscriber extends Model {
       // create new subscriber or update if no confirmation is required
       $subscriber = self::createOrUpdate($subscriber_data);
       if($subscriber->getErrors() !== false) {
+        $subscriber = Source::setSource($subscriber, Source::FORM);
+        $subscriber->save();
         return $subscriber;
       }
 
@@ -205,6 +208,8 @@ class Subscriber extends Model {
         $subscriber->set('status', self::STATUS_SUBSCRIBED);
       }
     }
+
+    $subscriber = Source::setSource($subscriber, Source::FORM);
 
     if($subscriber->save()) {
       // link subscriber to segments
@@ -882,5 +887,21 @@ class Subscriber extends Model {
       }
     }
     return array($data, $custom_fields);
+  }
+
+  public function getAllSegmentNamesWithStatus() {
+    return Segment::table_alias('segment')
+      ->select('name')
+      ->select('subscriber_segment.segment_id', 'segment_id')
+      ->select('subscriber_segment.status', 'status')
+      ->select('subscriber_segment.updated_at', 'updated_at')
+      ->join(
+        SubscriberSegment::$_table,
+        array('subscriber_segment.segment_id', '=', 'segment.id'),
+        'subscriber_segment'
+      )
+      ->where('subscriber_segment.subscriber_id', $this->id)
+      ->orderByAsc('name')
+      ->findArray();
   }
 }

@@ -3,7 +3,7 @@
 class WPDM_Messages {
     public static function Message($msg, $die = 0){
         if(is_array($msg))
-            $message = "<div class='w3eden'><div class='alert alert-{$msg['type']}'><strong>{$msg['title']}</strong><br/>{$msg['message']}</div></div>";
+            $message = "<div class='w3eden'><div class='alert alert-{$msg['type']}' data-title='{$msg['title']}'>{$msg['message']}</div></div>";
         else
             $message = $msg;
         if($die==-1) return $message;

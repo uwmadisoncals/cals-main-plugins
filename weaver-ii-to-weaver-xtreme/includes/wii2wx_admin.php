@@ -512,6 +512,8 @@ require(dirname( __FILE__ ) . '/conversions.php'); // load the conversion defini
 	else
 		$wii2wx_opts['subtheme_notes'] = $report;
 
+	$wii2wx_opts['last_option'] = 'Weaver Xtreme';
+
 
 
 	echo "<h4>Notes:</h4>Converted settings: {$cv}. Need Manual Conversion: {$mc}. Not supported {$ns}.<br />\n";
@@ -594,17 +596,19 @@ require(dirname( __FILE__ ) . '/conversions.php'); // load the conversion defini
 
 	// $pro_opts = $wii_settings['weaverii_pro'];
 
-	foreach ($pro_opts['social'] as $sopt => $val ) {
-		if (strlen($val) > 0) {
-			$curopt = explode('_', $sopt);
-			$name = str_replace( $mapfrom, $mapto, $curopt[0]);
-			//echo "Searching: {$name} - ";
-			if ( in_array( $name,$xp_social) ) { // can convert...
-				$xp['social']["{$name}_{$curopt[1]}"] = $val;
-				if ( $curopt[1] == 'use' )	// count active options
-						$social[] = $curopt[0];
-			} else if ($curopt[1] == 'use' ) {
-				$not_social[] = $curopt[0];		// not converted
+	if (isset($pro_opts['social'])) {
+		foreach ($pro_opts['social'] as $sopt => $val ) {
+			if (strlen($val) > 0) {
+				$curopt = explode('_', $sopt);
+				$name = str_replace( $mapfrom, $mapto, $curopt[0]);
+				//echo "Searching: {$name} - ";
+				if ( in_array( $name,$xp_social) ) { // can convert...
+					$xp['social']["{$name}_{$curopt[1]}"] = $val;
+					if ( $curopt[1] == 'use' )	// count active options
+							$social[] = $curopt[0];
+				} else if ($curopt[1] == 'use' ) {
+					$not_social[] = $curopt[0];		// not converted
+				}
 			}
 		}
 	}
@@ -628,11 +632,13 @@ require(dirname( __FILE__ ) . '/conversions.php'); // load the conversion defini
 
 	$nbuttons = 0;
 
-	foreach ($pro_opts['buttons'] as $buttons => $button ) {
-		if ( strlen($button) > 0 ) {
-			$xp['buttons'][$buttons] = $button;
-			if ( strpos ($buttons, '_url') !== false )
-				$nbuttons++;
+	if (isset($pro_opts['buttons'])) {
+		foreach ($pro_opts['buttons'] as $buttons => $button ) {
+			if ( strlen($button) > 0 ) {
+				$xp['buttons'][$buttons] = $button;
+				if ( strpos ($buttons, '_url') !== false )
+					$nbuttons++;
+			}
 		}
 	}
 	if ($nbuttons > 0)

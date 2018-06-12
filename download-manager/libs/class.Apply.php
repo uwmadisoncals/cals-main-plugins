@@ -36,6 +36,8 @@ class Apply {
         add_filter('pre_get_posts', array($this, 'queryTag'));
         add_filter('the_excerpt_embed', array($this, 'oEmbed'));
 
+
+
     }
 
     function AdminActions(){
@@ -43,6 +45,7 @@ class Apply {
         add_action( 'admin_init', array($this, 'sfbAccess'));
         add_action('save_post', array( $this, 'DashboardPages' ));
         add_action( 'wp_ajax_wpdm_clear_stats', array($this, 'clearStats'));
+        add_action( 'wp_ajax_clear_cache', array($this, 'clearCache'));
 
     }
 
@@ -337,6 +340,7 @@ class Apply {
             $media = explode("wpdm-media/", $_SERVER['REQUEST_URI']);
             $media = explode("/", $media[1]);
             list($ID, $file) = $media;
+            if(!\WPDM\Package::userCanAccess($ID)) \WPDM_Messages::Error(stripslashes(get_option('wpdm_permission_msg')), 1);
             $files = \WPDM\Package::getFiles($ID);
             $file = \WPDM\libs\FileSystem::fullPath($file, $ID);
             $stream = new \WPDM\libs\StreamMedia($file);
@@ -535,6 +539,18 @@ class Apply {
             die();
         }
     }
+
+    /**
+     * Empty cache dir
+     */
+    function clearCache(){
+        if(!current_user_can('manage_options')) return;
+        \WPDM\libs\FileSystem::deleteFiles(WPDM_CACHE_DIR, false);
+        die('ok');
+    }
+
+
+
 
 
 }

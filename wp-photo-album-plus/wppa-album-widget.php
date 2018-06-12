@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 6.8.07
+* Version 6.8.08
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -194,6 +194,8 @@ class AlbumWidget extends WP_Widget {
 										' ' . wppa( 'rel' ) . '="'.wppa_opt( 'lightbox_name' ).'[alw-'.wppa( 'mocc' ).'-'.$album['id'].']"' .
 										' ' . wppa( 'lbtitle' ) . '="'.$title.'"' .
 										' data-alt="' . esc_attr( wppa_get_imgalt( $thumb['id'], true ) ) . '"' .
+										' style="cursor:' . wppa_wait() . ';"' .
+										' onclick="return false;"' .
 										' >';
 								if ( $thumb['id'] == $image['id'] ) {		// the cover image
 									if ( wppa_is_video( $image['id'] ) ) {
@@ -203,7 +205,7 @@ class AlbumWidget extends WP_Widget {
 																						'controls' 		=> false,
 																						'margin_top' 	=> $imgstyle_a['margin-top'],
 																						'margin_bottom' => $imgstyle_a['margin-bottom'],
-																						'cursor' 		=> $cursor,
+																					//	'cursor' 		=> $cursor,
 																						'events' 		=> $imgevents,
 																						'tagid' 		=> 'i-'.$image['id'].'-'.wppa( 'mocc' ),
 																						'title' 		=> wppa_zoom_in( $image['id'] ),
@@ -218,7 +220,7 @@ class AlbumWidget extends WP_Widget {
 																	' src="'.$imgurl.'"' .
 																	' width="'.$width.'"' .
 																	' height="'.$height.'"' .
-																	' style="'.$imgstyle.$cursor.'" ' .
+																	' style="'.$imgstyle.'" ' .
 																	$imgevents . ' ' .
 																	wppa_get_imgalt( $image['id'] ) .
 																	' >';

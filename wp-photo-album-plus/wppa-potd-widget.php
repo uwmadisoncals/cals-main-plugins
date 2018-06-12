@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the widget
-* Version 6.8.07
+* Version 6.8.08
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -77,7 +77,9 @@ class PhotoOfTheDay extends WP_Widget {
 							' data-videonatheight="'.wppa_get_videoy( $id ).'"' : '' ) .
 							( $has_audio ? ' data-audiohtml="' . esc_attr( wppa_get_audio_body( $id ) ) . '"' : '' ) .
 							' ' . wppa( 'rel' ) . '="' . wppa_opt( 'lightbox_name' ) . '"' .
-							' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"';
+							' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
+							' onclick="return false;"' .
+							' style="cursor:' . wppa_wait() . ';"';
 			}
 			else {
 				$lightbox = '';
@@ -85,7 +87,7 @@ class PhotoOfTheDay extends WP_Widget {
 
 			if ( $link ) {
 				if ( $link['is_lightbox'] ) {
-					$cursor = ' cursor:url('.wppa_get_imgdir().wppa_opt( 'magnifier').'),pointer;';
+					$cursor = '';//' cursor:' . wppa_wait() . ';'; //url('.wppa_get_imgdir().wppa_opt( 'magnifier').'),pointer;';
 					$title  = wppa_zoom_in( $id );
 					$ltitle = wppa_get_lbtitle('potd', $id);
 				}

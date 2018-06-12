@@ -3,6 +3,7 @@
 namespace MailPoet\Config;
 
 use MailPoet\Models\Setting;
+use MailPoet\WP\Posts as WPPosts;
 
 class Hooks {
   function init() {
@@ -105,17 +106,17 @@ class Hooks {
     add_action(
       'user_register',
       '\MailPoet\Segments\WP::synchronizeUser',
-      1
+      6
     );
     add_action(
       'added_existing_user',
       '\MailPoet\Segments\WP::synchronizeUser',
-      1
+      6
     );
     add_action(
       'profile_update',
       '\MailPoet\Segments\WP::synchronizeUser',
-      1, 2
+      6, 2
     );
     add_action(
       'delete_user',
@@ -166,8 +167,7 @@ class Hooks {
   }
 
   function setupPostNotifications() {
-    $post_types = get_post_types();
-    foreach($post_types as $post_type) {
+    foreach(WPPosts::getTypes() as $post_type) {
       add_filter(
         'publish_' . $post_type,
         '\MailPoet\Newsletter\Scheduler\Scheduler::schedulePostNotification',

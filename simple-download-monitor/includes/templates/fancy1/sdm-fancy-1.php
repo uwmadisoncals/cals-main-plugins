@@ -87,6 +87,22 @@ function sdm_generate_fancy1_display_output($args) {
     // Check to see if the download link cpt is password protected
     $get_cpt_object = get_post($id);
     $cpt_is_password = !empty($get_cpt_object->post_password) ? 'yes' : 'no';  // yes = download is password protected;    
+    
+   
+    $main_advanced_opts = get_option('sdm_advanced_options');
+    
+    //Check if Terms & Condition enabled
+    $termscond_enable = isset($main_advanced_opts['termscond_enable']) ? true : false;
+    if ($termscond_enable) {
+        $download_button_code = sdm_get_download_form_with_termsncond($id, $shortcode_atts, 'sdm_download ' . $color);
+    }
+    
+    //Check if reCAPTCHA enabled
+    $recaptcha_enable = isset($main_advanced_opts['recaptcha_enable']) ? true : false;
+    if ($recaptcha_enable && $cpt_is_password == 'no') {
+        $download_button_code = sdm_get_download_form_with_recaptcha($id, $shortcode_atts, 'sdm_download ' . $color);
+    }
+    
     if ($cpt_is_password !== 'no') {//This is a password protected download so replace the download now button with password requirement
         $download_button_code = sdm_get_password_entry_form($id, $shortcode_atts, 'sdm_download ' . $color);
     }
@@ -127,6 +143,7 @@ function sdm_generate_fancy1_display_output($args) {
     }
     $output .= '</div>'; //end .sdm_download_link
     $output .= '</div>'; //end .sdm_download_item
+
 
     return $output;
 }

@@ -1,7 +1,7 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <div class="pull-right" style="margin-top: -3px"><a class="btn btn-xs btn-default" href="edit.php?post_type=wpdmpro&page=settings&tab=plugin-update&newpurchase=1"><i class="color-green fa fa-refresh"></i> <?php _e('Check For Updates','wpdmpro'); ?></a>   <a class="btn btn-default btn-xs" href="edit.php?post_type=wpdmpro&page=settings&tab=plugin-update&logout=1"><i class="fa fa-sign-out text-danger"></i> <?php _e('Logout','wpdmpro'); ?></a></div>
-        <i class="fa fa-refresh"></i> &nbsp; <?php _e('Add-on Update', 'wpdmpro') ?></div>
+        <div class="pull-right" style="margin-top: -3px"><a class="btn btn-xs btn-default" href="edit.php?post_type=wpdmpro&page=settings&tab=plugin-update&newpurchase=1"><i class="color-green fas fa-sync"></i> <?php _e('Check For Updates','wpdmpro'); ?></a>   <a class="btn btn-default btn-xs" href="edit.php?post_type=wpdmpro&page=settings&tab=plugin-update&logout=1"><i class="fa fa-sign-out text-danger"></i> <?php _e('Logout','wpdmpro'); ?></a></div>
+        <i class="fas fa-sync"></i> &nbsp; <?php _e('Add-on Update', 'wpdmpro') ?></div>
     <div class="panel-body-x">
 
         <?php if(get_option('__wpdm_suname') =='') { ?>
@@ -68,7 +68,7 @@
                                                         <?php if(!$plugin_data){ ?>
                                                             <a href="#" data-url="<?php echo $dlu; ?>" data-action="installaddon" data-plugin="<?php echo $plugin_name; ?>" class="btn btn-xs btn-success btn-block btn-update"><i class="fa fa-plus"></i> <?php _e('Install','wpdmpro'); ?></a>
                                                         <?php } else if(isset($latest[$plugin_name]) && version_compare($latest[$plugin_name], $plugin_data['Version'], '>')){ ?>
-                                                            <a href="#" data-url="<?php echo $dlu; ?>" data-action="updateaddon" data-plugin="<?php echo $plugin_name; ?>" class="btn btn-xs btn-warning btn-block btn-update"><i class="fa fa-refresh"></i> <?php _e('Update','wpdmpro'); ?></a>
+                                                            <a href="#" data-url="<?php echo $dlu; ?>" data-action="updateaddon" data-plugin="<?php echo $plugin_name; ?>" class="btn btn-xs btn-warning btn-block btn-update"><i class="fas fa-sync"></i> <?php _e('Update','wpdmpro'); ?></a>
                                                         <?php } else echo "<span class='text-success'><i class='fa fa-check-circle'></i> ". __( "Updated" , "download-manager" )."</span>"; ?>
                                                     <?php } else { ?>
                                                         <a href="https://www.wpdownloadmanager.com/user-dashboard/purchases/order/<?php echo $item->oid; ?>/" target="_blank" class="btn btn-xs btn-danger btn-block"><?php _e('Expired','wpdmpro'); ?></a>
@@ -109,7 +109,7 @@
                                     <?php if(!$plugin_data){ ?>
                                         <a href="#" data-url="https://www.wpdownloadmanager.com/?wpdmdl=<?php echo $addon->ID; ?>" data-action="installaddon" data-plugin="<?php echo $plugin_name; ?>" class="btn btn-xs btn-success btn-block btn-update"><i class="fa fa-plus"></i> <?php _e('Install','wpdmpro'); ?></a>
                                     <?php } else if(isset($latest[$plugin_name]) && version_compare($latest[$plugin_name], $plugin_data['Version'], '>')){ ?>
-                                        <a href="#" data-url="https://www.wpdownloadmanager.com/?wpdmdl=<?php echo $addon->ID; ?>" data-action="updateaddon" data-plugin="<?php echo $plugin_name; ?>" class="btn btn-xs btn-warning btn-block btn-update"><i class="fa fa-refresh"></i> <?php _e('Update','wpdmpro'); ?></a>
+                                        <a href="#" data-url="https://www.wpdownloadmanager.com/?wpdmdl=<?php echo $addon->ID; ?>" data-action="updateaddon" data-plugin="<?php echo $plugin_name; ?>" class="btn btn-xs btn-warning btn-block btn-update"><i class="fas fa-sync"></i> <?php _e('Update','wpdmpro'); ?></a>
                                     <?php } else echo "<span class='text-success'><i class='fa fa-check-circle'></i> ". __( "Updated" , "download-manager" )."</span>"; ?>
 
                                 </td>
@@ -125,7 +125,7 @@
                 jQuery(function($){
                     $('.btn-update').on('click', function (res) {
                         var bhtml = $(this).html(), btn = $(this);
-                        btn.html('<i class="fa fa-refresh fa-spin"></i> <?php _e('Please Wait...','wpdmpro'); ?>');
+                        btn.html('<i class="fas fa-sync fa-spin"></i> <?php _e('Please Wait...','wpdmpro'); ?>');
                         $.post('admin-ajax.php?action='+$(this).data('action'), {updateurl: $(this).data('url'),  plugin: $(this).data('plugin')}, function (res) {
                             btn.html('<i class="fa fa-check-circle"></i> <?php _e('Success!','wpdmpro'); ?>');
                         });

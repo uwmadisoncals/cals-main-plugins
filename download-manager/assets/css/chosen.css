@@ -102,10 +102,10 @@
   border-top-left-radius: 3px;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
-/*
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  */
+  /*
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    */
   color: #555555;
   display: block;
   height: 34px;
@@ -354,9 +354,9 @@
 
 
 .search-choice-close:after {
-  color: rgba(204, 34, 61, 0.86);
-  content: "\f056";
-  font-family: FontAwesome;
+  color: #aaaaaa;
+  content: "\f057";
+  font-family: "Font Awesome\ 5 Free";
   font-size: 8pt;
   height: 10px !important;
   left: 2px;
@@ -365,10 +365,14 @@
   width: 10px !important;
 }
 
+.search-choice-close:hover:after {
+  color: rgba(204, 34, 61, 0.86);
+}
+
 .chosen-container-single .chosen-single div b:after{
-  /*color: #19ad8e;*/
+
   content: "\f0c9";
-  font-family: FontAwesome;
+  font-family: "Font Awesome\ 5 Free";
   font-size: 8pt;
   height: 10px !important;
   left: -2px;
@@ -377,11 +381,9 @@
   width: 10px !important;
 }
 
+.chosen-container-single:hover .chosen-single div b:after,
 .chosen-container-single.chosen-with-drop .chosen-single div b:after{
   color: #3288e9;
-  /*content: "\f106";*/
-  /*font-size: 12pt;*/
-  /*margin-top: -1px;*/
 }
 .chosen-container-single.chosen-with-drop .chosen-single,
 .chosen-container-single .chosen-single:hover{

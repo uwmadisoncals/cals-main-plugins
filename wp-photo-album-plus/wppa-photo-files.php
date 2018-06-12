@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version 6.8.02
+* Version 6.9.01
 *
 */
 
@@ -259,8 +259,8 @@ global $wpdb;
 						else $src = false;
 						break;
 					case 2:	// jpeg
-						if ( ! function_exists( 'wppa_imagecreatefromjpeg' ) ) {
-							wppa_log( 'Error', 'Function wppa_imagecreatefromjpeg does not exist.' );
+						if ( ! function_exists( 'imagecreatefromjpeg' ) ) {
+							wppa_log( 'Error', 'Function imagecreatefromjpeg does not exist.' );
 						}
 						$src = @ wppa_imagecreatefromjpeg( $file );
 						break;
@@ -481,7 +481,7 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 					else $src = false;
 					break;
 				case 2:	// jpeg
-					if ( ! function_exists( 'wppa_imagecreatefromjpeg' ) ) wppa_log( 'Error', 'Function wppa_imagecreatefromjpeg does not exist.' );
+					if ( ! function_exists( 'imagecreatefromjpeg' ) ) wppa_log( 'Error', 'Function imagecreatefromjpeg does not exist.' );
 					$src = @ wppa_imagecreatefromjpeg( $file );
 					break;
 				case 3:	// png

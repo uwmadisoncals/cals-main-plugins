@@ -107,6 +107,11 @@ class wfDiagnostic
 					'hasOpenSSL' => __('Checking for OpenSSL support', 'wordfence'),
 					'openSSLVersion' => __('Checking OpenSSL version', 'wordfence'),
 					'hasCurl'    => __('Checking for cURL support', 'wordfence'),
+					'curlFeatures'    => __('cURL Features Code', 'wordfence'),
+					'curlHost'    => __('cURL Host', 'wordfence'),
+					'curlProtocols'    => __('cURL Support Protocols', 'wordfence'),
+					'curlSSLVersion'    => __('cURL SSL Version', 'wordfence'),
+					'curlLibZVersion'    => __('cURL libz Version', 'wordfence'),
 					'displayErrors' => __('Checking <code>display_errors</code><br><em> (<a href="http://php.net/manual/en/errorfunc.configuration.php#ini.display-errors" target="_blank" rel="noopener noreferrer">Should be disabled on production servers</a>)</em>', 'wordfence'),
 				)
 			),
@@ -116,6 +121,7 @@ class wfDiagnostic
 					'connectToServer1' => __('Connecting to Wordfence servers (http)', 'wordfence'),
 					'connectToServer2' => __('Connecting to Wordfence servers (https)', 'wordfence'),
 					'connectToSelf' => __('Connecting back to this site', 'wordfence'),
+					'serverIP' => __('IP(s) used by this server', 'wordfence'),
 				)
 			),
 		);
@@ -377,10 +383,10 @@ class wfDiagnostic
 		if (!function_exists('openssl_verify') || !defined('OPENSSL_VERSION_NUMBER') || !defined('OPENSSL_VERSION_TEXT')) {
 			return false;
 		}
-		$compare = wfUtils::openssl_version_compare('1.0.1');
+		$compare = wfVersionCheckController::shared()->checkOpenSSLVersion();
 		return array(
-			'test' => $compare < 0,
-			'message'  => OPENSSL_VERSION_TEXT,
+			'test' => $compare == wfVersionCheckController::VERSION_COMPATIBLE,
+			'message'  => OPENSSL_VERSION_TEXT . ' (0x' . dechex(OPENSSL_VERSION_NUMBER) . ')',
 		);
 	}
 
@@ -391,7 +397,67 @@ class wfDiagnostic
 		$version = curl_version();
 		return array(
 			'test' => version_compare($version['version'], $this->minVersion['cURL'], '>='),
-			'message'  => $version['version'],
+			'message'  => $version['version'] . ' (0x' . dechex($version['version_number']) . ')',
+		);
+	}
+	
+	public function curlFeatures() {
+		if (!is_callable('curl_version')) {
+			return false;
+		}
+		$version = curl_version();
+		return array(
+			'test' => true,
+			'message'  => '0x' . dechex($version['features']),
+			'infoOnly' => true,
+		);
+	}
+	
+	public function curlHost() {
+		if (!is_callable('curl_version')) {
+			return false;
+		}
+		$version = curl_version();
+		return array(
+			'test' => true,
+			'message'  => $version['host'],
+			'infoOnly' => true,
+		);
+	}
+	
+	public function curlProtocols() {
+		if (!is_callable('curl_version')) {
+			return false;
+		}
+		$version = curl_version();
+		return array(
+			'test' => true,
+			'message'  => implode(', ', $version['protocols']),
+			'infoOnly' => true,
+		);
+	}
+	
+	public function curlSSLVersion() {
+		if (!is_callable('curl_version')) {
+			return false;
+		}
+		$version = curl_version();
+		return array(
+			'test' => true,
+			'message'  => $version['ssl_version'],
+			'infoOnly' => true,
+		);
+	}
+	
+	public function curlLibZVersion() {
+		if (!is_callable('curl_version')) {
+			return false;
+		}
+		$version = curl_version();
+		return array(
+			'test' => true,
+			'message'  => $version['libz_version'],
+			'infoOnly' => true,
 		);
 	}
 	
@@ -485,6 +551,15 @@ class wfDiagnostic
 			'test' => false,
 			'message' => $message,
 			'detail' => $detail,
+		);
+	}
+	
+	public function serverIP() {
+		$serverIPs = wfUtils::serverIPs();
+		return array(
+			'test' => true,
+			'infoOnly' => true,
+			'message' => implode(',', $serverIPs),
 		);
 	}
 

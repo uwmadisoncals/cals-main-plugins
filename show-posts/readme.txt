@@ -9,7 +9,7 @@ Tags: weaver theme, settings, save, subthemes
 Text Domain: show-posts
 Requires at least: 4.2
 Tested up to: 4.9
-Stable tag: 1.3.13
+Stable tag: 1.3.15
 
 == Description ==
 
@@ -59,6 +59,12 @@ Please use the WordPress Plugins:Install page to install this plugin.
 
 
 == Changelog ==
+= 1.3.15 =
+* Fix: Don't add schema.org to posts when in a post slider for Weaver Xtreme Schema Tags
+
+= 1.3.14 =
+*Tweak - added compatibility tweak for Weaver Xtreme schema tags
+
 = 1.3.13 =
 * WP 4.9 compatibility update
 * Fix: Changed Featured Image links to point to single page view of post and not media lib image

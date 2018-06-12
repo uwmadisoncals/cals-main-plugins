@@ -475,10 +475,10 @@ class FrmFieldsHelper {
             return '';
         }
 
-        $link = sprintf(
-            __( 'Please add options from the WordPress "%1$s" page', 'formidable' ),
-			'<a href="' . esc_url( admin_url( 'edit-tags.php?taxonomy=' . $tax->name ) ) . '" target="_blank">' . ( empty( $tax->labels->name ) ? __( 'Categories' ) : $tax->labels->name ) . '</a>'
-        );
+		$link = sprintf(
+			esc_html__( 'Please add options from the WordPress "%1$s" page', 'formidable' ),
+			'<a href="' . esc_url( admin_url( 'edit-tags.php?taxonomy=' . $tax->name ) ) . '" target="_blank">' . ( empty( $tax->labels->name ) ? esc_html__( 'Categories' ) : $tax->labels->name ) . '</a>'
+		);
 		unset( $tax );
 
         return $link;
@@ -623,7 +623,7 @@ class FrmFieldsHelper {
 			$replace_with = self::get_value_for_shortcode( $atts );
 
 			if ( $replace_with !== null ) {
-				$replace_with = str_replace( '[', '&#91;', $replace_with ); // prevent shortcodes in fields from being processed
+				self::sanitize_embedded_shortcodes( compact( 'entry' ), $replace_with );
 				$content = str_replace( $shortcodes[0][ $short_key ], $replace_with, $content );
 			}
 
@@ -632,6 +632,21 @@ class FrmFieldsHelper {
 
 		return $content;
     }
+
+	/**
+	 * Prevent shortcodes in fields from being processed
+	 * @since 3.01.02
+	 *
+	 * @param array $atts - includes entry object
+	 * @param string $value
+	 */
+	public static function sanitize_embedded_shortcodes( $atts, &$value ) {
+		$atts['value'] = $value;
+		$should_sanitize = apply_filters( 'frm_sanitize_shortcodes', true, $atts );
+		if ( $should_sanitize ) {
+			$value = str_replace( '[', '&#91;', $value );
+		}
+	}
 
 	/**
 	 * @since 3.0
@@ -1079,7 +1094,7 @@ class FrmFieldsHelper {
 
 		?><label for="<?php echo esc_attr( $other_id ) ?>" class="frm_screen_reader frm_hidden"><?php
 		echo esc_html( $label );
-		?></label><input type="text" id="<?php echo esc_attr( $other_id ) ?>" class="<?php echo sanitize_text_field( implode( ' ', $classes ) ) ?>" <?php
+		?></label><input type="text" id="<?php echo esc_attr( $other_id ) ?>" class="<?php echo esc_attr( implode( ' ', $classes ) ) ?>" <?php
 		echo ( $args['read_only'] ? ' readonly="readonly" disabled="disabled"' : '' );
 		?> name="<?php echo esc_attr( $args['name'] ) ?>" value="<?php echo esc_attr( $args['value'] ); ?>" /><?php
 	}

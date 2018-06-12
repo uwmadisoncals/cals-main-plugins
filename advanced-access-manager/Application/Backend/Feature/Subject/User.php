@@ -66,11 +66,12 @@ class AAM_Backend_Feature_Subject_User {
         $userId  = filter_input(INPUT_POST, 'user');
         $expires = filter_input(INPUT_POST, 'expires');
         $action  = filter_input(INPUT_POST, 'after');
+        $role    = filter_input(INPUT_POST, 'role');
         
         if (current_user_can('edit_users')) {
             if ($userId != get_current_user_id()) {
                 if ($this->isAllowed(new AAM_Core_Subject_User($userId))) {
-                    $this->updateUserExpiration($userId, $expires, $action);
+                    $this->updateUserExpiration($userId, $expires, $action, $role);
                     $response['status'] = 'success';
                 }
             } else {
@@ -191,7 +192,7 @@ class AAM_Backend_Feature_Subject_User {
         if ($this->isAllowed($user) || ($user->ID == get_current_user_id())) {
             $actions = array('manage');
             
-            if (AAM_Core_Config::get('secure-login', true) 
+            if (AAM_Core_Config::get('core.settings.secureLogin', true) 
                     && current_user_can('aam_toggle_users')) {
                 $actions[] = ($user->user_status ? 'unlock' : 'lock');
             }
@@ -217,17 +218,18 @@ class AAM_Backend_Feature_Subject_User {
      * @param int    $user
      * @param string $expires
      * @param string $action
+     * @param string $role
      * 
      * @return bool
      * 
      * @access protected
      */
-    protected function updateUserExpiration($user, $expires, $action) {
+    protected function updateUserExpiration($user, $expires, $action, $role = '') {
         if (trim($expires)) {
             update_user_meta(
                 $user, 
                 'aam_user_expiration',
-                date('Y-m-d H:i:s', strtotime($expires)) . "|" . ($action ? $action : 'delete')
+                date('Y-m-d H:i:s', strtotime($expires)) . "|" . ($action ? $action : 'delete') . '|' . $role
             );
         } else {
             delete_user_meta($user, 'aam_user_expiration');

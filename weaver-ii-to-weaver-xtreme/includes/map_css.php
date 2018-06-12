@@ -1,8 +1,10 @@
 <?php
+
+// WARNING: Be sure these two arrays match in order!
 $map_css = array(
 'weaverii' => array(
 	'.title-description',	'#site-description', 		'#branding-content',	'#wrap-header',	// 1
-	'#header-extra-html', 	'.menu-add-left', 			'.menu-add', 							// 2
+	'#header-extra-html', 	'.menu-add-left', 			'.menu-add', 			'#header_image', // 2
 	'.menu_bar', 			'div.menu', 				'#access.', 			'#access2.',	// 3
 	'#access2', 			'#access', 					'.extra_menu',							// 4
 	'#sidebar_primary',		'#sidebar_left', 			'#sidebar_right',						// 5
@@ -28,7 +30,7 @@ $map_css = array(
 	),
 'weaverx' => array(
 	'#title-tagline',			'#site-tagline', 		'#title-tagline',	'#header',			// 1
-	'#header-html', 			'.wvrx-menu-left', 		'.wvrx-menu-right',						// 2
+	'#header-html', 			'.wvrx-menu-left', 		'.wvrx-menu-right',	'#header-image',	// 2
 	'.wvrx-menu-container', 	'ul.wvrx-menu',			'#nav-primary .', 	'#nav-secondary .',	// 3
 	'#nav-secondary', 			'#nav-primary', 		'.menu-extra',							// 4
 	'#primary-widget-area', 	'#secondary-widget-area', '#secondary-widget-area',				// 5

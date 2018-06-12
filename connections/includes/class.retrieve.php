@@ -341,7 +341,7 @@ class cnRetrieve {
 				// Retrieve the children categories
 				$termChildren = cnTerm::children( $categoryID, 'category' );
 
-				if ( ! is_a( $termChildren, 'WP_Error' ) && ! empty( $termChildren ) ) {
+				if ( ! $termChildren instanceof WP_Error && ! empty( $termChildren ) ) {
 
 					$categoryIDs = array_merge( $categoryIDs, $termChildren );
 				}
@@ -368,7 +368,7 @@ class cnRetrieve {
 				// Retrieve the children categories
 				$termChildren = cnTerm::children( $categoryID, 'category' );
 
-				if ( ! is_a( $termChildren, 'WP_Error' ) && ! empty( $termChildren ) ) {
+				if ( ! $termChildren instanceof WP_Error && ! empty( $termChildren ) ) {
 
 					$categoryExcludeIDs = array_merge( $categoryExcludeIDs, $termChildren );
 				}
@@ -2175,7 +2175,7 @@ class cnRetrieve {
 			$limit
 		);
 
-		$results = $wpdb->get_results( $sql );
+		$results = $wpdb->get_results( $sql, ARRAY_A );
 
 		return $results;
 	}

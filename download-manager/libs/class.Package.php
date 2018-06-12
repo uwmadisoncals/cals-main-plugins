@@ -344,7 +344,7 @@ class Package {
     }
 
     /**
-     * @usage Check if current user has access to package or category
+     * @usage Check if current user can access to package or category
      * @param $id
      * @param string $type
      *
@@ -362,6 +362,29 @@ class Package {
         if(in_array('guest', $roles)) return true;
         if(count($matched) > 0) return true;
 
+        return false;
+
+    }
+
+    /**
+     * @usage Check if current user has access to package or category
+     * @param $id
+     * @param string $type
+     *
+     * @return bool
+     */
+    public static function userHasAccess($user_id, $ID, $type = 'package'){
+
+        $user = get_user_by('ID', $user_id);
+
+        if($type=='package')
+            $roles = self::allowedRoles($ID);
+        else $roles = \WPDM\libs\CategoryHandler::getAllowedRoles($ID);
+        if(!is_array($roles)) $roles = array();
+        $matched = is_user_logged_in()?array_intersect($user->roles, $roles):array();
+        if($type == 'category' && count($roles) == 0) return true;
+        if(in_array('guest', $roles)) return true;
+        if(count($matched) > 0) return true;
         return false;
 
     }
@@ -396,7 +419,7 @@ class Package {
      * @param $ID
      * @return bool
      */
-    public static function UserCanDownload($ID){
+    public static function userCanDownload($ID){
         return self::UserCanAccess($ID) && self::userDownloadLimitExceeded($ID);
     }
 
@@ -540,6 +563,7 @@ class Package {
             //$video = home_url("/?wpdmdl={$ID}&ind=".\WPDM\libs\Crypt::Encrypt($videos[0])."&play=".basename($videos[0]));
             $video = \WPDM\libs\FileSystem::mediaURL($ID, 0, wpdm_basename($videos[0]));
             $player_html = "<video id='__wpdm_videoplayer' class='thumbnail' width=\"{$width}\" controls><source src=\"{$video}\" type=\"video/mp4\">Your browser does not support HTML5 video.</video>";
+            if(!\WPDM\Package::userCanAccess($ID)) $player_html = \WPDM_Messages::Error(stripslashes(get_option('wpdm_permission_msg')), -1);
         }
         $player_html = apply_filters("wpdm_video_player_html", $player_html, $ID, $file, $width);
         return $player_html;

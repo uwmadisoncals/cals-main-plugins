@@ -1,5 +1,89 @@
 WP Photo Album Plus Changelog
 
+= 6.9.02 =
+
+= Bug Fixes =
+
+* Fixed aspect ratio of images in comment admin.
+* Usernames apeared at photos rather than display names. Fixed.
+* If no download link specified and Domain links BuddyPress was active, a pseudocode was shown instead of the domain link under the slideshow. Fixed.
+
+= New Features =
+
+* New shortcode [wppa_div][/wppa_div]. Places a div. Attributes: style="" and class="". Default: style="clear:both;position:relative;"
+* Selectable spinner image. Works only with svg (Table II-J12).
+
+= 6.9.01 =
+
+= Bug Fixes =
+
+* Links to plain photo on sideshow did not work since 6.9.00. Fixed.
+
+= New Features =
+
+* Table IX-J10: Domain links BuddyPress. Converts usernames in extended photo names and as converted from w#owner to domain links in Buddypress.
+
+= Other Changes =
+
+* Improved layout of the Export user data file.
+* Table VII-D3 and 4 are now combined into VII-D3: Upload memory check.
+* Table VII-D4 is now: Upload memory check copy.
+If a photo is too large in pixelsize to be downsized due to memory limitation, it will be copied rather than resized.
+This will also result in having large thumbnails!
+It is recommended to have the two settings checked.
+Front-end upload photo sizes can only be limited by Table VII-B10.x. If VII-D3 or VII-D4 are UNchecked, you may expect out of memory errors.
+
+= 6.9.00 =
+
+= Bug Fixes =
+
+* Fixed wrong text in statistics widget activation screen.
+
+= New Features =
+
+* Added required code for the Privacy Policy procedures.
+
+= 6.8.09 =
+
+= Bug Fixes =
+
+* If lightbox global was active and no wppa images on the page, lightbox did not work. Fixed.
+* Import page: No import button when only .csv files were present. Fixed.
+
+= New Features =
+
+* Breadcrumb, Table II-A4.4: Photo name: Show name of photo above slideshow. You can now switch it off.
+* GPX maps, Table IX-K5.4: Zoomlevel: The starting zoomlevel for the embedded GPX implementation.
+
+= Other Changes =
+
+* Removed obsolete and not used code, obsolete comments and diagnostics.
+
+= 6.8.08 =
+
+= Bug Fixes =
+
+* The initial display of the fullscreen lightbox on Firefox was incorrect. Fixed.
+* Changing orientation of mobile devices gave wrong initial display of the fullscreen lightbox. Fixed.
+* Interactive maintenance procedures stopped at server errors. Fixed. After 10 server errors there is a confirmationbox asking to continue or not.
+* If a source image file does not exist, a backup of the displayfile int the source folder will be made prior to making an image edit with imagick.
+This enables the undo function for photos that did not have its source file present.
+* (Un)ticking Table I-D5, Table II-J9 and J10 did not work. Fixed.
+* Fixed a layout issue in the album navigator widget.
+* Fixed a lightbox issue resulting in displaying the plain image when the link was clicked before the lightbox was fully initialized.
+
+= New Features =
+
+* Added Table IV-A31: No rightclick. Disable right mouseclick on all images.
+
+= Other Changes =
+
+* When using Autoptimize, one can now optimize js with it, it will no longer conflict with wppa.
+You can also optimize html with Autoptimize and remove html comments without affecting the filmstrip speed or functionality.
+* When Defer Javascript is switched on (Table IV-A13), no wppa script files will be loaded if there is no wppa activity on the page. This is now the default.
+* Removed obsolete settings Table IV-A19: Lazy or HTML comp; Table IV-A29: JS and CSS when needed.
+* On the Import page: changing local/remote or the source folder will no longer need a buttonclick; the page will reload automatically.
+
 = 6.8.07 =
 
 = Bug Fixes =

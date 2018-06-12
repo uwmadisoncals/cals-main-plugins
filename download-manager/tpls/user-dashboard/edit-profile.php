@@ -6,13 +6,13 @@ $user = get_userdata($current_user->ID);
 
 ?>
 
-    <div id="edit-profile-form">
+    <div id="edit-profile-form" class="w3eden">
 
         <?php if(isset($_SESSION['member_error'])){ ?>
-            <div class="alert alert-error"><b>Save Failed!</b><br/><?php echo implode('<br/>',$_SESSION['member_error']); unset($_SESSION['member_error']); ?></div>
+            <div class="alert alert-danger" data-title="Save Failed!"><?php echo implode('<br/>',$_SESSION['member_error']); unset($_SESSION['member_error']); ?></div>
         <?php } ?>
         <?php if(isset($_SESSION['member_success'])){ ?>
-            <div class="alert alert-success"><b>Done!</b><br/><?php echo $_SESSION['member_success']; unset($_SESSION['member_success']); ?></div>
+            <div class="alert alert-success" data-title="Done!"><?php echo $_SESSION['member_success']; unset($_SESSION['member_success']); ?></div>
         <?php } ?>
 
 

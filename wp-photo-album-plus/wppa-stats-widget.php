@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the stats widget
-* Version 6.8.07
+* Version 6.9.00
 *
 */
 class WppaStatsWidget extends WP_Widget {
@@ -229,7 +229,7 @@ class WppaStatsWidget extends WP_Widget {
 		wppa_widget_checkbox( 	$this,
 								'photos',
 								$instance['photos'],
-								__( 'Show number of albums', 'wp-photo-album-plus' )
+								__( 'Show number of photos', 'wp-photo-album-plus' )
 								);
 
 		if ( wppa_switch( 'enable_video' ) ) {

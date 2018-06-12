@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit683c9e96a2feac320233f10a1d68d14e
+class ComposerStaticInite98a710e71e6174923a86d79102fe7dc
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -181,6 +181,9 @@ class ComposerStaticInit683c9e96a2feac320233f10a1d68d14e
         'MailPoet\\Config\\MP2Migrator' => __DIR__ . '/../..' . '/lib/Config/MP2Migrator.php',
         'MailPoet\\Config\\Menu' => __DIR__ . '/../..' . '/lib/Config/Menu.php',
         'MailPoet\\Config\\Migrator' => __DIR__ . '/../..' . '/lib/Config/Migrator.php',
+        'MailPoet\\Config\\PHPVersionWarnings' => __DIR__ . '/../..' . '/lib/Config/PHPVersionWarnings.php',
+        'MailPoet\\Config\\PersonalDataErasers' => __DIR__ . '/../..' . '/lib/Config/PersonalDataErasers.php',
+        'MailPoet\\Config\\PersonalDataExporters' => __DIR__ . '/../..' . '/lib/Config/PersonalDataExporters.php',
         'MailPoet\\Config\\PluginActivatedHook' => __DIR__ . '/../..' . '/lib/Config/PluginActivatedHook.php',
         'MailPoet\\Config\\Populator' => __DIR__ . '/../..' . '/lib/Config/Populator.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\AppWelcome' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/AppWelcome.php',
@@ -208,6 +211,7 @@ class ComposerStaticInit683c9e96a2feac320233f10a1d68d14e
         'MailPoet\\Config\\PopulatorData\\Templates\\WelcomeBlank1Column' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/WelcomeBlank1Column.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\WorldCup' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/WorldCup.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\YogaStudio' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/YogaStudio.php',
+        'MailPoet\\Config\\PrivacyPolicy' => __DIR__ . '/../..' . '/lib/Config/PrivacyPolicy.php',
         'MailPoet\\Config\\Renderer' => __DIR__ . '/../..' . '/lib/Config/Renderer.php',
         'MailPoet\\Config\\RequirementsChecker' => __DIR__ . '/../..' . '/lib/Config/RequirementsChecker.php',
         'MailPoet\\Config\\ServicesChecker' => __DIR__ . '/../..' . '/lib/Config/ServicesChecker.php',
@@ -285,6 +289,7 @@ class ComposerStaticInit683c9e96a2feac320233f10a1d68d14e
         'MailPoet\\Models\\SubscriberIP' => __DIR__ . '/../..' . '/lib/Models/SubscriberIP.php',
         'MailPoet\\Models\\SubscriberSegment' => __DIR__ . '/../..' . '/lib/Models/SubscriberSegment.php',
         'MailPoet\\Newsletter\\AutomatedLatestContent' => __DIR__ . '/../..' . '/lib/Newsletter/AutomatedLatestContent.php',
+        'MailPoet\\Newsletter\\Editor\\LayoutHelper' => __DIR__ . '/../..' . '/lib/Newsletter/Editor/LayoutHelper.php',
         'MailPoet\\Newsletter\\Editor\\MetaInformationManager' => __DIR__ . '/../..' . '/lib/Newsletter/Editor/MetaInformationManager.php',
         'MailPoet\\Newsletter\\Editor\\PostContentManager' => __DIR__ . '/../..' . '/lib/Newsletter/Editor/PostContentManager.php',
         'MailPoet\\Newsletter\\Editor\\PostListTransformer' => __DIR__ . '/../..' . '/lib/Newsletter/Editor/PostListTransformer.php',
@@ -341,6 +346,12 @@ class ComposerStaticInit683c9e96a2feac320233f10a1d68d14e
         'MailPoet\\Subscribers\\ImportExport\\ImportExportFactory' => __DIR__ . '/../..' . '/lib/Subscribers/ImportExport/ImportExportFactory.php',
         'MailPoet\\Subscribers\\ImportExport\\Import\\Import' => __DIR__ . '/../..' . '/lib/Subscribers/ImportExport/Import/Import.php',
         'MailPoet\\Subscribers\\ImportExport\\Import\\MailChimp' => __DIR__ . '/../..' . '/lib/Subscribers/ImportExport/Import/MailChimp.php',
+        'MailPoet\\Subscribers\\ImportExport\\PersonalDataExporters\\NewsletterClicksExporter' => __DIR__ . '/../..' . '/lib/Subscribers/ImportExport/PersonalDataExporters/NewsletterClicksExporter.php',
+        'MailPoet\\Subscribers\\ImportExport\\PersonalDataExporters\\NewslettersExporter' => __DIR__ . '/../..' . '/lib/Subscribers/ImportExport/PersonalDataExporters/NewslettersExporter.php',
+        'MailPoet\\Subscribers\\ImportExport\\PersonalDataExporters\\SegmentsExporter' => __DIR__ . '/../..' . '/lib/Subscribers/ImportExport/PersonalDataExporters/SegmentsExporter.php',
+        'MailPoet\\Subscribers\\ImportExport\\PersonalDataExporters\\SubscriberExporter' => __DIR__ . '/../..' . '/lib/Subscribers/ImportExport/PersonalDataExporters/SubscriberExporter.php',
+        'MailPoet\\Subscribers\\Source' => __DIR__ . '/../..' . '/lib/Subscribers/Source.php',
+        'MailPoet\\Subscribers\\SubscriberPersonalDataEraser' => __DIR__ . '/../..' . '/lib/Subscribers/SubscriberPersonalDataEraser.php',
         'MailPoet\\Subscription\\Comment' => __DIR__ . '/../..' . '/lib/Subscription/Comment.php',
         'MailPoet\\Subscription\\Form' => __DIR__ . '/../..' . '/lib/Subscription/Form.php',
         'MailPoet\\Subscription\\Manage' => __DIR__ . '/../..' . '/lib/Subscription/Manage.php',
@@ -991,10 +1002,10 @@ class ComposerStaticInit683c9e96a2feac320233f10a1d68d14e
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit683c9e96a2feac320233f10a1d68d14e::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit683c9e96a2feac320233f10a1d68d14e::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit683c9e96a2feac320233f10a1d68d14e::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit683c9e96a2feac320233f10a1d68d14e::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInite98a710e71e6174923a86d79102fe7dc::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInite98a710e71e6174923a86d79102fe7dc::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInite98a710e71e6174923a86d79102fe7dc::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInite98a710e71e6174923a86d79102fe7dc::$classMap;
 
         }, null, ClassLoader::class);
     }

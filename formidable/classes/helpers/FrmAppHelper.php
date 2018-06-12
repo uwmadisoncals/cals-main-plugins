@@ -4,14 +4,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class FrmAppHelper {
-	public static $db_version = 87; //version of the database we are moving to
+	public static $db_version = 88; //version of the database we are moving to
 	public static $pro_db_version = 37; //deprecated
 	public static $font_version = 3;
 
 	/**
 	 * @since 2.0
 	 */
-	public static $plug_version = '3.01.01';
+	public static $plug_version = '3.02';
 
     /**
      * @since 1.07.02
@@ -774,7 +774,7 @@ class FrmAppHelper {
             if ( 'hide' == $show_message ) {
                 $permission_error = '';
             }
-			wp_die( $permission_error );
+			wp_die( esc_html( $permission_error ) );
         }
     }
 
@@ -1680,7 +1680,7 @@ class FrmAppHelper {
 
 		$wp_list_table = _get_list_table( 'WP_Plugins_List_Table' );
 		echo '<tr class="plugin-update-tr active"><th colspan="' . absint( $wp_list_table->get_column_count() ) . '" class="check-column plugin-update colspanchange"><div class="update-message">' .
-        __( 'You are running an outdated version of Formidable. This plugin may not work correctly if you do not update Formidable.', 'formidable' ) .
+        esc_html__( 'You are running an outdated version of Formidable. This plugin may not work correctly if you do not update Formidable.', 'formidable' ) .
         '</div></td></tr>';
     }
 

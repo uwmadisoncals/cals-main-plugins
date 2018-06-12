@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.8.05
+* Version 6.8.09
 *
 */
 
@@ -14,10 +14,8 @@ function _wppa_admin() {
 	global $q_config;
 	global $wppa_revno;
 
-	if ( get_option('wppa_revision') != $wppa_revno ) wppa_check_database(true);
-
 	echo '
-<script type="text/javascript">
+<script type="text/javascript" >
 	/* <![CDATA[ */
 	wppaAjaxUrl = "'.admin_url('admin-ajax.php').'";
 	wppaUploadToThisAlbum = "'.__('Upload to this album', 'wp-photo-album-plus').'";
@@ -1105,10 +1103,10 @@ function wppaTryScheduleAll( id ) {
 									else {
 										$full = true;
 									}
-									
+
 									// Goto Upload
 									if ( current_user_can( 'wppa_upload' ) ) {
-										
+
 										$onc = ( $full ?
 													'alert(\''.__('Change the upload limit or remove photos to enable new uploads.', 'wp-photo-album-plus').'\')' :
 													'document.location = \''.wppa_dbg_url(get_admin_url()).'/admin.php?page=wppa_upload_photos&wppa-set-album='.$id.'\''

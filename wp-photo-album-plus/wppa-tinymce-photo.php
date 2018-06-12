@@ -2,7 +2,7 @@
 /* wppa-tinymce-photo.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 6.7.10
+* Version 6.8.08
 *
 */
 
@@ -49,7 +49,7 @@ static $done;
 	if ( wppa_switch( 'photo_shortcode_enabled' ) && ! $done ) {
 
 		// Things that wppa-tinymce.js AND OTHER MODULES!!! need to know
-		echo('<script type="text/javascript">'."\n");
+		echo('<script type="text/javascript" >'."\n");
 		echo('/* <![CDATA[ */'."\n");
 			echo("\t".'wppaImageDirectory = "'.wppa_get_imgdir().'";'."\n");
 			echo("\t".'wppaAjaxUrl = "'.admin_url('admin-ajax.php').'";'."\n");

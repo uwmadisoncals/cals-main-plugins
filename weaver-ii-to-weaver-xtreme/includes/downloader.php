@@ -51,6 +51,7 @@
 		} else {
 			$weaverx_header = 'WXB-V01.00';			/* Save all settings: 10 byte header */
 		}
+		$weaverx_opts['last_option'] = 'Weaver Xtreme';
 
 		$weaverx_settings = $weaverx_header . serialize($weaverx_opts); /* serialize full set of options right now */
 	} else {
@@ -59,6 +60,7 @@
 		$weaverx_opts['header'] = 'WVRX-PLUS1';		// format
 		$weaverx_opts['ext'] = $ext;				// the extension
 		$weaverx_opts['weaverxplus'] = $wii2wx_opts['wxplus_converted'];
+		$weaverx_opts['last_option'] = 'Weaver Xtreme';
 
 		$weaverx_settings = serialize($weaverx_opts); /* serialize full set of options right now */
 	}

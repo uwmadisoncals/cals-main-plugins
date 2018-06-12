@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display album names linking to content
-* Version 6.8.07
+* Version 6.8.08
 */
 
 class AlbumNavigatorWidget extends WP_Widget {
@@ -210,17 +210,17 @@ class AlbumNavigatorWidget extends WP_Widget {
 								'"' .
 							' >';
 						if ( $has_children ) $result .= '
-							<div' .
-								' style="cursor:default;width:8px;float:left;position:relative;left:-8px;text-align:center;font-weight:bold;"' .
+							<span' .
+								' style="padding:0;margin:0 2px 0 -4px;cursor:default;font-weight:bold;"' .
 								' class="anw-'.$w.'-'.$a.'-"' .
 								' onclick="' .
 									'jQuery(\'.anw-'.$w.'-'.$a.'\').css(\'display\',\'\');' .
 									'jQuery(\'.anw-'.$w.'-'.$a.'-\').css(\'display\',\'none\');' .
 								'" >' .
 								( $a == $ca ? '&raquo;' : '+') .
-							'</div>
-							<div' .
-								' style="cursor:default;width:8px;float:left;position:relative;left:-8px;text-align:center;font-weight:bold;display:none;"' .
+							'</span>
+							<span' .
+								' style="padding:0;margin:0 2px 0 -4px;cursor:default;font-weight:bold;display:none;"' .
 								' class="anw-'.$w.'-'.$a.'"' .
 								' onclick="' .
 									'jQuery(\'.anw-'.$w.'-'.$a.'-\').css(\'display\',\'\');' .
@@ -228,13 +228,15 @@ class AlbumNavigatorWidget extends WP_Widget {
 									'jQuery(\'.p-'.$w.'-'.$a.'\').css(\'display\',\'none\');' .
 								'" >' .
 								( $a == $ca ? '&raquo;' : '-') .
-							'</div>';
+							'</span>';
 						else $result .= '
-							<div style="width:8px;float:left;position:relative;left:-8px;text-align:center;font-weight:bold;" >' . ( $a == $ca ? '&raquo;' : '&nbsp;' ) . '</div>';
+							<span style="padding:0;margin:0 2px 0 -4px;cursor:default;font-weight:bold;" >' .
+								( $a == $ca ? '&raquo;' : '&nbsp;' ) .
+							'</span>';
 						$result .= '
 							<a' .
 								' href="'.wppa_encrypt_url(wppa_get_permalink( $page ).'&amp;wppa-album='.$a.'&amp;wppa-cover=0&amp;wppa-occur=1'.$slide).'"' .
-								' style="position:relative;left:-8px;"' .
+								' style=""' .
 								' >' .
 								wppa_get_album_name( $a ) .
 							'</a>

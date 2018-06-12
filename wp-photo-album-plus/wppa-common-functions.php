@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.8.03
+* Version 6.9.01
 *
 */
 
@@ -74,11 +74,13 @@ global $thumbs;
 	wppa_cache_thumb( 'invalidate' );
 	wppa_cache_album( 'invalidate' );
 
-	$mocc = isset( $wppa['mocc'] ) ? $wppa['mocc'] : '0';
-	$occ  = isset( $wppa['occur'] ) ? $wppa['occur'] : '0';
-	$wocc = isset( $wppa['widget_occur'] ) ? $wppa['widget_occur'] : '0';
-	$rend = isset( $wppa['rendering_enabled'] ) ? $wppa['rendering_enabled'] : false;
-	$debug = isset( $wppa['debug'] ) ? $wppa['debug'] : false;
+	$mocc 	= isset( $wppa['mocc'] ) ? $wppa['mocc'] : '0';
+	$occ  	= isset( $wppa['occur'] ) ? $wppa['occur'] : '0';
+	$wocc 	= isset( $wppa['widget_occur'] ) ? $wppa['widget_occur'] : '0';
+	$rend 	= isset( $wppa['rendering_enabled'] ) ? $wppa['rendering_enabled'] : false;
+	$debug 	= isset( $wppa['debug'] ) ? $wppa['debug'] : false;
+	$ajax 	= defined( 'DOING_AJAX' ) ? true : false;
+	$cron 	= wppa_is_cron();
 
 	$wppa = array (
 		'debug' 					=> $debug,
@@ -130,7 +132,7 @@ global $thumbs;
 		'searchstring'				=> wppa_test_for_search(),
 		'searchresults'				=> '',
 		'any'						=> false,
-		'ajax'						=> false,
+		'ajax'						=> $ajax,
 		'error'						=> false,
 		'iptc'						=> false,
 		'exif'						=> false,
@@ -216,6 +218,7 @@ global $thumbs;
 		'is_button' 				=> '',
 		'max_slides_in_ss_widget' 	=> '',
 		'is_random' 				=> false,
+		'cron' 						=> $cron,
 
 	);
 }
@@ -918,7 +921,7 @@ global $cache_path;
 		wppa_schedule_clear_cache();
 		return;
 	}
-	
+
 	// At activation, ($force = true) the entire cache must be cleared once.
 
 	// If wp-super-cache is on board, clear cache
@@ -962,6 +965,9 @@ global $cache_path;
 			wppa_log('obs', 'Generic cache cleared');
 		}
 	}
+
+	// Remove tempfiles
+	wppa_delete_obsolete_tempfiles( true );
 }
 
 // Removes the content of $dir, ignore errors
@@ -986,7 +992,7 @@ global $wppa;
 	}
 
 	if ( ! $reload && $msg ) {
-		wppa_add_js_page_data( '<script type="text/javascript">alert( \'' . $msg . '\' );jQuery( "#wppaer" ).html( "" );</script>' );
+		wppa_add_js_page_data( '<script type="text/javascript" >alert( \'' . $msg . '\' );jQuery( "#wppaer" ).html( "" );</script>' );
 	}
 	elseif ( $reload == 'home' ) {
 		echo 	'<script id="wppaer" type="text/javascript" >' .
@@ -1136,6 +1142,11 @@ function wppa_alfa_id( $id = '0' ) {
 // Returns bool
 function wppa_can_resize( $file, $size, $log_error = true ) {
 //ini_set('memory_limit', '32M');
+
+	// Do we need memory check?
+	if ( ! function_exists( 'memory_get_usage' ) ) return true;
+	if ( ! wppa_switch( 'memcheck_copy' ) ) return true;
+
 	$bytes_per_pixel = 4.6;
 
 	// If file does not exists, log error and return true
@@ -1215,8 +1226,7 @@ function wppa_check_memory_limit( $verbose = true, $x = '0', $y = '0' ) {
 
 // ini_set( 'memory_limit', '18M' );	// testing
 	if ( ! function_exists( 'memory_get_usage' ) ) return '';
-	if ( is_admin() && ! wppa_switch( 'memcheck_admin' ) ) return '';
-	if ( ! is_admin() && ! wppa_switch( 'memcheck_frontend' ) ) return '';
+	if ( ! wppa_switch( 'memcheck' ) ) return '';
 
 	// get memory limit
 	$memory_limit = 0;
@@ -1254,13 +1264,13 @@ function wppa_check_memory_limit( $verbose = true, $x = '0', $y = '0' ) {
 	//	$factor = '5.60';	//  5.60 for 17M: 386 x 289 ( 0.1 MP ) thumb only
 	//	$factor = '5.10';	//  5.10 for 104M: 4900 x 3675 ( 17.2 MP ) thumb only
 	$memlimmb = $memory_limit / ( 1024 * 1024 );
-	$factor = '6.00' - '0.58' * ( $memlimmb / 104 );	// 6.00 .. 0.58
+	$factor = 4.6; // '6.00' - '0.58' * ( $memlimmb / 104 );	// 6.00 .. 0.58
 
 	// Calculate max size
 	$maxpixels = ( $free_memory / $factor ) - $resizedpixels;
 
 	// Safety margin
-	$maxpixels = round( $maxpixels * 0.95 );
+	// $maxpixels = round( $maxpixels * 0.95 );
 
 	// If obviously faulty: quit silently
 	if ( $maxpixels < 0 ) return '';
@@ -1277,10 +1287,10 @@ function wppa_check_memory_limit( $verbose = true, $x = '0', $y = '0' ) {
 		$maxyhd = sqrt( $maxpixels / 144 ) * 9;
 		if ( $verbose ) {		// Make it a string
 			$result = '<br />'.sprintf(  __( 'Based on your server memory limit you should not upload images larger then <b>%2.1f</b> Mega pixels' , 'wp-photo-album-plus'), $maxpixels / ( 1024 * 1024 ) );
-			$result .= '<br />'.sprintf( __( 'E.g. not bigger than approx %s x %s pixels (4:3) or %s x %s (16:9)', 'wp-photo-album-plus' ), 
-										'<b>' . ( round( $maxx / 25 ) * 25 ) . '</b>', 
+			$result .= '<br />'.sprintf( __( 'E.g. not bigger than approx %s x %s pixels (4:3) or %s x %s (16:9)', 'wp-photo-album-plus' ),
+										'<b>' . ( round( $maxx / 25 ) * 25 ) . '</b>',
 										'<b>' . ( round( $maxy / 25 ) * 25 ) . '</b>',
-										'<b>' . ( round( $maxxhd / 25 ) * 25 ) . '</b>', 
+										'<b>' . ( round( $maxxhd / 25 ) * 25 ) . '</b>',
 										'<b>' . ( round( $maxyhd / 25 ) * 25 ) . '</b>'
 										);
 		}
@@ -1771,22 +1781,33 @@ global $wpdb;
 	}
 }
 
-function wppa_delete_obsolete_tempfiles() {
+function wppa_delete_obsolete_tempfiles( $force = false ) {
 
 	// To prevent filling up diskspace, divide lifetime by 2 and repeat removing obsolete files until count <= 10
-	$filecount = 101;
-	$lifetime = 3600;
-	while ( $filecount > 100 ) {
+	$filecount 	= 101;
+	$lifetime 	= 3600;
+	$max 		= $force ? 1 : 100;
+
+	while ( $filecount > $max ) {
+
 		$files = glob( WPPA_UPLOAD_PATH.'/temp/*' );
 		$filecount = 0;
+
 		if ( $files ) {
+
 			$timnow = time();
 			$expired = $timnow - $lifetime;
+
 			foreach ( $files as $file ) {
-				if ( is_file( $file ) && basename( $file ) != 'index.php' ) {
+
+				if ( is_file( $file ) && basename( $file ) != 'index.php' && basename( $file ) != 'wmfdummy.png' ) {
 					$modified = filemtime( $file );
-					if ( $modified < $expired ) @ unlink( $file );
-					else $filecount++;
+					if ( $modified < $expired || $force ) {
+						@ unlink( $file );
+					}
+					else {
+						$filecount++;
+					}
 				}
 			}
 		}
@@ -1826,7 +1847,7 @@ global $wpdb;
 	}
 }
 
-function wppa_add_js_page_data( $txt ) {
+function wppa_add_js_page_data( $txt, $echo_if_no_file = false ) {
 global $wppa_js_page_data_file;
 global $wppa;
 
@@ -1843,13 +1864,16 @@ global $wppa;
 	}
 
 	if ( $handle ) {
-		$txt = str_replace( '<script type="text/javascript">', '', $txt );
+		$txt = str_replace( '<script type="text/javascript" >', '', $txt );
 		$txt = str_replace( '</script>', '', $txt );
 		$txt = str_replace( "\t", '', $txt );
-		$txt = str_replace( "\n", '', $txt );
+//		$txt = str_replace( "\n", '', $txt );
 		$txt = trim( $txt );
 		if ( $txt ) fwrite( $handle, "\n".$txt );
 		fclose( $handle );
+	}
+	elseif ( $echo_if_no_file ) {
+		echo $txt;
 	}
 	else {
 		$wppa['out'] .= $txt;

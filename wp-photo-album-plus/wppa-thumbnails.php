@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version 6.8.04
+* Version 6.8.09
 *
 */
 
@@ -314,6 +314,8 @@ global $wpdb;
 						' ' . wppa( 'lbtitle' ) . '="'.$title.'" ' .
 						' class="thumb-img" id="x-'.$xid.'-'.wppa( 'mocc' ).'"' .
 						' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
+						' onclick="return false;"' .
+						' style="cursor:' . wppa_wait() . ';"' .
 						' >';
 			if ( $is_video ) {
 				$result .= wppa_get_video_html( array(
@@ -386,7 +388,7 @@ global $wpdb;
 							' />';
 			}
 			$result .= '</div>';
-			$result .= '<script type="text/javascript">';
+			$result .= '<script type="text/javascript" >';
 			$result .= '/* <![CDATA[ */';
 			$result .= 'wppaPopupOnclick['.$id.'] = "'.$link['url'].'";';
 			$result .= '/* ]]> */';
@@ -466,15 +468,7 @@ global $wpdb;
 
 	// Close the image container
 	$result .= '</div>';
-/*
-	// The audio when popup
-	if ( wppa_switch( 'use_thumb_popup' ) && wppa_switch( 'thumb_audio' ) && wppa_has_audio( $id ) && ! $com_alt ) {
-		$result .= wppa_get_audio_html( array(
-							'id' 		=> $id,
-							'width'		=> $imgwidth
-							));
-	}
-*/
+
 	// Comten alt display?
 	if ( $com_alt ) {
 		$comaltwidth = wppa_get_container_width() - $imgwidth - 16 - wppa_get_thumbnail_area_delta();
@@ -923,13 +917,14 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 
 	if ( $link['is_lightbox'] ) {
 		$href = wppa_get_hires_url( $id );
-		$cursor = ' cursor:url( ' .wppa_get_imgdir() . wppa_opt( 'magnifier' ) . ' ),pointer;';
+		$cursor = ' cursor:' . wppa_wait() . ';'; //url( ' .wppa_get_imgdir() . wppa_opt( 'magnifier' ) . ' ),pointer;';
 
 		$result .= 	'<a' .
 						' href="' . $href . '"' .
 						' ' . wppa( 'rel' ) . '="' . wppa_opt( 'lightbox_name' ). '[occ' . wppa( 'mocc' ) . ']"' .
 						( $title ? ' ' . wppa( 'lbtitle' ) . '="' . $title . '"' : '' ) .
 						' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
+						' onclick="return false;"' .
 						' >';
 
 			if ( wppa_is_video( $id ) ) {
@@ -1404,7 +1399,7 @@ global $wpdb;
 			}
 
 			$result .= '</div>';
-			$result .= '<script type="text/javascript">';
+			$result .= '<script type="text/javascript" >';
 			$result .= '/* <![CDATA[ */';
 			$result .= 'wppaPopupOnclick['.$id.'] = "'.$link['url'].'";';
 			$result .= '/* ]]> */';
@@ -1645,6 +1640,8 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 						( $title ? ' ' . wppa( 'lbtitle' ) . '="' . $title . '"' : '' ) .
 						' target="' . $link['target'] . '"' .
 						' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
+						' style="cursor:' . wppa_wait() . ';"' .
+						' onclick="return false;"' .
 						' >';
 				$result .= "\n\t\t";
 				if ( $display == 'thumbs' ) {
@@ -1658,7 +1655,7 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 							'margin_top' 	=> $imgstyle_a['margin-top'],
 							'margin_bottom' => $imgstyle_a['margin-bottom'],
 							'tagid' 		=> 'i-' . $xid . '-' . wppa( 'mocc' ),
-							'cursor' 		=> $imgstyle_a['cursor'],
+						//	'cursor' 		=> $imgstyle_a['cursor'],
 							'events' 		=> $imgevents,
 							'title' 		=> $title
 						) );
@@ -1670,7 +1667,7 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 										' src="' . $imgurl . '"' .
 										' width="' . $imgstyle_a['width'] . '"' .
 										' height="' . $imgstyle_a['height'] . '"' .
-										' style="' . $imgstyle_a['style'] . $imgstyle_a['cursor'] . '"' .
+										' style="' . $imgstyle_a['style'] . '"' .
 										' ' . $imgevents .
 										' ' . wppa_get_imgalt( $id ) .
 										' />';
@@ -1850,7 +1847,7 @@ function wppa_do_filmthumb( $id, $idx, $do_for_feed = false, $glue = false ) {
 		}
 
 			if ( $tmp == 'pre' && wppa_opt( 'film_linktype' ) == 'lightbox' ) $cursor = 'cursor:default;';
-			if ( $tmp == 'film' && ! $com_alt && ! wppa_cdn( 'front' ) && ! wppa_switch( 'lazy_or_htmlcomp' ) ) $result .= '<!--';
+	//		if ( $tmp == 'film' && ! $com_alt && ! wppa_cdn( 'front' ) && ! wppa_switch( 'lazy_or_htmlcomp' ) ) $result .= '<!--';
 				if ( wppa_is_video( $thumb['id'] ) ) {
 					$result .= wppa_get_video_html( array( 	'id' 			=> $thumb['id'],
 																	'width' 		=> $imgattr_a['width'],
@@ -1868,14 +1865,14 @@ function wppa_do_filmthumb( $id, $idx, $do_for_feed = false, $glue = false ) {
 					$result .=  '<img' .
 									' id="wppa-' . $tmp . '-' . $idx . '-' . wppa( 'mocc' ) . '"' .
 									' class="wppa-'.$tmp.'-'.wppa( 'mocc' ).'"' .
-									' src="' . $url . '"' .
+									( $tmp == 'film' ? ' data-src' : ' src' ) . '="' . $url . '"' .
 									' ' . $imgalt .
 									' style="' . $imgstyle . $cursor . '"' .
 									' ' . $events .
 									' data-title="' . ( $psourl ? esc_attr( $thumb['linktitle'] ) : '' ) . '"' .
 									' />';
 				}
-			if ( $tmp == 'film' && ! $com_alt && ! wppa_cdn( 'front' ) && ! wppa_switch( 'lazy_or_htmlcomp' ) ) $result .= '-->';
+	//		if ( $tmp == 'film' && ! $com_alt && ! wppa_cdn( 'front' ) && ! wppa_switch( 'lazy_or_htmlcomp' ) ) $result .= '-->';
 
 		if ( $psourl ) {	// True only when pso activated and data present
 			$result .= '</a>';	// $psourl contains url, target and title

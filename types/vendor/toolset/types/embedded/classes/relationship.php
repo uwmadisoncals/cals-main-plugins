@@ -304,14 +304,13 @@ class WPCF_Relationship
 
         $updated_id = wp_update_post( $post_data );
 
-	    remove_filter( 'types_updating_child_post', '__return_true' );
-
         if ( isset($temp_post_data) ) {
             $_POST = $temp_post_data;
             unset($temp_post_data);
         }
 
         if ( empty( $updated_id ) ) {
+	        remove_filter( 'types_updating_child_post', '__return_true' );
             return new WP_Error( 'relationship-update-post-failed', 'Updating post failed' );
         }
 
@@ -410,6 +409,8 @@ class WPCF_Relationship
         clean_post_cache( $child->ID );
         // Added because of caching meta 1.5.4
         wp_cache_flush();
+
+	    remove_filter( 'types_updating_child_post', '__return_true' );
 
         return true;
     }

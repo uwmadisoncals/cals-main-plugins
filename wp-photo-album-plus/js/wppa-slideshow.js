@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsSlideshowVersion = '6.7.09';
+var wppaJsSlideshowVersion = '6.9.01';
 
 // This is an entrypoint to load the slide data
 function wppaStoreSlideInfo(
@@ -836,6 +836,9 @@ function _wppaNextSlide_5( mocc ) {
 		}
 	}
 
+	// Hide rightclick optionally
+	wppaProtect();
+
 	jQuery( window ).trigger( 'resize' );
 }
 
@@ -1110,6 +1113,7 @@ function wppaMakeTheSlideHtml( mocc, bgfg, idx ) {
 
 			html += '<a href="'+url+'"' +
 					' onclick="wppaStopAudio();wppaStopShow('+mocc+');"' +
+					' style="cursor:pointer;"' +
 					' target="'+_wppaLinkTarget[mocc][idx]+'"' +
 					( ( _wppaIsVideo[mocc][i] ) ?
 						' data-videonatwidth="'+_wppaVideoNatWidth[mocc][idx]+'"' +
@@ -1208,13 +1212,22 @@ function _wppaAdjustFilmstrip( mocc ) {
 
 			if ( html ) {
 
-				// Remove comment-outs
+				// Change data-src="..." into src="..."
 				if ( from <= index <= to ) {
+
+					var src = jQuery( '#wppa-film-'+index+'-'+mocc ).attr( 'data-src' );
+
+					if ( src ) {
+						jQuery( '#wppa-film-'+index+'-'+mocc ).attr( 'src', src );
+						jQuery( '#wppa-film-'+index+'-'+mocc ).removeAttr( 'data-src' );
+					}
+					/*
 					if ( html.search( '<!--' ) != -1 ) {
 						html = html.replace( '<!--', '' );
 						html = html.replace( '-->', '' );
 						jQuery( '#film_wppatnf_'+_wppaId[mocc][index]+'_'+mocc ).html( html );
 					}
+					*/
 				}
 
 				// Fit title in

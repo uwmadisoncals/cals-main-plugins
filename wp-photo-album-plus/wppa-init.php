@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version 6.8.07
+* Version 6.8.08
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -242,14 +242,14 @@ global $pagenow;
 
 	// Rerate required?
 	if ( get_option( 'wppa_rating_on' ) == 'yes' && get_option( 'wppa_rerate_status' ) ) {
-		if ( strpos( get_option( 'wppa_rerate_status' ), 'cron' ) === false ) {
+		if ( strpos( get_option( 'wppa_rerate_user' ), 'cron' ) === false ) {
 			wppa_error_message( __('The avarage ratings need to be recalculated. Please run <i>Photo Albums -> Settings</i> admin page <i>Table VIII-A5</i>' , 'wp-photo-album-plus') );
 		}
 	}
 
 	// Cron jobs postponed?
 	if ( get_option( 'wppa_maint_ignore_cron' ) == 'yes' ) {
-		wppa_warning_message( __( 'Please do not forget to re-enable cron jobs for wppa when you are ready doing your bulk actions. See <i>Table VIII-A0.2</i>', 'wp-photo-album-plus') );
+		wppa_warning_message( __( 'Please do not forget to re-enable cron jobs for wppa when you are ready doing your bulk actions. See <i>Table VIII-A0</i>', 'wp-photo-album-plus') );
 	}
 
 	// Finish setup

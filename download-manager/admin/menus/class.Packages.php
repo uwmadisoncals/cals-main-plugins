@@ -67,7 +67,7 @@ class Packages
         if(!current_user_can('upload_files')) die('-2');
 
         $name = isset($_FILES['package_file']['name']) && !isset($_REQUEST["chunks"])?$_FILES['package_file']['name']:$_REQUEST['name'];
-
+        $name = esc_attr($name);
         $ext = explode('.', $name);
         $ext = end($ext);
         $ext = strtolower($ext);
@@ -80,7 +80,11 @@ class Packages
             $filename = time().'wpdm_'.$name;
         else
             $filename = $name;
+        
         do_action("wpdm_before_upload_file", $_FILES['package_file']);
+
+        if(get_option('__wpdm_sanitize_filename', 0) == 1)
+            $filename = sanitize_file_name($filename);
 
         if(isset($_REQUEST["chunks"])) $this->chunkUploadFile(UPLOAD_DIR.$filename);
         else

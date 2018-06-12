@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version 6.8.03
+* Version 6.9.00
 *
 */
 
@@ -134,7 +134,7 @@ function wppa_page_import() {
 	if ( wppa_is_user_blacklisted() ) wp_die(__( 'Importing is temporary disabled for you' , 'wp-photo-album-plus') );
 	wppa_grant_albums();
 	require_once 'wppa-import.php';
-	echo '<script type="text/javascript">/* <![CDATA[ */wppa_import = "'.__('Import', 'wp-photo-album-plus').'"; wppa_update = "'.__('Update', 'wp-photo-album-plus').'";/* ]]> */</script>';
+	echo '<script type="text/javascript" >/* <![CDATA[ */wppa_import = "'.__('Import', 'wp-photo-album-plus').'"; wppa_update = "'.__('Update', 'wp-photo-album-plus').'";/* ]]> */</script>';
 	_wppa_page_import();
 }
 // Moderate admin page
@@ -176,6 +176,7 @@ function wppa_page_help() {
 require_once 'wppa-admin-functions.php';
 require_once 'wppa-tinymce-shortcodes.php';
 require_once 'wppa-tinymce-photo.php';
+require_once 'wppa-privacy-policy.php';
 
 /* This is for the changelog text when an update is available */
 global $pagenow;

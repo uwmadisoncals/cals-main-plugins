@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 6.8.01
+* Version 6.8.09
 *
 */
 
@@ -137,7 +137,7 @@ global $wppa_session;
 					$hash = '#album-' . $a . '-';
 				}
 			}
-			wppa_bcitem( $value, $href, $title, 'b3', $ajax, $hash );
+			wppa_bcitem( $value, $href, $title, 'b3', $ajax, false, $hash );
 		}
 
 		// The album ( grand ) parents if not separate
@@ -216,7 +216,7 @@ global $wppa_session;
 				$thumbhref 	= wppa_get_permalink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-supersearch='.stripslashes( wppa( 'supersearch' ) );
 				$thumbajax  = wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-supersearch='.stripslashes( wppa( 'supersearch' ) );
 				$title  = __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
+				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 			}
 
 			$href 	= '';
@@ -264,7 +264,7 @@ global $wppa_session;
 					$thumbajax .= '&amp;wppa-catbox=' . trim( wppa( 'catbox' ), ',' );
 				}
 				$title  = __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
+				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 			}
 			$href 	= '';
 			$title	= isset ( $wppa_session['display_searchstring'] ) ? wppa_dss_to_title( $wppa_session['display_searchstring'] ) : '';
@@ -322,7 +322,7 @@ global $wppa_session;
 					$thumbajax = wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-upldr='.wppa( 'is_upldr' );
 				}
 				$title	= __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
+				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 			}
 			$value 	= sprintf( __( 'Photos by %s' , 'wp-photo-album-plus'), $user );
 			$href 	= '';
@@ -346,7 +346,7 @@ global $wppa_session;
 					$thumbajax .= '&amp;wppa-medals-only=1';
 				}
 				$title	= __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
+				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 			}
 			$value 	= __( 'Top rated photos' , 'wp-photo-album-plus');
 			$href 	= '';
@@ -371,7 +371,7 @@ global $wppa_session;
 				$thumbhref 	= wppa_get_permalink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-lasten='.wppa( 'lasten_count' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$thumbajax 	= wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-lasten='.wppa( 'lasten_count' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$title	= __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
+				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 			}
 			if ( wppa_switch( 'lasten_use_modified' ) ) {
 				$value 	= __( 'Recently modified photos' , 'wp-photo-album-plus');
@@ -396,7 +396,7 @@ global $wppa_session;
 				$thumbhref 	= wppa_get_permalink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-comten='.wppa( 'comten_count' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$thumbajax 	= wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-comten='.wppa( 'comten_count' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$title	= __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
+				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 			}
 			$value 	= __( 'Recently commented photos' , 'wp-photo-album-plus');
 			$href 	= '';
@@ -416,7 +416,7 @@ global $wppa_session;
 				$thumbhref 	= wppa_get_permalink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-featen='.wppa( 'featen_count' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$thumbajax 	= wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-featen='.wppa( 'featen_count' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$title	= __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
+				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 			}
 			$value 	= __( 'Featured photos' , 'wp-photo-album-plus');
 			$href 	= '';
@@ -429,7 +429,7 @@ global $wppa_session;
 				$href 	= wppa_get_permalink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-tag='.wppa( 'is_tag' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$ajax 	= wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-tag='.wppa( 'is_tag' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$title	= __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $href, $title, 'b8', $ajax );
+				wppa_bcitem( $value, $href, $title, 'b8', $ajax, true );
 			}
 			$value 	= __( 'Related photos' , 'wp-photo-album-plus');
 			$href 	= '';
@@ -444,7 +444,7 @@ global $wppa_session;
 				$thumbhref 	= wppa_get_permalink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-cat='.wppa( 'is_cat' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$thumbajax 	= wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-cat='.wppa( 'is_cat' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$title	= __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
+				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 			}
 			$value 	= __( 'Tagged photos:' , 'wp-photo-album-plus').'&nbsp;'.str_replace( ';', ' '.__( 'or' , 'wp-photo-album-plus').' ', str_replace( ',', ' '.__( 'and' , 'wp-photo-album-plus').' ', trim( wppa( 'is_tag' ), ',;' ) ) );
 			$value .= '&nbsp;' . __( 'From albums with', 'wp-photo-album-plus' ) . '&nbsp;';
@@ -470,7 +470,7 @@ global $wppa_session;
 					$thumbajax .= '&amp;wppa-inv=1';
 				}
 				$title	= __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
+				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 			}
 			$value 	= __( 'Tagged photos:' , 'wp-photo-album-plus').'&nbsp;'.str_replace( ';', ' '.__( 'or' , 'wp-photo-album-plus').' ', str_replace( ',', ' '.__( 'and' , 'wp-photo-album-plus').' ', trim( wppa( 'is_tag' ), ',;' ) ) );
 			if ( wppa( 'start_album' ) ) {
@@ -489,7 +489,7 @@ global $wppa_session;
 				$thumbhref 	= wppa_get_permalink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-cat='.wppa( 'is_cat' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$thumbajax 	= wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-cat='.wppa( 'is_cat' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$title	= __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
+				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 			}
 			$value 	= __( 'Category:' , 'wp-photo-album-plus').'&nbsp;'.str_replace( ';', ' '.__( 'or', 'wp-photo-album-plus' ).' ', str_replace( ',', ' '.__( 'and', 'wp-photo-album-plus' ).' ', trim( wppa( 'is_cat' ), ',;' ) ) );
 			$href 	= '';
@@ -503,14 +503,14 @@ global $wppa_session;
 				$href 	= wppa_get_permalink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$ajax 	= wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$title	= __( 'Album:' , 'wp-photo-album-plus').' '.$value;
-				wppa_bcitem( $value, $href, $title, 'b7', $ajax );
+				wppa_bcitem( $value, $href, $title, 'b7', $ajax, true );
 			}
 			if ( wppa( 'is_slide' ) ) {
 				$value 	= __( 'Recently updated albums' , 'wp-photo-album-plus');
 				$thumbhref 	= wppa_get_permalink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$thumbajax 	= wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$title	= __( 'View the thumbnails' , 'wp-photo-album-plus');
-				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax );
+				wppa_bcitem( $value, $thumbhref, $title, 'b8', $thumbajax, true );
 			}
 			$value 	= __( 'Recently updated albums' , 'wp-photo-album-plus');
 			$href 	= '';
@@ -530,7 +530,7 @@ global $wppa_session;
 				$href 	= wppa_get_permalink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$ajax 	= wppa_get_ajaxlink().'wppa-cover=0&amp;wppa-occur='.wppa( 'occur' ).'&amp;wppa-album='.wppa( 'start_album' );
 				$title	= $is_albenum ? __( 'Albums:' , 'wp-photo-album-plus').' '.wppa( 'start_album' ) : __( 'Album:' , 'wp-photo-album-plus').' '.$value;
-				wppa_bcitem( $value, $href, $title, 'b7', $ajax );
+				wppa_bcitem( $value, $href, $title, 'b7', $ajax, true );
 			}
 			$value 	= $is_albenum ? $various : wppa_get_album_name( $alb );
 			$href 	= '';
@@ -586,7 +586,7 @@ global $wppa_session;
 
 // Display a breadcrumb item with optionally a seperator if it is a link.
 // If it's a link, it's not the last item
-function wppa_bcitem( $value = '', $href = '', $title = '', $class = '', $ajax = '', $hash = '#wppa-container-' ) {
+function wppa_bcitem( $value = '', $href = '', $title = '', $class = '', $ajax = '', $is_pname = false, $hash = '#wppa-container-' ) {
 static $sep;
 
 	// Encrypt
@@ -625,7 +625,7 @@ static $sep;
 	else {					// No link, its the last item
 		wppa_out(	'<span' .
 						' id="' . $bc_pname . wppa( 'mocc' ) . '"' .
-						' class="wppa-nav-text '.$class.'"' .
+						' class="wppa-nav-text ' . $class . ( wppa( 'is_slide' ) ? ' bc-pname' : '' ) . '"' .
 						' style="' .
 							( $title ? 'cursor:pointer;' : '' ) .
 							wppa_wcs( 'wppa-nav-text' ) .
@@ -663,7 +663,7 @@ static $sep;
 		}
 	}
 	wppa_out(	'<span' .
-					' class="wppa-nav-text ' . $class . '"' .
+					' class="wppa-nav-text ' . $class . ( wppa( 'is_slide' ) && $is_pname ? ' bc-pname' : '' ) . '"' .
 					' style="' . wppa_wcs( 'wppa-nav-text' ).'"' .
 					' >' .
 					$sep .
@@ -676,8 +676,13 @@ global $wpdb;
 
 	// Find parent
     $parent = wppa_get_parentalbumid( $alb );
-	if ( $parent < '1' ) return;				// No parent -> toplevel -> done.
-
+	
+	// No parent -> toplevel -> done.
+	if ( $parent < '1' ) {
+		return;				
+	}
+	
+	// Next level
     wppa_crumb_ancestors( $parent, $to_cover );
 
 	// Find the album specific link type ( content, slide, page or none )
@@ -705,6 +710,7 @@ global $wpdb;
 	$title 	= __( 'Album:' , 'wp-photo-album-plus') . ' ' . wppa_get_album_name( $parent );
 	$class 	= 'b20';
 	wppa_bcitem( $value, $href, $title, $class, $ajax );
+	
     return;
 }
 

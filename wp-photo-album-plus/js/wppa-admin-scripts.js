@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.8.07
+/* Version 6.9.02
 /* Various js routines used in admin pages
 */
 
@@ -159,10 +159,8 @@ function wppaInitSettings() {
 	wppaCheckLinkPageErr('super_view');
 	wppaCheckSplitNamedesc();
 	wppaCheckShares();
-//	wppaCheckKeepSource();
 	wppaCheckCoverType();
 	wppaCheckNewpag();
-//	wppaCheckIndexSearch();
 	wppaCheckCDN();
 	wppaCheckAutoPage();
 	wppaCheckGps();
@@ -224,12 +222,7 @@ function wppaQuickSel() {
 				wppa_tablecookieoff(tab[table-1]+'-'+sub[subtab]);
 			}
 		}
-//		wppaToggleSubTable('X','Z');
-//		wppaToggleSubTable('XI','Z');
-//		wppaToggleSubTable('VII','A');
 	}
-
-//	jQuery( '.subtableheader' ).css('display')=='none');
 
 	// Find tags
 	tag1 = jQuery("#wppa-quick-selbox-1").val();
@@ -268,7 +261,7 @@ function wppaToggleTable(table) {
 var wppaSubTabOn = new Array();
 
 function wppaToggleSubTable(table,subtable) {
-	
+
 	// Hide
 	if (wppaSubTabOn[table+'-'+subtable]) {
 		jQuery('.wppa-'+table+'-'+subtable).addClass('wppa-none');
@@ -276,7 +269,7 @@ function wppaToggleSubTable(table,subtable) {
 		wppaSubTabOn[table+'-'+subtable] = false;
 		wppa_tablecookieoff(table+'-'+subtable);
 	}
-	
+
 	// Show
 	else {
 		jQuery('.wppa-'+table+'-'+subtable).removeClass('wppa-none');
@@ -339,11 +332,6 @@ function wppaCheckSlideVideoControls() {
 	if ( link == 'none' ) {
 		return;
 	}
-
-//	var on = document.getElementById( 'start_slide_video' ).checked;
-//	if ( ! on ) {
-//		return;
-//	}
 
 	alert('Warning! '+
 			"\n"+
@@ -589,13 +577,6 @@ function wppaCheckShares() {
 	if (Sh) jQuery('.wppa_share').css('display', '');
 	else jQuery('.wppa_share').css('display', 'none');
 }
-/*
-function wppaCheckKeepSource() {
-	var Ks = document.getElementById('keep_source').checked;
-	if ( Ks ) jQuery('.wppa_keep_source').css('display', '');
-	else jQuery('.wppa_keep_source').css('display', 'none');
-}
-*/
 
 function wppaCheckCoverType() {
 	var Type = document.getElementById('cover_type').value;
@@ -961,16 +942,6 @@ function wppaCheckSplitNamedesc() {
 	}
 }
 
-/*
-function wppaCheckIndexSearch() {
-//	if (document.getElementById('indexed_search').checked) {
-		jQuery('.index_search').css('display', '');
-//	}
-//	else {
-//		jQuery('.index_search').css('display', 'none');
-//	}
-}
-*/
 function wppa_tablecookieon(i) {
 	wppa_setCookie('table_'+i, 'on', '365');
 }
@@ -1805,7 +1776,7 @@ function wppaAjaxUpdateOptionCheckBox(slug, elem) {
 	xmlhttp.send();
 }
 
-var wppaAlwaysContinue = 10;
+var wppaAlwaysContinue = 100;
 
 function wppaMaintenanceProc(slug, intern, asCronJob ) {
 
@@ -1896,14 +1867,14 @@ function wppaMaintenanceProc(slug, intern, asCronJob ) {
 								},
 
 					error: 		function( xhr, status, error ) {
-									wppaConsoleLog( 'wppaMaintenanceProc failed. Slug = ' + $slug + ', Error = ' + error + ', status = ' + status, 'force' );
+									wppaConsoleLog( 'wppaMaintenanceProc failed. Slug = ' + slug + ', Error = ' + error + ', status = ' + status, 'force' );
 									jQuery("#"+slug+"_status").html('Server error #'+(11-wppaAlwaysContinue));
 									var wppaContinue = false;
 									wppaAlwaysContinue--;
 									if ( wppaAlwaysContinue < 1 ) {
 										wppaContinue = confirm( '10 Server errors happened.\nDo you want to continue?' );
 										if ( wppaContinue ) {
-											wppaAlwaysContinue = 10;
+											wppaAlwaysContinue = 100;
 										}
 									}
 									if ( wppaContinue || wppaAlwaysContinue > 0 ) {
@@ -1998,84 +1969,13 @@ function wppaAjaxPopupWindow( slug ) {
 
 												jQuery( '.ui-button' ).attr( 'title', wppaCloseText );
 
-		/*
-		wnd.document.write(result);
-		*/
 	}
-//	wnd.document.write('</body>');
-//	wnd.document.write('</html>');
-
 }
 
 function wppaAjaxUpdateOptionValue(slug, elem, multisel) {
 
-	var xmlhttp = wppaGetXmlHttp();
-
-	// on-unit to process the result
-	xmlhttp.onreadystatechange=function() {
-		if (xmlhttp.readyState != 4) {
-			jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'spinner.gif' );
-//			document.getElementById('img_'+slug).src = wppaImageDirectory+'spinner.gif';
-		}
-		else {	// Ready
-			var str = wppaTrim(xmlhttp.responseText);
-			var ArrValues = str.split("||");
-
-			if (ArrValues[0] != '') {
-				alert('The server returned unexpected output:\n'+ArrValues[0]);
-			}
-			if (xmlhttp.status!=404) {	// No Not found
-				switch (ArrValues[1]) {
-					case '0':	// No error
-						jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'tick.png' );
-//						document.getElementById('img_'+slug).src = wppaImageDirectory+'tick.png';
-						if ( ArrValues[3] ) alert(ArrValues[3]);
-						if ( _wppaRefreshAfter ) {
-							_wppaRefreshAfter = false;
-							document.location.reload(true);
-						}
-						break;
-					default:
-						jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'cross.png' );
-//						document.getElementById('img_'+slug).src = wppaImageDirectory+'cross.png';
-						if ( ArrValues[3] ) alert(ArrValues[3]);
-				}
-				jQuery( '#img_'+slug ).attr( 'title', ArrValues[2] );
-//				document.getElementById('img_'+slug).title = ArrValues[2];
-
-				// Update cron statusses
-				if (  ArrValues[4] ) {
-					var tokens = ArrValues[4].split( ';' );
-					var i = 0;
-					var temp;
-					var Old, New;
-					while ( i < tokens.length ) {
-						temp = tokens[i].split( ':' );
-						Old = jQuery( '#'+ temp[0] ).html();
-						New = temp[1];
-						if ( Old != '' && New == '' ) {
-					//		New = '<span style="color:red;font-weight:bold;" onclick="document.location.reload(true)" >Reload page</span>';
-							New = '<input type="button" class="button-secundary" style="border-radius:3px;font-size:11px;height:18px;margin: 0 4px;padding:0px;color:red;background-color:pink;" onclick="document.location.reload(true)" value="Reload" />';
-						}
-						jQuery( '#'+ temp[0] ).html( New );
-						i++;
-					}
-				}
-			}
-			else {						// Not found
-				jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'cross.png' );
-//				document.getElementById('img_'+slug).src = wppaImageDirectory+'cross.png';
-				document.getElementById('img_'+slug).title = 'Communication error';
-			}
-			wppaCheckInconsistencies();
-		}
-	}
-
-	// Make the Ajax url
-	eslug = wppaEncode(slug);
-	var data = 'action=wppa&wppa-action=update-option&wppa-option='+eslug;
-	data += '&wppa-nonce='+document.getElementById('wppa-nonce').value;
-
+	var data = 	'action=wppa&wppa-action=update-option&wppa-option='+wppaEncode(slug)+
+				'&wppa-nonce='+document.getElementById('wppa-nonce').value;
 	if ( elem != 0 ) {
 		if ( typeof( elem ) == 'number' ) {
 			data += '&value='+elem;
@@ -2088,12 +1988,74 @@ function wppaAjaxUpdateOptionValue(slug, elem, multisel) {
 		}
 	}
 
-//if (!confirm('Do '+wppaAjaxUrl+'\n'+data)) return;	// Diagnostic
+	jQuery.ajax( { 	url:		wppaAjaxUrl,
+					data: 		data,
+					async: 		true,
+					type: 		'POST',
+					timeout: 	100000,
+					beforeSend: function( xhr ) {
+									jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'spinner.gif' );
+								},
+					success: 	function( result, status, xhr ) {
+									var str = wppaTrim(result);
+									var ArrValues = str.split("||");
+									if (ArrValues[0] != '') {
+										alert('The server returned unexpected output:\n'+ArrValues[0]);
+									}
+									else {
+										// Process result
+										switch (ArrValues[1]) {
+											case '0':	// No error
+												jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'tick.png' );
+												if ( ArrValues[3] ) alert(ArrValues[3]);
+												if ( _wppaRefreshAfter ) {
+													_wppaRefreshAfter = false;
+													document.location.reload(true);
+												}
+												break;
+											default:
+												jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'cross.png' );
+												if ( ArrValues[3] ) alert(ArrValues[3]);
+										}
+										jQuery( '#img_'+slug ).attr( 'title', ArrValues[2] );
 
-	// Do the Ajax action
-	xmlhttp.open('POST',wppaAjaxUrl,true);
-	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-	xmlhttp.send(data);
+										// Update cron statusses
+										if (  ArrValues[4] ) {
+											var tokens = ArrValues[4].split( ';' );
+											var i = 0;
+											var temp;
+											var Old, New;
+											while ( i < tokens.length ) {
+												temp = tokens[i].split( ':' );
+												Old = jQuery( '#'+ temp[0] ).html();
+												New = temp[1];
+												if ( Old != '' && New == '' ) {
+													New = '<input type="button" class="button-secundary" style="border-radius:3px;font-size:11px;height:18px;margin: 0 4px;padding:0px;color:red;background-color:pink;" onclick="document.location.reload(true)" value="Reload" />';
+												}
+												jQuery( '#'+ temp[0] ).html( New );
+												i++;
+											}
+										}
+									}
+								},
+					error: 		function( xhr ) {
+									jQuery( '#img_'+slug ).attr( 'src', wppaImageDirectory+'cross.png' );
+									document.getElementById('img_'+slug).title = 'Communication error';
+								},
+					complete: 	function( xhr ) {
+									wppaCheckInconsistencies();
+									if ( slug == 'spinner_shape' || slug == 'icon_corner_style' ) {
+										wppaAjaxGetSpinnerHtml( 'normal', 'wppa-spin-pre-1' );
+										wppaAjaxGetSpinnerHtml( 'lightbox', 'wppa-spin-pre-2' );
+									}
+									if ( slug == 'svg_color' || slug == 'svg_bg_color' ) {
+										wppaAjaxGetSpinnerHtml( 'normal', 'wppa-spin-pre-1' );
+									}
+									if ( slug == 'ovl_svg_color' || slug == 'ovl_svg_bg_color' ) {
+										wppaAjaxGetSpinnerHtml( 'lightbox', 'wppa-spin-pre-2' );
+									}
+								}
+				} );
 }
 
 function wppaEncode(xtext) {
@@ -2462,7 +2424,7 @@ function wppaAjaxUpdateTogo(slug) {
 					async: 		true,
 					type: 		'GET',
 					timeout: 	100000,
-					beforesend: function( xhr ) {
+					beforeSend: function( xhr ) {
 								},
 					success: 	function( result, status, xhr ) {
 
@@ -2500,4 +2462,99 @@ function wppaIsEmpty( str ) {
 	if ( str == 0 ) return true;
 
 	return false;
+}
+
+// Timed confirmationbox
+function wppaTimedConfirm( text ) {
+	var opt = {
+		modal:		true,
+		resizable: 	false,
+		width:		400,
+		show: 		{
+						effect: 	"fadeIn",
+						duration: 	800
+					},
+		closeText: 	'X',
+
+		buttons: [
+					{
+						text: 	"NO",
+					//	icon: 	"ui-icon-heart",
+						click: 	function() {
+									jQuery( this ).dialog( "close" );
+								}
+
+
+					},
+					{
+						text: 	"YES",
+					//	icon: 	"ui-icon-heart",
+						click: 	function() {
+									jQuery( this ).dialog( "close" );
+								}
+
+
+					},
+				]
+	};
+	jQuery( '#wppa-modal-container' ).html( text ).dialog( opt ).dialog( "open" );
+	jQuery( '.ui-dialog' ).css( {
+									boxShadow: 			'0px 0px 5px 5px #aaaaaa',
+								//	borderRadius: 		wppaBoxRadius+'px',
+									padding: 			'8px',
+									backgroundColor: 	'#cccccc',
+									boxSizing: 			'content-box',
+									zIndex: 			'9999',
+								});
+	jQuery( '.ui-dialog-titlebar' ).css(
+											{
+												lineHeight: '0px',
+												height: 	'32px',
+											}
+										)
+	jQuery( '.ui-button' ).css(
+								{
+									float: 		'right',
+									position: 	'relative',
+									bottom: 	'40px',
+								});
+
+	jQuery( '.ui-dialog-titlebar-close' ).css(
+								{
+									display: 	'none',
+								});
+
+	jQuery( '.ui-button' ).attr( 'title', wppaCloseText );
+	setTimeout( function(){jQuery('.ui-button').trigger('click');}, 60000 );
+}
+
+function wppaAjaxGetSpinnerHtml( type, target ) {
+//alert(type+' '+target);
+	jQuery.ajax( { 	url:		wppaAjaxUrl,
+					data: 		'action=wppa' +
+								'&wppa-action=update-option' +
+								'&wppa-option=getspinnerpreview' +
+								'&type=' + type +
+								'&wppa-nonce=' + document.getElementById( 'wppa-nonce' ).value,
+					async: 		true,
+					type: 		'GET',
+					timeout: 	100000,
+					beforeSend: function( xhr ) {
+								},
+					success: 	function( result, status, xhr ) {
+//alert(result);
+									// Split status and data
+									var data = result.split('|');
+
+									// Update html
+									jQuery( '#' + target ).html( data[0] );
+
+								},
+					error: 		function( xhr ) {
+//alert('Error');
+								},
+					complete: 	function( xhr ) {
+//alert('Complete');
+								}
+					} );
 }

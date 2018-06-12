@@ -226,7 +226,7 @@ class FrmStylesHelper {
     	<select name="<?php echo esc_attr( $frm_style->get_field_name( $name ) ); ?>" id="frm_<?php echo esc_attr( $name ); ?>" class="frm_icon_font frm_multiselect hide-if-js">
             <?php foreach ( $icons as $key => $icon ) { ?>
 			<option value="<?php echo esc_attr( $key ) ?>" <?php selected( $style->post_content[ $name ], $key ) ?>>
-				<?php echo '&#xe' . $icon['+'] . '; &#xe' . $icon['-'] . ';'; ?>
+				<?php echo '&#xe' . esc_html( $icon['+'] ) . '; &#xe' . esc_html( $icon['-'] ) . ';'; ?>
             </option>
             <?php } ?>
     	</select>
@@ -302,11 +302,11 @@ class FrmStylesHelper {
 			if ( isset( $_POST['frm_style_setting'] ) ) {
 				$settings = $_POST['frm_style_setting']['post_content'];
 			} else {
-				$settings = $_POST;
+				$settings = $_GET;
 			}
 			FrmAppHelper::sanitize_value( 'sanitize_text_field', $settings );
 
-			$style_name = FrmAppHelper::get_post_param( 'style_name', '', 'sanitize_title' );
+			$style_name = FrmAppHelper::get_param( 'style_name', '', 'get', 'sanitize_title' );
 			$settings['style_class'] = '';
 			if ( ! empty( $style_name ) ) {
 				$settings['style_class'] = $style_name . '.';
@@ -393,11 +393,11 @@ class FrmStylesHelper {
 	}
 
 	/**
-	 * Where is 'flat' being used?
 	 * @since 2.3
 	 */
 	public static function previewing_style() {
-		return isset( $_POST['frm_style_setting'] ) || isset( $_POST['flat'] ) || isset( $_GET['flat'] );
+		$ajax_change = isset( $_POST['action'] ) && $_POST['action'] === 'frm_change_styling' && isset( $_POST['frm_style_setting'] );
+		return $ajax_change || isset( $_GET['flat'] );
 	}
 
 	/**

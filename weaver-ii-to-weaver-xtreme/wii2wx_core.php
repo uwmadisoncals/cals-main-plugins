@@ -44,7 +44,7 @@ function wii2wx_enqueue_scripts() {	// action definition
 
     //-- Aspen PLus js lib - requires jQuery...
 
-    wp_enqueue_script('wii2wxJSLib', wii2wx_plugins_url('/js/wii2wx_jslib', WII2WX_MINIFY . '.js'),array('jquery'),WII2WX_VERSION);
+    //wp_enqueue_script('wii2wxJSLib', wii2wx_plugins_url('/js/wii2wx_jslib', WII2WX_MINIFY . '.js'),array('jquery'),WII2WX_VERSION);
 
     // add plugin CSS here, too.
 

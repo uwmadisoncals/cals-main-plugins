@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a list of users linking to their photos
-* Version 6.8.07
+* Version 6.8.09
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -136,18 +136,19 @@ class UpldrWidget extends WP_Widget {
 		$widget_content .= '<table><tbody>';
 		$albs = $instance['parent'] ? wppa_expand_enum( wppa_alb_to_enum_children( wppa_expand_enum( $instance['parent'] ) ) ) : '';
 		$a = $albs ? wppa_trim_wppa_( '&amp;wppa-album='.$albs ) : '';
+		$width = round( wppa_opt( 'widget_width' ) / 1.8 ) . 'px;';
 
 		if ( $myline ) {
 			$user = $myline;
 			$widget_content .= '<tr class="wppa-user" >
-									<td style="padding: 0 3px;" ><a href="'.wppa_encrypt_url(wppa_get_upldr_link($user['login']).$a).'" title="'.__('Photos uploaded by', 'wp-photo-album-plus').' '.$user['name'].'" ><b>'.$user['name'].'</b></a></td>
+									<td style="padding: 0 3px;max-width:' . $width . 'overflow:hidden;" ><a href="'.wppa_encrypt_url(wppa_get_upldr_link($user['login']).$a).'" title="'.__('Photos uploaded by', 'wp-photo-album-plus').' '.$user['name'].'" ><b>'.$user['name'].'</b></a></td>
 									<td style="padding: 0 3px;" ><b>'.$user['count'].'</b></td>
 									<td style="padding: 0 3px;" ><b>'.wppa_get_time_since($user['date']).'</b></td>
 								</tr>';
 		}
 		foreach ( $workarr as $user ) {
 			$widget_content .= '<tr class="wppa-user" >
-									<td style="padding: 0 3px;" ><a href="'.wppa_encrypt_url(wppa_get_upldr_link($user['login']).$a).'" title="'.__('Photos uploaded by', 'wp-photo-album-plus').' '.$user['name'].'" >'.$user['name'].'</a></td>
+									<td style="padding: 0 3px;max-width:' . $width . 'overflow:hidden;" ><a href="'.wppa_encrypt_url(wppa_get_upldr_link($user['login']).$a).'" title="'.__('Photos uploaded by', 'wp-photo-album-plus').' '.$user['name'].'" >'.$user['name'].'</a></td>
 									<td style="padding: 0 3px;" >'.$user['count'].'</td>
 									<td style="padding: 0 3px;" >'.wppa_get_time_since($user['date']).'</td>
 								</tr>';

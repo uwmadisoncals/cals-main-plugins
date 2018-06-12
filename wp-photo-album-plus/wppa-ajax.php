@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.8.05
+* Version 6.9.02
 *
 */
 
@@ -21,7 +21,6 @@ global $wppa_log_file;
 	wppa( 'out', '' );
 	$wppa_session['page']--;
 	$wppa_session['ajax']++;
-//	wppa_save_session();
 
 	// ALTHOUGH IF WE ARE HERE AS FRONT END VISITOR, is_admin() is true.
 	// So, $wppa_opt switches are 'yes' or 'no' and not true or false.
@@ -363,7 +362,7 @@ global $wppa_log_file;
 			if ( wppa_switch( 'comment_need_db_agree' ) ) {
 				if ( ! isset( $_REQUEST['db-agree'] ) ) {
 					echo
-					'<script type="text/javascript">' .
+					'<script type="text/javascript" >' .
 						'alert( "' . esc_js( __( 'Your comment needs your agreement for database storage', 'wp-photo-album-plus' ) ) . '" )' .
 					'</script>';
 					$doit = false;
@@ -498,9 +497,6 @@ global $wppa_log_file;
 				echo '||ER||'.__( 'The album is empty' , 'wp-photo-album-plus');
 				wppa_exit();
 			}
-
-			// Remove obsolete files
-			wppa_delete_obsolete_tempfiles();
 
 			// Open zipfile
 			if ( ! class_exists( 'ZipArchive' ) ) {
@@ -693,9 +689,6 @@ global $wppa_log_file;
 					echo '||2||'.__( 'Unable to create tempdir' , 'wp-photo-album-plus');
 					wppa_exit();
 				}
-
-				// Remove obsolete files
-				wppa_delete_obsolete_tempfiles();
 
 				// Make the files
 				if ( $type == 'file' ) {
@@ -1092,7 +1085,7 @@ global $wppa_log_file;
 			$mem 	= memory_get_peak_usage( true ) / 1024 / 1024;
 
 			$msg 	= sprintf( 'WPPA Ajax render: db queries: WP:%d, WPPA+: %d in %4.2f seconds, using %4.2f MB memory max', $nq_1, $nq_2 - $nq_1, $tim_2 - $tim_1, $mem );
-			echo '<script type="text/javascript">wppaConsoleLog( \''.$msg.'\', \'force\' )</script>';
+			echo '<script type="text/javascript" >wppaConsoleLog( \''.$msg.'\', \'force\' )</script>';
 			break;
 
 		case 'delete-photo':
@@ -1670,7 +1663,25 @@ global $wppa_log_file;
 				case 'sepia':
 				case 'skyleft':
 				case 'skyright':
-					$path = wppa_get_photo_path( $photo );
+					$id = $photo;
+					$src_o1_path = wppa_get_o1_source_path( $id );
+					$src_path = wppa_get_source_path( $id );
+					if ( ! is_file( $src_o1_path ) && ! is_file( $src_path ) ) {
+
+						// Make a backup
+						$src_alb_dir = dirname( $src_path );
+						//$src_alb_dir = $src_dir . '/album-' . wppa_get_photo_item( $id, 'album' );
+						if ( ! is_dir( $src_alb_dir ) ) {
+
+							// Make source album folder
+							wppa_mktree( $src_alb_dir );
+						}
+						$filename = wppa_get_photo_item( $id, 'filename' );
+						$filename = wppa_strip_ext( $filename ) . '.' . wppa_get_photo_item( $id, 'ext' );
+						$path = wppa_get_photo_path( $id );
+						copy( $path, $src_alb_dir . '/' . $filename );
+						wppa_log( 'fso', 'Backup created for magic: ' . $src_alb_dir . '/' . $filename );
+					}
 					switch ( $item ) {
 						case 'magickrotleft':
 							$command = '-rotate -90';
@@ -1740,6 +1751,8 @@ global $wppa_log_file;
 							break;
 					}
 
+					$path = wppa_get_photo_path( $id );
+
 					// If jpg, apply jpeg quality
 					$q = wppa_opt( 'jpeg_quality' );
 					$quality = '';
@@ -1752,7 +1765,7 @@ global $wppa_log_file;
 
 					// Error?
 					if ( $err ) {
-						echo '||'.$err.'||'.sprintf( __( 'An error occurred while trying to process photo %s' , 'wp-photo-album-plus' ), $photo );
+						echo '||'.$err.'||'.sprintf( __( 'An error occurred while trying to process photo %s' , 'wp-photo-album-plus' ), $id );
 					}
 
 					// Housekeeping
@@ -1760,26 +1773,26 @@ global $wppa_log_file;
 
 						// Horizon correction shaves size.
 						if ( $item = 'skyleft' || $item = 'skyright' ) {
-							wppa_get_photox( $photo, true );
+							wppa_get_photox( $id, true );
 						}
 
 						wppa_bump_photo_rev();
-						wppa_create_thumbnail( $photo, false );
-						$stack = wppa_get_photo_item( $photo, 'magickstack' );
+						wppa_create_thumbnail( $id, false );
+						$stack = wppa_get_photo_item( $id, 'magickstack' );
 						if ( ! $stack ) {
 							$stack = $command;
 						}
 						else {
 							$stack .= ' | ' . $command;
 						}
-						wppa_update_photo( array( 'id' => $photo, 'magickstack' => $stack ) );
+						wppa_update_photo( array( 'id' => $id, 'magickstack' => $stack ) );
 
 						// Update CDN
 						$cdn = wppa_cdn( 'admin' );
 						if ( $cdn ) {
 							switch ( $cdn ) {
 								case 'cloudinary':
-									wppa_upload_to_cloudinary( $photo );
+									wppa_upload_to_cloudinary( $id );
 									break;
 								default:
 									wppa_dbg_msg( 'Missing upload instructions for '.$cdn, 'red', 'force' );
@@ -1788,9 +1801,9 @@ global $wppa_log_file;
 
 						echo
 							'||0||' .
-							sprintf( __( 'Command %s magically executed on photo %s', 'wp-photo-album-plus' ), '<span style="color:blue;" ><i>'.$command.'</i></span>', $photo ) .
+							sprintf( __( 'Command %s magically executed on photo %s', 'wp-photo-album-plus' ), '<span style="color:blue;" ><i>'.$command.'</i></span>', $id ) .
 							'||' . get_option( 'wppa_photo_version' ) . '||' . get_option( 'wppa_thumb_version' ) . '||' . $stack .
-							'||' . floor( wppa_get_photox( $photo ) ) . ' x ' . floor( wppa_get_photoy( $photo ) ).' px, ' . wppa_get_filesize( wppa_get_photo_path( $photo ) ) . '.';
+							'||' . floor( wppa_get_photox( $id ) ) . ' x ' . floor( wppa_get_photoy( $id ) ).' px, ' . wppa_get_filesize( wppa_get_photo_path( $id ) ) . '.';
 					}
 
 					// Done
@@ -2240,7 +2253,35 @@ global $wppa_log_file;
 			if ( strpos( $option, 'wppa_fontfamily_' ) !== false ) $value = str_replace( '"', "'", $value );
 
 			$option = wppa_decode( $option );
+
 			// Dispatch on option
+			if ( $option == 'wppa_getspinnerpreview' ) {
+				if ( $_REQUEST['type'] == 'normal' ) {
+					echo wppa_get_spinner_svg_html( array( 	'size' 		=> 60,
+															'display' 	=> 'inline',
+															'lightbox' 	=> false,
+															'position' 	=> 'relative',
+															'left' 		=> '0',
+															'top' 		=> '0',
+															'margin' 	=> '0',
+					) );
+				}
+				elseif ( $_REQUEST['type'] == 'lightbox' ) {
+					echo wppa_get_spinner_svg_html( array( 	'size' 		=> 60,
+															'display' 	=> 'inline',
+															'lightbox' 	=> true,
+															'position' 	=> 'relative',
+															'left' 		=> '0',
+															'top' 		=> '0',
+															'margin' 	=> '0',
+					) );
+				}
+				else {
+					echo 'Error';
+				}
+				wppa_exit();
+			}
+
 			if ( substr( $option, 0, 16 ) == 'wppa_iptc_label_' ) {
 				$tag = substr( $option, 16 );
 				$q = $wpdb->prepare( "UPDATE `".WPPA_IPTC."` SET `description`=%s WHERE `tag`=%s AND `photo`='0'", $value, $tag );
@@ -3355,7 +3396,6 @@ global $wppa_log_file;
 			}
 			wppa_exit();
 			break;
-
 
 		default:	// Unimplemented $wppa-action
 		die( '-1' );

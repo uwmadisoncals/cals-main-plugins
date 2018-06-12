@@ -67,10 +67,16 @@ function sdm_get_password_entry_form($id, $args = array(), $class = '') {
     $uuid = uniqid('sdm-pass-');
 
     $data = __('Enter Password to Download:', 'simple-download-monitor');
-    $data .= '<form action="' . $action_url . '" method="post" id="' . $uuid . '">';
+    $data .= '<form action="' . $action_url . '" method="post" id="' . $uuid . '" class="sdm-download-form">';
     $data .= '<input type="password" name="pass_text" class="sdm_pass_text" value="" /> ';
+    
+    $data .= sdm_get_download_with_recaptcha();
+    
+    //Check if Terms & Condition enabled
+    $data .= sdm_get_checkbox_for_termsncond();
+    
     $data .= '<span class="sdm-download-button">';
-    $data .= '<a href="javascript:document.getElementById(\'' . $uuid . '\').submit();" name="sdm_dl_pass_submit" class="pass_sumbit sdm_pass_protected_download ' . $class . '">' . $button_text_string . '</a>';
+    $data .= '<a href="#" name="sdm_dl_pass_submit" class="pass_sumbit sdm_pass_protected_download sdm_download_with_condition ' . $class . '">' . $button_text_string . '</a>';
     $data .= '</span>';
     $data .= '<input type="hidden" name="download_id" value="' . $id . '" />';
     $data .= '</form>';
@@ -211,4 +217,78 @@ function sdm_visitor_is_bot() {
     $isBot = apply_filters('sdm_visitor_is_bot', $isBot);
     
     return $isBot;
+}
+
+function sdm_get_download_form_with_recaptcha($id, $args = array(), $class = '') {
+    $action_url = WP_SIMPLE_DL_MONITOR_SITE_HOME_URL . '/?smd_process_download=1&download_id=' . $id;
+
+    //Get the download button text
+    $button_text = isset($args['button_text']) ? $args['button_text'] : '';
+    if (empty($button_text)) {//Use the default text for the button
+	$button_text_string = __('Download Now!', 'simple-download-monitor');
+    } else {//Use the custom text
+	$button_text_string = $button_text;
+    }
+    
+    $main_advanced_opts = get_option('sdm_advanced_options');
+    
+    $data = '<form action="' . $action_url . '" method="post" class="sdm-g-recaptcha-form sdm-download-form">';
+    
+    $data .= '<div class="sdm-recaptcha-button">';
+    $data .= '<div class="g-recaptcha sdm-g-recaptcha"></div>';
+     
+    //Check if Terms & Condition enabled
+    $data .= sdm_get_checkbox_for_termsncond();
+    
+    $data .= '<a href="#" class="sdm_download_with_condition ' . $class . '">' . $button_text_string . '</a>';
+    $data .= '</div>';
+    $data .= '<input type="hidden" name="download_id" value="' . $id . '" />';
+    $data .= '</form>';
+    return $data;
+}
+
+function sdm_get_download_with_recaptcha() {
+    $main_advanced_opts = get_option('sdm_advanced_options');
+    $recaptcha_enable = isset($main_advanced_opts['termscond_enable']) ? true : false;
+    if ($recaptcha_enable) {
+        return '<div class="g-recaptcha sdm-g-recaptcha"></div>';
+    }
+    return '';
+}
+
+function sdm_get_checkbox_for_termsncond() {
+    $main_advanced_opts = get_option('sdm_advanced_options');
+    $termscond_enable = isset($main_advanced_opts['termscond_enable']) ? true : false;
+    if ($termscond_enable) {
+        $data = '<div class="sdm-termscond-checkbox">';
+        $data .= '<input type="checkbox" class="agree_termscond" value="1"/> '.__('I agree to the ', 'simple-download-monitor') . '<a href="'.$main_advanced_opts['termscond_url'].'" target="_blank">'.__('terms and conditions', 'simple-download-monitor').'</a>';
+        $data .= '</div>';
+        return $data;
+    }
+    return '';
+}
+
+
+function sdm_get_download_form_with_termsncond($id, $args = array(), $class = '') {
+    $action_url = WP_SIMPLE_DL_MONITOR_SITE_HOME_URL . '/?smd_process_download=1&download_id=' . $id;
+
+    //Get the download button text
+    $button_text = isset($args['button_text']) ? $args['button_text'] : '';
+    if (empty($button_text)) {//Use the default text for the button
+	$button_text_string = __('Download Now!', 'simple-download-monitor');
+    } else {//Use the custom text
+	$button_text_string = $button_text;
+    }
+ 
+    $main_advanced_opts = get_option('sdm_advanced_options');
+    $termscond_enable = isset($main_advanced_opts['termscond_enable']) ? true : false;
+    
+    $data = '<form action="' . $action_url . '" method="post" class="sdm-download-form">';
+    $data .= sdm_get_checkbox_for_termsncond();
+    $data .= '<div class="sdm-termscond-button">';
+    $data .= '<a href="#" class="sdm_download_with_condition ' . $class . '">' . $button_text_string . '</a>';
+    $data .= '</div>';
+    $data .= '<input type="hidden" name="download_id" value="' . $id . '" />';
+    $data .= '</form>';
+    return $data;
 }

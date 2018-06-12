@@ -283,13 +283,47 @@ function wpdm_getlink()
         die();
     }
 
+    if (isset($_POST['force']) && $_POST['force'] != '') {
+        $vr = explode('|', base64_decode($_POST['force']));
+        if ($vr[0] == 'unlocked') {
+            $social = array('f' => 'wpdm_fb_likes', 'g' => 'wpdm_gplus1s', 't' => 'wpdm_tweets', 'l' => 'wpdm_lishare');
+            if ($_POST['social'] && isset($social[$_POST['social']]))
+                update_option($social[$_POST['social']], (int)get_option($social[$_POST['social']]) + 1);
+
+            $limit = apply_filters('wpdm_download_link_expiration_limit', 3, $file);
+            $limit = $limit <=0 ? 3:$limit;
+            update_post_meta($file['ID'], "__wpdmkey_".$key, $limit);
+            $_SESSION['_wpdm_unlocked_'.$file['ID']] = 1;
+            $data['downloadurl'] = wpdm_download_url($file, "_wpdmkey={$key}");
+            $adata = apply_filters("wpdmgetlink", $data, $file);
+            $data = is_array($adata) ? $adata : $data;
+
+            if(!wpdm_is_ajax()){
+
+                @setcookie("wpdm_getlink_data_".$key, json_encode($data));
+
+                if(isset($data['downloadurl']) && $data['downloadurl']!=''){
+                    header("location: ".$data['downloadurl']);
+                    die();
+                }
+
+                header("location: ".$_SERVER['HTTP_REFERER']."#nojs_popup|ckid:".$key);
+                die();
+            }
+
+            header("Content-type: application/json");
+            die(json_encode($data));
+        }
+
+    }
+
 
     if ($plock == 1 && $password != $file['password'] && !strpos("__" . $file['password'], "[$password]")) {
-        $data['error'] = '<span class="color-red" style="font-size: 8pt"><i class="fa fa-refresh"></i> '.__('Wrong Password! Try Again.','download-manager')."</span>";
+        $data['error'] = '<span class="color-red" style="font-size: 8pt"><i class="fas fa-sync"></i> '.__('Wrong Password! Try Again.','download-manager')."</span>";
         $file = array();
     }
     if ($plock == 1 && $password == '') {
-        $data['error'] = '<span class="color-red" style="font-size: 8pt"><i class="fa fa-refresh"></i> '.__('Wrong Password! Try Again.','download-manager')."</span>";
+        $data['error'] = '<span class="color-red" style="font-size: 8pt"><i class="fas fa-sync"></i> '.__('Wrong Password! Try Again.','download-manager')."</span>";
         $file = array();
     }
     $ux = "";
@@ -1326,3 +1360,26 @@ function wpdm_get_client_ip() {
 }
 
 
+
+function wpdm_is_url( $url ) {
+    $result = ( false !== filter_var( $url, FILTER_VALIDATE_URL ) );
+    return apply_filters( 'wpdm_is_url', $result, $url );
+}
+
+function wpdm_total_downloads($uid = null){
+    global $wpdb;
+    if(isset($uid) && $uid > 0)
+        $download_count = $wpdb->get_var("select sum(pm.meta_value) from {$wpdb->prefix}postmeta pm, {$wpdb->prefix}posts p where meta_key='__wpdm_download_count' and p.ID = pm.post_id and p.post_author = '{$uid}'");
+    else
+        $download_count = $wpdb->get_var("select sum(meta_value) from {$wpdb->prefix}postmeta where meta_key='__wpdm_download_count'");
+    return (int)$download_count;
+}
+
+function wpdm_total_views($uid = null){
+    global $wpdb;
+    if(isset($uid) && $uid > 0)
+        $download_count = $wpdb->get_var("select sum(pm.meta_value) from {$wpdb->prefix}postmeta pm, {$wpdb->prefix}posts p where meta_key='__wpdm_view_count' and p.ID = pm.post_id and p.post_author = '{$uid}'");
+    else
+        $download_count = $wpdb->get_var("select sum(meta_value) from {$wpdb->prefix}postmeta where meta_key='__wpdm_view_count'");
+    return $download_count;
+}

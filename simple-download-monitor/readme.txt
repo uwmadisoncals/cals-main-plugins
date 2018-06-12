@@ -4,7 +4,7 @@ Donate link: https://www.tipsandtricks-hq.com
 Tags: download, downloads, count, counter, tracker, tracking, hits, logging, monitor, manager, files, media, digital, download monitor, download manager, downloadmanager, file manager, protect downloads, password, download category, file tree, ajax, download template, grid, documents, ip address
 Requires at least: 4.1.0
 Tested up to: 4.9
-Stable tag: 3.5.8
+Stable tag: 3.6.4
 License: GPLv2 or later
 
 Easily manage downloadable files and monitor downloads of your digital files from your WordPress site.
@@ -68,6 +68,8 @@ https://www.youtube.com/watch?v=utYIH0fILuQ
 * Option to specify version number info for the download item so it can be shown to your visitors.
 * Option to restrict downloads to logged-in users only.
 * Option to ignore download count from bots.
+* Option to add Google reCAPTCHA to your download buttons.
+* Option to add Terms and Condtions to your download buttons.
 
 View more details on the [download monitor plugin](https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin) page.
 
@@ -178,6 +180,29 @@ Yes
 For screenshots please visit the [download monitor plugin page](https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin)
 
 == Changelog ==
+
+= 3.6.4 =
+- Switched the column location of "Title" and "Image" in the downloads admin interface. This helps with the downloads admin interface working better in all devices.
+- Fixed a CSS class name in the "Image" column.
+- French langauge file updated.
+
+= 3.6.3 =
+- German translation file updated. Thanks to Thorsten.
+- When there are multiple download now buttons on a page and the terms checkbox is enabled, it needs to be accepted on every download button.
+
+= 3.6.2 =
+- Added new feature that allows you to show a terms and conditions checkbox for the download buttons.
+
+= 3.6.1 =
+- Tweaked a newly added function's parameter to make it compatible with an older PHP version.
+
+= 3.6.0 =
+- Added a new feature to allow addition of Google reCAPTCHA to your download buttons.
+- This new option can be found in the Advanced Settings tab of the plugin.
+- French translation updated. Thanks to @momo-fr.
+
+= 3.5.9 =
+- Added a new option in the settings that allows you to disable capturing of visitor's IP address in the download logs menu. Helpful for GDPR 
 
 = 3.5.8 =
 - Added a new shortcode to allow listing of all downloads on a post/page.

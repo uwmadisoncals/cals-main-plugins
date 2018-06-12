@@ -14,6 +14,12 @@ class cnText_Domain {
 	var $domain = '';
 
 	/**
+	 * @since 8.20
+	 * @var string
+	 */
+	var $basename = '';
+
+	/**
 	 * @access public
 	 * @since  8.11
 	 *
@@ -21,27 +27,43 @@ class cnText_Domain {
 	 * @see cnText_Domain::register()
 	 *
 	 * @param string $domain
+	 * @param string $basename
 	 *
 	 * @return static
 	 */
-	public static function create( $domain ) {
+	public static function create( $domain, $basename = '' ) {
 
-		return new static( $domain );
+		return new static( $domain, $basename );
 	}
 
 	/**
+	 * Registers a text domain.
+	 *
+	 * If $priority is set to an integer it will be loaded via an action ran on the `plugins_loaded` action hook.
+	 * If $priority is set to `load` it will be loaded.
+	 *
 	 * @access public
 	 * @since  8.16
 	 *
-	 * @param string $domain
-	 * @param int    $priority
+	 * @param string     $domain   The text domain to register.
+	 * @param string     $basename The plugin basename of the text domain to be loaded.
+	 * @param int|string $priority The priority to load the text domain on the `plugins_loaded` action hook.
+	 *                             If `load` is passed as a value, then the text domain will be loaded.
 	 *
 	 * @return static
 	 */
-	public static function register( $domain, $priority = 10 ) {
+	public static function register( $domain, $basename = '', $priority = 10 ) {
 
-		$instance = new static( $domain );
-		$instance->addAction( $priority );
+		$instance = new static( $domain, $basename );
+
+		if ( is_int( $priority ) ) {
+
+			$instance->addAction( $priority );
+
+		} elseif ( 'load' === $priority ) {
+
+			$instance->load();
+		}
 
 		return $instance;
 	}
@@ -60,10 +82,12 @@ class cnText_Domain {
 	 * @since  8.11
 	 *
 	 * @param string $domain
+	 * @param string $basename
 	 */
-	public function __construct( $domain ) {
+	public function __construct( $domain, $basename = '' ) {
 
-		$this->domain = $domain;
+		$this->domain   = $domain;
+		$this->basename = $basename;
 	}
 
 	/**
@@ -87,41 +111,42 @@ class cnText_Domain {
 	}
 
 	/**
+	 * Load the localization.
+	 *
+	 * 1 - ../wp-content/languages/{text-domain}/{textdomain}-{locale}              (Custom Folder)
+	 * 2 - ../wp-content/languages/plugins/{textdomain}-{locale}                    (Language Pack Folder)
+	 * 3 - ../wp-content/plugins/{plugin-directory}/languages/{textdomain}-{locale} (Distributed with plugin)
+	 *
 	 * @access public
 	 * @since  8.11
-	 *
-	 * Load the localization.
 	 */
 	public function load() {
 
 		// Plugin textdomain. This should match the one set in the plugin header.
 		$domain = $this->domain;
 
+		// Plugin folder name.
+		$folder = 0 < strlen( $this->basename ) ? dirname( $this->basename ) : $domain;
+
 		// Set filter for plugin's languages directory
-		$languagesDirectory = apply_filters( "cn_{$domain}_languages_directory", CN_DIR_NAME . '/languages/' );
+		$relativePath = apply_filters( "cn_{$domain}_languages_directory", "{$folder}/languages/" );
 
 		// Traditional WordPress plugin locale filter
-		$locale   = is_admin() && function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
-		$fileName = sprintf( '%1$s-%2$s.mo', $domain, $locale );
+		$locale = is_admin() && function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
+		$file   = sprintf( '%1$s-%2$s.mo', $domain, $locale );
 
-		// Setup paths to current locale file
-		$local  = $languagesDirectory . $fileName;
-		$global = WP_LANG_DIR . "/{$domain}/" . $fileName;
+		// `../wp-content/languages/{$domain}/` folder. (Custom Folder)
+		$custom = WP_LANG_DIR . "/{$domain}/{$file}";
 
-		if ( file_exists( $global ) ) {
+		// Look in Custom Folder `../wp-content/languages/{$domain}/` folder.
+		if ( file_exists( $custom ) ) {
 
-			// Look in global `../wp-content/languages/{$domain}/` folder.
-			load_textdomain( $domain, $global );
+			load_textdomain( $domain, $custom );
 
-		} elseif ( file_exists( $local ) ) {
-
-			// Look in local `../wp-content/plugins/{plugin-directory}/languages/` folder.
-			load_textdomain( $domain, $local );
-
+		// Load the default language files from the Language Packs folder and then from the those distributed with plugin.
 		} else {
 
-			// Load the default language files
-			load_plugin_textdomain( $domain, FALSE, $languagesDirectory );
+			load_plugin_textdomain( $domain, FALSE, $relativePath );
 		}
 	}
 }

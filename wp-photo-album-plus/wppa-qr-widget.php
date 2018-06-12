@@ -3,9 +3,8 @@
 * Package: wp-photo-album-plus
 *
 * display qr code
-* Version 6.8.07
+* Version 6.8.09
 */
-
 
 class wppaQRWidget extends WP_Widget {
 
@@ -50,12 +49,8 @@ class wppaQRWidget extends WP_Widget {
 		'<div style="clear:both" ></div>';
 
 		$widget_content .=
-		'<script type="text/javascript">
-			/*[CDATA[*/
+		'<script type="text/javascript" >
 			var wppaQRUrl = document.location.href;
-
-			wppaConsoleLog( "doc.loc.href = " + wppaQRUrl );
-
 			function wppaQRUpdate( arg ) {
 				if ( arg ) {
 					wppaQRUrl = arg;
@@ -64,11 +59,9 @@ class wppaQRWidget extends WP_Widget {
 				document.getElementById( "wppa-qr-img" ).title = wppaQRUrl;
 				return;
 			}
-
 			jQuery(document).ready(function(){
 				wppaQRUpdate();
 			});
-			/*]]*/
 		</script>';
 
 		echo $before_widget . $before_title . $title . $after_title . $widget_content . $after_widget;

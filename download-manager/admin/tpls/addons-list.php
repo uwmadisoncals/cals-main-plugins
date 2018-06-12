@@ -244,7 +244,7 @@
                 $file = end($file);
                 $plugininfo = wpdm_plugin_data($file);
 
-                $linklabel = ($plugininfo)?'<i class="fa fa-refresh"></i> Re-Install':'<i class="fa fa-plus-circle"></i> Install';
+                $linklabel = ($plugininfo)?'<i class="fas fa-sync"></i> Re-Install':'<i class="fa fa-plus-circle"></i> Install';
                 ?>
                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 all <?php echo implode(" ", (array)$package->categories); ?>">
 

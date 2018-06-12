@@ -13,7 +13,7 @@ class Portfolio_Slideshow_Settings {
 	 * @return void
 	 */
 	static function admin_init() {
-		
+
 		if ( false == get_option( 'portfolio_slideshow_options' ) ) {
 			add_option( 'portfolio_slideshow_options' );
 		}
@@ -65,14 +65,14 @@ class Portfolio_Slideshow_Settings {
 		$options = Portfolio_Slideshow_Plugin::$options;
 
 		$checked = checked( 1, isset( $options[ $args[ 'id' ] ] ) ? $options[ $args[ 'id' ] ] : 0, false );
-		
+
 		$html = self::get_tooltip_label( $args );
 
 		$html .= '<input type="checkbox" id="portfolio_slideshow_options[' . esc_attr( $args['id'] ) . ']" name="portfolio_slideshow_options[' . esc_attr( $args['id'] ) . ']" value="1" ' . $checked . '>';
 
 		echo $html;
 	}
-	
+
 	/**
 	 * An empty callback for settings page headers.
 	 *
@@ -179,7 +179,7 @@ class Portfolio_Slideshow_Settings {
 	 * @return array
 	 */
 	static function get_image_sizes() {
-		
+
 		global $_wp_additional_image_sizes;
 
 		$sizes = array();
@@ -200,7 +200,7 @@ class Portfolio_Slideshow_Settings {
 			}
 		}
 
-		return $sizes; 
+		return $sizes;
 	}
 
 	/**
@@ -305,7 +305,7 @@ class Portfolio_Slideshow_Settings {
 			)
 
 		);
-		
+
 		self::$settings['behavior'] = array(
 
 			'timeout' => array( // text - default 3000
@@ -635,11 +635,11 @@ class Portfolio_Slideshow_Settings {
 		$tab = isset( $referrer['tab'] ) ? $referrer['tab'] : 'display_and_behavior';
 
 		$options = Portfolio_Slideshow_Plugin::$options;
-		
+
 		$raw_settings = self::get_registered_settings();
 
 		// Merges the settings into a single "flat" array for simpler handling.
-		$settings = array_merge( $raw_settings['display'], $raw_settings['behavior'], $raw_settings['navigation'] );	
+		$settings = array_merge( $raw_settings['display'], $raw_settings['behavior'], $raw_settings['navigation'] );
 
 		foreach ( $input as $key => $value ) {
 			$type = isset( $settings[ $key ]['type'] ) ? $settings[ $key ]['type'] : false;
@@ -659,7 +659,7 @@ class Portfolio_Slideshow_Settings {
 		// }
 
 		add_settings_error( 'portfolio-slideshow-notices', '', __( 'Settings updated.', 'portfolio-slideshow' ), 'updated' );
-		
+
 		return array_merge( $options, $input );
 	}
 

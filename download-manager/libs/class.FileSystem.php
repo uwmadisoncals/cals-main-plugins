@@ -152,6 +152,9 @@ class FileSystem
      */
     public static function downloadData($filename, $content){
         @ob_end_clean();
+        nocache_headers();
+        header( "X-Robots-Tag: noindex, nofollow", true );
+        header("Robots: none");
         header("Content-Description: File Transfer");
         header("Content-Type: text/plain");
         header("Content-disposition: attachment;filename=\"$filename\"");
@@ -248,6 +251,25 @@ class FileSystem
         }
         return $files;
     }
+
+    /**
+     * @param $dir
+     * @param bool|true $recur
+     * @return array|bool
+     */
+    public static function deleteFiles($dir, $recur = true){
+        $dir = realpath($dir)."/";
+        if($dir == '/' || $dir == '') return array();
+        $tmpfiles = file_exists($dir)?array_diff( scandir( $dir ), array( ".", ".." ) ):array();
+        $files = array();
+        foreach($tmpfiles as $file){
+            if( is_dir($dir.$file) && $recur == true) $files = array_merge($files, self::scanDir($dir.$file, true));
+            else
+                @unlink($dir.$file);
+        }
+        return true;
+    }
+
 
     public static function imageThumbnail($path, $width, $height){
         $opath = $path;

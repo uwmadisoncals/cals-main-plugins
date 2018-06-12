@@ -2,8 +2,9 @@
 Contributors: mmaunder 
 Tags: security, firewall, malware scanner, web application firewall, antivirus, block hackers, country blocking, clean hacked site, blacklist, waf, login security
 Requires at least: 3.9
-Tested up to: 4.9.5
-Stable tag: 7.1.2
+Requires PHP: 5.2
+Tested up to: 4.9.6
+Stable tag: 7.1.7
 
 Secure your website with the most comprehensive WordPress security plugin. Firewall, malware scan, blocking, live traffic, login security & more.
 
@@ -151,6 +152,10 @@ Providing excellent customer service is very important to us.  We offer help to 
 
 Designed for every skill level, [The WordPress Security Learning Center](https://www.wordfence.com/learn/) is dedicated to deepening users’ understanding of security best practices by providing free access to entry-level articles, in-depth articles, videos, industry survey results, graphics and more.
 
+= Where can I find the Wordfence Terms of Use and Privacy Policy? =
+
+These are available on our website: [Terms of Use](https://www.wordfence.com/terms-of-use/) and [Privacy Policy](https://www.wordfence.com/privacy-policy/)
+
 == Screenshots ==
 
 Secure your website with Wordfence. 
@@ -166,6 +171,57 @@ Secure your website with Wordfence.
 
 
 == Changelog ==
+
+= 7.1.7 =
+* Improvement: Added better support for keyboard navigation of options.
+* Improvement: staging. and dev. subdomains are now supported for sharing premium licenses.
+* Improvement: Bundled our interface font to avoid loading from a remote source and reduced the pages some assets were loaded on.
+* Improvement: Added option to trim Live Traffic records after a specific number of days.
+* Improvement: Updated to the current GeoIP2 database.
+* Improvement: Extended the automatic redaction applied to attack data that may include sensitive information.
+* Change: Removed a no-longer-used API call.
+* Fix: Fixed a few options that couldn't be searched for on the all options page.
+* Fix: Activity Report emails now detect and avoid symlink loops.
+
+= 7.1.6 =
+* Fix: Added a workaround for sites with inaccessible WAF config files when reading php://input
+
+= 7.1.5 =
+* Improvement: GDPR compliance updates.
+* Improvement: The list of blocks now shows the most recently-added blocks at the top by default.
+* Improvement: Added better table status display to Diagnostics to help with debugging.
+* Improvement: Added deferred loading to Live Traffic avatars to improve performance with some plugins.
+* Improvement: The server's own IP is now automatically whitelisted for known safe requests.
+* Fix: Added a workaround to Live Traffic human/bot detection to compensate for other scripts that modify our event handlers.
+* Fix: Fixed an error with Live Traffic human/bot detection when plugins change the load order.
+* Fix: Fixed auto-enabling of some controls when pasting values.
+* Fix: Fixed an instance where http links could be generated for emails rather than https.
+
+= 7.1.4 =
+* Improvement: Added additional XSS detection capabilities.
+* Change: Initial preparation for GDPR compliance. Additional changes will be included in an upcoming release to meet the GDPR deadline.
+* Change: Reworked Live Traffic/Rate Limiting human and bot detection to function without cookies.
+* Change: Removed the wfvt_ cookie as it was no longer necessary.
+* Change: Better debug messaging for scan forking.
+* Fix: PHP deprecation notices no longer suppress those of old OpenSSL or WordPress.
+* Fix: Fixes to the deprecated OpenSSL version detection and alerting to handle non-patch version numbers.
+* Fix: Added detection for and fixed a very large pcre.backtrack_limit setting that could cause scans to fail, when modified by other plugins.
+* Fix: Scan issue alert emails no longer incorrectly show high sensitivity was enabled.
+* Fix: Fixed wrapping of long strings on the Diagnostics page.
+
+= 7.1.3 =
+* Improvement: Improved the performance of our config table status check.
+* Improvement: The IP address of the user activating Wordfence is now used by the breached password check until an admin successfully logs in.
+* Improvement: Added several new error displays for scan failures to help diagnose and fix issues.
+* Improvement: Added the block duration to alerts generated when an IP is blocked.
+* Improvement: A text version of scan results is now included in the activity log email.
+* Improvement: The WAF install/uninstall process no longer asks to backup files that do not exist.
+* Change: Began a phased rollout of moving brute force queries to be https-only.
+* Change: Added the initial deprecation notice for PHP 5.2.
+* Change: Suppressed a script tag on the diagnostics page from being output in the email version.
+* Fix: Addressed an issue where plugins that return a null user during authentication would cause a PHP notice to be logged.
+* Fix: Fixed an issue where plugins that use non-standard version formatting could end up with a inaccurate vulnerability status.
+* Fix: Added a workaround for web email clients that erroneously encode some URL characters (e.g., #).
 
 = 7.1.2 =
 * Improvement: Added support for filtering the blocks list.

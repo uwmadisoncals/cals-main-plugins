@@ -2,6 +2,12 @@
 
 ## Changelog
 
+### 2.6.0, 2018-05-08
+
+* added: new filter `ssl_insecure_content_pcre_version_permissive` allowing sites that can't update PCRE beyond 7.2 to function
+* added: fix for plugins / themes overriding avatars and breaking them with insecure content
+* changed: no longer sets a cookie on test or settings pages
+
 ### 2.5.0, 2017-11-23
 
 * changed: .htaccess rules file for non-WP test script now supports Apache v2.4; thanks, [Andreas Schneider](https://github.com/cryptomilk)!

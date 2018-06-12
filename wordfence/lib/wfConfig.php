@@ -1,5 +1,7 @@
 <?php
 class wfConfig {
+	const TABLE_EXISTS_OPTION = 'wordfence_installed';
+	
 	const AUTOLOAD = 'yes';
 	const DONT_AUTOLOAD = 'no';
 	
@@ -146,6 +148,7 @@ class wfConfig {
 			'alert_maxHourly' => array('value' => 0, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_INT)), 
 			'loginSec_userBlacklist' => array('value' => '', 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_STRING)),
 			'liveTraf_maxRows' => array('value' => 2000, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_INT)),
+			'liveTraf_maxAge' => array('value' => 30, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_INT)),
 			"neverBlockBG" => array('value' => "neverBlockVerified", 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_STRING)),
 			"loginSec_countFailMins" => array('value' => 240, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_INT)),
 			"loginSec_lockoutMins" => array('value' => 240, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_INT)),
@@ -212,6 +215,8 @@ class wfConfig {
 			'needsUpgradeTour_livetraffic' => array('value' => false, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_BOOL)),
 			'supportContent' => array('value' => '{}', 'autoload' => self::DONT_AUTOLOAD, 'validation' => array('type' => self::TYPE_STRING)),
 			'supportHash' => array('value' => '', 'autoload' => self::DONT_AUTOLOAD, 'validation' => array('type' => self::TYPE_STRING)),
+			'touppPromptNeeded' => array('value' => false, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_BOOL)),
+			'touppBypassNextCheck' => array('value' => false, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_BOOL)),
 		),
 	);
 	public static $serializedOptions = array('lastAdminLogin', 'scanSched', 'emailedIssuesList', 'wf_summaryItems', 'adminUserList', 'twoFactorUsers', 'alertFreqTrack', 'wfStatusStartMsgs', 'vulnerabilities_plugin', 'vulnerabilities_theme', 'dashboardData', 'malwarePrefixes', 'coreHashes', 'noc1ScanSchedule', 'allScansScheduled', 'disclosureStates', 'scanStageStatuses', 'adminNoticeQueue');
@@ -290,14 +295,28 @@ class wfConfig {
 		
 		return $options;
 	}
-	public static function updateTableExists() {
-		global $wpdb;
-		self::$tableExists = $wpdb->get_col($wpdb->prepare(<<<SQL
-SELECT TABLE_NAME FROM information_schema.TABLES
-WHERE TABLE_SCHEMA=DATABASE()
-AND TABLE_NAME=%s
-SQL
-			, self::table()));
+	
+	/**
+	 * Bases the table's existence on the option specified by wfConfig::TABLE_EXISTS_OPTION for performance. We only
+	 * set that option just prior to deletion in the uninstall handler and after table creation in the install handler.
+	 */
+	public static function updateTableExists($change = null) {
+		if ($change !== null) {
+			self::$tableExists = !!$change;
+			update_option(wfConfig::TABLE_EXISTS_OPTION, self::$tableExists);
+			return;
+		}
+		
+		self::$tableExists = true;
+		$optionValue = get_option(wfConfig::TABLE_EXISTS_OPTION, null);
+		if ($optionValue === null) { //No value, set an initial one
+			global $wpdb;
+			self::updateTableExists(!!$wpdb->get_col($wpdb->prepare('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s', self::table())));
+			return;
+		}
+		if (!$optionValue) {
+			self::$tableExists = false;
+		}
 	}
 	private static function updateCachedOption($name, $val) {
 		$options = self::loadAllOptions();
@@ -1294,6 +1313,12 @@ Options -ExecCGI
 					$saved = true;
 					break;
 				}
+				case 'avoid_php_input':
+				{
+					$wafConfig->setConfig($key, wfUtils::truthyToInt($value));
+					$saved = true;
+					break;
+				}
 				
 				//============ Plugin (specialty treatment)
 				case 'alertEmails':
@@ -1478,6 +1503,11 @@ Options -ExecCGI
 					$saved = true;
 					break;
 				}
+				case 'liveTraf_maxAge':
+				{
+					$value = max(1, $value);
+					break;
+				}
 				
 				//Scan scheduling
 				case 'scanSched':
@@ -1545,7 +1575,7 @@ Options -ExecCGI
 			else if ($existingAPIKey != $apiKey) { //Key changed, try activating
 				$api = new wfAPI($apiKey, wfUtils::getWPVersion());
 				try {
-					$res = $api->call('check_api_key', array(), array());
+					$res = $api->call('check_api_key', array(), array('previousLicense' => $existingAPIKey));
 					if ($res['ok'] && isset($res['isPaid'])) {
 						$isPaid = wfUtils::truthyToBoolean($res['isPaid']);
 						wfConfig::set('apiKey', $apiKey);
@@ -1755,6 +1785,7 @@ Options -ExecCGI
 					'liveTraf_ignoreIPs',
 					'liveTraf_ignoreUA',
 					'liveTraf_maxRows',
+					'liveTraf_maxAge',
 					'displayTopLevelLiveTraffic',
 				);
 				break;
@@ -1908,6 +1939,7 @@ Options -ExecCGI
 					'liveTraf_ignoreIPs',
 					'liveTraf_ignoreUA',
 					'liveTraf_maxRows',
+					'liveTraf_maxAge',
 					'displayTopLevelLiveTraffic',
 					'other_noAnonMemberComments',
 					'other_scanComments',

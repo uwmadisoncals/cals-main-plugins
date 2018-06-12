@@ -82,7 +82,7 @@ class cnRewrite {
 		$var[] = 'cn-view';   // current view [ landing || list || detail ]
 
 		// Query vars to support showing entries within a specified radius.
-		$var[] = 'cn-near-coord'; // latitute and longitude
+		$var[] = 'cn-near-coord'; // latitude and longitude
 		$var[] = 'cn-near-addr'; // address url encoded
 		$var[] = 'cn-radius';  // distance
 		$var[] = 'cn-unit';   // unit of distance
@@ -170,7 +170,7 @@ class cnRewrite {
 
 		$rule = array();
 
-		// Get the page id of the user selected front page.
+		/** @var string $pageID Get the page id of the user selected front page. */
 		$pageID = get_option('page_on_front');
 
 		// Get the settings for the base of each data type to be used in the URL.

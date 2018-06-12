@@ -16,10 +16,10 @@ class Portfolio_Slideshow_Support {
 
 		if ( function_exists( 'get_mu_plugins' ) ) {
 			$mu_plugins_raw = get_mu_plugins();
-			
+
 			foreach ( $mu_plugins_raw as $k => $v ) {
 				$plugin = $v['Name'];
-				
+
 				if ( ! empty( $v['Version'] ) ) {
 					$plugin .= sprintf( ' version %s', $v['Version'] );
 				}
@@ -47,11 +47,11 @@ class Portfolio_Slideshow_Support {
 
 		if ( is_multisite() && function_exists( 'get_plugin_data' ) ) {
 			$plugins_raw = wp_get_active_network_plugins();
-			
+
 			foreach ( $plugins_raw as $k => $v ) {
 				$plugin_details = get_plugin_data( $v );
 				$plugin         = $plugin_details['Name'];
-				
+
 				if ( ! empty( $plugin_details['Version'] ) ) {
 					$plugin .= sprintf( ' version %s', $plugin_details['Version'] );
 				}
@@ -61,7 +61,7 @@ class Portfolio_Slideshow_Support {
 				if ( ! empty( $plugin_details['AuthorURI'] ) ) {
 					$plugin .= sprintf( '(%s)', $plugin_details['AuthorURI'] );
 				}
-				
+
 				$network_plugins[] = $plugin;
 			}
 		}
@@ -108,7 +108,7 @@ class Portfolio_Slideshow_Support {
 	 */
 	static function load_system_info() {
 		$user = wp_get_current_user();
-		
+
 		self::$systeminfo = array(
 			'URL'                => 'http://' . $_SERVER['HTTP_HOST'],
 			'Name'               => $user->display_name,
@@ -121,14 +121,14 @@ class Portfolio_Slideshow_Support {
 			'Theme'              => wp_get_theme()->get( 'Name' ),
 			'Multisite'          => is_multisite(),
 			'Settings'           => Portfolio_Slideshow_Plugin::get_options(),
-			'Max Upload Size'    => size_format( wp_max_upload_size() ),
+			'Max Upload Size'    => size_format( (int) wp_max_upload_size() ),
 			'WordPress Timezone' => get_option( 'timezone_string', __( 'Unknown or not set', 'portfolio-slideshow' ) ),
 			'Server Timezone'    => date_default_timezone_get(),
 			'Server Info'        => esc_html( $_SERVER['SERVER_SOFTWARE'] )
 		);
 
 		if ( function_exists( 'ini_get' ) ) {
-			self::$systeminfo['PHP Post Max Size']      = size_format( ini_get( 'post_max_size' ) );
+			self::$systeminfo['PHP Post Max Size']      = size_format( (int) ini_get( 'post_max_size' ) );
 			self::$systeminfo['PHP Max Execution Time'] = ini_get( 'max_execution_time' );
 			self::$systeminfo['PHP Max Input Vars']     = ini_get( 'max_input_vars' );
 		}
@@ -149,7 +149,7 @@ class Portfolio_Slideshow_Support {
 		?><dl class="support-stats"><?php
 
 		foreach ( self::$systeminfo as $k => $v ) :
-			
+
 			switch ( $k ) {
 				case 'name'  :
 				case 'email' :
@@ -179,7 +179,7 @@ class Portfolio_Slideshow_Support {
 			} elseif ( is_array( $v ) && $is_numeric_array ) {
 				printf( '<dd class="support-stats-array"><ul><li>%s</li></ul></dd>', join( '</li><li>', $v ) );
 			} else {
-				
+
 				$formatted_v = array();
 
 				foreach ( $v as $obj_key => $obj_val ) {
@@ -194,7 +194,7 @@ class Portfolio_Slideshow_Support {
 
 				printf( '<dd class="support-stats-object"><ul>%s</ul></dd>', print_r( $v, true ) );
 			}
-		
+
 		endforeach;
 
 		?></dl><?php

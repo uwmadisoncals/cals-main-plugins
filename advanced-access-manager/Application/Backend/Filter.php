@@ -25,11 +25,6 @@ class AAM_Backend_Filter {
     private static $_instance = null;
     
     /**
-     * pre_get_posts flag
-     */
-    protected $skip = false;
-
-    /**
      * Initialize backend filters
      * 
      * @return void
@@ -58,13 +53,6 @@ class AAM_Backend_Filter {
         //default category filder
         add_filter('pre_option_default_category', array($this, 'filterDefaultCategory'));
         
-        //add post filter for LIST restriction
-        if (!AAM::isAAM() && AAM_Core_Config::get('check-post-visibility', true)) {
-            add_filter('found_posts', array($this, 'filterPostCount'), 999, 2);
-            add_filter('posts_fields_request', array($this, 'fieldsRequest'), 999, 2);
-            add_action('pre_get_posts', array($this, 'preparePostQuery'), 999);
-        }
-        
         add_action('pre_post_update', array($this, 'prePostUpdate'), 10, 2);
         
         //user/role filters
@@ -72,6 +60,17 @@ class AAM_Backend_Filter {
             add_filter('editable_roles', array($this, 'filterRoles'));
             add_action('pre_get_users', array($this, 'filterUserQuery'), 999);
             add_filter('views_users', array($this, 'filterViews'));
+        }
+        
+        // Check if user has ability to perform certain task based on provided
+        // capability and meta data
+        if (AAM_Core_Config::get('core.settings.backendAccessControl', true)) {
+            add_filter(
+                'user_has_cap', 
+                array(AAM_Shared_Manager::getInstance(), 'userHasCap'), 
+                999, 
+                3
+            );
         }
         
         AAM_Backend_Authorization::bootstrap(); //bootstrap backend authorization
@@ -263,114 +262,17 @@ class AAM_Backend_Filter {
         if (is_null($default)) {
             //check if user category is defined
             $id      = get_current_user_id();
-            $default = AAM_Core_Config::get('default.category.user.' . $id , null);
+            $default = AAM_Core_Config::get('feature.post.defaultTerm.user.' . $id , null);
             $roles   = AAM::getUser()->roles;
             
             if (is_null($default) && count($roles)) {
                 $default = AAM_Core_Config::get(
-                    'default.category.role.' . array_shift($roles), false
+                    'feature.post.defaultTerm.role.' . array_shift($roles), false
                 );
             }
         }
         
         return ($default ? $default : $category);
-    }
-    
-    /**
-     * Filter post count for pagination
-     *  
-     * @param int      $counter
-     * @param WP_Query $query
-     * 
-     * @return array
-     * 
-     * @access public
-     */
-    public function filterPostCount($counter, $query) {
-        $filtered = array();
-        
-        foreach ($query->posts as $post) {
-            if (isset($post->post_type)) {
-                $type = $post->post_type;
-            } else {
-                $type = AAM_Core_API::getQueryPostType($query);
-            }
-            
-            $object = (is_scalar($post) ? get_post($post) : $post);
-            
-            if (!AAM_Core_API::isHiddenPost($object, $type, 'backend')) {
-                $filtered[] = $post;
-            } else {
-                $counter--;
-                $query->post_count--;
-            }
-        }
-        
-        $query->posts = $filtered;
-
-        return $counter;
-    }
-    
-    /**
-     * Filter pages fields
-     * 
-     * @param string   $fields
-     * @param WP_Query $query
-     * 
-     * @return string
-     * 
-     * @access public
-     * @global WPDB $wpdb
-     */
-    public function fieldsRequest($fields, $query) {
-        global $wpdb;
-        
-        $qfields = (isset($query->query['fields']) ? $query->query['fields'] : '');
-        
-        if ($qfields == 'id=>parent') {
-            $author = "{$wpdb->posts}.post_author";
-            if (strpos($fields, $author) === false) {
-                $fields .= ", $author"; 
-            }
-            
-            $status = "{$wpdb->posts}.post_status";
-            if (strpos($fields, $status) === false) {
-                $fields .= ", $status"; 
-            }
-                    
-            $type = "{$wpdb->posts}.post_type";
-            if (strpos($fields, $type) === false) {
-                $fields .= ", $type"; 
-            }        
-        }
-        
-        return $fields;
-    }
-    
-    /**
-     * Prepare pre post query
-     * 
-     * @param WP_Query $query
-     * 
-     * @return void
-     * 
-     * @access public
-     */
-    public function preparePostQuery($query) {
-        if ($this->skip === false) {
-            $this->skip = true;
-            $filtered   = AAM_Core_API::getFilteredPostList($query, 'backend');
-            $this->skip = false;
-            
-            if (isset($query->query_vars['post__not_in']) 
-                    && is_array($query->query_vars['post__not_in'])) {
-                $query->query_vars['post__not_in'] = array_merge(
-                        $query->query_vars['post__not_in'], $filtered
-                );
-            } else {
-                $query->query_vars['post__not_in'] = $filtered;
-            }
-        }
     }
     
     /**
@@ -389,7 +291,7 @@ class AAM_Backend_Filter {
         $post = get_post($id);
         
         if ($post->post_author != $data['post_author']) {
-            AAM_Core_Cache::clear($id);
+            AAM_Core_API::clearCache();
         }
     }
     

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Frontend links
-* Version 6.8.00
+* Version 6.8.08
 *
 */
 
@@ -1547,7 +1547,6 @@ global $wpdb;
 			$result['title'] = $title;
 			$result['is_url'] = false;
 			$result['is_lightbox'] = true;
-			wppa_add_wppa_on_page(); 	// Make sure wppa js files are loaded
 			$result['url'] = wppa_fix_poster_ext( $result['url'], $id );
 			return $result;
 		case 'widget':		// Defined at widget activation

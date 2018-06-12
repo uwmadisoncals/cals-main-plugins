@@ -73,6 +73,11 @@ class Initializer {
       'initialize'
     ));
 
+    add_action('admin_init', array(
+      $this,
+      'setupPrivacyPolicy'
+    ));
+
     add_action('wp_loaded', array(
       $this,
       'postInitialize'
@@ -130,12 +135,16 @@ class Initializer {
       $this->setupMenu();
       $this->setupShortcodes();
       $this->setupImages();
+      $this->setupPersonalDataExporters();
+      $this->setupPersonalDataErasers();
 
       $this->setupChangelog();
       $this->setupCronTrigger();
       $this->setupConflictResolver();
 
       $this->setupPages();
+
+      $this->setupPHPVersionWarnings();
 
       do_action('mailpoet_initialized', MAILPOET_VERSION);
     } catch(\Exception $e) {
@@ -204,7 +213,7 @@ class Initializer {
   }
 
   function setupImages() {
-    add_image_size('mailpoet_newsletter_max', 1320);
+    add_image_size('mailpoet_newsletter_max', Env::NEWSLETTER_CONTENT_WIDTH);
   }
 
   function setupChangelog() {
@@ -262,6 +271,27 @@ class Initializer {
   function setupHooks() {
     $hooks = new Hooks();
     $hooks->init();
+  }
+
+  function setupPrivacyPolicy() {
+    $privacy_policy = new PrivacyPolicy();
+    $privacy_policy->init();
+  }
+
+  function setupPersonalDataExporters() {
+    $exporters = new PersonalDataExporters();
+    $exporters->init();
+  }
+
+  function setupPersonalDataErasers() {
+    $erasers = new PersonalDataErasers();
+    $erasers->init();
+  }
+
+  function setupPHPVersionWarnings() {
+    $php_version_warnings = new PHPVersionWarnings();
+    $warnings = $php_version_warnings->init(phpversion(), Menu::isOnMailPoetAdminPage());
+    if(is_string($warnings)) echo $warnings;
   }
 
   function handleFailedInitialization($exception) {

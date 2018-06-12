@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.8.05
+* Version 6.9.02
 *
 */
 
@@ -1291,7 +1291,7 @@ function wppa_get_multitag_html( $nperline = '2', $seltags = '' ) {
 	$tags = wppa_get_taglist();
 
 	$result .= '
-	<script type="text/javascript">
+	<script type="text/javascript" >
 	function wppaProcessMultiTagRequest() {
 	var any = false;
 	var url="' . wppa_encrypt_url( $hr ) . '";';
@@ -3159,7 +3159,7 @@ static $albums_granted;
 
 	$head = '';
 	$body =
-		'<div style="height:6px;;clear:both;" ></div>' .
+		'<div style="height:6px;clear:both;" ></div>' .
 		'<input' .
 			' type="submit"' .
 			' id="wppa-user-submit-' . $yalb . '-' . $mocc . '"' .
@@ -3203,7 +3203,7 @@ static $albums_granted;
 	if ( $where == 'cover' || $where == 'thumb' ) {
 		$url_after_ajax_upload = wppa_get_permalink() . 'wppa-occur=' . wppa( 'occur' ) . '&wppa-cover=0&wppa-album=' . ( is_array( $alb ) ? implode( '.', $alb ) : $alb );
 		$ajax_url_after_upload = str_replace( '&amp;', '&', wppa_get_ajaxlink() ) . 'wppa-occur=' . wppa( 'occur' ) . '&wppa-cover=0&wppa-album=' . ( is_array( $alb ) ? implode( '.', $alb ) : $alb );
-		$on_complete = 'wppaDoAjaxRender( ' . $occur . ', \'' . $ajax_url_after_upload . '\', \'' . $url_after_ajax_upload . '\' );';
+		$on_complete = 'wppaDoAjaxRender( ' . $occur . ', \'' . $ajax_url_after_upload . '\', \'' . $url_after_ajax_upload . '\' )';
 	}
 	else {
 		$url_after_ajax_upload = '';
@@ -3214,51 +3214,9 @@ static $albums_granted;
 	// Ajax upload script
 	if ( $ajax_upload ) {
 		$result .=
-			'<script>' .
-				'jQuery(document).ready(function() {
-
-					var options = {
-						beforeSend: function() {
-							jQuery("#progress-'.$yalb.'-'.$mocc.'").show();
-							//clear everything
-							jQuery("#bar-'.$yalb.'-'.$mocc.'").width(\'0%\');
-							jQuery("#message-'.$yalb.'-'.$mocc.'").html("");
-							jQuery("#percent-'.$yalb.'-'.$mocc.'").html("");
-						},
-						uploadProgress: function(event, position, total, percentComplete) {
-							jQuery("#bar-'.$yalb.'-'.$mocc.'").css(\'backgroundColor\',\'#7F7\');
-							jQuery("#bar-'.$yalb.'-'.$mocc.'").width(percentComplete+\'%\');
-							if ( percentComplete < 95 ) {
-								jQuery("#percent-'.$yalb.'-'.$mocc.'").html(percentComplete+\'%\');
-							}
-							else {
-								jQuery("#percent-'.$yalb.'-'.$mocc.'").html(\'' . __( 'Processing...', 'wp-photo-album-plus' ) . '\');
-							}
-						},
-						success: function() {
-							jQuery("#bar-'.$yalb.'-'.$mocc.'").width(\'100%\');
-							jQuery("#percent-'.$yalb.'-'.$mocc.'").html(\'' . __( 'Done!', 'wp-photo-album-plus' ) . '\');
-							jQuery(".wppa-upload-button").val(wppaUploadButtonText);
-						},
-						complete: function(response) {
-							if (response.responseText.indexOf(\''.__( 'Upload failed', 'wp-photo-album-plus' ).'\')!=-1) {
-								jQuery("#bar-'.$yalb.'-'.$mocc.'").css(\'backgroundColor\',\'#F77\');
-								jQuery("#percent-'.$yalb.'-'.$mocc.'").html(\''.__('Failed!', 'wp-photo-album-plus').'\');
-								jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="font-size: 10px;" >\'+response.responseText+\'</span>\' );
-							}
-							else {
-								jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="font-size: 10px;" >\'+response.responseText+\'</span>\' );' .
-								( $where == 'thumb' || $where == 'cover' ? $on_complete : '' ) . '
-							}
-						},
-						error: function() {
-							jQuery("#message-'.$yalb.'-'.$mocc.'").html( \'<span style="color: red;" >'.__( 'Server error.', 'wp-photo-album-plus' ).'</span>\' );
-							jQuery("#bar-'.$yalb.'-'.$mocc.'").css(\'backgroundColor\',\'#F77\');
-							jQuery("#percent-'.$yalb.'-'.$mocc.'").html(\''.__('Failed!', 'wp-photo-album-plus').'\');
-						}
-					};
-
-					jQuery("#wppa-uplform-'.$yalb.'-'.$mocc.'").ajaxForm(options);
+			'<script>
+				jQuery(document).ready(function() {
+					jQuery("#wppa-uplform-'.$yalb.'-'.$mocc.'").ajaxForm(wppaGetUploadOptions( '.$yalb.', '.$mocc.', "'.$where.'", "'.$on_complete.'" ));
 				});
 			</script>';
 	}
@@ -3538,7 +3496,8 @@ global $wpdb;
 							' class="wppa-box-text wppa-td"' .
 							' style="vertical-align:top; width:30%; border-width: 0 0 0 0; '.wppa_wcs( 'wppa-box-text' ).wppa_wcs( 'wppa-td' ).'"' .
 							' >' .
-							$comment['user'] . ' ' . __( 'wrote:', 'wp-photo-album-plus' ) .
+							( wppa_switch( 'domain_link_buddypress' ) ? wppa_bp_userlink( $comment['email'], false, true ) : $comment['user'] ) . 
+							' ' . __( 'wrote:', 'wp-photo-album-plus' ) .
 							'<br />' .
 							'<span style="font-size:9px; ">' .
 								wppa_get_time_since( $comment['timestamp'] ) .
@@ -4385,8 +4344,9 @@ function wppa_bestof_html( $args, $widget = true ) {
 								' class="thumb-img"' .
 								' id="a-' . $id . '-' . wppa( 'mocc' ) . '"' .
 								' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
-								' style="cursor:url( ' . wppa_get_imgdir() . wppa_opt( 'magnifier' ) . ' ),pointer;"' .
+								' style="cursor:' . wppa_wait() . ';"' . // url( ' . wppa_get_imgdir() . wppa_opt( 'magnifier' ) . ' ),pointer;"' .
 								' title="' . wppa_zoom_in( $id ) . '"' .
+								' onclick="return false;"' .
 								' >';
 						}
 						elseif ( $linktype != 'none' ) {
@@ -4933,7 +4893,7 @@ function wppa_is_exif_date( $date ) {
 function wppa_get_responsive_widget_js_html( $mocc ) {
 
 	$result =
-		'<script type="text/javascript">' .
+		'<script type="text/javascript" >' .
 			'wppaAutoColumnWidth['.$mocc.'] = true;' .
 			'wppaAutoColumnFrac['.$mocc.'] = 1.0;' .
 			'wppaColWidth['.$mocc.'] = 0;' .

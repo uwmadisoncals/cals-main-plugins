@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.8.02';
+var wppaJsVersion = '6.8.09';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -150,6 +150,12 @@ var wppaSlideshowNavigationType = 'icons';
 var wppaCoverImageResponsive = [];
 var wppaSearchBoxSelItems = [];
 var wppaSlideWrap = [];
+var wppaHideRightClick = false;
+var wppaProcessing = 'Processing...';
+var wppaDone = 'Done!';
+var wppaUploadFailed = 'Upload failed';
+var wppaServerError = 'Server error';
+var wppaGeoZoom = 10;
 
 // 'Internal' variables ( private )
 var _wppaId = [];
@@ -299,15 +305,29 @@ function wppaDoInit( autoOnly ) {
 
 	// Fade ubbs out
 	setTimeout( function() {
-			var i = 1;
-			while( i < wppaTopMoc ) {
-				if ( jQuery( 'ubb-'+i+'-l' ) ) {
-					wppaUbb(i,'l','hide');
-					wppaUbb(i,'r','hide');
-				}
-				i++;
+		var i = 1;
+		while( i < wppaTopMoc ) {
+			if ( jQuery( 'ubb-'+i+'-l' ) ) {
+				wppaUbb(i,'l','hide');
+				wppaUbb(i,'r','hide');
 			}
-		}, 3000 );
+			i++;
+		}
+	}, 3000 );
+
+	wppaProtect();
+}
+
+// If disable right mouseclick
+function wppaProtect() {
+	if ( wppaHideRightClick ) {
+		jQuery( 'img' ).bind( 'contextmenu', function(e) {
+			return false;
+		});
+		jQuery( 'video' ).bind( 'contextmenu', function(e) {
+			return false;
+		});
+	}
 }
 
 // Initialize Ajax render partial page content with history update
@@ -612,7 +632,7 @@ function _wppaDoAutocol( mocc ) {
 			jQuery( ".wppa-searchsel-item-"+mocc ).css( 'width', ( 100 / wppaSearchBoxSelItems[mocc] ) + '%' );
 		}
 	}
-	
+
 	// Upload dialog album selectionbox
 	jQuery( ".wppa-upload-album-"+mocc ).css( 'maxWidth', 0.6 * w );
 
@@ -928,7 +948,7 @@ function wppaGeoInit( mocc, lat, lon ) {
 		scaleControl: true,
 		streetViewControl: true,
 		overviewMapControl: true,
-		zoom: 10,
+		zoom: wppaGeoZoom,
 		center: myLatLng,
 //			mapTypeId: google.maps.MapTypeId.TERRAIN,
 //			mapTypeControlOptions: {
@@ -1333,6 +1353,53 @@ function wppaIsEmpty( str ) {
 	if ( str == '' ) return true;
 	if ( str == false ) return true;
 	if ( str == 0 ) return true;
+}
+
+function wppaGetUploadOptions( yalb, mocc, where, onComplete ) {
+
+	var options = {
+		beforeSend: function() {
+			jQuery('#progress-'+yalb+'-'+mocc).show();
+			jQuery('#bar-'+yalb+'-'+mocc).width('0%');
+			jQuery('#message-'+yalb+'-'+mocc).html('');
+			jQuery('#percent-'+yalb+'-'+mocc).html('');
+		},
+		uploadProgress: function(event, position, total, percentComplete) {
+			jQuery('#bar-'+yalb+'-'+mocc).css('backgroundColor','#7F7');
+			jQuery('#bar-'+yalb+'-'+mocc).width(percentComplete+'%');
+			if ( percentComplete < 95 ) {
+				jQuery('#percent-'+yalb+'-'+mocc).html(percentComplete+'%');
+			}
+			else {
+				jQuery('#percent-'+yalb+'-'+mocc).html(wppaProcessing);
+			}
+		},
+		success: function() {
+			jQuery('#bar-'+yalb+'-'+mocc).width('100%');
+			jQuery('#percent-'+yalb+'-'+mocc).html(wppaDone);
+			jQuery('.wppa-upload-button').val(wppaUploadButtonText);
+		},
+		complete: function(response) {
+			if (response.responseText.indexOf(wppaUploadFailed)!=-1) {
+				jQuery('#bar-'+yalb+'-'+mocc).css('backgroundColor','#F77');
+				jQuery('#percent-'+yalb+'-'+mocc).html(wppaUploadFailed);
+				jQuery('#message-'+yalb+'-'+mocc).html( '<span style="font-size: 10px;" >'+response.responseText+'</span>' );
+			}
+			else {
+				jQuery('#message-'+yalb+'-'+mocc).html( '<span style="font-size: 10px;" >'+response.responseText+'</span>' );
+				if ( where == 'thumb' || where == 'cover' ) {
+					eval(onComplete);
+				}
+			}
+		},
+		error: function() {
+			jQuery('#message-'+yalb+'-'+mocc).html( '<span style="color: red;" >'+wppaServerError+'</span>' );
+			jQuery('#bar-'+yalb+'-'+mocc).css('backgroundColor','#F77');
+			jQuery('#percent-'+yalb+'-'+mocc).html(wppaUploadFailed);
+		}
+	};
+
+	return options;
 }
 
 // Say we're in

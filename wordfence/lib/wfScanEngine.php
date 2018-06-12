@@ -230,6 +230,19 @@ class wfScanEngine {
 			wfScanEngine::refreshScanNotification($this->i);
 			throw $e;
 		}
+		catch (wfScanEngineTestCallbackFailedException $e) {
+			wfConfig::set('lastScanCompleted', $e->getMessage());
+			wfConfig::set('lastScanFailureType', wfIssues::SCAN_FAILED_CALLBACK_TEST_FAILED);
+			$this->scanController->recordLastScanTime();
+			
+			$this->recordMetric('scan', 'duration', (time() - $this->startTime));
+			$this->recordMetric('scan', 'memory', wfConfig::get('wfPeakMemory', 0, false));
+			$this->recordMetric('scan', 'failure', $e->getMessage());
+			$this->submitMetrics();
+			
+			wfScanEngine::refreshScanNotification($this->i);
+			throw $e;
+		}
 		catch (Exception $e) {
 			if ($e->getCode() != wfScanEngine::SCAN_MANUALLY_KILLED) {
 				wfConfig::set('lastScanCompleted', $e->getMessage());
@@ -314,7 +327,7 @@ class wfScanEngine {
 		exit(0);
 	}
 	public function emailNewIssues($timeLimitReached = false){
-		$this->i->emailNewIssues($timeLimitReached);
+		$this->i->emailNewIssues($timeLimitReached, $this->scanController);
 	}
 	public function submitMetrics() {
 		if (wfConfig::get('other_WFNet', true)) {
@@ -1887,7 +1900,7 @@ class wfScanEngine {
 		
 		if (version_compare(phpversion(), '5.4') < 0 && wfConfig::get('isPaid') && wfBlock::hasCountryBlock()) {
 			$shortMsg = __('PHP Update Needed for Country Blocking', 'wordfence');
-			$longMsg = sprintf(__('The GeoIP database that is required for country blocking is being updated to a new format in April 2018. This new format requires sites to run PHP 5.4 or newer, and this site is on PHP %s. To ensure country blocking continues functioning, please update PHP prior to that date.', 'wordfence'), wfUtils::cleanPHPVersion());
+			$longMsg = sprintf(__('The GeoIP database that is required for country blocking has been updated to a new format. This new format requires sites to run PHP 5.4 or newer, and this site is on PHP %s. To ensure country blocking continues functioning, please update PHP.', 'wordfence'), wfUtils::cleanPHPVersion());
 			
 			$longMsg .= ' <a href="' . wfSupportController::esc_supportURL(wfSupportController::ITEM_SCAN_RESULT_GEOIP_UPDATE) . '" target="_blank" rel="noopener noreferrer">Get more information.</a>';
 			
@@ -1950,43 +1963,82 @@ class wfScanEngine {
 		}
 		$timeout = self::getMaxExecutionTime() - 2; //2 seconds shorter than max execution time which ensures that only 2 HTTP processes are ever occupied
 		$testURL = admin_url('admin-ajax.php?action=wordfence_testAjax');
-		if(! wfConfig::get('startScansRemotely', false)){
-			$testResult = wp_remote_post($testURL, array(
-				'timeout' => $timeout,
-				'blocking' => true,
-				'sslverify' => false,
-				'headers' => array()
+		if (!wfConfig::get('startScansRemotely', false)) {
+			try {
+				$testResult = wp_remote_post($testURL, array(
+					'timeout' => $timeout,
+					'blocking' => true,
+					'sslverify' => false,
+					'headers' => array()
 				));
+			}
+			catch (Exception $e) {
+				//Fall through to the remote start test below
+			}
+			
 			wordfence::status(4, 'info', "Test result of scan start URL fetch: " . var_export($testResult, true));	
 		}
+		
 		$cronKey = wfUtils::bigRandomHex();
 		wfConfig::set('currentCronKey', time() . ',' . $cronKey);
-		if( (! wfConfig::get('startScansRemotely', false)) && (! is_wp_error($testResult)) && (is_array($testResult) || $testResult instanceof ArrayAccess) && strstr($testResult['body'], 'WFSCANTESTOK') !== false){
+		if ((!wfConfig::get('startScansRemotely', false)) && (!is_wp_error($testResult)) && (is_array($testResult) || $testResult instanceof ArrayAccess) && strstr($testResult['body'], 'WFSCANTESTOK') !== false) {
 			//ajax requests can be sent by the server to itself
 			$cronURL = 'admin-ajax.php?action=wordfence_doScan&isFork=' . ($isFork ? '1' : '0') . '&scanMode=' . $scanMode . '&cronKey=' . $cronKey;
 			$cronURL = admin_url($cronURL);
 			$headers = array('Referer' => false/*, 'Cookie' => 'XDEBUG_SESSION=1'*/);
 			wordfence::status(4, 'info', "Starting cron with normal ajax at URL $cronURL");
-			wp_remote_get( $cronURL, array(
-				'timeout' => 0.01,
-				'blocking' => false,
-				'sslverify' => false,
-				'headers' => $headers 
-				) );
+			
+			try {
+				wfConfig::set('scanStartAttempt', time());
+				$response = wp_remote_get($cronURL, array(
+					'timeout' => 0.01,
+					'blocking' => false,
+					'sslverify' => false,
+					'headers' => $headers 
+					));
+			}
+			catch (Exception $e) {
+				wfConfig::set('lastScanCompleted', $e->getMessage());
+				wfConfig::set('lastScanFailureType', wfIssues::SCAN_FAILED_CALLBACK_TEST_FAILED);
+				return false;
+			}
+			
+			if (is_wp_error($response)) {
+				$error_message = $response->get_error_message();
+				wfConfig::set('lastScanCompleted', "There was an " . ($error_message ? '' : 'unknown ') . "error starting the scan" . ($error_message ? ": $error_message" : '.'));
+				wfConfig::set('lastScanFailureType', wfIssues::SCAN_FAILED_CALLBACK_TEST_FAILED);
+			}
+			
 			wordfence::status(4, 'info', "Scan process ended after forking.");
-		} else {
+		}
+		else {
 			$cronURL = admin_url('admin-ajax.php');
 			$cronURL = preg_replace('/^(https?:\/\/)/i', '$1noc1.wordfence.com/scanp/', $cronURL);
 			$cronURL .= '?action=wordfence_doScan&isFork=' . ($isFork ? '1' : '0') . '&scanMode=' . $scanMode . '&cronKey=' . $cronKey;
 			$headers = array();
 			wordfence::status(4, 'info', "Starting cron via proxy at URL $cronURL");
-
-			wp_remote_get( $cronURL, array(
-				'timeout' => 0.01,
-				'blocking' => false,
-				'sslverify' => false,
-				'headers' => $headers 
-				) );
+			
+			try {
+				wfConfig::set('scanStartAttempt', time());
+				$response = wp_remote_get($cronURL, array(
+					'timeout' => 0.01,
+					'blocking' => false,
+					'sslverify' => false,
+					'headers' => $headers 
+					));
+			}
+			catch (Exception $e) {
+				wfConfig::set('lastScanCompleted', $e->getMessage());
+				wfConfig::set('lastScanFailureType', wfIssues::SCAN_FAILED_CALLBACK_TEST_FAILED);
+				return false;
+			}
+			
+			if (is_wp_error($response)) {
+				$error_message = $response->get_error_message();
+				wfConfig::set('lastScanCompleted', "There was an " . ($error_message ? '' : 'unknown ') . "error starting the scan" . ($error_message ? ": $error_message" : '.'));
+				wfConfig::set('lastScanFailureType', wfIssues::SCAN_FAILED_CALLBACK_TEST_FAILED);
+			}
+			
 			wordfence::status(4, 'info', "Scan process ended after forking.");
 		}
 		return false; //No error
@@ -2441,4 +2493,6 @@ class wfScanEngineDurationLimitException extends Exception {
 }
 
 class wfScanEngineCoreVersionChangeException extends Exception {
+}
+class wfScanEngineTestCallbackFailedException extends Exception {
 }

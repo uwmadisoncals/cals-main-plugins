@@ -2,20 +2,20 @@
 //
 // Contains popup modules
 // Dependancies: wppa.js and default wp jQuery library
-// 
-var wppaJsPopupVersion = '6.1.9';
+//
+var wppaJsPopupVersion = '6.8.08';
 
-// Popup of thumbnail images 
+// Popup of thumbnail images
 function wppaPopUp( mocc, elm, id, name, desc, rating, ncom, videohtml, maxsizex, maxsizey ) {
 
 	var topDivBig, topDivSmall, leftDivBig, leftDivSmall;
 	var heightImgBig, heightImgSmall, widthImgBig, widthImgSmall, widthImgBigSpace;
 	var puImg;
 	var imghtml;
-	
+
 	// Give this' occurrances popup its content
 	if ( document.getElementById( 'x-'+id+'-'+mocc ) ) {
-	
+
 		var namediv 	= name ? '<div id="wppa-name-'+mocc+'" style="display:none; padding:1px;" class="wppa_pu_info">'+name+'</div>' : '';
 		var descdiv 	= desc ? '<div id="wppa-desc-'+mocc+'" style="clear:both; display:none; padding:1px;" class="wppa_pu_info">'+desc+'</div>' : '';
 		var ratediv 	= rating ? '<div id="wppa-rat-'+mocc+'" style="clear:both; display:none; padding:1px;" class="wppa_pu_info">'+rating+'</div>' : '';
@@ -47,42 +47,42 @@ function wppaPopUp( mocc, elm, id, name, desc, rating, ncom, videohtml, maxsizex
 				}
 		}
 	}
-	
-	// Find handle to the popup image 
+
+	// Find handle to the popup image
 	puImg = document.getElementById( 'wppa-img-'+mocc );
 
 	// Compute ending sizes
 	widthImgBig = parseInt(maxsizex);
 	heightImgBig = parseInt(maxsizey);
-		
-	// Set width of text fields to width of a landscape image	
+
+	// Set width of text fields to width of a landscape image
 	if ( puImg ) jQuery( ".wppa_pu_info" ).css( 'width', ( ( widthImgBig > heightImgBig ? widthImgBig : heightImgBig ) - 8 )+'px' );
-	
+
 	// Compute starting coords
 	leftDivSmall = parseInt( elm.offsetLeft ) - 7 - 5 - 1; // thumbnail_area:padding, wppa-img:padding, wppa-border; jQuery().css( "padding" ) does not work for padding in css file, only when litaral in the tag
 	topDivSmall = parseInt( elm.offsetTop ) - 7 - 1;
-		
+
 	// Compute starting sizes
 	widthImgSmall = parseInt( elm.clientWidth );
 	heightImgSmall = parseInt( elm.clientHeight );
 
 	// The hor space for a portrait image is the height of the image to create room for the text on very portrait images
 	widthImgBigSpace = widthImgBig > heightImgBig ? widthImgBig : heightImgBig;
-	
+
 	// Compute ending coords
 	leftDivBig = leftDivSmall - parseInt( ( widthImgBigSpace - widthImgSmall ) / 2 );
 	topDivBig = topDivSmall - parseInt( ( heightImgBig - heightImgSmall ) / 2 );
-	
+
 	// Margin for portrait images
 	var lrMarg = parseInt( ( widthImgBigSpace - widthImgBig ) / 2 );
-	
+
 	// To fix a Chrome bug where a theme class effect is: max-width:100% causing the width not being animated:
 	jQuery( '#wppa-img-'+mocc ).css( {"maxWidth":widthImgBig+"px" } );
-	
+
 	// Setup starting properties
 	jQuery( '#wppa-popup-'+mocc ).css( {"marginLeft":leftDivSmall+"px","marginTop":topDivSmall+"px"} );
 	jQuery( '#wppa-img-'+mocc ).css( {"marginLeft":0,"marginRight":0,"width":widthImgSmall+"px","height":heightImgSmall+"px"} );
-	
+
 	// Do the animation
 	jQuery( '#wppa-popup-'+mocc ).stop().animate( {"marginLeft":leftDivBig+"px","marginTop":topDivBig+"px"}, 400 );
 	jQuery( '#wppa-img-'+mocc ).stop().animate( {"marginLeft":lrMarg+"px","marginRight":lrMarg+"px","width":widthImgBig+"px","height":heightImgBig+"px"}, 400 );
@@ -95,10 +95,13 @@ function wppaPopReady( mocc ) {
 	jQuery( "#wppa-desc-"+mocc ).show();
 	jQuery( "#wppa-rat-"+mocc ).show();
 	jQuery( "#wppa-ncom-"+mocc ).show();
+
+	// Hide rightclick optionally
+	wppaProtect();
 }
 
 // Dismiss popup
-function wppaPopDown( mocc ) {	
+function wppaPopDown( mocc ) {
 	jQuery( '#wppa-popup-'+mocc ).html( "" );
 	return;
 }
@@ -114,20 +117,20 @@ function wppaFullPopUp( mocc, id, url, xwidth, xheight ) {
 	if ( elm ) {
 		name = elm.alt;
 		desc = elm.title;
-	}	
-	
+	}
+
 	// Open new browser window
 	var wnd = window.open( '', 'Print', 'width='+width+', height='+height+', location=no, resizable=no, menubar=yes ' );
-	
+
 	// Fill it in with the html
 	wnd.document.write( '<html>' );
-		wnd.document.write( '<head>' );	
+		wnd.document.write( '<head>' );
 			wnd.document.write( '<style type="text/css">body{margin:0; padding:6px; background-color:'+wppaBackgroundColorImage+'; text-align:center;}</style>' );
 			wnd.document.write( '<title>'+name+'</title>' );
-			wnd.document.write( 
+			wnd.document.write(
 			'<script type="text/javascript" src="/wp-includes/js/jquery/jquery.js" ></script>' +
 			'<script type="text/javascript">function wppa_downl() {'+
-				'jQuery.ajax( { 	url: 		\'' + wppaAjaxUrl + '\',' + 
+				'jQuery.ajax( { 	url: 		\'' + wppaAjaxUrl + '\',' +
 									'data: 		\'action=wppa' +
 												'&wppa-action=makeorigname' +
 												'&photo-id=' + id +
@@ -136,7 +139,7 @@ function wppaFullPopUp( mocc, id, url, xwidth, xheight ) {
 									'type: 		\'GET\',' +
 									'timeout: 	10000,' +
 									'beforeSend:	function( xhr ) {' +
-						
+
 													'},' +
 									'success: 		function( result, status, xhr ) {' +
 														'result = result.split( "||" );'+
@@ -153,9 +156,9 @@ function wppaFullPopUp( mocc, id, url, xwidth, xheight ) {
 									'error: 		function( xhr, status, error ) {' +
 														'wppaConsoleLog( \'wppaFullPopUp failed. Error = \' + error + \', status = \' + status, \'force\' );' +
 													'},' +
-								'} );' +				
+								'} );' +
 			'}</script>' );
-			wnd.document.write( 
+			wnd.document.write(
 			'<script type="text/javascript">function wppa_print() {'+
 				'document.getElementById( "wppa_printer" ).style.visibility="hidden"; '+
 				'document.getElementById( "wppa_download" ).style.visibility="hidden"; '+
@@ -173,6 +176,9 @@ function wppaFullPopUp( mocc, id, url, xwidth, xheight ) {
 			wnd.document.write( '</div>' );
 		wnd.document.write( '</body>' );
 	wnd.document.write( '</html>' );
+
+	// Hide rightclick optionally
+	wppaProtect();
 }
 
 // Say we're in

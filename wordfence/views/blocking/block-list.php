@@ -8,7 +8,7 @@ if (!defined('WORDFENCE_VERSION')) { exit; }
 <div class="wf-row">
 	<div class="wf-col-xs-12">
 		<div class="wf-flex-horizontal wf-flex-full-width wf-add-bottom-small">
-			<h3 class="wf-no-top wf-no-bottom"><?php printf(__('All blocks<span class="wf-hidden-xs"> for %s</span>', 'wordfence'), preg_replace('/^https?:\/\//i', '', wfUtils::wpSiteURL())); ?></h3>
+			<h3 class="wf-no-top wf-no-bottom"><?php printf(__('Current blocks<span class="wf-hidden-xs"> for %s</span>', 'wordfence'), preg_replace('/^https?:\/\//i', '', wfUtils::wpSiteURL())); ?></h3>
 			<div class="wf-right">
 				<div class="wf-inline-block">
 				<ul class="wf-option wf-option-toggled-boolean-switch wf-option-no-spacing" data-option="displayAutomaticBlocks" data-enabled-value="1" data-disabled-value="0" data-original-value="<?php echo wfConfig::get('displayAutomaticBlocks') ? 1 : 0; ?>">
@@ -295,7 +295,7 @@ if (!defined('WORDFENCE_VERSION')) { exit; }
 			}
 			
 			if (table.find('.wf-blocks-columns > .wf-sortable.wf-sorted-ascending, .wf-blocks-columns > .wf-sortable.wf-sorted-descending').length == 0) {
-				table.find('thead > .wf-blocks-columns > .wf-sortable[data-column="type"]').trigger('click', [true]);
+				table.find('thead > .wf-blocks-columns > .wf-sortable[data-column="ruleAdded"]').addClass('wf-sorted-ascending').trigger('click', [true]);
 			}
 
 			$(window).trigger('wordfenceUpdateBlockButtons');
@@ -338,8 +338,9 @@ if (!defined('WORDFENCE_VERSION')) { exit; }
 		});
 		
 		$(function() {
-			WFAD.sortColumn = 'type';
-			WFAD.sortDirection = 'ascending';
+			WFAD.sortColumn = 'ruleAdded';
+			WFAD.sortDirection = 'descending';
+			
 			$(window).trigger('wordfenceRefreshBlockList', [{blocks: [], loading: true}, false]);
 			$(window).trigger('wordfenceLoadBlocks', [true]);
 
@@ -363,17 +364,19 @@ if (!defined('WORDFENCE_VERSION')) { exit; }
 					$('#wf-blocks-apply-filter').trigger('click');
 					return false;
 				}
-			}).on('keyup', function(e) {
-				var currentValue = $('#wf-blocks-filter-field').val() || '';
-				if (!WFAD.blocksFilter) {
-					$('#wf-blocks-apply-filter').text('<?php _e('Filter', 'wordfence'); ?>').data('filterMode', '');
-				}
-				else if (currentValue == '' || currentValue == WFAD.blocksFilter) {
-					$('#wf-blocks-apply-filter').text('<?php _e('Clear Filter', 'wordfence'); ?>').data('filterMode', 'filtered');
-				}
-				else {
-					$('#wf-blocks-apply-filter').text('<?php _e('Change Filter', 'wordfence'); ?>').data('filterMode', 'pendingChange');
-				}
+			}).on('change paste keyup', function() {
+				setTimeout(function() {
+					var currentValue = $('#wf-blocks-filter-field').val() || '';
+					if (!WFAD.blocksFilter) {
+						$('#wf-blocks-apply-filter').text('<?php _e('Filter', 'wordfence'); ?>').data('filterMode', '');
+					}
+					else if (currentValue == '' || currentValue == WFAD.blocksFilter) {
+						$('#wf-blocks-apply-filter').text('<?php _e('Clear Filter', 'wordfence'); ?>').data('filterMode', 'filtered');
+					}
+					else {
+						$('#wf-blocks-apply-filter').text('<?php _e('Change Filter', 'wordfence'); ?>').data('filterMode', 'pendingChange');
+					}
+				}, 4);
 			});
 			
 			$('#wf-blocks-apply-filter').on('click', function(e) {

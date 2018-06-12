@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* Version 6.7.00
+* Version 6.9.02
 *
 */
 
@@ -84,7 +84,7 @@ class WPPA_Comment_table extends WP_List_Table {
 		$result =
 		'<img' .
 			' src="' . $src . '"' .
-			' style="width:100px;max-height:75px;"' .
+			' style="width:100px;"' .
 			' title="' . $title . '"' .
 		' />' .
 		'<br />' .

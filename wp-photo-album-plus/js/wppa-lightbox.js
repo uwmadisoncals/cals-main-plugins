@@ -3,7 +3,7 @@
 // Conatins lightbox modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaLightboxVersion = '6.8.05';
+var wppaLightboxVersion = '6.8.08';
 
 // Global inits
 var wppaNormsBtnOpac 		= 0.75;
@@ -265,6 +265,7 @@ wppaConsoleLog( 'wppaOvlShow arg=' + arg );
 				else {
 					temp = false;
 				}
+
 				if ( temp.length > 1 ) {
 					if ( temp[0] == 'wppa' && temp[1] == setname ) {	// Same set
 						wppaOvlUrls[j] = anchor.href;
@@ -394,7 +395,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 		// Fullsize Video
 		if ( wppaIsVideo ) {
 			html =
-			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+jQuery( window ).width()+'px; height:'+jQuery( window ).height()+'px; left:0px; top:0px; text-align:center;" >'+
+			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+screen.width+'px; height:'+screen.height+'px; left:0px; top:0px; text-align:center;" >'+
 				'<video id="wppa-overlay-img" controls preload="metadata"' +
 					( wppaOvlVideoStart ? ' autoplay' : '' ) +
 					' ontouchstart="wppaTouchStart( event, \'wppa-overlay-img\', -1 );"' +
@@ -403,7 +404,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 					' ontouchcancel="wppaTouchCancel( event );"' +
 					' onpause="wppaOvlVideoPlaying = false;"' +
 					' onplay="wppaOvlVideoPlaying = true;"' +
-					' style="border:none; width:'+jQuery( window ).width()+'px; box-shadow:none; position:absolute;"' +
+					' style="border:none; width:'+screen.width+'px; box-shadow:none; position:absolute;"' +
 					' alt="'+wppaOvlAlts[idx]+'"' +
 					' >'+
 						wppaOvlVideoHtmls[idx]+
@@ -423,14 +424,14 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 		// Fullsize Photo
 		else {
 			html =
-			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+jQuery( window ).width()+'px; height:'+jQuery( window ).height()+'px; left:0px; top:0px; text-align:center;" >'+
+			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+screen.width+'px; height:'+screen.height+'px; left:0px; top:0px; text-align:center;" >'+
 				'<img id="wppa-overlay-img"'+
 					' ontouchstart="wppaTouchStart( event, \'wppa-overlay-img\', -1 );"'+
 					' ontouchend="wppaTouchEnd( event );"'+
 					' ontouchmove="wppaTouchMove( event );"'+
 					' ontouchcancel="wppaTouchCancel( event );"'+
 					' src="'+wppaOvlUrls[idx]+'"'+
-					' style="border:none; width:'+jQuery( window ).width()+'px; visibility:hidden; box-shadow:none; position:absolute;"'+
+					' style="border:none; width:'+screen.width+'px; visibility:hidden; box-shadow:none; position:absolute;"'+
 					' alt="'+wppaOvlAlts[idx]+'"'+
 				' />';
 				if ( wppaHasAudio ) {
@@ -503,10 +504,11 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 			jQuery( '#wppa-overlay-ic' ).html( html );
 		}
 
-		// Disable right mouse button
-		jQuery( '#wppa-overlay-img' ).bind( 'contextmenu', function(e) {
-			return false;
-		});
+		// Disable right mouse button optionally
+		wppaProtect();
+//		jQuery( '#wppa-overlay-img' ).bind( 'contextmenu', function(e) {
+//			return false;
+//		});
 
 		// Replace svg img src to html
 //		wppaReplaceSvg();
@@ -520,10 +522,10 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 			wppaOvlFsPhotoId = 0;
 		}
 		wppaOvlFirst = false;
-		
+
 		// Record we are in
 		wppaOvlOpen = true;
-		
+
 		return false;
 	}
 
@@ -782,7 +784,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 		if ( wppaOvlFirst ) {
 			wppaShowFsButtons();
 		}
-		
+
 		// Record we are in
 		wppaOvlOpen = true;
 
@@ -888,20 +890,20 @@ wppaConsoleLog( 'wppaOvlSize' );
 	wppaSavedMarginTop 			= - parseInt( wppaSavedContainerHeight / 2 );
 
 	// Go to final size
-	jQuery( '#wppa-overlay-img' ).animate( 	{
-												width:wppaSavedImageWidth,
-												height:wppaSavedImageHeight,
-											},
-											speed
-										);
+	jQuery( '#wppa-overlay-img' ).stop().animate( 	{
+														width:wppaSavedImageWidth,
+														height:wppaSavedImageHeight,
+													},
+													speed
+												);
 
-	jQuery( '#wppa-overlay-ic' ).animate( 	{
-												width:wppaSavedContainerWidth,
-												marginLeft:wppaSavedMarginLeft,
-												marginTop:wppaSavedMarginTop,
-											},
-											speed
-										);
+	jQuery( '#wppa-overlay-ic' ).stop().animate( 	{
+														width:wppaSavedContainerWidth,
+														marginLeft:wppaSavedMarginLeft,
+														marginTop:wppaSavedMarginTop,
+													},
+													speed
+												);
 
 
 	// Done?
@@ -946,7 +948,7 @@ wppaConsoleLog( 'wppaOvlFormatFull '+wppaOvlMode );
 	 	natHeight 	= img.naturalHeight;
 	}
 
-	var screenRatio = jQuery( window ).width() / jQuery( window ).height();
+	var screenRatio = screen.width / screen.height;
 	var imageRatio 	= natWidth / natHeight;
 	var margLeft 	= 0;
 	var margTop 	= 0;
@@ -959,45 +961,45 @@ wppaConsoleLog( 'wppaOvlFormatFull '+wppaOvlMode );
 	switch ( wppaOvlMode ) {
 		case 'padded':
 			if ( screenRatio > imageRatio ) {	// Picture is more portrait
-				margLeft 	= ( jQuery( window ).width() - jQuery( window ).height() * imageRatio ) / 2;
+				margLeft 	= ( screen.width - screen.height * imageRatio ) / 2;
 				margTop 	= 0;
-				imgHeight 	= jQuery( window ).height();
-				imgWidth 	= jQuery( window ).height() * imageRatio;
+				imgHeight 	= screen.height;
+				imgWidth 	= screen.height * imageRatio;
 			}
 			else {
 				margLeft 	= 0;
-				margTop 	= ( jQuery( window ).height() - jQuery( window ).width() / imageRatio ) / 2;
-				imgHeight 	= jQuery( window ).width() / imageRatio;
-				imgWidth 	= jQuery( window ).width();
+				margTop 	= ( screen.height - screen.width / imageRatio ) / 2;
+				imgHeight 	= screen.width / imageRatio;
+				imgWidth 	= screen.width;
 			}
 			break;
 		case 'stretched':
 			margLeft 	= 0;
 			margTop 	= 0;
-			imgHeight 	= jQuery( window ).height();
-			imgWidth 	= jQuery( window ).width();
+			imgHeight 	= screen.height;
+			imgWidth 	= screen.width;
 			break;
 		case 'clipped':
 			if ( screenRatio > imageRatio ) {	// Picture is more portrait
 				margLeft 	= 0;
-				margTop 	= ( jQuery( window ).height() - jQuery( window ).width() / imageRatio ) / 2;
-				imgHeight 	= jQuery( window ).width() / imageRatio;
-				imgWidth 	= jQuery( window ).width();
+				margTop 	= ( screen.height - screen.width / imageRatio ) / 2;
+				imgHeight 	= screen.width / imageRatio;
+				imgWidth 	= screen.width;
 			}
 			else {
-				margLeft 	= ( jQuery( window ).width() - jQuery( window ).height() * imageRatio ) / 2;
+				margLeft 	= ( screen.width - screen.height * imageRatio ) / 2;
 				margTop 	= 0;
-				imgHeight 	= jQuery( window ).height();
-				imgWidth 	= jQuery( window ).height() * imageRatio;
+				imgHeight 	= screen.height;
+				imgWidth 	= screen.height * imageRatio;
 			}
 			break;
 		case 'realsize':
-			margLeft 	= ( jQuery( window ).width() - natWidth ) / 2;
+			margLeft 	= ( screen.width - natWidth ) / 2;
 			if ( margLeft < 0 ) {
 				scrollLeft 	= parseInt( - margLeft );
 				margLeft 	= 0;
 			}
-			margTop 	= ( jQuery( window ).height() - natHeight ) / 2;
+			margTop 	= ( screen.height - natHeight ) / 2;
 			if ( margTop < 0 ) {
 				scrollTop 	= parseInt( - margTop );
 				margTop 	= 0;
@@ -1115,7 +1117,7 @@ wppaConsoleLog( 'wppaOvlRun, running='+wppaOvlRunning );
 		return;
 	}
 
-	// If the current image is not yet complete, try again after 500 ms
+	// If the current image is not yet complete, try again after 50 ms
 	if ( ! wppaIsVideo ) {
 		var elm = document.getElementById( 'wppa-overlay-img' );
 		if ( elm ) {
@@ -1187,7 +1189,7 @@ wppaConsoleLog( 'wppaOvlHide' );
 
 	// Remove background
 	jQuery( '#wppa-overlay-bg' ).fadeOut( 300 );
-	
+
 	// Remove kb handler
 	jQuery( document ).off( 'keydown', wppaOvlKeyboardHandler );
 	wppaKbHandlerInstalled = false;
@@ -1223,7 +1225,7 @@ wppaConsoleLog( 'wppaOvlOnClick' );
 			var x = event.screenX - window.screenX;
 			var y = event.clientY;
 			if ( y > 48 ) {
-				if ( x < jQuery( window ).width() / 2 ) wppaOvlShowPrev();
+				if ( x < screen.width / 2 ) wppaOvlShowPrev();
 				else wppaOvlShowNext();
 			}
 			break;
@@ -1239,17 +1241,17 @@ function wppaInitOverlay() {
 wppaConsoleLog( 'wppaInitOverlay' );
 
 	// First find subtitles for non-wppa images
-	jQuery( '.wp-caption' ).each( function() { 
+	jQuery( '.wp-caption' ).each( function() {
 		var div 		= jQuery( this );
 		var title 		= div.find( 'IMG[alt]' ).attr( 'alt' ) || '';
-		var description = div.find( '.wp-caption-text' ).html() || ''; 
+		var description = div.find( '.wp-caption-text' ).html() || '';
 		var a 			= div.find( 'a' );
 		var lbtitle 	= title + '<br>' + description;
 		if ( ! a.attr( 'data-lbtitle' ) ) {
-			a.attr( 'data-lbtitle', lbtitle ); 
+			a.attr( 'data-lbtitle', lbtitle );
 		}
 	});
-	
+
 	if ( wppaOvlMode == '' ) {
 		wppaOvlMode = wppaOvlModeInitial;
 	}
@@ -1290,7 +1292,7 @@ wppaConsoleLog( 'wppaInitOverlay' );
 
 			// found one
 			wppaWppaOverlayActivated = true;
-
+/*
 			// Install handler
 			if ( wppaIsMobile ) {
 
@@ -1310,20 +1312,31 @@ wppaConsoleLog( 'wppaInitOverlay' );
 
 			}
 			else {
-
+*/
 				// Install onclick handler
 				jQuery( anchor ).on( 'click', function( event ) {
 					wppaOvlShow( this );
 					event.preventDefault();
 				});
+/*
 			}
+*/
+			// Set cursor to magnifier
+			jQuery( anchor ).css( 'cursor', 'url( ' + wppaImageDirectory + wppaMagnifierCursor + ' ),auto' );
+//alert( 'url( wppaImageDirectory + wppaMagnifierCursor ),auto' );
 
-			// Install orientationchange handler if mobile
-			if ( wppaIsMobile ) {
-				window.addEventListener( 'orientationchange', wppaDoOnOrientationChange);
-			}
+//			// Install orientationchange handler if mobile
+//			if ( wppaIsMobile ) {
+//				window.addEventListener( 'orientationchange', wppaDoOnOrientationChange);
+//			}
 		}
 	}
+
+	// Install orientationchange handler if mobile
+	if ( wppaIsMobile ) {
+		window.addEventListener( 'orientationchange', wppaDoOnOrientationChange);
+	}
+
 }
 
 // This module is intented to be used in any onclick definition that opens or closes a part of the photo description.

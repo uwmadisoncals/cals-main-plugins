@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.8.06
+* Version 6.9.02
 *
 */
 
@@ -38,12 +38,12 @@ global $silent;
 
 	// If not a new install, remove obsolete tempfiles
 	if ( $old_rev > '100' ) {
-		wppa_delete_obsolete_tempfiles();
+		wppa_clear_cache($force);	// Clear cache
 	}
 
 	if ( $old_rev == $wppa_revno && ! $force ) return; // Nothing to do here
 
-	wppa_clear_cache(true);	// Clear cache
+
 	delete_option( 'wppa_dismiss_admin_notice_scripts_are_obsolete' );
 
 	$wppa_error = false;	// Init no error
@@ -207,10 +207,6 @@ global $silent;
 		}
 		$idx++;
 	}
-
-	// Clear Session
-//	$wpdb->query( "TRUNCATE TABLE `".WPPA_SESSION."`" );
-//	wppa_session_start();
 
 	// Convert any changed and remove obsolete setting options
 	if ( $old_rev > '100' ) {	// On update only
@@ -646,10 +642,6 @@ global $silent;
 		wppa_ok_message($msg);
 	}
 
-	// Check if db is ok
-	if ( ! wppa_check_database() ) $wppa_error = true;
-
-
 	// Remove dynamic files
 	$files = glob( WPPA_PATH.'/wppa-init.*.js' );
 	if ( $files ) {
@@ -859,6 +851,7 @@ Hide Camera info
 						'wppa_show_home' 					=> 'yes',	// 4
 						'wppa_home_text' 					=> __( 'Home', 'wp-photo-album-plus' ),
 						'wppa_show_page' 					=> 'yes',	// 4
+						'wppa_show_pname' 					=> 'yes',
 						'wppa_bc_separator' 				=> 'raquo',	// 5
 						'wppa_bc_txt' 						=> htmlspecialchars('<span style="color:red; font_size:24px;">&bull;</span>'),	// 6
 						'wppa_bc_url' 						=> wppa_get_imgdir().'arrow.gif',	// 7
@@ -1096,6 +1089,7 @@ Hide Camera info
 						'wppa_close_text' 				=> 'Close',	// frontend upload/edit etc
 
 						'wppa_icon_corner_style' 		=> 'medium',
+						'wppa_spinner_shape' 			=> 'default',
 
 
 						// Table III: Backgrounds
@@ -1170,7 +1164,7 @@ Hide Camera info
 						'wppa_auto_page'				=> 'no',
 						'wppa_auto_page_type'			=> 'photo',
 						'wppa_auto_page_links'			=> 'bottom',
-						'wppa_defer_javascript' 		=> 'no',
+						'wppa_defer_javascript' 		=> 'yes',
 						'wppa_inline_css' 				=> 'yes',
 						'wppa_custom_style' 			=> '',
 						'wppa_custom_style_chrome' 		=> '',
@@ -1180,12 +1174,12 @@ Hide Camera info
 						'wppa_custom_style_ie' 			=> '',
 						'wppa_custom_style_opera' 		=> '',
 						'wppa_use_custom_style_file' 	=> 'no',
-						'wppa_js_css_optional' 			=> 'no',
+//						'wppa_js_css_optional' 			=> 'no',
 						'wppa_enable_pdf' 				=> 'no', 	// IV-A30
 						'wppa_use_custom_theme_file' 	=> 'no',
 						'wppa_cre_uploads_htaccess' 	=> 'remove',
 						'wppa_debug_trace_on' 			=> 'no',
-						'wppa_lazy_or_htmlcomp' 		=> 'no',
+//						'wppa_lazy_or_htmlcomp' 		=> 'no',
 						'wppa_relative_urls' 			=> 'no',
 
 						'wppa_thumbs_first' 			=> 'no',
@@ -1467,8 +1461,8 @@ Hide Camera info
 						'wppa_upload_notify' 			=> 'no',
 						'wppa_upload_backend_notify'	=> 'no',
 						'wppa_upload_one_only'			=> 'no',
-						'wppa_memcheck_frontend'		=> 'yes',
-						'wppa_memcheck_admin'			=> 'yes',
+						'wppa_memcheck'					=> 'yes',
+						'wppa_memcheck_copy' 			=> 'yes',
 						'wppa_comment_captcha'			=> 'none',
 						'wppa_spam_maxage'				=> 'none',
 						'wppa_user_create_on'			=> 'no',
@@ -1502,6 +1496,7 @@ Hide Camera info
 						'wppa_photo_owner_change' 	=> 'no',
 						'wppa_superuser_user' 		=> '',
 						'wppa_un_superuser_user' 	=> '',
+						'wppa_no_rightclick' 		=> 'no',
 
 						// Table VIII: Actions
 						// A Harmless
@@ -1770,6 +1765,7 @@ Hide Camera info
 						'wppa_use_scabn'				=> 'no',
 						'wppa_use_CMTooltipGlossary' 	=> 'no',
 						'wppa_photo_on_bbpress' 		=> 'no',
+						'wppa_domain_link_buddypress' 	=> 'no',
 
 						// K External services
 						'wppa_cdn_service'						=> '',
@@ -1785,6 +1781,7 @@ Hide Camera info
 						'wppa_map_apikey' 						=> '',
 						'wppa_load_map_api' 					=> 'no',
 						'wppa_gpx_shortcode'					=> '[map style="width: auto; height:300px; margin:0; " marker="yes" lat="w#lat" lon="w#lon"]',
+						'wppa_geo_zoom' 						=> '10',
 						'wppa_fotomoto_on'						=> 'no',
 						'wppa_fotomoto_fontsize'				=> '',
 						'wppa_fotomoto_hide_when_running'		=> 'no',

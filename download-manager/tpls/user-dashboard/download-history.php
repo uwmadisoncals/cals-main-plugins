@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) die();
 ?>
-<div class="panel panel-default dashboard-panel" style="margin-top: 20px">
+<div class="panel panel-default dashboard-panel">
     <div class="panel-heading">Download History</div>
     <table class="table">
         <thead>

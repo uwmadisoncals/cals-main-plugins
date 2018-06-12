@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the slideshow high level functions
-* Version 6.7.10
+* Version 6.9.02
 *
 */
 
@@ -241,7 +241,7 @@ function wppa_start_stop_icons( $opt = '' ) {
 	if ( wppa_switch( 'show_startstop_navigation' ) && ! wppa( 'is_slideonly' ) ) $hide = '';	// we want it
 
 	if ( wppa_opt( 'start_slide' ) || wppa_in_widget() ) {
-		wppa_add_js_page_data( "\n" . '<script type="text/javascript">' );
+		wppa_add_js_page_data( "\n" . '<script type="text/javascript" >' );
 		wppa_add_js_page_data( "\n" . 'wppaSlideInitRunning['.wppa( 'mocc' ).'] = true;' );
 		wppa_add_js_page_data( "\n" . 'wppaMaxOccur = '.wppa( 'mocc' ).';' );
 		wppa_add_js_page_data( "\n" . '</script>' );
@@ -299,7 +299,7 @@ function wppa_start_stop_text( $opt = '' ) {
 	if ( wppa_switch( 'show_startstop_navigation' ) && ! wppa( 'is_slideonly' ) ) $hide = '';	// we want it
 
 	if ( wppa_opt( 'start_slide' ) || wppa_in_widget() ) {
-		wppa_add_js_page_data( "\n" . '<script type="text/javascript">' );
+		wppa_add_js_page_data( "\n" . '<script type="text/javascript" >' );
 		wppa_add_js_page_data( "\n" . 'wppaSlideInitRunning['.wppa( 'mocc' ).'] = true;' );
 		wppa_add_js_page_data( "\n" . 'wppaMaxOccur = '.wppa( 'mocc' ).';' );
 		wppa_add_js_page_data( "\n" . '</script>' );
@@ -386,85 +386,10 @@ function wppa_slide_frame() {
 				'</div>'
 			);
 
-			switch( wppa_opt( 'icon_corner_style' ) ) {
-				case 'gif':
-				case 'none':
-					$bradius = '0';
-					break;
-				case 'light':
-					$bradius = '12';
-					break;
-				case 'medium':
-					$bradius = '24';
-					break;
-				case 'heavy':
-					$bradius = '60';
-					break;
-			}
-
-	if ( wppa_use_svg() ) {
-		wppa_out(	'<svg' .
-						' id="wppa-slide-spin-' . wppa( 'mocc' ) . '"' .
-						' class="wppa-ajax-spin uil-default"' .
-						' width="120px"' .
-						' height="120px"' .
-						' xmlns="http://www.w3.org/2000/svg"' .
-						' viewBox="0 0 100 100"' .
-						' preserveAspectRatio="xMidYMid"' .
-						' style="' .
-							'width:120px;' .
-							'height:120px;' .
-							'position:absolute;' .
-							'top:50%;' .
-							'margin-top:-60px;' .
-							'left:50%;' .
-							'margin-left:-60px;' .
-							'z-index:100100;' .
-							'opacity:1;' .
-							'display:block;' .
-							'fill:' . wppa_opt( 'svg_color' ) . ';' .
-							'background-color:' . wppa_opt( 'svg_bg_color' ) . ';' .
-							'box-shadow:none;' .
-							'border-radius:' . $bradius .'px;' .
-							'"' .
-						' >' .
-						wppa_get_spinner_svg_body_html() .
-					'</svg>'
-		);
-	}
-	else {
-		wppa_out( 	'<img' .
-						' id="wppa-slide-spin-' . wppa( 'mocc' ) . '"' .
-						' alt="spinner"' .
-						' style="' .
-							'width:120px;' .
-							'height:120px;' .
-							'position:absolute;' .
-							'top:50%;' .
-							'margin-top:-60px;' .
-							'left:50%;' .
-							'margin-left:-60px;' .
-							'z-index:100100;' .
-							'opacity:1;' .
-							'display:block;' .
-//							'fill:' . wppa_opt( 'svg_color' ) . ';' .
-							'background-color:' . wppa_opt( 'svg_bg_color' ) . ';' .
-							'box-shadow:none;' .
-							'border-radius:' . $bradius .'px;' .
-							'"' .
-						' src="' . wppa_get_imgdir() . 'loader.gif"' .
-					' />'
-				);
-	}
-
-
-	/*'<div' .
-					' id="spinner-' . wppa( 'mocc' ) . '"' .
-					' class="spinner"' .
-					' >' .
-				'</div>'
-			);
-	*/
+	// The Spinner image
+	wppa_out( wppa_get_spinner_svg_html( array( 	'id' 		=> 'wppa-slide-spin-' . wppa( 'mocc' ),
+													'position' 	=> 'absolute',
+													) ) );
 
 	if ( ! wppa_page( 'oneofone' ) ) {
 
@@ -1319,7 +1244,7 @@ function wppa_slide_filmstrip( $opt = '' ) {
 	$pagsiz = round( $w / ( wppa_opt( 'film_thumbsize' ) + wppa_opt( 'tn_margin' ) ) );
 	if ( wppa_in_widget() ) $pagsiz = round( $w / ( wppa_opt( 'film_thumbsize' ) / 2 + wppa_opt( 'tn_margin' ) / 2 ) );
 
-	wppa_add_js_page_data( '<script type="text/javascript">' );
+	wppa_add_js_page_data( '<script type="text/javascript" >' );
 	wppa_add_js_page_data( 'wppaFilmPageSize['.wppa( 'mocc' ).'] = '.$pagsiz.';' );
 	wppa_add_js_page_data( '</script>' );
 

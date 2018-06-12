@@ -3,7 +3,7 @@
 /* Package: wp-photo-album-plus
 /*
 /* Various style computation routines
-/* Version 6.8.02
+/* Version 6.8.09
 /*
 */
 
@@ -253,6 +253,10 @@ global $wppa_dynamic_css_data;
 		$content .= '
 #wppa-norms-btn, #wppa-fulls-btn { display:none; }';
 	}
+	if ( ! wppa_switch( 'show_pname' ) ) {
+		$content .= '
+.bc-pname { display:none; }';
+	}
 
 	// Add custom style
 	$content .= wppa_opt( 'custom_style' );
@@ -450,7 +454,7 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 			}
 			if ( wppa_opt( 'coverimg_linktype' ) == 'lightbox' ) {
 				$result['cursor'] =
-					' cursor:url( ' .wppa_get_imgdir() . wppa_opt( 'magnifier' ) . ' ),pointer;';
+					' cursor:' . wppa_wait() . ';';//url( ' .wppa_get_imgdir() . wppa_opt( 'magnifier' ) . ' ),pointer;';
 			}
 
 			$result['style'] .= 'display:inline;';
@@ -548,8 +552,9 @@ function wppa_get_imgstyle_a( $id, $file, $xmax_size, $xvalign = '', $type = '' 
 				$result['cursor'] = ' cursor:default;';
 			}
 			elseif ( $linktyp == 'lightbox' ) {
-				$result['cursor'] = ' cursor:url(' . wppa_get_imgdir() .
-					wppa_opt( 'magnifier' ) . '),pointer;';
+				$result['cursor'] = ' curor:wait;';
+					// ' cursor:url(' . wppa_get_imgdir() .
+					// wppa_opt( 'magnifier' ) . '),pointer;';
 			}
 			else {
 				$result['cursor'] = ' cursor:pointer;';

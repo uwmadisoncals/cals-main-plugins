@@ -2,9 +2,7 @@
 /* wppa-tinymce-shortcodes.php
 * Pachkage: wp-photo-album-plus
 *
-*
-* Version 6.8.06
-*
+* Version 6.8.08
 */
 
 if ( ! defined( 'ABSPATH' ) )
@@ -48,7 +46,7 @@ function wppa_inject_js() {
 global $wppa_api_version;
 
 	// Things that wppa-tinymce.js AND OTHER MODULES!!! need to know
-	echo('<script type="text/javascript">'."\n");
+	echo('<script type="text/javascript" >'."\n");
 	echo('/* <![CDATA[ */'."\n");
 		echo("\t".'wppaImageDirectory = "'.wppa_get_imgdir().'";'."\n");
 		echo("\t".'wppaAjaxUrl = "'.admin_url('admin-ajax.php').'";'."\n");
@@ -535,7 +533,7 @@ global $wpdb;
 			'<tr id="wppagallery-phototags-tr" style="display:none;" >'.
 				'<th><label for="wppagallery-phototags">'.__('The photo tag(s):', 'wp-photo-album-plus').'</label></th>'.
 				'<td>'.
-					'<select id="wppagallery-phototags" style="color:#700 !important;;" multiple="multiple" onchange="wppaGalleryEvaluate()">'.
+					'<select id="wppagallery-phototags" style="color:#700 !important;" multiple="multiple" onchange="wppaGalleryEvaluate()">'.
 						'<option value="" disabled="disabled" selected="selected" style="color:#700 !important;" >'.__('--- please select tag(s) ---', 'wp-photo-album-plus').'</option>';
 						if ( $tags ) foreach ( array_keys($tags) as $tag ) {
 							$result .= '<option class="wppagallery-phototags" value="'.$tag.'" >'.$tag.'</option>';

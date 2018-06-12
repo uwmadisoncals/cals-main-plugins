@@ -3,7 +3,7 @@
 Plugin Name: Paid Memberships Pro
 Plugin URI: http://www.paidmembershipspro.com
 Description: Plugin to Handle Memberships
-Version: 1.9.4.4
+Version: 1.9.5.1
 Author: Stranger Studios
 Author URI: http://www.strangerstudios.com
 Text Domain: paid-memberships-pro
@@ -14,8 +14,8 @@ Domain Path: /languages
 	GPLv2 Full license details in license.txt
 */
 
-// version constant
-define( 'PMPRO_VERSION', '1.9.4.4' );
+// version constant.1
+define( 'PMPRO_VERSION', '1.9.5' );
 define( 'PMPRO_USER_AGENT', 'Paid Memberships Pro v' . PMPRO_VERSION . '; ' . site_url() );
 define( 'PMPRO_MIN_PHP_VERSION', '5.6' );
 
@@ -58,6 +58,7 @@ require_once( PMPRO_DIR . '/includes/recaptcha.php' );				// load recaptcha file
 require_once( PMPRO_DIR . '/includes/cleanup.php' );				// clean things up when deletes happen, etc.
 require_once( PMPRO_DIR . '/includes/login.php' );					// code to redirect away from login/register page
 require_once( PMPRO_DIR . '/includes/capabilities.php' );			// manage PMPro capabilities for roles
+require_once( PMPRO_DIR . '/includes/privacy.php' );				// code to aid with user data privacy, e.g. GDPR compliance
 
 require_once( PMPRO_DIR . '/includes/xmlrpc.php' );					// xmlrpc methods
 

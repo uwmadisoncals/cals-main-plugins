@@ -3,7 +3,7 @@ Contributors: Bueltge, inpsyde
 Tags: multisite, administration, admin bar, network,
 Requires at least: 4.6
 Tested up to: 4.9
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,10 +96,17 @@ I'm German and my English might be gruesome here and there.
 So please be patient with me and let me know of typos or grammatical parts. Thanks
 
 == Changelog ==
+= 1.4.3 (2018-05-17) =
+* Fix undefined index Network on plugin list, #46
+* Fix small php notes.
+* Fix the possibility to translate the footer message about RAM, SQL queries.
+* ​Add fix to leave message for the parent theme in a single line.
+* Add Ui change to list more as 4 themes in Theme usage overview. Probs @n-goncalves #44
+
 = 1.4.2 (2017-02-22) =
 * Change syntax for usage of plugins, themes; probs @cfoellmann
 * Count the usage in sites for plugins, themes; probs @cfoellmann
-* Change of the autoloader, the removel of a function is now more solid. See [the wiki page](https://github.com/bueltge/wordpress-multisite-enhancements/wiki/Remove-features); probs @cfoellmann
+* Change of the autoloader, the removal of a function is now more solid. See [the wiki page](https://github.com/bueltge/wordpress-multisite-enhancements/wiki/Remove-features); probs @cfoellmann
 * Added option to display or hide the list of sites if too big #44; probs @n-goncalves
 
 = 1.4.1 (2017-08-10) =

@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick, pdf
-Version: 6.8.07
-Stable tag: 6.8.06
+Version: 6.9.02
+Stable tag: 6.9.01
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -126,7 +126,39 @@ If this happens, make sure (ask your hosting provider) that you have all the rig
 
 See for the full changelog: <a href="http://www.wppa.nl/changelog/" >The documentation website</a>
 
+== Privacy Policy ==
+
+* When you leave a comment on a photo or other media item on this site, we send your name, email address, IP address and comment text to the server.
+* When you enter a rating on a photo or other media item on this site, we send your (login)name or IP address and your rating to the server.
+* When you upload a photo or other media item on this site, we send your name to the server.
+* If the photo contains EXIF or IPTC data, this data may - dependant of the configuration - be saved on the server.
+* If the photo contains GPX location data, this data will be saved on the server.
+* If visit the site, the pages you visit, the photos you watch and your IP address will be saved on the server for statistical purposes in your session information. This information will be anonimized after one hour and removed after 24 hours.
+
 == Upgrade Notice ==
+
+= 6.9.02 =
+
+* This version addresses various minor bug fixes and feature requests.
+
+= 6.9.01 =
+
+* This version addresses various minor bug fixes and feature requests.
+
+= 6.9.00 =
+
+* This version includes the code for the privacy policy requirements.
+
+= 6.8.09
+
+* This version addresses various bug fixes and code edits.
+
+= 6.8.08 =
+
+* This version addresses various minor bug fixes and feature requests.
+* This version offers substantial performance improvements when the box in Table IV-A13: Defer Javascript is ticked.
+This setting is now recommended and set ticked as the default.
+* For more info on performance improvements and compatibility with optimizers: see the changelog.txt
 
 = 6.8.07 =
 

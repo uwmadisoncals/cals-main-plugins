@@ -55,7 +55,7 @@ class WordPressDownloadManagerAdmin
             wp_enqueue_style('jqui-css', plugins_url('/download-manager/assets/jqui/theme/jquery-ui.css'));
 
             wp_enqueue_script('wpdm-admin', plugins_url('/download-manager/assets/js/wpdm-admin.js'), array('jquery'));
-            wp_enqueue_style('font-awesome', WPDM_BASE_URL.'assets/font-awesome/css/font-awesome.min.css');
+            wp_enqueue_style('font-awesome', WPDM_BASE_URL.'assets/fontawesome/css/fontawesome.min.css');
         }
 
         if(get_post_type()=='wpdmpro' || wpdm_query_var('post_type') == 'wpdmpro' || $hook == 'index.php'){

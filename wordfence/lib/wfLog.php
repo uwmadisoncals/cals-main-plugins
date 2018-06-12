@@ -23,6 +23,65 @@ class wfLog {
 		}
 		return $_shared;
 	}
+	
+	/**
+	 * Returns whether or not we have a cached record identifying the visitor as human. This is used both by certain
+	 * rate limiting features and by Live Traffic.
+	 * 
+	 * @param bool|string $IP
+	 * @param bool|string $UA
+	 * @return bool
+	 */
+	public static function isHumanRequest($IP = false, $UA = false) {
+		global $wpdb;
+		
+		if ($IP === false) {
+			$IP = wfUtils::getIP();
+		}
+		
+		if ($UA === false) {
+			$UA = (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '');
+		}
+		
+		$table = wfDB::networkTable('wfLiveTrafficHuman');
+		if ($wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$table} WHERE IP = %s AND identifier = %s AND expiration >= UNIX_TIMESTAMP()", wfUtils::inet_pton($IP), hash('sha256', $UA, true)))) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Creates a cache record for the requester to tag it as human.
+	 * 
+	 * @param bool|string $IP
+	 * @param bool|string $UA
+	 * @return bool
+	 */
+	public static function cacheHumanRequester($IP = false, $UA = false) {
+		global $wpdb;
+		
+		if ($IP === false) {
+			$IP = wfUtils::getIP();
+		}
+		
+		if ($UA === false) {
+			$UA = (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '');
+		}
+		
+		$table = wfDB::networkTable('wfLiveTrafficHuman');
+		if ($wpdb->get_var($wpdb->prepare("INSERT IGNORE INTO {$table} (IP, identifier, expiration) VALUES (%s, %s, UNIX_TIMESTAMP() + 86400)", wfUtils::inet_pton($IP), hash('sha256', $UA, true)))) {
+			return true;
+		}
+	}
+	
+	/**
+	 * Prunes any expired records from the human cache.
+	 */
+	public static function trimHumanCache() {
+		global $wpdb;
+		$table = wfDB::networkTable('wfLiveTrafficHuman');
+		$wpdb->query("DELETE FROM {$table} WHERE `expiration` < UNIX_TIMESTAMP()");
+	}
 
 	public function __construct($apiKey, $wp_version){
 		$this->apiKey = $apiKey;
@@ -49,18 +108,12 @@ class wfLog {
 			$this->currentRequest->isGoogle = (wfCrawl::isGoogleCrawler() ? 1 : 0);
 			$this->currentRequest->IP = wfUtils::inet_pton(wfUtils::getIP());
 			$this->currentRequest->userID = $this->getCurrentUserID();
-			$this->currentRequest->newVisit = (wordfence::$newVisit ? 1 : 0);
 			$this->currentRequest->URL = wfUtils::getRequestedURL();
 			$this->currentRequest->referer = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
 			$this->currentRequest->UA = (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '');
 			$this->currentRequest->jsRun = 0;
 			
-			if (!function_exists('wp_verify_nonce')) {
-				add_action('plugins_loaded', array($this, 'actionSetRequestJSEnabled'));
-			} else {
-				$this->actionSetRequestJSEnabled();
-			}
-
+			add_action('wp_loaded', array($this, 'actionSetRequestJSEnabled'));
 			add_action('init', array($this, 'actionSetRequestOnInit'), 9999);
 
 			if (function_exists('register_shutdown_function')) {
@@ -70,11 +123,14 @@ class wfLog {
 	}
 
 	public function actionSetRequestJSEnabled() {
-		$UA = $this->currentRequest->UA;
+		if (get_current_user_id() > 0) {
+			$this->currentRequest->jsRun = true;
+			return;
+		}
+		
 		$IP = wfUtils::getIP();
-		$jsRun = (int) (isset($_COOKIE['wordfence_verifiedHuman']) &&
-			$this->validateVerifiedHumanCookie($_COOKIE['wordfence_verifiedHuman'], $UA, $IP));
-		$this->currentRequest->jsRun = $jsRun;
+		$UA = $this->currentRequest->UA;
+		$this->currentRequest->jsRun = wfLog::isHumanRequest($IP, $UA);
 	}
 
 	/**
@@ -83,43 +139,6 @@ class wfLog {
 	public function actionSetRequestOnInit() {
 		$this->currentRequest->IP = wfUtils::inet_pton(wfUtils::getIP());
 		$this->currentRequest->userID = $this->getCurrentUserID();
-	}
-
-	/**
-	 * @param string $cookieVal
-	 * @param string $ua
-	 * @param string $ip
-	 * @return string
-	 */
-	public function validateVerifiedHumanCookie($cookieVal, $ua = null, $ip = null) {
-		if ($ua === null) {
-			$ua = !empty($this->currentRequest) ? $this->currentRequest->UA : '';
-		}
-		if ($ip === null) {
-			$ip = wfUtils::getIP();
-		}
-		if (!function_exists('hash_equals')) {
-			require_once ABSPATH . WPINC . '/compat.php';
-		}
-		return hash_equals($cookieVal, $this->getVerifiedHumanCookieValue($ua, $ip));
-	}
-
-	/**
-	 * @param string $ua
-	 * @param string $ip
-	 * @return string
-	 */
-	public function getVerifiedHumanCookieValue($ua = null, $ip = null) {
-		if ($ua === null) {
-			$ua = !empty($this->currentRequest) ? $this->currentRequest->UA : '';
-		}
-		if ($ip === null) {
-			$ip = wfUtils::getIP();
-		}
-		if (!function_exists('wp_hash')) {
-			require_once ABSPATH . WPINC . '/pluggable.php';
-		}
-		return wp_hash('wordfence_verifiedHuman' . $ua . $ip, 'nonce');
 	}
 
 	/**
@@ -253,10 +272,6 @@ class wfLog {
 				$this->takeBlockingAction('maxGlobalRequests', "Exceeded the maximum global requests per minute for crawlers or humans.");
 			}
 			if($type == '404'){
-				if(wfConfig::get('other_WFNet')){
-					$table_wfNet404s = wfDB::networkTable('wfNet404s');
-					$this->getDB()->queryWrite("insert IGNORE into {$table_wfNet404s} (sig, ctime, URI) values (UNHEX(MD5('%s')), unix_timestamp(), '%s')", $_SERVER['REQUEST_URI'], $_SERVER['REQUEST_URI']);
-				}
 				$pat = wfConfig::get('vulnRegex');
 				if($pat){
 					$URL = wfUtils::getRequestedURL();
@@ -351,7 +366,7 @@ class wfLog {
 				else {
 					$IP = wfUtils::getIP();
 					$res['browser'] = array(
-						'isCrawler' => !(isset($_COOKIE['wordfence_verifiedHuman']) && $this->validateVerifiedHumanCookie($_COOKIE['wordfence_verifiedHuman'], $res['UA'], $IP))
+						'isCrawler' => !wfLog::isHumanRequest($IP, $res['UA'])
 					);
 				}
 			}
@@ -363,7 +378,6 @@ class wfLog {
 						'display_name' => $ud->display_name,
 						'ID' => $res['userID']
 						);
-					$res['user']['avatar'] = get_avatar($res['userID'], 16);
 				}
 			} else {
 				$res['user'] = false;
@@ -512,7 +526,7 @@ class wfLog {
 				else {
 					$IP = wfUtils::getIP();
 					$res['browser'] = array(
-						'isCrawler' => !(isset($_COOKIE['wordfence_verifiedHuman']) && $this->validateVerifiedHumanCookie($_COOKIE['wordfence_verifiedHuman'], $res['UA'], $IP)) ? 'true' : ''
+						'isCrawler' => !wfLog::isHumanRequest($IP, $res['UA']) ? 'true' : ''
 					);
 				}
 			}
@@ -526,7 +540,6 @@ class wfLog {
 						'display_name' => $res['display_name'],
 						'ID' => $res['userID']
 					);
-					$res['user']['avatar'] = get_avatar($res['userID'], 16);
 				}
 			} else {
 				$res['user'] = false;
@@ -686,16 +699,21 @@ class wfLog {
 				$this->tagRequestForBlock($reason);
 				
 				if (wfConfig::get('alertOn_block')) {
-					wordfence::alert("Blocking IP {$IP}", "Wordfence has blocked IP address {$IP}.\nThe reason is: \"{$reason}\".", $IP);
+					$message = sprintf(__('Wordfence has blocked IP address %s.', 'wordfence'), $IP) . "\n";
+					$message .= sprintf(__('The reason is: "%s".', 'wordfence'), $reason);
+					if ($secsToGo > 0) {
+						$message .= "\n" . sprintf(__('The duration of the block is %s.', 'wordfence'), wfUtils::makeDuration($secsToGo, true));
+					}
+					wordfence::alert(sprintf(__('Blocking IP %s', 'wordfence'), $IP), $message, $IP);
 				}
-				wordfence::status(2, 'info', "Blocking IP {$IP}. {$reason}");
+				wordfence::status(2, 'info', sprintf(__('Blocking IP %s. %s', 'wordfence'), $IP, $reason));
 			}
 			else if ($action == 'throttle') { //Rate limited - throttle
 				$secsToGo = wfBlock::rateLimitThrottleDuration();
 				wfBlock::createRateThrottle($reason, $IP, $secsToGo);
 				wfActivityReport::logBlockedIP($IP, null, 'throttle');
 				
-				wordfence::status(2, 'info', "Throttling IP {$IP}. {$reason}");
+				wordfence::status(2, 'info', sprintf(__('Throttling IP %s. %s', 'wordfence'), $IP, $reason));
 				wfConfig::inc('totalIPsThrottled');
 			}
 			$this->do503($secsToGo, $reason);
@@ -1303,7 +1321,6 @@ class wfRequestModel extends wfModel {
 		'statusCode',
 		'isGoogle',
 		'userID',
-		'newVisit',
 		'URL',
 		'referer',
 		'UA',
@@ -1345,7 +1362,6 @@ class wfLiveTrafficQuery {
 		'statuscode' => 'h.statuscode',
 		'isgoogle' => 'h.isgoogle',
 		'userid' => 'h.userid',
-		'newvisit' => 'h.newvisit',
 		'url' => 'h.url',
 		'referer' => 'h.referer',
 		'ua' => 'h.ua',

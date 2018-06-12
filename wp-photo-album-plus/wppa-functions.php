@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.8.06
+* Version 6.9.02
 *
 */
 
@@ -18,8 +18,6 @@ global $wppa_locale;
 global $wpdb;
 global $thumbs;
 global $wppa_session;
-
-	wppa_add_wppa_on_page();
 
 	// Diagnostics
 	wppa_dbg_msg( 'Entering wppa_albums' );
@@ -2175,8 +2173,9 @@ static $user;
 		else {
 			$fullname = wppa_get_photo_name( $id, array( 	'addowner' 	=> wppa_switch( 'show_full_owner' ),
 															'addmedal' 	=> true,
-															'escjs' 	=> true,
+															'escjs' 	=> ( wppa_opt( 'art_monkey_link' ) != 'none' ),
 															'showname' 	=> wppa_switch( 'show_full_name' ),
+															'nobpdomain' => ( wppa_opt( 'art_monkey_link' ) != 'none' ),
 														) );
 		}
 		if ( ! $fullname ) $fullname = '&nbsp;';
@@ -2455,7 +2454,7 @@ global $wppa_done;
 			$old_entry = $wpdb->prepare( 'SELECT * FROM `'.WPPA_COMMENTS.'` WHERE `photo` = %s AND `user` = %s AND `comment` = %s LIMIT 1', $photo, $user, $save_comment );
 			$iret = $wpdb->query( $old_entry );
 			if ( $iret ) {
-				if ( wppa( 'debug' ) ) echo( '<script type="text/javascript">alert( "Duplicate comment ignored" )</script>' );
+				if ( wppa( 'debug' ) ) echo( '<script type="text/javascript" >alert( "Duplicate comment ignored" )</script>' );
 				return;
 			}
 			$key = wppa_create_comments_entry( array( 'photo' => $photo, 'user' => $user, 'email' => $email, 'comment' => $save_comment, 'status' => $status ) );
@@ -2481,13 +2480,13 @@ global $wppa_done;
 			if ( $status == 'spam' ) {
 				if ( $wrong_captcha ) {
 					echo
-					'<script type="text/javascript">' .
+					'<script type="text/javascript" >' .
 						'alert( "'.__( 'Sorry, you gave a wrong answer.\n\nPlease try again to solve the computation.' , 'wp-photo-album-plus').'" )' .
 					'</script>';
 				}
 				else {
 					echo
-					'<script type="text/javascript">' .
+					'<script type="text/javascript" >' .
 						'alert( "'.__( 'Sorry, your comment is not accepted.' , 'wp-photo-album-plus').'" )' .
 					'</script>';
 				}
@@ -2661,7 +2660,7 @@ global $wppa_done;
 			wppa_clear_cache();
 		}
 		else {
-			echo( '<script type="text/javascript">alert( "'.__( 'Could not process comment.\nProbably timed out.' , 'wp-photo-album-plus').'" )</script>' );
+			echo( '<script type="text/javascript" >alert( "'.__( 'Could not process comment.\nProbably timed out.' , 'wp-photo-album-plus').'" )</script>' );
 		}
 	}
 	else {	// Empty comment
@@ -3215,77 +3214,11 @@ global $blog_id;
 		}
 
 		// Spinner for Ajax
-		if ( wppa_switch( 'allow_ajax' ) ) {
-			if ( ! wppa_in_widget() ) {
+		if ( wppa_switch( 'allow_ajax' ) && ! wppa_in_widget() ) {
 
-						switch( wppa_opt( 'icon_corner_style' ) ) {
-							case 'gif':
-							case 'none':
-								$bradius = '0';
-								break;
-							case 'light':
-								$bradius = '12';
-								break;
-							case 'medium':
-								$bradius = '24';
-								break;
-							case 'heavy':
-								$bradius = '60';
-								break;
-						}
-
-				if ( wppa_use_svg() ) {
-					wppa_out(	'<svg' .
-									' id="wppa-ajax-spin-' . wppa( 'mocc' ) . '"' .
-									' class="wppa-ajax-spin uil-default"' .
-									' width="120px"' .
-									' height="120px"' .
-									' xmlns="http://www.w3.org/2000/svg"' .
-									' viewBox="0 0 100 100"' .
-									' preserveAspectRatio="xMidYMid"' .
-									' style="' .
-										'box-shadow:none;' .
-										'z-index:1010;' .
-										'position:fixed;' .
-										'top:50%;' .
-										'margin-top:-60px;' .
-										'left:50%;' .
-										'margin-left:-60px;' .
-										'display:none;' .
-										'fill:' . wppa_opt( 'svg_color' ) . ';' .
-										'background-color:' . wppa_opt( 'svg_bg_color' ) . ';' .
-										'border-radius:' . $bradius . 'px;' .
-										'box-shadow:none;' .
-										'"' .
-									' >' .
-									wppa_get_spinner_svg_body_html() .
-								'</svg>'
-							);
-				}
-				else {
-					wppa_out( 	'<img' .
-									' id="wppa-ajax-spin-' . wppa( 'mocc' ) . '"' .
-									' src="'.wppa_get_imgdir().'loader.' . ( wppa_use_svg() ? 'svg' : 'gif' ) . '"' .
-									( wppa_use_svg() ? ' class="wppa-svg wppa-ajax-spin"' : ' class="wppa-ajax-spin"' ) .
-									' alt="spinner"' .
-									' style="' .
-										'box-shadow:none;' .
-										'z-index:1010;' .
-										'position:fixed;' .
-										'top:50%;' .
-										'margin-top:-60px;' .
-										'left:50%;' .
-										'margin-left:-60px;' .
-										'display:none;' .
-										'fill:' . wppa_opt( 'svg_color' ) . ';' .
-										'background-color:' . wppa_opt( 'svg_bg_color' ) . ';' .
-										'border-radius:' . $bradius . 'px;' .
-										'box-shadow:none;' .
-									'"' .
-								' />'
-							);
-				}
-			}
+			wppa_out( wppa_get_spinner_svg_html( array( 	'id' 	=> 'wppa-ajax-spin-' . wppa( 'mocc' ),
+															'class' => 'wppa-ajax-spin',
+															) ) );
 		}
 
 		// Start timer if in debug mode
@@ -3300,7 +3233,7 @@ global $blog_id;
 
 		/* Check if wppa.js and jQuery are present */
 		if ( ! $wppa_err_displayed && ( WPPA_DEBUG || wppa_get_get( 'debug' ) || WP_DEBUG ) && ! wppa_switch( 'defer_javascript' ) ) {
-			wppa_out( '<script type="text/javascript">/* <![CDATA[ */' );
+			wppa_out( '<script type="text/javascript" >/* <![CDATA[ */' );
 				wppa_out( "if ( typeof( _wppaSlides ) == 'undefined' ) " .
 									"alert( 'There is a problem with your theme. The file wppa.js is not loaded when it is expected ( Errloc = wppa_container ).' );" );
 				wppa_out( "if ( typeof( jQuery ) == 'undefined' ) " .
@@ -3311,7 +3244,7 @@ global $blog_id;
 
 		/* Check if init is properly done */
 		if ( ! wppa_opt( 'fullsize' ) ) {
-			wppa_out( '<script type="text/javascript">/* <![CDATA[ */' );
+			wppa_out( '<script type="text/javascript" >/* <![CDATA[ */' );
 				wppa_out( "alert( 'The initialisation of wppa+ is not complete yet. " .
 										"You will probably see division by zero errors. " .
 										"Please run Photo Albums -> Settings admin page Table VIII-A1. ( Errloc = wppa_container ).' );" );
@@ -3350,7 +3283,8 @@ global $blog_id;
 		wppa( 'alt', 'alt' );
 
 		// Javascript occurrence dependant stuff
-		wppa_add_js_page_data( "\n" . '<script type="text/javascript">' );
+		wppa_add_js_page_data( "\n" . '<script type="text/javascript" >' );
+		wppa_add_js_page_data( "\n /* START OCCURRANCE " . wppa( 'mocc' ) . " */" );
 			// wppa( 'auto_colwidth' ) is set by the filter or by wppa_albums in case called directly
 			// wppa_opt( 'colwidth' ) is the option setting
 			// script or call has precedence over option setting
@@ -3697,7 +3631,7 @@ global $thumbs;
 		$index = 0;
 		if ( $thumbs ) {
 			$t = -microtime( true );
-			wppa_add_js_page_data( "\n" . '<script type="text/javascript">' );
+			wppa_add_js_page_data( "\n" . '<script type="text/javascript" >' );
 
 				foreach ( $thumbs as $thumb ) {
 					if ( wppa_switch( 'next_on_callback' ) ) {
@@ -3715,7 +3649,7 @@ global $thumbs;
 			wppa_dbg_msg( 'SlideInfo took ' . $t . ' seconds.' );
 		}
 
-		wppa_add_js_page_data( "\n" . '<script type="text/javascript">' );
+		wppa_add_js_page_data( "\n" . '<script type="text/javascript" >' );
 
 			// How to start if slideonly
 			if ( wppa( 'is_slideonly' ) ) {
@@ -4100,12 +4034,12 @@ function wppa_is_photo_modified( $id ) {
 
 	$cretime = $thumb['timestamp'];
 	$modtime = $thumb['modified'];
-	
+
 	// A photo is regarded NOT to be modified if the datetime modified is within 2 seconds after creation
 	if ( $modtime <= ( $cretime + 2 ) ) {
 		return false;
 	}
-	
+
 	$timnow = time();
 	$isnew = ( ( $timnow - $modtime ) < wppa_opt( 'max_photo_modtime' ) );
 
@@ -5106,7 +5040,10 @@ function wppa_get_lbtitle( $type, $id ) {
 	$do_desc 		= wppa_switch( 'ovl_'.$type.'_desc' );
 	$do_sm 			= wppa_switch( 'share_on_lightbox' );
 
-	$dl_name = wppa_is_pdf( $id ) ? wppa_get_photo_item( $id, 'filename' ) : wppa_get_photo_name( $id, array( 'addowner' => wppa_switch( 'ovl_add_owner' ), 'showname' => wppa_switch( 'ovl_'.$type.'_name' ) ) );
+	$dl_name = wppa_is_pdf( $id ) ? wppa_get_photo_item( $id, 'filename' ) : wppa_get_photo_name( $id, array( 	'addowner' 		=> wppa_switch( 'ovl_add_owner' ),
+																												'showname' 		=> wppa_switch( 'ovl_'.$type.'_name' ),
+																												'nobpdomain' 	=> wppa_opt( 'art_monkey_display' ) == 'button' && $do_download,
+																											) );
 
 	$result = '';
 	if ( $do_download ) {

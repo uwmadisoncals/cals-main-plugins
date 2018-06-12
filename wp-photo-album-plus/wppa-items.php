@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version 6.8.05
+* Version 6.9.02
 *
 */
 
@@ -238,6 +238,7 @@ function wppa_get_photo_name( $id, $xargs = array() ) {
 						'addmedal' 	=> false,
 						'escjs' 	=> false,
 						'showname' 	=> true,
+						'nobpdomain' => false,
 						);
 	$args = wp_parse_args( $xargs, $defaults );
 
@@ -249,25 +250,29 @@ function wppa_get_photo_name( $id, $xargs = array() ) {
 
 	// Add owner?
 	if ( $args['addowner'] ) {
-		$user = wppa_get_user_by( 'login', $thumb['owner'] );
-		if ( $user ) {
-			if ( $args['showname'] ) {
-				if ( wppa_switch( 'owner_on_new_line' ) ) {
-					if ( ! $args['escjs'] ) {
-						$result .= '<br />';
-					}
-					else {
-						$result .= ' [br /]';
-					}
+		if ( $args['nobpdomain'] ) {
+			$owner = wppa_display_name( $thumb['owner'] );
+		}
+		else {
+			$owner = wppa_bp_userlink( $thumb['owner'] , $args['escjs'] );
+		}
+
+		if ( $args['showname'] ) {
+			if ( wppa_switch( 'owner_on_new_line' ) && wppa_opt( 'art_monkey_display' ) != 'button' ) {
+				if ( ! $args['escjs'] ) {
+					$result .= '<br />';
 				}
 				else {
-					$result .= ' ';
+					$result .= ' [br /]';
 				}
-				$result .= '('.$user->display_name.')';
 			}
 			else {
-				$result .= ' '.$user->display_name;
+				$result .= ' ';
 			}
+			$result .= '(' . $owner . ')';
+		}
+		else {
+			$result .= ' ' . $owner;
 		}
 	}
 
@@ -360,7 +365,8 @@ function wppa_translate_photo_keywords( $id, $text ) {
 		// General keywords
 		$result = str_replace( 'w#albumname', wppa_get_album_name( $thumb['album'] ), $result );
 		$result = str_replace( 'w#albumid', $thumb['album'], $result );
-		$keywords = array('name', 'filename', 'owner', 'id', 'tags', 'views', 'album');
+		$result = str_replace( 'w#owner', wppa_bp_userlink( $thumb['owner'] ), $result );
+		$keywords = array( 'name', 'filename', 'id', 'tags', 'views', 'album' );
 		foreach ( $keywords as $keyword ) {
 			$replacement = __( trim( stripslashes( $thumb[$keyword] ) ) , 'wp-photo-album-plus');
 			if ( $keyword == 'tags' ) {
@@ -670,7 +676,8 @@ function wppa_translate_album_keywords( $id, $text, $translate = true ) {
 		$album = wppa_cache_album( $id );
 
 		// Keywords
-		$keywords = array( 'name', 'owner', 'id', 'views' );
+		$result = str_replace( 'w#owner', wppa_bp_userlink( $album['owner'] ), $result );
+		$keywords = array( 'name', 'id', 'views' );
 		foreach ( $keywords as $keyword ) {
 			$replacement = trim( stripslashes( $album[$keyword] ) );
 			if ( $translate ) {

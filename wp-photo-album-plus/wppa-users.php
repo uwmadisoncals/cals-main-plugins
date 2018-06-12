@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains user and capabilities related routines
-* Version 6.8.05
+* Version 6.9.02
 *
 */
 
@@ -343,4 +343,69 @@ function wppa_may_user_fe_delete( $id ) {
 	}
 
 	return false;
+}
+
+// Convert user loginname or email into a link to the users BuddyPress domain.
+// Only if configured and available.
+// Otherwise return display name. If user no longer exists, return $owner
+function wppa_bp_userlink( $owner, $esc_js = false, $email = false ) {
+static $usercache;
+
+	// Init
+	if ( ! is_array( $usercache ) ) {
+		$usercache = array();
+	}
+
+	// This owner already found?
+	if ( isset( $usercache[$owner] ) ) {
+		$result = $usercache[$owner];
+	}
+
+	// Get userdata
+	else {
+		$user = $email ? get_user_by( 'email', $owner ) : get_user_by( 'login', $owner );
+		
+		// User exists
+		if ( $user ) {
+
+			// Buddypress link configured and available?
+			if ( wppa_switch( 'domain_link_buddypress' ) && function_exists( 'bp_core_get_userlink' ) ) {
+				$result = bp_core_get_userlink( $user->ID );
+			}
+			else {
+				$result = $user->display_name;
+			}
+		}
+		
+		// User vanished
+		else {
+			$result = $owner;
+		}
+	}
+
+	// Cache the result
+	$usercache[$owner] = $result;
+
+	// Filter
+	if ( $esc_js ) {
+		$result = str_replace( array( '<', '>' ), array( '[', ']' ), $result );
+	}
+
+	// Done
+	return $result;
+}
+
+// Convert login name to displayname
+function wppa_display_name( $owner ) {
+
+	// Init
+	$result = $owner;
+
+	// Get userdata
+	$user = get_user_by( 'login', $owner );
+	if ( ! $user ) {
+		return $result; // User deleted
+	}
+
+	return $user->display_name;
 }

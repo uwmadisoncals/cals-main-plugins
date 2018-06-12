@@ -4,22 +4,22 @@ defined( 'WPINC' ) or die;
 
 class Portfolio_Slideshow_Plugin {
 
-	const VERSION = '3.0.0';
+	const VERSION = '1.12.1';
 
-	static $defaults;
-	static $dot_min;
-	static $instance;
-	static $options;
-	static $plugin_dir;
-	static $plugin_path;
-	static $plugin_url;
+	public static $defaults;
+	public static $dot_min;
+	public static $instance;
+	public static $options;
+	public static $plugin_dir;
+	public static $plugin_path;
+	public static $plugin_url;
 
-	function __construct() {
+	public function __construct() {
 
 		self::$plugin_path = trailingslashit( dirname( __PORTFOLIO_SLIDESHOW_PLUGIN_FILE__ ) );
 		self::$plugin_dir  = trailingslashit( basename( self::$plugin_path ) );
 		self::$plugin_url  = plugins_url( self::$plugin_dir );
-		
+
 		self::$dot_min = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		self::$options  = $this->get_options();
@@ -41,6 +41,9 @@ class Portfolio_Slideshow_Plugin {
 		add_action( 'wp_enqueue_scripts',    array( $this, 'wp_enqueue_scripts' ) );
 		add_action( 'wp_head',               array( 'Portfolio_Slideshow_Slideshow', 'wp_head' ) );
 
+		// Temporary for version 1.12.1 only.
+		add_action( 'admin_notices', array( $this, 'temporary_survey_notice' ) );
+
 		add_filter( 'attachment_fields_to_edit', array( $this, 'attachment_fields_to_edit' ), 10, 2 );
 		add_filter( 'attachment_fields_to_save', array( $this, 'attachment_fields_to_save' ), 10, 2 );
 		add_filter( 'plugin_action_links_' . plugin_basename( plugin_dir_path( __PORTFOLIO_SLIDESHOW_PLUGIN_FILE__ ) . 'plugin.php' ), array( $this, 'plugin_action_links' ) );
@@ -54,7 +57,7 @@ class Portfolio_Slideshow_Plugin {
 	 *
 	 * @return array
 	 */
-	function add_meta_box( $post ) {
+	public function add_meta_box( $post ) {
 		require_once( self::$plugin_path . 'src/admin/uploader.php' );
 	}
 
@@ -64,7 +67,7 @@ class Portfolio_Slideshow_Plugin {
 	 * @param string $post_type
 	 * @return void
 	 */
-	function add_meta_boxes( $post_type ) {
+	public function add_meta_boxes( $post_type ) {
 		if ( in_array( $post_type, $this->get_supported_types() ) ) {
 			add_meta_box( 'portfolio_slideshow_uploader_meta_box', __( 'Portfolio Slideshow', 'portfolio-slideshow' ), array( $this, 'add_meta_box' ), $post_type, 'normal', 'high' );
 		}
@@ -75,7 +78,7 @@ class Portfolio_Slideshow_Plugin {
 	 *
 	 * @return void
 	 */
-	function add_options_page() {
+	public function add_options_page() {
 		require_once( self::$plugin_path . 'src/admin/settings.php' );
 	}
 
@@ -85,12 +88,12 @@ class Portfolio_Slideshow_Plugin {
 	 * @param string $hook
 	 * @return void
 	 */
-	function admin_enqueue_scripts( $hook ) {
+	public function admin_enqueue_scripts( $hook ) {
 
 		$js_deps  = array( 'jquery', 'underscore', 'jquery-ui-core', 'jquery-ui-tabs' );
 		$css_deps = array();
 
-		$slugs = array( 'post.php', 'post-new.php', 'edit.php' );	
+		$slugs = array( 'post.php', 'post-new.php', 'edit.php' );
 
 		if ( 'settings_page_portfolio_slideshow' == $hook ) {
 			$js_deps[]  = 'jquery-ui-tooltip';
@@ -118,7 +121,7 @@ class Portfolio_Slideshow_Plugin {
 	 *
 	 * @return void
 	 */
-	function admin_menu() {
+	public function admin_menu() {
 		add_options_page( esc_html__( 'Portfolio Slideshow', 'portfolio-slideshow' ), esc_html__( 'Slideshows', 'portfolio-slideshow' ), 'manage_options', 'portfolio_slideshow', array( $this, 'add_options_page' ) );
 	}
 
@@ -127,8 +130,8 @@ class Portfolio_Slideshow_Plugin {
 	 *
 	 * @return array
 	 */
-	function attachment_fields_to_edit( $form_fields, $post ) {
-		
+	public function attachment_fields_to_edit( $form_fields, $post ) {
+
 		$form_fields['ps_image_link'] = array(
 			'label' => __( 'Slide URL', 'portfolio-slideshow' ),
 			'input' => 'text',
@@ -143,8 +146,8 @@ class Portfolio_Slideshow_Plugin {
 	 *
 	 * @return array
 	 */
-	function attachment_fields_to_save( $post, $attachment ) {
-		
+	public function attachment_fields_to_save( $post, $attachment ) {
+
 		if ( isset( $attachment['ps_image_link'] ) ) {
 			update_post_meta( $post['ID'], '_ps_image_link', $attachment['ps_image_link'] );
 		}
@@ -158,11 +161,11 @@ class Portfolio_Slideshow_Plugin {
 	 * @param int $post_id The WP_Post ID.
 	 * @return void
 	 */
-	function edit_post( $post_id ) {
+	public function edit_post( $post_id ) {
 
 		if ( ! isset( $_POST[ 'portfolio_slideshow_metabox_slides_' . $post_id ] ) )
 			return $post_id;
-		
+
 		if ( empty( $_POST[ 'portfolio_slideshow_metabox_slides_' . $post_id ] ) || ! wp_verify_nonce( $_POST[ 'portfolio_slideshow_metabox_slides_' . $post_id ], 'portfolio_slideshow_save_metabox_slides' ) )
 			wp_die( esc_html__( 'It doesn\'t seem like you have permission to create or edit slideshows.', 'portfolio-slideshow' ) );
 
@@ -187,7 +190,7 @@ class Portfolio_Slideshow_Plugin {
 		foreach ( $attachments as $attachment_id ) {
 
 			if ( 0 == $attachment_id ) continue;
-			
+
 			$attachment      = get_post( $attachment_id );
 			$attachment_meta = get_post_meta( $attachment_id );
 
@@ -206,7 +209,7 @@ class Portfolio_Slideshow_Plugin {
 	 *
 	 * @return array
 	 */
-	function get_defaults() {
+	public function get_defaults() {
 
 		$defaults = array(
 			'size'             => 400,
@@ -239,7 +242,7 @@ class Portfolio_Slideshow_Plugin {
 	 *
 	 * @return mixed|false
 	 */
-	static function get_option( $option ) {
+	public static function get_option( $option ) {
 
 		if ( isset( self::$options[ $option ] ) ) {
 			return self::$options[ $option ];
@@ -257,18 +260,18 @@ class Portfolio_Slideshow_Plugin {
 	 *
 	 * @return array
 	 */
-	static function get_options() {
+	public static function get_options() {
 		$options = get_option( 'portfolio_slideshow_options' );
 
 		return $options ? $options : array();
 	}
 
 	/**
-	 * Gets post types where uploader metabox should load. 
+	 * Gets post types where uploader metabox should load.
 	 *
 	 * @return array
 	 */
-	function get_supported_types() {
+	public function get_supported_types() {
 		return apply_filters( 'portfolio_slideshow_get_supported_types', array( 'post', 'page' ) );
 	}
 
@@ -277,7 +280,7 @@ class Portfolio_Slideshow_Plugin {
 	 *
 	 * @return Portfolio_Slideshow_Plugin
 	 */
-	static function instance() {
+	public static function instance() {
 		return ! self::$instance ? new Portfolio_Slideshow_Plugin : self::$instance;
 	}
 
@@ -287,7 +290,7 @@ class Portfolio_Slideshow_Plugin {
 	 * @param $size
 	 * @return int
 	 */
-	static function letter_to_number(  $size ) {
+	public static function letter_to_number(  $size ) {
 		$l   = substr( $size, -1 );
 		$ret = substr( $size, 0, -1 );
 
@@ -313,7 +316,7 @@ class Portfolio_Slideshow_Plugin {
 	 * @param array $content
 	 * @return array
 	 */
-	function media_row_actions( $content ) {
+	public function media_row_actions( $content ) {
 
 		if ( ! is_array( $content ) || ! is_object( $post ) )
 			return $content;
@@ -330,22 +333,22 @@ class Portfolio_Slideshow_Plugin {
 	 * @param array $links
 	 * @return array
 	 */
-	function plugin_action_links( $links ) {
-		
+	public function plugin_action_links( $links ) {
+
 		$url = admin_url( 'options-general.php?page=portfolio_slideshow' );
 
-  		array_unshift( $links, sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( $url ), esc_html__( 'Settings', 'portfolio-slideshow' ) ) ); 
+  		array_unshift( $links, sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( $url ), esc_html__( 'Settings', 'portfolio-slideshow' ) ) );
 
   		return $links;
 	}
 
 	/**
-	 * Adds "Settings" link next to 
+	 * Adds "Settings" link next to
 	 *
 	 * @param array $plugin_meta
 	 * @return array
-	 */	
-	function plugin_row_meta( $plugin_meta, $plugin_file, $plugin_data, $status ) {
+	 */
+	public function plugin_row_meta( $plugin_meta, $plugin_file, $plugin_data, $status ) {
 
 		if ( isset( $plugin_data['slug'] ) && 'portfolio-slideshow' == $plugin_data['slug'] && is_array( $plugin_meta ) )
 			$plugin_meta[] = sprintf( '<a href="%s" target="_blank">%s</a>', 'http://wordpress.org/support/plugin/portfolio-slideshow/', esc_html__( 'Support', 'portfolio-slideshow' ) );
@@ -354,17 +357,17 @@ class Portfolio_Slideshow_Plugin {
 	}
 
 	/**
-	 * Gets a URL to a plugin resource, perhaps a minified one. 
+	 * Gets a URL to a plugin resource, perhaps a minified one.
 	 *
 	 * @param string $resource
 	 * @param bool $has_min
 	 * @return string
 	 */
-	static function resource_url( $resource = '', $has_min = false ) {
-		
+	public static function resource_url( $resource = '', $has_min = false ) {
+
 		if ( '' == $resource )
 			return self::$plugin_url . 'src/resources/';
-		
+
 		if ( ! $has_min )
 			return esc_url_raw( self::$plugin_url . 'src/resources/' . $resource );
 
@@ -381,11 +384,11 @@ class Portfolio_Slideshow_Plugin {
 	 * @param bool $has_min
 	 * @return string
 	 */
-	static function vendor_resource_url( $resource = '', $has_min = false ) {
-		
+	public static function vendor_resource_url( $resource = '', $has_min = false ) {
+
 		if ( '' == $resource )
 			return self::$plugin_url . 'vendor/';
-		
+
 		if ( ! $has_min )
 			return esc_url_raw( self::$plugin_url . 'vendor/' . $resource );
 
@@ -400,7 +403,7 @@ class Portfolio_Slideshow_Plugin {
 	 *
 	 * @return void
 	 */
-	function wp_enqueue_scripts() {
+	public function wp_enqueue_scripts() {
 
 		$css_deps = array();
 		$js_deps  = array();
@@ -426,4 +429,21 @@ class Portfolio_Slideshow_Plugin {
 		wp_register_script( 'ps-public-js', self::resource_url( 'public.js' ), $js_deps, self::VERSION, true );
 	}
 
+	/**
+	 * A one-time temporary survey.
+	 *
+	 * @since 1.12.1
+	 */
+	public function temporary_survey_notice() {
+
+		if ( isset( $_GET['portfolioslideshow_dismiss'] ) && 'yes' === $_GET['portfolioslideshow_dismiss'] ) {
+			return update_option( 'portfolio_slideshow_temp_survey_dismissed', 'yes' );
+		}
+
+		if ( 'yes' === get_option( 'portfolio_slideshow_temp_survey_dismissed' ) ) {
+			return;
+		}
+
+		include_once( self::$plugin_path . 'src/views/survey-notice.php' );
+	}
 }

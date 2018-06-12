@@ -3,7 +3,7 @@
 /**
   Plugin Name: Advanced Access Manager
   Description: All you need to manage access to your WordPress website
-  Version: 5.2.7
+  Version: 5.3.2
   Author: Vasyl Martyniuk <vasyl@vasyltech.com>
   Author URI: https://vasyltech.com
 
@@ -67,6 +67,14 @@ class AAM {
     protected function setUser(AAM_Core_Subject $user) {
         $this->_user = $user;
     }
+    
+    /**
+     * 
+     * @return type
+     */
+    public static function api() {
+        return AAM_Core_Gateway::getInstance();
+    }
 
     /**
      * Get current user
@@ -109,15 +117,15 @@ class AAM {
             AAM_Core_Config::bootstrap();
             
             //load WP Core hooks
-            AAM_Core_Wp::bootstrap();
+            AAM_Shared_Manager::bootstrap();
             
             //login control
-            if (AAM_Core_Config::get('secure-login', true)) {
+            if (AAM_Core_Config::get('core.settings.secureLogin', true)) {
                 AAM_Core_Login::bootstrap();
             }
             
             //JWT Authentication
-            if (AAM_Core_Config::get('jwt-authentication', false)) {
+            if (AAM_Core_Config::get('core.settings.jwtAuthentication', false)) {
                 AAM_Core_JwtAuth::bootstrap();
             }
         }
@@ -133,13 +141,17 @@ class AAM {
      */
     public static function getInstance() {
         if (is_null(self::$_instance)) {
+            self::$_instance = new self;
+            
+            // Logout user if he/she is blocked
+            $user = self::$_instance->getUser();
+            if ($user->getUID() == 'user' && $user->user_status == 1) {
+                wp_logout();
+            }
+            
             load_plugin_textdomain(
                     AAM_KEY, false, dirname(plugin_basename(__FILE__)) . '/Lang/'
             );
-            self::$_instance = new self;
-            
-            //load AAM cache
-            AAM_Core_Cache::bootstrap();
             
             //load all installed extension
             AAM_Extension_Repository::getInstance()->load();
@@ -148,9 +160,9 @@ class AAM {
             AAM_Core_Media::bootstrap();
             
             //bootstrap the correct interface
-            if (is_admin()) {
+            if (AAM_Core_Api_Area::isBackend()) {
                 AAM_Backend_Manager::bootstrap();
-            } else {
+            } elseif (AAM_Core_Api_Area::isFrontend()) {
                 AAM_Frontend_Manager::bootstrap();
             }
         }
@@ -240,6 +252,9 @@ if (defined('ABSPATH')) {
     //the highest priority (higher the core)
     //this is important to have to catch events like register core post types
     add_action('init', 'AAM::getInstance', -1);
+    
+    //register API manager is applicable
+    add_action('parse_request', 'AAM_Api_Manager::bootstrap', 1);
     
     //schedule cron
     if (!wp_next_scheduled('aam-cron')) {

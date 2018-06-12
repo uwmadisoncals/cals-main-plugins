@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version 6.8.05
+* Version 6.8.08
 *
 */
 
@@ -917,6 +917,8 @@ global $wpdb;
 					' ' . wppa( 'rel' ) . '="' . wppa_opt( 'lightbox_name' ) . '[alw-' . wppa( 'mocc' ) . '-' . $albumid . ']"' .
 					' ' . wppa( 'lbtitle' ) . '="' . $title . '"' .
 					' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
+					' style="cursor:' . wppa_wait() . ';"' .
+					' onclick="return false;"' .
 					' >' );
 
 				// the cover image
@@ -926,7 +928,7 @@ global $wpdb;
 							'<video preload="metadata" class="image wppa-img" id="i-' . $image['id'] . '-' .
 							wppa( 'mocc' ) . '" title="' . wppa_zoom_in( $image['id'] ) .
 							'" style="' .
-							wppa_wcs( 'wppa-img' ) . $imgattr . $imgattr_a['cursor'] . '" ' .
+							wppa_wcs( 'wppa-img' ) . $imgattr . '" ' .
 							$events . ' >' .
 							wppa_get_video_body( $image['id'] ) . '</video>'
 						);
@@ -936,7 +938,7 @@ global $wpdb;
 							'<img class="image wppa-img" id="i-' . $image['id'] . '-' .
 							wppa( 'mocc' ) . '" title="' . wppa_zoom_in( $image['id'] ) .
 							'" src="' . $src . '" style="' .
-							wppa_wcs( 'wppa-img' ) . $imgattr . $imgattr_a['cursor'] . '" ' .
+							wppa_wcs( 'wppa-img' ) . $imgattr . '" ' .
 							$events . ' ' . wppa_get_imgalt( $image['id'] ) . ' />'
 						);
 					}

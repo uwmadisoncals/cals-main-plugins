@@ -16,14 +16,14 @@
         $moreCond = '';
         if(wpdm_query_var('pid') > 0) $moreCond .= " and p.ID = ".wpdm_query_var('pid');
         if(wpdm_query_var('uid') > 0) $moreCond .= " and s.uid = ".wpdm_query_var('uid');
-        if(wpdm_query_var('ip') > 0) $moreCond .= " and s.ip = ".wpdm_query_var('ip');
+        if(wpdm_query_var('ip') != '' && get_option('__wpdm_noip') == 0) $moreCond .= " and s.ip = ".wpdm_query_var('ip');
         $res = $wpdb->get_results("select p.ID as pid,p.post_title,s.* from {$wpdb->prefix}posts p, {$wpdb->prefix}ahm_download_stats s where s.pid = p.ID $moreCond order by `timestamp` desc limit $start, $items_per_page");
         foreach($res as $stat){
             ?>
             <tr>
-                <td><a href="<?php echo get_permalink($stat->pid); ?>"><?php echo $stat->post_title; ?></a> | <a href="edit.php?post_type=wpdmpro&page=wpdm-stats&pid=<?php echo $stat->pid; ?>"><i class="fa fa-area-chart"></i></a></td>
+                <td><a href="<?php echo get_permalink($stat->pid); ?>"><?php echo $stat->post_title; ?></a> | <a href="edit.php?post_type=wpdmpro&page=wpdm-stats&pid=<?php echo $stat->pid; ?>"><i class="far fa-chart-bar"></i></a></td>
                 <td><?php echo date(get_option('date_format')." H:i",$stat->timestamp); ?></td>
-                <td><?php echo $stat->uid > 0?"<a href='edit.php?post_type=wpdmpro&page=wpdm-stats&uid={$stat->uid}'>".get_user_by('id', $stat->uid)->display_name . "</a> / ":''; ?><a href='edit.php?post_type=wpdmpro&page=wpdm-stats&ip=<?php echo $stat->ip; ?>'><?php echo $stat->ip; ?></a></td>
+                <td><?php echo $stat->uid > 0?"<a href='edit.php?post_type=wpdmpro&page=wpdm-stats&uid={$stat->uid}'>".get_user_by('id', $stat->uid)->display_name . "</a> ".((get_option('__wpdm_noip') == 0)?' / ':''):''; ?><?php if(get_option('__wpdm_noip') == 0) { ?> <a href='edit.php?post_type=wpdmpro&page=wpdm-stats&ip=<?php echo $stat->ip; ?>'><?php echo $stat->ip; ?></a><?php } ?></td>
             </tr>
             <?php
         }

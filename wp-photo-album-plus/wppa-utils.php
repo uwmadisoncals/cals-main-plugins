@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.8.07
+* Version 6.9.02
 *
 */
 
@@ -272,7 +272,7 @@ global $wppa;
 </script>';
 			}	// End first
 			$wppa['geo'] .= '
-<script type="text/javascript">_wppaLat[' . wppa( 'mocc' ) . '][' . $id . '] = ' . $lat.'; _wppaLon[' . wppa( 'mocc' ) . '][' . $id.'] = ' . $lon . ';</script>';
+<script type="text/javascript" >_wppaLat[' . wppa( 'mocc' ) . '][' . $id . '] = ' . $lat.'; _wppaLon[' . wppa( 'mocc' ) . '][' . $id.'] = ' . $lon . ';</script>';
 			break;	// End native
 	}
 }
@@ -527,7 +527,7 @@ function wppa_add_paths( $albums ) {
 	return $albums;
 }
 
-function wppa_add_parents($pages) {
+function wppa_add_parents( $pages ) {
 global $wpdb;
 static $parents;
 static $titles;
@@ -544,19 +544,19 @@ static $titles;
 
 	if ( is_array($pages) ) foreach ( array_keys($pages) as $index ) {
 		$tempid = $pages[$index]['ID'];
-		$pages[$index]['post_title'] = __(stripslashes($pages[$index]['post_title']));
+		$pages[$index]['post_title'] = __( stripslashes( $pages[$index]['post_title'] ) );
 		while ( $tempid > '0') {
 			if ( isset( $parents[$tempid] ) ) {
 				$tempid = $parents[$tempid];
 			}
 			else {
-				$t = $wpdb->get_var($wpdb->prepare("SELECT `post_parent` FROM `" . $wpdb->posts . "` WHERE `ID` = %s", $tempid));
+				$t = $wpdb->get_var( $wpdb->prepare( "SELECT `post_parent` FROM `" . $wpdb->posts . "` WHERE `ID` = %s", $tempid ) );
 				$parents[$tempid] = $t;
 				$tempid = $t;
 			}
 			if ( $tempid > '0' ) {
 				if ( ! isset( $titles[$tempid] ) ) {
-					$titles[$tempid] = __(stripslashes($wpdb->get_var($wpdb->prepare("SELECT `post_title` FROM `" . $wpdb->posts . "` WHERE `ID` = %s", $tempid))));
+					$titles[$tempid] = __( stripslashes( $wpdb->get_var( $wpdb->prepare( "SELECT `post_title` FROM `" . $wpdb->posts . "` WHERE `ID` = %s", $tempid ) ) ) );
 				}
 				$pages[$index]['post_title'] = $titles[$tempid].' > '.$pages[$index]['post_title'];
 			}
@@ -567,16 +567,16 @@ static $titles;
 }
 
 // Sort an array on a column, keeping the indexes
-function wppa_array_sort($array, $on, $order=SORT_ASC) {
+function wppa_array_sort( $array, $on, $order = SORT_ASC ) {
 
     $new_array = array();
     $sortable_array = array();
 
-    if (count($array) > 0) {
-        foreach ($array as $k => $v) {
-            if (is_array($v)) {
-                foreach ($v as $k2 => $v2) {
-                    if ($k2 == $on) {
+    if ( count( $array ) > 0 ) {
+        foreach ( $array as $k => $v ) {
+            if ( is_array( $v ) ) {
+                foreach ( $v as $k2 => $v2 ) {
+                    if ( $k2 == $on ) {
                         $sortable_array[$k] = $v2;
                     }
                 }
@@ -585,16 +585,16 @@ function wppa_array_sort($array, $on, $order=SORT_ASC) {
             }
         }
 
-        switch ($order) {
+        switch ( $order ) {
             case SORT_ASC:
-                asort($sortable_array);
+                asort( $sortable_array );
             break;
             case SORT_DESC:
-                arsort($sortable_array);
+                arsort( $sortable_array );
             break;
         }
 
-        foreach ($sortable_array as $k => $v) {
+        foreach ( $sortable_array as $k => $v ) {
             $new_array[$k] = $array[$k];
         }
     }
@@ -610,7 +610,7 @@ function wppa_get_taglist() {
 	}
 	else {
 		if ( is_array($result) ) foreach ( array_keys($result) as $tag ) {
-			$result[$tag]['ids'] = wppa_index_string_to_array($result[$tag]['ids']);
+			$result[$tag]['ids'] = wppa_index_string_to_array( $result[$tag]['ids'] );
 		}
 	}
 	return $result;
@@ -787,9 +787,6 @@ global $wppa_opt;
 
 	// Update the local cache
 	$wppa_opt[$option] = $value;
-
-	// Delete the cached options
-//	delete_option( 'wppa_cached_options' );
 
 	// Remove init.js files, they will be auto re-created
 	$files = glob( WPPA_PATH.'/wppa-init.*.js' );
@@ -2651,7 +2648,6 @@ static $wppa_void_keywords;
 		// Remove spaces and funny chars
 		$temp = str_replace( array( ' ', '-', '"', "'", '\\', '>', '<', ',', ':', ';', '!', '?', '=', '_', '[', ']', '(', ')', '{', '}' ), ',', $temp );
 		$temp = str_replace( ',,', ',', $temp );
-//wppa_log('dbg', $temp);
 
 		// Make array
 		$wppa_void_keywords = explode( ',', $temp );
@@ -3315,69 +3311,6 @@ global $wpdb;
 	return $result;
 }
 
-// Add page id to list of pages that need css and js
-function wppa_add_wppa_on_page() {
-global $wppa_first_id;
-
-	// Feature enabled?
-	if ( ! wppa_switch( 'js_css_optional' ) ) {
-		return;
-	}
-
-	// Init
-	$pages 	= wppa_index_string_to_array( get_option( 'wppa_on_pages_list' ) );
-	$ID 	= get_the_ID();
-	$doit 	= false;
-
-	// Check for the current ID
-	if ( $ID ) {
-		if ( ! in_array( $ID, $pages ) ) {
-			$pages[] = $ID;
-			$doit = true;
-		}
-	}
-
-	// Check for the first encountered ID that may not need wppa. Mark it as it is now the first post on a page, but posts further on the page will going to need it
-	if ( $wppa_first_id ) {
-		if ( ! in_array( $wppa_first_id, $pages ) ) {
-			$pages[] = $wppa_first_id;
-			$doit = true;
-		}
-	}
-
-	if ( $doit ) {
-		sort( $pages, SORT_NUMERIC );
-		update_option( 'wppa_on_pages_list', wppa_index_array_to_string( $pages ) );
-		echo '<script type="text/javascript" >document.location.reload(true);</script>';
-	}
-}
-
-// See during init if wppa styles and css is needed
-function wppa_wppa_on_page() {
-global $wppa_first_id;
-
-	// Feature enabled?
-	if ( ! wppa_switch( 'js_css_optional' ) ) {
-		return true;
-	}
-
-	// Init
-	$ID = get_the_ID();
-
-	// Remember the first ID
-	if ( ! $wppa_first_id ) {
-		if ( $ID ) {
-			$wppa_first_id = $ID;
-		}
-	}
-
-	// Look up
-	$pages 	= wppa_index_string_to_array( get_option( 'wppa_on_pages_list' ) );
-	$result = in_array( $ID, $pages );
-
-	return $result;
-}
-
 // Get an svg image html
 // @1: string: Name of the .svg file without extension
 // @2: string: CSS height or empty, no ; required
@@ -3388,11 +3321,6 @@ global $wppa_first_id;
 // @7: string: border radius in %: medium
 // @8: string: border radius in %: heavy
 function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = false, $none = '0', $light = '10', $medium = '20', $heavy = '50' ) {
-
-	// Slideonly has no navigation
-//	if ( wppa( 'is_slideonly' ) && ! wppa( 'is_slideonlyf' ) ) {
-//		return '';
-//	}
 
 	// Find the colors
 	if ( $lightbox ) {
@@ -3593,24 +3521,23 @@ function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = 
 
 	// Compose html. Non native svg or gif/png
 	else {
-if ( $use_svg ) wppa_log('dbg','Still used for '.$name,true);
-		$result = 	'<img' .
-						' src="' . wppa_get_imgdir( $src ) . '"' .
-						( $use_svg ? ' class="wppa-svg"' : '' ) .
-						' style="' .
-							( $height ? 'height:' . $height . ';' : '' ) .
-							'fill:' . $fillcolor . ';' .
-							'background-color:' . $bgcolor . ';' .
-							( $use_svg ? 'display:none;' : '' ) .
-							'text-decoration:none !important;' .
-							'vertical-align:middle;' .
-							( $bradius ? 'border-radius:' . $bradius . '%;' : '' ) .
-							( $border ? 'border:2px solid ' . $bgcolor . ';box-sizing:border-box;' : '' ) .
+		$result =
+		'<img' .
+			' src="' . wppa_get_imgdir( $src ) . '"' .
+			( $use_svg ? ' class="wppa-svg"' : '' ) .
+			' style="' .
+				( $height ? 'height:' . $height . ';' : '' ) .
+				'fill:' . $fillcolor . ';' .
+				'background-color:' . $bgcolor . ';' .
+				( $use_svg ? 'display:none;' : '' ) .
+				'text-decoration:none !important;' .
+				'vertical-align:middle;' .
+				( $bradius ? 'border-radius:' . $bradius . '%;' : '' ) .
+				( $border ? 'border:2px solid ' . $bgcolor . ';box-sizing:border-box;' : '' ) .
 
-						'"' .
-						' alt="' . $name . '"' .
-//						' onload="wppaReplaceSvg()"' .
-					' />';
+			'"' .
+			' alt="' . $name . '"' .
+		' />';
 	}
 	return $result;
 }
@@ -3927,6 +3854,7 @@ function wppa_create_qrcode_cache( $qrsrc ) {
 	}
 }
 
+
 function wppa_use_svg( $is_admin = false ) {
 	if ( wppa_is_ie() ) {
 		return false;
@@ -3937,58 +3865,672 @@ function wppa_use_svg( $is_admin = false ) {
 	return true;
 }
 
-function wppa_get_spinner_svg_body_html() {
-	$result =
-		'<rect x="0" y="0" width="100" height="100" fill="none" class="bk" >' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(0 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(22.5 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.09375s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(45 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.1875s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(67.5 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.28125s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(90 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.375s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(112.5 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.46875s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(135 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.5625s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(157.5 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.65625s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(180 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.75s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(202.5 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.84375s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(225 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.9375s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(247.5 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.03125s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(270 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.125s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(292.5 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.21875s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(315 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.3125s" repeatCount="indefinite"/>' .
-		'</rect>' .
-		'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(337.5 50 50) translate(0 -32)">' .
-			'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.40625s" repeatCount="indefinite"/>' .
-		'</rect>';
+
+function wppa_get_spinner_svg_html( $xargs = array() ) {
+
+	$defaults = array(
+					'id' 		=> 'wppa-spinner',
+					'class' 	=> 'wppa-spinner',
+					'size' 		=> '120',
+					'position' 	=> 'fixed',
+					'lightbox' 	=> false,
+					'display' 	=> 'none',
+					'left' 		=> '50%',
+					'top' 		=> '50%',
+					'margin' 	=> false,
+					);
+
+	$args 	= wp_parse_args( $xargs, $defaults );
+	if ( $args['margin'] === false ) $args['margin'] = $args['size'] / 2;
+	$width  = $args['size'];
+	$height = $args['size'];
+	$type 	= wppa_opt( 'spinner_shape' );
+	$corner = wppa_opt( 'icon_corner_style' );
+	$fgcol 	= $args['lightbox'] ? wppa_opt( 'ovl_svg_color' ) : wppa_opt( 'svg_color' );
+	$bgcol 	= $args['lightbox'] ? wppa_opt( 'ovl_svg_bg_color' ) : wppa_opt( 'svg_bg_color' );
+	$stcol 	= $fgcol;
+
+	// .svg requested and possible?
+	if ( wppa_use_svg() ) {
+		switch ( $type ) {
+
+			case 'audio':
+				$viewbox = '0 0 55 80';
+				$width = round( $args['size'] * 55 / 80 );
+				break;
+
+			case 'ball-triangle':
+				$viewbox = '0 0 57 57';
+				break;
+
+			case 'bars':
+				$viewbox = '0 0 135 140';
+				$width = round( $args['size'] * 135 / 140 );
+				break;
+
+			case 'circles':
+				$viewbox = '0 0 135 135';
+				$stcol = '';
+				break;
+
+			case 'grid':
+				$viewbox = '0 0 105 105';
+				$stcol = '';
+				break;
+
+			case 'hearts':
+				$viewbox = '0 0 140 64';
+				$height = round( $args['size'] * 64 / 140 );
+				break;
+
+			case 'puff':
+				$viewbox = '0 0 44 44';
+				break;
+
+			case 'rings':
+				$viewbox = '0 0 45 45';
+				break;
+
+			case 'spinning-circles':
+				$viewbox = '0 0 58 58';
+				break;
+
+			case 'oval':
+			case 'tail-spin':
+				$viewbox = '0 0 38 38';
+				break;
+
+			case 'three-dots':
+				$viewbox = '0 0 120 30';
+				$height = round( $args['size'] / 4 );
+				break;
+
+			default:
+				$viewbox = '0 0 100 100';
+				$stcol = '';
+				break;
+		}
+
+		switch ( $corner ) {
+			case 'gif':
+			case 'none':
+				$bradius = '0';
+				break;
+			case 'light':
+				$bradius = round( $args['size'] / 10 );
+				break;
+			case 'medium':
+				$bradius = round( $args['size'] / 5 );
+				break;
+			case 'heavy':
+				$bradius = round( $args['size'] / 2 );
+				break;
+		}
+
+		$result =
+			'<svg' .
+				' id="' . $args['id'] . '"' .
+				' class="' . $args['class'] . ' uil-default"' .
+				' width="' . $width . 'px"' .
+				' height="' . $height . 'px"' .
+				' xmlns="http://www.w3.org/2000/svg"' .
+				' viewBox="' . $viewbox . '"' .
+				' preserveAspectRatio="xMidYMid"' .
+				' stroke="' . $stcol . '"' .
+				' style="' .
+					'width:' . $width . 'px;' .
+					'height:' . $height . 'px;' .
+					'position:' . $args['position'] . ';' .
+					'top:' . $args['top'] . ';' .
+					'margin-top:-' . $args['margin'] . 'px;' .
+					'left:' . $args['left'] . ';' .
+					'margin-left:-' . $args['margin'] . 'px;' .
+					'z-index:100100;' .
+					'opacity:1;' .
+					'display:' . $args['display'] . ';' .
+					'fill:' . $fgcol . ';' .
+					'background-color:' . $bgcol . ';' .
+					'box-shadow:none;' .
+					'border-radius:' . $bradius .'px;' .
+					'"' .
+				' >';
+
+		switch ( $type ) {
+
+			case 'audio':
+				$result .=
+					'<g transform="matrix(1 0 0 -1 0 80)">
+        <rect width="10" height="20" rx="3">
+            <animate attributeName="height"
+                 begin="0s" dur="4.3s"
+                 values="20;45;57;80;64;32;66;45;64;23;66;13;64;56;34;34;2;23;76;79;20" calcMode="linear"
+                 repeatCount="indefinite" />
+        </rect>
+        <rect x="15" width="10" height="80" rx="3">
+            <animate attributeName="height"
+                 begin="0s" dur="2s"
+                 values="80;55;33;5;75;23;73;33;12;14;60;80" calcMode="linear"
+                 repeatCount="indefinite" />
+        </rect>
+        <rect x="30" width="10" height="50" rx="3">
+            <animate attributeName="height"
+                 begin="0s" dur="1.4s"
+                 values="50;34;78;23;56;23;34;76;80;54;21;50" calcMode="linear"
+                 repeatCount="indefinite" />
+        </rect>
+        <rect x="45" width="10" height="30" rx="3">
+            <animate attributeName="height"
+                 begin="0s" dur="2s"
+                 values="30;45;13;80;56;72;45;76;34;23;67;30" calcMode="linear"
+                 repeatCount="indefinite" />
+        </rect>
+    </g>';
+				break;
+
+			case 'ball-triangle':
+				$result .=
+					'<g fill="none" fill-rule="evenodd">
+						<g transform="translate(1 1)" stroke-width="2">
+							<circle cx="5" cy="50" r="5">
+								<animate attributeName="cy"
+									 begin="0s" dur="2.2s"
+									 values="50;5;50;50"
+									 calcMode="linear"
+									 repeatCount="indefinite" />
+								<animate attributeName="cx"
+									 begin="0s" dur="2.2s"
+									 values="5;27;49;5"
+									 calcMode="linear"
+									 repeatCount="indefinite" />
+							</circle>
+							<circle cx="27" cy="5" r="5">
+								<animate attributeName="cy"
+									 begin="0s" dur="2.2s"
+									 from="5" to="5"
+									 values="5;50;50;5"
+									 calcMode="linear"
+									 repeatCount="indefinite" />
+								<animate attributeName="cx"
+									 begin="0s" dur="2.2s"
+									 from="27" to="27"
+									 values="27;49;5;27"
+									 calcMode="linear"
+									 repeatCount="indefinite" />
+							</circle>
+							<circle cx="49" cy="50" r="5">
+								<animate attributeName="cy"
+									 begin="0s" dur="2.2s"
+									 values="50;50;5;50"
+									 calcMode="linear"
+									 repeatCount="indefinite" />
+								<animate attributeName="cx"
+									 from="49" to="49"
+									 begin="0s" dur="2.2s"
+									 values="49;5;27;49"
+									 calcMode="linear"
+									 repeatCount="indefinite" />
+							</circle>
+						</g>
+					</g>';
+				break;
+
+			case 'bars':
+				$result .=
+					'<rect y="10" width="15" height="120" rx="6">
+						<animate attributeName="height"
+							 begin="0.5s" dur="1s"
+							 values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+							 repeatCount="indefinite" />
+						<animate attributeName="y"
+							 begin="0.5s" dur="1s"
+							 values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+							 repeatCount="indefinite" />
+					</rect>
+					<rect x="30" y="10" width="15" height="120" rx="6">
+						<animate attributeName="height"
+							 begin="0.25s" dur="1s"
+							 values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+							 repeatCount="indefinite" />
+						<animate attributeName="y"
+							 begin="0.25s" dur="1s"
+							 values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+							 repeatCount="indefinite" />
+					</rect>
+					<rect x="60" width="15" height="140" rx="6">
+						<animate attributeName="height"
+							 begin="0s" dur="1s"
+							 values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+							 repeatCount="indefinite" />
+						<animate attributeName="y"
+							 begin="0s" dur="1s"
+							 values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+							 repeatCount="indefinite" />
+					</rect>
+					<rect x="90" y="10" width="15" height="120" rx="6">
+						<animate attributeName="height"
+							 begin="0.25s" dur="1s"
+							 values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+							 repeatCount="indefinite" />
+						<animate attributeName="y"
+							 begin="0.25s" dur="1s"
+							 values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+							 repeatCount="indefinite" />
+					</rect>
+					<rect x="120" y="10" width="15" height="120" rx="6">
+						<animate attributeName="height"
+							 begin="0.5s" dur="1s"
+							 values="120;110;100;90;80;70;60;50;40;140;120" calcMode="linear"
+							 repeatCount="indefinite" />
+						<animate attributeName="y"
+							 begin="0.5s" dur="1s"
+							 values="10;15;20;25;30;35;40;45;50;0;10" calcMode="linear"
+							 repeatCount="indefinite" />
+					</rect>';
+				break;
+
+			case 'circles':
+				$result .=
+					'<path d="M67.447 58c5.523 0 10-4.477 10-10s-4.477-10-10-10-10 4.477-10 10 4.477 10 10 10zm9.448 9.447c0 5.523 4.477 10 10 10 5.522 0 10-4.477 10-10s-4.478-10-10-10c-5.523 0-10 4.477-10 10zm-9.448 9.448c-5.523 0-10 4.477-10 10 0 5.522 4.477 10 10 10s10-4.478 10-10c0-5.523-4.477-10-10-10zM58 67.447c0-5.523-4.477-10-10-10s-10 4.477-10 10 4.477 10 10 10 10-4.477 10-10z">
+						<animateTransform
+							attributeName="transform"
+							type="rotate"
+							from="0 67 67"
+							to="-360 67 67"
+							dur="2.5s"
+							repeatCount="indefinite"/>
+					</path>
+					<path d="M28.19 40.31c6.627 0 12-5.374 12-12 0-6.628-5.373-12-12-12-6.628 0-12 5.372-12 12 0 6.626 5.372 12 12 12zm30.72-19.825c4.686 4.687 12.284 4.687 16.97 0 4.686-4.686 4.686-12.284 0-16.97-4.686-4.687-12.284-4.687-16.97 0-4.687 4.686-4.687 12.284 0 16.97zm35.74 7.705c0 6.627 5.37 12 12 12 6.626 0 12-5.373 12-12 0-6.628-5.374-12-12-12-6.63 0-12 5.372-12 12zm19.822 30.72c-4.686 4.686-4.686 12.284 0 16.97 4.687 4.686 12.285 4.686 16.97 0 4.687-4.686 4.687-12.284 0-16.97-4.685-4.687-12.283-4.687-16.97 0zm-7.704 35.74c-6.627 0-12 5.37-12 12 0 6.626 5.373 12 12 12s12-5.374 12-12c0-6.63-5.373-12-12-12zm-30.72 19.822c-4.686-4.686-12.284-4.686-16.97 0-4.686 4.687-4.686 12.285 0 16.97 4.686 4.687 12.284 4.687 16.97 0 4.687-4.685 4.687-12.283 0-16.97zm-35.74-7.704c0-6.627-5.372-12-12-12-6.626 0-12 5.373-12 12s5.374 12 12 12c6.628 0 12-5.373 12-12zm-19.823-30.72c4.687-4.686 4.687-12.284 0-16.97-4.686-4.686-12.284-4.686-16.97 0-4.687 4.686-4.687 12.284 0 16.97 4.686 4.687 12.284 4.687 16.97 0z">
+						<animateTransform
+							attributeName="transform"
+							type="rotate"
+							from="0 67 67"
+							to="360 67 67"
+							dur="8s"
+							repeatCount="indefinite"/>
+					</path>';
+				break;
+
+			case 'grid':
+				$result .=
+					'<circle cx="12.5" cy="12.5" r="12.5">
+						<animate attributeName="fill-opacity"
+						 begin="0s" dur="1s"
+						 values="1;.2;1" calcMode="linear"
+						 repeatCount="indefinite" />
+					</circle>
+					<circle cx="12.5" cy="52.5" r="12.5" fill-opacity=".5">
+						<animate attributeName="fill-opacity"
+						 begin="100ms" dur="1s"
+						 values="1;.2;1" calcMode="linear"
+						 repeatCount="indefinite" />
+					</circle>
+					<circle cx="52.5" cy="12.5" r="12.5">
+						<animate attributeName="fill-opacity"
+						 begin="300ms" dur="1s"
+						 values="1;.2;1" calcMode="linear"
+						 repeatCount="indefinite" />
+					</circle>
+					<circle cx="52.5" cy="52.5" r="12.5">
+						<animate attributeName="fill-opacity"
+						 begin="600ms" dur="1s"
+						 values="1;.2;1" calcMode="linear"
+						 repeatCount="indefinite" />
+					</circle>
+					<circle cx="92.5" cy="12.5" r="12.5">
+						<animate attributeName="fill-opacity"
+						 begin="800ms" dur="1s"
+						 values="1;.2;1" calcMode="linear"
+						 repeatCount="indefinite" />
+					</circle>
+					<circle cx="92.5" cy="52.5" r="12.5">
+						<animate attributeName="fill-opacity"
+						 begin="400ms" dur="1s"
+						 values="1;.2;1" calcMode="linear"
+						 repeatCount="indefinite" />
+					</circle>
+					<circle cx="12.5" cy="92.5" r="12.5">
+						<animate attributeName="fill-opacity"
+						 begin="700ms" dur="1s"
+						 values="1;.2;1" calcMode="linear"
+						 repeatCount="indefinite" />
+					</circle>
+					<circle cx="52.5" cy="92.5" r="12.5">
+						<animate attributeName="fill-opacity"
+						 begin="500ms" dur="1s"
+						 values="1;.2;1" calcMode="linear"
+						 repeatCount="indefinite" />
+					</circle>
+					<circle cx="92.5" cy="92.5" r="12.5">
+						<animate attributeName="fill-opacity"
+						 begin="200ms" dur="1s"
+						 values="1;.2;1" calcMode="linear"
+						 repeatCount="indefinite" />
+					</circle>';
+				break;
+
+			case 'hearts':
+				$result .=
+					'<path d="M30.262 57.02L7.195 40.723c-5.84-3.976-7.56-12.06-3.842-18.063 3.715-6 11.467-7.65 17.306-3.68l4.52 3.76 2.6-5.274c3.717-6.002 11.47-7.65 17.305-3.68 5.84 3.97 7.56 12.054 3.842 18.062L34.49 56.118c-.897 1.512-2.793 1.915-4.228.9z" fill-opacity=".5">
+						<animate attributeName="fill-opacity"
+							 begin="0s" dur="1.4s"
+							 values="0.5;1;0.5"
+							 calcMode="linear"
+							 repeatCount="indefinite" />
+					</path>
+					<path d="M105.512 56.12l-14.44-24.272c-3.716-6.008-1.996-14.093 3.843-18.062 5.835-3.97 13.588-2.322 17.306 3.68l2.6 5.274 4.52-3.76c5.84-3.97 13.592-2.32 17.307 3.68 3.718 6.003 1.998 14.088-3.842 18.064L109.74 57.02c-1.434 1.014-3.33.61-4.228-.9z" fill-opacity=".5">
+						<animate attributeName="fill-opacity"
+							 begin="0.7s" dur="1.4s"
+							 values="0.5;1;0.5"
+							 calcMode="linear"
+							 repeatCount="indefinite" />
+					</path>
+					<path d="M67.408 57.834l-23.01-24.98c-5.864-6.15-5.864-16.108 0-22.248 5.86-6.14 15.37-6.14 21.234 0L70 16.168l4.368-5.562c5.863-6.14 15.375-6.14 21.235 0 5.863 6.14 5.863 16.098 0 22.247l-23.007 24.98c-1.43 1.556-3.757 1.556-5.188 0z" />';
+				break;
+
+			case 'oval':
+				$result .=
+					'<g fill="none" fill-rule="evenodd">
+						<g transform="translate(1 1)" stroke-width="2">
+							<circle stroke-opacity=".3" cx="18" cy="18" r="18"/>
+							<path d="M36 18c0-9.94-8.06-18-18-18">
+								<animateTransform
+									attributeName="transform"
+									type="rotate"
+									from="0 18 18"
+									to="360 18 18"
+									dur="1s"
+									repeatCount="indefinite"/>
+							</path>
+						</g>
+					</g>';
+				break;
+
+			case 'puff':
+				$result .=
+					'<g fill="none" fill-rule="evenodd" stroke-width="2">
+						<circle cx="22" cy="22" r="1">
+							<animate attributeName="r"
+								begin="0s" dur="1.8s"
+								values="1; 20"
+								calcMode="spline"
+								keyTimes="0; 1"
+								keySplines="0.165, 0.84, 0.44, 1"
+								repeatCount="indefinite" />
+							<animate attributeName="stroke-opacity"
+								begin="0s" dur="1.8s"
+								values="1; 0"
+								calcMode="spline"
+								keyTimes="0; 1"
+								keySplines="0.3, 0.61, 0.355, 1"
+								repeatCount="indefinite" />
+						</circle>
+						<circle cx="22" cy="22" r="1">
+							<animate attributeName="r"
+								begin="-0.9s" dur="1.8s"
+								values="1; 20"
+								calcMode="spline"
+								keyTimes="0; 1"
+								keySplines="0.165, 0.84, 0.44, 1"
+								repeatCount="indefinite" />
+							<animate attributeName="stroke-opacity"
+								begin="-0.9s" dur="1.8s"
+								values="1; 0"
+								calcMode="spline"
+								keyTimes="0; 1"
+								keySplines="0.3, 0.61, 0.355, 1"
+								repeatCount="indefinite" />
+						</circle>
+					</g>';
+				break;
+
+			case 'rings':
+				$result .=
+					'<g fill="none" fill-rule="evenodd" transform="translate(1 1)" stroke-width="2">
+						<circle cx="22" cy="22" r="6" stroke-opacity="0">
+							<animate attributeName="r"
+								 begin="1.5s" dur="3s"
+								 values="6;22"
+								 calcMode="linear"
+								 repeatCount="indefinite" />
+							<animate attributeName="stroke-opacity"
+								 begin="1.5s" dur="3s"
+								 values="1;0" calcMode="linear"
+								 repeatCount="indefinite" />
+							<animate attributeName="stroke-width"
+								 begin="1.5s" dur="3s"
+								 values="2;0" calcMode="linear"
+								 repeatCount="indefinite" />
+						</circle>
+						<circle cx="22" cy="22" r="6" stroke-opacity="0">
+							<animate attributeName="r"
+								 begin="3s" dur="3s"
+								 values="6;22"
+								 calcMode="linear"
+								 repeatCount="indefinite" />
+							<animate attributeName="stroke-opacity"
+								 begin="3s" dur="3s"
+								 values="1;0" calcMode="linear"
+								 repeatCount="indefinite" />
+							<animate attributeName="stroke-width"
+								 begin="3s" dur="3s"
+								 values="2;0" calcMode="linear"
+								 repeatCount="indefinite" />
+						</circle>
+						<circle cx="22" cy="22" r="8">
+							<animate attributeName="r"
+								 begin="0s" dur="1.5s"
+								 values="6;1;2;3;4;5;6"
+								 calcMode="linear"
+								 repeatCount="indefinite" />
+						</circle>
+					</g>';
+				break;
+
+			case 'spinning-circles':
+				$result .=
+					'<g fill="none" fill-rule="evenodd">
+						<g transform="translate(2 1)" stroke="' . $stcol . '" stroke-width="1.5">
+							<circle cx="42.601" cy="11.462" r="5" fill-opacity="1" fill="' . $fgcol . '">
+								<animate attributeName="fill-opacity"
+									 begin="0s" dur="1.3s"
+									 values="1;0;0;0;0;0;0;0" calcMode="linear"
+									 repeatCount="indefinite" />
+							</circle>
+							<circle cx="49.063" cy="27.063" r="5" fill-opacity="0" fill="' . $fgcol . '">
+								<animate attributeName="fill-opacity"
+									 begin="0s" dur="1.3s"
+									 values="0;1;0;0;0;0;0;0" calcMode="linear"
+									 repeatCount="indefinite" />
+							</circle>
+							<circle cx="42.601" cy="42.663" r="5" fill-opacity="0" fill="' . $fgcol . '">
+								<animate attributeName="fill-opacity"
+									 begin="0s" dur="1.3s"
+									 values="0;0;1;0;0;0;0;0" calcMode="linear"
+									 repeatCount="indefinite" />
+							</circle>
+							<circle cx="27" cy="49.125" r="5" fill-opacity="0" fill="' . $fgcol . '">
+								<animate attributeName="fill-opacity"
+									 begin="0s" dur="1.3s"
+									 values="0;0;0;1;0;0;0;0" calcMode="linear"
+									 repeatCount="indefinite" />
+							</circle>
+							<circle cx="11.399" cy="42.663" r="5" fill-opacity="0" fill="' . $fgcol . '">
+								<animate attributeName="fill-opacity"
+									 begin="0s" dur="1.3s"
+									 values="0;0;0;0;1;0;0;0" calcMode="linear"
+									 repeatCount="indefinite" />
+							</circle>
+							<circle cx="4.938" cy="27.063" r="5" fill-opacity="0" fill="' . $fgcol . '">
+								<animate attributeName="fill-opacity"
+									 begin="0s" dur="1.3s"
+									 values="0;0;0;0;0;1;0;0" calcMode="linear"
+									 repeatCount="indefinite" />
+							</circle>
+							<circle cx="11.399" cy="11.462" r="5" fill-opacity="0" fill="' . $fgcol . '">
+								<animate attributeName="fill-opacity"
+									 begin="0s" dur="1.3s"
+									 values="0;0;0;0;0;0;1;0" calcMode="linear"
+									 repeatCount="indefinite" />
+							</circle>
+							<circle cx="27" cy="5" r="5" fill-opacity="0" fill="' . $fgcol . '">
+								<animate attributeName="fill-opacity"
+									 begin="0s" dur="1.3s"
+									 values="0;0;0;0;0;0;0;1" calcMode="linear"
+									 repeatCount="indefinite" />
+							</circle>
+						</g>
+					</g>';
+				break;
+
+			case 'tail-spin':
+				$result .=
+					'<defs>' .
+						'<linearGradient x1="8.042%" y1="0%" x2="65.682%" y2="23.865%" id="a">' .
+							'<stop stop-color="#000" stop-opacity="0" offset="0%"/>' .
+							'<stop stop-color="#000" stop-opacity=".631" offset="63.146%"/>' .
+							'<stop stop-color="#000" offset="100%"/>' .
+						'</linearGradient>' .
+					'</defs>' .
+					'<g fill="none" fill-rule="evenodd">' .
+						'<g transform="translate(1 1)">' .
+							'<path d="M36 18c0-9.94-8.06-18-18-18" id="Oval-2" stroke="' . $fgcol . '" stroke-width="2">' .
+								'<animateTransform' .
+									' attributeName="transform"' .
+									' type="rotate"' .
+									' from="0 18 18"' .
+									' to="360 18 18"' .
+									' dur="1.25s"' .
+									' repeatCount="indefinite" />' .
+							'</path>' .
+							'<circle fill="' . $fgcol . '" cx="36" cy="18" r="1">' .
+								'<animateTransform' .
+									' attributeName="transform"' .
+									' type="rotate"' .
+									' from="0 18 18"' .
+									' to="360 18 18"' .
+									' dur="1.25s"' .
+									' repeatCount="indefinite" />' .
+							'</circle>' .
+						'</g>' .
+					'</g>';
+				break;
+
+			case 'three-dots':
+				$result .=
+					'<circle cx="15" cy="15" r="15">
+						<animate attributeName="r" from="15" to="15"
+								 begin="0s" dur="0.8s"
+								 values="15;9;15" calcMode="linear"
+								 repeatCount="indefinite" />
+						<animate attributeName="fill-opacity" from="1" to="1"
+								 begin="0s" dur="0.8s"
+								 values="1;.5;1" calcMode="linear"
+								 repeatCount="indefinite" />
+					</circle>
+					<circle cx="60" cy="15" r="9" fill-opacity="0.3">
+						<animate attributeName="r" from="9" to="9"
+								 begin="0s" dur="0.8s"
+								 values="9;15;9" calcMode="linear"
+								 repeatCount="indefinite" />
+						<animate attributeName="fill-opacity" from="0.5" to="0.5"
+								 begin="0s" dur="0.8s"
+								 values=".5;1;.5" calcMode="linear"
+								 repeatCount="indefinite" />
+					</circle>
+					<circle cx="105" cy="15" r="15">
+						<animate attributeName="r" from="15" to="15"
+								 begin="0s" dur="0.8s"
+								 values="15;9;15" calcMode="linear"
+								 repeatCount="indefinite" />
+						<animate attributeName="fill-opacity" from="1" to="1"
+								 begin="0s" dur="0.8s"
+								 values="1;.5;1" calcMode="linear"
+								 repeatCount="indefinite" />
+					</circle>';
+				break;
+
+			default:
+				$result .=
+					'<rect x="0" y="0" width="100" height="100" fill="none" class="bk" >' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(0 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(22.5 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.09375s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(45 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.1875s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(67.5 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.28125s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(90 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.375s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(112.5 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.46875s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(135 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.5625s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(157.5 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.65625s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(180 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.75s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(202.5 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.84375s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(225 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="0.9375s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(247.5 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.03125s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(270 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.125s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(292.5 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.21875s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(315 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.3125s" repeatCount="indefinite"/>' .
+					'</rect>' .
+					'<rect class="wppa-ajaxspin"  x="47" y="40" width="6" height="20" rx="3" ry="3" transform="rotate(337.5 50 50) translate(0 -32)">' .
+						'<animate attributeName="opacity" from="1" to="0" dur="1.5s" begin="1.40625s" repeatCount="indefinite"/>' .
+					'</rect>';
+				break;
+
+		}
+		$result .= '</svg>';
+	}
+
+	// No .svg possible / requested, default to .gif
+	else {
+		$result =
+			'<img' .
+				' id="' . $args['id'] . '"' .
+				' src="' . wppa_get_imgdir() . 'loader.gif"' .
+				' class="' . $args['class'] . ' wppa-ajax-spin"' .
+				' alt="spinner"' .
+				' style="' .
+					'width:' . $args['size'] . 'px;' .
+					'height:' . $args['size'] . 'px;' .
+					'position:' . $args['position'] . ';' .
+					'top:' . $args['top'] . ';' .
+					'margin-top:-' . $args['margin'] . 'px;' .
+					'left:' . $args['left'] . ';' .
+					'margin-left:-' . $args['margin'] . 'px;' .
+					'z-index:100100;' .
+					'opacity:1;' .
+					'display:' . $args['display'] . ';' .
+					'background-color:' . $bgcol . ';' .
+					'box-shadow:none;' .
+					'"' .
+			' />';
+	}
 
 	return $result;
 }
@@ -4220,4 +4762,10 @@ function wppa_dump( $txt = '' ) {
 
 function wppa_is_pdf( $id ) {
 	return ( strtolower( wppa_get_ext( wppa_get_photo_item( $id, 'filename' ) ) ) == 'pdf' );
+}
+
+// If wppa embedded lightbox, show wait cursor prior to lightbox init. when generic lightbox, show pointer cursor
+function wppa_wait() {
+	$result = wppa_opt( 'lightbox_name' ) == 'wppa' ? 'wait' : 'pointer';
+	return $result;
 }

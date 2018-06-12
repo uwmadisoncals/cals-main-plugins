@@ -3,7 +3,7 @@
  * Plugin Name: Simple Download Monitor
  * Plugin URI: https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin
  * Description: Easily manage downloadable files and monitor downloads of your digital files from your WordPress site.
- * Version: 3.5.8
+ * Version: 3.6.4
  * Author: Tips and Tricks HQ, Ruhul Amin, Josh Lobe
  * Author URI: https://www.tipsandtricks-hq.com/development-center
  * License: GPL2
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('WP_SIMPLE_DL_MONITOR_VERSION', '3.5.8');
+define('WP_SIMPLE_DL_MONITOR_VERSION', '3.6.4');
 define('WP_SIMPLE_DL_MONITOR_DIR_NAME', dirname(plugin_basename(__FILE__)));
 define('WP_SIMPLE_DL_MONITOR_URL', plugins_url('', __FILE__));
 define('WP_SIMPLE_DL_MONITOR_PATH', plugin_dir_path(__FILE__));
@@ -77,7 +77,7 @@ add_action('plugins_loaded', 'sdm_plugins_loaded_tasks');
 
 function sdm_plugins_loaded_tasks() {
     //Load language
-    load_plugin_textdomain('simple-download-monitor', false, dirname(plugin_basename(__FILE__)) . '/langs/');
+    load_plugin_textdomain('simple-download-monitor', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 
     //Handle db upgrade stuff
     sdm_db_update_check();
@@ -212,6 +212,7 @@ class simpleDownloadManager {
 	    add_action('admin_init', array($this, 'sdm_register_options'));  // Register admin options
 	    //add_filter('post_row_actions', array($this, 'sdm_remove_view_link_cpt'), 10, 2);  // Remove 'View' link in all downloads list view
 	}
+        
     }
 
     public function sdm_admin_scripts() {
@@ -265,7 +266,18 @@ class simpleDownloadManager {
 	//Use this function to enqueue fron-end js scripts.
 	wp_enqueue_style('sdm-styles', WP_SIMPLE_DL_MONITOR_URL . '/css/sdm_wp_styles.css');
 	wp_register_script('sdm-scripts', WP_SIMPLE_DL_MONITOR_URL . '/js/sdm_wp_scripts.js', array('jquery'));
-	wp_enqueue_script('sdm-scripts');
+        wp_enqueue_script('sdm-scripts');
+        
+        //Check if reCAPTCHA is enabled.
+        $main_advanced_opts = get_option('sdm_advanced_options');
+        $recaptcha_enable = isset($main_advanced_opts['recaptcha_enable']) ? true : false;
+        if ($recaptcha_enable) {
+            wp_register_script('sdm-recaptcha-scripts-js', WP_SIMPLE_DL_MONITOR_URL . '/js/sdm_g_recaptcha.js', array(), true);
+            wp_localize_script("sdm-recaptcha-scripts-js", "sdm_recaptcha_opt", array("site_key" => $main_advanced_opts['recaptcha_site_key']));
+            wp_register_script('sdm-recaptcha-scripts-lib',  "//www.google.com/recaptcha/api.js?hl=".get_locale()."&onload=sdm_reCaptcha&render=explicit", array(), false);
+            wp_enqueue_script('sdm-recaptcha-scripts-js');
+            wp_enqueue_script('sdm-recaptcha-scripts-lib');
+        }
 
 	// Localize ajax script for frontend
 	wp_localize_script('sdm-scripts', 'sdm_ajax_script', array('ajaxurl' => admin_url('admin-ajax.php')));
@@ -322,9 +334,9 @@ class simpleDownloadManager {
 	echo '<br /><br />';
 	_e('Steps to upload a file or choose one from your media library:', 'simple-download-monitor');
 	echo '<ol>';
-	echo '<li>Hit the "Select File" button.</li>';
-	echo '<li>Upload a new file or choose an existing one from your media library.</li>';
-	echo '<li>Click the "Insert" button, this will populate the uploaded file\'s URL in the above text field.</li>';
+	echo '<li>' . __('Hit the "Select File" button.', 'simple-download-monitor') . '</li>';
+	echo '<li>' . __('Upload a new file or choose an existing one from your media library.', 'simple-download-monitor') . '</li>';
+	echo '<li>' . __('Click the "Insert" button, this will populate the uploaded file\'s URL in the above text field.', 'simple-download-monitor') . '</li>';
 	echo '</ol>';
 
 	wp_nonce_field('sdm_upload_box_nonce', 'sdm_upload_box_nonce_check');
@@ -452,7 +464,7 @@ class simpleDownloadManager {
 	echo "<input type='text' class='code' onfocus='this.select();' readonly='readonly' value='" . $shortcode_text . "' size='40'>";
 
 	echo '<br /><br />';
-	echo 'Read the full shortcode usage documentation <a href="https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin" target="_blank">here</a>.';
+	_e('Read the full shortcode usage documentation <a href="https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin" target="_blank">here</a>.', 'simple-download-monitor');
     }
 
     public function sdm_save_description_meta_data($post_id) {  // Save Description metabox
@@ -555,11 +567,16 @@ class simpleDownloadManager {
 
 	//Add all the settings section that will go under the main settings
 	add_settings_section('general_options', __('General Options', 'simple-download-monitor'), array($this, 'general_options_cb'), 'general_options_section');
-	add_settings_section('admin_options', __('Admin Options', 'simple-download-monitor'), array($this, 'admin_options_cb'), 'admin_options_section');
+        add_settings_section('admin_options', __('Admin Options', 'simple-download-monitor'), array($this, 'admin_options_cb'), 'admin_options_section');
+        
+        //add reCAPTCHA section
+        add_settings_section('recaptcha_options', __('Google Captcha (reCAPTCHA)', 'simple-download-monitor'), array($this, 'recaptcha_options_cb'), 'recaptcha_options_section');
+        add_settings_section('termscond_options', __('Terms and Conditions', 'simple-download-monitor'), array($this, 'termscond_options_cb'), 'termscond_options_section');
+        
 	add_settings_section('sdm_colors', __('Colors', 'simple-download-monitor'), array($this, 'sdm_colors_cb'), 'sdm_colors_section');
 	add_settings_section('sdm_debug', __('Debug', 'simple-download-monitor'), array($this, 'sdm_debug_cb'), 'sdm_debug_section');
 	add_settings_section('sdm_deldata', __('Delete Plugin Data', 'simple-download-monitor'), array($this, 'sdm_deldata_cb'), 'sdm_deldata_section');
-
+        
 	//Add all the individual settings fields that goes under the sections
 	add_settings_field('general_hide_donwload_count', __('Hide Download Count', 'simple-download-monitor'), array($this, 'hide_download_count_cb'), 'general_options_section', 'general_options');
 	add_settings_field('general_default_dispatch_value', __('PHP Dispatching', 'simple-download-monitor'), array($this, 'general_default_dispatch_value_cb'), 'general_options_section', 'general_options');
@@ -568,12 +585,22 @@ class simpleDownloadManager {
 
 	add_settings_field('admin_tinymce_button', __('Remove Tinymce Button', 'simple-download-monitor'), array($this, 'admin_tinymce_button_cb'), 'admin_options_section', 'admin_options');
 	add_settings_field('admin_log_unique', __('Log Unique IP', 'simple-download-monitor'), array($this, 'admin_log_unique'), 'admin_options_section', 'admin_options');
+	add_settings_field('admin_do_not_capture_ip', __('Do Not Capture IP Address', 'simple-download-monitor'), array($this, 'admin_do_not_capture_ip'), 'admin_options_section', 'admin_options');
 	add_settings_field('admin_dont_log_bots', __('Do Not Count Downloads from Bots', 'simple-download-monitor'), array($this, 'admin_dont_log_bots'), 'admin_options_section', 'admin_options');
 	add_settings_field('admin_no_logs', __('Disable Download Logs', 'simple-download-monitor'), array($this, 'admin_no_logs_cb'), 'admin_options_section', 'admin_options');
 
 	add_settings_field('download_button_color', __('Download Button Color', 'simple-download-monitor'), array($this, 'download_button_color_cb'), 'sdm_colors_section', 'sdm_colors');
 
 	add_settings_field('enable_debug', __('Enable Debug', 'simple-download-monitor'), array($this, 'enable_debug_cb'), 'sdm_debug_section', 'sdm_debug');
+        
+        //add reCAPTCHA section fields
+        add_settings_field('recaptcha_enable', __('Enable reCAPTCHA', 'simple-download-monitor'), array($this, 'recaptcha_enable_cb'), 'recaptcha_options_section', 'recaptcha_options');
+        add_settings_field('recaptcha_site_key', __('Site Key', 'simple-download-monitor'), array($this, 'recaptcha_site_key_cb'), 'recaptcha_options_section', 'recaptcha_options');
+        add_settings_field('recaptcha_secret_key', __('Secret Key', 'simple-download-monitor'), array($this, 'recaptcha_secret_key_cb'), 'recaptcha_options_section', 'recaptcha_options');
+
+        //add Terms & Condition section fields
+        add_settings_field('termscond_enable', __('Enable Terms and Conditions', 'simple-download-monitor'), array($this, 'termscond_enable_cb'), 'termscond_options_section', 'termscond_options');
+        add_settings_field('termscond_url', __('Terms Page URL', 'simple-download-monitor'), array($this, 'termscond_url_cb'), 'termscond_options_section', 'termscond_options');
     }
 
     public function general_options_cb() {
@@ -601,8 +628,39 @@ class simpleDownloadManager {
 	_e('You can delete all the data related to this plugin from database using the button below. Useful when you\'re uninstalling the plugin and don\'t want any leftovers remaining.', 'simple-download-monitor');
 	echo '<p><b>' . __('Warning', 'simple-download-monitor') . ': </b> ' . __('this can\'t be undone. All settings, download items, download logs will be deleted.', 'simple-download-monitor') . '</p>';
 	echo '<p><button id="sdmDeleteData" class="button" style="color:red;">' . __('Delete all data and deactivate plugin', 'simple-download-monitor') . '</button></p>';
+        echo '<br />';
     }
 
+    public function recaptcha_options_cb() {
+	//Set the message that will be shown below the debug options settings heading
+	_e('Google Captcha (reCAPTCHA) options', 'simple-download-monitor');
+    }
+    
+    public function termscond_options_cb() {
+        
+    }
+    
+    public function recaptcha_enable_cb() {
+	$main_opts = get_option('sdm_advanced_options');
+	echo '<input name="sdm_advanced_options[recaptcha_enable]" id="recaptcha_enable" type="checkbox" ' . checked(1, isset($main_opts['recaptcha_enable']), false) . ' /> ';
+	echo '<p class="description">' . __('Check this box if you want to use <a href="https://www.google.com/recaptcha/admin" target="_blank">reCAPTCHA</a>. ', 'simple-download-monitor') . '</p>';
+        echo '<p class="description">' . __('The captcha option adds a captcha to the download now buttons.', 'simple-download-monitor') . '</p>';
+    }
+    
+    public function recaptcha_site_key_cb() {
+	$main_opts = get_option('sdm_advanced_options');
+        $value = isset($main_opts['recaptcha_site_key']) ? $main_opts['recaptcha_site_key'] : '';
+	echo '<input size="100" name="sdm_advanced_options[recaptcha_site_key]" id="recaptcha_site_key" type="text" value="'.$value.'" /> ';
+	echo '<p class="description">' . __('The site key for the reCAPTCHA API', 'simple-download-monitor') . '</p>';
+    }
+    
+    public function recaptcha_secret_key_cb() {
+	$main_opts = get_option('sdm_advanced_options');
+        $value = isset($main_opts['recaptcha_secret_key']) ? $main_opts['recaptcha_secret_key'] : '';
+	echo '<input size="100" name="sdm_advanced_options[recaptcha_secret_key]" id="recaptcha_secret_key" type="text" value="'.$value.'" /> ';
+	echo '<p class="description">' . __('The secret key for the reCAPTCHA API', 'simple-download-monitor') . '</p>';
+    }
+    
     public function hide_download_count_cb() {
 	$main_opts = get_option('sdm_downloads_options');
 	echo '<input name="sdm_downloads_options[general_hide_donwload_count]" id="general_hide_download_count" type="checkbox" ' . checked(1, isset($main_opts['general_hide_donwload_count']), false) . ' /> ';
@@ -640,6 +698,12 @@ class simpleDownloadManager {
 	$main_opts = get_option('sdm_downloads_options');
 	echo '<input name="sdm_downloads_options[admin_log_unique]" id="admin_log_unique" type="checkbox" class="sdm_opts_ajax_checkboxes" ' . checked(1, isset($main_opts['admin_log_unique']), false) . ' /> ';
 	echo '<label for="admin_log_unique">' . __('Only logs downloads from unique IP addresses.', 'simple-download-monitor') . '</label>';
+    }
+    
+    public function admin_do_not_capture_ip() {
+	$main_opts = get_option('sdm_downloads_options');
+	echo '<input name="sdm_downloads_options[admin_do_not_capture_ip]" id="admin_do_not_capture_ip" type="checkbox" class="sdm_opts_ajax_checkboxes" ' . checked(1, isset($main_opts['admin_do_not_capture_ip']), false) . ' /> ';
+	echo '<label for="admin_do_not_capture_ip">' . __('Use this if you do not want to capture the IP address and Country of the visitors when they download an item.', 'simple-download-monitor') . '</label>';
     }
 
     public function admin_dont_log_bots() {
@@ -679,6 +743,18 @@ class simpleDownloadManager {
 	__(' to reset log file.', 'simple-download-monitor') . '</p></label>';
     }
 
+    public function termscond_enable_cb() {
+	$main_opts = get_option('sdm_advanced_options');
+	echo '<input name="sdm_advanced_options[termscond_enable]" id="termscond_enable" type="checkbox" ' . checked(1, isset($main_opts['termscond_enable']), false) . ' /> ';
+        echo '<p class="description">' . __('You can use this option to make the visitors agree to your terms before they can download the item.', 'simple-download-monitor') . '</p>';
+    }
+    
+    public function termscond_url_cb() {
+	$main_opts = get_option('sdm_advanced_options');
+        $value = isset($main_opts['termscond_url']) ? $main_opts['termscond_url'] : '';
+	echo '<input size="100" name="sdm_advanced_options[termscond_url]" id="termscond_url" type="text" value="'.$value.'" /> ';
+	echo '<p class="description">' . __('Enter the URL of your terms and conditions page.', 'simple-download-monitor') . '</p>';
+    }
 }
 
 //End of simpleDownloadManager class
@@ -789,9 +865,9 @@ function sdm_create_columns($cols) {
     unset($cols['taxonomy-sdm_tags']);
     unset($cols['taxonomy-sdm_categories']);
     unset($cols['date']);
-
-    $cols['sdm_downloads_thumbnail'] = __('Image', 'simple-download-monitor');
+    
     $cols['title'] = __('Title', 'simple-download-monitor');
+    $cols['sdm_downloads_thumbnail'] = __('Image', 'simple-download-monitor');
     $cols['sdm_downloads_id'] = __('ID', 'simple-download-monitor');
     $cols['sdm_downloads_file'] = __('File', 'simple-download-monitor');
     $cols['taxonomy-sdm_categories'] = __('Categories', 'simple-download-monitor');
@@ -817,7 +893,7 @@ function sdm_downloads_columns_content($column_name, $post_ID) {
 	$old_thumbnail = get_post_meta($post_ID, 'sdm_upload_thumbnail', true);
 	//$old_value = isset($old_thumbnail) ? $old_thumbnail : '';
 	if ($old_thumbnail) {
-	    echo '<p class="sdm_downloads_count"><img src="' . $old_thumbnail . '" style="width:50px;height:50px;" /></p>';
+	    echo '<p class="sdm_downloads_thumbnail_in_admin_listing"><img src="' . $old_thumbnail . '" style="width:50px;height:50px;" /></p>';
 	}
     }
     if ($column_name == 'sdm_downloads_id') {
@@ -833,19 +909,6 @@ function sdm_downloads_columns_content($column_name, $post_ID) {
 	$wpdb->get_results($wpdb->prepare('SELECT * FROM ' . $wpdb->prefix . 'sdm_downloads WHERE post_id=%s', $post_ID));
 	echo '<p class="sdm_downloads_count">' . $wpdb->num_rows . '</p>';
     }
-}
-
-// Adjust admin column widths
-add_action('admin_head', 'sdm_admin_column_width'); // Adjust column width in admin panel
-
-function sdm_admin_column_width() {
-
-    echo '<style type="text/css">';
-    echo '.column-sdm_downloads_thumbnail { width:75px !important; overflow:hidden }';
-    echo '.column-sdm_downloads_id { width:100px !important; overflow:hidden }';
-    echo '.column-taxonomy-sdm_categories { width:200px !important; overflow:hidden }';
-    echo '.column-taxonomy-sdm_tags { width:200px !important; overflow:hidden }';
-    echo '</style>';
 }
 
 /*
