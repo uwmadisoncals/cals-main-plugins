@@ -1,0 +1,28 @@
+.compare_img { 
+    width: 600px;
+    height: 400px;
+    position: relative;
+    overflow: hidden;
+}
+.compare_img::after { width: 100%; height: 100%; content: ''; position: absolute; z-index: 3; }
+.compare_img * {
+    margin: 0px;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    outline: 0px;
+}
+.compare_img .img { background-size: auto 100%; z-index: 1; }
+.compare_img .img.divisor { overflow: visible; width: 50%; z-index: 2; }
+
+.compare_img .img.divisor::after,
+.compare_img .img.divisor::before {
+    border: solid transparent;
+    content: '';
+    position: absolute;
+    border-width: 8px;
+    right: -8px;
+}
+.compare_img .img.divisor::before { border-top-color: #fff; top: 0px; }
+.compare_img .img.divisor::after { border-bottom-color: #fff; bottom: 0px; }
