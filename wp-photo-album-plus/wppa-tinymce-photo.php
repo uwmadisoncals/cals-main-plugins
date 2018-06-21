@@ -2,7 +2,7 @@
 /* wppa-tinymce-photo.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 6.8.08
+* Version 6.9.03
 *
 */
 
@@ -62,9 +62,9 @@ static $done;
 			echo("\t".'wppaSiteUrl = "'.site_url().'";'."\n");
 			echo("\t".'wppaWppaUrl = "'.WPPA_URL.'";'."\n");
 			echo("\t".'wppaIncludeUrl = "'.trim(includes_url(), '/').'";'."\n");
-			echo("\t".'wppaUIERR = "'.__('Unimplemented virtual album', 'wp-photo-album-plus').'";');
-			echo("\t".'wppaTxtProcessing = "'.__('Processing...', 'wp-photo-album-plus').'";');
-			echo("\t".'wppaTxtDone = "'.__('Done!', 'wp-photo-album-plus').'";');
+			echo("\t".'wppaUIERR = "'.__('Unimplemented virtual album', 'wp-photo-album-plus').'";'."\n");
+			echo("\t".'wppaTxtProcessing = "'.__('Processing...', 'wp-photo-album-plus').'";'."\n");
+			echo("\t".'wppaTxtDone = "'.__('Done!', 'wp-photo-album-plus').'";'."\n");
 			echo("\t".'wppaTxtErrUnable = "'.__( 'ERROR: unable to upload files.', 'wp-photo-album-plus' ).'";');
 		echo("/* ]]> */\n");
 		echo("</script>\n");

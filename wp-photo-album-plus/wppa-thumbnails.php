@@ -245,12 +245,13 @@ global $wpdb;
 					$result .= 	'<img' .
 									' onclick="' . $onclick . '"' .
 									' id="i-' . $xid . '-'.wppa( 'mocc' ) . '"' .
-									' src="' . $imgurl . '"' .
+									' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 									' ' . $imgalt .
 									( $title ? ' title="' . $title . '"' : '' ) .
 									' width="' . $imgwidth . '"' .
 									' height="' . $imgheight . '"' .
 									' style="' . $imgstyle . ' cursor:pointer;"' .
+									( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 									' ' . $events .
 								' />';
 				}
@@ -286,8 +287,9 @@ global $wpdb;
 				else {
 					$result .= 	'<img' .
 									' id="i-' . $xid . '-' . wppa( 'mocc' ) . '"' .
-									' src="' . $imgurl . '" ' . $imgalt .
+									' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '" ' . $imgalt .
 									( $title ? ' title="' . $title . '"' : '' ) .
+									( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 									' width="' . $imgwidth . '"' .
 									' height="' . $imgheight . '"' .
 									' style="' . $imgstyle . ' cursor:pointer;"' .
@@ -340,9 +342,10 @@ global $wpdb;
 				$title = wppa_zoom_in( $id );
 				$result .= 	'<img' .
 								' id="i-' . $xid . '-' . wppa( 'mocc' ) . '"' .
-								' src="' . $imgurl . '"' .
+								' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 								' ' . $imgalt .
 								( $title ? ' title="' . $title . '"' : '' ) .
+								( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 								' width="' . $imgwidth . '"' .
 								' height="' . $imgheight . '"' .
 								' style="' . $imgstyle . $cursor . '"' .
@@ -378,12 +381,13 @@ global $wpdb;
 			else {
 				$result .= 	'<img' .
 								' id="i-' . $xid . '-' . wppa( 'mocc' ) . '"' .
-								' src="' . $imgurl . '"' .
+								' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 								' ' . $imgalt .
 								( $title ? ' title="' . $title . '"' : '' ) .
 								' width="' . $imgwidth . '"' .
 								' height="' . $imgheight . '"' .
 								' style="' . $imgstyle . ' cursor:pointer;"' .
+								( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 								' ' . $events .
 							' />';
 			}
@@ -419,12 +423,13 @@ global $wpdb;
 				}
 				else {
 					$result .= 	'<img' .
-									' src="' . $imgurl . '"' .
+									' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 									' ' . $imgalt .
 									( $title ? ' title="' . $title . '"' : '' ) .
 									' width="' . $imgwidth . '"' .
 									' height="' . $imgheight . '"' .
 									' style="' . $imgstyle . '"' .
+									( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 									' ' . $events .
 								' />';
 				}
@@ -452,12 +457,13 @@ global $wpdb;
 			}
 			else {
 				$result .= 	'<img' .
-								' src="' . $imgurl . '"' .
+								' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 								' ' . $imgalt .
 								( $title ? ' title="' . $title . '"' : '' ) .
 								' width="' . $imgwidth . '"' .
 								' height="' . $imgheight . '"' .
 								' style="' . $imgstyle . '"' .
+								( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 								' ' . $events . ' />';
 			}
 		}
@@ -549,11 +555,11 @@ global $wpdb;
 
 								'<img' .
 									' id="wppa-like-' . $id . '-' . wppa( 'mocc' ) . '"' .
-									' src="' . $src . '"' .
+									' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $src . '"' .
 									' alt="up"' .
 									' title="' . esc_attr( $lt['title'] ) . '"' .
 									' style="height:16px; margin:0 0 -3px 0; padding:0 4px; box-shadow:none; display:inline;"' .
-									' class="no-shadow"' .
+									' class="no-shadow ' . ( wppa_switch( 'lazy' ) ? 'wppa-lazy' : '' ) . '"' .
 									' onmouseover="jQuery(this).stop().fadeTo(100, 1.0);"' .
 									' onmouseout="jQuery(this).stop().fadeTo(100, wppaStarOpacity);"' .
 									' onclick="wppaOvlRateIt( \'' . wppa_encrypt_photo( $id ) . '\', 1, ' . wppa( 'mocc' ) . ' );' . '"' .
@@ -948,9 +954,9 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 			}
 			else {
 				$result .= 	'<img' .
-								' src="' . $src . '"' .
+								' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $src . '"' .
 								' ' . wppa_get_imgalt( $id ) .
-								' class="image wppa-img"' .
+								' class="image wppa-img ' . ( wppa_switch( 'lazy' ) ? 'wppa-lazy' : '' ) . '"' .
 								' width="' . $imgwidth . '"' .
 								' height="' . $imgheight . '"' .
 								' style="' . wppa_wcs( 'wppa-img' ) . $imgattr . $cursor . '"' .
@@ -987,9 +993,9 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 			}
 			else {
 				$result .= 	'<img' .
-								' src="' . $src . '"' .
+								' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $src . '"' .
 								' ' . wppa_get_imgalt( $id ) .
-								' class="image wppa-img"' .
+								' class="image wppa-img ' . ( wppa_switch( 'lazy' ) ? 'wppa-lazy' : '' ) . '"' .
 								' width="' . $imgwidth . '"' .
 								' height="' . $imgheight . '"' .
 								' style="' . wppa_wcs( 'wppa-img' ) . $imgattr . '"' .
@@ -1020,9 +1026,9 @@ function wppa_the_thumbascoverphoto( $id, $src, $photo_left, $link, $imgattr_a, 
 		}
 		else {
 			$result .= 	'<img' .
-							' src="' . $src . '"' .
+							' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $src . '"' .
 							' ' . wppa_get_imgalt( $id ) .
-							' class="image wppa-img"' .
+							' class="image wppa-img wppa-lazy"' .
 							' width="' . $imgwidth . '"' .
 							' height="' . $imgheight . '"' .
 							' style="' . wppa_wcs( 'wppa-img' ) . $imgattr . '"' .
@@ -1162,10 +1168,11 @@ global $wpdb;
 		$style = $imgattr_a['style'];
 		$result .= '<a href="' . get_permalink() . '">' .
 						'<img' .
-							' src="' . $imgurl . '"' .
+							' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 							' ' . $imgalt .
 							( $title ? ' title="' . $title . '"' : '' ) .
 							' style="'.$style.'"' .
+							( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 						' />' .
 					'</a>';
 		return;
@@ -1256,10 +1263,11 @@ global $wpdb;
 					$result .= 	'<img' .
 									' onclick="' . $onclick . '"' .
 									' id="i-' . $xid . '-' . wppa( 'mocc' ) . '"' .
-									' src="' . $imgurl . '"' .
+									' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 									' ' . $imgalt .
 									( $title ? ' title="' . $title . '"' : '' ) .
 									' style="' . $imgstyle . ' cursor:pointer;"' .
+									( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 									' ' . $events .
 								' />';
 				}
@@ -1292,10 +1300,11 @@ global $wpdb;
 				else {
 					$result .= 	'<img' .
 									' id="i-' . $xid . '-' . wppa( 'mocc' ) . '"' .
-									' src="' . $imgurl . '"' .
+									' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 									' ' . $imgalt .
 									( $title ? ' title="' . $title . '"' : '' ) .
 									' style="' . $imgstyle . 'cursor:pointer;"' .
+									( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 									' ' . $events .
 								' />';
 				}
@@ -1348,10 +1357,11 @@ global $wpdb;
 			else {
 				$result .= 	'<img' .
 								' id="i-' . $xid . '-' . wppa( 'mocc' ) . '"' .
-								' src="' . $imgurl . '"' .
+								' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 								' ' . $imgalt .
 								( $title ? ' title="' . $title . '"' : '' ) .
 								' style="' . $imgstyle . $cursor . '"' .
+								( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 								' ' . $events .
 							' />';
 			}
@@ -1390,10 +1400,11 @@ global $wpdb;
 			else {
 				$result .= 	'<img' .
 								' id="i-' . $xid . '-' . wppa( 'mocc' ) . '"' .
-								' src="' . $imgurl . '"' .
+								' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 								' ' . $imgalt .
 								( $title ? ' title="' . $title . '"' : '' ) .
 								' style="' . $imgstyle . 'cursor:pointer;"' .
+								( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 								' ' . $events .
 							' />';
 			}
@@ -1432,12 +1443,13 @@ global $wpdb;
 				else {
 					$result .= 	'<img' .
 									' id="i-'.$xid.'-'.wppa( 'mocc' ).'"' .
-									' src="' . $imgurl . '"' .
+									' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 									' ' . $imgalt .
 									( $title ? ' title="' . $title . '"' : '' ) .
 									' width="' . $imgwidth . '"' .
 									' height="' . $imgheight . '"' .
 									' style="' . $imgstyle . '"' .
+									( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 									' ' . $events .
 								' />';
 				}
@@ -1468,12 +1480,13 @@ global $wpdb;
 			else {
 				$result .= 	'<img' .
 								' id="i-'.$xid.'-'.wppa( 'mocc' ).'"' .
-								' src="' . $imgurl . '"' .
+								' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 								' ' . $imgalt .
 								( $title ? ' title="' . $title . '"' : '' ) .
 								' width="' . $imgwidth . '"' .
 								' height="' . $imgheight . '"' .
 								' style="' . $imgstyle . '" ' . $events .
+								( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 							' />';
 			}
 		}
@@ -1613,12 +1626,13 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 						$result .= 	'<img' .
 										' id="i-' . $xid . '-' . wppa( 'mocc' ) . '"' .
 										( $title ? ' title="' . $title . '"' : '' ) .
-										' src="' . $imgurl . '"' .
+										' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 										' width="' . $imgstyle_a['width'] . '"' .
 										' height="' . $imgstyle_a['height'] . '"' .
 										' style="' . $imgstyle_a['style'] . ' cursor:pointer;"' .
 										' ' . $imgevents .
 										' ' . wppa_get_imgalt( $id ) .
+										( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 										' />';
 					}
 				}
@@ -1664,12 +1678,13 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 						$result .= 	'<img' .
 										' id="i-' . $xid . '-' . wppa( 'mocc' ) . '"' .
 										( $title ? ' title="' . $title . '"' : '' ) .
-										' src="' . $imgurl . '"' .
+										' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 										' width="' . $imgstyle_a['width'] . '"' .
 										' height="' . $imgstyle_a['height'] . '"' .
 										' style="' . $imgstyle_a['style'] . '"' .
 										' ' . $imgevents .
 										' ' . wppa_get_imgalt( $id ) .
+										( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 										' />';
 					}
 				}
@@ -1700,13 +1715,14 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 					$result .= 	'<img' .
 									' id="i-' . $xid . '-' . wppa( 'mocc' ) . '"' .
 									( $title ? ' title="' . $title . '"' : '' ) .
-									' src="' . $imgurl . '"' .
+									' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 									' width="' . $imgstyle_a['width'] . '"' .
 									' height="' . $imgstyle_a['height'] . '"' .
 									' style="' . $imgstyle_a['style'] . ' cursor:pointer;"' .
 									' ' . $imgevents .
 									' onclick="' . $link['url'] . '"' .
 									' ' . wppa_get_imgalt( $id ) .
+									( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 									' />';
 				}
 			}
@@ -1741,12 +1757,13 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 				$result .= 	'<img' .
 								' id="i-' . $xid . '-' . wppa( 'mocc' ) . '"' .
 								( $title ? ' title="' . $title . '"' : '' ) .
-								' src="' . $imgurl . '"' .
+								' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $imgurl . '"' .
 								' width="' . $imgstyle_a['width'] . '"' .
 								' height="' . $imgstyle_a['height'] . '"' .
 								' style="' . $imgstyle_a['style'] . '"' .
 								' ' . $imgevents .
 								' ' . wppa_get_imgalt( $id ) .
+								( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 								' />';
 			}
 		}
@@ -1864,8 +1881,8 @@ function wppa_do_filmthumb( $id, $idx, $do_for_feed = false, $glue = false ) {
 				else {
 					$result .=  '<img' .
 									' id="wppa-' . $tmp . '-' . $idx . '-' . wppa( 'mocc' ) . '"' .
-									' class="wppa-'.$tmp.'-'.wppa( 'mocc' ).'"' .
-									( $tmp == 'film' ? ' data-src' : ' src' ) . '="' . $url . '"' .
+									' class="wppa-'.$tmp.'-'.wppa( 'mocc' ).' ' . ( wppa_switch( 'lazy' ) ? 'wppa-lazy' : '' ) . '"' .
+									' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $url . '"' .
 									' ' . $imgalt .
 									' style="' . $imgstyle . $cursor . '"' .
 									' ' . $events .

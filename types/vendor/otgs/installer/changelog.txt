@@ -1,3 +1,10 @@
+= 1.8.20 =
+* Display a link for Toolset Types upgrade if there is an available paid update
+* Do not include the plugin in the list of updates if it is not part of the current user subscription
+
+= 1.8.19 =
+* Fixed a bug that was preventing Types from being downloaded from wordpress.org
+
 = 1.8.18 =
 * Fixed a scenario where the `get_plugins` function might not be defined yet
 
@@ -17,7 +24,6 @@
 * Fixed Warning when components storage cache is empty
 
 = 1.8.14 =
-
 * Optionally collect some site information and send to our Toolset and WPML servers, such as PHP version, theme and plugins
 * Resolved PHP fatal error when Types release/3.0 was active with WPML 3.9.4
 * Skipped sending reports when site key is missing

@@ -1,22 +1,28 @@
 jQuery(document).ready(function ($) {
 
+
     // ---------- Tools //
+    $('#ots-import-replace-existing, #ots-import--button').prop('disabled', true);
+
+    $('[name="ots_file_import"]').change(function (e) {
+        $('#ots-import-replace-existing, #ots-import--button').prop('disabled', !$(this).get([0]).files.length);
+    });
+
+
     $( '#ots-import-form' ).submit( function(e) {
 
         if( $( '#ots-import-replace-existing' ).prop('checked') === true ) {
-         
-            var  r = confirm( 'This will delete all your team members' )
 
-            if( r == true ) {
+            if (confirm( 'This will delete all your team members' )) {
                 return true
-            }else {
+            } else {
                 return false
             }
 
         }
-        
-        
-    })
+    });
+
+
     // -------------------
     
     var limit = $('#ots-display-limit-number');

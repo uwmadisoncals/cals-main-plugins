@@ -253,49 +253,41 @@ function weaverx_mainopts_fullwidth() {
 		'info' => __('Options to easily create full width site designs', 'weaver-xtreme' /*adm*/),
 		'help' => 'help.html#FullWidth'),
 
-	array('name' => __('Expand Areas', 'weaver-xtreme' /*adm*/), 'id' => '-editor-expand', 'type' => 'header_area',
-		'info' => __('This section has options that let you expand selected content areas of your site to the full browser width. The content will be responsively displayed - and fully occupy the browser window.', 'weaver-xtreme' /*adm*/)),
-	array('name' => '<span class="i-left dashicons dashicons-editor-expand"></span>' . __('Entire Site Full Width', 'weaver-xtreme' /*adm*/), 'id' => 'wrapper_fullwidth', 'type' => 'checkbox',
-		'info' => __('Checking this option will display the <strong>ENTIRE SITE</strong> in the full width of the browser. This option overrides the <em>Theme Width</em> option on the <em>Wrapping Areas : Wrapper Area</em> menu.', 'weaver-xtreme' /*adm*/)),
+
+
+	array('name' => __('One-Step Site Layout', 'weaver-xtreme' /*adm*/), 'id' => 'site_layout', 'type' => 'select_id',
+		'info' => __('Easiest way to set overall site width layout. Settings other than Custom or blank <strong>automatically</strong> set and clear other Extend BG and Stretch Width Options. Use Custom to enable manual Custom Full Width Options. You can also use <em>Full</em> and <em>Wide Align</em> options for individual areas to enhance these one-step settings.', 'weaver-xtreme' /*adm*/),
+		'value' => array(
+		array('val' => '', 			'desc' => ''),
+		array('val' => 'fullwidth', 'desc' => __('Full Width - Extends BG to full width', 'weaver-xtreme')),
+		array('val' => 'stretched', 'desc'  => __('Stretched - Expand to full width', 'weaver-xtreme')),
+		array('val' => 'boxed', 	'desc'=> __('Boxed - Traditional layout', 'weaver-xtreme')),
+		array('val' => 'custom', 	'desc' => __('Custom - Use Custom Width Options', 'weaver-xtreme'))
+	))
 	);
 
-	$expand = array (
-		'header' => array( __('Header Area Expand', 'weaver-xtreme'), __('Expand Header Area to full width. This will include all other Header Area sub-areas as well.','weaver-xtreme' )),
-		'header-image' => array( __('Header Image Expand', 'weaver-xtreme'), __('Expand Header Image to full width.','weaver-xtreme' )),
-		'site_title' => array( __('Site Title/Tagline Expand', 'weaver-xtreme'), __('This option includes the Site Title, Tagline, Search Button, and MiniMenu.','weaver-xtreme' )),
-		'header-widget-area' => array( __('Header Widget Area Expand', 'weaver-xtreme'), __('Expand Header Widget Area to full width.','weaver-xtreme' )),
-		'header-html' => array( __('Header HTML Area Expand', 'weaver-xtreme'), __('Expand Header HTML Area to full width.','weaver-xtreme' )),
-		'm_primary' => array( __('Primary Menu Expand', 'weaver-xtreme'), __('Expand Primary Menu to full width.','weaver-xtreme' )),
-		'm_secondary' => array( __('Secondary Menu Expand', 'weaver-xtreme'), __('Expand Secondary Menu to full width.','weaver-xtreme' )),
-		'container' => array( __('Container Area Expand', 'weaver-xtreme'), __('Expand Container Area to full width.','weaver-xtreme' )),
-		'infobar' => array( __('Info Bar Expand', 'weaver-xtreme'), __('Expand Info Bar to full width.','weaver-xtreme' )),
-		'post' => array( __('Post Area Expand', 'weaver-xtreme'), __('Expand Info Bar to full width.','weaver-xtreme' )),
-		'footer' => array( __('Footer Area Expand', 'weaver-xtreme'), __('Checking this option will automatically include the other Footer Area Expand options as well.','weaver-xtreme' )),
-		'footer_sb' => array( __('Footer Widget Area Expand', 'weaver-xtreme'), __('Expand Footer Widget Area to full width.','weaver-xtreme' )),
-		'footer_html' => array( __('Footer HTML Area Expand', 'weaver-xtreme'), __('Expand Footer HTML Area to full width.','weaver-xtreme' )),
-		'site-ig-wrap' => array( __('Footer Copyright Area Expand', 'weaver-xtreme'), __('Expand Footer Copyright Area to full width.','weaver-xtreme' )),
 
-	);
-
-	foreach ($expand as $id => $vals) {
-		$opts[] = array('name' => '<span class="i-left dashicons dashicons-editor-expand"></span>' . $vals[0], 'id' => 'expand_' . $id, 'type' => 'checkbox',
-		'info' => $vals[1]);
-	}
+	$opts[] = array('name' => __('Wide and Full Alignment', 'weaver-xtreme' /*adm*/), 'id' => '-admin-appearance3', 'type' => 'header_area',
+		'info' => __('Many wrapping areas and other items include Full and Wide alignment for a different way to get full or wide width.', 'weaver-xtreme' /*adm*/));
+	$opts[] = array('name' => '<small>' . __('Align Full and Wide', 'weaver-xtreme' /*adm*/) . '</small>', 'type' => 'note',
+		'info' => __('Two new alignment classes, .alignwide and .alignfull are supported by Weaver Xtreme. Most options with the Align option include options for full and wide alignment. Using a width alignment option will extend the full item, including content, to the specified width.', 'weaver-xtreme' /*adm*/));
 
 
 
-	$opts[] = array('name' => __('Extend BG Attributes', 'weaver-xtreme' /*adm*/), 'id' => '-editor-code', 'type' => 'header_area',
-		'info' => __('The Extend BG Attributes options in this section allow you to retain the original content width, while extending its Background attributes to full width. These includes BG color, BG image, and borders, for example.', 'weaver-xtreme' /*adm*/));
+
+	$opts[] = array('name' => __('Extend BG Attributes to Full Width', 'weaver-xtreme' /*adm*/), 'id' => '-editor-code', 'type' => 'header_area',
+		'info' => __('The Extend BG Attributes options in this section <em>retain the original content width</em>, while <em>extending the area\'s Background attributes to full width</em>. These includes BG color, BG image, and borders, for example. IMPORTANT: Extend options override wide and full alignment options.', 'weaver-xtreme' /*adm*/));
+
 
 	$extend = array (
 		'container' => array( __('Container Area Extend BG', 'weaver-xtreme'), __('Extend Container Area BG Attributes to full width.','weaver-xtreme' )),
-		'header' => array( __('Header Area Extend BG', 'weaver-xtreme'), __('Extend Header Area BG Attributes to full width.','weaver-xtreme' )),
+		'header' => array( __('Header Area Extend BG', 'weaver-xtreme'), __(' Extend Header Area BG Attributes to full width.','weaver-xtreme' )),
 		'header_sb' => array( __('Header Widget Area Extend BG', 'weaver-xtreme'), __('Extend Header Widget Area BG Attributes to full width.','weaver-xtreme' )),
 		'header_html' => array( __('Header HTML Area Extend BG', 'weaver-xtreme'), __('Extend Header HTML Area BG Attributes to full width.','weaver-xtreme' )),
-		'm_primary' => array( __('Primary Menu Extend BG', 'weaver-xtreme'), __('Extend Primary Menu BG Attributes to full width.','weaver-xtreme' )),
-		'm_secondary' => array( __('Secondary Menu Extend BG', 'weaver-xtreme'), __('Extend Secondary Menu BG Attributes to full width.','weaver-xtreme' )),
+		'm_primary' => array( __('Primary Menu Extend BG', 'weaver-xtreme'), __('Extend Primary Menu BG Attributes to full width, keep menu items constrained to theme width.','weaver-xtreme' )),
+		'm_secondary' => array( __('Secondary Menu Extend BG', 'weaver-xtreme'), __('Extend Secondary Menu BG Attributes to full width, keep menu items constrained to theme width.','weaver-xtreme' )),
 		'infobar' => array( __('Info Bar Extend BG', 'weaver-xtreme'), __('Extend Info Bar BG Attributes to full width.','weaver-xtreme' )),
-		//'content' => array( __('Content Area Extend BG', 'weaver-xtreme'), __('Extend Content Area BG Attributes to full width.','weaver-xtreme' )),
+		//'content' => array( __('Content Area Fullwidth BG', 'weaver-xtreme'), __('Extend Content Area BG Attributes to full width.','weaver-xtreme' )),
 		'post' => array( __('Post Area Extend BG', 'weaver-xtreme'), __('Extend each Post Area BG Attributes to full width.','weaver-xtreme' )),
 		'footer' => array( __('Footer Area Extend BG', 'weaver-xtreme'), __('Extend Footer Area BG Attributes to full width.','weaver-xtreme' )),
 		'footer_sb' => array( __('Footer Widget Area Extend BG', 'weaver-xtreme'), __('Extend Footer Widget Area BG Attributes to full width.','weaver-xtreme' )),
@@ -312,6 +304,37 @@ function weaverx_mainopts_fullwidth() {
 	}
 
 
+	$opts[] = array('name' => __('Stretch Areas (Expand)', 'weaver-xtreme' /*adm*/), 'id' => '-editor-expand', 'type' => 'header_area',
+		'info' => __('This section has options that let you stretch or expand selected content areas of your site to the full browser width. The content will be responsively displayed - and fully occupy the browser window.', 'weaver-xtreme' /*adm*/));
+	$opts[] = array('name' => '<small>' . __('These Options OBSOLETE', 'weaver-xtreme' /*adm*/) . '</small>', 'type' => 'note',
+		'info' => __('Due to the added support for Wide and Full Alignment, the Stretch options are essentially obsolete, and may be removed in a future version of the theme. Please use the Full and Wide align options available for most of these Stretch items.', 'weaver-xtreme' /*adm*/));
+
+	$opts[] = array('name' => '<span class="i-left dashicons dashicons-editor-expand"></span>' . __('Entire Site Full Width', 'weaver-xtreme' /*adm*/), 'id' => 'wrapper_fullwidth', 'type' => 'checkbox',
+		'info' => __('Checking this option will display the <strong>ENTIRE SITE</strong> in the full width of the browser. This option overrides the <em>Theme Width</em> option on the <em>Wrapping Areas : Wrapper Area</em> menu.', 'weaver-xtreme' /*adm*/));
+
+
+	$stretch = array (
+		'header' => array( __('Header Area Stretch', 'weaver-xtreme'), __('Stretch Header Area to full width. This will include all other Header Area sub-areas as well.','weaver-xtreme' )),
+		'header-image' => array( __('Header Image Stretch', 'weaver-xtreme'), __('Stretch Header Image to full width.','weaver-xtreme' )),
+		'site_title' => array( __('Site Title/Tagline Stretch', 'weaver-xtreme'), __('This option includes the Site Title, Tagline, Search Button, and MiniMenu.','weaver-xtreme' )),
+		'header-widget-area' => array( __('Header Widget Area Stretch', 'weaver-xtreme'), __('Stretch Header Widget Area to full width.','weaver-xtreme' )),
+		'header-html' => array( __('Header HTML Area Stretch', 'weaver-xtreme'), __('Stretch Header HTML Area to full width.','weaver-xtreme' )),
+		'm_primary' => array( __('Primary Menu Stretch', 'weaver-xtreme'), __('Stretch Primary Menu to full width.','weaver-xtreme' )),
+		'm_secondary' => array( __('Secondary Menu Stretch', 'weaver-xtreme'), __('Stretch Secondary Menu to full width.','weaver-xtreme' )),
+		'container' => array( __('Container Area Stretch', 'weaver-xtreme'), __('Stretch Container Area to full width.','weaver-xtreme' )),
+		'infobar' => array( __('Info Bar Stretch', 'weaver-xtreme'), __('Stretch Info Bar to full width.','weaver-xtreme' )),
+		'post' => array( __('Post Area Stretch', 'weaver-xtreme'), __('Stretch Info Bar to full width.','weaver-xtreme' )),
+		'footer' => array( __('Footer Area Stretch', 'weaver-xtreme'), __('Checking this option will automatically include the other Footer Area Stretch options as well.','weaver-xtreme' )),
+		'footer_sb' => array( __('Footer Widget Area Stretch', 'weaver-xtreme'), __('Stretch Footer Widget Area to full width.','weaver-xtreme' )),
+		'footer_html' => array( __('Footer HTML Area Stretch', 'weaver-xtreme'), __('Stretch Footer HTML Area to full width.','weaver-xtreme' )),
+		'site-ig-wrap' => array( __('Footer Copyright Area Stretch', 'weaver-xtreme'), __('Stretch Footer Copyright Area to full width.','weaver-xtreme' )),
+
+	);
+
+	foreach ($stretch as $id => $vals) {
+		$opts[] = array('name' => '<span class="i-left dashicons dashicons-editor-expand"></span>' . $vals[0], 'id' => 'expand_' . $id, 'type' => 'checkbox',
+		'info' => $vals[1]);
+	}
 
 
 	$opts[] = array('name' => __('Extend BG Color', 'weaver-xtreme' /*adm*/), 'id' => '-admin-appearance', 'type' => 'header_area',
@@ -401,6 +424,11 @@ array( 'name' => __('Header Other options', 'weaver-xtreme'), 'type' => 'break')
 
 			)) ),
 
+	array('name' => '<small>' . __('Minimum Header Height', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'header_min_height', 'type' => '+val_px',
+		'info' => __('Set Minimum Height for Header Area. Most useful used with Parallax Header BG Image. Adding Top Margin to Primary Menu bar can also add height. (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
+
+
 	array('name' => '<span class="i-left" style="font-size:120%;">&harr;</span><small>' . __('Maximum Image Width', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'header_image_max_width_dec', 'type' => '+val_percent',
 		'info' => __('Maximum width of Image (Default: 100%) (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
@@ -410,8 +438,8 @@ array( 'name' => __('Header Other options', 'weaver-xtreme'), 'type' => 'break')
 		'info' => __('Check to use actual header image size. (Default: theme width) (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
 
 	array('name' => '<span class="i-left dashicons dashicons-editor-alignleft"></span><small>' . __('Align Header Image', 'weaver-xtreme' /*adm*/) . '</small>',
-		'id' => 'header_image_align', 'type' => '+align',
-		'info' => __('How to align header image - meaningful only when Max Width or Actual Size set. (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
+		'id' => 'header_image_align', 'type' => 'align',
+		'info' => __('How to align header image - meaningful only when Max Width or Actual Size set.', 'weaver-xtreme' /*adm*/)),
 
 	array('name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide Header Image Front Page', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'hide_header_image_front', 'type' => 'checkbox',
@@ -625,8 +653,8 @@ function weaverx_mainopts_menus() {
 
 ##### SmartMenu
 		array('name' => '<span class="i-left dashicons dashicons-menu"></span>' . __('Use SmartMenus', 'weaver-xtreme' /*adm*/),
-			  'id' => 'use_smartmenus', 'type' => '+checkbox',
-			'info' => __('Use <em>SmartMenus</em> rather than default Weaver Xtreme Menus. <em>SmartMenus</em> provide enhanced menu support, including auto-visibility, and transition effects. Applies to all menus. Additional options for SmartMenus on the <em>Xtreme Plus:SmartMenus</em> tab. (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
+			  'id' => 'use_smartmenus', 'type' => 'checkbox',
+			'info' => __('Use <em>SmartMenus</em> rather than default Weaver Xtreme Menus. <em>SmartMenus</em> provide enhanced menu support, including auto-visibility, and transition effects. This option is recommended. There are additional <em>Smart Menu</em> options available on the <em>Appearance &rarr; +Xtreme Plus</em> menu.', 'weaver-xtreme' /*adm*/)),
 
 		array( 'name' =>  '<small>' . __('Menu Mobile/Desktop Switch Point', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => 'mobile_alt_switch', 'type' => '+val_px',
@@ -826,26 +854,13 @@ function weaverx_mainopts_content() {
 		'info' => __('Search box related options', 'weaver-xtreme' /*adm*/)),
 
 	array('name' => '<small>' . __('Search Input BG', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'search_bgcolor', 'type' => 'ctext',
-		'info' => __('Background color for search input boxes.', 'weaver-xtreme' /*adm*/)),
+		'info' => __('Background color for all search input boxes.', 'weaver-xtreme' /*adm*/)),
 	array('name' => '<small>' . __('Search Input Text', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'search_color', 'type' => 'color',
-		'info' => __('Text color for search input boxes.', 'weaver-xtreme' /*adm*/)),
+		'info' => __('Text color for all search input boxes.', 'weaver-xtreme' /*adm*/)),
 
-	array('name' => '<small>' . __('Search Icon', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'search_icon', 'type' => 'radio',	//code
-		'info' => __('Search Icon - used for both Header and Search Widgets.', 'weaver-xtreme' /*adm*/),
-		'value' => array(
-			array('val' => 'black'),
-			array('val' => 'gray'),
-			array('val' => 'light'),
-			array('val' => 'white'),
-			array('val' => 'black-bg'),
-			array('val' => 'gray-bg'),
-			array('val' => 'white-bg'),
-			array('val' => 'blue-bg'),
-			array('val' => 'green-bg'),
-			array('val' => 'orange-bg'),
-			array('val' => 'red-bg'),
-			array('val' => 'yellow-bg'),
-			)),
+	array('name' => __('Search Icon Color:', 'weaver-xtreme' /*adm*/),
+		'info' => __('The Search Icon colored graphics used by previous versions of Weaver Xtreme have been discontinued. A text icon is now used. The color of the search icon is inherited from wrapping areas text color, including the header area and menu bar.', 'weaver-xtreme' /*adm*/),
+		'type' => 'note'),
 
 
 	array( 'type' => 'submit'),
@@ -874,8 +889,16 @@ function weaverx_mainopts_content() {
 		'info' => __('Where to display Featured Image for Pages','weaver-xtreme' /*adm*/)),
 	array('name' => __('Full Width FI BG Image:', 'weaver-xtreme' /*adm*/),
 		'info' => __('To create full width Page BG images from the FI, check the <em>Container Area Extend BG Attributes</em> box on the <em>Full Width</em> tab.', 'weaver-xtreme' /*adm*/),
-		'type' => 'note'), // ,'help' => 'help.html#PhotoBlog'),
-	array('name' => '<span class="i-left dashicons dashicons-editor-alignleft"></span><small>' . __('Featured Image Alignment<small>', 'weaver-xtreme' /*adm*/), 'id' => 'page_fi_align', 'type' => 'fi_align',
+		'type' => 'note'),
+	array('name' => __('Parallax FI BG Image:', 'weaver-xtreme' /*adm*/),
+		'info' => __('It will usually be more useful to use the Per Page FI option to specify Parallax BG images.', 'weaver-xtreme' /*adm*/),
+		'type' => 'note'),
+	array('name' => '<small>'. __('Page Content Height', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'page_min_height', 'type' => '+val_px',
+		'info' => __('Minimum Height Page Content with Parallax BG. (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
+
+
+	array('name' => '<span class="i-left dashicons dashicons-editor-alignleft"></span><small>' . __('Featured Image Alignment', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'page_fi_align', 'type' => 'fi_align',
 		'info' => __('How to align the Featured Image', 'weaver-xtreme' /*adm*/)),
 
 	array('name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide Featured Image on Pages', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'page_fi_hide', 'type' => 'select_hide',
@@ -1219,6 +1242,11 @@ function weaverx_mainopts_posts() {
 	array('name' => '<span class="i-left" style=font-size:120%;">&nbsp;&#10538;</span>' . __('FI Location - Full Post', 'weaver-xtreme' /*adm*/),
 		'id' => 'post_full_fi_location', 'type' => 'fi_location_post',
 		'info' => __('Where to display Featured Image for full blog posts.', 'weaver-xtreme' /*adm*/)),
+
+	array('name' => '<small>'. __('Post Height - Blog View', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'post_blog_min_height', 'type' => '+val_px',
+		'info' => __('Minimum Height of Post, full or excerpt, with Parallax BG in blog views. (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
+
 	array('name' => '<span class="i-left dashicons dashicons-editor-alignleft"></span><small>' . __('FI Alignment - Full post', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'post_full_fi_align', 'type' => 'fi_align',
 		'info' => __('Featured Image alignment','weaver-xtreme' /*adm*/)),
@@ -1245,6 +1273,7 @@ function weaverx_mainopts_posts() {
 	array('name' => '<span class="i-left" style=font-size:120%;">&nbsp;&#10538;</span>'. __('FI Location - Excerpts', 'weaver-xtreme' /*adm*/),
 		'id' => 'post_excerpt_fi_location', 'type' => 'fi_location_post',
 		'info' => __('Where to display Featured Image for posts displayed as excerpt.', 'weaver-xtreme' /*adm*/)),
+
 	array('name' => '<span class="i-left dashicons dashicons-editor-alignleft"></span><small>' . __('FI Alignment - Excerpts', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'post_excerpt_fi_align', 'type' => 'fi_align',
 		'info' => __('How to align the Featured Image', 'weaver-xtreme' /*adm*/)),
@@ -1269,6 +1298,14 @@ function weaverx_mainopts_posts() {
 	array('name' => '<span class="i-left" style=font-size:120%;">&nbsp;&#10538;</span>' . __('FI Location - Single Page', 'weaver-xtreme' /*adm*/),
 		'id' => 'post_fi_location', 'type' => 'fi_location',
 		'info' => __('Where to display Featured Image for posts on single page view.', 'weaver-xtreme' /*adm*/)),
+
+	array('name' => '<small>'. __('Post Height - Single Page', 'weaver-xtreme' /*adm*/) . '</small>',
+		'id' => 'post_min_height', 'type' => '+val_px',
+		'info' => __('Minimum Height of Post with Parallax BG in Single Page view. (&starf;Plus)', 'weaver-xtreme' /*adm*/)),
+	array('name' => __('Parallax FI BG Image:', 'weaver-xtreme' /*adm*/),
+		'info' => __('It will usually be more useful to use the Per Post FI option to specify Parallax BG images.', 'weaver-xtreme' /*adm*/),
+		'type' => 'note'),
+
 	array('name' => '<span class="i-left dashicons dashicons-editor-alignleft"></span><small>' . __('FI Alignment - Single Page', 'weaver-xtreme' /*adm*/) . '</small>',
 		'id' => 'post_fi_align', 'type' => 'fi_align',
 		'info' => __('How to align the Featured Image on Single Page View.', 'weaver-xtreme' /*adm*/)),

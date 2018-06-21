@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.8.09';
+var wppaJsVersion = '6.9.04';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -156,6 +156,7 @@ var wppaDone = 'Done!';
 var wppaUploadFailed = 'Upload failed';
 var wppaServerError = 'Server error';
 var wppaGeoZoom = 10;
+var wppaLazyLoad = true;
 
 // 'Internal' variables ( private )
 var _wppaId = [];
@@ -307,7 +308,7 @@ function wppaDoInit( autoOnly ) {
 	setTimeout( function() {
 		var i = 1;
 		while( i < wppaTopMoc ) {
-			if ( jQuery( 'ubb-'+i+'-l' ) ) {
+			if ( jQuery( '#ubb-'+i+'-l' ) ) {
 				wppaUbb(i,'l','hide');
 				wppaUbb(i,'r','hide');
 			}
@@ -869,13 +870,20 @@ var newtext;
 }
 
 // Filter enables the use of a <br> tag while they are removed with strip_tags
+// Also fixes [a ] and [/a]
 function wppaRepairBrTags( text ) {
 var newtext;
 
 	// Just to be sure we do not run into undefined error
 	if ( typeof(text) == 'undefined' ) return '';
 
-	newtext = text.replace( '[br /]', '<br />' );
+	newtext = text;
+	newtext = newtext.replace( '[br /]', '<br />' );
+	newtext = newtext.replace( '[a', '<a' );
+	newtext = newtext.replace( '&quot;', '"' );
+	newtext = newtext.replace( '"]', '">' );
+	newtext = newtext.replace( '[/a]', '</a>' );
+
 	return newtext;
 }
 
@@ -1282,12 +1290,12 @@ function wppaUpdateSearchRoot( text, root ) {
 	i = 0;
 	while ( i < items.length ) {
 		if ( root ) {
-			jQuery( items[i] ).removeAttr( 'checked' );
-			jQuery( items[i] ).removeAttr( 'disabled' );
+			jQuery( items[i] ).prop( 'checked', false );
+			jQuery( items[i] ).prop( 'disabled', false );
 		}
 		else {
-			jQuery( items[i] ).attr( 'checked', 'checked' );
-			jQuery( items[i] ).attr( 'disabled', 'disabled' );
+			jQuery( items[i] ).prop( 'checked', true );
+			jQuery( items[i] ).prop( 'disabled', true );
 		}
 		i++;
 	}
@@ -1300,13 +1308,19 @@ function wppaUpdateSearchRoot( text, root ) {
 }
 
 function wppaSubboxChange( elm ) {
-	if ( jQuery( elm ).attr( 'checked' ) == 'checked' ) {
+	if ( jQuery( elm ).prop( 'checked' ) ) {
+		jQuery( ".wppa-rootbox" ).each(function(index) {
+			jQuery(this).prop('checked',true);
+		});
+
+		/*
 		var items = jQuery( ".wppa-rootbox" );
 		var i = 0;
 		while ( i < items.length ) {
-			jQuery( items[i] ).attr( 'checked', 'checked' );
+			jQuery( items[i] ).prop( 'checked', true );
 			i++;
 		}
+		*/
 	}
 }
 

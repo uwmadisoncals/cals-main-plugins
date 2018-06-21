@@ -9,14 +9,15 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: weaverx-theme-support
 Requires at least: 4.8
+Requires PHP: 5.4
 Tested up to: 4.9
-Stable tag: 3.2.3
+Stable tag: 4.0
 
 A useful shortcode and widget collection for Weaver Xtreme
 
 == Description ==
 
-This is the main theme suppot for the Weaver X Theme. This plugin provides a collection of useful shortcodes and widgets designed to complement the Weaver X theme. These shortcodes have been selected and developed based on requests and feedback from thousands of users of the Weaver X, Weaver II, and Aspen themes.
+This is the main theme support for the Weaver X Theme. This plugin provides a collection of useful shortcodes and widgets designed to complement the Weaver X theme. These shortcodes have been selected and developed based on requests and feedback from thousands of users of the Weaver X, Weaver II, and Aspen themes.
 
 While these shortcodes are optimized for the Weaver X theme, they will also work with full functionality for most WordPress themes, and can be used
 if you switch themes.
@@ -75,16 +76,20 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog ==
-= 3.2.3 =
-* Fix: deleted some unused files
+= 4.0 =
+* Change: Trying to make this plugin not essential. Have moved the per page/post stuff back into the theme where it belongs!
+  * Quite a few currently popular themes now have per page/post options, so apparently meta_boxes are no longer disapproved.
+
+= 3.9 =
+* Implemented some new options for Weaver Xtreme 4.0. See the 4.0 readme.txt file
 
 = 3.2.1 =
-*Fix: reverted to PHP pre-5.4 compatibility
+* Fix: reverted to PHP pre-5.4 compatibility
 
 = 3.2 =
 * New: Schema.org support - disable option
 * New: tabbed per page and per post option sections!
-* Fix: Main Options : Header : Site Title/Tagling menu link
+* Fix: Main Options : Header : Site Title/Tagline menu link
 
 = 3.1.11 =
 * Added Per Post Body Class for Single Page View
@@ -114,7 +119,7 @@ See ChangeLog for changes to this version.
 * New: support for some new Weaver Xtreme Plus 3.1 options
 * Tweak: don't need plugin stylesheet any more - included in Weaver Xtreme
 * Tweak: no need for separate JS lib - included in Weaver Xtreme
-* Note: jumped to 3.1.6 to match corresponding Weaver Xtrme version
+* Note: jumped to 3.1.6 to match corresponding Weaver Xtreme version
 * WP 4.8 compatibility update
 
 
@@ -225,7 +230,7 @@ Fix: removed duplicated tagline width option
 = 1.0.1 =
 * New - Per Page/Post Report from Add-ons menu
 * Fix: '\1234' values in per post style
-* Fix: Internal name of Per Post Style - may cause loss of prevoius setting - sorry
+* Fix: Internal name of Per Post Style - may cause loss of previous setting - sorry
 
 = 1.0 =
 * Minor tweaks

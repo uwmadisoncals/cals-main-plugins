@@ -158,7 +158,7 @@ class WeaverX_Widget_Login extends WP_Widget {
 
 // ###################################### ELEMENTOR WIDGET ####################################
 
-if (WVRX_TS_PAGEBUILDERS && defined( 'ELEMENTOR_VERSION' ) ) :
+if ((defined('WVRX_TS_PAGEBUILDERS') && WVRX_TS_PAGEBUILDERS) && defined( 'ELEMENTOR_VERSION' ) ) :
 class Weaver_Widget_Elementor extends WP_Widget {
 
 	function __construct() {
@@ -303,7 +303,7 @@ function form( $instance ) {
 endif;
 
 // ###################################### SITEORIGIN PAGE BUILDER WIDGET ####################################
-if ( WVRX_TS_PAGEBUILDERS && defined('SITEORIGIN_PANELS_VERSION' ) ) :
+if ( (defined('WVRX_TS_PAGEBUILDERS') && WVRX_TS_PAGEBUILDERS) && defined('SITEORIGIN_PANELS_VERSION' ) ) :
 class Weaver_Widget_SiteOrigin extends WP_Widget {
 
 	function __construct() {
@@ -455,7 +455,7 @@ function wvrx_ts_load_widgets() {
 	register_widget('WeaverX_Widget_Text');
 	register_widget('WeaverX_Widget_PPText');
 	register_widget('WeaverX_Widget_Login');
-	if (WVRX_TS_PAGEBUILDERS) :
+	if (defined('WVRX_TS_PAGEBUILDERS') && WVRX_TS_PAGEBUILDERS) :
 	if (defined( 'ELEMENTOR_VERSION' ) ) {		// only provide if elementor is active
 		register_widget('Weaver_Widget_Elementor');
 	}

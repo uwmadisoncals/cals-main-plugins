@@ -139,17 +139,8 @@ function weaverx_form_select_id( $value, $show_row = true ) {
 }
 
 function weaverx_form_select_alt_theme($value) {
-	$list = array(array('val' => 'default', 'desc' => __('Use Default', 'weaver-xtreme' /*adm*/) ),
-		array('val' => 'right', 'desc' => __('Sidebars on Right', 'weaver-xtreme' /*adm*/) ),
-		array('val' => 'right-top', 'desc' => __('Sidebars on Right (stack top)', 'weaver-xtreme' /*adm*/) ),
-		array('val' => 'left', 'desc' => __('Sidebars on Left', 'weaver-xtreme' /*adm*/) ),
-		array('val' => 'left-top', 'desc' => __(' Sidebars on Left (stack top)', 'weaver-xtreme' /*adm*/) ),
-		array('val' => 'split', 'desc' => __('Split - Sidebars on Right and Left', 'weaver-xtreme' /*adm*/) ),
-		array('val' => 'split-top', 'desc' => __('Split (stack top)', 'weaver-xtreme' /*adm*/) ),
-		array('val' => 'one-column', 'desc' => __('No sidebars, content only', 'weaver-xtreme' /*adm*/) )
-	);
 
-	$themes = wvrx_ts_get_alt_themes();
+	$themes = weaverx_pp_get_alt_themes();
 	$list = array();
 	$list[] = array( 'val' => '', 'desc' => '');
 	foreach ( $themes as $subtheme ) {
@@ -176,6 +167,7 @@ function weaverx_form_select_layout($value) {
 	$value['value'] = $list;
 	weaverx_form_select_id($value);
 }
+
 
 function weaverx_form_link($value) {
 	$id = $value['id'];
@@ -369,6 +361,7 @@ function weaverx_form_widget_area( $value, $submit = false ) {
 			'info' => '<em>' . $name . '</em>' . __(': How to align this area (Default: Left Align)', 'weaver-xtreme' /*adm*/) )
 
 		);
+
 		if ($id == 'header_html' || $id == 'footer_html') {
 			weaverx_form_checkbox(array(
 				'name' => '<span class="i-left dashicons dashicons-align-none"></span><small>' . __('Center Content', 'weaver-xtreme' /*adm*/) . '</small>',
@@ -517,7 +510,15 @@ function weaverx_form_menu_opts( $value, $submit = false ) {
 			'value' => array(
 				array('val' => 'left', 'desc' => 'Left'),
 				array('val' => 'center', 'desc' => 'Center'),
-				array('val' => 'right', 'desc' => 'Right')
+				array('val' => 'right', 'desc' => 'Right'),
+				array('val' => 'alignwide', 'desc' => __('Align Wide', 'weaver-xtreme' /*adm*/) ),
+				array('val' => 'alignwide left', 'desc' => __('Align Wide, Items Left', 'weaver-xtreme' /*adm*/) ),
+				array('val' => 'alignwide center', 'desc' => __('Align Wide, Items Center', 'weaver-xtreme' /*adm*/) ),
+				array('val' => 'alignwide right', 'desc' => __('Align Wide, Items Right', 'weaver-xtreme' /*adm*/) ),
+				array('val' => 'alignfull', 'desc' => __('Align Full', 'weaver-xtreme' /*adm*/) ),
+				array('val' => 'alignfull left', 'desc' => __('Align Full, Items Left', 'weaver-xtreme' /*adm*/) ),
+				array('val' => 'alignfull center', 'desc' => __('Align Full, Items Center', 'weaver-xtreme' /*adm*/) ),
+				array('val' => 'alignfull right', 'desc' => __('Align Full, Items Right', 'weaver-xtreme' /*adm*/) )
 		)),
 
 		array( 'name' => '<span class="i-left dashicons dashicons-visibility"></span><small>' . __('Hide Menu', 'weaver-xtreme' /*adm*/) . '</small>',
@@ -542,12 +543,21 @@ function weaverx_form_menu_opts( $value, $submit = false ) {
 
 
 		$opts[] = array('name' => '<span class="i-left dashicons dashicons-heart"></span><small>' . __('Add Site Logo to Left', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'm_primary_logo_left', 'type' => 'checkbox',
-		'info' => __('Add the Site Logo to the primary menu. Add custom CSS for <em>.custom-logo-on-menu</em> to style. (Use Customize : Site Identity to set Site Logo.) Logo: ', 'weaver-xtreme' /*adm*/) . $wp_logo_html);
+		'info' => __('Add the Site Logo to the primary menu. Add custom CSS for <em>.custom-logo-on-menu</em> to style. (Use Customize &rarr; General Options &rarr; Site Identity to set Site Logo.) Logo: ', 'weaver-xtreme' /*adm*/) . $wp_logo_html);
 
 		$opts[] = array( 'name' => '<span class="i-left dashicons dashicons-align-none"></span><small>' . __('Height of Logo on Menu', 'weaver-xtreme' /*adm*/) . '</small>',
 			'id' => 'm_primary_logo_height_dec', 'type' => 'val_em',
 			'info' =>  __('Set height of Logo on Menu. Will interact with padding. (Default: 2.0em, the standard Menu Bar height.)', 'weaver-xtreme' /*adm*/) );
 
+		$opts[] = array('name' => '<small>' . __('Logo Links to Home', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'm_primary_logo_home_link', 'type' => 'checkbox',
+		'info' => __('Add a link to home page to logo on menu bar.', 'weaver-xtreme' /*adm*/));
+
+		$opts[] = array('name' => '<small>' . __('Add Site Title to Left', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'm_primary_site_title_left', 'type' => 'checkbox',
+		'info' => __('Add Site Title to primary menu left, with link to home page. (Uses Header Title font family, bold, and italic settings. Custom style with .site-title-on-menu.', 'weaver-xtreme' /*adm*/));
+
+		$opts[] = array('name' => '<small>' . __("Add Search to Right", 'weaver-xtreme' /*adm*/) . '</small>',
+					'id' => 'm_primary_search', 'type' => '+checkbox',
+					'info' => __('Add slide open search icon to right end of primary menu. (&starf;Plus)', 'weaver-xtreme' /*adm*/) );
 
 		$opts[] = array('name' => '<small>' . __('No Home Menu Item', 'weaver-xtreme' /*adm*/) . '</small>', 'id' => 'menu_nohome', 'type' => 'checkbox',
 		'info' => __('Don\'t automatically add Home menu item for home page (as defined in Settings->Reading)', 'weaver-xtreme' /*adm*/));
@@ -828,6 +838,7 @@ function weaverx_from_fi_location( $value, $is_post = false ) {
 		array('val' => 'post-bg', 'desc' => __('As BG Image, Tile', 'weaver-xtreme' /*adm*/) ),
 		array('val' => 'post-bg-cover', 'desc' => __('As BG Image, Cover', 'weaver-xtreme' /*adm*/) ),
 		array('val' => 'post-bg-parallax', 'desc' => __('As BG Image, Parallax', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'post-bg-parallax-full', 'desc' => __('As BG Image, Parallax Full', 'weaver-xtreme' /*adm*/) ),
 	);
 
 	weaverx_form_select_id($value);
@@ -837,8 +848,11 @@ function weaverx_from_fi_location( $value, $is_post = false ) {
 function weaverx_form_align( $value ) {
 	$value['value'] = array(
 		array('val' => 'float-left', 'desc' => __('Align Left', 'weaver-xtreme' /*adm*/) ),
-		array('val' => 'center', 'desc' => __('Center', 'weaver-xtreme' /*adm*/) ),
-		array('val' => 'float-right', 'desc' => __('Align Right', 'weaver-xtreme' /*adm*/) )
+		array('val' => 'align-center', 'desc' => __('Center', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'float-right', 'desc' => __('Align Right', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'alignnone', 'desc' => __('No Alignment', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'alignwide', 'desc' => __('Align Wide', 'weaver-xtreme' /*adm*/) ),
+		array('val' => 'alignfull', 'desc' => __('Align Full', 'weaver-xtreme' /*adm*/) ),
 	);
 
 	weaverx_form_select_id($value);

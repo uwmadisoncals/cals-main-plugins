@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.9.02
+/* Version 6.9.03
 /* Various js routines used in admin pages
 */
 
@@ -1049,6 +1049,7 @@ function wppaAjaxDeletePhoto(photo, bef, aft) {
 					document.getElementById('photoitem-'+photo).innerHTML = before+ArrValues[2]+after;	// OK
 					wppaProcessFull(ArrValues[3], ArrValues[4]);
 				}
+				jQuery(window).trigger('scroll');
 				wppaFeAjaxLog('out');
 			}
 			else {	// status != 200
@@ -1424,6 +1425,7 @@ function _wppaAjaxUpdatePhoto( photo, actionslug, value, refresh, bef, aft ) {
 								},
 					complete: 	function( xhr, status, newurl ) {
 									jQuery( '#wppa-admin-spinner' ).css( 'display', 'none' );
+									jQuery(window).trigger('scroll');
 								}
 				} );
 }

@@ -27,6 +27,12 @@ class GoogleMapsAPILoader
 			global $wpgmza;
 			GoogleMapsAPILoader::$settings = (array)$wpgmza->settings;
 		}
+		
+		if(!$this->isIncludeAllowed($status))
+		{
+			echo "<script>var wpgmza_google_api_status = " . json_encode($status) . "</script>";
+			return '';
+		}
 	}
 	
 	public static function _createInstance()
@@ -272,12 +278,9 @@ class GoogleMapsAPILoader
 		if(preg_match('/maps\.google/i', $src))
 		{
 			if(!$this->isIncludeAllowed($status))
-			{
-				echo "<script>var wpgmza_google_api_status = " . json_encode($status) . "</script>";
 				return '';
-			}
 			
-			else if($handle != 'wpgmza_api_call')
+			if($handle != 'wpgmza_api_call')
 				return '';
 			
 			if(!preg_match('/\?.+$/', $src))

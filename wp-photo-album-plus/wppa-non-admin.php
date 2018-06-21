@@ -992,6 +992,7 @@ global $wppa_init_js_data;
 	wppaUploadFailed = "' . __( 'Upload failed', 'wp-photo-album-plus' ) . '";
 	wppaServerError = "' . __( 'Server error.', 'wp-photo-album-plus' ) . '";
 	wppaGeoZoom = ' . wppa_opt( 'geo_zoom' ) . ';
+	wppaLazyLoad = ' . ( wppa_switch( 'lazy' ) ? 'true' : 'false' ) . ';
 	';
 
 	// Open file

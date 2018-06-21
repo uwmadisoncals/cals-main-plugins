@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.9.02
+* Version 6.9.04
 *
 */
 
@@ -3119,7 +3119,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							wppa_setting($slug, '11', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Spinner design', 'wp-photo-album-plus');
-							$desc = __('Shape of the loader sybol', 'wp-photo-album-plus');
+							$desc = __('Shape of the loader symbol', 'wp-photo-album-plus');
 							$help = __('This works only when Table II-J11 is set to any svg style', 'wp-photo-album-plus');
 							$slug = 'wppa_spinner_shape';
 							$opts = array(	__('default', 'wp-photo-album-plus'),
@@ -3869,6 +3869,15 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$clas = '';
 							$tags = 'system,access';
 							wppa_setting($slug, '18', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Lazy load', 'wp-photo-album-plus');
+							$desc = __('Load photos from the server at the moment they will show up.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_lazy';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system,layout,album';
+							wppa_setting($slug, '19', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Thumbs first', 'wp-photo-album-plus');
 							$desc = __('When displaying album content: thumbnails before subalbums.', 'wp-photo-album-plus');
@@ -9843,8 +9852,16 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$desc = __('Select a CDN Service you want to use.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_cdn_service';
-							$opts = array(__('--- none ---', 'wp-photo-album-plus'), 'Cloudinary', __('Cloudinary in maintenance mode', 'wp-photo-album-plus') );
-							$vals = array('', 'cloudinary', 'cloudinarymaintenance');
+							$opts = array(	__('--- none ---', 'wp-photo-album-plus'),
+											__('Local', 'wp-photo-album-plus'),
+											'Cloudinary',
+											__('Cloudinary in maintenance mode', 'wp-photo-album-plus'),
+											);
+							$vals = array(	'',
+											'local',
+											'cloudinary',
+											'cloudinarymaintenance',
+											);
 							$onch = 'wppaCheckCDN()';
 							$html = wppa_select($slug, $opts, $vals, $onch);
 							$clas = '';

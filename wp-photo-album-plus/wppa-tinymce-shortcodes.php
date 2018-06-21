@@ -2,7 +2,7 @@
 /* wppa-tinymce-shortcodes.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 6.8.08
+* Version 6.9.03
 */
 
 if ( ! defined( 'ABSPATH' ) )
@@ -59,7 +59,8 @@ global $wppa_api_version;
 		echo("\t".'wppaSiteUrl = "'.site_url().'";'."\n");
 		echo("\t".'wppaWppaUrl = "'.WPPA_URL.'";'."\n");
 		echo("\t".'wppaIncludeUrl = "'.trim(includes_url(), '/').'";'."\n");
-		echo("\t".'wppaUIERR = "'.__('Unimplemented virtual album', 'wp-photo-album-plus').'";');
+		echo("\t".'wppaUIERR = "'.__('Unimplemented virtual album', 'wp-photo-album-plus').'";'."\n");
+		echo("\t".'wppaLazyLoad = '.(wppa_switch( 'lazy' ) ? 'true' : 'false' ).';');
 	echo("/* ]]> */\n");
 	echo("</script>\n");
 }

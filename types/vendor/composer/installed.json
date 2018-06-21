@@ -138,12 +138,12 @@
     },
     {
         "name": "otgs/installer",
-        "version": "1.8.18",
-        "version_normalized": "1.8.18.0",
+        "version": "1.8.20",
+        "version_normalized": "1.8.20.0",
         "source": {
             "type": "git",
             "url": "ssh://git@git.onthegosystems.com:10022/installer/installer.git",
-            "reference": "df1ab1ff7b017dadc0aae62b29f2d51ae8b7fd0d"
+            "reference": "b0e7b74f6f2c8436529fb84f11ca0e636d6ae4dd"
         },
         "require": {
             "composer/installers": "~1.0",
@@ -159,7 +159,7 @@
             "otgs/unit-tests-framework": "~1.2.0",
             "sebastian/phpcpd": "^3.0"
         },
-        "time": "2018-06-06T08:51:23+00:00",
+        "time": "2018-06-13T17:26:51+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {

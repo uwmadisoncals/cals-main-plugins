@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version 6.8.08
+* Version 6.9.03
 *
 */
 
@@ -172,6 +172,7 @@ global $wpdb;
 										);
 		$src 		= wppa_get_thumb_url( 	$coverphoto,
 											true,
+											'',
 											$imgattr_a['width'],
 											$imgattr_a['height']
 										);
@@ -449,6 +450,7 @@ global $wpdb;
 		$imgattrs_a[] 	= $imgattr_a;
 		$srcs[] 		= wppa_get_thumb_url( 	$coverphoto,
 												true,
+												'',
 												$imgattr_a['width'],
 												$imgattr_a['height']
 											);
@@ -678,7 +680,7 @@ global $wpdb;
 		$imgattr_a 	= wppa_get_imgstyle_a(
 							$coverphoto, $path, wppa_opt( 'smallsize' ), '', 'cover' );
 		$src 		= wppa_get_thumb_url(
-							$coverphoto, true, $imgattr_a['width'], $imgattr_a['height'] );
+							$coverphoto, true, '', $imgattr_a['width'], $imgattr_a['height'] );
 	}
 	else {
 		$path 		= '';
@@ -1796,15 +1798,27 @@ global $wpdb;
 					break;
 				case 'microthumbs':
 					$coverphoto_id = wppa_get_coverphoto_id( $album['id'] );
-					$src = wppa_get_thumb_url( $coverphoto_id );
+					$x = wppa_get_photo_item( $coverphoto_id, 'thumbx' );
+					$y = wppa_get_photo_item( $coverphoto_id, 'thumby' );
+					if ( $x > ( $y * 2 ) ) { // x limits
+						$f = $x / 100;
+						$x = 100;
+						$y = floor( $y / $f );
+					}
+					else { // y limits
+						$f = $y / 50;
+						$y = 50;
+						$x = floor( $x / $f );
+					}
+					$src = wppa_get_thumb_url( $coverphoto_id, true, '', $x, $y );
 					if ( $link_type == 'none' ) {
 						wppa_out( 	'<img' .
 										' class="wppa-cover-sublink-img"' .
 										' src="' . $src . '"' .
 										' alt="' . wppa_get_album_name( $album['id'] ) . '"' .
 										' style="' .
-											'max-width:100px;' .
-											'max-height:50px;' .
+											'width:' . $x . 'px;' .
+											'height:' . $y . 'px;' .
 											'padding:1px;' .
 											'margin:1px;' .
 											'background-color:' . wppa_opt( 'bgcolor_img' ) . ';' .
@@ -1824,8 +1838,8 @@ global $wpdb;
 												' src="' . $src . '"' .
 												' alt="' . wppa_get_album_name( $album['id'] ) . '"' .
 												' style="' .
-													'max-width:100px;' .
-													'max-height:50px;' .
+													'width:' . $x . 'px;' .
+													'height:' . $y . 'px;' .
 													'padding:1px;' .
 													'margin:1px;' .
 													'background-color:' . wppa_opt( 'bgcolor_img' ) . ';' .

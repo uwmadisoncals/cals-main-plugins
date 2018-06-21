@@ -1,5 +1,43 @@
 WP Photo Album Plus Changelog
 
+= 6.9.04 =
+
+= Bug Fixes =
+
+* On slideshow: Ugly browse buttons now vanish after 3 seconds, as designed.
+* Tagcloud and Multitags widget displayed untranslated (qTranslate-x) tags. Fixed.
+
+= New Features =
+
+* In Table IX-K4 one can now select 'Local'. This enables a local CDN functionality.
+All images are loaded at the reduced size they will be shown.
+Note that the first time you show a thumbnail or any other sized image, it take some extra time to create it.
+Sized image creation works both with standard GD and also with external Imagick commands (See Table IX-K7), which is much faster.
+
+= Other Changes =
+
+* Added handler onscroll="wppaMakeLazyVisible();" to thumbnail area. This enables the use of custom css
+
+.wppa-thumb-area {
+	max-height:500px;
+	overflow:auto;
+}
+
+while Lazy Loading is activated.
+
+= 6.9.03 =
+
+= Bug Fixes =
+
+* Cloudinary now works for all types of photo displays.
+* Slideshows did no longer work when the photo name has ' in the name. Fixed.
+
+= New Features =
+
+* Table IV-A19: Lazy Load. If ticked: All photos are now lazy-loaded.
+They will load at the moment they are or tend to appear inside the browser window.
+This causes a substantial performance improvement and allows a.o. for very large page sizes for thumbnails and filmstrips i.e. slideshows.
+
 = 6.9.02 =
 
 = Bug Fixes =

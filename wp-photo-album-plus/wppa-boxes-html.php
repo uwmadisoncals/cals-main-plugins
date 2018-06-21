@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.9.02
+* Version 6.9.04
 *
 */
 
@@ -40,6 +40,7 @@ function wppa_thumb_area( $action ) {
 								wppa_wcs( 'wppa-' . $alt ) .
 //								( wppa_is_mobile() ? '' : 'width:' . wppa_get_thumbnail_area_width() . 'px;' ) .
 								'"' .
+							' onscroll="wppaMakeLazyVisible();" ' .
 							' >';
 
 			if ( wppa_is_int( wppa( 'start_album' ) ) ) {
@@ -1234,7 +1235,7 @@ function wppa_get_tagcloud_html( $seltags = '', $minsize = '8', $maxsize = '24' 
 									' title="' . $title . '"' .
 									' style="font-size:' . $size . 'px;"' .
 									' >' .
-									$name .
+									__( $name ) .
 								'</a> ';
 			}
 		}
@@ -1420,7 +1421,7 @@ function wppa_get_multitag_html( $nperline = '2', $seltags = '' ) {
 									' id="wppa-'.str_replace( ' ', '_', $tag['tag'] ).'"' .
 									' ' . $checked .
 								' />' .
-								'&nbsp;' . str_replace( ' ', '&nbsp;', $tag['tag'] ) .
+								'&nbsp;' . str_replace( ' ', '&nbsp;', __( $tag['tag'] ) ) .
 							'</td>';
 				$count++;
 				if ( $count % $nperline == '0' ) {
@@ -3496,7 +3497,7 @@ global $wpdb;
 							' class="wppa-box-text wppa-td"' .
 							' style="vertical-align:top; width:30%; border-width: 0 0 0 0; '.wppa_wcs( 'wppa-box-text' ).wppa_wcs( 'wppa-td' ).'"' .
 							' >' .
-							( wppa_switch( 'domain_link_buddypress' ) ? wppa_bp_userlink( $comment['email'], false, true ) : $comment['user'] ) . 
+							( wppa_switch( 'domain_link_buddypress' ) ? wppa_bp_userlink( $comment['email'], false, true ) : $comment['user'] ) .
 							' ' . __( 'wrote:', 'wp-photo-album-plus' ) .
 							'<br />' .
 							'<span style="font-size:9px; ">' .

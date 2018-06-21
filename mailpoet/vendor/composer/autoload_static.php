@@ -4,12 +4,12 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInite98a710e71e6174923a86d79102fe7dc
+class ComposerStaticInit8ff3bb280d564817aa18e7f6d32f1657
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-        '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
+        '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -42,7 +42,6 @@ class ComposerStaticInite98a710e71e6174923a86d79102fe7dc
         array (
             'Cron\\' => 5,
             'Composer\\CaBundle\\' => 18,
-            'Carbon\\' => 7,
         ),
     );
 
@@ -95,10 +94,10 @@ class ComposerStaticInite98a710e71e6174923a86d79102fe7dc
         array (
             0 => __DIR__ . '/..' . '/composer/ca-bundle/src',
         ),
-        'Carbon\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon',
-        ),
+    );
+
+    public static $fallbackDirsPsr4 = array (
+        0 => __DIR__ . '/..' . '/nesbot/carbon/src',
     );
 
     public static $prefixesPsr0 = array (
@@ -125,7 +124,9 @@ class ComposerStaticInite98a710e71e6174923a86d79102fe7dc
     public static $classMap = array (
         'Carbon\\Carbon' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Carbon.php',
         'Carbon\\CarbonInterval' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/CarbonInterval.php',
+        'Carbon\\CarbonPeriod' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/CarbonPeriod.php',
         'Carbon\\Exceptions\\InvalidDateException' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Exceptions/InvalidDateException.php',
+        'Carbon\\Translator' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Translator.php',
         'Composer\\CaBundle\\CaBundle' => __DIR__ . '/..' . '/composer/ca-bundle/src/CaBundle.php',
         'Cron\\AbstractField' => __DIR__ . '/..' . '/mtdowling/cron-expression/src/Cron/AbstractField.php',
         'Cron\\CronExpression' => __DIR__ . '/..' . '/mtdowling/cron-expression/src/Cron/CronExpression.php',
@@ -143,6 +144,7 @@ class ComposerStaticInite98a710e71e6174923a86d79102fe7dc
         'IdiormResultSet' => __DIR__ . '/..' . '/j4mie/idiorm/idiorm.php',
         'IdiormString' => __DIR__ . '/..' . '/j4mie/idiorm/idiorm.php',
         'IdiormStringException' => __DIR__ . '/..' . '/j4mie/idiorm/idiorm.php',
+        'JsonSerializable' => __DIR__ . '/..' . '/nesbot/carbon/src/JsonSerializable.php',
         'MailPoet\\API\\API' => __DIR__ . '/../..' . '/lib/API/API.php',
         'MailPoet\\API\\JSON\\API' => __DIR__ . '/../..' . '/lib/API/JSON/API.php',
         'MailPoet\\API\\JSON\\Endpoint' => __DIR__ . '/../..' . '/lib/API/JSON/Endpoint.php',
@@ -172,6 +174,7 @@ class ComposerStaticInite98a710e71e6174923a86d79102fe7dc
         'MailPoet\\Config\\Capabilities' => __DIR__ . '/../..' . '/lib/Config/Capabilities.php',
         'MailPoet\\Config\\Changelog' => __DIR__ . '/../..' . '/lib/Config/Changelog.php',
         'MailPoet\\Config\\Database' => __DIR__ . '/../..' . '/lib/Config/Database.php',
+        'MailPoet\\Config\\DeactivationSurvey' => __DIR__ . '/../..' . '/lib/Config/DeactivationSurvey.php',
         'MailPoet\\Config\\DeferredAdminNotices' => __DIR__ . '/../..' . '/lib/Config/DeferredAdminNotices.php',
         'MailPoet\\Config\\Env' => __DIR__ . '/../..' . '/lib/Config/Env.php',
         'MailPoet\\Config\\Hooks' => __DIR__ . '/../..' . '/lib/Config/Hooks.php',
@@ -601,7 +604,6 @@ class ComposerStaticInite98a710e71e6174923a86d79102fe7dc
         'Symfony\\Component\\Translation\\Writer\\TranslationWriter' => __DIR__ . '/..' . '/symfony/translation/Writer/TranslationWriter.php',
         'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
         'Symfony\\Polyfill\\Php72\\Php72' => __DIR__ . '/..' . '/symfony/polyfill-php72/Php72.php',
-        'Text_Diff_Renderer_parallel' => __DIR__ . '/..' . '/cerdic/css-tidy/testing/unit-tests/class.Text_Diff_Renderer_parallel.php',
         'Twig\\Cache\\CacheInterface' => __DIR__ . '/..' . '/twig/twig/src/Cache/CacheInterface.php',
         'Twig\\Cache\\FilesystemCache' => __DIR__ . '/..' . '/twig/twig/src/Cache/FilesystemCache.php',
         'Twig\\Cache\\NullCache' => __DIR__ . '/..' . '/twig/twig/src/Cache/NullCache.php',
@@ -972,12 +974,8 @@ class ComposerStaticInite98a710e71e6174923a86d79102fe7dc
         'Twig_Util_DeprecationCollector' => __DIR__ . '/..' . '/twig/twig/lib/Twig/Util/DeprecationCollector.php',
         'Twig_Util_TemplateDirIterator' => __DIR__ . '/..' . '/twig/twig/lib/Twig/Util/TemplateDirIterator.php',
         'csstidy' => __DIR__ . '/..' . '/cerdic/css-tidy/class.csstidy.php',
-        'csstidy_csst' => __DIR__ . '/..' . '/cerdic/css-tidy/testing/unit-tests/class.csstidy_csst.php',
-        'csstidy_harness' => __DIR__ . '/..' . '/cerdic/css-tidy/testing/unit-tests/class.csstidy_harness.php',
         'csstidy_optimise' => __DIR__ . '/..' . '/cerdic/css-tidy/class.csstidy_optimise.php',
         'csstidy_print' => __DIR__ . '/..' . '/cerdic/css-tidy/class.csstidy_print.php',
-        'csstidy_reporter' => __DIR__ . '/..' . '/cerdic/css-tidy/testing/unit-tests/class.csstidy_reporter.php',
-        'csstidy_test_csst' => __DIR__ . '/..' . '/cerdic/css-tidy/testing/unit-tests/test.csst.php',
         'pQuery' => __DIR__ . '/..' . '/tburry/pquery/pQuery.php',
         'pQuery\\AspEmbeddedNode' => __DIR__ . '/..' . '/tburry/pquery/gan_node_html.php',
         'pQuery\\CSSQueryTokenizer' => __DIR__ . '/..' . '/tburry/pquery/gan_selector_html.php',
@@ -1002,10 +1000,11 @@ class ComposerStaticInite98a710e71e6174923a86d79102fe7dc
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInite98a710e71e6174923a86d79102fe7dc::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInite98a710e71e6174923a86d79102fe7dc::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInite98a710e71e6174923a86d79102fe7dc::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInite98a710e71e6174923a86d79102fe7dc::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit8ff3bb280d564817aa18e7f6d32f1657::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit8ff3bb280d564817aa18e7f6d32f1657::$prefixDirsPsr4;
+            $loader->fallbackDirsPsr4 = ComposerStaticInit8ff3bb280d564817aa18e7f6d32f1657::$fallbackDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit8ff3bb280d564817aa18e7f6d32f1657::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit8ff3bb280d564817aa18e7f6d32f1657::$classMap;
 
         }, null, ClassLoader::class);
     }

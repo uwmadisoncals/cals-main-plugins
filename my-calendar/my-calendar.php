@@ -1,60 +1,78 @@
 <?php
+/**
+ * My Calendar, Accessible Events Manager for WordPress
+ *
+ * @package     MyCalendar
+ * @author      Joe Dolson
+ * @copyright   2009-2018 Joe Dolson
+ * @license     GPL-2.0+
+ *
+ * @wordpress-plugin
+ * Plugin Name: My Calendar
+ * Plugin URI:  http://www.joedolson.com/my-calendar/
+ * Description: Accessible WordPress event calendar plugin. Show events from multiple calendars on pages, in posts, or in widgets.
+ * Author:      Joseph C Dolson
+ * Author URI:  http://www.joedolson.com
+ * Text Domain: my-calendar
+ * License:     GPL-2.0+
+ * License URI: http://www.gnu.org/license/gpl-2.0.txt
+ * Domain Path: lang
+ * Version:     3.0.5
+ */
+
 /*
-Plugin Name: My Calendar
-Plugin URI: http://www.joedolson.com/my-calendar/
-Description: Accessible WordPress event calendar plugin. Show events from multiple calendars on pages, in posts, or in widgets.
-Author: Joseph C Dolson
-Author URI: http://www.joedolson.com
-Text Domain: my-calendar
-Domain Path: lang
-Requires PHP: 5.3
-Version: 2.5.17
-*/
-/*  Copyright 2009-2018  Joe Dolson (email : joe@joedolson.com)
+	Copyright 2009-2018  Joe Dolson (email : joe@joedolson.com)
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
-} // Exit if accessed directly
+}
 
 global $mc_version, $wpdb;
-$mc_version = '2.5.17';
+$mc_version = '3.0.5';
+
+define( 'MC_DEBUG', false );
 
 register_activation_hook( __FILE__, 'mc_plugin_activated' );
 register_deactivation_hook( __FILE__, 'mc_plugin_deactivated' );
+/**
+ * Actions to execute on activation.
+ */
 function mc_plugin_activated() {
+	$required_php_version = '5.3.0';
+
+	if ( version_compare( PHP_VERSION, $required_php_version, '<' ) ) {
+		$plugin_data = get_plugin_data( __FILE__, false );
+		// Translators: Name of plug-in, required PHP version, current PHP version.
+		$message = sprintf( __( '%1$s requires PHP version %2$s or higher. Your current PHP version is %3$s', 'my-calendar' ), $plugin_data['Name'], $required_php_version, phpversion() );
+		echo "<div class='error'><p>$message</p></div>";
+		exit;
+	}
+
 	flush_rewrite_rules();
 	if ( my_calendar_exists() ) {
 		mc_upgrade_db();
 	}
-	check_my_calendar();
+
+	my_calendar_check();
 }
 
-register_activation_hook(__FILE__, 'mc_activation_hook');
-function mc_activation_hook() {
-    $required_php_version = '5.3.0';
-
-    if ( version_compare( PHP_VERSION, $required_php_version, '<' ) ) { 
-        $plugin_data = get_plugin_data(__FILE__, false);
-		$message = sprintf( __( '%s requires PHP version %s or higher. Your current PHP version is %s', 'my-calendar' ), $plugin_data['Name'], $required_php_version, phpversion() );
-        echo "<p>{$message}</p>";
-        exit;
-    } 
-}
-
+/**
+ * Actions to execute on plugin deactivation.
+ */
 function mc_plugin_deactivated() {
 	flush_rewrite_rules();
 }
@@ -62,12 +80,15 @@ function mc_plugin_deactivated() {
 include( dirname( __FILE__ ) . '/includes/date-utilities.php' );
 include( dirname( __FILE__ ) . '/includes/general-utilities.php' );
 include( dirname( __FILE__ ) . '/includes/kses.php' );
+include( dirname( __FILE__ ) . '/includes/screen-options.php' );
+include( dirname( __FILE__ ) . '/includes/db.php' );
+include( dirname( __FILE__ ) . '/includes/deprecated.php' );
 include( dirname( __FILE__ ) . '/my-calendar-core.php' );
-include( dirname( __FILE__ ) . '/my-calendar-db.php' );
 include( dirname( __FILE__ ) . '/my-calendar-install.php' );
 include( dirname( __FILE__ ) . '/my-calendar-settings.php' );
 include( dirname( __FILE__ ) . '/my-calendar-categories.php' );
 include( dirname( __FILE__ ) . '/my-calendar-locations.php' );
+include( dirname( __FILE__ ) . '/my-calendar-location-manager.php' );
 include( dirname( __FILE__ ) . '/my-calendar-help.php' );
 include( dirname( __FILE__ ) . '/my-calendar-event-manager.php' );
 include( dirname( __FILE__ ) . '/my-calendar-styles.php' );
@@ -85,18 +106,28 @@ include( dirname( __FILE__ ) . '/my-calendar-group-manager.php' );
 include( dirname( __FILE__ ) . '/my-calendar-api.php' );
 include( dirname( __FILE__ ) . '/my-calendar-generator.php' );
 
-// Enable internationalisation
 add_action( 'plugins_loaded', 'mc_load_textdomain' );
+/**
+ * Load internationalization.
+ */
 function mc_load_textdomain() {
-	// don't change this; just gradually remove shipped translations if .org trans become complete.
+	// Don't change this; remove shipped translations as .org trans become complete(r).
 	load_plugin_textdomain( 'my-calendar', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 }
 
-// Add actions
+// Add actions.
 add_action( 'admin_menu', 'my_calendar_menu' );
-add_action( 'wp_head', 'my_calendar_wp_head' );
+add_action( 'wp_head', 'my_calendar_head' );
 add_action( 'delete_user', 'mc_deal_with_deleted_user' );
 add_action( 'widgets_init', 'mc_register_widgets' );
+add_action( 'init', 'my_calendar_add_feed' );
+add_action( 'wp_footer', 'mc_footer_js' );
+add_action( 'init', 'mc_export_vcal', 200 );
+// Add filters.
+add_filter( 'widget_text', 'do_shortcode', 9 );
+add_filter( 'plugin_action_links', 'mc_plugin_action', 10, 2 );
+add_filter( 'wp_title', 'mc_event_filter', 10, 3 );
+
 /**
  * Register all My Calendar widgets
  */
@@ -108,105 +139,118 @@ function mc_register_widgets() {
 	register_widget( 'My_Calendar_Filters' );
 }
 
-add_action( 'init', 'my_calendar_add_feed' );
-add_action( 'admin_menu', 'my_calendar_admin_js' );
-add_action( 'wp_footer', 'mc_footer_js' );
-add_action( 'init', 'mc_export_vcal', 200 );
-// Add filters 
-add_filter( 'widget_text', 'do_shortcode', 9 );
-add_filter( 'plugin_action_links', 'mc_plugin_action', - 10, 2 );
-add_filter( 'wp_title', 'mc_event_filter', 10, 3 );
-
-// Customize canonical URL
 add_action( 'init', 'mc_custom_canonical' );
+/**
+ * Customize canonical URL for My Calendar custom links
+ */
 function mc_custom_canonical() {
 	add_action( 'wp_head', 'mc_canonical' );
 	remove_action( 'wp_head', 'rel_canonical' );
 }
 
+/**
+ * Generate canonical link
+ */
 function mc_canonical() {
-	// original code
-	if ( !is_singular() ) {
-		return;
-	}
-	global $wp_the_query;
-	if ( !$id = $wp_the_query->get_queried_object_id() ) {
+	// Original code.
+	if ( ! is_singular() ) {
 		return;
 	}
 
-	// original code
-	$link = get_permalink( $id );
-	if ( $page = get_query_var('cpage') ) {
-		$link = get_comments_pagenum_link( $page );
+	$id = get_queried_object_id();
+
+	if ( 0 === $id ) {
+		return;
 	}
-	if ( isset( $_GET['mc_id'] ) ) { 
-		$mc_id = ( is_numeric( $_GET['mc_id'] ) ) ? $_GET['mc_id'] : false;
-		$link = add_query_arg( 'mc_id', $mc_id, $link );
+
+	$link = wp_get_canonical_url( $id );
+
+	// End original code.
+	if ( isset( $_GET['mc_id'] ) ) {
+		$mc_id = ( absint( $_GET['mc_id'] ) ) ? $_GET['mc_id'] : false;
+		$link  = add_query_arg( 'mc_id', $mc_id, $link );
 	}
-	echo "<link rel='canonical' href='$link' />\n";	
+
+	echo "<link rel='canonical' href='$link' />\n";
 }
 
-function mc_event_filter( $title, $sep = ' | ', $seplocation = 'right' ) {
-	if ( isset( $_GET['mc_id'] ) && is_numeric( $_GET['mc_id'] ) ) {
-		$id        = (int) $_GET['mc_id'];
-		$event     = mc_get_event( $id );
-		if ( mc_event_is_hidden( $event ) ) {
-			return $title;
-		}
-		$array     = mc_create_tags( $event );
-		$left_sep  = ( $seplocation != 'right' ? ' ' . $sep . ' ' : '' );
-		$right_sep = ( $seplocation != 'right' ? '' : ' ' . $sep . ' ' );
-		$template  = ( get_option( 'mc_event_title_template' ) != '' ) ? stripslashes( get_option( 'mc_event_title_template' ) ) : "$left_sep {title} $sep {date} $right_sep ";
-
-		return strip_tags( jd_draw_template( $array, $template ) );
-	} else {
-		return $title;
-	}
-}
-
-// back compat
-function jd_show_support_box() {
-	mc_show_sidebar();
-}
-
-// produce admin support box
+/**
+ * Produce My Calendar admin sidebar
+ *
+ * @param string              $show deprecated.
+ * @param mixed array/boolean $add boolean or array.
+ * @param boolean             $remove Hide commercial blocks.
+ */
 function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
+	$add = apply_filters( 'mc_custom_sidebar_panels', $add );
+
 	if ( current_user_can( 'mc_view_help' ) ) {
 		?>
 		<div class="postbox-container jcd-narrow">
 		<div class="metabox-holder">
-		<?php if ( ! $remove ) { ?>
-			<?php if ( ! function_exists( 'mcs_submit_exists' ) ) { ?>
+		<?php
+		if ( is_array( $add ) ) {
+			foreach ( $add as $key => $value ) {
+				?>
+				<div class="ui-sortable meta-box-sortables">
+					<div class="postbox">
+						<h2 class='hndle'><?php echo $key; ?></h2>
+
+						<div class='<?php echo sanitize_title( $key ); ?> inside'>
+							<?php echo $value; ?>
+						</div>
+					</div>
+				</div>
+				<?php
+			}
+		}
+		if ( ! $remove ) {
+			if ( ! function_exists( 'mcs_submit_exists' ) ) {
+				?>
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox sell support">
 						<h2 class='sales hndle'><strong><?php _e( 'My Calendar Pro', 'my-calendar' ); ?></strong></h2>
 
 						<div class="inside resources">
-							<p class="mcbuy"><?php printf( __( "Buy <a href='%s' rel='external'>My Calendar Pro</a> &mdash; a more powerful calendar for your site.", 'my-calendar' ), 'https://www.joedolson.com/my-calendar/pro/' ); ?></p>
+							<p class="mcbuy">
+							<?php
+							// Translators: URL for My Calendar Pro.
+							printf( __( "Buy <a href='%s' rel='external'>My Calendar Pro</a> &mdash; a more powerful calendar for your site.", 'my-calendar' ), 'https://www.joedolson.com/my-calendar/pro/' );
+							?>
+							</p>
 						</div>
 					</div>
 				</div>
-			<?php } ?>			
-			<?php if ( ! function_exists( 'mt_valid' ) ) { ?>
+				<?php
+			}
+			if ( ! function_exists( 'mt_update_check' ) ) {
+				?>
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox sell my-tickets">
 						<h2 class='sales hndle'><strong><?php _e( 'My Tickets', 'my-calendar' ); ?></strong></h2>
 
 						<div class="inside resources">
-							<p class="mcbuy"><?php printf( __( 'Do you sell tickets to your events? <a href="%s" class="thickbox open-plugin-details-modal" rel="external">Use My Tickets</a> and sell directly from My Calendar.', 'my-calendar' ), 'http://dev.josephdolson.com/wp-admin/plugin-install.php?tab=plugin-information&plugin=my-tickets&TB_iframe=true&width=600&height=550' ); ?></p>
-							<p><?php _e( 'My Tickets integrates with My Calendar or sells tickets independently through posts and pages.', 'my-tickets' ); ?></p>
+							<p class="mcbuy">
+							<?php
+							// Translators: URL to view details about My Tickets.
+							printf( __( 'Do you sell tickets to your events? <a href="%s" class="thickbox open-plugin-details-modal" rel="external">Use My Tickets</a> and sell directly from My Calendar.', 'my-calendar' ), admin_url( 'plugin-install.php?tab=plugin-information&plugin=my-tickets&TB_iframe=true&width=600&height=550' ) );
+							?>
+							</p>
+
 						</div>
 					</div>
 				</div>
-			<?php } ?>	
+				<?php
+			}
+			if ( ! function_exists( 'mcs_submit_exists' ) ) {
+				?>
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox support">
 					<h2 class='hndle'><strong><?php _e( 'Support This Plug-in', 'my-calendar' ); ?></strong></h2>
 
 					<div class="inside resources">
-						<p>
-							<a href="https://twitter.com/intent/follow?screen_name=joedolson"
-							   class="twitter-follow-button" data-size="small" data-related="joedolson">Follow
+						<p class="follow-me">
+							<a href="https://twitter.com/intent/follow?screen_name=joedolson" class="twitter-follow-button" data-size="small" data-related="joedolson">Follow
 								@joedolson</a>
 							<script>!function (d, s, id) {
 									var js, fjs = d.getElementsByTagName(s)[0];
@@ -217,10 +261,6 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 										fjs.parentNode.insertBefore(js, fjs);
 									}
 								}(document, "script", "twitter-wjs");</script>
-						</p>
-						<p class="mcbuy"><?php _e( 'Help me help you:', 'my-calendar' ); ?> <a
-								href="http://www.joedolson.com/my-calendar/users-guide/"
-								rel="external"><?php _e( "Buy the My Calendar User's Guide", 'my-calendar' ); ?></a>
 						</p>
 
 						<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
@@ -233,29 +273,32 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 					</div>
 				</div>
 			</div>
-		<?php } ?>
+				<?php
+			}
+		}
+		?>
 		<div class="ui-sortable meta-box-sortables">
 			<div class="postbox">
 				<h2 class='hndle'><?php _e( 'Get Help', 'my-calendar' ); ?></h2>
 
 				<div class="inside">
 					<ul>
-						<li><strong><a
-									href="<?php echo admin_url( "admin.php?page=my-calendar-help" ); ?>#get-started"><?php _e( "Getting Started", 'my-calendar' ); ?>
-							</strong></a></li>
-						<li><strong><a
-									href="<?php echo admin_url( "admin.php?page=my-calendar-help" ); ?>#mc-generator"><?php _e( "Shortcode Generator", 'my-calendar' ); ?>
-							</strong></a></li>
 						<li>
-							<a href="<?php echo admin_url( "admin.php?page=my-calendar-help" ); ?>#get-support"><?php _e( "Get Support", 'my-calendar' ); ?></a>
+							<strong><a href="https://docs.joedolson.com/my-calendar/quick-start/"><?php _e( 'Documentation', 'my-calendar' ); ?></a></strong>
+						</li>
+						<li>
+							<strong><a href="<?php echo admin_url( 'admin.php?page=my-calendar-help' ); ?>#mc-generator"><?php _e( 'Shortcode Generator', 'my-calendar' ); ?></a></strong>
+						</li>
+						<li>
+							<a href="<?php echo admin_url( 'admin.php?page=my-calendar-help' ); ?>#get-support"><?php _e( 'Get Support', 'my-calendar' ); ?></a>
 						</li>
 						<li>
 							<div class="dashicons dashicons-editor-help" aria-hidden='true'></div>
-							<a href="<?php echo admin_url( "admin.php?page=my-calendar-help" ); ?>"><?php _e( "My Calendar Help", 'my-calendar' ); ?></a>
+							<a href="<?php echo admin_url( 'admin.php?page=my-calendar-help' ); ?>"><?php _e( 'My Calendar Help', 'my-calendar' ); ?></a>
 						</li>
 						<li>
 							<div class="dashicons dashicons-yes" aria-hidden='true'></div>
-							<a href="http://profiles.wordpress.org/users/joedolson/"><?php _e( 'Check out my other plug-ins', 'my-calendar' ); ?></a>
+							<a href="http://profiles.wordpress.org/joedolson/"><?php _e( 'Check out my other plug-ins', 'my-calendar' ); ?></a>
 						</li>
 						<li>
 							<div class="dashicons dashicons-star-filled" aria-hidden='true'></div>
@@ -269,165 +312,64 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 				</div>
 			</div>
 		</div>
-		<?php if ( is_array( $add ) ) {
-			foreach ( $add as $key => $value ) {
-				?>
-				<div class="ui-sortable meta-box-sortables">
-					<div class="postbox">
-						<h2 class='hndle'><?php echo $key; ?></h2>
-
-						<div class='<?php echo sanitize_title( $key ); ?> inside'>
-							<?php echo $value; ?>
-						</div>
-					</div>
-				</div>
-			<?php
-			}
-		} ?>
 		</div>
 		</div>
-	<?php
+		<?php
 	}
 }
 
-// Function to deal with adding the calendar menus
+/**
+ * Add My Calendar menu items to main admin menu
+ */
 function my_calendar_menu() {
-	$icon_path = plugins_url( '/my-calendar/images' );
-
 	if ( function_exists( 'add_menu_page' ) ) {
-		if ( get_option( 'mc_remote' ) != 'true' ) {
-			add_menu_page( __( 'My Calendar', 'my-calendar' ), __( 'My Calendar', 'my-calendar' ), 'mc_add_events', apply_filters( 'mc_modify_default', 'my-calendar' ), apply_filters( 'mc_modify_default_cb', 'edit_my_calendar' ), $icon_path . '/icon.png' );
+		if ( 'true' != get_option( 'mc_remote' ) ) {
+			add_menu_page( __( 'My Calendar', 'my-calendar' ), __( 'My Calendar', 'my-calendar' ), 'mc_add_events', apply_filters( 'mc_modify_default', 'my-calendar' ), apply_filters( 'mc_modify_default_cb', 'my_calendar_edit' ), 'dashicons-calendar' );
 		} else {
-			add_menu_page( __( 'My Calendar', 'my-calendar' ), __( 'My Calendar', 'my-calendar' ), 'mc_edit_settings', 'my-calendar', 'edit_my_calendar_config', $icon_path . '/icon.png' );
+			add_menu_page( __( 'My Calendar', 'my-calendar' ), __( 'My Calendar', 'my-calendar' ), 'mc_edit_settings', 'my-calendar', 'my_calendar_settings', 'dashicons-calendar' );
 		}
 	}
 	if ( function_exists( 'add_submenu_page' ) ) {
-		add_action( "admin_head", 'my_calendar_write_js' );
-		add_action( "admin_enqueue_scripts", 'my_calendar_add_styles' );
-		if ( get_option( 'mc_remote' ) == 'true' ) {
-		} else { // if we're accessing a remote page, remove these pages.
-			$edit = add_submenu_page( apply_filters( 'mc_locate_events_page', 'my-calendar' ), __( 'Add New Event', 'my-calendar' ), __( 'Add New Event', 'my-calendar' ), 'mc_add_events', 'my-calendar', 'edit_my_calendar' );
+		add_action( 'admin_head', 'my_calendar_write_js' );
+		add_action( 'admin_enqueue_scripts', 'my_calendar_add_styles' );
+		if ( 'true' == get_option( 'mc_remote' ) && function_exists( 'mc_remote_db' ) ) {
+			// If we're accessing a remote site, remove these pages.
+		} else {
+			if ( isset( $_GET['event_id'] ) ) {
+				$event_id = absint( $_GET['event_id'] );
+				// Translators: Title of event.
+				$page_title = sprintf( __( 'Editing Event: %s', 'my-calendar' ), mc_get_data( 'event_title', $event_id ) );
+			} else {
+				$page_title = __( 'Add New Event', 'my-calendar' );
+			}
+			$edit = add_submenu_page( apply_filters( 'mc_locate_events_page', 'my-calendar' ), $page_title, __( 'Add New Event', 'my-calendar' ), 'mc_add_events', 'my-calendar', 'my_calendar_edit' );
 			add_action( "load-$edit", 'mc_event_editing' );
-			$manage = add_submenu_page( 'my-calendar', __( 'Manage Events', 'my-calendar' ), __( 'Manage Events', 'my-calendar' ), 'mc_add_events', 'my-calendar-manage', 'manage_my_calendar' );
+			$manage = add_submenu_page( 'my-calendar', __( 'Manage Events', 'my-calendar' ), __( '&rarr; Manage Events', 'my-calendar' ), 'mc_add_events', 'my-calendar-manage', 'my_calendar_manage' );
 			add_action( "load-$manage", 'mc_add_screen_option' );
-			add_submenu_page( 'my-calendar', __( 'Event Categories', 'my-calendar' ), __( 'Manage Categories', 'my-calendar' ), 'mc_edit_cats', 'my-calendar-categories', 'my_calendar_manage_categories' );
-			add_submenu_page( 'my-calendar', __( 'Event Locations', 'my-calendar' ), __( 'Manage Locations', 'my-calendar' ), 'mc_edit_locations', 'my-calendar-locations', 'my_calendar_manage_locations' );
-			$groups = add_submenu_page( 'my-calendar', __( 'Event Groups', 'my-calendar' ), __( 'Manage Event Groups', 'my-calendar' ), 'mc_manage_events', 'my-calendar-groups', 'edit_my_calendar_groups' );
+			$groups = add_submenu_page( 'my-calendar', __( 'Event Groups', 'my-calendar' ), __( '&rarr; Event Groups', 'my-calendar' ), 'mc_manage_events', 'my-calendar-groups', 'my_calendar_group_edit' );
 			add_action( "load-$groups", 'mc_add_screen_option' );
+			add_submenu_page( 'my-calendar', __( 'Add Event Locations', 'my-calendar' ), __( 'Add New Location', 'my-calendar' ), 'mc_edit_locations', 'my-calendar-locations', 'my_calendar_add_locations' );
+			add_submenu_page( 'my-calendar', __( 'Manage Event Locations', 'my-calendar' ), __( '&rarr; Manage Locations', 'my-calendar' ), 'mc_edit_locations', 'my-calendar-location-manager', 'my_calendar_manage_locations' );
+			add_submenu_page( 'my-calendar', __( 'Event Categories', 'my-calendar' ), __( 'Manage Categories', 'my-calendar' ), 'mc_edit_cats', 'my-calendar-categories', 'my_calendar_manage_categories' );
 		}
-		add_submenu_page( 'my-calendar', __( 'Style Editor', 'my-calendar' ), __( 'Style Editor', 'my-calendar' ), 'mc_edit_styles', 'my-calendar-styles', 'edit_my_calendar_styles' );
-		add_submenu_page( 'my-calendar', __( 'Script Manager', 'my-calendar' ), __( 'Script Manager', 'my-calendar' ), 'mc_edit_behaviors', 'my-calendar-behaviors', 'edit_my_calendar_behaviors' );
-		add_submenu_page( 'my-calendar', __( 'Template Editor', 'my-calendar' ), __( 'Template Editor', 'my-calendar' ), 'mc_edit_templates', 'my-calendar-templates', 'edit_mc_templates' );
-		add_submenu_page( 'my-calendar', __( 'Settings', 'my-calendar' ), __( 'Settings', 'my-calendar' ), 'mc_edit_settings', 'my-calendar-config', 'edit_my_calendar_config' );
+		add_submenu_page( 'my-calendar', __( 'Style Editor', 'my-calendar' ), __( 'Style Editor', 'my-calendar' ), 'mc_edit_styles', 'my-calendar-styles', 'my_calendar_style_edit' );
+		add_submenu_page( 'my-calendar', __( 'Script Manager', 'my-calendar' ), __( 'Script Manager', 'my-calendar' ), 'mc_edit_behaviors', 'my-calendar-behaviors', 'my_calendar_behaviors_edit' );
+		add_submenu_page( 'my-calendar', __( 'Template Editor', 'my-calendar' ), __( 'Template Editor', 'my-calendar' ), 'mc_edit_templates', 'my-calendar-templates', 'mc_templates_edit' );
+		add_submenu_page( 'my-calendar', __( 'Settings', 'my-calendar' ), __( 'Settings', 'my-calendar' ), 'mc_edit_settings', 'my-calendar-config', 'my_calendar_settings' );
 		add_submenu_page( 'my-calendar', __( 'My Calendar Help', 'my-calendar' ), __( 'Help', 'my-calendar' ), 'mc_view_help', 'my-calendar-help', 'my_calendar_help' );
 	}
 	if ( function_exists( 'mcs_submissions' ) ) {
 		$permission = apply_filters( 'mcs_submission_permissions', 'manage_options' );
-		add_action( "admin_head", 'my_calendar_sub_js' );
-		add_action( "admin_head", 'my_calendar_sub_styles' );
+		add_action( 'admin_head', 'my_calendar_sub_js' );
+		add_action( 'admin_head', 'my_calendar_sub_styles' );
 		add_submenu_page( 'my-calendar', __( 'My Calendar Pro Settings', 'my-calendar' ), __( 'My Calendar Pro', 'my-calendar' ), $permission, 'my-calendar-submissions', 'mcs_settings' );
-		add_submenu_page( 'my-calendar', __( 'Payments Received', 'my-calendar' ), __( 'Payments', 'my-calendar' ), $permission, 'my-calendar-payments', 'mcs_sales_page' );
-	}
-}
-
-function mc_event_editing() {
-	$option = 'mc_show_on_page';
-	$args   = array(
-		'label'   => 'Show these fields',
-		'default' => get_option( 'mc_input_options' ),
-		'option'  => 'mc_show_on_page'
-	);
-	add_screen_option( $option, $args );
-}
-
-add_filter( 'screen_settings', 'mc_show_event_editing', 10, 2 );
-function mc_show_event_editing( $status, $args ) {
-	$return = $status;
-	if ( $args->base == 'toplevel_page_my-calendar' ) {
-		$input_options = get_user_meta( get_current_user_id(), 'mc_show_on_page', true );
-		$settings_options = get_option( 'mc_input_options' );
-		if ( ! is_array( $input_options ) ) {
-			$input_options = $settings_options;
-		}
-		$input_labels = array(
-			'event_location_dropdown' => __( 'Event Location Dropdown Menu', 'my-calendar' ),
-			'event_short'             => __( 'Event Short Description field', 'my-calendar' ),
-			'event_desc'              => __( 'Event Description Field', 'my-calendar' ),
-			'event_category'          => __( 'Event Category field', 'my-calendar' ),
-			'event_image'             => __( 'Event Image field', 'my-calendar' ),
-			'event_link'              => __( 'Event Link field', 'my-calendar' ),
-			'event_recurs'            => __( 'Event Recurrence Options', 'my-calendar' ),
-			'event_open'              => __( 'Event Registration options', 'my-calendar' ),
-			'event_location'          => __( 'Event Location fields', 'my-calendar' ),
-			'event_specials'          => __( 'Set Special Scheduling options', 'my-calendar' ),
-			'event_access'            => __( 'Event Accessibility', 'my-calendar' ),
-			'event_host'              => __( 'Event Host', 'my-calendar' )
-		);
-		$output       = '';
-		foreach ( $input_options as $key => $value ) {
-			$checked = ( $value == 'on' ) ? "checked='checked'" : '';
-			$allowed = ( isset( $settings_options[ $key ] ) && $settings_options[ $key ] == 'on' ) ? true : false;
-			if ( ! ( current_user_can( 'manage_options' ) && get_option( 'mc_input_options_administrators' ) == 'true' ) && ! $allowed ) {
-				// don't display options if this user can't use them.
-				$output .= "<input type='hidden' name='mc_show_on_page[$key]' value='off' />";
-			} else {
-				if ( isset( $input_labels[ $key ] ) ) {
-					// don't show if label doesn't exist. That means I removed the option.
-					$output .= "<label for='mci_$key'><input type='checkbox' id='mci_$key' name='mc_show_on_page[$key]' value='on' $checked /> $input_labels[$key]</label>";
-				}
-			}
-		}
-		$button = get_submit_button( __( 'Apply' ), 'button', 'screen-options-apply', false );
-		$return .= "
-	<fieldset>
-	<legend>" . __( 'Event editing fields to show', 'my-calendar' ) . "</legend>
-	<div class='metabox-prefs'>
-		<div><input type='hidden' name='wp_screen_options[option]' value='mc_show_on_page' /></div>
-		<div><input type='hidden' name='wp_screen_options[value]' value='yes' /></div>
-		$output
-	</div>
-	</fieldset>
-	<br class='clear'>
-	$button";
-	}
-
-	return $return;
-}
-
-add_filter( 'set-screen-option', 'mc_set_event_editing', 11, 3 );
-function mc_set_event_editing( $status, $option, $value ) {
-	if ( 'mc_show_on_page' == $option ) {
-		$orig  = get_option( 'mc_input_options' );
-		$value = array();
-		foreach ( $orig as $k => $v ) {
-			if ( isset( $_POST['mc_show_on_page'][ $k ] ) ) {
-				$value[ $k ] = 'on';
-			} else {
-				$value[ $k ] = 'off';
-			}
+		// Only show payments screen if enabled.
+		if ( 'true' == get_option( 'mcs_payments' ) ) {
+			add_submenu_page( 'my-calendar', __( 'Payments Received', 'my-calendar' ), __( 'Payments', 'my-calendar' ), $permission, 'my-calendar-payments', 'mcs_sales_page' );
 		}
 	}
-
-	return $value;
 }
 
-function mc_add_screen_option() {
-	$items_per_page = ( get_option( 'mc_num_per_page' ) ) ? get_option( 'mc_num_per_page' ) : 50;
-	$option         = 'per_page';
-	$args           = array(
-		'label'   => 'Events',
-		'default' => $items_per_page,
-		'option'  => 'mc_num_per_page'
-	);
-	add_screen_option( $option, $args );
-}
-
-add_filter( 'set-screen-option', 'mc_set_screen_option', 10, 3 );
-function mc_set_screen_option( $status, $option, $value ) {
-	return $value;
-}
-
-// add shortcode interpreters
 add_shortcode( 'my_calendar', 'my_calendar_insert' );
 add_shortcode( 'my_calendar_upcoming', 'my_calendar_insert_upcoming' );
 add_shortcode( 'my_calendar_today', 'my_calendar_insert_today' );

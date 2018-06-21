@@ -1,10 +1,28 @@
 <?php
+/**
+ * Shortcodes.
+ *
+ * @category Calendar
+ * @package  My Calendar
+ * @author   Joe Dolson
+ * @license  GPLv2 or later
+ * @link     https://www.joedolson.com/my-calendar/
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
-} // Exit if accessed directly
+}
 
+/**
+ * Primary My Calendar shortcode.
+ *
+ * @param array  $atts Shortcode attributes.
+ * @param string $content Contained content.
+ *
+ * @return string Calendar.
+ */
 function my_calendar_insert( $atts, $content = null ) {
-	extract( shortcode_atts( array(
+	$args = shortcode_atts( array(
 		'name'     => 'all',
 		'format'   => 'calendar',
 		'category' => 'all',
@@ -20,26 +38,35 @@ function my_calendar_insert( $atts, $content = null ) {
 		'year'     => false,
 		'month'    => false,
 		'day'      => false,
-		'site'     => false
-	), $atts, 'my_calendar' ) );
-	if ( $format != 'mini' ) {
+		'site'     => false,
+		'months'   => false,
+	), $atts, 'my_calendar' );
+
+	if ( 'mini' != $args['format'] ) {
 		if ( isset( $_GET['format'] ) ) {
-			$format = $_GET['format'];
+			$args['format'] = $_GET['format'];
 		}
 	}
 	global $user_ID;
-	if ( $author == 'current' ) {
-		$author = apply_filters( 'mc_display_author', $user_ID, 'main' );
+	if ( 'current' == $args['author'] ) {
+		$args['author'] = apply_filters( 'mc_display_author', $user_ID, 'main' );
 	}
-	if ( $host == 'current' ) {
-		$host = apply_filters( 'mc_display_host', $user_ID, 'main' );
+	if ( 'current' == $args['host'] ) {
+		$args['host'] = apply_filters( 'mc_display_host', $user_ID, 'main' );
 	}
-	
-	return my_calendar( $name, $format, $category, $time, $ltype, $lvalue, $id, $template, $content, $author, $host, $above, $below, $year, $month, $day, 'shortcode', $site );
+
+	return my_calendar( $args );
 }
 
+/**
+ * Upcoming Events My Calendar shortcode.
+ *
+ * @param array $atts Shortcode attributes.
+ *
+ * @return string Calendar.
+ */
 function my_calendar_insert_upcoming( $atts ) {
-	extract( shortcode_atts( array(
+	$args = shortcode_atts( array(
 		'before'     => 'default',
 		'after'      => 'default',
 		'type'       => 'default',
@@ -55,115 +82,180 @@ function my_calendar_insert_upcoming( $atts ) {
 		'lvalue'     => '',
 		'from'       => false,
 		'to'         => false,
-		'site'       => false
-	), $atts, 'my_calendar_upcoming' ) );
-	
+		'site'       => false,
+	), $atts, 'my_calendar_upcoming' );
+
 	global $user_ID;
-	if ( $author == 'current' ) {
-		$author = apply_filters( 'mc_display_author', $user_ID, 'upcoming' );
+	if ( 'current' == $args['author'] ) {
+		$args['author'] = apply_filters( 'mc_display_author', $user_ID, 'upcoming' );
 	}
-	if ( $host == 'current' ) {
-		$host = apply_filters( 'mc_display_host', $user_ID, 'upcoming' );
+	if ( 'current' == $args['host'] ) {
+		$args['host'] = apply_filters( 'mc_display_host', $user_ID, 'upcoming' );
 	}
-	
-	return my_calendar_upcoming_events( $before, $after, $type, $category, $template, $fallback, $order, $skip, $show_today, $author, $host, $ltype, $lvalue, $from, $to, $site );
+
+	return my_calendar_upcoming_events( $args );
 }
 
+/**
+ * Today's Events My Calendar shortcode.
+ *
+ * @param array $atts Shortcode attributes.
+ *
+ * @return string Calendar.
+ */
 function my_calendar_insert_today( $atts ) {
-	extract( shortcode_atts( array(
+	$args = shortcode_atts( array(
 		'category' => 'default',
 		'author'   => 'default',
 		'host'     => 'default',
 		'template' => 'default',
-		'fallback' => '', 
+		'fallback' => '',
 		'date'     => false,
-		'site'     => false
-	), $atts, 'my_calendar_today' ) );
+		'site'     => false,
+	), $atts, 'my_calendar_today' );
+
 	global $user_ID;
-	if ( $author == 'current' ) {
-		$author = apply_filters( 'mc_display_author', $user_ID, 'today' );
+	if ( 'current' == $args['author'] ) {
+		$args['author'] = apply_filters( 'mc_display_author', $user_ID, 'today' );
 	}
-	if ( $host == 'current' ) {
-		$host = apply_filters( 'mc_display_host', $user_ID, 'today' );
+	if ( 'current' == $args['host'] ) {
+		$args['host'] = apply_filters( 'mc_display_host', $user_ID, 'today' );
 	}
 
-	return my_calendar_todays_events( $category, $template, $fallback, $author, $host, $date, $site );
+	return my_calendar_todays_events( $args );
 }
 
-function my_calendar_locations( $atts ) {
-	extract( shortcode_atts( array(
-		'show'     => 'list',
-		'type'     => 'saved',
-		'datatype' => 'name'
-	), $atts, 'my_calendar_locations' ) );
-
-	return my_calendar_locations_list( $show, $type, $datatype );
-}
-
+/**
+ * Locations List My Calendar shortcode.
+ *
+ * @param array $atts Shortcode attributes.
+ *
+ * @return string locations.
+ */
 function my_calendar_show_locations_list( $atts ) {
-	extract( shortcode_atts( array(
+	$args = shortcode_atts( array(
 		'datatype' => 'name',
-		'template' => ''
-	), $atts, 'my_calendar_locations_list' ) );
+		'template' => '',
+	), $atts, 'my_calendar_locations_list' );
 
-	return my_calendar_show_locations( $datatype, $template );
+	return my_calendar_show_locations( $args['datatype'], $args['template'] );
 }
 
-function my_calendar_categories( $atts ) {
-	extract( shortcode_atts( array(
-		'show' => 'list'
-	), $atts, 'my_calendar_categories' ) );
-
-	return my_calendar_categories_list( $show );
-}
-
-function my_calendar_access( $atts ) {
-	extract( shortcode_atts( array(
-		'show' => 'list'
-	), $atts, 'my_calendar_access' ) );
-
-	return mc_access_list( $show );
-}
-
-function my_calendar_filters( $atts ) {
-	extract( shortcode_atts( array(
-		'show' => 'categories,locations', 
+/**
+ * Location Filter My Calendar shortcode.
+ *
+ * @param array $atts Shortcode attributes.
+ *
+ * @return string location filter.
+ */
+function my_calendar_locations( $atts ) {
+	$args = shortcode_atts( array(
+		'show'       => 'list',
+		'datatype'   => 'name',
 		'target_url' => '',
-		'ltype' => 'name'
-	), $atts, 'my_calendar_filters' ) );
+	), $atts, 'my_calendar_locations' );
 
-	return mc_filters( $show, $target_url, $ltype );
+	return my_calendar_locations_list( $args['show'], $args['datatype'], $args['target_url'] );
 }
 
+/**
+ * Category filter My Calendar shortcode.
+ *
+ * @param array $atts Shortcode attributes.
+ *
+ * @return string category filter.
+ */
+function my_calendar_categories( $atts ) {
+	$args = shortcode_atts( array(
+		'show'       => 'list',
+		'target_url' => '',
+	), $atts, 'my_calendar_categories' );
 
+	return my_calendar_categories_list( $args['show'], 'public', 'single', $args['target_url'] );
+}
+
+/**
+ * Accessibility Filter My Calendar shortcode.
+ *
+ * @param array $atts Shortcode attributes.
+ *
+ * @return string accessibility filters.
+ */
+function my_calendar_access( $atts ) {
+	$args = shortcode_atts( array(
+		'show'       => 'list',
+		'target_url' => '',
+	), $atts, 'my_calendar_access' );
+
+	return mc_access_list( $args['show'], 'single', $args['target_url'] );
+}
+
+/**
+ * All Filters My Calendar shortcode.
+ *
+ * @param array $atts Shortcode attributes.
+ *
+ * @return string filters.
+ */
+function my_calendar_filters( $atts ) {
+	$args = shortcode_atts( array(
+		'show'       => 'categories,locations',
+		'target_url' => '',
+		'ltype'      => 'name',
+	), $atts, 'my_calendar_filters' );
+
+	return mc_filters( $args['show'], $args['target_url'], $args['ltype'] );
+}
+
+/**
+ * Single Event My Calendar shortcode.
+ *
+ * @param array $atts Shortcode attributes.
+ *
+ * @return string event.
+ */
 function my_calendar_show_event( $atts ) {
-	extract( shortcode_atts( array(
+	$args = shortcode_atts( array(
 		'event'    => '',
 		'template' => '<h3>{title}</h3>{description}',
 		'list'     => '<li>{date}, {time}</li>',
 		'before'   => '<ul>',
 		'after'    => '</ul>',
-		'instance' => false
-	), $atts, 'my_calendar_event' ) );
+		'instance' => false,
+	), $atts, 'my_calendar_event' );
 
-	return mc_instance_list( $event, false, $template, $list, $before, $after, $instance );
+	return mc_instance_list( $args );
 }
 
+/**
+ * Search Form My Calendar shortcode.
+ *
+ * @param array $atts Shortcode attributes.
+ *
+ * @return string search form.
+ */
 function my_calendar_search( $atts ) {
-	extract( shortcode_atts( array(
+	$args = shortcode_atts( array(
 		'type' => 'simple',
-		'url' => ''
-	), $atts, 'my_calendar_search' ) );
+		'url'  => '',
+	), $atts, 'my_calendar_search' );
 
-	return my_calendar_searchform( $type, $url );
+	return my_calendar_searchform( $args['type'], $args['url'] );
 }
 
+/**
+ * Current Event My Calendar shortcode.
+ *
+ * @param array $atts Shortcode attributes.
+ *
+ * @return string event.
+ */
 function my_calendar_now( $atts ) {
-	extract( shortcode_atts( array(
+	$args = shortcode_atts( array(
 		'category' => '',
 		'template' => '<strong>{link_title}</strong> {timerange}',
-		'site'     => false
-	), $atts, 'my_calendar_now' ) );
-	
-	return my_calendar_events_now( $category, $template, $site );
+		'site'     => false,
+	), $atts, 'my_calendar_now' );
+
+	return my_calendar_events_now( $args['category'], $args['template'], $args['site'] );
 }

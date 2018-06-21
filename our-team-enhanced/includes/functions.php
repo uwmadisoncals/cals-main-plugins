@@ -38,6 +38,11 @@ function get_members_in_order( $limit = null, $group = false ) {
 		        'field'     => 'slug',
 		        'terms'     => $group
 	        ),
+		array(
+			'taxonomy'  => 'team_member_position',
+			'field'     => 'term_id',
+			'terms'     => array_map(function ($g) { return absint($g); }, $group)
+            	)
         );
 
     }
@@ -279,8 +284,15 @@ function map_template( $slug ) {
 }
 
 
-function get_groups() {
-
+/**
+ * Get an associative array of team member groups.
+ *
+ * @param string $key_field
+ *
+ * @since 4.0.0
+ * @return array
+ */
+function get_groups( $key_field = 'term_id' ) {
 	$args = array(
 		'taxonomy'   => 'team_member_position',
 		'hide_empty' => false
@@ -288,14 +300,9 @@ function get_groups() {
 
 	$groups = array();
 
-
 	foreach( get_terms( $args ) as $term ) {
-
-		$groups[ $term->term_id ] = $term->name;
-
+		$groups[ $term->{ $key_field } ] = $term->name;
 	}
 
-
 	return $groups;
-
 }

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.9.02
+* Version 6.9.03
 *
 */
 
@@ -2173,7 +2173,7 @@ static $user;
 		else {
 			$fullname = wppa_get_photo_name( $id, array( 	'addowner' 	=> wppa_switch( 'show_full_owner' ),
 															'addmedal' 	=> true,
-															'escjs' 	=> ( wppa_opt( 'art_monkey_link' ) != 'none' ),
+															'escjs' 	=> true, // ( wppa_opt( 'art_monkey_link' ) != 'none' ),
 															'showname' 	=> wppa_switch( 'show_full_name' ),
 															'nobpdomain' => ( wppa_opt( 'art_monkey_link' ) != 'none' ),
 														) );
@@ -3934,6 +3934,7 @@ function wppa_smx_photo( $stype ) {
 
 	$id 	= wppa( 'single_photo' );
 	$width 	= wppa_get_container_width();
+	$height = round( $width * wppa_get_photo_item( $id, 'photoy' ) / wppa_get_photo_item( $id, 'photox' ) );
 	$style 	= wppa_get_container_style();
 
 	// wrapper for maximized auto
@@ -3954,9 +3955,11 @@ function wppa_smx_photo( $stype ) {
 			);
 
 		// The image html
-		$html 		= wppa_get_picture_html( array( 'id' 	=> $id,
-													'type' 	=> $stype . 'photo',
-													'class' => 'size-medium wppa-' . $stype . 'photo',
+		$html 		= wppa_get_picture_html( array( 'id' 		=> $id,
+													'type' 		=> $stype . 'photo',
+													'class' 	=> 'size-medium wppa-' . $stype . 'photo',
+													'width' 	=> $width,
+													'height' 	=> $height,
 													) );
 
 		wppa_out( $html );

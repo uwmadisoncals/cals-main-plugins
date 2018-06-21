@@ -1,4 +1,14 @@
 <?php
+/**
+ * Uninstall My Calendar.
+ *
+ * @category Core
+ * @package  My Calendar
+ * @author   Joe Dolson
+ * @license  GPLv2 or later
+ * @link     https://www.joedolson.com/my-calendar/
+ */
+
 if ( ! defined( 'ABSPATH' ) && ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit();
 } else {
@@ -56,6 +66,7 @@ if ( ! defined( 'ABSPATH' ) && ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	delete_option( 'mc_event_registration' );
 	delete_option( 'mc_short' );
 	delete_option( 'mc_desc' );
+	delete_option( 'mc_image' );
 	delete_option( 'mc_location_type' );
 	delete_option( 'mc_skip_holidays_category' );
 	delete_option( 'mc_skip_holidays' );
@@ -78,7 +89,6 @@ if ( ! defined( 'ABSPATH' ) && ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	delete_option( 'mc_time_format' );
 	delete_option( 'mc_use_details_template' );
 	delete_option( 'mc_details' );
-	delete_option( 'mc_widget_defaults' );
 	delete_option( 'mc_default_sort' );
 	delete_option( 'mc_show_event_vcal' );
 	delete_option( 'mc_caching_enabled' );
@@ -112,6 +122,18 @@ if ( ! defined( 'ABSPATH' ) && ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	delete_option( 'mc_api_enabled' );
 	delete_option( 'mc_use_custom_js' );
 	delete_option( 'mc_update_notice' );
-	delete_option( 'mc_default_direction' );	
+	delete_option( 'mc_default_direction' );
+
+	if ( get_option( 'mc_drop_tables' ) == 'true' ) {
+		global $wpdb;
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'my_calendar' );
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'my_calendar_events' );
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'my_calendar_categories' );
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'my_calendar_category_relationships' );
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'my_calendar_locations' );
+	}
+
+	delete_option( 'mc_drop_tables' );
+
 	add_option( 'mc_uninstalled', 'true' );
 }

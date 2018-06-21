@@ -110,6 +110,10 @@
     height: auto;
 }
 
+.mc-main .details .category-icon {
+	width: auto;
+}
+
 .mc-main .details img.alignleft {
     width: auto;
     float: left;

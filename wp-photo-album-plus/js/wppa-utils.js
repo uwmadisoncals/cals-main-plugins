@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsUtilsVersion = '6.6.28';
+var wppaJsUtilsVersion = '6.9.04';
 var wppaDebug;
 
 // Trim
@@ -423,6 +423,40 @@ function wppaSvgHtml( image, height, isLightbox, border, none, light, medium, he
 	}
 
 	return result;
+}
+
+jQuery(window).on('DOMContentLoaded load resize scroll', wppaMakeLazyVisible);
+
+function wppaMakeLazyVisible() {
+	
+	var src;
+	
+	jQuery( '.wppa-lazy' ).each( function() {
+		src = jQuery( this ).attr( 'data-src' );
+		if ( ! wppaLazyLoad || wppaIsElementInViewport( this ) ) {
+			jQuery( this ).attr( 'src', src );
+			jQuery( this ).removeAttr( 'data-src' );
+			jQuery( this ).removeClass( 'wppa-lazy' );
+		}
+	});
+}
+
+// Determines whether (a part of) element elm (an image) is inside browser window
+function wppaIsElementInViewport( elm ) {
+
+	var result;
+    var rect = elm.getBoundingClientRect();
+
+	if ( rect ) {
+		result = rect.bottom > 0 && rect.right > 0 && rect.left < jQuery( window ).width() && rect.top < jQuery( window ).height();
+		wppaConsoleLog( 'getBoundingClientRect() for '+jQuery(elm).attr('id')+' returned (tlbr) '+parseInt(rect.top)+' '+parseInt(rect.left)+' '+parseInt(rect.bottom)+' '+parseInt(rect.right)+' result='+(result?'true':'false'));
+	}
+	else {
+		result = false;
+		wppaConsoleLog( 'getBoundingClientRect() not found for '+jQuery(elm).attr('id') );
+	}
+
+    return result;
 }
 
 // Say we're in

@@ -8,7 +8,7 @@ License: GPLv2
 Requires at least: 3.7
 Requires PHP: 5.3
 Tested up to: 4.9
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 
 The complete and reliable plugin for managing custom post types, custom taxonomies and custom fields.
 
@@ -170,6 +170,9 @@ Additionally, Types is the only plugin that lets you define parent/child relatio
 10. Bulk editing child content using Field Tables
 
 == Changelog ==
+
+= 2.3.2 =
+* An upgrade to the Installer component to prevent the notification about a possible upgrade to Types 3.0 for non-subscription users.
 
 = 2.3.1 =
 * Bring back the upgraded Installer in order to remedy upgrade issues for both subscription and non-subscription clients.

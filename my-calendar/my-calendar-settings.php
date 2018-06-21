@@ -1,16 +1,38 @@
 <?php
+/**
+ * Manage My Calendar settings
+ *
+ * @category Settings
+ * @package  My Calendar
+ * @author   Joe Dolson
+ * @license  GPLv2 or later
+ * @link     https://www.joedolson.com/my-calendar/
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
-} // Exit if accessed directly
+}
 
-function mc_settings_field( $name, $label, $default = '', $note = '', $atts = array( 'size' => '30' ), $type = 'text' ) {
-	$options = $attributes = '';
+/**
+ * Generate input & field for a My Calendar setting.
+ *
+ * @param string  $name Name of option.
+ * @param string  $label Label for input.
+ * @param string  $default default value if not set.
+ * @param string  $note Note to associate with field via aria-describedby.
+ * @param array   $atts Array of keys and values to use as input attributes.
+ * @param string  $type Field type for option.
+ * @param boolean $echo True to echo, false to return.
+ */
+function mc_settings_field( $name, $label, $default = '', $note = '', $atts = array( 'size' => '30' ), $type = 'text', $echo = true ) {
+	$options    = '';
+	$attributes = '';
 	if ( is_array( $atts ) && ! empty( $atts ) ) {
 		foreach ( $atts as $key => $value ) {
 			$attributes .= " $key='$value'";
 		}
 	}
-	$value = ( get_option( $name ) != '' ) ? esc_attr( stripslashes( get_option( $name ) ) ) : $default;
+	$value = ( '' != get_option( $name ) ) ? esc_attr( stripslashes( get_option( $name ) ) ) : $default;
 	switch ( $type ) {
 		case 'text':
 		case 'url':
@@ -20,9 +42,10 @@ function mc_settings_field( $name, $label, $default = '', $note = '', $atts = ar
 				$note = "<span id='$name-note'>$note</span>";
 				$aria = " aria-describedby='$name-note'";
 			} else {
-				$note = $aria = '';
+				$note = '';
+				$aria = '';
 			}
-			echo "<label for='$name'>$label</label> <input type='$type' id='$name' name='$name' value='" . esc_attr( $value ) . "'$aria$attributes /> $note";
+			$return = "<label for='$name'>$label</label> <input type='$type' id='$name' name='$name' value='" . esc_attr( $value ) . "'$aria$attributes /> $note";
 			break;
 		case 'textarea':
 			if ( $note ) {
@@ -30,9 +53,10 @@ function mc_settings_field( $name, $label, $default = '', $note = '', $atts = ar
 				$note = "<span id='$name-note'>$note</span>";
 				$aria = " aria-describedby='$name-note'";
 			} else {
-				$note = $aria = '';
+				$note = '';
+				$aria = '';
 			}
-			echo "<label for='$name'>$label</label><br /><textarea id='$name' name='$name'$aria$attributes>" . esc_attr( $value ) . "</textarea>$note";
+			$return = "<label for='$name'>$label</label><br /><textarea id='$name' name='$name'$aria$attributes>" . esc_attr( $value ) . "</textarea>$note";
 			break;
 		case 'checkbox-single':
 			$checked = mc_is_checked( $name, 'true', '', true );
@@ -41,7 +65,7 @@ function mc_settings_field( $name, $label, $default = '', $note = '', $atts = ar
 			} else {
 				$note = '';
 			}
-			echo "<input type='checkbox' id='$name' name='$name' value='on' $checked$attributes /> <label for='$name' class='checkbox-label'>$label $note</label>";
+			$return = "<input type='checkbox' id='$name' name='$name' value='on' $checked$attributes /> <label for='$name' class='checkbox-label'>$label $note</label>";
 			break;
 		case 'checkbox':
 		case 'radio':
@@ -50,13 +74,14 @@ function mc_settings_field( $name, $label, $default = '', $note = '', $atts = ar
 				$note = "<span id='$name-note'>$note</span>";
 				$aria = " aria-describedby='$name-note'";
 			} else {
-				$note = $aria = '';
+				$note = '';
+				$aria = '';
 			}
 			foreach ( $label as $k => $v ) {
-				$checked = ( $k == $value ) ? ' checked="checked"' : '';
+				$checked  = ( $k == $value ) ? ' checked="checked"' : '';
 				$options .= "<li><input type='radio' id='$name-$k' value='" . esc_attr( $k ) . "' name='$name'$aria$attributes$checked /> <label for='$name-$k'>$v</label></li>";
 			}
-			echo "$options $note";
+			$return = "$options $note";
 			break;
 		case 'select':
 			if ( $note ) {
@@ -64,36 +89,42 @@ function mc_settings_field( $name, $label, $default = '', $note = '', $atts = ar
 				$note = "<span id='$name-note'>$note</span>";
 				$aria = " aria-describedby='$name-note'";
 			} else {
-				$note = $aria = '';
+				$note = '';
+				$aria = '';
 			}
 			if ( is_array( $default ) ) {
 				foreach ( $default as $k => $v ) {
-					$checked = ( $k == $value ) ? ' selected="selected"' : '';
+					$checked  = ( $k == $value ) ? ' selected="selected"' : '';
 					$options .= "<option value='" . esc_attr( $k ) . "'$checked>$v</option>";
 				}
 			}
-			echo "
-			<label for='$name'>$label</label> 
+			$return = "
+			<label for='$name'>$label</label>
 				<select id='$name' name='$name'$aria$attributes />
 					$options
 				</select>
 			$note";
 			break;
 	}
+
+	if ( true == $echo ) {
+		echo $return;
+	} else {
+		return $return;
+	}
 }
 
-// Display the admin configuration page
+/**
+ * Display the admin configuration page
+ */
 function my_calendar_import() {
-	if ( get_option( 'ko_calendar_imported' ) != 'true' ) {
+	if ( 'true' != get_option( 'ko_calendar_imported' ) ) {
 		global $wpdb;
-		$mcdb = $wpdb;
-		define( 'KO_CALENDAR_TABLE', $mcdb->prefix . 'calendar' );
-		define( 'KO_CALENDAR_CATS', $mcdb->prefix . 'calendar_categories' );
-		$events         = $mcdb->get_results( "SELECT * FROM " . KO_CALENDAR_TABLE, 'ARRAY_A' );
+		$events         = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . 'calendar', 'ARRAY_A' );
 		$event_ids      = array();
 		$events_results = false;
 		foreach ( $events as $key ) {
-			$endtime        = ( $key['event_time'] == '00:00:00' ) ? '00:00:00' : date( 'H:i:s', strtotime( "$key[event_time] +1 hour" ) );
+			$endtime        = ( '00:00:00' == $key['event_time'] ) ? '00:00:00' : date( 'H:i:s', strtotime( "$key[event_time] +1 hour" ) );
 			$data           = array(
 				'event_title'    => $key['event_title'],
 				'event_desc'     => $key['event_desc'],
@@ -106,101 +137,96 @@ function my_calendar_import() {
 				'event_author'   => $key['event_author'],
 				'event_category' => $key['event_category'],
 				'event_hide_end' => 1,
-				'event_link'     => ( isset( $key['event_link'] ) ) ? $key['event_link'] : ''
+				'event_link'     => ( isset( $key['event_link'] ) ) ? $key['event_link'] : '',
 			);
 			$format         = array( '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s' );
-			$update         = $mcdb->insert( my_calendar_table(), $data, $format );
+			$update         = $wpdb->insert( my_calendar_table(), $data, $format );
 			$events_results = ( $update ) ? true : false;
-			$event_ids[]    = $mcdb->insert_id;
+			$event_ids[]    = $wpdb->insert_id;
 		}
 		foreach ( $event_ids as $value ) { // propagate event instances.
-			$sql   = "SELECT event_begin, event_time, event_end, event_endtime FROM " . my_calendar_table() . " WHERE event_id = $value";
-			$event = $wpdb->get_results( $sql );
+			$sql   = 'SELECT event_begin, event_time, event_end, event_endtime FROM ' . my_calendar_table() . ' WHERE event_id = %d';
+			$event = $wpdb->get_results( $wpdb->prepare( $sql, $value ) ); // WPCS: unprepared SQL ok.
 			$event = $event[0];
 			$dates = array(
 				'event_begin'   => $event->event_begin,
 				'event_end'     => $event->event_end,
 				'event_time'    => $event->event_time,
-				'event_endtime' => $event->event_endtime
+				'event_endtime' => $event->event_endtime,
 			);
 			mc_increment_event( $value, $dates );
 		}
-		$cats         = $mcdb->get_results( "SELECT * FROM " . KO_CALENDAR_CATS, 'ARRAY_A' );
+		$cats         = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . 'calendar_categories', 'ARRAY_A' );
 		$cats_results = false;
 		foreach ( $cats as $key ) {
 			$name         = esc_sql( $key['category_name'] );
 			$color        = esc_sql( $key['category_colour'] );
 			$id           = (int) $key['category_id'];
-			$catsql       = "INSERT INTO " . my_calendar_categories_table() . " SET
-				category_id='" . $id . "',
-				category_name='" . $name . "',
-				category_color='" . $color . "'
-				ON DUPLICATE KEY UPDATE 
-				category_name='" . $name . "',
-				category_color='" . $color . "';
-				";
-			$cats_results = $mcdb->query( $catsql );
+			$catsql       = 'INSERT INTO ' . my_calendar_categories_table() . ' SET category_id=%1$d, category_name=%2$s, category_color=%3$s ON DUPLICATE KEY UPDATE category_name=%2$s, category_color=%3$s;';
+			$cats_results = $wpdb->query( $wpdb->prepare( $catsql, $id, $name, $color ) ); // WPCS: unprepared SQL ok.
 		}
-		$message   = ( $cats_results !== false ) ? __( 'Categories imported successfully.', 'my-calendar' ) : __( 'Categories not imported.', 'my-calendar' );
-		$e_message = ( $events_results !== false ) ? __( 'Events imported successfully.', 'my-calendar' ) : __( 'Events not imported.', 'my-calendar' );
+		$message   = ( false !== $cats_results ) ? __( 'Categories imported successfully.', 'my-calendar' ) : __( 'Categories not imported.', 'my-calendar' );
+		$e_message = ( false !== $events_results ) ? __( 'Events imported successfully.', 'my-calendar' ) : __( 'Events not imported.', 'my-calendar' );
 		$return    = "<div id='message' class='updated fade'><ul><li>$message</li><li>$e_message</li></ul></div>";
 		echo $return;
-		if ( $cats_results !== false && $events_results !== false ) {
+		if ( false !== $cats_results && false !== $events_results ) {
 			update_option( 'ko_calendar_imported', 'true' );
 		}
 	}
 }
 
-function mc_drop_table( $table ) {
-	global $wpdb;
-	$sql = "DROP TABLE " . $table();
-	$wpdb->query( $sql );
-}
-
-function edit_my_calendar_config() {
-	global $wpdb;
-	$mcdb = $wpdb;
-	check_my_calendar();
+/**
+ * Build settings form.
+ */
+function my_calendar_settings() {
+	my_calendar_check();
 	if ( ! empty( $_POST ) ) {
 		$nonce = $_REQUEST['_wpnonce'];
 		if ( ! wp_verify_nonce( $nonce, 'my-calendar-nonce' ) ) {
-			die( "Security check failed" );
+			die( 'Security check failed' );
 		}
 		if ( isset( $_POST['remigrate'] ) ) {
 			echo "<div class='updated fade'><ol>";
-			echo "<li>" . __( 'Dropping occurrences database table', 'my-calendar' ) . "</li>";
+			echo '<li>' . __( 'Dropping occurrences database table', 'my-calendar' ) . '</li>';
 			mc_drop_table( 'my_calendar_event_table' );
-			sleep( 1 );
-			echo "<li>" . __( 'Reinstalling occurrences database table.', 'my-calendar' ) . "</li>";
+			echo '<li>' . __( 'Reinstalling occurrences database table.', 'my-calendar' ) . '</li>';
 			mc_upgrade_db();
-			sleep( 1 );
-			echo "<li>" . __( 'Generating event occurrences.', 'my-calendar' ) . "</li>";
+			echo '<li>' . __( 'Generating event occurrences.', 'my-calendar' ) . '</li>';
 			mc_migrate_db();
-			echo "<li>" . __( 'Event generation completed.', 'my-calendar' ) . "</li>";
-			echo "</ol></div>";
+			echo '<li>' . __( 'Event generation completed.', 'my-calendar' ) . '</li>';
+			echo '</ol></div>';
 		}
 	}
 	if ( isset( $_POST['mc_manage'] ) ) {
-		// management
-		$clear            = '';
-		$mc_event_approve = ( ! empty( $_POST['mc_event_approve'] ) && $_POST['mc_event_approve'] == 'on' ) ? 'true' : 'false';
-		$mc_api_enabled   = ( ! empty( $_POST['mc_api_enabled'] ) && $_POST['mc_api_enabled'] == 'on' ) ? 'true' : 'false';
-		$mc_remote        = ( ! empty( $_POST['mc_remote'] ) && $_POST['mc_remote'] == 'on' ) ? 'true' : 'false';
-		if ( isset( $_POST['mc_clear_cache'] ) && $_POST['mc_clear_cache'] == 'clear' ) {
-			mc_delete_cache();
-			$clear = __( 'My Calendar Cache cleared', 'my-calendar' );
+		// Management.
+		$clear          = '';
+		$mc_api_enabled = ( ! empty( $_POST['mc_api_enabled'] ) && 'on' == $_POST['mc_api_enabled'] ) ? 'true' : 'false';
+		$mc_remote      = ( ! empty( $_POST['mc_remote'] ) && 'on' == $_POST['mc_remote'] ) ? 'true' : 'false';
+		$mc_drop_tables = ( ! empty( $_POST['mc_drop_tables'] ) && 'on' == $_POST['mc_drop_tables'] ) ? 'true' : 'false';
+		// Handle My Calendar primary URL.
+		$mc_uri = get_option( 'mc_uri' );
+		if ( isset( $_POST['mc_uri'] ) && ! isset( $_POST['mc_uri_id'] ) ) {
+			$mc_uri = $_POST['mc_uri'];
+		} elseif ( isset( $_POST['mc_uri_id'] ) && is_numeric( $_POST['mc_uri_id'] ) ) {
+			if ( get_post( absint( $_POST['mc_uri_id'] ) ) ) {
+				$mc_uri = get_permalink( absint( $_POST['mc_uri_id'] ) );
+			} else {
+				$mc_uri = isset( $_POST['mc_uri'] ) ? $_POST['mc_uri'] : get_option( 'mc_uri' );
+			}
 		}
-		update_option( 'mc_uri', $_POST['mc_uri'] );		
-		update_option( 'mc_event_approve', $mc_event_approve );
+		update_option( 'mc_uri', $mc_uri );
+		update_option( 'mc_uri_id', absint( $_POST['mc_uri_id'] ) );
+		// End handling of primary URL.
 		update_option( 'mc_api_enabled', $mc_api_enabled );
 		update_option( 'mc_remote', $mc_remote );
+		update_option( 'mc_drop_tables', $mc_drop_tables );
 		update_option( 'mc_default_sort', $_POST['mc_default_sort'] );
 		update_option( 'mc_default_direction', $_POST['mc_default_direction'] );
-		if ( get_site_option( 'mc_multisite' ) == 2 ) {
+		if ( 2 == get_site_option( 'mc_multisite' ) ) {
 			$mc_current_table = (int) $_POST['mc_current_table'];
 			update_option( 'mc_current_table', $mc_current_table );
 		}
-		echo "<div class='updated'><p><strong>" . __( 'My Calendar Management Settings saved', 'my-calendar' ) . ". $clear</strong></p></div>";
+		mc_show_notice( __( 'My Calendar Management Settings saved', 'my-calendar' ) . ". $clear" );
 	}
 	if ( isset( $_POST['mc_permissions'] ) ) {
 		$perms = $_POST['mc_caps'];
@@ -214,7 +240,7 @@ function edit_my_calendar_config() {
 			'mc_edit_behaviors' => __( 'Edit Behaviors', 'my-calendar' ),
 			'mc_edit_templates' => __( 'Edit Templates', 'my-calendar' ),
 			'mc_edit_settings'  => __( 'Edit Settings', 'my-calendar' ),
-			'mc_view_help'      => __( 'View Help', 'my-calendar' )
+			'mc_view_help'      => __( 'View Help', 'my-calendar' ),
 		);
 		foreach ( $perms as $key => $value ) {
 			$role = get_role( $key );
@@ -228,37 +254,38 @@ function edit_my_calendar_config() {
 				}
 			}
 		}
-		echo "<div class='updated'><p><strong>" . __( 'My Calendar Permissions Updated', 'my-calendar' ) . "</strong></p></div>";
+		mc_show_notice( __( 'My Calendar Permissions Updated', 'my-calendar' ) );
 	}
-	// output
+	// Output.
 	if ( isset( $_POST['mc_show_months'] ) ) {
-		$permalinks = get_option( 'mc_use_permalinks' );
+		$permalinks      = get_option( 'mc_use_permalinks' );
 		$mc_open_day_uri = ( ! empty( $_POST['mc_open_day_uri'] ) ) ? $_POST['mc_open_day_uri'] : '';
 		update_option( 'mc_use_permalinks', ( ! empty( $_POST['mc_use_permalinks'] ) ) ? 'true' : 'false' );
-		update_option( 'mc_open_uri', ( ! empty( $_POST['mc_open_uri'] ) && $_POST['mc_open_uri'] == 'on' && get_option( 'mc_uri' ) != '' ) ? 'true' : 'false' );
+		update_option( 'mc_open_uri', ( ! empty( $_POST['mc_open_uri'] ) && 'on' == $_POST['mc_open_uri'] && '' != get_option( 'mc_uri' ) ) ? 'true' : 'false' );
 		update_option( 'mc_mini_uri', $_POST['mc_mini_uri'] );
 		update_option( 'mc_open_day_uri', $mc_open_day_uri );
-		update_option( 'mc_display_author', ( ! empty( $_POST['mc_display_author'] ) && $_POST['mc_display_author'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_show_event_vcal', ( ! empty( $_POST['mc_show_event_vcal'] ) && $_POST['mc_show_event_vcal'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_show_gcal', ( ! empty( $_POST['mc_show_gcal'] ) && $_POST['mc_show_gcal'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_show_list_info', ( ! empty( $_POST['mc_show_list_info'] ) && $_POST['mc_show_list_info'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_show_list_events', ( ! empty( $_POST['mc_show_list_events'] ) && $_POST['mc_show_list_events'] == 'on' ) ? 'true' : 'false' );
+		update_option( 'mc_display_author', ( ! empty( $_POST['mc_display_author'] ) && 'on' == $_POST['mc_display_author'] ) ? 'true' : 'false' );
+		update_option( 'mc_show_event_vcal', ( ! empty( $_POST['mc_show_event_vcal'] ) && 'on' == $_POST['mc_show_event_vcal'] ) ? 'true' : 'false' );
+		update_option( 'mc_show_gcal', ( ! empty( $_POST['mc_show_gcal'] ) && 'on' == $_POST['mc_show_gcal'] ) ? 'true' : 'false' );
+		update_option( 'mc_show_list_info', ( ! empty( $_POST['mc_show_list_info'] ) && 'on' == $_POST['mc_show_list_info'] ) ? 'true' : 'false' );
+		update_option( 'mc_show_list_events', ( ! empty( $_POST['mc_show_list_events'] ) && 'on' == $_POST['mc_show_list_events'] ) ? 'true' : 'false' );
 		update_option( 'mc_show_months', (int) $_POST['mc_show_months'] );
-		// calculate sequence for navigation elements
-		$top = $bottom = array();
-		$nav = $_POST['mc_nav'];
-		$set = 'top';
+		// Calculate sequence for navigation elements.
+		$top    = array();
+		$bottom = array();
+		$nav    = $_POST['mc_nav'];
+		$set    = 'top';
 		foreach ( $nav as $n ) {
-			if ( $n == 'calendar' ) {
+			if ( 'calendar' == $n ) {
 				$set = 'bottom';
 			} else {
-				if ( $set == 'top' ) {
+				if ( 'top' == $set ) {
 					$top[] = $n;
 				} else {
 					$bottom[] = $n;
 				}
 			}
-			if ( $n == 'stop' ) {
+			if ( 'stop' == $n ) {
 				break;
 			}
 		}
@@ -266,32 +293,31 @@ function edit_my_calendar_config() {
 		$bottom = ( empty( $bottom ) ) ? 'none' : implode( ',', $bottom );
 		update_option( 'mc_bottomnav', $bottom );
 		update_option( 'mc_topnav', $top );
-		update_option( 'mc_show_map', ( ! empty( $_POST['mc_show_map'] ) && $_POST['mc_show_map'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_gmap', ( ! empty( $_POST['mc_gmap'] ) && $_POST['mc_gmap'] == 'on' ) ? 'true' : 'false' );
+		update_option( 'mc_show_map', ( ! empty( $_POST['mc_show_map'] ) && 'on' == $_POST['mc_show_map'] ) ? 'true' : 'false' );
+		update_option( 'mc_gmap', ( ! empty( $_POST['mc_gmap'] ) && 'on' == $_POST['mc_gmap'] ) ? 'true' : 'false' );
 		update_option( 'mc_gmap_api_key', ( ! empty( $_POST['mc_gmap_api_key'] ) ) ? strip_tags( $_POST['mc_gmap_api_key'] ) : '' );
-		update_option( 'mc_show_address', ( ! empty( $_POST['mc_show_address'] ) && $_POST['mc_show_address'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_display_more', ( ! empty( $_POST['mc_display_more'] ) && $_POST['mc_display_more'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_hide_icons', ( ! empty( $_POST['mc_hide_icons'] ) && $_POST['mc_hide_icons'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_apply_color', $_POST['mc_apply_color'] );
-		update_option( 'mc_event_registration', ( ! empty( $_POST['mc_event_registration'] ) && $_POST['mc_event_registration'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_inverse_color', ( ! empty( $_POST['mc_inverse_color'] ) && $_POST['mc_inverse_color'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_short', ( ! empty( $_POST['mc_short'] ) && $_POST['mc_short'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_desc', ( ! empty( $_POST['mc_desc'] ) && $_POST['mc_desc'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_process_shortcodes', ( ! empty( $_POST['mc_process_shortcodes'] ) && $_POST['mc_process_shortcodes'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_event_link', ( ! empty( $_POST['mc_event_link'] ) && $_POST['mc_event_link'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_show_weekends', ( ! empty( $_POST['mc_show_weekends'] ) && $_POST['mc_show_weekends'] == 'on' ) ? 'true' : 'false' );
+		update_option( 'mc_show_address', ( ! empty( $_POST['mc_show_address'] ) && 'on' == $_POST['mc_show_address'] ) ? 'true' : 'false' );
+		update_option( 'mc_display_more', ( ! empty( $_POST['mc_display_more'] ) && 'on' == $_POST['mc_display_more'] ) ? 'true' : 'false' );
+		update_option( 'mc_event_registration', ( ! empty( $_POST['mc_event_registration'] ) && 'on' == $_POST['mc_event_registration'] ) ? 'true' : 'false' );
+		update_option( 'mc_short', ( ! empty( $_POST['mc_short'] ) && 'on' == $_POST['mc_short'] ) ? 'true' : 'false' );
+		update_option( 'mc_desc', ( ! empty( $_POST['mc_desc'] ) && 'on' == $_POST['mc_desc'] ) ? 'true' : 'false' );
+		update_option( 'mc_process_shortcodes', ( ! empty( $_POST['mc_process_shortcodes'] ) && 'on' == $_POST['mc_process_shortcodes'] ) ? 'true' : 'false' );
+		update_option( 'mc_event_link', ( ! empty( $_POST['mc_event_link'] ) && 'on' == $_POST['mc_event_link'] ) ? 'true' : 'false' );
+		update_option( 'mc_image', ( ! empty( $_POST['mc_image'] ) && 'on' == $_POST['mc_image'] ) ? 'true' : 'false' );
+		update_option( 'mc_show_weekends', ( ! empty( $_POST['mc_show_weekends'] ) && 'on' == $_POST['mc_show_weekends'] ) ? 'true' : 'false' );
 		update_option( 'mc_convert', ( ! empty( $_POST['mc_convert'] ) ) ? $_POST['mc_convert'] : 'false' );
-		if ( ( isset( $_POST['mc_use_permalinks'] ) && get_option( 'mc_use_permalinks' ) == 'true' ) && $permalinks != 'true' ) {
+		if ( ( isset( $_POST['mc_use_permalinks'] ) && 'true' == get_option( 'mc_use_permalinks' ) ) && 'true' != $permalinks ) {
 			$url = admin_url( 'options-permalink.php#mc_cpt_base' );
+			// Translators: URL to permalink settings page.
 			$note = ' ' . sprintf( __( 'You activated My Calendar permalinks. Go to <a href="%s">permalink settings</a> to set the base URL for My Calendar Events.', 'my-calendar' ), $url );
 		} else {
 			$note = '';
 		}
-		echo "<div class=\"updated\"><p><strong>" . __( 'Output Settings saved', 'my-calendar' ) . "</strong>$note</p></div>";
+		mc_show_notice( __( 'Output Settings saved', 'my-calendar' ) . $note );
 	}
-	// INPUT
+	// INPUT.
 	if ( isset( $_POST['mc_input'] ) ) {
-		$mc_input_options_administrators = ( ! empty( $_POST['mc_input_options_administrators'] ) && $_POST['mc_input_options_administrators'] == 'on' ) ? 'true' : 'false';
+		$mc_input_options_administrators = ( ! empty( $_POST['mc_input_options_administrators'] ) && 'on' == $_POST['mc_input_options_administrators'] ) ? 'true' : 'false';
 		$mc_input_options                = array(
 			'event_short'             => ( ! empty( $_POST['mci_event_short'] ) && $_POST['mci_event_short'] ) ? 'on' : 'off',
 			'event_desc'              => ( ! empty( $_POST['mci_event_desc'] ) && $_POST['mci_event_desc'] ) ? 'on' : 'off',
@@ -304,15 +330,14 @@ function edit_my_calendar_config() {
 			'event_location_dropdown' => ( ! empty( $_POST['mci_event_location_dropdown'] ) && $_POST['mci_event_location_dropdown'] ) ? 'on' : 'off',
 			'event_specials'          => ( ! empty( $_POST['mci_event_specials'] ) && $_POST['mci_event_specials'] ) ? 'on' : 'off',
 			'event_access'            => ( ! empty( $_POST['mci_event_access'] ) && $_POST['mci_event_access'] ) ? 'on' : 'off',
-			'event_host'	          => ( ! empty( $_POST['mci_event_host'] ) && $_POST['mci_event_host'] ) ? 'on' : 'off'
+			'event_host'              => ( ! empty( $_POST['mci_event_host'] ) && $_POST['mci_event_host'] ) ? 'on' : 'off',
 		);
 		update_option( 'mc_input_options', $mc_input_options );
 		update_option( 'mc_input_options_administrators', $mc_input_options_administrators );
-		update_option( 'mc_skip_holidays', ( ! empty( $_POST['mc_skip_holidays'] ) && $_POST['mc_skip_holidays'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_no_fifth_week', ( ! empty( $_POST['mc_no_fifth_week'] ) && $_POST['mc_no_fifth_week'] == 'on' ) ? 'true' : 'false' );
-		update_option( 'mc_event_link_expires', ( ! empty( $_POST['mc_event_link_expires'] ) && $_POST['mc_event_link_expires'] == 'on' ) ? 'true' : 'false' );
-		
-		echo "<div class=\"updated\"><p><strong>" . __( 'Input Settings saved', 'my-calendar' ) . ".</strong></p></div>";
+		update_option( 'mc_skip_holidays', ( ! empty( $_POST['mc_skip_holidays'] ) && 'on' == $_POST['mc_skip_holidays'] ) ? 'true' : 'false' );
+		update_option( 'mc_no_fifth_week', ( ! empty( $_POST['mc_no_fifth_week'] ) && 'on' == $_POST['mc_no_fifth_week'] ) ? 'true' : 'false' );
+		update_option( 'mc_event_link_expires', ( ! empty( $_POST['mc_event_link_expires'] ) && 'on' == $_POST['mc_event_link_expires'] ) ? 'true' : 'false' );
+		mc_show_notice( __( 'Input Settings saved', 'my-calendar' ) );
 	}
 	if ( current_user_can( 'manage_network' ) && is_multisite() ) {
 		if ( isset( $_POST['mc_network'] ) ) {
@@ -320,10 +345,10 @@ function edit_my_calendar_config() {
 			update_site_option( 'mc_multisite', $mc_multisite );
 			$mc_multisite_show = (int) $_POST['mc_multisite_show'];
 			update_site_option( 'mc_multisite_show', $mc_multisite_show );
-			echo "<div class=\"updated\"><p><strong>" . __( 'Multisite settings saved', 'my-calendar' ) . ".</strong></p></div>";
+			mc_show_notice( __( 'Multisite settings saved', 'my-calendar' ) );
 		}
 	}
-	// custom text
+	// custom text.
 	if ( isset( $_POST['mc_previous_events'] ) ) {
 		$mc_title_template       = $_POST['mc_title_template'];
 		$mc_title_template_solo  = $_POST['mc_title_template_solo'];
@@ -334,8 +359,6 @@ function edit_my_calendar_config() {
 		$mc_notime_text          = $_POST['mc_notime_text'];
 		$mc_previous_events      = $_POST['mc_previous_events'];
 		$mc_next_events          = $_POST['mc_next_events'];
-		$mc_event_open           = $_POST['mc_event_open'];
-		$mc_event_closed         = $_POST['mc_event_closed'];
 		$mc_week_caption         = $_POST['mc_week_caption'];
 		$mc_caption              = $_POST['mc_caption'];
 		$templates               = get_option( 'mc_templates' );
@@ -351,21 +374,18 @@ function edit_my_calendar_config() {
 		update_option( 'mc_next_events', $mc_next_events );
 		update_option( 'mc_previous_events', $mc_previous_events );
 		update_option( 'mc_caption', $mc_caption );
-		update_option( 'mc_event_open', $mc_event_open );
-		update_option( 'mc_event_closed', $mc_event_closed );
-		// date/time
+		// Date/time.
 		update_option( 'mc_date_format', stripslashes( $_POST['mc_date_format'] ) );
+		update_option( 'mc_multidate_format', stripslashes( $_POST['mc_multidate_format'] ) );
 		update_option( 'mc_week_format', stripslashes( $_POST['mc_week_format'] ) );
 		update_option( 'mc_time_format', stripslashes( $_POST['mc_time_format'] ) );
 		update_option( 'mc_month_format', stripslashes( $_POST['mc_month_format'] ) );
-		$mc_ical_utc = ( ! empty( $_POST['mc_ical_utc'] ) && $_POST['mc_ical_utc'] == 'on' ) ? 'true' : 'false';
-		update_option( 'mc_ical_utc', $mc_ical_utc );
-		echo "<div class=\"updated\"><p><strong>" . __( 'Custom text settings saved', 'my-calendar' ) . ".</strong></p></div>";
+		mc_show_notice( __( 'Custom text settings saved', 'my-calendar' ) );
 	}
-	// Mail function by Roland
+	// Mail function by Roland.
 	if ( isset( $_POST['mc_email'] ) ) {
-		$mc_event_mail         = ( ! empty( $_POST['mc_event_mail'] ) && $_POST['mc_event_mail'] == 'on' ) ? 'true' : 'false';
-		$mc_html_email         = ( ! empty( $_POST['mc_html_email'] ) && $_POST['mc_html_email'] == 'on' ) ? 'true' : 'false';
+		$mc_event_mail         = ( ! empty( $_POST['mc_event_mail'] ) && 'on' == $_POST['mc_event_mail'] ) ? 'true' : 'false';
+		$mc_html_email         = ( ! empty( $_POST['mc_html_email'] ) && 'on' == $_POST['mc_html_email'] ) ? 'true' : 'false';
 		$mc_event_mail_to      = $_POST['mc_event_mail_to'];
 		$mc_event_mail_from    = $_POST['mc_event_mail_from'];
 		$mc_event_mail_subject = $_POST['mc_event_mail_subject'];
@@ -378,13 +398,12 @@ function edit_my_calendar_config() {
 		update_option( 'mc_event_mail_bcc', $mc_event_mail_bcc );
 		update_option( 'mc_event_mail', $mc_event_mail );
 		update_option( 'mc_html_email', $mc_html_email );
-		echo "<div class=\"updated\"><p><strong>" . __( 'Email notice settings saved', 'my-calendar' ) . ".</strong></p></div>";
+		mc_show_notice( __( 'Email notice settings saved', 'my-calendar' ) );
 	}
-	// Custom User Settings
 
 	apply_filters( 'mc_save_settings', '', $_POST );
 
-	// pull templates for passing into functions.
+	// Pull templates for passing into functions.
 	$templates              = get_option( 'mc_templates' );
 	$mc_title_template      = ( isset( $templates['title'] ) ) ? esc_attr( stripslashes( $templates['title'] ) ) : '';
 	$mc_title_template_solo = ( isset( $templates['title_solo'] ) ) ? esc_attr( stripslashes( $templates['title_solo'] ) ) : '';
@@ -400,33 +419,30 @@ function edit_my_calendar_config() {
 	<div class="mc-tabs settings postbox-container jcd-wide">
 	<div class="metabox-holder">
 	<?php
-	//update_option( 'ko_calendar_imported','false' ); // for testing importing.
-	if ( isset( $_POST['import'] ) && $_POST['import'] == 'true' ) {
+	if ( isset( $_POST['import'] ) && 'true' == $_POST['import'] ) {
 		$nonce = $_REQUEST['_wpnonce'];
 		if ( ! wp_verify_nonce( $nonce, 'my-calendar-nonce' ) ) {
-			die( "Security check failed" );
+			die( 'Security check failed' );
 		}
 		my_calendar_import();
 	}
-	if ( get_option( 'ko_calendar_imported' ) != 'true' ) {
+	if ( 'true' != get_option( 'ko_calendar_imported' ) ) {
 		if ( function_exists( 'check_calendar' ) ) {
 			?>
 			<div class='import upgrade-db'>
 				<p>
-					<?php _e( 'My Calendar has identified that you have the Calendar plugin by Kieran O\'Shea installed. You can import those events and categories into the My Calendar database. Would you like to import these events?', 'my-calendar' ); ?>
+					<?php _e( 'You have the Calendar plugin by Kieran O\'Shea installed. You can import those events and categories into My Calendar.', 'my-calendar' ); ?>
 				</p>
 
-				<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config" ); ?>">
-					<div><input type="hidden" name="_wpnonce"
-					            value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/></div>
+				<form method="post" action="<?php echo admin_url( 'admin.php?page=my-calendar-config' ); ?>">
 					<div>
-						<input type="hidden" name="import" value="true"/>
-						<input type="submit" value="<?php _e( 'Import from Calendar', 'my-calendar' ); ?>"
-						       name="import-calendar" class="button-primary"/>
+						<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/>
+						<input type="hidden" name="import" value="true" />
+						<input type="submit" value="<?php _e( 'Import from Calendar', 'my-calendar' ); ?>" name="import-calendar" class="button-primary"/>
 					</div>
 				</form>
 			</div>
-		<?php
+			<?php
 		}
 	}
 	?>
@@ -435,9 +451,13 @@ function edit_my_calendar_config() {
 			<li role="tab" id="tab_text" aria-controls="my-calendar-text"><a href="#my-calendar-text"><?php _e( 'Text', 'my-calendar' ); ?></a></li>
 			<li role="tab" id="tab_output" aria-controls="mc-output"><a href="#mc-output"><?php _e( 'Output', 'my-calendar' ); ?></a></li>
 			<li role="tab" id="tab_input" aria-controls="my-calendar-input"><a href="#my-calendar-input"><?php _e( 'Input', 'my-calendar' ); ?></a></li>
-			<?php if ( current_user_can( 'manage_network' ) && is_multisite() ) { ?>
+			<?php
+			if ( current_user_can( 'manage_network' ) && is_multisite() ) {
+				?>
 				<li role="tab" id="tab_multi" aria-controls="my-calendar-multisite"><a href="#my-calendar-multisite"><?php _e( 'Multi-site', 'my-calendar' ); ?></a></li>
-			<?php } ?>
+				<?php
+			}
+			?>
 			<li role="tab" id="tab_permissions" aria-controls="my-calendar-permissions"><a href="#my-calendar-permissions"><?php _e( 'Permissions', 'my-calendar' ); ?></a></li>
 			<li role="tab" id="tab_email" aria-controls="my-calendar-email"><a href="#my-calendar-email"><?php _e( 'Notifications', 'my-calendar' ); ?></a></li>
 			<?php echo apply_filters( 'mc_settings_section_links', '' ); ?>
@@ -448,67 +468,109 @@ function edit_my_calendar_config() {
 			<h2><?php _e( 'My Calendar Management', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
-				<?php if ( current_user_can( 'administrator' ) ) { ?>
-					<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#my-calendar-manage" ); ?>">
-						<div><input type="hidden" name="_wpnonce"
-						            value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/></div>
+				<?php
+				if ( current_user_can( 'administrator' ) ) {
+					?>
+					<form method="post" action="<?php echo admin_url( 'admin.php?page=my-calendar-config#my-calendar-manage' ); ?>">
+						<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>" />
 						<fieldset>
 							<legend class="screen-reader-text"><?php _e( 'Management', 'my-calendar' ); ?></legend>
 							<ul>
-								<?php $guess = mc_guess_calendar(); ?>
-								<li><?php mc_settings_field( 'mc_uri', __( 'Where is your main calendar page?', 'my-calendar' ), '', "$guess[message]", array( 'size' => '60' ), 'url' ); ?></li>							
-								<li><?php mc_settings_field( 'mc_remote', __( 'Get data (events, categories and locations) from a remote database.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-								<?php if ( get_option( 'mc_remote' ) == 'true' ) { ?>
-									<li><?php _e( 'Add this code to your theme\'s <code>functions.php</code> file:', 'my-calendar' ); ?>
-										<pre>function mc_remote_db() {
-	$mcdb = new wpdb('DB_USER','DB_PASSWORD','DB_NAME','DB_ADDRESS');
-	return $mcdb;
-}</pre>
-										<?php _e( 'You will need to allow remote connections from this site to the site hosting your My Calendar events. Replace the above placeholders with the host-site information. The two sites must have the same WP table prefix. While this option is enabled, you may not enter or edit events through this installation.', 'my-calendar' ); ?>
-									</li>
-								<?php } ?>
-								<li><?php mc_settings_field( 'mc_event_approve', __( 'Enable approval options.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-								<li><?php mc_settings_field( 'mc_api_enabled', __( 'Enable external API.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 								<?php
-								if ( apply_filters( 'mc_caching_clear', false ) ) {
+								$guess      = mc_guess_calendar();
+								$page_title = '';
+								$permalink  = '';
+								if ( get_option( 'mc_uri_id' ) ) {
+									$page_title = get_post( absint( get_option( 'mc_uri_id' ) ) )->post_title;
+									$permalink  = esc_url( get_permalink( absint( get_option( 'mc_uri_id' ) ) ) );
+								}
+								if ( '' != get_option( 'mc_uri' ) && ( get_option( 'mc_uri' ) != $permalink ) ) {
 									?>
-									<li><?php mc_settings_field( 'mc_clear_cache', __( 'Clear current cache. (Necessary if you edit shortcodes to change displayed categories, for example.)', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-								<?php } ?>
-								<li><?php mc_settings_field( 'mc_default_sort', __( 'Default Sort order for Admin Events List', 'my-calendar' ), array(
-											'1' => __( 'Event ID', 'my-calendar' ),
-											'2' => __( 'Title', 'my-calendar' ),
-											'3' => __( 'Description', 'my-calendar' ),
-											'4' => __( 'Start Date', 'my-calendar' ),
-											'5' => __( 'Author', 'my-calendar' ),
-											'6' => __( 'Category', 'my-calendar' ),
-											'7' => __( 'Location Name', 'my-calendar' )
-										), '', array(), 'select' ); ?> <?php mc_settings_field( 'mc_default_direction', __( 'Sort direction', 'my-calendar' ), array(
-											'ASC' => __( 'Ascending', 'my-calendar' ),
-											'DESC' => __( 'Descending', 'my-calendar' )
-										), '', array(), 'select' ); ?></li>										
+								<li><?php mc_settings_field( 'mc_uri', __( 'Where is your main calendar page?', 'my-calendar' ), '', "$guess[message]", array( 'size' => '60' ), 'url' ); ?></li>
+								<li>
+									<?php
+									mc_settings_field( 'mc_uri_id', __( 'Calendar Page ID?', 'my-calendar' ), '', "($page_title)", array(
+										'size'  => '20',
+										'class' => 'suggest',
+									), 'text' );
+									?>
+								</li>
+									<?php
+								} else {
+									?>
+								<li>
+									<?php
+									mc_settings_field( 'mc_uri_id', __( 'Where is your main calendar page?', 'my-calendar' ), '', "(<a href='$permalink'>$page_title</a>)", array(
+										'size'  => '20',
+										'class' => 'suggest',
+									), 'text' );
+									?>
+								</li>
+									<?php
+								}
+								?>
+								<li><?php mc_settings_field( 'mc_remote', __( 'Get data (events, categories and locations) from a remote database.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+								<?php
+								if ( 'true' == get_option( 'mc_remote' ) && ! function_exists( 'mc_remote_db' ) ) {
+									?>
+								<li><?php _e( 'Add this code to your theme\'s <code>functions.php</code> file:', 'my-calendar' ); ?>
+<pre>
+function mc_remote_db() {
+	$mcdb = new wpdb('DB_USER','DB_PASSWORD','DB_NAME','DB_ADDRESS');
+
+	return $mcdb;
+}
+</pre>
+									<?php _e( 'You will need to allow remote connections from this site to the site hosting your My Calendar events. Replace the above placeholders with the host-site information. The two sites must have the same WP table prefix. While this option is enabled, you may not enter or edit events through this installation.', 'my-calendar' ); ?>
+								</li>
+									<?php
+								}
+								?>
+								<li><?php mc_settings_field( 'mc_api_enabled', __( 'Enable external API.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+								<li><?php mc_settings_field( 'remigrate', __( 'Re-generate event occurrences table.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+								<li><?php mc_settings_field( 'mc_drop_tables', __( 'Drop MySQL tables on uninstall', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+								<li>
+								<?php
+								mc_settings_field( 'mc_default_sort', __( 'Default Sort order for Admin Events List', 'my-calendar' ), array(
+									'1' => __( 'Event ID', 'my-calendar' ),
+									'2' => __( 'Title', 'my-calendar' ),
+									'3' => __( 'Description', 'my-calendar' ),
+									'4' => __( 'Start Date', 'my-calendar' ),
+									'5' => __( 'Author', 'my-calendar' ),
+									'6' => __( 'Category', 'my-calendar' ),
+									'7' => __( 'Location Name', 'my-calendar' ),
+								), '', array(), 'select' );
+								mc_settings_field( 'mc_default_direction', __( 'Sort direction', 'my-calendar' ), array(
+									'ASC'  => __( 'Ascending', 'my-calendar' ),
+									'DESC' => __( 'Descending', 'my-calendar' ),
+								), '', array(), 'select' );
+								?>
+								</li>
 								<?php
 								if ( get_site_option( 'mc_multisite' ) == 2 && my_calendar_table() != my_calendar_table( 'global' ) ) {
 									mc_settings_field( 'mc_current_table', array(
-											'0' => __( 'Currently editing my local calendar', 'my-calendar' ),
-											'1' => __( 'Currently editing the network calendar', 'my-calendar' )
-										), '0', '', array(), 'radio' );
+										'0' => __( 'Currently editing my local calendar', 'my-calendar' ),
+										'1' => __( 'Currently editing the network calendar', 'my-calendar' ),
+									), '0', '', array(), 'radio' );
 								} else {
 									if ( get_option( 'mc_remote' ) != 'true' && current_user_can( 'manage_network' ) && is_multisite() ) {
 										?>
-										<li><?php _e( 'You are currently working in the primary site for this network; your local calendar is also the global table.', 'my-calendar' ); ?></li><?php
+										<li><?php _e( 'You are currently working in the primary site for this network; your local calendar is also the global table.', 'my-calendar' ); ?></li>
+										<?php
 									}
-								} ?>
-								<li><?php mc_settings_field( 'remigrate', __( 'Re-generate event occurrences table.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+								}
+								?>
 							</ul>
 						</fieldset>
 						<p>
-							<input type="submit" name="mc_manage" class="button-primary"
-							       value="<?php _e( 'Save Management Settings', 'my-calendar' ); ?>"/>
+							<input type="submit" name="mc_manage" class="button-primary" value="<?php _e( 'Save Management Settings', 'my-calendar' ); ?>"/>
 						</p>
 					</form>
-				<?php } else { ?>
-					<?php _e( 'My Calendar management settings are only available to administrators.', 'my-calendar' ); ?>
-				<?php } ?>
+					<?php
+				} else {
+					_e( 'My Calendar management settings are only available to administrators.', 'my-calendar' );
+				}
+				?>
 			</div>
 		</div>
 
@@ -516,25 +578,27 @@ function edit_my_calendar_config() {
 			<h2><?php _e( 'Text Settings', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
-				<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#my-calendar-text" ); ?>">
-					<div><input type="hidden" name="_wpnonce"
-					            value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/></div>
+				<form method="post" action="<?php echo admin_url( 'admin.php?page=my-calendar-config#my-calendar-text' ); ?>">
+					<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>" />
 					<fieldset>
 						<legend class="screen-reader-text"><?php _e( 'Customize Text Fields', 'my-calendar' ); ?></legend>
 						<ul>
-							<li><?php mc_settings_field( 'mc_notime_text', __( 'Label for all-day events', 'my-calendar' ), 'N/A' ); ?></li>
+							<li><?php mc_settings_field( 'mc_notime_text', __( 'Label for all-day events', 'my-calendar' ), 'All Day' ); ?></li>
 							<li><?php mc_settings_field( 'mc_previous_events', __( 'Previous events link', 'my-calendar' ), __( 'Previous', 'my-calendar' ), __( 'Use <code>{date}</code> to display date in navigation.', 'my-calendar' ) ); ?></li>
 							<li><?php mc_settings_field( 'mc_next_events', __( 'Next events link', 'my-calendar' ), __( 'Next', 'my-calendar' ), __( 'Use <code>{date}</code> to display date in navigation.', 'my-calendar' ) ); ?></li>
-							<li><?php mc_settings_field( 'mc_event_open', __( 'If events are open', 'my-calendar' ), __( 'Registration is open', 'my-calendar' ) ); ?></li>
-							<li><?php mc_settings_field( 'mc_event_closed', __( 'If events are closed', 'my-calendar' ), __( 'Registration is closed', 'my-calendar' ) ); ?></li>
 							<li><?php mc_settings_field( 'mc_week_caption', __( 'Week view caption:', 'my-calendar' ), '', __( 'Available tag: <code>{date format=""}</code>', 'my-calendar' ) ); ?></li>
 							<li><?php mc_settings_field( 'mc_caption', __( 'Extended caption:', 'my-calendar' ), '', __( 'Follows month/year in list views.', 'my-calendar' ) ); ?></li>
-							<li><?php mc_settings_field( 'mc_title_template', __( 'Event title (Grid)', 'my-calendar' ), $mc_title_template, "<a href='" . admin_url( "admin.php?page=my-calendar-help#templates" ) . "'>" . __( "Templating Help", 'my-calendar' ) . '</a>' ); ?></li>
-							<li><?php mc_settings_field( 'mc_title_template_solo', __( 'Event title (Single)', 'my-calendar' ), $mc_title_template_solo, "<a href='" . admin_url( "admin.php?page=my-calendar-help#templates" ) . "'>" . __( "Templating Help", 'my-calendar' ) . '</a>' ); ?></li>
-							<li><?php mc_settings_field( 'mc_title_template_list', __( 'Event title (List)', 'my-calendar' ), $mc_title_template_list, "<a href='" . admin_url( "admin.php?page=my-calendar-help#templates" ) . "'>" . __( "Templating Help", 'my-calendar' ) . '</a>' ); ?></li>
+							<li><?php mc_settings_field( 'mc_title_template', __( 'Event title (Grid)', 'my-calendar' ), $mc_title_template, "<a href='" . admin_url( 'admin.php?page=my-calendar-help#templates' ) . "'>" . __( 'Templating Help', 'my-calendar' ) . '</a>' ); ?></li>
+							<li><?php mc_settings_field( 'mc_title_template_solo', __( 'Event title (Single)', 'my-calendar' ), $mc_title_template_solo, "<a href='" . admin_url( 'admin.php?page=my-calendar-help#templates' ) . "'>" . __( 'Templating Help', 'my-calendar' ) . '</a>' ); ?></li>
+							<li><?php mc_settings_field( 'mc_title_template_list', __( 'Event title (List)', 'my-calendar' ), $mc_title_template_list, "<a href='" . admin_url( 'admin.php?page=my-calendar-help#templates' ) . "'>" . __( 'Templating Help', 'my-calendar' ) . '</a>' ); ?></li>
 							<li><?php mc_settings_field( 'mc_details_label', __( 'Event details link text', 'my-calendar' ), $mc_details_label, __( 'Tags: <code>{title}</code>, <code>{location}</code>, <code>{color}</code>, <code>{icon}</code>, <code>{date}</code>, <code>{time}</code>.', 'my-calendar' ) ); ?></li>
-							<li><?php mc_settings_field( 'mc_link_label', __( 'Event URL link text', 'my-calendar' ), $mc_link_label, "<a href='" . admin_url( "admin.php?page=my-calendar-help#templates" ) . "'>" . __( "Templating Help", 'my-calendar' ) . '</a>' ); ?></li>
-							<li><?php mc_settings_field( 'mc_event_title_template', __( 'Title element template', 'my-calendar' ), '{title} &raquo; {date}', __( 'Current: %s', 'my-calendar' ) ); ?></li>
+							<li><?php mc_settings_field( 'mc_link_label', __( 'Event URL link text', 'my-calendar' ), $mc_link_label, "<a href='" . admin_url( 'admin.php?page=my-calendar-help#templates' ) . "'>" . __( 'Templating Help', 'my-calendar' ) . '</a>' ); ?></li>
+							<li>
+							<?php
+							// Translators: Current title template (code).
+							mc_settings_field( 'mc_event_title_template', __( 'Title element template', 'my-calendar' ), '{title} &raquo; {date}', __( 'Current: %s', 'my-calendar' ) );
+							?>
+							</li>
 						</ul>
 					</fieldset>
 					<fieldset>
@@ -542,26 +606,28 @@ function edit_my_calendar_config() {
 						<div><input type='hidden' name='mc_dates' value='true'/></div>
 						<ul>
 							<?php
-							$month_format = ( get_option( 'mc_month_format' ) == '' ) ? date_i18n( 'F Y' ) : date_i18n( get_option( 'mc_month_format' ) );
-							$time_format  = ( get_option( 'mc_time_format' ) == '' ) ? date_i18n( get_option( 'time_format' ) ) : date_i18n( get_option( 'mc_time_format' ) );
-							$week_format  = ( get_option( 'mc_week_format' ) == '' ) ? date_i18n( 'M j, \'y' ) : date_i18n( get_option( 'mc_week_format' ) );
-							$date_format  = ( get_option( 'mc_date_format' ) == '' ) ? date_i18n( get_option( 'date_format' ) ) : date_i18n( get_option( 'mc_date_format' ) );
+							$month_format = ( '' == get_option( 'mc_month_format' ) ) ? date_i18n( 'F Y' ) : date_i18n( get_option( 'mc_month_format' ) );
+							$time_format  = ( '' == get_option( 'mc_time_format' ) ) ? date_i18n( get_option( 'time_format' ) ) : date_i18n( get_option( 'mc_time_format' ) );
+							$week_format  = ( '' == get_option( 'mc_week_format' ) ) ? date_i18n( 'M j, \'y' ) : date_i18n( get_option( 'mc_week_format' ) );
+							$date_format  = ( '' == get_option( 'mc_date_format' ) ) ? date_i18n( get_option( 'date_format' ) ) : date_i18n( get_option( 'mc_date_format' ) );
+							$tomorrow     = date( 'j' ) + 1;
+							$multi_format = ( '' == get_option( 'mc_multidate_format' ) ) ? date_i18n( str_replace( '%d', $tomorrow, 'F j-%d, Y' ) ) : date_i18n( str_replace( '%j', $tomorrow, get_option( 'mc_multidate_format' ) ) );
+							echo $multi_format;
 							?>
 							<li><?php mc_settings_field( 'mc_month_format', __( 'Month format (calendar headings)', 'my-calendar' ), '', $month_format ); ?></li>
 							<li><?php mc_settings_field( 'mc_time_format', __( 'Time format', 'my-calendar' ), '', $time_format ); ?></li>
 							<li><?php mc_settings_field( 'mc_week_format', __( 'Date in grid mode, week view', 'my-calendar' ), '', $week_format ); ?></li>
 							<li><?php mc_settings_field( 'mc_date_format', __( 'Date Format in other views', 'my-calendar' ), '', $date_format ); ?></li>
-							<li><?php mc_settings_field( 'mc_ical_utc', __( 'iCal times are UTC', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+							<li><?php mc_settings_field( 'mc_multidate_format', __( 'Date Format for multi-day events', 'my-calendar' ), 'F j-%d, Y', $multi_format . ' (' . __( 'Use <code>&#37;d</code> to represent the end date.', 'my-calendar' ) . ')' ); ?></li>
 						</ul>
-					</fieldset>					
+					</fieldset>
 					<p>
-						<input type="submit" name="save" class="button-primary"
-						       value="<?php _e( 'Save Custom Text Settings', 'my-calendar' ); ?>"/>
+						<input type="submit" name="save" class="button-primary" value="<?php _e( 'Save Custom Text', 'my-calendar' ); ?>"/>
 					</p>
 				</form>
 				<p>
 				<?php _e( 'Date formats use syntax from the <a href="http://php.net/date">PHP <code>date()</code> function</a>. Save to update sample output.', 'my-calendar' ); ?>
-				</p>				
+				</p>
 			</div>
 		</div>
 
@@ -569,34 +635,38 @@ function edit_my_calendar_config() {
 			<h2><?php _e( 'Output Settings', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
-				<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#mc-output" ); ?>">
-					<div><input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/></div>
-					<input type="submit" name="save" class="button screen-reader-text" value="<?php _e( 'Save Output Settings', 'my-calendar' ); ?>" /></p>		
+				<form method="post" action="<?php echo admin_url( 'admin.php?page=my-calendar-config#mc-output' ); ?>">
+					<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>" />
+					<input type="submit" name="save" class="button screen-reader-text" value="<?php _e( 'Save Output Settings', 'my-calendar' ); ?>" /></p>
 					<fieldset>
 						<legend><?php _e( 'Calendar Link Targets', 'my-calendar' ); ?></legend>
 						<ul>
-							<?php 
-							if ( isset( $_POST['mc_use_permalinks'] ) && $note != '' ) {
+							<?php
+							if ( isset( $_POST['mc_use_permalinks'] ) && '' != $note ) {
 								$url = admin_url( 'options-permalink.php#mc_cpt_base' );
+								// Translators: URL for WordPress Settings > Permalinks.
 								$note = ' <span class="mc-notice">' . sprintf( __( 'Go to <a href="%s">permalink settings</a> to set the base URL for events.', 'my-calendar' ) . '</span>', $url );
 							} else {
 								$note = '';
 							}
 							?>
-							<li><?php mc_settings_field( 'mc_use_permalinks', __( 'Use Pretty Permalinks for Events','my-calendar' ), '', $note, array(), 'checkbox-single' ); ?></li>
-							<li><?php mc_settings_field( 'mc_open_uri', __( 'Open calendar links to event details URL', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-							<li><?php mc_settings_field( 'mc_mini_uri', __( 'Target <abbr title="Uniform resource locator">URL</abbr> for mini calendar date links:', 'my-calendar' ), '', '', array( 'size' => '60' ), 'url' ); ?></li>							
+							<li><?php mc_settings_field( 'mc_use_permalinks', __( 'Use Pretty Permalinks for Events', 'my-calendar' ), '', $note, array(), 'checkbox-single' ); ?></li>
+							<li><?php mc_settings_field( 'mc_open_uri', __( 'Open calendar links to event details', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+							<li><?php mc_settings_field( 'mc_mini_uri', __( 'Target <abbr title="Uniform resource locator">URL</abbr> for mini calendar date links:', 'my-calendar' ), '', '', array( 'size' => '60' ), 'url' ); ?></li>
 							<?php
 							$disabled = ( ! get_option( 'mc_uri' ) && ! get_option( 'mc_mini_uri' ) ) ? array( 'disabled' => 'disabled' ) : array();
 							?>
-							<li><?php mc_settings_field( 'mc_open_day_uri', __( 'Mini calendar widget date links to:', 'my-calendar' ), array(
-										'false'          => __( 'jQuery pop-up view', 'my-calendar' ),
-										'true'           => __( 'daily view page (above)', 'my-calendar' ),
-										'listanchor'     => __( 'in-page anchor on main calendar page (list)', 'my-calendar' ),
-										'calendaranchor' => __( 'in-page anchor on main calendar page (grid)', 'my-calendar' )
-									), '', $disabled, 'select' ); ?></li>
+							<li>
+							<?php
+							mc_settings_field( 'mc_open_day_uri', __( 'Mini calendar widget date links to:', 'my-calendar' ), array(
+								'false'          => __( 'jQuery pop-up view', 'my-calendar' ),
+								'true'           => __( 'daily view page (above)', 'my-calendar' ),
+								'listanchor'     => __( 'in-page anchor on main calendar page (list)', 'my-calendar' ),
+								'calendaranchor' => __( 'in-page anchor on main calendar page (grid)', 'my-calendar' ),
+							), '', $disabled, 'select' );
+							?>
+							</li>
 						</ul>
-						<?php // End General Options // ?>
 					</fieldset>
 
 					<fieldset>
@@ -614,34 +684,35 @@ function edit_my_calendar_config() {
 							'timeframe' => '<div class="dashicons dashicons-clock"></div> ' . __( 'Toggle between day, week, and month view', 'my-calendar' ),
 							'calendar'  => '<div class="dashicons dashicons-calendar"></div> ' . __( 'The calendar', 'my-calendar' ),
 							'key'       => '<div class="dashicons dashicons-admin-network"></div> ' . __( 'Categories', 'my-calendar' ),
-							'feeds'     => '<div class="dashicons dashicons-rss"></div> ' . __( 'Links to RSS and iCal output', 'my-calendar' ),
-							'stop'      => '<div class="dashicons dashicons-no"></div> ' . __( 'Elements below here will be hidden.' )
+							'feeds'     => '<div class="dashicons dashicons-rss"></div> ' . __( 'RSS and iCal Subscription Links', 'my-calendar' ),
+							'exports'   => '<div class="dashicons dashicons-calendar-alt"></div> ' . __( 'Links to iCal Exports', 'my-calendar' ),
+							'stop'      => '<div class="dashicons dashicons-no"></div> ' . __( 'Elements below here will be hidden.' ),
 						);
 						echo "<div id='mc-sortable-update' aria-live='assertive'></div>";
 						echo "<ul id='mc-sortable'>";
 						$inserted = array();
-						$class = 'visible';
-						$count = count( $nav_elements );
-						$i = 1;
+						$class    = 'visible';
+						$count    = count( $nav_elements );
+						$i        = 1;
 						foreach ( $order as $k ) {
 							$k = trim( $k );
 							$v = ( isset( $nav_elements[ $k ] ) ) ? $nav_elements[ $k ] : false;
-							if ( $v !== false ) {
+							if ( false !== $v ) {
 								$inserted[ $k ] = $v;
-								if ( $k == 'stop' ) {
+								if ( 'stop' == $k ) {
 									$label = 'hide';
 								} else {
 									$label = $k;
 								}
-								$buttons = "<button class='up' type='button'><i class='dashicons dashicons-arrow-up' aria-hidden='true'></i><span class='screen-reader-text'>Up</span></button> <button class='down'><i class='dashicons dashicons-arrow-down' aria-hidden='true'></i><span class='screen-reader-text'>Down</span></button>";								
-								$buttons = "<div class='mc-buttons'>$buttons</div>";								
+								$buttons = "<button class='up' type='button'><i class='dashicons dashicons-arrow-up' aria-hidden='true'></i><span class='screen-reader-text'>Up</span></button> <button class='down'><i class='dashicons dashicons-arrow-down' aria-hidden='true'></i><span class='screen-reader-text'>Down</span></button>";
+								$buttons = "<div class='mc-buttons'>$buttons</div>";
 								echo "<li class='ui-state-default mc-$k mc-$class'>$buttons <code>$label</code> $v <input type='hidden' name='mc_nav[]' value='$k' /></li>";
-								$i++;
+								$i ++;
 							}
 						}
 						$missed = array_diff( $nav_elements, $inserted );
-						$i = 1;
-						$count = count( $missed );
+						$i      = 1;
+						$count  = count( $missed );
 						foreach ( $missed as $k => $v ) {
 							if ( $i != $count ) {
 								$buttons = "<button class='up'><i class='dashicons dashicons-arrow-up'></i><span class='screen-reader-text'>Up</span></button> <button class='down'><i class='dashicons dashicons-arrow-down'></i><span class='screen-reader-text'>Down</span></button>";
@@ -650,10 +721,10 @@ function edit_my_calendar_config() {
 							}
 							$buttons = "<div class='mc-buttons'>$buttons</div>";
 							echo "<li class='ui-state-default mc-$k mc-hidden'>$buttons <code>$k</code> $v <input type='hidden' name='mc_nav[]' value='$k' /></li>";
-							$i++;
+							$i ++;
 						}
 
-						echo "</ul>";
+						echo '</ul>';
 						?>
 					</fieldset>
 
@@ -670,6 +741,7 @@ function edit_my_calendar_config() {
 							<li><?php mc_settings_field( 'mc_show_address', __( 'Event Address', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_short', __( 'Short description', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_desc', __( 'Full description', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+							<li><?php mc_settings_field( 'mc_image', __( 'Image', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_process_shortcodes', __( 'Process WordPress shortcodes in descriptions', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_event_link', __( 'External link', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_display_more', __( 'More details link', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
@@ -681,11 +753,15 @@ function edit_my_calendar_config() {
 						<legend><?php _e( 'Grid Options', 'my-calendar' ); ?></legend>
 						<ul>
 							<li><?php mc_settings_field( 'mc_show_weekends', __( 'Show Weekends on Calendar', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-							<li><?php mc_settings_field( 'mc_convert', array(
-											'true' => __( 'Switch to list view on mobile devices', 'my-calendar' ),
-											'mini' => __( 'Switch to mini calendar on mobile devices', 'my-calendar' ),
-											'none' => __( 'Do not switch calendar mode', 'my-calendar' )
-										), 'false', '', array(), 'radio' ); ?></li>
+							<li>
+							<?php
+							mc_settings_field( 'mc_convert', __( 'Mobile View', 'my-calendar' ), array(
+								'true' => __( 'Switch to list view', 'my-calendar' ),
+								'mini' => __( 'Switch to mini calendar', 'my-calendar' ),
+								'none' => __( 'No change', 'my-calendar' ),
+							), '', array(), 'select' );
+							?>
+							</li>
 						</ul>
 					</fieldset>
 					<fieldset>
@@ -695,39 +771,25 @@ function edit_my_calendar_config() {
 							<li><?php mc_settings_field( 'mc_show_list_info', __( 'Show the first event\'s title and the number of events that day next to the date.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_show_list_events', __( 'Show all event titles next to the date.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 						</ul>
-					</fieldset>					
-					
-					<fieldset>
-						<legend><?php _e( 'Category Colors', 'my-calendar' ); ?></legend>
-						<ul class='checkboxes'>
-							<?php mc_settings_field( 'mc_apply_color', array(
-									'default'    => __( 'No category colors with titles.', 'my-calendar' ),
-									'font'       => __( 'Titles are in category colors.', 'my-calendar' ),
-									'background' => __( 'Titles have category color as background.', 'my-calendar' )
-								), 'default', '', array(), 'radio' ); ?>
-							<li><?php mc_settings_field( 'mc_inverse_color', __( 'Optimize contrast for category colors.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-							<li><?php mc_settings_field( 'mc_hide_icons', __( 'Hide Category icons', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-						</ul>
-						<?php // End Event Options // ?>
 					</fieldset>
-					<p><input type="submit" name="save" class="button-primary"
-					          value="<?php _e( 'Save Output Settings', 'my-calendar' ); ?>"/></p>
+
+					<p><input type="submit" name="save" class="button-primary" value="<?php _e( 'Save Output Settings', 'my-calendar' ); ?>"/></p>
 				</form>
 			</div>
 		</div>
-		
+
 		<div class="wptab postbox" aria-labelledby="tab_input" role="tabpanel" aria-live="assertive"  id="my-calendar-input">
 			<h2><?php _e( 'Calendar Input Fields', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
-				<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#my-calendar-input" ); ?>">
-					<div><input type="hidden" name="_wpnonce"
-					            value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/></div>
+				<form method="post" action="<?php echo admin_url( 'admin.php?page=my-calendar-config#my-calendar-input' ); ?>">
+					<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>" />
 					<fieldset>
 						<legend><?php _e( 'Show in event manager', 'my-calendar' ); ?></legend>
 						<div><input type='hidden' name='mc_input' value='true'/></div>
 						<ul class="checkboxes">
 							<?php
+							$output        = '';
 							$input_options = get_option( 'mc_input_options' );
 							$input_labels  = array(
 								'event_location_dropdown' => __( 'Event Location Dropdown Menu', 'my-calendar' ),
@@ -741,29 +803,29 @@ function edit_my_calendar_config() {
 								'event_location'          => __( 'Event Location fields', 'my-calendar' ),
 								'event_specials'          => __( 'Set Special Scheduling options', 'my-calendar' ),
 								'event_access'            => __( 'Event Accessibility', 'my-calendar' ),
-								'event_host'              => __( 'Event Host', 'my-calendar' )
+								'event_host'              => __( 'Event Host', 'my-calendar' ),
 							);
-							$output        = '';
-							// if input options isn't an array, we'll assume that this plugin wasn't upgraded properly, and reset them to the default.
+
+							// If input options isn't an array, assume that plugin wasn't upgraded, and reset to default.
 							if ( ! is_array( $input_options ) ) {
 								update_option( 'mc_input_options', array(
-										'event_short'             => 'on',
-										'event_desc'              => 'on',
-										'event_category'          => 'on',
-										'event_image'             => 'on',
-										'event_link'              => 'on',
-										'event_recurs'            => 'on',
-										'event_open'              => 'on',
-										'event_location'          => 'off',
-										'event_location_dropdown' => 'on',
-										'event_specials'          => 'on',
-										'event_access'            => 'on',
-										'event_host'              => 'on'
-									) );
+									'event_location_dropdown' => 'on',
+									'event_short'    => 'on',
+									'event_desc'     => 'on',
+									'event_category' => 'on',
+									'event_image'    => 'on',
+									'event_link'     => 'on',
+									'event_recurs'   => 'on',
+									'event_open'     => 'on',
+									'event_location' => 'off',
+									'event_specials' => 'on',
+									'event_access'   => 'on',
+									'event_host'     => 'on',
+								) );
 								$input_options = get_option( 'mc_input_options' );
 							}
 							foreach ( $input_options as $key => $value ) {
-								$checked = ( $value == 'on' ) ? "checked='checked'" : '';
+								$checked = ( 'on' == $value ) ? "checked='checked'" : '';
 								if ( isset( $input_labels[ $key ] ) ) {
 									$output .= "<li><input type='checkbox' id='mci_$key' name='mci_$key' $checked /> <label for='mci_$key'>$input_labels[$key]</label></li>";
 								}
@@ -780,116 +842,113 @@ function edit_my_calendar_config() {
 							<li><?php mc_settings_field( 'mc_no_fifth_week', __( 'If a recurring event falls on a date that doesn\'t exist (like the 5th Wednesday in February), move it back one week.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_skip_holidays', __( 'If an event coincides with an event in the designated "Holiday" category, do not show the event.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 						</ul>
-						<?php // End Scheduling Options // ?>
-					</fieldset>					
+					</fieldset>
 					<p>
-						<input type="submit" name="save" class="button-primary"
-						       value="<?php _e( 'Save Input Settings', 'my-calendar' ); ?>"/>
+						<input type="submit" name="save" class="button-primary" value="<?php _e( 'Save Input Settings', 'my-calendar' ); ?>"/>
 					</p>
 				</form>
 			</div>
 		</div>
 
-	<?php if ( current_user_can( 'manage_network' ) && is_multisite() ) { ?>
-			<div class="wptab postbox" aria-labelledby="tab_multi" role="tabpanel" aria-live="assertive"  id="my-calendar-multisite">
-				<h2><?php _e( 'Multisite Settings (Network Administrators only)', 'my-calendar' ); ?></h2>
+	<?php
+	if ( current_user_can( 'manage_network' ) && is_multisite() ) {
+		?>
+		<div class="wptab postbox" aria-labelledby="tab_multi" role="tabpanel" aria-live="assertive"  id="my-calendar-multisite">
+			<h2><?php _e( 'Multisite Settings (Network Administrators only)', 'my-calendar' ); ?></h2>
 
-				<div class="inside">
-					<p><?php _e( 'The central calendar is the calendar associated with the primary site in your WordPress Multisite network.', 'my-calendar' ); ?></p>
-					<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#my-calendar-multisite" ); ?>">
-						<div>
-							<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/>
-							<input type='hidden' name='mc_network' value='true'/>
-						</div>
-						<fieldset>
-							<legend><?php _e( 'Multisite configuration - input', 'my-calendar' ); ?></legend>
-							<ul>
-								<li>
-									<input type="radio" value="0" id="ms0" name="mc_multisite"<?php echo jd_option_selected( get_site_option( 'mc_multisite' ), '0' ); ?> /> <label for="ms0"><?php _e( 'Site owners may only post to their local calendar', 'my-calendar' ); ?></label>
-								</li>
-								<li>
-									<input type="radio" value="1" id="ms1" name="mc_multisite"<?php echo jd_option_selected( get_site_option( 'mc_multisite' ), '1' ); ?> /> <label for="ms1"><?php _e( 'Site owners may only post to the central calendar', 'my-calendar' ); ?></label>
-								</li>
-								<li>
-									<input type="radio" value="2" id="ms2" name="mc_multisite"<?php echo jd_option_selected( get_site_option( 'mc_multisite' ), 2 ); ?> /> <label for="ms2"><?php _e( 'Site owners may manage either calendar', 'my-calendar' ); ?></label>
-								</li>
-							</ul>
-							<p>
-								<em><?php _e( 'Changes only effect input permissions. Public-facing calendars will be unchanged.', 'my-calendar' ); ?></em>
-							</p>
-						</fieldset>
-						<fieldset>
-							<legend><?php _e( 'Multisite configuration - output', 'my-calendar' ); ?></legend>							
-							<ul>
-								<li><input type="radio" value="0" id="mss0"
-								           name="mc_multisite_show"<?php echo jd_option_selected( get_site_option( 'mc_multisite_show' ), '0' ); ?> />
-									<label
-										for="mss0"><?php _e( 'Sub-site calendars show events from their local calendar.', 'my-calendar' ); ?></label>
-								</li>
-								<li><input type="radio" value="1" id="mss1"
-								           name="mc_multisite_show"<?php echo jd_option_selected( get_site_option( 'mc_multisite_show' ), '1' ); ?> />
-									<label
-										for="mss1"><?php _e( 'Sub-site calendars show events from the central calendar.', 'my-calendar' ); ?></label>
-								</li>
-							</ul>
-						</fieldset>
+			<div class="inside">
+				<p><?php _e( 'The central calendar is the calendar associated with the primary site in your WordPress Multisite network.', 'my-calendar' ); ?></p>
+				<form method="post" action="<?php echo admin_url( 'admin.php?page=my-calendar-config#my-calendar-multisite' ); ?>">
+					<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/>
+					<input type='hidden' name='mc_network' value='true'/>
+					<fieldset>
+						<legend><?php _e( 'Multisite configuration - input', 'my-calendar' ); ?></legend>
+						<ul>
+							<li>
+								<input type="radio" value="0" id="ms0" name="mc_multisite"<?php echo mc_option_selected( get_site_option( 'mc_multisite' ), '0' ); ?> /> <label for="ms0"><?php _e( 'Site owners may only post to their local calendar', 'my-calendar' ); ?></label>
+							</li>
+							<li>
+								<input type="radio" value="1" id="ms1" name="mc_multisite"<?php echo mc_option_selected( get_site_option( 'mc_multisite' ), '1' ); ?> /> <label for="ms1"><?php _e( 'Site owners may only post to the central calendar', 'my-calendar' ); ?></label>
+							</li>
+							<li>
+								<input type="radio" value="2" id="ms2" name="mc_multisite"<?php echo mc_option_selected( get_site_option( 'mc_multisite' ), 2 ); ?> /> <label for="ms2"><?php _e( 'Site owners may manage either calendar', 'my-calendar' ); ?></label>
+							</li>
+						</ul>
 						<p>
-							<input type="submit" name="save" class="button-primary"
-							       value="<?php _e( 'Save Multisite Settings', 'my-calendar' ); ?>"/>
+							<em><?php _e( 'Changes only effect input permissions. Public-facing calendars will be unchanged.', 'my-calendar' ); ?></em>
 						</p>
-					</form>
-				</div>
+					</fieldset>
+					<fieldset>
+						<legend><?php _e( 'Multisite configuration - output', 'my-calendar' ); ?></legend>
+						<ul>
+							<li>
+								<input type="radio" value="0" id="mss0" name="mc_multisite_show"<?php echo mc_option_selected( get_site_option( 'mc_multisite_show' ), '0' ); ?> />
+								<label for="mss0"><?php _e( 'Sub-site calendars show events from their local calendar.', 'my-calendar' ); ?></label>
+							</li>
+							<li>
+								<input type="radio" value="1" id="mss1" name="mc_multisite_show"<?php echo mc_option_selected( get_site_option( 'mc_multisite_show' ), '1' ); ?> />
+								<label for="mss1"><?php _e( 'Sub-site calendars show events from the central calendar.', 'my-calendar' ); ?></label>
+							</li>
+						</ul>
+					</fieldset>
+					<p>
+						<input type="submit" name="save" class="button-primary" value="<?php _e( 'Save Multisite Settings', 'my-calendar' ); ?>"/>
+					</p>
+				</form>
 			</div>
-	<?php } ?>
+		</div>
+		<?php
+	}
+	?>
 
 		<div class="wptab postbox" aria-labelledby="tab_permissions" role="tabpanel" aria-live="assertive"  id="my-calendar-permissions">
 			<h2><?php _e( 'My Calendar Permissions', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
-				<?php if ( current_user_can( 'administrator' ) ) { ?>
+	<?php
+	if ( current_user_can( 'administrator' ) ) {
+		?>
 
-					<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#my-calendar-permissions" ); ?>">
-						<div><input type="hidden" name="_wpnonce"
-						            value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/></div>
-						<?php
-						global $wp_roles;
-						$roles     = $wp_roles->get_names();
-						$caps      = array(
-							'mc_add_events'     => __( 'Add Events', 'my-calendar' ),
-							'mc_approve_events' => __( 'Approve Events', 'my-calendar' ),
-							'mc_manage_events'  => __( 'Manage Events', 'my-calendar' ),
-							'mc_edit_cats'      => __( 'Edit Categories', 'my-calendar' ),
-							'mc_edit_locations' => __( 'Edit Locations', 'my-calendar' ),
-							'mc_edit_styles'    => __( 'Edit Styles', 'my-calendar' ),
-							'mc_edit_behaviors' => __( 'Edit Behaviors', 'my-calendar' ),
-							'mc_edit_templates' => __( 'Edit Templates', 'my-calendar' ),
-							'mc_edit_settings'  => __( 'Edit Settings', 'my-calendar' ),
-							'mc_view_help'      => __( 'View Help', 'my-calendar' )
-						);
-						$role_container = '';
-						foreach ( $roles as $role => $rolename ) {
-							if ( $role == 'administrator' ) {
-								continue;
-							}
-							$role_container .= "<div class='mc_$role mc_permissions' id='container_mc_$role'><fieldset id='mc_$role' class='roles'><legend>$rolename</legend>";
-							$role_container .= "<input type='hidden' value='none' name='mc_caps[" . $role . "][none]' />
-			<ul class='mc-settings checkboxes'>";
-							foreach ( $caps as $cap => $name ) {
-								$role_container .= mc_cap_checkbox( $role, $cap, $name );
-							}
-							$role_container .= "
-			</ul></fieldset></div>\n";
-						}
-						echo "$role_container";
-						?>
+					<form method="post" action="<?php echo admin_url( 'admin.php?page=my-calendar-config#my-calendar-permissions' ); ?>">
+						<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>" />
+		<?php
+		global $wp_roles;
+		$role_container = '';
+		$roles          = $wp_roles->get_names();
+		$caps           = array(
+			'mc_add_events'     => __( 'Add Events', 'my-calendar' ),
+			'mc_approve_events' => __( 'Approve Events', 'my-calendar' ),
+			'mc_manage_events'  => __( 'Manage Events', 'my-calendar' ),
+			'mc_edit_cats'      => __( 'Edit Categories', 'my-calendar' ),
+			'mc_edit_locations' => __( 'Edit Locations', 'my-calendar' ),
+			'mc_edit_styles'    => __( 'Edit Styles', 'my-calendar' ),
+			'mc_edit_behaviors' => __( 'Edit Behaviors', 'my-calendar' ),
+			'mc_edit_templates' => __( 'Edit Templates', 'my-calendar' ),
+			'mc_edit_settings'  => __( 'Edit Settings', 'my-calendar' ),
+			'mc_view_help'      => __( 'View Help', 'my-calendar' ),
+		);
+		foreach ( $roles as $role => $rolename ) {
+			if ( 'administrator' == $role ) {
+				continue;
+			}
+			$role_container .= "<div class='mc_$role mc_permissions' id='container_mc_$role'><fieldset id='mc_$role' class='roles'><legend>$rolename</legend>";
+			$role_container .= "<input type='hidden' value='none' name='mc_caps[" . $role . "][none]' /><ul class='mc-settings checkboxes'>";
+			foreach ( $caps as $cap => $name ) {
+				$role_container .= mc_cap_checkbox( $role, $cap, $name );
+			}
+			$role_container .= '</ul></fieldset></div>';
+		}
+		echo $role_container;
+		?>
 						<p>
-							<input type="submit" name="mc_permissions" class="button-primary"
-							       value="<?php _e( 'Save Permissions', 'my-calendar' ); ?>"/>
+							<input type="submit" name="mc_permissions" class="button-primary" value="<?php _e( 'Save Permissions', 'my-calendar' ); ?>"/>
 						</p>
 					</form>
-				<?php } else { ?>
-					<?php _e( 'My Calendar permission settings are only available to administrators.', 'my-calendar' ); ?>
-				<?php } ?>
+		<?php
+	} else {
+		_e( 'My Calendar permission settings are only available to administrators.', 'my-calendar' );
+	}
+	?>
 			</div>
 		</div>
 
@@ -897,26 +956,33 @@ function edit_my_calendar_config() {
 			<h2><?php _e( 'Calendar Email Settings', 'my-calendar' ); ?></h2>
 
 			<div class="inside">
-				<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config#my-calendar-email" ); ?>">
-					<div><input type="hidden" name="_wpnonce"
-					            value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/></div>
+				<form method="post" action="<?php echo admin_url( 'admin.php?page=my-calendar-config#my-calendar-email' ); ?>">
+					<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>" />
 					<fieldset>
 						<legend><?php _e( 'Email Notifications', 'my-calendar' ); ?></legend>
 						<div><input type='hidden' name='mc_email' value='true'/></div>
 						<ul>
-							<li><?php mc_settings_field( 'mc_event_mail', __( 'Send Email Notifications when new events are scheduled or reserved.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
-							<li><?php mc_settings_field( 'mc_html_email', __( 'Send HTML email', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>	
+							<li><?php mc_settings_field( 'mc_event_mail', __( 'Send Email Notifications when new events are scheduled or drafted.', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
+							<li><?php mc_settings_field( 'mc_html_email', __( 'Send HTML email', 'my-calendar' ), '', '', array(), 'checkbox-single' ); ?></li>
 							<li><?php mc_settings_field( 'mc_event_mail_to', __( 'Notification messages are sent to:', 'my-calendar' ), get_bloginfo( 'admin_email' ) ); ?></li>
 							<li><?php mc_settings_field( 'mc_event_mail_from', __( 'Notification messages are sent from:', 'my-calendar' ), get_bloginfo( 'admin_email' ) ); ?></li>
-							<li><?php mc_settings_field( 'mc_event_mail_bcc', __( 'BCC on notifications (one per line):', 'my-calendar' ), '', '', array(
-										'cols' => 60,
-										'rows' => 6
-									), 'textarea' ); ?></li>
+							<li>
+	<?php
+	mc_settings_field( 'mc_event_mail_bcc', __( 'BCC on notifications (one per line):', 'my-calendar' ), '', '', array(
+		'cols' => 60,
+		'rows' => 6,
+	), 'textarea' );
+	?>
+							</li>
 							<li><?php mc_settings_field( 'mc_event_mail_subject', __( 'Email subject', 'my-calendar' ), get_bloginfo( 'name' ) . ': ' . __( 'New event added', 'my-calendar' ), '', array( 'size' => 60 ) ); ?></li>
-							<li><?php mc_settings_field( 'mc_event_mail_message', __( 'Message Body', 'my-calendar' ), __( 'New Event:', 'my-calendar' ) . "\n{title}: {date}, {time} - {event_status}", "<br /><a href='" . admin_url( "admin.php?page=my-calendar-help#templates" ) . "'>" . __( "Templating Help", 'my-calendar' ) . '</a>', array(
-										'cols' => 60,
-										'rows' => 6
-									), 'textarea' ); ?></li>
+							<li>
+	<?php
+	mc_settings_field( 'mc_event_mail_message', __( 'Message Body', 'my-calendar' ), __( 'New Event:', 'my-calendar' ) . "\n{title}: {date}, {time} - {event_status}", "<br /><a href='" . admin_url( 'admin.php?page=my-calendar-help#templates' ) . "'>" . __( 'Templating Help', 'my-calendar' ) . '</a>', array(
+		'cols' => 60,
+		'rows' => 6,
+	), 'textarea' );
+	?>
+							</li>
 						</ul>
 					</fieldset>
 					<p>
@@ -935,18 +1001,35 @@ function edit_my_calendar_config() {
 	<?php mc_show_sidebar(); ?>
 
 	</div>
-<?php
+	<?php
 }
 
+/**
+ * Check whether given role has defined capability.
+ *
+ * @param string $role Name of a role defined in WordPress.
+ * @param string $cap Name of capability to check for.
+ *
+ * @return string
+ */
 function mc_check_caps( $role, $cap ) {
 	$role = get_role( $role );
 	if ( $role->has_cap( $cap ) ) {
-		return " checked='checked'";
+		return ' checked="checked"';
 	}
 
 	return '';
 }
 
+/**
+ * Checkbox for displaying capabilities.
+ *
+ * @param string $role Name of a role.
+ * @param string $cap Name of a capability.
+ * @param string $name Display name of role.
+ *
+ * @return string HTML checkbox.
+ */
 function mc_cap_checkbox( $role, $cap, $name ) {
 	return "<li><input type='checkbox' id='mc_caps_{$role}_$cap' name='mc_caps[$role][$cap]' value='on'" . mc_check_caps( $role, $cap ) . " /> <label for='mc_caps_{$role}_$cap'>$name</label></li>";
 }

@@ -513,7 +513,7 @@ function doc_import_team() { ?>
         <p><?php _e( 'To use this feature, go to Import/Export menu item under Team, select the CSV file that contains your team member data from your computer and click the Import button.', 'ots' ); ?></p>
 
         <p>
-            <a href="https://raw.githubusercontent.com/smartcatdev/docs/master/ots/demo-data.csv" class="button button-primary" download><?php _e( 'Download Sample CSV', 'ots' ); ?></a>
+            <a href="//raw.githubusercontent.com/smartcatdev/docs/master/ots/demo-data.csv" class="button button-primary" download="team-export.csv"><?php _e( 'Download Sample CSV', 'ots' ); ?></a>
         </p>
 
         
@@ -598,14 +598,14 @@ function doc_shortcode_details() { ?>
             <tr>
                 <td>show_filter</td>
                 <td>
-                    yes, no
+                    true, false
                 </td>
                 <td>Display buttons that allow viewers to filter your team members by group. You must have groups with assigned team members for this to work.</td>
             </tr>
             <tr>
                 <td>show_search</td>
                 <td>
-                    yes, no
+                    true, false
                 </td>
                 <td>Display a search bar allowing viewers to search team members by name, title, bio etc...</td>
             </tr>

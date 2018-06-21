@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.8.08
+* Version 6.9.04
 *
 */
 
@@ -385,6 +385,7 @@ function wppaTryDelete( id, video ) {
 
 	if ( confirm( query ) ) {
 		wppaAjaxDeletePhoto( id );
+		jQuery( window ).trigger( 'scroll' );
 	}
 }
 
@@ -652,9 +653,10 @@ function wppaToggleExif( id, count ) {
 										' >' .
 										'<img' .
 											' id="tnp-' . $id . '"' .
-											' src="' . $src . '"' .
+											' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $src . '"' .
 											' alt="' . esc_attr( $name ) . '"' .
 											' style="max-width: 160px; vertical-align:middle;"' .
+											( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 										' />' .
 									'</a>';
 									if ( $has_audio ) {
@@ -1005,6 +1007,20 @@ function wppaToggleExif( id, count ) {
 										'<span style="color:red;" >' .
 											__( 'Unavailable', 'wp-photo-album-plus' ) . '. ' .
 										'</span>';
+									}
+								}
+
+								// Local CDN
+								if ( wppa_cdn( 'admin' ) == 'local' ) {
+									echo __( 'Local CDN files', 'wp-photo-album-plus' ) . ': ';
+									$files = wppa_cdn_files( $id );
+									if ( is_array( $files ) ) {
+										foreach( $files as $file ) {
+											if ( basename( $file ) != 'index.php' ) {
+												$size = filesize( $file );
+												echo basename( $file ) . ' ' . sprintf( '%4.2fkB', $size / 1024 ) . ' ';
+											}
+										}
 									}
 								}
 
@@ -1624,8 +1640,9 @@ function wppaToggleExif( id, count ) {
 								'<td>' .
 									'<img' .
 										' id="fs-img-' . $id . '"' .
-										' src="' . wppa_get_photo_url( $id ) . '"' .
+										' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . wppa_get_photo_url( $id ) . '"' .
 										' style="float:left;max-width:90%;" ' .
+										( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 									' />' .
 									'<div' .
 										' style="display:inline-block;vertical-align:middle;margin-left:4px;margin-top:' . ( min( 600, wppa_get_photoy( $id ) ) / 2 - 30 ) . 'px;"' .
@@ -2716,8 +2733,8 @@ function wppaSetConfirmMove( id ) {
 										' title="Click to see fullsize"' .
 										' >' .
 										'<img' .
-											' class="wppa-bulk-thumb"' .
-											' src="' . wppa_get_thumb_url( $photo['id'] ) . '"' .
+											' class="wppa-bulk-thumb ' . ( wppa_switch( 'lazy' ) ? 'wppa-lazy' : '' ) . '"' .
+											' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . wppa_get_thumb_url( $photo['id'] ) . '"' .
 											' style="max-width:' . $maxsize . 'max-height:' . $maxsize . 'px;"' .
 									//		' onmouseover="jQuery( this ).stop().animate( {height:120}, 100 )"' .
 									//		' onmouseout="jQuery( this ).stop().animate( {height:60}, 100 )"' .
@@ -3025,9 +3042,13 @@ global $wpdb;
 						</video>
 	-->
 					<?php }
-					else { ?>
-						<img class="wppa-bulk-thumb" src="<?php echo wppa_get_thumb_url( $photo['id'] ) ?>" style="max-width:<?php echo $mw ?>px; max-height:<?php echo $mh ?>px; margin-top: <?php echo $mt ?>px;" />
-					<?php } ?>
+					else {
+						echo
+						'<img' .
+							' class="wppa-bulk-thumb ' . ( wppa_switch( 'lazy' ) ? 'wppa-lazy' : '' ) . '"' .
+							' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . wppa_get_thumb_url( $photo['id'] ) . '"' .
+							' style="max-width:' . $mw . 'px; max-height:' . $mh . 'px; margin-top:' . $mt . 'px;" />';
+					} ?>
 						<div style="font-size:9px; position:absolute; bottom:24px; text-align:center; width:<?php echo $size ?>px;" ><?php echo wppa_get_photo_name( $photo['id'] ) ?></div>
 						<div style="text-align: center; width: <?php echo $size ?>px; position:absolute; bottom:8px;" >
 							<span style="margin-left:15px;float:left"><?php echo __( 'Id: ' , 'wp-photo-album-plus').$photo['id']?></span>
@@ -3299,8 +3320,9 @@ function wppa_fe_edit_new_style( $photo ) {
 			'<h3>' .
 			'<img' .
 				' style="height:50px;"' .
-				' src="' . wppa_get_thumb_url( $photo ) . '"' .
+				' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . wppa_get_thumb_url( $photo ) . '"' .
 				' alt="' . $photo . '"' .
+				( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
 			' />' .
 			'&nbsp;&nbsp;' .
 			wppa_opt( 'fe_edit_caption' ) . '</h3>';

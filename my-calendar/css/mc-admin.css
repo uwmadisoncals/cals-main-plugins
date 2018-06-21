@@ -1,15 +1,18 @@
-.mc_edit_links {
-    font-size: .9em;
-    margin: 5px -5px -5px;
-    padding: 2px;
+.mc-main .details .mc_edit_links {
+    font-size: 12px;
+	font-family: sans-serif;
+	line-height: 1;
+    margin: 5px;
+    padding: 5px;
     clear: both;
     border-top: 1px solid #ddd;
 }
 
-.mc_edit_links a {
-    display: inline !important;
+.mc-main .details .mc_edit_links p {
+	padding: 0;
+	margin: 0;
 }
 
-.mini .mc_edit_links, .list .mc_edit_links {
-    margin-bottom: 5px;
+.mc-main .mc_edit_links a {
+	display: inline !important;
 }

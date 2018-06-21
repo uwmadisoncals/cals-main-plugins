@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsSlideshowVersion = '6.9.01';
+var wppaJsSlideshowVersion = '6.9.03';
 
 // This is an entrypoint to load the slide data
 function wppaStoreSlideInfo(
@@ -137,7 +137,7 @@ function wppaStoreSlideInfo(
 		_wppaSlides[mocc][id] += 'style="' + size + '; cursor:'+cursor+'; display:none; vertical-align:middle;">';
 	}
 
-    _wppaFullNames[mocc][id] = fullname;
+    _wppaFullNames[mocc][id] = wppaRepairBrTags(fullname);
     _wppaNames[mocc][id] = name;
     _wppaDsc[mocc][id] = desc;
 	_wppaOgDsc[mocc][id] = ogdsc;
@@ -1212,23 +1212,8 @@ function _wppaAdjustFilmstrip( mocc ) {
 
 			if ( html ) {
 
-				// Change data-src="..." into src="..."
-				if ( from <= index <= to ) {
-
-					var src = jQuery( '#wppa-film-'+index+'-'+mocc ).attr( 'data-src' );
-
-					if ( src ) {
-						jQuery( '#wppa-film-'+index+'-'+mocc ).attr( 'src', src );
-						jQuery( '#wppa-film-'+index+'-'+mocc ).removeAttr( 'data-src' );
-					}
-					/*
-					if ( html.search( '<!--' ) != -1 ) {
-						html = html.replace( '<!--', '' );
-						html = html.replace( '-->', '' );
-						jQuery( '#film_wppatnf_'+_wppaId[mocc][index]+'_'+mocc ).html( html );
-					}
-					*/
-				}
+				// Make lazy filmthumbs visible
+				jQuery( window ).trigger( 'scroll' );
 
 				// Fit title in
 				if ( jQuery( '#wppa-film-'+index+'-'+mocc ).attr( 'data-title' ) != '' ) {

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.9.02
+* Version 6.9.04
 *
 */
 
@@ -35,6 +35,13 @@ global $blog_id;
 	if ( wppa_cdn( 'front' ) && ! wppa_is_multi( $id ) && ! $is_old && ! wppa_is_stereo( $id ) ) {
 		if ( $x && $y ) {		// Only when size is given !! To prevent download of the fullsize image
 			switch ( wppa_cdn( 'front' ) ) {
+				case 'local':
+					$url = wppa_cdn_url( $id, $x, $y );
+					if ( $url ) {
+						return $url;
+					}
+					break;
+
 				case 'cloudinary':
 					$transform	= explode( ':', wppa_opt( 'thumb_aspect' ) );
 					$t 			= 'limit';
@@ -123,19 +130,27 @@ global $wppa_supported_stereo_types;
 	$for_sm = wppa( 'for_sm' ); 				// Social media do not accept cloud images
 	$is_old = wppa_too_old_for_cloud( $id );
 	if ( wppa_cdn( 'front' ) && ! wppa_is_multi( $id ) && ! $is_old && ! wppa_is_stereo( $id ) && ! $for_sm && ! $thumb['magickstack'] ) {
-		switch ( wppa_cdn( 'front' ) ) {
-			case 'cloudinary':
-				$x = round($x);
-				$y = round($y);
-				$prefix 	= ( is_multisite() && ! WPPA_MULTISITE_GLOBAL ) ? $blog_id.'-' : '';
-				$t 			= wppa_switch( 'enlarge') ? 'fit' : 'limit';
-				$q 			= wppa_opt( 'jpeg_quality' );
-				$sizespec 	= ( $x && $y ) ? 'w_'.$x.',h_'.$y.',c_'.$t.',q_'.$q.'/' : '';
-				$s = is_ssl() ? 's' : '';
-				$url = 'http'.$s.'://res.cloudinary.com/'.get_option('wppa_cdn_cloud_name').'/image/upload/'.$sizespec.$prefix.$thumb['id'].'.'.$thumb['ext'];
-				return $url;
-				break;
+		if ( $x && $y ) {		// Only when size is given
+			switch ( wppa_cdn( 'front' ) ) {
+				case 'local':
+					$url = wppa_cdn_url( $id, $x, $y );
+					if ( $url ) {
+						return $url;
+					}
+					break;
 
+				case 'cloudinary':
+					$x = round($x);
+					$y = round($y);
+					$prefix 	= ( is_multisite() && ! WPPA_MULTISITE_GLOBAL ) ? $blog_id.'-' : '';
+					$t 			= wppa_switch( 'enlarge') ? 'fit' : 'limit';
+					$q 			= wppa_opt( 'jpeg_quality' );
+					$sizespec 	= ( $x && $y ) ? 'w_'.$x.',h_'.$y.',c_'.$t.',q_'.$q.'/' : '';
+					$s = is_ssl() ? 's' : '';
+					$url = 'http'.$s.'://res.cloudinary.com/'.get_option('wppa_cdn_cloud_name').'/image/upload/'.$sizespec.$prefix.$thumb['id'].'.'.$thumb['ext'];
+					return $url;
+					break;
+			}
 		}
 	}
 
@@ -1397,7 +1412,9 @@ global $wpdb;
 	if ( wppa_cdn( 'admin' ) == 'cloudinary' ) {
 		wppa_delete_from_cloudinary( $photo );
 	}
-
+	elseif ( wppa_cdn( 'admin' ) == 'local' ) {
+		wppa_cdn_delete( $photo );
+	}
 }
 
 function wppa_microtime($txt = '') {
@@ -1908,6 +1925,9 @@ function wppa_cdn( $side ) {
 
 	// Check for fully configured and active
 	switch ( $cdn ) {
+		case 'local':
+			break;
+
 		case 'cloudinary':
 		case 'cloudinarymaintenance':
 			if ( wppa_opt( 'cdn_cloud_name' ) && wppa_opt( 'cdn_api_key' ) && wppa_opt( 'cdn_api_secret' ) ) {

@@ -1,76 +1,87 @@
 <?php
+/**
+ * Upgrade Database.
+ *
+ * @category Core
+ * @package  My Calendar
+ * @author   Joe Dolson
+ * @license  GPLv2 or later
+ * @link     https://www.joedolson.com/my-calendar/
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
-} // Exit if accessed directly
+}
 
+/**
+ * Check whether the My Calendar database is up to date
+ */
 function my_calendar_check_db() {
-	if ( get_option( 'mc_remote' ) == 'true' && function_exists( 'mc_remote_db' ) ) {
+	if ( 'true' == get_option( 'mc_remote' ) && function_exists( 'mc_remote_db' ) ) {
 		return;
 	}
+
 	global $wpdb;
-	$mcdb = $wpdb;
-	$row  = $mcdb->get_row( 'SELECT * FROM ' . my_calendar_table() );
-	if ( isset( $_POST['upgrade'] ) && $_POST['upgrade'] == 'true' ) {
-		my_calendar_mc_upgrade_db();
+	$cols         = $wpdb->get_col( 'DESC ' . my_calendar_table() ); // WPCS: unprepared SQL ok.
+	$needs_update = false;
+
+	if ( ! in_array( 'event_tickets', $cols ) ) {
+		$needs_update = true;
+	}
+
+	if ( isset( $_POST['upgrade'] ) && 'true' == $_POST['upgrade'] ) {
+		mc_upgrade_db();
 		?>
 		<div class='upgrade-db updated'>
 			<p><?php _e( 'My Calendar Database is updated.', 'my-calendar' ); ?></p>
 		</div>
-	<?php
-	} else if ( ! isset( $row->event_tickets ) && isset( $row->event_id ) ) {
-		if ( $_GET['page'] == 'my-calendar-config' ) {
+		<?php
+	} elseif ( $needs_update ) {
+		if ( 'my-calendar-config' == $_GET['page'] ) {
 			?>
 			<div class='upgrade-db error'>
-				<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config" ); ?>">
+				<p>
+					<?php _e( 'The My Calendar database needs to be updated.', 'my-calendar' ); ?>
+				</p>
+				<form method="post" action="<?php echo admin_url( 'admin.php?page=my-calendar-config' ); ?>">
 					<div>
-						<input type="hidden" name="_wpnonce"
-						       value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>"/>
-						<input type="hidden" name="upgrade" value="true"/>
+						<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>" />
+						<input type="hidden" name="upgrade" value="true" />
 					</div>
 					<p>
-						<?php _e( 'The My Calendar database needs to be updated.', 'my-calendar' ); ?>
-						<input type="submit" value="<?php _e( 'Update now', 'my-calendar' ); ?>" name="update-calendar"
-						       class="button-primary"/>
+						<input type="submit" value="<?php _e( 'Update now', 'my-calendar' ); ?>" name="update-calendar" class="button-primary"/>
 					</p>
 				</form>
 			</div>
-		<?php } else { ?>
+			<?php
+		} else {
+			?>
 			<div class='upgrade-db error'>
 			<p>
-				<?php _e( 'The My Calendar database needs to be updated.', 'my-calendar' ); ?> <a
-					href="<?php echo admin_url( "admin.php?page=my-calendar-config" ); ?>"><?php _e( 'Update now', 'my-calendar' ); ?></a>
+				<?php _e( 'The My Calendar database needs to be updated.', 'my-calendar' ); ?>
+				<a href="<?php echo admin_url( 'admin.php?page=my-calendar-config' ); ?>"><?php _e( 'Update now', 'my-calendar' ); ?></a>
 			</p>
-			</div><?php
-		}
-	} elseif ( ! isset ( $row->event_id ) ) {
-		?>
-		<div class='upgrade-db error'>
-		<form method="post" action="<?php echo admin_url( "admin.php?page=my-calendar-config" ); ?>">
-			<div>
-				<input type="hidden" name="_wpnonce" value="<?php echo wp_create_nonce( 'my-calendar-nonce' ); ?>" />
-				<input type="hidden" name="upgrade" value="true" />
 			</div>
-			<p>
-				<?php _e( 'You haven\'t entered any events, so My Calendar can\'t tell whether your database is up to date. If you can\'t add events, upgrade your database!', 'my-calendar' ); ?>
-				<input type="submit" value="<?php _e( 'Update now', 'my-calendar' ); ?>" name="update-calendar"
-				       class="button-primary" />
-			</p>
-		</form>
-		</div><?php
+			<?php
+		}
 	}
 }
 
-function my_calendar_mc_upgrade_db() {
-	global $mc_version, $initial_db, $initial_cat_db, $initial_loc_db, $initial_occur_db;
+/**
+ * Execute DB upgrade.
+ */
+function mc_upgrade_db() {
+	$globals = mc_globals();
+	foreach ( $globals as $key => $global ) {
+		${$key} = $global;
+	}
+	global $mc_version;
+
 	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 	dbDelta( $initial_db );
-	dbDelta( $initial_cat_db );
-	dbDelta( $initial_loc_db );
 	dbDelta( $initial_occur_db );
-	mc_migrate_db();
+	dbDelta( $initial_cat_db );
+	dbDelta( $initial_rel_db );
+	dbDelta( $initial_loc_db );
 	update_option( 'mc_db_version', $mc_version );
-
-	return true;
 }
-
-?>

@@ -182,9 +182,7 @@
 }
 
 .mc-main .calendar-event .event-time, .mc-main .list-event .event-time {
-    display: block;
     height: 100%;
-    margin-right: 10px;
     margin-bottom: 10px;
     font-weight: 700;
     font-size: .9em;
@@ -323,9 +321,4 @@
     font-size: .9em;
     padding: 10px;
     float: right;
-}
-
-.screen-reader-text {
-    position: absolute;
-    left: -999em;
 }

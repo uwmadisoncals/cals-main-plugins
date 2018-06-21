@@ -3,7 +3,7 @@
     $(function () {
         $("li.mc-events").children().not(".event-date").hide();
         $("li.current-day").children().show();
-        $(document).on("click", ".event-date button",
+        $(document).on( "click", ".event-date button",
             function (e) {
                 e.preventDefault();
 				var vevent = $( this ).closest( '.mc-events' ).find( '.vevent:first' );

@@ -1181,6 +1181,7 @@ Hide Camera info
 						'wppa_debug_trace_on' 			=> 'no',
 //						'wppa_lazy_or_htmlcomp' 		=> 'no',
 						'wppa_relative_urls' 			=> 'no',
+						'wppa_lazy' 					=> 'no',
 
 						'wppa_thumbs_first' 			=> 'no',
 						'wppa_login_links' 				=> 'yes',

@@ -5,7 +5,7 @@ Plugin URI: http://weavertheme.com/plugins
 Description: Weaver Xtreme Theme Support - a package of useful shortcodes and widgets that integrates closely with the Weaver Xtreme and Weaver Foundation themes.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 3.2.3
+Version: 4.0
 License: GPL V3
 
 Weaver Xtreme Theme Support
@@ -43,9 +43,9 @@ if ( function_exists( 'weavercore_ts_installed' ) ) {
 
 if ( strpos( $theme, '/weaver-xtreme') !== false ) {		// only load if Weaver Xtreme is the theme
 
-define ('WVRX_TS_VERSION','3.2.3');
+define ('WVRX_TS_VERSION','3.9');
 define ('WVRX_TS_MINIFY','.min');		// '' for dev, '.min' for production
-define ('WVRX_TS_PAGEBUILDERS', false);  // currently not safely implemented - will be in Weaver 4.0
+define ('WVRX_TS_PAGEBUILDERS', true);  // currently not safely implemented - will be in Weaver 4.0
 
 if ( !defined('WEAVER_GET_OPTION')) define ('WEAVER_GET_OPTION', 'get_option');
 if ( !defined('WEAVER_DELETE_OPTION')) define ('WEAVER_DELETE_OPTION', 'delete_option');
@@ -76,6 +76,7 @@ function wvrx_ts_enqueue_scripts() {	// action definition
 
 add_action('wp_enqueue_scripts', 'wvrx_ts_enqueue_scripts' );
 
+//require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-editor-style.php'); // Load the editor style generation
 
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-runtime-lib.php'); // NOW - load the basic library
 require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-widgets.php'); 		// widgets runtime library
@@ -84,76 +85,13 @@ require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-shortcodes.php'); // load 
 // load traditional Weaver Xtreme Options
 
 function weaver_xtreme_load_admin_action() {
-	require_once(dirname( __FILE__ ) . '/admin/add-weaverx-sapi-options.php'); // NOW - load the traditional opions admin
+	require_once(dirname( __FILE__ ) . '/admin/add-weaverx-sapi-options.php'); // NOW - load the traditional options admin
 
 }
 
 add_action('weaver_xtreme_load_admin','weaver_xtreme_load_admin_action');
 
 
-//if (!defined('WEAVER_XPLUS_VERSION') || version_compare( WEAVER_XPLUS_VERSION, '2.90', '>=') ) {
-
-
-add_action('admin_menu', 'wvrx_ts_add_page_fields',11);	// allow X-Plus to override us
-
-function wvrx_ts_add_page_fields() {
-	$per_post_label = defined('WEAVER_XPLUS_VERSION') ? __(' (with Weaver Xtreme Plus Options)','weaverx-theme-support') : '';
-	add_meta_box('page-box', __('Weaver Xtreme Options For This Page','weaverx-theme-support') . $per_post_label ,
-				 'wvrx_ts_page_extras_load', 'page', 'normal', 'high');
-	add_meta_box('post-box', __('Weaver Xtreme Options For This Post' . $per_post_label,
-								'weaverx-theme-support'), 'wvrx_ts_post_extras_load', 'post', 'normal', 'high');
-	global $post;
-	$func_opt = WEAVER_GET_OPTION;
-	$opts = $func_opt( apply_filters('weaverx_options',WEAVER_SETTINGS_NAME) , array());	// need to fetch Weaver Xtreme options
-
-	$i = 1;
-	$args=array( 'public'   => true, '_builtin' => false );
-	$post_types = get_post_types($args,'names','and');
-	foreach ($post_types  as $post_type ) {
-		add_meta_box('post-box' . $i, __('Weaver Xtreme Options For This Post Type','weaverx-theme-support') . $per_post_label,
-					 'wvrx_ts_post_extras_pt', $post_type, 'normal', 'high');
-		$i++;
-	}
-
-require_once(dirname( __FILE__ ) . '/includes/wvrx-ts-admin-page-posts.php');	// per page-posts admin - needs to be here
-
-}
-
-function wvrx_ts_page_extras_load() {
-	wvrx_ts_load_pp_scripts();
-	wvrx_ts_page_extras();
-}
-
-function wvrx_ts_post_extras_load() {
-	wvrx_ts_load_pp_scripts();
-	wvrx_ts_post_extras();
-}
-
-function wvrx_ts_post_extras_pt() {
-	// special handling for non-Weaver Custom Post Types
-	$func_opt = WEAVER_GET_OPTION;
-	$opts = $func_opt( apply_filters('weaverx_options',WEAVER_SETTINGS_NAME) , array());
-	if ((isset($opts['_show_per_post_all']) && $opts['_show_per_post_all']) || function_exists('atw_slider_plugins_loaded') ) {
-		wvrx_ts_load_pp_scripts();
-		wvrx_ts_post_extras();
-	} else {
-		echo '<p>' .
-__('You can enable Weaver Xtreme Per Post Options for Custom Post Types on the Weaver Xtreme:Advanced Options:Admin Options tab.','weaverx-theme-support' /*adm*/) .
-		'</p>';
-	}
-}
-
-function wvrx_ts_load_pp_scripts() {
-	// I know, this is non-standard - does not use enqueue style/script, but it is necessary to avoid conflicts with Weaver themes.
-	$p_url = plugins_url('/admin/assets/yetii/', __FILE__);
-	$vers = WVRX_TS_VERSION;
-	$min = WVRX_TS_MINIFY;
-	echo "<link rel='stylesheet' id='wvrx-ts-style'  href='{$p_url}yetii-weaver{$min}.css?ver={$vers}' type='text/css' media='all' />\n";
-	echo "<script type='text/javascript' src='{$p_url}yetii{$min}.js?ver={$vers}'></script>\n";
-
-}
-
-//} // x-plus installed - as of V3, this is no longer needed
 
 // ======================================== subthemes ========================================
 add_action('weaverx_child_show_extrathemes','wvrx_ts_child_show_extrathemes_action');
@@ -208,7 +146,7 @@ function wvrx_ts_child_saverestore_action() {
 // --------------------------------------
 function wvrx_ts_per_page_report() {
 	echo '<div style="border:1px solid black; padding:1em;background:#F8FFCC;width:70%;margin:1em auto 1em auto;">';
-	echo "<h2>" . __('Show Pages and Posts with  Per Page / Per Post Settings','weaverx-axtreme') . "</h2>\n";
+	echo "<h2>" . __('Show Pages and Posts with  Per Page / Per Post Settings','weaverx-xtreme') . "</h2>\n";
 	echo "<h3>" . __('Posts','weaverx-axtreme') . "</h3>\n";
 	wvrx_ts_scan_section('post');
 	echo "<h3>" . __('Pages','weaverx-axtreme') . "</h3>\n";
