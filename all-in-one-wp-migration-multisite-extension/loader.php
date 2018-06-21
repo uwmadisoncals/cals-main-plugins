@@ -23,7 +23,7 @@
  * ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
  */
 
-// include all the files that you want to load in here
+// Include all the files that you want to load in here
 require_once AI1WMME_CONTROLLER_PATH .
 			DIRECTORY_SEPARATOR .
 			'class-ai1wmme-main-controller.php';
@@ -35,6 +35,10 @@ require_once AI1WMME_CONTROLLER_PATH .
 require_once AI1WMME_EXPORT_PATH .
 			DIRECTORY_SEPARATOR .
 			'class-ai1wmme-export-config.php';
+
+require_once AI1WMME_EXPORT_PATH .
+			DIRECTORY_SEPARATOR .
+			'class-ai1wmme-export-config-file.php';
 
 require_once AI1WMME_EXPORT_PATH .
 			DIRECTORY_SEPARATOR .

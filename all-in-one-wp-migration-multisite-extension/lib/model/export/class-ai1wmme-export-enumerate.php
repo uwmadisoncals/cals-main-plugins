@@ -27,6 +27,20 @@ class Ai1wmme_Export_Enumerate {
 
 	public static function execute( $params ) {
 
+		// Get total files count
+		if ( isset( $params['total_files_count'] ) ) {
+			$total_files_count = (int) $params['total_files_count'];
+		} else {
+			$total_files_count = 0;
+		}
+
+		// Get total files size
+		if ( isset( $params['total_files_size'] ) ) {
+			$total_files_size = (int) $params['total_files_size'];
+		} else {
+			$total_files_size = 0;
+		}
+
 		// Set progress
 		Ai1wm_Status::info( __( 'Retrieving a list of all WordPress files...', AI1WMME_PLUGIN_NAME ) );
 
@@ -183,20 +197,6 @@ class Ai1wmme_Export_Enumerate {
 				// Set exclude uploads
 				$exclude_filters = array_merge( $exclude_filters, array( 'uploads', 'blogs.dir' ) );
 			}
-		}
-
-		// Get total files count
-		if ( isset( $params['total_files_count'] ) ) {
-			$total_files_count = (int) $params['total_files_count'];
-		} else {
-			$total_files_count = 0;
-		}
-
-		// Get total files size
-		if ( isset( $params['total_files_size'] ) ) {
-			$total_files_size = (int) $params['total_files_size'];
-		} else {
-			$total_files_size = 0;
 		}
 
 		// Create map file

@@ -27,11 +27,14 @@ class Ai1wmme_Import_Blogs {
 
 	public static function execute( $params ) {
 
-		// Read package.json file
-		$handle = ai1wm_open( ai1wm_package_path( $params ), 'r' );
-
 		// Set progress
 		Ai1wm_Status::info( __( 'Preparing blogs...', AI1WMME_PLUGIN_NAME ) );
+
+		$sites = array();
+		$blogs = array();
+
+		// Read package.json file
+		$handle = ai1wm_open( ai1wm_package_path( $params ), 'r' );
 
 		// Parse package.json file
 		$config = ai1wm_read( $handle, filesize( ai1wm_package_path( $params ) ) );
@@ -39,9 +42,6 @@ class Ai1wmme_Import_Blogs {
 
 		// Close handle
 		ai1wm_close( $handle );
-
-		$sites = array();
-		$blogs = array();
 
 		// Single site
 		if ( ! is_file( ai1wm_multisite_path( $params ) ) ) {
@@ -131,20 +131,20 @@ class Ai1wmme_Import_Blogs {
 				$new_blog_path = parse_url( home_url(), PHP_URL_PATH );
 
 				// Get old blog domain without www subdomain
-				$old_www_domain = parse_url( str_ireplace( '//www.', '//', $config['HomeURL'] ), PHP_URL_HOST );
+				$old_home_url_www_inversion = parse_url( str_ireplace( '//www.', '//', $config['HomeURL'] ), PHP_URL_HOST );
 
 				// Get new blog domain without www subdomain
-				$new_www_domain = parse_url( str_ireplace( '//www.', '//', home_url() ), PHP_URL_HOST );
+				$new_home_url_www_inversion = parse_url( str_ireplace( '//www.', '//', home_url() ), PHP_URL_HOST );
 
 				// Get standalone domain and path
 				if ( is_null( $subsite['BlogID'] ) ) {
 
 					// Get blog sub domain
-					if ( ( $old_blog_subdomain = explode( '.', untrailingslashit( $old_www_domain ) ) ) ) {
+					if ( ( $old_blog_subdomain = explode( '.', untrailingslashit( $old_home_url_www_inversion ) ) ) ) {
 						if ( ( $old_blog_subdomain = array_filter( $old_blog_subdomain ) ) ) {
 							if ( ( $new_blog_name = array_shift( $old_blog_subdomain ) ) ) {
 								if ( is_subdomain_install() ) {
-									$new_subsite_domain = sprintf( '%s.%s', strtolower( $new_blog_name ), strtolower( $new_www_domain ) );
+									$new_subsite_domain = sprintf( '%s.%s', strtolower( $new_blog_name ), strtolower( $new_home_url_www_inversion ) );
 									$new_subsite_path   = sprintf( '%s', untrailingslashit( $new_blog_path ) );
 								} else {
 									$new_subsite_domain = sprintf( '%s', strtolower( $new_blog_domain ) );
@@ -159,7 +159,7 @@ class Ai1wmme_Import_Blogs {
 						if ( ( $old_blog_subpath = array_filter( $old_blog_subpath ) ) ) {
 							if ( ( $new_blog_name = array_pop( $old_blog_subpath ) ) ) {
 								if ( is_subdomain_install() ) {
-									$new_subsite_domain = sprintf( '%s.%s', strtolower( $new_blog_name ), strtolower( $new_www_domain ) );
+									$new_subsite_domain = sprintf( '%s.%s', strtolower( $new_blog_name ), strtolower( $new_home_url_www_inversion ) );
 									$new_subsite_path   = sprintf( '%s', untrailingslashit( $new_blog_path ) );
 								} else {
 									$new_subsite_domain = sprintf( '%s', strtolower( $new_blog_domain ) );
@@ -202,13 +202,13 @@ class Ai1wmme_Import_Blogs {
 								}
 							}
 						}
-					} elseif ( strripos( $subsite['Domain'], $old_www_domain ) !== false ) {
+					} elseif ( strripos( $subsite['Domain'], $old_home_url_www_inversion ) !== false ) {
 
 						// Get blog sub domain
-						if ( ( $old_blog_subdomain = substr_replace( $subsite['Domain'], '', strripos( $subsite['Domain'], $old_www_domain ), strlen( $old_www_domain ) ) ) ) {
+						if ( ( $old_blog_subdomain = substr_replace( $subsite['Domain'], '', strripos( $subsite['Domain'], $old_home_url_www_inversion ), strlen( $old_home_url_www_inversion ) ) ) ) {
 							if ( ( $new_blog_name = trim( $old_blog_subdomain, '.' ) ) ) {
 								if ( is_subdomain_install() ) {
-									$new_subsite_domain = sprintf( '%s.%s', strtolower( $new_blog_name ), strtolower( $new_www_domain ) );
+									$new_subsite_domain = sprintf( '%s.%s', strtolower( $new_blog_name ), strtolower( $new_home_url_www_inversion ) );
 									$new_subsite_path   = sprintf( '%s', untrailingslashit( $new_blog_path ) );
 								} else {
 									$new_subsite_domain = sprintf( '%s', strtolower( $new_blog_domain ) );
@@ -223,7 +223,7 @@ class Ai1wmme_Import_Blogs {
 								if ( ( $old_blog_subpath = array_filter( $old_blog_subpath ) ) ) {
 									if ( ( $new_blog_name = array_pop( $old_blog_subpath ) ) ) {
 										if ( is_subdomain_install() ) {
-											$new_subsite_domain = sprintf( '%s.%s', strtolower( $new_blog_name ), strtolower( $new_www_domain ) );
+											$new_subsite_domain = sprintf( '%s.%s', strtolower( $new_blog_name ), strtolower( $new_home_url_www_inversion ) );
 											$new_subsite_path   = sprintf( '%s', untrailingslashit( $new_blog_path ) );
 										} else {
 											$new_subsite_domain = sprintf( '%s', strtolower( $new_blog_domain ) );
@@ -435,14 +435,6 @@ class Ai1wmme_Import_Blogs {
 
 			// Set progress
 			Ai1wm_Status::blogs(
-				Ai1wm_Template::get_content(
-					'import/sites', array(
-						'networks' => $networks,
-						'sites'    => $sites,
-						'subsite'  => $subsite,
-					),
-					AI1WMME_TEMPLATES_PATH
-				),
 				sprintf(
 					__(
 						'Subsite (%d of %d)',
@@ -450,6 +442,14 @@ class Ai1wmme_Import_Blogs {
 					),
 					$subsite + 1,
 					count( $sites )
+				),
+				Ai1wm_Template::get_content(
+					'import/sites', array(
+						'networks' => $networks,
+						'sites'    => $sites,
+						'subsite'  => $subsite,
+					),
+					AI1WMME_TEMPLATES_PATH
 				)
 			);
 			exit;

@@ -67,20 +67,16 @@ class Ai1wmme_Export_Database {
 			$mysql = new Ai1wm_Database_Mysqli( $wpdb );
 		}
 
-		// Replace table prefix on columns
-		$mysql->set_table_prefix_columns( ai1wm_table_prefix() . 'options', array( 'option_name' ) )
-			->set_table_prefix_columns( ai1wm_table_prefix() . 'usermeta', array( 'meta_key' ) );
-
 		// Network or sites
 		if ( isset( $params['options']['sites'] ) ) {
 
-			// Set spam comments, post revisions and find and replace
+			// Set spam comments, post revisions and table prefix on columns
 			foreach ( ai1wmme_include_sites( $params ) as $site ) {
 
 				// Spam comments
 				if ( isset( $params['options']['no_spam_comments'] ) ) {
-					$mysql->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'comments', array( "`comment_approved` != 'spam'" ) );
-					$mysql->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'commentmeta', array( sprintf( "`comment_ID` IN ( SELECT `comment_ID` FROM `%s` WHERE `comment_approved` != 'spam' )", ai1wm_table_prefix( $site['BlogID'] ) . 'comments' ) ) );
+					$mysql->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'comments', array( "`comment_approved` != 'spam'" ) )
+						->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'commentmeta', array( sprintf( "`comment_ID` IN ( SELECT `comment_ID` FROM `%s` WHERE `comment_approved` != 'spam' )", ai1wm_table_prefix( $site['BlogID'] ) . 'comments' ) ) );
 				}
 
 				// Post revisions
@@ -88,12 +84,11 @@ class Ai1wmme_Export_Database {
 					$mysql->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'posts', array( "`post_type` != 'revision'" ) );
 				}
 
-				// Exclude active plugins and status options
+				// Exclude table options
 				$mysql->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'options', array( sprintf( "`option_name` NOT IN ('%s', '%s', '%s', '%s')", AI1WM_ACTIVE_PLUGINS, AI1WM_ACTIVE_TEMPLATE, AI1WM_ACTIVE_STYLESHEET, AI1WM_STATUS ) ) );
 
 				// Replace table prefix on columns
-				$mysql->set_table_prefix_columns( ai1wm_table_prefix( $site['BlogID'] ) . 'options', array( 'option_name' ) )
-					->set_table_prefix_columns( ai1wm_table_prefix( $site['BlogID'] ) . 'usermeta', array( 'meta_key' ) );
+				$mysql->set_table_prefix_columns( ai1wm_table_prefix( $site['BlogID'] ) . 'options', array( 'option_name' ) );
 			}
 
 			$usermeta = array();
@@ -168,7 +163,7 @@ class Ai1wmme_Export_Database {
 					}
 
 					// Set table prefixes based on user meta
-					foreach ( array( 'capabilities', 'user_level', 'user_roles' ) as $user_meta ) {
+					foreach ( array( 'capabilities', 'user_level', 'user_roles', 'dashboard_quick_press_last_post_id', 'user-settings', 'user-settings-time' ) as $user_meta ) {
 						$old_table_prefixes[] = $user_meta;
 						$new_table_prefixes[] = ai1wm_servmask_prefix( 'mainsite' ) . $user_meta;
 					}
@@ -207,15 +202,25 @@ class Ai1wmme_Export_Database {
 
 		} else {
 
-			// Spam comments
-			if ( isset( $params['options']['no_spam_comments'] ) ) {
-				$mysql->set_table_where_clauses( ai1wm_table_prefix() . 'comments', array( "`comment_approved` != 'spam'" ) );
-				$mysql->set_table_where_clauses( ai1wm_table_prefix() . 'commentmeta', array( sprintf( "`comment_ID` IN ( SELECT `comment_ID` FROM `%s` WHERE `comment_approved` != 'spam' )", ai1wm_table_prefix() . 'comments' ) ) );
-			}
+			// Set spam comments, post revisions and table prefix on columns
+			foreach ( ai1wmme_sites( $params ) as $site ) {
 
-			// Post revisions
-			if ( isset( $params['options']['no_revisions'] ) ) {
-				$mysql->set_table_where_clauses( ai1wm_table_prefix() . 'posts', array( "`post_type` != 'revision'" ) );
+				// Spam comments
+				if ( isset( $params['options']['no_spam_comments'] ) ) {
+					$mysql->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'comments', array( "`comment_approved` != 'spam'" ) )
+						->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'commentmeta', array( sprintf( "`comment_ID` IN ( SELECT `comment_ID` FROM `%s` WHERE `comment_approved` != 'spam' )", ai1wm_table_prefix( $site['BlogID'] ) . 'comments' ) ) );
+				}
+
+				// Post revisions
+				if ( isset( $params['options']['no_revisions'] ) ) {
+					$mysql->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'posts', array( "`post_type` != 'revision'" ) );
+				}
+
+				// Exclude table options
+				$mysql->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'options', array( sprintf( "`option_name` NOT IN ('%s', '%s', '%s', '%s')", AI1WM_ACTIVE_PLUGINS, AI1WM_ACTIVE_TEMPLATE, AI1WM_ACTIVE_STYLESHEET, AI1WM_STATUS ) ) );
+
+				// Replace table prefix on columns
+				$mysql->set_table_prefix_columns( ai1wm_table_prefix( $site['BlogID'] ) . 'options', array( 'option_name' ) );
 			}
 
 			$old_table_prefixes = array();
@@ -232,7 +237,7 @@ class Ai1wmme_Export_Database {
 				}
 
 				// Set table prefixes based on user meta
-				foreach ( array( 'capabilities', 'user_level', 'user_roles' ) as $user_meta ) {
+				foreach ( array( 'capabilities', 'user_level', 'user_roles', 'dashboard_quick_press_last_post_id', 'user-settings', 'user-settings-time' ) as $user_meta ) {
 					$old_table_prefixes[] = $user_meta;
 					$new_table_prefixes[] = ai1wm_servmask_prefix() . $user_meta;
 				}
@@ -257,11 +262,11 @@ class Ai1wmme_Export_Database {
 				->set_exclude_table_prefixes( $exclude_table_prefixes );
 		}
 
-		// Exclude active sitewide plugins option
+		// Exclude table options
 		$mysql->set_table_where_clauses( ai1wm_table_prefix() . 'sitemeta', array( sprintf( "`meta_key` NOT IN ('%s')", AI1WM_ACTIVE_SITEWIDE_PLUGINS ) ) );
 
-		// Exclude active plugins and status options
-		$mysql->set_table_where_clauses( ai1wm_table_prefix() . 'options', array( sprintf( "`option_name` NOT IN ('%s', '%s', '%s', '%s')", AI1WM_ACTIVE_PLUGINS, AI1WM_ACTIVE_TEMPLATE, AI1WM_ACTIVE_STYLESHEET, AI1WM_STATUS ) ) );
+		// Replace table prefix on columns
+		$mysql->set_table_prefix_columns( ai1wm_table_prefix() . 'usermeta', array( 'meta_key' ) );
 
 		// Export database
 		if ( $mysql->export( ai1wm_database_path( $params ), $table_index, $table_offset, 10 ) ) {

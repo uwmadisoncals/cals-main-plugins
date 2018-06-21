@@ -69,44 +69,66 @@ class Ai1wmme_Main_Controller {
 	}
 
 	/**
-	 * Register scripts and styles for Export Controller
+	 * Enqueue scripts and styles for Export Controller
 	 *
+	 * @param  string $hook Hook suffix
 	 * @return void
 	 */
-	public function register_export_scripts_and_styles( $hook ) {
-		if ( stripos( 'toplevel_page_site-migration-export', $hook ) === false ) {
+	public function enqueue_export_scripts_and_styles( $hook ) {
+		if ( stripos( 'toplevel_page_ai1wm_export', $hook ) === false ) {
 			return;
 		}
 
+		if ( is_rtl() ) {
+			wp_enqueue_style(
+				'ai1wmme_export',
+				Ai1wm_Template::asset_link( 'css/export.min.rtl.css', 'AI1WMME' ),
+				array( 'ai1wm_export' )
+			);
+		} else {
+			wp_enqueue_style(
+				'ai1wmme_export',
+				Ai1wm_Template::asset_link( 'css/export.min.css', 'AI1WMME' ),
+				array( 'ai1wm_export' )
+			);
+		}
+
 		wp_enqueue_script(
-			'ai1wmme-js-export',
+			'ai1wmme_export',
 			Ai1wm_Template::asset_link( 'javascript/export.min.js', 'AI1WMME' ),
-			array( 'jquery' )
-		);
-		wp_enqueue_style(
-			'ai1wmme-css-export',
-			Ai1wm_Template::asset_link( 'css/export.min.css', 'AI1WMME' )
+			array( 'ai1wm_export' )
 		);
 	}
 
 	/**
-	 * Register scripts and styles for Import Controller
+	 * Enqueue scripts and styles for Import Controller
 	 *
+	 * @param  string $hook Hook suffix
 	 * @return void
 	 */
-	public function register_import_scripts_and_styles( $hook ) {
-		if ( stripos( 'all-in-one-wp-migration_page_site-migration-import', $hook ) === false ) {
+	public function enqueue_import_scripts_and_styles( $hook ) {
+		if ( stripos( 'all-in-one-wp-migration_page_ai1wm_import', $hook ) === false ) {
 			return;
 		}
 
+		if ( is_rtl() ) {
+			wp_enqueue_style(
+				'ai1wmme_import',
+				Ai1wm_Template::asset_link( 'css/import.min.rtl.css', 'AI1WMME' ),
+				array( 'ai1wm_import' )
+			);
+		} else {
+			wp_enqueue_style(
+				'ai1wmme_import',
+				Ai1wm_Template::asset_link( 'css/import.min.css', 'AI1WMME' ),
+				array( 'ai1wm_import' )
+			);
+		}
+
 		wp_enqueue_script(
-			'ai1wmme-js-import',
+			'ai1wmme_import',
 			Ai1wm_Template::asset_link( 'javascript/import.min.js', 'AI1WMME' ),
-			array( 'jquery' )
-		);
-		wp_enqueue_style(
-			'ai1wmme-css-import',
-			Ai1wm_Template::asset_link( 'css/import.min.css', 'AI1WMME' )
+			array( 'ai1wm_import' )
 		);
 	}
 
@@ -138,7 +160,7 @@ class Ai1wmme_Main_Controller {
 				color: #fff;
 			}
 		</style>
-	<?php
+		<?php
 	}
 
 	/**
@@ -159,11 +181,11 @@ class Ai1wmme_Main_Controller {
 		// Export and import commands
 		add_action( 'plugins_loaded', array( $this, 'ai1wm_commands' ), 20 );
 
-		// Add export scripts and styles
-		add_action( 'admin_enqueue_scripts', array( $this, 'register_export_scripts_and_styles' ), 20 );
+		// Enqueue export scripts and styles
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_export_scripts_and_styles' ), 20 );
 
-		// Add import scripts and styles
-		add_action( 'admin_enqueue_scripts', array( $this, 'register_import_scripts_and_styles' ), 20 );
+		// Enqueue import scripts and styles
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_import_scripts_and_styles' ), 20 );
 
 		return $this;
 	}
@@ -174,6 +196,8 @@ class Ai1wmme_Main_Controller {
 	 * @return Object Instance of this class
 	 */
 	private function activate_filters() {
+		// Add links to plugin list page
+		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 5, 2 );
 
 		return $this;
 	}
@@ -186,7 +210,8 @@ class Ai1wmme_Main_Controller {
 	public function ai1wm_commands() {
 		if ( is_multisite() ) {
 			// Add export commands
-			add_filter( 'ai1wm_export', 'Ai1wmme_Export_Config::execute', 60 );
+			add_filter( 'ai1wm_export', 'Ai1wmme_Export_Config::execute', 70 );
+			add_filter( 'ai1wm_export', 'Ai1wmme_Export_Config_File::execute', 80 );
 			add_filter( 'ai1wm_export', 'Ai1wmme_Export_Enumerate::execute', 100 );
 			add_filter( 'ai1wm_export', 'Ai1wmme_Export_Database::execute', 200 );
 
@@ -318,6 +343,19 @@ class Ai1wmme_Main_Controller {
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * Add links to plugin list page
+	 *
+	 * @return array
+	 */
+	public function plugin_row_meta( $links, $file ) {
+		if ( $file == AI1WMME_PLUGIN_BASENAME ) {
+			$links[] = __( '<a href="https://help.servmask.com/knowledgebase/multisite-extension-user-guide/" target="_blank">User Guide</a>', AI1WMME_PLUGIN_NAME );
+		}
+
+		return $links;
 	}
 
 	/**

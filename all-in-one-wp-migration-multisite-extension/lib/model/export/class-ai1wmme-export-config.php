@@ -28,9 +28,8 @@ class Ai1wmme_Export_Config {
 	public static function execute( $params ) {
 
 		// Set progress
-		Ai1wm_Status::info( __( 'Adding multisite configuration to archive...', AI1WMME_PLUGIN_NAME ) );
+		Ai1wm_Status::info( __( 'Preparing multisite configuration file...', AI1WMME_PLUGIN_NAME ) );
 
-		// Set config
 		$config = array();
 
 		// Set network
@@ -58,13 +57,8 @@ class Ai1wmme_Export_Config {
 		ai1wm_write( $handle, json_encode( $config ) );
 		ai1wm_close( $handle );
 
-		// Add multisite.json file
-		$archive = new Ai1wm_Compressor( ai1wm_archive_path( $params ) );
-		$archive->add_file( ai1wm_multisite_path( $params ), AI1WM_MULTISITE_NAME );
-		$archive->close();
-
 		// Set progress
-		Ai1wm_Status::info( __( 'Done adding multisite configuration to archive.', AI1WMME_PLUGIN_NAME ) );
+		Ai1wm_Status::info( __( 'Done preparing multisite configuration file.', AI1WMME_PLUGIN_NAME ) );
 
 		return $params;
 	}
