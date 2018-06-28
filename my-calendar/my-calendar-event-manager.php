@@ -1958,7 +1958,7 @@ function mc_list_events() {
 					href="<?php echo admin_url( 'admin.php?page=my-calendar-manage&amp;restrict=archived' ); ?>"><?php _e( 'Archived', 'my-calendar' ); ?></a>
 			</li>
 		<?php
-		if ( ( function_exists( 'akismet_http_post' ) || function_exists( 'bs_checker' ) ) && $allow_filters ) {
+		if ( function_exists( 'akismet_http_post' ) && $allow_filters ) {
 			?>
 			<li>
 				<a <?php echo ( isset( $_GET['restrict'] ) && 'flagged' == $_GET['restrict'] ) ? 'class="active-link" aria-current="true"' : ''; ?> href="<?php echo admin_url( 'admin.php?page=my-calendar-manage&amp;restrict=flagged&amp;filter=1' ); ?>"><?php _e( 'Spam', 'my-calendar' ); ?></a>
@@ -2247,7 +2247,7 @@ function mc_list_events() {
 					href="<?php echo admin_url( 'admin.php?page=my-calendar-manage&amp;restrict=archived' ); ?>"><?php _e( 'Archived', 'my-calendar' ); ?></a>
 			</li>
 			<?php
-			if ( ( function_exists( 'akismet_http_post' ) || function_exists( 'bs_checker' ) ) && $allow_filters ) {
+			if ( function_exists( 'akismet_http_post' ) && $allow_filters ) {
 				?>
 			<li>
 				<a <?php echo ( isset( $_GET['restrict'] ) && 'flagged' == $_GET['restrict'] ) ? 'class="active-link" aria-current="true"' : ''; ?>
@@ -2427,6 +2427,10 @@ function mc_check_data( $action, $post, $i ) {
 		if ( '' != $time ) {
 			$default_modifier = apply_filters( 'mc_default_event_length', '1 hour' );
 			$endtime          = ! empty( $post['event_endtime'][ $i ] ) ? trim( $post['event_endtime'][ $i ] ) : date( 'H:i:s', mc_strtotime( $time . ' +' . $default_modifier ) );
+			if ( empty( $post['event_endtime'][ $i ] ) && date( 'H', mc_strtotime( $endtime ) ) == '00' ) {
+				// If one hour pushes event into next day, reset to 11:59pm.
+				$endtime = '23:59:00';
+			}
 		} else {
 			$endtime = ! empty( $post['event_endtime'][ $i ] ) ? trim( $post['event_endtime'][ $i ] ) : '';
 		}
@@ -3785,7 +3789,7 @@ function mc_increment_event( $id, $post = array(), $test = false, $instances = a
 					for ( $i = 0; $i <= $numforward; $i ++ ) {
 						$next_week_diff = ( date( 'm', $newbegin ) == date( 'm', my_calendar_add_date( date( 'Y-m-d', $newbegin ), 7, 0, 0 ) ) ) ? false : true;
 						$move_event     = ( ( 1 == $fifth_week ) && ( ( week_of_month( date( 'd', $newbegin ) ) + 1 ) == $week_of_event ) && true == $next_week_diff ) ? true : false;
-						if ( week_of_month( date( 'd', $newbegin ) == $week_of_event ) || true == $move_event ) {
+						if ( week_of_month( date( 'd', $newbegin ) ) == $week_of_event || true == $move_event ) {
 						} else {
 							$newbegin   = my_calendar_add_date( date( 'Y-m-d  H:i:s', $newbegin ), 7, 0, 0 );
 							$newend     = my_calendar_add_date( date( 'Y-m-d  H:i:s', $newend ), 7, 0, 0 );

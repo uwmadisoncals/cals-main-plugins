@@ -229,8 +229,8 @@ function mc_default_settings() {
 	foreach ( $globals as $key => $global ) {
 		${$key} = $global;
 	}
+
 	add_option( 'mc_display_author', 'false' );
-	add_option( 'mc_version', $mc_version );
 	add_option( 'mc_use_styles', 'false' );
 	add_option( 'mc_show_months', 1 );
 	add_option( 'mc_show_map', 'false' );
@@ -306,7 +306,7 @@ function mc_default_settings() {
 	$has_uri = mc_guess_calendar();
 	if ( false == $has_uri['response'] ) {
 		// if mc_guess_calendar returns a string, no valid URI was found.
-		$slug = sanitize_title( __( 'my-calendar', 'my-calendar' ) );
+		$slug = sanitize_title( __( 'My Calendar', 'my-calendar' ) );
 		mc_generate_calendar_page( $slug );
 	}
 	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );

@@ -5,7 +5,7 @@ Plugin URI: http://weavertheme.com/plugins
 Description: Weaver Xtreme Theme Support - a package of useful shortcodes and widgets that integrates closely with the Weaver Xtreme and Weaver Foundation themes.
 Author: wpweaver
 Author URI: http://weavertheme.com/about/
-Version: 4.0
+Version: 4.0.2
 License: GPL V3
 
 Weaver Xtreme Theme Support
@@ -43,7 +43,7 @@ if ( function_exists( 'weavercore_ts_installed' ) ) {
 
 if ( strpos( $theme, '/weaver-xtreme') !== false ) {		// only load if Weaver Xtreme is the theme
 
-define ('WVRX_TS_VERSION','3.9');
+define ('WVRX_TS_VERSION','4.0.2');
 define ('WVRX_TS_MINIFY','.min');		// '' for dev, '.min' for production
 define ('WVRX_TS_PAGEBUILDERS', true);  // currently not safely implemented - will be in Weaver 4.0
 

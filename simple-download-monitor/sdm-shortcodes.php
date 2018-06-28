@@ -198,13 +198,19 @@ function sdm_handle_category_shortcode( $args ) {
     if ( ! empty( $category_slug ) && empty( $category_id ) ) {
 
 	$field	 = 'slug';
-	$terms	 = $category_slug;
+        
+        $terms	 = array_filter(explode(',', $category_slug), function($value) {
+            return !empty($value) ? trim($value) : false;
+        });
     }
     // Else setup query arguments for category_id
     else if ( ! empty( $category_id ) && empty( $category_slug ) ) {
 
 	$field	 = 'term_id';
-	$terms	 = $category_id;
+	//$terms = $category_id;
+        $terms	 = array_filter(explode(',', $category_id), function($value) {
+            return !empty($value) ? trim($value) : false;
+        });        
     }
 
     if ( isset( $args[ 'show_all' ] ) ) {
@@ -320,8 +326,8 @@ function sdm_handle_category_shortcode( $args ) {
 		'add_args'	 => '',
 		'current'	 => max( 1, get_query_var( 'paged' ) ),
 		'total'		 => $total_pages,
-		'prev_text'	 => '&larr;',
-		'next_text'	 => '&rarr;',
+		'prev_text'	 => '&laquo;',
+		'next_text'	 => '&raquo;',
 	    ) );
 	    $output		 .= '<div class="sdm_pagination">' . $pagination . '</div>';
 	}

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://support.mailpoet.com/\n"
-"POT-Creation-Date: 2018-06-20 11:03:17+00:00\n"
+"POT-Creation-Date: 2018-06-26 12:01:20+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1492,7 +1492,7 @@ msgstr ""
 msgid "Bounced"
 msgstr ""
 
-#: lib/Newsletter/Editor/PostContentManager.php:92
+#: lib/Newsletter/Editor/PostContentManager.php:96
 msgid "Click here to view media."
 msgstr ""
 

@@ -269,8 +269,8 @@
     ),
     'less\\event.less' => 
     array (
-      'size' => 3741,
-      'sha1' => 'cbbce626a293594f13974628b2be746d837898ba',
+      'size' => 3834,
+      'sha1' => '4d8998b021b5480608424156cc554ff7393d60f0',
     ),
     'less\\font-awesome\\bordered-pulled.less' => 
     array (

@@ -261,8 +261,9 @@ function weaverx_mainopts_fullwidth() {
 		array('val' => '', 			'desc' => ''),
 		array('val' => 'fullwidth', 'desc' => __('Full Width - Extends BG to full width', 'weaver-xtreme')),
 		array('val' => 'stretched', 'desc'  => __('Stretched - Expand to full width', 'weaver-xtreme')),
-		array('val' => 'boxed', 	'desc'=> __('Boxed - Traditional layout', 'weaver-xtreme')),
-		array('val' => 'custom', 	'desc' => __('Custom - Use Custom Width Options', 'weaver-xtreme'))
+		//array('val' => 'boxed', 	'desc'=> __('Boxed - Traditional layout', 'weaver-xtreme')),
+		//array('val' => 'custom', 	'desc' => __('Custom - Use Custom Width Options', 'weaver-xtreme'))
+		array('val' => 'custom', 	'desc' => __('Traditional - Use Traditional Width Options', 'weaver-xtreme'))
 	))
 	);
 
