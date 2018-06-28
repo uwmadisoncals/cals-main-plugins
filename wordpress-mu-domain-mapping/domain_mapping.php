@@ -685,7 +685,9 @@ function remote_logout_loader() {
 }
 
 function redirect_to_mapped_domain() {
-	global $current_blog, $wpdb;
+	// edited 6/27/2018 by Jason Pursian to fix the wp customizer error (non-existent changeset uuid) and no preview
+	//global $current_blog, $wpdb;
+  	global $current_blog, $wpdb, $wp_customize;
 
 	// don't redirect the main site
 	if ( is_main_site() )
@@ -695,7 +697,9 @@ function redirect_to_mapped_domain() {
 		return;
 
 	// don't redirect theme customizer (WP 3.4)
-	if ( isset( $_POST['customize'] ) && isset( $_POST['theme'] ) && $_POST['customize'] == 'on' )
+	// edited 6/27/2018 by Jason Pursian to fix the wp customizer error (non-existent changeset uuid) and no preview
+	// if ( isset( $_POST['customize'] ) && isset( $_POST['theme'] ) && $_POST['customize'] == 'on' )
+	if ( is_a( $wp_customize, 'WP_Customize_Manager' ) )
 		return;
 
 	$protocol = is_ssl() ? 'https://' : 'http://';
@@ -838,3 +842,4 @@ function dm_idn_warning() {
 }
 
 ?>
+
