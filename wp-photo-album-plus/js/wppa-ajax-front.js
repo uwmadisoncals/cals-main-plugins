@@ -3,7 +3,7 @@
 // Contains frontend ajax modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsAjaxVersion = '6.8.08';
+var wppaJsAjaxVersion = '6.9.05';
 
 var wppaRenderAdd = false;
 var wppaWaitForCounter = 0;
@@ -171,7 +171,7 @@ function wppaDoAjaxRender( mocc, ajaxurl, newurl, add, waitfor, addHilite ) {
 										jQuery( '#wppa-ajax-spin-'+mocc ).stop().fadeOut();
 
 										// Fake resize
-										setTimeout(function(){jQuery(window).trigger('resize')}, 250);
+										window.dispatchEvent(new Event('resize'));
 
 										// Hide rightclick optionally
 										wppaProtect();

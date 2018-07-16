@@ -893,33 +893,29 @@ function my_calendar_send_email( $event ) {
  * @return boolean true if spam
  */
 function mc_spam( $event_url = '', $description = '', $post = array() ) {
-	global $akismet_api_host, $akismet_api_port, $current_user;
-	$wpcom_api_key = defined( 'WPCOM_API_KEY' ) ? WPCOM_API_KEY : false;
-	$current_user  = wp_get_current_user();
-	if ( current_user_can( 'mc_manage_events' ) ) { // is a privileged user.
-		return 0;
+	global $akismet_api_host, $akismet_api_port;
+	if ( current_user_can( 'mc_manage_events' ) || apply_filters( 'mc_disable_spam_checking', false, $post ) ) { // is a privileged user.
+		return apply_filters( 'mc_custom_spam_status', 0, $post );
 	}
 	$akismet = false;
 	$c       = array();
 	// check for Akismet.
-	if ( function_exists( 'akismet_http_post' ) || ( get_option( 'wordpress_api_key' ) || $wpcom_api_key ) ) {
+	if ( ( function_exists( 'akismet_http_post' ) || method_exists( 'Akismet', 'http_post' ) ) && ( akismet_get_key() ) ) {
 		$akismet = true;
 	}
 	if ( $akismet ) {
-		$c['blog']         = get_option( 'home' );
-		$c['user_ip']      = preg_replace( '/[^0-9., ]/', '', $_SERVER['REMOTE_ADDR'] );
-		$c['user_agent']   = $_SERVER['HTTP_USER_AGENT'];
-		$c['referrer']     = $_SERVER['HTTP_REFERER'];
-		$c['comment_type'] = 'my_calendar_event';
-		if ( get_permalink() == $permalink ) {
-			$c['permalink'] = $permalink;
-		}
-		if ( '' != $event_url ) {
-			$c['comment_author_url'] = $event_url;
-		}
-		if ( '' != $description ) {
-			$c['comment_content'] = $description;
-		}
+		$c['blog']                 = home_url();
+		$c['user_ip']              = preg_replace( '/[^0-9., ]/', '', $_SERVER['REMOTE_ADDR'] );
+		$c['user_agent']           = $_SERVER['HTTP_USER_AGENT'];
+		$c['referrer']             = $_SERVER['HTTP_REFERER'];
+		$c['comment_type']         = 'calendar-event';
+		$c['blog_lang']            = get_bloginfo( 'language' );
+		$c['blog_charset']         = get_bloginfo( 'charset' );
+		$c['comment_author_url']   = $event_url;
+		$c['comment_content']      = $description;
+		$c['comment_author']       = $post['mcs_name'];
+		$c['comment_author_email'] = $post['mcs_email'];
+
 		$ignore = array( 'HTTP_COOKIE' );
 
 		foreach ( $_SERVER as $key => $value ) {
@@ -931,7 +927,11 @@ function mc_spam( $event_url = '', $description = '', $post = array() ) {
 		foreach ( $c as $key => $data ) {
 			$query_string .= $key . '=' . urlencode( stripslashes( (string) $data ) ) . '&';
 		}
-		$response = akismet_http_post( $query_string, $akismet_api_host, '/1.1/comment-check', $akismet_api_port );
+		if ( method_exists( 'Akismet', 'http_post' ) ) {
+			$response = Akismet::http_post( $query_string, 'comment-check' );
+		} else {
+			$response = akismet_http_post( $query_string, $akismet_api_host, '/1.1/comment-check', $akismet_api_port );
+		}
 		if ( 'true' == $response[1] ) {
 			return 1;
 		} else {
@@ -940,6 +940,28 @@ function mc_spam( $event_url = '', $description = '', $post = array() ) {
 	}
 
 	return 0;
+}
+
+/**
+ * Cache total number of events for admin.
+ */
+function mc_update_count_cache() {
+	global $wpdb;
+	$published = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_approved = 1' ); // WPCS: unprepared SQL OK.
+	$draft     = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_approved = 0' ); // WPCS: unprepared SQL OK.
+	$trash     = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_status = 2' ); // WPCS: unprepared SQL OK.
+	$archive   = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_status = 0' ); // WPCS: unprepared SQL OK.
+	$spam      = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_flagged = 1' ); // WPCS: unprepared SQL OK.
+	$counts    = array(
+		'published' => $published,
+		'draft'     => $draft,
+		'trash'     => $trash,
+		'archive'   => $archive,
+		'spam'      => $spam,
+	);
+	update_option( 'mc_count_cache', $counts );
+
+	return $counts;
 }
 
 add_action( 'admin_enqueue_scripts', 'mc_scripts' );
@@ -988,12 +1010,15 @@ function mc_scripts() {
 			date_i18n( 'D', strtotime( 'Friday' ) ),
 			date_i18n( 'D', strtotime( 'Saturday' ) ),
 		) );
-		$sweek = get_option( 'start_of_week' );
+		$sweek = absint( get_option( 'start_of_week' ) );
 		wp_localize_script( 'pickadate.date', 'mc_text', array(
-			'today' => addslashes( __( 'Today', 'my-calendar' ) ),
-			'clear' => addslashes( __( 'Clear', 'my-calendar' ) ),
-			'close' => addslashes( __( 'Close', 'my-calendar' ) ),
-			'start' => ( 1 == $sweek || 0 == $sweek ) ? $sweek : 0,
+			'vals' => array(
+				'today' => addslashes( __( 'Today', 'my-calendar' ) ),
+				'clear' => addslashes( __( 'Clear', 'my-calendar' ) ),
+				'close' => addslashes( __( 'Close', 'my-calendar' ) ),
+				// False-y values = Sunday, truth-y = Monday.
+				'start' => ( 1 == $sweek || 0 == $sweek ) ? $sweek : 0,
+			),
 		) );
 		wp_localize_script( 'pickadate.time', 'mc_time_format', apply_filters( 'mc_time_format', 'h:i A' ) );
 		wp_localize_script( 'pickadate.time', 'mc_interval', apply_filters( 'mc_interval', '15' ) );
@@ -1003,14 +1028,11 @@ function mc_scripts() {
 			wp_enqueue_media();
 		}
 	}
-
-	if ( 'my-calendar_page_my-calendar-locations' == $id ) {
-		if ( 'true' == get_option( 'mc_gmap' ) ) {
-			$api_key = get_option( 'mc_gmap_api_key' );
-			if ( $api_key ) {
-				wp_enqueue_script( 'gmaps', "https://maps.googleapis.com/maps/api/js?key=$api_key" );
-				wp_enqueue_script( 'gmap3', plugins_url( 'js/gmap3.min.js', __FILE__ ), array( 'jquery' ) );
-			}
+	if ( 'my-calendar_page_my-calendar-locations' == $id || 'toplevel_page_my-calendar' == $id ) {
+		$api_key = get_option( 'mc_gmap_api_key' );
+		if ( $api_key ) {
+			wp_enqueue_script( 'gmaps', "https://maps.googleapis.com/maps/api/js?key=$api_key" );
+			wp_enqueue_script( 'gmap3', plugins_url( 'js/gmap3.min.js', __FILE__ ), array( 'jquery' ) );
 		}
 	}
 
@@ -1365,7 +1387,7 @@ $plugins_string
 				if ( 'Donor' == $has_donated || 'Purchaser' == $has_purchased ) {
 					mc_show_notice( __( 'Thank you for supporting the continuing development of this plug-in! I\'ll get back to you as soon as I can.', 'my-calendar' ) );
 				} else {
-					mc_show_notice( __( 'I\'ll get back to you as soon as I can, after dealing with any support requests from plug-in supporters.', 'my-calendar' ) );
+					mc_show_notice( __( 'I\'ll get back to you as soon as I can, after dealing with any support requests from plug-in supporters.', 'my-calendar' ) . __( 'You should receive an automatic response to your request when I receive it. If you do not receive this notice, then either I did not receive your message or the email it was sent from was not a valid address.', 'my-calendar' ) );
 				}
 			} else {
 				// Translators: Support form URL.

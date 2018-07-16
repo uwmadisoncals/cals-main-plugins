@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.9.02
+* Version 6.9.05
 *
 */
 
@@ -2576,19 +2576,22 @@ global $wppa_log_file;
 					}
 					break;
 				case 'wppa_imgfact_count':
-					wppa_ajax_check_range( $value, false, '1', '24', __( 'Number of coverphotos' , 'wp-photo-album-plus') );
+					wppa_ajax_check_range( $value, false, '1', '24', __( 'Number of coverphotos', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_dislike_value':
-					wppa_ajax_check_range( $value, false, '-10', '0', __( 'Dislike value' , 'wp-photo-album-plus') );
+					wppa_ajax_check_range( $value, false, '-10', '0', __( 'Dislike value', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_slideshow_pagesize':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Slideshow pagesize' , 'wp-photo-album-plus') );
+					wppa_ajax_check_range( $value, false, '0', false, __( 'Slideshow pagesize', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_slideonly_max':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Slideonly max', 'wp-photo-album-plus') );
+					wppa_ajax_check_range( $value, false, '0', false, __( 'Slideonly max', 'wp-photo-album-plus' ) );
 					break;
 				case 'wppa_pagelinks_max':
-					wppa_ajax_check_range( $value, false, '0', false, __( 'Max Pagelinks' , 'wp-photo-album-plus') );
+					wppa_ajax_check_range( $value, false, '0', false, __( 'Max Pagelinks', 'wp-photo-album-plus' ) );
+					break;
+				case 'wppa_thumb_area_size':
+					wppa_ajax_check_range( $value, false, '0', false, __( 'Thumbnail area max size', 'wp-photo-album-plus' ) );
 					break;
 /*
 				case 'wppa_start_pause_symbol_size':

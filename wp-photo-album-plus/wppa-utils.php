@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.9.04
+* Version 6.9.06
 *
 */
 
@@ -3352,6 +3352,8 @@ function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = 
 		$bgcolor 	= wppa_opt( 'svg_bg_color' );
 	}
 
+$border = false; // debug
+
 	// Find the border radius
 	switch( wppa_opt( 'icon_corner_style' ) ) {
 		case 'gif':
@@ -3404,7 +3406,7 @@ function wppa_get_svghtml( $name, $height = false, $lightbox = false, $border = 
 							'text-decoration:none !important;' .
 							'vertical-align:middle;' .
 							( $bradius ? 'border-radius:' . $bradius . '%;' : '' ) .
-							( $border ? 'border:2px solid ' . $bgcolor . ';box-sizing:border-box;' : '' ) .
+							( $border ? 'border:2px solid ' . $bgcolor . ';box-sizing:content-box;' : '' ) .
 							'"' .
 						' xml:space="preserve"' .
 						' >' .
@@ -4787,5 +4789,30 @@ function wppa_is_pdf( $id ) {
 // If wppa embedded lightbox, show wait cursor prior to lightbox init. when generic lightbox, show pointer cursor
 function wppa_wait() {
 	$result = wppa_opt( 'lightbox_name' ) == 'wppa' ? 'wait' : 'pointer';
+	return $result;
+}
+
+// Get navigation symbol size
+function wppa_icon_size( $default = '', $type = 0, $factor = 1 ) {
+
+	switch ( $type ) {
+		case 0:
+			$opt = wppa_opt( 'nav_icon_size' );
+			break;
+		case 1:
+			$opt = wppa_opt( 'nav_icon_size_slide' );
+			break;
+		case 2:
+			$opt = wppa_opt( 'icon_size_rating' );
+			break;
+	}
+
+	if ( $opt === 'default' ) {
+		return rtrim( $default, ';' ) . ';';
+	}
+
+	$opt *= $factor;
+	$result = ( wppa_in_widget() ? $opt / '2' : $opt ) . 'px;';
+
 	return $result;
 }

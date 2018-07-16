@@ -164,6 +164,34 @@ class AAM_Extension_Repository {
         AAM_Core_API::updateOption('aam-extensions', $list);
     }
     
+    /**
+     * 
+     * @return type
+     */
+    public function getCommercialLicenses($details = true) {
+        $response   = array();
+        $licenses   = AAM_Core_API::getOption('aam-extensions', array());
+        $extensions = AAM_Extension_List::get();
+        
+        foreach((array) $licenses as $key => $data) {
+            if (isset($extensions[$key]) 
+                    && !empty($data['license']) 
+                    && $extensions[$key]['type'] == 'commercial') {
+                
+                if ($details) {
+                    $response[] = array(
+                        'license'   => $data['license'],
+                        'extension' => $extensions[$key]['title'],
+                        'expires'   => (isset($data['expires']) ? $data['expires'] : null)
+                    );
+                } else {
+                    $response[] = $data['license'];
+                }
+            }
+        }
+        
+        return $response;
+    }
     
     /**
      * Add new extension
@@ -312,7 +340,7 @@ class AAM_Extension_Repository {
             if (isset($retrieved->$id)) {
                 $outdated = version_compare($version, $retrieved->$id->version) == -1;
             } else {
-                $outdated = version_compare($version, $item['latest']);
+                $outdated = version_compare($version, $item['latest']) == -1;
             }
         }
 
@@ -352,14 +380,20 @@ class AAM_Extension_Repository {
      * 
      * @access public
      */
-    public function getBasedir() {
-        $dirname = AAM_Core_Config::get('core.extention.directory', AAM_EXTENSION_BASE);
+    public function getBasedir($relative = false) {
+        $dir = AAM_Core_Config::get('core.extention.directory', AAM_EXTENSION_BASE);
         
-        if (file_exists($dirname) === false) {
-            @mkdir($dirname, fileperms( ABSPATH ) & 0777 | 0755);
-        }
+        return ($relative ? str_replace(ABSPATH, '', $dir) : $dir);
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function isWriteableDirectory() {
+        $directory = $this->getBasedir();
         
-        return $dirname;
+        return file_exists($directory) && is_writeable($directory);
     }
     
     /**

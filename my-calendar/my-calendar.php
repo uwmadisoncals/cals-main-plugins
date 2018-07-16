@@ -17,7 +17,7 @@
  * License:     GPL-2.0+
  * License URI: http://www.gnu.org/license/gpl-2.0.txt
  * Domain Path: lang
- * Version:     3.0.7
+ * Version:     3.0.12
  */
 
 /*
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 global $mc_version, $wpdb;
-$mc_version = '3.0.7';
+$mc_version = '3.0.12';
 
 define( 'MC_DEBUG', false );
 
@@ -144,8 +144,10 @@ add_action( 'init', 'mc_custom_canonical' );
  * Customize canonical URL for My Calendar custom links
  */
 function mc_custom_canonical() {
-	add_action( 'wp_head', 'mc_canonical' );
-	remove_action( 'wp_head', 'rel_canonical' );
+	if ( isset( $_GET['mc_id'] ) ) {
+		add_action( 'wp_head', 'mc_canonical' );
+		remove_action( 'wp_head', 'rel_canonical' );
+	}
 }
 
 /**
@@ -167,7 +169,7 @@ function mc_canonical() {
 
 	// End original code.
 	if ( isset( $_GET['mc_id'] ) ) {
-		$mc_id = ( absint( $_GET['mc_id'] ) ) ? $_GET['mc_id'] : false;
+		$mc_id = ( absint( $_GET['mc_id'] ) ) ? absint( $_GET['mc_id'] ) : false;
 		$link  = add_query_arg( 'mc_id', $mc_id, $link );
 	}
 

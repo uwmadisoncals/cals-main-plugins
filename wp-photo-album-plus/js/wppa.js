@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.9.04';
+var wppaJsVersion = '6.9.06';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -157,6 +157,11 @@ var wppaUploadFailed = 'Upload failed';
 var wppaServerError = 'Server error';
 var wppaGeoZoom = 10;
 var wppaLazyLoad = true;
+var wppaThumbAreaMaxFrac = 1.0;
+var wppaNiceScroll = false;
+var wppaIconSizeNormal = 'default';
+var wppaIconSizeSlide = 48;
+var wppaIconSizeStars = 24;
 
 // 'Internal' variables ( private )
 var _wppaId = [];
@@ -316,6 +321,15 @@ function wppaDoInit( autoOnly ) {
 		}
 	}, 3000 );
 
+	// Size scrollable thumb areas
+	jQuery(window).on('DOMContentLoaded load resize scroll',wppaSizeThumbArea);
+	wppaSizeThumbArea();
+
+	// Make Lazy load images visible
+	jQuery(window).on('DOMContentLoaded load resize scroll', wppaMakeLazyVisible);
+	wppaMakeLazyVisible();
+
+	// Protect rightclick
 	wppaProtect();
 }
 
@@ -716,6 +730,7 @@ function wppaFotomotoHide( mocc ) {
 }
 
 // Compute fullsize ( slideshow ) url with current photo
+/* obsolete
 function wppaGetCurrentFullUrl( mocc, idx ) {
 
 var xurl = document.location.href;
@@ -765,6 +780,7 @@ var url;
 
 	return url;
 }
+*/
 
 // Sanitize utility
 function wppaStringContainsForbiddenChars( str ) {

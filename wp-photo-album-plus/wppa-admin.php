@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version 6.9.00
+* Version 6.9.06
 *
 */
 
@@ -217,14 +217,22 @@ add_action( 'admin_init', 'wppa_check_tag_system' );
 add_action( 'admin_init', 'wppa_check_cat_system' );
 
 // Activity feed
-if ( true ) {
-	add_action( 'do_meta_boxes', 'wppa_activity' );
-}
+add_action( 'do_meta_boxes', 'wppa_activity' );
+
 function wppa_activity(){
-	if ( function_exists( 'wp_add_dashboard_widget' ) ) {
+
+	// Are we configured to show the activity widgets?
+	switch ( wppa_opt( 'show_dashboard_widgets' ) ) {
+		case 'all': $doit = true; break;
+		case 'admin': $doit = current_user_can( 'administrator' ); break;
+		default: $doit = false;
+	}
+
+	if ( $doit && function_exists( 'wp_add_dashboard_widget' ) ) {
 		wp_add_dashboard_widget( 'wppa-activity', __( 'Recent WPPA activity', 'wp-photo-album-plus' ), 'wppa_show_activity_feed' ); //, $control_callback = null, $callback_args = null )
 	}
 }
+
 function wppa_show_activity_feed() {
 global $wpdb;
 
@@ -330,12 +338,20 @@ global $wpdb;
 
 }
 
-// Photo of the day history
+// Photo of the day history. This is undocumented and no setting for available.
 if ( get_option( 'wppa_potd_log', 'no' ) == 'yes' ) {
 	add_action( 'do_meta_boxes', 'wppa_potdlog' );
 }
 function wppa_potdlog() {
-	if ( function_exists( 'wp_add_dashboard_widget' ) ) {
+
+	// Are we configured to show the activity widgets?
+	switch ( wppa_opt( 'show_dashboard_widgets' ) ) {
+		case 'all': $doit = true; break;
+		case 'admin': $doit = current_user_can( 'administrator' ); break;
+		default: $doit = false;
+	}
+
+	if ( $doit && function_exists( 'wp_add_dashboard_widget' ) ) {
 		wp_add_dashboard_widget( 'wppa-potdlog', __( 'Photo of the day history', 'wp-photo-album-plus' ), 'wppa_show_potd_log' );
 	}
 }

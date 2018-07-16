@@ -132,8 +132,9 @@ class ShortCodes
     function Packages($params = array('items_per_page' => 10, 'title' => false, 'desc' => false, 'order_field' => 'date', 'order' => 'desc', 'paging' => false, 'toolbar' => 1, 'template' => '','cols'=>3, 'colspad'=>2, 'colsphone' => 1))
     {
 
-        $defaults = array('items_per_page' => 10, 'title' => false, 'desc' => false, 'order_field' => 'date', 'order' => 'desc', 'paging' => false, 'toolbar' => 1, 'template' => 'link-template-panel','cols'=>3, 'colspad'=>2, 'colsphone' => 1);
+        $defaults = array('items_per_page' => 10, 's' =>'', 'title' => false, 'desc' => false, 'order_field' => 'date', 'order' => 'desc', 'paging' => false, 'toolbar' => 1, 'template' => 'link-template-panel','cols'=>3, 'colspad'=>2, 'colsphone' => 1);
         $params = shortcode_atts($defaults, $params, 'wpdm_packages' );
+
         if(is_array($params))
             extract($params);
 
@@ -163,6 +164,10 @@ class ShortCodes
             'posts_per_page' => $items_per_page,
             'include_children' => false,
         );
+
+        if(isset($s) && $s != '')
+            $params['s'] = $s;
+
 
         if (get_option('_wpdm_hide_all', 0) == 1) {
             $params['meta_query'] = array(

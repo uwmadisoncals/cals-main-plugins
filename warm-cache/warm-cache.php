@@ -3,46 +3,46 @@
 Plugin Name: Warm cache
 Plugin URI: https://www.mijnpress.nl
 Description: Crawls your website-pages based on any XML sitemap plugin. If you have a caching plugin this wil keep your cache warm. Speeds up your site.
-Version: 2.2.2
+Version: 2.2.3
 Author: Ramon Fincken
 Author URI: https://www.mijnpress.nl
 */
-if (!defined('ABSPATH')) 
+if( !defined( 'ABSPATH' ) ) 
 {
-	if(!isset($_GET['warm_cache']))
+	if( !isset( $_GET['warm_cache'] ) )
 	{
-		die("Aren't you supposed to come here via WP-Admin?");
+		die( "Aren't you supposed to come here via WP-Admin?" );
 	}
 }
 
-if(!class_exists('mijnpress_plugin_framework'))
+if( !class_exists( 'mijnpress_plugin_framework' ) )
 {
-	include('mijnpress_plugin_framework.php');
+	include( 'mijnpress_plugin_framework.php' );
 }
 
 add_action( 'init', 'mp_warmcache_create_post_type' );
 function mp_warmcache_create_post_type() {
 	$labels = array(
-        'name' => 'warmcache',
-        'singular_name' => 'warmcache',
-    );
+		'name'		=> 'warmcache',
+		'singular_name'	=> 'warmcache',
+	);
  
-    $args = array(
-        'labels'             => $labels,
-        'public'             => true,
-        'publicly_queryable' => true,
-        'show_ui'            => true,
-        'show_in_menu'       => true,
-        'query_var'          => true,
-        'rewrite'            => array( 'slug' => 'warmcache' ),
-        'capability_type'    => 'post',
-        'has_archive'        => true,
-        'hierarchical'       => false,
-        'menu_position'      => null,
-        'supports'           => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments' ),
-    );
- 
-    register_post_type( 'warmcache', $args );
+	$args = array(
+		'labels'             => $labels,
+		'public'             => true,
+		'publicly_queryable' => true,
+		'show_ui'            => true,
+		'show_in_menu'       => true,
+		'query_var'          => true,
+		'rewrite'            => array( 'slug' => 'warmcache' ),
+		'capability_type'    => 'post',
+		'has_archive'        => true,
+		'hierarchical'       => false,
+		'menu_position'      => null,
+		'supports'           => array( 'title', 'editor', 'author', 'excerpt', ),
+	);
+	 
+	register_post_type( 'warmcache', $args );
 }
 
 class warm_cache extends mijnpress_plugin_framework
@@ -139,7 +139,13 @@ class warm_cache extends mijnpress_plugin_framework
 			'supports'           => array( 'title', 'editor', 'custom-fields' )
 		);
 
-		register_post_type( 'warmcache', $args );		
+		register_post_type( 'warmcache', $args );	
+
+		if( defined( 'WARM_CACHE_CRAWL_CLASS' ) )
+		{
+			$warm_cache_crawler = new warm_cache_crawl();
+		}
+
 	}
 
 	function warm_cache()
@@ -271,7 +277,7 @@ class warm_cache extends mijnpress_plugin_framework
 	private function update_sitemap_overide_url($url)
 	{
 		delete_option('plugin_warm_cache_sitemap_override');
-		add_option('plugin_warm_cache_sitemap_override',htmlspecialchars($url));			
+		add_option( 'plugin_warm_cache_sitemap_override', htmlspecialchars($url));			
 	}
 	
 	/**
@@ -334,7 +340,7 @@ class warm_cache extends mijnpress_plugin_framework
 			
 			$returnvar = true;
 		}
-		$this->show_message('<strong>'.$msg.'</strong>');
+		$this->show_message( '<strong>'.$msg.'</strong>' );
 
 		return $returnvar;
 	}
@@ -352,13 +358,13 @@ class warm_cache extends mijnpress_plugin_framework
 			$sitemap_url =  trailingslashit(get_bloginfo('url')). $this->google_sitemap_generator_options["sm_b_filename"];
 		}
 		
-		$override = get_option('plugin_warm_cache_sitemap_override');
-		if($override && !empty($override) && $override != 'http://')
+		$override = get_option( 'plugin_warm_cache_sitemap_override' );
+		if( $override && !empty( $override ) && $override != 'http://' )
 		{
 			$sitemap_url = $override;
 		}
 		// Final check
-		if(isset($sitemap_url) && $sitemap_url && !empty($sitemap_url) && $sitemap_url != 'http://' && $sitemap_url != trailingslashit(get_bloginfo('url')))
+		if( isset( $sitemap_url ) && $sitemap_url && !empty( $sitemap_url ) && $sitemap_url != 'http://' && $sitemap_url != trailingslashit( get_bloginfo( 'url' ) ) )
 		{
 			$this->sitemap_url = $sitemap_url;
 			return $this->sitemap_url;
@@ -367,20 +373,19 @@ class warm_cache extends mijnpress_plugin_framework
 	}
 }
 
-add_action('init', array('warm_cache', 'init'));
+add_action( 'init', array('warm_cache', 'init' ) );
 
-if(isset($_GET['warm_cache']) && !empty($_GET['warm_cache']) && $_GET['warm_cache'] == get_option('plugin_warm_cache_api'))
+if( isset( $_GET['warm_cache'] ) && !empty( $_GET['warm_cache'] ) && $_GET['warm_cache'] == get_option( 'plugin_warm_cache_api' ) )
 {
-	define('PLUGIN_WARM_CACHE_CALLED', true);
-	include('warm_cache_crawl.php');
+	include( 'warm_cache_crawl.php' );
 }
 else
 {
-	if(is_admin())
+	if( is_admin() )
 	{
-		add_action('admin_menu', array('warm_cache', 'addPluginSubMenu_'));
-		add_filter('plugin_row_meta', array('warm_cache', 'addPluginContent_'), 10, 2);
-		add_action('admin_notices', array('warm_cache', 'admin_notices'));
+		add_action( 'admin_menu', array( 'warm_cache', 'addPluginSubMenu_' ) );
+		add_filter( 'plugin_row_meta', array( 'warm_cache', 'addPluginContent_' ), 10, 2 );
+		add_action( 'admin_notices', array( 'warm_cache', 'admin_notices' ) );
 	}
 }
 ?>

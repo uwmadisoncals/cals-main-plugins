@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick, pdf
-Version: 6.9.04
-Stable tag: 6.9.03
+Version: 6.9.06
+Stable tag: 6.9.05
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -136,6 +136,14 @@ See for the full changelog: <a href="http://www.wppa.nl/changelog/" >The documen
 * If visit the site, the pages you visit, the photos you watch and your IP address will be saved on the server for statistical purposes in your session information. This information will be anonimized after one hour and removed after 24 hours.
 
 == Upgrade Notice ==
+
+= 6.9.06 =
+
+* This version addresses various minor bug fixes and feature requests.
+
+= 6.9.05 =
+
+* This version addresses various minor bug fixes and feature requests.
 
 = 6.9.04 =
 

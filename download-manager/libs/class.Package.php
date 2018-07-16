@@ -162,7 +162,7 @@ class Package {
             $post_vars['link_label'] = __('Download Limit Exceeded','download-manager');
             $post_vars['download_link_popup'] =
             $post_vars['download_link_extended'] =
-            $post_vars['download_link'] = "<div class='alert alert-warning {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
+            $post_vars['download_link'] = "<div class='alert alert-warning {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fas fa-arrow-alt-circle-down'></i> {$post_vars['link_label']}</div>";
         }
 
         else if (isset($post_vars['expire_date']) && $post_vars['expire_date'] != "" && strtotime($post_vars['expire_date']) < time()) {
@@ -170,7 +170,7 @@ class Package {
             $post_vars['link_label'] = __('Download was expired on','download-manager') . " " . date_i18n(get_option('date_format')." h:i A", strtotime($post_vars['expire_date']));
             $post_vars['download_link'] =
             $post_vars['download_link_extended'] =
-            $post_vars['download_link_popup'] = "<div class='alert alert-warning {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
+            $post_vars['download_link_popup'] = "<div class='alert alert-warning {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fas fa-arrow-alt-circle-down'></i> {$post_vars['link_label']}</div>";
         }
 
         else if (isset($post_vars['publish_date']) && $post_vars['publish_date'] !='' && strtotime($post_vars['publish_date']) > time()) {
@@ -178,7 +178,7 @@ class Package {
             $post_vars['link_label'] = __('Download will be available from ','download-manager') . " " . date_i18n(get_option('date_format')." h:i A", strtotime($post_vars['publish_date']));
             $post_vars['download_link'] =
             $post_vars['download_link_extended'] =
-            $post_vars['download_link_popup'] = "<div class='alert alert-warning {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
+            $post_vars['download_link_popup'] = "<div class='alert alert-warning {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fas fa-arrow-alt-circle-down'></i> {$post_vars['link_label']}</div>";
         }
 
         else if(is_user_logged_in() && !self::userCanAccess($post_vars['ID'])){
@@ -186,7 +186,7 @@ class Package {
             $post_vars['link_label'] = stripslashes(get_option('wpdm_permission_msg'));
             $post_vars['download_link'] =
             $post_vars['download_link_extended'] =
-            $post_vars['download_link_popup'] = "<div class='alert alert-danger {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fa fa-download'></i> {$post_vars['link_label']}</div>";
+            $post_vars['download_link_popup'] = "<div class='alert alert-danger {$alert_size}' data-title='".__('DOWNLOAD ERROR','download-manager')."'><i class='fas fa-arrow-alt-circle-down'></i> {$post_vars['link_label']}</div>";
         }
 
         else if(!is_user_logged_in() && count(self::AllowedRoles($post_vars['ID'])) > 0 && !self::userCanAccess($post_vars['ID'])){
@@ -235,10 +235,10 @@ class Package {
                                                   </div>
                                                 </div>';
                 */
-                //$post_vars['download_link_popup'] = $post_vars['download_link'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'><span><i class='fa fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer download_footer_{$post_vars['ID']}' style='display: none'>{$post_vars['download_link']}</div></div>";
+                //$post_vars['download_link_popup'] = $post_vars['download_link'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'><span><i class='fas fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer download_footer_{$post_vars['ID']}' style='display: none'>{$post_vars['download_link']}</div></div>";
             }
 
-            $post_vars['download_link_extended'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'><span><i class='fa fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$post_vars['ID']}' style='display:none;'>{$post_vars['download_link_extended']}</div></div>";
+            $post_vars['download_link_extended'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'><span><i class='fas fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$post_vars['ID']}' style='display:none;'>{$post_vars['download_link_extended']}</div></div>";
 
 
         }
@@ -547,24 +547,53 @@ class Package {
      * @param int $width
      * @return string
      */
-    public static function videoPlayer($ID, $files, $width = 800){
+    public static function videoPlayer($ID, $files = null, $width = 800){
+
+        if(!$files)
+            $files = \WPDM\Package::getFiles($ID);
 
         $videos = array();
         foreach($files as $index => $file){
             $realpath = file_exists($file)?$file:UPLOAD_DIR.$file;
             $filetype = wp_check_filetype( $realpath );
             $tmpvar = explode('/',$filetype['type']);
-            if($tmpvar[0]=='video')
-                $videos[] =  $file;
+            if($tmpvar[0]=='video') {
+                $videos[] = $file;
+                $vidx[] = $index;
+            }
+
+        }
+
+        $videothumbs = "";
+        $mpvs = get_post_meta($ID,'__wpdm_additional_previews', true);
+        $mmv = 0;
+
+        if(is_array($mpvs) && count($mpvs) > 1 && count($videos) > 1) {
+
+            foreach ($mpvs as $i => $mpv) {
+                if($mmv < count($videos) ) {
+                    //$url = self::expirableDownloadLink($ID, 3);
+                    $ind = $vidx[$i]; //\WPDM_Crypt::Encrypt($videos[$mmv]);
+                    //$video = $url . "&ind={$ind}&play=" . basename($videos[$mmv]);
+                    $video = \WPDM\libs\FileSystem::mediaURL($ID, $ind, wpdm_basename($videos[$mmv]));
+
+                    $videothumbs .= "<a href='#' data-video='{$video}' class='__wpdm_playvideo'><img class='thumbnail' src='" . wpdm_dynamic_thumb($mpv, array(64, 64)) . "'/></a>";
+                }
+                $mmv++;
+            }
         }
 
         $player_html = '';
         if(count($videos)>0) {
-            //$video = home_url("/?wpdmdl={$ID}&ind=".\WPDM\libs\Crypt::Encrypt($videos[0])."&play=".basename($videos[0]));
-            $video = \WPDM\libs\FileSystem::mediaURL($ID, 0, wpdm_basename($videos[0]));
-            $player_html = "<video id='__wpdm_videoplayer' class='thumbnail' width=\"{$width}\" controls><source src=\"{$video}\" type=\"video/mp4\">Your browser does not support HTML5 video.</video>";
-            if(!\WPDM\Package::userCanAccess($ID)) $player_html = \WPDM_Messages::Error(stripslashes(get_option('wpdm_permission_msg')), -1);
+            //$url = self::expirableDownloadLink($ID, 10);
+            $ind = $vidx[0]; //\WPDM_Crypt::Encrypt($videos[0]);
+            //$video = $url . "&ind={$ind}&play=" . basename($videos[0]);
+            $video = \WPDM\libs\FileSystem::mediaURL($ID, $ind, wpdm_basename($videos[0]));
+
+            $player_html = "<video id='__wpdm_videoplayer' class='thumbnail' width=\"{$width}\" controls><source src=\"{$video}\" type=\"video/mp4\">Your browser does not support HTML5 video.</video><div class='videothumbs'>{$videothumbs}</div>";
+            //if(!\WPDM\Package::userCanAccess($ID)) $player_html = \WPDM_Messages::Error(stripslashes(get_option('wpdm_permission_msg')), -1);
         }
+
         $player_html = apply_filters("wpdm_video_player_html", $player_html, $ID, $file, $width);
         return $player_html;
     }
@@ -885,7 +914,7 @@ class Package {
 
                 }
                 if($embed == 1)
-                    $data = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$package['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input data-pid='{$post_vars['ID']}' class='terms_checkbox terms_checkbox_{$post_vars['ID']}' type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'><span><i class='fa fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$package['ID']}' style='display:none;'>{$data}</div></div><script>jQuery(function($){ $('#wpdm-filelist-{$package['ID']} .btn.inddl, #xfilelist .btn.inddl').attr('disabled', 'disabled'); });</script>";
+                    $data = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$package['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input data-pid='{$package['ID']}' class='terms_checkbox terms_checkbox_{$package['ID']}' type='checkbox' onclick='jQuery(\".download_footer_{$package['ID']}\").slideToggle();'><span><i class='fas fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$package['ID']}' style='display:none;'>{$data}</div></div><script>jQuery(function($){ $('#wpdm-filelist-{$package['ID']} .btn.inddl, #xfilelist .btn.inddl').attr('disabled', 'disabled'); });</script>";
 
             }
 
@@ -1108,7 +1137,8 @@ class Package {
         if ($vars['download_link'] == 'loginform' && $type == 'link') return "";
         if ($vars['download_link'] == 'loginform' && $type == 'page') return $hide_all_message;
 
-        wp_reset_query();
+        //wp_reset_query();
+        wp_reset_postdata();
 
         return @str_replace($keys, $values, @stripcslashes($template));
     }

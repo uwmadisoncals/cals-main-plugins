@@ -793,9 +793,6 @@ class Ai1wmme_Import_Database {
 		// Set the new HTTP password
 		update_option( AI1WM_AUTH_PASSWORD, $auth_password );
 
-		// Remove ms files rewriting default filters
-		remove_all_filters( 'default_site_option_ms_files_rewriting' );
-
 		// Set the new ms files rewriting
 		update_site_option( AI1WM_MS_FILES_REWRITING, $ms_files_rewriting );
 

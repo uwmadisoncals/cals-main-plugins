@@ -1,5 +1,35 @@
 WP Photo Album Plus Changelog
 
+= 6.9.06 =
+
+= Bug Fixes =
+ 
+* One button vote did not work properly. Fixed.
+* Fixed a bug in updating addressline in slideshows.
+
+= Other Changes =
+
+* Navigation and rating icon sizes can now be set in Table I-J.
+* The display of the wppa activity dashboard widget can not be specified in Table II-J13.
+
+= 6.9.05 =
+
+= Bug Fixes =
+
+* Uploading by shortcode withut album spec succeeded but resulted in a blank page. Fixed.
+* Sub album cover links to empty albums caused division by zero errors. Fixed.
+
+= New Features =
+
+* Table I-C10: Thumbnail area max size. A number > 1 means pixels, a number < 1 means a fraction of the viewport height.
+* Table I-C11: Use nicescroller. Use nicescroller on thumbnail area that has been limited in size due to Table I-C10.
+* Table IV-A32: Nice scroll on window. Use nicescroller on the window.
+* Table IV-A33: Nice scroll configuration options
+
+= Other Changes =
+
+* Admin will no longer receive notification emails reporting his own comments.
+
 = 6.9.04 =
 
 = Bug Fixes =

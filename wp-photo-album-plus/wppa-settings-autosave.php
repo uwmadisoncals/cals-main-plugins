@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.9.04
+* Version 6.9.06
 *
 */
 
@@ -1138,8 +1138,27 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$clas = '';
 							$tags = 'thumb,system';
 							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Thumbnail area max size', 'wp-photo-album-plus');
+							$desc = __('The max height of the thumbnais area', 'wp-photo-album-plus');
+							$help = __('A number > 1 is pixelsize, a number < 1 is fraction of the viewport height, 0 is no limit', 'wp-photo-album-plus');
+							$slug = 'wppa_thumb_area_size';
+							$html = wppa_input($slug, '40px', '', __('pixels / fraction', 'wp-photo-album-plus'));
+							$clas = '';
+							$tags = 'thumb,system';
+							wppa_setting($slug, '10', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Use nicescroller', 'wp-photo-album-plus');
+							$desc = __('Use nice scrollbars on thumbnail area', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_nicescroll';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'thumb,system';
+							wppa_setting($slug, '11', $name, $desc, $html, $help, $clas, $tags);
+
 							}
-							wppa_setting_subheader( 'D', '1', __( 'Album cover related size settings' , 'wp-photo-album-plus') );
+						wppa_setting_subheader( 'D', '1', __( 'Album cover related size settings' , 'wp-photo-album-plus') );
 							{
 							$name = __('Max Cover width', 'wp-photo-album-plus');
 							$desc = __('Maximum width for a album cover display.', 'wp-photo-album-plus');
@@ -1518,6 +1537,74 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$clas = 'wppa-video';
 							$tags = 'size,video';
 							wppa_setting($slug, '2', $name, $desc, $html, $help, $clas, $tags);
+							}
+
+						wppa_setting_subheader( 'J', '1', __( 'Navigation icon size settings' , 'wp-photo-album-plus') );
+							{
+							$name = __('Navigation icon size', 'wp-photo-album-plus');
+							$desc = __('The size of navigation icons', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_nav_icon_size';
+							$opts = array(	'1.5em',
+											'16px',
+											'20px',
+											'24px',
+											'32px',
+											);
+							$vals = array(	'default',
+											'16',
+											'20',
+											'24',
+											'32',
+											);
+							$html = wppa_select($slug, $opts, $vals);
+							$clas = '';
+							$tags = 'size,layout';
+							wppa_setting($slug, '1', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Navigation icon size slideshow', 'wp-photo-album-plus');
+							$desc = __('The size of navigation icons on the slide', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_nav_icon_size_slide';
+							$opts = array(	'16px',
+											'20px',
+											'24px',
+											'32px',
+											'48px',
+											);
+							$vals = array(	'16',
+											'20',
+											'24',
+											'32',
+											'default',
+											);
+							$html = wppa_select($slug, $opts, $vals);
+							$clas = '';
+							$tags = 'size,layout';
+							wppa_setting($slug, '2', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Icon size rating', 'wp-photo-album-plus');
+							$desc = __('The size of rating stars', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_icon_size_rating';
+							$opts = array(	'1em+3px',
+											'16px',
+											'18px',
+											'20px',
+											'24px',
+											'32px',
+											);
+							$vals = array(	'default',
+											'16',
+											'18',
+											'20',
+											'24',
+											'32',
+											);
+							$html = wppa_select($slug, $opts, $vals);
+							$clas = '';
+							$tags = 'size,layout';
+							wppa_setting($slug, '3', $name, $desc, $html, $help, $clas, $tags);
 							}
 
 							?>
@@ -3157,6 +3244,23 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$tags = 'layout,navi';
 							wppa_setting($slug, '12', $name, $desc, $html, $help, $clas, $tags);
 
+							$name = __('Show dashboard widget', 'wp-photo-album-plus');
+							$desc = __('Select when the dashboard widget should show up', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_show_dashboard_widgets';
+							$opts = array( 	__('Never', 'wp-photo-album-plus'),
+											__('All loggedin users', 'wp-photo-album-plus'),
+											__('Administartors only', 'wp-photo-album-plus'),
+											);
+							$vals = array( 	'none',
+											'all',
+											'admin',
+											);
+							$html = wppa_select($slug, $opts, $vals);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '13', $name, $desc, $html, $help, $clas, $tags);
+
 							?>
 						</tbody>
 						<tfoot style="font-weight: bold;" class="wppa_table_2">
@@ -3978,6 +4082,30 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$clas = '';
 							$tags = 'system';
 							wppa_setting($slug, '31', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Nice scroll on window', 'wp-photo-album-plus');
+							$desc = __('Apply the nice scroller on the browserwindow', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_nicescroll_window';
+							$html = wppa_checkbox( $slug );
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '32', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Nice scroller options', 'wp-photo-album-plus');
+							$desc = __('The nice scroller configuration options', 'wp-photo-album-plus');
+							$help = __('Enter options, one per line, seperated by commas(,).', 'wp-photo-album-plus');
+							$help .= '<br />' .
+										sprintf( __('Click %s here %s for documentation and a full list of available options', 'wp-photo-album-plus'),
+											'<a href="' . WPPA_URL . '/vendor/nicescroll/README.txt" target="_blank" >',
+											'</a>'
+											) .
+									'<br />';
+							$slug = 'wppa_nicescroll_opts';
+							$html = wppa_textarea( $slug );
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '33', $name, $desc, $html, $help, $clas, $tags);
 
 							}
 						wppa_setting_subheader( 'B', '1', __( 'Slideshow related settings' , 'wp-photo-album-plus') );

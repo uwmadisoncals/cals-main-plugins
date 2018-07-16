@@ -2,8 +2,8 @@
 Contributors: ramon fincken
 Tags: cache, warm, keep, xml, sitemap, load, speed, quick, tag, w3tc, optimize, page cache, preload, google, pagespeed, webmaster, sitemap, generator, warmup, cold, expire, expired, nginx, varnish, microcaching, microcache
 Requires at least: 3.5
-Tested up to: 4.8
-Stable tag: 2.2.2
+Tested up to: 4.9.7
+Stable tag: 2.2.3
 
 Crawls your website-pages based on google XML sitemap. If you have a caching plugin this will keep your cache warm. Speeds up your site.
 
@@ -31,11 +31,13 @@ page cache expiration time. <br>Example: Page cache expiration = 1 hour, so set 
 
 == Frequently Asked Questions ==
 = I have multiple (language / domain) sitemaps, but I can only add one sitemap! =
-> Use a sitemap index, pointing to all your (custom/sub)-sitemaps. Only add the sitemap main index file to the plugin
+> Use a sitemap index, pointing to all your (custom/sub)-sitemaps. Only add the sitemap main index file to the plugin. Do NOT have this in the custom file name:
+warmcache-sitemap.xml OR warmcache. Use this for example: supersitemap.xml or my_cache_sitemap.xml
 
 = How to disable logging completely (for very large sites)? =
 > Set a define in your wp-config (at the top, newline, after <?php ) with name MP_WARM_CACHE_NO_LOGGING_AT_ALL and value "yes"
-Example
+Example<br>
+Please check https://plugins.trac.wordpress.org/browser/warm-cache/trunk/readme.txt#L38 DO not copy directly below due to the "curly quotes"<br>
 define('MP_WARM_CACHE_NO_LOGGING_AT_ALL', 'yes');
 
 = How to run a cronjob? =
@@ -56,7 +58,8 @@ See https://wordpress.org/support/topic/29-september-2016-update-causing-constan
 
 = How to override the 20 pages crawl limit =
 > Set a define in your wp-config (at the top, newline, after <?php ) with name MP_WARM_CACHE_FILTER_LIMIT and value INTEGER
-Example
+Example<br>
+Please check https://plugins.trac.wordpress.org/browser/warm-cache/trunk/readme.txt#L58 DO not copy directly below due to the "curly quotes"<br>
 define('MP_WARM_CACHE_FILTER_LIMIT', 25);
 
 = I have a lot of questions and I want support where can I go? =
@@ -65,6 +68,12 @@ The support forums over here, drop me a tweet to notify me of your support topic
 I always check my tweets, so mention my name with @ramonfincken and your problem.
 
 == Changelog ==
+= 2.2.3 -
+Added: Complete rewrite of the crawler, better compatibility with W3TC (permalink)<br>
+Bugfix: Statistics<br>
+Bugfix: PHP static notice
+
+
 = 2.2.2 =
 Bugfix: Fixed skipping the first item in sitemap(s). Thanks Jeff (@upekshapriya) for reporting<br>
 Added: simplexml_load_string function check

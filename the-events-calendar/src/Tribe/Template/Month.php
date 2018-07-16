@@ -397,7 +397,7 @@ if ( ! class_exists( 'Tribe__Events__Template__Month' ) ) {
 				$args = array(
 					'post_type'    => Tribe__Events__Main::POSTTYPE,
 					'eventDisplay' => 'month',
-					'eventDate'    => $_POST['eventDate'],
+					'eventDate'    => is_array( $_POST['eventDate'] ) ? Tribe__Utils__Array::get( $_POST, array( 'eventDate', 0 ) ) : $_POST['eventDate'],
 					'post_status'  => $post_status,
 					'featured'     => tribe( 'tec.featured_events' )->featured_events_requested(),
 				);
@@ -454,7 +454,7 @@ if ( ! class_exists( 'Tribe__Events__Template__Month' ) ) {
 
 			if ( ! empty( $search_term ) ) {
 				Tribe__Notices::set_notice( 'event-search-no-results', sprintf( esc_html__( 'There were no results found for %s this month. Try searching next month.', 'the-events-calendar' ),
-					'<strong>"' . esc_html( $search_term ) . '"</strong>' ) );
+					'<strong>"' . esc_html( urldecode( stripslashes( $search_term ) ) ) . '"</strong>' ) );
 			} // if attempting to view a category archive.
 			elseif ( ! empty( $tax_term ) ) {
 				Tribe__Notices::set_notice( 'events-not-found', sprintf( esc_html__( 'No matching %1$s listed under %2$s. Please try viewing the full calendar for a complete list of events.', 'the-events-calendar' ), $events_label_plural_lowercase, $tax_term ) );

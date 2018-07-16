@@ -176,7 +176,7 @@ class Ai1wmme_Main_Controller {
 		add_action( 'admin_head', array( $this, 'admin_head' ) );
 
 		// All in One WP Migration
-		add_action( 'plugins_loaded', array( $this, 'ai1wm_loaded' ), 10 );
+		add_action( 'plugins_loaded', array( $this, 'ai1wm_loaded' ), 20 );
 
 		// Export and import commands
 		add_action( 'plugins_loaded', array( $this, 'ai1wm_commands' ), 20 );
@@ -258,9 +258,6 @@ class Ai1wmme_Main_Controller {
 
 			// Add import unlimited
 			add_filter( 'ai1wm_max_file_size', array( $this, 'max_file_size' ) );
-
-			// Add multisite menu
-			add_filter( 'ai1wm_multisite_menu', array( $this, 'multisite_menu' ) );
 		}
 	}
 
@@ -286,72 +283,12 @@ class Ai1wmme_Main_Controller {
 	}
 
 	/**
-	 * Display All in One WP Migration multisite notice
-	 *
-	 * @return void
-	 */
-	public function multisite_notice() {
-		?>
-		<div class="error">
-			<p>
-				<?php
-				_e(
-					'Multisite extension is not compatible with the current version of All in One WP Migration. You can get a copy of latest one here.',
-					AI1WMME_PLUGIN_NAME
-				);
-				?>
-				<a href="https://wordpress.org/plugins/all-in-one-wp-migration/" class="ai1wm-label">
-					<i class="ai1wm-icon-notification"></i>
-					<?php _e( 'Get plugin', AI1WMME_PLUGIN_NAME ); ?>
-				</a>
-			</p>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Display All in One WP Migration admin notice
-	 *
-	 * @return void
-	 */
-	public function admin_notice() {
-		if ( is_multisite() ) {
-			remove_all_filters( 'network_admin_notices', 10 );
-
-			// Add multisite compatibility notice
-			add_action( 'network_admin_notices', array( $this, 'multisite_notice' ), 20 );
-		} else {
-			remove_all_filters( 'admin_notices', 10 );
-
-			// Add multisite compatibility notice
-			add_action( 'admin_notices', array( $this, 'multisite_notice' ), 20 );
-		}
-	}
-
-	/**
-	 * Multisite menu callback
-	 *
-	 * @return boolean
-	 */
-	public function multisite_menu() {
-		// Check plguin version
-		if ( AI1WM_VERSION !== 'develop' && version_compare( AI1WM_VERSION, '5', '<' ) ) {
-			// Add admin notice
-			add_action( 'plugins_loaded', array( $this, 'admin_notice' ) );
-
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	/**
 	 * Add links to plugin list page
 	 *
 	 * @return array
 	 */
 	public function plugin_row_meta( $links, $file ) {
-		if ( $file == AI1WMME_PLUGIN_BASENAME ) {
+		if ( $file === AI1WMME_PLUGIN_BASENAME ) {
 			$links[] = __( '<a href="https://help.servmask.com/knowledgebase/multisite-extension-user-guide/" target="_blank">User Guide</a>', AI1WMME_PLUGIN_NAME );
 		}
 
@@ -373,8 +310,7 @@ class Ai1wmme_Main_Controller {
 	 * @return void
 	 */
 	public function init() {
-		// Set Purchase ID
-		if ( ! get_option( 'ai1wmme_plugin_key' ) ) {
+		if ( AI1WMME_PURCHASE_ID ) {
 			update_option( 'ai1wmme_plugin_key', AI1WMME_PURCHASE_ID );
 		}
 	}

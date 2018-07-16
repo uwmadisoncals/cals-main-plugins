@@ -15,6 +15,48 @@
     
     /**
      * 
+     * @param {type} id
+     * @param {type} btn
+     * @param {type} rowAction
+     * @returns {undefined}
+     */
+    function switchToUser(id, btn, rowAction) {
+       $.ajax(aamLocal.ajaxurl, {
+           type: 'POST',
+           dataType: 'json',
+           data: {
+               action: 'aam',
+               sub_action: 'switchToUser',
+               _ajax_nonce: aamLocal.nonce,
+               user: id
+           },
+           beforeSend: function () {
+                $(btn).attr(
+                    'class', 
+                    'icon-spin4 animate-spin ' + (rowAction ? 'aam-row-action' : 'aam-switch-user')
+                );
+           },
+           success: function (response) {
+               if (response.status === 'success') {
+                   location.href = response.redirect;
+               } else {
+                   aam.notification('danger', response.reason);
+               }
+           },
+           error: function () {
+               aam.notification('danger', aam.__('Application error'));
+           },
+           complete: function () {
+                $(btn).attr(
+                    'class', 
+                    'icon-exchange ' + (rowAction ? 'aam-row-action text-success' : 'aam-switch-user')
+                );
+           }
+       });
+    }
+    
+    /**
+     * 
      * @returns {undefined}
      */
     function UI() {
@@ -127,10 +169,15 @@
                         var create = $('<a/>', {
                             'href': '#',
                             'class': 'btn btn-primary'
-                        }).html('<i class="icon-plus"></i> ' + aam.__('Create'))
+                        })
+                        .html('<i class="icon-plus"></i>')
                         .bind('click', function () {
                             resetForm('#add-role-modal .modal-body');
                             $('#add-role-modal').modal('show');
+                        })
+                        .attr({
+                            'data-toggle': "tooltip",
+                            'title': aam.__('Create New Role')
                         });
 
                         $('.dataTables_filter', '#role-list_wrapper').append(create);
@@ -500,7 +547,6 @@
              * @returns {undefined}
              */
             function loadRoleList(selected) {
-                console.log(selected);
                 $.ajax(aamLocal.ajaxurl, {
                     type: 'POST',
                     dataType: 'json',
@@ -576,41 +622,6 @@
                 });
             }
 
-            /**
-             * 
-             * @param {type} id
-             * @param {type} btn
-             * @returns {undefined}
-             */
-            function switchToUser(id, btn) {
-                $.ajax(aamLocal.ajaxurl, {
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        action: 'aam',
-                        sub_action: 'switchToUser',
-                        _ajax_nonce: aamLocal.nonce,
-                        user: id
-                    },
-                    beforeSend: function () {
-                        $(btn).attr('class', 'aam-row-action icon-spin4 animate-spin');
-                    },
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            location.href = response.redirect;
-                        } else {
-                            aam.notification('danger', response.reason);
-                        }
-                    },
-                    error: function () {
-                        aam.notification('danger', aam.__('Application error'));
-                    },
-                    complete: function () {
-                        $(btn).attr('class', 'aam-row-action icon-exchange text-success');
-                    }
-                });
-            }
-
             //initialize the user list table
             $('#user-list').DataTable({
                 autoWidth: false,
@@ -624,10 +635,13 @@
                     url: aamLocal.ajaxurl,
                     type: 'POST',
                     dataType: 'json',
-                    data: {
-                        action: 'aam',
-                        sub_action: 'Subject_User.getTable',
-                        _ajax_nonce: aamLocal.nonce
+                    data: function(params) {
+                       params.action = 'aam';
+                       params.sub_action = 'Subject_User.getTable';
+                       params._ajax_nonce = aamLocal.nonce;
+                       params.role = $('#user-list-filter').val();
+                       
+                       return params;
                     }
                 },
                 columnDefs: [
@@ -644,11 +658,48 @@
                         var create = $('<a/>', {
                             'href': '#',
                             'class': 'btn btn-primary'
-                        }).html('<i class="icon-plus"></i> ' + aam.__('Create')).bind('click', function () {
+                        })
+                        .html('<i class="icon-plus"></i> ')
+                        .bind('click', function () {
                             window.open(aamLocal.url.addUser, '_blank');
+                        })
+                        .attr({
+                            'data-toggle': "tooltip",
+                            'title': aam.__('Create New User')
                         });
 
                         $('.dataTables_filter', '#user-list_wrapper').append(create);
+                        
+                        var filter = $('<select>').attr({
+                            'class': 'user-filter',
+                            'id': 'user-list-filter'
+                        })
+                        .html('<option value="">' + aam.__('Loading roles...') + '</option>')
+                        .bind('change', function() {
+                            $('#user-list').DataTable().ajax.reload();
+                        });
+                        
+                        $('.dataTables_filter', '#user-list_wrapper').append(filter);
+                        
+                        $.ajax(aamLocal.ajaxurl, {
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                action: 'aam',
+                                sub_action: 'Subject_Role.getList',
+                                _ajax_nonce: aamLocal.nonce
+                            },
+                            success: function (response) {
+                                $('#user-list-filter').html(
+                                    '<option value="">' + aam.__('Select Role') + '</option>'
+                                );
+                                for (var i in response) {
+                                    $('#user-list-filter').append(
+                                        '<option value="' + i + '">' + response[i].name + '</option>'
+                                    );
+                                }
+                            }
+                        });
                     }
                 },
                 createdRow: function (row, data) {
@@ -785,7 +836,7 @@
                                     $(container).append($('<i/>', {
                                         'class': 'aam-row-action icon-exchange text-success'
                                     }).bind('click', function () {
-                                        switchToUser(data[0], $(this));
+                                        switchToUser(data[0], $(this), true);
                                     }).attr({
                                         'data-toggle': "tooltip",
                                         'title': aam.__('Switch To User')
@@ -1783,7 +1834,7 @@
                             }
                         },
                         columnDefs: [
-                            {visible: false, targets: [0, 1]}
+                            {visible: false, targets: [0, 1, 5]}
                         ],
                         language: {
                             search: '_INPUT_',
@@ -1816,7 +1867,7 @@
                                     $('td:eq(0)', row).html('<i class="icon-doc-text-inv"></i>');
                                     break;
                             }
-
+                            
                             //update the title to a link
                             if (data[2] === 'type') {
                                 var link = $('<a/>', {
@@ -1837,8 +1888,31 @@
 
                                 }).html(data[3]);
                                 $('td:eq(1)', row).html(link);
-                            } else { //reset the post/term title
-                                $('td:eq(1)', row).html(data[3]);
+                            } else if (data[2] == 'term') {
+                                var name  = '<span>' + data[3] + '</span><i class="aam-row-subtitle">';
+                                
+                                if (data[5]) {
+                                    name += aam.__('Parent:') + ' <b>' + data[5] + '</b>; ';
+                                } else {
+                                    name += aam.__('Parent:') + ' none; ';
+                                }
+                                
+                                name += aam.__('ID:') + ' <b>' + data[0].split('|')[0] + '</b>';
+                                
+                                $('td:eq(1)', row).html(name);
+                                //$('td:eq(1)', row).html(data[3]);
+                            } else {
+                                var name  = '<span>' + data[3] + '</span><i class="aam-row-subtitle">';
+                                
+                                if (data[5]) {
+                                    name += aam.__('Parent:') + ' <b>' + data[5] + '</b>; ';
+                                } else {
+                                    name += aam.__('Parent:') + ' none; ';
+                                }
+                                
+                                name += aam.__('ID:') + ' <b>' + data[0] + '</b>';
+                                
+                                $('td:eq(1)', row).html(name);
                             }
 
                             //update the actions
@@ -2417,8 +2491,8 @@
                             }
                         },
                         columnDefs: [
-                            {visible: false, targets: [0]},
-                            {className: 'text-center', targets: [1]}
+                           // {visible: false, targets: [0]},
+                            {className: 'text-center', targets: [0, 1]}
                         ],
                         language: {
                             search: '_INPUT_',
@@ -2434,7 +2508,11 @@
                                 'class': 'aam-api-method ' + data[1].toLowerCase()
                             }).text(data[1]);
                             
-                            $('td:eq(0)', row).html(method);
+                            $('td:eq(0)', row).html(
+                                '<small>' + (data[0] === 'restful' ? 'JSON' : 'XML') + '</small>'
+                            );
+                            
+                            $('td:eq(1)', row).html(method);
                             
                             var actions = data[3].split(',');
 
@@ -2461,7 +2539,7 @@
                                         break;
                                 }
                             });
-                            $('td:eq(2)', row).html(container);
+                            $('td:eq(3)', row).html(container);
                         }
                     });
 
@@ -2556,6 +2634,7 @@
              */
             function initialize() {
                 if ($('#extension-content').length) {
+                    $('[data-toggle="toggle"]', '.extensions-metabox').bootstrapToggle();
                     //check for updates
                     $('#aam-update-check').bind('click', function() {
                         $.ajax(aamLocal.ajaxurl, {
@@ -2660,6 +2739,39 @@
                             }, function() {
                                 $('i', _this).attr('class', 'icon-download-cloud');
                             });
+                        });
+                    });
+                    
+                    $('#fix-extension-dir-issue').bind('click', function(event) {
+                        event.preventDefault();
+                        
+                        $('i', this).attr('class', 'icon-spin4 animate-spin');
+                        
+                        $.ajax(aamLocal.ajaxurl, {
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                action: 'aam',
+                                sub_action: 'Extension_Manager.fixDirectoryIssue',
+                                _ajax_nonce: aamLocal.nonce
+                            },
+                            success: function(response) {
+                                if (response.status === 'success') {
+                                    $('#extension-dir-warning').remove();
+                                    aam.notification(
+                                        'success', 
+                                        aam.__('The issue has been resolved')
+                                    );
+                                } else {
+                                    $('#extension-dir-issue-modal').modal('show');
+                                }
+                            },
+                            error: function() {
+                                aam.notification('danger', aam.__('Application error'));
+                            },
+                            complete: function () {
+                                $('i', '#fix-extension-dir-issue').attr('class', 'icon-wrench');
+                            }
                         });
                     });
 
@@ -3182,10 +3294,14 @@
         $('body').delegate('[data-toggle="tooltip"]', 'hover', function (event) {
             event.preventDefault();
             $(this).tooltip({
-                'placement' : 'top',
+                'placement' : $(this).data('placement') || 'top',
                 'container' : 'body'
             });
             $(this).tooltip('show');
+        });
+        
+        $('body').delegate('.aam-switch-user', 'click', function (event) {
+            switchToUser(aam.getSubject().id, $(this), false);
         });
         
         $('.aam-area').each(function() {
@@ -3229,9 +3345,13 @@
         
         //update the header
         var subject = type.charAt(0).toUpperCase() + type.slice(1);
-        $('.aam-current-subject').html(
-                aam.__(subject) + ': <strong>' + name + '</strong>'
-        );
+        var title = aam.__(subject) + ': <strong>' + name + '</strong>';
+
+        if (type === 'user') {
+            title += '<i data-toggle="tooltip" title="Switch To User" data-placement="right" class="icon-exchange aam-switch-user"></i>';
+        }
+        
+        $('.aam-current-subject').html(title);
 
         //highlight screen if the same level
         if (parseInt(level) >= aamLocal.level || type === 'default') {

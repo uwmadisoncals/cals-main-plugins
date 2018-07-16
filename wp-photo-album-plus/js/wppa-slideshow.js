@@ -3,7 +3,7 @@
 // Contains slideshow modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaJsSlideshowVersion = '6.9.03';
+var wppaJsSlideshowVersion = '6.9.06';
 
 // This is an entrypoint to load the slide data
 function wppaStoreSlideInfo(
@@ -202,17 +202,17 @@ function wppaStartStop( mocc, index ) {
 
 			// Stop it
 			_wppaStop( mocc );
-			jQuery( '#wppa-startstop-icon-' + mocc ).html( wppaSvgHtml( 'Play-Button', '48px', false, true, '0', '10', '50', '50' ) );
+			jQuery( '#wppa-startstop-icon-' + mocc ).html( wppaSvgHtml( 'Play-Button', wppaIconSize( mocc, '48px', true ), false, true, '0', '10', '50', '50' ) );
 		}
 		else {
 
 			// Start it
 			_wppaStart( mocc, index );
 			if ( index == -1 ) {
-				jQuery( '#wppa-startstop-icon-' + mocc ).html( wppaSvgHtml( 'Pause-Button', '48px', false, true, '0', '10', '50', '50' ) );
+				jQuery( '#wppa-startstop-icon-' + mocc ).html( wppaSvgHtml( 'Pause-Button', wppaIconSize( mocc, '48px', true ), false, true, '0', '10', '50', '50' ) );
 			}
 		}
-//		wppaReplaceSvg();
+
 		if ( wppaIsMobile ) {
 			jQuery( '#wppa-startstop-icon-' + mocc ).stop().fadeTo( 10, 1 ).fadeTo( 3000, 0 );
 			jQuery( '.ubb-'+mocc ).stop().fadeTo( 10, 1 ).fadeTo( 3000, 0 );
@@ -450,8 +450,9 @@ function _wppaNextSlide( mocc, mode ) {
 
 		// Display prev/next
 		if ( wppaSlideshowNavigationType == 'icons' ) {
-			jQuery( '#prev-arrow-'+mocc ).html( wppaSvgHtml( 'Prev-Button', '1.5em', false, true ) );
-			jQuery( '#next-arrow-'+mocc ).html( wppaSvgHtml( 'Next-Button', '1.5em', false, true ) );
+			var iconsize = wppaIconSize( mocc, '1.5em', false );
+			jQuery( '#prev-arrow-'+mocc ).html( wppaSvgHtml( 'Prev-Button', iconsize, false, true ) );
+			jQuery( '#next-arrow-'+mocc ).html( wppaSvgHtml( 'Next-Button', iconsize, false, true ) );
 		}
 		else {
 			if ( wppaIsMini[mocc] || wppaGetContainerWidth( mocc ) < wppaMiniTreshold ) {
@@ -786,12 +787,13 @@ function _wppaNextSlide_5( mocc ) {
 		// ( this is the only running non-mini OR there are no running non-minis ) )
 		if ( ! wppaIsMini[mocc] ) {		// This is NOT a widget
 
-		// Prepare visual url ( for addressline )
-			var visurl = wppaGetCurrentFullUrl( mocc, _wppaCurIdx[mocc] );
-				if ( '' == visurl ) {
-					visurl = _wppaShareUrl[mocc][_wppaCurIdx[mocc]];
-				}
-
+			// Prepare visual url ( for addressline )
+			var visurl = _wppaShareUrl[mocc][_wppaCurIdx[mocc]];
+//			var visurl = wppaGetCurrentFullUrl( mocc, _wppaCurIdx[mocc] );
+//				if ( '' == visurl ) {
+//					visurl = _wppaShareUrl[mocc][_wppaCurIdx[mocc]];
+//				}
+//wppaConsoleLog('Visurl='+visurl, 'force');
 			// Update possible QR Widget
 			if ( typeof( wppaQRUpdate ) != 'undefined' ) {
 				wppaQRUpdate( _wppaShareUrl[mocc][_wppaCurIdx[mocc]] );
@@ -1366,8 +1368,9 @@ function _wppaStartIcons( mocc, idx ) {
 		}
 	}
 
+	var iconsize = wppaIconSize( mocc, '1.5em', false );
 	if ( idx > -1 ) {	// Init still at index idx
-		jQuery( '#startstop-'+mocc ).html( wppaSvgHtml( 'Play-Button', '1.5em', false, true, '0', '10', '20', '50' ) );
+		jQuery( '#startstop-'+mocc ).html( wppaSvgHtml( 'Play-Button', iconsize, false, true, '0', '10', '20', '50' ) );
 		jQuery( '#speed0-'+mocc ).hide();
 		jQuery( '#speed1-'+mocc ).hide();
 		_wppaNxtIdx[mocc] = idx;
@@ -1378,7 +1381,7 @@ function _wppaStartIcons( mocc, idx ) {
 	else {	// idx == -1, start from where you are
 		_wppaSSRuns[mocc] = true;
 		_wppaNextSlide( mocc, 0 );
-		jQuery( '#startstop-'+mocc ).html( wppaSvgHtml( 'Pause-Button', '1.5em', false, true, '0', '10', '20', '50' ) );
+		jQuery( '#startstop-'+mocc ).html( wppaSvgHtml( 'Pause-Button', iconsize, false, true, '0', '10', '20', '50' ) );
 		jQuery( '#speed0-'+mocc ).show();
 		jQuery( '#speed1-'+mocc ).show();
 		_wppaShowMetaData( mocc, 'hide' );
@@ -1447,7 +1450,7 @@ function _wppaStop( mocc ) {
 function _wppaStopIcons( mocc ) {
 
     _wppaSSRuns[mocc] = false;
-	jQuery( '#startstop-'+mocc ).html( wppaSvgHtml( 'Play-Button', '1.5em', false, true ) );
+	jQuery( '#startstop-'+mocc ).html( wppaSvgHtml( 'Play-Button', wppaIconSize( mocc, '1.5em', false ), false, true ) );
 //	wppaReplaceSvg();
 	jQuery( '#speed0-'+mocc ).hide(); //css( 'display', 'none' );
 	jQuery( '#speed1-'+mocc ).hide(); // css( 'display', 'none' );

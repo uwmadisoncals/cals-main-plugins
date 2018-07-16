@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.9.02
+* Version 6.9.06
 *
 */
 
@@ -727,6 +727,20 @@ Hide Camera info
 </table>
 </div>';
 
+	// Nice scroll options
+	$nso = "cursorwidth:8,
+cursoropacitymin:0.4,
+cursorcolor:'#777777',
+cursorborder:'none',
+cursorborderradius:6,
+autohidemode:'leave',
+nativeparentscrolling:false,
+preservenativescrolling:false,
+bouncescroll:false,
+smoothscroll:true,
+cursorborder:'2px solid transparent',";
+
+
 	$wppa_defaults = array ( 	'wppa_revision' 		=> '100',
 								'wppa_prevrev'			=> '100',
 								'wppa_max_users' 		=> '1000',
@@ -789,6 +803,8 @@ Hide Camera info
 						'wppa_thumb_page_size' 			=> '0',			// 7
 						'wppa_popupsize' 				=> '150',		// 8
 						'wppa_use_thumbs_if_fit'		=> 'yes',		// 9
+						'wppa_thumb_area_size' 			=> '0', 		// 10
+						'wppa_nicescroll' 				=> 'no', 		// 11
 
 						// D Covers
 						'wppa_max_cover_width'				=> '1024',	// 1
@@ -836,6 +852,11 @@ Hide Camera info
 						// H Video
 						'wppa_video_width'				=> '640',
 						'wppa_video_height' 			=> '480',
+
+						// J Icon sizes
+						'wppa_nav_icon_size' 			=> 'default',
+						'wppa_nav_icon_size_slide' 		=> 'default',
+						'wppa_icon_size_rating' 		=> 'default',
 
 						// Table II: Visibility
 						// A Breadcrumb
@@ -1090,6 +1111,7 @@ Hide Camera info
 
 						'wppa_icon_corner_style' 		=> 'medium',
 						'wppa_spinner_shape' 			=> 'default',
+						'wppa_show_dashboard_widgets' 	=> 'all',
 
 
 						// Table III: Backgrounds
@@ -1192,6 +1214,9 @@ Hide Camera info
 						'wppa_capitalize_tags' 			=> 'yes',
 						'wppa_enable_admins_choice' 	=> 'no',
 						'wppa_owner_to_name' 			=> 'no',
+
+						'wppa_nicescroll_window' 		=> 'no',
+						'wppa_nicescroll_opts' 			=> $nso,
 
 						// B Full size and Slideshow
 						'wppa_fullvalign' 				=> 'center',

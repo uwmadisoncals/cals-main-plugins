@@ -19,7 +19,7 @@ $pack->Prepare(get_the_ID());
     <title>Download <?php the_title(); ?></title>
     <link rel="stylesheet" href="<?php echo WPDM_BASE_URL; ?>assets/bootstrap/css/bootstrap.css" />
     <link rel="stylesheet" href="<?php echo WPDM_BASE_URL; ?>assets/css/front.css" />
-    <link rel="stylesheet" href="<?php echo WPDM_BASE_URL; ?>assets/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="<?php echo WPDM_BASE_URL; ?>assets/fontawesome/css/fontawesome.min.css" />
     <script src="<?php echo includes_url(); ?>/js/jquery/jquery.js"></script>
     <script src="<?php echo includes_url(); ?>/js/jquery/jquery.form.min.js"></script>
     <script src="<?php echo WPDM_BASE_URL; ?>assets/bootstrap/js/bootstrap.min.js"></script>
@@ -32,12 +32,12 @@ $pack->Prepare(get_the_ID());
             width: 100%;
             padding: 0;
             margin: 0;
-            font-family: Montserrat, sans-serif;
+            font-family: 'Josefin Sans', sans-serif;
             font-weight: 300;
             font-size: 10pt;
         }
         h4.modal-title{
-            font-family: Montserrat, sans-serif;
+            font-family: 'Josefin Sans', sans-serif;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;

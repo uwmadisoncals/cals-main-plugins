@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.9.03
+* Version 6.9.05
 *
 */
 
@@ -2560,24 +2560,38 @@ global $wppa_done;
 						if ( user_can( $moduser, 'wppa_comments' ) ) $cont['3'] = $cont2; else $cont['3'] = '';
 						if ( user_can( $moduser, 'wppa_admin' ) ) 	 $cont['4'] = $cont3; else $cont['4'] = '';
 						$cont['5'] 	= __( 'You receive this email as you are assigned to moderate' , 'wp-photo-album-plus');
-						// Send!
-						wppa_send_mail( $to, $subj, $cont, $photo, ( wppa_switch( 'mail_upl_email' ) ? $email : 'void' ), $returnurl );
+
+						// Send, but not to the commenter himself
+						if ( $to != $email ) {
+							wppa_send_mail( $to, $subj, $cont, $photo, ( wppa_switch( 'mail_upl_email' ) ? $email : 'void' ), $returnurl );
+						}
+
+						// Remember if we sent him or skipped him because its his own comment
 						$sentto[] = $moduser->user_login;
 					}
 					if ( wppa_opt( 'comment_notify' ) == 'admin' || wppa_opt( 'comment_notify' ) == 'both' || wppa_opt( 'comment_notify' ) == 'upadmin' ) {
+
 						// Mail admin
 						$moduser   = wppa_get_user_by( 'id', '1' );
 						if ( ! in_array( $moduser->user_login, $sentto ) ) {	// Already sent him?
 							$to        = get_bloginfo( 'admin_email' );
-							$cont['3'] = $cont2;
-							$cont['4'] = $cont3;
-							$cont['5'] = __( 'You receive this email as administrator of the site' , 'wp-photo-album-plus');
-							// Send!
-							wppa_send_mail( $to, $subj, $cont, $photo, $email, $returnurl );
+
+							// only when he is not the commenter himself
+							if ( $to != $email ) {
+								$cont['3'] = $cont2;
+								$cont['4'] = $cont3;
+								$cont['5'] = __( 'You receive this email as administrator of the site' , 'wp-photo-album-plus');
+
+								// Send!
+								wppa_send_mail( $to, $subj, $cont, $photo, $email, $returnurl );
+							}
+
+							// Remember if we sent him or skipped him because its his own comment
 							$sentto[] = $moduser->user_login;
 						}
 					}
 					if ( wppa_opt( 'comment_notify' ) == 'upload' || wppa_opt( 'comment_notify' ) == 'upadmin' || wppa_opt( 'comment_notify' ) == 'upowner' ) {
+
 						// Mail uploader
 						$uploader = $wpdb->get_var( $wpdb->prepare( "SELECT `owner` FROM `".WPPA_PHOTOS."` WHERE `id` = %d", $id ) );
 						$moduser = wppa_get_user_by( 'login', $uploader );
@@ -2589,8 +2603,11 @@ global $wppa_done;
 								elseif ( wppa_may_user_fe_edit( $photo ) ) $cont['4'] = $cont3a;
 								else $cont['4'] = '';
 								$cont['5'] = __( 'You receive this email as uploader of the photo' , 'wp-photo-album-plus');
+
 								// Send!
-								wppa_send_mail( $to, $subj, $cont, $photo, ( wppa_switch( 'mail_upl_email' ) ? $email : 'void' ), $returnurl );
+								if ( $to != $email ) {
+									wppa_send_mail( $to, $subj, $cont, $photo, ( wppa_switch( 'mail_upl_email' ) ? $email : 'void' ), $returnurl );
+								}
 								$sentto[] = $moduser->user_login;
 							}
 						}
@@ -2606,8 +2623,11 @@ global $wppa_done;
 							if ( user_can( $moduser, 'wppa_comments' ) ) $cont['3'] = $cont2; else $cont['3'] = '';
 							if ( user_can( $moduser, 'wppa_admin' ) ) 	 $cont['4'] = $cont3; else $cont['4'] = '';
 							$cont['5'] = __( 'You receive this email as owner of the album' , 'wp-photo-album-plus');
+
 							// Send!
-							wppa_send_mail( $to, $subj, $cont, $photo, ( wppa_switch( 'mail_upl_email' ) ? $email : 'void' ), $returnurl );
+							if ( $to != $email ) {
+								wppa_send_mail( $to, $subj, $cont, $photo, ( wppa_switch( 'mail_upl_email' ) ? $email : 'void' ), $returnurl );
+							}
 							$sentto[] = $moduser->user_login;
 						}
 					}
@@ -2623,8 +2643,11 @@ global $wppa_done;
 									$cont['3'] = '';
 									$cont['4'] = '';
 									$cont['5'] = __( 'You receive this email because you commented this photo earlier.' , 'wp-photo-album-plus');
+
 									// Send!
-									wppa_send_mail( $to, $subj, $cont, $photo, ( wppa_switch( 'mail_upl_email' ) ? $email : 'void' ), $returnurl );
+									if ( $to != $email ) {
+										wppa_send_mail( $to, $subj, $cont, $photo, ( wppa_switch( 'mail_upl_email' ) ? $email : 'void' ), $returnurl );
+									}
 									$sentto[] = $to;
 								}
 							}
@@ -3933,8 +3956,29 @@ function wppa_force_balance_pee( $xtext ) {
 function wppa_smx_photo( $stype ) {
 
 	$id 	= wppa( 'single_photo' );
+	
+	// Photo known?
+	if ( ! $id ) {
+		wppa_log( 'Err', 'Unknown photo id in wppa_smx_photo()', true );
+		return; 
+	}
+	
 	$width 	= wppa_get_container_width();
-	$height = round( $width * wppa_get_photo_item( $id, 'photoy' ) / wppa_get_photo_item( $id, 'photox' ) );
+	
+	if ( wppa_is_video( $id ) ) {
+		$py 	= wppa_get_videoy( $id );
+		$px 	= wppa_get_videox( $id );
+	}
+	else {
+		$py 	= wppa_get_photoy( $id );
+		$px 	= wppa_get_photox( $id );
+	}
+	if ( ! $px ) {
+		wppa_log( 'Err', 'Unknown size of item nr ' . $id . ' in wppa_smx_photo()', true );
+		return;
+	}
+	
+	$height = round( $width * $py / $px ); 
 	$style 	= wppa_get_container_style();
 
 	// wrapper for maximized auto

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.9.02
+* Version 6.9.05
 *
 */
 
@@ -192,6 +192,9 @@ global $wppa_revno;
 			}
 			else {
 				$wppa['start_album'] = $atts['album'];
+			}
+			if ( ! $wppa['start_album'] ) {
+				$wppa['start_album'] = '0';
 			}
 			$wppa['is_upload'] = true;
 			break;

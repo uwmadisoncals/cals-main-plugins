@@ -20,6 +20,17 @@ class DOMDocument extends \DOMDocument
 		$this->onReady();
 	}
 	
+	public static function convertUTF8ToHTMLEntities($html)
+	{
+		if(function_exists('mb_convert_encoding'))
+			return mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+		else
+		{
+			trigger_error('Using fallback UTF to HTML entity conversion', E_USER_NOTICE);
+			return htmlspecialchars_decode(utf8_decode(htmlentities($html, ENT_COMPAT, 'utf-8', false)));
+		}
+	}
+	
 	/**
 	 * Fired after construction when the Document is initialized
 	 * @return void
@@ -77,7 +88,7 @@ class DOMDocument extends \DOMDocument
 		if(empty($html))
 			throw new \Exception("$src is empty");
 		
-		$html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+		$html = DOMDocument::convertUTF8ToHTMLEntities($html);
 		$suppress_warnings = !(defined('WP_DEBUG') && WP_DEBUG);
 		
 		// From PHP 5.4.0 onwards, loadHTML takes 2 arguments
@@ -212,9 +223,12 @@ class DOMDocument extends \DOMDocument
 	{
 		$result = '';
 		
-		//Plugin::resetAttributeHooks($this);
+		$body = $this->querySelector('body');
 		
-		foreach($this->querySelectorAll('body>*') as $node)
+		if(!$body)
+			return null;
+		
+		for($node = $body->firstChild; $node != null; $node = $node->nextSibling)
 			$result .= $this->saveHTML($node);
 			
 		return $result;

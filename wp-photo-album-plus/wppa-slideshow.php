@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the slideshow high level functions
-* Version 6.9.02
+* Version 6.9.06
 *
 */
 
@@ -21,7 +21,7 @@ function wppa_the_slideshow() {
 		while ( $i < '12' ) {
 			switch ( $indexes[$i] ) {
 				case '0':
-					wppa_start_stop('optional');				// The 'Slower | start/stop | Faster' bar
+					wppa_start_stop('optional');			// The 'Slower | start/stop | Faster' bar
 					break;
 				case '1':
 					wppa_slide_frame();						// The photo / slide
@@ -248,6 +248,8 @@ function wppa_start_stop_icons( $opt = '' ) {
 	}
 
 	if ( ! $hide ) {
+
+		$iconsize = wppa_icon_size( '1.5em;' );
 		wppa_out( 	'<div' .
 						' id="prevnext1-'.wppa( 'mocc' ).'"' .
 						' class="wppa-box wppa-nav wppa-nav-text"' .
@@ -260,7 +262,7 @@ function wppa_start_stop_icons( $opt = '' ) {
 							' title="' . __('Slower', 'wp-photo-album-plus') . '"' .
 							' onclick="wppaSpeed('.wppa( 'mocc' ).', false); return false;"' .
 							' >' .
-							wppa_get_svghtml( 'Snail', '1.5em' ) .
+							wppa_get_svghtml( 'Snail', $iconsize ) .
 						'</span>' .
 						' ' .
 						'<span' .
@@ -270,7 +272,7 @@ function wppa_start_stop_icons( $opt = '' ) {
 							' title="' . __( 'Start / stop slideshow', 'wp-photo-album-plus' ) . '"' .
 							' onclick="wppaStartStop(' . wppa( 'mocc' ) . ', -1); return false;"' .
 							' >' .
-							wppa_get_svghtml( 'Play-Button', '1.5em' ) .
+							wppa_get_svghtml( 'Play-Button', $iconsize ) .
 						'</span>' .
 						' ' .
 						'<span' .
@@ -279,7 +281,7 @@ function wppa_start_stop_icons( $opt = '' ) {
 							' style="'.wppa_wcs('wppa-nav-text').'"' .
 							' title="' . __('Faster', 'wp-photo-album-plus') . '"' .
 							' onclick="wppaSpeed('.wppa( 'mocc' ).', true); return false;">' .
-							wppa_get_svghtml( 'Eagle-1', '1.5em' ) .
+							wppa_get_svghtml( 'Eagle-1', $iconsize ) .
 						'</span>' .
 					'</div>' );
 	}
@@ -448,6 +450,8 @@ function wppa_slide_frame() {
 		if ( ( wppa_switch( 'show_ubb' ) && ! wppa_in_widget() ) ||
 			 ( wppa_switch( 'show_ubb_widget' ) && wppa_in_widget() ) ) {
 
+			$iconsize = wppa_icon_size( '48px;', 1 );
+			$margin = wppa_icon_size( '48px;', 1, 0.5 );
 			wppa_out( 	'<div' .
 							' id="ubb-'.wppa( 'mocc' ).'-l"' .
 							' class="ubb ubb-l ubb-'.wppa( 'mocc' ).'"' .
@@ -457,11 +461,11 @@ function wppa_slide_frame() {
 								'z-index:85;' .
 								'position:absolute;' .
 								'top:50%;' .
-								'margin-top:-24px;' .
+								'margin-top:-' . $margin .
 								'left:0;' .
 								'box-shadow:none;' .
 								'cursor:pointer;' .
-								'width:48px;' .
+								'width:' . $iconsize . ';' .
 								'"' .
 							' onmouseover="wppaUbb('.wppa( 'mocc' ).',\'l\',\'show\')"' .
 							' ontouchstart="wppaUbb('.wppa( 'mocc' ).',\'l\',\'show\')"' .
@@ -469,7 +473,7 @@ function wppa_slide_frame() {
 							' ontouchend="wppaUbb('.wppa( 'mocc' ).',\'l\',\'hide\');"' .
 							' onclick="wppaUbb('.wppa( 'mocc' ).',\'l\',\'click\')"' .
 							' >' .
-							wppa_get_svghtml( 'Prev-Button', '48px', false, true ) .
+							wppa_get_svghtml( 'Prev-Button', $iconsize, false, true ) .
 						'</div>' .
 						'<div' .
 							' id="ubb-'.wppa( 'mocc' ).'-r"' .
@@ -480,11 +484,11 @@ function wppa_slide_frame() {
 								'z-index:85;' .
 								'position:absolute;' .
 								'top:50%;' .
-								'margin-top:-24px;' .
+								'margin-top:-' . $margin .
 								'right:0;' .
 								'box-shadow:none;' .
 								'cursor:pointer;' .
-								'width:48px;' .
+								'width:' . $iconsize . ';' .
 								'"' .
 							' onmouseover="wppaUbb('.wppa( 'mocc' ).',\'r\',\'show\')"' .
 							' ontouchstart="wppaUbb('.wppa( 'mocc' ).',\'r\',\'show\')"' .
@@ -492,7 +496,7 @@ function wppa_slide_frame() {
 							' onclick="wppaUbb('.wppa( 'mocc' ).',\'r\',\'click\')"' .
 							' ontouchend="wppaUbb('.wppa( 'mocc' ).',\'r\',\'click\');wppaUbb('.wppa( 'mocc' ).',\'r\',\'hide\');"' .
 							' >' .
-							wppa_get_svghtml( 'Next-Button', '48px', false, true ) .
+							wppa_get_svghtml( 'Next-Button', $iconsize, false, true ) .
 						'</div>'
 					);
 		}
@@ -823,7 +827,7 @@ function wppa_get_slide_rating_vote_only( $opt, $id = '0', $is_lightbox = false 
 							' class="wppa-vote-button"' .
 							' style="margin:0;"' .
 							' type="button"' .
-							' onclick="wppa'.$ovl.'RateIt('.wppa( 'mocc' ).', 1)"' .
+							' onclick="wppa'.($is_lightbox?'Ovl':'').'RateIt('.wppa( 'mocc' ).', 1)"' .
 							' value="'.wppa_opt( 'vote_button_text' ) . '"' .
 						' />';
 		}
@@ -926,7 +930,7 @@ global $wpdb;
 		}
 		else for ( $i = '1'; $i <= '10'; $i++ ) $r[$i] = $i;
 
-		$style = 'height:'.$fs.'px; margin:0 0 -3px 0; padding:0; box-shadow:none; display:inline;background-color:transparent;';
+		$style = 'height:' . wppa_icon_size( $fs.'px;', 2 ) . ' margin:0 0 -3px 0; padding:0; box-shadow:none; display:inline;background-color:transparent;';
 		$icon = 'star.ico';
 
 		$avgrat_label = ( wppa_opt( 'initial_colwidth' ) < wppa_opt( 'mini_treshold' ) ? __( 'Avg.', 'wp-photo-album-plus' ) : __( 'Average&nbsp;rating', 'wp-photo-album-plus' ) );
@@ -1013,7 +1017,7 @@ global $wpdb;
 								' title="'.__('Click this if you do NOT like this image!', 'wp-photo-album-plus').'"' .
 								' src="'.wppa_get_imgdir().'thumbdown.png"' .
 								' alt="d"' .
-								' style="height:'.$fs.'px; margin:0 0 -3px 0; padding:0 '.$pad.'px; box-shadow:none; display:inline;"' .
+								' style="height:'.wppa_icon_size( $fs.'px;', 2 ).'; margin:0 0 -3px 0; padding:0 '.$pad.'px; box-shadow:none; display:inline;"' .
 								' class="wppa-rating-thumb  no-shadow"' .
 								' onmouseover="jQuery(this).stop().fadeTo(100, 1.0)"' .
 								' onmouseout="jQuery(this).stop().fadeTo(100, wppaStarOpacity)"' .
@@ -1144,7 +1148,7 @@ global $wpdb;
 									' title="'.__('Click this if you do NOT like this image!', 'wp-photo-album-plus').'"' .
 									' src="'.wppa_get_imgdir().'thumbdown.png"' .
 									' alt="d"' .
-									' style="height:'.$fs.'px; margin:0 0 -3px 0; padding:0 '.$pad.'px; box-shadow:none; display:inline;"' .
+									' style="height:'.wppa_icon_size( $fs.'px;', 2 ).' margin:0 0 -3px 0; padding:0 '.$pad.'px; box-shadow:none; display:inline;"' .
 									' class="no-shadow"' .
 									' onmouseover="jQuery(this).stop().fadeTo(100, 1.0)"' .
 									' onmouseout="jQuery(this).stop().fadeTo(100, wppaStarOpacity)"' .
@@ -1253,6 +1257,7 @@ function wppa_slide_filmstrip( $opt = '' ) {
 	}
 	else {
 
+	$iconsize = wppa_icon_size( $fs . 'px;' );
 	wppa_out( 	'<div' .
 					' class="wppa-box wppa-nav wppa-filmstrip-box"' .
 					' style="text-align:center; '.wppa_wcs('wppa-box').wppa_wcs('wppa-nav').'height:'.$height.'px;"' .
@@ -1268,7 +1273,7 @@ function wppa_slide_filmstrip( $opt = '' ) {
 							' onclick="wppaFirst('.wppa( 'mocc' ).');"' .
 							' title="'.__('First', 'wp-photo-album-plus').'"' .
 							' >' .
-							wppa_get_svghtml( 'Backward-Button', $fs . 'px;', false, false ) .
+							wppa_get_svghtml( 'Backward-Button', $iconsize, false, false ) .
 						'</span>' .
 					'</div>' .
 					'<div' .
@@ -1282,7 +1287,7 @@ function wppa_slide_filmstrip( $opt = '' ) {
 							' onclick="wppaLast('.wppa( 'mocc' ).');"' .
 							' title="'.__('Last', 'wp-photo-album-plus').'"' .
 							' >' .
-							wppa_get_svghtml( 'Forward-Button', $fs . 'px;', false, false ) .
+							wppa_get_svghtml( 'Forward-Button', $iconsize, false, false ) .
 						'</span>' .
 					'</div>' .
 					'<div' .
@@ -1354,6 +1359,9 @@ function wppa_startstop_icons() {
 		return;
 	}
 
+	$iconsize = wppa_icon_size( '48px;', 1 );
+	$margin = wppa_icon_size( '48px;', 1, 0.5 );
+
 	// Create and output the html
 	wppa_out( 	'<div' .
 					' id="wppa-startstop-icon-' . wppa( 'mocc' ) . '"' .
@@ -1361,11 +1369,11 @@ function wppa_startstop_icons() {
 					' style="' .
 						'position:absolute;' .
 						'left:50%;' .
-						'margin-left:-24px;' .
+						'margin-left:-' . $margin .
 						'top:50%;' .
-						'margin-top:-24px;' .
+						'margin-top:-' . $margin .
 						'z-index:90;' .
-						'width:48px;' .
+						'width:' . $iconsize .
 						'opacity:0.8;' .
 						'cursor:pointer;' .
 						'box-shadow:none;' .
@@ -1377,7 +1385,7 @@ function wppa_startstop_icons() {
 					' onclick="wppaStartStop( ' . wppa( 'mocc' ) . ', -1 );"' .
 					' onload="jQuery(this).fadeTo(1000,0);"' .
 					' >' .
-					wppa_get_svghtml( 'Play-Button', '48px', false, true, '0', '5', '50', '50' ) .
+					wppa_get_svghtml( 'Play-Button', $iconsize, false, true, '0', '5', '50', '50' ) .
 				'</div>'
 			);
 }
@@ -1494,6 +1502,7 @@ function wppa_browsebar_icons( $opt = '' ) {
 	if ( wppa( 'is_slideonly' ) && wppa( 'browse_on' ) ) $do_it = true;
 
 	if ( $do_it ) {
+		$iconsize = wppa_icon_size( '1.5em;' );
 		wppa_out( 	'<div' .
 						' id="prevnext2-' . wppa( 'mocc' ) . '"' .
 						' class="wppa-box wppa-nav wppa-nav-text"' .
@@ -1506,7 +1515,7 @@ function wppa_browsebar_icons( $opt = '' ) {
 							' title="' . __( 'Previous photo', 'wp-photo-album-plus' ) . '"' .
 							' onclick="wppaPrev(' . wppa( 'mocc' ) . ')"' .
 							' >' .
-							wppa_get_svghtml( 'Prev-Button', '1.5em' ) .
+							wppa_get_svghtml( 'Prev-Button', $iconsize ) .
 						'</span>' .
 						'<span' .
 							' id="next-arrow-' . wppa( 'mocc' ) . '"' .
@@ -1515,7 +1524,7 @@ function wppa_browsebar_icons( $opt = '' ) {
 							' title="' . __( 'Next photo', 'wp-photo-album-plus' ) . '"' .
 							' onclick="wppaNext(' . wppa( 'mocc' ) . ')"' .
 							' >' .
-							wppa_get_svghtml( 'Next-Button', '1.5em' ) .
+							wppa_get_svghtml( 'Next-Button', $iconsize ) .
 						'</span>' .
 						'<span' .
 							' id="counter-'.wppa( 'mocc' ).'"' .
@@ -1525,10 +1534,12 @@ function wppa_browsebar_icons( $opt = '' ) {
 							' title="'.__('Click to start/stop', 'wp-photo-album-plus').'"' .
 							' >' .
 						'</span>' .
+						'<div style="clear:both;" ></div>' .
 					'</div>'
 				);
 	}
 }
+
 function wppa_browsebar_text( $opt = '' ) {
 
 	// A single image slideshow needs no navigation

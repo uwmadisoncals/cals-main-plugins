@@ -73,7 +73,7 @@ class AAM_Core_Object_Metabox extends AAM_Core_Object {
         } elseif (is_string($widget['callback'][0])) {
             $callback = $widget['callback'][0];
         } else {
-            $callback = null;
+            $callback = isset($widget['classname']) ? $widget['classname'] : null;
         }
 
         return $callback;
@@ -92,6 +92,22 @@ class AAM_Core_Object_Metabox extends AAM_Core_Object {
                 if ($screen == $screen_id) {
                     $this->filterZones($zones, $screen_id);
                 }
+            }
+        }
+    }
+    
+    /**
+     * 
+     * @global type $wp_registered_widgets
+     */
+    public function filterAppearanceWidgets() {
+        global $wp_registered_widgets;
+        
+        foreach($wp_registered_widgets as $id => $widget) {
+            $callback = $this->getWidgetCallback($widget);
+            if ($this->has('widgets', $callback)) {
+                unregister_widget($callback);
+                unset($wp_registered_widgets[$id]);
             }
         }
     }
@@ -152,6 +168,34 @@ class AAM_Core_Object_Metabox extends AAM_Core_Object {
         $options = $this->getOption();
 
         return !empty($options[$screen][$metabox]);
+    }
+    
+    /**
+     * Allow access to a specific metabox
+     * 
+     * @param string $screen
+     * @param string $metabox
+     * 
+     * @return boolean
+     * 
+     * @access public
+     */
+    public function allow($screen, $metabox) {
+        $this->save("{$screen}|{$metabox}", 0);
+    }
+    
+    /**
+     * Deny access to a specific metabox
+     * 
+     * @param string $screen
+     * @param string $metabox
+     * 
+     * @return boolean
+     * 
+     * @access public
+     */
+    public function deny($screen, $metabox) {
+        return $this->save("{$screen}|{$metabox}", 1);
     }
 
 }

@@ -2,8 +2,8 @@
 Tags: page builder, responsive, widget, widgets, builder, page, admin, gallery, content, cms, pages, post, css, layout, grid
 Requires at least: 4.4
 Tested up to: 4.9
-Stable tag: 2.7.0
-Build time: 2018-06-27T14:38:16+02:00
+Stable tag: 2.7.2
+Build time: 2018-06-29T09:54:52+02:00
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Donate link: https://siteorigin.com/downloads/contribution/
@@ -95,6 +95,12 @@ Page Builder is actively developed and updated, so generally I'd recommend that 
 We've tried to ensure that Page Builder is compatible with most plugin widgets. It's best to just download Page Builder and test for yourself.
 
 == Changelog ==
+
+= 2.7.2 - 29 June 2018 =
+* Skip Yoast compat for non PB content.
+
+= 2.7.1 - 28 June 2018 =
+* Check for yoast metabox before enqueuing compat JS.
 
 = 2.7.0 - 27 June 2018 =
 * New setting to automatically open widget forms when they're added.

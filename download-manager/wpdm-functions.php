@@ -1359,6 +1359,47 @@ function wpdm_get_client_ip() {
     return $ipaddress;
 }
 
+/**
+ * @param $ID
+ * @param $_key
+ * @param bool $execute
+ * @return bool|int
+ * @since 4.7.4
+ */
+function is_wpdmkey_valid($ID, $_key, $update = false){
+    if($_key == '') return 0; // Invalid
+
+    $key = "__wpdmkey_".$_key;
+    $xlimit = get_post_meta($ID, $key, true);
+
+    if(!$xlimit) return 0; // Invalid
+
+    $xlimit = maybe_unserialize($xlimit);
+    if(!is_array($xlimit)) return 0;
+
+    $limit = isset($xlimit['use'])?$xlimit['use']:0;
+
+    $expired = false;
+
+    if ($limit <= 0) {
+        delete_post_meta($ID, $key);
+        return -1; // Limit exceeded
+    }
+    else {
+
+        $limit --;
+        $xlimit['use'] = $limit;
+
+        if($xlimit['expire'] < time()){
+            $xlimit['use'] = $limit = 0;
+            $expired = true;
+        }
+        if($update)
+            update_post_meta($ID, $key, $xlimit);
+        if($expired) return -2; // Time expired
+    }
+    return 1;
+}
 
 
 function wpdm_is_url( $url ) {
@@ -1366,6 +1407,10 @@ function wpdm_is_url( $url ) {
     return apply_filters( 'wpdm_is_url', $result, $url );
 }
 
+/**
+ * @param null $uid
+ * @return int
+ */
 function wpdm_total_downloads($uid = null){
     global $wpdb;
     if(isset($uid) && $uid > 0)
@@ -1375,6 +1420,10 @@ function wpdm_total_downloads($uid = null){
     return (int)$download_count;
 }
 
+/**
+ * @param null $uid
+ * @return mixed
+ */
 function wpdm_total_views($uid = null){
     global $wpdb;
     if(isset($uid) && $uid > 0)
@@ -1383,3 +1432,50 @@ function wpdm_total_views($uid = null){
         $download_count = $wpdb->get_var("select sum(meta_value) from {$wpdb->prefix}postmeta where meta_key='__wpdm_view_count'");
     return $download_count;
 }
+
+/**
+ * @param $total
+ * @param $item_per_page
+ * @param int $page
+ * @param string $var
+ * @return string
+ */
+function wpdm_paginate_links($total, $items_per_page, $page = 1, $var = 'cp', $params = array()){
+
+    $pages = ceil($total/$items_per_page);
+
+    $args = array(
+        //'base'               => '%_%',
+        'format'             => "?{$var}=%#%",
+        'total'              => $pages,
+        'current'            => $page,
+        //'show_all'           => false,
+        //'end_size'           => 2,
+        //'mid_size'           => 1,
+        //'prev_next'          => true,
+        'prev_text'          => isset($params['prev_text'])?$params['prev_text']:__('Previous'),
+        'next_text'          => isset($params['prev_text'])?$params['next_text']:__('Next'),
+        'type'               => 'array',
+        //'add_args'           => false,
+        //'add_fragment'       => '',
+        //'before_page_number' => '',
+        //'after_page_number'  => ''
+    );
+    //wpdmprecho($args);
+    $pags = paginate_links($args);
+    //wpdmprecho($pags);
+    $phtml = "";
+    if(is_array($pags)) {
+        foreach ($pags as $pagl) {
+            if(isset($params['container'])){
+                $pagl = str_replace("<a", "<a data-container='{$params['container']}'", $pagl);
+            }
+            $phtml .= "<li>{$pagl}</li>";
+        }
+    }
+    $async = isset($params['async']) && $params['async']?' async':'';
+    $phtml = "<div class='text-center'><ul class='pagination wpdm-pagination pagination-centered text-center{$async}'>{$phtml}</ul></div>";
+    return $phtml;
+}
+
+

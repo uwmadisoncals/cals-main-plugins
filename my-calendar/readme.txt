@@ -5,7 +5,7 @@ Tags: calendar, dates, times, event, events, scheduling, schedule, event manager
 Requires at least: 4.4
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 3.0.7
+Stable tag: 3.0.12
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -82,6 +82,34 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 4. Visit My Calendar -> Help for assistance with shortcode options or widget configuration.
 
 == Changelog ==
+
+= 3.0.12 =
+
+* Bug fix: My Calendar could prevent canonical link from displaying if canonical link being filtered by another application.
+* Modernize & improve Akismet integration.
+* Add filter to disable Akismet checks.
+
+= 3.0.11 =
+
+* SECURITY: XSS - Canonical URL not properly sanitized. Affects 3.0.0 and up. 
+
+= 3.0.10 =
+
+* Bug fix: invalid method used to sort location lists.
+* Bug fix: shortcode generator missing input value
+* Bug fix: datepicker did not reflect start of week settings
+* Stylesheet CSS change
+
+= 3.0.9 =
+
+* Bug fix: Error thrown if Akismet had previously been configured, then deleted.
+* Bug fix: location type was added to params if category key was set.
+* Bug fix: remove a couple notices
+* Bug fix: category relationships not carried over when recurring events split
+
+= 3.0.8 =
+
+* Bug fix: need to allow <a> elements in mc_strip_tags so calendar linkscan point to non-calendar URLs
 
 = 3.0.7 =
 
@@ -1020,4 +1048,4 @@ The search feature in My Calendar is pretty basic; but buying My Calendar Pro gi
 
 == Upgrade Notice ==
 
-* 3.0.0 Major update! New features, many bug fixes and improvements.
+* 3.0.11 URGENT: Security fix - XSS scripting vulnerability resolved.

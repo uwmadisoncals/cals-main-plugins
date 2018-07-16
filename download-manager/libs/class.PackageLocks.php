@@ -60,7 +60,7 @@ class PackageLocks
                                     jQuery("#msg_<?php echo  $package['ID']; ?>").hide();
                                     jQuery("#wpdmdlf_<?php echo  $unqid . '_' . $package['ID']; ?>").show();
                                 } else {
-                                    jQuery("#msg_<?php echo $package['ID']; ?>").html("<div class='btn btn-lg btn-default btn-block'>"+res.error+"</div>");
+                                    jQuery("#msg_<?php echo $package['ID']; ?>").html("<div class='btn btn-lg btn-light btn-block'>"+res.error+"</div>");
                                 }
                             }
                         });

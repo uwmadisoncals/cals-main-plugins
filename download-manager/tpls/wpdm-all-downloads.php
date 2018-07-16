@@ -240,19 +240,19 @@ if(isset($params['jstable']) && $params['jstable']==1):
                                         break;
                                     case 'file_count':
                                         if($cx > 0)
-                                            echo "<span class='__dt_file_count {$cxc}'><i class=\"fa fa-files-o\"></i> &nbsp;". count($data['files'])." " . __('file(s)','download-manager')."</span>";
+                                            echo "<span class='__dt_file_count {$cxc}'><i class=\"far fa-copy\"></i>&nbsp;". count($data['files'])." " . __('file(s)','download-manager')." </span>";
                                         else
-                                            echo "<span class=\"hidden-md hidden-lg td-mobile\">{$colheads[$colx]}: </span><span class='__dt_file_count {$cxc}'>".count($data['files'])."</span>";
+                                            echo "<span class=\"hidden-md hidden-lg td-mobile\">{$colheads[$colx]}: </span><span class='__dt_file_count {$cxc}'>".count($data['files'])." </span>";
                                         break;
                                     case 'download_count':
                                         if($cx > 0)
-                                            echo "<span class='__dt_download_count {$cxc}'><i class=\"fa fa-download\"></i> &nbsp;". (isset($data['download_count'])?$data['download_count']:0)." ".(isset($data['download_count']) && $data['download_count'] > 1 ?  __('downloads','download-manager') : __('download','download-manager'))."</span>";
+                                            echo "<span class='__dt_download_count {$cxc}'><i class=\"fa fa-download\"></i>&nbsp;". (isset($data['download_count'])?$data['download_count']:0)." ".(isset($data['download_count']) && $data['download_count'] > 1 ?  __('downloads','download-manager') : __('download','download-manager'))."</span>";
                                         else
                                             echo "<span class=\"hidden-md hidden-lg td-mobile\">{$colheads[$colx]}: </span><span class='__dt_download_count {$cxc}'>{$data['download_count']}</span>";
                                         break;
                                     case 'view_count':
                                         if($cx > 0)
-                                            echo "<span class='__dt_view_count {$cxc}'><i class=\"fa fa-eye\"></i> &nbsp;". (isset($data['view_count'])?$data['view_count']:0)." ".(isset($data['view_count']) && $data['view_count'] > 1 ?  __('views','download-manager') : __('view','download-manager'))."</span>";
+                                            echo "<span class='__dt_view_count {$cxc}'><i class=\"fa fa-eye\"></i>&nbsp;". (isset($data['view_count'])?$data['view_count']:0)." ".(isset($data['view_count']) && $data['view_count'] > 1 ?  __('views','download-manager') : __('view','download-manager'))."</span>";
                                         else
                                             echo "<span class=\"hidden-md hidden-lg td-mobile\">{$colheads[$colx]}: </span><span class='__dt_view_count'>{$data['view_count']}</span>";
                                         break;
@@ -323,7 +323,7 @@ if(isset($params['jstable']) && $params['jstable']==1):
         if( !empty($wp_query->query_vars['s']) )
             $pagination['add_args'] = array('s'=>get_query_var('s'));
 
-        echo  "<div class='text-center'>".str_replace("<ul class='page-numbers'>","<ul class='page-numbers pagination pagination-centered'>",paginate_links($pagination))."</div>";
+        echo  wpdm_paginate_links( $pagination['total'], $items, $cp, 'paged');
 
         wp_reset_query();
         ?>

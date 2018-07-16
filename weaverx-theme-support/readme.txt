@@ -11,7 +11,7 @@ Text Domain: weaverx-theme-support
 Requires at least: 4.8
 Requires PHP: 5.4
 Tested up to: 4.9
-Stable tag: 4.0.2
+Stable tag: 4.0.3
 
 A useful shortcode and widget collection for Weaver Xtreme
 
@@ -76,6 +76,9 @@ Support for this plugin can best be found at our forum - http://forum.weaverthem
 See ChangeLog for changes to this version.
 
 == ChangeLog ==
+= 4.0.3 =
+* New: support for direct file access for alternative editor style file creation
+
 = 4.0.2 =
 * Fix/Change - Removed (for now) the Boxed easy-width layout option.
 

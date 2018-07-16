@@ -222,14 +222,20 @@
 			};
 			
 			navigator.geolocation.getCurrentPosition(function(position) {
-				callback(position);
+				if(callback)
+					callback(position);
+				
+				WPGMZA.events.trigger("userlocationfound");
 			},
 			function(error) {
 				
 				options.enableHighAccuracy = false;
 				
 				navigator.geolocation.getCurrentPosition(function(position) {
-					callback(position);
+					if(callback)
+						callback(position);
+					
+					WPGMZA.events.trigger("userlocationfound");
 				},
 				function(error) {
 					console.warn(error.code, error.message);
@@ -286,12 +292,12 @@
 			
 			switch(WPGMZA.settings.engine)
 			{
-				case "google-maps":
-					engine = "Google";
+				case "open-layers":
+					engine = "OL";
 					break;
 				
 				default:
-					engine = "OL";
+					engine = "Google";
 					break;
 			}
 			

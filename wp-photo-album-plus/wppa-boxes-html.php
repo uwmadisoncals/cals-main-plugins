@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.9.04
+* Version 6.9.05
 *
 */
 
@@ -16,6 +16,8 @@ function wppa_thumb_area( $action ) {
 	$result = '';
 	$mocc 	= wppa( 'mocc' );
 	$alt 	= wppa( 'alt' );
+	$maxh 	= wppa_opt( 'thumb_area_size' );
+	$nice 	= false;
 
 	// Open thumbnail area box
 	if ( $action == 'open' ) {
@@ -38,7 +40,8 @@ function wppa_thumb_area( $action ) {
 							' style="' .
 								wppa_wcs( 'wppa-box' ) .
 								wppa_wcs( 'wppa-' . $alt ) .
-//								( wppa_is_mobile() ? '' : 'width:' . wppa_get_thumbnail_area_width() . 'px;' ) .
+								( $maxh > '1' ? 'max-height:' . $maxh . 'px;' : '' ) .
+								( $nice ? 'overflow:hidden;' : 'overflow:auto;' ) .
 								'"' .
 							' onscroll="wppaMakeLazyVisible();" ' .
 							' >';
@@ -46,6 +49,11 @@ function wppa_thumb_area( $action ) {
 			if ( wppa_is_int( wppa( 'start_album' ) ) ) {
 				wppa_bump_viewcount( 'album', wppa( 'start_album') );
 			}
+		}
+
+		// Use nicescroller?
+		if ( wppa_switch( 'nicescroll' ) ) {
+			$result .= 	'<div class="wppa-nicewrap" >';
 		}
 
 		// Toggle alt/even
@@ -61,7 +69,7 @@ function wppa_thumb_area( $action ) {
 
 	}
 
-	// Cloase thumbnail area box
+	// Close thumbnail area box
 	elseif ( $action == 'close' ) {
 
 		// Display create subalbum and upload photo links conditionally
@@ -74,6 +82,17 @@ function wppa_thumb_area( $action ) {
 
 		// Clear both
 		$result .= '<div class="wppa-clear" style="' . wppa_wis( 'clear:both;' ) . '" ></div>';
+
+		// Nicescroller
+		if ( wppa_switch( 'nicescroll' ) ) {
+			$result .=
+			'<script type="text/javascript" >' .
+				'jQuery(document).ready(function(){' .
+					'jQuery(".wppa-thumb-area").niceScroll(".wppa-nicewrap",{' . wppa_opt( 'nicescroll_opts' ) . '});' .
+				'});' .
+			'</script>' .
+			'</div>';
+		}
 
 		// Close the thumbnail box
 		$result .= '</div>';
@@ -2177,7 +2196,7 @@ function wppa_get_user_create_html( $alb, $width, $where = '', $mcr = false ) {
 				'jQuery( \'#wppa-ea-'.str_replace('.','-',$alb).'-'.$mocc.'\' ).css( \'display\',\'none\' );'.			// Hide the Edit link
 				'jQuery( \'#wppa-cats-' . str_replace('.','-',$alb) . '-' . $mocc . '\' ).css( \'display\',\'none\' );'.	// Hide catogory
 				'jQuery( \'#_wppa-cr-'.str_replace('.','-',$alb).'-'.$mocc.'\' ).css( \'display\',\'block\' );'. 		// Show backlink
-				'_wppaDoAutocol( ' . $mocc . ' )'.													// Trigger autocol
+				'window.dispatchEvent(new Event(\'resize\'));'.
 				'"' .
 			' style="float:left;cursor:pointer;"' .
 			'> ' .
@@ -2193,7 +2212,7 @@ function wppa_get_user_create_html( $alb, $width, $where = '', $mcr = false ) {
 				'jQuery( \'#wppa-ea-'.str_replace('.','-',$alb).'-'.$mocc.'\' ).css( \'display\',\'block\' );'.			// Show the Edit link
 				'jQuery( \'#wppa-cats-' . str_replace('.','-',$alb) . '-' . $mocc . '\' ).css( \'display\',\'block\' );'.	// Show catogory
 				'jQuery( \'#_wppa-cr-'.str_replace('.','-',$alb).'-'.$mocc.'\' ).css( \'display\',\'none\' );'. 			// Hide backlink
-				'_wppaDoAutocol( ' . $mocc . ' )'.													// Trigger autocol
+				'window.dispatchEvent(new Event(\'resize\'));'.
 				'"' .
 			' style="float:right;cursor:pointer;display:none;padding-right:6px;"' .
 			' >' .
@@ -2531,7 +2550,7 @@ static $albums_granted;
 				'jQuery( \'#wppa-ea-'.str_replace('.','-',$yalb).'-'.$mocc.'\' ).css( \'display\',\'none\' );'.			// Hide the Edit link
 				'jQuery( \'#wppa-cats-' . str_replace('.','-',$yalb) . '-' . $mocc . '\' ).css( \'display\',\'none\' );'.	// Hide catogory
 				'jQuery( \'#_wppa-up-'.str_replace('.','-',$yalb).'-'.$mocc.'\' ).css( \'display\',\'block\' );'. 		// Show backlink
-				'_wppaDoAutocol( ' . $mocc . ' )' .													// Trigger autocol
+				'window.dispatchEvent(new Event(\'resize\'));'.
 				'"' .
 			' style="float:left; cursor:pointer;' .
 			'" >' .
@@ -2547,7 +2566,7 @@ static $albums_granted;
 				'jQuery( \'#wppa-ea-'.str_replace('.','-',$yalb).'-'.$mocc.'\' ).css( \'display\',\'block\' );'.			// Show the Edit link
 				'jQuery( \'#wppa-cats-' . str_replace('.','-',$yalb) . '-' . $mocc . '\' ).css( \'display\',\'block\' );'.	// Show catogory
 				'jQuery( \'#_wppa-up-'.str_replace('.','-',$yalb).'-'.$mocc.'\' ).css( \'display\',\'none\' );'. 			// Hide backlink
-				'_wppaDoAutocol( ' . $mocc . ' )' .													// Trigger autocol
+				'window.dispatchEvent(new Event(\'resize\'));'.
 				'"' .
 			' style="float:right; cursor:pointer;display:none;padding-right:6px;' .
 			'" >' .

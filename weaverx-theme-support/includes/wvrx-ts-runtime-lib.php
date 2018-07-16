@@ -200,9 +200,6 @@ function weaverx_ts_show_version_action() {
 }
 
 
-
-
-
 function weaverx_ts_get_sysinfo() {
 
 		global $wpdb;
@@ -295,5 +292,27 @@ function weaverx_ts_get_sysinfo() {
 		$return .= "\n" . '### End System Info ###' . "\n";
 		return $return;
 }
+
+// ======== fallback file support ======
+
+function weaverx_ts_write_to_upload( $filename, $output ) {
+	// some sytems fail using $wp_filesystem to create editor file. This will use direct PHP I/O (not allowed in themes) to avoid the problem.
+
+	// recreate the directory name
+
+	$upload_dir = wp_upload_dir(); // Grab uploads folder array
+	$dir = trailingslashit( $upload_dir['basedir'] ) . 'weaverx-subthemes'. DIRECTORY_SEPARATOR; // Set storage directory path
+
+	if (! wp_mkdir_p($dir) ) {
+		weaverx_f_file_access_fail(__('Directory not writable to save editor style file. You will have to check with your hosting company to have your installation fixed to allow directories to be created. Directory: ', 'weaver-xtreme' /*adm*/) . $dir);
+	}
+
+	$file = fopen ($dir . $filename, 'w');
+	if ( fwrite($file, $output) == false ) {
+		weaverx_f_file_access_fail(__('Unable to save editor style file. You will have to check with your hosting company to have your installation fixed to allow files to be created.', 'weaver-xtreme' /*adm*/) . $dir);
+	}
+	fclose( $file );
+}
+
 
 ?>

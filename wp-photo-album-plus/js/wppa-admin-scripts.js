@@ -1,7 +1,7 @@
 /* admin-scripts.js */
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.9.03
+/* Version 6.9.05
 /* Various js routines used in admin pages
 */
 
@@ -11,6 +11,14 @@ var wppa_update = 'Update';
 var wppaImageDirectory;
 var wppaAjaxUrl;
 var wppaUploadToThisAlbum = 'Upload to this album';
+
+// Init at dom ready
+jQuery( document ).ready(function() {
+
+	// Make Lazy load images visible
+	jQuery(window).on('DOMContentLoaded load resize scroll', wppaMakeLazyVisible);
+	wppaMakeLazyVisible();
+});
 
 /* Check if jQuery library revision is high enough, othewise give a message and uncheck checkbox elm */
 function checkjQueryRev(msg, elm, rev){

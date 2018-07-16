@@ -368,11 +368,14 @@ class FileSystem
 
     public static function mediaURL($pid, $fileID, $fileName = ''){
         if($fileName == '') {
-            $files = get_post_meta($pid, '__wpdm_files', true);
-            $file = array_shift($files);
-            $fileName = wpdm_basename($file);
+            $files = \WPDM\Package::getFiles($pid);
+            $fileName = wpdm_basename($files[$fileID]);
         }
-        return home_url("/wpdm-media/{$pid}/{$fileName}");
+        $key = uniqid();
+        $exp = array('use' => 0, 'expire' => time()+30);
+        update_post_meta($pid, "__wpdmkey_".$key, $exp);
+
+        return home_url("/wpdm-media/{$pid}/{$fileID}/{$fileName}?_wpdmkey={$key}");
     }
 
 

@@ -55,16 +55,16 @@
 	{
 		switch(WPGMZA.settings.engine)
 		{
-			case "google-maps":
+			case "open-layers":
 				if(WPGMZA.isProVersion())
-					return WPGMZA.GoogleProMarker;
-				return WPGMZA.GoogleMarker;
+					return WPGMZA.OLProMarker;
+				return WPGMZA.OLMarker;
 				break;
 				
 			default:
 				if(WPGMZA.isProVersion())
-					return WPGMZA.OLProMarker;
-				return WPGMZA.OLMarker;
+					return WPGMZA.GoogleProMarker;
+				return WPGMZA.GoogleMarker;
 				break;
 		}
 	}
@@ -138,7 +138,15 @@
 	
 	WPGMZA.Marker.prototype.getIcon = function()
 	{
-		return WPGMZA.settings.default_marker_icon;
+		function stripProtocol(url)
+		{
+			if(typeof url != "string")
+				return url;
+			
+			return url.replace(/^http(s?):/, "");
+		}
+		
+		return stripProtocol(WPGMZA.settings.default_marker_icon);
 	}
 	
 	/**

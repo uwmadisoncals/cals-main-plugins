@@ -35,11 +35,16 @@ class Plugin
 	
 	protected $scriptLoader;
 	
+	private $mysqlVersion = null;
 	private $cachedVersion = null;
 	private $legacySettings;
 	
 	public function __construct()
 	{
+		global $wpdb;
+		
+		$this->mysqlVersion = $wpdb->get_var('SELECT VERSION()');
+		
 		$this->legacySettings = get_option('WPGMZA_OTHER_SETTINGS');
 		if(!$this->legacySettings)
 			$this->legacySettings = array();
@@ -85,6 +90,27 @@ class Plugin
 		
 		if($this->settings->engine == 'open-layers')
 			require_once(plugin_dir_path(__FILE__) . 'open-layers/class.nominatim-geocode-cache.php');
+	}
+	
+	public function __get($name)
+	{
+		switch($name)
+		{
+			case "spatialFunctionPrefix":
+				$result = '';
+				
+				if(!empty($this->mysqlVersion))
+				{
+					$majorVersion = (int)preg_match('/^\d+/', $this->mysqlVersion);
+					if($majorVersion >= 8)
+						$result = 'ST_';
+				}
+				
+				return $result;
+				break;
+		}
+		
+		return $this->{$name};
 	}
 	
 	public function loadScripts()

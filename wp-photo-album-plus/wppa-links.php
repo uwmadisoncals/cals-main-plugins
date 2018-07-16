@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Frontend links
-* Version 6.8.08
+* Version 6.9.06
 *
 */
 
@@ -1076,6 +1076,7 @@ function wppa_page_links( $npages = '1', $curpage = '1', $slide = false ) {
 
 	// Icons
 	if ( wppa_get_navigation_type() == 'icons' ) {
+		$iconsize = wppa_icon_size( '1.5em' );
 		$result = "\n" .
 		'<div' .
 			' class="wppa-nav-text wppa-box wppa-nav"' .
@@ -1095,7 +1096,7 @@ function wppa_page_links( $npages = '1', $curpage = '1', $slide = false ) {
 						' title="' . esc_attr( __( 'Previous page', 'wp-photo-album-plus' ) ) . '"' .
 						' onclick="wppaDoAjaxRender( ' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-page=' . ( $curpage - 1 ) . '\', \'' . wppa_convert_to_pretty ( $link_url . '&amp;wppa-page=' . ( $curpage - 1 ) ) . '\' )"' .
 						' >' .
-						wppa_get_svghtml( 'Prev-Button', '1.5em' ) .
+						wppa_get_svghtml( 'Prev-Button', $iconsize ) .
 					'</a>';
 				}
 				else {
@@ -1105,7 +1106,7 @@ function wppa_page_links( $npages = '1', $curpage = '1', $slide = false ) {
 						' title="' . esc_attr( __( 'Previous page', 'wp-photo-album-plus' ) ) . '"' .
 						' href="' . $link_url . '&amp;wppa-page=' . ( $curpage - 1 ) . '"' .
 						' >' .
-						wppa_get_svghtml( 'Prev-Button', '1.5em' ) .
+						wppa_get_svghtml( 'Prev-Button', $iconsize ) .
 					'</a>';
 				}
 			$result .=
@@ -1123,7 +1124,7 @@ function wppa_page_links( $npages = '1', $curpage = '1', $slide = false ) {
 						' title="' . esc_attr( __( 'Next page', 'wp-photo-album-plus' ) ) . '"' .
 						' onclick="wppaDoAjaxRender( ' . wppa( 'mocc' ) . ', \'' . $ajax_url . '&amp;wppa-page=' . ( $curpage + 1 ) . '\', \'' . wppa_convert_to_pretty( $link_url . '&amp;wppa-page=' . ( $curpage + 1 ) ) . '\')"' .
 						' >' .
-						wppa_get_svghtml( 'Next-Button', '1.5em' ) .
+						wppa_get_svghtml( 'Next-Button', $iconsize ) .
 					'</a>';
 				}
 				else {
@@ -1132,7 +1133,7 @@ function wppa_page_links( $npages = '1', $curpage = '1', $slide = false ) {
 						' style="cursor:pointer;"' .
 						' href="' . $link_url . '&amp;wppa-page=' . ( $curpage + 1 ) . '"' .
 						' >' .
-						wppa_get_svghtml( 'Next-Button', '1.5em' ) .
+						wppa_get_svghtml( 'Next-Button', $iconsize ) .
 					'</a>';
 				}
 			$result .=
@@ -1192,7 +1193,7 @@ function wppa_page_links( $npages = '1', $curpage = '1', $slide = false ) {
 				$result .= $curpage . '/' . $npages;
 			}
 
-	//	$result .= '<script>wppaReplaceSvg()</script>';
+		$result .= '<div style="clear:both;" ></div>';
 		$result .= '</div><!-- #prevnext-a-' . wppa( 'mocc' ) . ' -->';
 		wppa_out( $result );
 	}

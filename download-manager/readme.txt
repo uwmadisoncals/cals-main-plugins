@@ -55,6 +55,7 @@ Also, you may use WordPress Download Manager as a complete e-Commerce Solution f
 *	Advanced server file browser
 *	Complete category and file tree using a simple short-code [wpdm_tree]
 *   MP4 video upload and play support
+*   Video file download protection, allow visitors to play but block download
 *   Translation Ready
 
 = Complete Digital Store Solution: =
@@ -155,6 +156,13 @@ Check download stats and get a push notification when someone downloads, install
 15. Quick Add Panel
 
 == Changelog ==
+
+= 2.9.76 =
+* Fixed the issue with pagination class name
+
+= 2.9.75 =
+* Improved video file protection, now you can allow user to play/view video but block download
+* Improved UI
 
 = 2.9.74 =
 * Moved privacy settings to a separate settings tab

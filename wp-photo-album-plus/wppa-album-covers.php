@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version 6.9.03
+* Version 6.9.05
 *
 */
 
@@ -1798,8 +1798,8 @@ global $wpdb;
 					break;
 				case 'microthumbs':
 					$coverphoto_id = wppa_get_coverphoto_id( $album['id'] );
-					$x = wppa_get_photo_item( $coverphoto_id, 'thumbx' );
-					$y = wppa_get_photo_item( $coverphoto_id, 'thumby' );
+					$x = max( '1', wppa_get_thumbx( $coverphoto_id ) );
+					$y = max( '1', wppa_get_thumby( $coverphoto_id ) );
 					if ( $x > ( $y * 2 ) ) { // x limits
 						$f = $x / 100;
 						$x = 100;

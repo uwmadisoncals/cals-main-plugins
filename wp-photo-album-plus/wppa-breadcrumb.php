@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 6.8.09
+* Version 6.9.06
 *
 */
 
@@ -544,36 +544,32 @@ global $wppa_session;
 			if ( wppa_switch( 'bc_slide_thumblink' ) ) {
 				$pg = ( ( wppa_opt( 'thumb_page_size' ) == wppa_opt( 'slideshow_pagesize' ) ) && wppa_get_curpage() != '1' ) ? '&wppa-page='.wppa_get_curpage() : '&wppa-page=1';
 				$thumbhref .= $pg;
-//				wppa_out( '<script>wppaPageArg="' . $pg . ';"</script>' );
+
 				if ( $virtual ) {
 					if ( $thumbhref ) {
 						$thumbhref = wppa_trim_wppa_( $thumbhref );
-						$fs = wppa_opt( 'fontsize_nav' );
-						if ( $fs != '' ) $fs += 3; else $fs = '15';	// iconsize = fontsize+3, Default to 15
-						$imgs = 'height: '.$fs.'px; margin:0 0 -3px 0; padding:0; box-shadow:none;';
+
 						wppa_out( 	'<a' .
 										' href="' . $thumbhref . '"' .
 										' title="' . __( 'Thumbnail view' , 'wp-photo-album-plus') . '"' .
 										' class="wppa-nav-text"' .
 										' style="' . wppa_wcs( 'wppa-nav-text' ) . 'float:right; cursor:pointer; text-decoration:none;"' .
 										' >' .
-										wppa_get_svghtml( 'Content-View', '1.5em', false, false, '10', '10', '10', '10' ) .
+										wppa_get_svghtml( 'Content-View', wppa_icon_size( '1.5em' ), false, false, '10', '10', '10', '10' ) .
 									'</a>' );
 					}
 				}
 				else {
 					$s = wppa( 'src' ) ? '&wppa-searchstring='.urlencode( wppa( 'searchstring' ) ) : '';
 					$onclick = "wppaDoAjaxRender( ".wppa( 'mocc' ).", '".wppa_encrypt_url(wppa_get_album_url_ajax( wppa( 'start_album' ), '0' )."&amp;wppa-photos-only=1".$s)."'+wppaPageArg, '".wppa_convert_to_pretty( wppa_encrypt_url( wppa_get_album_url( wppa( 'start_album' ), '0' ).'&wppa-photos-only=1'.$s.$pg ) )."', '', '', true )";
-					$fs = wppa_opt( 'fontsize_nav' );
-					if ( $fs != '' ) $fs += 3; else $fs = '15';	// iconsize = fontsize+3, Default to 15
-					$imgs = 'height: '.$fs.'px; margin:0 0 -3px 0; padding:0; box-shadow:none;';
+
 					wppa_out( 	'<span' .
 									' title="' . __( 'Thumbnail view', 'wp-photo-album-plus' ) . '"' .
 									' class="wppa-nav-text"' .
 									' style="'.wppa_wcs( 'wppa-nav-text' ).'float:right; cursor:pointer;"' .
 									' onclick="' . $onclick . '"' .
 									' >' .
-									wppa_get_svghtml( 'Content-View', '1.5em', false, false, '10', '10', '10', '10' ) .
+									wppa_get_svghtml( 'Content-View', wppa_icon_size( '1.5em' ), false, false, '10', '10', '10', '10' ) .
 								'</span>' );
 				}
 			}
@@ -676,12 +672,12 @@ global $wpdb;
 
 	// Find parent
     $parent = wppa_get_parentalbumid( $alb );
-	
+
 	// No parent -> toplevel -> done.
 	if ( $parent < '1' ) {
-		return;				
+		return;
 	}
-	
+
 	// Next level
     wppa_crumb_ancestors( $parent, $to_cover );
 
@@ -710,7 +706,7 @@ global $wpdb;
 	$title 	= __( 'Album:' , 'wp-photo-album-plus') . ' ' . wppa_get_album_name( $parent );
 	$class 	= 'b20';
 	wppa_bcitem( $value, $href, $title, $class, $ajax );
-	
+
     return;
 }
 

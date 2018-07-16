@@ -47,6 +47,11 @@ class AAM_Shared_Manager {
             // Disable XML-RPC if needed
             if (!AAM_Core_Config::get('core.settings.xmlrpc', true)) {
                 add_filter('xmlrpc_enabled', '__return_false');
+            } else {
+                add_action(
+                    'xmlrpc_call', 
+                    array(self::$_instance, 'authorizeXMLRPCRequest')
+                );
             }
 
             // Disable RESTful API if needed
@@ -57,7 +62,7 @@ class AAM_Shared_Manager {
                     1
                 );
             }
-
+            
             // Control post visibility
             //important to keep this option optional for optimization reasons
             if (AAM_Core_Config::get('core.settings.checkPostVisibility', true)) {
@@ -78,68 +83,165 @@ class AAM_Shared_Manager {
     
     /**
      * 
+     * @param type $method
+     */
+    public function authorizeXMLRPCRequest($method) {
+        $object = AAM::api()->getUser(get_current_user_id())->getObject('route');
+        
+        if ($object->has('xmlrpc', $method)) {
+            AAM_Core_API::getXMLRPCServer()->error(
+                401, 
+                'Authorization Error. You are not authorized to perform this action'
+            );
+        }
+    }
+    
+    /**
+     * After post SELECT query 
+     * 
+     * @param array    $clauses
+     * @param WP_Query $wpQuery
+     * 
+     * @return array
+     * 
+     * @access public
      * @global WPDB $wpdb
-     * @param type $clauses
-     * @param type $wpQuery
-     * @return type
      */
     public function filterPostQuery($clauses, $wpQuery) {
-        global $wpdb;
-        
-        $query  = '';
-        $option = AAM::getUser()->getObject('visibility')->getOption();
-        
-        //echo '<pre>'; print_r($option);
-        
-        if (!empty($option['post'])) {
-            if (!empty($wpQuery->query['post_type'])) {
-                $postType = $wpQuery->query['post_type'];
-            } elseif (!empty($wpQuery->query_vars['post_type'])) {
-                $postType = $wpQuery->query_vars['post_type'];
-            } elseif ($wpQuery->is_attachment) {
-                $postType = 'attachment';
-            } elseif ($wpQuery->is_page) {
-                $postType = 'page';
+        if ($this->isPostFilterEnabled()) {
+            $option = AAM::getUser()->getObject('visibility')->getOption();
+            
+            if (!empty($option['post'])) {
+                $query = $this->preparePostQuery($option['post'], $wpQuery);
             } else {
-                $postType = 'post';
+                $query = '';
             }
+
+            $clauses['where'] .= apply_filters(
+                'aam-post-where-clause-filter', $query, $wpQuery, $option
+            );
+
+            $this->finalizePostQuery($clauses);
+        }
         
-            $not = array();
-            $area = AAM_Core_Api_Area::get();
-            
-            foreach($option['post'] as $id => $access) {
-                $chunks = explode('|', $id);
-                
-                if ($postType == $chunks[1]) {
-                    if (!empty($access["{$area}.list"])) {
-                        $not[] = $chunks[0];
-                    }
-                }
-            }
-            
-            $chunks = array();
-            if (!empty($not)) {
-                $query .= " AND {$wpdb->posts}.ID NOT IN (" . implode(',', $not) . ")";
+        return $clauses;
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    protected function isPostFilterEnabled() {
+        $visibility = AAM_Core_Config::get('core.settings.checkPostVisibility', true);
+        
+        if ($visibility) {
+            if (AAM_Core_Api_Area::isBackend()) {
+                $visibility = AAM_Core_Config::get('core.settings.backendAccessControl', true);
+            } elseif (AAM_Core_Api_Area::isAPI()) {
+                $visibility = AAM_Core_Config::get('core.settings.apiAccessControl', true);
+            } else {
+                $visibility = AAM_Core_Config::get('core.settings.frontendAccessControl', true);
             }
         }
         
-        $clauses['where'] .= apply_filters(
-            'aam-post-where-clause-filter', $query, $wpQuery, $option
-        );
+        return $visibility;
+    }
+    
+    /**
+     * Get querying post type
+     * 
+     * @param WP_Query $wpQuery
+     * 
+     * @return string
+     * 
+     * @access protected
+     */
+    protected function getQueryingPostType($wpQuery) {
+        if (!empty($wpQuery->query['post_type'])) {
+            $postType = $wpQuery->query['post_type'];
+        } elseif (!empty($wpQuery->query_vars['post_type'])) {
+            $postType = $wpQuery->query_vars['post_type'];
+        } elseif ($wpQuery->is_attachment) {
+            $postType = 'attachment';
+        } elseif ($wpQuery->is_page) {
+            $postType = 'page';
+        } else {
+            $postType = 'post';
+        }
         
-        if (strpos($clauses['where'], $wpdb->term_relationships) !== false) {
-            if (strpos($clauses['join'], $wpdb->term_relationships) === false) {
-                $clauses['join'] .= " LEFT JOIN {$wpdb->term_relationships} ON ({$wpdb->posts}.ID = {$wpdb->term_relationships}.object_id)";
+        if ($postType == 'any') {
+            $postType = array_keys(
+                get_post_types(
+                    array('public' => true, 'exclude_from_search' => false), 
+                    'names'
+                )
+            );
+        }
+        
+        return (array) $postType;
+    }
+    
+    /**
+     * Prepare post query
+     * 
+     * @param array    $visibility
+     * @param WP_Query $wpQuery
+     * 
+     * @return string
+     * 
+     * @access protected
+     * @global WPDB $wpdb
+     */
+    protected function preparePostQuery($visibility, $wpQuery) {
+        global $wpdb;
+        
+        $postTypes = $this->getQueryingPostType($wpQuery);
+        
+        $not = array();
+        $area = AAM_Core_Api_Area::get();
+
+        foreach($visibility as $id => $access) {
+            $chunks = explode('|', $id);
+
+            if (in_array($chunks[1], $postTypes)) {
+                if (!empty($access["{$area}.list"])) {
+                    $not[] = $chunks[0];
+                }
+            }
+        }
+
+        if (!empty($not)) {
+            $query = " AND {$wpdb->posts}.ID NOT IN (" . implode(',', $not) . ")";
+        } else {
+            $query = '';
+        }
+        
+        return $query;
+    }
+    
+    /**
+     * Finalize post query
+     * 
+     * @param array &$clauses
+     * 
+     * @access protected
+     * @global WPDB $wpdb
+     */
+    protected function finalizePostQuery(&$clauses) {
+        global $wpdb;
+        
+        $table = $wpdb->term_relationships;
+        
+        if (strpos($clauses['where'], $table) !== false) {
+            if (strpos($clauses['join'], $table) === false) {
+                $clauses['join'] .= " LEFT JOIN {$table} ON ";
+                $clauses['join'] .= "({$wpdb->posts}.ID = {$table}.object_id)";
             }
             
             if (empty($clauses['groupby'])) {
                 $clauses['groupby'] = "{$wpdb->posts}.ID";
             }
         }
-        
-        //echo '<pre>'; print_r($clauses); die();
-        
-        return $clauses;
     }
     
     /**
@@ -412,8 +514,12 @@ class AAM_Shared_Manager {
     }
     
     /**
+     * Get single instance of itself
      * 
-     * @return type
+     * @return AAM_Shared_Manager
+     * 
+     * @access public
+     * @static
      */
     public static function getInstance() {
         if (is_null(self::$_instance)) {

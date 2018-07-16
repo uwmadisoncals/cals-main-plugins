@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.9.02
+* Version 6.9.06
 *
 */
 
@@ -347,6 +347,7 @@ global $wppa_opt;
 						'wppa-popup',
 						'wppa-touch',
 						'wppa-utils',
+//						'jquery.nicescroll',
 					);
 
 	$js_dept1 = array( 'jquery', 'jquery-form', 'wppa-utils' );
@@ -361,6 +362,7 @@ global $wppa_opt;
 						array( 'jquery' ),
 						array( 'jquery' ),
 						array( 'jquery' ),
+//						array( 'jquery' ),
 					);
 
 	$js_doits = array ( true,
@@ -370,6 +372,7 @@ global $wppa_opt;
 						true,
 						wppa_switch( 'slide_swipe' ) || $any_lightbox,
 						true,
+//						wppa_switch( 'nicescroll' ) || wppa_switch( 'nicescroll_window' ),
 					);
 
 	$js_footer = array ( $footer,
@@ -379,6 +382,7 @@ global $wppa_opt;
 						 $footer,
 						 $footer,
 						 $footer,
+//						 $footer,
 					);
 
 	foreach ( array_keys( $js_files ) as $idx ) {
@@ -401,6 +405,29 @@ global $wppa_opt;
 			wp_enqueue_script( 'wppa-geo', 'https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false', '', $wppa_api_version, $footer );
 		}
 	}
+
+	// Nicescroller
+	if ( wppa_switch( 'nicescroll' ) || wppa_switch( 'nicescroll_window' ) ) {
+
+		// jQuery Easing
+		$easing_url = 'https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js';
+		$easing_cdn = wp_remote_get( $easing_url );
+		if( (int) wp_remote_retrieve_response_code( $easing_cdn ) !== 200 ) {
+
+			$easing_url = WPPA_URL . '/vendor/jquery-easing/jquery.easing.min.js';
+		}
+		wp_enqueue_script( 'nicescrollr-easing-min-js', $easing_url, array( 'jquery' ), 'all' );
+
+		// Nicescroll Library
+		$nice_url = 'https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.6/jquery.nicescroll.min.js';
+		$nice_cdn = wp_remote_get( $nice_url );
+		if( (int) wp_remote_retrieve_response_code( $nice_cdn ) !== 200 ) {
+
+			$nice_url = WPPA_URL . '/vendor/nicescroll/jquery.nicescroll.min.js';
+		}
+		wp_enqueue_script( 'nicescrollr-inc-nicescroll-min-js', $nice_url, array( 'jquery', 'nicescrollr-easing-min-js' ), 'all' );
+	}
+
 	// wppa-init
 	if ( ! file_exists( WPPA_PATH.'/wppa-init.'.$wppa_lang.'.js' ) ) {
 		wppa_create_wppa_init_js();
@@ -409,6 +436,7 @@ global $wppa_opt;
 	if ( file_exists( WPPA_PATH.'/wppa-init.'.$wppa_lang.'.js' ) ) {
 		wp_enqueue_script( 'wppa-init', WPPA_URL.'/wppa-init.'.$wppa_lang.'.js', array( 'wppa' ), get_option( 'wppa_ini_js_version_'.$wppa_lang, $footer ) );
 	}
+
 	// wppa.pagedata
 	if ( $footer ) {
 		wp_enqueue_script( 'wppa-pagedata', str_replace( WPPA_UPLOAD_PATH, WPPA_UPLOAD_URL, $wppa_js_page_data_file ), array( 'wppa-init' ), rand( 0,4711 ), $footer );
@@ -632,6 +660,15 @@ global $wppa_js_page_data_file;
 	// Done
 	echo '
 <!-- Done user upload -->';
+
+	// Window nicescroller
+	if ( wppa_switch( 'nicescroll_window' ) ) {
+		echo '
+<!-- Nice scroller on window, by wppa -->
+<script type="text/javascript" >
+	jQuery("body").niceScroll({' . wppa_opt( 'nicescroll_opts' ) . '});
+</script>';
+	}
 }
 
 /* FACEBOOK COMMENTS */
@@ -993,6 +1030,10 @@ global $wppa_init_js_data;
 	wppaServerError = "' . __( 'Server error.', 'wp-photo-album-plus' ) . '";
 	wppaGeoZoom = ' . wppa_opt( 'geo_zoom' ) . ';
 	wppaLazyLoad = ' . ( wppa_switch( 'lazy' ) ? 'true' : 'false' ) . ';
+	wppaThumbAreaMaxFrac = ' . ( wppa_opt( 'thumb_area_size' ) < 1 ? wppa_opt( 'thumb_area_size' ) : 1.0 ) . ';
+	wppaNiceScroll = ' . ( wppa_switch( 'nicescroll' ) ? 'true' : 'false' ) . ';
+	wppaIconSizeNormal = "' . wppa_opt( 'nav_icon_size' ) . '";
+	wppaIconSizeSlide = "' . wppa_opt( 'nav_icon_size_slide' ) . '";
 	';
 
 	// Open file

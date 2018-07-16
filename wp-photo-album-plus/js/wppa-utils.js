@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsUtilsVersion = '6.9.04';
+var wppaJsUtilsVersion = '6.9.06';
 var wppaDebug;
 
 // Trim
@@ -275,6 +275,8 @@ function wppaSvgHtml( image, height, isLightbox, border, none, light, medium, he
 	if ( ! medium ) medium = '20';
 	if ( ! heavy ) heavy = '50';
 
+	border = false; // debug
+
 	// Find Radius
 	switch ( wppaSvgCornerStyle ) {
 		case 'gif':
@@ -347,7 +349,7 @@ function wppaSvgHtml( image, height, isLightbox, border, none, light, medium, he
 								'text-decoration:none !important;' +
 								'vertical-align:middle;' +
 								( radius ? 'border-radius:' + radius + '%;' : '' ) +
-								( border ? 'border:2px solid ' + bc + ';box-sizing:border-box;' : '' ) +
+								( border ? 'border:2px solid ' + bc + ';box-sizing:content-box;' : '' ) +
 								'"' +
 							' xml:space="preserve"' +
 							' >' +
@@ -425,12 +427,21 @@ function wppaSvgHtml( image, height, isLightbox, border, none, light, medium, he
 	return result;
 }
 
-jQuery(window).on('DOMContentLoaded load resize scroll', wppaMakeLazyVisible);
-
+var wppaLastLazy = 0;
+// Make lazy load images visible
 function wppaMakeLazyVisible() {
+
+	// Only do this if the previous time was more than 200 ms ago
+	var d = new Date();
+    var n = d.getTime();
+	if ( n < ( wppaLastLazy + 200 ) ) {
+		wppaConsoleLog( 'MakeLazyVisible() skipped' );
+		return;
+	}
 	
+	wppaConsoleLog( 'MakeLazyVisible()' );
 	var src;
-	
+
 	jQuery( '.wppa-lazy' ).each( function() {
 		src = jQuery( this ).attr( 'data-src' );
 		if ( ! wppaLazyLoad || wppaIsElementInViewport( this ) ) {
@@ -439,6 +450,8 @@ function wppaMakeLazyVisible() {
 			jQuery( this ).removeClass( 'wppa-lazy' );
 		}
 	});
+	
+	wppaLastLazy = n;
 }
 
 // Determines whether (a part of) element elm (an image) is inside browser window
@@ -449,14 +462,34 @@ function wppaIsElementInViewport( elm ) {
 
 	if ( rect ) {
 		result = rect.bottom > 0 && rect.right > 0 && rect.left < jQuery( window ).width() && rect.top < jQuery( window ).height();
-		wppaConsoleLog( 'getBoundingClientRect() for '+jQuery(elm).attr('id')+' returned (tlbr) '+parseInt(rect.top)+' '+parseInt(rect.left)+' '+parseInt(rect.bottom)+' '+parseInt(rect.right)+' result='+(result?'true':'false'));
 	}
 	else {
-		result = false;
-		wppaConsoleLog( 'getBoundingClientRect() not found for '+jQuery(elm).attr('id') );
+		result = true;
 	}
 
     return result;
+}
+
+// Size scrollable thumbnail areas
+function wppaSizeThumbArea() {
+
+	if ( wppaThumbAreaMaxFrac > 0 && wppaThumbAreaMaxFrac < 1 ) {
+		wppaConsoleLog( 'SizeThumbArea()' );
+		jQuery('.wppa-thumb-area').css('max-height',(jQuery(window).height()*wppaThumbAreaMaxFrac));
+	}
+}
+
+// Get the icon size
+function wppaIconSize( mocc, dflt, large ) {
+
+	var opt = large ? wppaIconSizeSlide : wppaIconSizeNormal;
+	if ( opt == 'default' ) {
+		return dflt;
+	}
+
+	var result = ( wppaIsMini[mocc] ? opt / 2 : opt ) + 'px;';
+
+	return result;
 }
 
 // Say we're in

@@ -339,9 +339,25 @@ class Apply {
         if(strstr("!{$_SERVER['REQUEST_URI']}", "/wpdm-media/")){
             $media = explode("wpdm-media/", $_SERVER['REQUEST_URI']);
             $media = explode("/", $media[1]);
-            list($ID, $file) = $media;
-            if(!\WPDM\Package::userCanAccess($ID)) \WPDM_Messages::Error(stripslashes(get_option('wpdm_permission_msg')), 1);
+            list($ID, $file, $name) = $media;
+            $key = wpdm_query_var('_wpdmkey');
+
+            if ( isset($_SERVER['HTTP_RANGE']) ) {
+                $partialContent = true;
+                preg_match('/bytes=(\d+)-(\d+)?/', $_SERVER['HTTP_RANGE'], $matches);
+                $offset = intval($matches[1]);
+                $length = intval($matches[2]) - $offset;
+            } else {
+                $partialContent = false;
+            }
+
+            $keyValid = is_wpdmkey_valid($ID, $key, true);
+            if(!$partialContent) {
+                if ($key == '' || !$keyValid)
+                    \WPDM_Messages::Error(stripslashes(get_option('wpdm_permission_msg')), 1);
+            }
             $files = \WPDM\Package::getFiles($ID);
+            $file = $files[$file];
             $file = \WPDM\libs\FileSystem::fullPath($file, $ID);
             $stream = new \WPDM\libs\StreamMedia($file);
             $stream->start();
