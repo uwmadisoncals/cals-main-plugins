@@ -2,22 +2,6 @@
 
 namespace WPGMZA;
 
-/*class MyCustomGlobalSettings extends GlobalSettings
-{
-	public function __construct()
-	{
-		GlobalSettings::__construct();
-		
-		var_dump("It works!");
-		exit;
-	}
-	
-	protected static function createInstanceDelegate()
-	{
-		return new MyCustomGlobalSettings();
-	}
-}*/
-
 class Plugin
 {
 	const PAGE_MAP_LIST			= "map-list";
@@ -34,6 +18,7 @@ class Plugin
 	public $settings;
 	
 	protected $scriptLoader;
+	protected $restAPI;
 	
 	private $mysqlVersion = null;
 	private $cachedVersion = null;
@@ -77,8 +62,14 @@ class Plugin
 		}
 		
 		$this->settings = (object)array_merge($this->legacySettings, $settings);
+		
+		$this->restAPI = new RestAPI();
+		
 		if(!empty($this->settings->wpgmza_maps_engine))
 			$this->settings->engine = $this->settings->wpgmza_maps_engine;
+		
+		if(!empty($_COOKIE['wpgmza-developer-mode']))
+			$this->settings->developer_mode = true;
 		
 		add_action('wp_enqueue_scripts', function() {
 			Plugin::$enqueueScriptsFired = true;

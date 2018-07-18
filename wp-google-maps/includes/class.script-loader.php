@@ -371,14 +371,17 @@ class ScriptLoader
 		
 		switch($version)
 		{
-			case '5.*':
-				wp_enqueue_style('fontawesome', 'https://use.fontawesome.com/releases/v5.0.9/css/all.css');
-				break;
-				
 			case 'none':
 				break;
 				
+			case '5.*':
+				wp_enqueue_style('fontawesome', 'https://use.fontawesome.com/releases/v5.0.9/css/all.css');
+				
+				if(!is_admin())
+					break;
+				
 			default:
+				wp_enqueue_style('fontawesome', plugin_dir_url(__DIR__) . 'css/font-awesome.min.css');
 				break;
 		}
 		

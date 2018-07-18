@@ -215,6 +215,13 @@ Please upgrade your version of WP Google Maps to version 6.0.27 as it includes m
 
 == Changelog ==
 
+= 7.10.22 :- 2018-07-18 :- Medium priority =
+* Added filter wpgmza_localized_strings
+* Added beginnings for REST API
+* Added scroll animation when edit marker is clicked
+* Fixed UTF-8 characters not being decoded into PHPs native charset before passing them to loadHTML in GDPR compliance module
+* Fixed edit marker button not re-enabled following unsuccessful geocode
+
 = 7.10.21 :- 2018-07-09 :- Medium priority =
 * Added MySQL version check and dropped ST_ function prefixes for versions < 8.0
 * Fixed markers not appearing front end and back end marker table empty for servers running old MySQL versions

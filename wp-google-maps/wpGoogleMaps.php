@@ -3,7 +3,7 @@
 Plugin Name: WP Google Maps
 Plugin URI: https://www.wpgmaps.com
 Description: The easiest to use Google Maps plugin! Create custom Google Maps with high quality markers containing locations, descriptions, images and links. Add your customized map to your WordPress posts and/or pages quickly and easily with the supplied shortcode. No fuss.
-Version: 7.10.21
+Version: 7.10.22
 Author: WP Google Maps
 Author URI: https://www.wpgmaps.com
 Text Domain: wp-google-maps
@@ -11,6 +11,13 @@ Domain Path: /languages
 */
 
 /*
+ * 7.10.22 :- 2018-07-18 :- Medium priority
+ * Added filter wpgmza_localized_strings
+ * Added beginnings for REST API
+ * Added scroll animation when edit marker is clicked
+ * Fixed UTF-8 characters not being decoded into PHPs native charset before passing them to loadHTML in GDPR compliance module
+ * Fixed edit marker button not re-enabled following unsuccessful geocode
+ *
  * 7.10.21 :- 2018-07-09 :- Medium priority
  * Added MySQL version check and dropped ST_ function prefixes for versions < 8.0
  * Fixed markers not appearing front end and back end marker table empty for servers running old MySQL versions
@@ -2811,6 +2818,10 @@ function wpgmaps_tag_basic( $atts ) {
 	if(!empty($wpgmza_settings['wpgmza_settings_remove_api']))
 		$core_dependencies[] = 'wpgmza_api_call';
     
+	//$googleMapsAPILoader = new WPGMZA\GoogleMapsAPILoader();
+	//if(!$googleMapsAPILoader->isIncludeAllowed())
+		//wp_deregister_script('wpgmza_api_call');
+	
 	if($wpgmza->settings->engine == 'google-maps')
 	{
 		wp_enqueue_script('wpgmza_canvas_layer_options', plugin_dir_url(__FILE__) . 'lib/CanvasLayerOptions.js', array('wpgmza_api_call'));
@@ -4860,6 +4871,7 @@ function wpgmaps_settings_page_basic() {
 }
 
 function wpgmaps_menu_advanced_layout() {
+	
     if (function_exists('wpgmza_register_pro_version')) {
         wpgmza_pro_advanced_menu();
     }
@@ -6564,7 +6576,7 @@ function wpgmza_return_marker_list($map_id,$admin = true,$width = "100%",$mashup
                 $wpgmza_tmp_body .= "<td>$pic<input type=\"hidden\" id=\"wpgmza_hid_marker_pic_".$result->id."\" value=\"".$result->pic."\" /></td>";
                 $wpgmza_tmp_body .= "<td>$linktd<input type=\"hidden\" id=\"wpgmza_hid_marker_link_".$result->id."\" value=\"".$result->link."\" /></td>";
                 $wpgmza_tmp_body .= "<td width='170' align='center'>";
-                $wpgmza_tmp_body .= "    <a href=\"#wpgmaps_marker\" title=\"".__("Edit this marker","wp-google-maps")."\" class=\"wpgmza_edit_btn button\" id=\"".$result->id."\"><i class=\"fa fa-edit\"> </i> </a> ";
+                $wpgmza_tmp_body .= "    <a title=\"".__("Edit this marker","wp-google-maps")."\" class=\"wpgmza_edit_btn button\" id=\"".$result->id."\"><i class=\"fa fa-edit\"> </i> </a> ";
                 $wpgmza_tmp_body .= "    <a href=\"?page=wp-google-maps-menu&action=edit_marker&id=".$result->id."\" title=\"".__("Edit this marker location","wp-google-maps")."\" class=\"wpgmza_edit_btn button\" id=\"".$result->id."\"><i class=\"fa fa-map-marker\"> </i></a> ";
                 if ($show_approval_button) {
                     $wpgmza_tmp_body .= "    <a href=\"javascript:void(0);\" title=\"".__("Approve this marker","wp-google-maps")."\" class=\"wpgmza_approve_btn button\" id=\"".$result->id."\"><i class=\"fa fa-check\"> </i> </a> ";
