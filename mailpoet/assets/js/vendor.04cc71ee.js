@@ -103,7 +103,7 @@
 /************************************************************************/
 /******/ ({
 
-/***/ 276:
+/***/ 277:
 /***/ (function(module, exports, __webpack_require__) {
 
 /**!
@@ -4961,7 +4961,7 @@ module.exports = global["MailPoetLib"]["Hooks"] = __webpack_require__(518);
 /***/ 516:
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(276);
+__webpack_require__(277);
 __webpack_require__(517);
 module.exports = __webpack_require__(32);
 
@@ -4972,7 +4972,7 @@ module.exports = __webpack_require__(32);
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* eslint-disable func-names */
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(276)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (Handlebars) {
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(277)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (Handlebars) {
   // Handlebars helpers
   Handlebars.registerHelper('concat', function () {
     var size = (arguments.length - 1);

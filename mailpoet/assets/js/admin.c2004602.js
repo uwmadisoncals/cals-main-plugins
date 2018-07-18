@@ -2945,48 +2945,6 @@ function GeneratePropsFromAttributes(attributes, key) {
 
 /***/ }),
 
-/***/ 286:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _react = __webpack_require__(4);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactRouter = __webpack_require__(26);
-
-var _mailpoet = __webpack_require__(5);
-
-var _mailpoet2 = _interopRequireDefault(_mailpoet);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var ListingHeading = function ListingHeading() {
-  return _react2.default.createElement(
-    'h1',
-    { className: 'title' },
-    _mailpoet2.default.I18n.t('pageTitle'),
-    _react2.default.createElement(
-      _reactRouter.Link,
-      {
-        className: 'page-title-action',
-        to: '/new',
-        onClick: function onClick() {
-          return _mailpoet2.default.trackEvent('Emails > Add New', { 'MailPoet Free version': window.mailpoet_version });
-        },
-        'data-automation-id': 'new_email'
-      },
-      _mailpoet2.default.I18n.t('new')
-    )
-  );
-};
-
-module.exports = ListingHeading;
-
-/***/ }),
-
 /***/ 31:
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16110,23 +16068,23 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
 /***/ }),
 
-/***/ 614:
+/***/ 615:
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(615);
-__webpack_require__(619);
-__webpack_require__(636);
-__webpack_require__(640);
-__webpack_require__(642);
+__webpack_require__(616);
+__webpack_require__(620);
+__webpack_require__(637);
+__webpack_require__(641);
 __webpack_require__(643);
-__webpack_require__(647);
+__webpack_require__(644);
 __webpack_require__(648);
-module.exports = __webpack_require__(651);
+__webpack_require__(649);
+module.exports = __webpack_require__(652);
 
 
 /***/ }),
 
-/***/ 615:
+/***/ 616:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16144,11 +16102,11 @@ var _reactRouter = __webpack_require__(26);
 
 var _history = __webpack_require__(98);
 
-var _list = __webpack_require__(616);
+var _list = __webpack_require__(617);
 
 var _list2 = _interopRequireDefault(_list);
 
-var _form = __webpack_require__(617);
+var _form = __webpack_require__(618);
 
 var _form2 = _interopRequireDefault(_form);
 
@@ -16182,7 +16140,7 @@ if (container) {
 
 /***/ }),
 
-/***/ 616:
+/***/ 617:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16272,7 +16230,7 @@ var messages = {
     _mailpoet2.default.Notice.success(message);
   },
   onNoItemsFound: function onNoItemsFound(group) {
-    if (group === 'bounced' && !window.mailpoet_premium_active) {
+    if (group === 'bounced' && !window.mailpoet_premium_active && !window.mss_active) {
       return _react2.default.createElement(
         'div',
         null,
@@ -16576,19 +16534,19 @@ module.exports = SubscriberList;
 
 /***/ }),
 
-/***/ 617:
+/***/ 618:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global) {
 
 if (!global["MailPoetLib"]) global["MailPoetLib"] = {};
-module.exports = global["MailPoetLib"]["Form"] = __webpack_require__(618);
+module.exports = global["MailPoetLib"]["Form"] = __webpack_require__(619);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
 
-/***/ 618:
+/***/ 619:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16604,7 +16562,7 @@ var _mailpoet = __webpack_require__(5);
 
 var _mailpoet2 = _interopRequireDefault(_mailpoet);
 
-var _form = __webpack_require__(282);
+var _form = __webpack_require__(283);
 
 var _form2 = _interopRequireDefault(_form);
 
@@ -16810,7 +16768,7 @@ module.exports = SubscriberForm;
 
 /***/ }),
 
-/***/ 619:
+/***/ 620:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16836,23 +16794,23 @@ var _underscore = __webpack_require__(7);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _types = __webpack_require__(620);
+var _types = __webpack_require__(621);
 
 var _types2 = _interopRequireDefault(_types);
 
-var _templates = __webpack_require__(621);
+var _templates = __webpack_require__(622);
 
 var _templates2 = _interopRequireDefault(_templates);
 
-var _send = __webpack_require__(626);
+var _send = __webpack_require__(627);
 
 var _send2 = _interopRequireDefault(_send);
 
-var _standard = __webpack_require__(630);
+var _standard = __webpack_require__(631);
 
 var _standard2 = _interopRequireDefault(_standard);
 
-var _notification = __webpack_require__(631);
+var _notification = __webpack_require__(632);
 
 var _notification2 = _interopRequireDefault(_notification);
 
@@ -16860,19 +16818,19 @@ var _events_list = __webpack_require__(499);
 
 var _events_list2 = _interopRequireDefault(_events_list);
 
-var _standard3 = __webpack_require__(632);
+var _standard3 = __webpack_require__(633);
 
 var _standard4 = _interopRequireDefault(_standard3);
 
-var _welcome = __webpack_require__(633);
+var _welcome = __webpack_require__(634);
 
 var _welcome2 = _interopRequireDefault(_welcome);
 
-var _notification3 = __webpack_require__(634);
+var _notification3 = __webpack_require__(635);
 
 var _notification4 = _interopRequireDefault(_notification3);
 
-var _notification_history = __webpack_require__(635);
+var _notification_history = __webpack_require__(636);
 
 var _notification_history2 = _interopRequireDefault(_notification_history);
 
@@ -16976,7 +16934,7 @@ if (container) {
 
 /***/ }),
 
-/***/ 620:
+/***/ 621:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17198,7 +17156,7 @@ module.exports = NewsletterTypes;
 
 /***/ }),
 
-/***/ 621:
+/***/ 622:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17224,19 +17182,19 @@ var _breadcrumb = __webpack_require__(63);
 
 var _breadcrumb2 = _interopRequireDefault(_breadcrumb);
 
-var _loading = __webpack_require__(622);
+var _loading = __webpack_require__(623);
 
 var _loading2 = _interopRequireDefault(_loading);
 
-var _tabs = __webpack_require__(623);
+var _tabs = __webpack_require__(624);
 
 var _tabs2 = _interopRequireDefault(_tabs);
 
-var _template_box = __webpack_require__(624);
+var _template_box = __webpack_require__(625);
 
 var _template_box2 = _interopRequireDefault(_template_box);
 
-var _import_template = __webpack_require__(625);
+var _import_template = __webpack_require__(626);
 
 var _import_template2 = _interopRequireDefault(_import_template);
 
@@ -17549,7 +17507,7 @@ exports.default = NewsletterTemplates;
 
 /***/ }),
 
-/***/ 622:
+/***/ 623:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17610,7 +17568,7 @@ exports.default = Loading;
 
 /***/ }),
 
-/***/ 623:
+/***/ 624:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17732,7 +17690,7 @@ exports.default = Tabs;
 
 /***/ }),
 
-/***/ 624:
+/***/ 625:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17976,7 +17934,7 @@ exports.default = TemplateBox;
 
 /***/ }),
 
-/***/ 625:
+/***/ 626:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18157,7 +18115,7 @@ exports.default = ImportTemplate;
 
 /***/ }),
 
-/***/ 626:
+/***/ 627:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18181,19 +18139,19 @@ var _breadcrumb = __webpack_require__(63);
 
 var _breadcrumb2 = _interopRequireDefault(_breadcrumb);
 
-var _form = __webpack_require__(282);
+var _form = __webpack_require__(283);
 
 var _form2 = _interopRequireDefault(_form);
 
-var _standard = __webpack_require__(627);
+var _standard = __webpack_require__(628);
 
 var _standard2 = _interopRequireDefault(_standard);
 
-var _notification = __webpack_require__(628);
+var _notification = __webpack_require__(629);
 
 var _notification2 = _interopRequireDefault(_notification);
 
-var _welcome = __webpack_require__(629);
+var _welcome = __webpack_require__(630);
 
 var _welcome2 = _interopRequireDefault(_welcome);
 
@@ -18589,7 +18547,7 @@ module.exports = NewsletterSend;
 
 /***/ }),
 
-/***/ 627:
+/***/ 628:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19011,7 +18969,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 628:
+/***/ 629:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19131,7 +19089,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 629:
+/***/ 630:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19219,7 +19177,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 630:
+/***/ 631:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19287,7 +19245,7 @@ module.exports = NewsletterStandard;
 
 /***/ }),
 
-/***/ 631:
+/***/ 632:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19405,7 +19363,7 @@ module.exports = NewsletterNotification;
 
 /***/ }),
 
-/***/ 632:
+/***/ 633:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19437,7 +19395,7 @@ var _tabs = __webpack_require__(273);
 
 var _tabs2 = _interopRequireDefault(_tabs);
 
-var _heading = __webpack_require__(286);
+var _heading = __webpack_require__(275);
 
 var _heading2 = _interopRequireDefault(_heading);
 
@@ -19571,7 +19529,7 @@ newsletterActions = _wpJsHooks2.default.applyFilters('mailpoet_newsletters_listi
 var NewsletterListStandard = _react2.default.createClass({
   displayName: 'NewsletterListStandard',
 
-  mixins: [_mixins.QueueMixin, _mixins.StatisticsMixin, _mixins.MailerMixin],
+  mixins: [_mixins.QueueMixin, _mixins.StatisticsMixin, _mixins.MailerMixin, _mixins.CronMixin],
   renderItem: function renderItem(newsletter, actions, meta) {
     var rowClasses = (0, _classnames2.default)('manage-column', 'column-primary', 'has-row-actions');
 
@@ -19629,6 +19587,8 @@ var NewsletterListStandard = _react2.default.createClass({
     );
   },
   render: function render() {
+    var _this = this;
+
     return _react2.default.createElement(
       'div',
       null,
@@ -19649,7 +19609,9 @@ var NewsletterListStandard = _react2.default.createClass({
         auto_refresh: true,
         sort_by: 'sent_at',
         sort_order: 'desc',
-        afterGetItems: this.checkMailerStatus
+        afterGetItems: function afterGetItems(state) {
+          _this.checkMailerStatus(state);_this.checkCronStatus(state);
+        }
       })
     );
   }
@@ -19659,7 +19621,7 @@ module.exports = NewsletterListStandard;
 
 /***/ }),
 
-/***/ 633:
+/***/ 634:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19677,7 +19639,7 @@ var _tabs = __webpack_require__(273);
 
 var _tabs2 = _interopRequireDefault(_tabs);
 
-var _heading = __webpack_require__(286);
+var _heading = __webpack_require__(275);
 
 var _heading2 = _interopRequireDefault(_heading);
 
@@ -19796,7 +19758,7 @@ newsletterActions = _wpJsHooks2.default.applyFilters('mailpoet_newsletters_listi
 var NewsletterListWelcome = _react2.default.createClass({
   displayName: 'NewsletterListWelcome',
 
-  mixins: [_mixins.StatisticsMixin, _mixins.MailerMixin],
+  mixins: [_mixins.StatisticsMixin, _mixins.MailerMixin, _mixins.CronMixin],
   updateStatus: function updateStatus(e) {
     var _this = this;
 
@@ -19974,6 +19936,8 @@ var NewsletterListWelcome = _react2.default.createClass({
     );
   },
   render: function render() {
+    var _this2 = this;
+
     return _react2.default.createElement(
       'div',
       null,
@@ -19994,7 +19958,9 @@ var NewsletterListWelcome = _react2.default.createClass({
         auto_refresh: true,
         sort_by: 'updated_at',
         sort_order: 'desc',
-        afterGetItems: this.checkMailerStatus
+        afterGetItems: function afterGetItems(state) {
+          _this2.checkMailerStatus(state);_this2.checkCronStatus(state);
+        }
       })
     );
   }
@@ -20004,7 +19970,7 @@ module.exports = NewsletterListWelcome;
 
 /***/ }),
 
-/***/ 634:
+/***/ 635:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20024,7 +19990,7 @@ var _tabs = __webpack_require__(273);
 
 var _tabs2 = _interopRequireDefault(_tabs);
 
-var _heading = __webpack_require__(286);
+var _heading = __webpack_require__(275);
 
 var _heading2 = _interopRequireDefault(_heading);
 
@@ -20152,7 +20118,7 @@ var newsletterActions = [{
 var NewsletterListNotification = _react2.default.createClass({
   displayName: 'NewsletterListNotification',
 
-  mixins: [_mixins.MailerMixin],
+  mixins: [_mixins.MailerMixin, _mixins.CronMixin],
   updateStatus: function updateStatus(e) {
     var _this = this;
 
@@ -20317,6 +20283,8 @@ var NewsletterListNotification = _react2.default.createClass({
     );
   },
   render: function render() {
+    var _this2 = this;
+
     return _react2.default.createElement(
       'div',
       null,
@@ -20337,7 +20305,9 @@ var NewsletterListNotification = _react2.default.createClass({
         auto_refresh: true,
         sort_by: 'updated_at',
         sort_order: 'desc',
-        afterGetItems: this.checkMailerStatus
+        afterGetItems: function afterGetItems(state) {
+          _this2.checkMailerStatus(state);_this2.checkCronStatus(state);
+        }
       })
     );
   }
@@ -20347,7 +20317,7 @@ module.exports = NewsletterListNotification;
 
 /***/ }),
 
-/***/ 635:
+/***/ 636:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20379,7 +20349,7 @@ var _tabs = __webpack_require__(273);
 
 var _tabs2 = _interopRequireDefault(_tabs);
 
-var _heading = __webpack_require__(286);
+var _heading = __webpack_require__(275);
 
 var _heading2 = _interopRequireDefault(_heading);
 
@@ -20424,7 +20394,7 @@ newsletterActions = _wpJsHooks2.default.applyFilters('mailpoet_newsletters_listi
 var NewsletterListNotificationHistory = _react2.default.createClass({
   displayName: 'NewsletterListNotificationHistory',
 
-  mixins: [_mixins.QueueMixin, _mixins.StatisticsMixin, _mixins.MailerMixin],
+  mixins: [_mixins.QueueMixin, _mixins.StatisticsMixin, _mixins.MailerMixin, _mixins.CronMixin],
   renderItem: function renderItem(newsletter, actions, meta) {
     var rowClasses = (0, _classnames2.default)('manage-column', 'column-primary', 'has-row-actions');
 
@@ -20475,6 +20445,8 @@ var NewsletterListNotificationHistory = _react2.default.createClass({
     );
   },
   render: function render() {
+    var _this = this;
+
     return _react2.default.createElement(
       'div',
       null,
@@ -20501,7 +20473,9 @@ var NewsletterListNotificationHistory = _react2.default.createClass({
         auto_refresh: true,
         sort_by: 'sent_at',
         sort_order: 'desc',
-        afterGetItems: this.checkMailerStatus
+        afterGetItems: function afterGetItems(state) {
+          _this.checkMailerStatus(state);_this.checkCronStatus(state);
+        }
       })
     );
   }
@@ -20511,7 +20485,7 @@ module.exports = NewsletterListNotificationHistory;
 
 /***/ }),
 
-/***/ 636:
+/***/ 637:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20529,11 +20503,11 @@ var _reactRouter = __webpack_require__(26);
 
 var _history = __webpack_require__(98);
 
-var _list = __webpack_require__(637);
+var _list = __webpack_require__(638);
 
 var _list2 = _interopRequireDefault(_list);
 
-var _form = __webpack_require__(638);
+var _form = __webpack_require__(639);
 
 var _form2 = _interopRequireDefault(_form);
 
@@ -20567,7 +20541,7 @@ if (container) {
 
 /***/ }),
 
-/***/ 637:
+/***/ 638:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20889,19 +20863,19 @@ module.exports = SegmentList;
 
 /***/ }),
 
-/***/ 638:
+/***/ 639:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global) {
 
 if (!global["MailPoetLib"]) global["MailPoetLib"] = {};
-module.exports = global["MailPoetLib"]["Form"] = __webpack_require__(639);
+module.exports = global["MailPoetLib"]["Form"] = __webpack_require__(640);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
 
-/***/ 639:
+/***/ 640:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20921,7 +20895,7 @@ var _mailpoet = __webpack_require__(5);
 
 var _mailpoet2 = _interopRequireDefault(_mailpoet);
 
-var _form = __webpack_require__(282);
+var _form = __webpack_require__(283);
 
 var _form2 = _interopRequireDefault(_form);
 
@@ -20988,7 +20962,7 @@ exports.default = SegmentForm;
 
 /***/ }),
 
-/***/ 640:
+/***/ 641:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21006,7 +20980,7 @@ var _reactRouter = __webpack_require__(26);
 
 var _history = __webpack_require__(98);
 
-var _list = __webpack_require__(641);
+var _list = __webpack_require__(642);
 
 var _list2 = _interopRequireDefault(_list);
 
@@ -21038,7 +21012,7 @@ if (container) {
 
 /***/ }),
 
-/***/ 641:
+/***/ 642:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21245,7 +21219,8 @@ var FormList = _react2.default.createClass({
           {
             className: 'page-title-action',
             href: 'javascript:;',
-            onClick: this.createForm
+            onClick: this.createForm,
+            'data-automation-id': 'create_new_form'
           },
           _mailpoet2.default.I18n.t('new')
         )
@@ -21270,7 +21245,7 @@ module.exports = FormList;
 
 /***/ }),
 
-/***/ 642:
+/***/ 643:
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
@@ -21364,7 +21339,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
 
 /***/ }),
 
-/***/ 643:
+/***/ 644:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21382,15 +21357,15 @@ var _reactRouter = __webpack_require__(26);
 
 var _history = __webpack_require__(98);
 
-var _system_status = __webpack_require__(644);
+var _system_status = __webpack_require__(645);
 
 var _system_status2 = _interopRequireDefault(_system_status);
 
-var _system_info = __webpack_require__(645);
+var _system_info = __webpack_require__(646);
 
 var _system_info2 = _interopRequireDefault(_system_info);
 
-var _knowledge_base = __webpack_require__(646);
+var _knowledge_base = __webpack_require__(647);
 
 var _knowledge_base2 = _interopRequireDefault(_knowledge_base);
 
@@ -21424,7 +21399,7 @@ if (container) {
 
 /***/ }),
 
-/***/ 644:
+/***/ 645:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21539,7 +21514,7 @@ module.exports = SystemStatus;
 
 /***/ }),
 
-/***/ 645:
+/***/ 646:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21613,7 +21588,7 @@ module.exports = SystemInfo;
 
 /***/ }),
 
-/***/ 646:
+/***/ 647:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21731,7 +21706,7 @@ module.exports = KnowledgeBase;
 
 /***/ }),
 
-/***/ 647:
+/***/ 648:
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
@@ -21780,7 +21755,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_
 
 /***/ }),
 
-/***/ 648:
+/***/ 649:
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* eslint-disable func-names */
@@ -21789,9 +21764,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* eslint-disabl
     __webpack_require__(7),
     __webpack_require__(10),
     __webpack_require__(5),
-    __webpack_require__(276),
-    __webpack_require__(649),
+    __webpack_require__(277),
     __webpack_require__(650),
+    __webpack_require__(651),
     __webpack_require__(0)
   ], __WEBPACK_AMD_DEFINE_RESULT__ = (function (
     Backbone,
@@ -22956,7 +22931,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* eslint-disabl
 
 /***/ }),
 
-/***/ 649:
+/***/ 650:
 /***/ (function(module, exports) {
 
 /*!
@@ -22968,7 +22943,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* eslint-disabl
 
 /***/ }),
 
-/***/ 650:
+/***/ 651:
 /***/ (function(module, exports) {
 
 /*
@@ -23054,14 +23029,14 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* eslint-disabl
 
 /***/ }),
 
-/***/ 651:
+/***/ 652:
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
     __webpack_require__(7),
     __webpack_require__(10),
     __webpack_require__(5),
-    __webpack_require__(276)
+    __webpack_require__(277)
   ], __WEBPACK_AMD_DEFINE_RESULT__ = (function exportSubscribers(
     _,
     jQuery,
@@ -25707,7 +25682,7 @@ Writable.prototype._destroy = function (err, cb) {
   this.end();
   cb(err);
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(278).setImmediate, __webpack_require__(8)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(279).setImmediate, __webpack_require__(8)))
 
 /***/ }),
 
@@ -25990,4 +25965,4 @@ function simpleEnd(buf) {
 
 /***/ })
 
-},[614]);
+},[615]);

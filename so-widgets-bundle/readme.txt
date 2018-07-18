@@ -2,8 +2,8 @@
 Tags: bundle, widget, button, slider, image, carousel, price table, google maps, tinymce, social links
 Requires at least: 4.2
 Tested up to: 4.9.1
-Stable tag: 1.12.0
-Build time: 2018-07-11T16:45:12+02:00
+Stable tag: 1.12.1
+Build time: 2018-07-17T11:59:12+02:00
 License: GPLv3 or later
 Contributors: gpriday, braam-genis
 Donate link: https://siteorigin.com/downloads/contribution/
@@ -64,6 +64,10 @@ The SiteOrigin Widgets Bundle is the perfect platform to build widgets for your 
 3. An example of the button widget.
 
 == Changelog ==
+
+= 1.12.1 - 17 July 2018 =
+* Contact: Allow non-string values in required field validation.
+* Initialize CTA, Price Table and Video JS widgets correctly when in accordion/tabs widgets.
 
 = 1.12.0 - 11 July 2018 =
 * Contact: Add dedicated textarea height.

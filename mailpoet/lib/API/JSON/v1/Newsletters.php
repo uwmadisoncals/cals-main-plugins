@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use MailPoet\API\JSON\Endpoint as APIEndpoint;
 use MailPoet\API\JSON\Error as APIError;
 use MailPoet\Config\AccessControl;
+use MailPoet\Cron\CronHelper;
 use MailPoet\Cron\Workers\SendingQueue\Tasks\Newsletter as NewsletterQueueTask;
 use MailPoet\Listing;
 use MailPoet\Models\Newsletter;
@@ -79,6 +80,10 @@ class Newsletters extends APIEndpoint {
         $relation->newsletter_id = $newsletter->id;
         $relation->save();
       }
+    }
+
+    if(isset($data['sender_address']) && isset($data['sender_name'])) {
+      Setting::saveDefaultSenderIfNeeded($data['sender_address'], $data['sender_name']);
     }
 
     if(!empty($options)) {
@@ -416,6 +421,7 @@ class Newsletters extends APIEndpoint {
       'groups' => $listing_data['groups'],
       'mta_log' => Setting::getValue('mta_log'),
       'mta_method' => Setting::getValue('mta.method'),
+      'cron_accessible' => CronHelper::isDaemonAccessible(),
       'current_time' => WPFunctions::currentTime('mysql')
     ));
   }

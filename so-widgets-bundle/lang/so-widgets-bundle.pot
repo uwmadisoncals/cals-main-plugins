@@ -1085,7 +1085,7 @@ msgstr ""
 msgid "Required Field"
 msgstr ""
 
-#: widgets/contact/contact.php:180, widgets/contact/contact.php:1009
+#: widgets/contact/contact.php:180, widgets/contact/contact.php:1010
 msgid "Required field"
 msgstr ""
 
@@ -1401,35 +1401,35 @@ msgstr ""
 msgid "Please write something"
 msgstr ""
 
-#: widgets/contact/contact.php:1021
+#: widgets/contact/contact.php:1022
 msgid "Invalid email address."
 msgstr ""
 
-#: widgets/contact/contact.php:1100
+#: widgets/contact/contact.php:1101
 msgid "Error sending email, please try again later."
 msgstr ""
 
-#: widgets/contact/contact.php:1126
+#: widgets/contact/contact.php:1127
 msgid "A valid email is required"
 msgstr ""
 
-#: widgets/contact/contact.php:1128
+#: widgets/contact/contact.php:1129
 msgid "The email address is invalid"
 msgstr ""
 
-#: widgets/contact/contact.php:1132
+#: widgets/contact/contact.php:1133
 msgid "Missing subject"
 msgstr ""
 
-#: widgets/contact/contact.php:1166
+#: widgets/contact/contact.php:1167
 msgid "Error validating your Captcha response."
 msgstr ""
 
-#: widgets/contact/contact.php:1198
+#: widgets/contact/contact.php:1199
 msgid "Unfortunately our system identified your message as spam."
 msgstr ""
 
-#: widgets/contact/contact.php:1206
+#: widgets/contact/contact.php:1207
 msgctxt "The name of who sent this email"
 msgid "From"
 msgstr ""

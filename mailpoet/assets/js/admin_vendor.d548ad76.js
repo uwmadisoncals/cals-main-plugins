@@ -4509,7 +4509,7 @@ webpackJsonp([0],[
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(277)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(278)(module)))
 
 /***/ }),
 /* 1 */
@@ -12534,7 +12534,7 @@ function formatPattern(pattern, params) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {if(!global["MailPoetLib"]) global["MailPoetLib"] = {};
-module.exports = global["MailPoetLib"]["History"] = __webpack_require__(600);
+module.exports = global["MailPoetLib"]["History"] = __webpack_require__(601);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
@@ -28912,6 +28912,17 @@ module.exports = global["MailPoetLib"]["NewslettersListingsMixins"] = __webpack_
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+if (!global["MailPoetLib"]) global["MailPoetLib"] = {};
+module.exports = global["MailPoetLib"]["NewslettersListingsHeading"] = __webpack_require__(594);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+
+/***/ }),
+/* 276 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 
 
 exports.__esModule = true;
@@ -28919,8 +28930,8 @@ var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.do
 exports.canUseDOM = canUseDOM;
 
 /***/ }),
-/* 276 */,
-/* 277 */
+/* 277 */,
+/* 278 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -28948,7 +28959,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 278 */
+/* 279 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -29018,7 +29029,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
-/* 279 */
+/* 280 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29145,7 +29156,7 @@ var useQueries = function useQueries(createHistory) {
 exports.default = useQueries;
 
 /***/ }),
-/* 280 */
+/* 281 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29260,7 +29271,7 @@ var useBasename = function useBasename(createHistory) {
 exports.default = useBasename;
 
 /***/ }),
-/* 281 */
+/* 282 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29315,7 +29326,7 @@ var isExtraneousPopstateEvent = exports.isExtraneousPopstateEvent = function isE
 };
 
 /***/ }),
-/* 282 */
+/* 283 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29326,7 +29337,7 @@ module.exports = global["MailPoetLib"]["Form"] = __webpack_require__(581);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
-/* 283 */
+/* 284 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;/*!
@@ -35081,7 +35092,7 @@ S2.define('jquery.select2',[
 
 
 /***/ }),
-/* 284 */
+/* 285 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35162,7 +35173,7 @@ function supportsGoWithoutReloadUsingHash() {
 }
 
 /***/ }),
-/* 285 */
+/* 286 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35188,7 +35199,6 @@ module.exports = exports['default'];
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 286 */,
 /* 287 */,
 /* 288 */,
 /* 289 */,
@@ -50695,7 +50705,7 @@ exports.go = exports.replaceLocation = exports.pushLocation = exports.startListe
 
 var _LocationUtils = __webpack_require__(95);
 
-var _DOMUtils = __webpack_require__(281);
+var _DOMUtils = __webpack_require__(282);
 
 var _DOMStateStorage = __webpack_require__(485);
 
@@ -51262,7 +51272,7 @@ module.exports = FormFieldSelect;
 /* WEBPACK VAR INJECTION */(function(global) {
 
 if (!global["MailPoetLib"]) global["MailPoetLib"] = {};
-module.exports = global["MailPoetLib"]["NewsletterSchedulingCommonOptions"] = __webpack_require__(598);
+module.exports = global["MailPoetLib"]["NewsletterSchedulingCommonOptions"] = __webpack_require__(599);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
@@ -52017,11 +52027,11 @@ module.exports = exports['default'];
 exports.__esModule = true;
 exports.default = createMemoryHistory;
 
-var _useQueries = __webpack_require__(279);
+var _useQueries = __webpack_require__(280);
 
 var _useQueries2 = _interopRequireDefault(_useQueries);
 
-var _useBasename = __webpack_require__(280);
+var _useBasename = __webpack_require__(281);
 
 var _useBasename2 = _interopRequireDefault(_useBasename);
 
@@ -52201,11 +52211,11 @@ exports.default = createMemoryHistory;
 exports.__esModule = true;
 exports.default = useRouterHistory;
 
-var _useQueries = __webpack_require__(279);
+var _useQueries = __webpack_require__(280);
 
 var _useQueries2 = _interopRequireDefault(_useQueries);
 
-var _useBasename = __webpack_require__(280);
+var _useBasename = __webpack_require__(281);
 
 var _useBasename2 = _interopRequireDefault(_useBasename);
 
@@ -52244,7 +52254,7 @@ var _RefreshProtocol = __webpack_require__(550);
 
 var RefreshProtocol = _interopRequireWildcard(_RefreshProtocol);
 
-var _DOMUtils = __webpack_require__(281);
+var _DOMUtils = __webpack_require__(282);
 
 var _createHistory = __webpack_require__(459);
 
@@ -52457,7 +52467,7 @@ var _invariant2 = _interopRequireDefault(_invariant);
 
 var _ExecutionEnvironment = __webpack_require__(460);
 
-var _DOMUtils = __webpack_require__(281);
+var _DOMUtils = __webpack_require__(282);
 
 var _HashProtocol = __webpack_require__(552);
 
@@ -53153,9 +53163,9 @@ var Redirect = __WEBPACK_IMPORTED_MODULE_0_create_react_class___default()({
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = createMemoryHistory;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_history_lib_useQueries__ = __webpack_require__(279);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_history_lib_useQueries__ = __webpack_require__(280);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_history_lib_useQueries___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_history_lib_useQueries__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_history_lib_useBasename__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_history_lib_useBasename__ = __webpack_require__(281);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_history_lib_useBasename___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_history_lib_useBasename__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_history_lib_createMemoryHistory__ = __webpack_require__(482);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_history_lib_createMemoryHistory___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_history_lib_createMemoryHistory__);
@@ -53181,9 +53191,9 @@ function createMemoryHistory(options) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = useRouterHistory;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_history_lib_useQueries__ = __webpack_require__(279);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_history_lib_useQueries__ = __webpack_require__(280);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_history_lib_useQueries___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_history_lib_useQueries__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_history_lib_useBasename__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_history_lib_useBasename__ = __webpack_require__(281);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_history_lib_useBasename___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_history_lib_useBasename__);
 
 
@@ -53253,7 +53263,7 @@ module.exports = global["MailPoetLib"]["StatsBadge"] = __webpack_require__(589);
 /* WEBPACK VAR INJECTION */(function(global) {
 
 if (!global["MailPoetLib"]) global["MailPoetLib"] = {};
-module.exports = global["MailPoetLib"]["AutomaticEmailEventsList"] = __webpack_require__(594);
+module.exports = global["MailPoetLib"]["AutomaticEmailEventsList"] = __webpack_require__(595);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
@@ -53264,7 +53274,7 @@ module.exports = global["MailPoetLib"]["AutomaticEmailEventsList"] = __webpack_r
 /* WEBPACK VAR INJECTION */(function(global) {
 
 if (!global["MailPoetLib"]) global["MailPoetLib"] = {};
-module.exports = global["MailPoetLib"]["AutomaticEmailsBreadcrumb"] = __webpack_require__(595);
+module.exports = global["MailPoetLib"]["AutomaticEmailsBreadcrumb"] = __webpack_require__(596);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
@@ -53275,7 +53285,7 @@ module.exports = global["MailPoetLib"]["AutomaticEmailsBreadcrumb"] = __webpack_
 /* WEBPACK VAR INJECTION */(function(global) {
 
 if (!global["MailPoetLib"]) global["MailPoetLib"] = {};
-module.exports = global["MailPoetLib"]["NewsletterWelcomeNotificationScheduling"] = __webpack_require__(597);
+module.exports = global["MailPoetLib"]["NewsletterWelcomeNotificationScheduling"] = __webpack_require__(598);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
@@ -53370,9 +53380,9 @@ var _invariant = __webpack_require__(14);
 
 var _invariant2 = _interopRequireDefault(_invariant);
 
-var _ExecutionEnvironment = __webpack_require__(275);
+var _ExecutionEnvironment = __webpack_require__(276);
 
-var _DOMUtils = __webpack_require__(284);
+var _DOMUtils = __webpack_require__(285);
 
 var _createHistory = __webpack_require__(504);
 
@@ -53413,11 +53423,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _deepEqual = __webpack_require__(602);
+var _deepEqual = __webpack_require__(603);
 
 var _deepEqual2 = _interopRequireDefault(_deepEqual);
 
-var _AsyncUtils = __webpack_require__(605);
+var _AsyncUtils = __webpack_require__(606);
 
 var _Actions = __webpack_require__(99);
 
@@ -53429,7 +53439,7 @@ var _runTransitionHook = __webpack_require__(469);
 
 var _runTransitionHook2 = _interopRequireDefault(_runTransitionHook);
 
-var _deprecate = __webpack_require__(285);
+var _deprecate = __webpack_require__(286);
 
 var _deprecate2 = _interopRequireDefault(_deprecate);
 
@@ -53754,11 +53764,11 @@ var _warning = __webpack_require__(100);
 
 var _warning2 = _interopRequireDefault(_warning);
 
-var _ExecutionEnvironment = __webpack_require__(275);
+var _ExecutionEnvironment = __webpack_require__(276);
 
-var _DOMUtils = __webpack_require__(284);
+var _DOMUtils = __webpack_require__(285);
 
-var _deprecate = __webpack_require__(285);
+var _deprecate = __webpack_require__(286);
 
 var _deprecate2 = _interopRequireDefault(_deprecate);
 
@@ -53870,7 +53880,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
-var _qs = __webpack_require__(609);
+var _qs = __webpack_require__(610);
 
 var _qs2 = _interopRequireDefault(_qs);
 
@@ -54199,15 +54209,16 @@ __webpack_require__(33);
 __webpack_require__(529);
 __webpack_require__(271);
 __webpack_require__(61);
-__webpack_require__(282);
+__webpack_require__(283);
 __webpack_require__(498);
 __webpack_require__(63);
 __webpack_require__(273);
 __webpack_require__(274);
+__webpack_require__(275);
 __webpack_require__(499);
 __webpack_require__(500);
 __webpack_require__(501);
-__webpack_require__(599);
+__webpack_require__(600);
 __webpack_require__(98);
 module.exports = __webpack_require__(20);
 
@@ -57028,7 +57039,7 @@ var _warning2 = _interopRequireDefault(_warning);
 
 var _LocationUtils = __webpack_require__(95);
 
-var _DOMUtils = __webpack_require__(281);
+var _DOMUtils = __webpack_require__(282);
 
 var _DOMStateStorage = __webpack_require__(485);
 
@@ -57331,7 +57342,7 @@ var isRegExp = nodeIsRegExp ? baseUnary(nodeIsRegExp) : baseIsRegExp;
 
 module.exports = isRegExp;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8), __webpack_require__(277)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8), __webpack_require__(278)(module)))
 
 /***/ }),
 /* 555 */
@@ -58296,7 +58307,7 @@ var ListingItems = _react2.default.createClass({
           'td',
           { colSpan: this.props.columns.length + (this.props.is_selectable ? 1 : 0)
           },
-          this.props.selection !== 'all' ? _mailpoet2.default.I18n.t('selectAllLabel') : _mailpoet2.default.I18n.t('selectedAllLabel').replace('%d', this.props.count),
+          this.props.selection !== 'all' ? _mailpoet2.default.I18n.t('selectAllLabel') : _mailpoet2.default.I18n.t('selectedAllLabel').replace('%d', this.props.count.toLocaleString()),
           '\xA0',
           _react2.default.createElement(
             'a',
@@ -61410,7 +61421,7 @@ var Form = _react2.default.createClass({
 });
 
 exports.default = Form;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(278).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(279).setImmediate))
 
 /***/ }),
 /* 582 */
@@ -61850,7 +61861,7 @@ var _underscore2 = _interopRequireDefault(_underscore);
 
 __webpack_require__(33);
 
-__webpack_require__(283);
+__webpack_require__(284);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -62844,7 +62855,7 @@ module.exports = ListingTabs;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.MailerMixin = exports.StatisticsMixin = exports.QueueMixin = undefined;
+exports.CronMixin = exports.MailerMixin = exports.StatisticsMixin = exports.QueueMixin = undefined;
 
 var _react = __webpack_require__(4);
 
@@ -62971,9 +62982,9 @@ var QueueMixin = {
       label = _react2.default.createElement(
         'span',
         null,
-        newsletter.queue.count_processed,
-        ' / ',
-        newsletter.queue.count_total,
+        parseInt(newsletter.queue.count_processed, 10).toLocaleString(),
+        '/',
+        parseInt(newsletter.queue.count_total, 10).toLocaleString(),
         '\xA0\xA0',
         _react2.default.createElement(
           'a',
@@ -63366,12 +63377,88 @@ var MailerMixin = {
   }
 };
 
+var CronMixin = {
+  checkCronStatus: function checkCronStatus(state) {
+    if (state.meta.cron_accessible !== false) {
+      _mailpoet2.default.Notice.hide('mailpoet_cron_error');
+      return;
+    }
+
+    var cronPingCheckNotice = (0, _reactStringReplace2.default)(_mailpoet2.default.I18n.t('cronNotAccessibleNotice'), /\[link\](.*?)\[\/link\]/g, function (match) {
+      return _react2.default.createElement(
+        'a',
+        {
+          href: 'https://beta.docs.mailpoet.com/article/231-sending-does-not-work',
+          target: '_blank',
+          rel: 'noopener noreferrer',
+          key: 'check-cron'
+        },
+        match
+      );
+    });
+
+    _mailpoet2.default.Notice.error('', { static: true, id: 'mailpoet_cron_error' });
+
+    _reactDom2.default.render(_react2.default.createElement(
+      'div',
+      null,
+      _react2.default.createElement(
+        'p',
+        null,
+        cronPingCheckNotice
+      )
+    ), (0, _jquery2.default)('[data-id="mailpoet_cron_error"]')[0]);
+  }
+};
+
 exports.QueueMixin = QueueMixin;
 exports.StatisticsMixin = StatisticsMixin;
 exports.MailerMixin = MailerMixin;
+exports.CronMixin = CronMixin;
 
 /***/ }),
 /* 594 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouter = __webpack_require__(26);
+
+var _mailpoet = __webpack_require__(5);
+
+var _mailpoet2 = _interopRequireDefault(_mailpoet);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var ListingHeading = function ListingHeading() {
+  return _react2.default.createElement(
+    'h1',
+    { className: 'title' },
+    _mailpoet2.default.I18n.t('pageTitle'),
+    _react2.default.createElement(
+      _reactRouter.Link,
+      {
+        className: 'page-title-action',
+        to: '/new',
+        onClick: function onClick() {
+          return _mailpoet2.default.trackEvent('Emails > Add New', { 'MailPoet Free version': window.mailpoet_version });
+        },
+        'data-automation-id': 'new_email'
+      },
+      _mailpoet2.default.I18n.t('new')
+    )
+  );
+};
+
+module.exports = ListingHeading;
+
+/***/ }),
+/* 595 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63387,7 +63474,7 @@ var _breadcrumb = __webpack_require__(500);
 
 var _breadcrumb2 = _interopRequireDefault(_breadcrumb);
 
-var _event = __webpack_require__(596);
+var _event = __webpack_require__(597);
 
 var _event2 = _interopRequireDefault(_event);
 
@@ -63428,6 +63515,11 @@ var AutomaticEmailEventsList = function (_React$Component) {
   _createClass(AutomaticEmailEventsList, [{
     key: 'eventsConfigurator',
     value: function eventsConfigurator(eventSlug) {
+      _mailpoet2.default.trackEvent('Emails > Automatic Type selected', {
+        'MailPoet Free version': window.mailpoet_version,
+        'MailPoet Premium version': window.mailpoet_premium_version,
+        'Email type': eventSlug
+      });
       this.props.router.push('new/' + this.email.slug + '/' + eventSlug + '/conditions');
     }
   }, {
@@ -63490,7 +63582,7 @@ AutomaticEmailEventsList.propTypes = {
 module.exports = AutomaticEmailEventsList;
 
 /***/ }),
-/* 595 */
+/* 596 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63546,7 +63638,7 @@ AutomaticEmailsBreadcrumb.propTypes = {
 module.exports = AutomaticEmailsBreadcrumb;
 
 /***/ }),
-/* 596 */
+/* 597 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63697,7 +63789,7 @@ AutomaticEmailEvent.propTypes = {
 module.exports = AutomaticEmailEvent;
 
 /***/ }),
-/* 597 */
+/* 598 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63876,7 +63968,7 @@ var WelcomeScheduling = _react2.default.createClass({
 module.exports = WelcomeScheduling;
 
 /***/ }),
-/* 598 */
+/* 599 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -63972,7 +64064,7 @@ exports.monthDayValues = monthDayValues;
 exports.nthWeekDayValues = nthWeekDayValues;
 
 /***/ }),
-/* 599 */
+/* 600 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64073,7 +64165,7 @@ var initializeEditor = function initializeEditor(config) {
 _wpJsHooks2.default.addAction('mailpoet_newsletters_editor_initialize', initializeEditor);
 
 /***/ }),
-/* 600 */
+/* 601 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64083,19 +64175,19 @@ exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _createBrowserHistory = __webpack_require__(601);
+var _createBrowserHistory = __webpack_require__(602);
 
 var _createBrowserHistory2 = _interopRequireDefault(_createBrowserHistory);
 
 exports.createHistory = _createBrowserHistory2['default'];
 
-var _createHashHistory2 = __webpack_require__(606);
+var _createHashHistory2 = __webpack_require__(607);
 
 var _createHashHistory3 = _interopRequireDefault(_createHashHistory2);
 
 exports.createHashHistory = _createHashHistory3['default'];
 
-var _createMemoryHistory2 = __webpack_require__(607);
+var _createMemoryHistory2 = __webpack_require__(608);
 
 var _createMemoryHistory3 = _interopRequireDefault(_createMemoryHistory2);
 
@@ -64107,7 +64199,7 @@ var _createLocation3 = _interopRequireDefault(_createLocation2);
 
 exports.createLocation = _createLocation3['default'];
 
-var _useBasename2 = __webpack_require__(608);
+var _useBasename2 = __webpack_require__(609);
 
 var _useBasename3 = _interopRequireDefault(_useBasename2);
 
@@ -64133,20 +64225,20 @@ exports.Actions = _Actions3['default'];
 
 // deprecated
 
-var _enableBeforeUnload2 = __webpack_require__(612);
+var _enableBeforeUnload2 = __webpack_require__(613);
 
 var _enableBeforeUnload3 = _interopRequireDefault(_enableBeforeUnload2);
 
 exports.enableBeforeUnload = _enableBeforeUnload3['default'];
 
-var _enableQueries2 = __webpack_require__(613);
+var _enableQueries2 = __webpack_require__(614);
 
 var _enableQueries3 = _interopRequireDefault(_enableQueries2);
 
 exports.enableQueries = _enableQueries3['default'];
 
 /***/ }),
-/* 601 */
+/* 602 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64164,9 +64256,9 @@ var _invariant2 = _interopRequireDefault(_invariant);
 
 var _Actions = __webpack_require__(99);
 
-var _ExecutionEnvironment = __webpack_require__(275);
+var _ExecutionEnvironment = __webpack_require__(276);
 
-var _DOMUtils = __webpack_require__(284);
+var _DOMUtils = __webpack_require__(285);
 
 var _DOMStateStorage = __webpack_require__(502);
 
@@ -64325,12 +64417,12 @@ module.exports = exports['default'];
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 602 */
+/* 603 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var pSlice = Array.prototype.slice;
-var objectKeys = __webpack_require__(603);
-var isArguments = __webpack_require__(604);
+var objectKeys = __webpack_require__(604);
+var isArguments = __webpack_require__(605);
 
 var deepEqual = module.exports = function (actual, expected, opts) {
   if (!opts) opts = {};
@@ -64425,7 +64517,7 @@ function objEquiv(a, b, opts) {
 
 
 /***/ }),
-/* 603 */
+/* 604 */
 /***/ (function(module, exports) {
 
 exports = module.exports = typeof Object.keys === 'function'
@@ -64440,7 +64532,7 @@ function shim (obj) {
 
 
 /***/ }),
-/* 604 */
+/* 605 */
 /***/ (function(module, exports) {
 
 var supportsArgumentsClass = (function(){
@@ -64466,7 +64558,7 @@ function unsupported(object){
 
 
 /***/ }),
-/* 605 */
+/* 606 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64498,7 +64590,7 @@ function loopAsync(turns, work, callback) {
 }
 
 /***/ }),
-/* 606 */
+/* 607 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64520,9 +64612,9 @@ var _invariant2 = _interopRequireDefault(_invariant);
 
 var _Actions = __webpack_require__(99);
 
-var _ExecutionEnvironment = __webpack_require__(275);
+var _ExecutionEnvironment = __webpack_require__(276);
 
-var _DOMUtils = __webpack_require__(284);
+var _DOMUtils = __webpack_require__(285);
 
 var _DOMStateStorage = __webpack_require__(502);
 
@@ -64730,7 +64822,7 @@ module.exports = exports['default'];
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 607 */
+/* 608 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64879,7 +64971,7 @@ module.exports = exports['default'];
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 608 */
+/* 609 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64893,7 +64985,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
-var _ExecutionEnvironment = __webpack_require__(275);
+var _ExecutionEnvironment = __webpack_require__(276);
 
 var _runTransitionHook = __webpack_require__(469);
 
@@ -65014,13 +65106,13 @@ exports['default'] = useBasename;
 module.exports = exports['default'];
 
 /***/ }),
-/* 609 */
+/* 610 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Load modules
 
-var Stringify = __webpack_require__(610);
-var Parse = __webpack_require__(611);
+var Stringify = __webpack_require__(611);
+var Parse = __webpack_require__(612);
 
 
 // Declare internals
@@ -65035,7 +65127,7 @@ module.exports = {
 
 
 /***/ }),
-/* 610 */
+/* 611 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Load modules
@@ -65162,7 +65254,7 @@ module.exports = function (obj, options) {
 
 
 /***/ }),
-/* 611 */
+/* 612 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Load modules
@@ -65354,7 +65446,7 @@ module.exports = function (str, options) {
 
 
 /***/ }),
-/* 612 */
+/* 613 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65364,7 +65456,7 @@ exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _deprecate = __webpack_require__(285);
+var _deprecate = __webpack_require__(286);
 
 var _deprecate2 = _interopRequireDefault(_deprecate);
 
@@ -65376,7 +65468,7 @@ exports['default'] = _deprecate2['default'](_useBeforeUnload2['default'], 'enabl
 module.exports = exports['default'];
 
 /***/ }),
-/* 613 */
+/* 614 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65386,7 +65478,7 @@ exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _deprecate = __webpack_require__(285);
+var _deprecate = __webpack_require__(286);
 
 var _deprecate2 = _interopRequireDefault(_deprecate);
 

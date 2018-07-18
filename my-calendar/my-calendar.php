@@ -17,7 +17,7 @@
  * License:     GPL-2.0+
  * License URI: http://www.gnu.org/license/gpl-2.0.txt
  * Domain Path: lang
- * Version:     3.0.12
+ * Version:     3.0.13
  */
 
 /*
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 global $mc_version, $wpdb;
-$mc_version = '3.0.12';
+$mc_version = '3.0.13';
 
 define( 'MC_DEBUG', false );
 
@@ -207,7 +207,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 			}
 		}
 		if ( ! $remove ) {
-			if ( ! function_exists( 'mcs_submit_exists' ) ) {
+			if ( ! function_exists( 'mcs_submissions' ) ) {
 				?>
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox sell support">
@@ -244,7 +244,7 @@ function mc_show_sidebar( $show = '', $add = false, $remove = false ) {
 				</div>
 				<?php
 			}
-			if ( ! function_exists( 'mcs_submit_exists' ) ) {
+			if ( ! function_exists( 'mcs_submissions' ) ) {
 				?>
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox support">
