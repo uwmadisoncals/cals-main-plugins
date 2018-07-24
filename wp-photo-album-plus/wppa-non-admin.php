@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.9.06
+* Version 6.9.07
 *
 */
 
@@ -426,6 +426,12 @@ global $wppa_opt;
 			$nice_url = WPPA_URL . '/vendor/nicescroll/jquery.nicescroll.min.js';
 		}
 		wp_enqueue_script( 'nicescrollr-inc-nicescroll-min-js', $nice_url, array( 'jquery', 'nicescrollr-easing-min-js' ), 'all' );
+	}
+
+	// Panorama
+	if ( wppa_switch( 'enable_panorama' ) ) {
+		$three_url = WPPA_URL . '/vendor/three/three.min.js';
+		wp_enqueue_script( 'wppa-three-min-js', $three_url );
 	}
 
 	// wppa-init

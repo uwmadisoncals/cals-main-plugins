@@ -152,6 +152,7 @@ class Plugin
 		
 		return apply_filters('wpgmza_plugin_get_localized_data', array(
 			'ajaxurl' 				=> admin_url('admin-ajax.php'),
+			'resturl'				=> get_rest_url(null, 'wpgmza/v1'),
 			'settings' 				=> $this->settings,
 			'localized_strings'		=> $strings->getLocalizedStrings(),
 			'api_consent_html'		=> $wpgmzaGDPRCompliance->getConsentPromptHTML(),

@@ -4,6 +4,7 @@ Donate link: http://www.wpgmaps.com
 Tags: google maps, maps, map, map markers, google map, google maps plugin, wp google maps, wp google map, map plugin, directions, google map plugin, map widget
 Requires at least: 3.5
 Tested up to: 4.9.6
+Requires PHP: 5.3
 Stable tag: trunk
 License: GPLv2
 
@@ -214,6 +215,10 @@ We no longer support timthumb and we have opted to remove it from WP Google Maps
 Please upgrade your version of WP Google Maps to version 6.0.27 as it includes multiple security improvements.
 
 == Changelog ==
+
+= 7.10.23 :- 2018-07-23 :- Medium priority =
+* Fixed REST API endpoint URL incorrect for installations in subfolders
+* Added PHP version requirement 5.3 to readme.txt
 
 = 7.10.22 :- 2018-07-18 :- Medium priority =
 * Added filter wpgmza_localized_strings

@@ -1,9 +1,25 @@
 WP Photo Album Plus Changelog
 
+= 6.9.07 =
+
+= Bug Fixes =
+
+* Fixed alignment of slide navigation icons 48px.
+* Removed erroneous warning during upload when local cdn is enabled.
+
+= New Features =
+
+* Panorama images phase 1: 360 deg spherical panorama photos can be displayed as any of the three single image types. 
+Tick Table IV-A24.2 and a selectionbox will appear on the photo admin page at every photo.
+
+= Other Changes =
+
+* Added Table IX-L7.1: Render photo once. Replace shortcode by html. Use only if you need this for other plugins purposes.
+
 = 6.9.06 =
 
 = Bug Fixes =
- 
+
 * One button vote did not work properly. Fixed.
 * Fixed a bug in updating addressline in slideshows.
 

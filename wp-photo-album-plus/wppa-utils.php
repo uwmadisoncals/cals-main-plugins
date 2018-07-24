@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.9.06
+* Version 6.9.07
 *
 */
 
@@ -3388,6 +3388,12 @@ $border = false; // debug
 												'Full-Screen',
 												'Exit-Full-Screen',
 												'Content-View',
+												'Left-4',
+												'Right-4',
+												'Up-4',
+												'Down-4',
+												'ZoomIn',
+												'ZoomOut',
 
 																) ) ) {
 
@@ -3532,7 +3538,52 @@ $border = false; // debug
 									'M8.5,11.5h4c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5h-4C8.224,10.5,8,10.724,8,11S8.224,11.5,8.5,11.5z"' .
 							' />';
 				break;
-
+			case 'Left-4':
+				$result .= '<path' .
+								' d="M30,0H0V30H30V0z' .
+									'M24.5,19c0,0.3-0.2,0.5-0.5,0.5h-9.5V24' .
+									'c0,0.2-0.1,0.4-0.3,0.5c-0.1,0-0.1,0-0.2,0c-0.1,0-0.3-0.1-0.4-0.1l-9-9c-0.2-0.2-0.2-0.5,0-0.7l9-9c0.1-0.1,0.4-0.2,0.5-0.1' .
+									'c0.2,0.1,0.3,0.3,0.3,0.5v4.5H24c0.3,0,0.5,0.2,0.5,0.5V19z"' .
+							'/>';
+				break;
+			case 'Right-4':
+				$result .= '<path' .
+								' d="M30,0H0V30H30V0z' .
+									'M5.5,11c0-0.3,0.2-0.5,0.5-0.5h9.5V6' .
+									'c0-0.2,0.1-0.4,0.3-0.5c0.1,0,0.1,0,0.2,0c0.1,0,0.3,0.1,0.4,0.1l9,9c0.2,0.2,0.2,0.5,0,0.7l-9,9c-0.1,0.1-0.4,0.2-0.5,0.1' .
+									'c-0.2-0.1-0.3-0.3-0.3-0.5v-4.5H6c-0.3,0-0.5-0.2-0.5-0.5V11z"' .
+							'/>';
+				break;
+			case 'Up-4':
+				$result .= '<path' .
+								' d="M30,0H0V30H30V0z' .
+									'M11,24.5c-0.3,0-0.5-0.2-0.5-0.5v-9.5H6' .
+									'c-0.2,0-0.4-0.1-0.5-0.3c0-0.1,0-0.1,0-0.2c0-0.1,0.1-0.3,0.1-0.4l9-9c0.2-0.2,0.5-0.2,0.7,0l9,9c0.1,0.1,0.2,0.4,0.1,0.5' .
+									'c-0.1,0.2-0.3,0.3-0.5,0.3h-4.5V24c0,0.3-0.2,0.5-0.5,0.5H11z"' .
+							'/>';
+				break;
+			case 'Down-4':
+				$result .= '<path' .
+								' d="M30,0H0V30H30V0z' .
+									'M19,5.5c0.3,0,0.5,0.2,0.5,0.5v9.5H24' .
+									'c0.2,0,0.4,0.1,0.5,0.3c0,0.1,0,0.1,0,0.2c0,0.1-0.1,0.3-0.1,0.4l-9,9c-0.2,0.2-0.5,0.2-0.7,0l-9-9c-0.1-0.1-0.2-0.4-0.1-0.5' .
+									'c0.1-0.2,0.3-0.3,0.5-0.3h4.5V6c0-0.3,0.2-0.5,0.5-0.5H19z"' .
+							'/>';
+				break;
+			case 'ZoomIn':
+				$result .= '<path' .
+								' d="M30,0H0V30H30V0z' .
+								'M5.5,11h5.5v-5.5h8v5.5h5.5v8h-5.5v5.5h-8v-5.5h-5.5z' .
+									'"' .
+							'/>';
+				break;
+			case 'ZoomOut':
+				$result .= '<path' .
+								' d="M30,0H0V30H30V0z' .
+								'M5.5,11h19v8h-19z' .
+									'"' .
+							'/>';
+				break;
 		}
 
 		$result .= 		'</g>' .
@@ -4808,11 +4859,21 @@ function wppa_icon_size( $default = '', $type = 0, $factor = 1 ) {
 	}
 
 	if ( $opt === 'default' ) {
-		return rtrim( $default, ';' ) . ';';
+		$units = strpos( $default, 'em' ) !== false ? 'em' : 'px';
+		$opt = rtrim( $default, 'pxem;' );
+	}
+	else {
+		$units = 'px';
 	}
 
 	$opt *= $factor;
-	$result = ( wppa_in_widget() ? $opt / '2' : $opt ) . 'px;';
+	$result = ( wppa_in_widget() ? $opt / '2' : $opt ) . $units . ';';
 
 	return $result;
+}
+
+// See if a photo is a panorama
+function wppa_is_panorama( $id ) {
+
+	return wppa_get_photo_item( $id, 'panorama' );
 }

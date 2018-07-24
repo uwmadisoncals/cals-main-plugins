@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.9.06
+* Version 6.9.07
 *
 */
 
@@ -115,6 +115,7 @@ global $silent;
 					crypt tinytext NOT NULL,
 					magickstack text NOT NULL,
 					indexdtm tinytext NOT NULL,
+					panorama smallint(5) NOT NULL default '0',
 					PRIMARY KEY  (id),
 					KEY albumkey (album),
 					KEY statuskey (status(6))
@@ -1210,6 +1211,7 @@ cursorborder:'2px solid transparent',";
 						'wppa_enable_video' 			=> 'yes',
 						'wppa_enable_audio' 			=> 'yes',
 						'wppa_enable_stereo' 			=> 'no',
+						'wppa_enable_panorama' 			=> 'no',
 
 						'wppa_capitalize_tags' 			=> 'yes',
 						'wppa_enable_admins_choice' 	=> 'no',
@@ -1822,6 +1824,7 @@ cursorborder:'2px solid transparent',";
 						'wppa_photo_shortcode_fe_type' 			=> '-none-',
 						'wppa_photo_shortcode_random_albums' 	=> '-2',
 						'wppa_photo_shortcode_random_fixed' 	=> 'no',
+						'wppa_photo_shortcode_random_fixed_html' => 'no',
 
 						// Photo of the day widget
 						'wppa_potd_title'			=> __('Photo of the day', 'wp-photo-album-plus'),

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.9.06
+* Version 6.9.07
 *
 */
 
@@ -356,6 +356,14 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 										__( 'No problem, but some widgets may not work and some album selectionboxes will revert to a simple input field asking for an album id.', 'wp-photo-album-plus' ) . ' ' .
 										__( 'If you do not have pageload performance problems, you may increase the number in Table IX-B6.3.', 'wp-photo-album-plus' ) . ' ' .
 										__( 'If there are many empty albums, you can simply remove them by running the maintenance procedure in Table VIII-B7.', 'wp-photo-album-plus' ) );
+			}
+		}
+
+		// Check for availability of hires urls in case panorama is on
+		if ( wppa_switch( 'enable_panorama' ) ) {
+			if ( wppa_switch( 'resize_on_upload' ) && ! wppa_switch( 'keep_source_admin' ) && ! wppa_switch( 'keep_source_frontend' ) ) {
+				wppa_warning_message( 	__( 'You enabled the display of complex panoramic photos', 'wp-photo-album-plus' ) . '<br />' .
+										__( 'It is strongly recommended that you either do NOT resize (Table I-A2) or save sourcefiles (Table IX-H1 and 2) during upload in order to preserve resolution.', 'wp-photo-album-plus' ) );
 			}
 		}
 ?>
@@ -4026,8 +4034,17 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$slug = 'wppa_enable_stereo';
 							$html = wppa_checkbox($slug);
 							$clas = '';
-							$tags = 'system,audio';
-							wppa_setting($slug, '24', $name, $desc, $html, $help, $clas, $tags);
+							$tags = 'system';
+							wppa_setting($slug, '24.1', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Enable Pnorama', 'wp-photo-album-plus');
+							$desc = __('Enable panorama photo support.', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_enable_panorama';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '24.2', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Relative urls', 'wp-photo-album-plus');
 							$desc = __('Use relative urls only.', 'wp-photo-album-plus');
@@ -10365,6 +10382,17 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$tags = 'system';
 							wppa_setting($slug, '7', $name, $desc, $html, $help, $clas, $tags);
 							}
+
+							$name = __('Render photo once', 'wp-photo-album-plus');
+							$desc = __('Replace shortcode by html', 'wp-photo-album-plus');
+							$help = __('Do not replace \'random\' by a number, but by the corresponding html', 'wp-photo-album-plus') . '<br />';
+							$help .= __('WARNING: changes in [photo] shortcode afterwards do no longer have any effect!', 'wp-photo-album-plus');
+							$slug = 'wppa_photo_shortcode_random_fixed_html';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '7.1', $name, $desc, $html, $help, $clas, $tags);
+
 							?>
 
 

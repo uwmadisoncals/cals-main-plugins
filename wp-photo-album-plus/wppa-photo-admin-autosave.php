@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.9.04
+* Version 6.9.07
 *
 */
 
@@ -542,6 +542,7 @@ function wppaToggleExif( id, count ) {
 			$status 		= $photo['status'];
 			$tags 			= trim( stripslashes( $photo['tags'] ), ',' );
 			$stereo 		= $photo['stereo'];
+			$panorama 		= $photo['panorama'];
 			$magickstack 	= $photo['magickstack'];
 			$scheduledel 	= $photo['scheduledel'];
 
@@ -1094,7 +1095,10 @@ function wppaToggleExif( id, count ) {
 				echo	// Section 2
 				"\n" . '<!-- Section 2 -->';
 
-				if ( ( wppa_switch( 'enable_stereo' ) && ! $is_multi ) || ( is_file( wppa_get_photo_path( $id ) ) && wppa_switch( 'watermark_on' ) ) ) {
+				if ( ( wppa_switch( 'enable_stereo' ) && ! $is_multi ) ||
+					 ( wppa_switch( 'enable_panorama' ) ) ||
+					 ( is_file( wppa_get_photo_path( $id ) ) && wppa_switch( 'watermark_on' ) )
+					 ) {
 					echo
 					'<table' .
 						' class="wppa-table wppa-photo-table"' .
@@ -1122,12 +1126,17 @@ function wppaToggleExif( id, count ) {
 												__( 'Right - left stereo image', 'wp-photo-album-plus' ) .
 											'</option>' .
 										'</select>' .
-										' ';
+										' ' .
 										__( 'Images:', 'wp-photo-album-plus' ) . ' ';
 										$files = glob( WPPA_UPLOAD_PATH . '/stereo/' . $id . '-*.*' );
-										$c = 0;
-										if ( ! empty( $files ) ) {
+
+										if ( empty( $files ) ) {
+											echo
+											__( 'None', 'wp-photo-album-plus' ) . '. ';
+										}
+										else {
 											sort( $files );
+											$c = 0;
 											foreach ( $files as $file ) {
 												echo
 												'<a href="' . str_replace( WPPA_UPLOAD_PATH, WPPA_UPLOAD_URL, $file ) . '" target="_blank" >' .
@@ -1142,6 +1151,19 @@ function wppaToggleExif( id, count ) {
 												}
 											}
 										}
+									}
+
+									// Panorama
+									if ( wppa_switch( 'enable_panorama' ) ) {
+										echo
+										__( 'Panorama' ) . ': ' .
+										'<select' .
+											' onchange="wppaAjaxUpdatePhoto( ' . $id . ', \'panorama\', this )"' .
+											' >' .
+											'<option value="0"' . ( $panorama == '0' ? ' selected="selected"' : '' ) . ' >' . __( '- none -', 'wp-photo-album-plus' ) . '</option>' .
+											'<option value="1"' . ( $panorama == '1' ? ' selected="selected"' : '' ) . ' >' . __( '360&deg; Spheric', 'wp-photo-album-plus' ) . '</option>' .
+								//			'<option value="2"' . ( $panorama == '2' ? ' selected="selected"' : '' ) . ' >' . __( 'Non 360&deg; Flat', 'wp-photo-album-plus' ) . '</option>' .
+										' />';
 									}
 
 									// Watermark

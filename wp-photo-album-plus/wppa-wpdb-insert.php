@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 6.8.05
+* Version 6.9.07
 *
 */
 
@@ -279,6 +279,7 @@ global $wpdb;
 					'crypt' 			=> wppa_get_unique_photo_crypt(),
 					'magickstack' 		=> '',
 					'indexdtm' 			=> '',
+					'panorama' 			=> '0',
 					) );
 
 	if ( $args['scheduledtm'] ) $args['status'] = 'scheduled';
@@ -314,9 +315,10 @@ global $wpdb;
 																	`custom`,
 																	`crypt`,
 																	`magickstack`,
-																	`indexdtm`
+																	`indexdtm`,
+																	`panorama`
 																)
-														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
+														VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
 																$args['id'],
 																$args['album'],
 																$args['ext'],
@@ -346,7 +348,8 @@ global $wpdb;
 																$args['custom'],
 																$args['crypt'],
 																$args['magickstack'],
-																$args['indexdtm']
+																$args['indexdtm'],
+																$args['panorama']
 														);
 	$iret = $wpdb->query( $query );
 

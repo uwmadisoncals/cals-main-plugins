@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version 6.9.01
+* Version 6.9.07
 *
 */
 
@@ -372,6 +372,8 @@ global $wpdb;
 		switch ( $cdn ) {
 			case 'cloudinary':
 				wppa_upload_to_cloudinary( $id );
+				break;
+			case 'local':
 				break;
 			default:
 				wppa_dbg_msg( 'Missing upload instructions for '.$cdn, 'red', 'force' );

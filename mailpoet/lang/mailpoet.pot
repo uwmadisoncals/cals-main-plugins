@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://support.mailpoet.com/\n"
-"POT-Creation-Date: 2018-07-17 19:45:44+00:00\n"
+"POT-Creation-Date: 2018-07-24 12:17:51+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -148,59 +148,59 @@ msgstr ""
 msgid "This newsletter has not been sent yet."
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:31 lib/API/JSON/v1/Services.php:89
+#: lib/API/JSON/v1/Services.php:33 lib/API/JSON/v1/Services.php:95
 msgid "Please specify a key."
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:48 views/settings/premium.html:40
+#: lib/API/JSON/v1/Services.php:50 views/settings/premium.html:40
 msgid "Your MailPoet Sending Service key has been successfully validated."
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:51
+#: lib/API/JSON/v1/Services.php:53
 msgid "Your MailPoet Sending Service key expires on %s!"
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:62
+#: lib/API/JSON/v1/Services.php:68
 msgid "Your MailPoet Sending Service key is invalid."
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:65
+#: lib/API/JSON/v1/Services.php:71
 msgid "Your MailPoet Sending Service key is already used on another site."
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:69
+#: lib/API/JSON/v1/Services.php:75
 msgid "Error validating MailPoet Sending Service key, please try again later (%s)."
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:72
+#: lib/API/JSON/v1/Services.php:78
 msgid "Note that it doesn't work on localhost."
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:106 views/settings/premium.html:30
+#: lib/API/JSON/v1/Services.php:112 views/settings/premium.html:30
 msgid "Your Premium key has been successfully validated."
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:109
+#: lib/API/JSON/v1/Services.php:115
 msgid "Your Premium key expires on %s."
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:123
+#: lib/API/JSON/v1/Services.php:133
 msgid "Your Premium key is invalid."
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:126
+#: lib/API/JSON/v1/Services.php:136
 msgid "Your Premium key is already used on another site."
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:131
+#: lib/API/JSON/v1/Services.php:141
 msgid "Error validating Premium key, please try again later (%s)"
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:143
+#: lib/API/JSON/v1/Services.php:153
 msgid "Service unavailable"
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:146
+#: lib/API/JSON/v1/Services.php:156
 msgid ""
 "Contact your hosting support to check the connection between your host and "
 "https://bridge.mailpoet.com"
@@ -865,13 +865,13 @@ msgstr ""
 
 #: lib/Config/PopulatorData/Templates/PostNotificationsBlank1Column.php:161
 #: views/newsletter/editor.html:997 views/newsletter/editor.html:1052
-#: views/newsletter/editor.html:1177
+#: views/newsletter/editor.html:1181
 msgid "Author:"
 msgstr ""
 
 #: lib/Config/PopulatorData/Templates/PostNotificationsBlank1Column.php:163
 #: views/newsletter/editor.html:999 views/newsletter/editor.html:1054
-#: views/newsletter/editor.html:1179
+#: views/newsletter/editor.html:1183
 msgid "Categories:"
 msgstr ""
 
@@ -1351,8 +1351,26 @@ msgstr ""
 msgid "Unprocessed subscriber"
 msgstr ""
 
-#: lib/Mailer/Methods/MailPoet.php:26
+#: lib/Mailer/Methods/MailPoet.php:29
 msgid "MailPoet API key is invalid!"
+msgstr ""
+
+#: lib/Mailer/Methods/MailPoet.php:51
+msgid "JSON input is not an array"
+msgstr ""
+
+#: lib/Mailer/Methods/MailPoet.php:58
+msgid ""
+"Email service is temporarily not available, please try again in a few "
+"minutes."
+msgstr ""
+
+#: lib/Mailer/Methods/MailPoet.php:141
+msgid "Error while sending: "
+msgstr ""
+
+#: lib/Mailer/Methods/MailPoet.php:143
+msgid "Error while sending newsletters. "
 msgstr ""
 
 #: lib/Models/CustomField.php:20 lib/Models/Form.php:13
@@ -1585,7 +1603,7 @@ msgid "Unsubscribe link"
 msgstr ""
 
 #: lib/Newsletter/Shortcodes/ShortcodesHelper.php:85
-#: views/newsletter/editor.html:1134
+#: views/newsletter/editor.html:1138
 msgid "Unsubscribe"
 msgstr ""
 
@@ -1594,7 +1612,7 @@ msgid "Edit subscription page link"
 msgstr ""
 
 #: lib/Newsletter/Shortcodes/ShortcodesHelper.php:93
-#: views/newsletter/editor.html:1134
+#: views/newsletter/editor.html:1138
 msgid "Manage subscription"
 msgstr ""
 
@@ -2182,7 +2200,7 @@ msgstr ""
 #: views/newsletter/templates/blocks/automatedLatestContent/settings.hbs:299
 #: views/newsletter/templates/blocks/automatedLatestContentLayout/settings.hbs:311
 #: views/newsletter/templates/blocks/button/settings.hbs:117
-#: views/newsletter/templates/blocks/container/settings.hbs:14
+#: views/newsletter/templates/blocks/container/settings.hbs:44
 #: views/newsletter/templates/blocks/divider/settings.hbs:37
 #: views/newsletter/templates/blocks/footer/settings.hbs:59
 #: views/newsletter/templates/blocks/header/settings.hbs:59
@@ -2536,13 +2554,13 @@ msgstr ""
 msgid "Visit MailPoet.com to purchase a key"
 msgstr ""
 
-#: views/layout.html:62
+#: views/layout.html:64
 msgid ""
 "An error has happened while performing a request, the server has responded "
 "with response code %d"
 msgstr ""
 
-#: views/layout.html:96
+#: views/layout.html:98
 msgid ""
 "Want to give feedback to the MailPoet team? Contact us here. Please provide "
 "as much information as possible!"
@@ -2864,7 +2882,7 @@ msgstr ""
 
 #: views/newsletter/editor.html:1001 views/newsletter/editor.html:1003
 #: views/newsletter/editor.html:1056 views/newsletter/editor.html:1058
-#: views/newsletter/editor.html:1181 views/newsletter/editor.html:1183
+#: views/newsletter/editor.html:1185 views/newsletter/editor.html:1187
 msgid "Read more"
 msgstr ""
 
@@ -2877,31 +2895,31 @@ msgstr ""
 msgid "Button"
 msgstr ""
 
-#: views/newsletter/editor.html:1134
+#: views/newsletter/editor.html:1138
 msgid "Add your postal address here!"
 msgstr ""
 
-#: views/newsletter/editor.html:1154
+#: views/newsletter/editor.html:1158
 msgid "An image of..."
 msgstr ""
 
-#: views/newsletter/editor.html:1232
+#: views/newsletter/editor.html:1236
 msgid "Facebook"
 msgstr ""
 
-#: views/newsletter/editor.html:1243
+#: views/newsletter/editor.html:1247
 msgid "Twitter"
 msgstr ""
 
-#: views/newsletter/editor.html:1256
+#: views/newsletter/editor.html:1260
 msgid "Edit this to insert text."
 msgstr ""
 
-#: views/newsletter/editor.html:1259
+#: views/newsletter/editor.html:1263
 msgid "Display problems?"
 msgstr ""
 
-#: views/newsletter/editor.html:1260
+#: views/newsletter/editor.html:1264
 msgid "Open this email in your web browser."
 msgstr ""
 
@@ -2947,6 +2965,7 @@ msgstr ""
 
 #: views/newsletter/templates/blocks/automatedLatestContent/settings.hbs:41
 #: views/newsletter/templates/blocks/automatedLatestContentLayout/settings.hbs:41
+#: views/newsletter/templates/blocks/container/settings.hbs:22
 #: views/newsletter/templates/blocks/posts/settings.hbs:7
 msgid "Display options"
 msgstr ""
@@ -3235,7 +3254,6 @@ msgid "Bold"
 msgstr ""
 
 #: views/newsletter/templates/blocks/button/settings.hbs:71
-#: views/newsletter/templates/blocks/container/settings.hbs:7
 #: views/newsletter/templates/blocks/divider/settings.hbs:28
 #: views/newsletter/templates/blocks/footer/settings.hbs:34
 #: views/newsletter/templates/blocks/header/settings.hbs:34
@@ -3279,6 +3297,35 @@ msgstr ""
 #: views/newsletter/templates/blocks/container/settings.hbs:1
 #: views/newsletter/templates/components/sidebar/layout.hbs:2
 msgid "Columns"
+msgstr ""
+
+#: views/newsletter/templates/blocks/container/settings.hbs:7
+msgid "Background color"
+msgstr ""
+
+#: views/newsletter/templates/blocks/container/settings.hbs:12
+msgid "Background image"
+msgstr ""
+
+#: views/newsletter/templates/blocks/container/settings.hbs:19
+#: views/newsletter/templates/blocks/image/settings.hbs:83
+msgid "Select another image"
+msgstr ""
+
+#: views/newsletter/templates/blocks/container/settings.hbs:19
+msgid "Select image"
+msgstr ""
+
+#: views/newsletter/templates/blocks/container/settings.hbs:26
+msgid "Scale"
+msgstr ""
+
+#: views/newsletter/templates/blocks/container/settings.hbs:32
+msgid "Fit"
+msgstr ""
+
+#: views/newsletter/templates/blocks/container/settings.hbs:38
+msgid "Tile"
 msgstr ""
 
 #: views/newsletter/templates/blocks/container/threeColumnLayoutWidget.hbs:4
@@ -3337,10 +3384,6 @@ msgstr ""
 
 #: views/newsletter/templates/blocks/image/settings.hbs:20
 msgid "Alternative text"
-msgstr ""
-
-#: views/newsletter/templates/blocks/image/settings.hbs:83
-msgid "Select another image"
 msgstr ""
 
 #: views/newsletter/templates/blocks/posts/settings.hbs:6
@@ -5628,7 +5671,7 @@ msgstr ""
 msgid "Awesome! Now, take me to MailPoet"
 msgstr ""
 
-#: lib/API/JSON/v1/Services.php:149
+#: lib/API/JSON/v1/Services.php:159
 msgctxt "Error code (inside parentheses)"
 msgid "code: %s"
 msgstr ""

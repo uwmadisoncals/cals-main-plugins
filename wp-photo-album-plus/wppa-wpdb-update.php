@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version 6.8.04
+* Version 6.9.07
 *
 */
 
@@ -191,6 +191,7 @@ global $wpdb;
 				$need_re_index = true;
 				break;
 			case 'stereo':
+			case 'panorama':
 				$doit = true;
 				break;
 			case 'custom':

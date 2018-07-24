@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.9.05
+* Version 6.9.07
 *
 */
 
@@ -578,7 +578,12 @@ static $seed;
 		if ( $photo ) {
 			if ( wppa_switch( 'photo_shortcode_random_fixed' ) ) {
 				$post_content = $wpdb->get_var( $wpdb->prepare( "SELECT `post_content` FROM `" . $wpdb->posts . "` WHERE `ID` = %d", $wppa_postid ) );
-				$post_content = preg_replace( '/\[photo random\]/', '[photo '.$photo.']', $post_content, 1, $done );
+				if ( wppa_switch( 'photo_shortcode_random_fixed_html' ) ) {
+					$post_content = preg_replace( '/\[photo random\]/', do_shortcode('[photo '.$photo.']'), $post_content, 1, $done );
+				}
+				else {
+					$post_content = preg_replace( '/\[photo random\]/', '[photo '.$photo.']', $post_content, 1, $done );
+				}
 				$wpdb->query( $wpdb->prepare( "UPDATE `" . $wpdb->posts . "` SET `post_content` = %s WHERE `ID` = %d", $post_content, $wppa_postid ) );
 			}
 		}

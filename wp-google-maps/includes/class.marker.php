@@ -25,7 +25,7 @@ class Marker extends Crud implements \JsonSerializable
 	
 	public function jsonSerialize()
 	{
-		$json = Parent::jsonSerialize();
+		$json = Crud::jsonSerialize();
 		
 		unset($json['latlng']);
 		

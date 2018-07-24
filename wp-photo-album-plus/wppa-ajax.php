@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.9.05
+* Version 6.9.07
 *
 */
 
@@ -1794,6 +1794,8 @@ global $wppa_log_file;
 								case 'cloudinary':
 									wppa_upload_to_cloudinary( $id );
 									break;
+								case 'local':
+									break;
 								default:
 									wppa_dbg_msg( 'Missing upload instructions for '.$cdn, 'red', 'force' );
 							}
@@ -1840,6 +1842,8 @@ global $wppa_log_file;
 						switch ( $cdn ) {
 							case 'cloudinary':
 								wppa_upload_to_cloudinary( $photo );
+								break;
+							case 'local':
 								break;
 							default:
 								wppa_dbg_msg( 'Missing upload instructions for '.$cdn, 'red', 'force' );
@@ -2186,6 +2190,12 @@ global $wppa_log_file;
 					wppa_create_thumbnail( $photo );
 					$t = microtime(true) - $t;
 					echo '||0||' . sprintf( __( 'Stereo mode updated in %d milliseconds', 'wp-photo-album-plus'), floor( $t * 1000 ) );
+					wppa_exit();
+					break;
+
+				case 'panorama':
+					wppa_update_photo( array( 'id' => $photo, 'panorama' => $value ) );
+					echo '||0||' . 'Panorama set to '.$value;
 					wppa_exit();
 					break;
 
