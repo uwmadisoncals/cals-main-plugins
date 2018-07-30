@@ -106,72 +106,76 @@ function rvm_map_shortcode( $attr ) // $attr manages the shortcode parameter - [
                                          * START : MARKERS ARRAYS
                                          * ----------------------------------------------------------------------------
                                          */
-                                         
-                                    $rvm_marker_array_count = count( $marker_array_unserialized[ 'rvm_marker_name_array' ] ); // count element of the array starting from 1
+
                                     $end_of_array = ','; // for arrays building 
-                                    
-                                    if ( $rvm_marker_array_count > 0 && is_array( $marker_array_unserialized[ 'rvm_marker_name_array' ] ) && !empty( $marker_array_serialized[ 'rvm_marker_name' ] ) && !empty( $marker_array_serialized[ 'rvm_marker_lat' ] ) && is_array( $marker_array_unserialized[ 'rvm_marker_lat_array' ] ) && !empty( $marker_array_serialized[ 'rvm_marker_long' ] ) && is_array( $marker_array_unserialized[ 'rvm_marker_long_array' ] ) ) {
-                                                //$end_of_array = ',' ;// for arrays building                
-                                                $output .= 'var markers = [';
-                                                for ( $i = 0; $i < $rvm_marker_array_count; $i++ ) {
-                                                            if ( !empty( $marker_array_unserialized[ 'rvm_marker_name_array' ][ $i ] ) && !empty( $marker_array_unserialized[ 'rvm_marker_lat_array' ][ $i ] ) && !empty( $marker_array_unserialized[ 'rvm_marker_long_array' ][ $i ] ) ) { //display markers ONLY if all valus but the link are filled
-                                                                        $output_is_markers = 1; // variable fo later reference in javascript
-                                                                        $output .= '{latLng: [' . strip_tags( $marker_array_unserialized[ 'rvm_marker_lat_array' ][ $i ] ) . ', ' . $marker_array_unserialized[ 'rvm_marker_long_array' ][ $i ] . ' ],';
-                                                                        $output .= 'name: "' . strip_tags( $marker_array_unserialized[ 'rvm_marker_name_array' ][ $i ] ) . '", ';
-                                                                        $output .= 'weburl : "' . strip_tags( $marker_array_unserialized[ 'rvm_marker_link_array' ][ $i ] ) . '" } ';
-                                                            } //if( !empty( $rvm_marker_name_array[ $i ] ) && ... 
-                                                            else {
-                                                                        $output .= '""'; //prevent displaying the wrong label and dimension for array misallineament
-                                                            }
-                                                            $output .= $end_of_array;
-                                                } //for( $i=0; $i < $rvm_marker_array_count; $i++ )     
-                                                if ( isset( $output_is_markers ) && $output_is_markers ) { // if exist at least one value in DB
-                                                            $output_temp = rvm_delete_last_character( $output ); //get rid of last comma     
-                                                            $output  = $output_temp;
-                                                } //isset($output_is_markers) && $output_is_markers
-                                                $output .= '];';
-                                                //echo '$output_is_markers:' . $output_is_markers ;
-                                                //echo '$rvm_marker_array_count:' . $rvm_marker_array_count ;
-                                                $output .= 'var marker_dimensions = ['; // create markers dimensions array
-                                                $rvm_is_dim_value_more_then_two = 0;
-                                                for ( $i = 0; $i < $rvm_marker_array_count; $i++ ) {
-                                                            // load marker dimension for marker radius             
-                                                            if ( !empty( $marker_array_unserialized[ 'rvm_marker_dim_array' ][ $i ] ) ) {
-                                                                        $rvm_is_dim_value_more_then_two++; // will use it later in javascript to check if use the dimension scale or not ( not if counter is lower then 2 )
-                                                                        $output_is_marker_dim = 1; // variable fo later reference in javascript
-                                                                        $output .= strip_tags( $marker_array_unserialized[ 'rvm_marker_dim_array' ][ $i ] ); //replace all comma occurencies with '': it will lead in a issue in javascript array
-                                                            } //!empty($marker_array_unserialized['rvm_marker_dim_array'][$i])
-                                                            else {
-                                                                        $output .= '0';
-                                                            } // when empty value substitute with a "0" so to not show undefined
-                                                            $output .= $end_of_array;
-                                                            //echo '$marker_array_unserialized[\'rvm_marker_dim_array\'][ $i ]:' . $marker_array_unserialized['rvm_marker_dim_array'][ $i ] .'<br>';
-                                                } //$i = 0; $i < $rvm_marker_array_count; $i++
-                                                //echo '$rvm_is_dim_value_more_then_two :' .$rvm_is_dim_value_more_then_two ;
-                                                //echo '$output_is_marker_dim :' .$output_is_marker_dim ;
-                                                $output_temp = rvm_delete_last_character( $output ); //get rid of last comma anyway    
-                                                $output      = $output_temp;
-                                                $output .= '];';
-                                                $output .= 'var marker_popup = ['; // create markers popup label array
-                                                for ( $i = 0; $i < $rvm_marker_array_count; $i++ ) {
-                                                            if ( !empty( $marker_array_unserialized[ 'rvm_marker_popup_array' ][ $i ] ) ) {
-                                                                        $output_is_marker_popup = 1;
-                                                                        $output .= '"' . force_balance_tags( preg_replace( "/\r|\n/", " ", $marker_array_unserialized[ 'rvm_marker_popup_array' ][ $i ] ) ) . '"'; //close unclosed html tags
-                                                            } //!empty($marker_array_unserialized['rvm_marker_popup_array'][$i])
-                                                            else {
-                                                                        $output .= '""';
-                                                            } // when empty value substitute with a "" so to not show undefined
-                                                            $output .= $end_of_array;
-                                                } //$i = 0; $i < $rvm_marker_array_count; $i++
-                                                $output_temp = rvm_delete_last_character( $output ); //get rid of last comma anyway     
-                                                $output  = $output_temp;
-                                                // create the onlabelshow function to use later in the javascript: evoid the undefined vales in case no entries in db
-                                                $output_marker_popup = ', onMarkerTipShow: function(event, label, code) {'; // show popup onmouseover
-                                                $output_marker_popup .= 'label.html( label.html() + "<br>" + marker_popup[code] );';
-                                                $output_marker_popup .= '}';
-                                                $output .= '];';
-                                    } //$rvm_marker_array_count > 0 && is_array($marker_array_unserialized['rvm_marker_name_array']) && !empty($marker_array_serialized['rvm_marker_name']) && !empty($marker_array_serialized['rvm_marker_lat']) && is_array($marker_array_unserialized['rvm_marker_lat_array']) && !empty($marker_array_serialized['rvm_marker_long']) && is_array($marker_array_unserialized['rvm_marker_long_array'])
-                                   
+                                         
+                                    //Fix for warning count() parameter PHP ver 7.2
+                                    if( is_array( $marker_array_unserialized[ 'rvm_marker_name_array' ] ) ) {
+                                          $rvm_marker_array_count = count( $marker_array_unserialized[ 'rvm_marker_name_array' ] ); // count element of the array starting from 1
+                                          
+                                          
+                                          if ( $rvm_marker_array_count > 0 && is_array( $marker_array_unserialized[ 'rvm_marker_name_array' ] ) && !empty( $marker_array_serialized[ 'rvm_marker_name' ] ) && !empty( $marker_array_serialized[ 'rvm_marker_lat' ] ) && is_array( $marker_array_unserialized[ 'rvm_marker_lat_array' ] ) && !empty( $marker_array_serialized[ 'rvm_marker_long' ] ) && is_array( $marker_array_unserialized[ 'rvm_marker_long_array' ] ) ) {
+                                                      //$end_of_array = ',' ;// for arrays building                
+                                                      $output .= 'var markers = [';
+                                                      for ( $i = 0; $i < $rvm_marker_array_count; $i++ ) {
+                                                                  if ( !empty( $marker_array_unserialized[ 'rvm_marker_name_array' ][ $i ] ) && !empty( $marker_array_unserialized[ 'rvm_marker_lat_array' ][ $i ] ) && !empty( $marker_array_unserialized[ 'rvm_marker_long_array' ][ $i ] ) ) { //display markers ONLY if all valus but the link are filled
+                                                                              $output_is_markers = 1; // variable fo later reference in javascript
+                                                                              $output .= '{latLng: [' . strip_tags( $marker_array_unserialized[ 'rvm_marker_lat_array' ][ $i ] ) . ', ' . $marker_array_unserialized[ 'rvm_marker_long_array' ][ $i ] . ' ],';
+                                                                              $output .= 'name: "' . strip_tags( $marker_array_unserialized[ 'rvm_marker_name_array' ][ $i ] ) . '", ';
+                                                                              $output .= 'weburl : "' . strip_tags( $marker_array_unserialized[ 'rvm_marker_link_array' ][ $i ] ) . '" } ';
+                                                                  } //if( !empty( $rvm_marker_name_array[ $i ] ) && ... 
+                                                                  else {
+                                                                              $output .= '""'; //prevent displaying the wrong label and dimension for array misallineament
+                                                                  }
+                                                                  $output .= $end_of_array;
+                                                      } //for( $i=0; $i < $rvm_marker_array_count; $i++ )     
+                                                      if ( isset( $output_is_markers ) && $output_is_markers ) { // if exist at least one value in DB
+                                                                  $output_temp = rvm_delete_last_character( $output ); //get rid of last comma     
+                                                                  $output  = $output_temp;
+                                                      } //isset($output_is_markers) && $output_is_markers
+                                                      $output .= '];';
+                                                      //echo '$output_is_markers:' . $output_is_markers ;
+                                                      //echo '$rvm_marker_array_count:' . $rvm_marker_array_count ;
+                                                      $output .= 'var marker_dimensions = ['; // create markers dimensions array
+                                                      $rvm_is_dim_value_more_then_two = 0;
+                                                      for ( $i = 0; $i < $rvm_marker_array_count; $i++ ) {
+                                                                  // load marker dimension for marker radius             
+                                                                  if ( !empty( $marker_array_unserialized[ 'rvm_marker_dim_array' ][ $i ] ) ) {
+                                                                              $rvm_is_dim_value_more_then_two++; // will use it later in javascript to check if use the dimension scale or not ( not if counter is lower then 2 )
+                                                                              $output_is_marker_dim = 1; // variable fo later reference in javascript
+                                                                              $output .= strip_tags( $marker_array_unserialized[ 'rvm_marker_dim_array' ][ $i ] ); //replace all comma occurencies with '': it will lead in a issue in javascript array
+                                                                  } //!empty($marker_array_unserialized['rvm_marker_dim_array'][$i])
+                                                                  else {
+                                                                              $output .= '0';
+                                                                  } // when empty value substitute with a "0" so to not show undefined
+                                                                  $output .= $end_of_array;
+                                                                  //echo '$marker_array_unserialized[\'rvm_marker_dim_array\'][ $i ]:' . $marker_array_unserialized['rvm_marker_dim_array'][ $i ] .'<br>';
+                                                      } //$i = 0; $i < $rvm_marker_array_count; $i++
+                                                      //echo '$rvm_is_dim_value_more_then_two :' .$rvm_is_dim_value_more_then_two ;
+                                                      //echo '$output_is_marker_dim :' .$output_is_marker_dim ;
+                                                      $output_temp = rvm_delete_last_character( $output ); //get rid of last comma anyway    
+                                                      $output      = $output_temp;
+                                                      $output .= '];';
+                                                      $output .= 'var marker_popup = ['; // create markers popup label array
+                                                      for ( $i = 0; $i < $rvm_marker_array_count; $i++ ) {
+                                                                  if ( !empty( $marker_array_unserialized[ 'rvm_marker_popup_array' ][ $i ] ) ) {
+                                                                              $output_is_marker_popup = 1;
+                                                                              $output .= '"' . force_balance_tags( preg_replace( "/\r|\n/", " ", $marker_array_unserialized[ 'rvm_marker_popup_array' ][ $i ] ) ) . '"'; //close unclosed html tags
+                                                                  } //!empty($marker_array_unserialized['rvm_marker_popup_array'][$i])
+                                                                  else {
+                                                                              $output .= '""';
+                                                                  } // when empty value substitute with a "" so to not show undefined
+                                                                  $output .= $end_of_array;
+                                                      } //$i = 0; $i < $rvm_marker_array_count; $i++
+                                                      $output_temp = rvm_delete_last_character( $output ); //get rid of last comma anyway     
+                                                      $output  = $output_temp;
+                                                      // create the onlabelshow function to use later in the javascript: evoid the undefined vales in case no entries in db
+                                                      $output_marker_popup = ', onMarkerTipShow: function(event, label, code) {'; // show popup onmouseover
+                                                      $output_marker_popup .= 'label.html( label.html() + "<br>" + marker_popup[code] );';
+                                                      $output_marker_popup .= '}';
+                                                      $output .= '];';
+                                          } //$rvm_marker_array_count > 0 && is_array($marker_array_unserialized['rvm_marker_name_array']) && !empty($marker_array_serialized['rvm_marker_name']) && !empty($marker_array_serialized['rvm_marker_lat']) && is_array($marker_array_unserialized['rvm_marker_lat_array']) && !empty($marker_array_serialized['rvm_marker_long']) && is_array($marker_array_unserialized['rvm_marker_long_array'])
+                                    }
                                     /**
                                          * END  : MARKERS ARRAYS
                                          * ----------------------------------------------------------------------------

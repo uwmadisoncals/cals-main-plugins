@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 6.9.07
+* Version 6.9.08
 *
 */
 
@@ -278,11 +278,11 @@ function wppa_get_picture_html( $args ) {
 
 // Get the html for a panorama image
 function wppa_get_panorama_html( $args ) {
-	
+
 	if ( ! isset( $args['id'] ) ) return;
-	
+
 	switch( wppa_is_panorama( $args['id'] ) ) {
-		
+
 		case '1':
 			$result = wppa_get_spheric_panorama_html( $args );
 			break;
@@ -290,15 +290,15 @@ function wppa_get_panorama_html( $args ) {
 			$result = wppa_get_flat_panorama_html( $args );
 			break;
 		default:
-			$result = '';		
+			$result = '';
 	}
-	
+
 	return $result;
 }
 
 // Spheric 360deg panorama
 function wppa_get_spheric_panorama_html( $args ) {
-	
+
 	// Init
 	$defaults 	= array( 	'id' 		=> '0',
 							'mocc' 		=> '0',
@@ -314,16 +314,16 @@ function wppa_get_spheric_panorama_html( $args ) {
 	$width 		= $args['width'] ? $args['width'] : wppa_get_container_width();
 	$height 	= $args['height'] ? $args['height'] : round( $width * wppa_get_photoy( $id ) / wppa_get_photox( $id ) );
 	$haslink 	= $args['haslink'];
-	$iconsize 	= '32px';
+	$iconsize 	= wppa_opt( 'nav_icon_size_panorama' ) . 'px;';
 
-	$url 	= wppa_get_hires_url( $id );
+	$url 		= wppa_is_mobile() ? wppa_get_photo_url( $id ) : wppa_get_hires_url( $id );
 
 	$result =
 	( $haslink ? '</a>' : '' ) .
 	'<div' .
 		' id="wppa-panorama-div-' . $mocc . '"' .
 		' class="wppa-panorama-div wppa-panorama-div-' . $mocc . '"' .
-		' style="margin-bottom:4px;"' .
+		' style="margin-bottom:4px;cursor:grab;"' .
 		' >' .
 	'</div>' .
 	'<div' .
@@ -341,7 +341,7 @@ function wppa_get_spheric_panorama_html( $args ) {
 			' id="wppa-panoramacontrol-right-' . $mocc . '"' .
 			' style="margin:2px;"' .
 			' >' .
-			wppa_get_svghtml( 'Right-4', $iconsize ) . 
+			wppa_get_svghtml( 'Right-4', $iconsize ) .
 		'</span>' .
 		'<span' .
 			' id="wppa-panoramacontrol-up-' . $mocc . '"' .
@@ -437,10 +437,11 @@ function wppa_get_spheric_panorama_html( $args ) {
 				'zoomin.addEventListener("touchend", function(){run=false;deltaFov=0}, false);' .
 				'zoomout.addEventListener("touchstart", function(){run=true;deltaFov=0.2;doZoom();render();}, false);' .
 				'zoomout.addEventListener("touchend", function(){run=false;deltaFov=0}, false);'
-				: 
+				:
 				'div.addEventListener("mousedown", onDivMouseDown, false);' .
 				'div.addEventListener("mousemove", onDivMouseMove, false);' .
 				'div.addEventListener("mouseup", onDivMouseUp, false);' .
+			//	'div.addEventListener("mouseout", onDivMouseUp, false);' .
 				'right.addEventListener("mousedown", function(){run=true;deltaX=0.2;render();}, false);' .
 				'right.addEventListener("mouseup", function(){run=false;deltaX=0}, false);' .
 				'left.addEventListener("mousedown", function(){run=true;deltaX=-0.2;render();}, false);' .
@@ -454,7 +455,7 @@ function wppa_get_spheric_panorama_html( $args ) {
 				'zoomout.addEventListener("mousedown", function(){run=true;deltaFov=0.2;doZoom();render();}, false);' .
 				'zoomout.addEventListener("mouseup", function(){run=false;deltaFov=0}, false);'
 			) .
-			
+
 			// Init and Resize hanler
 			'jQuery(window).on("DOMContentLoaded load resize scroll",onResize' . $mocc . ');' .
 
@@ -534,7 +535,7 @@ function wppa_get_spheric_panorama_html( $args ) {
 				run=false;
 
 			}' .
-			
+
 			// When a (responsive) resize is required, we resize the scene
 			'function onResize' . $mocc . '(event){
 				var containerwidth = div.parentNode.clientWidth;
@@ -545,7 +546,7 @@ function wppa_get_spheric_panorama_html( $args ) {
 				render();
 				doZoom();
 				run=false;
-				
+
 			}' .
 
 		'});
@@ -558,7 +559,7 @@ function wppa_get_spheric_panorama_html( $args ) {
 
 // Non 360 flat panorama
 function wppa_get_flat_panorama_html( $args ) {
-	
+
 	// Init
 	$defaults 	= array( 	'id' 		=> '0',
 							'mocc' 		=> '0',
@@ -574,35 +575,39 @@ function wppa_get_flat_panorama_html( $args ) {
 	$width 		= $args['width'] ? $args['width'] : wppa_get_container_width();
 	$height 	= $args['height'] ? $args['height'] : round( $width * wppa_get_photoy( $id ) / wppa_get_photox( $id ) );
 	$haslink 	= $args['haslink'];
-	$iconsize 	= '32px';
+	$iconsize 	= wppa_opt( 'nav_icon_size_panorama' ) . 'px;';
 
-	$url 	= wppa_get_hires_url( $id );
+	$url 		= wppa_is_mobile() ? wppa_get_photo_url( $id ) : wppa_get_hires_url( $id );
 
 	$result =
 	( $haslink ? '</a>' : '' ) .
-	
+
 	// The container
 	'<div' .
 		' id="wppa-panorama-div-' . $mocc . '"' .
 		' class="wppa-panorama-div wppa-panorama-div-' . $mocc . '"' .
 		' style="margin-bottom:4px;"' .
 		' >' .
-		
+
 		// The actual drawing area
 		'<canvas' .
 			' id="wppa-panorama-canvas-' . $mocc . '"' .
-			' style="width:100%;height:50%;"' .
-			' >' .		
+			' style="background-color:black;cursor:grab;"' .
+			' width="' . $width . '"' .
+			' height=' . ( $width / 2 ) . '"' .
+			' >' .
 		'</canvas>' .
-		
-		// The hidden image
-		'<img' .
-			' id="wppa-panorama-img-' . $mocc . '"' .
-			' src="' . $url . '"' .
-			' style="display:none;position:fixed;max-width:100000px;max-height:10000px;"' .
+
+		// The preview image
+		'<canvas' .
+			' id="wppa-panorama-prev-canvas-' . $mocc . '"' .
+			' style="margin-top:4px;background-color:black;"' .
+			' width="' . $width . '"' .
+			' height=' . $height . '"' .
 		' />' .
+
 	'</div>' .
-	
+
 	// The controlbar
 	'<div' .
 		' id="wppa-panoramacontrol-div-' . $mocc . '"' .
@@ -619,7 +624,7 @@ function wppa_get_flat_panorama_html( $args ) {
 			' id="wppa-panoramacontrol-right-' . $mocc . '"' .
 			' style="margin:2px;"' .
 			' >' .
-			wppa_get_svghtml( 'Right-4', $iconsize ) . 
+			wppa_get_svghtml( 'Right-4', $iconsize ) .
 		'</span>' .
 		'<span' .
 			' id="wppa-panoramacontrol-up-' . $mocc . '"' .
@@ -646,20 +651,25 @@ function wppa_get_flat_panorama_html( $args ) {
 			wppa_get_svghtml( 'ZoomOut', $iconsize ) .
 		'</span>' .
 	'</div>' .
-	
-	// The preview image
-	'<img' .
-		' id="wppa-panorama-prev-img-' . $mocc . '"' .
-		' src="' . $url . '"' .
-		' style="width:100%;"' .
-	' />' .
-		
+
+
 	'<script>' .
 
-		'jQuery(document).ready(function(){' .
-		
+		// Create image object and add the image url to it
+		'image' . $mocc . ' = new Image();' .
+		'image' . $mocc . '.src = "' . $url . '",' .
+
+		// When document complete, run the main proc
+		'jQuery(document).ready(function(){wppaDoFlatPanorama' . $mocc . '();});' .
+
+		// The main proccedure
+		'function wppaDoFlatPanorama' . $mocc . '(){' .
+
+			// Wait until the image file has been completely loaded
+			'if (!image' . $mocc . '.complete){setTimeout( wppaDoFlatPanorama' . $mocc . ', 20 );return;}' .
+
+			// Var declarations
 			'var manualControl = false,' .
-				'zoomFactor = 1.0,' .
 				'deltaX = 0,' .
 				'deltaY = 0,' .
 				'deltaFactor = 1.0,' .
@@ -667,126 +677,223 @@ function wppa_get_flat_panorama_html( $args ) {
 				'busy = false,' .
 				'div = document.getElementById("wppa-panorama-div-' . $mocc . '"),' .
 				'canvas = document.getElementById("wppa-panorama-canvas-' . $mocc . '"),' .
-				'image = document.getElementById("wppa-panorama-img-' . $mocc . '"),' .
+				'prevCanvas = document.getElementById("wppa-panorama-prev-canvas-' . $mocc . '"),' .
 				'left = document.getElementById("wppa-panoramacontrol-left-' . $mocc . '"),' .
 				'right = document.getElementById("wppa-panoramacontrol-right-' . $mocc . '"),' .
 				'up = document.getElementById("wppa-panoramacontrol-up-' . $mocc . '"),' .
 				'down = document.getElementById("wppa-panoramacontrol-down-' . $mocc . '"),' .
 				'zoomin = document.getElementById("wppa-panoramacontrol-zoomin-' . $mocc . '"),' .
 				'zoomout = document.getElementById("wppa-panoramacontrol-zoomout-' . $mocc . '"),' .
-				'imgWidth = jQuery(image).width(),' .
-				'imgHeight = jQuery(image).height(),' .
 				'canvasWidth = div.parentNode.clientWidth,' .
+				'canvasHeight = canvasWidth / 2,' .
+				'savedCanvasX = 0,' .
+				'savedCanvasY = 0,' .
+				'fromHeight = image' . $mocc . '.height / 2,' .
+				'fromWidth = fromHeight * 2,' .
+				'fromX = ( image' . $mocc . '.width - fromWidth ) / 2,' .
+				'fromY = ( image' . $mocc . '.height - fromHeight ) / 2,' .
+				'centerX = fromX + fromWidth / 2,' .
+				'centerY = fromY + fromHeight / 2;' .
+
+			// Set canvas sizes
+//			'canvas.width = canvasWidth;' .
+//			'canvas.height = canvasHeight;' .
+//			'prevCanvas.width = canvasWidth;' .
+//			'prevCanvas.height = canvasWidth * image' . $mocc . '.height / image' . $mocc . '.width;' .
+//			'jQuery(prevCanvas).css({width:\'\',height:\'\'});' .
+
+			// Install listeners
+			( wppa_is_mobile() ? /*
+				div.addEventListener("touchstart", onDivMouseDown, false);
+				div.addEventListener("touchmove", onDivMouseMove, false);
+				div.addEventListener("touchend", onDivMouseUp, false); */
+				'right.addEventListener("touchstart", function(){run=true;deltaX=2;render();}, false);' .
+				'right.addEventListener("touchend", onButtonup, false);' .
+				'left.addEventListener("touchstart", function(){run=true;deltaX=-2;render();}, false);' .
+				'left.addEventListener("touchend", onButtonup, false);' .
+				'up.addEventListener("touchstart", function(){run=true;deltaY=-2;render();}, false);' .
+				'up.addEventListener("touchend", onButtonup, false);' .
+				'down.addEventListener("touchstart", function(){run=true;deltaY=2;render();}, false);' .
+				'down.addEventListener("touchend", onButtonup, false);' .
+				'zoomin.addEventListener("touchstart", function(){run=true;deltaFactor=1.01;render();}, false);' .
+				'zoomin.addEventListener("touchend", onButtonup, false);' .
+				'zoomout.addEventListener("touchstart", function(){run=true;deltaFactor=0.99;render();}, false);' .
+				'zoomout.addEventListener("touchend", onButtonup, false);'
+				:
+				'canvas.addEventListener("mousedown", onCanvasMouseDown, false);' .
+				'canvas.addEventListener("mousemove", onCanvasMouseMove, false);' .
+				'canvas.addEventListener("mouseup", onCanvasMouseUp, false);' .
+			//	'canvas.addEventListener("mouseout", onCanvasMouseUp, false);' .
+				'prevCanvas.addEventListener("mousedown", onCanvasMouseDown, false);' .
+				'prevCanvas.addEventListener("mousemove", onPrevCanvasMouseMove, false);' .
+				'prevCanvas.addEventListener("mouseup", onCanvasMouseUp, false);' .
+			//	'prevCanvas.addEventListener("mouseout", onCanvasMouseUp, false);' .
+				'right.addEventListener("mousedown", function(){run=true;deltaX=2;render();}, false);' .
+				'right.addEventListener("mouseup", onButtonup, false);' .
+				'left.addEventListener("mousedown", function(){run=true;deltaX=-2;render();}, false);' .
+				'left.addEventListener("mouseup", onButtonup, false);' .
+				'up.addEventListener("mousedown", function(){run=true;deltaY=-2;render();}, false);' .
+				'up.addEventListener("mouseup", onButtonup, false);' .
+				'down.addEventListener("mousedown", function(){run=true;deltaY=2;render();}, false);' .
+				'down.addEventListener("mouseup", onButtonup, false);' .
+				'zoomin.addEventListener("mousedown", function(){run=true;deltaFactor=1.01;render();}, false);' .
+				'zoomin.addEventListener("mouseup", onButtonup, false);' .
+				'zoomout.addEventListener("mousedown", function(){run=true;deltaFactor=0.99;render();}, false);' .
+				'zoomout.addEventListener("mouseup", onButtonup, false);'
+			) .
+
+			// Install Resize handler
+			'jQuery(window).on("DOMContentLoaded load resize scroll",onResize' . $mocc . ');' .
+
+			// Do the rendering
+			'render();' .
+
+			// The render function
+			'function render(){' .
+				'if (!run) return;' .
+				'if (busy) return;' .
+				'busy = true;' .
+
+				// manualControl is true when a drag on the canvas is being performed
+				'if(!manualControl){' .
+
+					// Panning
+					'fromX += deltaX;' .
+					'fromY += deltaY;' .
+
+					// Zooming
+					'var newHeight = fromHeight / deltaFactor;' .
+					'var newWidth = fromWidth / deltaFactor;' .
+
+					// Keep zooming in range
+					'if ( deltaFactor != 1 && newHeight <= image' . $mocc . '.height && newHeight > 50 ) {' .
+						'fromX -= ( newWidth - fromWidth ) / 2;' .
+						'fromY -= ( newHeight - fromHeight ) / 2;' .
+						'fromWidth = newWidth;' .
+						'fromHeight = newHeight;' .
+					'}' .
+				'}' .
+
+				// Keep viewport within image boundaries
+				'fromX = Math.max(0, Math.min(image' . $mocc . '.width-fromWidth, fromX));' .
+				'fromY = Math.max(0, Math.min(image' . $mocc . '.height-fromHeight, fromY));' .
+
+				// Draw the image
+				'var context = canvas.getContext("2d");' .
+				'context.drawImage(image' . $mocc . ',fromX,fromY,fromWidth,fromHeight,0,0,canvasWidth,canvasHeight);' .
+
+				// Draw the preview image
+				'var prevContext = prevCanvas.getContext("2d");' .
+				'prevContext.clearRect(0, 0, prevCanvas.width, prevCanvas.height);' .
+				'prevContext.drawImage(image' . $mocc . ',0,0,image' . $mocc . '.width,image' . $mocc . '.height,0,0,prevCanvas.width,prevCanvas.height);' .
+
+				// Draw viewport rect on preview iamge
+				'var factor = prevCanvas.width / image' . $mocc . '.width;' .
+				'prevContext.strokeRect(factor*fromX,factor*fromY,factor*fromWidth,factor*fromHeight);' .
+
+				// Done so far
+				'busy = false;' .
+
+				// Re-render if needed
+				'if (run) {' .
+					'if (manualControl){setTimeout(function(){render()},25);}' .
+					'else {setTimeout(function(){render()},5);}' .
+				'}' .
+			'}' .
+
+			// When a navigation button is released, stop and reset all deltas
+			'function onButtonup(event) {' .
+				'run=false;deltaX=0;deltaY=0;deltaFactor=1;' .
+			'}' .
+
+			// When a (responsive) resize is required, we resize the scene
+			'function onResize' . $mocc . '(event){' .
+
+				'canvasWidth = div.parentNode.clientWidth;' .
 				'canvasHeight = canvasWidth / 2;' .
-//				'scaleFactor = imgHeight / canvasHeight;' .
-				
-				
-				
-				// listeners
-				( wppa_is_mobile() ? /*
-					div.addEventListener("touchstart", onDivMouseDown, false);
-					div.addEventListener("touchmove", onDivMouseMove, false);
-					div.addEventListener("touchend", onDivMouseUp, false); */
-					'right.addEventListener("touchstart", function(){run=true;deltaX=0.2;render();}, false);' .
-					'right.addEventListener("touchend", function(){run=false;deltaX=0}, false);' .
-					'left.addEventListener("touchstart", function(){run=true;deltaX=-0.2;render();}, false);' .
-					'left.addEventListener("touchend", function(){run=false;deltaX=0}, false);' .
-					'up.addEventListener("touchstart", function(){run=true;deltaY=0.2;render();}, false);' .
-					'up.addEventListener("touchend", function(){run=false;deltaY=0}, false);' .
-					'down.addEventListener("touchstart", function(){run=true;deltaY=-0.2;render();}, false);' .
-					'down.addEventListener("touchend", function(){run=false;deltaY=0}, false);' .
-					'zoomin.addEventListener("touchstart", function(){run=true;deltaFov=-0.2;doZoom();render();}, false);' .
-					'zoomin.addEventListener("touchend", function(){run=false;deltaFov=0}, false);' .
-					'zoomout.addEventListener("touchstart", function(){run=true;deltaFov=0.2;doZoom();render();}, false);' .
-					'zoomout.addEventListener("touchend", function(){run=false;deltaFov=0}, false);'
-					: 
-//					'div.addEventListener("mousedown", onDivMouseDown, false);' .
-//					'div.addEventListener("mousemove", onDivMouseMove, false);' .
-//					'div.addEventListener("mouseup", onDivMouseUp, false);' .
-					'right.addEventListener("mousedown", function(){run=true;deltaX=2;render();}, false);' .
-					'right.addEventListener("mouseup", function(){run=false;deltaX=0}, false);' .
-					'left.addEventListener("mousedown", function(){run=true;deltaX=-2;render();}, false);' .
-					'left.addEventListener("mouseup", function(){run=false;deltaX=0}, false);' .
-					'up.addEventListener("mousedown", function(){run=true;deltaY=-2;render();}, false);' .
-					'up.addEventListener("mouseup", function(){run=false;deltaY=0}, false);' .
-					'down.addEventListener("mousedown", function(){run=true;deltaY=2;render();}, false);' .
-					'down.addEventListener("mouseup", function(){run=false;deltaY=0}, false);' .
-					'zoomin.addEventListener("mousedown", function(){run=true;deltaFactor=1.01;render();}, false);' .
-					'zoomin.addEventListener("mouseup", function(){run=false;deltaFactor=1;}, false);' .
-					'zoomout.addEventListener("mousedown", function(){run=true;deltaFactor=0.99;render();}, false);' .
-					'zoomout.addEventListener("mouseup", function(){run=false;deltaFactor=1;}, false);'
-				) .
-
-				// Init and Resize handler
-				'jQuery(window).on("DOMContentLoaded load resize scroll",onResize' . $mocc . ');' .
-
-				'
-				var fromHeight = imgHeight;
-				var fromWidth = fromHeight * 2;
-				
-				var savedFromX = ( imgWidth - fromWidth ) / 2;
-				var savedFromY = ( imgHeight - fromHeight ) / 2;
-				
-				var scaleFactor = imgHeight / canvasHeight;
-				' .
-				
-				// Doit!
+				'canvas.width = canvasWidth;' .
+				'canvas.height = canvasHeight;' .
+				'prevCanvas.width = canvasWidth;' .
+				'prevCanvas.height = canvasWidth * ' . $height . ' / ' . $width . ';' .
+				'run=true;' .
 				'render();' .
+				'run=false;' .
+			'}' .
 
-				// The render function
-				'function render(){
-					if (!run) return;
-					if (busy) return;
-					busy = true;
-					if(!manualControl){' .
-					
-						// Panning
-						'savedFromX += deltaX;
-//						savedFromX = Math.max(0, Math.min(imgWidth-fromWidth, savedFromX));
-						savedFromY += deltaY;
-//						savedFromY = Math.max(0, Math.min(imgHeight-fromHeight, savedFromY));' .
-						
-						// Zooming
-						'
-//				wppaConsoleLog(zoomFactor+" "+deltaFactor+" "+zoomFactor * deltaFactor);
-						zoomFactor = zoomFactor * deltaFactor;
-//				wppaConsoleLog( zoomFactor+" "+deltaFactor);
-						zoomFactor = Math.max(1, Math.min(10, zoomFactor));
-						fromX = savedFromX + ( zoomFactor - 1 ) * scaleFactor*fromWidth/zoomFactor / 4; 
-						fromY = savedFromY + ( zoomFactor - 1 ) * scaleFactor*fromHeight/zoomFactor / 4; 
-						
-						fromX = Math.max(0, Math.min(imgWidth-fromWidth, fromX));
-						fromY = Math.max(0, Math.min(imgHeight-fromHeight, fromY));
-					
+			// when the mouse is pressed on the canvas, we switch to manual control and save current coordinates
+			'function onCanvasMouseDown(event){
+
+				event.preventDefault();
+
+				manualControl = true;
+
+				savedCanvasX = event.offsetX;
+				savedCanvasY = event.offsetY;
+
+				fromX = fromX;
+				fromY = fromY;
+
+				run=true;
+				render();
+
+			}' .
+
+			'function onCanvasMouseMove(event){
+
+				if ( manualControl && !busy ){
+
+					var factor = canvasWidth / fromWidth;
+
+					fromX = ( savedCanvasX - event.offsetX ) / factor + fromX;
+					fromY = ( savedCanvasY - event.offsetY ) / factor + fromY;
+
+					savedCanvasX = event.offsetX;
+					savedCanvasY = event.offsetY;
+				}
+
+			}' .
+
+			'function onPrevCanvasMouseMove(event){
+
+				var factor = prevCanvas.width / image' . $mocc . '.width;
+
+				if (event.offsetX > factor * fromX &&
+					event.offsetX < factor * ( fromX + fromWidth ) &&
+					event.offsetY > factor * fromY &&
+					event.offsetY < factor * ( fromY + fromHeight ) ) {
+
+					jQuery(prevCanvas).css(\'cursor\',\'grab\');
+				}
+				else {
+					jQuery(prevCanvas).css(\'cursor\',\'default\');
+				}
+
+				if ( manualControl && !busy ){
+
+					if (event.offsetX > factor * fromX &&
+						event.offsetX < factor * ( fromX + fromWidth ) &&
+						event.offsetY > factor * fromY &&
+						event.offsetY < factor * ( fromY + fromHeight ) ) {
+
+						fromX = ( event.offsetX - savedCanvasX ) / factor + fromX;
+						fromY = ( event.offsetY - savedCanvasY ) / factor + fromY;
+
+						savedCanvasX = event.offsetX;
+						savedCanvasY = event.offsetY;
+
 					}
-					var context = canvas.getContext("2d");
+				}
+			}' .
 
-//wppaConsoleLog(fromX+", "+fromY+", "+scaleFactor*fromWidth/zoomFactor+", "+scaleFactor*fromHeight/zoomFactor+", 0, 0, canvasWidth="+canvasWidth+", canvasHeight="+canvasHeight+", zoomFactor="+zoomFactor);
-					context.drawImage(image,
-											fromX,
-											fromY,
-											scaleFactor*fromWidth/zoomFactor,
-											scaleFactor*fromHeight/zoomFactor,
-											0,0,canvasWidth,canvasHeight);
-					busy = false;
-					if (run) setTimeout(function(){render()},25);
-				}' .
-				
-				// When a (responsive) resize is required, we resize the scene
-				'function onResize' . $mocc . '(event){
+			'function onCanvasMouseUp(event){
 
-					canvasWidth = div.parentNode.clientWidth;
-					canvasHeight = canvasWidth / 2;
-					scaleFactor = imgHeight / canvasHeight;
-				
-					run=true;
-					render();
-					run=false;
-					
-				}' .
+				manualControl = false;
+				run=false;
 
-		'});
-		
+			}' .
+
+		'}
+
 	</script>
 	' . ( $haslink ? '<a>' : '' ) . '';
 

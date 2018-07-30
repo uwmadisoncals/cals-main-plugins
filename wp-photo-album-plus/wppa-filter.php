@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.9.07
+* Version 6.9.08
 *
 */
 
@@ -506,15 +506,18 @@ function wppa_lightbox_global( $content ) {
 		if ( wppa_opt( 'lightbox_name' ) == 'wppa' ) {	// Our lightbox
 			if ( wppa_switch( 'lightbox_global_set' )  ) { // A set
 				$pattern 		= "/<a(.*?)href=('|\")(.*?).(bmp|gif|jpeg|jpg|png)('|\")(.*?)>/i";
-//				$replacement 	= '<a$1href=$2$3.$4$5 data-rel="wppa[single]" style="'.' cursor:url('.wppa_get_imgdir().wppa_opt( 'magnifier' ).'),pointer;'.'"$6>';
 				$replacement 	= '<a$1href=$2$3.$4$5 data-rel="wppa[single]" style="cursor:' . wppa_wait() . ';" onclick="return false;" $6>';
 				$content 		= preg_replace($pattern, $replacement, $content);
 			}
 			else {	// Not a set
 				$pattern 		= "/<a(.*?)href=('|\")(.*?).(bmp|gif|jpeg|jpg|png)('|\")(.*?)>/i";
-//				$replacement 	= '<a$1href=$2$3.$4$5 data-rel="wppa" style="'.' cursor:url('.wppa_get_imgdir().wppa_opt( 'magnifier' ).'),pointer;'.'"$6>';
 				$replacement 	= '<a$1href=$2$3.$4$5 data-rel="wppa" style="cursor:' . wppa_wait() . ';" onclick="return false;" $6>';
 				$content 		= preg_replace($pattern, $replacement, $content);
+			}
+
+			// If any lightbox global occurred on this page, make sure we load (deferred) js filesize
+			if ( strpos( $content, 'data-rel="wppa"' ) !== false ) {
+				wppa_bump_mocc();
 			}
 		}
 	}

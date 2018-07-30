@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsUtilsVersion = '6.9.06';
+var wppaJsUtilsVersion = '6.9.08';
 var wppaDebug;
 
 // Trim
@@ -435,11 +435,11 @@ function wppaMakeLazyVisible() {
 	var d = new Date();
     var n = d.getTime();
 	if ( n < ( wppaLastLazy + 200 ) ) {
-		wppaConsoleLog( 'MakeLazyVisible() skipped' );
+//		wppaConsoleLog( 'MakeLazyVisible() skipped' );
 		return;
 	}
-	
-	wppaConsoleLog( 'MakeLazyVisible()' );
+
+//	wppaConsoleLog( 'MakeLazyVisible()' );
 	var src;
 
 	jQuery( '.wppa-lazy' ).each( function() {
@@ -450,7 +450,7 @@ function wppaMakeLazyVisible() {
 			jQuery( this ).removeClass( 'wppa-lazy' );
 		}
 	});
-	
+
 	wppaLastLazy = n;
 }
 
@@ -474,7 +474,7 @@ function wppaIsElementInViewport( elm ) {
 function wppaSizeThumbArea() {
 
 	if ( wppaThumbAreaMaxFrac > 0 && wppaThumbAreaMaxFrac < 1 ) {
-		wppaConsoleLog( 'SizeThumbArea()' );
+//		wppaConsoleLog( 'SizeThumbArea()' );
 		jQuery('.wppa-thumb-area').css('max-height',(jQuery(window).height()*wppaThumbAreaMaxFrac));
 	}
 }

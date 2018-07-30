@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.9.06';
+var wppaJsVersion = '6.9.08';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -729,59 +729,6 @@ function wppaFotomotoHide( mocc ) {
 	jQuery( '#wppa-fotomoto-checkout-'+mocc ).css( 'display','none' );
 }
 
-// Compute fullsize ( slideshow ) url with current photo
-/* obsolete
-function wppaGetCurrentFullUrl( mocc, idx ) {
-
-var xurl = document.location.href;
-var url;
-
-	// Remove &wppa-photo=... if present.
-	var temp1 = xurl.split( "?" );
-	var temp2 = 'nil';
-	var temp3;
-	var i = 0;
-	var first = true;
-	var pfx;
-
-	if ( ! wppaShortQargs ) pfx = 'wppa-';
-	else pfx = '';
-
-	if ( temp1[1] ) temp2 = temp1[1].split( "&" );
-
-	var albumSeen = false;
-	url = temp1[0];	// everything before '?'
-	if ( temp2 != 'nil' ) {
-		if ( temp2.length > 0 ) {
-			while ( i<temp2.length ) {
-				temp3 = temp2[i].split( "=" );
-				if ( temp3[0] == pfx+'album' ) albumSeen = true;
-				if ( temp3[0] != pfx+'photo' ) {
-					if ( first ) url += "?";
-					else url += "&";
-					first = false;
-					url += temp2[i];
-				}
-				i++;
-			}
-		}
-	}
-	if ( ! albumSeen ) return '';
-
-	// Append new &wppa-photo=...
-	if ( first ) url += "?";
-	else url += "&";
-	if ( wppaUsePhotoNamesInUrls ) { //&& ! wppaStringContainsForbiddenChars( _wppaNames[mocc][idx] ) ) {
-		url += pfx+'photo='+encodeURIComponent(_wppaNames[mocc][idx]);
-	}
-	else {
-		url += pfx+'photo='+_wppaId[mocc][idx];
-	}
-
-	return url;
-}
-*/
-
 // Sanitize utility
 function wppaStringContainsForbiddenChars( str ) {
 var forbidden = [ '?', '&', '#', '/', '"', "'" ];
@@ -814,7 +761,7 @@ window.onpopstate = function( event ) {
 			}
 		}
 		else if ( wppaUpdateAddressLine ) {
-		/**/
+
 			occ = wppaFirstOccur;
 			// Restore first modified occurrences content
 			jQuery( '#wppa-container-'+occ ).html( wppaStartHtml[occ] );

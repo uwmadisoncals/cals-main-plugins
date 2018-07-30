@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.9.07
+* Version 6.9.08
 *
 */
 
@@ -794,8 +794,32 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$help .= '\n'.esc_js(__('The use of a non-default value is particularly usefull when you make use of lightbox functionality.', 'wp-photo-album-plus'));
 							$slug = 'wppa_resize_to';
 							$px = __('pixels', 'wp-photo-album-plus');
-							$options = array(__('Fit within rectangle as set in Table I-B1,2', 'wp-photo-album-plus'), '640 x 480 '.$px, '800 x 600 '.$px, '1024 x 768 '.$px, '1200 x 900 '.$px, '1280 x 960 '.$px, '1366 x 768 '.$px, '1920 x 1080 '.$px);
-							$values = array( '0', '640x480', '800x600', '1024x768', '1200x900', '1280x960', '1366x768', '1920x1080');
+							$options = array(	__('Fit within rectangle as set in Table I-B1,2', 'wp-photo-album-plus'), 
+												'640 x 480 '.$px, 
+												'800 x 600 '.$px, 
+												'1024 x 768 '.$px, 
+												'1200 x 900 '.$px, 
+												'1280 x 960 '.$px, 
+												'1366 x 768 '.$px, 
+												'1920 x 1080 '.$px,
+												'2400 x 1200 '.$px,
+												'3600 x 1800 '.$px,
+												'4800 x 2400 '.$px,
+												'6000 x 3000 '.$px,
+												);
+							$values = array( 	'0', 
+												'640x480', 
+												'800x600', 
+												'1024x768', 
+												'1200x900', 
+												'1280x960', 
+												'1366x768', 
+												'1920x1080',
+												'2400x1200',
+												'3600x1800',
+												'4800x2400',
+												'6000x3000',
+												);
 							$html = wppa_select($slug, $options, $values);
 							$clas = 're_up';
 							$tags = 'size,upload';
@@ -1613,6 +1637,29 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$clas = '';
 							$tags = 'size,layout';
 							wppa_setting($slug, '3', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Navigation icon size panorama', 'wp-photo-album-plus');
+							$desc = __('The size of navigation icons on panorama photos', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_nav_icon_size_panorama';
+							$opts = array(	'16px',
+											'20px',
+											'24px',
+											'32px',
+											'40px',
+											'48px',
+											);
+							$vals = array(	'16',
+											'20',
+											'24',
+											'32',
+											'40',
+											'48',
+											);
+							$html = wppa_select($slug, $opts, $vals);
+							$clas = '';
+							$tags = 'size,layout';
+							wppa_setting($slug, '4', $name, $desc, $html, $help, $clas, $tags);
 							}
 
 							?>
@@ -4037,7 +4084,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$tags = 'system';
 							wppa_setting($slug, '24.1', $name, $desc, $html, $help, $clas, $tags);
 
-							$name = __('Enable Pnorama', 'wp-photo-album-plus');
+							$name = __('Enable Panorama', 'wp-photo-album-plus');
 							$desc = __('Enable panorama photo support.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_enable_panorama';

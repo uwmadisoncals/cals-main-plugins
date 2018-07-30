@@ -2266,19 +2266,37 @@ function mc_category_key( $category ) {
 		}
 		$hex   = ( 0 !== strpos( $cat->category_color, '#' ) ) ? '#' : '';
 		$class = mc_category_class( $cat, '' );
-		if ( isset( $_GET['mcat'] ) && $_GET['mcat'] == $cat->category_id || $category == $cat->category_id ) {
-			$class .= ' current';
+
+		$selected_categories = ( empty( $_GET['mcat'] ) ) ? array() : explode( ',', $_GET['mcat'] );
+
+		if ( in_array( $cat->category_id, $selected_categories ) || $category == $cat->category_id ) {
+			$selected_categories = array_diff( $selected_categories, array( $cat->category_id ) );
+			$class              .= ' current';
+			$aria_current        = 'aria-current="true"';
+		} else {
+			$selected_categories[] = $cat->category_id;
+			$aria_current          = '';
+		}
+		$selectable_categories = implode( ',', $selected_categories );
+		if ( '' == $selectable_categories ) {
+			$url = remove_query_arg( 'mcat', mc_get_current_url() );
+		} else {
+			$url = mc_build_url( array( 'mcat' => $selectable_categories ), array( 'mcat' ) );
 		}
 		if ( 1 == $cat->category_private ) {
 			$class .= ' private';
 		}
 		$cat_name = mc_kses_post( stripcslashes( $cat->category_name ) );
-		$url      = mc_build_url( array( 'mcat' => $cat->category_id ), array( 'mcat' ) );
+		$cat_key  = '';
 		if ( '' != $cat->category_icon && 'true' != get_option( 'mc_hide_icons' ) ) {
-			$key .= '<li class="cat_' . $class . '"><a href="' . esc_url( $url ) . '" class="mcajax"><span class="category-color-sample"><img src="' . $path . $cat->category_icon . '" alt="" style="background:' . $hex . $cat->category_color . ';" /></span>' . $cat_name . '</a></li>';
+			$cat_key .= '<span class="category-color-sample"><img src="' . $path . $cat->category_icon . '" alt="" style="background:' . $hex . $cat->category_color . ';" /></span>' . $cat_name;
+		} elseif ( 'default' != get_option( 'mc_apply_color' ) ) {
+			$cat_key .= '<span class="category-color-sample no-icon" style="background:' . $hex . $cat->category_color . ';"> &nbsp; </span>' . $cat_name;
 		} else {
-			$key .= '<li class="cat_' . $class . '"><a href="' . esc_url( $url ) . '" class="mcajax"><span class="category-color-sample no-icon" style="background:' . $hex . $cat->category_color . ';"> &nbsp; </span>' . $cat_name . '</a></li>';
+			// If category colors are ignored, don't render HTML for them.
+			$cat_key .= $cat_name;
 		}
+		$key .= '<li class="cat_' . $class . '"><a href="' . esc_url( $url ) . '" class="mcajax"' . $aria_current . '>' . $cat_key . '</a></li>';
 	}
 	if ( isset( $_GET['mcat'] ) ) {
 		$key .= "<li class='all-categories'><a href='" . esc_url( mc_build_url( array(), array( 'mcat' ), mc_get_current_url() ) ) . "' class='mcajax'>" . apply_filters( 'mc_text_all_categories', __( 'All Categories', 'my-calendar' ) ) . '</a></li>';
@@ -2854,7 +2872,8 @@ function mc_get_list_locations( $datatype, $full = true, $return_type = OBJECT )
 	} else {
 		$select = '*';
 	}
-	$locations = $mcdb->get_results( $mcdb->prepare( "SELECT DISTINCT $select FROM " . my_calendar_locations_table() . " $where ORDER BY %s ASC", $data ), $return_type );
+	// Value of $data is set in switch above. $select is same as data unless *.
+	$locations = $mcdb->get_results( "SELECT DISTINCT $select FROM " . my_calendar_locations_table() . " $where ORDER BY $data ASC", $return_type ); // WPCS: unprepared SQL ok.
 
 	return $locations;
 }

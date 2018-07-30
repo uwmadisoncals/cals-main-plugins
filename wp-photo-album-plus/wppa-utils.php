@@ -129,7 +129,7 @@ global $wppa_supported_stereo_types;
 	// If in the cloud...
 	$for_sm = wppa( 'for_sm' ); 				// Social media do not accept cloud images
 	$is_old = wppa_too_old_for_cloud( $id );
-	if ( wppa_cdn( 'front' ) && ! wppa_is_multi( $id ) && ! $is_old && ! wppa_is_stereo( $id ) && ! $for_sm && ! $thumb['magickstack'] ) {
+	if ( wppa_cdn( 'front' ) && ! wppa_is_multi( $id ) && ! $is_old && ! wppa_is_stereo( $id ) && ! $for_sm && ! $thumb['magickstack'] && ! wppa_is_panorama( $id ) ) {
 		if ( $x && $y ) {		// Only when size is given
 			switch ( wppa_cdn( 'front' ) ) {
 				case 'local':
@@ -2011,7 +2011,7 @@ function wppa_get_hires_url( $id ) {
 	}
 
 	// Try CDN
-	if ( wppa_cdn( 'front' ) && ! wppa_too_old_for_cloud( $id ) ) {
+	if ( wppa_cdn( 'front' ) && ! wppa_too_old_for_cloud( $id ) && ! wppa_is_panorama( $id ) ) {
 		switch ( wppa_cdn( 'front' ) ) {
 			case 'cloudinary':
 				$url = wppa_get_cloudinary_url( $id );

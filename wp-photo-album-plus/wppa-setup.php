@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.9.07
+* Version 6.9.08
 *
 */
 
@@ -858,6 +858,7 @@ cursorborder:'2px solid transparent',";
 						'wppa_nav_icon_size' 			=> 'default',
 						'wppa_nav_icon_size_slide' 		=> 'default',
 						'wppa_icon_size_rating' 		=> 'default',
+						'wppa_nav_icon_size_panorama' 	=> '32',
 
 						// Table II: Visibility
 						// A Breadcrumb

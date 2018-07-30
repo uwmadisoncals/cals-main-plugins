@@ -3,8 +3,8 @@ Contributors: Enrico Urbinati
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40responsivemapsplugin%2ecom&lc=IT&item_name=responsive%20Vector%20Maps%20Plugin&item_number=rvm%2dplugin%2dwordpress%2drepo&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Tags: responsive maps, svg, maps, country maps, France map, Germany map, Italy map, Netherlands map, Norway map, Poland map, Portugal map, Spain map, Sweden map, Switzerland map, United Kingdom map, customizable maps, vector maps, svg map, linkable map, USA map, Belgium map, html tooltip,country maps, continent maps, city maps, region maps, clickable maps, linkable maps, professional maps      
 Requires at least: 3.6
-Tested up to: 4.9.5
-Stable tag: 5.3.1
+Tested up to: 4.9.7
+Stable tag: 5.3.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,13 +19,15 @@ Based on great work of Kirill Lebedev [jvectormap](http://jvectormap.com/), this
 
 You can use maps in sidebars as widgets or just in the post content using shortcodes.
 
+[Sponsored By: Infolinks, Smart Ads for WordPress Sites, Get Started](http://www.infolinks.com/join-us?aid=3113977)
+
 
 = Features = 
 
 * Responsive: Maps will adapt their width to any device
 * High quality image: Vector maps never loose quality
 * Cross-browser compatibility using ( yes, works even on IE7 )
-* More then 100  downloadable maps available on [responsivemapsplugin.com](http://www.responsivemapsplugin.com/expand-your-horizons/) 
+* More then 100  downloadable maps available on [responsivemapsplugin.com](http://www.responsivemapsplugin.com/redirect-to-custom-maps-from-wp-plugin-page/) 
 * Chance to install dynamic maps with all kind of svg ( not only geographical maps ! )
 * Mouseover tooltip effect
 * Subdivisions: Customize background colours, links and html popup ( tooltip )
@@ -87,6 +89,9 @@ an additional **width** parameter to the shortcode within a specific post. Your 
 5. The result... finally! We see a widget sidebar and a content map ( Notice we used two different shortcode/ID for Italy map )
 
 == Changelog ==
+
+= 5.3.2 =
+* Fix : fix the "warning count() parameter must be an array or an object" issue of PHP ver 7.2
 
 = 5.3.1 =
 * Fix : map width and padding accept <10 values

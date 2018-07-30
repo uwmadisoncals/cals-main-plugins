@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.9.07
+* Version 6.9.08
 *
 */
 
@@ -536,6 +536,8 @@ function wppaToggleExif( id, count ) {
 			$linktitle 		= stripslashes( $photo['linktitle'] );
 			$alt 			= stripslashes( $photo['alt'] );
 			$filename 		= $photo['filename'];
+			$photox 		= $photo['photox'];
+			$photoy 		= $photo['photoy'];
 			$videox 		= $photo['videox'];
 			$videoy 		= $photo['videoy'];
 			$location 		= $photo['location'];
@@ -1155,15 +1157,17 @@ function wppaToggleExif( id, count ) {
 
 									// Panorama
 									if ( wppa_switch( 'enable_panorama' ) ) {
+										$can_panorama = $photox / $photoy >= 1.999;
 										echo
 										__( 'Panorama' ) . ': ' .
-										'<select' .
-											' onchange="wppaAjaxUpdatePhoto( ' . $id . ', \'panorama\', this )"' .
-											' >' .
-											'<option value="0"' . ( $panorama == '0' ? ' selected="selected"' : '' ) . ' >' . __( '- none -', 'wp-photo-album-plus' ) . '</option>' .
-											'<option value="1"' . ( $panorama == '1' ? ' selected="selected"' : '' ) . ' >' . __( '360&deg; Spheric', 'wp-photo-album-plus' ) . '</option>' .
-								//			'<option value="2"' . ( $panorama == '2' ? ' selected="selected"' : '' ) . ' >' . __( 'Non 360&deg; Flat', 'wp-photo-album-plus' ) . '</option>' .
-										' />';
+										( $can_panorama ?
+											'<select onchange="wppaAjaxUpdatePhoto( ' . $id . ', \'panorama\', this )" >' .
+												'<option value="0"' . ( $panorama == '0' ? ' selected="selected"' : '' ) . ' >' . __( '- none -', 'wp-photo-album-plus' ) . '</option>' .
+												'<option value="1"' . ( $panorama == '1' ? ' selected="selected"' : '' ) . ' >' . __( '360&deg; Spheric', 'wp-photo-album-plus' ) . '</option>' .
+												'<option value="2"' . ( $panorama == '2' ? ' selected="selected"' : '' ) . ' >' . __( 'Non 360&deg; Flat', 'wp-photo-album-plus' ) . '</option>' .
+											'</select>' :
+											__( 'Too narrow.', 'wp-photo-album-plus' )
+										);
 									}
 
 									// Watermark
@@ -1177,7 +1181,7 @@ function wppaToggleExif( id, count ) {
 										$user = wppa_get_user();
 										if ( wppa_switch( 'watermark_user' ) || current_user_can( 'wppa_settings' ) ) {
 											echo
-											__( 'Watermark:', 'wp-photo-album-plus') . ' ';
+											' ' . __( 'Watermark:', 'wp-photo-album-plus') . ' ';
 											echo
 											'<select' .
 												' id="wmfsel_' . $id . '"' .
@@ -1185,7 +1189,7 @@ function wppaToggleExif( id, count ) {
 												' >' .
 												wppa_watermark_file_select( 'user', $album ) .
 											'</select>' .
-											__( 'Pos:', 'wp-photo-album-plus' ) . ' ' .
+											' ' . __( 'Pos:', 'wp-photo-album-plus' ) . ' ' .
 											'<select' .
 												' id="wmpsel_' . $id . '"' .
 												' onchange="wppaAjaxUpdatePhoto( ' . $id . ', \'wppa_watermark_pos_' . $user . '\', this );"' .

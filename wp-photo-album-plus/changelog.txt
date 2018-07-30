@@ -1,5 +1,15 @@
 WP Photo Album Plus Changelog
 
+= 6.9.08 =
+
+= Bug Fixes =
+
+* When lightbox global was the only wppa activity on the page and javascript deferred, lightbox did not work. Fixed.
+
+= New Features =
+
+* Panorama images phase II: Non 360 flat panorama photos can be displayed as any of the three single image types.
+
 = 6.9.07 =
 
 = Bug Fixes =
@@ -9,7 +19,7 @@ WP Photo Album Plus Changelog
 
 = New Features =
 
-* Panorama images phase 1: 360 deg spherical panorama photos can be displayed as any of the three single image types. 
+* Panorama images phase I: 360 deg spherical panorama photos can be displayed as any of the three single image types.
 Tick Table IV-A24.2 and a selectionbox will appear on the photo admin page at every photo.
 
 = Other Changes =
