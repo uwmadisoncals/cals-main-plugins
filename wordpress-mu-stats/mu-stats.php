@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: WordPress MU Stats
+Plugin Name: CALS WordPress MU Stats
 Plugin URI: http://ocaoimh.ie/wordpress-mu-domain-mapping/
-Description: Map any blog on a WordPress website to another domain.
+Description: Site title, owner, and contact information.
 Version: 1.0
 Author: Al Nemec
 Author URI: http://cals.wisc.edu
@@ -24,22 +24,41 @@ Author URI: http://cals.wisc.edu
 */
 
 
+
+/*echo get_site_option( 'site_owner' );
+
+
+
+					if ( add_site_option( 'site_owner', 'new_value' ) ) {
+					echo get_site_option( 'site_owner' );
+					} else {
+					echo 'Already exists';
+					}*/
+
+
+
 // show mapping on site admin blogs screen
 function ra_stat_columns( $columns ) {
 	$columns[ 'title' ] = __( 'Title' );
+	$columns[ 'owner' ] = __( 'Owner' );
+	$columns[ 'primarycontact' ] = __( 'Primary Contact' );
 	return $columns;
 }
 add_filter( 'wpmu_blogs_columns', 'ra_stat_columns' );
 
 function ra_stat_field( $column, $blog_id ) {
 	global $wpdb;
-	static $maps = false;
+	//static $maps = false;
+	//static $maps2 = false;
+
+	$wpdb->dmtable = $wpdb->base_prefix . 'blogs';
+	$work = $wpdb->get_results( "SELECT blog_id, domain FROM {$wpdb->dmtable} ORDER BY blog_id" );
+	$maps = array();
 
 	if ( $column == 'title' ) {
-		if ( $maps === false ) {
-			$wpdb->dmtable = $wpdb->base_prefix . 'blogs';
-			$work = $wpdb->get_results( "SELECT blog_id, domain FROM {$wpdb->dmtable} ORDER BY blog_id" );
-			$maps = array();
+
+
+
 			if($work) {
 				foreach( $work as $blog ) {
 
@@ -47,22 +66,81 @@ function ra_stat_field( $column, $blog_id ) {
                     $sitetitle = $wpdb->get_results( "SELECT option_value FROM {$tablename} WHERE option_name='blogname'" );
 
                     $size = sizeof($sitetitle);
-                    $sitename = "<em>No Name Value</em>";
+					$sitename = "<em>No Name Value</em>";
+
 
                     if($size > 0) {
                         $sitename = $sitetitle[0]->option_value;
                     }
 
-                    $maps[ $blog->blog_id ][] = $sitename;
+					$maps[ $blog->blog_id ][] = $sitename;
+
 				}
 			}
-		}
+
+
+
 		if( !empty( $maps[ $blog_id ] ) && is_array( $maps[ $blog_id ] ) ) {
 			foreach( $maps[ $blog_id ] as $blog ) {
 				echo $blog . '<br />';
 			}
 		}
 	}
+
+	if ( $column == 'owner' ) {
+
+			if($work) {
+				foreach( $work as $blog ) {
+
+
+					$owner = get_blog_option($blog->blog_id, 'site_owner');
+
+					if(!$owner) {
+						add_blog_option( $blog->blog_id, 'site_owner', '' );
+					}
+
+					if($owner != "") {
+						$maps[ $blog->blog_id ][] = $owner;
+					}
+
+				}
+			}
+
+			if( !empty( $maps[ $blog_id ] ) && is_array( $maps[ $blog_id ] ) ) {
+				foreach( $maps[ $blog_id ] as $blog ) {
+					echo $blog . '<br />';
+				}
+			}
+
+	}
+
+
+	if ( $column == 'primarycontact' ) {
+
+		if($work) {
+			foreach( $work as $blog ) {
+
+
+				$contact = get_blog_option($blog->blog_id, 'primary_contact');
+
+				if(!$contact) {
+					add_blog_option( $blog->blog_id, 'primary_contact', '' );
+				}
+
+				if($contact != "") {
+					$maps[ $blog->blog_id ][] = $contact;
+				}
+
+			}
+		}
+
+		if( !empty( $maps[ $blog_id ] ) && is_array( $maps[ $blog_id ] ) ) {
+			foreach( $maps[ $blog_id ] as $blog ) {
+				echo $blog . '<br />';
+			}
+		}
+
+}
 }
 add_action( 'manage_blogs_custom_column', 'ra_stat_field', 1, 3 );
 add_action( 'manage_sites_custom_column', 'ra_stat_field', 1, 3 );
