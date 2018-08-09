@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: CALS WordPress MU Stats
-Plugin URI: http://ocaoimh.ie/wordpress-mu-domain-mapping/
+Plugin URI: http://cals.wisc.edu
 Description: Site title, owner, and contact information.
 Version: 1.0
 Author: Al Nemec
