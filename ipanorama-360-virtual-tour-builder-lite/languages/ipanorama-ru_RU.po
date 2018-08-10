@@ -1,0 +1,1226 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2018-06-18 10:51+0300\n"
+"PO-Revision-Date: 2018-06-18 10:51+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0.3\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Poedit-KeywordsList: _;__;gettext;gettext_noop;_e\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Poedit-SearchPathExcluded-1: *.css\n"
+"X-Poedit-SearchPathExcluded-2: *.txt\n"
+"X-Poedit-SearchPathExcluded-3: *.html\n"
+
+#: admin/class-ipanorama-admin.php:103
+msgid "Builder"
+msgstr "Построитель"
+
+#: admin/class-ipanorama-admin.php:110
+msgid "Using this iPanorama"
+msgstr "Пример шорткода"
+
+#: admin/class-ipanorama-admin.php:117
+msgid "Useful Links"
+msgstr "Полезные ссылки"
+
+#: admin/class-ipanorama-admin.php:134
+msgid "Settings"
+msgstr "Настройки"
+
+#: admin/class-ipanorama-admin.php:135
+msgid "Documentation"
+msgstr "Документация"
+
+#: admin/class-ipanorama-admin.php:145
+msgid "iPanorama Items"
+msgstr "Все панорамы"
+
+#: admin/class-ipanorama-admin.php:146
+msgid "iPanorama Item"
+msgstr "Панорама"
+
+#: admin/class-ipanorama-admin.php:147
+msgid "Add New"
+msgstr "Добавить панораму"
+
+#: admin/class-ipanorama-admin.php:148
+msgid "Add New Item"
+msgstr "Добавить панораму"
+
+#: admin/class-ipanorama-admin.php:149
+msgid "Edit Item"
+msgstr "Изменить панораму"
+
+#: admin/class-ipanorama-admin.php:150
+msgid "New Item"
+msgstr "Новая панорама"
+
+#: admin/class-ipanorama-admin.php:151
+msgid "View Item"
+msgstr "Посмотреть панораму"
+
+#: admin/class-ipanorama-admin.php:152
+msgid "Search iPanorama Item"
+msgstr "Поиск панорамы"
+
+#: admin/class-ipanorama-admin.php:153
+msgid "No iPanorama Item found"
+msgstr "Ничего не найдено"
+
+#: admin/class-ipanorama-admin.php:154
+msgid "No iPanorama Item found in Trash"
+msgstr "В корзине элемент не найден"
+
+#: admin/class-ipanorama-admin.php:156
+msgid "All Items"
+msgstr "Все панорамы"
+
+#: admin/class-ipanorama-admin.php:157
+msgid "iPanorama 360"
+msgstr "iPanorama 360"
+
+#: admin/class-ipanorama-admin.php:183
+#: admin/partials/ipanorama-meta-box-builder-display.php:538
+#: admin/partials/ipanorama-settings-display.php:335
+msgid "Title"
+msgstr "Заголовок"
+
+#: admin/class-ipanorama-admin.php:184
+msgid "Shortcodes"
+msgstr "Шорткоды"
+
+#: admin/class-ipanorama-admin.php:185
+msgid "Total Scenes"
+msgstr "Всего сцен"
+
+#: admin/class-ipanorama-admin.php:186
+msgid "Author"
+msgstr "Автор"
+
+#: admin/class-ipanorama-admin.php:187
+msgid "Date"
+msgstr "Дата"
+
+#: admin/class-ipanorama-admin.php:209
+msgid "scene(s)"
+msgstr "сцена"
+
+#: admin/class-ipanorama-admin.php:360 admin/class-ipanorama-admin.php:361
+msgid "iPanorama item updated."
+msgstr "Панорама обновлена."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:35
+msgid "yaw"
+msgstr "по горизонтали (лево/право)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:36
+msgid "pitch"
+msgstr "по вертикали (верх/низ)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:37
+msgid "zoom"
+msgstr "масштаб"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:42
+msgid "Preview"
+msgstr "Предпросмотр"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:44
+msgid "Load From File"
+msgstr "Конфиг из файла"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:45
+msgid "Save To File"
+msgstr "Конфиг в файл"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:47
+#: admin/partials/ipanorama-settings-display.php:36
+msgid "General"
+msgstr "Настройки"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:48
+msgid "Scenes"
+msgstr "Сцены"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:49
+msgid "Hotspots"
+msgstr "Маркеры"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:58
+#: admin/partials/ipanorama-settings-display.php:44
+msgid ""
+"Set panorama custom width and height.<br><br>Note:<br>Also you can set size "
+"via shortcode."
+msgstr ""
+"Задайте ширину и высоту панорамы. <br><br> Заметка: <br> Также вы можете "
+"установить размер по короткому коду."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:59
+#: admin/partials/ipanorama-settings-display.php:45
+msgid "Size"
+msgstr "Размер"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:65
+#: admin/partials/ipanorama-meta-box-builder-display.php:108
+#: admin/partials/ipanorama-settings-display.php:51
+#: admin/partials/ipanorama-settings-display.php:77
+msgid "Default"
+msgstr "По умолчанию"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:73
+#: admin/partials/ipanorama-meta-box-builder-display.php:83
+#: admin/partials/ipanorama-meta-box-builder-display.php:92
+#: admin/partials/ipanorama-meta-box-builder-display.php:128
+#: admin/partials/ipanorama-meta-box-builder-display.php:150
+#: admin/partials/ipanorama-meta-box-builder-display.php:179
+#: admin/partials/ipanorama-meta-box-builder-display.php:190
+#: admin/partials/ipanorama-meta-box-builder-display.php:200
+#: admin/partials/ipanorama-meta-box-builder-display.php:210
+#: admin/partials/ipanorama-meta-box-builder-display.php:221
+#: admin/partials/ipanorama-meta-box-builder-display.php:232
+#: admin/partials/ipanorama-meta-box-builder-display.php:242
+#: admin/partials/ipanorama-meta-box-builder-display.php:254
+#: admin/partials/ipanorama-meta-box-builder-display.php:264
+#: admin/partials/ipanorama-meta-box-builder-display.php:275
+#: admin/partials/ipanorama-meta-box-builder-display.php:285
+#: admin/partials/ipanorama-meta-box-builder-display.php:295
+#: admin/partials/ipanorama-meta-box-builder-display.php:306
+#: admin/partials/ipanorama-meta-box-builder-display.php:316
+#: admin/partials/ipanorama-meta-box-builder-display.php:327
+#: admin/partials/ipanorama-meta-box-builder-display.php:337
+#: admin/partials/ipanorama-meta-box-builder-display.php:348
+#: admin/partials/ipanorama-meta-box-builder-display.php:359
+#: admin/partials/ipanorama-meta-box-builder-display.php:370
+#: admin/partials/ipanorama-meta-box-builder-display.php:381
+#: admin/partials/ipanorama-meta-box-builder-display.php:392
+#: admin/partials/ipanorama-meta-box-builder-display.php:412
+#: admin/partials/ipanorama-meta-box-builder-display.php:423
+#: admin/partials/ipanorama-meta-box-builder-display.php:437
+#: admin/partials/ipanorama-meta-box-builder-display.php:447
+#: admin/partials/ipanorama-meta-box-builder-display.php:458
+#: admin/partials/ipanorama-meta-box-builder-display.php:469
+#: admin/partials/ipanorama-meta-box-builder-display.php:479
+#: admin/partials/ipanorama-meta-box-builder-display.php:498
+#: admin/partials/ipanorama-meta-box-builder-display.php:509
+#: admin/partials/ipanorama-meta-box-builder-display.php:520
+#: admin/partials/ipanorama-meta-box-builder-display.php:531
+#: admin/partials/ipanorama-meta-box-builder-display.php:542
+#: admin/partials/ipanorama-meta-box-builder-display.php:562
+#: admin/partials/ipanorama-meta-box-builder-display.php:572
+#: admin/partials/ipanorama-meta-box-builder-display.php:594
+#: admin/partials/ipanorama-meta-box-builder-display.php:604
+#: admin/partials/ipanorama-meta-box-builder-display.php:619
+#: admin/partials/ipanorama-meta-box-builder-display.php:644
+#: admin/partials/ipanorama-meta-box-builder-display.php:670
+#: admin/partials/ipanorama-meta-box-builder-display.php:682
+#: admin/partials/ipanorama-meta-box-builder-display.php:701
+#: admin/partials/ipanorama-meta-box-builder-display.php:725
+msgid "Check to use global settings"
+msgstr "Включение глобальных настроек для данного параметра"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:79
+#: admin/partials/ipanorama-settings-display.php:58
+msgid "Width"
+msgstr "Ширина"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:88
+#: admin/partials/ipanorama-settings-display.php:62
+msgid "Height"
+msgstr "Высота"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:101
+#: admin/partials/ipanorama-settings-display.php:70
+msgid ""
+"Choose a theme from the list.<br><br>Note:<br>You can create your own theme "
+"too and put it into the plugin folder for later use."
+msgstr ""
+"Выберите тему из списка. <br><br>Заметка:<br>Вы также можете создать свою "
+"собственную тему и поместить ее в папку плагина для последующего "
+"использования."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:102
+#: admin/partials/ipanorama-settings-display.php:71
+msgid "Theme"
+msgstr "Темы"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:136
+#: admin/partials/ipanorama-settings-display.php:101
+msgid "Set a preview image that will display before the panorama load."
+msgstr ""
+"Установите изображение предварительного просмотра, которое будет "
+"отображаться перед загрузкой панорамы."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:137
+#: admin/partials/ipanorama-settings-display.php:102
+msgid "Image Preview"
+msgstr "Фоновое изображение"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:143
+#: admin/partials/ipanorama-settings-display.php:108
+msgid "Enable/disable image preview."
+msgstr "Включить/отключить фоновое изображение."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:159
+#: admin/partials/ipanorama-meta-box-builder-display.php:880
+#: admin/partials/ipanorama-meta-box-builder-display.php:1052
+#: admin/partials/ipanorama-settings-display.php:116
+msgid "Image"
+msgstr "Изображение"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:167
+#: admin/partials/ipanorama-settings-display.php:124
+msgid "Use this options to enable or disable different UI actions."
+msgstr ""
+"Используйте эти параметры для включения или отключения различных действий "
+"пользовательского интерфейса."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:168
+#: admin/partials/ipanorama-settings-display.php:125
+msgid "Actions"
+msgstr "Действия"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:174
+#: admin/partials/ipanorama-settings-display.php:131
+msgid "If ON the panorama will automatically load."
+msgstr "Если ON, панорама будет автоматически загружаться."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:175
+#: admin/partials/ipanorama-settings-display.php:132
+msgid "Auto load"
+msgstr "Автоматическая загрузка"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:185
+#: admin/partials/ipanorama-settings-display.php:137
+msgid "If ON the panorama will automatically rotate when loaded."
+msgstr "Если ON, панорама будет автоматически вращаться после загрузки."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:186
+#: admin/partials/ipanorama-settings-display.php:138
+msgid "Auto rotate"
+msgstr "Автоматическое вращение"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:196
+#: admin/partials/ipanorama-settings-display.php:143
+msgid "Speed"
+msgstr "Скорость"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:206
+#: admin/partials/ipanorama-settings-display.php:148
+msgid "Inactivity delay (ms)"
+msgstr "Задержка бездействия (мс)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:216
+#: admin/partials/ipanorama-settings-display.php:153
+msgid ""
+"Enable/disable prevention of the default behavior on the mouseWheel event."
+msgstr ""
+"Включить/отключить поведения по умолчанию при использования колеса прокрутки "
+"мыши."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:217
+#: admin/partials/ipanorama-settings-display.php:154
+msgid "Mouse wheel, prevent the default behavior"
+msgstr "Колесо прокрутки мыши, отключение обработки по умолчанию"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:227
+#: admin/partials/ipanorama-settings-display.php:159
+msgid "Enable/disable the panorama rotate using the mouse scroll wheel."
+msgstr ""
+"Включить/отключить вращение панорамы с помощью колёсика прокрутки мыши."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:228
+#: admin/partials/ipanorama-settings-display.php:160
+msgid "Mouse wheel rotate"
+msgstr "Вращение панорамы с помощью колёсика мыши"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:238
+#: admin/partials/ipanorama-settings-display.php:165
+msgid "Rotate coefficient"
+msgstr "Шаг вращения"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:249
+#: admin/partials/ipanorama-settings-display.php:171
+msgid "Enable/disable the panorama zoom using the mouse scroll wheel."
+msgstr "Включить/отключить масштабирование с помощью колеса прокрутки мыши."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:250
+#: admin/partials/ipanorama-settings-display.php:172
+msgid "Mouse wheel zoom"
+msgstr "Управление масштабом с помощью колёсика мышки"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:260
+#: admin/partials/ipanorama-settings-display.php:177
+msgid "Zoom coefficient"
+msgstr "Шаг масштабирования"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:270
+#: admin/partials/ipanorama-settings-display.php:182
+msgid "Enable/disable the \"grab/move\" mode on the mouse hover event."
+msgstr ""
+"Включить/отключить режим управления камерой при наведении курсора мыши."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:271
+#: admin/partials/ipanorama-settings-display.php:183
+msgid "Hover grab"
+msgstr "Управление камерой при наведении и перемещении курсора"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:281
+#: admin/partials/ipanorama-settings-display.php:188
+msgid "Yaw coefficient"
+msgstr "Шаг изменения по горизонтали (лево/право)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:291
+#: admin/partials/ipanorama-settings-display.php:193
+msgid "Pitch coefficient"
+msgstr "Шаг изменения по вертикали (верх/низ)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:301
+#: admin/partials/ipanorama-settings-display.php:198
+msgid ""
+"Enable/disable the \"grab/move\" mode on the mouse click and move events."
+msgstr ""
+"Включить/отключить режим управления камерой при перемещении курсора мыши с "
+"нажатой клавишей."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:302
+#: admin/partials/ipanorama-settings-display.php:199
+msgid "Grab (click and drag)"
+msgstr "Управление камерой с помощью мыши"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:312
+#: admin/partials/ipanorama-settings-display.php:204
+msgid "Grab coefficient"
+msgstr "Шаг изменения"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:322
+#: admin/partials/ipanorama-settings-display.php:209
+msgid "Enable/disable the zoom by pinch gesture."
+msgstr "Включить/отключить масштабирование с помощью жестов."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:323
+#: admin/partials/ipanorama-settings-display.php:210
+msgid "Pinch zoom"
+msgstr "Масштабирование с помощью жестов"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:333
+#: admin/partials/ipanorama-settings-display.php:215
+msgid "Pinch zoom coefficient"
+msgstr "Шаг измененения"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:343
+#: admin/partials/ipanorama-settings-display.php:220
+msgid "Enable/disable navigation via keyboard."
+msgstr "Включить/отключить навигацию с помощью клавиатуры."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:344
+#: admin/partials/ipanorama-settings-display.php:221
+msgid "Keyboard navigation"
+msgstr "Навигация при помощи клавиатуры"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:354
+#: admin/partials/ipanorama-settings-display.php:226
+msgid "Enable/disable zoom via keyboard."
+msgstr "Включить/отключить масштабирование с помощью клавиатуры."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:355
+#: admin/partials/ipanorama-settings-display.php:227
+msgid "Keyboard zoom"
+msgstr "Масштабирование с помощью клавиатуры"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:365
+#: admin/partials/ipanorama-settings-display.php:232
+msgid ""
+"Specifies the fade duration in milliseconds, when transitioning between "
+"scenes."
+msgstr "Длительность затухания в миллисекундах при переходе между сценами."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:366
+#: admin/partials/ipanorama-settings-display.php:233
+msgid "Scene fade duration (ms)"
+msgstr "Продолжительность затухания сцены при смене (мс)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:376
+#: admin/partials/ipanorama-settings-display.php:238
+msgid "Enable/disable loading scene images in background."
+msgstr "Включить/отключить загрузку сцен в фоновом режиме."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:377
+#: admin/partials/ipanorama-settings-display.php:239
+msgid "Scene images background load"
+msgstr "Загрузка всех сцен в фоне"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:387
+#: admin/partials/ipanorama-settings-display.php:244
+msgid "Enable/disable the animation in the mobile browsers."
+msgstr "Включить/отключить анимацию в мобильных браузерах."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:388
+#: admin/partials/ipanorama-settings-display.php:245
+msgid "Mobile animation"
+msgstr "Мобильная анимация"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:400
+#: admin/partials/ipanorama-settings-display.php:252
+msgid "Use this options to show or hide controls."
+msgstr ""
+"Используйте эти параметры, чтобы показать или скрыть элементы управления."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:401
+#: admin/partials/ipanorama-settings-display.php:253
+msgid "Controls"
+msgstr "Элементы управления"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:407
+#: admin/partials/ipanorama-settings-display.php:259
+msgid "Show controls on mouse hover event."
+msgstr "Показывать элементы управления при наведении курсора мыши."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:408
+#: admin/partials/ipanorama-settings-display.php:260
+msgid "Show controls on hover"
+msgstr "Показывать элементы управления при наведении курсора"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:418
+#: admin/partials/ipanorama-settings-display.php:265
+msgid "Show/hide the thumbnails slider control."
+msgstr "Показать/скрыть элемент управления с миниатюрами сцен."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:419
+#: admin/partials/ipanorama-settings-display.php:266
+msgid "Thumbnails slider control"
+msgstr "Миниатюры сцен"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:430
+#: admin/partials/ipanorama-settings-display.php:272
+msgid "Vertical type"
+msgstr "Вертикальный вид"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:432
+#: admin/partials/ipanorama-settings-display.php:274
+msgid "Horizontal type"
+msgstr "Горизонтальный вид"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:443
+#: admin/partials/ipanorama-settings-display.php:280
+msgid "Thumbnails are static"
+msgstr "Статические"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:453
+#: admin/partials/ipanorama-settings-display.php:285
+msgid "Show/hide the toggle thumbnails slider control."
+msgstr "Показать/скрыть элемент управления для показа миниатюр."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:454
+#: admin/partials/ipanorama-settings-display.php:286
+msgid "Toggle thumbnails slider control"
+msgstr "Вкл/выкл миниатюр"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:464
+#: admin/partials/ipanorama-settings-display.php:291
+msgid "Show/hide the scene next/prev control."
+msgstr "Показать/скрыть элемент управления перехода между сценами."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:465
+#: admin/partials/ipanorama-settings-display.php:292
+msgid "Scene next/prev control"
+msgstr "Переход между сценами"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:475
+#: admin/partials/ipanorama-settings-display.php:297
+msgid "Scene next/prev loop"
+msgstr "Переход между сценами по кругу"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:493
+#: admin/partials/ipanorama-settings-display.php:310
+msgid "Show/hide the zoom control."
+msgstr "Показать/скрыть элемент управления масштабированием."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:494
+#: admin/partials/ipanorama-settings-display.php:311
+msgid "Zoom control"
+msgstr "Масштабирование"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:504
+#: admin/partials/ipanorama-settings-display.php:316
+msgid "Show/hide the fullscreen control."
+msgstr ""
+"Показать/скрыть элемент управления включения и выключения полноэкранного "
+"режима."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:505
+#: admin/partials/ipanorama-settings-display.php:317
+msgid "Fullscreen control"
+msgstr "Полноэкранный режим"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:515
+#: admin/partials/ipanorama-settings-display.php:322
+msgid "Show/hide the auto rotate control."
+msgstr "Показать/скрыть элемент управления автовращением."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:516
+#: admin/partials/ipanorama-settings-display.php:323
+msgid "AutoRotate control"
+msgstr "Автоматическое вращение сцены"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:526
+#: admin/partials/ipanorama-settings-display.php:328
+msgid "Show/hide the compass control."
+msgstr "Показать/скрыть элемент управления компасом."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:527
+#: admin/partials/ipanorama-settings-display.php:329
+msgid "Compass"
+msgstr "Компас"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:537
+#: admin/partials/ipanorama-settings-display.php:334
+msgid "Show/hide the title control."
+msgstr "Показать/скрыть элемент управления заголовком."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:550
+#: admin/partials/ipanorama-settings-display.php:342
+msgid "Use this options to set common popover settings."
+msgstr ""
+"Используйте эти параметры для установки общих настроек для всплывающих окон."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:551
+#: admin/partials/ipanorama-meta-box-builder-display.php:1113
+#: admin/partials/ipanorama-settings-display.php:343
+msgid "Popover Settings"
+msgstr "Настройки всплывающих окон"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:557
+#: admin/partials/ipanorama-settings-display.php:349
+msgid "Enable/disable popovers."
+msgstr "Включить/отключить всплывающие окна."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:558
+#: admin/partials/ipanorama-settings-display.php:350
+msgid "Show Popovers"
+msgstr "Всплывающие окна"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:567
+#: admin/partials/ipanorama-settings-display.php:354
+msgid ""
+"Set a custom popover HTML template.<br><br>Note:<br>We recommend do not "
+"change this parameter without having some knowledge."
+msgstr ""
+"Задайте настраиваемый шаблон HTML для всплывающего окна. <br><br> Заметка: "
+"<br> Мы не рекомендуем изменять этот параметр без веских причин."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:568
+#: admin/partials/ipanorama-settings-display.php:355
+msgid "HTML template"
+msgstr "Шаблон HTML"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:579
+#: admin/partials/ipanorama-settings-display.php:360
+msgid "Set default placement property of popovers"
+msgstr ""
+"Установить свойство размещения всплывающего окна относительно маркера по "
+"умолчанию"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:590
+#: admin/partials/ipanorama-settings-display.php:371
+msgid "Popover placement"
+msgstr "Размещение всплывающего окна относительно маркера"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:600
+#: admin/partials/ipanorama-settings-display.php:376
+msgid "Popover is under the hotspot"
+msgstr "Всплывающее окно распологается под маркером"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:609
+#: admin/partials/ipanorama-settings-display.php:380
+msgid "Popover show trigger"
+msgstr "Показ всплывающего окна"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:610
+#: admin/partials/ipanorama-settings-display.php:381
+msgid "Specify how a popover will be triggered."
+msgstr "Укажите, при каких командах будет показано всплывающее окно."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:615
+#: admin/partials/ipanorama-meta-box-builder-display.php:625
+#: admin/partials/ipanorama-settings-display.php:384
+msgid "Hover"
+msgstr "При наведении курсора"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:616
+#: admin/partials/ipanorama-meta-box-builder-display.php:628
+#: admin/partials/ipanorama-meta-box-builder-display.php:639
+#: admin/partials/ipanorama-meta-box-builder-display.php:653
+#: admin/partials/ipanorama-settings-display.php:387
+#: admin/partials/ipanorama-settings-display.php:398
+msgid "Click"
+msgstr "При нажатии"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:632
+#: admin/partials/ipanorama-settings-display.php:391
+msgid "Popover hide trigger"
+msgstr "Закрытие всплывающего окна"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:633
+#: admin/partials/ipanorama-settings-display.php:392
+msgid "Specify how a popover will be hidden."
+msgstr "Укажите, при каких командах будет закрыто всплывающее окно."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:638
+#: admin/partials/ipanorama-meta-box-builder-display.php:650
+#: admin/partials/ipanorama-settings-display.php:395
+msgid "Leave"
+msgstr "При покидании курсора"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:640
+#: admin/partials/ipanorama-meta-box-builder-display.php:656
+#: admin/partials/ipanorama-settings-display.php:401
+msgid "Grab"
+msgstr "При перемещении сцены"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:641
+#: admin/partials/ipanorama-meta-box-builder-display.php:659
+#: admin/partials/ipanorama-settings-display.php:404
+msgid "Manual"
+msgstr "Вручную"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:663
+#: admin/partials/ipanorama-settings-display.php:408
+msgid "Specify a CSS animation class for the popover show"
+msgstr ""
+"Задание CSS класса с анимацией, который применяется при показе всплывающего "
+"окна"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:666
+#: admin/partials/ipanorama-settings-display.php:411
+msgid "Popover Show CSS3 Class"
+msgstr "CSS3 класс при показе"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:675
+#: admin/partials/ipanorama-settings-display.php:415
+msgid "Specify a CSS animation class for the popover hide"
+msgstr ""
+"Задание CSS класса с анимацией, который применяется при закрытии "
+"всплывающего окна"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:678
+#: admin/partials/ipanorama-settings-display.php:418
+msgid "Popover Hide CSS3 Class"
+msgstr "CSS3 класс при закрытии"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:690
+#: admin/partials/ipanorama-settings-display.php:425
+msgid ""
+"Enter any custom css you want to apply on this virtual tour.<br><br>Note:"
+"<br>Please do not use <b>&lt;style&gt;...&lt;/style&gt;</b> tag with Custom "
+"CSS."
+msgstr ""
+"Введите любой пользовательский CSS, который вы хотите применить для этой "
+"панорамы. <br><br> Заметка: <br>Не используйте <b>&lt;style&gt;...&lt;/"
+"style&gt;</b>."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:691
+#: admin/partials/ipanorama-settings-display.php:426
+msgid "Custom CSS"
+msgstr "Пользовательский CSS"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:697
+#: admin/partials/ipanorama-settings-display.php:432
+msgid "Enable/disable custom css rules."
+msgstr "Включить/отключить пользовательский CSS."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:713
+#: admin/partials/ipanorama-settings-display.php:443
+msgid ""
+"Enter any custom javascript code you want to execute after the ipanorama "
+"load.<br><br>Note:<br>Please do not use <b>&lt;script&gt;...&lt;/script&gt;</"
+"b> tag with Custom JavaScript."
+msgstr ""
+"Введите любой пользовательский код javascript, который вы хотите выполнить "
+"после загрузки панорамы. <br><br> Заметка: <br> Не используйте <b>&lt;"
+"script&gt;...&lt;/script&gt;</b>."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:714
+#: admin/partials/ipanorama-settings-display.php:444
+msgid "Custom JavaScript"
+msgstr "Пользовательский JS"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:720
+#: admin/partials/ipanorama-settings-display.php:450
+msgid ""
+"Enable/disable a custom js source code. The code is hooked to the onload "
+"event."
+msgstr ""
+"Включить/отключить пользовательский javascipt. Код подключен к событию "
+"onLoad."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:721
+#: admin/partials/ipanorama-settings-display.php:451
+msgid "Handle 'onLoad' event"
+msgstr "Обработать событие onLoad"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:760
+msgid "Use this options to set common scene settings."
+msgstr "Используйте эти параметры для задания общих настроек сцены."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:761
+msgid "Scene Settings"
+msgstr "Настройки сцены"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:766
+msgid "Set title for selected scene."
+msgstr "Задать заголовок для выбранной сцены."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:767
+msgid "Scene title"
+msgstr "Название сцены"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:772
+msgid "The title has HTML markup"
+msgstr "Название содержит HTML разметку"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:783
+msgid "Select a type of selected scene and set images."
+msgstr "Выберите тип сцены и набор панорамных изображений для нее."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:785
+msgid "sphere"
+msgstr "сфера"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:786
+msgid "cylinder"
+msgstr "цилиндр"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:787
+msgid "cube"
+msgstr "куб"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:789
+msgid "Scene type"
+msgstr "Тип сцены"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:793
+msgid "Select count of textures for a cube scene."
+msgstr "Выберите количество текстур для сцены типа куб."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:795
+msgid "1 Texture"
+msgstr "1 текстура"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:796
+msgid "6 Textures"
+msgstr "6 текстур"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:798
+msgid "Texture count"
+msgstr "Количество текстур"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:806
+msgid "Front"
+msgstr "Изображение"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:814
+msgid "Back"
+msgstr "Зад"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:821
+msgid "Left"
+msgstr "Лево"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:828
+msgid "Right"
+msgstr "Право"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:835
+msgid "Top"
+msgstr "Верх"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:842
+msgid "Bottom"
+msgstr "Низ"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:848
+#: admin/partials/ipanorama-meta-box-builder-display.php:1083
+msgid "Advanced Options"
+msgstr "Расширенные настройки"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:851
+msgid ""
+"Set the sphere mesh quality.<br><br>Note:<br>This is a number of horizontal "
+"and vertical segments."
+msgstr ""
+"Задайте качество сетки.<br><br>Примечание:<br>Это количество горизонтальных "
+"и вертикальных сегментов."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:854
+msgid "Width segments"
+msgstr "Кол-во сегментов по горизонтали"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:860
+msgid "Height segments"
+msgstr "Кол-во сегментов по вертикали"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:871
+msgid "Set a thumbnail image for selected scene."
+msgstr "Задать изображение миниатюры для выбранной сцены."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:872
+msgid "Scene thumb image"
+msgstr "Изображение для миниатюры"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:886
+msgid "Save or use original scene camera lookat vector."
+msgstr "Сохранять или нет свойства камеры"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:887
+msgid "Save camera lookat vector"
+msgstr "Сохранять свойства камеры"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:892
+msgid "Enable/disable the pitch limits."
+msgstr ""
+"Включить/отключить ограничения изменения вектора взгляда по вертикали (верх/"
+"низ)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:893
+msgid "Pitch limits"
+msgstr "Ограничения изменения вектора взгляда по вертикали (верх/низ)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:898
+msgid "Up limit (degree)"
+msgstr "Верхнее ограничение (градусы)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:903
+msgid "Down limit (degree)"
+msgstr "Нижнее ограничение (градусы)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:908
+msgid "Enable/disable the yaw limits."
+msgstr ""
+"Включить/отключить ограничения изменения вектора взгляда по горизонтали "
+"(лево/право)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:909
+msgid "Yaw limits"
+msgstr "Ограничения изменения вектора взгляда по вертикали (верх/низ)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:914
+msgid "Left limit (degree)"
+msgstr "Ограничение слева (градусы)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:919
+msgid "Right limit (degree)"
+msgstr "Ограничения справа (градусы)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:923
+msgid ""
+"Set the panorama's starting yaw and pitch position in degrees, and the zoom "
+"parameter."
+msgstr ""
+"Установите начальную позицию камеры по горизонтали и вертикали в градусах и "
+"параметр масштабирования."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:926
+#: admin/partials/ipanorama-meta-box-builder-display.php:1010
+msgid "Yaw"
+msgstr "по горизонтали"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:933
+#: admin/partials/ipanorama-meta-box-builder-display.php:1016
+msgid "Pitch"
+msgstr "по вертикали"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:940
+msgid "Zoom"
+msgstr "масштаб"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:949
+msgid ""
+"Set the north offset for compass direction, in degrees.<br><br>Note:<br>It "
+"only has an effect if compass is set to ON."
+msgstr ""
+"Задайте смещение компаса относительно севера в градусах.<br><br>Примечание:"
+"<br>Компас должен быть включен."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:952
+msgid "Compass Offset"
+msgstr "Компас"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:987
+msgid ""
+"Use target tool to quick create a hotspot and it's location on the panorama."
+msgstr ""
+"Используйте данный инструмент для быстрого создания маркеров и их размещения "
+"на панораме."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:988
+msgid "Target Tool"
+msgstr "Инструмент создания маркеров"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:994
+msgid ""
+"Enable/disable target tool.<br><br>Note:<br>When the target tool is ON click "
+"on the panorama together with Ctrl Key (for Mac with Meta Key)."
+msgstr ""
+"Включить/отключить инструмент маркеров.<br><br>Примечание:<br>Когда "
+"инструмент активен при нажатой клавише Ctrl (для Mac клавиша Meta) и клике "
+"мыши на панораме будет создан маркер."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1001
+msgid "Set a hotspot location."
+msgstr "Задайте местоположение маркера."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1002
+msgid "Hotspot Location"
+msgstr "Положение маркера"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1007
+msgid ""
+"Set the hotspot's starting yaw and pitch position in degrees.<br><br>Note:"
+"<br>If you want to change the location of the selected hotspot, just click "
+"on the panorama together with Ctrl Key (for Mac with Meta Key)."
+msgstr ""
+"Задайте начальную позицию по горизонтали и вертикали для маркера в градусах."
+"<br><br>Примечание:<br>Если вы хотите изменить местоположение выбранного "
+"маркера, просто кликните мышкой на панораме вместе с нажатой клавишей Ctrl "
+"(для Mac клавиша Meta) в нужной позиции."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1027
+msgid "Set common hotspot settings."
+msgstr "Задайте общие параметры для маркера."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1028
+msgid "Hotspot Settings"
+msgstr "Настройки маркеров"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1033
+msgid "Set title for selected hotspot."
+msgstr "Задать заголовок для выбранного маркера."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1034
+msgid "Hotspot title"
+msgstr "Заголовок маркера"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1038
+msgid "Specify the ID of the scene to link to."
+msgstr "Идентификатор сцены для перехода."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1040
+msgid "none"
+msgstr "не задано"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1043
+msgid "Go to the scene"
+msgstr "Перейти на сцену"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1047
+msgid "Set a hotspot image, otherwise the plugin uses a theme icon."
+msgstr ""
+"Задайте изображение для маркера, в противном случае плагин использует значок "
+"из темы."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1058
+msgid "Image Custom Width (px)"
+msgstr "Пользовательская ширина изображения (px)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1065
+msgid "Image Custom Height (px)"
+msgstr "Пользовательские высота изображения (px)"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1073
+msgid "This lets you connect a hotspot to an internet address."
+msgstr "Это позволяет задать маркер в виде интернет ссылки."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1074
+msgid "Url"
+msgstr "Ссылка"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1079
+msgid "Open url in new window"
+msgstr "Открывать ссылку в новом окне"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1086
+msgid ""
+"Enable/disable hotspot custom style.<br><br>Note:<br>You can define your own "
+"style for hotspot with images, icons, text and etc.."
+msgstr ""
+"Включить/отключить пользовательский стиль для маркера.<br><br>Примечание:"
+"<br>Можно определить собственный стиль для маркера с изображениями, "
+"значками, текстом и т.д..."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1088
+msgid "Custom style"
+msgstr "Пользовательский стиль"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1092
+msgid "Hotspot Class Name"
+msgstr "CSS классы маркера"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1093
+msgid "Set custom classes for a hotspot element."
+msgstr "Установить пользовательские CSS классы для маркера."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1097
+msgid "Hotspot HTML Content"
+msgstr "HTML разметка"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1098
+msgid "Set content for a hotspot element, if you want to make it complex."
+msgstr ""
+"Задать содержимое для маркера, если вы хотите сделать что-то нестандартное."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1102
+msgid "Hotspot user data, can be any valid string"
+msgstr "Пользовательские данные для маркера"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1103
+msgid ""
+"Set user data for a hotspot element, if you want to use it in your scripts."
+msgstr ""
+"Задать пользовательские данные для маркера, если вы хотите использовать их в "
+"своих скриптах."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1112
+msgid "Set common hotspot popover settings."
+msgstr "Задайте общие параметры для всплывающего окна выбранного маркера."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1119
+msgid "Enable/disable hotspot popover window."
+msgstr "Включить/отключить всплывающее окно."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1123
+msgid "Popover Content"
+msgstr "Содержимое всплывающего окна"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1124
+msgid "Set content for a popover window."
+msgstr "Задать содержимое всплывающего окна."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1130
+msgid "The popover content has HTML markup"
+msgstr "Содержимое является HTML разметкой"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1149
+msgid "Show on load"
+msgstr "Показать сразу после загрузки сцены"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1153
+msgid "Popover Placement"
+msgstr "Размещение всплывающего окна"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1154
+msgid "Set a placement property for a popover window."
+msgstr ""
+"Установить свойство размещения всплывающего окна относительно маркера по "
+"умолчанию."
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1156
+msgid "default"
+msgstr "По умолчанию"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1157
+#: admin/partials/ipanorama-settings-display.php:362
+msgid "top"
+msgstr "сверху"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1158
+#: admin/partials/ipanorama-settings-display.php:363
+msgid "bottom"
+msgstr "снизу"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1159
+#: admin/partials/ipanorama-settings-display.php:364
+msgid "left"
+msgstr "слева"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1160
+#: admin/partials/ipanorama-settings-display.php:365
+msgid "right"
+msgstr "справа"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1161
+#: admin/partials/ipanorama-settings-display.php:366
+msgid "top-left"
+msgstr "сверху-слева"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1162
+#: admin/partials/ipanorama-settings-display.php:367
+msgid "top-right"
+msgstr "сверху-справа"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1163
+#: admin/partials/ipanorama-settings-display.php:368
+msgid "bottom-left"
+msgstr "снизу-слева"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1164
+#: admin/partials/ipanorama-settings-display.php:369
+msgid "bottom-right"
+msgstr "снизу-справа"
+
+#: admin/partials/ipanorama-meta-box-builder-display.php:1169
+msgid "Popover Custom Width (px)"
+msgstr "Пользовательская ширина всплывающего окна (px)"
+
+#: admin/partials/ipanorama-meta-box-shortcode-display.php:17
+msgid ""
+"To use this iPanorama item in your posts or pages use the following "
+"shortcode:"
+msgstr ""
+"Чтобы использовать панораму в ваших постах или страницах используйте "
+"следующие шорткод:"
+
+#: admin/partials/ipanorama-settings-display.php:21
+msgid ""
+"This is global settings. These options are shared among all items if you "
+"turn it ON for an item, see an item right side checkbox for each parameter."
+msgstr ""
+"Глобальные настройки. Данные параметры применяются ко всем элементам, если в "
+"них эта опция активна, смотри флажок переключения в правой части параметров "
+"элемента."
+
+#: admin/partials/ipanorama-settings-display.php:34
+msgid "Update Settings"
+msgstr "Сохранить"
+
+#: admin/partials/ipanorama-settings-display.php:52
+msgid "Fixed Size"
+msgstr "Фиксированный"
+
+#: admin/partials/ipanorama-settings-display.php:436
+msgid "Custom CSS Content"
+msgstr "Пользовательский CSS"
+
+#: admin/partials/ipanorama-settings-display.php:455
+msgid "Custom JS code"
+msgstr "Пользовательский JavaScript код"
+
+#: public/class-ipanorama-public.php:163
+msgid "Invalid iPanorama shortcode attributes"
+msgstr "Неверно заданы атрибуты вызова шорткода"
+
+#: public/class-ipanorama-public.php:171
+msgid "Invalid iPanorama slug attribute"
+msgstr "Неверный задан атрибут slug при вызове шорткода"
+
+#~ msgid "Top limit [-90, 90]"
+#~ msgstr "Верхняя граница [-90, 90]"
+
+#~ msgid "Bottom limit [-90, 90]"
+#~ msgstr "Нижняя граница [-90, 90]"
+
+#~ msgid ""
+#~ "This is global settings. These options are shared among all items if you "
+#~ "turn it ON for an item, see an item right side checkbox."
+#~ msgstr ""
+#~ "Глобальный настройки. Данные настройки применяются для всех элементов, "
+#~ "если в параметрах элемента данная функция активна, смотри флажок "
+#~ "переключения в правой стороне каждого параметра."
