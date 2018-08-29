@@ -1,8 +1,8 @@
 === Advanced Custom Fields Pro ===
 Contributors: elliotcondon
 Tags: acf, advanced, custom, field, fields, form, repeater, content
-Requires at least: 3.6.0
-Tested up to: 4.9.0
+Requires at least: 4.4.0
+Tested up to: 4.9.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,10 +29,10 @@ Use the Advanced Custom Fields plugin to take full control of your WordPress edi
 * [Website](https://www.advancedcustomfields.com)
 * [Documentation](https://www.advancedcustomfields.com/resources/)
 * [Support](https://support.advancedcustomfields.com)
-* [ACF PRO](https://www.advancedcustomfields.com/resources/pro/)
+* [ACF PRO](https://www.advancedcustomfields.com/pro/)
 
 = PRO =
-The Advanced Custom Fields plugin is also available in a professional version which includes more fields, more functionality, and more flexibility! [Learn more](https://www.advancedcustomfields.com/resources/pro/)
+The Advanced Custom Fields plugin is also available in a professional version which includes more fields, more functionality, and more flexibility! [Learn more](https://www.advancedcustomfields.com/pro/)
 
 
 == Installation ==
@@ -66,6 +66,121 @@ From your WordPress dashboard
 
 == Changelog ==
 
+= 5.7.3 =
+*Release Date - 20 August 2018*
+
+* New - Added Dark Mode styles for the [Dark Mode Plugin](https://en-au.wordpress.org/plugins/dark-mode/).
+* New - Added "Value Contains" condition to the Select field type.
+* New - Added support for the WooCommerce product type dropdown to trigger "update metaboxes".
+* Tweak - Improved acf.screen model responsible for "updating metaboxes" when changing post data.
+* Tweak - Removed user fields from the multisite "Add New User" page. 
+* Fix - Fixed bug preventing some tinymce customizations from working.
+* Fix - Fixed JS bug throwing "preference" error in console.
+* Dev - Added action 'acf/enqueue_uploader' triggered after the hidden "ACF Content" editor is rendered.
+
+= 5.7.2 =
+*Release Date - 6 August 2018*
+
+* Fix - Fixed bug preventing the Google Maps Field address from being customised.
+* Fix - Improved logic to request and cache plugin update information.
+* Fix - Fixed bug preventing JS initialization when editing widgets in accessibility mode.
+* Fix - Added missing $parent argument to term_exists() function when adding a new term via taxonomy field popup.
+* Fix - Fixed bug where nested Group Fields did not delete their values.
+* Fix - Fixed JS error thrown by localStorage if cookies are not enabled.
+* Dev - Bumped minimum WP version requirement to 4.4.
+* Dev - Added action 'wp_nav_menu_item_custom_fields' for compatibility with other plugins modifying the menu walker class.
+* Dev - Added 'multiple' to the allowed attributes for an email field.
+* Dev - Added new ACF_Ajax class for upcoming features.
+
+= 5.7.1 =
+* Core: Minor fixes and improvements
+
+= 5.7.0 =
+* Core: Major JavaScript updates
+* Core: Improved conditional logic with new types and more supported fields
+* Core: Improved localization and internationalization
+* Repeater field: Improved logic that remembers collapsed row states
+* Repeater field: Added support to collapse multiple rows (hold shift)
+* API: Improved lookup to find fields without a reference value
+* Language: Added Croatian translation - Thanks to Vlado Bosnjak
+* Language: Updated Italian translation - thanks to Davide Pantè
+* Language: Updated Romanian translation - thanks to Ionut Staicu
+* Language: Updated German translation - thanks to Ralf Koller
+* Language: Updated Arabic translation - thanks to Karim Ramadan
+* Language: Updated Portuguese translation - thanks to Pedro Mendonça
+
+= 5.6.10 =
+* Core: Minor fixes and improvements
+
+= 5.6.9 =
+* User field: Added new 'Return Format' setting (Array, Object, ID)
+* Core: Added basic compatibility with Gutenberg - values now save
+* Core: Fixed bug affecting the loading of fields on new Menu Items
+* Core: Removed private ('show_ui' => false) post types from the 'Post Type' location rule choices
+* Core: Minor fixes and improvements
+* Language: Updated French translation - thanks to Maxime Bernard-Jacquet
+
+= 5.6.8 =
+* API: Fixed bug causing have_rows() to fail with PHP 7.2
+* Core: Fixed bug causing "Add new term" form to hide after submit
+* Core: Minor fixes and improvements
+* Language: Updated German translation - thanks to Ralf Koller
+* Language: Updated Portuguese translation - thanks to Pedro Mendonça
+* Language: Updated Arabic translation - thanks to Karim Ramadan
+* Language: Updated Spanish translation - thanks to Luis Rull Muñoz
+* Language: Updated Persian translation - thanks to Majix
+
+= 5.6.7 =
+* Fixed an assortment of bugs found in 5.6.6
+
+= 5.6.6 =
+* Accordion field: Added new field type
+* Tab field: Added logic to remember active tabs
+* WYSIWYG field: Fixed JS error in quicktags initialization
+* Core: Fixed issue preventing conditional logic for menu item fields
+* Core: Fixed issue preventing JS initialization for newly added menu items.
+* Core: Allow whitespace in input value (previously trimmed)
+* Core: Minor fixes and improvements
+* Language: Updated Italian translation - thanks to Davide Pantè
+* Language: Updated Brazilian Portuguese translation - thanks to Rafael Ribeiro
+* Language: Updated Dutch translation - thanks to Derk Oosterveld
+* Language: Updated Portuguese translation - thanks to Pedro Mendonça
+* Language: Updated Persian translation - thanks to Kamel Kimiaei
+* Language: Updated Swiss German translation - thanks to Raphael Hüni
+* Language: Updated Arabic translation - thanks to Karim Ramadan
+
+= 5.6.5 =
+* API: Added new 'kses' setting to the `acf_form()` function
+* Core: Added new 'Admin Tools' framework (includes design refresh)
+* Core: Minor fixes and improvements
+* Language: Update Ukrainian translation - thanks to Jurko Chervony
+* Language: Update Russian translation - thanks to Andriy Toniyevych
+* Language: Update Hebrew translation - thanks to Itamar Megged
+
+= 5.6.4 =
+* Google Map field: Fixed bug causing invalid url to JavaScript library
+* WYSIWYG field: Fixed minor z-index and drag/drop bugs
+* Group field: Fixed bug causing incorrect export settings
+* Core: Fixed bug in 'Post Taxonomy' location rule ignoring selected terms during AJAX callback
+* Core: Fixed bug preventing a draft to validate with required fields
+* Language: Updated Italian translation - thanks to Davide Pantè
+* Language: Update Turkish translation - thanks to Emre Erkan
+* Language: Updated Chinese translation - thanks to Wang Hao
+* Language: Update Hebrew translation - thanks to Itamar Megged
+
+= 5.6.3 =
+* Button Group field: Added new field type
+* Range field: Added missing 'step' attribute to number input
+* Range field: Added width to number input based on max setting
+* Basic fields: Added missing 'required' attribute to inputs
+* Basic fields: Removed empty attributes from inputs
+* API: Fixed `get_fields()` bug ignoring fields starting with an underscore
+* Core: Minor fixes and improvements
+* Language: Updated Portuguese translation - thanks to Pedro Mendonça
+* Language: Updated French translation - thanks to Maxime Bernard-Jacquet
+* Language: Updated Finnish translation - thanks to Sauli Rajala
+* Language: Updated German translation - thanks to Ralf Koller
+
 = 5.6.2 =
 * Range field: Added new field type
 * Clone field: Fixed bug causing value update issues for 'seamless' + widgets / nave menu items
@@ -89,7 +204,7 @@ From your WordPress dashboard
 * API: Improved `have_rows()` function to work with clone and group field values
 * Core: Added new location for Menus
 * Core: Added new location for Menu Items
-* Core: Added types to Attachment location rule
+* Core: Added types to Attachment location rule - thanks to Jan Thomas
 * Core: Added "Confirm Remove" tooltips
 * Core: Updated Select2 JS library to v4
 * Core: Minor fixes and improvements
