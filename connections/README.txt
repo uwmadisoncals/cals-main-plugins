@@ -5,7 +5,7 @@ Tags: address book, business directory, chamber of commerce business directory, 
 Requires at least: 4.5.3
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 8.24
+Stable tag: 8.27
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -233,6 +233,40 @@ Yes this is possible but there is a special setup required to do so. It is recom
 == Changelog ==
 
 [Complete Changelog can be found here.](https://connections-pro.com/changelog/)
+
+= 8.27 08/31/2018 =
+* NEW: Add Algolia as a geocoding provider.
+* TWEAK: Default to Algolia to geocode address if the Google Maps API Server key has not been set in the settings.
+* TWEAK: Switch from the goMap library to the Leaflet library to provide mapping and geocoding when clicking the Geocode button while adding an address.
+* TWEAK: Default to Wikimedia Maps to display maps if the Google Maps API Browser key has not been set in the settings.
+* DEV: phpDoc corrections
+* DEV: A package.json update to remove grunt-phpdocumentor.
+
+= 8.26 08/20/2018 =
+* NEW: Introduce multiple service provider geocoding API.
+* NEW: Refactor entry action to geocode addresses to utilize the new multiple service provider geocode API.
+* TWEAK: Tweak to `cnEntry_Collection_Item::__isset()` and `cnEntry_Collection_Item::__get()` so empty() calls return values as expected.
+* TWEAK: Remove duplicate code in `cnAddress` by extending it using `cnEntry_Collection_Item` to match the other entry object types.
+* TWEAK: Add toArray method to cnCoordinates.
+* TWEAK: Move country an coordinates to the Model folder.
+* TWEAK: Move cnTimezone to Model folder.
+* TWEAK: Update user-agent sent when doing plugin update check.
+* TWEAK: Update dependencies registry to account for file path changes.
+* TWEAK: Remove old geocoding functions.
+* DEV: phpDoc additions and corrections.
+
+= 8.25.1 08/06/2018 =
+* BUG: Add limit parameter to `cnOutput::getDateBlock()` to correct index not defined PHP notice.
+* DEV: phpDoc correction.
+
+= 8.25 08/01/2018 =
+* TWEAK: Refactor the Manage admin page to utilize `cnEntryDates::render()`.
+* TWEAK: Refactor `cnEntry_Output::getDateBlock()` to utilize the `cnEntry_Dates` objects `render()` method using templates.
+* TWEAK: Remove unused parameters from methods in cnOutput.
+* BUG: Correct a couple typos in `cnEntry_Dates::render()`.
+* I18N: Update POT file.
+* I18N: Update MO files.
+* DEV: phpDoc correction.
 
 = 8.24 07/27/2018 =
 * NEW: Introduce `cnString::replaceFirst()` and `cnString::replaceLast()`.
@@ -493,71 +527,9 @@ Yes this is possible but there is a special setup required to do so. It is recom
 * BUG: Correct `Illegal string offset` and `Cannot create references to/from string offsets` PHP errors when saving user meta.
 * DEV: Include the Rinvex\Country library.
 
-= 8.6.12 11/01/2017 =
-* NEW: Introduce support for custom taxonomies.
-* NEW: Introduce the `cn_image_editors` filter.
-* NEW: Introduce the `cn_entry_directory_homepage` filter.
-* NEW: Introduce the `cn_image_link` and `cn_image_link-{type}` filters.
-* NEW: Introduce the `cn_entry_output_category_items` filter.
-* TWEAK: Some code cleanup of the output for social media networks icons.
-* TWEAK: Add some RTL CSS in its own CSS file to be conditionally loaded.
-* BUG: When exporting all, make sure to attempt to JSON decode the option column before access its value.
-* BUG: Drop the `slug` index on the connections_terms table.
-* BUG: Remove debug code from the CSV export all output.
-* BUG: Correct bug which could prevent the logo/photo URL from being exported.
-* OTHER: Add reference to the Local Time extension in the readme.txt file.
-* OTHER: Replace `http` with `https` for wordpress.org and connections-pro.com domain links.
-* DEV: phpDoc corrections.
-* DEV: Add curly brackets to a variable variable for better code clarity.
-
-= 8.6.11 09/01/2017 =
-* BUG: Fix to allow `0` minutes and seconds by improving check for existing key and ensure it is not false after parsing a datetime format before merging value.
-* BUG: If the parsed datetime is in 12 hour format, properly convert the time to 24 hour format.
-
-= 8.6.10 08/25/2017 =
-* TWEAK: Rename the getGMTOffset method in cnEntry_vCard to better describe its function.
-* TWEAK: Add Angola and its provinces.
-* TWEAK: Tweak to logic to determine if a canonical redirect should be processed or not.
-* TWEAK: Cache requests to the Google Maps Time Zone API for 24 hours.
-* TWEAK: Add `get_utc_offset()` and `utc_offset()` methods to cnTimezone.
-* TWEAK: Add `getTimezone()` to cnAddress which utilizes cnGoogleMapsTimezone().
-* TWEAK: Update `cnRetrieve::setQueryVisibility()` to return a query selector of none if the current user does not have the required capabilities to view the object.
-* TWEAK: Update `cnRetrieve::upcoming()` to respect the visibility status of the date based on the current user's capabilities.
-* TWEAK: Update the `[upcoming_list]` shortcode to utilize `cnRetrieve::upcoming()` instead of custom query in the shortcode callback to standardize results globally across the core plugin.
-* BUG: Correct the return value of cnTimezone::get_raw_offset().
-* BUG: Ensure property exists before using it in cnGoogleMapsTimeZone::queryTimeZone().
-* BUG: Function should be static.
-* DEV: Add a few missing phpDoc blocks.
-
-= 8.6.9 08/11/2017 =
-* NEW: Introduce `cnGoogleMapsTimeZone` wrapper for the Google Timezone API and `cnTimezone` classes.
-* NEW: Add Pear File_IMC as a vendor library.
-* TWEAK: Tweak the require_once logic in the Card and Profile template to allow them to be pulled out and activated as plugins without causing PHP errors when trying to run the Template Customizer.
-* TWEAK: Rename `cnvCard` to `cnEntry_vCard`.
-* TWEAK: Refactor cnEntry_vCard to utilize the File_IMC_Build_Vcard class.
-* TWEAK: Correct the value for the label to properly associate it to the search input.
-* TWEAK: Add a value for the search submit button then use CSS to hide it for a11y.
-* BUG: Ensure the parsed shortcode atts is an array before attempting to add values to the atts array.
-* BUG: Deal with custom field names which contain punctuation and other extended characters.
-* OTHER: Indent with tabs, not spaces.
-* OTHER: Add missing space.
-* OTHER: Update the Chosen library from 1.6.1 to 1.7.
-
 [Complete Changelog can be found here.](https://connections-pro.com/changelog/)
 
 == Upgrade Notice ==
-
-= 8.6.9 =
-It is recommended to backup before updating. Requires WordPress >= 4.4.
-
-= 8.6.10 =
-It is recommended to backup before updating. Requires WordPress >= 4.4.
-
-= 8.6.11 =
-It is recommended to backup before updating. Requires WordPress >= 4.4.
-
-= 8.6.12 =
-It is recommended to backup before updating. Requires WordPress >= 4.4.
 
 = 8.7 =
 It is recommended to backup before updating. Requires WordPress >= 4.4.
@@ -618,3 +590,15 @@ It is recommended to backup before updating. Requires WordPress >= 4.5.3 and PHP
 
 = 8.24 =
 It is recommended to backup before updating. Requires WordPress >= 4.5.3 and PHP >= 5.3. PHP version >= 7.1 recommended.
+
+= 8.25 =
+It is recommended to backup before updating. Requires WordPress >= 4.5.3 and PHP >= 5.3. PHP version >= 7.1 recommended.
+
+= 8.25.1 =
+It is recommended to backup before updating. Requires WordPress >= 4.5.3 and PHP >= 5.3. PHP version >= 7.1 recommended.
+
+= 8.26 =
+It is recommended to backup before updating. Requires WordPress >= 4.5.3 and PHP >= 5.3.9. PHP version >= 7.1 recommended.
+
+= 8.27 =
+It is recommended to backup before updating. Requires WordPress >= 4.5.3 and PHP >= 5.3.9. PHP version >= 7.1 recommended.

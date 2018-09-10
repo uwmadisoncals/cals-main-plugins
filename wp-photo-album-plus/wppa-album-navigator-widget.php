@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display album names linking to content
-* Version 6.8.08
+* Version 6.9.12
 */
 
 class AlbumNavigatorWidget extends WP_Widget {
@@ -89,6 +89,15 @@ class AlbumNavigatorWidget extends WP_Widget {
     /** @see WP_Widget::update */
     function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
+
+		//Defaults
+		$instance = wp_parse_args( (array) $instance, array(
+															'title' 	=> __( 'Album Navigator', 'wp-photo-album-plus' ),
+															'parent' 	=> '0',
+															'skip' 		=> 'yes',
+															'logonly' => 'no',
+															) );
+
 		$instance['title'] 		= strip_tags( $new_instance['title'] );
 		$instance['parent'] 	= $new_instance['parent'];
 		$instance['skip'] 		= $new_instance['skip'];
@@ -101,7 +110,6 @@ class AlbumNavigatorWidget extends WP_Widget {
 		global $wpdb;
 
 		//Defaults
-
 		$instance = wp_parse_args( (array) $instance, array(
 															'title' 	=> __( 'Album Navigator', 'wp-photo-album-plus' ),
 															'parent' 	=> '0',

@@ -1,21 +1,17 @@
-=== Easy Maps ===
-Contributors: awerhane74, usetrippy
-Tags: maps, travel
+=== Trippy Places ===
+Contributors: usetrippy
+Tags: travel
 Requires at least: 3.5.0
-Tested up to: 4.8.1
+Tested up to: 4.9.8
 Stable tag: trunk
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Enhance your posts with Google Maps.  Use the Easy Maps plugin to easily create more dynamic content with an inline editor.
+Enhance your posts.  Use the Trippy Places plugin to easily create more dynamic content with an inline editor.
 
 == Description ==
 
-In literally just a few seconds, you can add beautiful Google maps to any of your posts with Easy Maps (watch the video below to see it in action!).  
-As you write, Easy Maps can instantly find towns, restaurants, attraction, hotels and more.  And because it's connected with Trippy.com, 
-using Easy Maps in a post will automagically get your post listed as a resource on Trippy.com, which means more new readers for your blog.
-
-[youtube https://www.youtube.com/watch?v=tT4agJzRjv0&feature=youtu.be]
+As you write, Trippy can find towns, restaurants, attraction, hotels and more.
 
 == Installation ==
 
@@ -25,23 +21,23 @@ e.g.
 
 1. Upload the `easy-maps` folder to the `/wp-content/plugins/` directory or upload the zip file using the Install Plugins tool in the Wordpress Dashboard.
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. While editing a post, press the @-symbol and start adding great maps to your post.
+3. While editing a post, press the @-symbol and start adding places to your post.
 
 == Frequently Asked Questions ==
 
 = How do I get the autocompleter to appear? =
 
-A: Type the "@" symbol to trigger the autocompleter.  Alternatively, you can click the "Add Mapped Place" button in the toolbar.
+A: Type the "@" symbol to trigger the autocompleter.  Alternatively, you can click the "Add Place" button in the toolbar.
 
 
 == Screenshots ==
 
-1. Magically add a map without ever leaving your post.
-2. Control how the map displays in your post
-3. Adding a few more places on the fly
-4. What it looks like in a published post
+1. Add places within your post.
 
 == Changelog ==
+
+= 1.2.0 =
+* Removed map due to changes by Google
 
 = 1.1.9 =
 * Migrate to https for SSL support

@@ -171,6 +171,9 @@ Additionally, Types is the only plugin that lets you define parent/child relatio
 
 == Changelog ==
 
+= 2.3.3 =
+* Fixed an issue when saving checkboxes while relationship posts also contains checkboxes.
+
 = 2.3.2 =
 * An upgrade to the Installer component to prevent the notification about a possible upgrade to Types 3.0 for non-subscription users.
 

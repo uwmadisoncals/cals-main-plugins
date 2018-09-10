@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Make the picture html
-* Version 6.9.08
+* Version 6.9.12
 *
 */
 
@@ -126,11 +126,10 @@ function wppa_get_picture_html( $args ) {
 
 	}
 	if ( $link['is_lightbox'] ) {
-//		$style .= 'cursor:' . wppa_wait() . ';'; //url( ' . wppa_get_imgdir() . wppa_opt( 'magnifier' ) . ' ),pointer;';
 		$title = wppa_zoom_in( $id );
 	}
 
-	// Create the html. To prevent mis-alignment of the audio control bar or to escape from the <a> tag for the panorama controlbar
+	// Create the html. To prevent mis-alignment of the audio control bar or to escape from the <a> tag for the pan controlbar
 	// we wrap it in a div with zero fontsize and lineheight.
 	$result = '<div style="font-size:0;line-height:0;" >';
 
@@ -153,6 +152,7 @@ function wppa_get_picture_html( $args ) {
 				( $videox ? ' data-videonatwidth="' . $videox . '"' : '' ) .
 				( $videoy ? ' data-videonatheight="' . $videoy . '"' : '' ) .
 				' ' . wppa( 'rel' ) . '="'.wppa_opt( 'lightbox_name' ).'"' .
+				wppa_get_lb_panorama_full_html( $id ) .
 				( $link['target'] ? ' target="' . $link['target'] . '"' : '' ) .
 				' class="thumb-img"' .
 				' id="a-' . $id . '-' . wppa( 'mocc' ) . '"' .
@@ -276,18 +276,46 @@ function wppa_get_picture_html( $args ) {
 	return $result;
 }
 
-// Get the html for a panorama image
+// Get full html for a lightbox pan image, e.g. ' data-panorama="'..."' for use in lightbox anchor link
+function wppa_get_lb_panorama_full_html( $id ) {
+
+	$result = wppa_get_lb_panorama_html( $id );
+	if ( $result ) {
+		return ' data-panorama="' . esc_attr( $result ) . '"';
+	}
+	else {
+		return '';
+	}
+}
+
+// Get the html for a lightbox pan image
+function wppa_get_lb_panorama_html( $id ) {
+
+	return wppa_get_panorama_html( array( 'id' => $id, 'lightbox' 	=> true, ) );
+}
+
+// Get the html for a pan image
 function wppa_get_panorama_html( $args ) {
 
+	// If no id given, quit
 	if ( ! isset( $args['id'] ) ) return;
+
+	$args['controls'] = ( wppa_opt( 'panorama_control' ) == 'all' ) || ( wppa_opt( 'panorama_control' ) == 'mobile' && wppa_is_mobile() );
+	$args['manual'] = wppa_opt( 'panorama_manual' ) == 'all' ? true : false;
+	$args['autorun'] = wppa_opt( 'panorama_autorun' ) == 'none' ? '' : wppa_opt( 'panorama_autorun' );
+	$args['autorunspeed'] = wppa_opt( 'panorama_autorun_speed' );
+	$args['zoomsensitivity'] = wppa_opt( 'panorama_wheel_sensitivity' );
 
 	switch( wppa_is_panorama( $args['id'] ) ) {
 
 		case '1':
-			$result = wppa_get_spheric_panorama_html( $args );
+			$result = wppa_get_spheric_pan_html( $args );
+
+			// Save we have a spheric panorama on board for loading THREE.js
+			wppa( 'has_panorama', true );
 			break;
 		case '2':
-			$result = wppa_get_flat_panorama_html( $args );
+			$result = wppa_get_flat_pan_html( $args );
 			break;
 		default:
 			$result = '';
@@ -296,181 +324,306 @@ function wppa_get_panorama_html( $args ) {
 	return $result;
 }
 
-// Spheric 360deg panorama
-function wppa_get_spheric_panorama_html( $args ) {
+// Spheric 360deg pan
+function wppa_get_spheric_pan_html( $args ) {
 
 	// Init
-	$defaults 	= array( 	'id' 		=> '0',
-							'mocc' 		=> '0',
-							'width' 	=> false,
-							'height' 	=> false,
-							'haslink' 	=> false,
+	$defaults 	= array( 	'id' 				=> '0',
+							'mocc' 				=> '0',
+							'width' 			=> false,
+							'height' 			=> false,
+							'haslink' 			=> false,
+							'lightbox' 			=> 0,
+							'controls' 			=> true,
+							'autorun' 			=> '',
+							'manual' 			=> true,
+							'autorunspeed' 		=> '3',
+							'zoomsensitivity' 	=> '3',
+
 						);
 
-	$args 		= wp_parse_args( $args, $defaults );
+	$args 				= wp_parse_args( $args, $defaults );
 
-	$id 		= strval( intval ( $args['id'] ) );
-	$mocc 		= $args['mocc'] ? $args['mocc'] : wppa( 'mocc' );
-	$width 		= $args['width'] ? $args['width'] : wppa_get_container_width();
-	$height 	= $args['height'] ? $args['height'] : round( $width * wppa_get_photoy( $id ) / wppa_get_photox( $id ) );
-	$haslink 	= $args['haslink'];
-	$iconsize 	= wppa_opt( 'nav_icon_size_panorama' ) . 'px;';
+	$id 				= strval( intval ( $args['id'] ) );
+	$mocc 				= $args['mocc'] ? $args['mocc'] : wppa( 'mocc' );
+	$width 				= $args['width'] ? $args['width'] : wppa_get_container_width();
+	$height 			= $args['height'] ? $args['height'] : round( $width * wppa_get_photoy( $id ) / wppa_get_photox( $id ) );
+	$haslink 			= $args['haslink'];
+	$icsiz 				= wppa_opt( 'nav_icon_size_panorama' );
+	$iconsize 			= $icsiz . 'px;';
+	$lightbox 			= $args['lightbox'];
+	$controls 			= $args['controls'];
+	$autorun 			= $args['autorun'];
+	$manual 			= $args['manual'];
+	$autorunspeed 		= $args['autorunspeed'];
+	$zoomsensitivity 	= $args['zoomsensitivity'];
 
-	$url 		= wppa_is_mobile() ? wppa_get_photo_url( $id ) : wppa_get_hires_url( $id );
+	$url 				= esc_url( wppa_is_mobile() ? wppa_get_photo_url( $id ) : wppa_get_hires_url( $id ) );
 
 	$result =
+	( $lightbox ? $id . '.' : '' ) .
 	( $haslink ? '</a>' : '' ) .
-	'<div' .
-		' id="wppa-panorama-div-' . $mocc . '"' .
-		' class="wppa-panorama-div wppa-panorama-div-' . $mocc . '"' .
-		' style="margin-bottom:4px;cursor:grab;"' .
-		' >' .
-	'</div>' .
-	'<div' .
-		' id="wppa-panoramacontrol-div-' . $mocc . '"' .
-		' class="wppa-panoramacontrol-div wppa-panoramacontrol-div-' . $mocc . '"' .
-		' style="text-align:center;margin-bottom:4px;"' .
-		' >' .
-		'<span' .
-			' id="wppa-panoramacontrol-left-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'Left-4', $iconsize ) .
+	( $lightbox ? '<div id="wppa-ovl-pan-container" >' : '' ) .
+	'<div
+		id="wppa-pan-div-' . $mocc . '"
+		class="wppa-pan-div wppa-pan-div-' . $mocc . '"
+		style="' . ( $controls ? 'margin-bottom:4px;' : '' ) . ( $manual ? 'cursor:grab;': '' ) . 'line-height:0;"
+		>
+	</div>' .
+	( $controls ?
+	'<div
+		id="wppa-pctl-div-' . $mocc . '"
+		class="wppa-pctl-div wppa-pctl-div-' . $mocc . '"
+		style="text-align:center;"
+		>' .
+		( $lightbox ?
+			'<span
+				id="wppa-pctl-prev-' . $mocc . '"
+				class="wppa-pan-prevnext"
+				style="margin:0 2px 0 0;float:left;"
+				>' .
+				wppa_get_svghtml( 'Prev-Button', $iconsize, true ) .
+			'</span>'
+			:
+			''
+		) .
+		'<span
+			id="wppa-pctl-left-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'Left-4', $iconsize, true ) .
+		'</span>
+		<span
+			id="wppa-pctl-right-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'Right-4', $iconsize, true ) .
+		'</span>
+		<span
+			id="wppa-pctl-up-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'Up-4', $iconsize, true ) .
+		'</span>
+		<span
+			id="wppa-pctl-down-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'Down-4', $iconsize, true ) .
+		'</span>
+		<span
+			id="wppa-pctl-zoomin-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'ZoomIn', $iconsize, true ) .
+		'</span>
+		<span
+			id="wppa-pctl-zoomout-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'ZoomOut', $iconsize, true ) .
 		'</span>' .
-		'<span' .
-			' id="wppa-panoramacontrol-right-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'Right-4', $iconsize ) .
-		'</span>' .
-		'<span' .
-			' id="wppa-panoramacontrol-up-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'Up-4', $iconsize ) .
-		'</span>' .
-		'<span' .
-			' id="wppa-panoramacontrol-down-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'Down-4', $iconsize ) .
-		'</span>' .
-		'<span' .
-			' id="wppa-panoramacontrol-zoomin-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'ZoomIn', $iconsize ) .
-		'</span>' .
-		'<span' .
-			' id="wppa-panoramacontrol-zoomout-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'ZoomOut', $iconsize ) .
-		'</span>' .
-	'</div>' .
+		( $lightbox ?
+			'<span
+				id="wppa-pctl-next-' . $mocc . '"
+				class="wppa-pan-prevnext"
+				style="margin:0 0 0 2px;float:right;"
+				>' .
+				wppa_get_svghtml( 'Next-Button', $iconsize, true ) .
+			'</span>'
+			:
+			''
+		) .
+	'</div>'
+	:
+	'' ) .
+
+	( $lightbox ? '</div>' : '' ) .
+
 	'<script>' .
 
-		'jQuery(document).ready(function(){' .
+		// Create image object and add the image url to it
+		'var image' . $mocc . ' = new Image();
+		image' . $mocc . '.src = "' . $url . '";' .
 
-			'var manualControl = false,' .
-				'longitude = 0,' .
-				'latitude = 0,' .
-				'savedX,' .
-				'savedY,' .
-				'savedLongitude,' .
-				'savedLatitude,' .
-				'deltaX = 0,' .
-				'deltaY = 0,' .
-				'deltaFov = 0,' .
-				'fov = 75,' .
-				'run = true,' .
-				'busy = false,' .
-				'aspect = ' . $width / $height . ',' .
-				'div = document.getElementById("wppa-panorama-div-' . $mocc . '"),' .
-				'left = document.getElementById("wppa-panoramacontrol-left-' . $mocc . '"),' .
-				'right = document.getElementById("wppa-panoramacontrol-right-' . $mocc . '"),' .
-				'up = document.getElementById("wppa-panoramacontrol-up-' . $mocc . '"),' .
-				'down = document.getElementById("wppa-panoramacontrol-down-' . $mocc . '"),' .
-				'zoomin = document.getElementById("wppa-panoramacontrol-zoomin-' . $mocc . '"),' .
-				'zoomout = document.getElementById("wppa-panoramacontrol-zoomout-' . $mocc . '");' .
+		// When document complete, run the main proc
+		'jQuery(document).ready(function(){wppaDoSphericPanorama' . $mocc . '();});' .
 
-			// setting up the renderer
-			'renderer' . $mocc . ' = new THREE.WebGLRenderer();' .
-			'renderer' . $mocc . '.setSize(' . $width . ', ' . $height . ');' .
+		// The main proccedure
+		'function wppaDoSphericPanorama' . $mocc . '(){' .
 
-			// Place the element
-			'div.appendChild(renderer' . $mocc . '.domElement);' .
+			// Wait until the image file has been completely loaded
+			'if (!image' . $mocc . '.complete){setTimeout( wppaDoSphericPanorama' . $mocc . ', 100 );return;};' .
 
-			// creating a new scene
-			'var scene = new THREE.Scene();' .
+			// Var declarations
+			'var
+			$ 				= jQuery,
+			uniqueId,
+			manualControl 	= false,
+			longitude 		= 180,
+			latitude 		= 0,
+			savedX,
+			savedY,
+			savedLongitude,
+			savedLatitude,' .
+			( $autorun == 'right' ? 'deltaX = 0.05 * ' . $autorunspeed . ' / 3,' : '' ) .
+			( $autorun == 'left' ? 'deltaX = -0.05 * ' . $autorunspeed . ' / 3,' : '' ) .
+			( $autorun == '' ? 'deltaX = 0,' : '' ) .
+			'deltaY 		= 0,
+			deltaFov 		= 0,
+			fov 			= 75,
+			abort 			= false,
+			aspect 			= ' . $width / $height . ',
+			div 			= $( "#wppa-pan-div-' . $mocc . '" ),
+			left 			= $("#wppa-pctl-left-' . $mocc . '" ),
+			right 			= $("#wppa-pctl-right-' . $mocc . '" ),
+			up 				= $("#wppa-pctl-up-' . $mocc . '" ),
+			down 			= $("#wppa-pctl-down-' . $mocc . '" ),
+			zoomin 			= $("#wppa-pctl-zoomin-' . $mocc . '" ),
+			zoomout 		= $("#wppa-pctl-zoomout-' . $mocc . '" ),
+			prev 			= $("#wppa-pctl-prev-' . $mocc . '" ),
+			next 			= $("#wppa-pctl-next-' . $mocc . '" );' .
 
-			// adding a camera
-			'var camera = new THREE.PerspectiveCamera(fov, aspect, 1, 1000);' .
-			'camera.target = new THREE.Vector3(0, 0, 0);' .
+			// Setting the global id, indicating the most recent invocation
+			( $lightbox ? '
+				wppaGlobalOvlPanoramaId++;
+				uniqueId = wppaGlobalOvlPanoramaId;' :
+				'' ) .
 
-			// creation of a big sphere geometry
-			'var sphere = new THREE.SphereGeometry(100, 100, 40);' .
-			'sphere.applyMatrix(new THREE.Matrix4().makeScale(-1, 1, 1));' .
+			// Lghtbox uses the global vars used for the webGL context
+			( $lightbox ?
+				// setting up the renderer
+				'if ( ! wppaRenderer ) {
+					wppaRenderer = new THREE.WebGLRenderer();
+				}
+				wppaRenderer.setSize(' . $width . ', ' . $height . ');
+				$(div).append(wppaRenderer.domElement);' .
 
-			// creation of the sphere material
-			'var sphereMaterial = new THREE.MeshBasicMaterial();' .
-			'sphereMaterial.map = THREE.ImageUtils.loadTexture("' . $url . '");' .
+				// Creating a new scene if not yet available
+				'if ( ! wppaScene ) {
+					wppaScene = new THREE.Scene();
+				}' .
 
-			// geometry + material = mesh (actual object)
-			'var sphereMesh = new THREE.Mesh(sphere, sphereMaterial);' .
-			'scene.add(sphereMesh);' .
+				// Adding a camera
+				'if ( ! wppaCamera ) {
+					wppaCamera = new THREE.PerspectiveCamera(fov, aspect, 1, 1000);
+					wppaCamera.target = new THREE.Vector3(0, 0, 0);
+				}' .
 
-			// listeners
-			( wppa_is_mobile() ? /*
-				div.addEventListener("touchstart", onDivMouseDown, false);
-				div.addEventListener("touchmove", onDivMouseMove, false);
-				div.addEventListener("touchend", onDivMouseUp, false); */
-				'right.addEventListener("touchstart", function(){run=true;deltaX=0.2;render();}, false);' .
-				'right.addEventListener("touchend", function(){run=false;deltaX=0}, false);' .
-				'left.addEventListener("touchstart", function(){run=true;deltaX=-0.2;render();}, false);' .
-				'left.addEventListener("touchend", function(){run=false;deltaX=0}, false);' .
-				'up.addEventListener("touchstart", function(){run=true;deltaY=0.2;render();}, false);' .
-				'up.addEventListener("touchend", function(){run=false;deltaY=0}, false);' .
-				'down.addEventListener("touchstart", function(){run=true;deltaY=-0.2;render();}, false);' .
-				'down.addEventListener("touchend", function(){run=false;deltaY=0}, false);' .
-				'zoomin.addEventListener("touchstart", function(){run=true;deltaFov=-0.2;doZoom();render();}, false);' .
-				'zoomin.addEventListener("touchend", function(){run=false;deltaFov=0}, false);' .
-				'zoomout.addEventListener("touchstart", function(){run=true;deltaFov=0.2;doZoom();render();}, false);' .
-				'zoomout.addEventListener("touchend", function(){run=false;deltaFov=0}, false);'
-				:
-				'div.addEventListener("mousedown", onDivMouseDown, false);' .
-				'div.addEventListener("mousemove", onDivMouseMove, false);' .
-				'div.addEventListener("mouseup", onDivMouseUp, false);' .
-			//	'div.addEventListener("mouseout", onDivMouseUp, false);' .
-				'right.addEventListener("mousedown", function(){run=true;deltaX=0.2;render();}, false);' .
-				'right.addEventListener("mouseup", function(){run=false;deltaX=0}, false);' .
-				'left.addEventListener("mousedown", function(){run=true;deltaX=-0.2;render();}, false);' .
-				'left.addEventListener("mouseup", function(){run=false;deltaX=0}, false);' .
-				'up.addEventListener("mousedown", function(){run=true;deltaY=0.2;render();}, false);' .
-				'up.addEventListener("mouseup", function(){run=false;deltaY=0}, false);' .
-				'down.addEventListener("mousedown", function(){run=true;deltaY=-0.2;render();}, false);' .
-				'down.addEventListener("mouseup", function(){run=false;deltaY=0}, false);' .
-				'zoomin.addEventListener("mousedown", function(){run=true;deltaFov=-0.2;doZoom();render();}, false);' .
-				'zoomin.addEventListener("mouseup", function(){run=false;deltaFov=0}, false);' .
-				'zoomout.addEventListener("mousedown", function(){run=true;deltaFov=0.2;doZoom();render();}, false);' .
-				'zoomout.addEventListener("mouseup", function(){run=false;deltaFov=0}, false);'
+				// Creation of a big sphere geometry
+				'if ( ! wppaSphere ) {
+					wppaSphere = new THREE.SphereGeometry(100, 100, 40);
+					wppaSphere.applyMatrix(new THREE.Matrix4().makeScale(-1, 1, 1));
+				}' .
+
+				// Creation of the sphere material
+				'if ( ! wppaSphereMaterial ) {
+					wppaSphereMaterial = new THREE.MeshBasicMaterial();
+				}
+				wppaSphereMaterial.map = THREE.ImageUtils.loadTexture("' . $url . '");' .
+
+				// geometry + material = mesh (actual object)
+				'if ( ! wppaSphereMesh ) {
+					wppaSphereMesh = new THREE.Mesh(wppaSphere, wppaSphereMaterial);
+					wppaScene.add(wppaSphereMesh);
+				}
+				' :
+
+				// setting up the wpparenderer
+				'var wppaRenderer = new THREE.WebGLRenderer();
+				wppaRenderer.setSize(' . $width . ', ' . $height . ');' .
+
+				// Place the element
+				'$(div).append(wppaRenderer.domElement);' .
+
+				// Creating a new scene
+				'var wppaScene = new THREE.Scene();' .
+
+				// Adding a camera
+				'var wppaCamera = new THREE.PerspectiveCamera(fov, aspect, 1, 1000);
+				wppaCamera.target = new THREE.Vector3(0, 0, 0);' .
+
+				// Creation of a big sphere geometry
+				'var wppaSphere = new THREE.SphereGeometry(100, 100, 40);
+				wppaSphere.applyMatrix(new THREE.Matrix4().makeScale(-1, 1, 1));' .
+
+				// Creation of the sphere material
+				'var wppaSphereMaterial = new THREE.MeshBasicMaterial();
+				wppaSphereMaterial.map = THREE.ImageUtils.loadTexture("' . $url . '");' .
+
+				// geometry + material = mesh (actual object)
+				'var wppaSphereMesh = new THREE.Mesh(wppaSphere, wppaSphereMaterial);
+				wppaScene.add(wppaSphereMesh);'
 			) .
 
-			// Init and Resize hanler
-			'jQuery(window).on("DOMContentLoaded load resize scroll",onResize' . $mocc . ');' .
+			// listeners
+			( wppa_is_mobile() ?
+				'$(right).on("touchstart", onRightMouseDown);
+				$(right).on("touchend", onButtonUp);
+				$(left).on("touchstart", onLeftMouseDown);
+				$(left).on("touchend", onButtonUp);
+				$(up).on("touchstart", onUpMouseDown);
+				$(up).on("touchend", onButtonUp);
+				$(down).on("touchstart", onDownMouseDown);
+				$(down).on("touchend", onButtonUp);
+				$(zoomin).on("touchstart", onZoomInMouseDown);
+				$(zoomin).on("touchend", onButtonUp);
+				$(zoomout).on("touchstart", onZoomOutMouseDown);
+				$(zoomout).on("touchend", onButtonUp);'
+				:
+				( $manual ?
+				'$(div).on("mousedown", onDivMouseDown);
+				$(div).on("mousemove", onDivMouseMove);
+				$(div).on("mouseup", onDivMouseUp);
+				document.getElementById("wppa-pan-div-' . $mocc . '").addEventListener("wheel", onDivWheel);' : '' ) .
+				'$(right).on("mousedown", onRightMouseDown);
+				$(right).on("mouseup", onButtonUp);
+				$(left).on("mousedown", onLeftMouseDown);
+				$(left).on("mouseup", onButtonUp);
+				$(up).on("mousedown", onUpMouseDown);
+				$(up).on("mouseup", onButtonUp);
+				$(down).on("mousedown", onDownMouseDown);
+				$(down).on("mouseup", onButtonUp);
+				$(zoomin).on("mousedown", onZoomInMouseDown);
+				$(zoomin).on("mouseup", onButtonUp);
+				$(zoomout).on("mousedown", onZoomOutMouseDown);
+				$(zoomout).on("mouseup", onButtonUp);
+				'
+			) .
+
+			// Common event handlers
+			( $lightbox ? '
+				if (prev) {
+					prev.on("click", panPrev);
+					next.on("click", panNext);
+				}' : '' ) .
+
+			// Install Resize hanler
+			'$(window).on("DOMContentLoaded load resize orientationchange",onResize);' .
+
+			// Resize
+			'onResize();' .
+
+			// Remove spinner
+			'$("#wppa-ovl-spin").hide();' .
 
 			// Doit!
 			'render();' .
 
-			'function render(){
+			// The rendering function
+			'function render(){' .
 
-				if(!run)return;
-				if(busy)return;
-				busy = true;
+				// See if a lightbox instance has to die
+				( $lightbox ? 'if ( ! wppaOvlOpen || wppaOvlActivePanorama != ' . $id . ' || wppaGlobalOvlPanoramaId > uniqueId ) abort=true;' : '' ) .
 
-				requestAnimationFrame(render);
+				// If the abort flag is risen, die gracefully
+				'if(abort){
+					return;
+				}' .
 
-				if(!manualControl){
+				'requestAnimationFrame(render);
+
+				if ( ! manualControl ) {
 					longitude += deltaX;
 					latitude += deltaY;
 				}' .
@@ -478,186 +631,394 @@ function wppa_get_spheric_panorama_html( $args ) {
 				// limiting latitude from -85 to 85 (cannot point to the sky or under your feet)
 				'latitude = Math.max(-85, Math.min(85, latitude));' .
 
-				// moving the camera according to current latitude (vertical movement) and longitude (horizontal movement)
-				'camera.target.x = 500 * Math.sin(THREE.Math.degToRad(90 - latitude)) * Math.cos(THREE.Math.degToRad(longitude));
-				camera.target.y = 500 * Math.cos(THREE.Math.degToRad(90 - latitude));
-				camera.target.z = 500 * Math.sin(THREE.Math.degToRad(90 - latitude)) * Math.sin(THREE.Math.degToRad(longitude));
-				camera.lookAt(camera.target);' .
+				// moving the wppaCamera according to current latitude (vertical movement) and longitude (horizontal movement)
+				'wppaCamera.target.x = 500 * Math.sin(THREE.Math.degToRad(90 - latitude)) * Math.cos(THREE.Math.degToRad(longitude));
+				wppaCamera.target.y = 500 * Math.cos(THREE.Math.degToRad(90 - latitude));
+				wppaCamera.target.z = 500 * Math.sin(THREE.Math.degToRad(90 - latitude)) * Math.sin(THREE.Math.degToRad(longitude));
+				wppaCamera.lookAt(wppaCamera.target);' .
 
 				// calling again render function
-				'renderer' . $mocc . '.render(scene, camera);
+				'wppaRenderer.render(wppaScene, wppaCamera);
+			}' .
 
-				busy = false;
+			// Mouse wheel
+			'function onDivWheel(e) {
+				e.preventDefault();
+				deltaFov=-e.deltaY * ' . $zoomsensitivity . ' / 6;
+				doZoom(true);
 			}' .
 
 			// Zoom in/out
-			'function doZoom(){
-
+			'function doZoom(once){
 				fov += deltaFov;
 				fov = Math.max(20, Math.min(120, fov));
-				camera = new THREE.PerspectiveCamera(fov, aspect, 1, 1000);
-				camera.target = new THREE.Vector3(0, 0, 0);
-				if (run) setTimeout(function(){doZoom()}, 25);
+				wppaCamera = new THREE.PerspectiveCamera(fov, aspect, 1, 1000);
+				wppaCamera.target = new THREE.Vector3(0, 0, 0);
+				if ( ! once && deltaFov != 0 ) {
+					setTimeout(function(){doZoom()}, 25);
+				}
+				if ( once ) {
+					deltaFov = 0;
+				}
 			}' .
 
-			// when the mouse is pressed, we switch to manual control and save current coordinates
-			'function onDivMouseDown(event){
+			// Previous
+			'function panPrev(e) {
+				var stop;
+				if ( ! stop ) {
+					stop = true;
+					$(this).css({opacity:0.5});
+					$("#wppa-overlay-ic").css({display:"none"});
+					$("#wppa-ovl-spin").show();
+					wppaOvlShowPrev();
+				}
+			}' .
 
-				event.preventDefault();
+			// Next
+			'function panNext(e) {
+				var stop;
+				if ( ! stop ) {
+					stop = true;
+					$(this).css({opacity:0.5});
+					$("#wppa-overlay-ic").css({display:"none"});
+					$("#wppa-ovl-spin").show();
+					wppaOvlShowNext();
+				}
+			}' .
 
+			// Manual movement on the image div
+			'function onDivMouseDown(e){
+				e.preventDefault();
 				manualControl = true;
-
-				savedX = event.clientX;
-				savedY = event.clientY;
-
+				savedX = e.clientX;
+				savedY = e.clientY;
 				savedLongitude = longitude;
 				savedLatitude = latitude;
-
-				run=true;
-				render();
-
 			}' .
-
-			// when the mouse moves, if in manual contro we adjust coordinates
-			'function onDivMouseMove(event){
-
+			'function onDivMouseMove(e){
 				if(manualControl){
-					longitude = (savedX - event.clientX) * 0.1 + savedLongitude;
-					latitude = (event.clientY - savedY) * 0.1 + savedLatitude;
+					longitude = (savedX - e.clientX) * 0.1 + savedLongitude;
+					latitude = (e.clientY - savedY) * 0.1 + savedLatitude;
 				}
-
 			}' .
-
-			// when the mouse is released, we turn manual control off
-			'function onDivMouseUp(event){
-
+			'function onDivMouseUp(e){
 				manualControl = false;
-				run=false;
-
+				deltaX=0;
 			}' .
 
-			// When a (responsive) resize is required, we resize the scene
-			'function onResize' . $mocc . '(event){
-				var containerwidth = div.parentNode.clientWidth;
-				var newWidth = containerwidth;
-				var newHeight = newWidth * ' . ( $height / $width ) . ';
-				renderer' . $mocc . '.setSize(newWidth, newHeight);
-				run=true;
-				render();
+			// Horizontal movement by buttons
+			'function onRightMouseDown(e) {
+				deltaX=0.2;
+			}' .
+			'function onLeftMouseDown(e) {
+				deltaX=-0.2;
+			}' .
+
+			// Vertical movement by buttons
+			'function onUpMouseDown(e) {
+				deltaY=0.2;
+			}' .
+			'function onDownMouseDown(e) {
+				deltaY=-0.2;
+			}' .
+
+			// Zooming
+			'function onZoomInMouseDown(e) {
+				deltaFov=-0.4;
 				doZoom();
-				run=false;
-
+			}' .
+			'function onZoomOutMouseDown(e) {
+				deltaFov=0.4;
+				doZoom();
 			}' .
 
-		'});
+			// Release a button resets all deltas
+			'function onButtonUp(e) {
+				deltaX=0;
+				deltaY=0;
+				deltaFov=0;
+			}' .
+
+			// When a (responsive) resize is required, we resize the wppaScene
+			'function onResize(e){' .
+
+				( $lightbox ?
+
+					// Show image container
+					'$("#wppa-overlay-ic").css("display", "");
+					$("#wppa-overlay-ic").css("width", "");' .
+
+					// There are 4 possiblilities: all combi of 'Width is the limit or not' and 'Mode is normal or fullscreen'
+					'var widthIsLim,
+						modeIsNormal = wppaOvlMode == "normal";' .
+
+					// Find container dimensions dependant of mode
+					'var contWidth,	contHeight;
+
+					if ( modeIsNormal ) {
+						contWidth = window.innerWidth ? window.innerWidth : screen.width;
+						contHeight = window.innerHeight ? window.innerHeight : screen.height;
+					}
+					else {
+						contWidth = screen.width;
+						contHeight = screen.height;
+					}'.
+//					alert("contWidth="+contWidth);' .
+
+					// Initialize new display sizes
+					'var newWidth,
+						newHeight,
+						topMarg,
+						leftMarg,
+						extraX = 8,
+						extraY = 8 + ' . ( $controls ? $icsiz + 10 : 0 ) . ' + 30;' .
+
+					// Add borderwidth in case of mode == normal
+					'if ( modeIsNormal ) {
+						extraX += 2 * ' . wppa_opt( 'ovl_border_width' ) . ';
+						extraY += 2 * ' . wppa_opt( 'ovl_border_width' ) . ';
+					}
+					' .
+
+					// Find out if the width is the limitng dimension
+					'widthIsLim = ( contHeight > ( ( ( contWidth  - extraX ) / 2 ) + extraY ) );' .
+
+					// Compute new sizes and margins
+					'if ( widthIsLim ) {
+						newWidth = contWidth - extraX;
+						newHeight = newWidth / 2;
+						topMarg = ( contHeight - newHeight - extraY ) / 2 + 20;' .
+					'}
+					else {
+						newHeight = contHeight - extraY;
+						newWidth = newHeight * 2;
+						topMarg = 20;' .
+
+					'}
+					newWidth = parseInt(newWidth);
+					newHeight = parseInt(newHeight);
+					' .
+
+					// Set css common for all 4 situations
+					'$("#wppa-ovl-pan-container").css({marginTop:topMarg});
+					$("#wppa-overlay-ic").css({marginTop:0});' .
+
+					// Now set css for all 4 situations: Mode is normal
+					'if ( modeIsNormal ) {' .
+
+						// Common for mode normal
+						'$("#wppa-ovl-pan-container").css({
+							backgroundColor:"' . wppa_opt( 'ovl_theme' ) . '",
+							padding:"' . wppa_opt( 'ovl_border_width' ) . 'px",
+							borderRadius:"' . wppa_opt( 'ovl_border_radius' ) . 'px",
+							width:newWidth,
+								marginLeft:0
+						});
+						$( "#wppa-pctl-div-' . $mocc . '" ).css({marginLeft:0});' .
+
+						// Limit specific
+						'if ( widthIsLim ) {
+							$("#wppa-overlay-ic").css({marginLeft:4});
+						}
+						else {
+							$("#wppa-overlay-ic").css({marginLeft:(contWidth-newWidth)/2});
+						}
+					}' .
+
+					// Mode is fullscreen
+					'else {' .
+
+						// Common for mode fullscreen
+						'$("#wppa-overlay-ic").css({marginLeft:0});
+						$("#wppa-ovl-pan-container").css({
+							backgroundColor:"transparent",
+							padding:0,
+							borderRadius:0,
+							width:newWidth,
+							marginLeft:(contWidth-newWidth)/2
+						});
+
+						if ( widthIsLim ) {
+							$("#wppa-pctl-div-' . $mocc . '").css({marginLeft:0});
+						}
+						else {
+							$("#wppa-pctl-div-' . $mocc . '").css({marginLeft:0});
+						}
+					}
+
+					wppaRenderer.setSize(newWidth, newHeight);
+					doZoom(true);
+				' :
+				'
+					var containerwidth = $(div).parent().width();
+					var newWidth = containerwidth;
+					var newHeight = newWidth * ' . ( $height / $width ) . ';
+					wppaRenderer.setSize(newWidth, newHeight);
+					doZoom(true);'
+				) . '
+			}' .
+		'};
 
 	</script>
 	' . ( $haslink ? '<a>' : '' ) . '';
 
-	return $result;
+	return wppa_pan_min( $result );
 }
 
-// Non 360 flat panorama
-function wppa_get_flat_panorama_html( $args ) {
+// Non 360 flat pan
+function wppa_get_flat_pan_html( $args ) {
 
 	// Init
-	$defaults 	= array( 	'id' 		=> '0',
-							'mocc' 		=> '0',
-							'width' 	=> false,
-							'height' 	=> false,
-							'haslink' 	=> false,
+	$defaults 	= array( 	'id' 				=> '0',
+							'mocc' 				=> '0',
+							'width' 			=> false,
+							'height' 			=> false,
+							'haslink' 			=> false,
+							'lightbox' 			=> 0,
+							'controls' 			=> true,
+							'autorun' 			=> '',
+							'manual' 			=> true,
+							'autorunspeed' 		=> '3',
+							'zoomsensitivity' 	=> '3',
 						);
 
 	$args 		= wp_parse_args( $args, $defaults );
 
-	$id 		= strval( intval ( $args['id'] ) );
-	$mocc 		= $args['mocc'] ? $args['mocc'] : wppa( 'mocc' );
-	$width 		= $args['width'] ? $args['width'] : wppa_get_container_width();
-	$height 	= $args['height'] ? $args['height'] : round( $width * wppa_get_photoy( $id ) / wppa_get_photox( $id ) );
-	$haslink 	= $args['haslink'];
-	$iconsize 	= wppa_opt( 'nav_icon_size_panorama' ) . 'px;';
+	$id 				= strval( intval ( $args['id'] ) );
+	$mocc 				= $args['mocc'] ? $args['mocc'] : wppa( 'mocc' );
+	$width 				= $args['width'] ? $args['width'] : wppa_get_container_width();
+	$height 			= $args['height'] ? $args['height'] : round( $width * wppa_get_photoy( $id ) / wppa_get_photox( $id ) );
+	$haslink 			= $args['haslink'];
+	$icsiz 				= wppa_opt( 'nav_icon_size_panorama' );
+	$iconsize 			= $icsiz . 'px;';
+	$lightbox 			= $args['lightbox'];
+	$controls 			= $args['controls'];
+	$autorun 			= $args['autorun'];
+	$manual 			= $args['manual'];
+	$autorunspeed 		= $args['autorunspeed'];
+	$zoomsensitivity 	= $args['zoomsensitivity'];
 
-	$url 		= wppa_is_mobile() ? wppa_get_photo_url( $id ) : wppa_get_hires_url( $id );
+	switch ( $autorun ) {
+		case 'right':
+			$deltaX = $autorunspeed / 3;
+			break;
+		case 'left':
+			$deltaX = - $autorunspeed / 3;
+			break;
+		default:
+			$deltaX = '0';
+	}
+
+	$url 				= esc_url( wppa_is_mobile() ? wppa_get_photo_url( $id ) : wppa_get_hires_url( $id ) );
 
 	$result =
+	( $lightbox ? $id . '.' : '' ) .
 	( $haslink ? '</a>' : '' ) .
 
-	// The container
-	'<div' .
-		' id="wppa-panorama-div-' . $mocc . '"' .
-		' class="wppa-panorama-div wppa-panorama-div-' . $mocc . '"' .
-		' style="margin-bottom:4px;"' .
-		' >' .
+	// The overall container
+	( $lightbox ? '<div id="wppa-ovl-pan-container" >' : '' ) .
+
+	// The canvas container
+	'<div
+		id="wppa-pan-div-' . $mocc . '"
+		class="wppa-pan-div wppa-pan-div-' . $mocc . '"
+		style="' . ( $controls ? 'margin-bottom:4px;' : '' ) . 'line-height:0;"
+		>' .
 
 		// The actual drawing area
-		'<canvas' .
-			' id="wppa-panorama-canvas-' . $mocc . '"' .
-			' style="background-color:black;cursor:grab;"' .
-			' width="' . $width . '"' .
-			' height=' . ( $width / 2 ) . '"' .
-			' >' .
-		'</canvas>' .
+		'<canvas
+			id="wppa-pan-canvas-' . $mocc . '"
+			style="background-color:black;' . ( $manual ? 'cursor:grab;' : '' ) . '"
+			width="' . $width . '"
+			height="' . ( $width / 2 ) . '"
+		></canvas>' .
 
 		// The preview image
-		'<canvas' .
-			' id="wppa-panorama-prev-canvas-' . $mocc . '"' .
-			' style="margin-top:4px;background-color:black;"' .
-			' width="' . $width . '"' .
-			' height=' . $height . '"' .
-		' />' .
+		'<canvas
+			id="wppa-pan-prev-canvas-' . $mocc . '"
+			style="margin-top:4px;background-color:black;"
+			width="' . $width . '"
+			height=' . $height . '"
+		></canvas>
 
-	'</div>' .
+	</div>' .
 
 	// The controlbar
-	'<div' .
-		' id="wppa-panoramacontrol-div-' . $mocc . '"' .
-		' class="wppa-panoramacontrol-div wppa-panoramacontrol-div-' . $mocc . '"' .
-		' style="text-align:center;margin-bottom:4px;"' .
-		' >' .
-		'<span' .
-			' id="wppa-panoramacontrol-left-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'Left-4', $iconsize ) .
+	( $controls ?
+	'<div
+		id="wppa-pctl-div-' . $mocc . '"
+		class="wppa-pctl-div wppa-pctl-div-' . $mocc . '"
+		style="text-align:center;"
+		>' .
+		( $lightbox ?
+			'<span
+				id="wppa-pctl-prev-' . $mocc . '"
+				class="wppa-pan-prevnext"
+				style="margin:0 2px 0 0;float:left;"
+				>' .
+				wppa_get_svghtml( 'Prev-Button', $iconsize, true ) .
+			'</span>'
+			:
+			''
+		) .
+		'<span
+			id="wppa-pctl-left-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'Left-4', $iconsize, true ) .
+		'</span>
+		<span
+			id="wppa-pctl-right-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'Right-4', $iconsize, true ) .
+		'</span>
+		<span
+			id="wppa-pctl-up-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'Up-4', $iconsize, true ) .
+		'</span>
+		<span
+			id="wppa-pctl-down-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'Down-4', $iconsize, true ) .
+		'</span>
+		<span
+			id="wppa-pctl-zoomin-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'ZoomIn', $iconsize, true ) .
+		'</span>
+		<span
+			id="wppa-pctl-zoomout-' . $mocc . '"
+			style="margin:0 2px;"
+			>' .
+			wppa_get_svghtml( 'ZoomOut', $iconsize, true ) .
 		'</span>' .
-		'<span' .
-			' id="wppa-panoramacontrol-right-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'Right-4', $iconsize ) .
-		'</span>' .
-		'<span' .
-			' id="wppa-panoramacontrol-up-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'Up-4', $iconsize ) .
-		'</span>' .
-		'<span' .
-			' id="wppa-panoramacontrol-down-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'Down-4', $iconsize ) .
-		'</span>' .
-		'<span' .
-			' id="wppa-panoramacontrol-zoomin-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'ZoomIn', $iconsize ) .
-		'</span>' .
-		'<span' .
-			' id="wppa-panoramacontrol-zoomout-' . $mocc . '"' .
-			' style="margin:2px;"' .
-			' >' .
-			wppa_get_svghtml( 'ZoomOut', $iconsize ) .
-		'</span>' .
-	'</div>' .
+		( $lightbox ?
+			'<span
+				id="wppa-pctl-next-' . $mocc . '"
+				class="wppa-pan-prevnext"
+				style="margin:0 0 0 2px;float:right;"
+				>' .
+				wppa_get_svghtml( 'Next-Button', $iconsize, true ) .
+			'</span>'
+			:
+			''
+		) .
+	'</div>'
+	:
+	'' ) .
 
+	( $lightbox ? '</div>' : '' ) .
 
 	'<script>' .
 
 		// Create image object and add the image url to it
-		'image' . $mocc . ' = new Image();' .
-		'image' . $mocc . '.src = "' . $url . '",' .
+		'var image' . $mocc . ' = new Image();
+		image' . $mocc . '.src = "' . $url . '";' .
 
 		// When document complete, run the main proc
 		'jQuery(document).ready(function(){wppaDoFlatPanorama' . $mocc . '();});' .
@@ -666,236 +1027,498 @@ function wppa_get_flat_panorama_html( $args ) {
 		'function wppaDoFlatPanorama' . $mocc . '(){' .
 
 			// Wait until the image file has been completely loaded
-			'if (!image' . $mocc . '.complete){setTimeout( wppaDoFlatPanorama' . $mocc . ', 20 );return;}' .
+			'if (!image' . $mocc . '.complete){setTimeout( wppaDoFlatPanorama' . $mocc . ', 100 );return;}' .
 
 			// Var declarations
-			'var manualControl = false,' .
-				'deltaX = 0,' .
-				'deltaY = 0,' .
-				'deltaFactor = 1.0,' .
-				'run = true,' .
-				'busy = false,' .
-				'div = document.getElementById("wppa-panorama-div-' . $mocc . '"),' .
-				'canvas = document.getElementById("wppa-panorama-canvas-' . $mocc . '"),' .
-				'prevCanvas = document.getElementById("wppa-panorama-prev-canvas-' . $mocc . '"),' .
-				'left = document.getElementById("wppa-panoramacontrol-left-' . $mocc . '"),' .
-				'right = document.getElementById("wppa-panoramacontrol-right-' . $mocc . '"),' .
-				'up = document.getElementById("wppa-panoramacontrol-up-' . $mocc . '"),' .
-				'down = document.getElementById("wppa-panoramacontrol-down-' . $mocc . '"),' .
-				'zoomin = document.getElementById("wppa-panoramacontrol-zoomin-' . $mocc . '"),' .
-				'zoomout = document.getElementById("wppa-panoramacontrol-zoomout-' . $mocc . '"),' .
-				'canvasWidth = div.parentNode.clientWidth,' .
-				'canvasHeight = canvasWidth / 2,' .
-				'savedCanvasX = 0,' .
-				'savedCanvasY = 0,' .
-				'fromHeight = image' . $mocc . '.height / 2,' .
-				'fromWidth = fromHeight * 2,' .
-				'fromX = ( image' . $mocc . '.width - fromWidth ) / 2,' .
-				'fromY = ( image' . $mocc . '.height - fromHeight ) / 2,' .
-				'centerX = fromX + fromWidth / 2,' .
-				'centerY = fromY + fromHeight / 2;' .
-
-			// Set canvas sizes
-//			'canvas.width = canvasWidth;' .
-//			'canvas.height = canvasHeight;' .
-//			'prevCanvas.width = canvasWidth;' .
-//			'prevCanvas.height = canvasWidth * image' . $mocc . '.height / image' . $mocc . '.width;' .
-//			'jQuery(prevCanvas).css({width:\'\',height:\'\'});' .
+			'var
+			$ 				= jQuery,
+			manualControl 	= false,
+			zoomsensitivity = ' . $zoomsensitivity . ',
+			deltaX 			= ' . $deltaX . ',
+			deltaY 			= 0,
+			deltaFactor 	= 1.0,
+			autorun 		= ' . ( $autorun ? 'true' : 'false' ) . ',
+			run 			= deltaX ? 5 : 4,
+			busy 			= false,
+			abort 			= false,
+			div 			= $("#wppa-pan-div-' . $mocc . '"),
+			canvas 			= document.getElementById("wppa-pan-canvas-' . $mocc . '"),
+			prevCanvas 		= document.getElementById("wppa-pan-prev-canvas-' . $mocc . '"),
+			left 			= $("#wppa-pctl-left-' . $mocc . '"),
+			right 			= $("#wppa-pctl-right-' . $mocc . '"),
+			up 				= $("#wppa-pctl-up-' . $mocc . '"),
+			down 			= $("#wppa-pctl-down-' . $mocc . '"),
+			zoomin 			= $("#wppa-pctl-zoomin-' . $mocc . '"),
+			zoomout 		= $("#wppa-pctl-zoomout-' . $mocc . '"),
+			prev 			= $("#wppa-pctl-prev-' . $mocc . '"),
+			next 			= $("#wppa-pctl-next-' . $mocc . '"),
+			canvasWidth 	= $(div).parent().width(),
+			canvasHeight 	= canvasWidth / 2,
+			savedCanvasX 	= 0,
+			savedCanvasY 	= 0,
+			fromHeight 		= image' . $mocc . '.height / 2,
+			fromWidth 		= fromHeight * 2,
+			fromX 			= ( image' . $mocc . '.width - fromWidth ) / 2,
+			fromY 			= ( image' . $mocc . '.height - fromHeight ) / 2,
+			centerX 		= fromX + fromWidth / 2,
+			centerY 		= fromY + fromHeight / 2;' .
 
 			// Install listeners
-			( wppa_is_mobile() ? /*
-				div.addEventListener("touchstart", onDivMouseDown, false);
-				div.addEventListener("touchmove", onDivMouseMove, false);
-				div.addEventListener("touchend", onDivMouseUp, false); */
-				'right.addEventListener("touchstart", function(){run=true;deltaX=2;render();}, false);' .
-				'right.addEventListener("touchend", onButtonup, false);' .
-				'left.addEventListener("touchstart", function(){run=true;deltaX=-2;render();}, false);' .
-				'left.addEventListener("touchend", onButtonup, false);' .
-				'up.addEventListener("touchstart", function(){run=true;deltaY=-2;render();}, false);' .
-				'up.addEventListener("touchend", onButtonup, false);' .
-				'down.addEventListener("touchstart", function(){run=true;deltaY=2;render();}, false);' .
-				'down.addEventListener("touchend", onButtonup, false);' .
-				'zoomin.addEventListener("touchstart", function(){run=true;deltaFactor=1.01;render();}, false);' .
-				'zoomin.addEventListener("touchend", onButtonup, false);' .
-				'zoomout.addEventListener("touchstart", function(){run=true;deltaFactor=0.99;render();}, false);' .
-				'zoomout.addEventListener("touchend", onButtonup, false);'
+			( wppa_is_mobile() ?
+				'right.on("touchstart", onRightMouseDown);
+				right.on("touchend", onButtonUp);
+				left.on("touchstart", onLeftMouseDown);
+				left.on("touchend", onButtonUp);
+				up.on("touchstart", onUpMouseDown);
+				up.on("touchend", onButtonUp);
+				down.on("touchstart", onDownMouseDown);
+				down.on("touchend", onButtonUp);
+				zoomin.on("touchstart", onZoomInMouseDown);
+				zoomin.on("touchend", onButtonUp);
+				zoomout.on("touchstart", onZoomOutMouseDown);
+				zoomout.on("touchend", onButtonUp);'
 				:
-				'canvas.addEventListener("mousedown", onCanvasMouseDown, false);' .
-				'canvas.addEventListener("mousemove", onCanvasMouseMove, false);' .
-				'canvas.addEventListener("mouseup", onCanvasMouseUp, false);' .
-			//	'canvas.addEventListener("mouseout", onCanvasMouseUp, false);' .
-				'prevCanvas.addEventListener("mousedown", onCanvasMouseDown, false);' .
-				'prevCanvas.addEventListener("mousemove", onPrevCanvasMouseMove, false);' .
-				'prevCanvas.addEventListener("mouseup", onCanvasMouseUp, false);' .
-			//	'prevCanvas.addEventListener("mouseout", onCanvasMouseUp, false);' .
-				'right.addEventListener("mousedown", function(){run=true;deltaX=2;render();}, false);' .
-				'right.addEventListener("mouseup", onButtonup, false);' .
-				'left.addEventListener("mousedown", function(){run=true;deltaX=-2;render();}, false);' .
-				'left.addEventListener("mouseup", onButtonup, false);' .
-				'up.addEventListener("mousedown", function(){run=true;deltaY=-2;render();}, false);' .
-				'up.addEventListener("mouseup", onButtonup, false);' .
-				'down.addEventListener("mousedown", function(){run=true;deltaY=2;render();}, false);' .
-				'down.addEventListener("mouseup", onButtonup, false);' .
-				'zoomin.addEventListener("mousedown", function(){run=true;deltaFactor=1.01;render();}, false);' .
-				'zoomin.addEventListener("mouseup", onButtonup, false);' .
-				'zoomout.addEventListener("mousedown", function(){run=true;deltaFactor=0.99;render();}, false);' .
-				'zoomout.addEventListener("mouseup", onButtonup, false);'
+				( $manual ?
+				'canvas.addEventListener("mousedown", onCanvasMouseDown);
+				canvas.addEventListener("mousemove", onCanvasMouseMove);
+				canvas.addEventListener("mouseup", onCanvasMouseUp);
+				canvas.addEventListener("mouseout", onCanvasMouseUp);
+				document.getElementById("wppa-pan-canvas-' . $mocc . '").addEventListener("wheel", onDivWheel);
+				prevCanvas.addEventListener("mousedown", onCanvasMouseDown);
+				prevCanvas.addEventListener("mousemove", onPrevCanvasMouseMove);
+				prevCanvas.addEventListener("mouseup", onCanvasMouseUp);
+				prevCanvas.addEventListener("mouseout", onCanvasMouseUp);' : '' ) .
+				'right.on("mousedown", onRightMouseDown);
+				right.on("mouseup", onButtonUp);
+				left.on("mousedown", onLeftMouseDown);
+				left.on("mouseup", onButtonUp);
+				up.on("mousedown", onUpMouseDown);
+				up.on("mouseup", onButtonUp);
+				down.on("mousedown", onDownMouseDown);
+				down.on("mouseup", onButtonUp);
+				zoomin.on("mousedown", onZoomInMouseDown);
+				zoomin.on("mouseup", onButtonUp);
+				zoomout.on("mousedown", onZoomOutMouseDown);
+				zoomout.on("mouseup", onButtonUp);'
 			) .
 
+			// Common event handlers
+			( $lightbox ? '
+				$("#wppa-fulls-btn").on("click", function(){abort=true;});
+				if (prev) {
+					prev.on("click", panPrev);
+					next.on("click", panNext);
+				}' : '' ) .
+
 			// Install Resize handler
-			'jQuery(window).on("DOMContentLoaded load resize scroll",onResize' . $mocc . ');' .
+			'$(window).on("DOMContentLoaded load resize orientationchange",onResize' . $mocc . ');' .
+
+			// Remove spinner
+			'$("#wppa-ovl-spin").hide();' .
 
 			// Do the rendering
 			'render();' .
 
+			// Resize
+			'onResize' . $mocc . '();' .
+
 			// The render function
 			'function render(){' .
-				'if (!run) return;' .
-				'if (busy) return;' .
-				'busy = true;' .
+
+				( $lightbox ? 'if (!wppaOvlOpen) abort=true;' :'' ) .
+				'if (abort) {
+					ctx = null;
+					prevctx = null;
+					return;
+				}
+				if (run==0) return;
+				if (busy) return;
+				busy = true;' .
+
+				( $lightbox ? 'if ( wppaOvlActivePanorama != ' . $id . ' ) return;' : '' ) .
 
 				// manualControl is true when a drag on the canvas is being performed
 				'if(!manualControl){' .
 
 					// Panning
-					'fromX += deltaX;' .
-					'fromY += deltaY;' .
+					'fromX += deltaX;
+					fromY += deltaY;' .
 
 					// Zooming
-					'var newHeight = fromHeight / deltaFactor;' .
-					'var newWidth = fromWidth / deltaFactor;' .
+					'var newHeight = fromHeight / deltaFactor;
+					var newWidth = fromWidth / deltaFactor;' .
 
 					// Keep zooming in range
-					'if ( deltaFactor != 1 && newHeight <= image' . $mocc . '.height && newHeight > 50 ) {' .
-						'fromX -= ( newWidth - fromWidth ) / 2;' .
-						'fromY -= ( newHeight - fromHeight ) / 2;' .
-						'fromWidth = newWidth;' .
-						'fromHeight = newHeight;' .
-					'}' .
-				'}' .
+					'if ( deltaFactor != 1 && newHeight <= image' . $mocc . '.height && newHeight > 50 ) {
+						fromX -= ( newWidth - fromWidth ) / 2;
+						fromY -= ( newHeight - fromHeight ) / 2;
+						fromWidth = newWidth;
+						fromHeight = newHeight;
+					}
+				}' .
 
 				// Keep viewport within image boundaries
 				'fromX = Math.max(0, Math.min(image' . $mocc . '.width-fromWidth, fromX));' .
 				'fromY = Math.max(0, Math.min(image' . $mocc . '.height-fromHeight, fromY));' .
 
+				// Check for turningpoint in case autrun
+				'if ( autorun ) {
+					if ( fromX == 0 || fromX == ( image' . $mocc . '.width-fromWidth ) ) {
+						deltaX *= -1;
+					}
+				}' .
+
 				// Draw the image
-				'var context = canvas.getContext("2d");' .
-				'context.drawImage(image' . $mocc . ',fromX,fromY,fromWidth,fromHeight,0,0,canvasWidth,canvasHeight);' .
+				'var ctx = canvas.getContext("2d");' .
+				'ctx.drawImage(image' . $mocc . ',fromX,fromY,fromWidth,fromHeight,0,0,canvas.width,canvas.height);' .
 
 				// Draw the preview image
-				'var prevContext = prevCanvas.getContext("2d");' .
-				'prevContext.clearRect(0, 0, prevCanvas.width, prevCanvas.height);' .
-				'prevContext.drawImage(image' . $mocc . ',0,0,image' . $mocc . '.width,image' . $mocc . '.height,0,0,prevCanvas.width,prevCanvas.height);' .
+				'var prevctx = prevCanvas.getContext("2d");' .
+				'prevctx.clearRect(0, 0, prevCanvas.width, prevCanvas.height);' .
+				'prevctx.drawImage(image' . $mocc . ',0,0,image' . $mocc . '.width,image' . $mocc . '.height,0,0,prevCanvas.width,prevCanvas.height);' .
 
-				// Draw viewport rect on preview iamge
+				// Draw viewport rect on preview image
 				'var factor = prevCanvas.width / image' . $mocc . '.width;' .
-				'prevContext.strokeRect(factor*fromX,factor*fromY,factor*fromWidth,factor*fromHeight);' .
+				'prevctx.strokeRect(factor*fromX,factor*fromY,factor*fromWidth,factor*fromHeight);' .
 
 				// Done so far
 				'busy = false;' .
 
 				// Re-render if needed
-				'if (run) {' .
-					'if (manualControl){setTimeout(function(){render()},25);}' .
+				'if (run>0) {' .
+					'if (manualControl||autorun){setTimeout(function(){render()},25);}' .
 					'else {setTimeout(function(){render()},5);}' .
-				'}' .
+				'}
+				if(run<5)run--;' .
 			'}' .
+
+			// Previous
+			'function panPrev(e) {
+				e.preventDefault();
+				abort = true;
+				var stop;
+				if ( ! stop ) {
+					stop = true;
+					$(this).css({opacity:0.5});
+					$("#wppa-overlay-ic").css({display:"none"});
+					$("#wppa-ovl-spin").show();
+					wppaOvlShowPrev();
+				}
+			}' .
+
+			// Next
+			'function panNext(e) {
+				e.preventDefault();
+				abort = true;
+				var stop;
+				if ( ! stop ) {
+					stop = true;
+					$(this).css({opacity:0.5});
+					$("#wppa-overlay-ic").css({display:"none"});
+					$("#wppa-ovl-spin").show();
+					wppaOvlShowNext();
+				}
+			}' .
+
+			// Horizontal movement by button
+			'function onRightMouseDown(e){
+				e.preventDefault();
+				run=5;deltaX=3;render();
+			}' .
+
+			'function onLeftMouseDown(e){
+				e.preventDefault();
+				run=5;deltaX=-3;render();
+			}' .
+
+			// Vertical movement by button
+			'function onUpMouseDown(e){
+				e.preventDefault();
+				run=5;deltaY=-3;render();
+			}' .
+
+			'function onDownMouseDown(e){
+				e.preventDefault();
+				run=5;deltaY=3;render();
+			}' .
+
+			// Zooming
+			'function onZoomInMouseDown(e){
+				e.preventDefault();
+				run=5;deltaFactor=1.005;render();
+			}' .
+
+			'function onZoomOutMouseDown(e){
+				e.preventDefault();
+				run=5;deltaFactor=0.995;render();
+			}' .
+
+			// Mouse wheel
+			'function onDivWheel(e) {
+				e.preventDefault();
+				run=(autorun?5:4);
+				deltaFactor = 1 + e.deltaY * zoomsensitivity / 1000;
+				if ( ! autorun ) render();
+				setTimeout(function(){deltaFactor = 1}, 25);
+			}' .
 
 			// When a navigation button is released, stop and reset all deltas
-			'function onButtonup(event) {' .
-				'run=false;deltaX=0;deltaY=0;deltaFactor=1;' .
-			'}' .
+			'function onButtonUp(e) {
+				e.preventDefault();
+				deltaX=0;deltaY=0;deltaFactor=1;
+				if ( ! ' . $lightbox . ' ) run--;
+				run=4;
+			}' .
 
-			// When a (responsive) resize is required, we resize the scene
-			'function onResize' . $mocc . '(event){' .
+			// When a (responsive) resize is required, we resize the wppaScene
+			'function onResize' . $mocc . '(e){' .
 
-				'canvasWidth = div.parentNode.clientWidth;' .
+				'if (abort) return;' .
+
+				( $lightbox ?
+
+					// Show image container
+					'$("#wppa-overlay-ic").css("display", "");' .
+
+					// There are 4 possiblilities: all combi of 'Width is the limit or not' and 'Mode is normal or fullscreen'
+					'var widthIsLim,
+						modeIsNormal = wppaOvlMode == "normal";' .
+
+					// First find container dimensions dependant of mode
+					'var contWidth,	contHeight;
+
+					if ( modeIsNormal ) {
+						contWidth = window.innerWidth ? window.innerWidth : screen.width;
+						contHeight = window.innerHeight ? window.innerHeight : screen.height;
+					}
+					else {
+						contWidth = screen.width;
+						contHeight = screen.height;
+					}
+					newWidth = parseInt(newWidth);
+					newHeight = parseInt(newHeight);
+					' .
+
+					// Initialize new display sizes
+					'var newWidth,
+						newHeight,
+						topMarg,
+						leftMarg,
+						extraX = 8,
+						extraY = 24 + ' . ( $controls ? $icsiz : 0 ) . ' + contWidth * ' . $height . ' / ' . $width . ' + 40;' .
+
+					// Add borderwidth in case of mode == normal
+					'if ( modeIsNormal ) {
+						extraX += 2 * ' . wppa_opt( 'ovl_border_width' ) . ';
+						extraY += 2 * ' . wppa_opt( 'ovl_border_width' ) . ';
+					}
+					' .
+
+					// Find out if the width is the limitng dimension
+					'widthIsLim = ( contHeight > ( ( contWidth / 2 ) + extraY ) );' .
+
+					// Compute new sizes and margins
+					'if ( widthIsLim ) {
+						newWidth = contWidth - extraX;
+						newHeight = newWidth / 2;
+						topMarg = ( contHeight - newHeight - extraY ) / 2 + 20;' .
+					'}
+					else {
+						newWidth = 2 * ( contHeight - ' . ( $controls ? $icsiz : 0 ) . ' - 24 - 40 ) / ( 1 + 2 * ' . $height . ' / ' . $width . ' );
+						newHeight = newWidth / 2;
+						topMarg = 20;' .
+
+					'}' .
+
+					// Set css common for all 4 situations
+					'$("#wppa-ovl-pan-container").css({marginTop:topMarg});
+					$("#wppa-overlay-ic").css({marginTop:0});
+
+					canvas.width = newWidth;
+					canvas.height = newHeight;
+					prevCanvas.width = newWidth;
+					prevCanvas.height = newWidth * ' . $height . ' / ' . $width . ';' .
+
+					// Now set css for all 4 situations: Mode is normal
+					'if ( modeIsNormal ) {' .
+
+						// Common for mode normal
+						'$("#wppa-ovl-pan-container").css({
+							backgroundColor:"' . wppa_opt( 'ovl_theme' ) . '",
+							padding:"' . wppa_opt( 'ovl_border_width' ) . 'px",
+							borderRadius:"' . wppa_opt( 'ovl_border_radius' ) . 'px",
+							width:newWidth,
+								marginLeft:0
+						});
+						$( "#wppa-pctl-div-' . $mocc . '" ).css({marginLeft:0});' .
+
+						// Limit specific
+						'if ( widthIsLim ) {
+							$("#wppa-overlay-ic").css({marginLeft:4});
+						}
+						else {
+							$("#wppa-overlay-ic").css({marginLeft:(contWidth-newWidth)/2});
+						}
+
+					}' .
+
+					// Mode is fullscreen
+					'else {' .
+
+						// Common for mode fullscreen
+						'$("#wppa-overlay-ic").css({marginLeft:0});
+						$("#wppa-ovl-pan-container").css({
+							backgroundColor:"transparent",
+							padding:0,
+							borderRadius:0,
+							width:newWidth,
+							marginLeft:(contWidth-newWidth)/2
+						});
+						$("#wppa-pctl-div-' . $mocc . '").css({marginLeft:0});' .
+
+						/*
+
+						if ( widthIsLim ) {
+							$("#wppa-pctl-div-' . $mocc . '").css({marginLeft:0});
+						}
+						else {
+							$("#wppa-pctl-div-' . $mocc . '").css({marginLeft:(contWidth-newWidth)/2});
+
+						} */ '
+					}' .
+
+					'run=(autorun?5:4);
+					render();
+
+				' :
+				'canvasWidth = $(div).parent().width();' .
 				'canvasHeight = canvasWidth / 2;' .
 				'canvas.width = canvasWidth;' .
 				'canvas.height = canvasHeight;' .
 				'prevCanvas.width = canvasWidth;' .
 				'prevCanvas.height = canvasWidth * ' . $height . ' / ' . $width . ';' .
-				'run=true;' .
-				'render();' .
-				'run=false;' .
+				'run=(autorun?5:4);' .
+				'render();'
+				) .
+
 			'}' .
 
 			// when the mouse is pressed on the canvas, we switch to manual control and save current coordinates
-			'function onCanvasMouseDown(event){
+			'function onCanvasMouseDown(e){
 
-				event.preventDefault();
+				e.preventDefault();
 
 				manualControl = true;
 
-				savedCanvasX = event.offsetX;
-				savedCanvasY = event.offsetY;
+				savedCanvasX = e.offsetX;
+				savedCanvasY = e.offsetY;
 
-				fromX = fromX;
-				fromY = fromY;
-
-				run=true;
+				run=5;
 				render();
 
 			}' .
 
-			'function onCanvasMouseMove(event){
+			'function onCanvasMouseMove(e){
 
-				if ( manualControl && !busy ){
+				var factor = canvas.width / fromWidth;
 
-					var factor = canvasWidth / fromWidth;
+				if ( manualControl ){
 
-					fromX = ( savedCanvasX - event.offsetX ) / factor + fromX;
-					fromY = ( savedCanvasY - event.offsetY ) / factor + fromY;
+					var x = ( savedCanvasX - e.offsetX ) / factor + fromX;
+					var y = ( savedCanvasY - e.offsetY ) / factor + fromY;
 
-					savedCanvasX = event.offsetX;
-					savedCanvasY = event.offsetY;
+					if ( x > 0 && y > 0 && ( x + fromWidth ) < image' . $mocc . '.width && ( y + fromHeight ) < image' . $mocc . '.height ) {
+
+						fromX = x;
+						fromY = y;
+
+						savedCanvasX = e.offsetX;
+						savedCanvasY = e.offsetY;
+					}
 				}
-
 			}' .
 
-			'function onPrevCanvasMouseMove(event){
+			'function onPrevCanvasMouseMove(e){
 
 				var factor = prevCanvas.width / image' . $mocc . '.width;
 
-				if (event.offsetX > factor * fromX &&
-					event.offsetX < factor * ( fromX + fromWidth ) &&
-					event.offsetY > factor * fromY &&
-					event.offsetY < factor * ( fromY + fromHeight ) ) {
+				if (e.offsetX > factor * fromX &&
+					e.offsetX < factor * ( fromX + fromWidth ) &&
+					e.offsetY > factor * fromY &&
+					e.offsetY < factor * ( fromY + fromHeight ) ) {
 
-					jQuery(prevCanvas).css(\'cursor\',\'grab\');
+					$(prevCanvas).css("cursor","grab");
 				}
 				else {
-					jQuery(prevCanvas).css(\'cursor\',\'default\');
+					$(prevCanvas).css("cursor","default");
 				}
 
 				if ( manualControl && !busy ){
 
-					if (event.offsetX > factor * fromX &&
-						event.offsetX < factor * ( fromX + fromWidth ) &&
-						event.offsetY > factor * fromY &&
-						event.offsetY < factor * ( fromY + fromHeight ) ) {
+					if (e.offsetX > factor * fromX &&
+						e.offsetX < factor * ( fromX + fromWidth ) &&
+						e.offsetY > factor * fromY &&
+						e.offsetY < factor * ( fromY + fromHeight ) ) {
 
-						fromX = ( event.offsetX - savedCanvasX ) / factor + fromX;
-						fromY = ( event.offsetY - savedCanvasY ) / factor + fromY;
+						fromX = ( e.offsetX - savedCanvasX ) / factor + fromX;
+						fromY = ( e.offsetY - savedCanvasY ) / factor + fromY;
 
-						savedCanvasX = event.offsetX;
-						savedCanvasY = event.offsetY;
+						savedCanvasX = e.offsetX;
+						savedCanvasY = e.offsetY;
 
 					}
 				}
 			}' .
 
-			'function onCanvasMouseUp(event){
+			'function onCanvasMouseUp(e){
 
-				manualControl = false;
-				run=false;
-
+				if ( manualControl ) {
+					run=4;
+					manualControl = false;
+				}
 			}' .
-
 		'}
 
 	</script>
 	' . ( $haslink ? '<a>' : '' ) . '';
 
+	return wppa_pan_min( $result );
+}
+
+// Minimize inine mixed html / js code
+function wppa_pan_min( $result ) {
+//	return $result; // debug
+//  wppa_log('dbg','voor len='.strlen($result));
+
+	// Remove tabs
+	$result = str_replace( "\t", '', $result );
+
+	// Remove newlines
+	$result = str_replace( array( "\r\n", "\n\r", "\n", "\r" ), ' ', $result );
+
+	// Trim operators
+	$result = str_replace( array( ' = ',' + ',' * ',' / ' ), array( '=','+','*','/' ), $result );
+
+	// Replace multiple spaces by one
+	$olen = 0;
+	$nlen = strlen( $result );
+	do {
+		$olen = $nlen;
+		$result = str_replace( '  ', ' ', $result );
+		$nlen = strlen( $result );
+	} while ( $nlen != $olen );
+
+	// Trim , ; and !
+	$result = str_replace( array( ', ', '; ', '! ' ), array( ',', ';', '!' ), $result );
+
+	// Trim braces
+	$result = str_replace( array(  ' ) ', ') ', ' )' ), ')', $result );
+	$result = str_replace( array(  ' ( ', '( ', ' (' ), '(', $result );
+
+	// Remove space between html tags
+	$result = str_replace( '> <', '><', $result );
+
+// 	wppa_log('dbg',' na len='.strlen($result));
+// 	wppa_dump($result);
 	return $result;
 }

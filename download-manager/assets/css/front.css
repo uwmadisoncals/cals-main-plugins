@@ -587,8 +587,13 @@
 .w3eden .btn.wpdm-spotify {
     background: #84bd00;
 }
-.w3eden .btn.wpdm-stack-exchange {
-    background: #366fb3;
+.w3eden .btn.wpdm-box {
+    background: #07c;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-onedrive {
+    background: #0088f3;
+    color: #ffffff !important;
 }
 .w3eden .btn.wpdm-stack-overflow {
     background: #07c;
@@ -2128,7 +2133,7 @@
     border-radius: 3px;
 }
 .w3eden .btn.btn-addtocart .label {
-    font-size: 80%;
+    font-size: 95%;
     letter-spacing: 0.5px;
 }
 .w3eden .g-recaptcha > div > div {
@@ -2896,4 +2901,46 @@
 .w3eden .package-title{
     font-weight: 700;
     font-size: 110%;
+}
+
+.w3eden .wpdm-link-tpl img.wpdm_icon { width: 48px !important; margin: 5px 0; }
+
+
+
+.panel-heading[data-toggle="collapse"]{
+    cursor: pointer !important;
+    position: relative;
+}
+.panel-heading[data-toggle="collapse"]:after{
+    position: absolute;
+    font-family: "Font Awesome 5 Free";
+    right: 15px;
+    line-height: 40px;
+    top: 0;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 900;
+    content: "\f078";
+    color: rgba(0,0,0,0.3) !important;
+}
+
+.panel-heading[aria-expanded="true"]:after{
+    position: absolute;
+    font-family: "Font Awesome 5 Free";
+    right: 15px;
+    line-height: 40px;
+    top: 0;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 900;
+    content: "\f077";
+}
+
+.panel-heading.collapsed {
+    border-bottom: 0;
+    border-radius: 3px;
 }

@@ -5,7 +5,7 @@
 * Various funcions to display a thumbnail image
 * Contains all possible frontend thumbnail types
 *
-* Version 6.8.09
+* Version 6.9.09
 *
 */
 
@@ -314,6 +314,7 @@ global $wpdb;
 						( $has_audio ? ' data-audiohtml="' . esc_attr( wppa_get_audio_body( $id ) ) . '"' : '' ) .
 						' ' . wppa( 'rel' ) . '="'.wppa_opt( 'lightbox_name' ).'[occ'.wppa( 'mocc' ).']"' .
 						' ' . wppa( 'lbtitle' ) . '="'.$title.'" ' .
+						wppa_get_lb_panorama_full_html( $id ) .
 						' class="thumb-img" id="x-'.$xid.'-'.wppa( 'mocc' ).'"' .
 						' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
 						' onclick="return false;"' .
@@ -1325,6 +1326,7 @@ global $wpdb;
 						( $has_audio ? ' data-audiohtml="' . esc_attr( wppa_get_audio_body( $id ) ) . '"' : '' ) .
 						' ' . wppa( 'rel' ) . '="' . wppa_opt( 'lightbox_name' ) . '[occ'.wppa( 'mocc' ) . ']"' .
 						( $title ? ' ' . wppa( 'lbtitle' ) . '="' . $title . '"' : '' ) .
+						wppa_get_lb_panorama_full_html( $id ) .
 						' class="thumb-img"' .
 						' id="x-' . $xid . '-' . wppa( 'mocc' ) . '"' .
 						' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
@@ -1652,6 +1654,7 @@ function wppa_get_the_widget_thumb( $type, $image, $album, $display, $link, $tit
 						( $audiohtml ? ' data-audiohtml="' . $audiohtml . '"' : '' ) .
 						' ' . wppa( 'rel' ) . '="' . wppa_opt( 'lightbox_name' ) . '[' . $type . '-' . $album . '-' . wppa( 'mocc' ) . ']"' .
 						( $title ? ' ' . wppa( 'lbtitle' ) . '="' . $title . '"' : '' ) .
+						wppa_get_lb_panorama_full_html( $id ) .
 						' target="' . $link['target'] . '"' .
 						' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
 						' style="cursor:' . wppa_wait() . ';"' .
@@ -1860,6 +1863,7 @@ function wppa_do_filmthumb( $id, $idx, $do_for_feed = false, $glue = false ) {
 							( $audiohtml ? ' data-audiohtml="' . $audiohtml . '"' : '' ) .
 							' ' . wppa( 'rel' ) . '="' . wppa_opt( 'lightbox_name' ) . '[occ'.wppa( 'mocc' ) . ']"' .
 							( $title ? ' ' . wppa( 'lbtitle' ) . '="' . $title . '"' : '' ) .
+							wppa_get_lb_panorama_full_html( $id ) .
 							' >';
 		}
 

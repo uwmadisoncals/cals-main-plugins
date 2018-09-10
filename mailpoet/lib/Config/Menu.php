@@ -9,6 +9,7 @@ use MailPoet\Form\Block;
 use MailPoet\Form\Renderer as FormRenderer;
 use MailPoet\Helpscout\Beacon;
 use MailPoet\Listing;
+use MailPoet\Mailer\MailerLog;
 use MailPoet\Models\CustomField;
 use MailPoet\Models\Form;
 use MailPoet\Models\Segment;
@@ -20,6 +21,8 @@ use MailPoet\Services\Bridge;
 use MailPoet\Settings\Hosts;
 use MailPoet\Settings\Pages;
 use MailPoet\Subscribers\ImportExport\ImportExportFactory;
+use MailPoet\Tasks\Sending;
+use MailPoet\Tasks\State;
 use MailPoet\Util\License\Features\Subscribers as SubscribersFeature;
 use MailPoet\Util\License\License;
 use MailPoet\WP\DateTime;
@@ -275,16 +278,16 @@ class Menu {
       )
     );
 
-    // Welcome page
+    // Welcome wizard page
     add_submenu_page(
       true,
-      $this->setPageTitle(__('Welcome', 'mailpoet')),
-      __('Welcome', 'mailpoet'),
+      $this->setPageTitle(__('Welcome Wizard', 'mailpoet')),
+      __('Welcome Wizard', 'mailpoet'),
       AccessControl::PERMISSION_ACCESS_PLUGIN_ADMIN,
-      'mailpoet-welcome',
+      'mailpoet-welcome-wizard',
       array(
         $this,
-        'welcome'
+        'welcomeWizard'
       )
     );
 
@@ -320,33 +323,6 @@ class Menu {
     remove_action('admin_print_styles', 'print_emoji_styles');
   }
 
-  function welcome() {
-    if((bool)(defined('DOING_AJAX') && DOING_AJAX)) return;
-
-    global $wp;
-    $current_url = home_url(add_query_arg($wp->query_string, $wp->request));
-    $redirect_url =
-      (!empty($_GET['mailpoet_redirect']))
-        ? urldecode($_GET['mailpoet_redirect'])
-        : wp_get_referer();
-
-    if(
-      $redirect_url === $current_url
-      or
-      strpos($redirect_url, 'mailpoet') === false
-    ) {
-      $redirect_url = admin_url('admin.php?page=' . self::MAIN_PAGE_SLUG);
-    }
-
-    $data = array(
-      'settings' => Setting::getAll(),
-      'current_user' => wp_get_current_user(),
-      'redirect_url' => $redirect_url,
-      'sub_menu' => self::MAIN_PAGE_SLUG
-    );
-    $this->displayPage('welcome.html', $data);
-  }
-
   function migration() {
     $mp2_migrator = new MP2Migrator($this->access_control);
     $mp2_migrator->init();
@@ -355,6 +331,17 @@ class Menu {
       'progress_url' => $mp2_migrator->progressbar->url,
     );
     $this->displayPage('mp2migration.html', $data);
+  }
+
+  function welcomeWizard() {
+    if((bool)(defined('DOING_AJAX') && DOING_AJAX)) return;
+    $data = [
+      'is_mp2_migration_complete' => (bool)Setting::getValue('mailpoet_migration_complete'),
+      'is_woocommerce_active' => class_exists('WooCommerce'),
+      'finish_wizard_url' => admin_url('admin.php?page=' . self::MAIN_PAGE_SLUG),
+      'sender' => Setting::getValue('sender')
+    ];
+    $this->displayPage('welcome_wizard.html', $data);
   }
 
   function update() {
@@ -447,18 +434,24 @@ class Menu {
 
 
   function help() {
+    $tasks_state = new State();
     $system_info_data = Beacon::getData();
-    $system_status_data = array(
-      'cron' => array(
+    $system_status_data = [
+      'cron' => [
         'url' => CronHelper::getCronUrl(CronDaemon::ACTION_PING),
         'isReachable' => CronHelper::pingDaemon(true)
-      ),
-      'mss' => array(
+      ],
+      'mss' => [
         'enabled' => (Bridge::isMPSendingServiceEnabled()) ?
-          array('isReachable' => Bridge::pingBridge()) :
+          ['isReachable' => Bridge::pingBridge()] :
           false
-      )
-    );
+      ],
+      'cronStatus' => CronHelper::getDaemon(),
+      'queueStatus' => MailerLog::getMailerLog(),
+    ];
+    $system_status_data['cronStatus']['accessible'] = CronHelper::isDaemonAccessible();
+    $system_status_data['queueStatus']['tasksStatusCounts'] = $tasks_state->getCountsPerStatus();
+    $system_status_data['queueStatus']['latestTasks'] = $tasks_state->getLatestTasks(Sending::TASK_TYPE);
     $this->displayPage(
       'help.html',
       array(

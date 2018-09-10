@@ -148,6 +148,7 @@ function mc_register_styles() {
 		wp_enqueue_style( 'my-calendar-admin-style' );
 	}
 
+	$default   = apply_filters( 'mc_display_css_on_archives', true, $wp_query );
 	$id        = ( is_object( $this_post ) && isset( $this_post->ID ) ) ? $this_post->ID : false;
 	$js_array  = ( '' != get_option( 'mc_show_js' ) ) ? explode( ',', get_option( 'mc_show_js' ) ) : array();
 	$css_array = ( '' != get_option( 'mc_show_css' ) ) ? explode( ',', get_option( 'mc_show_css' ) ) : array();
@@ -165,9 +166,9 @@ function mc_register_styles() {
 			}
 		}
 	}
-
+	// True means styles are disabled.
 	if ( 'true' != get_option( 'mc_use_styles' ) ) {
-		if ( is_array( $css_array ) && in_array( $id, $css_array ) || get_option( 'mc_show_css' ) == '' ) {
+		if ( ( $default && ! $id ) || ( is_array( $css_array ) && in_array( $id, $css_array ) || get_option( 'mc_show_css' ) == '' ) ) {
 			wp_enqueue_style( 'my-calendar-style' );
 		}
 	}
@@ -949,7 +950,7 @@ function mc_update_count_cache() {
 	global $wpdb;
 	$published = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_approved = 1' ); // WPCS: unprepared SQL OK.
 	$draft     = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_approved = 0' ); // WPCS: unprepared SQL OK.
-	$trash     = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_status = 2' ); // WPCS: unprepared SQL OK.
+	$trash     = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_approved = 2' ); // WPCS: unprepared SQL OK.
 	$archive   = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_status = 0' ); // WPCS: unprepared SQL OK.
 	$spam      = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_flagged = 1' ); // WPCS: unprepared SQL OK.
 	$counts    = array(
@@ -1279,7 +1280,7 @@ function mc_guess_calendar() {
  * Set up support form
  */
 function mc_get_support_form() {
-	global $current_user;
+	global $current_user, $wpdb;
 	$current_user = wp_get_current_user();
 	// send fields for My Calendar.
 	$version       = get_option( 'mc_version' );
@@ -1305,6 +1306,7 @@ function mc_get_support_form() {
 	$charset    = get_bloginfo( 'charset' );
 	// server.
 	$php_version = phpversion();
+	$db_version  = $wpdb->db_version();
 	$admin_email = get_option( 'admin_email' );
 	// theme data.
 	$theme         = wp_get_theme();
@@ -1345,6 +1347,7 @@ Charset: $charset
 
 ==Extra info:==
 PHP Version: $php_version
+DB Version: $db_version
 Server Software: $_SERVER[SERVER_SOFTWARE]
 User Agent: $_SERVER[HTTP_USER_AGENT]
 

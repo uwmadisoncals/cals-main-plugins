@@ -47,7 +47,7 @@ class FileList
 
         $file['access'] = wpdm_allowed_roles($file['ID']);
 
-        if (count($file['files']) > 0 || count($dfiles) > 0) {
+        if ((is_array($file['files']) && count($file['files']) > 0) || (is_array($dfiles) && count($dfiles) > 0)) {
             $fileinfo = isset($file['fileinfo']) ? $file['fileinfo'] : array();
             $pwdlock = isset($file['password_lock']) ? $file['password_lock'] : 0;
 

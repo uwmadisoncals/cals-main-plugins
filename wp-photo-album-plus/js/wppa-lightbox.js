@@ -3,7 +3,7 @@
 // Conatins lightbox modules
 // Dependancies: wppa.js and default wp jQuery library
 //
-var wppaLightboxVersion = '6.8.08';
+var wppaLightboxVersion = '6.9.12';
 
 // Global inits
 var wppaNormsBtnOpac 		= 0.75;
@@ -15,6 +15,9 @@ var wppaOvlMode 			= '';
 var wppaOvlCurIdx 			= 0;
 var wppaOvlSvgInverse 		= false;
 var wppaOvlFsExitBtnSize 	= '48';
+var wppaOvlActivePanorama 	= 0;
+var wppaOvlHasPanoramas 	= false;
+var wppaGlobalOvlPanoramaId = 0;
 
 // Global size specs
 var wppaSavedContainerWidth = 0;
@@ -23,6 +26,9 @@ var wppaSavedMarginLeft;
 var wppaSavedMarginTop;
 var wppaSavedImageWidth;
 var wppaSavedImageHeight;
+
+// Panorama related vars
+var wppaRenderer, wppaScene, wppaCamera, wppaSphere, wppaSphereMaterial, wppaSphereMesh;
 
 // Initial initialization
 jQuery( document ).ready( function( e ) {
@@ -139,7 +145,7 @@ wppaConsoleLog( 'wppaOvlFull' );
 		} else if ( elem.webkitRequestFullscreen ) {
 			elem.webkitRequestFullscreen();
 		}
-		setTimeout( function(){wppaOvlShow( wppaOvlIdx )}, 50 );
+// if ( ! init )		setTimeout( function(){wppaOvlShow( wppaOvlIdx )}, 50 );
 	}
 
 	// Cancel fullscreen. This is browser dependant
@@ -193,6 +199,19 @@ wppaConsoleLog( 'wppaOvlNorm' );
 function wppaOvlShow( arg ) {
 wppaConsoleLog( 'wppaOvlShow arg=' + arg );
 
+	var panData;
+	var dotPos;
+
+	// Panorama requires image container top=0 left=0
+	// Non panorama: 50%
+	if ( wppaOvlActivePanorama > 0 ) {
+		jQuery( '#wppa-overlay-ic' ).css({top:0,left:0});
+	}
+	else {
+		jQuery( '#wppa-overlay-ic' ).css({top:'50%',left:'50%'});
+	}
+//	jQuery( '#wppa-overlay-ic' ).css({top:'50%',left:'50%'});
+
 	// Do the setup right after the invocation of the lightbox
 	if ( wppaOvlFirst ) {
 
@@ -233,6 +252,9 @@ wppaConsoleLog( 'wppaOvlShow arg=' + arg );
 		wppaOvlVideoNaturalHeights 	= [];
 		wppaOvlImgs					= [];
 		wppaOvlIdx 					= 0;
+		wppaOvlPanoramaHtml 		= [];
+		wppaOvlPanoramaIds 			= [];
+		wppaOvlHasPanoramas 		= false;
 
 		// Do we use rel or data-rel?
 		var rel;
@@ -280,6 +302,19 @@ wppaConsoleLog( 'wppaOvlShow arg=' + arg );
 						wppaOvlAudioHtmls[j] 			= jQuery( anchor ).attr( 'data-audiohtml' ) ? decodeURI( jQuery( anchor ).attr( 'data-audiohtml' ) ) : '';
 						wppaOvlVideoNaturalWidths[j] 	= jQuery( anchor ).attr( 'data-videonatwidth' ) ? jQuery( anchor ).attr( 'data-videonatwidth' ) : '';
 						wppaOvlVideoNaturalHeights[j] 	= jQuery( anchor ).attr( 'data-videonatheight' ) ? jQuery( anchor ).attr( 'data-videonatheight' ) : '';
+						panData 						= jQuery( anchor ).attr( 'data-panorama' ) ? jQuery( anchor ).attr( 'data-panorama' ) : '';
+
+						if ( panData.length > 0 ) {
+							wppaOvlHasPanoramas = true;
+							dotPos = panData.indexOf( '.' );
+							wppaOvlPanoramaHtml[j] 		= panData.substr(dotPos+1);
+							wppaOvlPanoramaIds[j] 		= panData.substr(0,dotPos);
+						}
+						else {
+							wppaOvlPanoramaHtml[j] 		= '';
+							wppaOvlPanoramaIds[j] 		= 0;
+						}
+
 						if ( anchor.href == arg.href ) {
 							wppaOvlIdx = j;									// Current index
 						}
@@ -303,6 +338,18 @@ wppaConsoleLog( 'wppaOvlShow arg=' + arg );
 			wppaOvlAudioHtmls[0] 			= jQuery( arg ).attr( 'data-audiohtml' ) ? decodeURI( jQuery( arg ).attr( 'data-audiohtml' ) ) : '';
 			wppaOvlVideoNaturalWidths[0] 	= jQuery( arg ).attr( 'data-videonatwidth' ) ? jQuery( arg ).attr( 'data-videonatwidth' ) : '';
 			wppaOvlVideoNaturalHeights[0] 	= jQuery( arg ).attr( 'data-videonatheight' ) ? jQuery( arg ).attr( 'data-videonatheight' ) : '';
+			panData 						= jQuery( arg ).attr( 'data-panorama' ) ? jQuery( arg ).attr( 'data-panorama' ) : '';
+
+			if ( panData.length > 0 ) {
+				wppaOvlHasPanoramas = true;
+				dotPos = panData.indexOf( '.' );
+				wppaOvlPanoramaHtml[0] 		= panData.substr(dotPos+1);
+				wppaOvlPanoramaIds[0] 		= panData.substr(0,dotPos);
+			}
+			else {
+				wppaOvlPanoramaHtml[0] 		= '';
+				wppaOvlPanoramaIds[0] 		= 0;
+			}
 			wppaOvlIdx = 0;
 		}
 	}
@@ -311,6 +358,8 @@ wppaConsoleLog( 'wppaOvlShow arg=' + arg );
 	else {
 		wppaOvlIdx = arg;
 	}
+
+	wppaOvlOpen = true;
 
 	// Now start the actual function
 	setTimeout( function(){ _wppaOvlShow( wppaOvlIdx )}, 1 );
@@ -327,7 +376,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 
 	// Show spinner
 	if ( wppaOvlFirst ) {
-		jQuery( "#wppa-ovl-spin" ).fadeIn( 500 );
+		jQuery( "#wppa-ovl-spin" ).show();
 	}
 
 	// Find handy switches
@@ -340,9 +389,9 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 		wppaOvlImgs[idx] 			= new Image();
 		wppaOvlImgs[idx].src 		= wppaOvlUrls[idx];	// Preload
 		wppaConsoleLog( 'Preloading ' + ( idx + 1 ) + '/' + wppaOvlUrls.length + ' (current)' );
-		if ( ! wppaIsIe && ! wppaOvlImgs[idx].complete ) {
+		if ( ! wppaIsIe && ! wppaOvlImgs[idx].complete && wppaOvlOpen ) {
 			wppaConsoleLog( 'Retrying preload current image' );
-			setTimeout( '_wppaOvlShow(' + idx + ')', 10 );
+			setTimeout( '_wppaOvlShow(' + idx + ')', 500 );
 			return;
 		}
 	}
@@ -358,7 +407,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 		next = wppaOvlIdx + 1;
 	}
 	// only if not video
-	if ( wppaOvlVideoHtmls[next] == '' ) {
+	if ( wppaOvlVideoHtmls[next] == '' && wppaOvlOpen ) {
 		wppaOvlImgs[next] 			= new Image();
 		wppaOvlImgs[next].src 		= wppaOvlUrls[next];	// Preload
 		wppaConsoleLog( 'Preloading > ' + ( next + 1 ) );
@@ -366,7 +415,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 
 	// Preload previous ( for hitting the prev button )
 	// Only when in browsemode
-	if ( ! wppaOvlRunning ) {
+	if ( ! wppaOvlRunning && wppaOvlOpen ) {
 		if ( wppaOvlIdx == 0 ) {
 			prev = wppaOvlUrls.length-1;
 		}
@@ -388,12 +437,41 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 	// A single image?
 	wppaOvlIsSingle = ( wppaOvlUrls.length == 1  );
 
+	// If there are panoramas, switch to fullscreen, if not yet
+	if ( wppaOvlHasPanoramas && wppaOvlMode == 'normal' ) {
+//		wppaOvlFull();
+	}
+
+	// Panorama requires image container top=0 left=0
+	// Non panorama: 50%
+	if ( wppaOvlPanoramaIds[idx] > 0 ) {
+		wppaOvlActivePanorama = wppaOvlPanoramaIds[idx];
+		jQuery( '#wppa-overlay-ic' ).css({top:0,left:0});
+	}
+	else {
+		wppaOvlActivePanorama = 0;
+		jQuery( '#wppa-overlay-ic' ).css({top:'50%',left:'50%',display:'block'});
+	}
+
 	// Fullsize?
-	if ( wppaOvlMode != 'normal' ) {
+	if ( wppaOvlMode != 'normal' || wppaOvlActivePanorama ) {
 		var html;
 
+		// Fullsize panorama?
+		if ( wppaOvlActivePanorama ) {
+			html = wppaOvlPanoramaHtml[idx] +
+			'<div style="height: 20px; width: 100%; position:absolute; top:0; left:0;" onmouseover="jQuery(\'#wppa-ovl-legenda-2\').css(\'visibility\',\'visible\');" onmouseout="jQuery(\'#wppa-ovl-legenda-2\').css(\'visibility\',\'hidden\');wppaShowLegenda=\'hidden\';" >';
+			if ( wppaOvlShowLegenda && wppaOvlMode != 'normal' ) {
+				html +=
+				'<div id="wppa-ovl-legenda-2" style="position:fixed; left:0; top:0; background-color:'+(wppaOvlTheme == 'black' ? '#272727' : '#a7a7a7')+'; color:'+(wppaOvlTheme == 'black' ? '#a7a7a7' : '#272727')+'; visibility:'+wppaShowLegenda+';" >'+
+					'Mode=fullscreen. '+( wppaOvlIsSingle ? wppaOvlFullLegendaSinglePanorama : wppaOvlFullLegendaPanorama )+
+				'</div>';
+			}
+			html += '</div>';
+		}
+
 		// Fullsize Video
-		if ( wppaIsVideo ) {
+		else if ( wppaIsVideo ) {
 			html =
 			'<div id="wppa-ovl-full-bg" style="position:fixed; width:'+screen.width+'px; height:'+screen.height+'px; left:0px; top:0px; text-align:center;" >'+
 				'<video id="wppa-overlay-img" controls preload="metadata"' +
@@ -483,7 +561,8 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 				'</div>';
 
 
-		// The 'back to normal' icon
+		// The 'back to normal' icon, only on non-panorama
+		if ( wppaOvlMode != 'normal' ) {
 		html += '<div' +
 					' id="wppa-norms-btn"' +
 					' style="height:48px;z-index:100098;position:fixed;top:0;right:' + wppaOvlFsExitBtnSize + 'px;opacity:' + wppaNormsBtnOpac + ';"' +
@@ -495,6 +574,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 					' >' +
 					wppaSvgHtml( 'Exit-Full-Screen', wppaOvlFsExitBtnSize+'px', true, true, '0', '0', '0', '0' ) +
 				'</div>';
+		}
 
 		// Replacing the html stops a running video,
 		// so we only replace html on a new id, or a photo without audio
@@ -504,17 +584,17 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 			jQuery( '#wppa-overlay-ic' ).html( html );
 		}
 
+		// If panorama and single, hide panorama browse buttons
+		if ( wppaOvlPanoramaIds[idx] > 0 && wppaOvlIsSingle ) {
+			jQuery( '.wppa-pan-prevnext' ).hide();
+		}
+
 		// Disable right mouse button optionally
 		wppaProtect();
-//		jQuery( '#wppa-overlay-img' ).bind( 'contextmenu', function(e) {
-//			return false;
-//		});
 
-		// Replace svg img src to html
-//		wppaReplaceSvg();
 
 		wppaOvlIsVideo = wppaIsVideo;
-		setTimeout( 'wppaOvlFormatFull()', 1 );
+		setTimeout( 'wppaOvlFormatFull()', 10 );
 		if ( wppaIsVideo || wppaHasAudio ) {
 			setTimeout( 'wppaOvlUpdateFsId()', 20 );
 		}
@@ -523,8 +603,10 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 		}
 		wppaOvlFirst = false;
 
+		// ??
+		wppaShowFsButtons();
 		// Record we are in
-		wppaOvlOpen = true;
+//		wppaOvlOpen = true;
 
 		return false;
 	}
@@ -762,7 +844,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 						wppaOvlTitles[idx] +
 					'</div>';
 				'</div>';
-//alert(html);
+
 		// Insert the html
 		jQuery( '#wppa-overlay-ic' ).html( html );
 
@@ -770,15 +852,17 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 //		wppaReplaceSvg();
 
 		// Restore opacity of fs and exit buttons
-//		wppaShowFsButtons();
+		wppaShowFsButtons();
 
 		// Disable right mouse button
 		jQuery( '#wppa-overlay-img' ).bind( 'contextmenu', function(e) {
 			return false;
 		});
 
-		// Size
-		wppaOvlResize();
+		// Size if not panorama
+		if ( wppaOvlPanoramaIds[idx] == 0 ) {
+			wppaOvlResize();
+		}
 
 		// Show fs and exit buttons
 		if ( wppaOvlFirst ) {
@@ -786,7 +870,7 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 		}
 
 		// Record we are in
-		wppaOvlOpen = true;
+//		wppaOvlOpen = true;
 
 		// Done!
 		return false;
@@ -796,6 +880,9 @@ wppaConsoleLog( '_wppaOvlShow, idx='+idx );
 // Adjust display sizes
 function wppaOvlSize( speed ) {
 wppaConsoleLog( 'wppaOvlSize' );
+
+	// Panoramas do their own formatting
+	if ( wppaOvlActivePanorama ) return;
 
 	var img = document.getElementById( 'wppa-overlay-img' );	// Do NOT jquerify this:
 	var txt = document.getElementById( 'wppa-overlay-txt' ); 	// jQuery does not support .naturalHeight etc.
@@ -915,7 +1002,7 @@ wppaConsoleLog( 'wppaOvlSize' );
 	else {
 
 		// Remove spinner
-		jQuery( '#wppa-ovl-spin' ).stop().fadeOut();
+		jQuery( '#wppa-ovl-spin' ).hide();
 		wppaConsoleLog( 'Done '+wppaOvlIdx );
 		wppaOvlFirst = false;
 	}
@@ -925,6 +1012,20 @@ wppaConsoleLog( 'wppaOvlSize' );
 // Show fullscreen lightbox image
 function wppaOvlFormatFull() {
 wppaConsoleLog( 'wppaOvlFormatFull '+wppaOvlMode );
+
+	// Are we still in?
+	if ( ! wppaOvlOpen ) {
+		return;
+	}
+
+	// Panoramas do their own resize
+	if ( wppaOvlActivePanorama > 0 ) {
+//		setTimeout(function(){
+//			wppaConsoleLog('kicking panorama from wppaOvlFormatFull');
+//			jQuery(window).trigger("kickpanorama");
+//		},125);
+		return;
+	}
 
 	var img;
 	var natWidth;
@@ -1019,7 +1120,7 @@ wppaConsoleLog( 'wppaOvlFormatFull '+wppaOvlMode );
 	jQuery( '#wppa-ovl-full-bg' ).css({overflow:Overflow});
 	jQuery( '#wppa-ovl-full-bg' ).scrollTop( scrollTop );
 	jQuery( '#wppa-ovl-full-bg' ).scrollLeft( scrollLeft );
-	jQuery( '#wppa-ovl-spin' ).stop().fadeOut();
+	jQuery( '#wppa-ovl-spin' ).hide();
 
 	return true;	// Done!
 }
@@ -1161,6 +1262,9 @@ wppaConsoleLog( 'wppaOvlShowPrev' );
 function wppaOvlShowNext() {
 wppaConsoleLog( 'wppaOvlShowNext' );
 
+	// Show spinner
+	jQuery( '#wppa-ovl-spin' ).show();
+
 	wppaOvlFsPhotoId = 0;
 	wppaPhotoId = 0;
 
@@ -1199,11 +1303,17 @@ wppaConsoleLog( 'wppaOvlHide' );
 	wppaOvlRunning = false;
 	wppaOvlMode = wppaOvlModeInitial;
 	wppaNormsBtnOpac = 0.75;
-	jQuery( '#wppa-ovl-spin' ).stop().fadeOut();
+	jQuery( '#wppa-ovl-spin' ).hide();
 
 	// Remove fs and exit buttons
 	jQuery( '#wppa-fulls-btn' ).stop().fadeOut( 300 );
 	jQuery( '#wppa-exit-btn' ).stop().fadeOut( 300 );
+
+	// Remove spinner
+	jQuery( '#wppa-ovl-spin' ).hide();
+
+	// Stop any panorama from running the wppaRenderer
+	wppaOvlActivePanorama = 0;
 
 	// Record we are out
 	wppaOvlOpen = false;
@@ -1264,6 +1374,7 @@ wppaConsoleLog( 'wppaInitOverlay' );
 	wppaOvlFsPhotoId = 0; // Reset ovl fullscreen photo id
 	wppaPhotoId = 0;
 	wppaOvlCurIdx = 0;
+	wppaOvlActivePanorama = 0;
 
 	// First time ?
 	if ( wppaSavedContainerWidth == 0 ) {
@@ -1292,43 +1403,16 @@ wppaConsoleLog( 'wppaInitOverlay' );
 
 			// found one
 			wppaWppaOverlayActivated = true;
-/*
-			// Install handler
-			if ( wppaIsMobile ) {
 
-				// Install ontouch handlers
-				jQuery( anchor ).on( 'touchstart', function( event ) {	// tap
-
-					wppaStartTime();
-
-				});
-				jQuery( anchor ).on( 'touchend', function( event ) {	// tap
-
-					if ( wppaInTime() ) {
-						wppaOvlShow( this );
-					}
-					event.preventDefault();
-				});
-
-			}
-			else {
-*/
 				// Install onclick handler
 				jQuery( anchor ).on( 'click', function( event ) {
 					wppaOvlShow( this );
 					event.preventDefault();
 				});
-/*
-			}
-*/
+
 			// Set cursor to magnifier
 			jQuery( anchor ).css( 'cursor', 'url( ' + wppaImageDirectory + wppaMagnifierCursor + ' ),auto' );
-//alert( 'url( wppaImageDirectory + wppaMagnifierCursor ),auto' );
 
-//			// Install orientationchange handler if mobile
-//			if ( wppaIsMobile ) {
-//				window.addEventListener( 'orientationchange', wppaDoOnOrientationChange);
-//			}
 		}
 	}
 
@@ -1346,6 +1430,15 @@ wppaConsoleLog( 'wppaInitOverlay' );
 // Isn't it simple?
 function wppaOvlResize() {
 wppaConsoleLog( 'wppaOvlResize' );
+
+	// Panoramas do their own resize
+	if ( wppaOvlActivePanorama > 0 ) {
+//		setTimeout(function(){
+//			wppaConsoleLog('kicking panorama from wppaOvlResize');
+//			jQuery(window).trigger("kickpanorama");
+//		},125);
+		return;
+	}
 
 	// After resizing, the number of lines may have changed
 	setTimeout( 'wppaOvlSize( '+wppaOvlAnimSpeed+' )', 10 );

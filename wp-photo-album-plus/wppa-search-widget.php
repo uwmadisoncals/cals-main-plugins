@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the search widget
-* Version 6.8.07
+* Version 6.9.12
 *
 */
 
@@ -75,6 +75,21 @@ class SearchPhotos extends WP_Widget {
     function update( $new_instance, $old_instance ) {
 
 		$instance 					= $old_instance;
+
+		// Defaults
+		$instance 		= wp_parse_args( 	(array) $instance,
+											array(
+												'title' 		=> __( 'Search Photos', 'wp-photo-album-plus' ),
+												'label' 		=> '',
+												'root' 			=> false,
+												'sub' 			=> false,
+												'album' 		=> '0',
+												'landingpage' 	=> '',
+												'catbox' 		=> false,
+												'selboxes' 		=> false,
+												'logonly' 		=> 'no',
+												) );
+
 		$instance['title'] 			= strip_tags($new_instance['title']);
 		$instance['label']			= $new_instance['label'];
 		$instance['root']  			= isset( $new_instance['root'] ) ? $new_instance['root'] : false;

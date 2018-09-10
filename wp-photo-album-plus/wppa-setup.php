@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.9.08
+* Version 6.9.11
 *
 */
 
@@ -1314,6 +1314,13 @@ cursorborder:'2px solid transparent',";
 						'wppa_ovl_audio_start' 			=> 'yes',
 						'wppa_ovl_mode_initial' 		=> 'normal',
 						'wppa_ovl_mode_initial_mob' 	=> 'padded',
+
+						// H Panorama
+						'wppa_panorama_control' 			=> 'all',
+						'wppa_panorama_manual' 				=> 'all',
+						'wppa_panorama_autorun' 			=> 'none',
+						'wppa_panorama_autorun_speed' 		=> '3',
+						'wppa_panorama_wheel_sensitivity' 	=> '3',
 
 						// Table V: Fonts
 						'wppa_fontfamily_title' 	=> '',

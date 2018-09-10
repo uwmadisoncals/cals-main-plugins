@@ -342,7 +342,11 @@ function wpcf_fields_checkbox_save_check( $post_source )
             $re = sprintf('/\-(%s)$/', implode('|', $children));
             $checkboxes = array();
             foreach(array_keys($_POST['_wptoolset_checkbox']) as $key) {
-                $checkboxes[] = preg_replace($re, '', $key);
+            	// make sure to only collect checkboxes which are assigned to the children post type
+            	if( preg_match( $re, $key ) ) {
+		            $checkboxes[] = preg_replace($re, '', $key);
+	            }
+
             }
             foreach( $children as $child_id ) {
                 foreach( array_unique($checkboxes) as $slug ) {

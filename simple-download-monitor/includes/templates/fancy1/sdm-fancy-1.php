@@ -61,6 +61,9 @@ function sdm_generate_fancy1_display_output($args) {
     $main_opts = get_option('sdm_downloads_options');
 
     // See if new window parameter is set
+    if(empty($new_window)){
+        $new_window = get_post_meta( $id, 'sdm_item_new_window', true ); 
+    }
     $window_target = empty($new_window) ? '_self' : '_blank';
 
     // Get CPT thumbnail
@@ -80,14 +83,30 @@ function sdm_generate_fancy1_display_output($args) {
 
     //Get item file size
     $item_file_size = get_post_meta($id, 'sdm_item_file_size', true);
+    //Check if show file size is enabled
+    if(empty($show_size)){
+        //Disabled in shortcode. Lets check if it is enabled in the download meta.
+        $show_size =  get_post_meta($id, 'sdm_item_show_file_size_fd', true);
+    }
     $isset_item_file_size = ($show_size && isset($item_file_size)) ? $item_file_size : ''; //check if show_size is enabled and if there is a size value
+    
     //Get item version
     $item_version = get_post_meta($id, 'sdm_item_version', true);
+    //Check if show version is enabled
+    if(empty($show_version)){
+        //Disabled in shortcode. Lets check if it is enabled in the download meta.
+        $show_version =  get_post_meta($id, 'sdm_item_show_item_version_fd', true);
+    }
     $isset_item_version = ($show_version && isset($item_version)) ? $item_version : ''; //check if show_version is enabled and if there is a version value
-    // Check to see if the download link cpt is password protected
+    
+    //Check to see if the download link cpt is password protected
     $get_cpt_object = get_post($id);
     $cpt_is_password = !empty($get_cpt_object->post_password) ? 'yes' : 'no';  // yes = download is password protected;    
     
+    //Check if show date is enabled
+    $show_date_fd =  get_post_meta($id, 'sdm_item_show_date_fd', true);
+    //Get item date 
+    $download_date = get_the_date(get_option('date_format'), $id) ; 
    
     $main_advanced_opts = get_option('sdm_advanced_options');
     
@@ -138,8 +157,20 @@ function sdm_generate_fancy1_display_output($args) {
         $output .= '<span class="sdm_download_version_value">' . $isset_item_version . '</span>';
         $output .= '</div>';
     }
+    
+    if ($show_date_fd) {//Show date 
+        $output .= '<div class="sdm_download_date">';
+        $output .= '<span class="sdm_download_date_label">' . __('Published: ', 'simple-download-monitor') . '</span>';
+        $output .= '<span class="sdm_download_date_value">' . $download_date . '</span>';
+        $output .= '</div>';
+    }
+    
 
     $output .= '<div class="sdm_download_link">';
+    
+    //apply filter on button HTML code
+    $download_button_code=apply_filters('sdm_download_button_code_html', $download_button_code );
+    
     $output .= '<span class="sdm_download_button">' . $download_button_code . '</span>';
     if (!isset($main_opts['general_hide_donwload_count'])) {//The hide download count is enabled.
         $output .= '<span class="sdm_download_item_count">' . $download_count_string . '</span>';

@@ -1,6 +1,6 @@
 <!-- WPDM Link Template: Default Template (Extended) -->
 
-<div class="panel panel-default">
+<div class="wpdm-link-tpl panel panel-default">
     <div class="panel-body">
  
     <div class="media">

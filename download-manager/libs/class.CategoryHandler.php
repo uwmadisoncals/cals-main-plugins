@@ -11,7 +11,9 @@ class CategoryHandler {
     public static function  getAllowedRoles( $term_id ){
         $MetaData = get_option( "__wpdmcategory" );
         $MetaData = maybe_unserialize($MetaData);
-        $roles = isset($MetaData[$term_id], $MetaData[$term_id]['access']) && is_array($MetaData[$term_id]['access'])?$MetaData[$term_id]['access']:array();
+        $roles = maybe_unserialize(get_term_meta($term_id, '__wpdm_access', true));
+        if(!is_array($roles))
+            $roles = isset($MetaData[$term_id], $MetaData[$term_id]['access']) && is_array($MetaData[$term_id]['access']) ? $MetaData[$term_id]['access'] : array();
         $roles = apply_filters("wpdm_categoryhandler_getallowedroles", $roles, $term_id);
         return $roles;
     }
@@ -20,19 +22,27 @@ class CategoryHandler {
         if(!$cid) return array();
         $roles = array();
         $parents = \WPDM\libs\CategoryHandler::categoryParents($cid, 0);
+        $MetaData = get_option( "__wpdmcategory" );
+        $MetaData = maybe_unserialize($MetaData);
         foreach ($parents as $catid) {
-            $MetaData = get_option( "__wpdmcategory" );
-            $MetaData = maybe_unserialize($MetaData);
-            $croles = isset($MetaData[$catid], $MetaData[$catid]['access']) && is_array($MetaData[$catid]['access'])?$MetaData[$catid]['access']:array();
+            $croles = maybe_unserialize(get_term_meta($catid, '__wpdm_access', true));
+            if(!is_array($roles))
+                $croles = isset($MetaData[$catid], $MetaData[$catid]['access']) && is_array($MetaData[$catid]['access']) ? $MetaData[$catid]['access'] : array();
             $roles += $croles;
         }
         return array_unique($roles);
     }
 
     public static function  icon( $term_id ){
-        $MetaData = get_option( "__wpdmcategory" );
-        $MetaData = maybe_unserialize($MetaData);
-        return isset($MetaData[$term_id]['icon'])?$MetaData[$term_id]['icon']:'';
+        $icon = get_term_meta($term_id, '__wpdm_icon', true);
+        if($icon == '') {
+            $MetaData = get_option("__wpdmcategory");
+            $MetaData = maybe_unserialize($MetaData);
+            $icon = get_term_meta($term_id, '__wpdm_icon', true);
+            if($icon == '')
+                $icon = isset($MetaData[$term_id]['icon'])?$MetaData[$term_id]['icon']:'';
+        }
+        return $icon;
     }
 
     public static function categoryParents($cid, $offset = 1){

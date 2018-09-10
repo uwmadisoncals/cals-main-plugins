@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the tagcloud widget
-* Version 6.8.07
+* Version 6.9.12
 *
 */
 
@@ -59,6 +59,14 @@ class TagcloudPhotos extends WP_Widget {
     /** @see WP_Widget::update */
     function update($new_instance, $old_instance) {
 		$instance = $old_instance;
+
+		// Defaults
+		$instance = wp_parse_args( (array) $instance, array(
+															'title' => __( 'Photo Tag Cloud', 'wp-photo-album-plus' ),
+															'tags' => '',
+															'logonly' => 'no' ,
+															) );
+
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['tags'] = $new_instance['tags'];
 		$instance['logonly'] = $new_instance['logonly'];
@@ -69,7 +77,7 @@ class TagcloudPhotos extends WP_Widget {
     /** @see WP_Widget::form */
     function form( $instance ) {
 
-		//Defaults
+		// Defaults
 		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Photo Tag Cloud', 'wp-photo-album-plus' ), 'tags' => '', 'logonly' => 'no' ) );
 		$title = $instance['title'];
 		$stags = $instance['tags'];

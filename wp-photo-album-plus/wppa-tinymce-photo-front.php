@@ -2,7 +2,7 @@
 /* wppa-tinymce-photo-front.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 6.8.09
+* Version 6.9.12
 *
 */
 
@@ -52,7 +52,7 @@ global $wppa_js_page_data_file;
 	if ( wppa_switch( 'photo_shortcode_enabled' ) && ! $done ) {
 
 		// Find an existing photo
-		$id = $wpdb->get_var( "SELECT `id` FROM " . WPPA_PHOTOS . " WHERE `ext` <> 'xxx' ORDER BY `timestamp` DESC LIMIT 1" );
+		$id = $wpdb->get_var( "SELECT `id` FROM " . WPPA_PHOTOS . " WHERE `ext` <> 'xxx' AND `panorama` = 0 ORDER BY `timestamp` DESC LIMIT 1" );
 
 		// Fake we are in a widget, to prevent wppa_get_picture_html() from bumping viewcount
 		wppa( 'in_widget', true );

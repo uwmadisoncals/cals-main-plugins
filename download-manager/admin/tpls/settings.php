@@ -3,6 +3,9 @@
 
 <div style="clear: both;"></div>
     <form method="post" id="wdm_settings_form" style="margin-top:35px;">
+        <?php
+        wp_nonce_field(NONCE_KEY, '__wpdms_nonce');
+        ?>
  <div class="panel panel-default" id="wpdm-wrapper-panel">
      <div class="panel-heading"><button type="submit" class="btn btn-default pull-right" style="font-weight: 600"><i class="sinc fa fa-hdd color-green"></i> <?php _e("Save Settings",'download-manager'); ?></button><h3 class="h"><i class="fa fa-cogs color-purple"></i>&nbsp;&nbsp;<?php _e("Download Manager Settings",'download-manager'); ?></h3>
 
@@ -21,8 +24,7 @@
         </div><div class="col-md-9">
      <div class="tab-content">
 <div onclick="jQuery(this).slideUp();" class="alert alert-info" style="display: none" id="message"></div>
-<?php wp_nonce_field(NONCE_KEY, '__wpdms_nonce'); ?>
-<input type="hidden" name="task" id="task" value="wdm_save_settings" />
+         <input type="hidden" name="task" id="task" value="wdm_save_settings" />
 <input type="hidden" name="action" id="action" value="wdm_settings" />
 <input type="hidden" name="section" id="section" value="<?php echo (isset($_REQUEST['tab']))?esc_attr($_REQUEST['tab']):'basic'; ?>" />
 <div id="fm_settings">

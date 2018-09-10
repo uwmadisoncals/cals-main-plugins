@@ -217,6 +217,10 @@ class WPCF_Relationship
      */
     function save_child( $parent_id, $child_id, $save_fields = array() )
     {
+    	// this function modifies $_POST
+	    // we need to make sure to revoke all changes to $_POST at the end (types-1644)
+    	$POST_backup = $_POST;
+
         $parent = get_post( intval( $parent_id ) );
         $child = get_post( intval( $child_id ) );
         $post_data = array();
@@ -411,6 +415,9 @@ class WPCF_Relationship
         wp_cache_flush();
 
 	    remove_filter( 'types_updating_child_post', '__return_true' );
+
+	    // re-apply original $_POST data
+		$_POST = $POST_backup;
 
         return true;
     }

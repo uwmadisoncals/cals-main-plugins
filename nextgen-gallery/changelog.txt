@@ -1,6 +1,9 @@
 NextGEN Gallery
 by Imagely
 
+= V3.0.8 - 09.05.2018 =
+* Fixed:   IGW broken with Chrome 69+
+
 = V3.0.6 - 07.24.2018 =
 * NEW:     Added 'ngg_gallery_title_select_field' filter
 * NEW:     Danish translations

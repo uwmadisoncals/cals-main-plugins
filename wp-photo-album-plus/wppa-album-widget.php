@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 6.8.08
+* Version 6.9.12
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -193,6 +193,7 @@ class AlbumWidget extends WP_Widget {
 										( $has_audio ? ' data-audiohtml="' . esc_attr( wppa_get_audio_body( $thumb['id'] ) ) . '"' : '' ) .
 										' ' . wppa( 'rel' ) . '="'.wppa_opt( 'lightbox_name' ).'[alw-'.wppa( 'mocc' ).'-'.$album['id'].']"' .
 										' ' . wppa( 'lbtitle' ) . '="'.$title.'"' .
+										wppa_get_lb_panorama_full_html( $id ) .
 										' data-alt="' . esc_attr( wppa_get_imgalt( $thumb['id'], true ) ) . '"' .
 										' style="cursor:' . wppa_wait() . ';"' .
 										' onclick="return false;"' .
@@ -320,6 +321,16 @@ class AlbumWidget extends WP_Widget {
     /** @see WP_Widget::update */
     function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
+
+		//Defaults
+		$instance = wp_parse_args( (array) $instance, array(
+															'title' => __( 'Thumbnail Albums', 'wp-photo-album-plus' ),
+															'parent' => '0',
+															'name' => 'no',
+															'skip' => 'yes',
+															'logonly' => 'no',
+															) );
+
 		$instance['title'] 		= strip_tags( $new_instance['title'] );
 		$instance['parent'] 	= $new_instance['parent'];
 		$instance['name'] 		= $new_instance['name'];

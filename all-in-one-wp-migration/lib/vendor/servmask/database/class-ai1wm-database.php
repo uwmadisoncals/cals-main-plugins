@@ -54,6 +54,20 @@ abstract class Ai1wm_Database {
 	protected $new_table_prefixes = array();
 
 	/**
+	 * Old column prefixes
+	 *
+	 * @var array
+	 */
+	protected $old_column_prefixes = array();
+
+	/**
+	 * New column prefixes
+	 *
+	 * @var array
+	 */
+	protected $new_column_prefixes = array();
+
+	/**
 	 * Old replace values
 	 *
 	 * @var array
@@ -183,6 +197,48 @@ abstract class Ai1wm_Database {
 	 */
 	public function get_new_table_prefixes() {
 		return $this->new_table_prefixes;
+	}
+
+	/**
+	 * Set old column prefixes
+	 *
+	 * @param  array $prefixes List of column prefixes
+	 * @return Ai1wm_Database
+	 */
+	public function set_old_column_prefixes( $prefixes ) {
+		$this->old_column_prefixes = $prefixes;
+
+		return $this;
+	}
+
+	/**
+	 * Get old column prefixes
+	 *
+	 * @return array
+	 */
+	public function get_old_column_prefixes() {
+		return $this->old_column_prefixes;
+	}
+
+	/**
+	 * Set new column prefixes
+	 *
+	 * @param  array $prefixes List of column prefixes
+	 * @return Ai1wm_Database
+	 */
+	public function set_new_column_prefixes( $prefixes ) {
+		$this->new_column_prefixes = $prefixes;
+
+		return $this;
+	}
+
+	/**
+	 * Get new column prefixes
+	 *
+	 * @return array
+	 */
+	public function get_new_column_prefixes() {
+		return $this->new_column_prefixes;
 	}
 
 	/**
@@ -474,10 +530,9 @@ abstract class Ai1wm_Database {
 	 * @param  string $file_name    Name of file
 	 * @param  int    $table_index  Table index
 	 * @param  int    $table_offset Table offset
-	 * @param  int    $timeout      Process timeout
 	 * @return bool
 	 */
-	public function export( $file_name, &$table_index = 0, &$table_offset = 0, $timeout = 0 ) {
+	public function export( $file_name, &$table_index = 0, &$table_offset = 0 ) {
 		// Set file handler
 		$file_handler = ai1wm_open( $file_name, 'ab' );
 
@@ -610,7 +665,7 @@ abstract class Ai1wm_Database {
 						foreach ( $row as $key => $value ) {
 							// Replace table prefix columns
 							if ( isset( $columns[ strtolower( $key ) ] ) ) {
-								$value = $this->replace_table_prefixes( $value, 0 );
+								$value = $this->replace_column_prefixes( $value, 0 );
 							}
 
 							// Replace table values
@@ -652,7 +707,7 @@ abstract class Ai1wm_Database {
 				$this->free_result( $result );
 
 				// Time elapsed
-				if ( $timeout ) {
+				if ( ( $timeout = apply_filters( 'ai1wm_completed_timeout', 10 ) ) ) {
 					if ( ( microtime( true ) - $start ) > $timeout ) {
 						$completed = false;
 						break 2;
@@ -672,10 +727,9 @@ abstract class Ai1wm_Database {
 	 *
 	 * @param  string $file_name    Name of file
 	 * @param  int    $query_offset Query offset
-	 * @param  int    $timeout      Process timeout
 	 * @return bool
 	 */
-	public function import( $file_name, &$query_offset = 0, $timeout = 0 ) {
+	public function import( $file_name, &$query_offset = 0 ) {
 		// Set max allowed packet
 		$max_allowed_packet = $this->get_max_allowed_packet();
 
@@ -738,7 +792,7 @@ abstract class Ai1wm_Database {
 						$query_offset = ftell( $file_handler );
 
 						// Time elapsed
-						if ( $timeout ) {
+						if ( ( $timeout = apply_filters( 'ai1wm_completed_timeout', 10 ) ) ) {
 							if ( ! $this->is_atomic_query( $query ) ) {
 								if ( ( microtime( true ) - $start ) > $timeout ) {
 									$completed = false;
@@ -906,14 +960,42 @@ abstract class Ai1wm_Database {
 	/**
 	 * Replace table prefixes
 	 *
-	 * @param  string  $input    Table value
-	 * @param  bool    $position Replace first occurrence at a specified position
+	 * @param  string $input    Table value
+	 * @param  mixed  $position Replace first occurrence at a specified position
 	 * @return string
 	 */
 	protected function replace_table_prefixes( $input, $position = false ) {
 		// Get table prefixes
 		$search  = $this->get_old_table_prefixes();
 		$replace = $this->get_new_table_prefixes();
+
+		// Replace first occurance at a specified position
+		if ( $position !== false ) {
+			for ( $i = 0; $i < count( $search ); $i++ ) {
+				$current = stripos( $input, $search[ $i ] );
+				if ( $current === $position ) {
+					$input = substr_replace( $input, $replace[ $i ], $current, strlen( $search[ $i ] ) );
+				}
+			}
+
+			return $input;
+		}
+
+		// Replace all occurrences
+		return str_ireplace( $search, $replace, $input );
+	}
+
+	/**
+	 * Replace column prefixes
+	 *
+	 * @param  string $input    Column value
+	 * @param  mixed  $position Replace first occurrence at a specified position
+	 * @return string
+	 */
+	protected function replace_column_prefixes( $input, $position = false ) {
+		// Get column prefixes
+		$search  = $this->get_old_column_prefixes();
+		$replace = $this->get_new_column_prefixes();
 
 		// Replace first occurance at a specified position
 		if ( $position !== false ) {

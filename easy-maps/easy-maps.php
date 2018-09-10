@@ -6,12 +6,12 @@ if( ! class_exists( 'simple_html_dom_node' ) ) {
 }
 
 /**
- * Plugin Name: Easy Maps for Wordpress
- * Description: Enhance your posts with Google Maps.  Use the Trippy Easy Maps plugin to easily create more dynamic content.
+ * Plugin Name: Trippy Places for Wordpress
+ * Description: Enhance your posts with.  Use the Trippy plugin to easily create more dynamic content.
  * Plugin URI:
- * Version:     1.1.9
+ * Version:     1.2.0
  * Author:      Team Trippy
- * Author URI:  https://www.trippy.com
+ * Author URI:  https://www.trippy.com/
  * License:     GPLv2
  * License URI: ./assets/license.txt
  * Text Domain:
@@ -59,19 +59,14 @@ function trippy_add_tinymce_plugin($plugin_array) {
 	wp_enqueue_script ( 'jquery' );
 	wp_enqueue_script('jquery-ui-autocomplete', '', array('jquery-ui-widget', 'jquery-ui-position'), '1.8.6');
 	
-	
-	
 	$plugin_array ['trippy_autocomplete'] = plugins_url ( '/plugin.js', __FILE__ );
-	// Print all plugin js path
-	// var_dump( $plugin_array );
+
 	return $plugin_array;
 }
 
 // Add the button key for address via JS
 function trippy_add_tinymce_button($buttons) {
 	array_push ( $buttons, 'trippy_autocomplete_button_key' );
-	// Print all buttons
-	// var_dump( $buttons );
 	
 	return $buttons;
 }
@@ -79,7 +74,7 @@ function trippy_add_tinymce_button($buttons) {
 add_action( 'add_meta_boxes', 'trippy_map_panel_add' );
 function trippy_map_panel_add()
 {
-    add_meta_box( 'trippy-map-preview-container', 'Easy Maps Map Preview', 'trippy_render_map_panel', 'post', 'normal', 'high' );
+    add_meta_box( 'trippy-map-preview-container', 'Trippy Places Preview', 'trippy_render_map_panel', 'post', 'normal', 'high' );
 }
 
 function trippy_render_map_panel()
@@ -88,7 +83,7 @@ function trippy_render_map_panel()
 	
 	$contentBody = $post->post_content;
 	
-	$currentLayoutMode = getTrippyMapLayoutOption();
+	$currentLayoutMode = getTrippyLayoutOption();
 	
 	$selectedLeft = "";
 	$selectedRight = "";
@@ -109,10 +104,10 @@ function trippy_render_map_panel()
 
 	$hasPlaces = trippy_content_has_places($contentBody);
 	if (!$hasPlaces) {
-		echo "<div class=\"trippy-map-panel-preview-instructions\">Type \"@place-name\" in your post to map a town, attraction, hotel, or restaurant. (example @Eiffel Tower)</div>";
+		echo "<div class=\"trippy-map-panel-preview-instructions\">Type \"@place-name\" in your post to select a town, attraction, hotel, or restaurant. (example @Eiffel Tower)</div>";
 	}
 	
-	echo "<div class=\"trippy-admin-panel-position-control\"><p><strong>Display Map on published post:</strong></p>";
+	echo "<div class=\"trippy-admin-panel-position-control\"><p><strong>Display Places on published post:</strong></p>";
 	echo "<input type=\"radio\" name=\"trippy-map-position-radio\" value=\"left\" ". $selectedLeft . "><img width=\"25\" alt=\"float left\" src=\"" . plugins_url('img/float-left-icon.gif',  __FILE__) . "\">left ";
 	echo "<input type=\"radio\" name=\"trippy-map-position-radio\" value=\"right\" ". $selectedRight . "><img width=\"25\" alt=\"float right\"src=\"" . plugins_url('img/float-right-icon.gif',  __FILE__) . "\">right ";
 	echo "<input type=\"radio\" name=\"trippy-map-position-radio\" value=\"bottom\" ". $selectedBottom . "><img width=\"25\" alt=\"bottom\"src=\"" . plugins_url('img/bottom-icon.gif',  __FILE__) . "\">bottom ";
@@ -135,10 +130,7 @@ function trippy_content_has_places($contentBody) {
 function trippy_render_map($contentBody, $isAdminMode) {
  	global $post;
 	
-// 	$postID = $post->ID;
-	
-	
- 	$currentLayoutMode = getTrippyMapLayoutOption() ? getTrippyMapLayoutOption() : "right" ; 
+ 	$currentLayoutMode = getTrippyLayoutOption() ? getTrippyLayoutOption() : "right" ; 
  	
 	
 	wp_enqueue_style( 'admin_css', plugins_url('css/trippy-map-style.css',  __FILE__));
@@ -172,25 +164,9 @@ function trippy_render_map($contentBody, $isAdminMode) {
 		$easymaps_content_width = 250;
 	}
 	
-	$mapWidth = $isAdminMode ? 250 : round($easymaps_content_width);
-	
-	if (!$mapWidth || $mapWidth == 0) {
-		$mapWidth = 640;
-	}
-	
-	if ($mapWidth < 250) {
-		$mapWidth = 250;
-	}
-	
-	$mapWidthMinusBorders = $mapWidth - 10;
-	
-	$trippyStaticMapUrl = "https://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=". $mapWidthMinusBorders . "x250";
 	$label = 0;
 	
 	$trippy_base_url = "https://www.trippy.com";
-	
-	$trippyMapDetailUrl = $trippy_base_url . "/places/map?utm_campaign=EASY_MAPS&utm_source=" . $_SERVER['SERVER_NAME']. "&utm_medium=map&placeIds=";
-	
 	
 	$trippyTrackingUrl = $trippy_base_url . "/trwpdot.gif?perm=" . urlencode(get_permalink()) . "&ts=" . get_the_time('U') . "&title=" . urlencode(get_the_title()) ."&placeIds=";
 	
@@ -200,9 +176,7 @@ function trippy_render_map($contentBody, $isAdminMode) {
 
 	if ($html) {
 	foreach($html->find('.trippy-place-element') as $element) {
-		$trippyStaticMapUrl .= "&markers=label:" . strtoupper(chr(($label % 26) + 97))  . "%7C" . $element->{'data-coords'};
 
-		$trippyMapDetailUrl .= $element->{'data-trippy-place-id'} . ",";
 		$trippyTrackingUrl .= $element->{'data-trippy-place-id'} . ",";
 		
 		$label++;
@@ -235,48 +209,23 @@ function trippy_render_map($contentBody, $isAdminMode) {
 
 	}
 
-	if (strlen($trippyStaticMapUrl) > 2000) {
-		$label = 0;
-		$trippyStaticMapUrl = "https://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=". $mapWidthMinusBorders . "x250";
-		foreach($html->find('.trippy-place-element') as $element) {
-			$coords = explode(",",$element->{'data-coords'});
-			$coords[0] = round($coords[0],4);
-			$coords[1] = round($coords[1],4);
-			$trippyStaticMapUrl .= "&markers=label:" . strtoupper(chr(($label % 26) + 97))  . "%7C" . $coords[0] . "," . $coords[1];
-			$label++;
-		}
-	}
-
-	if (strlen($trippyStaticMapUrl) > 2000) {
-		$label = 0;
-		$trippyStaticMapUrl = "https://maps.googleapis.com/maps/api/staticmap?key=AIzaSyBzXWNRqto9a4mUXUtCdwt3KLXNsSE9l_0&sensor=false&size=". $mapWidthMinusBorders . "x250";
-		foreach($html->find('.trippy-place-element') as $element) {
-			$coords = explode(",",$element->{'data-coords'});
-			$coords[0] = round($coords[0],2);
-			$coords[1] = round($coords[1],2);
-			$trippyStaticMapUrl .= "&markers=label:" . strtoupper(chr(($label % 26) + 97))  . "%7C" . $coords[0] . "," . $coords[1];
-			$label++;
-		}
-	}
-	
 	$trippyPlacesList .= "</ol></div>";
 
 	if ($isAdminMode) {
-		$trippyPlacesList .= "<div>" . $label . " mapped places | <span id=\"trippy-admin-show-map-details\">details</span></div>";
+		$trippyPlacesList .= "<div>" . $label . " places | <span id=\"trippy-admin-show-map-details\">details</span></div>";
 	}
 	
 	
 	
 	
 	if ($label > 0) {
-		$pluginUrl = $trippy_base_url . "/tools/wordpress-easy-maps-plugin";
 		if ($currentLayoutMode != "bottom") {
 		  $inline_style = "width:".$easymaps_content_width."px";
 		} else {
 			$inline_style = "";
 		}
 		
-		return "<div style=\"".$inline_style."\" class=\"trippy-map-panel-preview-container trippy-map-panel-preview-container-" . $currentLayoutMode . "\"><div class=\"trippy-map-panel-title\">Mentioned in this post</div><a href=\"". $trippyMapDetailUrl . "\" target=\"_blank\"><img src=\"" . $trippyStaticMapUrl . "\" class=\"trippy-map-panel-preview-map-img\"><!--</a>-->". $trippyPlacesList. " <div class=\"trippy-map-panel-preview-container-header\">" . ($isAdminMode || is_preview() ? "" : "<img src=\"" . $trippyTrackingUrl.  "\" width=\"1\" height=\"1\" style=\"float:left;\">"). "<span class=\"trippy-map-panel-preview-container-header-contents\"><a href=\"https://www.trippy.com\" target=\"_blank\">powered by <strong>trippy</strong></a> &nbsp;|&nbsp; <a href=\"". $pluginUrl . "\" target=\"_blank\">get the wordpress map plugin</a></span></div></div>";	
+		return "<div style=\"".$inline_style."\" class=\"trippy-map-panel-preview-container trippy-map-panel-preview-container-" . $currentLayoutMode . "\"><div class=\"trippy-map-panel-title\">Mentioned in this post</div>" . $trippyPlacesList. " <div class=\"trippy-map-panel-preview-container-header\">" . ($isAdminMode || is_preview() ? "" : "<img src=\"" . $trippyTrackingUrl.  "\" width=\"1\" height=\"1\" style=\"float:left;\">"). "<span class=\"trippy-map-panel-preview-container-header-contents\"><a href=\"https://www.trippy.com/\" target=\"_blank\">powered by <strong>trippy</strong></a></span></div></div>";	
 	} else {
 		return "";
 	}
@@ -293,13 +242,10 @@ function trippy_map_layout_option_save( $post_id )
 	// if our current user can't edit this post, bail
 	if( !current_user_can( 'edit_post' ) ) return;
 	 
-	 
 	if( isset( $_POST['trippy-map-position-radio'] ) )
 		update_post_meta( $post_id, 'trippy-map-layout-option', esc_attr( $_POST['trippy-map-position-radio'] ) );
 	 
 }
-
-
 
 
 function my_plugin_function_callback() {
@@ -314,10 +260,10 @@ function my_plugin_function_callback() {
 
 add_action('wp_ajax_my_plugin_function', 'my_plugin_function_callback');
 
-//Add Map to Live Post
-add_filter( "the_content", "trippy_add_map_content_after_post" );
+//Add to Live Post
+add_filter( "the_content", "trippy_add_content_after_post" );
 
-function getTrippyMapLayoutOption() {
+function getTrippyLayoutOption() {
 	global $post;
 	$currentLayoutMode = get_post_meta( $post->ID, 'trippy-map-layout-option', true);
 	
@@ -327,14 +273,14 @@ function getTrippyMapLayoutOption() {
 	return $currentLayoutMode;
 }
 
-function trippy_add_map_content_after_post($content){
+function trippy_add_content_after_post($content){
 	
 	wp_enqueue_style( 'admin_css', plugins_url('css/trippy-map-style.css',  __FILE__));
 	
 	
 	wp_register_style( 'custom-style', plugins_url( '/css/trippy-map-style.css', __FILE__ ), array(), '20140619', 'all' );
 	
-	$currentLayoutMode = getTrippyMapLayoutOption();
+	$currentLayoutMode = getTrippyLayoutOption();
 	
 	$processContent = $content;
 	if (is_single()) {

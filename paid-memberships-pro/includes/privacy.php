@@ -411,7 +411,7 @@ function pmpro_save_consent( $user_id = NULL, $post_id = NULL, $post_modified = 
 	// Default to current user.
 	if( empty( $user_id ) ) {
 		global $current_user;
-		$user_id = $user->ID;
+		$user_id = $current_user->ID;
 	}
 
 	if( empty( $user_id ) ) {
@@ -455,7 +455,7 @@ function pmpro_get_consent_log( $user_id = NULL, $reversed = true ) {
 	// Default to current user.
 	if( empty( $user_id ) ) {
 		global $current_user;
-		$user_id = $user->ID;
+		$user_id = $current_user->ID;
 	}
 
 	if( empty( $user_id ) ) {
@@ -494,7 +494,7 @@ function pmpro_after_checkout_update_consent( $user_id, $order ) {
 }
 add_action( 'pmpro_after_checkout', 'pmpro_after_checkout_update_consent', 10, 2 );
 add_action( 'pmpro_before_send_to_paypal_standard', 'pmpro_after_checkout_update_consent', 10, 2);
-add_action( 'pmpro_before_send_to_twocheckout', 'pmpro_after_checkout_update_consent' );
+add_action( 'pmpro_before_send_to_twocheckout', 'pmpro_after_checkout_update_consent', 10, 2);
 
 /**
  * Convert a consent entry into a English sentence.

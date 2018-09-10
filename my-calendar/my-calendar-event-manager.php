@@ -30,7 +30,7 @@ function mc_event_post( $action, $data, $event_id ) {
 		if ( isset( $_POST['event_post'] ) && ( 0 == $_POST['event_post'] || '' == $_POST['event_post'] ) ) {
 			$post_id = mc_create_event_post( $data, $event_id );
 		} else {
-			$post_id = $_POST['event_post'];
+			$post_id = ( isset( $_POST['event_post'] ) ) ? absint( $_POST['event_post'] ) : false;
 		}
 		// If, after all that, the post doesn't exist, create it.
 		if ( ! get_post_status( $post_id ) ) {
@@ -113,7 +113,11 @@ function mc_add_post_meta_data( $post_id, $post, $data, $event_id ) {
 	// access features for the event.
 	$description = isset( $data['event_desc'] ) ? $data['event_desc'] : '';
 	$image       = isset( $data['event_image'] ) ? esc_url_raw( $data['event_image'] ) : '';
-
+	$guid        = get_post_meta( $post_id, '_mc_guid', true );
+	if ( '' == $guid ) {
+		$guid = md5( $post_id . $event_id . $data['event_title'] );
+		update_post_meta( $post_id, '_mc_guid', $guid );
+	}
 	update_post_meta( $post_id, '_mc_event_shortcode', $data['shortcode'] );
 	update_post_meta( $post_id, '_mc_event_access', ( isset( $_POST['events_access'] ) ) ? $_POST['events_access'] : '' );
 	update_post_meta( $post_id, '_mc_event_id', $event_id );
@@ -476,6 +480,7 @@ function my_calendar_manage() {
 		if ( current_user_can( 'mc_approve_events' ) ) {
 			$event_id = absint( $_GET['event_id'] );
 			$wpdb->get_results( $wpdb->prepare( 'UPDATE ' . my_calendar_table() . ' SET event_approved = 1 WHERE event_id=%d', $event_id ) ); // WPCS: unprepared SQL OK.
+			mc_update_count_cache();
 		} else {
 			mc_show_error( __( 'You do not have permission to approve that event.', 'my-calendar' ) );
 		}
@@ -486,6 +491,7 @@ function my_calendar_manage() {
 		if ( current_user_can( 'mc_approve_events' ) ) {
 			$event_id = absint( $_GET['event_id'] );
 			$wpdb->get_results( $wpdb->prepare( 'UPDATE ' . my_calendar_table() . ' SET event_approved = 2 WHERE event_id=%d', $event_id ) ); // WPCS: unprepared SQL OK.
+			mc_update_count_cache();
 		} else {
 			mc_show_error( __( 'You do not have permission to trash that event.', 'my-calendar' ) );
 		}
@@ -665,7 +671,6 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 		$add      = apply_filters( 'mc_before_save_insert', $add );
 		$result   = $wpdb->insert( my_calendar_table(), $add, $formats );
 		$event_id = $wpdb->insert_id;
-		mc_update_count_cache();
 		mc_increment_event( $event_id );
 		mc_set_category_relationships( $cats, $event_id );
 		if ( ! $result ) {
@@ -763,8 +768,11 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 				$result = $wpdb->update( my_calendar_table(), $update, array(
 					'event_id' => $event_id,
 				), $formats, '%d' );
-
-				$recur_changed = ( $update['event_repeats'] != $_POST['prev_event_repeats'] || $update['event_recur'] != $_POST['prev_event_recur'] ) ? true : false;
+				if ( isset( $_POST['prev_event_repeats'] ) && isset( $_POST['prev_event_recur'] ) ) {
+					$recur_changed = ( $update['event_repeats'] != $_POST['prev_event_repeats'] || $update['event_recur'] != $_POST['prev_event_recur'] ) ? true : false;
+				} else {
+					$recur_changed = false;
+				}
 				if ( $date_changed || $recur_changed ) {
 					// Function mc_increment_event uses previous events and re-uses same ID if new has same date as old event.
 					$instances = mc_get_instances( $event_id );
@@ -774,7 +782,6 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 			}
 			$data = $update;
 			do_action( 'mc_save_event', $action, $data, $event_id, $result );
-			mc_update_count_cache();
 			if ( false === $result ) {
 				$message = mc_show_error( __( 'Your event was not updated.', 'my-calendar' ) . " $url", false );
 			} else {
@@ -784,7 +791,10 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 				if ( isset( $post['event_approved'] ) && $post['event_approved'] != $event_approved ) {
 					$event_approved = absint( $post['event_approved'] );
 				}
-				do_action( 'mc_transition_event', (int) $_POST['prev_event_status'], $event_approved );
+				if ( isset( $_POST['prev_event_status'] ) ) {
+					// Don't execute transition actions if prev status not known.
+					do_action( 'mc_transition_event', (int) $_POST['prev_event_status'], $event_approved );
+				}
 				$message = mc_show_notice( __( 'Event updated successfully', 'my-calendar' ) . ". $url", false );
 			}
 		} else {
@@ -797,6 +807,7 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 		'event_id' => $event_id,
 		'message'  => $message,
 	);
+	mc_update_count_cache();
 
 	return apply_filters( 'mc_event_saved_message', $saved_response );
 }
@@ -2581,7 +2592,7 @@ function mc_check_data( $action, $post, $i ) {
 		$event_holiday      = ! empty( $post['event_holiday'] ) ? 1 : 0;
 		$group_id           = (int) $post['event_group_id'];
 		$event_group_id     = ( ( is_array( $post['event_begin'] ) && count( $post['event_begin'] ) > 1 ) || mc_event_is_grouped( $group_id ) ) ? $group_id : 0;
-		$event_span         = ( ! empty( $post['event_span'] ) && 0 != event_group_id ) ? 1 : 0;
+		$event_span         = ( ! empty( $post['event_span'] ) && 0 != $event_group_id ) ? 1 : 0;
 		$event_hide_end     = ( ! empty( $post['event_hide_end'] ) ) ? (int) $post['event_hide_end'] : 0;
 		$event_hide_end     = ( '' == $time || '23:59:59' == $time ) ? 1 : $event_hide_end; // Hide end time on all day events.
 		// Set location.
@@ -3194,7 +3205,7 @@ add_action( 'save_post', 'mc_post_update_event' );
  */
 function mc_post_update_event( $id ) {
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE || wp_is_post_revision( $id ) || ! ( get_post_type( $id ) == 'mc-events' ) ) {
-		return;
+		return $id;
 	}
 	$post           = get_post( $id );
 	$featured_image = wp_get_attachment_url( get_post_thumbnail_id( $post->ID ) );
@@ -3443,11 +3454,13 @@ function mc_can_edit_event( $event = false ) {
 		$event        = mc_get_first_event( $event );
 		$event_author = $event->event_author;
 	} else {
+		// What is the case where the event is neither an object, int, or falsey? Hmm.
 		$event_author = wp_get_current_user()->ID;
+		$event_id     = $event;
 	}
 	$current_user    = wp_get_current_user();
 	$user            = $current_user->ID;
-	$categories      = mc_get_categories( $event->event_id );
+	$categories      = mc_get_categories( $event_id );
 	$has_permissions = true;
 	if ( is_array( $categories ) ) {
 		foreach ( $categories as $cat ) {

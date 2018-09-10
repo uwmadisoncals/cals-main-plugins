@@ -6,12 +6,12 @@ Description: Adds your Google Analytics Tracking Code to your WordPress site.
 Tags: analytics, ga, google, google analytics, tracking, statistics, stats
 Author: Jeff Starr
 Author URI: https://plugin-planet.com/
-Donate link: https://m0n.co/donate
+Donate link: https://monzillamedia.com/donate.html
 Contributors: specialk
 Requires at least: 4.1
 Tested up to: 5.0
-Stable tag: 20180506
-Version: 20180506
+Stable tag: 20180828
+Version: 20180828
 Requires PHP: 5.2
 Text Domain: ga-google-analytics
 Domain Path: /languages
@@ -23,8 +23,8 @@ Adds your Google Analytics Tracking Code to your WordPress site.
 
 == Description ==
 
-> Supports Global Site Tag / gtag.js !
-> Works perfectly with or without Gutenberg
+> Supports Global Site Tag / gtag.js
+> GDPR compliant: does not collect any user data
 
 This plugin enables Google Analytics for your entire WordPress site. Lightweight and fast with plenty of great features.
 
@@ -60,9 +60,13 @@ This is a lightweight plugin that inserts the required GA tracking code. To view
 * Supports [Tracker Objects](https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers)
 * Supports [Google Optimize](https://support.google.com/360suite/optimize/)
 
-GDPR Notice: This plugin is 100% compliant with GDPR because it does not collect any user data. Even so, the tracking code added by this plugin is used by Google to collect all sorts of user data. So to ensure that your site is compliant with GDPR, please consult with Google and/or configure your Google account settings and/or tracking code as required by GDPR.
-
 Learn more about [Google Analytics](http://www.google.com/analytics/)!
+
+**GDPR**
+
+This plugin does not collect any user data. Even so, the tracking code added by this plugin is used by Google to collect all sorts of user data. So this plugin does _not_ do anything to make your site _less_ compliant with GDPR. I have done my best to ensure that this plugin is 100% GDPR compliant, but I'm not a lawyer so can't guarantee anything. To ensure that your site is compliant with GDPR, please consult an attorney, and also check with Google and/or configure your Google account settings and/or tracking code as required by GDPR.
+
+> Works perfectly with or without Gutenberg
 
 
 
@@ -124,7 +128,8 @@ GA Google Analytics cleans up after itself. All plugin settings will be removed 
 
 == Screenshots ==
 
-1. GA Google Analytics: Plugin Settings (panels toggle open/closed)
+1. GA Google Analytics: Plugin Settings (default)
+2. GA Google Analytics: Plugin Settings (expanded)
 
 More screenshots available at the [GA Plugin Homepage](https://perishablepress.com/google-analytics-plugin/).
 
@@ -182,7 +187,7 @@ To ask a question, suggest a feature, or provide feedback, [contact me directly]
 
 == Support development of this plugin ==
 
-I develop and maintain this free plugin with love for the WordPress community. To show support, you can [make a cash donation](https://m0n.co/donate), [bitcoin donation](https://m0n.co/bitcoin), or purchase one of my books:  
+I develop and maintain this free plugin with love for the WordPress community. To show support, you can [make a donation](https://monzillamedia.com/donate.html) or purchase one of my books: 
 
 * [The Tao of WordPress](https://wp-tao.com/)
 * [Digging into WordPress](https://digwp.com/)
@@ -203,6 +208,22 @@ Links, tweets and likes also appreciated. Thanks! :)
 == Changelog ==
 
 *Thank you to everyone who shares feedback for GA Google Analytics!*
+
+**20180828**
+
+* Corrects incorrect syntax for gtag tacking code
+* Further tests on WP versions 4.9 and 5.0 (alpha)
+
+**20180816**
+
+* Adds `rel="noopener noreferrer"` to all [blank-target links](https://perishablepress.com/wordpress-blank-target-vulnerability/)
+* Updates GDPR blurb and donate link
+* Improves support for WP-CLI ([details](https://wordpress.org/support/topic/php-fatal-error-in-wp-cli/))
+* Refines some option descriptions on the settings page
+* Enables display of Custom Code when tracking is disabled
+* Updates plugin screenshots for WordPress Plugin Directory
+* Regenerates default translation template
+* Further tests on WP versions 4.9 and 5.0 (alpha)
 
 **20180506**
 

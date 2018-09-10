@@ -3,7 +3,7 @@
  * Plugin Name: Our Team Showcase
  * Plugin URI: https://smartcatdesign.net/downloads/our-team-showcase/
  * Description: Display your team members in a very attractive way as a widget or page with a shortcode [our-team] or a widget
- * Version: 4.4.1
+ * Version: 4.4.2
  * Author: Smartcat
  * Author URI: https://smartcatdesign.net
  * License: GPL2
@@ -15,6 +15,11 @@ namespace ots;
  * Include constants and Options definitions
  */
 include_once dirname( __FILE__ ) . '/constants.php';
+
+
+if ( !function_exists( 'scts_init' ) ) {
+    include_once dirname( __FILE__ ) . '/includes/libraries/theme-showcase.php';
+}
 
 
 /**

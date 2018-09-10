@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GA Google Analytics\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-06 02:41+0000\n"
+"POT-Creation-Date: 2018-08-17 21:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -233,7 +233,7 @@ msgid "Force SSL"
 msgstr ""
 
 #: inc/settings-display.php:145
-msgid "Code Location"
+msgid "Tracking Code Location"
 msgstr ""
 
 #: inc/settings-display.php:149
@@ -296,12 +296,8 @@ msgstr ""
 msgid "to display the current user ID."
 msgstr ""
 
-#: inc/settings-display.php:179 inc/settings-display.php:189
-msgid "Custom"
-msgstr ""
-
 #: inc/settings-display.php:179
-msgid "Code"
+msgid "Custom Code"
 msgstr ""
 
 #: inc/settings-display.php:183
@@ -315,15 +311,11 @@ msgid ""
 msgstr ""
 
 #: inc/settings-display.php:189
-msgid "Location"
+msgid "Custom Code Location"
 msgstr ""
 
 #: inc/settings-display.php:192
-msgid "Display custom"
-msgstr ""
-
-#: inc/settings-display.php:192
-msgid "code"
+msgid "Display Custom Code"
 msgstr ""
 
 #: inc/settings-display.php:192
@@ -331,7 +323,7 @@ msgid "before"
 msgstr ""
 
 #: inc/settings-display.php:193
-msgid "GA tracking code. Leave unchecked to display"
+msgid "the GA tracking code. Leave unchecked to display"
 msgstr ""
 
 #: inc/settings-display.php:193

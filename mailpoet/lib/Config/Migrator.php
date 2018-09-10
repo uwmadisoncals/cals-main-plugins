@@ -13,7 +13,7 @@ class Migrator {
   function __construct() {
     $this->prefix = Env::$db_prefix;
     $this->charset_collate = Env::$db_charset_collate;
-    $this->models = array(
+    $this->models = [
       'segments',
       'settings',
       'custom_fields',
@@ -37,8 +37,9 @@ class Migrator {
       'statistics_opens',
       'statistics_unsubscribes',
       'statistics_forms',
-      'mapping_to_external_entities'
-    );
+      'mapping_to_external_entities',
+      'log',
+    ];
   }
 
   function up() {
@@ -153,7 +154,8 @@ class Migrator {
       'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'deleted_at TIMESTAMP NULL,',
       'PRIMARY KEY  (id),',
-      'KEY task_id (task_id)',
+      'KEY task_id (task_id),',
+      'KEY newsletter_id (newsletter_id)',
     );
     return $this->sqlify(__FUNCTION__, $attributes);
   }
@@ -310,7 +312,9 @@ class Migrator {
       'hash varchar(20) NOT NULL,',
       'created_at TIMESTAMP NULL,',
       'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
-      'PRIMARY KEY  (id)',
+      'PRIMARY KEY  (id),',
+      'KEY newsletter_id (newsletter_id),',
+      'KEY queue_id (queue_id)',
     );
     return $this->sqlify(__FUNCTION__, $attributes);
   }
@@ -322,7 +326,8 @@ class Migrator {
       'post_id int(11) unsigned NOT NULL,',
       'created_at TIMESTAMP NULL,',
       'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
-      'PRIMARY KEY  (id)',
+      'PRIMARY KEY  (id),',
+      'KEY newsletter_id (newsletter_id)',
     );
     return $this->sqlify(__FUNCTION__, $attributes);
   }
@@ -350,7 +355,8 @@ class Migrator {
       'queue_id int(11) unsigned NOT NULL,',
       'sent_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
-      'KEY newsletter_id (newsletter_id)',
+      'KEY newsletter_id (newsletter_id),',
+      'KEY subscriber_id (subscriber_id)',
     );
     return $this->sqlify(__FUNCTION__, $attributes);
   }
@@ -424,6 +430,18 @@ class Migrator {
       'PRIMARY KEY (old_id, type),',
       'KEY new_id (new_id)'
     );
+    return $this->sqlify(__FUNCTION__, $attributes);
+  }
+
+  function log() {
+    $attributes = [
+      'id BIGINT unsigned NOT NULL AUTO_INCREMENT,',
+      'name VARCHAR(255),',
+      'level INTEGER,',
+      'message LONGTEXT,',
+      'created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,',
+      'PRIMARY KEY (id)',
+    ];
     return $this->sqlify(__FUNCTION__, $attributes);
   }
 

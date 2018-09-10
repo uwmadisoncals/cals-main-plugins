@@ -5,7 +5,7 @@ Tags: calendar, dates, times, event, events, scheduling, schedule, event manager
 Requires at least: 4.4
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 3.0.14
+Stable tag: 3.0.17
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -82,6 +82,31 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 4. Visit My Calendar -> Help for assistance with shortcode options or widget configuration.
 
 == Changelog ==
+
+TODO: Support limiting views to multiple locations
+
+= 3.0.17 =
+
+* Bug fix: Group event editing was broken.
+* Bug fix: Eliminate four PHP notices in the Today's Events widget.
+* Added: Filter to control whether CSS should be loaded on archives.
+
+= 3.0.16 =
+
+* Changed display UID to avoid duplicate IDs when multiple calendars shown.
+* Add option to display heading in details pop-up.
+* Unify position and size of close button in Twentyeighteen mini calendar.
+* Eliminate multi category parameter from CSV output (doesn't support multidimensional data)
+* Add GUID to export data.
+
+= 3.0.15 =
+
+* Bug fix: prevent some PHP notices when running Pro importer.
+* Bug fix: Display of multidate time string when crossing months or years.
+* Bug fix: Variable written as constant prevented event_span from saving correctly.
+* Bug fix: Trash counter updated with incorrect values.
+* Bug fix: Two cases where status counter not updated.
+* Change: Add DB version to debugging info
 
 = 3.0.14 =
 
@@ -250,19 +275,19 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 
 = Hey! Why don't you have any Frequently Asked Questions here! =
 
-Because the majority of users end up on my web site asking for help anyway -- and it's simply more difficult to maintain two copies of my Frequently Asked Questions. Please visit [my web site FAQ](http://www.joedolson.com/my-calendar/faq/) to read my Frequently Asked Questions!
+Because the majority of users end up on my web site asking for help anyway -- and it's simply more work to maintain two copies. Please visit [my web site FAQ](http://www.joedolson.com/my-calendar/faq/) to read my Frequently Asked Questions!
 
-= This plug-in is really complicated. Why can't you personally help me figure out how to use it? =
+= This plug-in is complicated. Why won't you help me figure out how to use it? =
 
-I can! But not in person. Take a look at my [documentation website for My Calendar](http://docs.joedolson.com/my-calendar/) before making your request, and consider [making a donation](https://www.joedolson.com/donate.php)!
+I will! But not in person. Take a look at my [documentation website for My Calendar](http://docs.joedolson.com/my-calendar/) or [buy the User's Guide](https://www.joedolson.com/my-calendar/users-guide/) before making your request, and consider [making a donation](https://www.joedolson.com/donate/)!
 
 = Can my visitors or members submit events? =
 
-I've written a paid plug-in that adds this feature to My Calendar, called My Calendar Pro. [Buy it today](https://www.joedolson.com/my-calendar/pro/)!
+I've written a premium plug-in that adds this feature: My Calendar Pro. [Buy it today](https://www.joedolson.com/my-calendar/pro/)!
 
 = Is there an advanced search feature? =
 
-The search feature in My Calendar is pretty basic; but buying My Calendar Pro gives you a richer search feature, where you can narrow by dates, categories, authors, and more to refine your event search.
+The search feature in My Calendar is pretty basic; but [buying My Calendar Pro](https://www.joedolson.com/my-calendar/pro/) gives you a richer search feature, where you can narrow by dates, categories, authors, and more to refine your event search.
 
 == Screenshots ==
 

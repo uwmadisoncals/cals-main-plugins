@@ -8,32 +8,32 @@ $plugin_url = esc_url(GAP_URL);
 
 $array = array(
 			
-	0  => '<a target="_blank" href="https://plugin-planet.com/bbq-pro/" title="Premium WP Plugin: BBQ Pro">
+	0  => '<a target="_blank" rel="noopener noreferrer" href="https://plugin-planet.com/bbq-pro/" title="Premium WP Plugin: BBQ Pro">
 				<img width="125" height="125" src="'. $plugin_url .'img/250x250-bbq-pro.jpg" alt="BBQ Pro - Block Bad Queries" />
 			</a>',
-	1  => '<a target="_blank" href="https://plugin-planet.com/banhammer-pro/" title="Premium WP Plugin: Banhammer Pro">
+	1  => '<a target="_blank" rel="noopener noreferrer" href="https://plugin-planet.com/banhammer-pro/" title="Premium WP Plugin: Banhammer Pro">
 				<img width="125" height="125" src="'. $plugin_url .'img/250x250-banhammer-pro.jpg" alt="Banhammer Pro - Drop the hammer." />
 			</a>',
-	2  => '<a target="_blank" href="https://plugin-planet.com/blackhole-pro/" title="Premium WP Plugin: Blackhole Pro">
+	2  => '<a target="_blank" rel="noopener noreferrer" href="https://plugin-planet.com/blackhole-pro/" title="Premium WP Plugin: Blackhole Pro">
 				<img width="125" height="125" src="'. $plugin_url .'img/250x250-blackhole-pro.jpg" alt="Blackhole Pro - Block Bad Bots" />
 			</a>',
-	3  => '<a target="_blank" href="https://plugin-planet.com/ses-pro/" title="Premium WP Plugin: SES Pro">
-				<img width="125" height="125" src="'. $plugin_url .'img/250x250-ses-pro.jpg" alt="SES Pro - Ajax-Powered Email Signup Forms" />
+	3  => '<a target="_blank" rel="noopener noreferrer" href="https://plugin-planet.com/ses-pro/" title="Premium WP Plugin: SES Pro">
+				<img width="125" rel="noopener noreferrer" height="125" src="'. $plugin_url .'img/250x250-ses-pro.jpg" alt="SES Pro - Ajax-Powered Email Signup Forms" />
 			</a>',
-	4  => '<a target="_blank" href="https://plugin-planet.com/usp-pro/" title="Premium WP Plugin: USP Pro">
+	4  => '<a target="_blank" rel="noopener noreferrer" href="https://plugin-planet.com/usp-pro/" title="Premium WP Plugin: USP Pro">
 				<img width="125" height="125" src="'. $plugin_url .'img/250x250-usp-pro.jpg" alt="USP Pro - Unlimited Front-End Forms" />
 			</a>',
 		
-	5  => '<a target="_blank" href="https://digwp.com/" title="Take your WordPress Skills to the Next Level">
+	5  => '<a target="_blank" rel="noopener noreferrer" href="https://digwp.com/" title="Take your WordPress Skills to the Next Level">
 				<img width="125" height="125" src="'. $plugin_url .'img/250x250-digging-into-wordpress.jpg" alt="Digging Into WordPress" />
 			</a>',
-	6  => '<a target="_blank" href="https://wp-tao.com/" title="Learn the Way of WordPress">
+	6  => '<a target="_blank" rel="noopener noreferrer" href="https://wp-tao.com/" title="Learn the Way of WordPress">
 				<img width="125" height="125" src="'. $plugin_url .'img/250x250-tao-of-wordpress.jpg" alt="The Tao of WordPress" />
 			</a>',
-	7  => '<a target="_blank" href="https://wp-tao.com/wordpress-themes-book/" title="WordPress Themes In Depth">
+	7  => '<a target="_blank" rel="noopener noreferrer" href="https://wp-tao.com/wordpress-themes-book/" title="WordPress Themes In Depth">
 				<img width="125" height="125" src="'. $plugin_url .'img/250x250-wp-themes-in-depth.jpg" alt="WordPress Themes In Depth" />
 			</a>',
-	8  => '<a target="_blank" href="https://htaccessbook.com/" title="Optimize and Secure with .htaccess">
+	8  => '<a target="_blank" rel="noopener noreferrer" href="https://htaccessbook.com/" title="Optimize and Secure with .htaccess">
 				<img width="125" height="125" src="'. $plugin_url .'img/250x250-htaccess-made-easy.jpg" alt=".htaccess made easy" />
 			</a>',
 	
@@ -47,15 +47,15 @@ $item3 = isset($array[$items[2]]) ? $array[$items[2]] : 2;
 
 $url1 = esc_url('https://wp-tao.com/store/');
 $url2 = esc_url('https://plugin-planet.com/store/');
-$url3 = esc_url('https://m0n.co/donate');
+$url3 = esc_url('https://monzillamedia.com/donate.html');
 
 $title1 = esc_html__('Perishable Press Books', 'ga-google-analytics');
 $title2 = esc_html__('Plugin Planet',          'ga-google-analytics');
 $title3 = esc_html__('Donate via PayPal',      'ga-google-analytics');
 
-$link1 = ' <a target="_blank" href="'. $url1 .'" title="'. $title1 .'">'. esc_html__('books',    'ga-google-analytics') .'</a> ';
-$link2 = ' <a target="_blank" href="'. $url2 .'" title="'. $title2 .'">'. esc_html__('plugins',  'ga-google-analytics') .'</a>, ';
-$link3 = ' <a target="_blank" href="'. $url3 .'" title="'. $title3 .'">'. esc_html__('donation', 'ga-google-analytics') .'</a>. ';
+$link1 = ' <a target="_blank" rel="noopener noreferrer" href="'. $url1 .'" title="'. $title1 .'">'. esc_html__('books',    'ga-google-analytics') .'</a> ';
+$link2 = ' <a target="_blank" rel="noopener noreferrer" href="'. $url2 .'" title="'. $title2 .'">'. esc_html__('plugins',  'ga-google-analytics') .'</a>, ';
+$link3 = ' <a target="_blank" rel="noopener noreferrer" href="'. $url3 .'" title="'. $title3 .'">'. esc_html__('donation', 'ga-google-analytics') .'</a>. ';
 
 $message  = esc_html__('Thank you for using', 'ga-google-analytics') .' '. $plugin_project .'! ';
 $message .= esc_html__('Please show support by purchasing one of my', 'ga-google-analytics') . $link1;
@@ -105,8 +105,7 @@ $donate = esc_html__('Any size donation helps me to continue developing this fre
 		<p><strong>Please Donate</strong></p>
 		<p><?php echo $donate; ?></p>
 		<ul>
-			<li><a target="_blank" href="https://m0n.co/donate">Donate via PayPal &raquo;</a></li>
-			<li><a target="_blank" href="https://m0n.co/bitcoin">Donate via Bitcoin &raquo;</a></li>
+			<li><a target="_blank" rel="noopener noreferrer" href="https://monzillamedia.com/donate.html">Make a donation&nbsp;&raquo;</a></li>
 		</ul>
 	</div>
 </div>

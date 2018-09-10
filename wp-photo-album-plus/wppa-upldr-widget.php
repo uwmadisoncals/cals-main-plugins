@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a list of users linking to their photos
-* Version 6.8.09
+* Version 6.9.12
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -169,6 +169,18 @@ class UpldrWidget extends WP_Widget {
     function update( $new_instance, $old_instance ) {
 
 		$instance = $old_instance;
+
+		//Defaults
+		$instance 		= wp_parse_args( (array) $instance, array(
+														'title' 			=> __( 'Uploader Photos', 'wp-photo-album-plus' ),
+														'sortby' 			=> 'name',
+														'ignore' 			=> 'admin',
+														'parent' 			=> '',
+														'showownercount' 	=> '',
+														'showphotocount' 	=> '',
+														'logonly' 			=> 'no',
+														) );
+
 		$instance['title'] 			= strip_tags($new_instance['title']);
 		$instance['sortby'] 		= $new_instance['sortby'];
 		$instance['ignore'] 		= $new_instance['ignore'];

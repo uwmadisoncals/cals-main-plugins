@@ -2,8 +2,8 @@
 Tags: page builder, responsive, widget, widgets, builder, page, admin, gallery, content, cms, pages, post, css, layout, grid
 Requires at least: 4.4
 Tested up to: 4.9
-Stable tag: 2.7.3
-Build time: 2018-07-20T09:39:41+02:00
+Stable tag: 2.8.2
+Build time: 2018-08-10T14:17:40+02:00
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Donate link: https://siteorigin.com/downloads/contribution/
@@ -95,6 +95,19 @@ Page Builder is actively developed and updated, so generally I'd recommend that 
 We've tried to ensure that Page Builder is compatible with most plugin widgets. It's best to just download Page Builder and test for yourself.
 
 == Changelog ==
+
+= 2.8.2 - 10 August 2018 =
+* Use post ID in content, not revision ID, when saving revisions.
+* Prevent adding duplicate `panels_data` metadata to posts for revisions.
+* Include row labels and colors when copy/pasting rows.
+* Process raw widgets when importing a layout file.
+* Fix after breaking change in gutenberg API.
+
+= 2.8.1 - 07 August 2018 =
+* Fix for PHP5.2 :(
+
+= 2.8.0 - 06 August 2018 =
+* SiteOrigin Layouts Gutenberg block!
 
 = 2.7.3 - 20 July 2018 =
 * Post Loop: Add filter to allow for custom template directories.

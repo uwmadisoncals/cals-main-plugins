@@ -4,7 +4,7 @@ Plugin Name: Download Manager
 Plugin URI: https://www.wpdownloadmanager.com/purchases/
 Description: Manage, Protect and Track File Downloads from your WordPress site
 Author: Shahjada
-Version: 2.9.76
+Version: 2.9.81
 Author URI: https://www.wpdownloadmanager.com/
 Text Domain: download-manager
 Domain Path: /languages
@@ -17,7 +17,7 @@ namespace WPDM;
 if(!isset($_SESSION) && !strstr($_SERVER['REQUEST_URI'], 'wpdm-media/') && !isset($_REQUEST['wpdmdl']))
     @session_start();
 
-define('WPDM_Version','2.9.76');
+define('WPDM_Version','2.9.81');
 
 $content_dir = str_replace('\\','/',WP_CONTENT_DIR);
 
@@ -43,6 +43,13 @@ define('_DEL_DIR',$content_dir.'/uploads/download-manager-files');
 if(!defined('UPLOAD_BASE'))
 define('UPLOAD_BASE',$content_dir.'/uploads/');
 
+if(!defined('WPDM_TPL_DIR')) {
+    if((int)get_option('__wpdm_bsversion', '') === 4)
+        define('WPDM_TPL_DIR', dirname(__FILE__) . '/tpls4/');
+    else
+        define('WPDM_TPL_DIR', dirname(__FILE__) . '/tpls/');
+}
+
 include_once(dirname(__FILE__) . "/wpdm-functions.php");
 
 include(dirname(__FILE__)."/wpdm-core.php");
@@ -57,6 +64,7 @@ class WordPressDownloadManager{
 
         register_activation_hook(__FILE__, array($this, 'Install'));
 
+        add_action( 'init', array($this, 'registerScripts'), 0 );
         add_action( 'init', array($this, 'registerPostTypeTaxonomy'), 1 );
 
         add_action( 'plugins_loaded', array($this, 'loadTextdomain') );
@@ -231,6 +239,15 @@ class WordPressDownloadManager{
         \WPDM\libs\FileSystem::blockHTTPAccess(UPLOAD_DIR);
     }
 
+    function registerScripts(){
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('jquery-form');
+        wp_register_style('wpdm-bootstrap', WPDM_BASE_URL . 'assets/bootstrap/css/bootstrap.css');
+        wp_register_style('wpdm-font-awesome', WPDM_BASE_URL . 'assets/fontawesome/css/all.css');
+
+        wp_register_script('wpdm-bootstrap', WPDM_BASE_URL.'assets/bootstrap/js/bootstrap.min.js', array('jquery'));
+    }
+
     /**
      * @usage Enqueue all styles and scripts
      */
@@ -238,15 +255,12 @@ class WordPressDownloadManager{
     {
         global $post;
 
-        wp_enqueue_script('jquery');
-        wp_enqueue_script('jquery-form');
-
         $wpdmss = maybe_unserialize(get_option('__wpdm_disable_scripts', array()));
 
         //if((is_object($post) && has_shortcode($post->post_content,'wpdm_frontend')) || get_post_type()=='wpdmpro' )
 
         if (!in_array('wpdm-font-awesome', $wpdmss))
-            wp_enqueue_style('font-awesome', WPDM_BASE_URL.'assets/fontawesome/css/fontawesome.min.css');
+            wp_enqueue_style('wpdm-font-awesome' );
 
 
         if(is_object($post) && ( has_shortcode($post->post_content,'wpdm_frontend') || has_shortcode($post->post_content,'wpdm-package-form') || has_shortcode($post->post_content,'wpdm_user_dashboard') || has_shortcode($post->post_content,'wpdm-file-browser') ) ){
@@ -259,27 +273,27 @@ class WordPressDownloadManager{
         }
 
         if(get_post_type()=='wpdmpro' && is_single()){
-            wp_enqueue_script('wpdm-datatable', plugins_url('/download-manager/assets/js/jquery.dataTables.min.js'), array('jquery'));
+            wp_enqueue_script('wpdm-datatable', WPDM_BASE_URL . 'assets/js/jquery.dataTables.min.js', array('jquery'));
         }
 
 
         if (!in_array('wpdm-bootstrap-css', $wpdmss)) {
-            wp_enqueue_style('wpdm-bootstrap', plugins_url('/download-manager/assets/bootstrap/css/bootstrap.css'));
+            wp_enqueue_style('wpdm-bootstrap' );
         }
 
 
         if (!in_array('wpdm-front', $wpdmss)) {
-            wp_enqueue_style('wpdm-front', plugins_url() . '/download-manager/assets/css/front.css', 9999999999);
+            wp_enqueue_style('wpdm-front', WPDM_BASE_URL . 'assets/css/front.css', 9999999999);
         }
 
 
         if (!in_array('wpdm-bootstrap-js', $wpdmss)) {
-            wp_enqueue_script('wpdm-bootstrap', plugins_url('/download-manager/assets/bootstrap/js/bootstrap.min.js'), array('jquery'));
+            wp_enqueue_script('wpdm-bootstrap' );
         }
 
-        wp_enqueue_script('frontjs', plugins_url('/download-manager/assets/js/front.js'), array('jquery'));
+        wp_enqueue_script('frontjs', WPDM_BASE_URL . 'assets/js/front.js', array('jquery'));
 
-        wp_enqueue_script('jquery-choosen', plugins_url('/download-manager/assets/js/chosen.jquery.min.js'), array('jquery'));
+        wp_enqueue_script('jquery-choosen', WPDM_BASE_URL . 'assets/js/chosen.jquery.min.js', array('jquery'));
         //wp_enqueue_style('choosen-css', plugins_url('/download-manager/assets/css/chosen.css'), 999999);
 
 

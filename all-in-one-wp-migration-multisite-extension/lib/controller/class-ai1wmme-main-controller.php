@@ -34,15 +34,15 @@ class Ai1wmme_Main_Controller {
 		register_activation_hook( AI1WMME_PLUGIN_BASENAME, array( $this, 'activation_hook' ) );
 
 		// Activate hooks
-		$this->activate_actions()
-			->activate_filters()
-			->activate_textdomain();
+		$this->activate_actions();
+		$this->activate_filters();
+		$this->activate_textdomain();
 	}
 
 	/**
 	 * Activation hook callback
 	 *
-	 * @return Object Instance of this class
+	 * @return void
 	 */
 	public function activation_hook() {
 
@@ -51,12 +51,10 @@ class Ai1wmme_Main_Controller {
 	/**
 	 * Initializes language domain for the plugin
 	 *
-	 * @return Object Instance of this class
+	 * @return void
 	 */
 	private function activate_textdomain() {
 		load_plugin_textdomain( AI1WMME_PLUGIN_NAME, false, false );
-
-		return $this;
 	}
 
 	/**
@@ -166,7 +164,7 @@ class Ai1wmme_Main_Controller {
 	/**
 	 * Register listeners for actions
 	 *
-	 * @return Object Instance of this class
+	 * @return void
 	 */
 	private function activate_actions() {
 		// Init
@@ -186,20 +184,16 @@ class Ai1wmme_Main_Controller {
 
 		// Enqueue import scripts and styles
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_import_scripts_and_styles' ), 20 );
-
-		return $this;
 	}
 
 	/**
 	 * Register listeners for filters
 	 *
-	 * @return Object Instance of this class
+	 * @return void
 	 */
 	private function activate_filters() {
 		// Add links to plugin list page
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 5, 2 );
-
-		return $this;
 	}
 
 	/**
@@ -298,7 +292,7 @@ class Ai1wmme_Main_Controller {
 	/**
 	 * Max file size callback
 	 *
-	 * @return string
+	 * @return integer
 	 */
 	public function max_file_size() {
 		return AI1WMME_MAX_FILE_SIZE;
