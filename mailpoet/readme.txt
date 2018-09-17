@@ -3,7 +3,7 @@ Contributors: mailpoet, wysija, kgjerstad
 Tags: newsletter, newsletter subscribers, email, welcome email, post notification, WooCommerce emails, newsletter builder, mailing list
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 3.9.1
+Stable tag: 3.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -162,24 +162,28 @@ Stop by our [support site](https://www.mailpoet.com/support).
 
 == Changelog ==
 
+= 3.10 - 2018-09-11 =
+* Changed: welcome emails to new subscribers are now free for everyone!
+* Fixed: newsletter footer warning to be displayed if unsubscribe link is missing.
+
 = 3.9.1 - 2018-09-04 =
-Improved: instructions for migrating from MP2 to MP3 clarified;
-Improved: minor style adjustments for migration tool;
-Improved: minor fixes to onboarding intro guide;
-Improved: template page loading times decreased;
-Fixed: resolved javascript warnings on help page status;
-Fixed: subscriber status remains persistent after migration from MP2 to MP3 without sign-up confirmation enabled;
+* Improved: instructions for migrating from MP2 to MP3 clarified;
+* Improved: minor style adjustments for migration tool;
+* Improved: minor fixes to onboarding intro guide;
+* Improved: template page loading times decreased;
+* Fixed: resolved javascript warnings on help page status;
+* Fixed: subscriber status remains persistent after migration from MP2 to MP3 without sign-up confirmation enabled;
 
 = 3.9.0 - 2018-08-28 =
-Improved: email processing in sending queues is now more resilient to invalid data. Thanks Tara!
-Fixed: replaced WooCommerce image in welcome wizard;
-Fixed: swapped video in welcome wizard with an updated one;
-Fixed: welcome wizard button displays properly for all users;
-Fixed: permission error when bypassing data import after new install or reset;
-Fixed: added indexes to some foreign keys which were missing;
-Fixed: error displaying number of exported users;
-Fixed: export search function restored;
-Fixed: prevent third party APIs from adding data incorrectly via MailPoets API.
+* Improved: email processing in sending queues is now more resilient to invalid data. Thanks Tara!
+* Fixed: replaced WooCommerce image in welcome wizard;
+* Fixed: swapped video in welcome wizard with an updated one;
+* Fixed: welcome wizard button displays properly for all users;
+* Fixed: permission error when bypassing data import after new install or reset;
+* Fixed: added indexes to some foreign keys which were missing;
+* Fixed: error displaying number of exported users;
+* Fixed: export search function restored;
+* Fixed: prevent third party APIs from adding data incorrectly via MailPoets API.
 
 = 3.8.6 - 2018-08-21 =
 * Improved: compatibility with caching plugins

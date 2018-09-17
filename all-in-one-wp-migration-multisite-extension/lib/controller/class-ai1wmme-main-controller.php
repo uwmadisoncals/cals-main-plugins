@@ -267,7 +267,7 @@ class Ai1wmme_Main_Controller {
 				<?php
 				_e(
 					'Multisite extension requires <a href="https://wordpress.org/plugins/all-in-one-wp-migration/" target="_blank">All-in-One WP Migration plugin</a> to be activated. ' .
-					'<a href="https://help.servmask.com/knowledgebase/install-instructions-for-multisite-extension/" target="_blank">Multisite extension install instructions</a>',
+					'<a href="https://help.servmask.com/knowledgebase/install-instructions-for-multisite-extension/" target="_blank">Multisite Extension install instructions</a>',
 					AI1WMME_PLUGIN_NAME
 				);
 				?>
