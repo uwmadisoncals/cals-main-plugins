@@ -1,11 +1,23 @@
 WP Photo Album Plus Changelog
 
+= 6.9.13 =
+
+= Bug Fixes =
+
+* Trying to import a non existing remote photo no longer generates a warning in the server log.
+
+= Other Changes =
+
+* Several security issues found by RIPS Technologies (https://www.ripstech.com)
+* If ImageMagick is activated, all filenames of newly uploaded or imported files will be sanitized by sanitize_file_name(). 
+This implies (a.o.) that spaces in filenames will be converted to dashes. Due to security reasons this is a permanent restriction.
+
 = 6.9.12 =
 
 = Bug Fixes =
 
 * Fixed a layout issue on the settings page.
-* Fixed a loayout issue on lightbox spheric panoramas that occurs when there are also normal photos in the set.
+* Fixed a layout issue on lightbox spheric panoramas that occurs when there are also normal photos in the set.
 * Fixed uninitialized vars in widget activation screens.
 
 = Other Changes =

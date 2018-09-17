@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.9.07
+* Version 6.9.13
 *
 */
 
@@ -2147,7 +2147,7 @@ global $wppa_log_file;
 					$filename = wppa_get_photo_item( $photo, 'filename' );
 					// If very old, no filename, take new name
 					if ( ! $filename ) {
-						$filename = $_FILES['photo']['name'];
+						$filename = wppa_sima( $_FILES['photo']['name'] );
 						wppa_update_photo( array( 'id' => $photo, 'filename' => $filename ) );
 					}
 					wppa_save_source( $_FILES['photo']['tmp_name'], $filename, wppa_get_photo_item( $photo, 'album') );

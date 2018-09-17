@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.9.12
+* Version 6.9.13
 *
 */
 
@@ -136,11 +136,11 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 					else {
 						$imgsize = getimagesize($file['tmp_name']);
 						if ( !is_array($imgsize) || !isset($imgsize[2]) || $imgsize[2] != 3 ) {
-							wppa_error_message(sprintf(__('Uploaded file %s is not a .png file', 'wp-photo-album-plus'), $file['name']).' (Type='.$file['type'].').');
+							wppa_error_message(sprintf(__('Uploaded file %s is not a .png file', 'wp-photo-album-plus'), wppa_sima( $file['name'] ) ) . ' (Type='.$file['type'].').');
 						}
 						else {
-							copy($file['tmp_name'], WPPA_UPLOAD_PATH . '/watermarks/' . basename($file['name']));
-							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), basename($file['name'])));
+							copy($file['tmp_name'], WPPA_UPLOAD_PATH . '/watermarks/' . wppa_sima(basename($file['name'])));
+							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), wppa_sima(basename($file['name']))));
 						}
 					}
 				}
@@ -156,12 +156,12 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 						wppa_error_message(sprintf(__('Upload error %s', 'wp-photo-album-plus'), $file['error']));
 					}
 					else {
-						if ( substr($file['name'], -4) != '.ttf' ) {
-							wppa_error_message(sprintf(__('Uploaded file %s is not a .ttf file', 'wp-photo-album-plus'), $file['name']).' (Type='.$file['type'].').');
+						if ( substr(wppa_sima($file['name']), -4) != '.ttf' ) {
+							wppa_error_message(sprintf(__('Uploaded file %s is not a .ttf file', 'wp-photo-album-plus'), wppa_sima($file['name']) ).' (Type='.$file['type'].').');
 						}
 						else {
-							copy($file['tmp_name'], WPPA_UPLOAD_PATH . '/fonts/' . basename($file['name']));
-							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), basename($file['name'])));
+							copy($file['tmp_name'], WPPA_UPLOAD_PATH . '/fonts/' . wppa_sima(basename($file['name'])));
+							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), wppa_sima(basename($file['name']))));
 						}
 					}
 				}
@@ -179,7 +179,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 					else {
 						$imgsize = getimagesize($file['tmp_name']);
 						if ( ! is_array( $imgsize ) || ! isset( $imgsize[2] ) || $imgsize[2] < 1 || $imgsize[2] > 3 ) {
-							wppa_error_message(sprintf(__('Uploaded file %s is not a valid image file', 'wp-photo-album-plus'), $file['name']).' (Type='.$file['type'].').');
+							wppa_error_message(sprintf(__('Uploaded file %s is not a valid image file', 'wp-photo-album-plus'), wppa_sima($file['name'])).' (Type='.$file['type'].').');
 						}
 						else {
 							switch ( $imgsize[2] ) {
@@ -198,7 +198,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 
 							// Thumbx, thumby, phtox and photoy must be cleared for the new stub
 							$wpdb->query( "UPDATE `" . WPPA_PHOTOS ."` SET `thumbx` = 0, `thumby` = 0, `photox` = 0, `photoy` = 0 WHERE `ext` = 'xxx'" );
-							wppa_alert( sprintf( __( 'Upload of %s done', 'wp-photo-album-plus'), basename( $file['name'] ) ) );
+							wppa_alert( sprintf( __( 'Upload of %s done', 'wp-photo-album-plus'), basename( wppa_sima( $file['name'] ) ) ) );
 						}
 					}
 				}

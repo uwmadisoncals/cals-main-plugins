@@ -3,7 +3,7 @@
 Plugin Name: WP Google Maps
 Plugin URI: https://www.wpgmaps.com
 Description: The easiest to use Google Maps plugin! Create custom Google Maps with high quality markers containing locations, descriptions, images and links. Add your customized map to your WordPress posts and/or pages quickly and easily with the supplied shortcode. No fuss.
-Version: 7.10.33
+Version: 7.10.34
 Author: WP Google Maps
 Author URI: https://www.wpgmaps.com
 Text Domain: wp-google-maps
@@ -11,6 +11,15 @@ Domain Path: /languages
 */
 
 /*
+ * 7.10.34 :- 2018-09-17 :- Low priority
+ * Added descriptive error messages when Google API is required but not loaded
+ * Added "I agree" translation to German files
+ * Added getPluginScripts to Scriptloader module
+ * jQuery 3.x document ready compatibility
+ * Changed wpgmza_google_api_status to be passed via wp_localize_script to prevent redirection issues in some circumstances
+ * Prevented UGM e-mail address being transmitted in WPGMZA_localized_data
+ * Removed redundant locationSelect dropdown
+ *
  * 7.10.33 :- 2018-09-05 :- Medium priority
  * Fixed OpenLayers InfoWindow not opening
  *
@@ -520,7 +529,7 @@ if(!function_exists('wpgmza_show_php_version_error'))
 		<div class="notice notice-error">
 			<p>
 				<?php
-				_e('WP Google Maps: This plugin does not support PHP version 5.2 or below. Please use your cPanel or speak to your host to switch version.', 'wp-google-maps');
+				_e('<strong>WP Google Maps:</strong> This plugin does not support PHP version 5.2 or below. Please use your cPanel or contact your host to switch version.', 'wp-google-maps');
 				?>
 			</p>
 		</div>
@@ -1265,7 +1274,7 @@ function wpgmaps_admin_edit_marker_javascript() {
     <link rel="stylesheet" type="text/css" media="all" href="<?php echo wpgmaps_get_plugin_url(); ?>css/data_table.css" />
     <script type="text/javascript" src="<?php echo wpgmaps_get_plugin_url(); ?>js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" >
-        jQuery(document).ready(function(){
+        jQuery(function($) {
             function wpgmza_InitMap() {
                 var myLatLng = new WPGMZA.LatLng(<?php echo $wpgmza_lat; ?>,<?php echo $wpgmza_lng; ?>);
                 MYMAP.init('#wpgmza_map', myLatLng, 15);
@@ -2871,7 +2880,16 @@ function wpgmaps_tag_basic( $atts ) {
 		$googleMapsAPILoader->loadGoogleMaps();
 	});*/
 
-	$core_dependencies = array('wpgmza');
+	//$core_dependencies = array('wpgmza');
+	
+	$core_dependencies = array();
+	$scriptLoader = new WPGMZA\ScriptLoader($wpgmza->isProVersion());
+	$v8Scripts = $scriptLoader->getPluginScripts();
+	
+	foreach($v8Scripts as $handle => $script)
+	{
+		$core_dependencies[] = $handle;
+	}
 	
 	$apiLoader = new WPGMZA\GoogleMapsAPILoader();
 	// if(!empty($wpgmza_settings['wpgmza_settings_remove_api']))
@@ -3122,7 +3140,7 @@ function wpgmaps_sl_user_output_basic($map_id) {
 	
 	$ret_msg .= "       <div class='wpgmza-not-found-msg js-not-found-msg'><p>" . $sl_not_found_message . "</p></div>";
 	$ret_msg .= "    </div>";
-    $ret_msg .= "    <div><select id=\"locationSelect\" style=\"width:100%;visibility:hidden\"></select></div>";
+    //$ret_msg .= "    <div><select id=\"locationSelect\" style=\"width:100%;visibility:hidden\"></select></div>";
     
     return $ret_msg;
     
@@ -3683,7 +3701,7 @@ function wpgmaps_head() {
 		?>
 		<script type='text/javascript'>
 		
-		jQuery(document).ready(function() {
+		jQuery(function($) {
 			window.location.reload();
 		});
 		
@@ -3747,7 +3765,7 @@ function wpgmaps_head() {
 		?>
 		<script type='text/javascript'>
 		
-		jQuery(document).ready(function() {
+		jQuery(function($) {
 			window.location.reload();
 		});
 		
@@ -7892,7 +7910,7 @@ function wpgmaps_b_admin_add_circle_javascript()
 					bounds: null
 				};
 				
-				$(document).ready(function(){
+				jQuery(function($) {
 					function wpgmza_InitMap() {
 						
 						MYMAP.init('#wpgmza_map', myLatLng, <?php echo $start_zoom; ?>);
@@ -8312,7 +8330,7 @@ function wpgmaps_b_admin_add_rectangle_javascript()
 		
 				var myLatLng = new google.maps.LatLng(<?php echo $wpgmza_lat; ?>,<?php echo $wpgmza_lng; ?>);
 				
-				$(document).ready(function(){
+				jQuery(function($) {
 					function wpgmza_InitMap() {
 						
 						MYMAP.init('#wpgmza_map', myLatLng, <?php echo $start_zoom; ?>);

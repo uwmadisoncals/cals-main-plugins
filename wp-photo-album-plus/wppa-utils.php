@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.9.07
+* Version 6.9.13
 *
 */
 
@@ -2562,7 +2562,7 @@ function wppa_force_numeric_else( $value, $default ) {
 function wppa_sanitize_file_name( $file, $check_length = true ) {
 	$temp 	= explode( '/', $file );
 	$cnt 	= count( $temp );
-	$temp[$cnt - 1] = strip_tags( stripslashes( $temp[$cnt - 1] ) );//sanitize_file_name( $temp[$cnt - 1] );
+	$temp[$cnt - 1] = wppa_sima( strip_tags( stripslashes( $temp[$cnt - 1] ) ) );
 	$maxlen = wppa_opt( 'max_filename_length' );
 	if ( $maxlen && $check_length ) {
 		if ( strpos( $temp[$cnt - 1], '.' ) !== false ) {
@@ -3699,7 +3699,12 @@ function wppa_chmod( $fso ) {
 
 // Test if a given url is to a photo file
 function wppa_is_url_a_photo( $url ) {
-	global $wppa_supported_photo_extensions;
+global $wppa_supported_photo_extensions;
+
+	// Check existence
+	if ( ! wppa_remote_file_exists( $url ) ) {
+		return false;
+	}
 
 	// Init
 	$result = true;
@@ -4632,13 +4637,13 @@ function wppa_pdf_preprocess( &$file, $alb, $i = false ) {
 
 	// Is it a pdf?
 	if ( $i === false ) {
-		$is_pdf = wppa_get_ext( $file['name'] ) == 'pdf';
+		$is_pdf = wppa_get_ext( wppa_sima( $file['name'] ) ) == 'pdf';
 		$single = true;
 	}
 
 	// One file out of a multiple upload
 	else {
-		$is_pdf = wppa_get_ext( $file['name'][$i] ) == 'pdf';
+		$is_pdf = wppa_get_ext( wppa_sima( $file['name'][$i] ) ) == 'pdf';
 		$single = false;
 	}
 
@@ -4648,11 +4653,14 @@ function wppa_pdf_preprocess( &$file, $alb, $i = false ) {
 	}
 
 	// Make sure there are no spaces in the filename, otherwise the download link is broken
-	if ( $single ) {
-		$file['name'] = str_replace( ' ', '_', $file['name'] );
-	}
-	else {
-		$file['name'][$i] = str_replace( ' ', '_', $file['name'][$i] );
+	// Needs to be done only when imagick is not active because filename will be sanitized in that case
+	if ( ! wppa_opt( 'image_magick' ) ) {
+		if ( $single ) {
+			$file['name'] = str_replace( ' ', '_', $file['name'] );
+		}
+		else {
+			$file['name'][$i] = str_replace( ' ', '_', $file['name'][$i] );
+		}
 	}
 
 	// Copy pdf to source dir,
@@ -4663,34 +4671,29 @@ function wppa_pdf_preprocess( &$file, $alb, $i = false ) {
 	$src .=  '/';
 
 	if ( $single ) {
-		copy( $file['tmp_name'], $src . $file['name'] );
+		copy( $file['tmp_name'], $src . sanitize_file_name( $file['name'] ) );
 	}
 	else {
-		copy( $file['tmp_name'][$i], $src . $file['name'][$i] );
+		copy( $file['tmp_name'][$i], $src . sanitize_file_name( $file['name'][$i] ) );
 	}
 
 	// Make it a jpg in the source dir,
 	if ( $single ) {
-		$jpg = wppa_strip_ext( $file['name'] ) . '.jpg';
-		if ( wppa_is_windows() ) {
-
-			// On windows the filename[pageno] must be enclosed in "", on unix in ''
-			wppa_image_magick( 'convert  -density 300 "' . $src . $file['name'] . '[0]" ' . $src . $jpg );//, null, $result );
-		}
-		else {
-			wppa_image_magick( "convert  -density 300 '" . $src . $file['name'] . "[0]' " . $src . $jpg );//, null, $result );
-		}
+		$pdf = sanitize_file_name( $file['name'] );
 	}
 	else {
-		$jpg = wppa_strip_ext( $file['name'][$i] ) . '.jpg';
-		if ( wppa_is_windows() ) {
+		$pdf = sanitize_file_name( $file['name'][$i] );
+	}
+	$jpg = wppa_strip_ext( $pdf ) . '.jpg';
 
-			// On windows the filename[pageno] must be enclosed in "", on unix in ''
-			wppa_image_magick( 'convert  -density 300 "' . $src . $file['name'][$i] . '[0]" ' . $src . $jpg );//, null, $result );
-		}
-		else {
-			wppa_image_magick( "convert  -density 300 '" . $src . $file['name'][$i] . "[0]' " . $src . $jpg );//, null, $result );
-		}
+	$err = wppa_image_magick( 'convert -limit thread 1 ' . $src . $pdf . ' -background white -alpha deactivate -scene 1 ' . $src . $jpg );
+
+	// Log what we did
+	if ( $err ) {
+		wppa_log( 'fso', 'Imagick failed to create ' . $src . $jpg );
+	}
+	else {
+		wppa_log( 'fso', 'Imagick Created ' . $src . $jpg );
 	}
 
 	// Copy the jpg image back to $file['name'] and $file['tmp_name']
@@ -4876,4 +4879,63 @@ function wppa_icon_size( $default = '', $type = 0, $factor = 1 ) {
 function wppa_is_panorama( $id ) {
 
 	return wppa_get_photo_item( $id, 'panorama' );
+}
+
+// See if a remote file exists
+function wppa_remote_file_exists( $url ) {
+    $ch = curl_init( $url );
+    curl_setopt( $ch, CURLOPT_NOBODY, true );
+	curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false );
+    curl_exec( $ch );
+    $httpCode = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+    curl_close( $ch );
+    if( $httpCode == 200 ) {
+		return true;
+	}
+	return false;
+}
+
+// Sanitize filename when imagemagick is active
+function wppa_sima( $filename ) {
+
+	if ( wppa_opt( 'image_magick' ) ) {
+		$filename = sanitize_file_name( $filename );
+	}
+	return $filename;
+}
+
+// Rename all files inside a tree to their sanitized name (recursive)
+function wppa_rename_files_sanitized( $root ) {
+
+	// Get the files
+	$my_import_files = glob( $root . '/*' );
+
+	// If files
+	if ( is_array( $my_import_files ) ) {
+
+		foreach( $my_import_files as $path ) {
+
+			// Process files
+			if ( is_file( $path ) ) {
+				$file = basename( $path );
+				$new_name = sanitize_file_name( $file );
+				if ( $new_name != $file ) {
+					rename( $path, $root . '/' . $new_name );
+					wppa_log( 'fso', 'Sanitized import filename ' . $path . ' to ' . $root . '/' . $new_name );
+				}
+			}
+
+			// Process directories
+			else {
+				$file = basename( $path );
+
+				// Only process real subfolders
+				if ( $file != '.' && $file != '..' ) {
+
+					// Recursively one level deeper
+					wppa_rename_files_sanitized( $path );
+				}
+			}
+		}
+	}
 }

@@ -2,8 +2,8 @@
 Contributors: opajaap
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=OpaJaap@OpaJaap.nl&item_name=WP-Photo-Album-Plus&item_number=Support-Open-Source&currency_code=USD&lc=US
 Tags: photo, album, slideshow, video, audio, lightbox, iptc, exif, cloudinary, fotomoto, imagemagick, pdf
-Version: 6.9.12
-Stable tag: 6.9.11
+Version: 6.9.13
+Stable tag: 6.9.12
 Author: J.N. Breetvelt
 Author URI: http://www.opajaap.nl/
 Requires at least: 3.9
@@ -15,7 +15,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 This plugin is more than just a photo album plugin, it is a complete, highly customizable multimedia cms and display system.
 
 == Description ==
-
+[](http://coderisk.com/wp/plugin/wp-photo-album-plus/RIPS-3qeuBUUZ5V)
 This plugin is more than just a photo album plugin, it is a complete, highly customizable multimedia content management and display system.
 
 Features:
@@ -136,6 +136,10 @@ See for the full changelog: <a href="http://www.wppa.nl/changelog/" >The documen
 * If visit the site, the pages you visit, the photos you watch and your IP address will be saved on the server for statistical purposes in your session information. This information will be anonimized after one hour and removed after 24 hours.
 
 == Upgrade Notice ==
+
+= 6.9.13 =
+
+* Security release.
 
 = 6.9.12 =
 

@@ -3,7 +3,7 @@
  * @module GoogleAPIErrorHandler
  * @requires WPGMZA
  */
-(function($){  
+jQuery(function($) { 
 
 	WPGMZA.GoogleAPIErrorHandler = function() {
 		
@@ -26,6 +26,9 @@
 		this.templateListItem = this.element.find("li.template").remove();
 		
 		this.messagesAlreadyDisplayed = {};
+		
+		if(WPGMZA.settings.developer_mode)
+			return;
 		
 		// Override error function
 		var _error = console.error;
@@ -122,4 +125,4 @@
 	
 	WPGMZA.googleAPIErrorHandler = new WPGMZA.GoogleAPIErrorHandler();
 
-})(jQuery);
+});

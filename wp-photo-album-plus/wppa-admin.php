@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version 6.9.12
+* Version 6.9.13
 *
 */
 
@@ -133,6 +133,7 @@ function wppa_edit_photo() {
 function wppa_page_import() {
 	if ( wppa_is_user_blacklisted() ) wp_die(__( 'Importing is temporary disabled for you' , 'wp-photo-album-plus') );
 	wppa_grant_albums();
+	wppa_rename_files_sanitized( WPPA_DEPOT_PATH );
 	require_once 'wppa-import.php';
 	echo '<script type="text/javascript" >/* <![CDATA[ */wppa_import = "'.__('Import', 'wp-photo-album-plus').'"; wppa_update = "'.__('Update', 'wp-photo-album-plus').'";/* ]]> */</script>';
 	_wppa_page_import();

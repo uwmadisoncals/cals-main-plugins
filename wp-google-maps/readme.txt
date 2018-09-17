@@ -216,6 +216,18 @@ Please upgrade your version of WP Google Maps to version 6.0.27 as it includes m
 
 == Changelog ==
 
+= 7.10.34 :- 2018-09-17 :- Low priority =
+* Added descriptive error messages when Google API is required but not loaded
+* Added "I agree" translation to German files
+* Added getPluginScripts to Scriptloader module
+* jQuery 3.x document ready compatibility
+* Changed wpgmza_google_api_status to be passed via wp_localize_script to prevent redirection issues in some circumstances
+* Prevented UGM e-mail address being transmitted in WPGMZA_localized_data
+* Removed redundant locationSelect dropdown
+
+= 7.10.33 :- 2018-09-05 :- Medium priority =
+* Fixed OpenLayers InfoWindow not opening
+
 = 7.10.32 :- 2018-08-31 :- Medium priority =
 * Fixed redundant setting wpgmza_gdpr_enabled causing "user consent not given" to be flagged erroneously
 
