@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version 6.9.07
+* Version 6.9.13
 *
 */
 
@@ -36,7 +36,7 @@ function wppa_make_o1_source( $id ) {
 
 	// ImageMagick
 	if ( wppa_opt( 'image_magick' ) ) {
-		wppa_image_magick( 'convert "' . $src_path . '" -auto-orient "' . $dst_path . '"' );
+		wppa_image_magick( 'convert ' . $src_path . ' -auto-orient ' . $dst_path );
 	}
 
 	// Classic
@@ -192,7 +192,10 @@ global $wpdb;
 				$quality = '-quality ' . $q;
 			}
 
-			wppa_image_magick( 'convert "' . $file . '" ' . $quality . ' -resize ' . ( $thumb['stereo'] ? 2 * $max_width : $max_width ) . 'x' . $max_height . ' ' . $newimage );
+			$iret = wppa_image_magick( 'convert ' . $file . ' ' . $quality . ' -resize ' . ( $thumb['stereo'] ? 2 * $max_width : $max_width ) . 'x' . $max_height . ' ' . $newimage );
+			if ( $iret ) {
+				wppa_log( 'fso', 'Magick could not create ' . $newimage );
+			}
 		}
 
 		// Classic GD
@@ -466,7 +469,10 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 
 		// Image Magick?
 		if ( wppa_opt( 'image_magick' ) && $type == 'none' ) {
-			wppa_image_magick( 'convert "' . $file . '" -thumbnail ' . $max_side . 'x' . $max_side . ' ' . $thumbpath );
+			$iret = wppa_image_magick( 'convert ' . $file . ' -thumbnail ' . $max_side . 'x' . $max_side . ' ' . $thumbpath );
+			if ( $iret ) {
+				wppa_log( 'fso', 'Magick could not create ' . $thumbpath );
+			}
 		}
 
 		// Classic GD

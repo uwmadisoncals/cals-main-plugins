@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the admins-choice widget
-* Version 6.8.07
+* Version 6.9.12
 *
 */
 
@@ -69,6 +69,10 @@ class AdminsChoice extends WP_Widget {
     function update( $new_instance, $old_instance ) {
 
 		$instance = $old_instance;
+
+		// Defaults
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Admins Choice', 'wp-photo-album-plus' ), 'logonly' => 'no' ) );
+
 		$instance['title'] = strip_tags( $new_instance['title'] );
 		$instance['logonly'] = $new_instance['logonly'];
         return $instance;

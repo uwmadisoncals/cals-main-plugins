@@ -229,10 +229,11 @@ class cnDependency {
 			'cnImage'                  => 'includes/image/class.image.php',
 
 			// Shortcodes.
-			'cnShortcode'              => 'includes/shortcode/class.shortcode.php',
-			'cnShortcode_Connections'  => 'includes/shortcode/class.shortcode-connections.php',
-			'cnThumb'                  => 'includes/shortcode/class.shortcode-thumbnail.php',
-			'cnThumb_Responsive'       => 'includes/shortcode/class.shortcode-thumbnail-responsive.php',
+			'cnShortcode'                              => 'includes/shortcode/class.shortcode.php',
+			'cnShortcode_Connections'                  => 'includes/shortcode/class.shortcode-connections.php',
+			'Connections_Directory\Shortcode\mapBlock' => 'includes/shortcode/class.shortcode-mapblock.php',
+			'cnThumb'                                  => 'includes/shortcode/class.shortcode-thumbnail.php',
+			'cnThumb_Responsive'                       => 'includes/shortcode/class.shortcode-thumbnail-responsive.php',
 
 			// Register the query vars, rewrite URL/s and canonical redirects.
 			'cnRewrite'                => 'includes/class.rewrite.php',
@@ -320,8 +321,6 @@ class cnDependency {
 			// Address objects.
 			'cnEntry_Addresses'        => 'includes/entry/address/class.entry-addresses.php',
 			'cnAddress'                => 'includes/entry/address/class.address.php',
-			'cnCountry'                => 'includes/entry/address/class.country.php',
-			'cnCoordinates'            => 'includes/entry/address/class.coordinates.php',
 
 			// Phone objects
 			'cnEntry_Phone_Numbers'    => 'includes/entry/phone/class.entry-phone-numbers.php',
@@ -354,10 +353,54 @@ class cnDependency {
 
 			// Timezone.
 			'cnGoogleMapsTimeZone'     => 'includes/class.google-maps-timezone-api.php',
-			'cnTimezone'               => 'includes/class.timezone.php',
 
 			// Countries
 			'cnCountries'              => 'includes/geo/class.countries.php',
+
+			// Models
+			'Connections_Directory\Model\Address' => 'includes/model/class.address.php',
+			'cnCountry'                           => 'includes/model/class.country.php',
+			'cnCoordinates'                       => 'includes/model/class.coordinates.php',
+			'Connections_Directory\Model\Bounds'  => 'includes/model/class.bounds.php',
+			'cnTimezone'                          => 'includes/model/class.timezone.php',
+
+			// Format
+			'Connections_Directory\Model\Format\Address\As_String' => 'includes/model/format/address/class.as-string.php',
+
+			// Geocoder
+			'Connections_Directory\Geocoder\Geocoder'                         => 'includes/geocoder/class.geocoder.php',
+			'Connections_Directory\Geocoder\Assert'                           => 'includes/geocoder/class.assert.php',
+			//'Connections_Directory\Geocoder\Exception\Exception'              => 'includes/geocoder/exception/interface.exception.php',
+			//'Connections_Directory\Geocoder\Exception\Invalid_Argument'       => 'includes/geocoder/exception/class.invalid-argument.php',
+			//'Connections_Directory\Geocoder\Exception\Logic_Exception'        => 'includes/geocoder/exception/class.logic-exception.php',
+			//'Connections_Directory\Geocoder\Model\Address'                    => 'includes/geocoder/model/class.address.php',
+			'Connections_Directory\Geocoder\Model\Address_Builder'            => 'includes/geocoder/model/class.address-builder.php',
+			'Connections_Directory\Geocoder\Query\Query'                      => 'includes/geocoder/query/interface.query.php',
+			'Connections_Directory\Geocoder\Query\Address'                    => 'includes/geocoder/query/class.address.php',
+			'Connections_Directory\Geocoder\Query\Coordinates'                => 'includes/geocoder/query/class.reverse.php',
+			'Connections_Directory\Geocoder\Provider\Provider'                => 'includes/geocoder/provider/interface.provider.php',
+			'Connections_Directory\Geocoder\Provider\Algolia\Algolia'         => 'includes/geocoder/provider/class.algolia.php',
+			'Connections_Directory\Geocoder\Provider\Google_Maps\Google_Maps' => 'includes/geocoder/provider/class.google-maps.php',
+			'Connections_Directory\Geocoder\Provider\Bing_Maps\Bing_Maps'     => 'includes/geocoder/provider/class.bing-maps.php',
+			'Connections_Directory\Geocoder\Provider\Nominatim\Nominatim'     => 'includes/geocoder/provider/class.nominatim.php',
+
+			// Map
+			'Connections_Directory\Map\Map'                                   => 'includes/map/class.map.php',
+			'Connections_Directory\Map\Map_Object'                            => 'includes/map/interface.map-object.php',
+			//'Connections_Directory\Map\Layer'                                 => 'includes/map/class.layer.php',
+			'Connections_Directory\Map\Layer\Layer'                           => 'includes/map/layer/interface.layer.php',
+			'Connections_Directory\Map\Layer\Abstract_Layer'                  => 'includes/map/layer/abstract.layer.php',
+			'Connections_Directory\Map\Layer\Group\Layer_Group'               => 'includes/map/layer/group/class.layer-group.php',
+			'Connections_Directory\Map\Layer\Raster\Tile_Layer'               => 'includes/map/layer/raster/class.tile-layer.php',
+			'Connections_Directory\Map\Layer\Raster\Provider\Nominatim'       => 'includes/map/layer/raster/provider/class.nominatim.php',
+			'Connections_Directory\Map\Layer\Raster\Provider\Wikimedia'       => 'includes/map/layer/raster/provider/class.wikimedia.php',
+			'Connections_Directory\Map\Layer\Raster\Provider\Google_Maps'     => 'includes/map/layer/raster/provider/class.google-maps.php',
+			'Connections_Directory\Map\UI\Marker'                             => 'includes/map/ui/class.marker.php',
+			'Connections_Directory\Map\UI\Popup'                              => 'includes/map/ui/class.popup.php',
+			//'Connections_Directory\Map\Marker'                                => 'includes/map/class.marker.php',
+			//'Connections_Directory\Map\Marker_Collection'                     => 'includes/map/class.marker-collection.php',
+			'Connections_Directory\Map\Common\Options'                        => 'includes/map/common/trait.options.php',
+			'Connections_Directory\Map\Common\Popup_Trait'                    => 'includes/map/common/trait.popup.php',
 
 			// Third Party Libraries
 			//'Rinvex\Country\Country'                => 'vendor/rinvex/country/Country.php',

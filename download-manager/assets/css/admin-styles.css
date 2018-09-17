@@ -899,3 +899,206 @@ a:focus, a:active{ box-shadow: none !important; }
 i.sinc{
     width: 16px !important;
 }
+
+.w3eden .btn.btn-fb {
+    background-color: #354C8C !important;
+    border: 0 !important;
+    color: #ffffff !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+}
+.w3eden .btn.btn-fb .label-white {
+    color: #354C8C !important;
+}
+.w3eden .btn.wpdm-android {
+    background: #8ec147;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-apple {
+    background: #777;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-behance {
+    background: #0077ff;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-bitcoin {
+    background: #f79012;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-buysellads {
+    background: #c90100;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-codepen {
+    background: #444;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-css3 {
+    background: #0270bb;
+    color: #ffffff;
+}
+.w3eden .btn.wpdm-delicious {
+    background: #31a9ff;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-deviantart {
+    background: #05cc47;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-digg {
+    background: #0093cc;
+}
+.w3eden .btn.wpdm-dropbox {
+    background: #007ee5;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-email-1 {
+    background: #35c7ed;
+}
+.w3eden .btn.wpdm-email-2 {
+    background: #35c7ed;
+}
+.w3eden .btn.wpdm-facebook {
+    background: #4862a3;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-flickr {
+    background: #ff1981;
+}
+.w3eden .btn.wpdm-foursquare {
+    background: #f04d7a;
+}
+.w3eden .btn.wpdm-git {
+    background: #f64d27;
+}
+.w3eden .btn.wpdm-github {
+    background: #999;
+}
+.w3eden .btn.wpdm-google {
+    background: #3f85f4;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-google-plus {
+    background: #dd4b39;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-html5 {
+    background: #e54d26;
+}
+.w3eden .btn.wpdm-instagram {
+    background: #3d6b92;
+}
+.w3eden .btn.wpdm-joomla {
+    background: #fc8f30;
+}
+.w3eden .btn.wpdm-jsfiddle {
+    background: #4679bd;
+}
+.w3eden .btn.wpdm-lastfm {
+    background: #df1c23;
+}
+.w3eden .btn.wpdm-linkedin {
+    background: #0177b5;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-linux {
+    background: #39a6df;
+}
+.w3eden .btn.wpdm-maxcdn {
+    background: #ff5b02;
+}
+.w3eden .btn.wpdm-medium {
+    background: #333;
+}
+.w3eden .btn.wpdm-pagelines {
+    background: #444;
+}
+.w3eden .btn.wpdm-paypal {
+    background: #009cde;
+}
+.w3eden .btn.wpdm-pinterest {
+    background: #db242c;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-reddit {
+    background: #ff4500;
+}
+.w3eden .btn.wpdm-rss {
+    background: #fc8f55;
+}
+.w3eden .btn.wpdm-share {
+    background: #01924b;
+}
+.w3eden .btn.wpdm-skype {
+    background: #00aff0;
+}
+.w3eden .btn.wpdm-slideshare {
+    background: #0679b5;
+}
+.w3eden .btn.wpdm-soundcloud {
+    background: #ff4e00;
+}
+.w3eden .btn.wpdm-spotify {
+    background: #84bd00;
+}
+.w3eden .btn.wpdm-box {
+    background: #07c;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-onedrive {
+    background: #0088f3;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-stack-overflow {
+    background: #07c;
+}
+.w3eden .btn.wpdm-stumbleupon {
+    background: #ea4b24;
+}
+.w3eden .btn.wpdm-trello {
+    background: #026aa7;
+}
+.w3eden .btn.wpdm-tumblr {
+    background: #2c4762;
+}
+.w3eden .btn.wpdm-twitter {
+    background: #55acee;
+    color: #ffffff !important;
+}
+.w3eden .btn.wpdm-vimeo {
+    background: #44bbff;
+}
+.w3eden .btn.wpdm-vine {
+    background: #00bf8f;
+}
+.w3eden .btn.wpdm-vk {
+    background: #6281a3;
+}
+.w3eden .btn.wpdm-whatsapp {
+    background: #59ac23;
+}
+.w3eden .btn.wpdm-windows {
+    background: #00bcf2;
+}
+.w3eden .btn.wpdm-wordpress {
+    background: #1e8cbe;
+}
+.w3eden .btn.wpdm-xing {
+    background: #006464;
+}
+.w3eden .btn.wpdm-yahoo {
+    background: #5210c4;
+}
+.w3eden .btn.wpdm-yelp {
+    background: #c41200;
+}
+.w3eden .btn.wpdm-youtube {
+    background: #d02022;
+}
+.w3eden .btn.wpdm-youtube-play {
+    background: #d02022;
+}
+.w3eden .btn.wpdm-*:hover {
+    opacity: 0.9;
+}

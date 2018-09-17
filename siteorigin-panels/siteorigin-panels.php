@@ -3,7 +3,7 @@
 Plugin Name: Page Builder by SiteOrigin
 Plugin URI: https://siteorigin.com/page-builder/
 Description: A drag and drop, responsive page builder that simplifies building your website.
-Version: 2.7.3
+Version: 2.8.2
 Author: SiteOrigin
 Author URI: https://siteorigin.com
 License: GPL3
@@ -11,12 +11,12 @@ License URI: http://www.gnu.org/licenses/gpl.html
 Donate link: http://siteorigin.com/page-builder/#donate
 */
 
-define( 'SITEORIGIN_PANELS_VERSION', '2.7.3' );
+define( 'SITEORIGIN_PANELS_VERSION', '2.8.2' );
 if ( ! defined( 'SITEORIGIN_PANELS_JS_SUFFIX' ) ) {
 	define( 'SITEORIGIN_PANELS_JS_SUFFIX', '.min' );
 }
 define( 'SITEORIGIN_PANELS_CSS_SUFFIX', '.min' );
-define( 'SITEORIGIN_PANELS_VERSION_SUFFIX', '-273' );
+define( 'SITEORIGIN_PANELS_VERSION_SUFFIX', '-282' );
 
 require_once plugin_dir_path( __FILE__ ) . 'inc/functions.php';
 
@@ -66,6 +66,10 @@ class SiteOrigin_Panels {
 		
 		// Content cache has been removed. SiteOrigin_Panels_Cache_Renderer just deletes any existing caches.
 		SiteOrigin_Panels_Cache_Renderer::single();
+		
+		if ( function_exists( 'register_block_type' ) ) {
+			SiteOrigin_Panels_Compat_Gutenberg_Block::single();
+		}
 		
 		
 		define( 'SITEORIGIN_PANELS_BASE_FILE', __FILE__ );
@@ -132,6 +136,10 @@ class SiteOrigin_Panels {
 			$filename = str_replace( '_', '-', $filename );
 			$filename = strtolower( preg_replace( '/([a-z])([A-Z])/', '$1-$2', $filename ) );
 			$filename = plugin_dir_path( __FILE__ ) . 'inc/widgets/' . $filename . '.php';
+		}
+		else if ( strpos( $class, 'SiteOrigin_Panels_Compat_' ) === 0 ) {
+			$filename = str_replace( array( 'SiteOrigin_Panels_Compat_', '_' ), array( '', '-' ), $class );
+			$filename = plugin_dir_path( __FILE__ ) . 'compat/' . strtolower( $filename ) . '.php';
 		}
 		else if ( strpos( $class, 'SiteOrigin_Panels_' ) === 0 ) {
 			$filename = str_replace( array( 'SiteOrigin_Panels_', '_' ), array( '', '-' ), $class );

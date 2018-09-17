@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the widget
-* Version 6.8.08
+* Version 6.9.12
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -78,6 +78,7 @@ class PhotoOfTheDay extends WP_Widget {
 							( $has_audio ? ' data-audiohtml="' . esc_attr( wppa_get_audio_body( $id ) ) . '"' : '' ) .
 							' ' . wppa( 'rel' ) . '="' . wppa_opt( 'lightbox_name' ) . '"' .
 							' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
+							wppa_get_lb_panorama_full_html( $id ) .
 							' onclick="return false;"' .
 							' style="cursor:' . wppa_wait() . ';"';
 			}
@@ -207,6 +208,12 @@ class PhotoOfTheDay extends WP_Widget {
     /** @see WP_Widget::update */
     function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
+
+		// Defaults
+		$instance = wp_parse_args( (array) $instance, array( 	'title' => wppa_opt( 'potd_title' ),
+																'logonly' => 'no',
+																) );
+
 		$instance['title'] = strip_tags( $new_instance['title'] );
 		$instance['logonly'] = $new_instance['logonly'];
 

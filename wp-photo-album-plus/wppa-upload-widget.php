@@ -4,7 +4,7 @@
 *
 * A wppa widget to upload photos
 *
-* Version 6.8.07
+* Version 6.9.12
 */
 
 class WppaUploadWidget extends WP_Widget {
@@ -84,6 +84,9 @@ class WppaUploadWidget extends WP_Widget {
 
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
+
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Upload Photos', 'wp-photo-album-plus' ), 'album' => '0', 'logonly' => 'no' ) );
+
 		$instance['title'] = strip_tags( $new_instance['title'] );
 		$instance['album'] = strval( intval( $new_instance['album'] ) );
 		$instance['logonly'] = $new_instance['logonly'];

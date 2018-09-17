@@ -6,12 +6,12 @@
 	Tags: analytics, ga, google, google analytics, tracking, statistics, stats
 	Author: Jeff Starr
 	Author URI: https://plugin-planet.com/
-	Donate link: https://m0n.co/donate
+	Donate link: https://monzillamedia.com/donate.html
 	Contributors: specialk
 	Requires at least: 4.1
 	Tested up to: 5.0
-	Stable tag: 20180506
-	Version: 20180506
+	Stable tag: 20180828
+	Version: 20180828
 	Requires PHP: 5.2
 	Text Domain: ga-google-analytics
 	Domain Path: /languages
@@ -60,7 +60,7 @@ if (!class_exists('GA_Google_Analytics')) {
 		
 		function constants() {
 			
-			if (!defined('GAP_VERSION')) define('GAP_VERSION', '20180506');
+			if (!defined('GAP_VERSION')) define('GAP_VERSION', '20180828');
 			if (!defined('GAP_REQUIRE')) define('GAP_REQUIRE', '4.1');
 			if (!defined('GAP_AUTHOR'))  define('GAP_AUTHOR',  'Jeff Starr');
 			if (!defined('GAP_NAME'))    define('GAP_NAME',    __('GA Google Analytics', 'ga-google-analytics'));
@@ -140,7 +140,7 @@ if (!class_exists('GA_Google_Analytics')) {
 				$rate_title = esc_attr__('Click here to rate and review this plugin on WordPress.org', 'ga-google-analytics');
 				$rate_text  = esc_html__('Rate this plugin', 'ga-google-analytics') .'&nbsp;&raquo;';
 				
-				$links[]    = '<a target="_blank" href="'. $rate_href .'" title="'. $rate_title .'">'. $rate_text .'</a>';
+				$links[]    = '<a target="_blank" rel="noopener noreferrer" href="'. $rate_href .'" title="'. $rate_title .'">'. $rate_text .'</a>';
 				
 			}
 			
@@ -360,9 +360,9 @@ if (!class_exists('GA_Google_Analytics')) {
 			$url2 = 'https://developers.google.com/analytics/devguides/collection/gtagjs/';
 			$url3 = 'https://developers.google.com/analytics/devguides/collection/gajs/';
 			
-			$link1 = '<a target="_blank" href="'. $url1 .'">'. esc_html__('Universal Analytics', 'ga-google-analytics') .'</a> ';
-			$link2 = '<a target="_blank" href="'. $url2 .'">'. esc_html__('Global Site Tag', 'ga-google-analytics') .'</a> ';
-			$link3 = '<a target="_blank" href="'. $url3 .'">'. esc_html__('Legacy', 'ga-google-analytics') .'</a> ';
+			$link1 = '<a target="_blank" rel="noopener noreferrer" href="'. $url1 .'">'. esc_html__('Universal Analytics', 'ga-google-analytics') .'</a> ';
+			$link2 = '<a target="_blank" rel="noopener noreferrer" href="'. $url2 .'">'. esc_html__('Global Site Tag', 'ga-google-analytics') .'</a> ';
+			$link3 = '<a target="_blank" rel="noopener noreferrer" href="'. $url3 .'">'. esc_html__('Legacy', 'ga-google-analytics') .'</a> ';
 			
 			return array(
 				
@@ -447,7 +447,7 @@ if (!class_exists('GA_Google_Analytics')) {
 		
 	}
 	
-	$GA_Google_Analytics = new GA_Google_Analytics(); 
+	$GLOBALS['GA_Google_Analytics'] = $GA_Google_Analytics = new GA_Google_Analytics(); 
 	
 	ga_google_analytics_init($GA_Google_Analytics);
 	

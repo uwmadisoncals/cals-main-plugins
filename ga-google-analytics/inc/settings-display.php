@@ -29,12 +29,12 @@ if (!function_exists('add_action')) die(); ?>
 							<ul>
 								<li><a class="gap-toggle" data-target="usage" href="#gap-panel-usage"><?php esc_html_e('How to Use', 'ga-google-analytics'); ?></a></li>
 								<li><a class="gap-toggle" data-target="settings" href="#gap-panel-settings"><?php esc_html_e('Plugin Settings', 'ga-google-analytics'); ?></a></li>
-								<li><a target="_blank" href="https://wordpress.org/support/plugin/ga-google-analytics"><?php esc_html_e('Plugin Homepage', 'ga-google-analytics'); ?></a></li>
+								<li><a target="_blank" rel="noopener noreferrer" href="https://wordpress.org/support/plugin/ga-google-analytics"><?php esc_html_e('Plugin Homepage', 'ga-google-analytics'); ?></a></li>
 							</ul>
 							
 							<p>
 								<?php esc_html_e('If you like this plugin, please', 'ga-google-analytics'); ?> 
-								<a target="_blank" href="https://wordpress.org/support/plugin/ga-google-analytics/reviews/?rate=5#new-post" title="<?php esc_attr_e('THANK YOU for your support!', 'ga-google-analytics'); ?>">
+								<a target="_blank" rel="noopener noreferrer" href="https://wordpress.org/support/plugin/ga-google-analytics/reviews/?rate=5#new-post" title="<?php esc_attr_e('THANK YOU for your support!', 'ga-google-analytics'); ?>">
 									<?php esc_html_e('give it a 5-star rating', 'ga-google-analytics'); ?>&nbsp;&raquo;
 								</a>
 							</p>
@@ -59,8 +59,8 @@ if (!function_exists('add_action')) die(); ?>
 								<li><?php esc_html_e('Visit the "Plugin Settings" panel', 'ga-google-analytics'); ?></li>
 								<li><?php esc_html_e('Enter your GA Tracking ID', 'ga-google-analytics'); ?></li>
 								<li>
-									<?php esc_html_e('Choose either', 'ga-google-analytics'); ?> <a target="_blank" href="https://developers.google.com/analytics/devguides/collection/analyticsjs/"><?php esc_html_e('Universal Analytics', 'ga-google-analytics'); ?></a> 
-									<?php esc_html_e('or', 'ga-google-analytics'); ?> <a target="_blank" href="https://developers.google.com/analytics/devguides/collection/gtagjs/"><?php esc_html_e('Global Site Tag', 'ga-google-analytics'); ?></a>
+									<?php esc_html_e('Choose either', 'ga-google-analytics'); ?> <a target="_blank" rel="noopener noreferrer" href="https://developers.google.com/analytics/devguides/collection/analyticsjs/"><?php esc_html_e('Universal Analytics', 'ga-google-analytics'); ?></a> 
+									<?php esc_html_e('or', 'ga-google-analytics'); ?> <a target="_blank" rel="noopener noreferrer" href="https://developers.google.com/analytics/devguides/collection/gtagjs/"><?php esc_html_e('Global Site Tag', 'ga-google-analytics'); ?></a>
 								</li>
 								<li><?php esc_html_e('Configure any other plugin settings as desired (optional)', 'ga-google-analytics'); ?></li>
 							</ol>
@@ -70,9 +70,9 @@ if (!function_exists('add_action')) die(); ?>
 							<div class="gap-caption">
 								
 								<?php esc_html_e('Note that it can take 24-48 hours after adding the tracking code before any analytical data appears in your', 'ga-google-analytics'); ?> 
-								<a target="_blank" href="https://www.google.com/analytics/"><?php esc_html_e('Google Analytics account', 'ga-google-analytics'); ?></a>. 
+								<a target="_blank" rel="noopener noreferrer" href="https://www.google.com/analytics/"><?php esc_html_e('Google Analytics account', 'ga-google-analytics'); ?></a>. 
 								<?php esc_html_e('To check that the GA tacking code is included, look at the source code of your web page(s). Learn more at the', 'ga-google-analytics'); ?> 
-								<a target="_blank" href="https://support.google.com/analytics/?hl=en#topic=3544906"><?php esc_html_e('Google Analytics Help Center', 'ga-google-analytics'); ?></a>.
+								<a target="_blank" rel="noopener noreferrer" href="https://support.google.com/analytics/?hl=en#topic=3544906"><?php esc_html_e('Google Analytics Help Center', 'ga-google-analytics'); ?></a>.
 								
 							</div>
 							
@@ -109,7 +109,7 @@ if (!function_exists('add_action')) die(); ?>
 										<td>
 											<input id="gap_options[gap_display_ads]" name="gap_options[gap_display_ads]" type="checkbox" value="1" <?php if (isset($gap_options['gap_display_ads'])) checked('1', $gap_options['gap_display_ads']); ?>> 
 											<?php esc_html_e('Enable support for', 'ga-google-analytics'); ?> 
-											<a target="_blank" href="https://support.google.com/analytics/answer/2444872"><?php esc_html_e('Display Advertising', 'ga-google-analytics'); ?></a>
+											<a target="_blank" rel="noopener noreferrer" href="https://support.google.com/analytics/answer/2444872"><?php esc_html_e('Display Advertising', 'ga-google-analytics'); ?></a>
 										</td>
 									</tr>
 									<tr>
@@ -117,7 +117,7 @@ if (!function_exists('add_action')) die(); ?>
 										<td>
 											<input id="gap_options[link_attr]" name="gap_options[link_attr]" type="checkbox" value="1" <?php if (isset($gap_options['link_attr'])) checked('1', $gap_options['link_attr']); ?>> 
 											<?php esc_html_e('Enable support for', 'ga-google-analytics'); ?> 
-											<a target="_blank" href="https://developers.google.com/analytics/devguides/collection/analyticsjs/enhanced-link-attribution"><?php esc_html_e('Enhanced Link Attribution', 'ga-google-analytics'); ?></a>
+											<a target="_blank" rel="noopener noreferrer" href="https://developers.google.com/analytics/devguides/collection/analyticsjs/enhanced-link-attribution"><?php esc_html_e('Enhanced Link Attribution', 'ga-google-analytics'); ?></a>
 										</td>
 									</tr>
 									<tr>
@@ -125,7 +125,7 @@ if (!function_exists('add_action')) die(); ?>
 										<td>
 											<input id="gap_options[gap_anonymize]" name="gap_options[gap_anonymize]" type="checkbox" value="1" <?php if (isset($gap_options['gap_anonymize'])) checked('1', $gap_options['gap_anonymize']); ?>> 
 											<?php esc_html_e('Enable support for', 'ga-google-analytics'); ?> 
-											<a target="_blank" href="https://developers.google.com/analytics/devguides/collection/analyticsjs/ip-anonymization"><?php esc_html_e('IP Anonymization', 'ga-google-analytics'); ?></a>
+											<a target="_blank" rel="noopener noreferrer" href="https://developers.google.com/analytics/devguides/collection/analyticsjs/ip-anonymization"><?php esc_html_e('IP Anonymization', 'ga-google-analytics'); ?></a>
 										</td>
 									</tr>
 									<tr>
@@ -133,7 +133,7 @@ if (!function_exists('add_action')) die(); ?>
 										<td>
 											<input id="gap_options[gap_force_ssl]" name="gap_options[gap_force_ssl]" type="checkbox" value="1" <?php if (isset($gap_options['gap_force_ssl'])) checked('1', $gap_options['gap_force_ssl']); ?>>
 											<?php esc_html_e('Enable support for', 'ga-google-analytics'); ?> 
-											<a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#forceSSL"><?php esc_html_e('Force SSL', 'ga-google-analytics'); ?></a>
+											<a target="_blank" rel="noopener noreferrer" href="https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#forceSSL"><?php esc_html_e('Force SSL', 'ga-google-analytics'); ?></a>
 										</td>
 									</tr>
 								</table>
@@ -142,7 +142,7 @@ if (!function_exists('add_action')) die(); ?>
 							
 							<table class="widefat">
 								<tr>
-									<th><label for="gap_options[gap_location]"><?php esc_html_e('Code Location', 'ga-google-analytics'); ?></label></th>
+									<th><label for="gap_options[gap_location]"><?php esc_html_e('Tracking Code Location', 'ga-google-analytics'); ?></label></th>
 									<td>
 										<?php echo $this->select_menu($this->options_locations(), 'gap_location'); ?>
 										<div class="gap-caption">
@@ -159,7 +159,7 @@ if (!function_exists('add_action')) die(); ?>
 											<?php esc_html_e('Any code entered here will be added to', 'ga-google-analytics'); ?> <code>ga('create')</code> 
 											<?php esc_html_e('for Universal Analytics, or added to', 'ga-google-analytics'); ?> <code>gtag('config')</code> 
 											<?php esc_html_e('for Global Site Tag.', 'ga-google-analytics'); ?> 
-											<a target="_blank" href="https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers"><?php esc_html_e('Learn more about creating trackers', 'ga-google-analytics'); ?></a>.
+											<a target="_blank" rel="noopener noreferrer" href="https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers"><?php esc_html_e('Learn more about creating trackers', 'ga-google-analytics'); ?></a>.
 										</div>
 									</td>
 								</tr>
@@ -169,14 +169,14 @@ if (!function_exists('add_action')) die(); ?>
 										<textarea id="gap_options[gap_custom_code]" name="gap_options[gap_custom_code]" type="textarea" rows="4" cols="70"><?php if (isset($gap_options['gap_custom_code'])) echo esc_textarea($gap_options['gap_custom_code']); ?></textarea>
 										<div class="gap-caption"> 
 											<?php esc_html_e('Any code entered here will be added to the GA code snippet. This is useful for things like', 'ga-google-analytics'); ?> 
-											<a target="_blank" href="https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers#working_with_multiple_trackers"><?php esc_html_e('creating multiple trackers', 'ga-google-analytics'); ?></a> 
-											<?php esc_html_e('and', 'ga-google-analytics'); ?> <a target="_blank" href="https://support.google.com/360suite/optimize/"><?php esc_html_e('Google Optimize', 'ga-google-analytics'); ?></a>. 
+											<a target="_blank" rel="noopener noreferrer" href="https://developers.google.com/analytics/devguides/collection/analyticsjs/creating-trackers#working_with_multiple_trackers"><?php esc_html_e('creating multiple trackers', 'ga-google-analytics'); ?></a> 
+											<?php esc_html_e('and', 'ga-google-analytics'); ?> <a target="_blank" rel="noopener noreferrer" href="https://support.google.com/360suite/optimize/"><?php esc_html_e('Google Optimize', 'ga-google-analytics'); ?></a>. 
 											<?php esc_html_e('Can use', 'ga-google-analytics'); ?> <code>%%userid%%</code> <?php esc_html_e('to display the current user ID.', 'ga-google-analytics'); ?>
 										</div>
 									</td>
 								</tr>
 								<tr>
-									<th><label for="gap_options[gap_custom]"><?php esc_html_e('Custom', 'ga-google-analytics'); ?> <code>&lt;head&gt;</code> <?php esc_html_e('Code', 'ga-google-analytics'); ?></label></th>
+									<th><label for="gap_options[gap_custom]"><?php esc_html_e('Custom Code', 'ga-google-analytics'); ?></label></th>
 									<td>
 										<textarea id="gap_options[gap_custom]" name="gap_options[gap_custom]" type="textarea" rows="4" cols="70"><?php if (isset($gap_options['gap_custom'])) echo esc_textarea($gap_options['gap_custom']); ?></textarea>
 										<div class="gap-caption">
@@ -186,11 +186,11 @@ if (!function_exists('add_action')) die(); ?>
 									</td>
 								</tr>
 								<tr>
-									<th><label for="gap_options[gap_custom_loc]"><?php esc_html_e('Custom', 'ga-google-analytics'); ?> <code>&lt;head&gt;</code> <?php esc_html_e('Location', 'ga-google-analytics'); ?></label></th>
+									<th><label for="gap_options[gap_custom_loc]"><?php esc_html_e('Custom Code Location', 'ga-google-analytics'); ?></label></th>
 									<td>
 										<input id="gap_options[gap_custom_loc]" name="gap_options[gap_custom_loc]" type="checkbox" value="1" <?php if (isset($gap_options['gap_custom_loc'])) checked('1', $gap_options['gap_custom_loc']); ?>> 
-										<?php esc_html_e('Display custom', 'ga-google-analytics'); ?> <code>&lt;head&gt;</code> <?php esc_html_e('code', 'ga-google-analytics'); ?> <em><?php esc_html_e('before', 'ga-google-analytics'); ?></em> 
-										<?php esc_html_e('GA tracking code. Leave unchecked to display', 'ga-google-analytics'); ?> <em><?php esc_html_e('after', 'ga-google-analytics'); ?></em> <?php esc_html_e('the tracking code.', 'ga-google-analytics'); ?>
+										<?php esc_html_e('Display Custom Code', 'ga-google-analytics'); ?> <em><?php esc_html_e('before', 'ga-google-analytics'); ?></em> 
+										<?php esc_html_e('the GA tracking code. Leave unchecked to display', 'ga-google-analytics'); ?> <em><?php esc_html_e('after', 'ga-google-analytics'); ?></em> <?php esc_html_e('the tracking code.', 'ga-google-analytics'); ?>
 									</td>
 								</tr>
 								<tr>
@@ -249,11 +249,11 @@ if (!function_exists('add_action')) die(); ?>
 		
 		<div class="gap-credit-info">
 			
-			<a target="_blank" href="<?php echo esc_url(GAP_HOME); ?>" title="<?php esc_attr_e('Plugin Homepage', 'ga-google-analytics'); ?>"><?php echo GAP_NAME; ?></a> 
+			<a target="_blank" rel="noopener noreferrer" href="<?php echo esc_url(GAP_HOME); ?>" title="<?php esc_attr_e('Plugin Homepage', 'ga-google-analytics'); ?>"><?php echo GAP_NAME; ?></a> 
 			<?php esc_attr_e('by', 'ga-google-analytics'); ?> 
-			<a target="_blank" href="https://twitter.com/perishable" title="<?php esc_attr_e('Jeff Starr on Twitter', 'ga-google-analytics'); ?>">Jeff Starr</a> 
+			<a target="_blank" rel="noopener noreferrer" href="https://twitter.com/perishable" title="<?php esc_attr_e('Jeff Starr on Twitter', 'ga-google-analytics'); ?>">Jeff Starr</a> 
 			<?php esc_attr_e('@', 'ga-google-analytics'); ?> 
-			<a target="_blank" href="https://monzillamedia.com/" title="<?php esc_attr_e('Obsessive Web Development', 'ga-google-analytics'); ?>">Monzilla Media</a>
+			<a target="_blank" rel="noopener noreferrer" href="https://monzillamedia.com/" title="<?php esc_attr_e('Obsessive Web Development', 'ga-google-analytics'); ?>">Monzilla Media</a>
 			
 		</div>
 		

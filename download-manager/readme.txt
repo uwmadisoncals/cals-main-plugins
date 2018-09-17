@@ -107,10 +107,11 @@ Use [Box.com Explorer](https://www.wpdownloadmanager.com/download/box-com-explor
 = Add-ons =
 Download and Install following free add-on to add additional features as per your need
 
+* [Gutenberg Blocks](https://www.wpdownloadmanager.com/download/gutenberg-blocks/) for gutenberg editor
 * [Advanced Tiny-Mce Button](https://www.wpdownloadmanager.com/download/advanced-tinymce-button/) for editor button to generate short-codes
 * [Extended Short-codes](https://www.wpdownloadmanager.com/download/wpdm-extended-short-codes/) for tree view ( [wpdm_tree] ), slider ( [wpdm_slider] ) & carousel ( [wpdm_carousel] )
-* [WPDM Button Templates](https://www.wpdownloadmanager.com/download/wpdm-button-templates/) for pre-designed colorful button styles
 * [WPDM Image Button](https://www.wpdownloadmanager.com/download/wpdm-image-button/) to replace download link label with a custom designed image
+* [WPDM Button Templates](https://www.wpdownloadmanager.com/download/wpdm-button-templates/) for pre-designed colorful button styles
 
 = Mobile Apps =
 Check download stats and get a push notification when someone downloads, install:
@@ -156,6 +157,26 @@ Check download stats and get a push notification when someone downloads, install
 15. Quick Add Panel
 
 == Changelog ==
+
+= 2.9.81 =
+* Changed Font Awesome enqueue ID
+* Added some missing file type icons
+
+= 2.9.80 =
+* Fixed an issue with the font awesome enqueue
+
+= 2.9.79 =
+* Compatibility update for gutenberg
+* Updated font awesome
+
+= 2.9.78 =
+* Fixed an issue with category access
+* Fixed SQL issue in download history page
+
+= 2.9.77 =
+* Fixed the icon size issue with link template
+* Updated crypt class
+* Updated category access settings
 
 = 2.9.76 =
 * Fixed the issue with pagination class name

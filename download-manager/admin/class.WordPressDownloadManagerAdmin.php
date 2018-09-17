@@ -20,6 +20,7 @@ class WordPressDownloadManagerAdmin
     {
         add_action('admin_enqueue_scripts', array($this, 'enqueueScripts'));
         add_action('admin_init', array($this, 'metaBoxes'), 0);
+        add_action('init', array($this, 'registerScripts'), 0);
         add_action('wp_ajax_updatenow', array($this, 'updateNow'));
         add_action('admin_head', array($this, 'adminHead'));
 
@@ -30,10 +31,18 @@ class WordPressDownloadManagerAdmin
 
     }
 
+    function registerScripts(){
+        wp_register_script('wpdm-bootstrap', WPDM_BASE_URL . 'assets/bootstrap/js/bootstrap.min.js', array('jquery'));
+        wp_register_style('wpdm-bootstrap', WPDM_BASE_URL . 'assets/bootstrap/css/bootstrap.min.css');
+        wp_register_style('wpdm-font-awesome', WPDM_BASE_URL . 'assets/fontawesome/css/all.css');
+        wp_register_style('wpdm-front', WPDM_BASE_URL . 'assets/css/front.css');
+    }
+
     /**
      * Enqueue admin scripts & styles
      */
     function enqueueScripts($hook){
+
 
         if(get_post_type()=='wpdmpro' || wpdm_query_var('post_type') == 'wpdmpro' || $hook == 'index.php'){
             wp_enqueue_script('jquery');
@@ -55,12 +64,12 @@ class WordPressDownloadManagerAdmin
             wp_enqueue_style('jqui-css', plugins_url('/download-manager/assets/jqui/theme/jquery-ui.css'));
 
             wp_enqueue_script('wpdm-admin', plugins_url('/download-manager/assets/js/wpdm-admin.js'), array('jquery'));
-            wp_enqueue_style('font-awesome', WPDM_BASE_URL.'assets/fontawesome/css/fontawesome.min.css');
+            wp_enqueue_style('wpdm-font-awesome' );
         }
 
         if(get_post_type()=='wpdmpro' || wpdm_query_var('post_type') == 'wpdmpro' || $hook == 'index.php'){
-            wp_enqueue_script('wpdm-bootstrap', plugins_url('/download-manager/assets/bootstrap/js/bootstrap.min.js'), array('jquery'));
-            wp_enqueue_style('wpdm-bootstrap', plugins_url('/download-manager/assets/bootstrap/css/bootstrap.css'));
+            wp_enqueue_script('wpdm-bootstrap' );
+            wp_enqueue_style('wpdm-bootstrap' );
             //wp_enqueue_style('wpdm-bootstrap-theme', plugins_url('/download-manager/assets/bootstrap/css/bootstrap-theme.min.css'));
             wp_enqueue_style('wpdm-admin-styles', plugins_url('/download-manager/assets/css/admin-styles.css'));
         }
@@ -114,6 +123,11 @@ class WordPressDownloadManagerAdmin
         remove_submenu_page( 'index.php', 'wpdm-welcome' );
         ?>
         <script type="text/javascript">
+
+            var wpdmConfig = {
+                siteURL: '<?php echo site_url(); ?>'
+            };
+
             jQuery(function () {
 
 

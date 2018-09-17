@@ -4,7 +4,7 @@
  * @requires WPGMZA.Marker
  * @pro-requires WPGMZA.ProMarker
  */
-(function($) {
+jQuery(function($) {
 	
 	var Parent;
 	
@@ -168,8 +168,7 @@
 		
 		this.setPosition(latLngAfterDrag);
 		
-		this.trigger({type: "dragend", latLng: latLngAfterDrag})
-		$(this.element).trigger("dragend.wpgmza");
+		this.trigger({type: "dragend", latLng: latLngAfterDrag});
 	}
 	
-})(jQuery);
+});

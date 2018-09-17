@@ -2,7 +2,7 @@
 //
 // conatins common vars and functions
 //
-var wppaJsVersion = '6.9.08';
+var wppaJsVersion = '6.9.10';
 
 // Important notice:
 // All external vars that may be given a value in wppa-non-admin.php must be declared here and not in other front-end js files!!
@@ -303,11 +303,9 @@ function wppaDoInit( autoOnly ) {
 
 	// Make sure ajax spinners dies
 	jQuery( '.wppa-ajax-spin' ).stop().fadeOut();
-	setTimeout( function() {jQuery( '.wppa-ajax-spin' ).stop().fadeOut();}, 1000 );
 
 	// Make sure ovl spinner dies
-	jQuery( '.wppa-ovl-spin' ).stop().fadeOut();
-	setTimeout( function() {jQuery( '.wppa-ovl-spin' ).stop().fadeOut();}, 1000 );
+	jQuery( '.wppa-ovl-spin' ).hide();
 
 	// Fade ubbs out
 	setTimeout( function() {

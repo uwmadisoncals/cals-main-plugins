@@ -63,7 +63,7 @@ class Ai1wmme_Export_Config_File {
 		$archive->set_file_pointer( $archive_bytes_offset );
 
 		// Add multisite.json to archive
-		if ( $archive->add_file( ai1wm_multisite_path( $params ), AI1WM_MULTISITE_NAME, $multisite_bytes_written, $multisite_bytes_offset, 10 ) ) {
+		if ( $archive->add_file( ai1wm_multisite_path( $params ), AI1WM_MULTISITE_NAME, $multisite_bytes_written, $multisite_bytes_offset ) ) {
 
 			// Set progress
 			Ai1wm_Status::info( __( 'Done archiving multisite configuration file.', AI1WMME_PLUGIN_NAME ) );

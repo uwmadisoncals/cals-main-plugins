@@ -3,7 +3,7 @@
  * @module Marker
  * @requires WPGMZA
  */
-(function($) {
+jQuery(function($) {
 	/**
 	 * Constructor
 	 * @param json to load (optional)
@@ -239,6 +239,11 @@
 		
 	}
 	
+	WPGMZA.Marker.prototype.setOptions = function()
+	{
+		
+	}
+	
 	WPGMZA.Marker.prototype.panIntoView = function()
 	{
 		if(!this.map)
@@ -272,4 +277,4 @@
 	}
 	
 	
-})(jQuery);
+});

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 6.8.09
+* Version 6.8.13
 *
 */
 
@@ -562,15 +562,15 @@ global $upload_album;
 				}
 				if ( ! $file['error'][$i] ) {
 					wppa_pdf_preprocess( $file, $upload_album, $i );
-					$id = wppa_insert_photo( $file['tmp_name'][$i], $upload_album, $file['name'][$i] );
+					$id = wppa_insert_photo( $file['tmp_name'][$i], $upload_album, wppa_sima($file['name'][$i]) );
 					if ( $id ) {
 						$uploaded_a_file = true;
 						$count++;
 						wppa_pdf_postprocess( $id );
-						wppa_backend_upload_mail( $id, $upload_album, $file['name'][$i] );
+						wppa_backend_upload_mail( $id, $upload_album, wppa_sima($file['name'][$i]) );
 					}
 					else {
-						wppa_error_message( __( 'Error inserting photo' , 'wp-photo-album-plus') . ' ' . wppa_sanitize_file_name( basename( $file['name'][$i] ) ) . '.' );
+						wppa_error_message( __( 'Error inserting photo' , 'wp-photo-album-plus') . ' ' . wppa_sanitize_file_name( wppa_sima( basename( $file['name'][$i] ) ) ) . '.' );
 						return;
 					}
 				}
@@ -598,12 +598,12 @@ global $upload_album;
 	foreach ( $_FILES as $file ) {
 		if ( $file['tmp_name'] != '' ) {
 			wppa_pdf_preprocess( $file, $upload_album );
-			$id = wppa_insert_photo( $file['tmp_name'], $upload_album, $file['name'] );
+			$id = wppa_insert_photo( $file['tmp_name'], $upload_album, wppa_sima( $file['name'] ) );
 			if ( $id ) {
 				$uploaded_a_file = true;
 				$count++;
 				wppa_pdf_postprocess( $id );
-				wppa_backend_upload_mail( $id, $upload_album, $file['name'] );
+				wppa_backend_upload_mail( $id, $upload_album, wppa_sima( $file['name'] ) );
 			}
 			else {
 				wppa_error_message( __( 'Error inserting photo' , 'wp-photo-album-plus') . ' ' . wppa_sanitize_file_name( basename( $file['name'] ) ) . '.' );

@@ -88,7 +88,22 @@ final class AAM_Core_Gateway {
      * @access public
      */
     public function denyAccess($params = null) {
-        AAM_Core_API::reject();
+        AAM_Core_API::reject(AAM_Core_Api_Area::get(), $params);
+    }
+    
+    /**
+     * Check if capability exists
+     * 
+     * This method checks if provided capability exists (registered for any role).
+     * 
+     * @param string $capability
+     * 
+     * @return boolean
+     * 
+     * @access public
+     */
+    public function capabilityExists($capability) {
+        return AAM_Core_API::capabilityExists($capability);
     }
     
     /**

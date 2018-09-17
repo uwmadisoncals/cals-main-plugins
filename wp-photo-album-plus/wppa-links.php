@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Frontend links
-* Version 6.9.06
+* Version 6.9.11
 *
 */
 
@@ -1537,7 +1537,7 @@ global $wpdb;
 				//$result['url'] = str_replace( 'xxx', $is_video['0'], $result['url'] );
 			}
 			else {
-				if ( wppa_switch( 'lb_hres' ) && ! wppa_is_stereo( $id ) ) {
+				if ( ( wppa_switch( 'lb_hres' ) && ! wppa_is_stereo( $id ) && ! wppa_is_panorama( $id ) ) || ( wppa_is_panorama( $id ) && ! wppa_is_mobile() ) ) {
 					$result['url'] = wppa_get_hires_url( $id );
 				}
 				else {

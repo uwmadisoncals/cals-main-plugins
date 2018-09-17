@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the stats widget
-* Version 6.9.00
+* Version 6.9.12
 *
 */
 class WppaStatsWidget extends WP_Widget {
@@ -147,6 +147,11 @@ class WppaStatsWidget extends WP_Widget {
     // Update settings
     function update( $new_instance, $old_instance ) {
 		$instance = $new_instance;
+
+		// Defaults
+		$this->defaults['title'] = __( 'Statistics', 'wp-photo-album-plus' );
+		$instance = wp_parse_args( (array) $instance, $this->defaults );
+
 		$instance['title'] = strip_tags( $new_instance['title'] );
         return $instance;
     }

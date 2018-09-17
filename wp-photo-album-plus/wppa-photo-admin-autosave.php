@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.9.08
+* Version 6.9.11
 *
 */
 
@@ -536,10 +536,10 @@ function wppaToggleExif( id, count ) {
 			$linktitle 		= stripslashes( $photo['linktitle'] );
 			$alt 			= stripslashes( $photo['alt'] );
 			$filename 		= $photo['filename'];
-			$photox 		= $photo['photox'];
-			$photoy 		= $photo['photoy'];
-			$videox 		= $photo['videox'];
-			$videoy 		= $photo['videoy'];
+			$photox 		= wppa_get_photox( $id );
+			$photoy 		= wppa_get_photoy( $id );
+			$videox 		= wppa_get_videox( $id );
+			$videoy 		= wppa_get_videoy( $id );
 			$location 		= $photo['location'];
 			$status 		= $photo['status'];
 			$tags 			= trim( stripslashes( $photo['tags'] ), ',' );

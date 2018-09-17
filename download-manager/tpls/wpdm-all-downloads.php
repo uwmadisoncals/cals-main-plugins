@@ -172,10 +172,12 @@ if(isset($params['jstable']) && $params['jstable']==1):
 
             $q = new WP_Query($query_params);
             $total_files = $q->found_posts;
+            global $post;
             while ($q->have_posts()): $q->the_post();
 
                 $ext = "unknown";
-                $data = wpdm_custom_data(get_the_ID());
+                $data = (array)$post + wpdm_custom_data(get_the_ID());
+
                 if(isset($data['files'])&&count($data['files'])){
                     if(count($data['files']) == 1) {
                         $tmpavar = $data['files'];

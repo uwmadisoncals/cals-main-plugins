@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: Simple Download Monitor
- * Plugin URI: https://www.tipsandtricks-hq.com/simple-wordpress-download-monitor-plugin
+ * Plugin URI: https://simple-download-monitor.com/
  * Description: Easily manage downloadable files and monitor downloads of your digital files from your WordPress site.
- * Version: 3.6.6
+ * Version: 3.6.8
  * Author: Tips and Tricks HQ, Ruhul Amin, Josh Lobe
  * Author URI: https://www.tipsandtricks-hq.com/development-center
  * License: GPL2
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('WP_SIMPLE_DL_MONITOR_VERSION', '3.6.6');
+define('WP_SIMPLE_DL_MONITOR_VERSION', '3.6.8');
 define('WP_SIMPLE_DL_MONITOR_DIR_NAME', dirname(plugin_basename(__FILE__)));
 define('WP_SIMPLE_DL_MONITOR_URL', plugins_url('', __FILE__));
 define('WP_SIMPLE_DL_MONITOR_PATH', plugin_dir_path(__FILE__));
@@ -202,6 +202,7 @@ class simpleDownloadManager {
 	    add_action('save_post', array($this, 'sdm_save_description_meta_data'));  // Save 'description' metabox
 	    add_action('save_post', array($this, 'sdm_save_upload_meta_data'));  // Save 'upload file' metabox
 	    add_action('save_post', array($this, 'sdm_save_dispatch_meta_data'));  // Save 'dispatch' metabox
+	    add_action('save_post', array($this, 'sdm_save_misc_properties_meta_data'));  // Save 'misc properties/settings' metabox
 	    add_action('save_post', array($this, 'sdm_save_thumbnail_meta_data'));  // Save 'thumbnail' metabox
 	    add_action('save_post', array($this, 'sdm_save_statistics_meta_data'));  // Save 'statistics' metabox
 	    add_action('save_post', array($this, 'sdm_save_other_details_meta_data'));  // Save 'other details' metabox
@@ -305,6 +306,7 @@ class simpleDownloadManager {
 	add_meta_box('sdm_description_meta_box', __('Description', 'simple-download-monitor'), array($this, 'display_sdm_description_meta_box'), 'sdm_downloads', 'normal', 'default');
 	add_meta_box('sdm_upload_meta_box', __('Downloadable File (Visitors will download this item)', 'simple-download-monitor'), array($this, 'display_sdm_upload_meta_box'), 'sdm_downloads', 'normal', 'default');
 	add_meta_box('sdm_dispatch_meta_box', __('PHP Dispatch or Redirect', 'simple-download-monitor'), array($this, 'display_sdm_dispatch_meta_box'), 'sdm_downloads', 'normal', 'default');
+        add_meta_box('sdm_misc_properties_meta_box', __('Miscellaneous Download Properties', 'simple-download-monitor'), array($this, 'display_sdm_misc_properties_meta_box'), 'sdm_downloads', 'normal', 'default');// Meta box for misc properies/settings 
 	add_meta_box('sdm_thumbnail_meta_box', __('File Thumbnail (Optional)', 'simple-download-monitor'), array($this, 'display_sdm_thumbnail_meta_box'), 'sdm_downloads', 'normal', 'default');
 	add_meta_box('sdm_stats_meta_box', __('Statistics', 'simple-download-monitor'), array($this, 'display_sdm_stats_meta_box'), 'sdm_downloads', 'normal', 'default');
 	add_meta_box('sdm_other_details_meta_box', __('Other Details (Optional)', 'simple-download-monitor'), array($this, 'display_sdm_other_details_meta_box'), 'sdm_downloads', 'normal', 'default');
@@ -365,6 +367,25 @@ class simpleDownloadManager {
 	echo '<label for="sdm_item_dispatch">' . __('Dispatch the file via PHP directly instead of redirecting to it. PHP Dispatching keeps the download URL hidden. Dispatching works only for local files (files that you uploaded to this site via this plugin or media library).', 'simple-download-monitor') . '</label>';
 
 	wp_nonce_field('sdm_dispatch_box_nonce', 'sdm_dispatch_box_nonce_check');
+    }
+    // Open Download in new window 
+    public function display_sdm_misc_properties_meta_box($post) {
+        
+        //Check the open in new window value
+	$new_window = get_post_meta($post->ID, 'sdm_item_new_window', true);
+	if ($new_window === '') {
+	    // No value yet (either new item or saved with older version of plugin)
+	    $screen = get_current_screen();
+	    if ($screen->action === 'add') {                
+		//New item: we can set a default value as per plugin settings. If a general settings is introduced at a later stage.
+                //Does nothing at the moment.
+	    }
+	}
+        
+	echo '<p> <input id="sdm_item_new_window" type="checkbox" name="sdm_item_new_window" value="yes"' . checked(true, $new_window, false) . ' />';
+	echo '<label for="sdm_item_new_window">' . __('Open download in a new window.', 'simple-download-monitor') . '</label> </p>';
+        
+	wp_nonce_field('sdm_misc_properties_box_nonce', 'sdm_misc_properties_box_nonce_check');
     }
 
     public function display_sdm_thumbnail_meta_box($post) {  // Thumbnail upload metabox
@@ -433,26 +454,43 @@ class simpleDownloadManager {
     }
 
     public function display_sdm_other_details_meta_box($post) { //Other details metabox
+        
+        $show_date_fd = get_post_meta($post->ID, 'sdm_item_show_date_fd', true);
+        $sdm_item_show_file_size_fd = get_post_meta($post->ID, 'sdm_item_show_file_size_fd', true);
+        $sdm_item_show_item_version_fd = get_post_meta($post->ID, 'sdm_item_show_item_version_fd', true);
+
 	$file_size = get_post_meta($post->ID, 'sdm_item_file_size', true);
 	$file_size = isset($file_size) ? $file_size : '';
 
 	$version = get_post_meta($post->ID, 'sdm_item_version', true);
 	$version = isset($version) ? $version : '';
-
+        
 	echo '<div class="sdm-download-edit-filesize">';
-	_e('File Size: ', 'simple-download-monitor');
+        echo '<strong>'.__('File Size: ', 'simple-download-monitor').'</strong>';
 	echo '<br />';
 	echo ' <input type="text" name="sdm_item_file_size" value="' . esc_attr($file_size) . '" size="20" />';
-	echo '<p class="description">' . __('Enter the size of this file (example value: 2.15 MB). You can show this value in the fancy display by using a shortcode parameter.', 'simple-download-monitor') . '</p>';
-	echo '</div>';
+	echo '<p class="description">' . __('Enter the size of this file (example value: 2.15 MB).', 'simple-download-monitor') . '</p>';
+	echo '<div class="sdm-download-edit-show-file-size"> <input id="sdm_item_show_file_size_fd" type="checkbox" name="sdm_item_show_file_size_fd" value="yes"' . checked(true, $sdm_item_show_file_size_fd, false) . ' />';
+	echo '<label for="sdm_item_show_file_size_fd">' . __('Show file size in fancy display.', 'simple-download-monitor') . '</label> </div>';	
+        echo '</div>';
+        echo '<hr />';
 
 	echo '<div class="sdm-download-edit-version">';
-	_e('Version: ', 'simple-download-monitor');
+        echo '<strong>'.__('Version: ', 'simple-download-monitor').'</strong>';
 	echo '<br />';
 	echo ' <input type="text" name="sdm_item_version" value="' . esc_attr($version) . '" size="20" />';
-	echo '<p class="description">' . __('Enter the version number for this item if any (example value: v2.5.10). You can show this value in the fancy display by using a shortcode parameter.', 'simple-download-monitor') . '</p>';
+	echo '<p class="description">' . __('Enter the version number for this item if any (example value: v2.5.10).', 'simple-download-monitor') . '</p>';
+	echo '<div class="sdm-download-edit-show-item-version"> <input id="sdm_item_show_item_version_fd" type="checkbox" name="sdm_item_show_item_version_fd" value="yes"' . checked(true, $sdm_item_show_item_version_fd, false) . ' />';
+	echo '<label for="sdm_item_show_item_version_fd">' . __('Show version number in fancy display.', 'simple-download-monitor') . '</label> </div>';        
 	echo '</div>';
-
+        echo '<hr />';
+               
+        echo '<div class="sdm-download-edit-show-publish-date">';
+        echo '<strong>'.__('Publish Date: ', 'simple-download-monitor').'</strong>';
+	echo '<br /> <input id="sdm_item_show_date_fd" type="checkbox" name="sdm_item_show_date_fd" value="yes"' . checked(true, $show_date_fd, false) . ' />';
+	echo '<label for="sdm_item_show_date_fd">' . __('Show download published date in fancy display.', 'simple-download-monitor') . '</label>';
+        echo '</div>';
+        
 	wp_nonce_field('sdm_other_details_nonce', 'sdm_other_details_nonce_check');
     }
 
@@ -506,6 +544,19 @@ class simpleDownloadManager {
 	$value = filter_input(INPUT_POST, 'sdm_item_dispatch', FILTER_VALIDATE_BOOLEAN);
 	update_post_meta($post_id, 'sdm_item_dispatch', $value);
     }
+    
+    public function sdm_save_misc_properties_meta_data($post_id) {
+	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+	    return;
+	}
+	if (!isset($_POST['sdm_misc_properties_box_nonce_check']) || !wp_verify_nonce($_POST['sdm_misc_properties_box_nonce_check'], 'sdm_misc_properties_box_nonce')) {
+	    return;
+	}
+	// Get POST-ed data as boolean value
+	$new_window_open = filter_input(INPUT_POST, 'sdm_item_new_window', FILTER_VALIDATE_BOOLEAN);
+
+	update_post_meta($post_id, 'sdm_item_new_window', $new_window_open);
+    }
 
     public function sdm_save_thumbnail_meta_data($post_id) {  // Save Thumbnail Upload metabox
 	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE){
@@ -546,6 +597,15 @@ class simpleDownloadManager {
 	    return;
 	}
 
+        $show_date_fd = filter_input(INPUT_POST, 'sdm_item_show_date_fd', FILTER_VALIDATE_BOOLEAN);
+        update_post_meta($post_id, 'sdm_item_show_date_fd', $show_date_fd);
+
+        $sdm_item_show_file_size_fd = filter_input(INPUT_POST, 'sdm_item_show_file_size_fd', FILTER_VALIDATE_BOOLEAN);
+        update_post_meta($post_id, 'sdm_item_show_file_size_fd', $sdm_item_show_file_size_fd);
+
+        $sdm_item_show_item_version_fd = filter_input(INPUT_POST, 'sdm_item_show_item_version_fd', FILTER_VALIDATE_BOOLEAN);
+        update_post_meta($post_id, 'sdm_item_show_item_version_fd', $sdm_item_show_item_version_fd);
+        
 	if (isset($_POST['sdm_item_file_size'])) {
 	    update_post_meta($post_id, 'sdm_item_file_size', sanitize_text_field($_POST['sdm_item_file_size']));
 	}

@@ -499,6 +499,7 @@ function wpdm_query_var($var, $params = array())
     $validate = is_array($params) && isset($params['validate']) ? $params['validate'] : $validate;
 
     switch ($validate) {
+        case 'int':
         case 'num':
             $val = intval($val);
             break;

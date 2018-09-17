@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.9.08
+* Version 6.9.13
 *
 */
 
@@ -136,11 +136,11 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 					else {
 						$imgsize = getimagesize($file['tmp_name']);
 						if ( !is_array($imgsize) || !isset($imgsize[2]) || $imgsize[2] != 3 ) {
-							wppa_error_message(sprintf(__('Uploaded file %s is not a .png file', 'wp-photo-album-plus'), $file['name']).' (Type='.$file['type'].').');
+							wppa_error_message(sprintf(__('Uploaded file %s is not a .png file', 'wp-photo-album-plus'), wppa_sima( $file['name'] ) ) . ' (Type='.$file['type'].').');
 						}
 						else {
-							copy($file['tmp_name'], WPPA_UPLOAD_PATH . '/watermarks/' . basename($file['name']));
-							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), basename($file['name'])));
+							copy($file['tmp_name'], WPPA_UPLOAD_PATH . '/watermarks/' . wppa_sima(basename($file['name'])));
+							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), wppa_sima(basename($file['name']))));
 						}
 					}
 				}
@@ -156,12 +156,12 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 						wppa_error_message(sprintf(__('Upload error %s', 'wp-photo-album-plus'), $file['error']));
 					}
 					else {
-						if ( substr($file['name'], -4) != '.ttf' ) {
-							wppa_error_message(sprintf(__('Uploaded file %s is not a .ttf file', 'wp-photo-album-plus'), $file['name']).' (Type='.$file['type'].').');
+						if ( substr(wppa_sima($file['name']), -4) != '.ttf' ) {
+							wppa_error_message(sprintf(__('Uploaded file %s is not a .ttf file', 'wp-photo-album-plus'), wppa_sima($file['name']) ).' (Type='.$file['type'].').');
 						}
 						else {
-							copy($file['tmp_name'], WPPA_UPLOAD_PATH . '/fonts/' . basename($file['name']));
-							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), basename($file['name'])));
+							copy($file['tmp_name'], WPPA_UPLOAD_PATH . '/fonts/' . wppa_sima(basename($file['name'])));
+							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), wppa_sima(basename($file['name']))));
 						}
 					}
 				}
@@ -179,7 +179,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 					else {
 						$imgsize = getimagesize($file['tmp_name']);
 						if ( ! is_array( $imgsize ) || ! isset( $imgsize[2] ) || $imgsize[2] < 1 || $imgsize[2] > 3 ) {
-							wppa_error_message(sprintf(__('Uploaded file %s is not a valid image file', 'wp-photo-album-plus'), $file['name']).' (Type='.$file['type'].').');
+							wppa_error_message(sprintf(__('Uploaded file %s is not a valid image file', 'wp-photo-album-plus'), wppa_sima($file['name'])).' (Type='.$file['type'].').');
 						}
 						else {
 							switch ( $imgsize[2] ) {
@@ -198,7 +198,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 
 							// Thumbx, thumby, phtox and photoy must be cleared for the new stub
 							$wpdb->query( "UPDATE `" . WPPA_PHOTOS ."` SET `thumbx` = 0, `thumby` = 0, `photox` = 0, `photoy` = 0 WHERE `ext` = 'xxx'" );
-							wppa_alert( sprintf( __( 'Upload of %s done', 'wp-photo-album-plus'), basename( $file['name'] ) ) );
+							wppa_alert( sprintf( __( 'Upload of %s done', 'wp-photo-album-plus'), basename( wppa_sima( $file['name'] ) ) ) );
 						}
 					}
 				}
@@ -459,6 +459,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							for( i=1;i<15;i++ ) { jQuery('#wppa_table_'+i).css('display', 'inline');}
 							jQuery( '.wppa-setting' ).css('display','');
 							jQuery( '.wppa-h' ).css( 'display', 'none' );
+							jQuery( '.wppa-video' ).css( 'display', '' );
 							"
 			/>
 
@@ -794,26 +795,26 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$help .= '\n'.esc_js(__('The use of a non-default value is particularly usefull when you make use of lightbox functionality.', 'wp-photo-album-plus'));
 							$slug = 'wppa_resize_to';
 							$px = __('pixels', 'wp-photo-album-plus');
-							$options = array(	__('Fit within rectangle as set in Table I-B1,2', 'wp-photo-album-plus'), 
-												'640 x 480 '.$px, 
-												'800 x 600 '.$px, 
-												'1024 x 768 '.$px, 
-												'1200 x 900 '.$px, 
-												'1280 x 960 '.$px, 
-												'1366 x 768 '.$px, 
+							$options = array(	__('Fit within rectangle as set in Table I-B1,2', 'wp-photo-album-plus'),
+												'640 x 480 '.$px,
+												'800 x 600 '.$px,
+												'1024 x 768 '.$px,
+												'1200 x 900 '.$px,
+												'1280 x 960 '.$px,
+												'1366 x 768 '.$px,
 												'1920 x 1080 '.$px,
 												'2400 x 1200 '.$px,
 												'3600 x 1800 '.$px,
 												'4800 x 2400 '.$px,
 												'6000 x 3000 '.$px,
 												);
-							$values = array( 	'0', 
-												'640x480', 
-												'800x600', 
-												'1024x768', 
-												'1200x900', 
-												'1280x960', 
-												'1366x768', 
+							$values = array( 	'0',
+												'640x480',
+												'800x600',
+												'1024x768',
+												'1200x900',
+												'1280x960',
+												'1366x768',
 												'1920x1080',
 												'2400x1200',
 												'3600x1800',
@@ -1172,7 +1173,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							wppa_setting($slug, '9', $name, $desc, $html, $help, $clas, $tags);
 
 							$name = __('Thumbnail area max size', 'wp-photo-album-plus');
-							$desc = __('The max height of the thumbnais area', 'wp-photo-album-plus');
+							$desc = __('The max height of the thumbnail area', 'wp-photo-album-plus');
 							$help = __('A number > 1 is pixelsize, a number < 1 is fraction of the viewport height, 0 is no limit', 'wp-photo-album-plus');
 							$slug = 'wppa_thumb_area_size';
 							$html = wppa_input($slug, '40px', '', __('pixels / fraction', 'wp-photo-album-plus'));
@@ -4088,7 +4089,8 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$desc = __('Enable panorama photo support.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_enable_panorama';
-							$html = wppa_checkbox($slug);
+							$onch = 'alert(\''.__('The page will be reloaded after the action has taken place.', 'wp-photo-album-plus').'\');wppaRefreshAfter();';
+							$html = wppa_checkbox($slug, $onch);
 							$clas = '';
 							$tags = 'system';
 							wppa_setting($slug, '24.2', $name, $desc, $html, $help, $clas, $tags);
@@ -5033,7 +5035,6 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$tags = 'comment,mail';
 							wppa_setting($slug, '5.4', $name, $desc, $html, $help, $clas, $tags);
 
-
 							$name = __('Comment ntfy added', 'wp-photo-album-plus');
 							$desc = __('Show "Comment added" after successfull adding a comment.', 'wp-photo-album-plus');
 							$help = '';
@@ -5229,6 +5230,93 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$clas = '';
 							$tags = 'lightbox,layout';
 							wppa_setting($slug, '10', $name, $desc, $html, $help, $clas, $tags);
+							}
+
+							if ( wppa_switch( 'enable_panorama' ) ) {
+
+							wppa_setting_subheader( 'H', '1', __( 'Panorama related settings. These settings have effect only when Table IV-A24.2 is ticked' , 'wp-photo-album-plus') );
+
+								$name = __( 'Control bar', 'wp-photo-album-plus' );
+								$desc = __( 'Select when the control bar must be displayed', 'wp-photo-album-plus' );
+								$help = '';
+								$slug = 'wppa_panorama_control';
+								$opts = array( 	__( 'Always', 'wp-photo-album-plus' ),
+												__( 'On mobile only', 'wp-photo-album-plus' ),
+												__( 'None', 'wp-photo-album-plus' ),
+												);
+								$vals = array(	'all',
+												'mobile',
+												'none',
+												);
+								$html = wppa_select($slug, $opts, $vals);
+								$clas = '';
+								$tags = '';
+								wppa_setting( $slug, '1', $name, $desc, $html, $help, $clas, $tags );
+
+								$name = __( 'Manual movement', 'wp-photo-album-plus' );
+								$desc = __( 'Select if movement by drag and drop is allowed', 'wp-photo-album-plus' );
+								$help = '';
+								$slug = 'wppa_panorama_manual';
+								$opts = array(  __( 'Yes', 'wp-photo-album-plus' ),
+												__( 'No', 'wp-photo-album-plus' ),
+												);
+								$vals = array( 	'all',
+												'none',
+												);
+								$html = wppa_select($slug, $opts, $vals);
+								$clas = '';
+								$tags = '';
+								wppa_setting( $slug, '2', $name, $desc, $html, $help, $clas, $tags );
+
+								$name = __( 'Auto panning', 'wp-photo-album-plus' );
+								$desc = __( 'Start the display panning', 'wp-photo-album-plus' );
+								$help = '';
+								$slug = 'wppa_panorama_autorun';
+								$opts = array( 	__( 'no', 'wp-photo-album-plus' ),
+												__( 'left', 'wp-photo-album-plus' ),
+												__( 'right', 'wp-photo-album-plus' ),
+												);
+								$vals = array( 	'none',
+												'left',
+												'right',
+												);
+								$html = wppa_select($slug, $opts, $vals);
+								$clas = '';
+								$tags = '';
+								wppa_setting( $slug, '3', $name, $desc, $html, $help, $clas, $tags );
+
+								$name = __( 'Auto panning speed', 'wp-photo-album-plus' );
+								$desc = __( 'The speed of the auto panning movement', 'wp-photo-album-plus' );
+								$help = '';
+								$slug = 'wppa_panorama_autorun_speed';
+								$opts = array( 	__( 'very slow', 'wp-photo-album-plus' ),
+												__( 'slow', 'wp-photo-album-plus' ),
+												__( 'normal', 'wp-photo-album-plus' ),
+												__( 'fast', 'wp-photo-album-plus' ),
+												__( 'very fast', 'wp-photo-album-plus' ),
+												);
+								$vals = array( '1', '2', '3', '5', '8' );
+								$html = wppa_select($slug, $opts, $vals);
+								$clas = '';
+								$tags = '';
+								wppa_setting( $slug, '3.1', $name, $desc, $html, $help, $clas, $tags );
+
+								$name = __( 'Zoom sensitivity', 'wp-photo-album-plus' );
+								$desc = __( 'The speed of zooming by mouse wheel', 'wp-photo-album-plus' );
+								$help = '';
+								$slug = 'wppa_panorama_wheel_sensitivity';
+								$opts = array( 	__( 'very low', 'wp-photo-album-plus' ),
+												__( 'low', 'wp-photo-album-plus' ),
+												__( 'normal', 'wp-photo-album-plus' ),
+												__( 'high', 'wp-photo-album-plus' ),
+												__( 'very high', 'wp-photo-album-plus' ),
+												);
+								$vals = array( '1', '2', '3', '5', '8' );
+								$html = wppa_select($slug, $opts, $vals);
+								$clas = '';
+								$tags = '';
+								wppa_setting( $slug, '3.1', $name, $desc, $html, $help, $clas, $tags );
+
 							}
 							?>
 						</tbody>

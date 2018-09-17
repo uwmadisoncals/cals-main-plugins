@@ -98,12 +98,12 @@
 /******/ 	__webpack_require__.oe = function(err) { console.error(err); throw err; };
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 516);
+/******/ 	return __webpack_require__(__webpack_require__.s = 576);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 277:
+/***/ 302:
 /***/ (function(module, exports, __webpack_require__) {
 
 /**!
@@ -4949,30 +4949,30 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ }),
 
-/***/ 32:
+/***/ 34:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {if(!global["MailPoetLib"]) global["MailPoetLib"] = {};
-module.exports = global["MailPoetLib"]["Hooks"] = __webpack_require__(518);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+module.exports = global["MailPoetLib"]["Hooks"] = __webpack_require__(578);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
 
-/***/ 516:
+/***/ 576:
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(277);
-__webpack_require__(517);
-module.exports = __webpack_require__(32);
+__webpack_require__(302);
+__webpack_require__(577);
+module.exports = __webpack_require__(34);
 
 
 /***/ }),
 
-/***/ 517:
+/***/ 577:
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* eslint-disable func-names */
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(277)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (Handlebars) {
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(302)], __WEBPACK_AMD_DEFINE_RESULT__ = (function (Handlebars) {
   // Handlebars helpers
   Handlebars.registerHelper('concat', function () {
     var size = (arguments.length - 1);
@@ -5135,7 +5135,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* eslint-disabl
 
 /***/ }),
 
-/***/ 518:
+/***/ 578:
 /***/ (function(module, exports) {
 
 ( function( window, undefined ) {
@@ -5393,7 +5393,7 @@ module.exports = wp.hooks;
 
 /***/ }),
 
-/***/ 8:
+/***/ 6:
 /***/ (function(module, exports) {
 
 var g;

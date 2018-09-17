@@ -32,7 +32,13 @@ function ga_google_analytics_tracking_code() {
 	
 	extract(ga_google_analytics_options());
 	
-	if (empty($tracking_id)) return;
+	if (empty($tracking_id)) {
+		
+		echo $custom;
+		
+		return;
+		
+	}
 	
 	if (empty($tracking_method)) return;
 	
@@ -109,7 +115,7 @@ function ga_google_analytics_global() {
 		<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $tracking_id; ?>"></script>
 		<script>
 			window.dataLayer = window.dataLayer || [];
-			function gtag(){dataLayer.push(arguments)};
+			function gtag(){dataLayer.push(arguments);}
 			gtag('js', new Date());
 			gtag('config', '<?php echo $tracking_id; ?>'<?php if ($tracker_object) echo ', '. $tracker_object; ?>);
 			<?php if ($custom_code) echo $custom_code; ?>

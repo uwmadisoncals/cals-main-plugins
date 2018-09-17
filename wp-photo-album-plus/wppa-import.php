@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.8.09
+* Version 6.8.13
 *
 */
 
@@ -127,7 +127,7 @@ global $wppa_session;
 	if ( isset( $_POST['wppa-import-submit'] ) ) {
 		if ( wppa( 'ajax' ) ) {
 			if ( ! wp_verify_nonce( $_POST['wppa-update-check'], '$wppa_nonce' ) ) {
-				echo $_POST['wppa-update-check'].' Security check failure';
+				echo 'Security check failure';
 				wppa_exit();
 			}
 		}

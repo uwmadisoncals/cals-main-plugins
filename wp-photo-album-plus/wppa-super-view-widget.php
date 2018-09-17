@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * ask the album / display you want
-* Version 6.8.07
+* Version 6.9.12
 */
 
 
@@ -52,6 +52,14 @@ class WppaSuperView extends WP_Widget {
     /** @see WP_Widget::update */
     function update($new_instance, $old_instance) {
 		$instance = $old_instance;
+
+		//Defaults
+		$instance = wp_parse_args( (array) $instance, array( 	'title' => __( 'Super View' , 'wp-photo-album-plus' ),
+																'root' 	=> '0',
+																'sort'	=> true,
+																'logonly' => 'no',
+															) );
+
 		$instance['title'] 	= strip_tags($new_instance['title']);
 		$instance['root'] 	= $new_instance['root'];
 		$instance['sort']	= $new_instance['sort'];

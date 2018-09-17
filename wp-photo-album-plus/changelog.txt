@@ -1,5 +1,58 @@
 WP Photo Album Plus Changelog
 
+= 6.9.13 =
+
+= Bug Fixes =
+
+* Trying to import a non existing remote photo no longer generates a warning in the server log.
+
+= Other Changes =
+
+* Several security issues found by RIPS Technologies (https://www.ripstech.com)
+* If ImageMagick is activated, all filenames of newly uploaded or imported files will be sanitized by sanitize_file_name(). 
+This implies (a.o.) that spaces in filenames will be converted to dashes. Due to security reasons this is a permanent restriction.
+
+= 6.9.12 =
+
+= Bug Fixes =
+
+* Fixed a layout issue on the settings page.
+* Fixed a layout issue on lightbox spheric panoramas that occurs when there are also normal photos in the set.
+* Fixed uninitialized vars in widget activation screens.
+
+= Other Changes =
+
+* One can select 'none' in Table IV-H1: Panorama control bar.
+* A smaller subset of THREE.js is now loaded, and it is only loaded when needed, provided that you have set defer javascript in Table IV-A13 (is the default).
+* Panorama code is now also available at the backend edit screen if applicable.
+
+= 6.9.11 =
+
+= Bug Fixes =
+
+* Performance improvement on panoramas on lightbox. A.o.: the wrong image was pre-loaded. Fixed.
+
+= New Features =
+
+* Additional panorama settings. See Table IV-H.
+* Zoom by the mousewheel on panoramas.
+
+= 6.9.10 =
+
+= Bug Fixes =
+
+* Lightbox on a single image did no longer work on images that are not a panorama. Fixed.
+
+= Other Changes =
+
+* Increase stability, improved performance and reduced codesize for panoramas.
+
+= 6.9.09 =
+
+= New Features =
+
+* Panorama images phase III: Lightbox supports panoramic images.
+
 = 6.9.08 =
 
 = Bug Fixes =

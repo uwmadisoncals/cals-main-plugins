@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.9.07
+* Version 6.9.12
 *
 */
 
@@ -14,7 +14,6 @@ require_once 'wppa-filter.php';
 require_once 'wppa-breadcrumb.php';
 require_once 'wppa-album-covers.php';
 require_once 'wppa-cart.php';
-require_once 'wppa-picture.php';
 require_once 'wppa-tinymce-photo-front.php';
 
 /* LOAD STYLESHEET */
@@ -430,8 +429,24 @@ global $wppa_opt;
 
 	// Panorama
 	if ( wppa_switch( 'enable_panorama' ) ) {
-		$three_url = WPPA_URL . '/vendor/three/three.min.js';
-		wp_enqueue_script( 'wppa-three-min-js', $three_url );
+
+		// Only if either in header or in footer and panorama's on the page found
+		if ( ! wppa_switch( 'defer_javascript' ) || ( wppa_switch( 'defer_javascript' ) && wppa( 'has_panorama' ) ) ) {
+
+			if ( is_file ( WPPA_PATH . '/js/wppa-panorama.min.js' ) ) {
+				$three_url = WPPA_URL . '/js/wppa-panorama.min.js';
+				$ver = $wppa_api_version;
+			}
+			elseif ( is_file ( WPPA_PATH . '/js/wppa-panorama.js' ) ) {
+				$three_url = WPPA_URL . '/js/wppa-panorama.js';
+				$ver = $wppa_api_version;
+			}
+			else {
+				$three_url = WPPA_URL . '/vendor/three/three.min.js';
+				$ver = '69';
+			}
+			wp_enqueue_script( 'wppa-three-min-js', $three_url, array(), $ver );
+		}
 	}
 
 	// wppa-init
@@ -545,6 +560,8 @@ global $wppa_js_page_data_file;
 				'opacity:1;' .
 				'box-shadow:none;' .
 				'box-sizing:content-box;' .
+				'text-align:center;' .  		// for panorama
+				'background-color:transparent;' .
 				'"' .
 			' >' .
 		'</div>';
@@ -610,6 +627,8 @@ global $wppa_js_page_data_file;
 		'.( wppa_opt( 'fontsize_lightbox' ) ? 'wppaOvlLineHeight = "'.(wppa_opt( 'fontsize_lightbox' ) + '2').'"' : '').'
 		wppaOvlFullLegenda = "'.__('Keys: f = next mode; q,x = exit; p = previous, n = next, s = start/stop, d = dismiss this notice.', 'wp-photo-album-plus').'";
 		wppaOvlFullLegendaSingle = "'.__('Keys: f = next mode; q,x = exit; d = dismiss this notice.', 'wp-photo-album-plus').'";
+		wppaOvlFullLegendaPanorama = "'.__('Keys: q,x = exit; p = previous, n = next, s = start/stop, d = dismiss this notice.', 'wp-photo-album-plus').'";
+		wppaOvlFullLegendaSinglePanorama = "'.__('Keys: q,x = exit; d = dismiss this notice.', 'wp-photo-album-plus').'";
 		wppaOvlVideoStart = '.( wppa_switch( 'ovl_video_start' ) ? 'true' : 'false' ).';
 		wppaOvlAudioStart = '.( wppa_switch( 'ovl_audio_start' ) ? 'true' : 'false' ).';
 		wppaOvlShowLegenda = '.( wppa_switch( 'ovl_show_legenda' ) && ! wppa( 'is_mobile' ) ? 'true' : 'false' ).';

@@ -34,6 +34,11 @@ function filter_sdm_post_type_content($content) {
         $item_version = get_post_meta($id, 'sdm_item_version', true);
         $isset_item_version = isset($item_version) ? $item_version : '';
 
+        //Check if show published date is enabled
+        $show_date_fd =  get_post_meta($id, 'sdm_item_show_date_fd', true);
+        //Get published date 
+        $published_date = get_the_date(get_option('date_format'), $id); 
+
         // See if user color option is selected
         $main_opts = get_option('sdm_downloads_options');
         $color_opt = $main_opts['download_button_color'];
@@ -44,9 +49,13 @@ function filter_sdm_post_type_content($content) {
         //*** Generate the download now button code ***
         $button_text_string = __('Download Now!', 'simple-download-monitor');
 
+        // See if new window parameter is set
+        $new_window = get_post_meta( $id, 'sdm_item_new_window', true ); 
+        $window_target = empty($new_window) ? '_self' : '_blank';
+    
         $homepage = get_bloginfo('url');
         $download_url = $homepage . '/?smd_process_download=1&download_id=' . $id;
-        $download_button_code = '<a href="' . $download_url . '" class="sdm_download ' . $def_color . '" title="' . $isset_item_title . '">' . $button_text_string . '</a>';
+        $download_button_code = '<a href="' . $download_url . '" class="sdm_download ' . $def_color . '" title="' . $isset_item_title . '" target="' . $window_target . '">' . $button_text_string . '</a>';
         
         $main_advanced_opts = get_option('sdm_advanced_options');
         
@@ -111,6 +120,13 @@ function filter_sdm_post_type_content($content) {
             $content .= '<div class="sdm_post_download_version">';
             $content .= '<span class="sdm_post_download_version_label">' . __('Version: ', 'simple-download-monitor') . '</span>';
             $content .= '<span class="sdm_post_download_version_value">' . $isset_item_version . '</span>';
+            $content .= '</div>';
+        }
+
+        if ($show_date_fd) {//Show Published date
+            $content .= '<div class="sdm_post_download_published_date">';
+            $content .= '<span class="sdm_post_download_published_date_label">' . __('Published: ', 'simple-download-monitor') . '</span>';
+            $content .= '<span class="sdm_post_download_published_date_value">' . $published_date . '</span>';
             $content .= '</div>';
         }
 

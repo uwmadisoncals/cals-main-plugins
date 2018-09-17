@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the featured photos
-* Version 6.8.07
+* Version 6.9.12
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -178,6 +178,10 @@ class FeaTenWidget extends WP_Widget {
     function update( $new_instance, $old_instance ) {
 
 		$instance = $old_instance;
+
+		//Defaults
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Featured Photos', 'wp-photo-album-plus' ), 'album' => '0', 'logonly' => 'no' ) );
+
 		$instance['title'] 		= strip_tags( $new_instance['title'] );
 		$instance['album'] 		= $new_instance['album'];
 		$instance['logonly'] 	= $new_instance['logonly'];

@@ -1255,7 +1255,7 @@ class cnOutput extends cnEntry {
 		if ( $atts['static'] ) $atts['width'] = ( $atts['width'] <= 640 ) ? $atts['width'] : 640;
 		if ( $atts['static'] ) $atts['height'] = ( $atts['height'] <= 640 ) ? $atts['height'] : 640;
 
-		$addresses = $this->getAddresses( $atts , $cached );
+		$addresses = $this->getAddresses( $atts, $cached );
 
 		if ( empty( $addresses ) ) return '';
 
@@ -1285,20 +1285,75 @@ class cnOutput extends cnEntry {
 			$out .= '<span class="cn-image-style" style="display: inline-block;"><span class="cn-image" style="height: ' . $atts['height'] . '; width: ' . $atts['width'] . '">';
 			$out .= '<img class="map" title="' . $attr['center'] . '" alt="' . $attr['center'] . '" width="' . $atts['width'] . '" height="' . $atts['height'] . '" src="http://maps.googleapis.com/maps/api/staticmap?' . http_build_query( $attr , '' , '&amp;' ) . '"/>';
 			$out .= '</span></span>';
-		}
-		else {
-			$attr[] = 'class="cn-gmap" id="map-' . $this->getRuid() . '"';
-			if ( ! empty( $addr ) ) $attr[] = 'data-address="' . implode( ', ', $addr ) .'"';
-			if ( ! empty( $geo['latitude'] ) ) $attr[] = 'data-latitude="' . $geo['latitude'] .'"';
-			if ( ! empty( $geo['longitude'] ) ) $attr[] = 'data-longitude="' . $geo['longitude'] .'"';
-			$attr[] = 'style="' . ( ! empty( $atts['width'] ) ? 'width: ' . $atts['width'] . 'px; ' : '' ) . 'height: ' . $atts['height'] . 'px"';
-			$attr[] = 'data-maptype="' . $atts['maptype'] .  '"';
-			$attr[] = 'data-zoom="' . $atts['zoom'] .  '"';
 
-			$out = '<div ' . implode( ' ', $attr ) . '></div>';
+		} else {
+
+			if ( 0 < count( $addresses ) ) {
+
+				$layers = array();
+
+				$googleMapsAPIBrowserKey = cnSettingsAPI::get(
+					'connections',
+					'google_maps_geocoding_api',
+					'browser_key'
+				);
+
+				// Strings to be used for setting the Leaflet maps `attribution`.
+				$leaflet  = '<a href="https://www.leafletjs.com" target="_blank" title="Leaflet">Leaflet</a>';
+				$backlink = '<a href="https://connections-pro.com/" target="_blank" title="Connections Business Directory plugin for WordPress">Connections Business Directory</a> | ' . $leaflet;
+
+				$attribution = array( $backlink );
+
+				if ( 0 < strlen( $googleMapsAPIBrowserKey ) ) {
+
+					$baseMap = \Connections_Directory\Map\Layer\Raster\Provider\Google_Maps::create();
+
+				} else {
+
+					$baseMap = \Connections_Directory\Map\Layer\Raster\Provider\Wikimedia::create();
+
+					$attribution[] = $baseMap->getAttribution();
+				}
+
+				$baseMap->setAttribution( implode( ' | ', $attribution )  );
+
+				foreach ( $addresses as $address ) {
+
+					$coordinates = cnCoordinates::create( $address->latitude, $address->longitude );
+
+					if ( ! is_wp_error( $coordinates ) ) {
+
+						$popup = \Connections_Directory\Model\Format\Address\As_String::format(
+							new cnAddress( (array) $address )
+						);
+
+						$layers[] = \Connections_Directory\Map\UI\Marker::create( 'default', $coordinates )
+						                                    ->bindPopup( \Connections_Directory\Map\UI\Popup::create( 'default', $popup ) );
+					}
+
+				}
+
+				if ( 0 < count( $layers ) ) {
+
+					$map = \Connections_Directory\Map\Map::create(
+						'cn-map-' . $this->getRuid(),
+						array(
+							'center' => new cnCoordinates( 39.8283, -98.5795 ),
+							'zoom'   => $atts['zoom'],
+						)
+					)->setHeight( $atts['height'] . 'px' )
+					 ->setWidth( empty( $atts['width'] ) ? '100%' : $atts['width'] )
+					 ->addLayer( $baseMap )
+					 ->addLayers( $layers );
+
+					$out = $map;
+				}
+
+			}
+
 		}
 
-		$out = $atts['before'] . $out . $atts['after'] . PHP_EOL;
+		$out = $atts['before'] . $out . $atts['after'];
 
 		return $this->echoOrReturn( $atts['return'], $out );
 	}
@@ -1908,15 +1963,15 @@ class cnOutput extends cnEntry {
 	 * @since 0.7.3
 	 *
 	 * @param array $atts   Accepted values as noted above.
-	 * @param bool  $cached Returns the cached data rather than querying the db.
 	 *
 	 * @return string
 	 */
-	public function getDateBlock( $atts = array(), $cached = TRUE ) {
+	public function getDateBlock( $atts = array() ) {
 
 		$defaults = array(
 			'preferred'   => NULL,
 			'type'        => NULL,
+			'limit'       => NULL,
 			'format'      => '',
 			'name_format' => '',
 			'date_format' => cnSettingsAPI::get( 'connections', 'display_general', 'date_format' ),
@@ -1938,52 +1993,23 @@ class cnOutput extends cnEntry {
 
 		$atts['id'] = $this->getId();
 
-		$dates = $this->getDates( $atts , $cached );
-		$search = array( '%label%' , '%date%' , '%separator%' );
+		$html = $this->dates->filterBy( 'type', $atts['type'] )
+		                    ->filterBy( 'preferred', $atts['preferred'] )
+		                    ->filterBy( 'visibility', Connections_Directory()->currentUser->canView() )
+		                    ->take( $atts['limit'] )
+		                    ->escapeFor( 'display' )
+		                    ->render( 'hcard', array( 'atts' => $atts, 'entry' => $this ), TRUE, TRUE );
 
-		if ( empty( $dates ) ) return '';
+		// The filters need to be reset so additional calls to get links with different params return expected results.
+		$this->dates->resetFilters();
 
-		$out = '<span class="date-block">' . PHP_EOL;
+		if ( ! is_null( $html ) || 0 < strlen( $html ) ) {
 
-		foreach ( $dates as $date ) {
-
-			try {
-
-				// Go thru the formatting acrobats to make sure DateTime is feed a valid date format
-				// just in case a user manages to input an incorrect date or date format.
-				$dateObject = new DateTime( date( 'm/d/Y', strtotime( $date->date ) ) );
-
-			} catch ( Exception $e ) {
-
-				continue;
-			}
-
-			$replace = array();
-
-			$out .= "\t" . '<span class="vevent cn-date' . ( $date->preferred ? ' cn-preferred cn-date-preferred' : '' ) . '">';
-
-			// Hidden elements are to maintain hCalendar spec compatibility
-			$replace[] = ( empty( $date->name ) ) ? '' : '<span class="date-name">' . $date->name . '</span>';
-			//$replace[] = ( empty($date->date) ) ? '' : '<span class="dtstart"><span class="value" style="display: none;">' . $dateObject->format( 'Y-m-d' ) . '</span><span class="date-displayed">' . $dateObject->format( $atts['date_format'] ) . '</span></span>';
-			$replace[] = ( empty( $date->date ) ) ? '' : '<abbr class="dtstart" title="' . $dateObject->format( 'Ymd' ) .'">' . date_i18n( $atts['date_format'] , strtotime( $date->date ) , FALSE ) /*$dateObject->format( $atts['date_format'] )*/ . '</abbr><span class="summary" style="display:none">' . $date->name . ' - ' . $this->getName( array( 'format' => $atts['name_format'] ) ) . '</span><span class="uid" style="display:none">' . $dateObject->format( 'YmdHis' ) . '</span>';
-			$replace[] = '<span class="cn-separator">' . $atts['separator'] . '</span>';
-
-			$out .= str_ireplace(
-				$search,
-				$replace,
-				empty( $atts['format'] ) ? ( empty( $defaults['format'] ) ? '%label%%separator% %date%' : $defaults['format'] ) : $atts['format']
-			);
-
-			$out .= '</span>' . PHP_EOL;
+			$html = cnString::replaceWhatWith( $html, ' ' );
+			$html = $atts['before'] . $html . $atts['after'] . PHP_EOL;
 		}
 
-		$out .= '</span>' . PHP_EOL;
-
-		$out = cnString::replaceWhatWith( $out, ' ' );
-
-		$out = $atts['before'] . $out . $atts['after'] . PHP_EOL;
-
-		return $this->echoOrReturn( $atts['return'], $out );
+		return $this->echoOrReturn( $atts['return'], $html );
 	}
 
 	/**

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.9.05
+* Version 6.9.13
 *
 */
 
@@ -24,7 +24,6 @@ global $wppa_session;
 	wppa_dbg_msg( 'Lang=' . $wppa_lang . ', Locale=' . $wppa_locale . ', Ajax=' . wppa( 'ajax' ) );
 	wppa_dbg_msg( 'Get=' . serialize($_GET) );
 	wppa_dbg_msg( 'Post=' . serialize($_POST) );
-//	wppa_dbg_msg( '$wppa_session = ' . serialize( $wppa_session ) );
 
 	// List content filters
 	// Data struct:	$wp_filter[$tag]->callbacks[$priority][$idx] = array( 'function' => $function_to_add, 'accepted_args' => $accepted_args );
@@ -3956,15 +3955,15 @@ function wppa_force_balance_pee( $xtext ) {
 function wppa_smx_photo( $stype ) {
 
 	$id 	= wppa( 'single_photo' );
-	
+
 	// Photo known?
 	if ( ! $id ) {
 		wppa_log( 'Err', 'Unknown photo id in wppa_smx_photo()', true );
-		return; 
+		return;
 	}
-	
+
 	$width 	= wppa_get_container_width();
-	
+
 	if ( wppa_is_video( $id ) ) {
 		$py 	= wppa_get_videoy( $id );
 		$px 	= wppa_get_videox( $id );
@@ -3977,8 +3976,8 @@ function wppa_smx_photo( $stype ) {
 		wppa_log( 'Err', 'Unknown size of item nr ' . $id . ' in wppa_smx_photo()', true );
 		return;
 	}
-	
-	$height = round( $width * $py / $px ); 
+
+	$height = round( $width * $py / $px );
 	$style 	= wppa_get_container_style();
 
 	// wrapper for maximized auto
@@ -4417,7 +4416,7 @@ global $wppa_upload_succes_id;
 							if ( $iret ) {
 								$f['error'] = $file['error'][$i];
 								$f['tmp_name'] = $file['tmp_name'][$i];
-								$f['name'] = $file['name'][$i];
+								$f['name'] = wppa_sima( $file['name'][$i] );
 								$f['type'] = $file['type'][$i];
 								$f['size'] = $file['size'][$i];
 								$iret = wppa_do_frontend_file_upload( $f, $alb );
@@ -4610,7 +4609,7 @@ global $wppa_supported_audio_extensions;
 global $wppa_alert;
 
 	// Log upload attempt
-	wppa_log( 'Upl', 'FE Upload attempt of file ' . $file['name'] . ', size=' . filesize( $file['tmp_name'] ) );
+	wppa_log( 'Upl', 'FE Upload attempt of file ' . wppa_sima( $file['name'] ) . ', size=' . filesize( $file['tmp_name'] ) );
 
 	$album = wppa_cache_album( $alb );
 
@@ -4656,7 +4655,7 @@ global $wppa_alert;
 			$name = wppa_get_post( 'user-name' );
 		}
 		else {
-			$name = $file['name'];
+			$name = wppa_sima( $file['name'] );
 		}
 		$name = wppa_sanitize_photo_name( $name );
 
@@ -4697,7 +4696,7 @@ global $wppa_alert;
 
 		// Repair name if not standard
 		if ( ! wppa_get_post( 'user-name' ) ) {
-			wppa_set_default_name( $id, $file['name'] );
+			wppa_set_default_name( $id, wppa_sima( $file['name'] ) );
 		}
 
 		// tags
@@ -4780,7 +4779,7 @@ global $wppa_alert;
 		$name = wppa_get_post( 'user-name' );
 	}
 	else {
-		$name = $file['name'];
+		$name = wppa_sima( $file['name'] );
 	}
 
 	// Sanitize input
@@ -4833,7 +4832,7 @@ global $wppa_alert;
 
 		// Repair photoname if not standard
 		if ( ! wppa_get_post( 'user-name' ) ) {
-			wppa_set_default_name( $id, $file['name'] );
+			wppa_set_default_name( $id, wppa_sima( $file['name'] ) );
 		}
 
 		// Custom data

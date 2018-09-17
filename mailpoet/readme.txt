@@ -3,12 +3,11 @@ Contributors: mailpoet, wysija, kgjerstad
 Tags: newsletter, newsletter subscribers, email, welcome email, post notification, WooCommerce emails, newsletter builder, mailing list
 Requires at least: 4.7
 Tested up to: 4.9
-Requires PHP: 5.6
-Stable tag: 3.8.1
+Stable tag: 3.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Send beautiful newsletters directly from WordPress. Add a signup form, manage your subscribers, automate your emails including WooCommerce & more.
+Send beautiful newsletters from WordPress. Collect subscribers with signup forms, automate your emails for WooCommerce, blog post notifications & more
 
 == Description ==
 
@@ -18,7 +17,7 @@ Our newsletter builder integrates perfectly with WordPress so any website owner 
 
 Schedule your newsletters, send them right away or set it up to send new blog post notifications automatically in just a few clicks.
 
-Trusted by 300,000 WordPress websites since 2011. 
+Trusted by 300,000 WordPress websites since 2011.
 
 = All features =
 
@@ -53,7 +52,7 @@ Please note:
 
 = WooCommerce emails (Premium) =
 
-Increase your sales and stay in touch with your customers with our emails for WooCommerce !
+Increase your sales and stay in touch with your customers with our emails for WooCommerce!
 
 With our WooCommerce emails, you can :
 
@@ -78,6 +77,19 @@ The Premium version adds the following features:
 See the [short video summary on the Premium](http://beta.docs.mailpoet.com/article/208-video-overview-of-mailpoet-premium)
 
 Visit the Premium page inside the plugin for more info.
+
+= MailPoet Sending Service =
+Sending emails and newsletter with your host is not a good idea. You might face sending speed limitations and see your emails ending up in the spam box.
+
+To help your sending go without a hitch, we’ve created an advanced email delivery infrastructure built for WordPress. Our technology allows you to:
+
+* Reach Inboxes, not Spam Boxes
+* Send your emails super fast (up to 50,000 emails per hour)
+* Get all your emails automatically signed with SPF & DKIM
+
+The MailPoet Sending Service is very easy to setup, you just have to enter a key in your WordPress admin and you’re all set!
+
+[Signup now](https://account.mailpoet.com/?utm_source=wordpress&utm_medium=readme&utm_campaign=mss), it’s free for your first 2,000 readers (pay as you go afterwards).
 
 = Translations =
 
@@ -106,6 +118,10 @@ We welcome experienced translators to translate directly on [our Transifex proje
 Have a question for us? Reach us at security@ our domain.
 
 == Installation ==
+
+= Minimum requirements =
+PHP version 5.6 or greater (PHP 7 or greater is recommended)
+Visit our [Minimum and Recommended Requirements](https://beta.docs.mailpoet.com/article/152-minimum-requirements-for-mailpoet-3) for a detailed list of server requirements.
 
 There are 3 ways to install this plugin:
 
@@ -145,6 +161,50 @@ Stop by our [support site](https://www.mailpoet.com/support).
 5. Subscriber import (via a CSV file or directly from MailChimp)
 
 == Changelog ==
+
+= 3.10 - 2018-09-11 =
+* Changed: welcome emails to new subscribers are now free for everyone!
+* Fixed: newsletter footer warning to be displayed if unsubscribe link is missing.
+
+= 3.9.1 - 2018-09-04 =
+* Improved: instructions for migrating from MP2 to MP3 clarified;
+* Improved: minor style adjustments for migration tool;
+* Improved: minor fixes to onboarding intro guide;
+* Improved: template page loading times decreased;
+* Fixed: resolved javascript warnings on help page status;
+* Fixed: subscriber status remains persistent after migration from MP2 to MP3 without sign-up confirmation enabled;
+
+= 3.9.0 - 2018-08-28 =
+* Improved: email processing in sending queues is now more resilient to invalid data. Thanks Tara!
+* Fixed: replaced WooCommerce image in welcome wizard;
+* Fixed: swapped video in welcome wizard with an updated one;
+* Fixed: welcome wizard button displays properly for all users;
+* Fixed: permission error when bypassing data import after new install or reset;
+* Fixed: added indexes to some foreign keys which were missing;
+* Fixed: error displaying number of exported users;
+* Fixed: export search function restored;
+* Fixed: prevent third party APIs from adding data incorrectly via MailPoets API.
+
+= 3.8.6 - 2018-08-21 =
+* Improved: compatibility with caching plugins
+
+= 3.8.5 - 2018-08-14 =
+* Changed: End of support for PHP 5.3 and 5.4. Please upgrade to PHP 7.0 or newer!
+* Added: improved compatibility with sites cached by server
+* Added: setup wizard for new users;
+* Fixed: plugin activation for new installs to not crash with white screen;
+* Fixed: slow sending on sites with a lot of sent newsletters.
+
+= 3.8.4 - 2018-08-07 =
+* Added: activation prompt for Mailpoet Sending Service when API key is verified;
+* Added: next scheduled tasks now display in sending queue status;
+* Added: new additional save button to the top of editor page;
+
+= 3.8.3 - 2018-08-01 =
+* Fixed: resolved potential duplicate sending issue.
+
+= 3.8.2 - 2018-07-31 =
+* Added: more useful sending status information in Help page.
 
 = 3.8.1 - 2018-07-24 =
 * Added: images can be used as backgrounds for column layout blocks;

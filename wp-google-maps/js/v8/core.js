@@ -2,7 +2,7 @@
  * @module WPGMZA
  * @summary This is the core Javascript module. Some code exists in ../core.js, the functionality there will slowly be handed over to this module.
  */
-(function($) {
+jQuery(function($) {
 	var core = {
 		maps: [],
 		events: null,
@@ -385,7 +385,7 @@
 		WPGMZA[key] = value;
 	}
 	
-	$(document).ready(function(event) {
+	jQuery(function($) {
 		
 		// Combined script warning
 		if($("script[src*='wp-google-maps.combined.js'], script[src*='wp-google-maps-pro.combined.js']").length)
@@ -427,4 +427,4 @@
 	
 	
 	
-})(jQuery);
+});

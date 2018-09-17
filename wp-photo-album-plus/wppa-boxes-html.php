@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.9.05
+* Version 6.9.09
 *
 */
 
@@ -4366,6 +4366,7 @@ function wppa_bestof_html( $args, $widget = true ) {
 								' data-alt="' . esc_attr( wppa_get_imgalt( $id, true ) ) . '"' .
 								' style="cursor:' . wppa_wait() . ';"' . // url( ' . wppa_get_imgdir() . wppa_opt( 'magnifier' ) . ' ),pointer;"' .
 								' title="' . wppa_zoom_in( $id ) . '"' .
+								wppa_get_lb_panorama_full_html( $id ) .
 								' onclick="return false;"' .
 								' >';
 						}

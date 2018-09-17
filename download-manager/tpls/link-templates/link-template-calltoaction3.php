@@ -1,6 +1,6 @@
 <!-- WPDM Link Template: Call to Action 3 -->
 
-<div class="well c2a3">
+<div class="wpdm-link-tpl well c2a3">
     <div class="media">
         <div class="pull-left" align="left">
             [icon]

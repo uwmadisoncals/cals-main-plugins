@@ -1016,16 +1016,64 @@ class cnEntry_Action {
 	 */
 	public static function geoCode( $address ) {
 
-		if ( empty( $address['latitude'] ) || empty( $address['longitude'] ) ) {
+		$query  = \Connections_Directory\Model\Format\Address\As_String::format( $address );
 
-			$result = cnGeo::address( $address );
+		/*
+		 * If the address is empty, no need to geocode.
+		 */
+		if ( empty( $query ) ) {
 
-			if ( ! empty( $result ) && isset( $result->latitude ) && isset( $result->longitude ) ) {
+			return $address;
+		}
 
-				$address['latitude']  = $result->latitude;
-				$address['longitude'] = $result->longitude;
+		/*
+		 * Only geocode when the latitude and longitude have not been supplied.
+		 */
+		if ( ! empty( $address['latitude'] ) && ! empty( $address['longitude'] ) ) {
+
+			return $address;
+		}
+
+		$APIkey = cnSettingsAPI::get( 'connections', 'google_maps_geocoding_api', 'server_key' );
+
+		if ( 0 < strlen( $APIkey ) ) {
+
+			$query = \Connections_Directory\Geocoder\Query\Address::create( $query );
+
+			$provider = new \Connections_Directory\Geocoder\Provider\Google_Maps\Google_Maps( $APIkey );
+			$geocoder = new \Connections_Directory\Geocoder\Geocoder( $provider );
+
+			/** @var cnCollection $result */
+			$result = $geocoder->geocode( $query );
+
+			if ( ! is_wp_error( $result ) ) {
+
+				/** @var \Connections_Directory\Model\Address $location */
+				$location = $result->first();
+
+				$address['latitude']  = $location->getLatitude();
+				$address['longitude'] = $location->getLongitude();
 			}
 
+		} else {
+
+			$query = \Connections_Directory\Geocoder\Query\Address::create( $query );
+
+			$locale   = substr( get_user_locale(), 0, 2 );
+			$provider = new \Connections_Directory\Geocoder\Provider\Algolia\Algolia();
+			$geocoder = new \Connections_Directory\Geocoder\Geocoder( $provider, $locale );
+
+			/** @var cnCollection $result */
+			$result = $geocoder->geocode( $query );
+
+			if ( ! is_wp_error( $result ) ) {
+
+				/** @var \Connections_Directory\Model\Address $location */
+				$location = $result->first();
+
+				$address['latitude']  = $location->getLatitude();
+				$address['longitude'] = $location->getLongitude();
+			}
 		}
 
 		return $address;

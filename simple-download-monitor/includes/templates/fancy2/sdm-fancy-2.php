@@ -75,6 +75,9 @@ function sdm_generate_fancy2_display_output($args) {
     }
 
     // See if new window parameter is set
+    if(empty($new_window)){
+        $new_window = get_post_meta( $id, 'sdm_item_new_window', true ); 
+    }
     $window_target = empty($new_window) ? '_self' : '_blank';
 
     $homepage = get_bloginfo('url');
@@ -118,11 +121,25 @@ function sdm_generate_fancy2_display_output($args) {
 
     //Get item file size
     $item_file_size = get_post_meta($id, 'sdm_item_file_size', true);
+    //Check if show file size is enabled
+    if(empty($show_size)){
+        //Disabled in shortcode. Lets check if it is enabled in the download meta.
+        $show_size =  get_post_meta($id, 'sdm_item_show_file_size_fd', true);
+    }    
     $isset_item_file_size = ($show_size && isset($item_file_size)) ? $item_file_size : ''; //check if show_size is enabled and if there is a size value
     //Get item version
     $item_version = get_post_meta($id, 'sdm_item_version', true);
+    //Check if show version is enabled
+    if(empty($show_version)){
+        //Disabled in shortcode. Lets check if it is enabled in the download meta.
+        $show_version =  get_post_meta($id, 'sdm_item_show_item_version_fd', true);
+    }    
     $isset_item_version = ($show_version && isset($item_version)) ? $item_version : ''; //check if show_version is enabled and if there is a version value
-
+    
+    // check show date in fancy display 
+    $show_date_fd =  get_post_meta($id, 'sdm_item_show_date_fd', true);
+    // Get item date 
+    $download_date = get_the_date(get_option('date_format'), $id) ; 
 
     $output = '';
     $output .= '<div class="sdm_fancy2_item ' . $css_class . '">';
@@ -147,6 +164,16 @@ function sdm_generate_fancy2_display_output($args) {
         $output .= '<span class="sdm_fancy2_download_version_value">' . $isset_item_version . '</span>';
         $output .= '</div>';
     }
+    
+    if ($show_date_fd) {//Show version info if specified in the shortcode
+        $output .= '<div class="sdm_fancy2_download_date">';
+        $output .= '<span class="sdm_fancy2_download_date_label">' . __('Published: ', 'simple-download-monitor') . '</span>';
+        $output .= '<span class="sdm_fancy2_download_date_value">' . $download_date . '</span>';
+        $output .= '</div>';
+    }
+    
+    //apply filter on button HTML code
+    $download_button_code=apply_filters('sdm_download_button_code_html', $download_button_code );
 
     $output .= '<div class="sdm_fancy2_download_link">' . $download_button_code . '</div>';
 

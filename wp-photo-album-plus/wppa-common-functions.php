@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.9.01
+* Version 6.9.12
 *
 */
 
@@ -79,6 +79,7 @@ global $thumbs;
 	$wocc 	= isset( $wppa['widget_occur'] ) ? $wppa['widget_occur'] : '0';
 	$rend 	= isset( $wppa['rendering_enabled'] ) ? $wppa['rendering_enabled'] : false;
 	$debug 	= isset( $wppa['debug'] ) ? $wppa['debug'] : false;
+	$pano 	= isset( $wppa['has_panorama'] ) ? $wppa['has_panorama'] : false;
 	$ajax 	= defined( 'DOING_AJAX' ) ? true : false;
 	$cron 	= wppa_is_cron();
 
@@ -219,6 +220,7 @@ global $thumbs;
 		'max_slides_in_ss_widget' 	=> '',
 		'is_random' 				=> false,
 		'cron' 						=> $cron,
+		'has_panorama' 				=> $pano,
 
 	);
 }

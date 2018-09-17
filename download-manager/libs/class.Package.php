@@ -67,7 +67,7 @@ class Package {
         $post_vars = array_merge($data, $post_vars);
         if(!isset($post_vars['files']) || !is_array($post_vars['files']))
             $post_vars['files'] = get_post_meta($post_vars['ID'], '__wpdm_files', true);
-        $post_vars['file_count'] = count($post_vars['files']);
+        $post_vars['file_count'] = is_array($post_vars['files'])?count($post_vars['files']):0;
 
         $post_vars['link_label'] = isset($post_vars['link_label']) ? $post_vars['link_label'] : __('Download','download-manager');
         $post_vars['page_link'] = "<a href='" . get_permalink($post_vars['ID']) . "'>{$post_vars['title']}</a>";
@@ -88,7 +88,7 @@ class Package {
             }}
         $post_vars['tags'] = $taghtml;
 
-        if (count($post_vars['files']) > 1) $post_vars['file_ext'] = 'zip';
+        if (is_array($post_vars['files']) && count($post_vars['files']) > 1) $post_vars['file_ext'] = 'zip';
         if (is_array($post_vars['files']) && count($post_vars['files']) == 1) {
             $tmpdata = $post_vars['files'];
             $tmpdata = array_shift($tmpdata);

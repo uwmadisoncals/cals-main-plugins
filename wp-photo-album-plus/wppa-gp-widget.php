@@ -4,7 +4,7 @@
 *
 * A text widget that interpretes wppa shortcodes
 *
-* Version 6.8.07
+* Version 6.9.12
 */
 
 class WppaGpWidget extends WP_Widget {
@@ -67,6 +67,8 @@ class WppaGpWidget extends WP_Widget {
 	function update( $new_instance, $old_instance ) {
 
 		$instance = $old_instance;
+		$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Text', 'wp-photo-album-plus' ), 'text' => '', 'filter' => false, 'loggedinonly' => false ) );
+
 		$instance['title'] 			= strip_tags( $new_instance['title'] );
 		if ( current_user_can('unfiltered_html') )
 			$instance['text'] 		=  $new_instance['text'];

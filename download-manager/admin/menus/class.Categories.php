@@ -44,9 +44,9 @@ class Categories
     function MetaFields() {
         ?>
         <div class="form-field">
-            <label><?php _e( 'Category Image:', 'wpdmcategory' ); ?></label>
+            <label><?php _e( 'Category Image:', 'download-manager' ); ?></label>
             <div class="button-group">
-                <input type="text" id="catimurl" placeholder="<?php _e('Image URL','wpdmpro'); ?>" class="button" style="background: #ffffff" name="__wpdmcategory[icon]" value=""> <button data-uploader_button_text="Insert" data-uploader_title="Select Category Image" id="catim" type="button" class="button button-secondary">Insert From Media Library</button>
+                <input type="text" id="catimurl" placeholder="<?php _e( "Image URL" , "download-manager" ); ?>" class="button" style="background: #ffffff" name="__wpdmcategory[icon]" value=""> <button data-uploader_button_text="Insert" data-uploader_title="<?php _e('Select Category Image', 'download-manager'); ?>" id="catim" type="button" class="button button-secondary"><?php _e('Insert From Media Library', 'download-manager'); ?></button>
             </div>
             <script type="text/javascript">
 
@@ -104,7 +104,7 @@ class Categories
         </div>
         <div class="form-field">
             <label><?php _e( 'Access:', 'wpdmcategory' ); ?></label>
-            <p class="description"><?php _e( 'Select the roles who should have access to the packages under this category','wpdmpro' ); ?></p>
+            <p class="description"><?php _e( "Select the roles who should have access to the packages under this category" , "download-manager" ); ?></p>
 
 
             <label><input name="__wpdmcategory[access][]" type="checkbox" value="guest"> <?php echo __( "All Visitors" , "download-manager" ); ?></label>
@@ -130,11 +130,15 @@ class Categories
     function MetaFieldsEdit() {
         $MetaData = get_option( "__wpdmcategory" );
         $MetaData = maybe_unserialize($MetaData);
+        $icon = get_term_meta(wpdm_query_var('tag_ID', 'int'), '__wpdm_icon', true);
+        if($icon == '')
+            $icon = isset($MetaData[$_GET['tag_ID']]['icon'])?$MetaData[$_GET['tag_ID']]['icon']:'';
+
         ?>
         <tr class="form-field">
-            <th><?php _e( 'Category Image:', 'wpdmcategory' ); ?></th>
+            <th><?php _e( 'Category Image:', 'download-manager' ); ?></th>
             <td class="button-group">
-                <input type="text" id="catimurl" placeholder="<?php _e('Image URL','wpdmpro'); ?>" class="button" style="background: #ffffff" name="__wpdmcategory[icon]" value="<?php echo isset($MetaData[$_GET['tag_ID']]['icon'])?$MetaData[$_GET['tag_ID']]['icon']:''; ?>"> <button data-uploader_button_text="Insert" data-uploader_title="Select Category Image" id="catim" type="button" class="button button-secondary">Insert From Media Library</button>
+                <input type="text" id="catimurl" placeholder="<?php _e( "Image URL" , "download-manager" ); ?>" class="button" style="background: #ffffff" name="__wpdmcategory[icon]" value="<?php echo $icon; ?>"> <button data-uploader_button_text="Insert" data-uploader_title="<?php _e('Select Category Image', 'download-manager'); ?>" id="catim" type="button" class="button button-secondary"><?php _e('Insert From Media Library', 'download-manager'); ?></button>
 
                 <script type="text/javascript">
 
@@ -195,12 +199,14 @@ class Categories
             <th><label><?php _e( 'Access:', 'wpdmcategory' ); ?></label>
             </th>
             <td>
-                <p class="description"><?php _e( 'Select the roles who should have access to the packages under this category','wpdmpro' ); ?></p>
+                <p class="description"><?php _e( "Select the roles who should have access to the packages under this category" , "download-manager" ); ?></p>
                 <ul>
                     <input name="__wpdmcategory[access][]" type="hidden" value="__wpdm__" />
                     <?php
 
-                    $currentAccess = isset($MetaData[$_GET['tag_ID']])?$MetaData[$_GET['tag_ID']]['access']:array();
+                    $currentAccess = maybe_unserialize(get_term_meta(wpdm_query_var('tag_ID', 'int'), '__wpdm_access', true));
+                    if(!is_array($currentAccess))
+                        $currentAccess = isset($MetaData[$_GET['tag_ID']])?$MetaData[$_GET['tag_ID']]['access']:array();
 
                     $selz = '';
                     if(  $currentAccess ) $selz = (in_array('guest',$currentAccess))?'checked=checked':'';
@@ -228,12 +234,15 @@ class Categories
         <?php
     }
 
-    function SaveMetaData( $term_id ) {
+    function saveMetaData( $term_id ) {
         if ( isset( $_POST['__wpdmcategory'] ) ) {
-            $MetaData = get_option( "__wpdmcategory" );
-            $MetaData = maybe_unserialize($MetaData);
-            $MetaData[$term_id] = $_POST['__wpdmcategory'];
-            update_option( "__wpdmcategory", $MetaData );
+            //$MetaData = get_option( "__wpdmcategory" );
+            //$MetaData = maybe_unserialize($MetaData);
+            foreach ($_POST['__wpdmcategory'] as $metaKey => $metaValue){
+                update_term_meta($term_id, "__wpdm_".$metaKey, $metaValue);
+            }
+            //$MetaData[$term_id] = $_POST['__wpdmcategory'];
+            //update_option( "__wpdmcategory", $MetaData );
         }
     }
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version 6.9.06
+* Version 6.9.13
 *
 */
 
@@ -133,6 +133,7 @@ function wppa_edit_photo() {
 function wppa_page_import() {
 	if ( wppa_is_user_blacklisted() ) wp_die(__( 'Importing is temporary disabled for you' , 'wp-photo-album-plus') );
 	wppa_grant_albums();
+	wppa_rename_files_sanitized( WPPA_DEPOT_PATH );
 	require_once 'wppa-import.php';
 	echo '<script type="text/javascript" >/* <![CDATA[ */wppa_import = "'.__('Import', 'wp-photo-album-plus').'"; wppa_update = "'.__('Update', 'wp-photo-album-plus').'";/* ]]> */</script>';
 	_wppa_page_import();
@@ -407,5 +408,28 @@ function wppa_show_potd_log() {
 		'<p>' .
 			__( 'There is no photo of the day history', 'wp-photo-album-plus' ) .
 		'</p>';
+	}
+}
+
+// Load pnoama js if needed at the backend
+if ( get_option( 'wppa_enable_panorama' ) == 'yes' ) {
+	add_action( 'admin_footer', 'wppa_load_panorama_js' );
+}
+function wppa_load_panorama_js() {
+	
+	if ( wppa( 'has_panorama' ) ) {
+		if ( is_file ( WPPA_PATH . '/js/wppa-panorama.min.js' ) ) {
+			$three_url = WPPA_URL . '/js/wppa-panorama.min.js';
+			$ver = $wppa_api_version;
+		}
+		elseif ( is_file ( WPPA_PATH . '/js/wppa-panorama.js' ) ) {
+			$three_url = WPPA_URL . '/js/wppa-panorama.js';
+			$ver = $wppa_api_version;
+		}
+		else {
+			$three_url = WPPA_URL . '/vendor/three/three.min.js';
+			$ver = '69';
+		}
+		wp_enqueue_script( 'wppa-three-min-js', $three_url, array(), $ver, true );
 	}
 }
