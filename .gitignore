@@ -1,2 +1,3 @@
 #ignore wordfence cache files
 wordfence/tmp
+.DS_Store
