@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version 6.9.12
+* Version 6.9.14
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -71,7 +71,9 @@ if ( PHP_VERSION_ID >= 50300 ) require_once 'wppa-cloudinary.php';
 
 /* DO THE ADMIN/NON ADMIN SPECIFIC STUFF */
 if ( is_admin() ) require_once 'wppa-admin.php';
-else require_once 'wppa-non-admin.php';
+if ( ! is_admin() || get_option( 'wppa_load_frontend_always' ) == 'yes' ) {
+	require_once 'wppa-non-admin.php';
+}
 
 /* ADD AJAX */
 if ( defined( 'DOING_AJAX' ) ) {
@@ -265,7 +267,7 @@ global $wpdb;
 
 	if ( current_user_can( 'wppa_settings' ) ) {
 		if ( get_option( 'wppa_tags_ok' ) != '1' ) {
-			$tag = $wpdb->get_var( "SELECT `tags` FROM `" . WPPA_PHOTOS . "` WHERE `tags` <> '' ORDER BY `id` DESC LIMIT 1" );
+			$tag = $wpdb->get_var( "SELECT `tags` FROM $wpdb->wppa_photos WHERE `tags` <> '' ORDER BY `id` DESC LIMIT 1" );
 			if ( $tag ) {
 				if ( substr( $tag, 0, 1 ) != ',' ) {
 					add_action('admin_notices', 'wppa_tag_message');
@@ -287,7 +289,7 @@ global $wpdb;
 
 	if ( current_user_can( 'wppa_settings' ) ) {
 		if ( get_option( 'wppa_cats_ok' ) != '1' ) {
-			$tag = $wpdb->get_var( "SELECT `cats` FROM `" . WPPA_ALBUMS . "` WHERE `cats` <> '' ORDER BY `id` DESC LIMIT 1" );
+			$tag = $wpdb->get_var( "SELECT `cats` FROM $wpdb->wppa_albums WHERE `cats` <> '' ORDER BY `id` DESC LIMIT 1" );
 			if ( $tag ) {
 				if ( substr( $tag, 0, 1 ) != ',' ) {
 					add_action('admin_notices', 'wppa_cat_message');

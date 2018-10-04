@@ -4,7 +4,7 @@
 *
 * Functions for counts etc
 * Common use front and admin
-* Version 6.7.02
+* Version 6.9.15
 *
 */
 
@@ -53,10 +53,10 @@ global $wpdb;
 	}
 	elseif ( ! $id ) {
 		if ( current_user_can('wppa_moderate') ) {
-			$count = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` " );
+			$count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos " );
 		}
 		else {
-			$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s )", wppa_get_user() ) );
+			$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s )", wppa_get_user() ) );
 		}
 	}
 	else {
@@ -74,7 +74,7 @@ global $wpdb;
 
 	// Substract private photos if not logged in and album given
 	if ( $id && ! is_user_logged_in() ) {
-		$count -= $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `album` = %s AND `status` = 'private' ", $id ) );
+		$count -= $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `album` = %s AND `status` = 'private' ", $id ) );
 	}
 	return $count;
 }
@@ -100,7 +100,7 @@ global $wpdb;
 static $count;
 
 	if ( ! $count ) {
-		$count = $wpdb->get_var("SELECT COUNT(*) FROM `".WPPA_ALBUMS."`");
+		$count = $wpdb->get_var("SELECT COUNT(*) FROM $wpdb->wppa_albums");
 	}
 
 	return $count;
@@ -123,7 +123,7 @@ global $wpdb;
 	// Admin, do not look to owner
 	if ( wppa_user_is( 'administrator' ) ) {
 		$result = $wpdb->get_var( 	"SELECT COUNT(*) " .
-									"FROM `" . WPPA_ALBUMS . "` " .
+									"FROM $wpdb->wppa_albums " .
 									( $where ? "WHERE " . $where : "" )
 								);
 	}
@@ -131,7 +131,7 @@ global $wpdb;
 	// Owner or public
 	elseif ( wppa_switch( 'upload_owner_only' ) ) {
 		$result = $wpdb->get_var( $wpdb->prepare( 	"SELECT COUNT(*) " .
-													"FROM `" . WPPA_ALBUMS . "` " .
+													"FROM $wpdb->wppa_albums " .
 													"WHERE `owner` = '--- public ---' OR `owner` = %s" .
 													( $where ? "AND " . $where : "" ),
 													wppa_get_user()
@@ -142,7 +142,7 @@ global $wpdb;
 	// No upload owners only
 	else {
 		$result = $wpdb->get_var( 	"SELECT COUNT(*) " .
-									"FROM `" . WPPA_ALBUMS . "` " .
+									"FROM $wpdb->wppa_albums " .
 									( $where ? "WHERE " . $where : "" )
 								);
 	}
@@ -178,7 +178,7 @@ global $wpdb;
 function wppa_get_youngest_album_id() {
 global $wpdb;
 
-	$result = $wpdb->get_var( "SELECT `id` FROM `" . WPPA_ALBUMS . "` ORDER BY `timestamp` DESC, `id` DESC LIMIT 1" );
+	$result = $wpdb->get_var( "SELECT `id` FROM $wpdb->wppa_albums ORDER BY `timestamp` DESC, `id` DESC LIMIT 1" );
 
 	return $result;
 }
@@ -187,7 +187,7 @@ global $wpdb;
 function wppa_get_youngest_album_name() {
 global $wpdb;
 
-	$result = $wpdb->get_var( "SELECT `name` FROM `" . WPPA_ALBUMS . "` ORDER BY `timestamp` DESC, `id` DESC LIMIT 1" );
+	$result = $wpdb->get_var( "SELECT `name` FROM $wpdb->wppa_albums ORDER BY `timestamp` DESC, `id` DESC LIMIT 1" );
 
 	return stripslashes($result);
 }
@@ -215,9 +215,9 @@ global $wppa_session;
 	// Remember click and update photodata, only if first time
 	if ( ! isset( $wppa_session['click'][$id] ) ) {
 		$wppa_session['click'][$id] = true;
-		$count = $wpdb->get_var( "SELECT `clicks` FROM `" . WPPA_PHOTOS . "` WHERE `id` = $id" );
+		$count = $wpdb->get_var( "SELECT `clicks` FROM $wpdb->wppa_photos WHERE `id` = $id" );
 		$count++;
-		$wpdb->query( "UPDATE `" . WPPA_PHOTOS . "` SET `clicks` = $count WHERE `id` = $id" );
+		$wpdb->query( "UPDATE $wpdb->wppa_photos SET `clicks` = $count WHERE `id` = $id" );
 
 		// Invalidate cache
 		wppa_cache_photo( 'invalidate', $id );
@@ -251,13 +251,16 @@ global $wppa_session;
 	}
 	if ( ! isset($wppa_session[$type][$id] ) ) {	// This one not done yest
 		$wppa_session[$type][$id] = true;			// Mark as viewed
-		if ( $type == 'album' ) $table = WPPA_ALBUMS; else $table = WPPA_PHOTOS;
-
-		$count = $wpdb->get_var("SELECT `views` FROM `".$table."` WHERE `id` = ".$id);
-		$count++;
-
-		$wpdb->query("UPDATE `".$table."` SET `views` = ".$count." WHERE `id` = ".$id);
-		wppa_log( 'dbg', 'Bumped viewcount for '.$type.' '.$id.' to '.$count );
+		if ( $type == 'album' ) {
+			$count = $wpdb->get_var( $wpdb->prepare( "SELECT `views` FROM $wpdb->wppa_albums WHERE `id` = %d", $id ) );
+			$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_albums SET `views` = %d  WHERE `id` = %d", $count+1, $id ) );
+			wppa_log( 'dbg', 'Bumped viewcount for album ' . $id . ' to ' . $count );
+		}
+		else {
+			$count = $wpdb->get_var( $wpdb->prepare( "SELECT `views` FROM $wpdb->wppa_photos WHERE `id` = %d", $id ) );
+			$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET `views` = %d  WHERE `id` = %d", $count+1, $id ) );
+			wppa_log( 'dbg', 'Bumped viewcount for photo ' . $id . ' to ' . $count );
+		}
 
 		// If 'wppa_owner_to_name'
 		if ( $type == 'photo' ) {
@@ -321,7 +324,7 @@ function wppa_flush_upldr_cache( $key = '', $id = '' ) {
 function wppa_get_random_photo_id_from_youngest_album() {
 global $wpdb;
 
-	$albums = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_ALBUMS . "` ORDER BY `timestamp` DESC" );
+	$albums = $wpdb->get_col( "SELECT `id` FROM $wpdb->wppa_albums ORDER BY `timestamp` DESC" );
 	$found 	= false;
 	$count 	= count( $albums );
 	$idx 	= 0;
@@ -329,7 +332,7 @@ global $wpdb;
 
 	while ( ! $found && $idx < $count ) {
 		$album = $albums[$idx];
-		$result = $wpdb->get_var( "SELECT `id` FROM `" . WPPA_PHOTOS ."` WHERE `album` = $album ORDER BY RAND() LIMIT 1" );
+		$result = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM $wpdb->wppa_photos WHERE `album` = %d ORDER BY RAND() LIMIT 1", $album ) );
 		if ( $result ) {
 			$found = true;
 		}
@@ -357,7 +360,7 @@ global $wpdb;
 
 	// No album id, flush them all
 	else {
-		$iret = $wpdb->query( "UPDATE `" . WPPA_ALBUMS . "` SET `treecounts` = ''" );
+		$iret = $wpdb->query( "UPDATE $wpdb->wppa_albums SET `treecounts` = ''" );
 		if ( ! $iret ) {
 			wppa_log( 'Dbg', 'Unable to clear all treecounts' );
 		}
@@ -387,7 +390,7 @@ global $wpdb;
 
 	// Get the ids of the child albums
 	$child_ids 	= $wpdb->get_col( 	"SELECT `id` " .
-									"FROM `" . WPPA_ALBUMS . "` " .
+									"FROM $wpdb->wppa_albums " .
 									"WHERE `a_parent` = $alb"
 								);
 
@@ -415,7 +418,7 @@ global $wpdb;
 
 	// Self albums
 	$result['selfalbums'] 			= $wpdb->get_var( 	"SELECT COUNT(*) " .
-														"FROM `" . WPPA_ALBUMS . "` " .
+														"FROM $wpdb->wppa_albums " .
 														"WHERE `a_parent` = $alb "
 													);
 
@@ -430,7 +433,7 @@ global $wpdb;
 
 	// Self photos
 	$result['selfphotos'] 			= $wpdb->get_var( 	"SELECT COUNT(*) " .
-														"FROM `" . WPPA_PHOTOS . "` " .
+														"FROM $wpdb->wppa_photos " .
 														"WHERE `album` = $alb " .
 														"AND `status` <> 'pending' " .
 														"AND `status` <> 'scheduled'"
@@ -447,7 +450,7 @@ global $wpdb;
 
 	// Pending self photos
 	$result['pendselfphotos'] 		= $wpdb->get_var( 	"SELECT COUNT(*) " .
-														"FROM `" . WPPA_PHOTOS . "` " .
+														"FROM $wpdb->wppa_photos " .
 														"WHERE `album` = $alb " .
 														"AND `status` = 'pending'"
 													);
@@ -463,7 +466,7 @@ global $wpdb;
 
 	// Scheduled self photos
 	$result['scheduledselfphotos'] 	= $wpdb->get_var( 	"SELECT COUNT(*) " .
-														"FROM `" . WPPA_PHOTOS . "` " .
+														"FROM $wpdb->wppa_photos " .
 														"WHERE `album` = $alb " .
 														"AND `status` = 'scheduled'"
 													);
@@ -478,7 +481,7 @@ global $wpdb;
 	}
 
 	// Self photo views
-	$views = $wpdb->get_col( "SELECT `views` FROM `" . WPPA_PHOTOS . "` WHERE `album` = $alb" );
+	$views = $wpdb->get_col( "SELECT `views` FROM $wpdb->wppa_photos WHERE `album` = $alb" );
 	$result['selfphotoviews'] 		= array_sum( $views );
 
 	// Tree photo views
@@ -547,7 +550,7 @@ global $wpdb;
 		$result = serialize( $result );
 
 		// Manually update. If used wppa_update_album, remake index would be triggered
-		$iret = $wpdb->query( "UPDATE `" . WPPA_ALBUMS . "` SET `treecounts` = '$result' WHERE `id` = $alb" );
+		$iret = $wpdb->query( "UPDATE $wpdb->wppa_albums SET `treecounts` = '$result' WHERE `id` = $alb" );
 		wppa_cache_album( 'invalidate', $alb );
 	}
 }
@@ -582,7 +585,7 @@ global $wpdb;
 
 		// Convert to array
 		if ( $treecount_string ) {
-			$treecount_array = unserialize( $treecount_string );
+			$treecount_array = wppa_unserialize( $treecount_string );
 		}
 		else {
 			$treecount_array = array();

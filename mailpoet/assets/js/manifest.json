@@ -1,10 +1,10 @@
 {
-  "mp2migrator.js": "mp2migrator.e5a53bf4.js",
-  "public.js": "public.0ac1326d.js",
-  "admin.js": "admin.1a382b74.js",
-  "admin_vendor.js": "admin_vendor.34b8c603.js",
-  "form_editor.js": "form_editor.1c91ecad.js",
-  "mailpoet.js": "mailpoet.f24a811e.js",
-  "newsletter_editor.js": "newsletter_editor.23164b7e.js",
-  "vendor.js": "vendor.b1917743.js"
+  "mp2migrator.js": "mp2migrator.8768b2f6.js",
+  "public.js": "public.8a5f8230.js",
+  "admin.js": "admin.41cfe984.js",
+  "admin_vendor.js": "admin_vendor.41cfe984.js",
+  "form_editor.js": "form_editor.41cfe984.js",
+  "mailpoet.js": "mailpoet.41cfe984.js",
+  "newsletter_editor.js": "newsletter_editor.41cfe984.js",
+  "vendor.js": "vendor.41cfe984.js"
 }

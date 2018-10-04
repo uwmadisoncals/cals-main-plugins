@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all comments
-* Version 6.9.02
+* Version 6.9.14
 *
 */
 
@@ -228,7 +228,7 @@ class WPPA_Comment_table extends WP_List_Table {
 			// Delete
 			if ( 'delete' === $current_action || 'deletesingle' === $current_action ) {
 				foreach( $ids as $id ) {
-					$wpdb->query( $wpdb->prepare( "DELETE FROM `" . WPPA_COMMENTS . "` WHERE `id` = %s", $id ) );
+					$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_comments WHERE `id` = %s", $id ) );
 				}
 			}
 
@@ -236,11 +236,11 @@ class WPPA_Comment_table extends WP_List_Table {
 			if ( 'approve' === $current_action || 'approvesingle' === $current_action ) {
 				foreach( $ids as $id ) {
 
-					$iret = $wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_COMMENTS . "` SET `status` = 'approved' WHERE `id` = %s", $id ) );
+					$iret = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_comments SET `status` = 'approved' WHERE `id` = %s", $id ) );
 
 					if ( $iret ) {
 						wppa_send_comment_approved_email( $id );
-						$photo = $wpdb->get_var( $wpdb->prepare( "SELECT `photo` FROM `" . WPPA_COMMENTS . "` WHERE `id` = %s", $id ) );
+						$photo = $wpdb->get_var( $wpdb->prepare( "SELECT `photo` FROM $wpdb->wppa_comments WHERE `id` = %s", $id ) );
 						wppa_add_credit_points( wppa_opt( 'cp_points_comment_appr' ), __( 'Photo comment approved' , 'wp-photo-album-plus'), $photo, '', wppa_get_photo_item( $photo, 'owner' )	);
 					}
 				}
@@ -249,14 +249,14 @@ class WPPA_Comment_table extends WP_List_Table {
 			// Spam
 			if ( 'spam' === $current_action || 'spamsingle' === $current_action ) {
 				foreach( $ids as $id ) {
-					$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_COMMENTS . "` SET `status` = 'spam' WHERE `id` = %s", $id ) );
+					$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_comments SET `status` = 'spam' WHERE `id` = %s", $id ) );
 				}
 			}
 
 			// Pending
 			if ( 'pending' === $current_action || 'pendingsingle' === $current_action ) {
 				foreach( $ids as $id ) {
-					$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_COMMENTS . "` SET `status` = 'pending' WHERE `id` = %s", $id ) );
+					$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_comments SET `status` = 'pending' WHERE `id` = %s", $id ) );
 				}
 			}
 
@@ -264,13 +264,13 @@ class WPPA_Comment_table extends WP_List_Table {
 			if ( 'editsingle' === $current_action ) {
 				$commenttext = $_GET['commenttext'];
 				$id = $_GET['comment'];
-				$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_COMMENTS . "` SET `comment` = %s WHERE `id` = %s", $commenttext, $id ) );
+				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_comments SET `comment` = %s WHERE `id` = %s", $commenttext, $id ) );
 			}
 
 			// Update index in the near future
 			if ( wppa_switch( 'search_comments' ) ) {
 				foreach( $ids as $id ) {
-					$photo = $wpdb->get_var( $wpdb->prepare( "SELECT `photo` FROM `" . WPPA_COMMENTS . "` WHERE `id` = %s", $id ) );
+					$photo = $wpdb->get_var( $wpdb->prepare( "SELECT `photo` FROM $wpdb->wppa_comments WHERE `id` = %s", $id ) );
 					wppa_index_update( 'photo', $photo );
 				}
 			}
@@ -315,7 +315,7 @@ class WPPA_Comment_table extends WP_List_Table {
 			}
 		}
 
-	    $data = $wpdb->get_results( "SELECT * FROM `" . WPPA_COMMENTS . "` " . $filter . " ORDER BY `timestamp` DESC", ARRAY_A );
+	    $data = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_comments " . $filter . " ORDER BY `timestamp` DESC", ARRAY_A );
 
 		function usort_reorder( $a, $b ) {
 			$orderby = ( ! empty( $_REQUEST['orderby'] ) ) ? $_REQUEST['orderby'] : 'timestamp'; //If no sort, default to title
@@ -403,22 +403,22 @@ function _wppa_comment_admin() {
 				<tbody>
 					<tr>
 						<td style="margin:0; font-weight:bold; color:#777777;">' . __( 'Total:', 'wp-photo-album-plus' ) . '</td>
-						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "`" ) . '</td>
+						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments" ) . '</td>
 						<td></td>
 					</tr>
 					<tr>
 						<td style="margin:0; font-weight:bold; color:green;">' . __( 'Approved:', 'wp-photo-album-plus' ) . '</td>
-						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "` WHERE `status` = 'approved'" ) . '</td>
+						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE `status` = 'approved'" ) . '</td>
 						<td></td>
 					</tr>
 					<tr>
 						<td style="margin:0; font-weight:bold; color:#e66f00;">' . __( 'Pending:', 'wp-photo-album-plus' ) . '</td>
-						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "` WHERE `status` = 'pending'" ) . '</td>
+						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE `status` = 'pending'" ) . '</td>
 						<td></td>
 					</tr>
 					<tr>
 						<td style="margin:0; font-weight:bold; color:red;">' . __( 'Spam:', 'wp-photo-album-plus' ) . '</td>
-						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "` WHERE `status` = 'spam'" ) . '</td>
+						<td style="margin:0; font-weight:bold;">' . $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE `status` = 'spam'" ) . '</td>
 						<td></td>
 					</tr>';
 					if ( $spamtime ) {

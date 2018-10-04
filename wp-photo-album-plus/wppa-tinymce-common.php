@@ -2,7 +2,7 @@
 /* wppa-tinymce-common.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 6.7.11
+* Version 6.9.14
 *
 */
 
@@ -11,7 +11,7 @@ global $wpdb;
 
 	// Prepare albuminfo
 	$albums = $wpdb->get_results( 	"SELECT `id`, `name` " .
-									"FROM `" . WPPA_ALBUMS . "` " .
+									"FROM $wpdb->wppa_albums " .
 									"WHERE `owner` = '" . wppa_get_user() . "' " .
 									"OR `owner` = '--- public ---' " .
 									"ORDER BY `name` ",
@@ -333,7 +333,7 @@ global $wpdb;
 
 	// Prepare photoinfo
 	$my_photos = $wpdb->get_results( 	"SELECT `id`, `name`, `album`, `ext` " .
-										"FROM `" . WPPA_PHOTOS . "` " .
+										"FROM $wpdb->wppa_photos " .
 										"WHERE `owner` = '" . wppa_get_user() . "' " .
 										"ORDER BY `timestamp` DESC LIMIT 100",
 										ARRAY_A );
@@ -399,7 +399,7 @@ global $wpdb;
 
 	// Prepare photoinfo
 	$all_photos = $wpdb->get_results( 	"SELECT `id`, `name`, `album`, `ext` " .
-										"FROM `" . WPPA_PHOTOS . "` " .
+										"FROM $wpdb->wppa_photos " .
 										"ORDER BY `timestamp` DESC LIMIT 100",
 										ARRAY_A );
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version 6.9.02
+* Version 6.9.15
 *
 */
 
@@ -26,12 +26,12 @@ static $album_cache_2;
 	if ( empty( $album_cache_2 ) && ! is_admin() ) {
 
 		// Find # of albums
-		$n_albs = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "`" );
+		$n_albs = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums" );
 
 		if ( $n_albs && $n_albs < 1000 ) {
 
 			// Get them all
-			$allalbs = $wpdb->get_results( "SELECT * FROM `" . WPPA_ALBUMS ."`", ARRAY_A );
+			$allalbs = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_albums", ARRAY_A );
 
 			// Store in 2nd level cache
 			foreach( $allalbs as $album ) {			// Add multiple
@@ -95,7 +95,7 @@ static $album_cache_2;
 	}
 
 	// Not in cache, do query
-	$album = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `".WPPA_ALBUMS."` WHERE `id` = %s", $id ), ARRAY_A );
+	$album = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE `id` = %s", $id ), ARRAY_A );
 	wppa_dbg_cachecounts( 'albummis' );
 
 	// Found one?
@@ -203,7 +203,7 @@ static $thumb_cache_2;
 	}
 
 	// Not in cache, do query
-	$thumb = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $id ), ARRAY_A );
+	$thumb = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `id` = %s", $id ), ARRAY_A );
 	wppa_dbg_cachecounts( 'photomis' );
 
 	// Found one?
@@ -433,7 +433,7 @@ function wppa_translate_photo_keywords( $id, $text ) {
 		// Custom data fields
 		if ( wppa_switch( 'custom_fields' ) ) {
 			$custom = $thumb['custom'];
-			$custom_data = $custom ? unserialize( $custom ) : array( '', '', '', '', '', '', '', '', '', '' );
+			$custom_data = $custom ? wppa_unserialize( $custom ) : array( '', '', '', '', '', '', '', '', '', '' );
 			for ( $i = '0'; $i < '10'; $i++ ) {
 				if ( wppa_opt( 'custom_caption_'.$i ) ) {					// Field defined
 					if ( wppa_switch( 'custom_visible_'.$i ) ) {			// May be displayed
@@ -712,7 +712,7 @@ function wppa_translate_album_keywords( $id, $text, $translate = true ) {
 
 			// Get raw data
 			$custom = $album['custom'];
-			$custom_data = $custom ? unserialize( $custom ) : array( '', '', '', '', '', '', '', '', '', '' );
+			$custom_data = $custom ? wppa_unserialize( $custom ) : array( '', '', '', '', '', '', '', '', '', '' );
 
 			// Process max all 10 sub-items
 			for ( $i = '0'; $i < '10'; $i++ ) {

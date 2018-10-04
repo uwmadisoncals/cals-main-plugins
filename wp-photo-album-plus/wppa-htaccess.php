@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various funcions
-* Version 6.7.04
+* Version 6.9.14
 *
 */
 
@@ -159,7 +159,7 @@ global $wpdb;
 	// RewriteBase /wp-content/wppa-pl
 	fwrite( $file, "\n" . 'RewriteBase /' . str_replace( ABSPATH, '', $pl_root ) );
 
-	$albs = $wpdb->get_results( "SELECT `id`, `name` FROM `".WPPA_ALBUMS."` ORDER BY `name` DESC", ARRAY_A );
+	$albs = $wpdb->get_results( "SELECT `id`, `name` FROM $wpdb->wppa_albums ORDER BY `name` DESC", ARRAY_A );
 
 	if ( $albs ) foreach( $albs as $alb ) {
 

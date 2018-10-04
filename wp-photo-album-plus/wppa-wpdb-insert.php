@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that add new records
-* Version 6.9.07
+* Version 6.9.14
 *
 */
 
@@ -48,7 +48,7 @@ global $wpdb;
 
 	// Succcessful insert: return record id
 	if ( $iret ) {
-		$result = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM `" . WPPA_SESSION . "` WHERE `session` = %s ORDER BY `id` DESC LIMIT 1", wppa_get_session_id() ) );
+		$result = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM $wpdb->wppa_session WHERE `session` = %s ORDER BY `id` DESC LIMIT 1", wppa_get_session_id() ) );
 		return $result;
 	}
 	else {
@@ -69,7 +69,7 @@ global $wpdb;
 
 	// WPPA_INDEX is now AUTO_INCREMENT
 
-	$query = $wpdb->prepare("INSERT INTO `" . WPPA_INDEX . "` 	(
+	$query = $wpdb->prepare("INSERT INTO $wpdb->wppa_index 	(
 																	`slug`,
 																	`albums`,
 																	`photos`
@@ -104,7 +104,7 @@ global $wpdb;
 	$args['description'] = sanitize_text_field( $args['description'] );
 	$args['description'] = str_replace( array(chr(0),chr(1),chr(2),chr(3),chr(4),chr(5),chr(6),chr(7)), '', $args['description'] );
 
-	$query = $wpdb->prepare("INSERT INTO `" . WPPA_EXIF . "` 	(
+	$query = $wpdb->prepare("INSERT INTO $wpdb->wppa_exif 	(
 																	`photo`,
 																	`tag`,
 																	`description`,
@@ -143,7 +143,7 @@ global $wpdb;
 	$args['description'] = sanitize_text_field( $args['description'] );
 	$args['description'] = str_replace( array(chr(0),chr(1),chr(2),chr(3),chr(4),chr(5),chr(6),chr(7)), '', $args['description'] );
 
-	$query = $wpdb->prepare("INSERT INTO `" . WPPA_IPTC . "` 	(
+	$query = $wpdb->prepare("INSERT INTO $wpdb->wppa_iptc 	(
 																	`photo`,
 																	`tag`,
 																	`description`,
@@ -178,7 +178,7 @@ global $wpdb;
 
 	if ( ! wppa_is_id_free( WPPA_COMMENTS, $args['id'] ) ) $args['id'] = wppa_nextkey( WPPA_COMMENTS );
 
-	$query = $wpdb->prepare("INSERT INTO `" . WPPA_COMMENTS . "` 	( 	`id`,
+	$query = $wpdb->prepare("INSERT INTO $wpdb->wppa_comments 	( 	`id`,
 																		`timestamp`,
 																		`photo`,
 																		`user`,
@@ -223,7 +223,7 @@ global $wpdb;
 
 	if ( ! wppa_is_id_free( WPPA_RATING, $args['id'] ) ) $args['id'] = wppa_nextkey( WPPA_RATING );
 
-	$query = $wpdb->prepare("INSERT INTO `" . WPPA_RATING . "` ( 	`id`,
+	$query = $wpdb->prepare("INSERT INTO $wpdb->wppa_rating ( 	`id`,
 																	`timestamp`,
 																	`photo`,
 																	`value`,
@@ -273,7 +273,7 @@ global $wpdb;
 					'exifdtm' 			=> '',
 					'videox' 			=> '0',
 					'videoy' 			=> '0',
-					'scheduledtm' 		=> $args['album'] ? $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledtm` FROM `".WPPA_ALBUMS."` WHERE `id` = %s", $args['album'] ) ) : '',
+					'scheduledtm' 		=> $args['album'] ? $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledtm` FROM $wpdb->wppa_albums WHERE `id` = %s", $args['album'] ) ) : '',
 					'scheduledel' 		=> '',
 					'custom'			=> '',
 					'crypt' 			=> wppa_get_unique_photo_crypt(),
@@ -286,7 +286,7 @@ global $wpdb;
 
 	if ( ! wppa_is_id_free( WPPA_PHOTOS, $args['id'] ) ) $args['id'] = wppa_nextkey( WPPA_PHOTOS );
 
-	$query = $wpdb->prepare( "INSERT INTO `" . WPPA_PHOTOS . "` ( 	`id`,
+	$query = $wpdb->prepare( "INSERT INTO $wpdb->wppa_photos ( 	`id`,
 																	`album`,
 																	`ext`,
 																	`name`,
@@ -397,7 +397,7 @@ global $wpdb;
 
 	if ( ! wppa_is_id_free( WPPA_ALBUMS, $args['id'] ) ) $args['id'] = wppa_nextkey( WPPA_ALBUMS );
 
-	$query = $wpdb->prepare("INSERT INTO `" . WPPA_ALBUMS . "` ( 	`id`,
+	$query = $wpdb->prepare("INSERT INTO $wpdb->wppa_albums ( 	`id`,
 																	`name`,
 																	`description`,
 																	`a_order`,

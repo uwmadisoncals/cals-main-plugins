@@ -522,8 +522,6 @@ class Menu {
   }
 
   function segments() {
-    if($this->subscribers_over_limit) return $this->displaySubscriberLimitExceededTemplate();
-
     $data = array();
     $data['items_per_page'] = $this->getLimitPerPage('segments');
     $this->displayPage('segments.html', $data);
@@ -560,6 +558,8 @@ class Menu {
     });
     $data['segments'] = $segments;
     $data['settings'] = Setting::getAll();
+    $data['current_wp_user'] = wp_get_current_user()->to_array();
+    $data['site_url'] = site_url();
     $data['roles'] = $wp_roles->get_names();
     $data['roles']['mailpoet_all'] = __('In any WordPress role', 'mailpoet');
 
@@ -639,7 +639,7 @@ class Menu {
     $data = array(
       'shortcodes' => ShortcodesHelper::getShortcodes(),
       'settings' => Setting::getAll(),
-      'current_wp_user' => Subscriber::getCurrentWPUser(),
+      'current_wp_user' => array_merge(Subscriber::getCurrentWPUser()->asArray(), wp_get_current_user()->to_array()),
       'sub_menu' => self::MAIN_PAGE_SLUG,
       'mss_active' => Bridge::isMPSendingServiceEnabled()
     );

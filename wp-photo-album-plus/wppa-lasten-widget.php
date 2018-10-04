@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the last uploaded photos
-* Version 6.9.12
+* Version 6.9.14
 */
 
 class LasTenWidget extends WP_Widget {
@@ -63,7 +63,7 @@ class LasTenWidget extends WP_Widget {
 			case '0': // ---all---
 				break;
 			case '-2': // ---generic---
-				$albs = $wpdb->get_results( "SELECT `id` FROM `" . WPPA_ALBUMS . "` WHERE `a_parent` = '0'", ARRAY_A );
+				$albs = $wpdb->get_results( "SELECT `id` FROM $wpdb->wppa_albums WHERE `a_parent` = '0'", ARRAY_A );
 				$album = '';
 				foreach ( $albs as $alb ) {
 					$album .= '.' . $alb['id'];
@@ -90,18 +90,18 @@ class LasTenWidget extends WP_Widget {
 		if ( wppa_switch( 'lasten_limit_new' ) && wppa_opt( 'max_photo_newtime' ) ) {
 			$newtime = " `" . $order_by . "` >= ".( time() - wppa_opt( 'max_photo_newtime' ) );
 			if ( $album ) {
-				$q = "SELECT * FROM `".WPPA_PHOTOS."` WHERE (".$newtime.") AND `album` IN ( ".$album." ) AND ( `status` <> 'pending' AND `status` <> 'scheduled' ) ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
+				$q = "SELECT * FROM $wpdb->wppa_photos WHERE (".$newtime.") AND `album` IN ( ".$album." ) AND ( `status` <> 'pending' AND `status` <> 'scheduled' ) ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
 			}
 			else {
-				$q = "SELECT * FROM `".WPPA_PHOTOS."` WHERE (".$newtime.") AND `album` > 0 AND `status` <> 'pending' AND `status` <> 'scheduled' ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
+				$q = "SELECT * FROM $wpdb->wppa_photos WHERE (".$newtime.") AND `album` > 0 AND `status` <> 'pending' AND `status` <> 'scheduled' ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
 			}
 		}
 		else {
 			if ( $album ) {
-				$q = "SELECT * FROM `".WPPA_PHOTOS."` WHERE `album` IN ( ".$album." ) AND ( `status` <> 'pending' AND `status` <> 'scheduled' ) ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
+				$q = "SELECT * FROM $wpdb->wppa_photos WHERE `album` IN ( ".$album." ) AND ( `status` <> 'pending' AND `status` <> 'scheduled' ) ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
 			}
 			else {
-				$q = "SELECT * FROM `".WPPA_PHOTOS."` WHERE `album` > 0 AND `status` <> 'pending' AND `status` <> 'scheduled' ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
+				$q = "SELECT * FROM $wpdb->wppa_photos WHERE `album` > 0 AND `status` <> 'pending' AND `status` <> 'scheduled' ORDER BY `" . $order_by . "` DESC LIMIT " . $max;
 			}
 		}
 

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level wpdb routines that update records
-* Version 6.9.07
+* Version 6.9.14
 *
 */
 
@@ -78,7 +78,7 @@ global $wpdb;
 		}
 
 		if ( $doit ) {
-			if ( $wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_ALBUMS."` SET `".$itemname."` = %s WHERE `id` = %s LIMIT 1", $itemvalue, $id ) ) ) {
+			if ( $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_albums SET `".$itemname."` = %s WHERE `id` = %s LIMIT 1", $itemvalue, $id ) ) ) {
 				wppa_cache_album( 'invalidate' );
 			}
 		}
@@ -219,7 +219,7 @@ global $wpdb;
 		}
 
 		if ( $doit ) {
-			if ( $wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_PHOTOS."` SET `".$itemname."` = %s WHERE `id` = %s LIMIT 1", $itemvalue, $id ) ) ) {
+			if ( $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET `".$itemname."` = %s WHERE `id` = %s LIMIT 1", $itemvalue, $id ) ) ) {
 				wppa_cache_photo( 'invalidate', $id );
 			}
 		}

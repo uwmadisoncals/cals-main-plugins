@@ -16,7 +16,7 @@ class M_Third_Party_Compat extends C_Base_Module
             'photocrati-third_party_compat',
             'Third Party Compatibility',
             "Adds Third party compatibility hacks, adjustments, and modifications",
-            '3.0.0',
+            '3.0.0.1',
             'https://www.imagely.com/wordpress-gallery-plugin/nextgen-gallery/',
             'Imagely',
             'https://www.imagely.com'
@@ -165,6 +165,7 @@ class M_Third_Party_Compat extends C_Base_Module
         // Assign our own shortcode handler; ngglegacy and ATP do this same routine for their own
         // legacy and preview image placeholders.
         remove_all_shortcodes();
+        C_NextGen_Shortcode_Manager::add('ngg',        array($this, 'wpseo_shortcode_handler'));
         C_NextGen_Shortcode_Manager::add('ngg_images', array($this, 'wpseo_shortcode_handler'));
         do_shortcode($post->post_content);
 

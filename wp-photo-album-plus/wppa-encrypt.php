@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 6.6.09
+* Version 6.9.14
 *
 */
 
@@ -36,11 +36,21 @@ function wppa_get_unique_crypt( $table ) {
 global $wpdb;
 
 	$crypt 	= substr( md5( microtime() ), 0, 12 );
-	$dup 	= $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM `" . $table . "` WHERE `crypt` = %s", $crypt ) );
+	if ( $table == WPPA_PHOTOS ) {
+		$dup = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM $wpdb->wppa_photos WHERE `crypt` = %s", $crypt ) );
+	}
+	else {
+		$dup = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM $wpdb->wppa_albums WHERE `crypt` = %s", $crypt ) );
+	}
 	while ( $dup ) {
 		sleep( 1 );
 		$crypt 	= substr( md5( microtime() ), 0, 12 );
-		$dup 	= $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM `" . $table . "` WHERE `crypt` = %s", $crypt ) );
+		if ( $table == WPPA_PHOTOS ) {
+			$dup = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM `" . WPPA_PHOTOS . " WHERE `crypt` = %s", $crypt ) );
+		}
+		else {
+			$dup = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM $wpdb->wppa_albums WHERE `crypt` = %s", $crypt ) );
+		}
 	}
 	return $crypt;
 }
@@ -143,7 +153,7 @@ global $wpdb;
 	}
 
 	// Just do it
-	$id = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM `" . WPPA_PHOTOS . "` WHERE `crypt` = %s", substr( $photo, 0, 12 ) ) );
+	$id = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM $wpdb->wppa_photos WHERE `crypt` = %s", substr( $photo, 0, 12 ) ) );
 	if ( ! $id ) {
 		if ( $report_error ) {
 			wppa_dbg_msg( 'Invalid photo identifier: ' . $photo, 'red', 'force' );
@@ -205,7 +215,7 @@ global $wpdb;
 
 			// Just do it
 			else {
-				$id = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM `" . WPPA_ALBUMS . "` WHERE `crypt` = %s", substr( $crypt, 0, 12 ) ) );
+				$id = $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM $wpdb->wppa_albums WHERE `crypt` = %s", substr( $crypt, 0, 12 ) ) );
 				if ( ! $id ) {
 					wppa_log( 'Dbg', 'Invalid album identifier: ' . $crypt . ' found in: ' . $album . ' (wppa_decrypt_album)' );
 					$id = '-9';

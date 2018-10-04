@@ -5,7 +5,7 @@ Tags: calendar, dates, times, event, events, scheduling, schedule, event manager
 Requires at least: 4.4
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 3.0.17
+Stable tag: 3.0.18
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -84,6 +84,12 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 == Changelog ==
 
 TODO: Support limiting views to multiple locations
+
+= 3.0.18 =
+
+* Bug fix: Invalid setting in bottom nav defaults.
+* Bug fix: Generate feeds by date added rather than fixed number. If empty, get most recent regardless.
+* Bug fix: Legitimate HTML escaped in visual editor in group event editor.
 
 = 3.0.17 =
 

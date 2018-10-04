@@ -1,6 +1,7 @@
 <?php
 
 define('NGG_ATTACH_TO_POST_SLUG', 'nextgen-attach_to_post');
+define('NGG_ATTACH_TO_POST_VERSION', '3.0.0.5');
 
 class M_Attach_To_Post extends C_Base_Module
 {
@@ -25,7 +26,7 @@ class M_Attach_To_Post extends C_Base_Module
 			'photocrati-attach_to_post',
 			'Attach To Post',
 			'Provides the "Attach to Post" interface for displaying galleries and albums',
-			'3.0.3',
+			NGG_ATTACH_TO_POST_VERSION,
 			'https://www.imagely.com/wordpress-gallery-plugin/nextgen-gallery/',
 			'Imagely',
 			'https://www.imagely.com',
@@ -447,9 +448,13 @@ class M_Attach_To_Post extends C_Base_Module
 	 */
 	function add_attach_to_post_tinymce_plugin($plugins)
 	{
-        $router = C_Router::get_instance();
+		$router = C_Router::get_instance();
 		wp_enqueue_script('photocrati_ajax');
-		$plugins[$this->attach_to_post_tinymce_plugin] = $router->get_static_url('photocrati-attach_to_post#ngg_attach_to_post_tinymce_plugin.js');
+		$plugins[$this->attach_to_post_tinymce_plugin] = add_query_arg(
+			'ver',
+			NGG_ATTACH_TO_POST_VERSION,
+			$router->get_static_url('photocrati-attach_to_post#ngg_attach_to_post_tinymce_plugin.js')
+		);
 		return $plugins;
 	}
 

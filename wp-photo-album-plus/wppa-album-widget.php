@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail albums
-* Version 6.9.12
+* Version 6.9.14
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -170,7 +170,7 @@ class AlbumWidget extends WP_Widget {
 							$widget_content .= "\n\t".'</a>';
 						}
 						elseif ( $link['is_lightbox'] ) {
-							$thumbs = $wpdb->get_results($wpdb->prepare("SELECT * FROM `".WPPA_PHOTOS."` WHERE `album` = %s ".wppa_get_photo_order($album['id']), $album['id']), 'ARRAY_A');
+							$thumbs = $wpdb->get_results($wpdb->prepare("SELECT * FROM $wpdb->wppa_photos WHERE `album` = %s ".wppa_get_photo_order($album['id']), $album['id']), 'ARRAY_A');
 							if ( $thumbs ) foreach ( $thumbs as $thumb ) {
 								$title = wppa_get_lbtitle('alw', $thumb['id']);
 								if ( wppa_is_video( $thumb['id']  ) ) {
@@ -358,7 +358,7 @@ class AlbumWidget extends WP_Widget {
 		wppa_widget_input( $this, 'title', $instance['title'], __( 'Title', 'wp-photo-album-plus' ) );
 
 		// Parent album selection
-		$albs = $wpdb->get_results( "SELECT `id`, `name` FROM `" . WPPA_ALBUMS . "` ORDER BY `name`", ARRAY_A );
+		$albs = $wpdb->get_results( "SELECT `id`, `name` FROM $wpdb->wppa_albums ORDER BY `name`", ARRAY_A );
 
 		$options 	= array(
 							__( '--- all albums ---', 'wp-photo-album-plus' ),

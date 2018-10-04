@@ -2,7 +2,7 @@
 Contributors: photocrati, imagely
 Tags: wordpress gallery plugin, gallery, nextgen, nextgen gallery, photo gallery, image gallery, photography, slideshow, images, photo, photo album, watermark
 Requires at least: 4.0.0
-Stable tag: 3.0.8
+Stable tag: 3.0.9
 Tested up to: 4.9.8
 License: GPLv2
 
@@ -182,6 +182,17 @@ For more information, feel free to visit the official website for the NextGEN Ga
 
 
 == Changelog ==
+
+= V3.0.9 - 10.02.2018 =
+* NEW:     Added 2.0 template mechanism for basic galleries
+* NEW:     Simple Lightbox is the new default Lightbox
+* Changed: Changed Javascript library and styling for basic slideshow
+* Changed: New default template and styling for thumbnail galleries
+* Changed: New default template and styling for imagebrowser galleries
+* Changed: New default template and styling for compact albums
+* Changed: New default template and styling for extended albums
+* Changed: Changed implementation of "Number of Columns" setting
+* Changed: Significantly simplified NextGEN default shortcodes
 
 = V3.0.8 - 09.05.2018 =
 * Fixed:   IGW broken with Chrome 69+

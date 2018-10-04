@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.9.13
+* Version 6.9.15
 *
 */
 
@@ -29,6 +29,13 @@ global $wppa_supported_camara_brands;
 	// Start test area
 	/*
 echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\' )" />';
+*//*
+$session = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}wppa_session ORDER BY id DESC LIMIT 1", ARRAY_A );
+echo $session['data'].'<br /><br />';
+var_dump ( unserialize($session['data']));
+echo '<br /><br />';
+var_dump ( wppa_unserialize($session['data']));
+echo '<br /><br />';
 */
 	// End test area
 
@@ -197,7 +204,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							wppa_update_option( 'wppa_audiostub', 'audiostub'. $ext );
 
 							// Thumbx, thumby, phtox and photoy must be cleared for the new stub
-							$wpdb->query( "UPDATE `" . WPPA_PHOTOS ."` SET `thumbx` = 0, `thumby` = 0, `photox` = 0, `photoy` = 0 WHERE `ext` = 'xxx'" );
+							$wpdb->query( "UPDATE $wpdb->wppa_photos SET `thumbx` = 0, `thumby` = 0, `photox` = 0, `photoy` = 0 WHERE `ext` = 'xxx'" );
 							wppa_alert( sprintf( __( 'Upload of %s done', 'wp-photo-album-plus'), basename( wppa_sima( $file['name'] ) ) ) );
 						}
 					}
@@ -258,7 +265,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 	} // wppa-settings-submit
 
 	// Fix invalid ratings
-	$iret = $wpdb->query( "DELETE FROM `".WPPA_RATING."` WHERE `value` = 0" );
+	$iret = $wpdb->query( "DELETE FROM `" . WPPA_RATING . "` WHERE `value` = 0" );
 	if ( $iret ) wppa_update_message( sprintf( __( '%s invalid ratings removed. Please run Table VIII-A5: Rerate to fix the averages.' , 'wp-photo-album-plus'), $iret ) );
 
 	// Fix invalid source path
@@ -282,6 +289,9 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 			__( 'WP Charset:', 'wp-photo-album-plus') . ' ' . get_bloginfo( 'charset' ) . '. ' .
 			__( 'Current PHP version:', 'wp-photo-album-plus' ) . ' ' . phpversion() . ' ' .
 			__( 'WPPA+ API Version:', 'wp-photo-album-plus' ) . ' ' . $wppa_api_version . '.';
+			if ( function_exists( 'wppa_shortcodes' ) ) {
+				echo ' ' . __( 'Front-end code loaded', 'wp-photo-album-plus' );
+			}
 		?>
 		<br /><?php if ( is_multisite() ) {
 			if ( WPPA_MULTISITE_GLOBAL ) {
@@ -350,7 +360,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 
 		// Check for 'many' albums
 		if ( wppa_opt( 'photo_admin_max_albums' ) ) { 	// Not OFF
-			$abs = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "` " );
+			$abs = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums " );
 			if ( wppa_opt( 'photo_admin_max_albums' ) < $abs ) {
 				wppa_warning_message( 	__( 'This system contains more albums than the maximum set in Table IX-B6.3.', 'wp-photo-album-plus' ) . ' ' .
 										__( 'No problem, but some widgets may not work and some album selectionboxes will revert to a simple input field asking for an album id.', 'wp-photo-album-plus' ) . ' ' .
@@ -8528,6 +8538,16 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$clas = '';
 							$tags = 'system';
 							wppa_setting($slug, '13', $name, $desc, $html, $help, $clas, $tags);
+
+							$name = __('Load front-end code always', 'wp-photo-album-plus');
+							$desc = __('Load front-end code also on admin pages', 'wp-photo-album-plus');
+							$help = '';
+							$slug = 'wppa_load_frontend_always';
+							$html = wppa_checkbox($slug);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting($slug, '14', $name, $desc, $html, $help, $clas, $tags);
+
 							}
 						wppa_setting_subheader( 'B', '1', __( 'WPPA+ Admin related miscellaneous settings' , 'wp-photo-album-plus') );
 							{
@@ -8590,9 +8610,9 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$desc = __('The number of albums per page on the Edit Album admin page.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_album_admin_pagesize';
-							$options = array( __('--- off ---', 'wp-photo-album-plus'), '10', '20', '50', '100', '200');
-							$values = array('0', '10', '20', '50', '100', '200');
-							$html = wppa_select($slug, $options, $values);
+							$opts = array( '10', '20', '50', '100', '200' );
+							$vals = array( '10', '20', '50', '100', '200' );
+							$html = wppa_select($slug, $opts, $vals);
 							$clas = '';
 							$tags = 'system,page';
 							wppa_setting($slug, '6.1', $name, $desc, $html, $help, $clas, $tags);
@@ -8601,9 +8621,9 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$desc = __('The number of photos per page on the <br/>Edit Album -> Manage photos and Edit Photos admin pages.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_photo_admin_pagesize';
-							$options = array( __('--- off ---', 'wp-photo-album-plus'), '10', '20', '50', '100', '200');
-							$values = array('0', '10', '20', '50', '100', '200');
-							$html = wppa_select($slug, $options, $values);
+							$opts = array( '10', '20', '50', '100', '200' );
+							$vals = array( '10', '20', '50', '100', '200' );
+							$html = wppa_select($slug, $opts, $vals);
 							$clas = '';
 							$tags = 'system,page';
 							wppa_setting($slug, '6.2', $name, $desc, $html, $help, $clas, $tags);
@@ -9004,7 +9024,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$slug = 'wppa_default_parent';
 							$opts = array( __('--- none ---', 'wp-photo-album-plus'), __('--- separate ---', 'wp-photo-album-plus') );
 							$vals = array( '0', '-1');
-							$albs = $wpdb->get_results( "SELECT `id`, `name` FROM `" . WPPA_ALBUMS . "` ORDER BY `name`", ARRAY_A );
+							$albs = $wpdb->get_results( "SELECT `id`, `name` FROM $wpdb->wppa_albums ORDER BY `name`", ARRAY_A );
 							if ( $albs ) {
 								foreach ( $albs as $alb ) {
 									$opts[] = __(stripslashes($alb['name']), 'wp-photo-album-plus');
@@ -9080,7 +9100,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 									$slug = 'wppa_grant_parent';
 									$opts = array( __('--- none ---', 'wp-photo-album-plus'), __('--- separate ---', 'wp-photo-album-plus') );
 									$vals = array( 'zero', '-1');
-									$albs = $wpdb->get_results( "SELECT `id`, `name` FROM`" . WPPA_ALBUMS . "` ORDER BY `name`", ARRAY_A );
+									$albs = $wpdb->get_results( "SELECT `id`, `name` FROM $wpdb->wppa_albums ORDER BY `name`", ARRAY_A );
 									if ( $albs ) {
 										foreach ( $albs as $alb ) {
 											$opts[] = __(stripslashes($alb['name']), 'wp-photo-album-plus');
@@ -9697,7 +9717,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 							$desc = __('A real life preview. To update: refresh the page.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_watermark_preview';
-							$id = $wpdb->get_var( "SELECT `id` FROM `".WPPA_PHOTOS."` ORDER BY RAND() LIMIT 1" );
+							$id = $wpdb->get_var( "SELECT `id` FROM $wpdb->wppa_photos ORDER BY RAND() LIMIT 1" );
 							$tr = floor( 127 * ( 100 - wppa_opt( 'watermark_opacity_text' ) ) / 100 );
 							$args = array( 'id' => $id, 'content' => '---predef---', 'pos' => 'cencen', 'url' => true, 'width' => '1000', 'height' => '400', 'transp' => $tr );
 							$html = '<div style="text-align:center; max-width:400px; overflow:hidden; background-image:url('.WPPA_UPLOAD_URL.'/fonts/turkije.jpg);" ><img src="'.wppa_create_textual_watermark_file( $args ).'?ver='.rand(0, 4711).'" /></div><div style="clear:both;"></div>';
@@ -10490,7 +10510,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 								$html = wppa_input( $slug, '220', __('Enter album ids separated by commas','wp-photo-album-plus' ) );
 							}
 							else {
-								$albums = $wpdb->get_results( "SELECT `id`, `name` FROM `" . WPPA_ALBUMS . "`", ARRAY_A );
+								$albums = $wpdb->get_results( "SELECT `id`, `name` FROM $wpdb->wppa_albums", ARRAY_A );
 								$albums = wppa_add_paths( $albums );
 								$albums = wppa_array_sort( $albums, 'name' );
 								$opts = array();
@@ -10570,7 +10590,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 
 							$wppa_subtable = 'Z';
 
-							$labels = $wpdb->get_results( "SELECT * FROM `".WPPA_IPTC."` WHERE `photo` = '0' ORDER BY `tag`", ARRAY_A );
+							$labels = $wpdb->get_results( "SELECT * FROM `" . WPPA_IPTC . "` WHERE `photo` = '0' ORDER BY `tag`", ARRAY_A );
 							if ( is_array( $labels ) ) {
 								$i = '1';
 								foreach ( $labels as $label ) {
@@ -10638,7 +10658,7 @@ echo '<input type="button" vaue="Click me" onclick="wppaTimedConfirm( \'My Text\
 									'<b></span>');
 							}
 
-							$labels = $wpdb->get_results( "SELECT * FROM `".WPPA_EXIF."` WHERE `photo` = '0' ORDER BY `tag`", ARRAY_A);
+							$labels = $wpdb->get_results( "SELECT * FROM `" . WPPA_EXIF . "` WHERE `photo` = '0' ORDER BY `tag`", ARRAY_A);
 							if ( is_array( $labels ) ) {
 								$i = '1';
 								foreach ( $labels as $label ) {

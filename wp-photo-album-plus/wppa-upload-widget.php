@@ -4,7 +4,7 @@
 *
 * A wppa widget to upload photos
 *
-* Version 6.9.12
+* Version 6.9.14
 */
 
 class WppaUploadWidget extends WP_Widget {
@@ -34,7 +34,7 @@ class WppaUploadWidget extends WP_Widget {
  		$title = apply_filters( 'widget_title', $instance['title'] );
 		$album = $instance['album'];
 
-		if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "` WHERE `id` = %d", $album ) ) ) {
+		if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE `id` = %d", $album ) ) ) {
 			$album = '0';	// Album vanished
 		}
 

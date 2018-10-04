@@ -3,7 +3,7 @@ Contributors: mailpoet, wysija, kgjerstad
 Tags: newsletter, newsletter subscribers, email, welcome email, post notification, WooCommerce emails, newsletter builder, mailing list
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 3.10
+Stable tag: 3.11.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -25,7 +25,7 @@ Trusted by 300,000 WordPress websites since 2011.
 * Manage your subscribers and subscriber lists in WordPress
 * Build and send newsletters with WordPress
 * Create automatic emails to send new post notifications
-* Send automated signup welcome emails (Premium)
+* Send automated signup welcome emails (**now in free**)
 * Increase your sales with our emails for WooCommerce (Premium)
 * Insightful stats on your audience engagement (Premium)
 
@@ -68,7 +68,6 @@ MailPoet's free version is fully featured, and comes with access to a free sendi
 The Premium version adds the following features:
 
 * For each newsletter, see which subscribers opened it and which links got the most clicks
-* Ability to send Welcome Emails automatically; i.e. “Welcome to my Newsletter” autoresponders or multi-email courses
 * All WooCommerce emails features
 * Removes the small MailPoet logo in the footer of your emails
 * Same day support (Monday to Friday)
@@ -161,6 +160,21 @@ Stop by our [support site](https://www.mailpoet.com/support).
 5. Subscriber import (via a CSV file or directly from MailChimp)
 
 == Changelog ==
+
+= 3.11.1 - 2018-10-02 =
+* Fixed: JS assets caching issues;
+
+= 3.11.0 - 2018-09-25 =
+* Added: notice for users who've migrated from MP2 to MP3;
+* Added: many new templates for newsletters, welcome emails, notifications, and Woo Commerce;
+* Added: improved sending method error handling;
+* Improved: onboarding user experience tweaks and improvements;
+* Fixed: JS warning in the emails section;
+* Fixed: minor translation issues;
+* Fixed: welcome emails removed from Premium page, as they're free now.
+
+= 3.10.1 - 2018-09-18 =
+* Improved: made some error messages clearer
 
 = 3.10 - 2018-09-11 =
 * Changed: welcome emails to new subscribers are now free for everyone!

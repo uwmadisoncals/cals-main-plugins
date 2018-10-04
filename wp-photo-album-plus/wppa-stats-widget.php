@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the stats widget
-* Version 6.9.12
+* Version 6.9.14
 *
 */
 class WppaStatsWidget extends WP_Widget {
@@ -63,13 +63,13 @@ class WppaStatsWidget extends WP_Widget {
 			$widget_content .= __('Today is day no', 'wp-photo-album-plus') . ': <b>' . ( date_i18n( 'z', time() ) + 1 ) . '</b><br />';
 		}
 		if ( wppa_checked( $instance['sessions-active'] ) ) {
-			$sescount = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_SESSION . "` WHERE `timestamp` > '" . ( time() - 3600 ) . "'" );
+			$sescount = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE `timestamp` > '" . ( time() - 3600 ) . "'" );
 			$widget_content .= __('Number of active sessions', 'wp-photo-album-plus') . ': <b>' . $sescount . '</b><br />';
 		}
 		if ( wppa_checked( $instance['sessions-day'] ) ) {
 			$t = time() - 3600*24;
-			$daysescount = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_SESSION . "` WHERE `timestamp` > '" . $t . "'" );
-			$robots 	 = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_SESSION . "` WHERE `timestamp` > '" . $t . "' AND `data` LIKE '%\"isrobot\";b:1;%'" );
+			$daysescount = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE `timestamp` > '" . $t . "'" );
+			$robots 	 = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_session WHERE `timestamp` > '" . $t . "' AND `data` LIKE '%\"isrobot\";b:1;%'" );
 			$widget_content .= 	__('Number of sessions last 24 hours', 'wp-photo-album-plus') . ': <b>' . $daysescount . '</b><br />' .
 								__('Of which robots', 'wp-photo-album-plus') . ': <b>' . $robots . '</b><br />';
 		}
@@ -78,26 +78,26 @@ class WppaStatsWidget extends WP_Widget {
 			$widget_content .= __('Number of registered users', 'wp-photo-album-plus') . ': <b>' . $users . '</b><br />';
 		}
 		if ( wppa_checked( $instance['albums'] ) ) {
-			$albums = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "`" );
+			$albums = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums" );
 			if ( $albums ) {
 				$widget_content .= __('Number of albums', 'wp-photo-album-plus') . ': <b>' . $albums . '</b><br />';
 			}
 		}
 		if ( wppa_checked( $instance['mediaitems'] ) ) {
-			$items = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_PHOTOS . "`" );
+			$items = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos" );
 			if ( $items ) {
 				$widget_content .= __('Number of media items', 'wp-photo-album-plus') . ': <b>' . $items . '</b><br />';
 			}
 		}
 		if ( wppa_checked( $instance['photos'] ) ) {
-			$photos = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_PHOTOS . "` WHERE `ext` <> 'xxx' AND `filename` NOT LIKE '%.pdf'" );
+			$photos = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `ext` <> 'xxx' AND `filename` NOT LIKE '%.pdf'" );
 			if ( $photos ) {
 				$widget_content .= __('Number of photos', 'wp-photo-album-plus') . ': <b>' . $photos . '</b><br />';
 			}
 		}
 		$multi = false;
 		if ( wppa_checked( $instance['videos'] ) && wppa_switch( 'enable_video' ) ) {
-			$multi = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_PHOTOS . "` WHERE `ext` = 'xxx'" );
+			$multi = $wpdb->get_col( "SELECT `id` FROM $wpdb->wppa_photos WHERE `ext` = 'xxx'" );
 			$cnt = 0;
 			foreach( $multi as $item ) {
 				if ( wppa_is_video( $item ) ) $cnt++;
@@ -108,7 +108,7 @@ class WppaStatsWidget extends WP_Widget {
 		}
 		if ( wppa_checked( $instance['audios'] ) && wppa_switch( 'enable_audio' ) ) {
 			if ( ! $multi ) {
-				$multi = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_PHOTOS . "` WHERE `ext` = 'xxx'" );
+				$multi = $wpdb->get_col( "SELECT `id` FROM $wpdb->wppa_photos WHERE `ext` = 'xxx'" );
 			}
 			$cnt = 0;
 			foreach( $multi as $item ) {
@@ -119,19 +119,19 @@ class WppaStatsWidget extends WP_Widget {
 			}
 		}
 		if ( wppa_checked( $instance['pdfs'] ) && wppa_can_pdf() ) {
-			$pdfs = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_PHOTOS . "` WHERE `filename` LIKE '%.pdf'" );
+			$pdfs = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `filename` LIKE '%.pdf'" );
 			if ( $pdfs ) {
 				$widget_content .= __('Number of pdfs', 'wp-photo-album-plus') . ': <b>' . $pdfs . '</b><br />';
 			}
 		}
 		if ( wppa_checked( $instance['comments'] ) && wppa_switch( 'show_comments' ) ) {
-			$comments = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "`" );
+			$comments = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments" );
 			if ( $comments ) {
 				$widget_content .= __('Number of comments', 'wp-photo-album-plus') . ': <b>' . $comments . '</b><br />';
 			}
 		}
 		if ( wppa_checked( $instance['rating'] ) && wppa_switch( 'rating_on' ) ) {
-			$ratings = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_RATING . "`" );
+			$ratings = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_rating" );
 			if ( $ratings ) {
 				$widget_content .= __('Number of ratings', 'wp-photo-album-plus') . ': <b>' . $ratings . '</b><br />';
 			}

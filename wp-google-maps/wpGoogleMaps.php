@@ -3,7 +3,7 @@
 Plugin Name: WP Google Maps
 Plugin URI: https://www.wpgmaps.com
 Description: The easiest to use Google Maps plugin! Create custom Google Maps with high quality markers containing locations, descriptions, images and links. Add your customized map to your WordPress posts and/or pages quickly and easily with the supplied shortcode. No fuss.
-Version: 7.10.34
+Version: 7.10.37
 Author: WP Google Maps
 Author URI: https://www.wpgmaps.com
 Text Domain: wp-google-maps
@@ -11,6 +11,24 @@ Domain Path: /languages
 */
 
 /*
+ * 7.10.37 :- 2018-09-27 :- Medium priority
+ * Fixed undefined variable on iOS breaking store locator
+ * Fixed edit marker using REST API not working when API route has two slashes
+ * Fixed map not appearing with particular versions of dataTables where the packaged version is not used
+ *
+ * 7.10.36 :- 2018-09-25 :- Medium Priority
+ * Fixed change in 7.10.35 causing problems with OLMarker click event, preventing infowindow opening
+ * Dropped .gitignore which was causing deployment issues, now using .gitattributes to ignore minified files
+ *
+ * 7.10.35 :- 2018-09-20 :- Medium priority
+ * Added links to new API troubleshooting documentation to Google Maps API Error dialog
+ * Fixed marker dispatching click event after drag when using OpenLayers
+ * Fixed map dispatching click event after drag when using OpenLayers
+ * Fixed map editor right click marker appearing multiple times
+ * Fixed map editor right click marker disappearing after map drag
+ * Fixed modern store locator circle crashing some iOS devices by disabling this feature on iOS devices
+ * Fixed gesture handling setting not respected when theme data is set in
+ *
  * 7.10.34 :- 2018-09-17 :- Low priority
  * Added descriptive error messages when Google API is required but not loaded
  * Added "I agree" translation to German files
@@ -4746,7 +4764,7 @@ function wpgmaps_settings_page_basic() {
             $ret .= "               <tr>";
             $ret .= "                        <td width='200' valign='top'>".__("Disable Two-Finger Pan","wp-google-maps").":</td>";
             $ret .= "                     <td>";
-            $ret .= "                           <div class='switch'><input name='wpgmza_force_greedy_gestures' type='checkbox' class='cmn-toggle cmn-toggle-yes-no' id='wpgmza_force_greedy_gestures' value='yes' $wpgmza_force_greedy_gestures_checked /> <label for='wpgmza_force_greedy_gestures' data-on='".__("Yes", "wp-google-maps")."' data-off='".__("No", "wp-google-maps")."'></label></div> " . __("Removes the need to use two fingers to move the map on mobile devices", "wp-google-maps");
+            $ret .= "                           <div class='switch wpgmza-open-layers-feature-unavailable'><input name='wpgmza_force_greedy_gestures' type='checkbox' class='cmn-toggle cmn-toggle-yes-no' id='wpgmza_force_greedy_gestures' value='yes' $wpgmza_force_greedy_gestures_checked /> <label for='wpgmza_force_greedy_gestures' data-on='".__("Yes", "wp-google-maps")."' data-off='".__("No", "wp-google-maps")."'></label></div> " . __("Removes the need to use two fingers to move the map on mobile devices", "wp-google-maps");
             $ret .= "                    </td>";
             $ret .= "                </tr>";
 			

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the export functions
-* Version 6.6.18
+* Version 6.9.14
 *
 */
 
@@ -35,7 +35,7 @@ global $wpdb;
 			<?php wp_nonce_field('$wppa_nonce', WPPA_NONCE); ?>
 			<?php echo(sprintf(__('Photos will be exported to: <b>%s</b>.', 'wp-photo-album-plus'), WPPA_DEPOT)) ?>
 			<h2><?php _e('Export photos from album <span style="font-size:12px;">(Including Album information)</span>:', 'wp-photo-album-plus'); ?></h2>
-			<?php $albums = $wpdb->get_results( "SELECT * FROM `" . WPPA_ALBUMS . "` " . wppa_get_album_order(), ARRAY_A);
+			<?php $albums = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_albums " . wppa_get_album_order(), ARRAY_A);
 			$high = '0'; ?>
 
 			<table class="form-table albumtable">

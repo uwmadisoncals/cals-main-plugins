@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.9.12
+* Version 6.9.14
 *
 */
 
@@ -165,7 +165,7 @@ echo '
 
 	if ( $album ) {
 		if ( wppa_switch( 'meta_page' ) ) {
-			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `album` = %s AND `status` = 'featured'", $album ), ARRAY_A );
+			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `album` = %s AND `status` = 'featured'", $album ), ARRAY_A );
 			wppa_cache_photo( 'add', $photos );
 			if ( $photos ) {
 				echo("\n<!-- WPPA+ BEGIN Featured photos on this page -->");
@@ -185,7 +185,7 @@ echo '
 
 	// No photo and no album, give the plain photo links of all featured photos
 	elseif ( wppa_switch( 'meta_all' ) ) {
-		$photos = $wpdb->get_results( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `status` = 'featured'", ARRAY_A);
+		$photos = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_photos WHERE `status` = 'featured'", ARRAY_A);
 		wppa_cache_photo( 'add', $photos );
 		if ( $photos ) {
 			echo("\n<!-- WPPA+ BEGIN Featured photos on this site -->");

@@ -3,208 +3,275 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.8.09
+* Version 6.9.16
 *
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
 
 function _wppa_admin() {
-	global $wpdb;
-	global $q_config;
-	global $wppa_revno;
+global $wpdb;
+global $q_config;
+global $wppa_revno;
 
 	echo '
 <script type="text/javascript" >
 	/* <![CDATA[ */
-	wppaAjaxUrl = "'.admin_url('admin-ajax.php').'";
-	wppaUploadToThisAlbum = "'.__('Upload to this album', 'wp-photo-album-plus').'";
-	wppaImageDirectory = "'.wppa_get_imgdir().'";
+	wppaAjaxUrl = "' . admin_url( 'admin-ajax.php' ) . '";
+	wppaUploadToThisAlbum = "' . __( 'Upload to this album', 'wp-photo-album-plus' ) . '";
+	wppaImageDirectory = "' . wppa_get_imgdir() . '";
 	/* ]]> */
 </script>
 ';
 
 	// Delete trashed comments
-	$query = "DELETE FROM " . WPPA_COMMENTS . " WHERE status='trash'";
-	$wpdb->query($query);
+	$wpdb->query( "DELETE FROM {$wpdb->prefix}wppa_comments WHERE status = 'trash'" );
 
 	$sel = 'selected="selected"';
 
 	// warn if the uploads directory is no writable
-	if (!is_writable(WPPA_UPLOAD_PATH)) {
-		wppa_error_message(__('Warning:', 'wp-photo-album-plus') . sprintf(__('The uploads directory does not exist or is not writable by the server. Please make sure that %s is writeable by the server.', 'wp-photo-album-plus'), WPPA_UPLOAD_PATH));
+	if ( ! is_writable( WPPA_UPLOAD_PATH ) ) {
+		wppa_error_message(
+			__( 'Warning:', 'wp-photo-album-plus' ) .
+			sprintf( __( 'The uploads directory does not exist or is not writable by the server. Please make sure that %s is writeable by the server.', 'wp-photo-album-plus' ),
+			WPPA_UPLOAD_PATH
+			) );
 	}
 
-	// Fix orphan albums and deleted target pages
-	$albs = $wpdb->get_results("SELECT * FROM `" . WPPA_ALBUMS . "`", ARRAY_A);
-
-	// Now we have them, put them in cache
+	// Get all albums and cache them
+	$albs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}wppa_albums", ARRAY_A );
 	wppa_cache_album( 'add', $albs );
 
+	// Fix orphan albums and deleted target pages
 	if ( $albs ) {
-		foreach ($albs as $alb) {
-			if ( $alb['a_parent'] > '0' && wppa_get_parentalbumid($alb['a_parent']) <= '-9' ) {	// Parent died?
-				$wpdb->query("UPDATE `".WPPA_ALBUMS."` SET `a_parent` = '-1' WHERE `id` = '".$alb['id']."'");
+		foreach ( $albs as $alb ) {
+			if ( $alb['a_parent'] > '0' && wppa_get_parentalbumid( $alb['a_parent'] ) <= '-9' ) {	// Parent died?
+				$wpdb->query( $wpdb->prepare( 	"UPDATE {$wpdb->prefix}wppa_albums
+												 SET a_parent = -1
+												 WHERE id = %d", $alb['id'] ) );
 			}
 			if ( $alb['cover_linkpage'] > '0' ) {
-				$iret = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM `".$wpdb->posts."` WHERE `ID` = %s AND `post_type` = 'page' AND `post_status` = 'publish'", $alb['cover_linkpage']));
+				$iret = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*)
+														 FROM {$wpdb->posts}
+														 WHERE ID = %d
+														 AND post_type = 'page'
+														 AND post_status = 'publish'", $alb['cover_linkpage'] ) );
+
 				if ( ! $iret ) {	// Page gone?
-					$wpdb->query("UPDATE `".WPPA_ALBUMS."` SET `cover_linkpage` = '0' WHERE `id` = '".$alb['id']."'");
+					$wpdb->query( $wpdb->prepare( 	"UPDATE {$wpdb->prefix}wppa_albums
+													 SET cover_linkpage = 0
+													 WHERE id = %d", $alb['id'] ) );
 				}
 			}
 		}
 	}
 
-	if (isset($_REQUEST['tab'])) {
+
+	if ( isset( $_REQUEST['tab'] ) ) {
+
 		// album edit page
-		if ($_REQUEST['tab'] == 'edit'){
-			if ( isset($_REQUEST['edit_id']) ) {
+		if ( $_REQUEST['tab'] == 'edit' ) {
+
+			if ( isset( $_REQUEST['edit_id'] ) ) {
+
 				$ei = $_REQUEST['edit_id'];
-				if ( $ei != 'new' && $ei != 'search' && $ei != 'trash' && $ei != 'single' && ! is_numeric($ei) ) {
-					wp_die('Security check failure 1');
+				if ( $ei != 'new' && $ei != 'search' && $ei != 'trash' && $ei != 'single' && ! is_numeric( $ei ) ) {
+					wppa_error_message( sprintf( __( 'Album edit id %s is not implemented', 'wp-photo-album-plus' ),
+												 '<b>' . sanitize_text_field( $ei ) . '</b>' ) );
+					return;
 				}
 				if ( ! wp_verify_nonce( $_REQUEST['wppa_nonce'], 'wppa_nonce' ) ) {
-					wp_die('Security check failure 2');
+					wp_die('Security check failure');
 				}
 			}
 
 			if ( $_REQUEST['edit_id'] == 'single' ) {
-				?>
-				<div class="wrap">
-					<h2><?php _e( 'Edit Single Photo', 'wp-photo-album-plus' );
-						echo ' - <small><i>'.__('Edit photo information', 'wp-photo-album-plus').'</i></small>';
-						?>
-					</h2>
-					<?php
-					wppa_album_photos($ei);
-					?>
-				</div>
-				<?php
 
+				echo '
+				<div class="wrap" >
+					<h2>' . __( 'Edit Single Photo', 'wp-photo-album-plus' ) .
+						' - <small><i>' . __( 'Edit photo information', 'wp-photo-album-plus' ) . '</i></small>
+					</h2>' .
+					wppa_album_photos( $ei ) . '
+				</div>';
 				return;
 			}
 
 			if ( $_REQUEST['edit_id'] == 'search' ) {
 
-				$back_url = get_admin_url().'admin.php?page=wppa_admin_menu';
-					if ( isset ( $_REQUEST['wppa-searchstring'] ) ) {
-						$back_url .= '&wppa-searchstring='.wppa_sanitize_searchstring( $_REQUEST['wppa-searchstring'] );
+				$back_url = get_admin_url() . 'admin.php?page=wppa_admin_menu';
+				if ( isset ( $_REQUEST['wppa-searchstring'] ) ) {
+					$back_url .= '&wppa-searchstring=' . wppa_sanitize_searchstring( $_REQUEST['wppa-searchstring'] );
+				}
+				$back_url .= '#wppa-edit-search-tag';
+
+				echo '
+				<a name="manage-photos" id="manage-photos" ></a>
+				<h2>' . __( 'Manage Photos', 'wp-photo-album-plus' );
+					if ( isset( $_REQUEST['bulk'] ) ) {
+						echo
+						' - <small><i>' .
+							__( 'Copy / move / delete / edit name / edit description / change status', 'wp-photo-album-plus' ) .
+						'</i></small>';
 					}
-					$back_url .= '#wppa-edit-search-tag';
-?>
-<a name="manage-photos" id="manage-photos" ></a>
-				<h2><?php _e('Manage Photos', 'wp-photo-album-plus');
-					if ( isset($_REQUEST['bulk']) ) echo ' - <small><i>'.__('Copy / move / delete / edit name / edit description / change status', 'wp-photo-album-plus').'</i></small>';
-					elseif ( isset($_REQUEST['quick']) ) echo ' - <small><i>'.__('Edit photo information except copy and move', 'wp-photo-album-plus').'</i></small>';
-					else echo ' - <small><i>'.__('Edit photo information', 'wp-photo-album-plus').'</i></small>';
-				?></h2>
-
-<a href="<?php echo $back_url ?>"><?php _e('Back to album table', 'wp-photo-album-plus') ?></a><br /><br />
-
-				<?php
-					if ( isset($_REQUEST['bulk']) ) wppa_album_photos_bulk($ei);
-					else wppa_album_photos($ei);
-				?>
-				<a href="#manage-photos">
-					<div style="position:fixed;right:30px;bottom:30px;background-color:lightblue;" >&nbsp;<?php _e('Top of page', 'wp-photo-album-plus') ?>&nbsp;</div>
-				</a>
-				<br /><a href="<?php echo $back_url ?>"><?php _e('Back to album table', 'wp-photo-album-plus') ?></a>
-<?php
-				return;
-			}
-
-			if ($_REQUEST['edit_id'] == 'trash' ) {
-				?>
-				<div class="wrap">
-					<h2><?php _e('Manage Trashed Photos', 'wp-photo-album-plus');
-						echo ' - <small><i>'.__('Edit photo information', 'wp-photo-album-plus').'</i></small>';
-						?>
-					</h2>
-					<?php
-					wppa_album_photos($ei);
-					?>
-				</div>
-				<?php
-
-				return;
-			}
-
-
-			if ($_REQUEST['edit_id'] == 'new') {
-				if ( ! wppa_can_create_album() ) wp_die('No rights to create an album');
-				$id = wppa_nextkey(WPPA_ALBUMS);
-				if (isset($_REQUEST['parent_id'])) {
-					$parent = $_REQUEST['parent_id'];
-					if ( ! is_numeric($parent) ) {
-						wp_die('Security check failure 3');
+					elseif ( isset( $_REQUEST['quick'] ) ) {
+						echo
+						' - <small><i>' .
+							__( 'Edit photo information except copy and move', 'wp-photo-album-plus' ) .
+						'</i></small>';
 					}
-					$name = wppa_get_album_name($parent).'-#'.$id;
-					if ( ! current_user_can('administrator') ) {	// someone creating an album for someone else?
-						$parentowner = $wpdb->get_var($wpdb->prepare("SELECT `owner` FROM `".WPPA_ALBUMS."` WHERE `id` = %s", $parent));
-						if ( $parentowner !== wppa_get_user() ) wp_die('You are not allowed to create an album for someone else');
+					else {
+						echo
+						' - <small><i>' .
+							__( 'Edit photo information', 'wp-photo-album-plus' ) .
+						'</i></small>';
 					}
+				echo '
+				</h2>
+
+				<a href="' . $back_url . '" >' .
+					__( 'Back to album table', 'wp-photo-album-plus' ) .
+				'</a>
+				<br /><br />';
+
+				if ( isset( $_REQUEST['bulk'] ) ) {
+					wppa_album_photos_bulk( $ei );
 				}
 				else {
+					wppa_album_photos( $ei );
+				}
+
+				echo '
+				<a href="#manage-photos">
+					<div style="position:fixed;right:30px;bottom:30px;background-color:lightblue;" >
+						&nbsp;' . __( 'Top of page', 'wp-photo-album-plus' ) .  '&nbsp;
+					</div>
+				</a>
+				<br />
+				<a href="' . $back_url . '" >' .
+					__( 'Back to album table', 'wp-photo-album-plus' ) .
+				'</a>';
+
+				return;
+			}
+
+			if ( $_REQUEST['edit_id'] == 'trash' ) {
+
+				echo '
+				<div class="wrap">
+					<h2>' . __( 'Manage Trashed Photos', 'wp-photo-album-plus' ) .
+						' - <small><i>' . __( 'Edit photo information', 'wp-photo-album-plus' ) . '</i></small>
+					</h2>' .
+					wppa_album_photos( $ei ) . '
+				</div>';
+
+				return;
+			}
+
+			if ( $_REQUEST['edit_id'] == 'new' ) {
+
+				if ( ! wppa_can_create_album() ) {
+					wp_die( __( 'You have insufficient rights to create an album', 'wp-photo-album-plus' ) );
+				}
+				$id = wppa_nextkey( WPPA_ALBUMS );
+
+				// Creating a sub-album of a given parent?
+				if ( isset( $_REQUEST['parent_id'] ) ) {
+					$parent = $_REQUEST['parent_id'];
+					if ( ! is_numeric( $parent ) ) {
+						wp_die('Security check failure 3');
+					}
+					$name = wppa_get_album_name( $parent ) . '-#' . $id;
+					if ( ! current_user_can( 'administrator' ) ) {	// someone creating an album for someone else?
+						$parentowner = $wpdb->get_var( $wpdb->prepare( "SELECT owner FROM {$wpdb->prefix}wppa_albums WHERE id = %s", $parent ) );
+						if ( $parentowner !== wppa_get_user() ) {
+							wp_die( __( 'You are not allowed to create an album for someone else', 'wp-photo-album-plus' ) );
+						}
+					}
+				}
+
+				// Create album with default parent or toplevel
+				else {
 					$parent = wppa_opt( 'default_parent' );
-					if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "` WHERE `id` = %s", $parent ) ) ) { // Deafault parent vanished
+
+					// Default parent still exists?
+					if ( ! $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}wppa_albums WHERE id = %s", $parent ) ) ) {
 						wppa_update_option( 'wppa_default_parent', '0' );
 						$parent = '0';
 					}
-					$name = __('New Album', 'wp-photo-album-plus');
-					if ( ! wppa_can_create_top_album() ) wp_die('No rights to create a top-level album');
+					$name = __( 'New Album', 'wp-photo-album-plus' );
+					if ( $parent == '0' && ! wppa_can_create_top_album() ) {
+						wp_die( __( 'You have insufficient rights to create a top-level album', 'wp-photo-album-plus' ) );
+					}
 				}
+
+				// Finally, now we can create the album
 				$id = wppa_create_album_entry( array( 'id' => $id, 'name' => $name, 'a_parent' => $parent ) );
 				if ( ! $id ) {
-					wppa_error_message( __('Could not create album.', 'wp-photo-album-plus') );
-					wp_die('Sorry, cannot continue');
+					wppa_error_message( __( 'Could not create album.', 'wp-photo-album-plus' ) );
+					wp_die( __( 'Sorry, cannot continue', 'wp-photo-album-plus' ) );
 				}
+
+				// Album created, do housekeeping and go edit it.
 				else {
-					$edit_id = $id;
-					wppa_set_last_album($edit_id);
-					wppa_invalidate_treecounts($edit_id);
-					wppa_index_add('album', $id);
-					wppa_update_message(__('Album #', 'wp-photo-album-plus') . ' ' . $edit_id . ' ' . __('Added.', 'wp-photo-album-plus'));
+					wppa_set_last_album( $id );
+					wppa_invalidate_treecounts( $id );
+					wppa_index_add( 'album', $id );
+					wppa_update_message( sprintf( __( 'Album #%d added', 'wp-photo-album-plus' ), $id ) );
 					wppa_create_pl_htaccess();
+					$edit_id = $id;
 				}
 			}
 			else {
-				$edit_id = $_REQUEST['edit_id'];
+				$edit_id = strval( intval( $_REQUEST['edit_id'] ) );
 			}
 
-			$album_owner = $wpdb->get_var($wpdb->prepare("SELECT `owner` FROM ".WPPA_ALBUMS." WHERE `id` = %s", $edit_id));
-			if ( ( $album_owner == '--- public ---' && ! current_user_can('wppa_admin') ) || ! wppa_have_access($edit_id) ) {
-				wp_die('You do not have the rights to edit this album');
+			// See if this user may edit this album
+			$album_owner = $wpdb->get_var( $wpdb->prepare( "SELECT owner FROM {$wpdb->prefix}wppa_albums WHERE id = %s", $edit_id ) );
+			if ( ( $album_owner == '--- public ---' && ! current_user_can( 'wppa_admin' ) ) || ! wppa_have_access( $edit_id ) ) {
+				wp_die( __( 'You have insufficient rights to edit this album', 'wp-photo-album-plus' ) );
 			}
 
 			// Apply new desc
-			if ( isset($_REQUEST['applynewdesc']) ) {
-				if ( ! wp_verify_nonce($_REQUEST['wppa_nonce'], 'wppa_nonce') ) wp_die('You do not have the rights to do this');
-				$iret = $wpdb->query($wpdb->prepare("UPDATE `".WPPA_PHOTOS."` SET `description` = %s WHERE `album` = %s", wppa_opt( 'newphoto_description' ), $edit_id));
-				wppa_ok_message($iret.' descriptions updated.');
+			if ( isset( $_REQUEST['applynewdesc'] ) ) {
+				if ( ! wp_verify_nonce( $_REQUEST['wppa_nonce'], 'wppa_nonce') ) {
+					wp_die( __( 'You do not have the rights to do this', 'wp-photo-album-plus' ) );
+				}
+				$iret = $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wppa_photos
+													   SET description = %s
+													   WHERE album = %d", wppa_opt( 'newphoto_description' ), $edit_id ) );
+				wppa_ok_message( sprintf( __( '%d photo descriptions updated', 'wp-photo-album-plus' ), $iret ) );
 			}
 
 			// Remake album
-			if ( isset($_REQUEST['remakealbum']) ) {
-				if ( ! wp_verify_nonce($_REQUEST['wppa_nonce'], 'wppa_nonce') ) wp_die('You do not have the rights to do this');
-				if ( get_option('wppa_remake_start_album_'.$edit_id) ) {	// Continue after time up
-					wppa_ok_message('Continuing remake, please wait');
+			if ( isset( $_REQUEST['remakealbum'] ) ) {
+				if ( ! wp_verify_nonce( $_REQUEST['wppa_nonce'], 'wppa_nonce' ) ) {
+					wp_die( __( 'You do not have the rights to do this', 'wp-photo-album-plus' ) );
+				}
+
+				// Continue after time up?
+				if ( get_option( 'wppa_remake_start_album_' . $edit_id ) ) {
+					wppa_ok_message( __( 'Continuing remake, please wait...', 'wp-photo-album-plus' ) );
 				}
 				else {
-					update_option('wppa_remake_start_album_'.$edit_id, time());
-					wppa_ok_message('Remaking photofiles, please wait');
+					update_option( 'wppa_remake_start_album_' . $edit_id, time() );
+					wppa_ok_message( __( 'Remaking photofiles, please wait...', 'wp-photo-album-plus' ) );
 				}
-				$iret = wppa_remake_files($edit_id);
+
+				// Do the remake
+				$iret = wppa_remake_files( $edit_id );
 				if ( $iret ) {
-					wppa_ok_message('Photo files remade');
-					update_option('wppa_remake_start_album_'.$edit_id, '0');
+					wppa_ok_message( __( 'Photo files remade', 'wp-photo-album-plus' ) );
+					update_option( 'wppa_remake_start_album_' . $edit_id, '0' );
 				}
 				else {
-					wppa_error_message('Remake of photo files did NOT complete');
+					wppa_error_message( __( 'Remake of photo files did NOT complete', 'wp-photo-album-plus' ) );
 				}
 			}
 
 			// Get the album information
-			$albuminfo = $wpdb->get_row($wpdb->prepare('SELECT * FROM `'.WPPA_ALBUMS.'` WHERE `id` = %s', $edit_id), ARRAY_A);
+			$albuminfo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wppa_albums
+														  WHERE id = %s", $edit_id ), ARRAY_A );
 
 			// We may not use extract(), so we do something like it here manually, hence controlled.
 			$id 			= $albuminfo['id'];
@@ -240,105 +307,86 @@ function _wppa_admin() {
 				wppa_admin_spinner();
 
 				// Local js functions placed here as long as there is not yet a possibility to translate texts in js files
-		?>
-<script>
-function wppaTryInheritCats( id ) {
+				echo '
+				<script>
+				function wppaTryInheritCats( id ) {
 
-	var query;
+					var query = ' . esc_js( __( 'Are you sure you want to inherit categories to all (grand)children of this album?', 'wp-photo-album-plus' ) ) . '
+					if ( confirm( query ) ) {
+						wppaAjaxUpdateAlbum( id, \'inherit_cats\', Math.random() );
+					}
+				}
 
-	query = '<?php echo esc_js( __( 'Are you sure you want to inherit categories to all (grand)children of this album?', 'wp-photo-album-plus' ) ) ?>';
+				function wppaTryAddCats( id ) {
 
-	if ( confirm( query ) ) {
-		wppaAjaxUpdateAlbum( id, 'inherit_cats', Math.random() );
-	}
-}
+					var query = ' . esc_js( __( 'Are you sure you want to add the categories to all (grand)children of this album?', 'wp-photo-album-plus' ) ) . '
+					if ( confirm( query ) ) {
+						wppaAjaxUpdateAlbum( id, \'inhadd_cats\', Math.random() );
+					}
+				}
 
-function wppaTryAddCats( id ) {
+				function wppaTryApplyDeftags( id ) {
 
-	var query;
+					var query = ' . esc_js( __( 'Are you sure you want to set the default tags to all photos in this album?', 'wp-photo-album-plus' ) ) . '
+					if ( confirm( query ) ) {
+						wppaAjaxUpdateAlbum( id, \'set_deftags\', Math.random(), true );
+					}
+				}
 
-	query = '<?php echo esc_js( __( 'Are you sure you want to add the categories to all (grand)children of this album?', 'wp-photo-album-plus' ) ) ?>';
+				function wppaTryAddDeftags( id ) {
 
-	if ( confirm( query ) ) {
-		wppaAjaxUpdateAlbum( id, 'inhadd_cats', Math.random() );
-	}
-}
+					var query = ' . esc_js( __( 'Are you sure you want to add the default tags to all photos in this album?', 'wp-photo-album-plus' ) ) . '
+					if ( confirm( query ) ) {
+						wppaAjaxUpdateAlbum( id, \'add_deftags\', Math.random(), true );
+					}
+				}
 
-function wppaTryApplyDeftags( id ) {
+				function wppaTryScheduleAll( id ) {
 
-	var query;
-
-	query = '<?php echo esc_js( __( 'Are you sure you want to set the default tags to all photos in this album?', 'wp-photo-album-plus' ) ) ?>';
-
-	if ( confirm( query ) ) {
-		wppaAjaxUpdateAlbum( id, 'set_deftags', Math.random(), true );
-	}
-}
-
-function wppaTryAddDeftags( id ) {
-
-	var query;
-
-	query = '<?php echo esc_js( __( 'Are you sure you want to add the default tags to all photos in this album?', 'wp-photo-album-plus' ) ) ?>';
-
-	if ( confirm( query ) ) {
-		wppaAjaxUpdateAlbum( id, 'add_deftags', Math.random(), true );
-	}
-}
-
-function wppaTryScheduleAll( id ) {
-
-	var query;
-
-	if ( jQuery( '#schedule-box' ).attr( 'checked' ) != 'checked' ) {
-		query = '<?php echo esc_js( __( 'Please switch feature on and set date/time to schedule first', 'wp-photo-album-plus' ) ) ?>';
-		alert( query );
-		return;
-	}
-
-	query = '<?php echo esc_js( __( 'Are you sure you want to schedule all photos in this album?', 'wp-photo-album-plus' ) ) ?>';
-
-	if ( confirm( query ) ) {
-		wppaAjaxUpdateAlbum( id, 'setallscheduled', Math.random(), true );
-	}
-}
-
-</script>
-		<?php
+					var query;
+					if ( ! jQuery( "#schedule-box" ).prop( "checked" ) ) {
+						query = ' . esc_js( __( 'Please switch feature on and set date/time to schedule first', 'wp-photo-album-plus' ) ) . '
+						alert( query );
+						return;
+					}
+					query = ' . esc_js( __( 'Are you sure you want to schedule all photos in this album?', 'wp-photo-album-plus' ) ) . '
+					if ( confirm( query ) ) {
+						wppaAjaxUpdateAlbum( id, \'setallscheduled\', Math.random(), true );
+					}
+				}
+				</script>';
 
 				// The header
-				echo
-				'<img src="' . WPPA_URL . '/img/album32.png' . '" alt="Album icon" />' .
-				'<h1 style="display:inline;" >' .
-					__('Edit Album Information', 'wp-photo-album-plus') .
-				'</h1>' .
-				'<p class="description">' .
-					__('All modifications are instantly updated on the server, except for those that require a button push.', 'wp-photo-album-plus' ) . ' ' .
-					__('The <b style="color:#070" >Remark</b> fields keep you informed on the actions taken at the background.', 'wp-photo-album-plus' ) .
-				'</p>' .
-				'<input' .
-					' type="hidden"' .
-					' id="album-nonce-' . $id . '"' .
-					' value="' . wp_create_nonce( 'wppa_nonce_' . $id ) . '"' .
-				' />';
+				echo '
+				<img src="' . WPPA_URL . '/img/album32.png' . '" alt="Album icon" />
+				<h1 style="display:inline;" >' .
+					__( 'Edit Album Information', 'wp-photo-album-plus' ) . '
+				</h1>
+				<p class="description">' .
+					__( 'All modifications are instantly updated on the server, except for those that require a button push.', 'wp-photo-album-plus' ) . ' ' .
+					__( 'The <b style="color:#070" >Remark</b> fields keep you informed on the actions taken at the background.', 'wp-photo-album-plus' ) . '
+				</p>
+				<input
+					type="hidden"
+					id="album-nonce-' . $id . '"
+					value="' . wp_create_nonce( 'wppa_nonce_' . $id ) . '"
+				/>';
 
 				// The edit albuminfo panel
-				echo
-				'<div' .
-					' id="albumitem-' . $id . '"' .
-					' class="wppa-table-wrap"' .
-					' style="width:100%;position:relative;"' .
-					' >';
+				echo '
+				<div
+					id="albumitem-' . $id . '"
+					class="wppa-table-wrap"
+					style="width:100%;position:relative;"
+					>';
 {
 					// Section 1
-					echo
-					"\n" . '<!-- Album Section 1 -->' .
-					'<table' .
-						' class="wppa-table wppa-album-table"' .
-						' >' .
-						'<tbody>' .
-							'<tr>' .
-								'<td>';
+					echo '
+					<!-- Album Section 1 -->
+					<table class="wppa-table wppa-album-table" >
+						<tbody>
+							<tr>
+								<td>';
 
 									// More or less static data
 									// Album number
@@ -380,7 +428,7 @@ function wppaTryScheduleAll( id ) {
 
 									// Clicks
 									if ( wppa_switch( 'track_clickcounts' ) ) {
-										$click_arr = $wpdb->get_col( "SELECT `clicks` FROM `" . WPPA_PHOTOS . "` WHERE `album` = $id" );
+										$click_arr = $wpdb->get_col( "SELECT `clicks` FROM $wpdb->wppa_photos WHERE `album` = $id" );
 										echo
 										__( 'Clicks:', 'wp-photo-album-plus' ) . ' ' . array_sum( $click_arr ) . '. ';
 									}
@@ -400,36 +448,34 @@ function wppaTryScheduleAll( id ) {
 										}
 									}
 									else {
-										$usercount = wppa_get_user_count();
-										if ( $usercount > wppa_opt( 'max_users' ) ) {
-											echo
-											'<input' .
-												' type="text"' .
-												' value="' . esc_attr( $owner ) . '"' .
-												' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'owner\', this )"' .
-											' />';
+										if ( wppa_get_user_count() > wppa_opt( 'max_users' ) ) {
+											echo '
+											<input
+												type="text"
+												value="' . esc_attr( $owner ) . '"
+												onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'owner\', this )"
+											/>&nbsp;';
 										}
 										else {
-											echo
-											'<select' .
-												' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'owner\', this )"' .
-												' >';
+											echo '
+											<select
+												onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'owner\', this )"';
 												wppa_user_select( $owner );
-												echo
-											'</select>' . ' ';
+												echo '
+											</select>&nbsp;';
 										}
 									}
 
 									// Order # -->
 									echo
-									__( 'Album order #', 'wp-photo-album-plus' ) . ': ' .
-									'<input' .
-										' type="text"' .
-										' onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'a_order\', this )"' .
-										' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'a_order\', this )"' .
-										' value="' . esc_attr( $a_order ) . '"' .
-										' style="width:50px;' .
-									'" />' . ' ';
+									__( 'Album order #', 'wp-photo-album-plus' ) . ':&nbsp;
+									<input
+										type="text"
+										onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'a_order\', this )"
+										onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'a_order\', this )"
+										value="' . esc_attr( $a_order ) . '"
+										style="width:50px;"
+									/>&nbsp';
 									if ( wppa_opt( 'list_albums_by' ) != '1' && $a_order != '0' ) {
 										echo
 										'<small class="description" style="color:red" >' .
@@ -439,7 +485,7 @@ function wppaTryScheduleAll( id ) {
 
 									// Parent
 									echo
-									__( 'Parent album:', 'wp-photo-album-plus' ) . ' ';
+									__( 'Parent album', 'wp-photo-album-plus' ) . ':&nbsp;';
 									if ( wppa_extended_access() ) {
 										echo
 											wppa_album_select_a( array( 'checkaccess' 		=> true,
@@ -464,12 +510,12 @@ function wppaTryScheduleAll( id ) {
 											'</select>';
 									}
 									else {
-										echo
-										'<select' .
-											' id="wppa-parsel"' .
-											' style="max-width:300px;"' .
-											' onchange="wppaAjaxUpdateAlbum( '. $id . ', \'a_parent\', this )"' .
-											' >' .
+										echo '
+										<select
+											id="wppa-parsel"
+											style="max-width:300px;"
+											onchange="wppaAjaxUpdateAlbum( '. $id . ', \'a_parent\', this )"
+											>' .
 											wppa_album_select_a( array( 'checkaccess' => true,
 																		'exclude' => $id,
 																		'selected' => $a_parent,
@@ -481,7 +527,7 @@ function wppaTryScheduleAll( id ) {
 																) .
 										'</select>';
 									}
-									echo ' ';
+									echo '&nbsp;';
 
 									// P-order-by
 									echo
@@ -516,124 +562,123 @@ function wppaTryScheduleAll( id ) {
 														'-5',
 														'-7'
 														);
-									echo
-									'<select' .
-										' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'p_order_by\', this )"' .
-										' >';
+									echo '
+									<select
+										onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'p_order_by\', this )"
+										>';
 										foreach ( array_keys( $options ) as $key ) {
 											$sel = $values[$key] == $p_order_by ? ' selected="selected"' : '';
-											echo '<option value="'.$values[$key].'"'.$sel.' >'.$options[$key].'</option>';
+											echo '<option value="' . $values[$key] . '"' . $sel . ' >' . $options[$key] . '</option>';
 										}
-									echo
-									'</select>' . ' ';
+									echo '
+									</select>&nbsp;';
 
 									// Child album order
+									$sel = ' selected="selected"';
 									echo
-									__( 'Sub album sort order:', 'wp-photo-album-plus' ) . ' ' .
-									'<select' .
-										' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'suba_order_by\', this )"' .
-										' >' .
-										'<option value="0"' . ( $suba_order_by == '0' ? 'selected="selected"' : '' ) . ' >' . __( '--- default --- See Table IV-D1', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="3"' . ( $suba_order_by == '3' ? 'selected="selected"' : '' ) . ' >' . __( 'Random', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="1"' . ( $suba_order_by == '1' ? 'selected="selected"' : '' ) . ' >' . __( 'Order #', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="-1"' . ( $suba_order_by == '-1' ? 'selected="selected"' : '' ) . ' >' . __( 'Order # reverse', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="2"' . ( $suba_order_by == '2' ? 'selected="selected"' : '' ) . ' >' . __( 'Name', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="-2"' . ( $suba_order_by == '-2' ? 'selected="selected"' : '' ) . ' >' . __( 'Name reverse', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="5"' . ( $suba_order_by == '5' ? 'selected="selected"' : '' ) . ' >' . __( 'Timestamp', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="-5"' . ( $suba_order_by == '-5' ? 'selected="selected"' : '' ) . ' >' . __( 'Timestamp reverse', 'wp-photo-album-plus' ) . '</option>' .
-									'</select>' . ' ';
+									__( 'Sub album sort order', 'wp-photo-album-plus' ) . ':&nbsp;
+									<select
+										onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'suba_order_by\', this )"
+										>
+										<option value="0"' . ( $suba_order_by == '0' ? $sel : '' ) . ' >' . __( '--- default --- See Table IV-D1', 'wp-photo-album-plus' ) . '</option>
+										<option value="3"' . ( $suba_order_by == '3' ? $sel : '' ) . ' >' . __( 'Random', 'wp-photo-album-plus' ) . '</option>
+										<option value="1"' . ( $suba_order_by == '1' ? $sel : '' ) . ' >' . __( 'Order #', 'wp-photo-album-plus' ) . '</option>
+										<option value="-1"' . ( $suba_order_by == '-1' ? $sel : '' ) . ' >' . __( 'Order # reverse', 'wp-photo-album-plus' ) . '</option>
+										<option value="2"' . ( $suba_order_by == '2' ? $sel : '' ) . ' >' . __( 'Name', 'wp-photo-album-plus' ) . '</option>
+										<option value="-2"' . ( $suba_order_by == '-2' ? $sel : '' ) . ' >' . __( 'Name reverse', 'wp-photo-album-plus' ) . '</option>
+										<option value="5"' . ( $suba_order_by == '5' ? $sel : '' ) . ' >' . __( 'Timestamp', 'wp-photo-album-plus' ) . '</option>
+										<option value="-5"' . ( $suba_order_by == '-5' ? $sel : '' ) . ' >' . __( 'Timestamp reverse', 'wp-photo-album-plus' ) . '</option>
+									</select>&nbsp;';
 
 									// Alternative thumbnail size
-									if ( ! wppa_switch( 'alt_is_restricted') || current_user_can('administrator') ) {
-										echo __( 'Use alt thumbsize:', 'wp-photo-album-plus' ) .
-										'<select' .
-											' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'alt_thumbsize\', this )"' .
-											' >' .
-											'<option value="0"' . ( $alt_thumbsize ? '' : ' selected="selected"' ) . ' >' .
-												__( 'no', 'wp-photo-album-plus' ) .
-											'</option>' .
-											'<option value="yes"' . ( $alt_thumbsize ? ' selected="selected"' : '' ) . ' >' .
-												__( 'yes', 'wp-photo-album-plus' ) .
-											'</option>' .
-										'</select>' . ' ';
+									if ( ! wppa_switch( 'alt_is_restricted' ) || wppa_user_is( 'administrator' ) ) {
+										$sel = ' selected="selected"';
+										echo __( 'Use alt thumbsize', 'wp-photo-album-plus' ) . ':&nbsp;
+										<select onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'alt_thumbsize\', this )" >
+											<option value="0"' . ( $alt_thumbsize ? '' : $sel ) . ' >' .
+												__( 'no', 'wp-photo-album-plus' ) . '
+											</option>
+											<option value="yes"' . ( $alt_thumbsize ? $sel : '' ) . ' >' .
+												__( 'yes', 'wp-photo-album-plus' ) . '
+											</option>
+										</select>&nbsp;';
 									}
 
 									// Cover type
 									if ( ! wppa_switch( 'covertype_is_restricted' ) || wppa_user_is( 'administrator' ) ) {
-										echo
-										__( 'Cover Type:', 'wp-photo-album-plus' ) . ' ';
 										$sel = ' selected="selected"';
 										echo
-										'<select' .
-											' onchange="wppaAjaxUpdateAlbum( '. $id . ', \'cover_type\', this )"' .
-											' >' .
-											'<option value=""' . ( $cover_type == '' ? $sel : '' ) . ' >' .
-												__( '--- default --- See Table IV-D6', 'wp-photo-album-plus' ) .
-											'</option>' .
-											'<option value="default"' . ( $cover_type == 'default' ? $sel : '' ) . ' >' .
-												__( 'Standard', 'wp-photo-album-plus' ) .
-											'</option>' .
-											'<option value="longdesc"' . ( $cover_type == 'longdesc' ? $sel : '' ) . ' >' .
-												__( 'Long Descriptions', 'wp-photo-album-plus' ) .
-											'</option>' .
-											'<option value="imagefactory"' . ( $cover_type == 'imagefactory' ? $sel : '' ) . ' >' .
-												__( 'Image Factory', 'wp-photo-album-plus' ) .
-											'</option>' .
-											'<option value="default-mcr"' . ( $cover_type == 'default-mcr' ? $sel : '' ) . ' >' .
-												__( 'Standard mcr', 'wp-photo-album-plus' ) .
-											'</option>' .
-											'<option value="longdesc-mcr"' . ( $cover_type == 'longdesc-mcr' ? $sel : '' ) . ' >' .
-												__( 'Long Descriptions mcr', 'wp-photo-album-plus' ) .
-											'</option>' .
-											'<option value="imagefactory-mcr"' . ( $cover_type == 'imagefactory-mcr' ? $sel : '' ) . ' >' .
-												__( 'Image Factory mcr', 'wp-photo-album-plus' ) .
-											'</option>' .
-										'</select>' . ' ';
+										__( 'Cover Type', 'wp-photo-album-plus' ) . ':&nbsp;
+										<select onchange="wppaAjaxUpdateAlbum( '. $id . ', \'cover_type\', this )" >
+											<option value=""' . ( $cover_type == '' ? $sel : '' ) . ' >' .
+												__( '--- default --- See Table IV-D6', 'wp-photo-album-plus' ) . '
+											</option>
+											<option value="default"' . ( $cover_type == 'default' ? $sel : '' ) . ' >' .
+												__( 'Standard', 'wp-photo-album-plus' ) . '
+											</option>
+											<option value="longdesc"' . ( $cover_type == 'longdesc' ? $sel : '' ) . ' >' .
+												__( 'Long Descriptions', 'wp-photo-album-plus' ) . '
+											</option>
+											<option value="imagefactory"' . ( $cover_type == 'imagefactory' ? $sel : '' ) . ' >' .
+												__( 'Image Factory', 'wp-photo-album-plus' ) . '
+											</option>
+											<option value="default-mcr"' . ( $cover_type == 'default-mcr' ? $sel : '' ) . ' >' .
+												__( 'Standard mcr', 'wp-photo-album-plus' ) . '
+											</option>
+											<option value="longdesc-mcr"' . ( $cover_type == 'longdesc-mcr' ? $sel : '' ) . ' >' .
+												__( 'Long Descriptions mcr', 'wp-photo-album-plus' ) . '
+											</option>
+											<option value="imagefactory-mcr"' . ( $cover_type == 'imagefactory-mcr' ? $sel : '' ) . ' >' .
+												__( 'Image Factory mcr', 'wp-photo-album-plus' ) . '
+											</option>
+										</select>&nbsp;';
 									}
 
 									// Cover photo
 									echo
-									__( 'Cover Photo:', 'wp-photo-album-plus' ) . ' ' .
-									wppa_main_photo( $main_photo , $cover_type ) . ' ';
+									__( 'Cover Photo:', 'wp-photo-album-plus' ) . '&nbsp;' .
+									wppa_main_photo( $main_photo, $cover_type ) . '&nbsp;';
 
 									// Upload limit
 									echo
-									__( 'Upload limit:', 'wp-photo-album-plus' ) . ' ';
+									__( 'Upload limit:', 'wp-photo-album-plus' ) . '&nbsp;';
 									$lims = explode( '/', $upload_limit );
 									if ( ! is_array( $lims ) ) {
 										$lims = array( '0', '0' );
 									}
 									if ( wppa_user_is( 'administrator' ) ) {
-										echo
-										'<input' .
-											' type="text"' .
-											' id="upload_limit_count"' .
-											' value="' . $lims[0] . '"' .
-											' style="width:50px"' .
-											' title="' . esc_attr( __( 'Set the upload limit (0 means unlimited).', 'wp-photo-album-plus' ) ) . '"' .
-											' onchange="wppaRefreshAfter(); wppaAjaxUpdateAlbum( ' . $id . ', \'upload_limit_count\', this )"' .
-										' />';
 										$sel = ' selected="selected"';
-										echo
-										'<select onchange="wppaRefreshAfter(); wppaAjaxUpdateAlbum( ' . $id . ', \'upload_limit_time\', this )" >' .
-											'<option value="0"' . ( $lims[1] == '0' ? $sel : '' ) . ' >' . __( 'for ever', 'wp-photo-album-plus' ) . '</option>' .
-											'<option value="3600"' . ( $lims[1] == '3600' ? $sel : '' ) . ' >' . __( 'per hour', 'wp-photo-album-plus' ) . '</option>' .
-											'<option value="86400"' . ( $lims[1] == '86400' ? $sel : '' ) . ' >' . __( 'per day', 'wp-photo-album-plus' ) . '</option>' .
-											'<option value="604800"' . ( $lims[1] == '604800' ? $sel : '' ) . ' >' . __( 'per week', 'wp-photo-album-plus' ) . '</option>' .
-											'<option value="2592000"' . ( $lims[1] == '2592000' ? $sel : '' ) . ' >' . __( 'per month', 'wp-photo-album-plus' ) . '</option>' .
-											'<option value="31536000"' . ( $lims[1] == '31536000' ? $sel : '' ) . ' >' . __( 'per year', 'wp-photo-album-plus' ) . '</option>' .
-										'</select>' . ' ';
+										echo '
+										<input
+											type="text"
+											id="upload_limit_count"
+											value="' . $lims[0] . '"
+											style="width:50px"
+											title="' . esc_attr( __( 'Set the upload limit (0 means unlimited).', 'wp-photo-album-plus' ) ) . '"
+											onchange="wppaRefreshAfter(); wppaAjaxUpdateAlbum( ' . $id . ', \'upload_limit_count\', this )"
+										/>
+										<select onchange="wppaRefreshAfter(); wppaAjaxUpdateAlbum( ' . $id . ', \'upload_limit_time\', this )" >
+											<option value="0"' . ( $lims[1] == '0' ? $sel : '' ) . ' >' . __( 'for ever', 'wp-photo-album-plus' ) . '</option>
+											<option value="3600"' . ( $lims[1] == '3600' ? $sel : '' ) . ' >' . __( 'per hour', 'wp-photo-album-plus' ) . '</option>
+											<option value="86400"' . ( $lims[1] == '86400' ? $sel : '' ) . ' >' . __( 'per day', 'wp-photo-album-plus' ) . '</option>
+											<option value="604800"' . ( $lims[1] == '604800' ? $sel : '' ) . ' >' . __( 'per week', 'wp-photo-album-plus' ) . '</option>
+											<option value="2592000"' . ( $lims[1] == '2592000' ? $sel : '' ) . ' >' . __( 'per month', 'wp-photo-album-plus' ) . '</option>
+											<option value="31536000"' . ( $lims[1] == '31536000' ? $sel : '' ) . ' >' . __( 'per year', 'wp-photo-album-plus' ) . '</option>
+										</select>&nbsp;';
 									}
 									else {
-										if ( $lims[0] == '0' ) _e( 'Unlimited', 'wp-photo-album-plus' );
+										if ( $lims[0] == '0' ) {
+											_e( 'Unlimited', 'wp-photo-album-plus' );
+										}
 										else {
-											echo $lims[0].' ';
-											switch ($lims[1]) {
+											echo $lims[0] . '&nbsp;';
+											switch ( $lims[1] ) {
 												case '3600': _e( 'per hour', 'wp-photo-album-plus' ); break;
 												case '86400': _e( 'per day', 'wp-photo-album-plus' ); break;
 												case '604800': _e( 'per week', 'wp-photo-album-plus' ); break;
 												case '2592000': _e( 'per month', 'wp-photo-album-plus' ); break;
 												case '31536000': _e( 'per year', 'wp-photo-album-plus' ); break;
+												default: echo sprintf( 'per %d seconds', $lims[1] );
 											}
 										}
 										echo '. ';
@@ -646,50 +691,44 @@ function wppaTryScheduleAll( id ) {
 										echo '<br />';
 
 										echo
-										__( 'Watermark file:', 'wp-photo-album-plus' ) .
-										'<select' .
-											' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'wmfile\', this )"' .
-											' >' .
-											wppa_watermark_file_select( 'album', $id ) .
-										'</select>' .
-										' ' .
-										__( 'Watermark pos:', 'wp-photo-album-plus' ) .
-										'<select' .
-											' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'wmpos\', this )"' .
-											' >' .
-											wppa_watermark_pos_select( 'album', $id ) .
-										'</select>';
+										__( 'Watermark file:', 'wp-photo-album-plus' ) . '
+										<select onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'wmfile\', this )" >' .
+											wppa_watermark_file_select( 'album', $id ) . '
+										</select>&nbsp;' .
+										__( 'Watermark pos:', 'wp-photo-album-plus' ) . '
+										<select onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'wmpos\', this )" >' .
+											wppa_watermark_pos_select( 'album', $id ) . '
+										</select>';
 									}
 
 									// Status
 									echo '<br />' .
-									__( 'Remark:', 'wp-photo-album-plus' ) . ' ' .
-									'<span' .
-										' id="albumstatus-' . $id . '"' .
-										' style="font-weight:bold;color:#00AA00;"' .
-										' >' .
-										sprintf( __( 'Album %s is not modified yet', 'wp-photo-album-plus' ), $id ) .
-									'</span>';
+									__( 'Remark', 'wp-photo-album-plus' ) . ':&nbsp;
+									<span
+										id="albumstatus-' . $id . '"
+										style="font-weight:bold;color:#00AA00;"
+										>' .
+										sprintf( __( 'Album %s is not modified yet', 'wp-photo-album-plus' ), $id ) . '
+									</span>';
 
 
-									echo
-								'</td>' .
-							'</tr>' .
-						'</tbody>' .
-					'</table>';
+									echo '
+								</td>
+							</tr>
+						</tbody>
+					</table>';
 }
+/*hbi*/
 {
 					// Section 2
-					echo
-					"\n" . '<!-- Album Section 2 -->' .
-					'<table' .
-						' class="wppa-table wppa-album-table"' .
-						' >' .
-						'<tbody>';
+					echo '
+					<!-- Album Section 2 -->
+					<table class="wppa-table wppa-album-table" >
+						<tbody>';
 
 							// Name
-							echo
-							'<tr>' .
+							echo '
+							<tr>' .
 								'<td>' .
 									__( 'Name:', 'wp-photo-album-plus' ) .
 								'</td>' .
@@ -826,7 +865,7 @@ function wppaTryScheduleAll( id ) {
 							if ( wppa_switch( 'album_custom_fields' ) ) {
 								$custom = wppa_get_album_item( $edit_id, 'custom' );
 								if ( $custom ) {
-									$custom_data = unserialize( $custom );
+									$custom_data = wppa_unserialize( $custom );
 								}
 								else {
 									$custom_data = array( '', '', '', '', '', '', '', '', '', '' );
@@ -1160,7 +1199,16 @@ function wppaTryScheduleAll( id ) {
 				<?php
 					if ( isset($_REQUEST['bulk']) ) wppa_album_photos_bulk($edit_id);
 					elseif ( isset($_REQUEST['seq']) ) wppa_album_photos_sequence($edit_id);
-					else wppa_album_photos($edit_id)
+					else wppa_album_photos($edit_id);
+
+
+					$back_url = get_admin_url() . 'admin.php?page=wppa_admin_menu';
+					echo '
+					<br />
+					<a href="' . $back_url . '" >' .
+						__( 'Back to album table', 'wp-photo-album-plus' ) .
+					'</a>';
+
 				?>
 				<a href="#manage-photos">
 					<div style="position:fixed;right:30px;bottom:30px;background-color:lightblue;" >&nbsp;<?php _e('Top of page', 'wp-photo-album-plus') ?>&nbsp;</div>
@@ -1206,7 +1254,7 @@ function wppaTryScheduleAll( id ) {
 		// album delete confirm page
 		else if ($_REQUEST['tab'] == 'del') {
 
-			$album_owner = $wpdb->get_var($wpdb->prepare("SELECT `owner` FROM ".WPPA_ALBUMS." WHERE `id` = %s", $_REQUEST['edit_id']));
+			$album_owner = $wpdb->get_var($wpdb->prepare( "SELECT `owner` FROM $wpdb->wppa_albums WHERE `id` = %s", $_REQUEST['edit_id']));
 			if ( ( $album_owner == '--- public ---' && ! current_user_can('administrator') ) || ! wppa_have_access($_REQUEST['edit_id']) ) {
 				wp_die('You do not have the rights to delete this album');
 			}
@@ -1244,8 +1292,14 @@ function wppaTryScheduleAll( id ) {
 			</div>
 <?php
 		}
+		else {
+			wppa_error_message( sprintf( __( 'Album admin action %s is not implemented', 'wp-photo-album-plus' ),
+										 '<b>' . sanitize_text_field( $_REQUEST['tab'] ) . '</b>' ) );
+		}
 	}
-	else {	//  'tab' not set. default, album manage page.
+
+	//  'tab' not set. default, album manage page.
+	else {
 
 		// if add form has been submitted
 //		if (isset($_POST['wppa-na-submit'])) {
@@ -1258,7 +1312,7 @@ function wppaTryScheduleAll( id ) {
 		if (isset($_POST['wppa-del-confirm'])) {
 			check_admin_referer( '$wppa_nonce', WPPA_NONCE );
 
-			$album_owner = $wpdb->get_var($wpdb->prepare("SELECT `owner` FROM ".WPPA_ALBUMS." WHERE `id` = %s", $_POST['wppa-del-id']));
+			$album_owner = $wpdb->get_var($wpdb->prepare("SELECT `owner` FROM $wpdb->wppa_albums WHERE `id` = %s", $_POST['wppa-del-id']));
 			if ( ( $album_owner == '--- public ---' && ! current_user_can('administrator') ) || ! wppa_have_access($_POST['wppa-del-id']) ) {
 				wp_die('You do not have the rights to delete this album');
 			}
@@ -1372,7 +1426,53 @@ global $wpdb;
 	}
 
 	// Read all albums, pre-ordered
-	$albums = $wpdb->get_results( "SELECT * FROM `" . WPPA_ALBUMS . "` ORDER BY " . get_option( 'wppa_album_order_'.wppa_get_user(), 'id' ) . ( get_option( 'wppa_album_order_' . wppa_get_user() . '_reverse' ) == 'yes' ? " DESC" : "" ) , ARRAY_A );
+	$order_by 	= get_option( 'wppa_album_order_' . wppa_get_user(), 'id' );
+	$order_desc = get_option( 'wppa_album_order_' . wppa_get_user() . '_reverse' );
+// 	A dynamic query is regarded as being insecure, so we make a switch statemnent with all possible sequences.
+//	$albums = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY " . $order_by . ( $order_desc == 'yes' ? " DESC" : "" ) , ARRAY_A );
+	if ( $order_desc == 'yes' ) {
+		switch( $order_by ) {
+			case 'name':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY name DESC";
+				break;
+			case 'description':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY description DESC";
+				break;
+			case 'owner':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY owner DESC";
+				break;
+			case 'a_order':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY a_order DESC";
+				break;
+			case 'a_parent':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY a_parent DESC";
+				break;
+			default:
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY id DESC";
+		}
+	}
+	else {
+		switch( $order_by ) {
+			case 'name':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY name";
+				break;
+			case 'description':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY description";
+				break;
+			case 'owner':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY owner";
+				break;
+			case 'a_order':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY a_order";
+				break;
+			case 'a_parent':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY a_parent";
+				break;
+			default:
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY id";
+		}
+	}
+	$albums = $wpdb->get_results( $query, ARRAY_A );
 
 	// Remove non accessible albums
 	$temp = $albums;
@@ -1566,7 +1666,7 @@ global $wpdb;
 					if ( wppa_have_access( $album ) && ( wppa_user_is( 'administrator' ) || $album['owner'] != '--- public ---' ) ) {
 						$counts = wppa_get_treecounts_a($album['id'], true);
 						$pendcount = $counts['pendselfphotos'];
-//						$pendcount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE album=%s AND status=%s", $album['id'], 'pending'));
+//						$pendcount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE album=%s AND status=%s", $album['id'], 'pending'));
 						?>
 						<tr <?php echo($alt); if ($pendcount) echo 'style="background-color:#ffdddd"' ?>>
 							<td><?php echo($album['id']) ?></td>
@@ -1740,7 +1840,53 @@ global $wpdb;
 	}
 
 	// Read all albums, pre-ordered
-	$albums = $wpdb->get_results( "SELECT * FROM `" . WPPA_ALBUMS . "` ORDER BY " . get_option( 'wppa_album_order_'.wppa_get_user(), 'id' ) . ( get_option( 'wppa_album_order_' . wppa_get_user() . '_reverse' ) == 'yes' ? " DESC" : "" ) , ARRAY_A );
+//	$albums = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_albums ORDER BY " . get_option( 'wppa_album_order_'.wppa_get_user(), 'id' ) . ( get_option( 'wppa_album_order_' . wppa_get_user() . '_reverse' ) == 'yes' ? " DESC" : "" ) , ARRAY_A );
+	$order_by 	= get_option( 'wppa_album_order_' . wppa_get_user(), 'id' );
+	$order_desc = get_option( 'wppa_album_order_' . wppa_get_user() . '_reverse' );
+// 	A dynamic query is regarded as being insecure, so we make a switch statemnent with all possible sequences.
+	if ( $order_desc == 'yes' ) {
+		switch( $order_by ) {
+			case 'name':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY name DESC";
+				break;
+			case 'description':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY description DESC";
+				break;
+			case 'owner':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY owner DESC";
+				break;
+			case 'a_order':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY a_order DESC";
+				break;
+			case 'a_parent':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY a_parent DESC";
+				break;
+			default:
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY id DESC";
+		}
+	}
+	else {
+		switch( $order_by ) {
+			case 'name':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY name";
+				break;
+			case 'description':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY description";
+				break;
+			case 'owner':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY owner";
+				break;
+			case 'a_order':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY a_order";
+				break;
+			case 'a_parent':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY a_parent";
+				break;
+			default:
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums ORDER BY id";
+		}
+	}
+	$albums = $wpdb->get_results( $query, ARRAY_A );
 
 	// Remove non accessible albums
 	$temp = $albums;
@@ -1784,7 +1930,7 @@ global $wpdb;
 					$done = false;
 
 					// Add missing parent
-					$albums[] = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" .WPPA_ALBUMS . "` WHERE `id` = %d", $parent ), ARRAY_A );
+					$albums[] = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE id = %d", $parent ), ARRAY_A );
 				}
 			}
 		}
@@ -1953,7 +2099,7 @@ global $wpdb;
 			<tbody>
 
 			<?php wppa_do_albumlist('0', '0', $albums, $seq); ?>
-			<?php if ( $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_ALBUMS."` WHERE `a_parent` = '-1'" ) > 0 ) { ?>
+			<?php if ( $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE `a_parent` = '-1'" ) > 0 ) { ?>
 				<tr>
 					<td colspan="<?php echo ( '19' + ( current_user_can( 'wppa_upload' ) ? '1' : '0' ) + ( current_user_can( 'wppa_import' ) ? '1' : '0' ) ) ?>" >
 						<em>
@@ -2160,7 +2306,7 @@ global $wpdb;
 	$doit = false;
 	if ( wppa_user_is( 'administrator' ) ) $doit = true;
 
-	$trashed = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_PHOTOS . "` WHERE `album` < '0'" );
+	$trashed = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `album` < '0'" );
 
 	if ( ! $trashed ) $doit = false;
 
@@ -2370,11 +2516,11 @@ global $wpdb;
 function wppa_have_accessible_children( $alb ) {
 global $wpdb;
 
-	$albums = $wpdb->get_results( "SELECT * FROM `" . WPPA_ALBUMS . "` WHERE `a_parent` = " . $alb['id'], ARRAY_A );
+	$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d", $alb['id'] ), ARRAY_A );
 
-	if ( ! $albums || ! count($albums) ) return false;
+	if ( ! $albums || ! count( $albums ) ) return false;
 	foreach ( $albums as $album ) {
-		if ( wppa_have_access($album) ) return true;
+		if ( wppa_have_access( $album ) ) return true;
 	}
 	return false;
 }
@@ -2393,11 +2539,11 @@ global $wpdb;
 	}
 
 	// Photos in the album
-	$photos = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM `' . WPPA_PHOTOS . '` WHERE `album` = %s', $id ), ARRAY_A );
+	$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wppa_photos WHERE album = %s", $id ), ARRAY_A );
 
 	if ( is_array( $photos ) ) {
 		foreach ( $photos as $photo ) {
-			$wpdb->query( $wpdb->prepare( 'UPDATE `' . WPPA_PHOTOS . '` SET `album` = %s WHERE `id` = %s', $move, $photo['id'] ) );
+			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wppa_photos SET album = %s WHERE id = %d", $move, $photo['id'] ) );
 
 			// Move to trash?
 			if ( $move > '0' ) {
@@ -2419,7 +2565,7 @@ global $wpdb;
 	wppa_invalidate_treecounts( $id );
 
 	// Now delete the album
-	$wpdb->query( $wpdb->prepare( 'DELETE FROM `' . WPPA_ALBUMS . '` WHERE `id` = %s LIMIT 1', $id ) );
+	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}wppa_albums WHERE id = %d", $id ) );
 	wppa_delete_album_source( $id );
 	wppa_index_remove( 'album', $id );
 	wppa_clear_catlist();
@@ -2439,7 +2585,7 @@ function wppa_main_photo($cur = '', $covertype) {
 global $wpdb;
 
     $a_id = $_REQUEST['edit_id'];
-	$photos = $wpdb->get_results($wpdb->prepare('SELECT * FROM `'.WPPA_PHOTOS.'` WHERE `album` = %s '.wppa_get_photo_order($a_id).' LIMIT 1000', $a_id), ARRAY_A);
+	$photos = $wpdb->get_results($wpdb->prepare("SELECT * FROM $wpdb->wppa_photos WHERE `album` = %s " . wppa_get_photo_order( $a_id ) . " LIMIT 1000", $a_id ), ARRAY_A );
 
 	$output = '';
 //	if ( ! empty($photos) ) {
@@ -2499,7 +2645,7 @@ global $wpdb;
 	// Get the albums
 	$albumorder 	= wppa_get_album_order( $parent );
 	$is_descending 	= strpos( $albumorder, 'DESC' ) !== false;
-	$albums 		= $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM `'.WPPA_ALBUMS.'` WHERE `a_parent` = %s '.$albumorder, $parent ), ARRAY_A );
+	$albums 		= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE `a_parent` = %s " . $albumorder, $parent ), ARRAY_A );
 
 	// Anything to do here ?
 	if ( empty ( $albums ) ) {

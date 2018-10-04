@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the admin menu and startups the admin pages
-* Version 6.9.13
+* Version 6.9.14
 *
 */
 
@@ -40,7 +40,7 @@ function wppa_add_admin() {
 
 	// See if there are uploads pending moderation
 	$upl_pending = '';
-	$upl_pending_count = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `status` = 'pending'" );
+	$upl_pending_count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `status` = 'pending'" );
 	if ( $upl_pending_count ) $upl_pending = '<span class="update-plugins"><span class="plugin-count">'.$upl_pending_count.'</span></span>';
 
 	// Compute total pending moderation
@@ -179,6 +179,10 @@ require_once 'wppa-tinymce-shortcodes.php';
 require_once 'wppa-tinymce-photo.php';
 require_once 'wppa-privacy-policy.php';
 
+if ( is_file( dirname( __FILE__ ) . '/wppa-gutenberg-photo.php' ) ) {
+	require_once 'wppa-gutenberg-photo.php';
+}
+
 /* This is for the changelog text when an update is available */
 global $pagenow;
 if ( 'plugins.php' === $pagenow )
@@ -239,7 +243,7 @@ global $wpdb;
 
 	// Recently uploaded photos
 	echo '<h3>' . __( 'Recently uploaded photos', 'wp-photo-album-plus' ) . '</h3>';
-	$photos = $wpdb->get_results( "SELECT * FROM `" . WPPA_PHOTOS . "` ORDER BY `timestamp` DESC LIMIT 5", ARRAY_A );
+	$photos = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_photos ORDER BY `timestamp` DESC LIMIT 5", ARRAY_A );
 
 	if ( ! empty( $photos ) ) {
 		echo
@@ -289,7 +293,7 @@ global $wpdb;
 
 	// Recent comments
 	echo '<h3>' . __( 'Recent comments on photos', 'wp-photo-album-plus' ) . '</h3>';
-	$comments = $wpdb->get_results( "SELECT * FROM `" . WPPA_COMMENTS . "` ORDER BY `timestamp` DESC LIMIT 5", ARRAY_A );
+	$comments = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_comments ORDER BY `timestamp` DESC LIMIT 5", ARRAY_A );
 	if ( ! empty( $comments ) ) {
 
 		echo

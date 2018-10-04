@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various wppa boxes
-* Version 6.9.09
+* Version 6.9.14
 *
 */
 
@@ -431,7 +431,7 @@ global $wppa_supported_camara_brands;
 											);
 	$pagelink 	= wppa_dbg_url( get_page_link( $page ) );
 	$fontsize 	= wppa_in_widget() ? 'font-size: 9px;' : '';
-	$query 		= 	"SELECT `id`, `name`, `owner` FROM `" . WPPA_ALBUMS . "` ORDER BY `name`";
+	$query 		= 	"SELECT `id`, `name`, `owner` FROM $wpdb->wppa_albums ORDER BY `name`";
 	$albums 	= $wpdb->get_results( $query, ARRAY_A );
 	$query 		= 	"SELECT `name` FROM `" . WPPA_PHOTOS .
 						"` WHERE `status` <> 'pending' AND `status` <> 'scheduled' ORDER BY `name`";
@@ -487,7 +487,7 @@ global $wppa_supported_camara_brands;
 //echo serialize($exiflist);
 	if ( ! empty( $exiflist ) ) {
 		foreach( array_keys( $exiflist ) as $idx ) {
-//			$exists = $wpdb->get_var( $wpdb->prepare( 	"SELECT * FROM `" . WPPA_EXIF . "` " .
+//			$exists = $wpdb->get_var( $wpdb->prepare( 	"SELECT * FROM $wpdb->wppa_exif " .
 //														"WHERE `photo` <> '0' " .
 //														"AND `tag` = %s " .
 //														"AND `description` <> '' LIMIT 1", $exiflist[$idx]['tag'] ) );
@@ -2397,7 +2397,7 @@ static $albums_granted;
 	// Login not required, but there are no public albums while user not logged in?
 	elseif ( ! is_user_logged_in() ) {
 		$public_exist = $wpdb->get_var( 	"SELECT COUNT(*) " .
-											"FROM `" . WPPA_ALBUMS . "` " .
+											"FROM $wpdb->wppa_albums " .
 											"WHERE `owner` = '--- public ---' " );
 
 		if ( ! $public_exist ) {
@@ -3411,7 +3411,7 @@ function wppa_user_albumedit_html( $alb, $width, $where = '', $mcr = false ) {
 			// Custom data
 			$custom 	= wppa_get_album_item( $alb, 'custom' );
 			if ( $custom ) {
-				$custom_data = unserialize( $custom );
+				$custom_data = wppa_unserialize( $custom );
 			}
 			else {
 				$custom_data = array( '', '', '', '', '', '', '', '', '', '' );
@@ -3888,7 +3888,7 @@ global $wppa_iptc_cache;
 
 	// Get tha labels if not yet present
 	if ( ! is_array( $wppa_iptc_labels ) ) {
-		$wppa_iptc_labels = $wpdb->get_results( "SELECT * FROM `" . WPPA_IPTC . "` WHERE `photo` = '0' ORDER BY `tag`", ARRAY_A );
+		$wppa_iptc_labels = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_iptc WHERE `photo` = '0' ORDER BY `tag`", ARRAY_A );
 	}
 
 	$count = 0;
@@ -3903,7 +3903,7 @@ global $wppa_iptc_cache;
 
 	// Get the photo data
 	if ( $iptcdata === false ) {
-		$iptcdata = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . WPPA_IPTC . "` WHERE `photo`=%s ORDER BY `tag`", $photo ), ARRAY_A );
+		$iptcdata = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_iptc WHERE `photo`=%s ORDER BY `tag`", $photo ), ARRAY_A );
 
 		// Save in cache, even when empty
 		$wppa_iptc_cache[$photo] = $iptcdata;
@@ -4001,7 +4001,7 @@ global $wppa_exif_cache;
 
 	// Get tha labels if not yet present
 	if ( ! is_array( $wppa_exif_labels ) ) {
-		$wppa_exif_labels = $wpdb->get_results( "SELECT * FROM `" . WPPA_EXIF . "` WHERE `photo` = '0' ORDER BY `tag`", ARRAY_A );
+		$wppa_exif_labels = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_exif WHERE `photo` = '0' ORDER BY `tag`", ARRAY_A );
 	}
 
 	$count = 0;
@@ -4203,7 +4203,7 @@ global $wpdb;
 		$photo = wppa( 'single_photo' );
 		$thumb = wppa_cache_thumb( $photo );
 		$album = $thumb['album'];
-		$photos = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `page_id` FROM `".WPPA_PHOTOS."` WHERE `album` = %s ".wppa_get_photo_order( $album ), $album ), ARRAY_A );
+		$photos = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `page_id` FROM $wpdb->wppa_photos WHERE `album` = %s ".wppa_get_photo_order( $album ), $album ), ARRAY_A );
 		$prevpag = '0';
 		$nextpag = '0';
 		$curpag  = get_the_ID();
@@ -4597,7 +4597,7 @@ global $wpdb;
 	switch ( $calendar_type ) {
 		case 'exifdtm':
 			$photos = $wpdb->get_results( 	"SELECT `id`, `exifdtm` " .
-											"FROM `" . WPPA_PHOTOS . "` " .
+											"FROM $wpdb->wppa_photos " .
 											"WHERE `exifdtm` <> '' " .
 												"AND `status` <> 'pending' " .
 												"AND `status` <> 'scheduled' " .

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all session routines
-* Version 6.9.00
+* Version 6.9.15
 *
 * Firefox modifies data in the superglobal $_SESSION.
 * See https://bugzilla.mozilla.org/show_bug.cgi?id=991019
@@ -37,17 +37,17 @@ global $wppa_session;
 	$expire 	= time() - $lifetime;
 
 	// Is session already started?
-	$session = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `".WPPA_SESSION."` WHERE `session` = %s AND `status` = 'valid' LIMIT 1", wppa_get_session_id() ), ARRAY_A );
+	$session = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_session WHERE `session` = %s AND `status` = 'valid' LIMIT 1", wppa_get_session_id() ), ARRAY_A );
 
 	// Started but expired?
 	if ( $session ) {
 		if ( $session['timestamp'] < $expire ) {
-			
-			$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_SESSION . "` SET `status` = 'expired' WHERE `id` = %s", $session['id'] ) );
+
+			$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET `status` = 'expired' WHERE `id` = %s", $session['id'] ) );
 			$session = false;
-			
+
 			// Anonimize all expired sessions, except robots (for the statistics widget)
-			$wpdb->query( 	"UPDATE `" . WPPA_SESSION . "` " .
+			$wpdb->query( 	"UPDATE $wpdb->wppa_session " .
 							"SET `ip` = '', `user` = '', `data` = '' " .
 							"WHERE `status` = 'expired' " .
 							"AND `data` NOT LIKE '%\"isrobot\";b:1;%'" );
@@ -92,9 +92,9 @@ global $wppa_session;
 
 	// Session exists, Update counter
 	else {
-		$wppa_session = unserialize( $data );
+		$wppa_session = wppa_unserialize( $data );
 
-		$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_SESSION . "` SET `count` = %s WHERE `id` = %s", $session['count'] + '1', $session['id'] ) );
+		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET `count` = %s WHERE `id` = %s", $session['count'] + '1', $session['id'] ) );
 	}
 
 	// Get info for root and sub search
@@ -189,7 +189,7 @@ static $last_query;
 	}
 
 	// Compose the query
-	$query = $wpdb->prepare( "UPDATE `".WPPA_SESSION."` SET `data` = %s WHERE `id` = %s", serialize( $wppa_session ), $wppa_session['id'] );
+	$query = $wpdb->prepare( "UPDATE $wpdb->wppa_session SET `data` = %s WHERE `id` = %s", serialize( $wppa_session ), $wppa_session['id'] );
 
 	// Only update if data differs from previous update
 	if ( $query != $last_query ) {
@@ -224,5 +224,5 @@ function wppa_extend_session() {
 global $wpdb;
 
 	$sessionid = wppa_get_session_id();
-	$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_SESSION . "` SET `timestamp` = %d WHERE `session` = %s", time(), $sessionid ) );
+	$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET `timestamp` = %d WHERE `session` = %s", time(), $sessionid ) );
 }

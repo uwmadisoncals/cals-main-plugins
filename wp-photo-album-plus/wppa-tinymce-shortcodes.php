@@ -2,7 +2,7 @@
 /* wppa-tinymce-shortcodes.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 6.9.03
+* Version 6.9.14
 */
 
 if ( ! defined( 'ABSPATH' ) )
@@ -73,7 +73,7 @@ global $wpdb;
 		$albums = null;
 	}
 	else {
-		$albums = $wpdb->get_results( "SELECT `id`, `name` FROM `".WPPA_ALBUMS."` ORDER BY `timestamp` DESC", ARRAY_A );
+		$albums = $wpdb->get_results( "SELECT `id`, `name` FROM $wpdb->wppa_albums ORDER BY `timestamp` DESC", ARRAY_A );
 		if ( wppa_switch( 'hier_albsel' ) ) {
 			$albums = wppa_add_paths( $albums );
 			$albums = wppa_array_sort( $albums, 'name' );
@@ -81,7 +81,7 @@ global $wpdb;
 	}
 
 	// Prepare photoinfo
-	$photos = $wpdb->get_results( "SELECT `id`, `name`, `album`, `ext` FROM `".WPPA_PHOTOS."` ORDER BY `timestamp` DESC LIMIT 100", ARRAY_A );
+	$photos = $wpdb->get_results( "SELECT `id`, `name`, `album`, `ext` FROM $wpdb->wppa_photos ORDER BY `timestamp` DESC LIMIT 100", ARRAY_A );
 
 	// Get Tags/cats
 	$tags 	= wppa_get_taglist();

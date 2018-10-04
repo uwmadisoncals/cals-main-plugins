@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
-* Version 6.8.07
+* Version 6.9.14
 *
 *
 */
@@ -184,7 +184,7 @@ global $wpdb;
 	$savetime 	= 86400;		// Save session data for 24 hour
 	$expire 	= time() - $lifetime;
 	$purge 		= time() - $savetime;
-	$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_SESSION . "` SET `status` = 'expired' WHERE `timestamp` < %s", $expire ) );
+	$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_session SET `status` = 'expired' WHERE `timestamp` < %s", $expire ) );
 	$wpdb->query( $wpdb->prepare( "DELETE FROM `" . WPPA_SESSION ."` WHERE `timestamp` < %s", $purge ) );
 
 	// Delete obsolete spam
@@ -200,13 +200,13 @@ global $wpdb;
 	wppa_re_animate_cron();
 
 	// Find lost photos, update their album to -9, meaning trashed
-	$album_ids = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_ALBUMS . "`" );
+	$album_ids = $wpdb->get_col( "SELECT `id` FROM $wpdb->wppa_albums" );
 	if ( ! empty( $album_ids ) ) {
-		$lost = $wpdb->query( "UPDATE `" . WPPA_PHOTOS . "` SET `album` = '-9' WHERE `album` > '0' AND `album` NOT IN ( " . implode( ',', $album_ids ) . " ) " );
+		$lost = $wpdb->query( "UPDATE $wpdb->wppa_photos SET `album` = '-9' WHERE `album` > '0' AND `album` NOT IN ( " . implode( ',', $album_ids ) . " ) " );
 	}
 
 	// Remove 'deleted' photos from system
-	$dels = $wpdb->get_col( "SELECT `id` FROM `".WPPA_PHOTOS."` WHERE `album` <= '-9' AND `modified` < " . ( time() - 3600 ) );
+	$dels = $wpdb->get_col( "SELECT `id` FROM $wpdb->wppa_photos WHERE `album` <= '-9' AND `modified` < " . ( time() - 3600 ) );
 	foreach( $dels as $del ) {
 		wppa_delete_photo( $del );
 		wppa_log( 'Cron', 'Removed photo {b}' . $del . '{/b} from system' );
@@ -387,7 +387,7 @@ global $wpdb;
 
 	$start = time();
 
-	$albs = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_ALBUMS . "` WHERE `a_parent` < '1' ORDER BY `id`" );
+	$albs = $wpdb->get_col( "SELECT `id` FROM $wpdb->wppa_albums WHERE `a_parent` < '1' ORDER BY `id`" );
 
 	foreach( $albs as $alb ) {
 		$treecounts = wppa_get_treecounts_a( $alb );

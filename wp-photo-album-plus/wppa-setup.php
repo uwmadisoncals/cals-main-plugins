@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.9.11
+* Version 6.9.15
 *
 */
 
@@ -379,13 +379,13 @@ global $silent;
 		}
 
 		if ( $old_rev <= '6310' ) {
-			$wpdb->query("UPDATE `".WPPA_PHOTOS."` SET `timestamp` = '0' WHERE `timestamp` = ''");
-			$wpdb->query("UPDATE `".WPPA_PHOTOS."` SET `modified` = `timestamp` WHERE `modified` = '' OR `modified` = '0'");
+			$wpdb->query("UPDATE $wpdb->wppa_photos SET `timestamp` = '0' WHERE `timestamp` = ''");
+			$wpdb->query("UPDATE $wpdb->wppa_photos SET `modified` = `timestamp` WHERE `modified` = '' OR `modified` = '0'");
 		}
 
 		if ( $old_rev <= '6312' ) {
-			$wpdb->query("UPDATE `".WPPA_ALBUMS."` SET `timestamp` = '0' WHERE `timestamp` = ''");
-			$wpdb->query("UPDATE `".WPPA_ALBUMS."` SET `modified` = `timestamp` WHERE `modified` = '' OR `modified` = '0'");
+			$wpdb->query("UPDATE $wpdb->wppa_albums SET `timestamp` = '0' WHERE `timestamp` = ''");
+			$wpdb->query("UPDATE $wpdb->wppa_albums SET `modified` = `timestamp` WHERE `modified` = '' OR `modified` = '0'");
 			wppa_copy_setting( 'wppa_wppa_set_shortcodes', 'wppa_set_shortcodes' );
 			wppa_remove_setting( 'wppa_wppa_set_shortcodes' );
 			wppa_copy_setting( 'wppa_max_album_newtime', 'wppa_max_album_modtime' );
@@ -551,9 +551,9 @@ global $silent;
 		}
 
 		if ( $old_rev <= '6800' ) {
-			$wpdb->query( "ALTER TABLE `" . WPPA_IPTC . "` MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT" );
-			$wpdb->query( "ALTER TABLE `" . WPPA_EXIF . "` MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT" );
-			$wpdb->query( "ALTER TABLE `" . WPPA_INDEX . "` MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT" );
+			$wpdb->query( "ALTER TABLE $wpdb->wppa_iptc MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT" );
+			$wpdb->query( "ALTER TABLE $wpdb->wppa_exif MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT" );
+			$wpdb->query( "ALTER TABLE $wpdb->wppa_index MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT" );
 			delete_option( 'wppa_' . WPPA_IPTC . '_lastkey' );
 			delete_option( 'wppa_' . WPPA_EXIF . '_lastkey' );
 			delete_option( 'wppa_' . WPPA_INDEX . '_lastkey' );
@@ -564,15 +564,24 @@ global $silent;
 		// Fix exiflables that were undefined so far but have a known description by now
 		if ( $old_rev <= '6801' ) {
 			if ( function_exists( 'exif_tagname' ) && function_exists( 'exif_read_data' ) ) {
-				$exif_labels = $wpdb->get_results( "SELECT * FROM `" . WPPA_EXIF . "` WHERE `photo` = 0 AND `description` LIKE 'UndefinedTag%'", ARRAY_A );
+				$exif_labels = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_exif WHERE `photo` = 0 AND `description` LIKE 'UndefinedTag%'", ARRAY_A );
 				if ( ! empty( $exif_labels ) ) foreach( $exif_labels as $label ) {
 					$newdesc = wppa_exif_tagname( $label['tag'] );
 					if ( $newdesc != $label['description'] ) {
-						$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_EXIF . "` SET `description` = %s WHERE `photo` = 0 AND `tag` = %s", $newdesc, $label['tag'] ) );
+						$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET `description` = %s WHERE `photo` = 0 AND `tag` = %s", $newdesc, $label['tag'] ) );
 						wppa_log( 'obs', 'There is a new desc for '.$label['tag'].' being: '.$newdesc );
 					}
 				}
 				wppa_schedule_maintenance_proc( 'wppa_recup' );
+			}
+		}
+
+		if ( $old_rev <= '6915' ) {
+			if ( ! get_option( 'wppa_album_admin_pagesize', '0' ) ) {
+				update_option( 'wppa_album_admin_pagesize', '100' );
+			}
+			if ( ! get_option( 'wppa_photo_admin_pagesize', '0' ) ) {
+				update_option( 'wppa_photo_admin_pagesize', '20' );
 			}
 		}
 	}
@@ -1634,7 +1643,7 @@ cursorborder:'2px solid transparent',";
 						'wppa_hier_albsel' 				=> 'yes',
 						'wppa_hier_pagesel'				=> 'no',
 						'wppa_alt_type'					=> 'fullname',
-						'wppa_album_admin_pagesize' 	=> '0',
+						'wppa_album_admin_pagesize' 	=> '100',
 						'wppa_photo_admin_pagesize'		=> '20',
 						'wppa_photo_admin_max_albums' 	=> '500',
 						'wppa_comment_admin_pagesize'	=> '10',
@@ -1669,6 +1678,7 @@ cursorborder:'2px solid transparent',";
 
 						'wppa_login_url' 				=> site_url( 'wp-login.php', 'login' ), 	// A
 						'wppa_cache_root' 				=> 'cache',
+						'wppa_load_frontend_always' 	=> 'no',
 
 
 						// IX D New
@@ -2086,7 +2096,7 @@ static $user;
 
 				// The option hold a category
 				$grant_parents = $wpdb->get_col( 	"SELECT `id` " .
-													"FROM `" . WPPA_ALBUMS . "` " .
+													"FROM $wpdb->wppa_albums " .
 													"WHERE `cats` LIKE '%," . wppa_opt( 'grant_parent' ) . ",%'"
 												);
 				if ( empty( $grant_parents ) ) {
@@ -2097,7 +2107,7 @@ static $user;
 
 			case 'indexsearch':
 				$temp = $wpdb->get_var( "SELECT `albums` " .
-										"FROM `" . WPPA_INDEX . "` " .
+										"FROM $wpdb->wppa_index " .
 										"WHERE `slug` = '" . wppa_opt( 'grant_parent' ) . "'"
 										);
 
@@ -2118,7 +2128,7 @@ static $user;
 
 	// Get all the parents of the current user albums if not done already
 	if ( ! is_array( $my_albs_parents ) ) {
-		$query = $wpdb->prepare( "SELECT DISTINCT `a_parent` FROM `" . WPPA_ALBUMS . "` WHERE `owner` = %s", $owner );
+		$query = $wpdb->prepare( "SELECT DISTINCT `a_parent` FROM $wpdb->wppa_albums WHERE `owner` = %s", $owner );
 		$my_albs_parents = $wpdb->get_col( $query );
 		if ( ! is_array( $my_albs_parents ) ) {
 			$my_albs_parents = array();

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all indexing functions
-* Version 6.8.04
+* Version 6.9.14
 *
 *
 */
@@ -24,7 +24,7 @@ global $pcount;
 
 		// Make sure this album will be re-indexed some time if we are not a cron job
 		if ( ! wppa_is_cron() && ! $force ) {
-			$wpdb->query( "UPDATE `" . WPPA_ALBUMS . "` SET `indexdtm` = '' WHERE `id` = " . strval( intval( $id ) ) );
+			$wpdb->query( "UPDATE $wpdb->wppa_albums SET `indexdtm` = '' WHERE `id` = " . strval( intval( $id ) ) );
 		}
 
 		// If there is a cron job running adding to the index and this is not that cron job, do nothing, unless force
@@ -54,7 +54,7 @@ global $pcount;
 		foreach ( $words as $word ) {
 
 			// Get the row of the index table where the word is registered.
-			$indexline = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . WPPA_INDEX . "` WHERE `slug` = %s", $word ), ARRAY_A );
+			$indexline = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index WHERE `slug` = %s", $word ), ARRAY_A );
 
 			// If this line does not exist yet, create it with only one album number as data
 			if ( ! $indexline ) {
@@ -80,7 +80,7 @@ global $pcount;
 					$newalbums = wppa_index_array_to_string( $oldalbums );
 
 					// Update db
-					$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_INDEX . "` SET `albums` = %s WHERE `id` = %s", $newalbums, $indexline['id'] ) );
+					$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_index SET `albums` = %s WHERE `id` = %s", $newalbums, $indexline['id'] ) );
 
 				}
 			}
@@ -92,7 +92,7 @@ global $pcount;
 
 		// Make sure this photo will be re-indexed some time if we are not a cron job
 		if ( ! wppa_is_cron() && ! $force ) {
-			$wpdb->query( "UPDATE `" . WPPA_PHOTOS . "` SET `indexdtm` = '' WHERE `id` = " . strval( intval( $id ) ) );
+			$wpdb->query( "UPDATE $wpdb->wppa_photos SET `indexdtm` = '' WHERE `id` = " . strval( intval( $id ) ) );
 		}
 
 		// If there is a cron job running adding to the index and this is not that cron job, do nothing
@@ -116,7 +116,7 @@ global $pcount;
 		foreach ( $words as $word ) {
 
 			// Get the row of the index table where the word is registered.
-			$indexline = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `" . WPPA_INDEX . "` WHERE `slug` = %s", $word ), ARRAY_A );
+			$indexline = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_index WHERE `slug` = %s", $word ), ARRAY_A );
 
 			// If this line does not exist yet, create it with only one album number as data
 			if ( ! $indexline ) {
@@ -143,7 +143,7 @@ global $pcount;
 					$newphotos = wppa_index_array_to_string( $oldphotos );
 
 					// Update db
-					$wpdb->query( $wpdb->prepare( "UPDATE `" . WPPA_INDEX . "` SET `photos` = %s WHERE `id` = %s", $newphotos, $indexline['id'] ) );
+					$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_index SET `photos` = %s WHERE `id` = %s", $newphotos, $indexline['id'] ) );
 				}
 			}
 
@@ -432,7 +432,7 @@ global $wpdb;
 				if ( $array[$k] == intval($id) ) {
 					unset ( $array[$k] );
 					$string = wppa_index_array_to_string($array);
-					$wpdb->query( "UPDATE `".WPPA_INDEX."` SET `albums` = '".$string."' WHERE `id` = ".$indexline['id'] );
+					$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_index SET `albums` = %s WHERE `id` = %d", $string, $indexline['id'] ) );
 				}
 			}
 		}
@@ -452,7 +452,7 @@ global $wpdb;
 				if ( $array[$k] == intval($id) ) {
 					unset ( $array[$k] );
 					$string = wppa_index_array_to_string($array);
-					$wpdb->query( "UPDATE `".WPPA_INDEX."` SET `photos` = '".$string."' WHERE `id` = ".$indexline['id'] );
+					$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_index SET `photos` = %s WHERE `id` = %d", $string, $indexline['id'] ) );
 				}
 			}
 		}
@@ -520,7 +520,7 @@ global $wpdb;
 
 	if ( wppa_switch( 'search_tags' ) ) $words .= ' '.$thumb['tags'];																					// Tags
 	if ( wppa_switch( 'search_comments' ) ) {
-		$coms = $wpdb->get_results($wpdb->prepare( "SELECT `comment` FROM `" . WPPA_COMMENTS . "` WHERE `photo` = %s AND `status` = 'approved'", $thumb['id'] ), ARRAY_A );
+		$coms = $wpdb->get_results($wpdb->prepare( "SELECT `comment` FROM $wpdb->wppa_comments WHERE `photo` = %s AND `status` = 'approved'", $thumb['id'] ), ARRAY_A );
 		if ( $coms ) {
 			foreach ( $coms as $com ) {
 				$words .= ' ' . stripslashes( $com['comment'] );

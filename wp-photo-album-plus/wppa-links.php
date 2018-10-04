@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Frontend links
-* Version 6.9.11
+* Version 6.9.14
 *
 */
 
@@ -1481,7 +1481,7 @@ global $wpdb;
 
 	// owner/public?
 	if ( $album == '-3' ) {
-		$temp = $wpdb->get_results( "SELECT `id` FROM `" . WPPA_ALBUMS . "` WHERE `owner` = '" . wppa_get_user() . "' OR `owner` = '--- public ---' ORDER BY `id`", ARRAY_A );
+		$temp = $wpdb->get_results( "SELECT `id` FROM $wpdb->wppa_albums WHERE `owner` = '" . wppa_get_user() . "' OR `owner` = '--- public ---' ORDER BY `id`", ARRAY_A );
 		$album = '';
 		if ( $temp ) {
 			foreach( $temp as $t ) {

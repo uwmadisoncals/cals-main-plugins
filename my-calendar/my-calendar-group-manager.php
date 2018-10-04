@@ -404,7 +404,7 @@ function my_calendar_print_group_fields( $data, $mode, $event_id, $group_id = ''
 						}
 						?>
 						</label><br/>
-						<?php wp_editor( esc_attr( $description ), 'content', array( 'textarea_rows' => 10 ) ); ?>
+						<?php wp_editor( $description, 'content', array( 'textarea_rows' => 10 ) ); ?>
 					</div>
 					<?php
 				}
@@ -1015,15 +1015,17 @@ function mc_list_groups() {
 	<?php
 	$num_pages = ceil( $items / $items_per_page );
 	if ( $num_pages > 1 ) {
-		$page_links = paginate_links( array(
-			'base'      => add_query_arg( 'paged', '%#%' ),
-			'format'    => '',
-			'prev_text' => __( '&laquo; Previous<span class="screen-reader-text"> Events</span>', 'my-calendar' ),
-			'next_text' => __( 'Next<span class="screen-reader-text"> Events</span> &raquo;', 'my-calendar' ),
-			'total'     => $num_pages,
-			'current'   => $current,
-			'mid_size'  => 1,
-		) );
+		$page_links = paginate_links(
+			array(
+				'base'      => add_query_arg( 'paged', '%#%' ),
+				'format'    => '',
+				'prev_text' => __( '&laquo; Previous<span class="screen-reader-text"> Events</span>', 'my-calendar' ),
+				'next_text' => __( 'Next<span class="screen-reader-text"> Events</span> &raquo;', 'my-calendar' ),
+				'total'     => $num_pages,
+				'current'   => $current,
+				'mid_size'  => 1,
+			)
+		);
 		printf( "<div class='tablenav'><div class='tablenav-pages'>%s</div></div>", $page_links );
 	}
 	if ( ! empty( $events ) ) {

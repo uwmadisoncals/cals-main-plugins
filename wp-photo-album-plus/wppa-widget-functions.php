@@ -2,7 +2,7 @@
 /* wppa-widget-functions.php
 /* Package: wp-photo-album-plus
 /*
-/* Version 6.8.03
+/* Version 6.9.14
 /*
 */
 
@@ -71,7 +71,7 @@ global $wpdb;
 	// If physical albums and inverse selection is active, invert selection
 	if ( wppa_opt( 'potd_album_type' ) == 'physical' && wppa_switch( 'potd_inverse' ) ) {
 		$albs = explode( ',', $alb );
-		$all  = $wpdb->get_col( "SELECT `id` FROM `" . WPPA_ALBUMS . "` " );
+		$all  = $wpdb->get_col( "SELECT `id` FROM $wpdb->wppa_albums " );
 		$alb  = implode( ',', array_diff( $all, $albs ) );
 	}
 
@@ -82,7 +82,7 @@ global $wpdb;
 	// Is it a single album?
 	if ( wppa_is_int( $alb ) ) {
 		$query = $wpdb->prepare(	"SELECT `id`, `p_order` " .
-									"FROM `" . WPPA_PHOTOS . "` " .
+									"FROM $wpdb->wppa_photos " .
 									"WHERE `album` = %s " .
 									"AND " . $statusclause . $option,
 									$alb );
@@ -93,7 +93,7 @@ global $wpdb;
 		$alb = trim( $alb, ',' );
 
 		$query = 	"SELECT `id`, `p_order` " .
-					"FROM `" . WPPA_PHOTOS . "` " .
+					"FROM $wpdb->wppa_photos " .
 					"WHERE `album` IN ( " . $alb . " ) " .
 					"AND " . $statusclause . $option;
 	}
@@ -102,14 +102,14 @@ global $wpdb;
 	// Is it ALL?
 	elseif ( $alb == 'all' ) {
 		$query = 	"SELECT `id`, `p_order` " .
-					"FROM `" . WPPA_PHOTOS . "` " .
+					"FROM $wpdb->wppa_photos " .
 					"WHERE " . $statusclause . $option;
 	}
 
 	// Is it SEP?
 	elseif ( $alb == 'sep' ) {
-		$albs = $wpdb->get_results( "SELECT `id`, `a_parent` FROM `" . WPPA_ALBUMS . "`", ARRAY_A );
-		$query = "SELECT `id`, `p_order` FROM `" . WPPA_PHOTOS . "` WHERE ( `album` = '0' ";
+		$albs = $wpdb->get_results( "SELECT `id`, `a_parent` FROM $wpdb->wppa_albums", ARRAY_A );
+		$query = "SELECT `id`, `p_order` FROM $wpdb->wppa_photos WHERE ( `album` = '0' ";
 		$first = true;
 		foreach ( $albs as $a ) {
 			if ( $a['a_parent'] == '-1' ) {
@@ -121,8 +121,8 @@ global $wpdb;
 
 	// Is it ALL-SEP?
 	elseif ( $alb == 'all-sep' ) {
-		$albs = $wpdb->get_results( "SELECT `id`, `a_parent` FROM `" . WPPA_ALBUMS . "`", ARRAY_A );
-		$query = "SELECT `id`, `p_order` FROM `" . WPPA_PHOTOS . "` WHERE ( `album` IN ('0'";
+		$albs = $wpdb->get_results( "SELECT `id`, `a_parent` FROM $wpdb->wppa_albums", ARRAY_A );
+		$query = "SELECT `id`, `p_order` FROM $wpdb->wppa_photos WHERE ( `album` IN ('0'";
 		foreach ( $albs as $a ) {
 			if ( $a['a_parent'] != '-1' ) {
 				$query .= ",'" . $a['id'] . "'";
@@ -152,7 +152,7 @@ global $wpdb;
 		}
 
 		// It is assumed that status is ok for top rated photos
-		$query = "SELECT `id`, `p_order` FROM `" . WPPA_PHOTOS . "` ORDER BY " . $sortby . " LIMIT " . wppa_opt( 'topten_count' );
+		$query = "SELECT `id`, `p_order` FROM $wpdb->wppa_photos ORDER BY " . $sortby . " LIMIT " . wppa_opt( 'topten_count' );
 		$query .= $option;
 	}
 
@@ -294,7 +294,7 @@ static $potd;
 								$ids[] = $photo['id'];
 							}
 							$photos = $wpdb->get_results( 	"SELECT `id`, `p_order` " .
-															"FROM `".WPPA_PHOTOS."` " .
+															"FROM $wpdb->wppa_photos " .
 															"WHERE `id` IN (" . implode( ',', $ids ) . ") " .
 															"ORDER BY RAND(".$idn.")",
 															ARRAY_A );

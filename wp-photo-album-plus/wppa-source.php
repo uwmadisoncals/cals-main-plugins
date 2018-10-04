@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains photo source file management routines
-* Version 6.6.03
+* Version 6.9.15
 *
 */
 
@@ -42,7 +42,7 @@ function wppa_save_source( $file, $name, $alb ) {
 			wppa_log( 'Err', 'Could not create source directory ' . $albdir );
 		}
 		$dest = $albdir . '/' . wppa_sanitize_file_name( $name );
-		if ( $file != $dest ) @ copy( $file, $dest );	// Do not copy to self, and do not bother on failure
+		if ( $file != $dest ) @ copy( str_replace( '../', '', $file ), str_replace( '../', '', $dest ) );	// Do not copy to self, and do not bother on failure
 		if ( is_file( $dest ) ) {
 			wppa_chmod( $dest );
 		}
@@ -60,7 +60,7 @@ function wppa_delete_source( $name, $alb ) {
 
 		$all_paths = glob( $path . '.*' );
 		$o1paths = glob( $path . '-o1.*' );
-		
+
 		if ( is_array( $all_paths ) && is_array( $o1paths ) ) {
 			$all_paths = array_merge( $all_paths, $o1paths );
 		}
@@ -118,6 +118,10 @@ global $wppa_supported_photo_extensions;
 
 // rename without warnings
 function wppa_rename( $from, $to ) {
+
+	$from 	= str_replace( '../', '', $from );
+	$to 	= str_replace( '../', '', $to );
+
 	if ( is_file( $from ) ) {
 		if ( is_file( $to ) ) {
 			copy( $from, $to );
@@ -147,10 +151,10 @@ global $wppa_supported_photo_extensions;
 
 		foreach( $supext as $ext ) {
 			if ( is_file( $frompath.'.'.$ext ) ) {
-				@ copy( $frompath.'.'.$ext, $topath.'.'.$ext );
+				@ copy( str_replace( '../', '', $frompath.'.'.$ext ), str_replace( '../', '', $topath.'.'.$ext ) );
 			}
 			if ( is_file( $frompath.'-o1.'.$ext ) ) {
-				@ copy( $frompath.'-o1.'.$ext, $topath.'-o1.'.$ext );
+				@ copy( str_replace( '../', '', $frompath.'-o1.'.$ext ), str_replace( '../', '', $topath.'-o1.'.$ext ) );
 			}
 		}
 	}

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.8.09
+* Version 6.9.14
 *
 */
 
@@ -147,7 +147,7 @@ global $wpdb;
 			if ( $files ) foreach ( $files as $file ) {
 				if ( ! is_dir( $file ) ) {
 					$filename = basename( $file );
-					$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `filename` = %s OR ( `filename` = '' AND `name` = %s )", $filename, $filename ), ARRAY_A );
+					$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `filename` = %s OR ( `filename` = '' AND `name` = %s )", $filename, $filename ), ARRAY_A );
 					if ( $photos ) foreach ( $photos as $photo ) {	// Photo exists
 						$modified_time = $photo['modified'];
 						if ( $modified_time < $start_time ) {
@@ -174,7 +174,7 @@ global $wpdb;
 
 	// Do it with a single photo
 	elseif ( $pid ) {
-		$photo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $pid ), ARRAY_A );
+		$photo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `id` = %s", $pid ), ARRAY_A );
 		if ( $photo ) {
 			$file = wppa_get_source_path( $photo['id'] );
 			if ( is_file( $file ) ) {
@@ -612,7 +612,7 @@ function wppa_admin_page_links( $curpage, $pagesize, $count, $link, $extra = '' 
 function wppa_update_single_photo( $file, $id, $name ) {
 global $wpdb;
 
-	$photo = $wpdb->get_row( $wpdb->prepare( "SELECT `id`, `name`, `ext`, `album`, `filename` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $id ), ARRAY_A );
+	$photo = $wpdb->get_row( $wpdb->prepare( "SELECT `id`, `name`, `ext`, `album`, `filename` FROM $wpdb->wppa_photos WHERE `id` = %s", $id ), ARRAY_A );
 
 	// Find extension
 	$ext = $photo['ext'];
@@ -659,7 +659,7 @@ global $allphotos;
 
 	// Find photo entries that apply to the supplied filename
 	$query = $wpdb->prepare(
-			"SELECT * FROM `".WPPA_PHOTOS."` WHERE ".
+			"SELECT * FROM $wpdb->wppa_photos WHERE ".
 			"`filename` = %s OR ".
 			"`filename` = %s OR ".
 			"( `filename` = '' AND `name` = %s ) OR ".
@@ -701,7 +701,7 @@ global $allphotos;
 
 			// Update filename if still empty ( Old )
 			if ( ! $photo['filename'] ) {
-				$wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_PHOTOS."` SET `filename` = %s WHERE `id` = %s", wppa_sanitize_file_name( basename( $file ) ), $id ) );
+				$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET `filename` = %s WHERE `id` = %s", wppa_sanitize_file_name( basename( $file ) ), $id ) );
 			}
 		}
 		return count( $photos );
@@ -867,7 +867,7 @@ global $warning_given_small;
 		if ( wppa_make_the_photo_files( $file, $id, $ext, ! wppa_does_thumb_need_watermark( $id ) ) ) {
 
 			// Repair photoname if not supplied and not standard
-			wppa_set_default_name( $id, $name );
+			if ( ! $name ) wppa_set_default_name( $id, $name );
 
 			// Tags
 			wppa_set_default_tags( $id );
@@ -998,18 +998,18 @@ function wppa_prep_for_csv( $data ) {
 function wppa_album_admin_footer() {
 global $wpdb;
 
-	$albcount 		= $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_ALBUMS."`" );
-	$photocount 	= $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."`" );
-	$pendingcount 	= $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `status` = 'pending'" );
-	$schedulecount 	= $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `status` = 'scheduled'" );
+	$albcount 		= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums" );
+	$photocount 	= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos" );
+	$pendingcount 	= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `status` = 'pending'" );
+	$schedulecount 	= $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `status` = 'scheduled'" );
 
 	echo sprintf(__('There are <strong>%d</strong> albums and <strong>%d</strong> photos in the system.', 'wp-photo-album-plus'), $albcount, $photocount);
 	if ( $pendingcount ) echo ' '.sprintf(__('<strong>%d</strong> photos are pending moderation.', 'wp-photo-album-plus'), $pendingcount);
 	if ( $schedulecount ) echo ' '.sprintf(__('<strong>%d</strong> photos are scheduled for later publishing.', 'wp-photo-album-plus'), $pendingcount);
 
-	$lastalbum = $wpdb->get_row( "SELECT `id`, `name` FROM `".WPPA_ALBUMS."` ORDER BY `id` DESC LIMIT 1", ARRAY_A );
+	$lastalbum = $wpdb->get_row( "SELECT `id`, `name` FROM $wpdb->wppa_albums ORDER BY `id` DESC LIMIT 1", ARRAY_A );
 	if ( $lastalbum ) echo '<br />'.sprintf(__('The most recently added album is <strong>%s</strong> (%d).', 'wp-photo-album-plus'), __(stripslashes($lastalbum['name']), 'wp-photo-album-plus'), $lastalbum['id']);
-	$lastphoto = $wpdb->get_row( "SELECT `id`, `name`, `album` FROM `".WPPA_PHOTOS."` ORDER BY `timestamp` DESC LIMIT 1", ARRAY_A );
+	$lastphoto = $wpdb->get_row( "SELECT `id`, `name`, `album` FROM $wpdb->wppa_photos ORDER BY `timestamp` DESC LIMIT 1", ARRAY_A );
 	if ( $lastphoto['album'] < '1' ) {
 		$trashed = true;
 		$album = - ( $lastphoto['album'] + '9' );
@@ -1018,7 +1018,7 @@ global $wpdb;
 		$trashed = false;
 		$album = $lastphoto['album'];
 	}
-	$lastphotoalbum = $wpdb->get_row($wpdb->prepare( "SELECT `id`, `name` FROM `".WPPA_ALBUMS."` WHERE `id` = %s", $album), ARRAY_A );
+	$lastphotoalbum = $wpdb->get_row($wpdb->prepare( "SELECT `id`, `name` FROM $wpdb->wppa_albums WHERE `id` = %s", $album), ARRAY_A );
 	if ( $lastphoto ) {
 		echo '<br />'.sprintf(__('The most recently added photo is <strong>%s</strong> (%d)', 'wp-photo-album-plus'), __(stripslashes($lastphoto['name']), 'wp-photo-album-plus'), $lastphoto['id']);
 		echo ' '.sprintf(__('in album <strong>%s</strong> (%d).', 'wp-photo-album-plus'), __(stripslashes($lastphotoalbum['name']), 'wp-photo-album-plus'), $lastphotoalbum['id']);

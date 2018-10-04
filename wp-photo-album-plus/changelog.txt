@@ -1,5 +1,23 @@
 WP Photo Album Plus Changelog
 
+= 6.9.15 =
+
+= Other Changes =
+
+* When ImageMagick is active and filename as default photoname has been defined:
+Uploading files with spaces and brackets in the name will have their photonames correctly derived from the original filename.
+The filename as saved in the database and on disk will be sanitized.
+This does not apply to photo imports, because their names are always sanitized before processing.
+
+* Various security fixes.
+
+= 6.9.14 =
+
+= Other Changes =
+
+* Added Table IX-A14: Load front-end code always.
+* Various security fixes.
+
 = 6.9.13 =
 
 = Bug Fixes =
@@ -9,7 +27,7 @@ WP Photo Album Plus Changelog
 = Other Changes =
 
 * Several security issues found by RIPS Technologies (https://www.ripstech.com)
-* If ImageMagick is activated, all filenames of newly uploaded or imported files will be sanitized by sanitize_file_name(). 
+* If ImageMagick is activated, all filenames of newly uploaded or imported files will be sanitized by sanitize_file_name().
 This implies (a.o.) that spaces in filenames will be converted to dashes. Due to security reasons this is a permanent restriction.
 
 = 6.9.12 =

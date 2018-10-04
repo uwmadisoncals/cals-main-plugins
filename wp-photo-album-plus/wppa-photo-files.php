@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version 6.9.13
+* Version 6.9.14
 *
 */
 
@@ -680,7 +680,7 @@ function wppa_image_magick( $command ) {
 	}
 	$out  = array();
 	$err  = 0;
-	$run  = exec( $path . $command, $out, $err );
+	$run  = exec( escapeshellcmd( $path . $command ), $out, $err );
 
 	$logcom = $command;
 	$logcom = str_replace( ABSPATH, '...', $logcom );

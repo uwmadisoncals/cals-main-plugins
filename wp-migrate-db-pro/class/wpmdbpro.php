@@ -22,7 +22,6 @@ class WPMDBPro extends WPMDB {
 		add_action( 'wp_ajax_wpmdb_check_licence', array( $this, 'ajax_check_licence' ) );
 		add_action( 'wp_ajax_wpmdb_copy_licence_to_remote_site', array( $this, 'ajax_copy_licence_to_remote_site' ) );
 		add_action( 'wp_ajax_wpmdb_reactivate_licence', array( $this, 'ajax_reactivate_licence' ) );
-		add_action( 'wp_ajax_wpmdb_process_notice_link', array( $this, 'ajax_process_notice_link' ) );
 
 		// external AJAX handlers
 		add_action( 'wp_ajax_nopriv_wpmdb_verify_connection_to_remote_site', array( $this, 'respond_to_verify_connection_to_remote_site' ) );
@@ -63,11 +62,92 @@ class WPMDBPro extends WPMDB {
 		// Seen when the user clicks "view details" on the plugin listing page
 		add_action( 'install_plugins_pre_plugin-information', array( $this, 'plugin_update_popup' ) );
 
+		//Remove 'Expect' header which some setups have issues with
+		add_filter( 'http_request_args', 'WPMDB_Utils::preempt_expect_header', 10, 2 );
+
+		// Updates the database backup header for pro version backups
+		add_filter( 'wpmdb_backup_header_included_tables', array( $this, 'backup_header_included_tables' ) );
+
 		// Removes the exclude post revision functionality (as seen in the free version of the plugin)
 		$this->remove_exclude_post_revision_functionality();
 
 		// Check if WP Engine is filtering the buffer and prevent it. Added here for ajax pull requests
 		$this->maybe_disable_wp_engine_filtering();
+
+		// Init WPMDB_Event_Logger class
+		$this->init_event_logger();
+
+		new WPMDBPro_Import( $this );
+
+		$beta_manager = new WPMDB_Beta_Manager( $this );
+		$beta_manager->register();
+	}
+
+	/**
+	 * Get an array of the addon basenames
+	 *
+	 * @return array
+	 */
+	public function get_addon_basenames() {
+		return array_keys( $this->addons );
+	}
+
+	/**
+	 * Get basename of the plugin
+	 */
+	public function get_plugin_basename() {
+		return $this->plugin_basename;
+	}
+
+	/**
+	 * Determine which tables to backup (if required).
+	 *
+	 * @param $profile
+	 * @param $prefixed_tables
+	 * @param $all_tables
+	 *
+	 * @return mixed|void
+	 */
+	public function get_tables_to_backup( $profile, $prefixed_tables, $all_tables ) {
+		$tables_to_backup = array();
+
+		switch ( $profile['backup_option'] ) {
+			case 'backup_only_with_prefix':
+				$tables_to_backup = $prefixed_tables;
+				break;
+			case 'backup_selected':
+				/**
+				 * When tables to migrate is tables with prefix, select_tables
+				 * might be empty. Intersecting it with remote/local tables
+				 * throws notice/warning and won't backup the file either.
+				 */
+				if ( 'migrate_only_with_prefix' === $profile['table_migrate_option'] ) {
+					$tables_to_backup = $prefixed_tables;
+				} else {
+					$tables_to_backup = array_intersect( $profile['select_tables'], $all_tables );
+				}
+				break;
+			case 'backup_manual_select':
+				$tables_to_backup = array_intersect( $profile['select_backup'], $all_tables );
+				break;
+		}
+
+		return apply_filters( 'wpmdb_tables_to_backup', $tables_to_backup, $profile );
+	}
+
+	/**
+	 * Updates the database backup header with the tables that were backed up.
+	 *
+	 * @param $included_tables
+	 *
+	 * @return mixed|void
+	 */
+	public function backup_header_included_tables( $included_tables ) {
+		if ( 'backup' === $this->state_data['stage'] ) {
+			$included_tables = $this->get_tables_to_backup( $this->form_data, $this->get_tables( 'prefix' ), $this->get_tables() );
+		}
+
+		return $included_tables;
 	}
 
 	/**
@@ -104,6 +184,13 @@ class WPMDBPro extends WPMDB {
 		return $res;
 	}
 
+	function template_import_radio_button( $loaded_profile ) {
+		$args = array(
+			'loaded_profile' => $loaded_profile,
+		);
+		$this->template( 'import-radio-button', 'pro', $args );
+	}
+
 	function template_pull_push_radio_buttons( $loaded_profile ) {
 		$args = array(
 			'loaded_profile' => $loaded_profile,
@@ -116,6 +203,36 @@ class WPMDBPro extends WPMDB {
 			'loaded_profile' => $loaded_profile,
 		);
 		$this->template( 'select-tables', 'pro', $args );
+	}
+
+	function template_import_file_status() {
+		$this->template( 'import-file-status', 'pro' );
+	}
+
+	function template_unrecognized_import_file() {
+		$this->template( 'unrecognized-import-file', 'pro' );
+	}
+
+	function template_mst_required() {
+		$this->template( 'mst-required', 'pro' );
+	}
+
+	function template_import_find_replace_option( $loaded_profile ) {
+		$args = array(
+			'loaded_profile' => $loaded_profile,
+		);
+		$this->template( 'import-find-replace-option', 'pro', $args );
+	}
+
+	function template_find_replace_options( $loaded_profile ) {
+		$this->template( 'find-replace-options', 'pro' );
+	}
+
+	function template_import_active_plugins_option( $loaded_profile ) {
+		$args = array(
+			'loaded_profile' => $loaded_profile,
+		);
+		$this->template( 'import-active-plugins-option', 'pro', $args );
 	}
 
 	function template_exclude_post_types( $loaded_profile ) {
@@ -235,41 +352,6 @@ class WPMDBPro extends WPMDB {
 	}
 
 	/**
-	 * Handler for ajax request to process a link click in a notice, e.g. licence deactivated ... re-check.
-	 *
-	 * @return bool|null
-	 */
-	function ajax_process_notice_link() {
-		$this->check_ajax_referer( 'process-notice-link' );
-
-		$key_rules = array(
-			'action'   => 'key',
-			'nonce'    => 'key',
-			'notice'   => 'key',
-			'type'     => 'key',
-			'reminder' => 'int',
-		);
-
-		$_POST = WPMDB_Sanitize::sanitize_data( $_POST, $key_rules, __METHOD__ );
-
-		if ( false === $_POST ) {
-			exit;
-		}
-
-		global $current_user;
-		$key   = 'wpmdb_' . $_POST['type'] . '_' . $_POST['notice'];
-		$value = true;
-		if ( 'reminder' == $_POST['type'] && isset( $_POST['reminder'] ) ) {
-			$value = strtotime( 'now' ) + ( is_numeric( $_POST['reminder'] ) ? $_POST['reminder'] : 604800 );
-		}
-		update_user_meta( $current_user->ID, $key, $value );
-
-		$result = $this->end_ajax();
-
-		return $result;
-	}
-
-	/**
 	 * AJAX endpoint for the wpmdb_verify_connection_to_remote_site action.
 	 * Verifies that the local site has a valid licence.
 	 * Sends a request to the remote site to collect additional information required to complete the migration.
@@ -279,14 +361,18 @@ class WPMDBPro extends WPMDB {
 	function ajax_verify_connection_to_remote_site() {
 		$this->check_ajax_referer( 'verify-connection-to-remote-site' );
 
-		$key_rules = array(
-			'action'                      => 'key',
-			'url'                         => 'url',
-			'key'                         => 'string',
-			'intent'                      => 'key',
-			'nonce'                       => 'key',
-			'convert_post_type_selection' => 'numeric',
-			'profile'                     => 'numeric',
+		$key_rules = apply_filters(
+			'wpmdb_key_rules',
+			array(
+				'action'                      => 'key',
+				'url'                         => 'url',
+				'key'                         => 'string',
+				'intent'                      => 'key',
+				'nonce'                       => 'key',
+				'convert_post_type_selection' => 'numeric',
+				'profile'                     => 'numeric',
+			),
+			__FUNCTION__
 		);
 		$this->set_post_data( $key_rules );
 
@@ -304,6 +390,7 @@ class WPMDBPro extends WPMDB {
 			'referer' => $this->get_short_home_address_from_url( home_url() ),
 			'version' => $this->plugin_version,
 		);
+		$data = apply_filters( 'wpmdb_verify_connection_to_remote_site_args', $data, $this->state_data );
 
 		$data['sig']         = $this->create_signature( $data, $this->state_data['key'] );
 		$ajax_url            = $this->ajax_url();
@@ -718,18 +805,35 @@ class WPMDBPro extends WPMDB {
 	 * @return mixed
 	 */
 	function respond_to_verify_connection_to_remote_site() {
-		$key_rules = array(
-			'action'  => 'key',
-			'intent'  => 'key',
-			'referer' => 'string',
-			'version' => 'string',
-			'sig'     => 'string',
+		$key_rules = apply_filters(
+			'wpmdb_key_rules',
+			array(
+				'action'  => 'key',
+				'intent'  => 'key',
+				'referer' => 'string',
+				'version' => 'string',
+				'sig'     => 'string',
+			),
+			__FUNCTION__
 		);
 		$this->set_post_data( $key_rules );
 
 		$return = array();
 
-		$filtered_post = $this->filter_post_elements( $this->state_data, array( 'action', 'intent', 'referer', 'version' ) );
+		unset( $key_rules['sig'] );
+		$filtered_post = $this->filter_post_elements( $this->state_data, array_keys( $key_rules ) );
+
+		// Only scramble response once we know it can be handled.
+		add_filter( 'wpmdb_before_response', array( $this, 'scramble' ) );
+
+		if ( ! $this->verify_signature( $filtered_post, $this->settings['key'] ) ) {
+			$return['error']   = 1;
+			$return['message'] = $this->invalid_content_verification_error . ' (#120) <a href="#" class="try-again js-action-link">' . _x( 'Try again?', 'Asking to try and connect to remote server after verification error', 'wp-migrate-db' ) . '</a>';
+			$this->log_error( $this->invalid_content_verification_error . ' (#120)', $filtered_post );
+			$result = $this->end_ajax( serialize( $return ) );
+
+			return $result;
+		}
 
 		if ( ! isset( $filtered_post['version'] ) || version_compare( $filtered_post['version'], $this->plugin_version, '!=' ) ) {
 			$return['error']    = 1;
@@ -741,19 +845,9 @@ class WPMDBPro extends WPMDB {
 				$return['message'] = sprintf( __( '<b>Version Mismatch</b> &mdash; We\'ve detected you have version %1$s of WP Migrate DB Pro at %2$s but are using %3$s here. Please go to the <a href="%4$s">Plugins page</a> on both installs and check for updates.', 'wp-migrate-db' ), $GLOBALS['wpmdb_meta'][ $this->plugin_slug ]['version'], $this->get_short_home_address_from_url( home_url() ), $filtered_post['version'], '%%plugins_url%%' );
 			}
 
+			remove_filter( 'wpmdb_before_response', array( $this, 'scramble' ) );
+
 			$this->log_error( $return['message'], $filtered_post );
-			$result = $this->end_ajax( serialize( $return ) );
-
-			return $result;
-		}
-
-		// Only scramble response once we know it can be handled.
-		add_filter( 'wpmdb_before_response', array( $this, 'scramble' ) );
-
-		if ( ! $this->verify_signature( $filtered_post, $this->settings['key'] ) ) {
-			$return['error']   = 1;
-			$return['message'] = $this->invalid_content_verification_error . ' (#120) <a href="#" class="try-again js-action-link">' . _x( 'Try again?', 'Asking to try and connect to remote server after verification error', 'wp-migrate-db' ) . '</a>';
-			$this->log_error( $this->invalid_content_verification_error . ' (#120)', $filtered_post );
 			$result = $this->end_ajax( serialize( $return ) );
 
 			return $result;
@@ -808,7 +902,7 @@ class WPMDBPro extends WPMDB {
 		$return['gzip']                   = ( $this->gzip() ? '1' : '0' );
 		$return['post_types']             = $this->get_post_types();
 		// TODO: Use WP_Filesystem API.
-		$return['write_permissions']      = ( is_writeable( $this->get_upload_info( 'path' ) ) ? '1' : '0' );
+		$return['write_permissions']      = ( is_writeable( $this->get_upload_info( 'path' ) ) ? 'true' : 'false' );
 		$return['upload_dir_long']        = $this->get_upload_info( 'path' );
 		$return['temp_prefix']            = $this->temp_prefix;
 		$return['lower_case_table_names'] = $this->get_lower_case_table_names_setting();
@@ -873,6 +967,8 @@ class WPMDBPro extends WPMDB {
 			$this->delete_temporary_tables( $filtered_post['temp_prefix'] );
 		}
 
+		do_action( 'wpmdb_respond_to_push_cancellation' );
+
 		$result = $this->end_ajax( true );
 
 		return $result;
@@ -929,7 +1025,7 @@ class WPMDBPro extends WPMDB {
 		return sprintf(
 			'<p class="masked-licence">%s <a href="%s">%s</a></p>',
 			$this->mask_licence( $this->settings['licence'] ),
-			network_admin_url( $this->plugin_base . '&nonce=' . wp_create_nonce( 'wpmdb-remove-licence' ) . '&wpmdb-remove-licence=1#settings' ),
+			network_admin_url( $this->plugin_base . '&nonce=' . WPMDB_Utils::create_nonce( 'wpmdb-remove-licence' ) . '&wpmdb-remove-licence=1#settings' ),
 			_x( 'Remove', 'Delete license', 'wp-migrate-db' )
 		);
 	}
@@ -946,8 +1042,7 @@ class WPMDBPro extends WPMDB {
 		}
 
 		$addon            = $addons[ $args->slug ];
-		$required_version = $this->get_required_version( $args->slug );
-		$is_beta          = $this->is_beta_version( $required_version ) && ! empty( $addon['beta_version'] );
+		$is_beta          = ! empty( $addon['beta_version'] ) && ( $this->has_beta_optin() );
 
 		$res                = new stdClass();
 		$res->name          = 'WP Migrate DB Pro ' . $addon['name'];
@@ -966,12 +1061,7 @@ class WPMDBPro extends WPMDB {
 		}
 
 		foreach ( $plugin_upgrade_data as $plugin_slug => $upgrade_data ) {
-			// If pre-1.1.2 version of Media Files addon, use the slug as folder name
-			if ( ! isset( $GLOBALS['wpmdb_meta'][ $plugin_slug ]['folder'] ) ) {
-				$plugin_folder = $plugin_slug;
-			} else {
-				$plugin_folder = $GLOBALS['wpmdb_meta'][ $plugin_slug ]['folder'];
-			}
+			$plugin_folder = $this->get_plugin_folder( $plugin_slug );
 
 			$plugin_basename = sprintf( '%s/%s.php', $plugin_folder, $plugin_slug );
 			$latest_version  = $this->get_latest_version( $plugin_slug );
@@ -1003,7 +1093,7 @@ class WPMDBPro extends WPMDB {
 				$is_beta = $this->is_beta_version( $latest_version );
 
 				$trans->response[ $plugin_basename ]              = new stdClass();
-				$trans->response[ $plugin_basename ]->url         = $this->dbrains_api_base;
+				$trans->response[ $plugin_basename ]->url         = $this->get_dbrains_api_base();
 				$trans->response[ $plugin_basename ]->slug        = $plugin_slug;
 				$trans->response[ $plugin_basename ]->package     = $this->get_plugin_update_download_url( $plugin_slug, $is_beta );
 				$trans->response[ $plugin_basename ]->new_version = $latest_version;
@@ -1015,25 +1105,40 @@ class WPMDBPro extends WPMDB {
 		return $trans;
 	}
 
+	/**
+	 * Get a plugin folder from the slug
+	 *
+	 * @param string $slug
+	 *
+	 * @return mixed
+	 */
+	public function get_plugin_folder( $slug ) {
+		if ( isset( $GLOBALS['wpmdb_meta'][ $slug ]['folder'] ) ) {
+			return $GLOBALS['wpmdb_meta'][ $slug ]['folder'];
+		}
+
+		// If pre-1.1.2 version of Media Files addon, use the slug as folder name
+		return $slug;
+	}
+
 	function enqueue_plugin_update_script( $hook ) {
 		if ( 'plugins.php' != $hook ) {
 			return;
 		}
 		$ver_string  = '-' . str_replace( '.', '', $this->plugin_version );
 		$min = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$src = plugins_url( "asset/dist/js/plugin-update{$ver_string}{$min}.js", dirname( __FILE__ ) );
 
+		$src = plugins_url( "asset/build/js/plugin-update{$ver_string}.js", dirname( __FILE__ ) );
 		wp_enqueue_script( 'wp-migrate-db-pro-plugin-update-script', $src, array( 'jquery' ), false, true );
 
-		wp_localize_script( 'wp-migrate-db-pro-plugin-update-script', 'wpmdb_nonces', array( 'check_licence' => wp_create_nonce( 'check-licence' ), ) );
-
+		wp_localize_script( 'wp-migrate-db-pro-plugin-update-script', 'wpmdb_nonces', array( 'check_licence' => WPMDB_Utils::create_nonce( 'check-licence' ), 'process_notice_link' => WPMDB_Utils::create_nonce( 'process-notice-link' ), ) );
 		wp_localize_script( 'wp-migrate-db-pro-plugin-update-script', 'wpmdb_update_strings', array( 'check_license_again' => __( 'Check my license again', 'wp-migrate-db' ), 'license_check_problem' => __( 'A problem occurred when trying to check the license, please try again.', 'wp-migrate-db' ), ) );
 	}
 
 	function add_plugin_update_styles() {
 		$version     = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : $this->plugin_version;
 		$plugins_url = trailingslashit( plugins_url() ) . trailingslashit( $this->plugin_folder_name );
-		$src         = $plugins_url . 'asset/dist/css/plugin-update-styles.css';
+		$src         = $plugins_url . 'asset/build/css/plugin-update-styles.css';
 		wp_enqueue_style( 'plugin-update-styles', $src, array(), $version );
 	}
 
@@ -1147,7 +1252,7 @@ class WPMDBPro extends WPMDB {
 				if ( ! $addons_available ) {
 					?>
 					<p class="inline-message warning">
-						<strong><?php _ex( 'Addons Unavailable', 'License does not allow use of addons', 'wp-migrate-db' ); ?></strong> &ndash; <?php printf( __( 'Addons are not included with the Personal license. Visit <a href="%s" target="_blank">My Account</a> to upgrade in just a few clicks.', 'wp-migrate-db' ), 'https://deliciousbrains.com/my-account/' ); ?>
+						<strong><?php _ex( 'Addons Unavailable', 'License does not allow use of addons', 'wp-migrate-db' ); ?></strong> &ndash; <?php printf( __( 'Addons are not included with the Personal license. Visit <a href="%s" target="_blank">My Account</a> to upgrade in just a few clicks.', 'wp-migrate-db' ), 'https://deliciousbrains.com/my-account/?utm_campaign=support%2Bdocs&utm_source=MDB%2BPaid&utm_medium=insideplugin' ); ?>
 					</p>
 					<?php
 				}
@@ -1174,9 +1279,8 @@ class WPMDBPro extends WPMDB {
 					$actions     = sprintf( '<a class="action" href="%s">%s</a>', $install_url, _x( 'Install', 'Download and activate addon', 'wp-migrate-db' ) );
 				}
 
-				$required_version = $this->get_required_version( $key );
-
-				$download_url = $this->get_plugin_update_download_url( $key, $this->is_beta_version( $required_version ) );
+				$is_beta = ! empty( $addon['beta_version'] ) && $this->has_beta_optin();
+				$download_url = $this->get_plugin_update_download_url( $key, $is_beta );
 				$actions .= sprintf( '<a class="action" href="%s">%s</a>', $download_url, _x( 'Download', 'Download to your computer', 'wp-migrate-db' ) ); ?>
 
 				<article class="addon <?php echo esc_attr( $key ); ?>">
@@ -1238,9 +1342,16 @@ class WPMDBPro extends WPMDB {
 			}
 
 			set_site_transient( 'wpmdb_licence_response', $response, $this->transient_timeout );
-			$decoded_response['errors'] = array(
-				sprintf( '<div class="notification-message warning-notice inline-message invalid-licence">%s</div>', $this->get_licence_status_message( $decoded_response, $this->state_data['context'] ) ),
-			);
+			if ( true === $this->doing_cli_migration ) {
+				$decoded_response['errors'] = array(
+					$this->get_licence_status_message( $decoded_response, $this->state_data['context'] ),
+				);
+			} else {
+				$decoded_response['errors'] = array(
+					sprintf( '<div class="notification-message warning-notice inline-message invalid-licence">%s</div>', $this->get_licence_status_message( $decoded_response, $this->state_data['context'] ) ),
+				);
+			}
+
 			if ( isset( $decoded_response['dbrains_api_down'] ) ) {
 				$decoded_response['errors'][] = $decoded_response['dbrains_api_down'];
 			}
@@ -1622,6 +1733,28 @@ class WPMDBPro extends WPMDB {
 	}
 
 	/**
+	 * Get changelog contents for the given plugin slug.
+	 *
+	 * @param string $slug
+	 * @param bool   $beta
+	 *
+	 * @return bool|string
+	 */
+	function get_changelog( $slug, $beta = false ) {
+		if ( true === $beta ) {
+			$slug .= '-beta';
+		}
+
+		$args = array(
+			'slug' => $slug,
+		);
+
+		$response = $this->dbrains_api_request( 'changelog', $args );
+
+		return $response;
+	}
+
+	/**
 	 * Override the standard plugin information popup for each pro addon
 	 *
 	 * @return  void
@@ -1639,22 +1772,34 @@ class WPMDBPro extends WPMDB {
 			return;
 		}
 
-		$filename       = $plugin_slug;
+		$error_msg      = sprintf( '<p>%s</p>', __( 'Could not retrieve version details. Please try again.', 'wp-migrate-db' ) );
 		$latest_version = $this->get_latest_version( $plugin_slug );
 
-		if ( $this->is_beta_version( $latest_version ) ) {
-			$filename .= '-beta';
+		if ( false === $latest_version ) {
+			echo $error_msg;
+			exit;
 		}
 
-		$url  = $this->dbrains_api_base . '/content/themes/delicious-brains/update-popup/' . $filename . '.html';
-		$data = wp_remote_get( $url, array( 'timeout' => 30 ) );
+		$data = $this->get_changelog( $plugin_slug, $this->is_beta_version( $latest_version ) );
 
-		if ( is_wp_error( $data ) || 200 != $data['response']['code'] ) {
+		if ( is_wp_error( $data ) || empty( $data ) ) {
 			echo '<p>' . __( 'Could not retrieve version details. Please try again.', 'wp-migrate-db' ) . '</p>';
 		} else {
-			echo $data['body'];
+			echo $data;
 		}
 
 		exit;
+	}
+
+	/*
+	 * Initializes WPMDB_Event_Logger class if it exists and the setting isn't disabled
+	 */
+	protected function init_event_logger() {
+		$logger_class_file = dirname( __FILE__ ) . '/wpmdb-event-logger.php';
+		if ( file_exists( $logger_class_file ) ) {
+			require_once( $logger_class_file );
+			$logger = new WPMDB_Event_Logger();
+			$logger->register( $this );
+		}
 	}
 }

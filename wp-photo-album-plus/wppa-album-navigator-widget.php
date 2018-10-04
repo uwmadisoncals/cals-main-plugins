@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display album names linking to content
-* Version 6.9.12
+* Version 6.9.14
 */
 
 class AlbumNavigatorWidget extends WP_Widget {
@@ -146,7 +146,7 @@ class AlbumNavigatorWidget extends WP_Widget {
 								false,
 								false,
 								);
-			$albs = $wpdb->get_results( "SELECT `name`, `id` FROM `" . WPPA_ALBUMS . "` ORDER BY `name`", ARRAY_A );
+			$albs = $wpdb->get_results( "SELECT `name`, `id` FROM $wpdb->wppa_albums ORDER BY `name`", ARRAY_A );
 
 			if ( $albs ) foreach( $albs as $alb ) {
 				$options[] 	= __( stripslashes( $alb['name'] ) );
@@ -199,7 +199,7 @@ class AlbumNavigatorWidget extends WP_Widget {
 		$p = $parent;
 		$result = '';
 
-		$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_ALBUMS."` WHERE `a_parent` = %s ".$extraclause.wppa_get_album_order( max( '0', $parent ) ), $parent ), ARRAY_A );
+		$albums = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE `a_parent` = %s ".$extraclause.wppa_get_album_order( max( '0', $parent ) ), $parent ), ARRAY_A );
 
 		if ( ! empty( $albums ) ) {
 			wppa_cache_album( 'add', $albums );

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version 6.9.09
+* Version 6.9.14
 *
 */
 
@@ -78,7 +78,7 @@ global $wpdb;
 	// Find album details
 	$coverphoto = wppa_get_coverphoto_id( $albumid );
 //	$query 		= $wpdb->prepare( 	"SELECT * " .
-//									"FROM `" . WPPA_PHOTOS . "` " .
+//									"FROM $wpdb->wppa_photos " .
 //									"WHERE `id` = %s",
 //									$coverphoto
 //								);
@@ -431,7 +431,7 @@ global $wpdb;
 	// Find the coverphotos details
 	foreach ( $coverphotos as $coverphoto ) {
 //		$query 			= $wpdb->prepare( 	"SELECT * " .
-//											"FROM `" . WPPA_PHOTOS . "` " .
+//											"FROM $wpdb->wppa_photos " .
 //											"WHERE `id` = %s",
 //											$coverphoto
 //										);
@@ -616,7 +616,7 @@ global $wpdb;
 
 	$coverphoto = wppa_get_coverphoto_id( $albumid );
 	$image 		= wppa_cache_thumb( $coverphoto ); //$wpdb->get_row( $wpdb->prepare(
-//					"SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `id` = %s", $coverphoto
+//					"SELECT * FROM $wpdb->wppa_photos WHERE `id` = %s", $coverphoto
 //					), ARRAY_A );
 	$photocount = wppa_get_photo_count( $albumid );
 	$albumcount = wppa_get_album_count( $albumid, true );
@@ -886,7 +886,7 @@ global $wpdb;
 		// If lightbox, we need all the album photos to set up a lightbox set
 		if ( $photolink['is_lightbox'] ) {
 			$thumbs = $wpdb->get_results( $wpdb->prepare(
-				"SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `album` = %s " .
+				"SELECT * FROM $wpdb->wppa_photos WHERE `album` = %s " .
 				wppa_get_photo_order( $albumid ), $albumid
 				), ARRAY_A );
 
@@ -1289,13 +1289,13 @@ static $cached_cover_photo_ids;
 	if ( '0' == $id ) {
 		if ( current_user_can( 'wppa_moderate' ) ) {
 			$temp = $wpdb->get_results( $wpdb->prepare(
-				"SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `album` = %s ORDER BY RAND( " . wppa_get_randseed( 'page' ) . " ) LIMIT %d",
-				$alb, $count ), ARRAY_A );
+				"SELECT * FROM $wpdb->wppa_photos WHERE `album` = %s ORDER BY RAND( %d ) LIMIT %d",
+				$alb, wppa_get_randseed( 'page' ), $count ), ARRAY_A );
 		}
 		else {
 			$temp = $wpdb->get_results( $wpdb->prepare(
-				"SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `album` = %s AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s ) ORDER BY RAND( " . wppa_get_randseed( 'page' ) . " ) LIMIT %d",
-				$alb, wppa_get_user(), $count ), ARRAY_A );
+				"SELECT * FROM $wpdb->wppa_photos WHERE `album` = %s AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s ) ORDER BY RAND( %d ) LIMIT %d",
+				$alb, wppa_get_randseed( 'page' ), wppa_get_user(), $count ), ARRAY_A );
 		}
 	}
 
@@ -1327,7 +1327,7 @@ static $cached_cover_photo_ids;
 	if ( '-3' == $id ) {
 		$allalb = wppa_expand_enum( wppa_alb_to_enum_children( $alb ) );
 		$temp = $wpdb->get_results( $wpdb->prepare(
-			"SELECT * FROM `" . WPPA_PHOTOS . "` " .
+			"SELECT * FROM $wpdb->wppa_photos " .
 			"WHERE `album` IN ( " . str_replace( '.', ',', $allalb ) . " ) " .
 			"AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s ) " .
 			"ORDER BY RAND( " . wppa_get_randseed( 'page' ) . " ) LIMIT %d", wppa_get_user(), $count ), ARRAY_A );
@@ -1337,7 +1337,7 @@ static $cached_cover_photo_ids;
 	if ( '-4' == $id ) {
 		$allalb = wppa_expand_enum( wppa_alb_to_enum_children( $alb ) );
 		$temp = $wpdb->get_results( $wpdb->prepare(
-			"SELECT * FROM `" . WPPA_PHOTOS . "` " .
+			"SELECT * FROM $wpdb->wppa_photos " .
 			"WHERE `album` IN ( " . str_replace( '.', ',', $allalb ) . " ) " .
 			"AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s ) " .
 			"ORDER BY `timestamp` DESC LIMIT %d", wppa_get_user(), $count ), ARRAY_A );
@@ -1686,7 +1686,7 @@ global $wpdb;
 	$first = true;
 
 	// Get the children
-	$subs = $wpdb->get_results( "SELECT * FROM `".WPPA_ALBUMS."` WHERE `a_parent` = " . $id . " " . wppa_get_album_order( $id ), ARRAY_A );
+	$subs = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_albums WHERE `a_parent` = " . $id . " " . wppa_get_album_order( $id ), ARRAY_A );
 
 	// Only if there are sub-albums
 	if ( ! empty( $subs ) ) {

@@ -561,8 +561,9 @@ global $upload_album;
 					return;
 				}
 				if ( ! $file['error'][$i] ) {
+					wppa( 'unsanitized_filename', $file['name'][$i] );
 					wppa_pdf_preprocess( $file, $upload_album, $i );
-					$id = wppa_insert_photo( $file['tmp_name'][$i], $upload_album, wppa_sima($file['name'][$i]) );
+					$id = wppa_insert_photo( $file['tmp_name'][$i], $upload_album, $file['name'][$i] );
 					if ( $id ) {
 						$uploaded_a_file = true;
 						$count++;
@@ -597,8 +598,9 @@ global $upload_album;
 	$count = '0';
 	foreach ( $_FILES as $file ) {
 		if ( $file['tmp_name'] != '' ) {
+			wppa( 'unsanitized_filename', $file['name'] );
 			wppa_pdf_preprocess( $file, $upload_album );
-			$id = wppa_insert_photo( $file['tmp_name'], $upload_album, wppa_sima( $file['name'] ) );
+			$id = wppa_insert_photo( $file['tmp_name'], $upload_album, $file['name'] );
 			if ( $id ) {
 				$uploaded_a_file = true;
 				$count++;

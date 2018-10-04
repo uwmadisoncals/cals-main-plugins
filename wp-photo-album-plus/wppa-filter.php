@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * get the albums via shortcode handler
-* Version 6.9.08
+* Version 6.9.14
 *
 */
 
@@ -76,6 +76,9 @@ global $wppa_revno;
 		'timeout' 	=> '',
 		'button' 	=> '',
 	), $xatts );
+
+	// Sanitize input
+	if ( $atts['alt'] && $atss['alt'] != 'none' ) $atts['alt'] = strval( intval( $atts['alt'] ) );
 
 	// Init
 	wppa_reset_occurrance();
@@ -570,12 +573,12 @@ static $seed;
 
 		if ( wppa_opt( 'photo_shortcode_random_albums' ) != '-2' ) {
 			$albs  = str_replace( '.', ',', wppa_expand_enum( wppa_opt( 'photo_shortcode_random_albums' ) ) );
-			$photo = $wpdb->get_var( $wpdb->prepare( 	"SELECT `id` FROM `" . WPPA_PHOTOS . "` " .
+			$photo = $wpdb->get_var( $wpdb->prepare( 	"SELECT `id` FROM $wpdb->wppa_photos " .
 														"WHERE `album` IN (" . $albs . ") " .
 														"ORDER BY RAND(%d) LIMIT 1", $seed ) );
 		}
 		else {
-			$photo = $wpdb->get_var( $wpdb->prepare( 	"SELECT `id` FROM `" . WPPA_PHOTOS . "` " .
+			$photo = $wpdb->get_var( $wpdb->prepare( 	"SELECT `id` FROM $wpdb->wppa_photos " .
 														"ORDER BY RAND(%d) LIMIT 1", $seed ) );
 		}
 		if ( $photo ) {

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.8.13
+* Version 6.9.15
 *
 */
 
@@ -80,17 +80,17 @@ global $wppa_session;
 	// Verify last albums still exist
 	$alb = get_option( 'wppa-photo-album-import-'.wppa_get_user(), '0' );
 	if ( $alb ) {
-		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "` WHERE `id` = %s", $alb ) );
+		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE `id` = %s", $alb ) );
 		if ( ! $exists ) update_option( 'wppa-photo-album-import-'.wppa_get_user(), '0' );
 	}
 	$alb = get_option( 'wppa-video-album-import-'.wppa_get_user(), '0' );
 	if ( $alb ) {
-		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "` WHERE `id` = %s", $alb ) );
+		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE `id` = %s", $alb ) );
 		if ( ! $exists ) update_option( 'wppa-video-album-import-'.wppa_get_user(), '0' );
 	}
 	$alb = get_option( 'wppa-audio-album-import-'.wppa_get_user(), '0' );
 	if ( $alb ) {
-		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "` WHERE `id` = %s", $alb ) );
+		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE `id` = %s", $alb ) );
 		if ( ! $exists ) update_option( 'wppa-audio-album-import-'.wppa_get_user(), '0' );
 	}
 
@@ -1607,6 +1607,13 @@ function wppa_get_import_files() {
 		}
 	}
 
+	// Security fix: remove paths with path traversal character sequences (../)
+	if ( is_array( $files ) ) foreach ( array_keys( $files ) as $key ) {
+		if ( strpos( $files[$key], '../' ) || strpos( $files[$key], '..\\' ) ) {
+			unset( $files[$key] );
+		}
+	}
+
 	// Sort to keep synchronicity when doing ajax import
 	if ( is_array( $files ) ) sort( $files );
 
@@ -1690,7 +1697,7 @@ global $wppa_supported_audio_extensions;
 				$parent = '0';
 				$porder = '0';
 				$owner = '';
-				$handle = fopen( $album, "r" );
+				$handle = fopen( str_replace( '../', '', $album ), "r" );
 				if ( $handle ) {
 					$buffer = fgets( $handle, 4096 );
 					while ( !feof( $handle ) ) {
@@ -2230,12 +2237,12 @@ global $wppa_supported_audio_extensions;
 							copy ( $file, $tempfile );
 
 							// Open file
-							$handle = fopen( $tempfile, "rt" );
+							$handle = fopen( str_replace( '../', '', $tempfile ), "rt" );
 							if ( ! $handle ) {
 								wppa_error_message( __( 'Can not open file. Can not continue. (1)', 'wp-photo-album-plus') );
 								return;
 							}
-							$write_handle = fopen( $file, "wt" );
+							$write_handle = fopen( str_replace( '../', '', $file ), "wt" );
 							if ( ! $write_handle ) {
 								wppa_error_message( __( 'Can not open file. Can not continue. (2)', 'wp-photo-album-plus') );
 								return;
@@ -2443,18 +2450,18 @@ global $wppa_supported_audio_extensions;
 										$search = $data_arr[0];
 										switch ( strtolower($captions[0]) ) {
 											case 'photoname':
-												$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `name` = %s", $data_arr[0] ), ARRAY_A );
+												$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `name` = %s", $data_arr[0] ), ARRAY_A );
 												break;
 											case 'filename':
-												$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `filename` = %s", $data_arr[0] ), ARRAY_A );
+												$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `filename` = %s", $data_arr[0] ), ARRAY_A );
 												break;
 											case 'name':
-												$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `name` = %s OR `filename` = %s", $data_arr[0], $data_arr[0] ), ARRAY_A );
+												$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `name` = %s OR `filename` = %s", $data_arr[0], $data_arr[0] ), ARRAY_A );
 												break;
 										}
 										if ( $photos ) {
 											foreach( $photos as $photo ) {
-												$cust_data = $photo['custom'] ? unserialize( $photo['custom'] ) : array( '', '', '', '', '', '', '', '', '', '' );
+												$cust_data = $photo['custom'] ? wppa_unserialize( $photo['custom'] ) : array( '', '', '', '', '', '', '', '', '', '' );
 
 												// Update custom fields
 												foreach( array_keys( $custptrs ) as $idx ) {
@@ -2780,7 +2787,7 @@ function wppa_get_meta_data( $file, $item, $opt ) {
 	if ( $opt == '{' ) $opt2 = '}';
 	if ( $opt == '[' ) $opt2 = ']';
 	if ( is_file( $file ) ) {
-		$handle = fopen( $file, "r" );
+		$handle = fopen( str_replace( '../', '', $file ), "r" );
 		if ( $handle ) {
 			while ( ( $buffer = fgets( $handle, 4096 ) ) !== false ) {
 				if ( substr( $buffer, 0, 5 ) == $item.'=' ) {
@@ -2827,7 +2834,7 @@ function wppa_extract( $xpath, $delz ) {
 		$ext = strtolower( wppa_get_ext( $xpath ) );
 		if ( $ext == 'zip' ) {
 			$zip = new ZipArchive;
-			if ( $zip->open( $xpath ) === true ) {
+			if ( $zip->open( str_replace( '../', '', $xpath ) ) === true ) {
 
 				$supported_file_ext = array( 'jpg', 'png', 'gif', 'JPG', 'PNG', 'GIF', 'amf', 'pmf', 'zip', 'csv' );
 				$done = '0';
@@ -2919,7 +2926,7 @@ global $wppa_session;
 					$pagid = wp_insert_post( $my_post );
 					if ( $pagid ) {
 						wppa_ok_message( sprintf( __( 'Page <a href="%s" target="_blank" >%s</a> created.', 'wp-photo-album-plus'), home_url().'?page_id='.$pagid, $name ) );
-						$wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_ALBUMS."` SET `cover_linkpage` = %s WHERE `id` = %s", $pagid, $alb ) );
+						$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_albums SET `cover_linkpage` = %s WHERE `id` = %s", $pagid, $alb ) );
 					}
 					else {
 						wppa_error_message( __( 'Could not create page.', 'wp-photo-album-plus') );

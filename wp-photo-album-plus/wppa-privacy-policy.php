@@ -4,7 +4,7 @@
 *
 * This file contains all procedures related to the privacy policy.
 *
-* Version 6.9.01
+* Version 6.9.14
 */
 
 function wppa_comment_exporter( $email_address, $page = 1 ) {
@@ -17,7 +17,7 @@ global $wpdb;
 	$group_id 		= 'wppa-comments';
 	$group_label 	= __( 'Comments on photos', 'wp-photo-album-plus' );
 	$comments 		= $wpdb->get_results( $wpdb->prepare(
-									"SELECT * FROM `" . WPPA_COMMENTS . "` " .
+									"SELECT * FROM $wpdb->wppa_comments " .
 									"WHERE `email` = %s " .
 									"ORDER BY `id` " .
 									"LIMIT %d,%d", $email_address, ( $page - 1 ) * $number, $number
@@ -78,11 +78,11 @@ function wppa_comment_eraser( $email_address, $page = 1 ) {
 global $wpdb;
 
 	$count = $wpdb->get_var( $wpdb->prepare(
-						"SELECT COUNT(*) FROM `" . WPPA_COMMENTS . "` " .
+						"SELECT COUNT(*) FROM $wpdb->wppa_comments " .
 						"WHERE `email` = %s ", $email_address ) );
 
 	$wpdb->query( $wpdb->prepare(
-					"DELETE FROM `" . WPPA_COMMENTS . "` " .
+					"DELETE FROM $wpdb->wppa_comments " .
 					"WHERE `email` = %s ", $email_address ) );
 
 	wppa_log( 'obs', $count . ' comments found to remove' );
@@ -124,7 +124,7 @@ global $wpdb;
 	$user 			= get_user_by( 'email', $email_address );
 	$owner 			= $user->user_login;
 	$ratings 		= $wpdb->get_results( $wpdb->prepare(
-									"SELECT * FROM `" . WPPA_RATING . "` " .
+									"SELECT * FROM $wpdb->wppa_rating " .
 									"WHERE `user` = %s " .
 									"ORDER BY `id` " .
 									"LIMIT %d,%d", $owner, ( $page - 1 ) * $number, $number
@@ -187,11 +187,11 @@ global $wpdb;
 	$user 			= get_user_by( 'email', $email_address );
 	$owner 			= $user->user_login;
 	$count = $wpdb->get_var( $wpdb->prepare(
-						"SELECT COUNT(*) FROM `" . WPPA_RATING . "` " .
+						"SELECT COUNT(*) FROM $wpdb->wppa_rating " .
 						"WHERE `user` = %s ", $owner ) );
 
 	$wpdb->query( $wpdb->prepare(
-					"DELETE FROM `" . WPPA_RATING . "` " .
+					"DELETE FROM $wpdb->wppa_rating " .
 					"WHERE `user` = %s ", $owner ) );
 
 	wppa_log( 'obs', $count . ' ratings found to remove' );
@@ -238,7 +238,7 @@ global $wpdb;
 	$user 			= get_user_by( 'email', $email_address );
 	$owner 			= $user->user_login;
 	$media_items 	= $wpdb->get_results( $wpdb->prepare(
-									"SELECT * FROM `" . WPPA_PHOTOS . "` " .
+									"SELECT * FROM $wpdb->wppa_photos " .
 									"WHERE `owner` = %s " .
 									"AND `album` > 0 " .
 									"LIMIT %d,%d", $owner, ( $page - 1 ) * $number, $number
@@ -347,7 +347,7 @@ global $wpdb;
 		}
 
 		// Generic exif
-		$exifs = $wpdb->get_results( 	"SELECT * FROM `" . WPPA_EXIF . "` " .
+		$exifs = $wpdb->get_results( 	"SELECT * FROM $wpdb->wppa_exif " .
 										"WHERE `photo` = " . $id . " " .
 										"ORDER BY `tag`", ARRAY_A );
 
@@ -372,7 +372,7 @@ global $wpdb;
 		}
 
 		// Generic iptc
-		$iptcs 	= $wpdb->get_results( 	"SELECT * FROM `" . WPPA_IPTC . "` " .
+		$iptcs 	= $wpdb->get_results( 	"SELECT * FROM $wpdb->wppa_iptc " .
 										"WHERE `photo` = " . $id . " " .
 										"ORDER BY `tag`", ARRAY_A );
 
@@ -382,7 +382,7 @@ global $wpdb;
 				$iptc_html .=
 				'<tr>' .
 					'<th>' .
-						$wpdb->get_var( "SELECT `description` FROM `" . WPPA_IPTC . "` " .
+						$wpdb->get_var( "SELECT `description` FROM $wpdb->wppa_iptc " .
 										"WHERE `photo` = 0 AND `tag` = '" . $iptc['tag'] . "'" ) .
 					'</th>' .
 					'<td>' .
@@ -565,7 +565,7 @@ global $wpdb;
 	$page 			= (int) $page;
 	$user 			= get_user_by( 'email', $email_address );
 	$media_items 	= $wpdb->get_results( $wpdb->prepare(
-									"SELECT * FROM `" . WPPA_PHOTOS . "` " .
+									"SELECT * FROM $wpdb->wppa_photos " .
 									"WHERE `owner` = %s " .
 									"AND `album` > 0 " .
 									"LIMIT %d,%d", $user->user_login, ( $page - 1 ) * $number, $number
@@ -579,7 +579,7 @@ global $wpdb;
 	}
 
 	$left_items 	= $wpdb->get_var( $wpdb->prepare(
-									"SELECT COUNT(*) FROM `" . WPPA_PHOTOS . "` " .
+									"SELECT COUNT(*) FROM $wpdb->wppa_photos " .
 									"WHERE `owner` = %s " .
 									"AND `album` > 0 ",
 									$user->user_login

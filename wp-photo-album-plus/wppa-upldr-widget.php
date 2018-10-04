@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display a list of users linking to their photos
-* Version 6.9.12
+* Version 6.9.14
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -63,10 +63,10 @@ class UpldrWidget extends WP_Widget {
 				}
 				else {
 					if ( $instance['parent'] ) {
-						$query = $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `owner` = %s AND `album` IN (".$selalbs.") AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s )", $user['user_login'], $me );//);
+						$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `owner` = %s AND `album` IN (".$selalbs.") AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s )", $user['user_login'], $me );//);
 					}
 					else {
-						$query = $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `owner` = %s AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s )", $user['user_login'], $me );//);
+						$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `owner` = %s AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s )", $user['user_login'], $me );//);
 					}
 					$photo_count = $wpdb->get_var( $query );
 					if ( $user['user_login'] != $me ) {
@@ -78,10 +78,10 @@ class UpldrWidget extends WP_Widget {
 					if ( $user['user_login'] != $me && isset ( $upldrcache[$this->get_widget_id()][$user['user_login']]['d'] ) ) $last_dtm = $upldrcache[$this->get_widget_id()][$user['user_login']]['d'];
 					else {
 						if ( $instance['parent'] ) {
-							$last_dtm = $wpdb->get_var($wpdb->prepare( "SELECT `timestamp` FROM `".WPPA_PHOTOS."` WHERE `owner` = %s AND `album` IN (".$selalbs.") AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s ) ORDER BY `timestamp` DESC LIMIT 1", $user['user_login'], $me ));
+							$last_dtm = $wpdb->get_var($wpdb->prepare( "SELECT `timestamp` FROM $wpdb->wppa_photos WHERE `owner` = %s AND `album` IN (".$selalbs.") AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s ) ORDER BY `timestamp` DESC LIMIT 1", $user['user_login'], $me ));
 						}
 						else {
-							$last_dtm = $wpdb->get_var($wpdb->prepare( "SELECT `timestamp` FROM `".WPPA_PHOTOS."` WHERE `owner` = %s AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s ) ORDER BY `timestamp` DESC LIMIT 1", $user['user_login'], $me ));
+							$last_dtm = $wpdb->get_var($wpdb->prepare( "SELECT `timestamp` FROM $wpdb->wppa_photos WHERE `owner` = %s AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s ) ORDER BY `timestamp` DESC LIMIT 1", $user['user_login'], $me ));
 						}
 					}
 					if ( $user['user_login'] != $me ) {
@@ -246,7 +246,7 @@ class UpldrWidget extends WP_Widget {
 					$albums = array();
 				}
 				else {
-					$albums = $wpdb->get_results( "SELECT `id`, `name` FROM `" . WPPA_ALBUMS . "`", ARRAY_A );
+					$albums = $wpdb->get_results( "SELECT `id`, `name` FROM $wpdb->wppa_albums", ARRAY_A );
 				}
 				if ( ! empty( $albums ) ) {
 					if ( wppa_switch( 'hier_albsel' ) ) {

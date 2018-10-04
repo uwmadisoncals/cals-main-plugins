@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the featured photos
-* Version 6.9.12
+* Version 6.9.14
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -46,7 +46,7 @@ class FeaTenWidget extends WP_Widget {
 
 			// Owner/public
 			case '-3':
-				$temp = $wpdb->get_results( "SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `status` = 'featured' ORDER BY RAND(" . wppa_get_randseed() . ") DESC", ARRAY_A );
+				$temp = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_photos WHERE `status` = 'featured' ORDER BY RAND(" . wppa_get_randseed() . ") DESC", ARRAY_A );
 				if ( $temp ) {
 					$c = '0';
 					$thumbs = array();
@@ -66,7 +66,7 @@ class FeaTenWidget extends WP_Widget {
 
 			// Generic
 			case '-2':
-				$temp = $wpdb->get_results( "SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `status` = 'featured' ORDER BY RAND(" . wppa_get_randseed() . ") DESC", ARRAY_A );
+				$temp = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_photos WHERE `status` = 'featured' ORDER BY RAND(" . wppa_get_randseed() . ") DESC", ARRAY_A );
 				if ( $temp ) {
 					$c = '0';
 					$thumbs = array();
@@ -85,12 +85,12 @@ class FeaTenWidget extends WP_Widget {
 
 			// All
 			case '0':
-				$thumbs = $wpdb->get_results( "SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `status` = 'featured' ORDER BY RAND(" . wppa_get_randseed() . ") DESC LIMIT " . $max, ARRAY_A );
+				$thumbs = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_photos WHERE `status` = 'featured' ORDER BY RAND(" . wppa_get_randseed() . ") DESC LIMIT " . $max, ARRAY_A );
 				break;
 
 			// Album spec
 			default:
-				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `" . WPPA_PHOTOS . "` WHERE `status`= 'featured' AND `album` = %s ORDER BY RAND(" . wppa_get_randseed() . ") DESC LIMIT " . $max, $album ), ARRAY_A );
+				$thumbs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `status`= 'featured' AND `album` = %s ORDER BY RAND(" . wppa_get_randseed() . ") DESC LIMIT " . $max, $album ), ARRAY_A );
 		}
 
 		$widget_content = "\n".'<!-- WPPA+ FeaTen Widget start -->';

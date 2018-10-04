@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains the interface to SCABN
-* Version 6.8.02
+* Version 6.9.14
 *
 */
 
@@ -25,7 +25,7 @@ global $wppa_session;
 	$thumb = wppa( 'current_photo' );
 
 	extract( shortcode_atts( array(
-		'name'  		=> wppa_get_photo_name( $thumb['id'] ),
+		'name'  		=> wppa_get_photo_name( strval( intval( $thumb['id'] ) ) ),
 		'price' 		=> '0.01',
 		'qty_field' 	=> '',
 		'b_title'		=> __('Buy now', 'wp-photo-album-plus'),

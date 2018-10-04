@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the widget
-* Version 6.9.12
+* Version 6.9.14
 */
 
 if ( ! defined( 'ABSPATH' ) ) die( "Can't load this file directly" );
@@ -136,7 +136,7 @@ class PhotoOfTheDay extends WP_Widget {
 			// The counter
 			if ( wppa_switch( 'potd_counter' ) ) { 	// If we want this
 				$alb = wppa_get_photo_item( $id, 'album' );
-				$c = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_PHOTOS . "` WHERE `album` = " . $alb ) - 1;
+				$c = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `album` = " . $alb ) - 1;
 				if ( $c > 0 ) {
 					if ( wppa_opt( 'potd_counter_link' ) == 'thumbs' ) {
 						$lnk = wppa_get_album_url( $alb, $page, 'thumbs', '1' );

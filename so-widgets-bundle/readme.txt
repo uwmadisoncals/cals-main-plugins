@@ -2,8 +2,8 @@
 Tags: bundle, widget, button, slider, image, carousel, price table, google maps, tinymce, social links
 Requires at least: 4.2
 Tested up to: 4.9.1
-Stable tag: 1.12.1
-Build time: 2018-07-17T11:59:12+02:00
+Stable tag: 1.13.0
+Build time: 2018-09-17T08:23:30-07:00
 License: GPLv3 or later
 Contributors: gpriday, braam-genis
 Donate link: https://siteorigin.com/downloads/contribution/
@@ -64,6 +64,18 @@ The SiteOrigin Widgets Bundle is the perfect platform to build widgets for your 
 3. An example of the button widget.
 
 == Changelog ==
+
+= 1.13.0 - 13 September 2018 =
+* SiteOrigin Widgets Gutenberg block!
+* Google Map: Prevent script from running further if no map canvas elements found.
+* Removed style to set `p` margins to zero.
+* Check that fallback image for static maps is not an empty string before attempting to use it.
+* TinyMCE: Ensure target is one of the editor tabs when switching modes.
+* Set values for repeaters which are direct children of section fields.
+* Prevent unselected radio input state emitters from affecting form states, when form values are set programmatically.
+* Plugin Action Links: Check if edit link is present before removal.
+* Social Media Buttons: Added Phone and Angelist. Changed email title text.
+* Metabox manager: Set empty post meta string value to array. Ensure metabox widget form values are saved when saving drafts too.
 
 = 1.12.1 - 17 July 2018 =
 * Contact: Allow non-string values in required field validation.

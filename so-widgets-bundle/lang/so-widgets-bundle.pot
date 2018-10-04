@@ -68,7 +68,7 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: base/inc/actions.php:10, base/inc/actions.php:75, base/inc/actions.php:119, base/inc/actions.php:155, base/inc/actions.php:168, base/inc/actions.php:172, base/inc/actions.php:263, base/inc/actions.php:266, so-widgets-bundle.php:370, so-widgets-bundle.php:394, so-widgets-bundle.php:407, so-widgets-bundle.php:437, so-widgets-bundle.php:448, so-widgets-bundle.php:514, so-widgets-bundle.php:525
+#: base/inc/actions.php:10, base/inc/actions.php:74, base/inc/actions.php:118, base/inc/actions.php:154, base/inc/actions.php:167, base/inc/actions.php:171, base/inc/actions.php:262, base/inc/actions.php:265, so-widgets-bundle.php:370, so-widgets-bundle.php:394, so-widgets-bundle.php:407, so-widgets-bundle.php:437, so-widgets-bundle.php:448, so-widgets-bundle.php:514, so-widgets-bundle.php:525
 msgid "Invalid request."
 msgstr ""
 
@@ -76,19 +76,19 @@ msgstr ""
 msgid "Invalid post."
 msgstr ""
 
-#: base/inc/actions.php:50, base/siteorigin-widget.class.php:637
+#: base/inc/actions.php:50, base/siteorigin-widget.class.php:642
 msgid "Widget Preview"
 msgstr ""
 
-#: base/inc/actions.php:211
+#: base/inc/actions.php:210
 msgid "Nonce error"
 msgstr ""
 
-#: base/inc/actions.php:221
+#: base/inc/actions.php:220
 msgid "Signature error"
 msgstr ""
 
-#: base/inc/actions.php:247
+#: base/inc/actions.php:246
 msgid "Attachment error"
 msgstr ""
 
@@ -405,6 +405,9 @@ msgstr ""
 msgid "Widgets Bundle Post Meta Data"
 msgstr ""
 
+#: base/inc/routes/siteorigin-widgets-resource.class.php:89
+msgstr ""
+
 #: base/inc/widgets/base-slider.class.php:54
 msgid "Animation speed"
 msgstr ""
@@ -513,39 +516,39 @@ msgstr ""
 msgid "previous slide"
 msgstr ""
 
-#: base/siteorigin-widget.class.php:481
+#: base/siteorigin-widget.class.php:486
 msgid "Preview"
 msgstr ""
 
-#: base/siteorigin-widget.class.php:486
+#: base/siteorigin-widget.class.php:491
 msgid "Help"
 msgstr ""
 
-#: base/siteorigin-widget.class.php:552
+#: base/siteorigin-widget.class.php:557
 msgid "This widget has scripts and styles that need to be loaded before you can use it. Please save and reload your current page."
 msgstr ""
 
-#: base/siteorigin-widget.class.php:553
+#: base/siteorigin-widget.class.php:558
 msgid "You will only need to do this once."
 msgstr ""
 
-#: base/siteorigin-widget.class.php:580
+#: base/siteorigin-widget.class.php:585
 msgid "Are you sure?"
 msgstr ""
 
-#: base/siteorigin-widget.class.php:582
+#: base/siteorigin-widget.class.php:587
 msgid "There is a newer version of this widget's content available."
 msgstr ""
 
-#: base/siteorigin-widget.class.php:583, base/siteorigin-widget.class.php:587
+#: base/siteorigin-widget.class.php:588, base/siteorigin-widget.class.php:592
 msgid "Restore"
 msgstr ""
 
-#: base/siteorigin-widget.class.php:584
+#: base/siteorigin-widget.class.php:589
 msgid "Dismiss"
 msgstr ""
 
-#: base/siteorigin-widget.class.php:586
+#: base/siteorigin-widget.class.php:591
 msgid "Clicking %s will replace the current widget contents. You can revert by refreshing the page before updating."
 msgstr ""
 
@@ -571,6 +574,10 @@ msgstr ""
 
 #: compat/builders.php:12
 msgid "Visual Composer"
+msgstr ""
+
+#: compat/gutenberg/gutenberg.php:63
+msgid "You need to select a widget type before you'll see anything here. :)"
 msgstr ""
 
 #: compat/visual-composer/visual-composer.php:38, compat/visual-composer/visual-composer.php:54
@@ -633,11 +640,11 @@ msgstr ""
 msgid "Deactivated"
 msgstr ""
 
-#: so-widgets-bundle.php:746
+#: so-widgets-bundle.php:748
 msgid "Manage Widgets"
 msgstr ""
 
-#: so-widgets-bundle.php:747
+#: so-widgets-bundle.php:749
 msgid "Support"
 msgstr ""
 
@@ -2527,166 +2534,174 @@ msgid "RSS"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:35
-msgid "Snapchat"
+msgid "Phone"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:41
-msgid "LinkedIn"
+msgid "Snapchat"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:47
-msgid "Pinterest"
+msgid "LinkedIn"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:53
-msgid "Tumblr"
+msgid "Pinterest"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:59
-msgid "Instagram"
+msgid "Tumblr"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:65
-msgid "VK"
+msgid "Instagram"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:71
-msgid "Flickr"
+msgid "VK"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:77
+msgid "Flickr"
+msgstr ""
+
+#: widgets/social-media-buttons/data/networks.php:83
 msgid "Vine"
 msgstr ""
 
-#: widgets/social-media-buttons/data/networks.php:86
+#: widgets/social-media-buttons/data/networks.php:92
 msgid "500px"
 msgstr ""
 
-#: widgets/social-media-buttons/data/networks.php:92
-msgid "Behance"
-msgstr ""
-
 #: widgets/social-media-buttons/data/networks.php:98
-msgid "Bitbucket"
+msgid "AngelList"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:104
-msgid "Codepen"
+msgid "Behance"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:110
-msgid "Delicious"
+msgid "Bitbucket"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:116
-msgid "deviantArt"
+msgid "Codepen"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:122
-msgid "Dribbble"
+msgid "Delicious"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:128
-msgid "Dropbox"
+msgid "deviantArt"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:134
-msgid "Foursquare"
+msgid "Dribbble"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:140
-msgid "Github"
+msgid "Dropbox"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:146
-msgid "Gratipay"
+msgid "Foursquare"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:152
-msgid "Hacker News"
+msgid "Github"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:158
-msgid "JSFiddle"
+msgid "Gratipay"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:164
-msgid "Last.fm"
+msgid "Hacker News"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:170
-msgid "Reddit"
+msgid "JSFiddle"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:176
-msgid "Slack"
+msgid "Last.fm"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:182
-msgid "Slideshare"
+msgid "Reddit"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:188
-msgid "Soundcloud"
+msgid "Slack"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:194
-msgid "Spotify"
+msgid "Slideshare"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:200
-msgid "Stack Exchange"
+msgid "Soundcloud"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:206
-msgid "Stack Overflow"
+msgid "Spotify"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:212
-msgid "Steam"
+msgid "Stack Exchange"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:218
-msgid "StumbleUpon"
+msgid "Stack Overflow"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:224
-msgid "Trello"
+msgid "Steam"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:230
-msgid "TripAdvisor"
+msgid "StumbleUpon"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:236
-msgid "Twitch"
+msgid "Trello"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:242
-msgid "Vimeo"
+msgid "TripAdvisor"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:248
-msgid "WhatsApp"
+msgid "Twitch"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:254
-msgid "WordPress"
+msgid "Vimeo"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:260
-msgid "Xing"
+msgid "WhatsApp"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:266
-msgid "Yahoo"
+msgid "WordPress"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:272
-msgid "Yelp"
+msgid "Xing"
 msgstr ""
 
 #: widgets/social-media-buttons/data/networks.php:278
+msgid "Yahoo"
+msgstr ""
+
+#: widgets/social-media-buttons/data/networks.php:284
+msgid "Yelp"
+msgstr ""
+
+#: widgets/social-media-buttons/data/networks.php:290
 msgid "YouTube"
 msgstr ""
 
@@ -2722,7 +2737,11 @@ msgstr ""
 msgid "Mobile Align"
 msgstr ""
 
-#: widgets/social-media-buttons/tpl/default.php:9
+#: widgets/social-media-buttons/tpl/default.php:13
+msgid "%s %s"
+msgstr ""
+
+#: widgets/social-media-buttons/tpl/default.php:19
 msgid "%s on %s"
 msgstr ""
 

@@ -2,7 +2,7 @@
 /* wppa-ajax.php
 *
 * Functions used in ajax requests
-* Version 6.9.13
+* Version 6.9.15
 *
 */
 
@@ -121,7 +121,7 @@ global $wppa_log_file;
 				}
 			}
 			if ( ! $any ) {
-				$query = $wpdb->prepare( "UPDATE `" . WPPA_IPTC . "` SET `status` = 'hide' WHERE `photo` = '0' AND `tag` = %s", $tag );
+				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_iptc SET `status` = 'hide' WHERE `photo` = '0' AND `tag` = %s", $tag );
 				$wpdb->query( $query );
 			}
 			wppa_exit();
@@ -235,7 +235,7 @@ global $wppa_log_file;
 
 			// Cleanup possible unused label
 			if ( ! $any ) {
-				$query = $wpdb->prepare( "UPDATE `" . WPPA_EXIF . "` SET `status` = 'hide' WHERE `photo` = '0' AND `tag` = %s", $tag );
+				$query = $wpdb->prepare( "UPDATE $wpdb->wppa_exif SET `status` = 'hide' WHERE `photo` = '0' AND `tag` = %s", $tag );
 				$wpdb->query( $query );
 			}
 			wppa_exit();
@@ -251,6 +251,7 @@ global $wppa_log_file;
 			else {
 				$photo = $_REQUEST['photo-id'];
 			}
+			$photo = strval( intval( $photo ) );
 
 			// Is this user aloowed to edit thisphoto?
 			$ok = wppa_may_user_fe_edit( $photo );
@@ -324,7 +325,7 @@ global $wppa_log_file;
 			// Custom fields
 			$custom = wppa_get_photo_item( $photo, 'custom' );
 			if ( $custom ) {
-				$custom_data = unserialize( $custom );
+				$custom_data = wppa_unserialize( $custom );
 			}
 			else {
 				$custom_data = array( '', '', '', '', '', '', '', '', '', '' );
@@ -398,9 +399,9 @@ global $wppa_log_file;
 			}
 
 			if ( isset( $_REQUEST['photo-id'] ) && current_user_can( 'wppa_moderate' ) ) {
-				$iret = $wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_PHOTOS."` SET `status` = 'publish' WHERE `id` = %s", $_REQUEST['photo-id'] ) );
+				$iret = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET `status` = 'publish' WHERE `id` = %s", $_REQUEST['photo-id'] ) );
 				wppa_flush_upldr_cache( 'photoid', $_REQUEST['photo-id'] );
-				$alb = $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $_REQUEST['photo-id'] ) );
+				$alb = $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM $wpdb->wppa_photos WHERE `id` = %s", $_REQUEST['photo-id'] ) );
 				wppa_clear_taglist();
 				wppa_invalidate_treecounts( $alb );
 			}
@@ -463,7 +464,7 @@ global $wppa_log_file;
 					wppa_exit();
 				}
 
-				$photo = $wpdb->get_var( $wpdb->prepare( "SELECT `photo` FROM `" . WPPA_COMMENTS . "` WHERE `id` = %s", $_REQUEST['comment-id'] ) );
+				$photo = $wpdb->get_var( $wpdb->prepare( "SELECT `photo` FROM $wpdb->wppa_comments WHERE `id` = %s", $_REQUEST['comment-id'] ) );
 				$iret = $wpdb->query( $wpdb->prepare( "DELETE FROM `".WPPA_COMMENTS."` WHERE `id`= %s", $_REQUEST['comment-id'] ) );
 				if ( $iret ) {
 					if ( wppa_opt( 'search_comments' ) ) {
@@ -492,7 +493,7 @@ global $wppa_log_file;
 			$status = "`status` <> 'pending' AND `status` <> 'scheduled'";
 			if ( ! is_user_logged_in() ) $status .= " AND `status` <> 'private'";
 
-			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `album` = %s AND ( ( ".$status." ) OR owner = %s ) ".wppa_get_photo_order( $alb ), $alb, wppa_get_user() ), ARRAY_A );
+			$photos = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `album` = %s AND ( ( ".$status." ) OR owner = %s ) ".wppa_get_photo_order( $alb ), $alb, wppa_get_user() ), ARRAY_A );
 			if ( ! $photos ) {
 				echo '||ER||'.__( 'The album is empty' , 'wp-photo-album-plus');
 				wppa_exit();
@@ -595,7 +596,7 @@ global $wppa_log_file;
 			$zipfile = $zipsdir.wppa_get_user().'.zip';
 
 			// Find the photo data
-			$data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ), ARRAY_A );
+			$data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `id` = %s", $photo ), ARRAY_A );
 
 			// Find the photo file
 			if ( is_file ( wppa_get_source_path( $photo ) ) ) {
@@ -645,7 +646,7 @@ global $wppa_log_file;
 				wppa_exit();
 			}
 
-			$data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ), ARRAY_A );
+			$data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `id` = %s", $photo ), ARRAY_A );
 
 			if ( $data ) {	// The photo is supposed to exist
 
@@ -692,7 +693,7 @@ global $wppa_log_file;
 
 				// Make the files
 				if ( $type == 'file' ) {
-					copy( $source, $dest );
+					copy( str_replace( '../', '', $source ), str_replace( '../', '', $dest ) );
 					$ext = $data['ext'];
 				}
 				elseif ( $type == 'zip' ) {
@@ -736,6 +737,21 @@ global $wppa_log_file;
 
 		case 'tinymcephotodialogfront':
 			$result = wppa_make_tinymce_photo_dialog( 'front' );
+			echo $result;
+			wppa_exit();
+			break;
+
+		case 'gutenbergphotodialog':
+			$result = wppa_make_gutenberg_photo_dialog();
+			echo $result;
+			wppa_exit();
+			break;
+			
+		case 'getshortcodedrendered':
+			require_once 'wppa-non-admin.php';
+			$id = trim( substr( $_REQUEST['shortcode'], 6 ), ' ]' );
+		//	$result = do_shortcode( $_REQUEST['shortcode'] );
+			$result = wppa_photo_shortcodes( array( 0 => $id ) );
 			echo $result;
 			wppa_exit();
 			break;
@@ -864,7 +880,7 @@ global $wppa_log_file;
 				if ( $mylast ) {
 
 					// Remove my like
-					$wpdb->query( $wpdb->prepare( "DELETE FROM `" . WPPA_RATING . "` WHERE `photo` = %s AND `user` = %s", $photo, $user ) );
+					$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->wppa_rating WHERE `photo` = %s AND `user` = %s", $photo, $user ) );
 					$myavgrat = '0';
 				}
 				else {
@@ -1020,7 +1036,7 @@ global $wppa_log_file;
 			// Compute rating_count and store in the photo info
 			$ratcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_RATING."` WHERE `photo` = %s", $photo ) );
 			if ( $ratcount !== false ) {
-				$iret = $wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_PHOTOS."` SET `rating_count` = %s WHERE `id` = %s", $ratcount, $photo ) );
+				$iret = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET `rating_count` = %s WHERE `id` = %s", $ratcount, $photo ) );
 				if ( $iret === false ) {
 					echo '0||107||'.$wartxt;
 					wppa_exit();																// Fail on save
@@ -1332,7 +1348,7 @@ global $wppa_log_file;
 				case 'hour':
 				case 'min':
 					$itemname = __( 'Schedule date/time' , 'wp-photo-album-plus');
-					$scheduledtm = $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledtm` FROM`".WPPA_ALBUMS."` WHERE `id` = %s", $album ) );
+					$scheduledtm = $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledtm` FROM$wpdb->wppa_albums WHERE `id` = %s", $album ) );
 					if ( ! $scheduledtm ) {
 						$scheduledtm = wppa_get_default_scheduledtm();
 					}
@@ -1349,9 +1365,9 @@ global $wppa_log_file;
 					break;
 
 				case 'setallscheduled':
-					$scheduledtm = $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledtm` FROM `" . WPPA_ALBUMS . "` WHERE `id` = %s", $album ) );
+					$scheduledtm = $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledtm` FROM $wpdb->wppa_albums WHERE `id` = %s", $album ) );
 					if ( $scheduledtm ) {
-						$iret = $wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_PHOTOS."` SET `status` = 'scheduled', `scheduledtm` = %s WHERE `album` = %s", $scheduledtm, $album ) );
+						$iret = $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET `status` = 'scheduled', `scheduledtm` = %s WHERE `album` = %s", $scheduledtm, $album ) );
 						echo '||0||'.__( 'All photos set to scheduled per date', 'wp-photo-album-plus' ) . ' ' . wppa_format_scheduledtm( $scheduledtm );
 					}
 					wppa_exit();
@@ -1370,7 +1386,7 @@ global $wppa_log_file;
 					$index 		= substr( $item, -1 );
 					$custom 	= wppa_get_album_item( $album, 'custom' );
 					if ( $custom ) {
-						$custom_data = unserialize( $custom );
+						$custom_data = wppa_unserialize( $custom );
 					}
 					else {
 						$custom_data = array( '', '', '', '', '', '', '', '', '', '' );
@@ -2044,7 +2060,7 @@ global $wppa_log_file;
 				case 'hour':
 				case 'min':
 					$itemname = __( 'Schedule date/time' , 'wp-photo-album-plus');
-					$scheduledtm = $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledtm` FROM`".WPPA_PHOTOS."` WHERE `id` = %s", $photo ) );
+					$scheduledtm = $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledtm` FROM$wpdb->wppa_photos WHERE `id` = %s", $photo ) );
 					if ( ! $scheduledtm ) {
 						$scheduledtm = wppa_get_default_scheduledtm();
 					}
@@ -2056,7 +2072,7 @@ global $wppa_log_file;
 					if ( $item == 'min' ) 	$temp[4] = $value;
 					$scheduledtm = implode( ',', $temp );
 					wppa_update_photo( array( 'id' => $photo, 'scheduledtm' => $scheduledtm, 'status' => 'scheduled' ) );
-					wppa_invalidate_treecounts( $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ) ) );
+					wppa_invalidate_treecounts( $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM $wpdb->wppa_photos WHERE `id` = %s", $photo ) ) );
 					wppa_flush_upldr_cache( 'photoid', $photo );
 					if ( wppa_is_video( $photo ) ) {
 						echo '||0||'.sprintf( __( '%s of video %s updated' , 'wp-photo-album-plus'), $itemname, $photo );
@@ -2072,7 +2088,7 @@ global $wppa_log_file;
 				case 'delhour':
 				case 'delmin':
 					$itemname = __( 'Delete date/time' , 'wp-photo-album-plus');
-					$scheduledel = $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledel` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ) );
+					$scheduledel = $wpdb->get_var( $wpdb->prepare( "SELECT `scheduledel` FROM $wpdb->wppa_photos WHERE `id` = %s", $photo ) );
 					if ( ! $scheduledel ) {
 						$scheduledel = wppa_get_default_scheduledtm();
 					}
@@ -2086,7 +2102,7 @@ global $wppa_log_file;
 					wppa_update_photo( array( 'id' => $photo, 'scheduledel' => $scheduledel ) );
 
 					// Make sure not deleted yet
-					$alb = $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM `".WPPA_PHOTOS."` WHERE `id` = %s", $photo ) );
+					$alb = $wpdb->get_var( $wpdb->prepare( "SELECT `album` FROM $wpdb->wppa_photos WHERE `id` = %s", $photo ) );
 					if ( $alb < '-9' ) {
 						$alb = - ( $alb + '9' );
 						wppa_update_photo( array( 'id' => $photo, 'album' => $alb ) );
@@ -2123,7 +2139,7 @@ global $wppa_log_file;
 					$index 		= substr( $item, -1 );
 					$custom 	= wppa_get_photo_item( $photo, 'custom' );
 					if ( $custom ) {
-						$custom_data = unserialize( $custom );
+						$custom_data = wppa_unserialize( $custom );
 					}
 					else {
 						$custom_data = array( '', '', '', '', '', '', '', '', '', '' );
@@ -2156,6 +2172,7 @@ global $wppa_log_file;
 					wppa_make_o1_source( $photo );
 
 					// Make the files
+					wppa( 'unsanitized_filename', $_FILES['photo']['name'] );
 					$bret = wppa_make_the_photo_files( $_FILES['photo']['tmp_name'], $photo, strtolower( wppa_get_ext( $_FILES['photo']['name'] ) ) );
 					if ( $bret ) {
 
@@ -2635,8 +2652,8 @@ global $wppa_log_file;
 					}
 					break;
 				case 'wppa_viewcount_clear':
-					$iret = $wpdb->query( "UPDATE `".WPPA_PHOTOS."` SET `views` = '0'" ) &&
-							$wpdb->query( "UPDATE `".WPPA_ALBUMS."` SET `views` = '0'" );
+					$iret = $wpdb->query( "UPDATE $wpdb->wppa_photos SET `views` = '0'" ) &&
+							$wpdb->query( "UPDATE $wpdb->wppa_albums SET `views` = '0'" );
 					if ( $iret !== false ) {
 						$title = __( 'Viewcounts cleared' , 'wp-photo-album-plus');
 					}
@@ -2974,9 +2991,9 @@ global $wppa_log_file;
 				case 'wppa_search_tags':
 				case 'wppa_search_cats':
 				case 'wppa_search_comments':
-					$wpdb->query( "UPDATE `" . WPPA_PHOTOS . "` SET `indexdtm` = ''" );
+					$wpdb->query( "UPDATE $wpdb->wppa_photos SET `indexdtm` = ''" );
 					wppa_schedule_maintenance_proc( 'wppa_remake_index_photos' );
-					$wpdb->query( "UPDATE `" . WPPA_ALBUMS . "` SET `indexdtm` = ''" );
+					$wpdb->query( "UPDATE $wpdb->wppa_albums SET `indexdtm` = ''" );
 					wppa_schedule_maintenance_proc( 'wppa_remake_index_albums' );
 					break;
 
@@ -2985,7 +3002,7 @@ global $wppa_log_file;
 					$value = trim ( $value );
 					$user = wppa_get_user_by ( 'login', $value );	// seems to be case insensitive
 					if ( $user && $user->user_login === $value ) {
-						$wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_PHOTOS."` SET `status` = 'pending' WHERE `owner` = %s", $value ) );
+						$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET `status` = 'pending' WHERE `owner` = %s", $value ) );
 						$black_listed_users = get_option( 'wppa_black_listed_users', array() );
 						if ( ! in_array( $value, $black_listed_users ) ) {
 							$black_listed_users[] = $value;
@@ -3000,7 +3017,7 @@ global $wppa_log_file;
 					break;
 
 				case 'wppa_un_blacklist_user':
-					$wpdb->query( $wpdb->prepare( "UPDATE `".WPPA_PHOTOS."` SET `status` = 'publish' WHERE `owner` = %s", $value ) );
+					$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET `status` = 'publish' WHERE `owner` = %s", $value ) );
 					$black_listed_users = get_option( 'wppa_black_listed_users', array() );
 					if ( in_array( $value, $black_listed_users ) ) {
 						foreach ( array_keys( $black_listed_users ) as $usr ) {
@@ -3139,8 +3156,8 @@ global $wppa_log_file;
 
 				case 'wppa_use_encrypted_links':
 					if ( $value == 'yes' ) {
-						$ca = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_ALBUMS . "` WHERE `crypt` = ''" );
-						$cp = $wpdb->get_var( "SELECT COUNT(*) FROM `" . WPPA_PHOTOS . "` WHERE `crypt` = ''" );
+						$ca = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE `crypt` = ''" );
+						$cp = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `crypt` = ''" );
 						if ( $ca + $cp ) {
 							if ( $ca ) update_option ( 'wppa_crypt_albums_status', 'Required' );
 							if ( $cp ) update_option ( 'wppa_crypt_photos_status', 'Required' );

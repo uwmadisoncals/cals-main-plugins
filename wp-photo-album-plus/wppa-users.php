@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains user and capabilities related routines
-* Version 6.9.02
+* Version 6.9.14
 *
 */
 
@@ -145,7 +145,7 @@ global $wp_roles;
 
 			// If logged out max set, check if limit reached
 			if ( $rmax ) {
-				$albs = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_ALBUMS."` WHERE `owner` = %s", wppa_get_user() ) );
+				$albs = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE `owner` = %s", wppa_get_user() ) );
 				if ( $albs >= $rmax ) {
 					return false;	// Limit reached
 				}
@@ -172,7 +172,7 @@ global $wp_roles;
 	}
 
 	// Check for global max albums per user setting
-	$albs = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `".WPPA_ALBUMS."` WHERE `owner` = %s", wppa_get_user() ) );
+	$albs = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_albums WHERE `owner` = %s", wppa_get_user() ) );
 	$gmax = wppa_opt( 'max_albums' );
 	if ( $gmax && $albs >= $gmax ) {
 		return false;

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display thumbnail photos
-* Version 6.9.12
+* Version 6.9.14
 */
 
 class ThumbnailWidget extends WP_Widget {
@@ -65,10 +65,10 @@ class ThumbnailWidget extends WP_Widget {
 		}
 
 		if ( $album ) {
-			$thumbs = $wpdb->get_results($wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `status` <> 'pending' AND `status` <> 'scheduled' AND `album` = %s ".$sortby." LIMIT %d", $album, $max ), 'ARRAY_A' );
+			$thumbs = $wpdb->get_results($wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `status` <> 'pending' AND `status` <> 'scheduled' AND `album` = %s ".$sortby." LIMIT %d", $album, $max ), 'ARRAY_A' );
 		}
 		else {
-			$thumbs = $wpdb->get_results($wpdb->prepare( "SELECT * FROM `".WPPA_PHOTOS."` WHERE `status` <> 'pending' AND `status` <> 'scheduled'".$sortby." LIMIT %d", $max ), 'ARRAY_A' );
+			$thumbs = $wpdb->get_results($wpdb->prepare( "SELECT * FROM $wpdb->wppa_photos WHERE `status` <> 'pending' AND `status` <> 'scheduled'".$sortby." LIMIT %d", $max ), 'ARRAY_A' );
 		}
 
 		global $widget_content;

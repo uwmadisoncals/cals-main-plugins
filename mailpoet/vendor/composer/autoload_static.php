@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit5ecbe6178e2e1b24b12876efcfaf87bd
+class ComposerStaticInit3ae7fb8a735f75fa470f55016270f278
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -196,34 +196,49 @@ class ComposerStaticInit5ecbe6178e2e1b24b12876efcfaf87bd
         'MailPoet\\Config\\MP2Migrator' => __DIR__ . '/../..' . '/lib/Config/MP2Migrator.php',
         'MailPoet\\Config\\Menu' => __DIR__ . '/../..' . '/lib/Config/Menu.php',
         'MailPoet\\Config\\Migrator' => __DIR__ . '/../..' . '/lib/Config/Migrator.php',
-        'MailPoet\\Config\\PHPVersionWarnings' => __DIR__ . '/../..' . '/lib/Config/PHPVersionWarnings.php',
         'MailPoet\\Config\\PersonalDataErasers' => __DIR__ . '/../..' . '/lib/Config/PersonalDataErasers.php',
         'MailPoet\\Config\\PersonalDataExporters' => __DIR__ . '/../..' . '/lib/Config/PersonalDataExporters.php',
         'MailPoet\\Config\\PluginActivatedHook' => __DIR__ . '/../..' . '/lib/Config/PluginActivatedHook.php',
         'MailPoet\\Config\\Populator' => __DIR__ . '/../..' . '/lib/Config/Populator.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\AppWelcome' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/AppWelcome.php',
-        'MailPoet\\Config\\PopulatorData\\Templates\\BurgerJoint' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/BurgerJoint.php',
-        'MailPoet\\Config\\PopulatorData\\Templates\\ChocolateStore' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/ChocolateStore.php',
-        'MailPoet\\Config\\PopulatorData\\Templates\\CoffeeShop' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/CoffeeShop.php',
-        'MailPoet\\Config\\PopulatorData\\Templates\\Discount' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Discount.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\Avocado' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Avocado.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\Charity' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Charity.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\Coffee' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Coffee.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\DogFood' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/DogFood.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\Drone' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Drone.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\Faith' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Faith.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\FashionStore' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/FashionStore.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\FestivalEvent' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/FestivalEvent.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\Fitness' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Fitness.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\FoodBox' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/FoodBox.php',
-        'MailPoet\\Config\\PopulatorData\\Templates\\KickOff' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/KickOff.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\GiftWelcome' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/GiftWelcome.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\Hotels' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Hotels.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\KidsClothing' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/KidsClothing.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\Minimal' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Minimal.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\ModularStyleStories' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/ModularStyleStories.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\Music' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Music.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\NewsDay' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/NewsDay.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\NewsletterBlank121Column' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/NewsletterBlank121Column.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\NewsletterBlank12Column' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/NewsletterBlank12Column.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\NewsletterBlank13Column' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/NewsletterBlank13Column.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\NewsletterBlank1Column' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/NewsletterBlank1Column.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\NotSoMedium' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/NotSoMedium.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\Phone' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Phone.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\PieceOfCake' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/PieceOfCake.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\PostNotificationsBlank1Column' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/PostNotificationsBlank1Column.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\RealEstate' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/RealEstate.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\Retro' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Retro.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\RetroComputingMagazine' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/RetroComputingMagazine.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\RssSimpleNews' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/RssSimpleNews.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\ScienceWeekly' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/ScienceWeekly.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\Shoes' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Shoes.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\SimpleText' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/SimpleText.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\Sunglasses' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/Sunglasses.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\TakeAHike' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/TakeAHike.php',
-        'MailPoet\\Config\\PopulatorData\\Templates\\TravelNomads' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/TravelNomads.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\WelcomeBlank12Column' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/WelcomeBlank12Column.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\WelcomeBlank1Column' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/WelcomeBlank1Column.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\WideStoryLayout' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/WideStoryLayout.php',
+        'MailPoet\\Config\\PopulatorData\\Templates\\WineCity' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/WineCity.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\WorldCup' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/WorldCup.php',
         'MailPoet\\Config\\PopulatorData\\Templates\\YogaStudio' => __DIR__ . '/../..' . '/lib/Config/PopulatorData/Templates/YogaStudio.php',
         'MailPoet\\Config\\PrivacyPolicy' => __DIR__ . '/../..' . '/lib/Config/PrivacyPolicy.php',
@@ -244,6 +259,7 @@ class ComposerStaticInit5ecbe6178e2e1b24b12876efcfaf87bd
         'MailPoet\\Cron\\Workers\\KeyCheck\\SendingServiceKeyCheck' => __DIR__ . '/../..' . '/lib/Cron/Workers/KeyCheck/SendingServiceKeyCheck.php',
         'MailPoet\\Cron\\Workers\\Scheduler' => __DIR__ . '/../..' . '/lib/Cron/Workers/Scheduler.php',
         'MailPoet\\Cron\\Workers\\SendingQueue\\Migration' => __DIR__ . '/../..' . '/lib/Cron/Workers/SendingQueue/Migration.php',
+        'MailPoet\\Cron\\Workers\\SendingQueue\\SendingErrorHandler' => __DIR__ . '/../..' . '/lib/Cron/Workers/SendingQueue/SendingErrorHandler.php',
         'MailPoet\\Cron\\Workers\\SendingQueue\\SendingQueue' => __DIR__ . '/../..' . '/lib/Cron/Workers/SendingQueue/SendingQueue.php',
         'MailPoet\\Cron\\Workers\\SendingQueue\\Tasks\\Links' => __DIR__ . '/../..' . '/lib/Cron/Workers/SendingQueue/Tasks/Links.php',
         'MailPoet\\Cron\\Workers\\SendingQueue\\Tasks\\Mailer' => __DIR__ . '/../..' . '/lib/Cron/Workers/SendingQueue/Tasks/Mailer.php',
@@ -361,12 +377,20 @@ class ComposerStaticInit5ecbe6178e2e1b24b12876efcfaf87bd
         'MailPoet\\Logging\\LogHandler' => __DIR__ . '/../..' . '/lib/Logging/LogHandler.php',
         'MailPoet\\Logging\\Logger' => __DIR__ . '/../..' . '/lib/Logging/Logger.php',
         'MailPoet\\Mailer\\Mailer' => __DIR__ . '/../..' . '/lib/Mailer/Mailer.php',
+        'MailPoet\\Mailer\\MailerError' => __DIR__ . '/../..' . '/lib/Mailer/MailerError.php',
         'MailPoet\\Mailer\\MailerLog' => __DIR__ . '/../..' . '/lib/Mailer/MailerLog.php',
         'MailPoet\\Mailer\\Methods\\AmazonSES' => __DIR__ . '/../..' . '/lib/Mailer/Methods/AmazonSES.php',
+        'MailPoet\\Mailer\\Methods\\ErrorMappers\\AmazonSESMapper' => __DIR__ . '/../..' . '/lib/Mailer/Methods/ErrorMappers/AmazonSESMapper.php',
+        'MailPoet\\Mailer\\Methods\\ErrorMappers\\ConnectionErrorMapperTrait' => __DIR__ . '/../..' . '/lib/Mailer/Methods/ErrorMappers/ConnectionErrorMapperTrait.php',
+        'MailPoet\\Mailer\\Methods\\ErrorMappers\\MailPoetMapper' => __DIR__ . '/../..' . '/lib/Mailer/Methods/ErrorMappers/MailPoetMapper.php',
+        'MailPoet\\Mailer\\Methods\\ErrorMappers\\PHPMailMapper' => __DIR__ . '/../..' . '/lib/Mailer/Methods/ErrorMappers/PHPMailMapper.php',
+        'MailPoet\\Mailer\\Methods\\ErrorMappers\\SMTPMapper' => __DIR__ . '/../..' . '/lib/Mailer/Methods/ErrorMappers/SMTPMapper.php',
+        'MailPoet\\Mailer\\Methods\\ErrorMappers\\SendGridMapper' => __DIR__ . '/../..' . '/lib/Mailer/Methods/ErrorMappers/SendGridMapper.php',
         'MailPoet\\Mailer\\Methods\\MailPoet' => __DIR__ . '/../..' . '/lib/Mailer/Methods/MailPoet.php',
         'MailPoet\\Mailer\\Methods\\PHPMail' => __DIR__ . '/../..' . '/lib/Mailer/Methods/PHPMail.php',
         'MailPoet\\Mailer\\Methods\\SMTP' => __DIR__ . '/../..' . '/lib/Mailer/Methods/SMTP.php',
         'MailPoet\\Mailer\\Methods\\SendGrid' => __DIR__ . '/../..' . '/lib/Mailer/Methods/SendGrid.php',
+        'MailPoet\\Mailer\\SubscriberError' => __DIR__ . '/../..' . '/lib/Mailer/SubscriberError.php',
         'MailPoet\\Models\\CustomField' => __DIR__ . '/../..' . '/lib/Models/CustomField.php',
         'MailPoet\\Models\\Form' => __DIR__ . '/../..' . '/lib/Models/Form.php',
         'MailPoet\\Models\\Log' => __DIR__ . '/../..' . '/lib/Models/Log.php',
@@ -484,6 +508,9 @@ class ComposerStaticInit5ecbe6178e2e1b24b12876efcfaf87bd
         'MailPoet\\Util\\Helpers' => __DIR__ . '/../..' . '/lib/Util/Helpers.php',
         'MailPoet\\Util\\License\\Features\\Subscribers' => __DIR__ . '/../..' . '/lib/Util/License/Features/Subscribers.php',
         'MailPoet\\Util\\License\\License' => __DIR__ . '/../..' . '/lib/Util/License/License.php',
+        'MailPoet\\Util\\Notices\\AfterMigrationNotice' => __DIR__ . '/../..' . '/lib/Util/Notices/AfterMigrationNotice.php',
+        'MailPoet\\Util\\Notices\\PHPVersionWarnings' => __DIR__ . '/../..' . '/lib/Util/Notices/PHPVersionWarnings.php',
+        'MailPoet\\Util\\Notices\\PermanentNotices' => __DIR__ . '/../..' . '/lib/Util/Notices/PermanentNotices.php',
         'MailPoet\\Util\\ProgressBar' => __DIR__ . '/../..' . '/lib/Util/ProgressBar.php',
         'MailPoet\\Util\\Security' => __DIR__ . '/../..' . '/lib/Util/Security.php',
         'MailPoet\\Util\\Url' => __DIR__ . '/../..' . '/lib/Util/Url.php',
@@ -1197,11 +1224,11 @@ class ComposerStaticInit5ecbe6178e2e1b24b12876efcfaf87bd
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit5ecbe6178e2e1b24b12876efcfaf87bd::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit5ecbe6178e2e1b24b12876efcfaf87bd::$prefixDirsPsr4;
-            $loader->fallbackDirsPsr4 = ComposerStaticInit5ecbe6178e2e1b24b12876efcfaf87bd::$fallbackDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit5ecbe6178e2e1b24b12876efcfaf87bd::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit5ecbe6178e2e1b24b12876efcfaf87bd::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit3ae7fb8a735f75fa470f55016270f278::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit3ae7fb8a735f75fa470f55016270f278::$prefixDirsPsr4;
+            $loader->fallbackDirsPsr4 = ComposerStaticInit3ae7fb8a735f75fa470f55016270f278::$fallbackDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit3ae7fb8a735f75fa470f55016270f278::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit3ae7fb8a735f75fa470f55016270f278::$classMap;
 
         }, null, ClassLoader::class);
     }

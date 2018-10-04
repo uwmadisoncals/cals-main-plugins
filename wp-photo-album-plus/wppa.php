@@ -2,7 +2,7 @@
 /*
  * Plugin Name: WP Photo Album Plus
  * Description: Easily manage and display your photo albums and slideshows within your WordPress site.
- * Version: 6.9.13.002
+ * Version: 6.9.15.004
  * Author: J.N. Breetvelt a.k.a. OpaJaap
  * Author URI: http://wppa.opajaap.nl/
  * Plugin URI: http://wordpress.org/extend/plugins/wp-photo-album-plus/
@@ -22,8 +22,8 @@ global $wpdb;
 global $wp_version;
 
 /* WPPA GLOBALS */
-global $wppa_revno; 		$wppa_revno = '6913';				// WPPA db version
-global $wppa_api_version; 	$wppa_api_version = '6-9-13-002';	// WPPA software version
+global $wppa_revno; 		$wppa_revno = '6915';				// WPPA db version
+global $wppa_api_version; 	$wppa_api_version = '6-9-15-004';	// WPPA software version
 
 /* start timers */
 global $wppa_starttime; $wppa_starttime = microtime( true );
@@ -69,13 +69,21 @@ else {
 
 /* DB Tables */
 define( 'WPPA_ALBUMS',   $wppa_prefix . 'wppa_albums' );
+$wpdb->wppa_albums = WPPA_ALBUMS;
 define( 'WPPA_PHOTOS',   $wppa_prefix . 'wppa_photos' );
+$wpdb->wppa_photos = WPPA_PHOTOS;
 define( 'WPPA_RATING',   $wppa_prefix . 'wppa_rating' );
+$wpdb->wppa_rating = WPPA_RATING;
 define( 'WPPA_COMMENTS', $wppa_prefix . 'wppa_comments' );
+$wpdb->wppa_comments = WPPA_COMMENTS;
 define( 'WPPA_IPTC',	 $wppa_prefix . 'wppa_iptc' );
+$wpdb->wppa_iptc = WPPA_IPTC;
 define( 'WPPA_EXIF', 	 $wppa_prefix . 'wppa_exif' );
+$wpdb->wppa_exif = WPPA_EXIF;
 define( 'WPPA_INDEX', 	 $wppa_prefix . 'wppa_index' );
+$wpdb->wppa_index = WPPA_INDEX;
 define( 'WPPA_SESSION',	 $wppa_prefix . 'wppa_session' );
+$wpdb->wppa_session = WPPA_SESSION;
 
 /* Paths and urls */ 									// Standard examples
 define( 'WPPA_FILE', basename( __FILE__ ) );			// wppa.php

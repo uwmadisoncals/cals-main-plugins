@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * enhances the admin bar with wppa+ menu
-* version 6.6.29
+* version 6.9.14
 *
 */
 
@@ -18,12 +18,12 @@ function wppa_admin_bar_menu() {
 	$menu_items = false;
 
 	// Pending comments
-	$com_pend = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_COMMENTS."` WHERE `status` = 'pending'" );
+	$com_pend = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_comments WHERE `status` = 'pending'" );
 	if ( $com_pend ) $com_pending = '&nbsp;<span id="ab-awaiting-mod" class="pending-count">'.$com_pend.'</span>';
 	else $com_pending = '';
 
 	// Pending uploads
-	$upl_pend = $wpdb->get_var( "SELECT COUNT(*) FROM `".WPPA_PHOTOS."` WHERE `status` = 'pending'" );
+	$upl_pend = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `status` = 'pending'" );
 	if ( $upl_pend ) $upl_pending = '&nbsp;<span id="ab-awaiting-mod" class="pending-count">'.$upl_pend.'</span>';
 	else $upl_pending = '';
 

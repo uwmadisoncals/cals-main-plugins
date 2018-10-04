@@ -216,6 +216,19 @@ Please upgrade your version of WP Google Maps to version 6.0.27 as it includes m
 
 == Changelog ==
 
+= 7.10.36 :- 2018-09-25 :- Medium Priority =
+* Fixed change in 7.10.35 causing problems with OLMarker click event, preventing infowindow opening
+* Dropped .gitignore which was causing deployment issues, now using .gitattributes to ignore minified files
+
+= 7.10.35 :- 2018-09-20 :- Medium priority =
+* Added links to new API troubleshooting documentation to Google Maps API Error dialog
+* Fixed marker dispatching click event after drag when using OpenLayers
+* Fixed map dispatching click event after drag when using OpenLayers
+* Fixed map editor right click marker appearing multiple times
+* Fixed map editor right click marker disappearing after map drag
+* Fixed modern store locator circle crashing some iOS devices by disabling this feature on iOS devices
+* Fixed gesture handling setting not respected when theme data is set in
+
 = 7.10.34 :- 2018-09-17 :- Low priority =
 * Added descriptive error messages when Google API is required but not loaded
 * Added "I agree" translation to German files

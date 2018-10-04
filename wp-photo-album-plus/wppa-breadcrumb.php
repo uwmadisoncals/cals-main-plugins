@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for breadcrumbs
-* Version 6.9.06
+* Version 6.9.14
 *
 */
 
@@ -192,7 +192,7 @@ global $wppa_session;
 							$value .= ' ' . __('of owner:', 'wp-photo-album-plus') . ' <b>' . $ss_data['3'] . '</b>';
 							break;
 						case 'i':
-							$label = $wpdb->get_var( $wpdb->prepare( "SELECT `description` FROM `" . WPPA_IPTC . "` WHERE `tag` = %s AND `photo` = '0'", str_replace( 'H', '#', $ss_data['2'] ) ) );
+							$label = $wpdb->get_var( $wpdb->prepare( "SELECT `description` FROM $wpdb->wppa_iptc WHERE `tag` = %s AND `photo` = '0'", str_replace( 'H', '#', $ss_data['2'] ) ) );
 							$label = trim( $label, ':' );
 							$value .= ' ' . __('with iptc tag:', 'wp-photo-album-plus') . ' <b>' . __($label, 'wp-photo-album-plus') . '</b> ' . __('with content:', 'wp-photo-album-plus') .' <b>' . $ss_data['3'] . '</b>';
 							break;
@@ -690,7 +690,7 @@ global $wpdb;
 	}
 
 	$pagid = $wpdb->get_var( $wpdb->prepare(
-		"SELECT `cover_linkpage` FROM `".WPPA_ALBUMS."` WHERE `id` = %s", $parent
+		"SELECT `cover_linkpage` FROM $wpdb->wppa_albums WHERE `id` = %s", $parent
 		) );
 
 	$value 	= wppa_get_album_name( $parent );

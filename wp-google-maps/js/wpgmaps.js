@@ -381,7 +381,13 @@ var wpgmza_last_default_circle = null;
 
 function wpgmza_show_store_locator_radius(map_id, center, radius, distance_type)
 {
-	switch(wpgmaps_localize[map_id].other_settings.wpgmza_store_locator_radius_style)
+	var style = wpgmaps_localize[map_id].other_settings.wpgmza_store_locator_radius_style;
+	
+	// Force legacy style on iOS, it appears CanvasLayer crashes some iOS devices
+	if(WPGMZA.isDeviceiOS())
+		style = "legacy";
+	
+	switch(style)
 	{
 		case "modern":
 			if(MYMAP.modernStoreLocatorCircle)
