@@ -3,7 +3,7 @@
 /* Package: wp-photo-album-plus
 /*
 /* Various style computation routines
-/* Version 6.8.09
+/* Version 6.9.16
 /*
 */
 
@@ -262,7 +262,7 @@ global $wppa_dynamic_css_data;
 	$content .= wppa_opt( 'custom_style' );
 
 	// Open file
-	$file = @ fopen ( WPPA_PATH . '/wppa-dynamic.css', 'wb' );
+	$file = wppa_fopen ( WPPA_PATH . '/wppa-dynamic.css', 'wb' );
 	if ( $file ) {
 		// Minify
 		$old_len = strlen( $content );

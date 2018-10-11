@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains low-level utility routines
-* Version 6.9.15
+* Version 6.9.19
 *
 */
 
@@ -1713,12 +1713,12 @@ global $wppa_log_file;
 		if ( $filesize > 1024000 ) {
 
 			// File > 1000kB, shorten it
-			$file = fopen( $wppa_log_file, 'rb' );
+			$file = wppa_fopen( $wppa_log_file, 'rb' );
 			if ( $file ) {
 				$buffer = @ fread( $file, $filesize );
 				$buffer = substr( $buffer, $filesize - 900*1024 );	// Take ending 900 kB
 				fclose( $file );
-				$file = fopen( $wppa_log_file, 'wb' );
+				$file = wppa_fopen( $wppa_log_file, 'wb' );
 				@ fwrite( $file, $buffer );
 				@ fclose( $file );
 			}
@@ -1726,7 +1726,7 @@ global $wppa_log_file;
 	}
 
 	// Open for append
-	if ( ! $file = fopen( $wppa_log_file, 'ab' ) ) return;	// Unable to open log file
+	if ( ! $file = wppa_fopen( $wppa_log_file, 'ab' ) ) return;	// Unable to open log file
 
 	// Write log message
 	$msg = strip_tags( $msg );
@@ -1739,7 +1739,7 @@ global $wppa_log_file;
 	}
 	if ( $trace ) {
 		ob_start();
-		debug_print_backtrace( 0, 12 );//DEBUG_BACKTRACE_IGNORE_ARGS, 12 );
+		debug_print_backtrace( 0, 5 );//DEBUG_BACKTRACE_IGNORE_ARGS, 12 );
 		$trace = ob_get_contents();
 		ob_end_clean();
 		@ fwrite( $file, $trace."\n" );
@@ -2116,7 +2116,12 @@ global $blog_id;
 function wppa_set_default_name( $id, $filename_raw = '' ) {
 global $wpdb;
 
-	if ( ! wppa_is_int( $id ) ) return;
+	if ( ! $id || ! wppa_is_int( $id ) ) {
+		wppa_log( 'Err', 'Missing id in wppa_set_default_name()', true );
+		return;
+	}
+
+	wppa_cache_thumb( 'invalidate', $id );
 	$thumb = wppa_cache_thumb( $id );
 
 	$method 	= wppa_opt( 'newphoto_name_method' );
@@ -2125,6 +2130,9 @@ global $wpdb;
 
 	if ( ! $filename_raw ) {
 		$filename_raw = wppa( 'unsanitized_filename' );
+	}
+	if ( ! $filename_raw ) {
+		$filename_raw = $filename;
 	}
 
 	switch ( $method ) {
@@ -2142,24 +2150,39 @@ global $wpdb;
 			}
 			$name = preg_replace('/\.[^.]*$/', '', $name);
 			break;
+		case 'noextspace':
+			if ( $filename_raw ) {
+				$name = wppa_sanitize_photo_name( $filename_raw );
+			}
+			$name = preg_replace('/\.[^.]*$/', '', $name);
+			$name = str_replace( '-', ' ', $name );
+			break;
 		case '2#005':
 			$tag = '2#005';
-			$name = $wpdb->get_var( $wpdb->prepare( "SELECT `description` FROM `".WPPA_IPTC."` WHERE `photo` = %s AND `tag` = %s", $id, $tag ) );
+			$name = $wpdb->get_var( $wpdb->prepare( "SELECT description FROM {$wpdb->prefix}wppa_iptc
+													 WHERE photo = %d
+													 AND tag = %s", $id, $tag ) );
 			break;
 		case '2#120':
 			$tag = '2#120';
-			$name = $wpdb->get_var( $wpdb->prepare( "SELECT `description` FROM `".WPPA_IPTC."` WHERE `photo` = %s AND `tag` = %s", $id, $tag ) );
+			$name = $wpdb->get_var( $wpdb->prepare( "SELECT description FROM {$wpdb->prefix}wppa_iptc
+													 WHERE photo = %d
+													 AND tag = %s", $id, $tag ) );
 			break;
 		case 'Photo w#id':
 			$name = __( 'Photo w#id', 'wp-photo-album-plus' );
 			break;
 	}
-	if ( ( $name && $name != $filename ) || $method == 'none' ) {	// Update name
-		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wppa_photos SET `name` = %s WHERE `id` = %s", $name, $id ) );
+	if ( ( $name ) || $method == 'none' ) {	// Update name
+		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wppa_photos
+									   SET name = %s
+									   WHERE id = %d", $name, $id ) );
+
 		wppa_cache_thumb( 'invalidate', $id );	// Invalidate cache
 	}
 	if ( ! wppa_switch( 'save_iptc') ) { 	// He doesn't want to keep the iptc data, so...
-		$wpdb->query($wpdb->prepare( "DELETE FROM {$wpdb->prefix}wppa_iptc WHERE `photo` = %s", $id ) );
+		$wpdb->query($wpdb->prepare( "DELETE FROM {$wpdb->prefix}wppa_iptc
+									  WHERE photo = %d", $id ) );
 	}
 
 	// In case owner must be set to name.
@@ -2189,10 +2212,9 @@ global $wpdb;
 	if ( wppa_opt( 'medal_bronze_when' ) || wppa_opt( 'medal_silver_when' ) || wppa_opt( 'medal_gold_when' ) ) {
 		$max_score = wppa_opt( 'rating_max' );
 
-		$max_ratings = $wpdb->get_var( $wpdb->prepare( 	"SELECT COUNT(*) FROM `".WPPA_RATING."` " .
-														"WHERE `photo` = %s AND `value` = %s AND `status` = %s", $id, $max_score, 'publish'
-													)
-									);
+		$max_ratings = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}wppa_rating
+														WHERE photo = %d AND value = %s
+														AND status = %s", $id, $max_score, 'publish' ) );
 
 		if ( $max_ratings >= wppa_opt( 'medal_gold_when' ) ) $status = 'gold';
 		elseif ( $max_ratings >= wppa_opt( 'medal_silver_when' ) ) $status = 'silver';
@@ -2371,6 +2393,7 @@ static $childcounts;
 // Get an enumeration of all the (grand)children of some album spec.
 // Album spec may be a number or an enumeration
 function wppa_alb_to_enum_children( $xalb ) {
+
 	if ( strpos( $xalb, '.' ) !== false ) {
 		$albums = explode( '.', $xalb );
 	}
@@ -2383,7 +2406,7 @@ function wppa_alb_to_enum_children( $xalb ) {
 		$result = trim( $result, '.' ).'.';
 	}
 	$result = trim( $result, '.' );
-//	$result = wppa_compress_enum( $result );
+
 	return $result;
 }
 
@@ -2398,7 +2421,8 @@ static $child_cache;
 
 	// Get the data
 	$result = $alb;
-	$children = $wpdb->get_results( $wpdb->prepare( "SELECT `id` FROM $wpdb->wppa_albums WHERE `a_parent` = %s " . wppa_get_album_order( $alb ), $alb ), ARRAY_A );
+	$children = $wpdb->get_results( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}wppa_albums
+													 WHERE a_parent = %s", $alb ), ARRAY_A );
 	if ( $children ) foreach ( $children as $child ) {
 		$result .= '.' . _wppa_alb_to_enum_children( $child['id'] );
 		$result = trim( $result, '.' );
@@ -2470,10 +2494,14 @@ global $wpdb;
 	if ( wppa_opt( 'rating_display_type' ) == 'likes' ) {
 
 		// Get rating(like)count
-		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_rating WHERE `photo` = %d", $id ) );
+		$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*)
+												  FROM {$wpdb->prefix}wppa_rating
+												  WHERE photo = %d", $id ) );
 
 		// Update photo
-		$wpdb->query( "UPDATE $wpdb->wppa_photos SET `rating_count` = '$count', `mean_rating` = '0' WHERE `id` = $id" );
+		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wppa_photos
+									   SET rating_count = %d, mean_rating = 0
+									   WHERE id = %d". $count, $id ) );
 
 		// Invalidate cache
 		wppa_cache_photo( 'invalidate', $id );
@@ -2481,24 +2509,38 @@ global $wpdb;
 	else {
 
 		// Get all ratings for this photo
-		$ratings = $wpdb->get_results( $wpdb->prepare( "SELECT `value` FROM `".WPPA_RATING."` WHERE `photo` = %s AND `status` = %s", $id, 'publish' ), ARRAY_A );
+		$ratings = $wpdb->get_results( $wpdb->prepare( "SELECT value
+														FROM {$wpdb->prefix}wppa_rating
+														WHERE photo = %d
+														AND status = %s", $id, 'publish' ), ARRAY_A );
 
 		// Init
 		$the_value = '0';
 		$the_count = '0';
 
 		// Compute mean value and count
-		if ( $ratings ) foreach ( $ratings as $rating ) {
-			if ( $rating['value'] == '-1' ) $the_value += wppa_opt( 'dislike_value' );
-			else $the_value += $rating['value'];
-			$the_count++;
+		if ( $ratings ) {
+
+			foreach ( $ratings as $rating ) {
+
+				if ( $rating['value'] == '-1' ) {
+					$the_value += wppa_opt( 'dislike_value' );
+				}
+				else {
+					$the_value += $rating['value'];
+				}
+
+				$the_count++;
+			}
 		}
 		if ( $the_count ) $the_value /= $the_count;
 		if ( wppa_opt( 'rating_max' ) == '1' ) $the_value = '0';
 		if ( $the_value == '10' ) $the_value = '9.9999999';	// mean_rating is a text field. for sort order reasons we make 10 into 9.99999
 
 		// Update photo
-		$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->wppa_photos SET `mean_rating` = %s, `rating_count` = %s WHERE `id` = $id", $the_value, $the_count ) );
+		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}wppa_photos
+									   SET mean_rating = %s, rating_count = %d
+									   WHERE id = %d", $the_value, $the_count, $id ) );
 
 		// Invalidate cache
 		wppa_cache_photo( 'invalidate', $id );
@@ -3670,7 +3712,7 @@ function wppa_chmod( $fso ) {
 
 		// Verify existance of index.php
 		if ( ! is_file( $fso . '/index.php' ) ) {
-			@ copy( WPPA_PATH . '/index.php', $fso . '/index.php' );
+			@ wppa_copy( WPPA_PATH . '/index.php', $fso . '/index.php' );
 			if ( is_file( $fso . '/index.php' ) ) {
 				wppa_log( 'fso', 'Added: ' . $fso . '/index.php' );
 			}
@@ -3750,22 +3792,6 @@ global $wppa_supported_photo_extensions;
 	}
 
 	// Done
-	return $result;
-}
-
-// Convert array into readable text
-function wppa_serialize( $array ) {
-
-	if ( ! is_array( $array ) ) {
-		return 'Arg is not an array (wppa_serialize)';
-	}
-	$result = '';
-	foreach( $array as $item ) {
-		$result .= $item . ' | ';
-	}
-	$result = trim( $result, ' |' );
-	$result = html_entity_decode( $result, ENT_QUOTES );
-
 	return $result;
 }
 
@@ -3886,9 +3912,10 @@ function wppa_memry_limit() {
 // Create qr code cache and return its url
 function wppa_create_qrcode_cache( $qrsrc ) {
 
+/* hbi */
 	// Make sure the data portion is url encoded
-	$temp = explode( 'data=', $qrsrc );
-	$qrsrc = $temp[0] . 'data=' . urlencode( urldecode( $temp[1] ) );
+//	$temp = explode( 'data=', $qrsrc );
+//	$qrsrc = $temp[0] . 'data=' . urlencode( urldecode( $temp[1] ) );
 
 	// Anything to do here?
 	if ( ! wppa_switch( 'qr_cache' ) ) {
@@ -3915,13 +3942,13 @@ function wppa_create_qrcode_cache( $qrsrc ) {
 	// Catch the qr image
 	$curl = curl_init();
 	curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
-	curl_setopt( $curl, CURLOPT_URL, $qrsrc );
+	curl_setopt( $curl, CURLOPT_URL, urlencode( $qrsrc ) );	// urlencode here is a security fix, does it still work?, see above /* hbi */
 	$contents = curl_exec( $curl );
 	curl_close( $curl );
 
 	// Save the image
 	if ( strlen( $contents ) > 1000 ) {
-		$file = fopen( WPPA_UPLOAD_PATH . '/qr/' . $key . '.svg', 'w' );
+		$file = wppa_fopen( WPPA_UPLOAD_PATH . '/qr/' . $key . '.svg', 'w' );
 		if ( $file ) {
 			fwrite( $file, $contents, strlen( $contents ) );
 			fclose( $file );
@@ -4675,18 +4702,18 @@ function wppa_pdf_preprocess( &$file, $alb, $i = false ) {
 	$src .=  '/';
 
 	if ( $single ) {
-		copy( $file['tmp_name'], $src . sanitize_file_name( $file['name'] ) );
+		wppa_copy( $file['tmp_name'], $src . sanitize_file_name( basename( $file['name'] ) ) );
 	}
 	else {
-		copy( $file['tmp_name'][$i], $src . sanitize_file_name( $file['name'][$i] ) );
+		wppa_copy( $file['tmp_name'][$i], $src . sanitize_file_name( basename( $file['name'][$i] ) ) );
 	}
 
 	// Make it a jpg in the source dir,
 	if ( $single ) {
-		$pdf = sanitize_file_name( $file['name'] );
+		$pdf = sanitize_file_name( basename( $file['name'] ) );
 	}
 	else {
-		$pdf = sanitize_file_name( $file['name'][$i] );
+		$pdf = sanitize_file_name( basename( $file['name'][$i] ) );
 	}
 	$jpg = wppa_strip_ext( $pdf ) . '.jpg';
 
@@ -4703,11 +4730,11 @@ function wppa_pdf_preprocess( &$file, $alb, $i = false ) {
 	// Copy the jpg image back to $file['name'] and $file['tmp_name']
 	if ( $single ) {
 		$file['name'] = $jpg;
-		copy( $src . $jpg, $file['tmp_name'] );
+		wppa_copy( $src . $jpg, $file['tmp_name'] );
 	}
 	else {
 		$file['name'][$i] = $jpg;
-		copy( $src . $jpg, $file['tmp_name'][$i] );
+		wppa_copy( $src . $jpg, $file['tmp_name'][$i] );
 	}
 
 	// and continue as if it was a jpg, but remember its a .pdf
@@ -4828,7 +4855,7 @@ function wppa_dump( $txt = '' ) {
 	else {
 		$mode = 'wb';
 	}
-	$handle = fopen( $file, $mode );
+	$handle = wppa_fopen( $file, $mode );
 
 	// Write
 	if ( $handle ) {
@@ -4889,7 +4916,7 @@ function wppa_is_panorama( $id ) {
 function wppa_remote_file_exists( $url ) {
     $ch = curl_init( $url );
     curl_setopt( $ch, CURLOPT_NOBODY, true );
-	curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false );
+	curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, true );
     curl_exec( $ch );
     $httpCode = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
     curl_close( $ch );
@@ -4944,117 +4971,3 @@ function wppa_rename_files_sanitized( $root ) {
 	}
 }
 
-// PHP unserialize() is unsafe because it can produce dangerous objects
-// This function unserializes arrays only
-// In case of error or dangerous data, returns an empty array
-function wppa_unserialize( $xstring ) {
-
-	$string = $xstring;
-
-	$result = array();
-
-	// Assume its an array, else return the input string
-	$type 	= substr( $string, 0, 2 );
-	$string	= substr( $string, 2 );
-
-	$cpos 	= strpos( $string, ':' );
-	$count 	= substr( $string, 0, $cpos );
-	$string = substr( $string, $cpos + 1 );
-	$string	= trim( $string, '{}' );
-
-	if ( $type != 'a:' ) {
-//		echo 'Exit 1';
-		wppa_log( 'Err', 'Not serialized arraydata encountered in wppa_unserialize()' );
-		return array();
-	}
-
-	// Process data items
-	while ( strlen( $string ) ) {
-
-		// Decode the key
-		$keytype = substr( $string, 0, 2 );
-		$string  = substr( $string, 2 );
-		switch ( $keytype ) {
-
-			// Integer key
-			case 'i:':
-				$cpos 	 = strpos( $string, ';' );
-				$key 	= intval( substr( $string, 0, $cpos ) );
-				$string = substr( $string, $cpos + 1 );
-//echo 'Keytype=' . $keytype . ', keyvalue=' . $key . ', string=' . $string . '<br />';
-				break;
-
-			// String key
-			case 's:':
-				$cpos 	= strpos( $string, ':' );
-				$keylen	= intval( substr( $string, 0, $cpos ) );
-				$string = substr( $string, $cpos + 1 );
-				$cpos 	= strpos( $string, ';' );
-				$key 	= substr( $string, 1, $keylen );
-				$string = substr( $string, $cpos + 1 );
-//echo 'Keytype='. $keytype . ', keylen=' . $keylen . ', keyvalue=' . $key . ', string='. $string.'<br />';;
-
-				break;
-
-			// Unimplemented key type
-			default:
-//				echo 'Exit 2' . $type;
-				wppa_log( 'Err', 'Unimplemented keytype ' . $keytype . ' encountered in wppa_unserialize()' );
-				return array();
-		}
-
-		// Decode the data
-		$datatype = substr( $string, 0, 2 );
-		$string   = substr( $string, 2 );
-
-		switch ( $datatype ) {
-
-			// Integer data
-			case 'i:':
-				$cpos 	= strpos( $string, ';' );
-				$data 	= intval( substr( $string, 0, $cpos ) );
-				$string = substr( $string, $cpos + 1 );
-//echo 'Datatype='. $datatype . ', datavalue=' . $data . ', string='. $string.'<br />';;
-				break;
-
-			// String data
-			case 's:':
-				$cpos 	 = strpos( $string, ':' );
-				$datalen = intval( substr( $string, 0, $cpos ) );
-				$string  = substr( $string, $cpos + 1 );
-				$data 	 = substr( $string, 1, $datalen );
-				$string  = substr( $string, $datalen + 3 );
-//echo 'Datatype='. $datatype . ', datalen=' . $datalen . ', datavalue=' . $data . ', string='. $string.'<br />';;
-				break;
-
-			// Boolean
-			case 'b:':
-				$data 	 = substr( $string, 0, 1 ) == '1';
-				$string  = substr( $string, 2 );
-				break;
-
-			// NULL
-			case 'N;':
-				$data 	 = NULL;
-				break;
-
-			// Array data
-			case 'a:':
-				$cbpos  = strpos( $string, '}' );
-				$data 	= wppa_unserialize( 'a:' . substr( $string, 0, $cbpos + 1 ) );
-				$string = substr( $string, $cbpos + 1 );
-				break;
-
-			// Unimplemented data type
-			default:
-//				echo 'Exit 3 '.$datatype;
-				wppa_log( 'Err', 'Unimplemented data type ' . $datatype . ' encountered in wppa_unserialize()' );
-				return array();
-		}
-
-		// Add to result array
-		$result[$key] = $data;
-	}
-
-	return $result;
-}

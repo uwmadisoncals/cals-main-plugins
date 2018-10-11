@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all video routines
-* Version 6.6.20
+* Version 6.9.16
 *
 */
 
@@ -214,7 +214,7 @@ global $wppa_supported_video_extensions;
 	foreach ( $wppa_supported_video_extensions as $ext ) {
 		$file = $raw_from_path . '.' . $ext;
 		if ( is_file( $file ) ) {
-			if ( ! copy( $file, $raw_to_path . '.' . $ext ) ) return false;
+			if ( ! wppa_copy( $file, $raw_to_path . '.' . $ext ) ) return false;
 		}
 	}
 

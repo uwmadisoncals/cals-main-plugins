@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * exif and iptc common functions
-* version 6.9.15
+* version 6.9.16
 *
 *
 */
@@ -2905,10 +2905,15 @@ function wppa_simplify_rational( $data, $divide = false, $dec = 0 ) {
 	$y = $t[1];
 
 	// Divide result?
-		if ( $divide ) {
-		$result = $x / $y;
-		if ( $dec ) {
-			$result = sprintf( '%4.' . $dec . 'f', $result );
+	if ( $divide ) {
+		if ( $y ) {
+			$result = $x / $y;
+			if ( $dec ) {
+				$result = sprintf( '%4.' . $dec . 'f', $result );
+			}
+		}
+		else {
+			$result = $data;
 		}
 		return $result;
 	}

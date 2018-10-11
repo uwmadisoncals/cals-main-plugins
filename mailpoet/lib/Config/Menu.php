@@ -419,6 +419,8 @@ class Menu {
       'pages' => Pages::getAll(),
       'flags' => $flags,
       'current_user' => wp_get_current_user(),
+      'linux_cron_path' => dirname(dirname(__DIR__)),
+      'ABSPATH' => ABSPATH,
       'hosts' => array(
         'web' => Hosts::getWebHosts(),
         'smtp' => Hosts::getSMTPHosts()
@@ -636,10 +638,12 @@ class Menu {
   }
 
   function newletterEditor() {
+    $subscriber = Subscriber::getCurrentWPUser();
+    $subscriber_data = $subscriber ? $subscriber->asArray() : [];
     $data = array(
       'shortcodes' => ShortcodesHelper::getShortcodes(),
       'settings' => Setting::getAll(),
-      'current_wp_user' => array_merge(Subscriber::getCurrentWPUser()->asArray(), wp_get_current_user()->to_array()),
+      'current_wp_user' => array_merge($subscriber_data, wp_get_current_user()->to_array()),
       'sub_menu' => self::MAIN_PAGE_SLUG,
       'mss_active' => Bridge::isMPSendingServiceEnabled()
     );

@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various funcions
-* Version 6.9.14
+* Version 6.9.16
 *
 */
 
@@ -24,7 +24,7 @@ function wppa_create_wppa_htaccess_( $filename ) {
 
 		// Grant access
 		case 'grant':
-			$file = fopen( $filename, 'wb' );
+			$file = wppa_fopen( $filename, 'wb' );
 			if ( $file ) {
 				fwrite( $file, '<IfModule mod_rewrite.c>' );
 				fwrite( $file, "\n" . 'RewriteEngine Off' );
@@ -53,7 +53,7 @@ function wppa_create_wppa_htaccess_( $filename ) {
 			if ( $i ) {
 				$domain = substr( $domain, 0, $i );
 			}
-			$file = fopen( $filename, 'wb' );
+			$file = wppa_fopen( $filename, 'wb' );
 			if ( $file ) {
 /*
 <IfModule mod_rewrite.c>
@@ -141,14 +141,14 @@ global $wpdb;
 	}
 
 	// Create pl root directory
-	$pl_root = WPPA_CONTENT_PATH . '/' . $pl_dirname;
+	$pl_root = WPPA_CONTENT_PATH . '/' . sanitize_file_name( basename( $pl_dirname ) );
 	if ( ! wppa_mktree( $pl_root ) ) {
 		wppa_log( 'Error', 'Can not create '.$pl_root );
 		return false;
 	}
 
 	// Create .htaccess file
-	$file = fopen( $pl_root . '/.htaccess', 'wb' );
+	$file = wppa_fopen( $pl_root . '/.htaccess', 'wb' );
 	if ( ! $file ) {
 		wppa_log( 'Error', 'Can not create '.$pl_root . '/.htaccess' );
 		return false;

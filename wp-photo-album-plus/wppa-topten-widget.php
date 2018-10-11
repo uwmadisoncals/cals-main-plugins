@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * display the top rated photos
-* Version 6.9.14
+* Version 6.9.17
 */
 
 class TopTenWidget extends WP_Widget {
@@ -51,6 +51,7 @@ class TopTenWidget extends WP_Widget {
 		$albumlinkpage 	= wppa_get_the_landing_page('topten_widget_album_linkpage', __('Top Ten Photo album', 'wp-photo-album-plus'));
 		$max  			= wppa_opt( 'topten_count' );
 		$album 			= $instance['album'];
+		/*
 		switch ( $instance['sortby'] ) {
 			case 'mean_rating':
 				$sortby = '`mean_rating` DESC, `rating_count` DESC, `views` DESC';
@@ -62,6 +63,7 @@ class TopTenWidget extends WP_Widget {
 				$sortby = '`views` DESC, `mean_rating` DESC, `rating_count` DESC';
 				break;
 		}
+		*/
 		$display 		= $instance['display'];
 		$meanrat		= wppa_checked( $instance['meanrat'] ) ? 'yes' : false;
 		$ratcount 		= wppa_checked( $instance['ratcount'] ) ? 'yes' : false;
@@ -91,7 +93,10 @@ class TopTenWidget extends WP_Widget {
 
 			// Albums of owner is current logged in user or public?
 			if ( $album == '-3' ) {
-				$temp = $wpdb->get_results( "SELECT `id` FROM $wpdb->wppa_albums WHERE `owner` = '--- public ---' OR `owner` = '" . wppa_get_user() . "' ORDER BY `id`", ARRAY_A );
+				$temp = $wpdb->get_results( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}wppa_albums
+															 WHERE owner = '--- public ---'
+															 OR owner = %s
+															 ORDER BY id", wppa_get_user() ), ARRAY_A );
 				$album = '';
 				if ( $temp ) {
 					foreach( $temp as $t ) {
@@ -112,62 +117,62 @@ class TopTenWidget extends WP_Widget {
 			if ( $medalsonly ) {
 				switch ( $instance['sortby'] ) {
 
-					case 'mean_rating':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` IN (" . $album . ") " .
-							"AND `status` IN ( 'gold', 'silver', 'bronze' ) " .
-							"ORDER BY `mean_rating` DESC, `rating_count` DESC, `views` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
-						break;
-
 					case 'rating_count':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` IN (" . $album . ") " .
-							"AND `status` IN ( 'gold', 'silver', 'bronze' ) " .
-							"ORDER BY `rating_count` DESC, `mean_rating` DESC, `views` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album IN ( aaaa )
+								  AND status IN ( 'gold', 'silver', 'bronze' )
+								  ORDER BY rating_count DESC, mean_rating DESC, views DESC DESC
+								  LIMIT %d";
 						break;
 
 					case 'views':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` IN (" . $album . ") " .
-							"AND `status` IN ( 'gold', 'silver', 'bronze' ) " .
-							"ORDER BY `views` DESC, `mean_rating` DESC, `rating_count` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album IN ( aaaa )
+								  AND status IN ( 'gold', 'silver', 'bronze' )
+								  ORDER BY views DESC, mean_rating DESC, rating_count DESC
+								  LIMIT %d";
 						break;
+
+			//		case 'mean_rating':
+					default:
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album IN ( aaaa )
+								  AND status IN ( 'gold', 'silver', 'bronze' )
+								  ORDER BY mean_rating DESC, rating_count DESC, views DESC
+								  LIMIT %d";
+						break;
+
 				}
+				$thumbs = $wpdb->get_results( $wpdb->prepare( str_replace( 'aaaa', $album, $query ), $max ), ARRAY_A );
 			}
 
 			else {
 				switch ( $instance['sortby'] ) {
 
-					case 'mean_rating':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` IN (" . $album . ") " .
-							"ORDER BY `mean_rating` DESC, `rating_count` DESC, `views` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
-						break;
-
 					case 'rating_count':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` IN (" . $album . ") " .
-							"ORDER BY `rating_count` DESC, `mean_rating` DESC, `views` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album IN ( aaaa )
+								  ORDER BY rating_count DESC, mean_rating DESC, views DESC DESC
+								  LIMIT %d";
 						break;
 
 					case 'views':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` IN (" . $album . ") " .
-							"ORDER BY `views` DESC, `mean_rating` DESC, `rating_count` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album IN ( aaaa )
+								  ORDER BY views DESC, mean_rating DESC, rating_count DESC
+								  LIMIT %d";
 						break;
+
+			//		case 'mean_rating':
+					default:
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album IN ( aaaa )
+								  ORDER BY mean_rating DESC, rating_count DESC, views DESC
+								  LIMIT %d";
+						break;
+
 				}
+				$thumbs = $wpdb->get_results( $wpdb->prepare( str_replace( 'aaaa', $album, $query ), $max ), ARRAY_A );
 			}
 		}
 
@@ -176,62 +181,62 @@ class TopTenWidget extends WP_Widget {
 			if ( $medalsonly ) {
 				switch ( $instance['sortby'] ) {
 
-					case 'mean_rating':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` > 0 " .
-							"AND `status` IN ( 'gold', 'silver', 'bronze' ) " .
-							"ORDER BY `mean_rating` DESC, `rating_count` DESC, `views` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
-						break;
-
 					case 'rating_count':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` > 0 " .
-							"AND `status` IN ( 'gold', 'silver', 'bronze' ) " .
-							"ORDER BY `rating_count` DESC, `mean_rating` DESC, `views` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album > 0
+								  AND status IN ( 'gold', 'silver', 'bronze' )
+								  ORDER BY rating_count DESC, mean_rating DESC, views DESC DESC
+								  LIMIT %d";
 						break;
 
 					case 'views':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` > 0 " .
-							"AND `status` IN ( 'gold', 'silver', 'bronze' ) " .
-							"ORDER BY `views` DESC, `mean_rating` DESC, `rating_count` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album > 0
+								  AND status IN ( 'gold', 'silver', 'bronze' )
+								  ORDER BY views DESC, mean_rating DESC, rating_count DESC
+								  LIMIT %d";
 						break;
+
+			//		case 'mean_rating':
+					default:
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album > 0
+								  AND status IN ( 'gold', 'silver', 'bronze' )
+								  ORDER BY mean_rating DESC, rating_count DESC, views DESC
+								  LIMIT %d";
+						break;
+
 				}
+				$thumbs = $wpdb->get_results( $wpdb->prepare( $query, $max ), ARRAY_A );
 			}
 
 			else {
 				switch ( $instance['sortby'] ) {
 
-					case 'mean_rating':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` > 0 " .
-							"ORDER BY `mean_rating` DESC, `rating_count` DESC, `views` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
-						break;
-
 					case 'rating_count':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` > 0 " .
-							"ORDER BY `rating_count` DESC, `mean_rating` DESC, `views` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album > 0
+								  ORDER BY rating_count DESC, mean_rating DESC, views DESC DESC
+								  LIMIT %d";
 						break;
 
 					case 'views':
-						$thumbs = $wpdb->get_results( $wpdb->prepare(
-							"SELECT * FROM $wpdb->wppa_photos " .
-							"WHERE `album` > 0 " .
-							"ORDER BY `views` DESC, `mean_rating` DESC, `rating_count` DESC " .
-							"LIMIT %d", $max ), ARRAY_A );
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album > 0
+								  ORDER BY views DESC, mean_rating DESC, rating_count DESC
+								  LIMIT %d";
 						break;
+
+			//		case 'mean_rating':
+					default:
+						$query = "SELECT * FROM {$wpdb->prefix}wppa_photos
+								  WHERE album > 0
+								  ORDER BY mean_rating DESC, rating_count DESC, views DESC
+								  LIMIT %d";
+						break;
+
 				}
+				$thumbs = $wpdb->get_results( $wpdb->prepare( $query, $max ), ARRAY_A );
 			}
 		}
 

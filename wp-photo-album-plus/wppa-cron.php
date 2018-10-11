@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all cron functions
-* Version 6.9.14
+* Version 6.9.16
 *
 *
 */
@@ -332,7 +332,7 @@ function _wppa_do_clear_cache( $dir ) {
 			_wppa_do_clear_cache( $fso );
 		}
 		else {
-			$file = fopen( $fso, 'rb' );
+			$file = wppa_fopen( $fso, 'rb' );
 			if ( $file ) {
 				$size = filesize( $fso );
 				if ( $size ) {

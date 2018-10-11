@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * gp admin functions
-* Version 6.9.14
+* Version 6.9.16
 *
 */
 
@@ -17,7 +17,7 @@ global $wppa_bu_err;
 	$fname = WPPA_DEPOT_PATH.'/settings.bak';
 	if ( wppa( 'debug' ) ) wppa_dbg_msg( 'Backing up to: '.$fname );
 
-	$file = fopen( $fname, 'wb' );
+	$file = wppa_fopen( $fname, 'wb' );
 	// Backup
 	if ( $file ) {
 		array_walk( $wppa_opt, 'wppa_save_an_option', $file );
@@ -90,7 +90,7 @@ function wppa_restore_settings( $fname, $type = '' ) {
 	}
 
 	// Open file
-	$file = fopen( $fname, 'r' );
+	$file = wppa_fopen( $fname, 'r' );
 	// Restore
 	if ( $file ) {
 		$buffer = fgets( $file, 4096 );
@@ -266,8 +266,8 @@ global $wpdb;
 	$status 	= $photo['status'];
 	$filename 	= $photo['filename'];
 	$location	= $photo['location'];
-	$oldimage 	= wppa_get_photo_path( $photo['id'] );
-	$oldthumb 	= wppa_get_thumb_path( $photo['id'] );
+	$oldimage 	= wppa_get_photo_path( strval( intval( $photo['id'] ) ) );
+	$oldthumb 	= wppa_get_thumb_path( strval( intval( $photo['id'] ) ) );
 	$tags 		= $photo['tags'];
 	$exifdtm 	= $photo['exifdtm'];
 
@@ -300,6 +300,7 @@ global $wpdb;
 
 	$err = '4';
 	// Find copied photo details
+	$id = strval( intval( $id ) );
 	if ( ! $id ) return $err;
 	$image_id = $id;
 	$newimage = wppa_strip_ext( wppa_get_photo_path( $image_id, false ) ) . '.' . wppa_get_ext( $oldimage );
@@ -317,13 +318,13 @@ global $wpdb;
 	$err = '6';
 	// Copy photo or poster
 	if ( is_file( $oldimage ) ) {
-		if ( ! copy( $oldimage, $newimage ) ) return $err;
+		if ( ! wppa_copy( $oldimage, $newimage ) ) return $err;
 	}
 
 	$err = '7';
 	// Copy thumbnail
 	if ( is_file( $oldthumb ) ) {
-		if ( ! copy( $oldthumb, $newthumb ) ) return $err;
+		if ( ! wppa_copy( $oldthumb, $newthumb ) ) return $err;
 	}
 
 	$err = '8';
@@ -867,7 +868,7 @@ global $warning_given_small;
 		if ( wppa_make_the_photo_files( $file, $id, $ext, ! wppa_does_thumb_need_watermark( $id ) ) ) {
 
 			// Repair photoname if not supplied and not standard
-			if ( ! $name ) wppa_set_default_name( $id, $name );
+			if ( ! $name ) wppa_set_default_name( $id );
 
 			// Tags
 			wppa_set_default_tags( $id );
@@ -932,7 +933,7 @@ global $wpdb;
 
 	// Open outputfile
 	$path = WPPA_UPLOAD_PATH . '/temp/' . $table . '.csv';
-	$file = fopen( $path, 'wb' );
+	$file = wppa_fopen( $path, 'wb' );
 	if ( ! $file ) {
 		return false;
 	}

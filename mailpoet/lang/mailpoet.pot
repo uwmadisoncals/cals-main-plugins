@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://support.mailpoet.com/\n"
-"POT-Creation-Date: 2018-10-02 11:09:12+00:00\n"
+"POT-Creation-Date: 2018-10-09 15:30:52+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -305,7 +305,7 @@ msgstr ""
 msgid "Manage segments"
 msgstr ""
 
-#: lib/Config/Capabilities.php:67 lib/Config/Menu.php:699
+#: lib/Config/Capabilities.php:67 lib/Config/Menu.php:703
 #: lib/Config/PrivacyPolicy.php:11 views/premium.html:41
 msgid "MailPoet"
 msgstr ""
@@ -478,72 +478,72 @@ msgstr ""
 msgid "Migration"
 msgstr ""
 
-#: lib/Config/Menu.php:564
+#: lib/Config/Menu.php:566
 msgid "In any WordPress role"
 msgstr ""
 
-#: lib/Config/Menu.php:583
+#: lib/Config/Menu.php:585
 msgid "WooCommerce"
 msgstr ""
 
-#: lib/Config/Menu.php:584
+#: lib/Config/Menu.php:586
 msgid ""
 "Automatically send an email when there is a new WooCommerce product, order "
 "and some other action takes place."
 msgstr ""
 
-#: lib/Config/Menu.php:588
+#: lib/Config/Menu.php:590
 msgid "Abandoned Shopping Cart"
 msgstr ""
 
-#: lib/Config/Menu.php:589
+#: lib/Config/Menu.php:591
 msgid ""
 "Send an email to logged-in visitors who have items in their shopping carts "
 "but left your website without checking out. Can convert up to 5% of "
 "abandoned carts."
 msgstr ""
 
-#: lib/Config/Menu.php:592 lib/Config/Menu.php:611
+#: lib/Config/Menu.php:594 lib/Config/Menu.php:613
 msgid "Must-have"
 msgstr ""
 
-#: lib/Config/Menu.php:598
+#: lib/Config/Menu.php:600
 msgid "Big Spender"
 msgstr ""
 
-#: lib/Config/Menu.php:599
+#: lib/Config/Menu.php:601
 msgid ""
 "Let MailPoet send an email to customers who have spent a certain amount to "
 "thank them, possibly with a coupon."
 msgstr ""
 
-#: lib/Config/Menu.php:602
+#: lib/Config/Menu.php:604
 msgid "Smart to have"
 msgstr ""
 
-#: lib/Config/Menu.php:608
+#: lib/Config/Menu.php:610
 msgid "First Purchase"
 msgstr ""
 
-#: lib/Config/Menu.php:609
+#: lib/Config/Menu.php:611
 msgid "Let MailPoet send an email to customers who make their first purchase."
 msgstr ""
 
-#: lib/Config/Menu.php:617
+#: lib/Config/Menu.php:619
 msgid "Purchased In This Category"
 msgstr ""
 
-#: lib/Config/Menu.php:618
+#: lib/Config/Menu.php:620
 msgid ""
 "Let MailPoet send an email to customers who purchase a product from a "
 "specific category."
 msgstr ""
 
-#: lib/Config/Menu.php:623
+#: lib/Config/Menu.php:625
 msgid "Purchased This Product"
 msgstr ""
 
-#: lib/Config/Menu.php:624
+#: lib/Config/Menu.php:626
 msgid "Let MailPoet send an email to customers who purchase a specific product."
 msgstr ""
 
@@ -1183,11 +1183,11 @@ msgstr ""
 msgid "Maximum execution time has been reached."
 msgstr ""
 
-#: lib/Cron/Daemon.php:40
+#: lib/Cron/DaemonHttpRunner.php:41
 msgid "Invalid or missing request data."
 msgstr ""
 
-#: lib/Cron/Daemon.php:43
+#: lib/Cron/DaemonHttpRunner.php:44
 msgid "Daemon does not exist."
 msgstr ""
 
@@ -1832,8 +1832,8 @@ msgstr ""
 #: views/newsletter/templates/blocks/posts/settingsDisplayOptions.hbs:151
 #: views/newsletter/templates/blocks/posts/settingsDisplayOptions.hbs:177
 #: views/newsletter/templates/blocks/posts/settingsDisplayOptions.hbs:239
-#: views/premium.html:62 views/premium.html:63 views/settings/advanced.html:124
-#: views/settings/advanced.html:164 views/settings/advanced.html:204
+#: views/premium.html:62 views/premium.html:63 views/settings/advanced.html:153
+#: views/settings/advanced.html:193 views/settings/advanced.html:233
 #: views/settings/mta.html:539 views/settings/mta.html:593
 #: views/settings/signup.html:46
 #: views/subscribers/importExport/import/step2.html:67
@@ -2212,8 +2212,8 @@ msgstr ""
 #: views/newsletter/templates/blocks/automatedLatestContentLayout/settings.hbs:293
 #: views/newsletter/templates/blocks/posts/settingsDisplayOptions.hbs:79
 #: views/newsletter/templates/blocks/posts/settingsDisplayOptions.hbs:233
-#: views/premium.html:56 views/settings/advanced.html:112
-#: views/settings/advanced.html:153 views/settings/advanced.html:193
+#: views/premium.html:56 views/settings/advanced.html:141
+#: views/settings/advanced.html:182 views/settings/advanced.html:222
 #: views/settings/mta.html:582 views/settings/signup.html:34
 #: views/subscribers/importExport/import/step2.html:63
 msgid "Yes"
@@ -4679,83 +4679,95 @@ msgstr ""
 msgid "MailPoet's own script. Doesn't work with [link]these hosts[/link]."
 msgstr ""
 
-#: views/settings/advanced.html:73
+#: views/settings/advanced.html:77
+msgid "Server side cron (Linux cron)"
+msgstr ""
+
+#: views/settings/advanced.html:83
+msgid "To use this option please add this command to your crontab:"
+msgstr ""
+
+#: views/settings/advanced.html:90
+msgid "With the frequency of running it every minute:"
+msgstr ""
+
+#: views/settings/advanced.html:102
 msgid "Roles and capabilities"
 msgstr ""
 
-#: views/settings/advanced.html:75
+#: views/settings/advanced.html:104
 msgid "Manage which WordPress roles access which features of MailPoet."
 msgstr ""
 
-#: views/settings/advanced.html:81
+#: views/settings/advanced.html:110
 msgid "Manage using the Members plugin"
 msgstr ""
 
-#: views/settings/advanced.html:84
+#: views/settings/advanced.html:113
 msgid "Install the plugin [link]Members[/link] (free) to manage permissions."
 msgstr ""
 
-#: views/settings/advanced.html:95
+#: views/settings/advanced.html:124
 msgid "Open and click tracking"
 msgstr ""
 
-#: views/settings/advanced.html:98
+#: views/settings/advanced.html:127
 msgid "Enable or disable open and click tracking."
 msgstr ""
 
-#: views/settings/advanced.html:133
+#: views/settings/advanced.html:162
 msgid "Share anonymous data"
 msgstr ""
 
-#: views/settings/advanced.html:136
+#: views/settings/advanced.html:165
 msgid ""
 "Share anonymous data and help us improve the plugin. We appreciate your "
 "help!"
 msgstr ""
 
-#: views/settings/advanced.html:173
+#: views/settings/advanced.html:202
 msgid "Enable reCAPTCHA"
 msgstr ""
 
-#: views/settings/advanced.html:176
+#: views/settings/advanced.html:205
 msgid "Use reCAPTCHA to protect MailPoet subscription forms."
 msgstr ""
 
-#: views/settings/advanced.html:180
+#: views/settings/advanced.html:209
 msgid "Sign up for an API key pair here."
 msgstr ""
 
-#: views/settings/advanced.html:212
+#: views/settings/advanced.html:241
 msgid "Your reCAPTCHA Site Key"
 msgstr ""
 
-#: views/settings/advanced.html:220
+#: views/settings/advanced.html:249
 msgid "Your reCAPTCHA Secret Key"
 msgstr ""
 
-#: views/settings/advanced.html:225
+#: views/settings/advanced.html:254
 msgid "Please fill the reCAPTCHA keys."
 msgstr ""
 
-#: views/settings/advanced.html:233
+#: views/settings/advanced.html:262
 msgid "Reinstall from scratch"
 msgstr ""
 
-#: views/settings/advanced.html:235
+#: views/settings/advanced.html:264
 msgid ""
 "Want to start from the beginning? This will completely delete MailPoet and "
 "reinstall it from scratch. Remember: you will lose all of your data!"
 msgstr ""
 
-#: views/settings/advanced.html:243
+#: views/settings/advanced.html:272
 msgid "Reinstall now..."
 msgstr ""
 
-#: views/settings/advanced.html:250
+#: views/settings/advanced.html:279
 msgid "Logging"
 msgstr ""
 
-#: views/settings/advanced.html:252
+#: views/settings/advanced.html:281
 msgid "Enables logging for diagnostics of plugin behavior."
 msgstr ""
 
@@ -4936,6 +4948,10 @@ msgstr ""
 
 #: views/settings/mta.html:101
 msgid "Get a free key"
+msgstr ""
+
+#: views/settings/mta.html:102
+msgid "or"
 msgstr ""
 
 #: views/settings/mta.html:104
@@ -5280,7 +5296,7 @@ msgstr ""
 msgid "Settings saved"
 msgstr ""
 
-#: views/settings.html:187
+#: views/settings.html:197
 msgid ""
 "Are you sure? All of your MailPoet data will be permanently erased "
 "(newsletters, statistics, subscribers, etc.)."
@@ -6039,22 +6055,22 @@ msgid "Got it!"
 msgstr ""
 
 #: views/settings/advanced.html:13 views/settings/advanced.html:37
-#: views/settings/advanced.html:140
+#: views/settings/advanced.html:169
 msgctxt "support article link label"
 msgid "Read more."
 msgstr ""
 
-#: views/settings/advanced.html:262
+#: views/settings/advanced.html:291
 msgctxt "In settings: \"Logging: Everything\""
 msgid "Everything"
 msgstr ""
 
-#: views/settings/advanced.html:268
+#: views/settings/advanced.html:297
 msgctxt "In settings: \"Logging: Errors only\""
 msgid "Errors only"
 msgstr ""
 
-#: views/settings/advanced.html:274
+#: views/settings/advanced.html:303
 msgctxt "In settings: \"Logging: Nothing\""
 msgid "Nothing"
 msgstr ""

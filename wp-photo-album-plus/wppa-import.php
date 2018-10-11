@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the import pages and functions
-* Version 6.9.15
+* Version 6.9.16
 *
 */
 
@@ -1432,13 +1432,13 @@ global $wppa_session;
 			echo '<br />';
 			_e( 'Compressed file types: .zip', 'wp-photo-album-plus' );
 		}
-		if ( true ) {
-			echo '<br />';
-			_e( 'Photo file types:', 'wp-photo-album-plus' );
-			foreach ( $wppa_supported_photo_extensions as $ext ) {
-				echo ' .'.$ext;
-			}
+
+		echo '<br />';
+		_e( 'Photo file types:', 'wp-photo-album-plus' );
+		foreach ( $wppa_supported_photo_extensions as $ext ) {
+			echo ' .'.$ext;
 		}
+
 		if ( wppa_switch( 'enable_video' ) ) {
 			echo '<br />';
 			_e( 'Video file types:', 'wp-photo-album-plus' );
@@ -1697,7 +1697,7 @@ global $wppa_supported_audio_extensions;
 				$parent = '0';
 				$porder = '0';
 				$owner = '';
-				$handle = fopen( str_replace( '../', '', $album ), "r" );
+				$handle = wppa_fopen( WPPA_DEPOT_PATH . '/' . basename( $album ), "r" );
 				if ( $handle ) {
 					$buffer = fgets( $handle, 4096 );
 					while ( !feof( $handle ) ) {
@@ -1797,7 +1797,7 @@ global $wppa_supported_audio_extensions;
 		}
 	}
 	elseif ( isset( $_POST['wppa-photo-album'] ) ) {
-		$album = $_POST['wppa-photo-album'];
+		$album = strval( intval( $_POST['wppa-photo-album'] ) );
 	}
 	else $album = '0';
 
@@ -1938,7 +1938,8 @@ global $wppa_supported_audio_extensions;
 						else {
 							$id = substr( $id, 0, strpos( $id, '.' ) );
 							if ( ! is_numeric( $id ) || ! wppa_is_id_free( WPPA_PHOTOS, $id ) ) $id = 0;
-							if ( wppa_insert_photo( $unsanitized_path_name, $alb, stripslashes( $name ), stripslashes( $desc ), $porder, $id, stripslashes( $linkurl ), stripslashes( $linktitle ) ) ) {
+							$id = wppa_insert_photo( $unsanitized_path_name, $alb, stripslashes( $name ), stripslashes( $desc ), $porder, $id, stripslashes( $linkurl ), stripslashes( $linktitle ) );
+							if ( $id ) {
 								if ( wppa( 'ajax' ) ) {
 									wppa( 'ajax_import_files_done', true );
 								}
@@ -1947,6 +1948,7 @@ global $wppa_supported_audio_extensions;
 									unlink( $unsanitized_path_name );
 									if ( is_file( $meta ) ) unlink( $meta );
 								}
+								wppa_set_default_name( $id, stripslashes( $name ) );
 
 								// If ajax and remote and not a page, update url to successfully imported photo
 								if ( wppa( 'ajax' ) && wppa( 'is_remote' ) ) {
@@ -2056,7 +2058,7 @@ global $wppa_supported_audio_extensions;
 						rename( $file, $newpath );
 					}
 					else {
-						copy( $file, $newpath );
+						wppa_copy( $file, $newpath );
 					}
 
 					if ( wppa( 'ajax' ) ) {
@@ -2118,7 +2120,7 @@ global $wppa_supported_audio_extensions;
 
 					// Add audio filetype
 					$newpath = wppa_strip_ext( wppa_get_photo_path( $id, false ) ).'.'.$ext;
-					copy( $file, $newpath );
+					wppa_copy( $file, $newpath );
 					if ( $delu ) unlink( $file );
 					if ( wppa( 'ajax' ) ) {
 						wppa( 'ajax_import_files_done', true );
@@ -2237,12 +2239,12 @@ global $wppa_supported_audio_extensions;
 							copy ( $file, $tempfile );
 
 							// Open file
-							$handle = fopen( str_replace( '../', '', $tempfile ), "rt" );
+							$handle = wppa_fopen( $tempfile, "rt" );
 							if ( ! $handle ) {
 								wppa_error_message( __( 'Can not open file. Can not continue. (1)', 'wp-photo-album-plus') );
 								return;
 							}
-							$write_handle = fopen( str_replace( '../', '', $file ), "wt" );
+							$write_handle = wppa_fopen( $file, "wt" );
 							if ( ! $write_handle ) {
 								wppa_error_message( __( 'Can not open file. Can not continue. (2)', 'wp-photo-album-plus') );
 								return;
@@ -2787,7 +2789,7 @@ function wppa_get_meta_data( $file, $item, $opt ) {
 	if ( $opt == '{' ) $opt2 = '}';
 	if ( $opt == '[' ) $opt2 = ']';
 	if ( is_file( $file ) ) {
-		$handle = fopen( str_replace( '../', '', $file ), "r" );
+		$handle = wppa_fopen( WPPA_DEPOT_PATH . '/' . basename( $file ), "r" );
 		if ( $handle ) {
 			while ( ( $buffer = fgets( $handle, 4096 ) ) !== false ) {
 				if ( substr( $buffer, 0, 5 ) == $item.'=' ) {
@@ -2834,7 +2836,7 @@ function wppa_extract( $xpath, $delz ) {
 		$ext = strtolower( wppa_get_ext( $xpath ) );
 		if ( $ext == 'zip' ) {
 			$zip = new ZipArchive;
-			if ( $zip->open( str_replace( '../', '', $xpath ) ) === true ) {
+			if ( $zip->open( WPPA_DEPOT_PATH . '/' . basename( $xpath ) ) === true ) {
 
 				$supported_file_ext = array( 'jpg', 'png', 'gif', 'JPG', 'PNG', 'GIF', 'amf', 'pmf', 'zip', 'csv' );
 				$done = '0';
@@ -2946,7 +2948,7 @@ global $wppa_session;
 
 					// If we find a .csv file, move it to our depot and give a warning message
 					if ( wppa_get_ext( $photofile ) == 'csv' ) {
-						copy( $photofile, WPPA_DEPOT_PATH . '/' . basename( $photofile ) );
+						wppa_copy( $photofile, WPPA_DEPOT_PATH . '/' . basename( $photofile ) );
 						@ unlink( $photofile );
 						wppa_warning_message( sprintf( __( '.csv file %s has been moved to your depot.', 'wp-photo-album-plus' ), basename( $photofile ) ) );
 					}
@@ -2956,8 +2958,11 @@ global $wppa_session;
 						}
 					}
 					else {
-						$bret = wppa_insert_photo( $photofile, $alb, basename( $photofile ) );
-						$photocount++;
+						$id = wppa_insert_photo( $photofile, $alb );
+						if ( $id ) {
+/*hier*/							wppa_set_default_name( $id );
+							$photocount++;
+						}
 					}
 					if ( ! wppa_switch( 'keep_import_files' ) ) {
 						@ unlink( $photofile );

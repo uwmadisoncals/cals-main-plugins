@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the non admin stuff
-* Version 6.9.14
+* Version 6.9.16
 *
 */
 
@@ -291,11 +291,11 @@ global $wppa_js_page_data_file;
 		$tempdir 	= WPPA_UPLOAD_PATH.'/temp';
 		if ( ! is_dir( $tempdir ) ) @ wppa_mktree( $tempdir );
 
-		$handle = fopen ( $wppa_js_page_data_file, 'wb' );
+		$handle = wppa_fopen( $wppa_js_page_data_file, 'wb' );
 
 		if ( $handle ) {
 			fwrite( $handle, '/* WPPA+ Generated Page dependant javascript */'."\n" );
-			fclose ( $handle );
+			fclose( $handle );
 		}
 		else {
 			$wppa_js_page_data_file = '';
@@ -789,7 +789,7 @@ wppaAudioHeight = '.wppa_get_audio_control_height().';';
 	$result = wppa_make_relative( $result );
 
 	if ( $wppa_js_page_data_file ) {
-		$handle = @ fopen( $wppa_js_page_data_file, 'ab' );
+		$handle = wppa_fopen( $wppa_js_page_data_file, 'ab' );
 		if ( $handle ) {
 			fwrite( $handle, "\n/* START Page specific urls and browser dependant data */" . $result . "\n/* END Page specific urls and browser dependant data */\n" );
 			fclose( $handle );
@@ -1062,7 +1062,7 @@ global $wppa_init_js_data;
 	';
 
 	// Open file
-	$file = @ fopen ( WPPA_PATH.'/wppa-init.'.$wppa_lang.'.js', 'wb' );
+	$file = wppa_fopen( WPPA_PATH.'/wppa-init.'.$wppa_lang.'.js', 'wb' );
 	if ( $file ) {
 		// Write file
 		fwrite ( $file, $content );

@@ -123,6 +123,7 @@ return array(
     'MailPoet\\Cron\\CronHelper' => $baseDir . '/lib/Cron/CronHelper.php',
     'MailPoet\\Cron\\CronTrigger' => $baseDir . '/lib/Cron/CronTrigger.php',
     'MailPoet\\Cron\\Daemon' => $baseDir . '/lib/Cron/Daemon.php',
+    'MailPoet\\Cron\\DaemonHttpRunner' => $baseDir . '/lib/Cron/DaemonHttpRunner.php',
     'MailPoet\\Cron\\Supervisor' => $baseDir . '/lib/Cron/Supervisor.php',
     'MailPoet\\Cron\\Triggers\\MailPoet' => $baseDir . '/lib/Cron/Triggers/MailPoet.php',
     'MailPoet\\Cron\\Triggers\\WordPress' => $baseDir . '/lib/Cron/Triggers/WordPress.php',

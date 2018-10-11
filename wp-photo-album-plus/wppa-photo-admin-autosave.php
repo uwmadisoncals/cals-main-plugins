@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * edit and delete photos
-* Version 6.9.15
+* Version 6.9.17
 *
 */
 
@@ -234,7 +234,7 @@ global $wpdb;
 															   ORDER BY `timestamp` DESC
 															   LIMIT %d, %d", $skip, $pagesize ), ARRAY_A );
 
-				$count 	= is_array( $photos ) ? count( $phots ) : 0;
+				$count 	= is_array( $photos ) ? count( $photos ) : 0;
 				$link 	= wppa_dbg_url( get_admin_url() . 'admin.php' . '?page=wppa_moderate_photos' . '&wppa_nonce=' . wp_create_nonce('wppa_nonce') );
 			}
 
@@ -625,10 +625,10 @@ function wppaToggleExif( id, count ) {
 										' >' .
 										'<img' .
 											' id="tnp-' . $id . '"' .
-											' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . $src . '"' .
+											' ' . ( wppa_switch( 'lazy' ) && $count > '1' ? 'data-' : '' ) . 'src="' . $src . '"' .
 											' alt="' . esc_attr( $name ) . '"' .
 											' style="max-width: 160px; vertical-align:middle;"' .
-											( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
+											( wppa_switch( 'lazy' ) && $count > '1' ? ' class="wppa-lazy"' : '' ) .
 										' />' .
 									'</a>';
 									if ( $has_audio ) {
@@ -1635,9 +1635,9 @@ function wppaToggleExif( id, count ) {
 								'<td>' .
 									'<img' .
 										' id="fs-img-' . $id . '"' .
-										' ' . ( wppa_switch( 'lazy' ) ? 'data-' : '' ) . 'src="' . wppa_get_photo_url( $id ) . '"' .
+										' ' . ( wppa_switch( 'lazy' ) && $count > '1' ? 'data-' : '' ) . 'src="' . wppa_get_photo_url( $id ) . '"' .
 										' style="float:left;max-width:90%;" ' .
-										( wppa_switch( 'lazy' ) ? ' class="wppa-lazy"' : '' ) .
+										( wppa_switch( 'lazy' ) && $count > '1' ? ' class="wppa-lazy"' : '' ) .
 									' />' .
 									'<div' .
 										' style="display:inline-block;vertical-align:middle;margin-left:4px;margin-top:' . ( min( 600, wppa_get_photoy( $id ) ) / 2 - 30 ) . 'px;"' .
@@ -3115,14 +3115,9 @@ global $wppa_search_stats;
 			else {
 				$pword = $wpdb->esc_like( $word ) . '%';
 			}
-
-			// According to the doc ( https://codex.wordpress.org/Class_Reference/wpdb/esc_like ) this should work,
-			// but it generates an error saying: Too few arguments to function wpdb::prepare(), 1 passed in /... and exactly 2 expected
-//			$pidxs = $wpdb->get_results( $wpdb->prepare( "SELECT slug, photos FROM {$wpdb->prefix}wppa_index
-//														  WHERE slug LIKE %s" ), $pword, ARRAY_A );
-			// So we must do it without prepare:
-			$pidxs = $wpdb->get_results( "SELECT slug, photos FROM {$wpdb->prefix}wppa_index
-										  WHERE slug LIKE '" . $pword . "'", ARRAY_A );
+			$pidxs = $wpdb->get_results( $wpdb->prepare( "SELECT slug, photos
+														  FROM {$wpdb->prefix}wppa_index
+														  WHERE slug LIKE %s", $pword ), ARRAY_A );
 			$photos = array();
 
 			// Accumulate photo ids

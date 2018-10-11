@@ -4,7 +4,7 @@
 *
 * This file loads required php files and contains all functions used in init actions.
 *
-* Version 6.9.14
+* Version 6.9.16
 */
 
 /* LOAD SIDEBAR WIDGETS */
@@ -56,6 +56,7 @@ require_once 'wppa-cron.php';
 require_once 'wppa-maintenance.php';
 require_once 'wppa-tinymce-common.php';
 require_once 'wppa-local-cdn.php';
+require_once 'wppa-wrappers.php';
 
 /* Required for widget displays at back-end */
 require_once 'wppa-links.php';

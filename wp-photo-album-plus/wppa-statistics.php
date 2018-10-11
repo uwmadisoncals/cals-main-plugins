@@ -350,9 +350,13 @@ global $wpdb;
 	if ( $alb ) {
 		$alb = strval( intval( $alb ) );
 	}
-
+	
 	// Album id given
 	if ( $alb ) {
+
+		if ( ! wppa_album_exists( $alb ) ) {
+			return;
+		}
 
 		// Flush this albums treecounts
 		wppa_mark_treecounts( $alb );
@@ -360,7 +364,7 @@ global $wpdb;
 
 	// No album id, flush them all
 	else {
-		$iret = $wpdb->query( "UPDATE $wpdb->wppa_albums SET `treecounts` = ''" );
+		$iret = $wpdb->query( "UPDATE {$wpdb->prefix}wppa_albums SET treecounts = ''" );
 		if ( ! $iret ) {
 			wppa_log( 'Dbg', 'Unable to clear all treecounts' );
 		}
@@ -509,6 +513,10 @@ function wppa_mark_treecounts( $alb ) {
 		$alb = strval( intval( $alb ) );
 	}
 
+	if ( ! wppa_album_exists( $alb ) ) {
+		return;
+	}
+	
 	// Do it
 	if ( $alb ) {
 		$treecounts = wppa_get_treecounts_a( $alb );

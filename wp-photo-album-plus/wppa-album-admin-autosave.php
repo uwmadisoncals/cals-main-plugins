@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * create, edit and delete albums
-* Version 6.9.16
+* Version 6.9.17
 *
 */
 
@@ -718,7 +718,6 @@ global $wppa_revno;
 						</tbody>
 					</table>';
 }
-/*hbi*/
 {
 					// Section 2
 					echo '
@@ -728,35 +727,35 @@ global $wppa_revno;
 
 							// Name
 							echo '
-							<tr>' .
-								'<td>' .
-									__( 'Name:', 'wp-photo-album-plus' ) .
-								'</td>' .
-								'<td>' .
-									'<input' .
-										' type="text"' .
-										' style="width:100%;"' .
-										' onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'name\', this )"' .
-										' onchange="wppaAjaxUpdateAlbum( ' . $id .  ', \'name\', this )"' .
-										' value="' . esc_attr( $name ) . '"' .
-									' />' .
-									'<span class="description" >' .
-										__( 'Type the name of the album. Do not leave this empty.', 'wp-photo-album-plus' ) .
-									'</span>' .
-								'</td>' .
-								'<td>' .
-								'</td>' .
-							'</tr>';
+							<tr>
+								<td>' .
+									__( 'Name:', 'wp-photo-album-plus' ) . '
+								</td>
+								<td>
+									<input
+										type="text"
+										style="width:100%;"
+										onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'name\', this )"
+										onchange="wppaAjaxUpdateAlbum( ' . $id .  ', \'name\', this )"
+										value="' . esc_attr( $name ) . '"
+									/>
+									<span class="description" >' .
+										__( 'Type the name of the album. Do not leave this empty.', 'wp-photo-album-plus' ) . '
+									</span>
+								</td>
+								<td>
+								</td>
+							</tr>';
 
 							// Description
-							echo
-							'<tr>' .
-								'<td>' .
-									__( 'Description:', 'wp-photo-album-plus' ) .
-								'</td>';
+							echo '
+							<tr>
+								<td>' .
+									__( 'Description:', 'wp-photo-album-plus' ) . '
+								</td>';
 								if ( wppa_switch( 'use_wp_editor') ) {
-									echo
-									'<td>';
+									echo '
+									<td>';
 										wp_editor( 	$description,
 													'wppaalbumdesc',
 													array( 	'wpautop' 		=> true,
@@ -765,101 +764,103 @@ global $wppa_revno;
 															'tinymce' 		=> true
 														)
 												);
-										echo
-										'<input' .
-											' type="button"' .
-											' class="button-secundary"' .
-											' value="' . esc_attr( __( 'Update Album description', 'wp-photo-album-plus' ) ) . '"' .
-											' onclick="wppaAjaxUpdateAlbum( ' . $id .  ', \'description\', document.getElementById( \'wppaalbumdesc\' ) )"' .
-										' />' .
-										'<img' .
-											' id="wppa-album-spin"' .
-											' src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_use_svg() ? 'svg' : 'gif' ) . '"' .
-											' alt="Spin"' .
-											' style="visibility:hidden"' .
-										' />' .
-									'</td>';
+										echo '
+										<input
+											type="button"
+											class="button-secundary"
+											value="' . esc_attr( __( 'Update Album description', 'wp-photo-album-plus' ) ) . '"
+											onclick="wppaAjaxUpdateAlbum( ' . $id .  ', \'description\', document.getElementById( \'wppaalbumdesc\' ) )"
+										/>
+										<img
+											id="wppa-album-spin"
+											src="' . wppa_get_imgdir() . 'spinner.' . ( wppa_use_svg() ? 'svg' : 'gif' ) . '"
+											alt="Spin"
+											style="visibility:hidden"
+										/>
+									</td>';
 								}
 								else {
-									echo
-									'<td>' .
-										'<textarea' .
-											' style="width:100%;height:60px;"' .
-											' onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'description\', this )"' .
-											' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'description\', this )"' .
-											' >' .
+									echo '
+									<td>
+										<textarea
+											style="width:100%;height:60px;"
+											onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'description\', this )"
+											onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'description\', this )"
+											>' .
 											$description .
-										'</textarea>' .
-									'</td>';
+										'</textarea>
+									</td>';
 								}
-								echo
-								'<td>' .
-								'</td>' .
-							'</tr>';
+								echo '
+								<td>
+								</td>
+							</tr>';
 
 							// Categories
-							echo
-							'<tr>' .
-								'<td>' .
-									__( 'Categories:', 'wp-photo-album-plus' ) .
-								'</td>' .
-								'<td>' .
-									'<input' .
-										' id="cats"' .
-										' type="text"' .
-										' style="width:100%;"' .
-										' onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'cats\', this )"' .
-										' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'cats\', this )"' .
-										' value="' . esc_attr( $cats ) . '"' .
-									' />' .
-									'<br />' .
-									'<span class="description" >' .
-										__( 'Separate categories with commas.', 'wp-photo-album-plus' ) .
-									'</span>' .
-									'<select' .
-										' onchange="wppaAddCat( this.value, \'cats\' ); wppaAjaxUpdateAlbum( ' . $id . ', \'cats\', document.getElementById( \'cats\' ) )"' .
-										' >';
+							echo '
+							<tr>
+								<td>' .
+									__( 'Categories:', 'wp-photo-album-plus' ) . '
+								</td>
+								<td>
+									<input
+										id="cats"
+										type="text"
+										style="width:100%;"
+										onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'cats\', this )"
+										onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'cats\', this )"
+										value="' . esc_attr( $cats ) . '"
+									/>
+									<br />
+									<span class="description" >' .
+										__( 'Separate categories with commas.', 'wp-photo-album-plus' ) . '
+									</span>
+									<select
+										onchange="wppaAddCat( this.value, \'cats\' ); wppaAjaxUpdateAlbum( ' . $id . ', \'cats\', document.getElementById( \'cats\' ) )"
+										>';
 										$catlist = wppa_get_catlist();
 										if ( is_array( $catlist ) ) {
-											echo '<option value="" >' . __( '- select to add -', 'wp-photo-album-plus' ) . '</option>';
+											echo '
+											<option value="" >' . __( '- select to add -', 'wp-photo-album-plus' ) . '</option>';
 											foreach ( $catlist as $cat ) {
-												echo '<option value="' . $cat['cat'] . '" >' . $cat['cat'] . '</option>';
+												echo '
+												<option value="' . $cat['cat'] . '" >' . $cat['cat'] . '</option>';
 											}
 										}
 										else {
-											echo '<option value="0" >' . __( 'No categories yet', 'wp-photo-album-plus') . '</option>';
+											echo '
+											<option value="0" >' . __( 'No categories yet', 'wp-photo-album-plus') . '</option>';
 										}
-									echo
-									'</select>' .
-								'</td>' .
-								'<td>' .
-								'</td>' .
-							'</tr>';
+									echo '
+									</select>
+								</td>
+								<td>
+								</td>
+							</tr>';
 
 							// Default tags
-							echo
-							'<tr>' .
-								'<td>' .
-									__( 'Default photo tags:', 'wp-photo-album-plus' ) .
-								'</td>' .
-								'<td>' .
-									'<input' .
-										' type="text"' .
-										' id="default_tags"' .
-										' value="' . esc_attr( $default_tags ) . '"' .
-										' style="width:100%"' .
-										' onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'default_tags\', this )"' .
-										' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'default_tags\', this )"' .
-									' />' .
-									'<br />' .
-									'<span class="description">' .
-										__( 'Enter the tags that you want to be assigned to new photos in this album.', 'wp-photo-album-plus' ) .
-									'</span>' .
-								'</td>' .
-								'<td>' .
-								'</td>' .
-							'</tr>';
-
+							echo '
+							<tr>
+								<td>
+									' . __( 'Default photo tags:', 'wp-photo-album-plus' ) . '
+								</td>
+								<td>
+									<input
+										type="text"
+										id="default_tags"
+										value="' . esc_attr( $default_tags ) . '"
+										style="width:100%"
+										onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'default_tags\', this )"
+										onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'default_tags\', this )"
+									/>
+									<br />
+									<span class="description">' .
+										__( 'Enter the tags that you want to be assigned to new photos in this album.', 'wp-photo-album-plus' ) . '
+									</span>
+								</td>
+								<td>
+								</td>
+							</tr>';
 
 							// Custom
 							if ( wppa_switch( 'album_custom_fields' ) ) {
@@ -872,139 +873,153 @@ global $wppa_revno;
 								}
 								foreach( array_keys( $custom_data ) as $key ) {
 									if ( wppa_opt( 'album_custom_caption_' . $key ) ) {
-										echo
-										'<tr>' .
-											'<td>' .
-												apply_filters( 'translate_text', wppa_opt( 'album_custom_caption_' . $key ) ) .
-												'<small style="float:right" >' .
-													'(w#cc'.$key.')' .
-												'</small>:' .
-											'</td>' .
-											'<td>' .
-												'<input' .
-													' type="text"' .
-													' style="width:100%;"' .
-													' id="album_custom_' . $key . '-' . $id . '"' .
-													' onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'album_custom_' . $key . '\', this );"' .
-													' onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'album_custom_' . $key . '\', this );"' .
-													' value="' . esc_attr( stripslashes( $custom_data[$key] ) ) . '"' .
-												' />' .
-											'</td>' .
-											'<td>' .
-												'<small>' .
-													'(w#cd' . $key . ')' .
-												'</small>' .
-											'</td>' .
-										'</tr>';
+										echo '
+										<tr>
+											<td>
+												' . apply_filters( 'translate_text', wppa_opt( 'album_custom_caption_' . $key ) ) . '
+												<small style="float:right" >
+													(w#cc' . $key . ')
+												</small>:
+											</td>
+											<td>
+												<input
+													type="text"
+													style="width:100%;"
+													id="album_custom_' . $key . '-' . $id . '"
+													onkeyup="wppaAjaxUpdateAlbum( ' . $id . ', \'album_custom_' . $key . '\', this );"
+													onchange="wppaAjaxUpdateAlbum( ' . $id . ', \'album_custom_' . $key . '\', this );"
+													value="' . esc_attr( stripslashes( $custom_data[$key] ) ) . '"
+												/>
+											</td>
+											<td>
+												<small>
+													(w#cd' . $key . ')
+												</small>
+											</td>
+										</tr>';
 									}
 								}
 							}
 
 							// Link type
-							echo
-							'<tr>' .
-								'<td>' .
-									__( 'Link type:', 'wp-photo-album-plus' ) .
-								'</td>' .
-								'<td>';
+							echo '
+							<tr>
+								<td>
+									' . __( 'Link type:', 'wp-photo-album-plus' ) . '
+								</td>
+								<td>';
 									$sel = ' selected="selected"';
 									$lt = $cover_linktype;
-									/* if ( !$linktype ) $linktype = 'content'; /* Default */
-									/* if ( $albuminfo['cover_linkpage'] == '-1' ) $linktype = 'none'; /* for backward compatibility */
-									echo
-									'<select onchange="wppaAjaxUpdateAlbum( '. $id . ', \'cover_linktype\', this )" >' .
-										'<option value="content"' . ( $lt == 'content' ? $sel : '' ) . ' >' . __( 'the sub-albums and thumbnails', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="albums"' . ( $lt == 'albums' ? $sel : '' ) . ' >' . __( 'the sub-albums', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="thumbs"' . ( $lt == 'thumbs' ? $sel : '' ) . ' >' . __( 'the thumbnails', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="slide"' . ( $lt == 'slide' ? $sel : '' ) . ' >' . __( 'the album photos as slideshow', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="page"' . ( $lt == 'page' ? $sel : '' ) . ' >' . __( 'the link page with a clean url', 'wp-photo-album-plus' ) . '</option>' .
-										'<option value="none"' . ( $lt == 'none' ? $sel : '' ) . ' >' . __( 'no link at all', 'wp-photo-album-plus' ) . '</option>' .
-									'</select>' .
-									'<br />' .
-									'<span class="description">';
-										if ( wppa_switch( 'auto_page') ) {
+									echo '
+									<select onchange="wppaAjaxUpdateAlbum( '. $id . ', \'cover_linktype\', this )" >
+										<option value="content"' . ( $lt == 'content' ? $sel : '' ) . ' >' . __( 'the sub-albums and thumbnails', 'wp-photo-album-plus' ) . '</option>
+										<option value="albums"' . ( $lt == 'albums' ? $sel : '' ) . ' >' . __( 'the sub-albums', 'wp-photo-album-plus' ) . '</option>
+										<option value="thumbs"' . ( $lt == 'thumbs' ? $sel : '' ) . ' >' . __( 'the thumbnails', 'wp-photo-album-plus' ) . '</option>
+										<option value="slide"' . ( $lt == 'slide' ? $sel : '' ) . ' >' . __( 'the album photos as slideshow', 'wp-photo-album-plus' ) . '</option>
+										<option value="page"' . ( $lt == 'page' ? $sel : '' ) . ' >' . __( 'the link page with a clean url', 'wp-photo-album-plus' ) . '</option>
+										<option value="none"' . ( $lt == 'none' ? $sel : '' ) . ' >' . __( 'no link at all', 'wp-photo-album-plus' ) . '</option>
+									</select>
+									<br />
+									<span class="description">';
+										if ( wppa_switch( 'auto_page' ) ) {
 											_e( 'If you select "the link page with a clean url", select an Auto Page of one of the photos in this album.', 'wp-photo-album-plus' );
 										}
 										else {
 											_e( 'If you select "the link page with a clean url", make sure you enter the correct shortcode on the target page.', 'wp-photo-album-plus' );
 										}
-									echo
-									'</span>' .
-								'</td>' .
-								'<td>' .
-								'</td>' .
-							'</tr>';
+									echo '
+									</span>
+								</td>
+								<td>
+								</td>
+							</tr>';
 
 							// Link page
 							if ( ! wppa_switch( 'link_is_restricted' ) || wppa_user_is( 'administrator' ) ) {
-								echo
-								'<tr>' .
-									'<td>' .
-										__( 'Link to:', 'wp-photo-album-plus' ) .
-									'</td>' .
-									'<td>';
-										$query = "SELECT `ID`, `post_title` FROM `" . $wpdb->posts . "` WHERE `post_type` = 'page' AND `post_status` = 'publish' ORDER BY `post_title` ASC";
+								echo '
+								<tr>
+									<td>
+										' . __( 'Link to:', 'wp-photo-album-plus' ) . '
+									</td>
+									<td>';
+										$query = "SELECT ID, post_title FROM {$wpdb->prefix}posts
+												  WHERE post_type = 'page'
+												  AND post_status = 'publish'
+												  ORDER BY post_title ASC";
 										$pages = $wpdb->get_results( $query, ARRAY_A );
 										if ( empty( $pages ) ) {
 											_e( 'There are no pages (yet) to link to.', 'wp-photo-album-plus' );
 										}
 										else {
 											$linkpage = $albuminfo['cover_linkpage'];
-											if ( ! is_numeric( $linkpage ) ) $linkpage = '0';
-											echo
-											'<select' .
-												' onchange="wppaAjaxUpdateAlbum( '. $id . ' , \'cover_linkpage\', this )"' .
-												' style="max-width:100%;"' .
-												'>' .
-												'<option value="0"' . ( $linkpage == '0' ? $sel : '' ) . ' >' . __( '--- the same page or post ---', 'wp-photo-album-plus' ) . '</option>';
+											if ( ! is_numeric( $linkpage ) ) {
+												$linkpage = '0';
+											}
+
+											echo '
+											<select
+												onchange="wppaAjaxUpdateAlbum( '. $id . ' , \'cover_linkpage\', this )"
+												style="max-width:100%;"
+												>
+												<option value="0"' . ( $linkpage == '0' ? $sel : '' ) . ' >' .
+													__( '--- the same page or post ---', 'wp-photo-album-plus' ) .
+												'</option>';
 												foreach ( $pages as $page ) {
-													echo
-													'<option value="' . $page['ID'] . '"' . ( $linkpage == $page['ID'] ? $sel : '' ) . ' >' . __( $page['post_title'] ) . '</option>';
+													echo '
+													<option
+														value="' . $page['ID'] . '"' .
+														( $linkpage == $page['ID'] ? ' selected="selected"' : '' ) .
+														' >' .
+														__( $page['post_title'] ) .
+													'</option>';
 												}
-											echo
-											'</select>' .
-											'<br />' .
-											'<span class="description" >' .
+											echo '
+											</select>
+											<br />
+											<span class="description" >' .
 												__( 'If you want, you can link the title to a WP page instead of the album\'s content. If so, select the page the title links to.', 'wp-photo-album-plus' ) .
 											'</span>';
 										}
-									echo
-									'</td>' .
-									'<td>' .
-									'</td>' .
-								'</tr>';
+									echo '
+									</td>
+									<td>
+									</td>
+								</tr>';
 							}
 
 							// Schedule
-							echo
-							'<tr>' .
-								'<td>' .
+							echo '
+							<tr>
+								<td>' .
 									__( 'Schedule:', 'wp-photo-album-plus' ) . ' ' .
-									'<input' .
-										' type="checkbox"' .
-										' id="schedule-box"' .
-										( $albuminfo['scheduledtm'] ? ' checked="checked"' : '' ) .
-										' onchange="wppaChangeScheduleAlbum(' . $id . ', this );"' .
-									' />' .
-								'</td>' .
-								'<td>' .
-									'<input type="hidden" value="" id="wppa-dummy" />' .
-									'<span class="wppa-datetime-' . $id . '"' . ( $albuminfo['scheduledtm'] ? '' : ' style="display:none;"' ) . ' >' .
+									'<input
+										type="checkbox"
+										id="schedule-box"' .
+										( $albuminfo['scheduledtm'] ? ' checked="checked"' : '' ) . '
+										onchange="wppaChangeScheduleAlbum(' . $id . ', this );"
+									 />
+								</td>
+								<td>
+									<input type="hidden" value="" id="wppa-dummy" />
+									<span
+										class="wppa-datetime-' . $id . '"' .
+										( $albuminfo['scheduledtm'] ? '' : ' style="display:none;"' ) .
+										' >' .
 										wppa_get_date_time_select_html( 'album', $id, true ) .
-									'</span>' .
-									'<br />' .
-									'<span class="description" >' .
+									'</span>
+									<br />
+									<span class="description" >' .
 										__( 'If enabled, new photos will have their status set scheduled for publication on the date/time specified here.', 'wp-photo-album-plus' ) .
-									'</span>' .
-								'</td>' .
-								'<td>' .
-								'</td>' .
-							'</tr>';
+									'</span>
+								</td>
+								<td>
+								</td>
+							</tr>';
 
-						echo
-						'</tbody>' .
-					'</table>';
-}
+						echo '
+						</tbody>
+					</table>';
+}	/*hbi*/
 {
 					// Section 3, Actions
 					echo
@@ -1317,16 +1332,16 @@ global $wppa_revno;
 				wp_die('You do not have the rights to delete this album');
 			}
 
-			if ($_POST['wppa-del-photos'] == 'move') {
-				$move = $_POST['wppa-move-album'];
-				if ( wppa_have_access($move) ) {
-					wppa_del_album($_POST['wppa-del-id'], $move);
+			if ( $_POST['wppa-del-photos'] == 'move' ) {
+				$move = strval( intval( $_POST['wppa-move-album'] ) );
+				if ( wppa_have_access( $move ) ) {
+					wppa_del_album( strval( intval( $_POST['wppa-del-id'] ) ), $move);
 				}
 				else {
 					wppa_error_message(__('Unable to move photos. Album not deleted.', 'wp-photo-album-plus'));
 				}
 			} else {
-				wppa_del_album( $_POST['wppa-del-id'] );
+				wppa_del_album( strval( intval ( $_POST['wppa-del-id'] ) ) );
 			}
 		}
 
@@ -2642,10 +2657,59 @@ global $wpdb;
 function wppa_album_sequence( $parent ) {
 global $wpdb;
 
-	// Get the albums
-	$albumorder 	= wppa_get_album_order( $parent );
-	$is_descending 	= strpos( $albumorder, 'DESC' ) !== false;
-	$albums 		= $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->wppa_albums WHERE `a_parent` = %s " . $albumorder, $parent ), ARRAY_A );
+	// Get the albums sort order column and desc flag
+	$albumorder_col	= wppa_get_album_order_column( $parent );
+	$is_descending = wppa_is_album_order_desc( $parent );
+
+	// If random...
+	if ( $albumorder_col == 'random' ) {
+
+		$query  = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %s ORDER BY RAND(%d)";
+
+		$albums = $wpdb->get_results( $wpdb->prepare( $query, $parent, wppa_get_randseed() ), ARRAY_A );
+	}
+
+	// Not random, Decending?
+	else if ( $is_descending ) {
+
+		switch ( $albumorder_col ) {
+
+			case 'a_order':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY a_order DESC";
+				break;
+			case 'name':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY name DESC";
+				break;
+			case 'timestamp':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY timestamp DESC";
+				break;
+			default:
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY id DESC";
+
+		}
+	}
+
+	// Not descending
+	else {
+
+		switch ( $albumorder_col ) {
+
+			case 'a_order':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY a_order";
+				break;
+			case 'name':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY name";
+				break;
+			case 'timestamp':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY timestamp";
+				break;
+			default:
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY id";
+
+		}
+	}
+
+	$albums = $wpdb->get_results( $wpdb->prepare( $query, $parent ), ARRAY_A );
 
 	// Anything to do here ?
 	if ( empty ( $albums ) ) {
@@ -2660,7 +2724,7 @@ global $wpdb;
 	}
 
 	// Check album order
-	if ( ! strpos( $albumorder, 'a_order' ) ) {
+	if ( $albumorder_col != 'a_order' ) {
 		if ( $parent == '0') {
 			echo '<br />';
 			_e( 'You can edit top-level album sequence order here when you set the album order to "Order #" or "Order # desc" in Table IV-D1.' );

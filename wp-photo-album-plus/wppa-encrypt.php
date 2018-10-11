@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all ecryption/decryption logic
-* Version 6.9.14
+* Version 6.9.17
 *
 */
 
@@ -140,7 +140,7 @@ global $wpdb;
 
 	// Feature enabled?
 	if ( ! wppa_switch( 'use_encrypted_links' ) ) {
-		return $photo;
+		return intval( $photo );
 	}
 
 	// Already decrypted?
@@ -149,7 +149,7 @@ global $wpdb;
 			wppa_dbg_msg( __( 'Invalid photo identifier:', 'wp-photo-album-plus' ) . ' ' . $photo, 'red', 'force' );
 			return false;
 		}
-		return $photo;
+		return intval( $photo );
 	}
 
 	// Just do it

@@ -76,15 +76,16 @@ class A_NextGen_Basic_Gallery_Mapper extends Mixin
         $settings = C_NextGen_Settings::get_instance();
         $this->object->_set_default_value($entity, 'settings', 'gallery_width', $settings->irWidth);
         $this->object->_set_default_value($entity, 'settings', 'gallery_height', $settings->irHeight);
-        $this->object->_set_default_value($entity, 'settings', 'thumbnail_width', $settings->thumbwidth);
-        $this->object->_set_default_value($entity, 'settings', 'thumbnail_height', $settings->thumbheight);
-        $this->object->_set_default_value($entity, 'settings', 'cycle_interval', $settings->irRotatetime);
-        $this->object->_set_default_value($entity, 'settings', 'cycle_effect', $settings->slideFX);
-        $this->object->_set_default_value($entity, 'settings', 'effect_code', $settings->thumbCode);
         $this->object->_set_default_value($entity, 'settings', 'show_thumbnail_link', $settings->galShowSlide ? 1 : 0);
         $this->object->_set_default_value($entity, 'settings', 'thumbnail_link_text', $settings->galTextGallery);
         $this->object->_set_default_value($entity, 'settings', 'template', '');
         $this->object->_set_default_value($entity, 'settings', 'display_view', 'default');
+        $this->object->_set_default_value($entity, 'settings', 'autoplay', 1);
+        $this->object->_set_default_value($entity, 'settings', 'pauseonhover', 1);
+        $this->object->_set_default_value($entity, 'settings', 'arrows', 0);
+        $this->object->_set_default_value($entity, 'settings', 'interval', 3000);
+        $this->object->_set_default_value($entity, 'settings', 'transition_speed', 300);
+        $this->object->_set_default_value($entity, 'settings', 'transition_style', 'fade');
         // Part of the pro-modules
         $this->object->_set_default_value($entity, 'settings', 'ngg_triggers_display', 'never');
     }
@@ -309,15 +310,67 @@ class A_NextGen_Basic_Slideshow_Form extends Mixin_Display_Type_Form
      */
     function _get_field_names()
     {
-        return array('nextgen_basic_slideshow_gallery_dimensions', 'nextgen_basic_slideshow_show_thumbnail_link', 'nextgen_basic_slideshow_thumbnail_link_text', 'display_view');
+        return array('nextgen_basic_slideshow_gallery_dimensions', 'nextgen_basic_slideshow_autoplay', 'nextgen_basic_slideshow_pauseonhover', 'nextgen_basic_slideshow_arrows', 'nextgen_basic_slideshow_transition_style', 'nextgen_basic_slideshow_interval', 'nextgen_basic_slideshow_transition_speed', 'nextgen_basic_slideshow_show_thumbnail_link', 'nextgen_basic_slideshow_thumbnail_link_text', 'display_view');
     }
-    function _render_nextgen_basic_slideshow_cycle_interval_field($display_type)
+    /**
+     * Renders the autoplay field for new Slick.js slideshow
+     *
+     * @param C_Display_Type $display_type
+     * @return string
+     */
+    function _render_nextgen_basic_slideshow_autoplay_field($display_type)
     {
-        return $this->_render_number_field($display_type, 'cycle_interval', __('Interval', 'nggallery'), $display_type->settings['cycle_interval'], '', FALSE, __('# of seconds', 'nggallery'), 1);
+        return $this->_render_radio_field($display_type, 'autoplay', __('Autoplay?', 'nggallery'), $display_type->settings['autoplay']);
     }
-    function _render_nextgen_basic_slideshow_cycle_effect_field($display_type)
+    /**
+     * Renders the Pause on Hover field for new Slick.js slideshow
+     *
+     * @param C_Display_Type $display_type
+     * @return string
+     */
+    function _render_nextgen_basic_slideshow_pauseonhover_field($display_type)
     {
-        return $this->_render_select_field($display_type, 'cycle_effect', 'Effect', array('fade' => 'fade', 'blindX' => 'blindX', 'cover' => 'cover', 'scrollUp' => 'scrollUp', 'scrollDown' => 'scrollDown', 'shuffle' => 'shuffle', 'toss' => 'toss', 'wipe' => 'wipe'), $display_type->settings['cycle_effect'], '', FALSE);
+        return $this->_render_radio_field($display_type, 'pauseonhover', __('Pause on Hover?', 'nggallery'), $display_type->settings['pauseonhover']);
+    }
+    /**
+     * Renders the arrows field for new Slick.js slideshow
+     *
+     * @param C_Display_Type $display_type
+     * @return string
+     */
+    function _render_nextgen_basic_slideshow_arrows_field($display_type)
+    {
+        return $this->_render_radio_field($display_type, 'arrows', __('Show Arrows?', 'nggallery'), $display_type->settings['arrows']);
+    }
+    /**
+     * Renders the effect field for new Slick.js slideshow
+     *
+     * @param C_Display_Type $display_type
+     * @return string
+     */
+    function _render_nextgen_basic_slideshow_transition_style_field($display_type)
+    {
+        return $this->_render_select_field($display_type, 'transition_style', __('Transition Style', 'nggallery'), array('slide' => 'Slide', 'fade' => 'Fade'), $display_type->settings['transition_style'], '', FALSE);
+    }
+    /**
+     * Renders the interval field for new Slick.js slideshow
+     *
+     * @param C_Display_Type $display_type
+     * @return string
+     */
+    function _render_nextgen_basic_slideshow_interval_field($display_type)
+    {
+        return $this->_render_number_field($display_type, 'interval', __('Interval', 'nggallery'), $display_type->settings['interval'], '', FALSE, __('Milliseconds', 'nggallery'), 1);
+    }
+    /**
+     * Renders the interval field for new Slick.js slideshow
+     *
+     * @param C_Display_Type $display_type
+     * @return string
+     */
+    function _render_nextgen_basic_slideshow_transition_speed_field($display_type)
+    {
+        return $this->_render_number_field($display_type, 'transition_speed', __('Transition Speed', 'nggallery'), $display_type->settings['transition_speed'], '', FALSE, __('Milliseconds', 'nggallery'), 1);
     }
     function _render_nextgen_basic_slideshow_gallery_dimensions_field($display_type)
     {

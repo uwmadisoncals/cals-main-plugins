@@ -16,9 +16,13 @@
     height: 100%;
 }
 
+.ngg-slideshow .ngg-gallery-slideshow-image a {
+    display: inline !important;
+}
+
 .ngg-slideshow .ngg-gallery-slideshow-image img {
     margin: 0 auto;
-    display: inline-block;
+    display: inline-block !important;
     vertical-align: middle;
     max-width: 99%!important;
     max-height: 98% !important;

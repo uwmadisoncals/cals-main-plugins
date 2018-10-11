@@ -2,7 +2,7 @@
 /* wppa-common-functions.php
 *
 * Functions used in admin and in themes
-* Version 6.9.14
+* Version 6.9.19
 *
 */
 
@@ -316,7 +316,7 @@ function wppa_errorlog() {
 	if ( ! is_file( $filename ) ) return;
 
 	// Open file
-	$file = @ fopen( $filename, 'r' );
+	$file = wppa_fopen( $filename, 'r' );
 
 	// If unable to open, quit
 	if ( ! $file ) return;
@@ -440,6 +440,58 @@ global $wppa;
 	return $result;
 }
 
+function wppa_get_album_order_column( $parent = '0' ) {
+
+	// Album given ?
+	if ( $parent > '0' ) {
+		$order = wppa_get_album_item( $parent, 'suba_order_by' );
+	}
+	else {
+		$order = '0';
+	}
+	if ( ! $order ) {
+		$order = wppa_opt( 'list_albums_by' );
+	}
+
+	switch ( $order ) {
+		case '1':
+		case '-1':
+			$result = 'a_order';
+			break;
+		case '2':
+		case '-2':
+			$result = 'name';
+			break;
+		case '3':
+			$result = 'random';
+			break;
+		case '5':
+		case '-5':
+			$result = 'timestamp';
+			break;
+		default:
+			$result = 'id';
+	}
+
+	return $result;
+}
+
+function wppa_is_album_order_desc( $parent = '0' ) {
+
+	// Album given ?
+	if ( $parent > '0' ) {
+		$order = wppa_get_album_item( $parent, 'suba_order_by' );
+	}
+	else {
+		$order = '0';
+	}
+	if ( ! $order ) {
+		$order = wppa_opt( 'list_albums_by' );
+	}
+
+	return ( $order < '0' ) ? "DESC" : "";
+}
+
 // get photo order
 function wppa_get_photo_order( $id = '0', $no_random = false ) {
 global $wpdb;
@@ -525,6 +577,88 @@ global $wppa;
     return $result;
 }
 
+function wppa_is_photo_order_desc( $id = '0' ) {
+
+	// Album specified?
+	if ( wppa_is_int( $id ) && $id > '0' ) {
+		$order = wppa_get_album_item( $id, 'p_order_by' );
+	}
+
+	// No album specified
+	else {
+		$order = '0';
+	}
+
+	// No order yet? Use default
+    if ( ! $order ) {
+		$order = wppa_opt( 'list_photos_by' );
+	}
+
+	return ( $order < '0' ) ? "DESC" : "";
+}
+
+function wppa_get_photo_order_column( $id = '0', $no_random = false ) {
+global $wpdb;
+global $wppa;
+
+	// Random overrule?
+	if ( wppa( 'is_random' ) ) {
+		$result = 'random';
+		return $result;
+	}
+
+	// Album specified?
+	if ( wppa_is_int( $id ) && $id > '0' ) {
+		$order = wppa_get_album_item( $id, 'p_order_by' );
+	}
+
+	// No album specified
+	else {
+		$order = '0';
+	}
+
+	// No order yet? Use default
+    if ( ! $order ) {
+		$order = wppa_opt( 'list_photos_by' );
+	}
+
+    switch ( $order ) {
+
+		case '1':
+		case '-1':
+			$result = 'p_order';
+			break;
+		case '2':
+		case '-2':
+			$result = 'name';
+			break;
+		case '3':
+		case '-3':
+			$result = 'random';
+			break;
+		case '4':
+		case '-4':
+			$result = 'mean_rating';
+			break;
+		case '5':
+		case '-5':
+			$result = 'timestamp';
+			break;
+		case '6':
+		case '-6':
+			$result = 'rating_count';
+			break;
+		case '7':
+		case '-7':
+			$result = 'exifdtm';
+			break;
+
+		default:
+			$result = 'id';
+    }
+
+    return $result;
+}
 
 // See if an album is another albums ancestor
 function wppa_is_ancestor( $anc, $xchild ) {
@@ -1094,7 +1228,6 @@ global $wpdb;
 		$timnow = time();
 		$timthen = $timnow - $limit_time;
 		$curcount = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `owner` = %s AND `timestamp` > %s" . $album_clause, $user, $timthen ) );
-wppa_log('obs', $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->wppa_photos WHERE `owner` = %s AND `timestamp` > %s", $user, $timthen ) . ' returns:' . $curcount );
 	}
 
 	// Compute the allowed number of photos
@@ -1860,7 +1993,7 @@ global $wppa;
 	}
 
 	if ( $wppa_js_page_data_file && ! $wppa['ajax'] ) {
-		$handle = fopen( $wppa_js_page_data_file, 'ab' );
+		$handle = wppa_fopen( $wppa_js_page_data_file, 'ab' );
 	}
 	else {
 		$handle = false;

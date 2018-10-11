@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the setup stuff
-* Version 6.9.15
+* Version 6.9.16
 *
 */
 
@@ -601,7 +601,7 @@ global $silent;
 	if ( is_array($watermarks) ) {
 		foreach ($watermarks as $fromfile) {
 			$tofile = WPPA_UPLOAD_PATH . '/watermarks/' . basename($fromfile);
-			@ copy($fromfile, $tofile);
+			wppa_copy( $fromfile, $tofile );
 		}
 	}
 
@@ -612,7 +612,7 @@ global $silent;
 		foreach ($fonts as $fromfile) {
 			if ( is_file ( $fromfile ) ) {
 				$tofile = WPPA_UPLOAD_PATH . '/fonts/' . basename($fromfile);
-				@ copy($fromfile, $tofile);
+				wppa_copy( $fromfile, $tofile );
 			}
 		}
 	}
@@ -621,7 +621,7 @@ global $silent;
 	$fromfile = WPPA_PATH . '/img/audiostub.jpg';
 	$tofile = WPPA_UPLOAD_PATH . '/audiostub';
 	if ( ! is_file( $tofile . '.jpg' ) && ! is_file( $tofile . '.gif' ) && ! is_file( $tofile . '.png' ) ) {
-		@ copy( $fromfile, $tofile . '.jpg' );
+		@ wppa_copy( $fromfile, $tofile . '.jpg' );
 		wppa_update_option( 'wppa_audiostub', 'audiostub.jpg' );
 	}
 
@@ -1612,6 +1612,7 @@ cursorborder:'2px solid transparent',";
 						'wppa_move_all_photos' 		=> '',
 						'wppa_move_all_photos_from' => '',
 						'wppa_move_all_photos_to' 	=> '',
+						'wppa_photos_hyphens_to_spaces' 	=> '',
 
 						'wppa_logfile_on_menu' 		=> 'no',
 

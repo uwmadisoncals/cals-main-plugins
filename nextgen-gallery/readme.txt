@@ -2,7 +2,7 @@
 Contributors: photocrati, imagely
 Tags: wordpress gallery plugin, gallery, nextgen, nextgen gallery, photo gallery, image gallery, photography, slideshow, images, photo, photo album, watermark
 Requires at least: 4.0.0
-Stable tag: 3.0.9
+Stable tag: 3.0.13
 Tested up to: 4.9.8
 License: GPLv2
 
@@ -182,6 +182,9 @@ For more information, feel free to visit the official website for the NextGEN Ga
 
 
 == Changelog ==
+
+= V3.0.13 - 10.11.2018 =
+* Changed: Added settings for basic slideshow
 
 = V3.0.9 - 10.02.2018 =
 * NEW:     Added 2.0 template mechanism for basic galleries

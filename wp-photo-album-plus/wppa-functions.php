@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Various functions
-* Version 6.9.15
+* Version 6.9.19
 *
 */
 
@@ -1003,7 +1003,9 @@ global $wppa_session;
 
 		// If Catbox specifies a category to limit, remove all albums that do not have the desired cat.
 		if ( wppa( 'catbox' ) ) {
-			$catalbs = $wpdb->get_col( "SELECT `id` FROM $wpdb->wppa_albums WHERE `cats` LIKE '%" . wppa( 'catbox' ) . "%' " );
+			$likecats = '%' . esc_like( wppa( 'catbox' ) ) . '%';
+			$catalbs = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}wppa_albums
+														WHERE cats LIKE %s", $likecats ) );
 			$final_array = array_intersect( $final_array, $catalbs );
 		}
 
@@ -1014,7 +1016,8 @@ global $wppa_session;
 		}
 
 		// Get them
-		$albums = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_albums WHERE " . $selection . " " . wppa_get_album_order( '0' ), ARRAY_A );
+		$albums = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}wppa_albums
+									   WHERE " . $selection . " " . wppa_get_album_order( '0' ), ARRAY_A );
 
 		// Exclusive separate albums?
 		if ( wppa_switch( 'excl_sep' ) ) {
@@ -2793,11 +2796,21 @@ global $wpdb;
 
 					if ( $x > $y ) {
 						$w = wppa_opt( 'popupsize' );
-						$h = round( $w * $y / $x );
+						if ( $x ) {
+							$h = round( $w * $y / $x );
+						}
+						else {
+							$h = $w;
+						}
 					}
 					else {
 						$h = wppa_opt( 'popupsize' );
-						$w = round( $h * $x / $y );
+						if ( $y ) {
+							$w = round( $h * $x / $y );
+						}
+						else {
+							$w = $h;
+						}
 					}
 
 					if ( wppa_is_video( $id ) ) {
@@ -3280,7 +3293,6 @@ global $blog_id;
 				$ok = wp_verify_nonce( $nonce, 'wppa-check' );
 				if ( $ok ) {
 					wppa_dbg_msg( 'Rating nonce ok' );
-					if ( ! is_user_logged_in() ) sleep( 2 );
 				}
 				else die( '<b>' . __( 'ERROR: Illegal attempt to enter a rating.' , 'wp-photo-album-plus') . '</b>' );
 			}
@@ -3293,7 +3305,6 @@ global $blog_id;
 				$ok = wp_verify_nonce( $nonce, 'wppa-check' );
 				if ( $ok ) {
 					wppa_dbg_msg( 'Comment nonce ok' );
-					if ( ! is_user_logged_in() ) sleep( 2 );
 				}
 				else die( '<b>' . __( 'ERROR: Illegal attempt to enter a comment.' , 'wp-photo-album-plus') . '</b>' );
 			}
@@ -4399,7 +4410,7 @@ global $wppa_upload_succes_id;
 				$fail = '0';
 				foreach ( $_FILES as $file ) {
 					if ( ! is_array( $file['error'] ) ) {
-						wppa( 'unsanitized_filename', $file['name'] );
+						wppa( 'unsanitized_filename', basename( $file['name'] ) );
 						$iret = wppa_do_frontend_file_upload( $file, $alb );	// this should no longer happen since the name is incl []
 						if ( $iret ) {
 							$uploaded_ids[] = $iret;
@@ -4417,10 +4428,10 @@ global $wppa_upload_succes_id;
 							if ( $iret ) {
 								$f['error'] = $file['error'][$i];
 								$f['tmp_name'] = $file['tmp_name'][$i];
-								$f['name'] = $file['name'][$i];
+								$f['name'] = basename( $file['name'][$i] );
 								$f['type'] = $file['type'][$i];
 								$f['size'] = $file['size'][$i];
-								wppa( 'unsanitized_filename', $file['name'][$i] );
+								wppa( 'unsanitized_filename', basename( $file['name'][$i] ) );
 								$iret = wppa_do_frontend_file_upload( $f, $alb );
 
 								// Report phto id if from tinymce photo shortcode generator upload
@@ -4628,7 +4639,7 @@ global $wppa_alert;
 	}
 
 	// Find the filename
-	$filename = wppa_sanitize_file_name( $file['name'] );
+	$filename = wppa_sanitize_file_name( basename( $file['name'] ) );
 	$filename = wppa_strip_ext( $filename );
 
 	// See if this filename with any extension already exists in this album
@@ -4694,11 +4705,11 @@ global $wppa_alert;
 		$ext 		= strtolower( wppa_get_ext( $file['name'] ) );
 		$newpath 	= wppa_strip_ext( wppa_get_photo_path( $id, false ) ).'.'.$ext;
 
-		copy( $file['tmp_name'], $newpath );
+		wppa_copy( $file['tmp_name'], $newpath );
 
 		// Repair name if not standard
 		if ( ! wppa_get_post( 'user-name' ) ) {
-			wppa_log('obs', 'in functions 4700:'.$file['name']);
+//			wppa_log('obs', 'in functions 4700:'.$file['name']);
 			wppa( 'unsanitized_filename', $file['name'] );
 			wppa_set_default_name( $id, $file['name'] );
 		}
@@ -4731,7 +4742,7 @@ global $wppa_alert;
 
 	// Is it a supported image filetype?
 	if ( $imgsize[2] != IMAGETYPE_GIF && $imgsize[2] != IMAGETYPE_JPEG && $imgsize[2] != IMAGETYPE_PNG ) {
-		$wppa_alert .= esc_js( sprintf( __( 'Only gif, jpg and png image files are supported. Returned info = %s.' , 'wp-photo-album-plus'), wppa_serialize( $imgsize ) ), false, false );
+		$wppa_alert .= esc_js( sprintf( __( 'Only gif, jpg and png image files are supported. Returned info = %s.' , 'wp-photo-album-plus'), serialize( $imgsize ) ), false, false );
 		return false;
 	}
 

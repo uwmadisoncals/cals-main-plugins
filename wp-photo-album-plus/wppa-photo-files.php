@@ -2,7 +2,7 @@
 /* wppa-photo-files.php
 *
 * Functions used to create/manipulate photofiles
-* Version 6.9.14
+* Version 6.9.16
 *
 */
 
@@ -43,7 +43,7 @@ function wppa_make_o1_source( $id ) {
 	else {
 
 		// Copy source to destination
-		copy( $src_path, $dst_path );
+		wppa_copy( $src_path, $dst_path );
 
 		// Correct orientation
 		if ( ! wppa_orientate_image_file( $dst_path, $orient ) ) {
@@ -319,7 +319,7 @@ global $wpdb;
 
 			}
 			else {	// No downsize needed, picture is small enough
-				copy( $file, $newimage );
+				wppa_copy( $file, $newimage );
 			}
 		}
 		wppa_log('dbg', 'Max memory used: ' . sprintf( '%6.2f MB', memory_get_peak_usage( true ) / ( 1024 * 1024 ) ) );
@@ -327,7 +327,7 @@ global $wpdb;
 
 	// No resize on upload checked
 	else {
-		copy( $file, $newimage );
+		wppa_copy( $file, $newimage );
 	}
 
 	// File successfully created ?
@@ -627,7 +627,7 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 
 	// Too litlle memory
 	else {
-		copy( $file, $thumbpath );
+		wppa_copy( $file, $thumbpath );
 	}
 
 	// Make sure file is accessible
@@ -640,15 +640,6 @@ function wppa_create_thumbnail( $id, $use_source = true ) {
 	wppa_get_thumbx( $id, 'force' );	// forces recalc x and y
 
 	return true;
-}
-
-// To fix a bug in PHP as that photos made with the selfie camera of an android smartphone
-// irroneously cause the PHP warning 'is not a valid JPEG file' and cause imagecreatefromjpag crash.
-function wppa_imagecreatefromjpeg( $file ) {
-
-	ini_set( 'gd.jpeg_ignore_warning', true );
-	$img = imagecreatefromjpeg( $file );
-	return $img;
 }
 
 // See if ImageMagick command exists

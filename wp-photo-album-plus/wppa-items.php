@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains functions to retrieve album and photo items
-* Version 6.9.15
+* Version 6.9.16
 *
 */
 
@@ -792,8 +792,11 @@ function wppa_get_thumbx( $id, $force = false ) {
 		if ( $x > $y ) { 	// Landscape
 			$result = wppa_opt( 'thumbsize' );
 		}
-		else {
+		elseif ( $y ) {
 			$result = wppa_opt( 'thumbsize' ) * $x / $y;
+		}
+		else {
+			$result = '';
 		}
 	}
 	else {

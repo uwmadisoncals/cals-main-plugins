@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the export functions
-* Version 6.9.14
+* Version 6.9.16
 *
 */
 
@@ -101,10 +101,10 @@ global $wppa_temp_idx;
 
 	if (isset($_POST['high'])) $high = $_POST['high']; else $high = 0;
 
-	if ($high) {
+	if ( $high ) {
 		$id = 0;
 		$cnt = 0;
-		while ($id <= $high) {
+		while ( $id <= $high ) {
 			if (isset($_POST['album-'.$id])) {
 				_e('<br/>Processing album', 'wp-photo-album-plus'); echo(' '.$id.'....');
 				wppa_write_album_file_by_id($id);
@@ -113,8 +113,9 @@ global $wppa_temp_idx;
 				foreach ( $photos as $photo ) {
 
 					// Copy the photo
-					$from = wppa_get_photo_path( $photo['id'] );
-					$to = WPPA_DEPOT_PATH.'/'.$photo['id'].'.'.$photo['ext'];
+					$photo_id = strval( intval( $photo['id'] ) );
+					$from = wppa_get_photo_path( $photo_id );
+					$to = WPPA_DEPOT_PATH . '/' . $photo_id . '.' . $photo['ext'];
 
 					if ( $wppa_zip ) {
 						$wppa_zip->addFile ( $from, basename ( $to ) );
@@ -159,7 +160,7 @@ global $wppa_temp_idx;
 	$album = $wpdb->get_row($wpdb->prepare( 'SELECT * FROM '.WPPA_ALBUMS.' WHERE id = %s LIMIT 0,1', $id ), 'ARRAY_A');
 	if ($album) {
 		$fname = WPPA_DEPOT_PATH.'/'.$id.'.amf';
-		$file = fopen($fname, 'wb');
+		$file = wppa_fopen($fname, 'wb');
 		$err = false;
 		if ($file) {
 			if (fwrite($file, "name=".$album['name']."\n") !== FALSE) {
@@ -225,7 +226,7 @@ global $wppa_temp;
 global $wppa_temp_idx;
 	if ($photo) {
 		$fname = WPPA_DEPOT_PATH.'/'.$photo['id'].'.pmf';
-		$file = fopen($fname, 'wb');
+		$file = wppa_fopen($fname, 'wb');
 		$err = false;
 		if ($file) {
 			if (fwrite($file, "name=".$photo['name']."\n") !== FALSE) {

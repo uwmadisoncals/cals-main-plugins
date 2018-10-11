@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * manage all options
-* Version 6.9.15
+* Version 6.9.19
 *
 */
 
@@ -36,7 +36,10 @@ var_dump ( unserialize($session['data']));
 echo '<br /><br />';
 var_dump ( wppa_unserialize($session['data']));
 echo '<br /><br />';
+var_dump ( json_decode( json_encode( unserialize( $session['data'] ) )));
 */
+//global $wppa_session;
+//var_dump($wppa_session['wfcart']);
 	// End test area
 
 	// Initialize
@@ -143,11 +146,11 @@ echo '<br /><br />';
 					else {
 						$imgsize = getimagesize($file['tmp_name']);
 						if ( !is_array($imgsize) || !isset($imgsize[2]) || $imgsize[2] != 3 ) {
-							wppa_error_message(sprintf(__('Uploaded file %s is not a .png file', 'wp-photo-album-plus'), wppa_sima( $file['name'] ) ) . ' (Type='.$file['type'].').');
+							wppa_error_message(sprintf(__('Uploaded file %s is not a .png file', 'wp-photo-album-plus'), sanitize_file_name( $file['name'] ) ) . ' (Type='.$file['type'].').');
 						}
 						else {
-							copy($file['tmp_name'], WPPA_UPLOAD_PATH . '/watermarks/' . wppa_sima(basename($file['name'])));
-							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), wppa_sima(basename($file['name']))));
+							wppa_copy( $file['tmp_name'], WPPA_UPLOAD_PATH . '/watermarks/' . sanitize_file_name(basename($file['name'])));
+							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), sanitize_file_name(basename($file['name']))));
 						}
 					}
 				}
@@ -163,12 +166,12 @@ echo '<br /><br />';
 						wppa_error_message(sprintf(__('Upload error %s', 'wp-photo-album-plus'), $file['error']));
 					}
 					else {
-						if ( substr(wppa_sima($file['name']), -4) != '.ttf' ) {
-							wppa_error_message(sprintf(__('Uploaded file %s is not a .ttf file', 'wp-photo-album-plus'), wppa_sima($file['name']) ).' (Type='.$file['type'].').');
+						if ( substr(sanitize_file_name($file['name']), -4) != '.ttf' ) {
+							wppa_error_message(sprintf(__('Uploaded file %s is not a .ttf file', 'wp-photo-album-plus'), sanitize_file_name($file['name']) ).' (Type='.$file['type'].').');
 						}
 						else {
-							copy($file['tmp_name'], WPPA_UPLOAD_PATH . '/fonts/' . wppa_sima(basename($file['name'])));
-							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), wppa_sima(basename($file['name']))));
+							wppa_copy($file['tmp_name'], WPPA_UPLOAD_PATH . '/fonts/' . sanitize_file_name(basename($file['name'])));
+							wppa_alert(sprintf(__('Upload of %s done', 'wp-photo-album-plus'), sanitize_file_name(basename($file['name']))));
 						}
 					}
 				}
@@ -186,7 +189,7 @@ echo '<br /><br />';
 					else {
 						$imgsize = getimagesize($file['tmp_name']);
 						if ( ! is_array( $imgsize ) || ! isset( $imgsize[2] ) || $imgsize[2] < 1 || $imgsize[2] > 3 ) {
-							wppa_error_message(sprintf(__('Uploaded file %s is not a valid image file', 'wp-photo-album-plus'), wppa_sima($file['name'])).' (Type='.$file['type'].').');
+							wppa_error_message(sprintf(__('Uploaded file %s is not a valid image file', 'wp-photo-album-plus'), sanitize_file_name($file['name'])).' (Type='.$file['type'].').');
 						}
 						else {
 							switch ( $imgsize[2] ) {
@@ -200,12 +203,12 @@ echo '<br /><br />';
 									$ext = '.png';
 									break;
 							}
-							copy( $file['tmp_name'], WPPA_UPLOAD_PATH . '/audiostub' . $ext );
+							wppa_copy( $file['tmp_name'], WPPA_UPLOAD_PATH . '/audiostub' . $ext );
 							wppa_update_option( 'wppa_audiostub', 'audiostub'. $ext );
 
 							// Thumbx, thumby, phtox and photoy must be cleared for the new stub
 							$wpdb->query( "UPDATE $wpdb->wppa_photos SET `thumbx` = 0, `thumby` = 0, `photox` = 0, `photoy` = 0 WHERE `ext` = 'xxx'" );
-							wppa_alert( sprintf( __( 'Upload of %s done', 'wp-photo-album-plus'), basename( wppa_sima( $file['name'] ) ) ) );
+							wppa_alert( sprintf( __( 'Upload of %s done', 'wp-photo-album-plus'), basename( sanitize_file_name( $file['name'] ) ) ) );
 						}
 					}
 				}
@@ -220,7 +223,6 @@ echo '<br /><br />';
 					wppa_ok_message('Done! wppa_delete_all_from_cloudinary');
 				}
 				else {
-					sleep(5);
 					wppa_ok_message('Not yet Done! wppa_delete_all_from_cloudinary' .
 									'<br />Trying to continue...');
 					echo
@@ -241,7 +243,6 @@ echo '<br /><br />';
 					wppa_ok_message('Done! wppa_delete_derived_from_cloudinary');
 				}
 				else {
-					sleep(5);
 					wppa_ok_message('Not yet Done! wppa_delete_derived_from_cloudinary' .
 									'<br />Trying to continue...');
 					echo
@@ -272,8 +273,10 @@ echo '<br /><br />';
 	wppa_fix_source_path();
 
 	// Cleanup obsolete settings
-	if ( $wpdb->get_var( "SELECT COUNT(*) FROM `".$wpdb->prefix.'options'."` WHERE `option_name` LIKE 'wppa_last_album_used-%'" ) > 100 ) {
-		$iret = $wpdb->query( "DELETE FROM `".$wpdb->prefix.'options'."` WHERE `option_name` LIKE 'wppa_last_album_used-%'" );
+	if ( $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}options
+						  WHERE option_name LIKE 'wppa_last_album_used-%'" ) > 100 ) {
+		$iret = $wpdb->query( "DELETE FROM {$wpdb->prefix}options
+							   WHERE option_name LIKE 'wppa_last_album_used-%'" );
 		wppa_update_message( sprintf( __( '%s last album used settings removed.', 'wp-photo-album-plus'), $iret ) );
 	}
 
@@ -8207,6 +8210,20 @@ echo '<br /><br />';
 
 							}
 
+							$name = __('Remove hypens from photonames', 'wp-photo-album-plus');
+							$desc = __('Remove all hyphens from all photo names and replace them by spaces', 'wp-photo-album-plus');
+							$help = '';
+							$slug2 = 'wppa_photos_hyphens_to_spaces';
+							$html1 = wppa_cronjob_button( $slug2 );
+							$html2 = wppa_maintenance_button( $slug2 );
+							$html3 = wppa_status_field( $slug2 );
+							$html4 = wppa_togo_field( $slug2 );
+							$html = array($html1, $html2, $html3, $html4);
+							$clas = '';
+							$tags = 'system';
+							wppa_setting(false, '20', $name, $desc, $html, $help, $clas, $tags);
+
+
 							if ( current_user_can( 'administrator' ) ) {
 								$name = __('Custom album proc', 'wp-photo-album-plus');
 								$desc = __('The php code to execute on all albums', 'wp-photo-album-plus');
@@ -8610,8 +8627,8 @@ echo '<br /><br />';
 							$desc = __('The number of albums per page on the Edit Album admin page.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_album_admin_pagesize';
-							$opts = array( '10', '20', '50', '100', '200' );
-							$vals = array( '10', '20', '50', '100', '200' );
+							$opts = array( '10', '20', '50', '100', '200', '500', '700', '1000' );
+							$vals = array( '10', '20', '50', '100', '200', '500', '700', '1000' );
 							$html = wppa_select($slug, $opts, $vals);
 							$clas = '';
 							$tags = 'system,page';
@@ -8621,8 +8638,8 @@ echo '<br /><br />';
 							$desc = __('The number of photos per page on the <br/>Edit Album -> Manage photos and Edit Photos admin pages.', 'wp-photo-album-plus');
 							$help = '';
 							$slug = 'wppa_photo_admin_pagesize';
-							$opts = array( '10', '20', '50', '100', '200' );
-							$vals = array( '10', '20', '50', '100', '200' );
+							$opts = array( '10', '20', '50', '100', '200', '500', '700', '1000' );
+							$vals = array( '10', '20', '50', '100', '200', '500', '700', '1000' );
 							$html = wppa_select($slug, $opts, $vals);
 							$clas = '';
 							$tags = 'system,page';
@@ -9176,12 +9193,20 @@ echo '<br /><br />';
 							$slug = 'wppa_newphoto_name_method';
 							$opts = array( 	__('Filename', 'wp-photo-album-plus'),
 											__('Filename without extension', 'wp-photo-album-plus'),
+											__('Filename without extension, spaces for hyphens', 'wp-photo-album-plus'),
 											__('IPTC Tag 2#005 (Graphic name)', 'wp-photo-album-plus'),
 											__('IPTC Tag 2#120 (Caption)', 'wp-photo-album-plus'),
 											__('No name at all', 'wp-photo-album-plus'),
 											__('Photo w#id (literally)', 'wp-photo-album-plus'),
 										);
-							$vals = array( 'filename', 'noext', '2#005', '2#120', 'none', 'Photo w#id' );
+							$vals = array( 	'filename',
+											'noext',
+											'noextspace',
+											'2#005',
+											'2#120',
+											'none',
+											'Photo w#id'
+										);
 							$html = wppa_select($slug, $opts, $vals);
 							$clas = '';
 							$tags = 'system,meta,album';

@@ -1,5 +1,34 @@
 WP Photo Album Plus Changelog
 
+= 6.9.19 =
+
+= Bug Fixes =
+
+* Fixed erroneously reported unsafe filepaths found and hence inability to upload/import in certain configurations.
+
+= 6.9.18 =
+
+= Bug Fixes =
+
+* Fixed erroneously reported unsafe filepaths found and hence inability to upload/import on new installations.
+
+= 6.9.17 =
+
+= Bug Fixes =
+
+* Fixed a layout issue of the album description field on the album admin edit album information screen.
+* Custom data fields disappeared in 6.9.16 when php version < 7.0. Fixed.
+
+= 6.9.16 =
+
+= Other Changes =
+
+* Increased number of options in Table IX-B6.1 and Table IX-B6.: Album and Photo admin pagesize.
+* Added 'Filename without extension, spaces for hyphens' as option to Table IX-D13.
+* Added maintenance proc Table VIII-B20: Remove all hyphens from all photo names and replace them by spaces.
+* Imported photos now get the name as defined by the new name method in Table VIII-B20.
+* Various security fixes.
+
 = 6.9.15 =
 
 = Other Changes =

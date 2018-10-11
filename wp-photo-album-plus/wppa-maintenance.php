@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains (not yet, but in the future maybe) all the maintenance routines
-* Version 6.9.15
+* Version 6.9.16
 *
 */
 
@@ -57,6 +57,7 @@ $wppa_all_maintenance_slugs = array( 	'wppa_remake_index_albums',
 										'wppa_owner_to_name_proc',
 										'wppa_move_all_photos',
 										'wppa_cleanup_index',
+										'wppa_photos_hyphens_to_spaces',
 									);
 
 global $wppa_cron_maintenance_slugs;
@@ -74,6 +75,7 @@ $wppa_cron_maintenance_slugs = array(	'wppa_remake_index_albums',
 										'wppa_add_hd_tag',
 										'wppa_crypt_photos',
 										'wppa_crypt_albums',
+										'wppa_photos_hyphens_to_spaces',
 
 									);
 
@@ -397,6 +399,7 @@ global $wppa_timestamp_start;
 		case 'wppa_create_o1_files':
 		case 'wppa_owner_to_name_proc':
 		case 'wppa_move_all_photos':
+		case 'wppa_photos_hyphens_to_spaces':
 
 			// Process photos
 			$table 		= WPPA_PHOTOS;
@@ -839,6 +842,14 @@ global $wppa_timestamp_start;
 						}
 						break;
 
+					case 'wppa_photos_hyphens_to_spaces':
+						$name = wppa_get_photo_item( $id, 'name' );
+						$newname = str_replace( '-', ' ', $name );
+						if ( $name != $newname ) {
+							wppa_update_photo( array( 'id' => $id, 'name' => $newname ) );
+						}
+						break;
+
 					case 'wppa_custom_photo_proc':
 						$file = WPPA_UPLOAD_PATH . '/procs/wppa_custom_photo_proc.php';
 						include $file;
@@ -1226,7 +1237,7 @@ global $wppa_log_file;
 			'</h2>' .
 			'<div style="float:left; clear:both; width:100%; overflow:auto; word-wrap:none;" >';
 
-			if ( ! $file = @ fopen( $wppa_log_file, 'r' ) ) {
+			if ( ! $file = wppa_fopen( $wppa_log_file, 'r' ) ) {
 				$result .= __( 'There are no log messages', 'wp-photo-album-plus' );
 			}
 			else {

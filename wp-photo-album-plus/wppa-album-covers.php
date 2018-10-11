@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Functions for album covers
-* Version 6.9.14
+* Version 6.9.16
 *
 */
 
@@ -77,12 +77,7 @@ global $wpdb;
 
 	// Find album details
 	$coverphoto = wppa_get_coverphoto_id( $albumid );
-//	$query 		= $wpdb->prepare( 	"SELECT * " .
-//									"FROM $wpdb->wppa_photos " .
-//									"WHERE `id` = %s",
-//									$coverphoto
-//								);
-	$image 		= wppa_cache_thumb( $coverphoto ); //$wpdb->get_row( $query, ARRAY_A );
+	$image 		= wppa_cache_thumb( $coverphoto );
 	$photocount = wppa_get_photo_count( $albumid );
 	$albumcount = wppa_get_album_count( $albumid, 'use_treecounts' );
 	$mincount 	= wppa_get_mincount();
@@ -430,12 +425,8 @@ global $wpdb;
 
 	// Find the coverphotos details
 	foreach ( $coverphotos as $coverphoto ) {
-//		$query 			= $wpdb->prepare( 	"SELECT * " .
-//											"FROM $wpdb->wppa_photos " .
-//											"WHERE `id` = %s",
-//											$coverphoto
-//										);
-		$images[] 		= wppa_cache_thumb( $coverphoto ); //$wpdb->get_row( $query, ARRAY_A );
+
+		$images[] 		= wppa_cache_thumb( $coverphoto );
 		$path 			= wppa_get_thumb_path( 	$coverphoto	 );
 		$paths[] 		= $path;
 		$cpsize 		= count( $coverphotos ) == '1' ?
@@ -615,9 +606,7 @@ global $wpdb;
 	if ( $multicolresp ) $mcr = 'mcr-'; else $mcr = '';
 
 	$coverphoto = wppa_get_coverphoto_id( $albumid );
-	$image 		= wppa_cache_thumb( $coverphoto ); //$wpdb->get_row( $wpdb->prepare(
-//					"SELECT * FROM $wpdb->wppa_photos WHERE `id` = %s", $coverphoto
-//					), ARRAY_A );
+	$image 		= wppa_cache_thumb( $coverphoto );
 	$photocount = wppa_get_photo_count( $albumid );
 	$albumcount = wppa_get_album_count( $albumid, true );
 	$mincount 	= wppa_get_mincount();
@@ -1287,42 +1276,47 @@ static $cached_cover_photo_ids;
 
 	// main_photo is 0? Random
 	if ( '0' == $id ) {
+		$rs = wppa_get_randseed( 'page' );
 		if ( current_user_can( 'wppa_moderate' ) ) {
-			$temp = $wpdb->get_results( $wpdb->prepare(
-				"SELECT * FROM $wpdb->wppa_photos WHERE `album` = %s ORDER BY RAND( %d ) LIMIT %d",
-				$alb, wppa_get_randseed( 'page' ), $count ), ARRAY_A );
+			$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wppa_photos
+														 WHERE album = %s
+														 ORDER BY RAND(%d)
+														 LIMIT %d", $alb, $rs, $count ), ARRAY_A );
 		}
 		else {
-			$temp = $wpdb->get_results( $wpdb->prepare(
-				"SELECT * FROM $wpdb->wppa_photos WHERE `album` = %s AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s ) ORDER BY RAND( %d ) LIMIT %d",
-				$alb, wppa_get_randseed( 'page' ), wppa_get_user(), $count ), ARRAY_A );
+			$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wppa_photos
+														 WHERE album = %s
+														 AND ( ( status <> 'pending' AND `status` <> 'scheduled' ) OR owner = %s )
+														 ORDER BY RAND(%d)
+														 LIMIT %d", $alb, $rs, wppa_get_user(), $count ), ARRAY_A );
 		}
 	}
 
 	// main_photo is -2? Last upload
 	if ( '-2' == $id ) {
 		if ( current_user_can( 'wppa_moderate' ) ) {
-			$temp = $wpdb->get_results( $wpdb->prepare(
-				"SELECT * FROM `" . WPPA_PHOTOS .
-				"` WHERE `album` = %s ORDER BY `timestamp` DESC LIMIT %d", $alb, $count
-				), ARRAY_A );
+			$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wppa_photos
+														 WHERE album = %s
+														 ORDER BY timestamp DESC
+														 LIMIT %d", $alb, $count ), ARRAY_A );
 		}
 		else {
-			$temp = $wpdb->get_results( $wpdb->prepare(
-				"SELECT * FROM `" . WPPA_PHOTOS .
-				"` WHERE `album` = %s AND ( ( `status` <> 'pending' AND `status` <> 'scheduled' ) OR `owner` = %s ) ORDER BY `timestamp` DESC LIMIT %d",
-				$alb, wppa_get_user(), $count ), ARRAY_A );
+			$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wppa_photos
+														 WHERE album = %s
+														 AND ( ( status <> 'pending' AND `status` <> 'scheduled' ) OR owner = %s )
+														 ORDER BY timestamp DESC
+														 LIMIT %d", $alb, wppa_get_user(), $count ), ARRAY_A );
 		}
 	}
 
 	// main_phtot is -1? Random featured
 	if ( '-1' == $id ) {
-		$temp = $wpdb->get_results( $wpdb->prepare(
-			"SELECT * FROM `" . WPPA_PHOTOS .
-			"` WHERE `album` = %s AND `status` = 'featured' ORDER BY RAND( " . wppa_get_randseed( 'page' ) . " ) LIMIT %d",
-			$alb, $count ), ARRAY_A );
+		$rs = wppa_get_randseed( 'page' );
+		$temp = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}wppa_photos
+													 WHERE album = %s AND status = 'featured'
+													 ORDER BY RAND(%d) LIMIT %d",$alb, $rs, $count ), ARRAY_A );
 	}
-
+/*hbi*/
 	// Random from children
 	if ( '-3' == $id ) {
 		$allalb = wppa_expand_enum( wppa_alb_to_enum_children( $alb ) );
@@ -1686,7 +1680,63 @@ global $wpdb;
 	$first = true;
 
 	// Get the children
-	$subs = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_albums WHERE `a_parent` = " . $id . " " . wppa_get_album_order( $id ), ARRAY_A );
+//	$subs = $wpdb->get_results( "SELECT * FROM $wpdb->wppa_albums WHERE `a_parent` = " . $id . " " . wppa_get_album_order( $id ), ARRAY_A );
+// Rewritten to:
+	/**/
+	// Get the albums sort order column
+	$albumorder_col	= wppa_get_album_order_column( $id );
+
+	// If random...
+	if ( $albumorder_col == 'random' ) {
+
+		$query  = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY RAND(%d)";
+
+		$subs = $wpdb->get_results( $wpdb->prepare( $query, $parent, wppa_get_randseed() ), ARRAY_A );
+	}
+
+	// Not random, Decending?
+	else if ( wppa_is_album_order_desc( $id ) ) {
+
+		switch ( $albumorder_col ) {
+
+			case 'a_order':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY a_order DESC";
+				break;
+			case 'name':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY name DESC";
+				break;
+			case 'timestamp':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY timestamp DESC";
+				break;
+			default:
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY id DESC";
+
+		}
+	}
+
+	// Not descending
+	else {
+
+		switch ( $albumorder_col ) {
+
+			case 'a_order':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY a_order";
+				break;
+			case 'name':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY name";
+				break;
+			case 'timestamp':
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY timestamp";
+				break;
+			default:
+				$query = "SELECT * FROM {$wpdb->prefix}wppa_albums WHERE a_parent = %d ORDER BY id";
+
+		}
+	}
+
+	$subs = $wpdb->get_results( $wpdb->prepare( $query, $id ), ARRAY_A );
+
+	/**/
 
 	// Only if there are sub-albums
 	if ( ! empty( $subs ) ) {

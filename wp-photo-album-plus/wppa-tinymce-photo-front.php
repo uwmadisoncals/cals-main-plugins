@@ -2,7 +2,7 @@
 /* wppa-tinymce-photo-front.php
 * Pachkage: wp-photo-album-plus
 *
-* Version 6.9.12
+* Version 6.9.16
 *
 */
 
@@ -71,7 +71,7 @@ wppaShortcodeTemplateId = "' . $id . '.' . wppa_get_photo_item( $id, 'ext' ) . '
 ';
 
 		if ( $wppa_js_page_data_file ) {
-			$handle = @ fopen( $wppa_js_page_data_file, 'ab' );
+			$handle = wppa_fopen( $wppa_js_page_data_file, 'ab' );
 			if ( $handle ) {
 				fwrite( $handle, "\n/* START PHOTO sc and TynyMce fe vars */" . $body . "/* END PHOTO and TynMce */\n" );
 				fclose( $handle );

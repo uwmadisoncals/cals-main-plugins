@@ -3,7 +3,7 @@
 * Package: wp-photo-album-plus
 *
 * Contains all the upload pages and functions
-* Version 6.8.13
+* Version 6.9.16
 *
 */
 
@@ -654,7 +654,7 @@ global $target;
 	$temp 	= $file['tmp_name'];
 	$target = WPPA_DEPOT_PATH.'/'.$name;
 
-	copy( $temp, $target );
+	wppa_copy( $temp, $target );
 
 	if ( $error == '0' ) wppa_ok_message( __( 'Zipfile' , 'wp-photo-album-plus').' '.$name.' '.__( 'sucessfully uploaded.' , 'wp-photo-album-plus') );
 	else wppa_error_message( __( 'Error' , 'wp-photo-album-plus').' '.$error.' '.__( 'during upload.' , 'wp-photo-album-plus') );
