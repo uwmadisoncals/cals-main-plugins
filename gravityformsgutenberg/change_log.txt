@@ -1,0 +1,18 @@
+# 1.0-beta-5 | 2018-07-16
+   - Add support for Gutenberg 3.2.0.
+
+
+# 1.0-beta-4 | 2018-04-10
+   - Add support for Gutenberg 2.6.0.
+
+
+# 1.0-beta-3 | 2018-02-26
+   - Add MailChimp block.
+
+
+# 1.0-beta-2 | 2018-02-16
+   - Update block to work with Gutenberg 2.2.0.
+
+
+# 1.0-beta-1 | 2018-02-07
+   - Initial release.
