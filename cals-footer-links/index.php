@@ -189,9 +189,9 @@ function cals_footer_inject() { ?>
         <div class="calsfooterLinks">
             <a href="<?php echo get_site_option('calsfooterlinks_option_login'); ?>" target="_blank">Login</a>
 
-            <a href="<?php echo get_option('calsfooterlinks_option_request'); ?>" target="_blank">Request Help</a>
+            <a href="<?php echo get_site_option('calsfooterlinks_option_request'); ?>" target="_blank">Request Help</a>
 
-            <a href="<?php echo get_option('calsfooterlinks_option_docs'); ?>" target="_blank">Help Docs</a>
+            <a href="<?php echo get_site_option('calsfooterlinks_option_docs'); ?>" target="_blank">Help Docs</a>
         </div>
     </div>
 
