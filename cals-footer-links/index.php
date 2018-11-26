@@ -160,7 +160,7 @@ add_action('wp_footer', 'cals_footer_inject');
 function cals_footer_inject() { ?>
     <style>
         .calsfooterWrapper {
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.7);
         }
 
         .calsfooterLinks {
@@ -172,8 +172,8 @@ function cals_footer_inject() { ?>
             text-align: center;
             font-size: 0.8rem;
             padding: 1rem;
-            padding-top: 0.4rem;
-            padding-bottom: 0.4rem;
+            padding-top: 0.6rem;
+            padding-bottom: 0.6rem;
             color: rgba(255,255,255,0.7);
         }
 
