@@ -9,7 +9,7 @@
  */
 
 
-function calsfooterlinks_register_settings() {
+/*function calsfooterlinks_register_settings() {
     add_option( 'calsfooterlinks_option_login', 'https://webhosting.cals.wisc.edu/wp-admin');
     register_setting( 'calsfooterlinks_options_group', 'calsfooterlinks_option_login', 'calsfooterlinks_callback' );
 
@@ -66,6 +66,94 @@ function calsfooterlinks_register_settings() {
   </form>
   </div>
 <?php
+}*/
+
+
+add_action("network_admin_menu", "calsfooterlinks_new_menu_items");
+function calsfooterlinks_new_menu_items() {
+
+	add_submenu_page(
+		'settings.php', // Parent element
+		'CALS Footer Links', // Text in browser title bar
+		'CALS Footer Links', // Text to be displayed in the menu.
+		'manage_options', // Capability
+		'cals-footer-links', // Page slug, will be displayed in URL
+		'calsfooterlinks_settings_page_1' // Callback function which displays the page
+	);
+
+
+
+}
+
+function calsfooterlinks_settings_page_1() {
+
+	echo '<div class="wrap">
+		<h1>Theme Options</h1>
+		<form method="post" action="edit.php?action=calsfooterlinksaction">';
+			wp_nonce_field( 'calsfooterlinks-validate' );
+			echo '
+
+			<table class="form-table">
+				<tr>
+					<th scope="row"><label for="calsfooterlinks_option_login">Login URL</label></th>
+					<td>
+						<input name="calsfooterlinks_option_login" class="regular-text" type="text" id="calsfooterlinks_option_login" value="' . esc_attr( get_site_option( 'calsfooterlinks_option_login') ) . '" />
+						<p class="description">Full URL to login.</p>
+					</td>
+                </tr>
+
+                <tr>
+					<th scope="row"><label for="calsfooterlinks_option_request">Request for Help URL</label></th>
+					<td>
+						<input name="calsfooterlinks_option_request" class="regular-text" type="text" id="calsfooterlinks_option_request" value="' . esc_attr( get_site_option( 'calsfooterlinks_option_request') ) . '" />
+						<p class="description">Full URL to contact form.</p>
+					</td>
+                </tr>
+
+                <tr>
+					<th scope="row"><label for="calsfooterlinks_option_docs">Documentation URL</label></th>
+					<td>
+						<input name="calsfooterlinks_option_docs" class="regular-text" type="text" id="calsfooterlinks_option_docs" value="' . esc_attr( get_site_option( 'calsfooterlinks_option_docs') ) . '" />
+						<p class="description">Full URL for documentation.</p>
+					</td>
+				</tr>
+			</table>';
+			submit_button();
+		echo '</form></div>';
+
+}
+
+add_action( 'network_admin_edit_calsfooterlinksaction', 'calsfooterlinks_save_settings' );
+
+function calsfooterlinks_save_settings(){
+
+	check_admin_referer( 'calsfooterlinks-validate' ); // Nonce security check
+
+	update_site_option( 'calsfooterlinks_option_login', $_POST['calsfooterlinks_option_login'] );
+
+    update_site_option( 'calsfooterlinks_option_request', $_POST['calsfooterlinks_option_request'] );
+
+    update_site_option( 'calsfooterlinks_option_docs', $_POST['calsfooterlinks_option_docs'] );
+
+
+	wp_redirect( add_query_arg( array(
+		'page' => 'cals-footer-links',
+		'updated' => true ), network_admin_url('settings.php')
+	));
+
+	exit;
+
+}
+
+
+add_action( 'network_admin_notices', 'calsfooterlinks_custom_notices' );
+
+function calsfooterlinks_custom_notices(){
+
+	if( isset($_GET['page']) && $_GET['page'] == 'cals-footer-links' && isset( $_GET['updated'] )  ) {
+		echo '<div id="message" class="updated notice is-dismissible"><p>Settings updated. You\'re the best!</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button></div>';
+	}
+
 }
 
 add_action('wp_footer', 'cals_footer_inject');
@@ -99,7 +187,7 @@ function cals_footer_inject() { ?>
 
     <div class="calsfooterWrapper">
         <div class="calsfooterLinks">
-            <a href="<?php echo get_option('calsfooterlinks_option_login'); ?>" target="_blank">Login</a>
+            <a href="<?php echo get_site_option('calsfooterlinks_option_login'); ?>" target="_blank">Login</a>
 
             <a href="<?php echo get_option('calsfooterlinks_option_request'); ?>" target="_blank">Request Help</a>
 
