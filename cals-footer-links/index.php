@@ -88,7 +88,7 @@ function calsfooterlinks_new_menu_items() {
 function calsfooterlinks_settings_page_1() {
 
 	echo '<div class="wrap">
-		<h1>Theme Options</h1>
+		<h1>CALS Network Footer Links</h1>
 		<form method="post" action="edit.php?action=calsfooterlinksaction">';
 			wp_nonce_field( 'calsfooterlinks-validate' );
 			echo '
