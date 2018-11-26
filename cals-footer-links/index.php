@@ -170,7 +170,7 @@ function cals_footer_inject() { ?>
             margin: 0 auto;
             max-width: 600px;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             padding: 1rem;
             padding-top: 0.6rem;
             padding-bottom: 0.6rem;
