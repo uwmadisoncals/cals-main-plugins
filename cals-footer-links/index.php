@@ -196,3 +196,12 @@ function cals_footer_inject() { ?>
     </div>
 
 <?php }
+
+
+add_action('admin_menu', 'check_refer');
+
+function check_refer() {
+
+    echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Came From: '.$_SERVER['HTTP_REFERER'].'</div>';
+
+}
