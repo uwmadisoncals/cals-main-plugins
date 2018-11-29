@@ -195,13 +195,34 @@ function cals_footer_inject() { ?>
         </div>
     </div>
 
+     <?php setcookie('frontface', $_SERVER['HTTP_HOST'], time()+300, '/', '.wisc.edu'); ?>
+
 <?php }
 
 
 add_action('admin_menu', 'check_refer');
 
 function check_refer() {
+    //setcookie('token', base64_encode(serialize($token)), time()+10800, '/', '.mydomain.com');
 
-    echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Came From: '.$_SERVER['HTTP_REFERER'].'</div>';
+if (isset($_COOKIE['frontface'])) {
+    $url = $_COOKIE['frontface']."/wp-admin";
+    $current = $_SERVER['HTTP_HOST']."/wp-admin";
+    //header('Location: ' . $url, true, 302);
+
+    //echo '<div style="position: fixed; bottom: 50px; right: 10px; z-index:3;">Would loop: '.$_SERVER['HTTP_HOST'].'</div>';
+
+    if($url != $current) {
+        echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Go to: '.$url.'</div>';
+        header('Location: ' . $url, true, 302);
+    } else {
+        //Thinks it will loop so avoids.
+        echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Would loop: '.$url.'</div>';
+    }
+} else {
+    echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">No Cookie :(</div>';
+}
+
+
 
 }
