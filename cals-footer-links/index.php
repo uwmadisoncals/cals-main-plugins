@@ -197,7 +197,7 @@ function cals_footer_inject() { ?>
 
      <?php
      unset($_COOKIE['frontface']);
-     setcookie('frontface', $_SERVER['HTTP_HOST'], time()+300, '/', '.wisc.edu'); ?>
+     setcookie('frontface', $_SERVER['HTTP_HOST'], time()+100, '/', '.wisc.edu'); ?>
 
 <?php }
 
@@ -218,7 +218,10 @@ if (isset($_COOKIE['frontface'])) {
         //echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Go to: '.$url.'</div>';
         header('Location: https://'.$url, true, 302);
     } else {
-        setcookie('frontface', '', time() - 3600);
+        //You should have no landed at the appropriate dashboard, ditch the cookie.
+
+        unset($_COOKIE['frontface']);
+        $res = setcookie('frontface', '', time() - 3600, '/', '.wisc.edu');
         //Thinks it will loop so avoids.
         //echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Would loop: '.$url.'</div>';
     }
