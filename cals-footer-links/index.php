@@ -195,7 +195,9 @@ function cals_footer_inject() { ?>
         </div>
     </div>
 
-     <?php setcookie('frontface', $_SERVER['HTTP_HOST'], time()+300, '/', '.wisc.edu'); ?>
+     <?php
+     unset($_COOKIE['frontface']);
+     setcookie('frontface', $_SERVER['HTTP_HOST'], time()+3600, '/', '.wisc.edu'); ?>
 
 <?php }
 
@@ -214,7 +216,7 @@ if (isset($_COOKIE['frontface'])) {
 
     if($url != $current) {
         echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Go to: '.$url.'</div>';
-        header('Location: ' . $url, true, 302);
+        header('Location: https://'.$url, true, 302);
     } else {
         //Thinks it will loop so avoids.
         echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Would loop: '.$url.'</div>';
