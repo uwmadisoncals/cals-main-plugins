@@ -215,14 +215,15 @@ if (isset($_COOKIE['frontface'])) {
     //echo '<div style="position: fixed; bottom: 50px; right: 10px; z-index:3;">Would loop: '.$_SERVER['HTTP_HOST'].'</div>';
 
     if($url != $current) {
-        echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Go to: '.$url.'</div>';
+        //echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Go to: '.$url.'</div>';
         header('Location: https://'.$url, true, 302);
     } else {
+        setcookie('frontface', '', time() - 3600);
         //Thinks it will loop so avoids.
-        echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Would loop: '.$url.'</div>';
+        //echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Would loop: '.$url.'</div>';
     }
 } else {
-    echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">No Cookie :(</div>';
+    //echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">No Cookie :(</div>';
 }
 
 
