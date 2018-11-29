@@ -208,8 +208,8 @@ function check_refer() {
     //setcookie('token', base64_encode(serialize($token)), time()+10800, '/', '.mydomain.com');
 
 if (isset($_COOKIE['frontface'])) {
-    $url = $_COOKIE['frontface']."/wp-admin";
-    $current = $_SERVER['HTTP_HOST']."/wp-admin";
+    $url = $_COOKIE['frontface']."/wp-admin/";
+    $current = $_SERVER['HTTP_HOST']."/wp-admin/";
     //header('Location: ' . $url, true, 302);
 
     //echo '<div style="position: fixed; bottom: 50px; right: 10px; z-index:3;">Would loop: '.$_SERVER['HTTP_HOST'].'</div>';
