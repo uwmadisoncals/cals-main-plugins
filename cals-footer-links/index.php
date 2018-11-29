@@ -197,7 +197,7 @@ function cals_footer_inject() { ?>
 
      <?php
      unset($_COOKIE['frontface']);
-     setcookie('frontface', $_SERVER['HTTP_HOST'], time()+3600, '/', '.wisc.edu'); ?>
+     setcookie('frontface', $_SERVER['HTTP_HOST'], time()+300, '/', '.wisc.edu'); ?>
 
 <?php }
 
