@@ -161,6 +161,8 @@ function cals_footer_inject() { ?>
     <style>
         .calsfooterWrapper {
             background: rgba(0,0,0,0.7);
+            position:relative;
+            z-index:5;
         }
 
         .calsfooterLinks {
@@ -187,7 +189,7 @@ function cals_footer_inject() { ?>
 
     <div class="calsfooterWrapper">
         <div class="calsfooterLinks">
-            <a href="<?php echo get_site_option('calsfooterlinks_option_login'); ?>" target="_blank">Login</a>
+            <a href="<?php echo get_site_option('calsfooterlinks_option_login'); ?>" class="footerLogin" target="_blank">Login</a>
 
             <a href="<?php echo get_site_option('calsfooterlinks_option_request'); ?>" target="_blank">Request Help</a>
 
@@ -195,9 +197,31 @@ function cals_footer_inject() { ?>
         </div>
     </div>
 
+    <script>
+        document.querySelector(".footerLogin").addEventListener("click", function(e) {
+            e.preventDefault();
+
+            var now = new Date();
+            now.setSeconds(now.getSeconds() + 10);
+
+
+            //document.cookie="name=frontface";
+            document.cookie = "frontface=<?php echo $_SERVER['HTTP_HOST'] ?>; expires=" + now.toUTCString() + "; path=/; domain=.wisc.edu;"
+
+            //console.log("setting cookies");
+
+            //document.cookie = "username=John Doe; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/; domain=.wisc.localhost;";
+
+            window.location.href = "<?php echo get_site_option('calsfooterlinks_option_login'); ?>";
+        });
+
+
+    </script>
+
+
      <?php
-     unset($_COOKIE['frontface']);
-     setcookie('frontface', $_SERVER['HTTP_HOST'], time()+100, '/', '.wisc.edu'); ?>
+     //unset($_COOKIE['frontface']);
+     //setcookie('frontface', $_SERVER['HTTP_HOST'], time()+100, '/', '.wisc.localhost'); ?>
 
 <?php }
 
@@ -218,7 +242,7 @@ if (isset($_COOKIE['frontface'])) {
         //echo '<div style="position: fixed; bottom: 0px; right: 10px; z-index:3;">Go to: '.$url.'</div>';
         header('Location: https://'.$url, true, 302);
     } else {
-        //You should have no landed at the appropriate dashboard, ditch the cookie.
+        //You should have landed at the appropriate dashboard, ditch the cookie.
 
         unset($_COOKIE['frontface']);
         $res = setcookie('frontface', '', time() - 3600, '/', '.wisc.edu');
