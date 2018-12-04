@@ -208,10 +208,6 @@ function cals_footer_inject() { ?>
             //document.cookie="name=frontface";
             document.cookie = "frontface=<?php echo $_SERVER['HTTP_HOST'] ?>; expires=" + now.toUTCString() + "; path=/; domain=.wisc.edu;"
 
-            //console.log("setting cookies");
-
-            //document.cookie = "username=John Doe; expires=Thu, 18 Dec 2013 12:00:00 UTC; path=/; domain=.wisc.localhost;";
-
             window.location.href = "<?php echo get_site_option('calsfooterlinks_option_login'); ?>";
         });
 
@@ -219,9 +215,7 @@ function cals_footer_inject() { ?>
     </script>
 
 
-     <?php
-     //unset($_COOKIE['frontface']);
-     //setcookie('frontface', $_SERVER['HTTP_HOST'], time()+100, '/', '.wisc.localhost'); ?>
+
 
 <?php }
 
