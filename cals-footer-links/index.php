@@ -194,6 +194,8 @@ function cals_footer_inject() { ?>
             <a href="<?php echo get_site_option('calsfooterlinks_option_request'); ?>" target="_blank">Request Help</a>
 
             <a href="<?php echo get_site_option('calsfooterlinks_option_docs'); ?>" target="_blank">Help Docs</a>
+
+             <a href="#"><?php echo get_option( 'siteurl' ); ?></a>
         </div>
     </div>
 
@@ -224,7 +226,7 @@ add_action('admin_menu', 'check_refer');
 
 function check_refer() {
     //setcookie('token', base64_encode(serialize($token)), time()+10800, '/', '.mydomain.com');
-    echo "<div style='font-size: 0.6rem; position: fixed; bottom: 0px; right: 10px; z-index:5;'>Site URL: ".get_option( 'siteurl' )."</div>";
+
 
 if (isset($_COOKIE['frontface'])) {
     $url = $_COOKIE['frontface']."/wp-admin/";
