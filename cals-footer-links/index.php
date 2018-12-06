@@ -195,7 +195,8 @@ function cals_footer_inject() { ?>
 
             <a href="<?php echo get_site_option('calsfooterlinks_option_docs'); ?>" target="_blank">Help Docs</a>
 
-             <a href="#"><?php echo get_option( 'siteurl' ); ?></a>
+
+
         </div>
     </div>
 
@@ -206,9 +207,21 @@ function cals_footer_inject() { ?>
             var now = new Date();
             now.setSeconds(now.getSeconds() + 10);
 
+            <?php
+
+global $wpdb;
+$wpdb->dmtable = $wpdb->base_prefix . 'blogs';
+
+ $custom_blog_id = get_current_blog_id();
+ $domain = $wpdb->get_results( "SELECT domain FROM {$wpdb->dmtable} WHERE blog_id = $custom_blog_id LIMIT 1" );
+            if ( $domain ) {
+                $rootdomain = $domain[0]->domain;
+            } else {
+                $rootdomain = $_SERVER['HTTP_HOST'];
+            } ?>
 
             //document.cookie="name=frontface";
-            document.cookie = "frontface=<?php echo $_SERVER['HTTP_HOST'] ?>; expires=" + now.toUTCString() + "; path=/; domain=.wisc.edu;"
+            document.cookie = "frontface=<?php echo $rootdomain ?>; expires=" + now.toUTCString() + "; path=/; domain=.wisc.edu;"
 
             window.location.href = "<?php echo get_site_option('calsfooterlinks_option_login'); ?>";
         });
