@@ -162,7 +162,7 @@ function cals_footer_inject() { ?>
         .calsfooterWrapper {
             background: rgba(0,0,0,0.7);
             position:relative;
-            z-index:5;
+            z-index:6;
         }
 
         .calsfooterLinks {
