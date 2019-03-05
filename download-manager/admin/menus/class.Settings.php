@@ -9,11 +9,11 @@ class Settings
     function __construct()
     {
         add_action('admin_init', array($this, 'initiateSettings'));
-        add_action('wp_ajax_wdm_settings', array($this, 'loadSettingsPage'));
-        add_action('admin_menu', array($this, 'Menu'));
+        add_action('wp_ajax_wpdm_settings', array($this, 'loadSettingsPage'));
+        add_action('admin_menu', array($this, 'menu'));
     }
 
-    function Menu(){
+    function menu(){
         $menu_access_cap = apply_filters('wpdm_admin_menu_settings', WPDM_MENU_ACCESS_CAP);
         add_submenu_page('edit.php?post_type=wpdmpro', __('Settings &lsaquo; Download Manager','download-manager'), __('Settings','download-manager'), $menu_access_cap, 'settings', array($this, 'UI'));
 
@@ -60,7 +60,8 @@ class Settings
     {
         global $stabs;
         $tabs = array();
-        $tabs['basic'] = array('id' => 'basic','icon'=>'fa fa-cog', 'link' => 'edit.php?post_type=wpdmpro&page=settings', 'title' => 'Basic', 'callback' => array($this, 'Basic'));
+        $tabs['basic'] = array('id' => 'basic','icon'=>'fas fa-cog', 'link' => 'edit.php?post_type=wpdmpro&page=settings', 'title' => 'Basic', 'callback' => array($this, 'Basic'));
+        $tabs['wpdmui'] = array('id' => 'wpdmui','icon'=>'fas fa-fill-drip', 'link' => 'edit.php?post_type=wpdmpro&page=settings', 'title' => 'User Interface', 'callback' => array($this, 'userInterface'));
 
         // Add buddypress settings menu when buddypress plugin is active
         if (function_exists('bp_is_active')) {
@@ -113,6 +114,7 @@ class Settings
 
             foreach ($_POST as $optn => $optv) {
                 if(strpos("__".$optn, '_wpdm_')) {
+                    $optv = wpdm_escs($optv);
                     update_option($optn, $optv);
                 }
             }
@@ -122,13 +124,32 @@ class Settings
             if (!isset($_POST['__wpdm_cat_img'])) delete_option('__wpdm_cat_img');
             if (!isset($_POST['__wpdm_cat_tb'])) delete_option('__wpdm_cat_tb');
             flush_rewrite_rules();
-            global $wp_rewrite;
-            $wpdm = new \WPDM\WordPressDownloadManager();
-            $wpdm->registerPostTypeTaxonomy();
+            global $wp_rewrite, $WPDM;
+            $WPDM->registerPostTypeTaxonomy();
             $wp_rewrite->flush_rules();
             die('Settings Saved Successfully');
         }
         include(WPDM_BASE_DIR.'admin/tpls/settings/basic.php');
+
+    }
+
+
+    function userInterface(){
+
+        if (isset($_POST['task']) && $_POST['task'] == 'wdm_save_settings' && current_user_can(WPDM_ADMIN_CAP)) {
+
+            if(!wp_verify_nonce($_POST['__wpdms_nonce'], NONCE_KEY)) die(__('Security token is expired! Refresh the page and try again.', 'download-manager'));
+
+            foreach ($_POST as $optn => $optv) {
+                if(strpos("__".$optn, '_wpdm_')) {
+                    $optv = wpdm_escs($optv);
+                    update_option($optn, $optv);
+                }
+            }
+
+            die('Settings Saved Successfully');
+        }
+        include(WPDM_BASE_DIR.'admin/tpls/settings/user-interface.php');
 
     }
 
@@ -140,6 +161,7 @@ class Settings
 
             foreach($_POST as $k => $v){
                 if(strpos("__".$k, '_wpdm_')){
+                    $v = wpdm_escs($v);
                     update_option($k, $v);
                 }
             }
@@ -195,6 +217,7 @@ class Settings
 
             foreach($_POST as $k => $v){
                 if(strpos("__".$k, '_wpdm_')){
+                    $v = wpdm_escs($v);
                     update_option($k, $v);
                 }
             }
@@ -210,6 +233,7 @@ class Settings
             
             foreach($_POST as $k => $v){
                 if(strpos("__".$k, '_wpdm_')){
+                    $v = wpdm_escs($v);
                     update_option($k, $v);
                 }
             }
@@ -225,6 +249,7 @@ class Settings
             delete_option('__wpdm_purchased_items');
             delete_option('__wpdm_freeaddons');
             delete_option('__wpdm_core_update_check');
+            delete_option('__wpdm_access_token');
             unset($_SESSION['__wpdm_download_url']);
             die('<script>location.href="edit.php?post_type=wpdmpro&page=settings&tab=plugin-update";</script>Refreshing...');
         }
@@ -235,6 +260,7 @@ class Settings
             delete_option('__wpdm_purchased_items');
             delete_option('__wpdm_freeaddons');
             delete_option('__wpdm_core_update_check');
+            delete_option('__wpdm_access_token');
             unset($_SESSION['__wpdm_download_url']);
             $access_token = wpdm_access_token();
             if($access_token != '') {

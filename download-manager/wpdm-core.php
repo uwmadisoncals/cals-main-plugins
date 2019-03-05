@@ -108,31 +108,30 @@ function wpdm_dropdown_categories($name = '', $selected = '', $id = '', $echo = 
 
 
 /**
- * @usage Post with cURL
  * @param $url
- * @param $data
- * @return bool|mixed|string
+ * @param array $data
+ * @return array|WP_Error
  */
-function remote_post($url, $data)
+function wpdm_remote_post($url, $data = array(), $headers = array())
 {
-    $fields_string = "";
-    foreach ($data as $key => $value) {
-        $fields_string .= $key . '=' . $value . '&';
+
+    $response = wp_remote_post( $url, array(
+            'method'      => 'POST',
+            'timeout'     => 45,
+            'redirection' => 5,
+            'httpversion' => '1.0',
+            'blocking'    => true,
+            'headers'     => $headers,
+            'body'        => $data,
+            'cookies'     => array()
+        )
+    );
+
+    if ( is_wp_error( $response ) ) {
+        return $response;
+    } else {
+        return $response['body'];
     }
-    rtrim($fields_string, '&');
-    //open connection
-    if(!function_exists('curl_init')) return WPDM_Messages::Error('<b>cURL</b> is not active or installed or not functioning properly in your server',-1);
-    $ch = curl_init();
-    //set the url, number of POST vars, POST data
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_POST, count($data));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
-    //execute post
-    $result = curl_exec($ch);
-    //close connection
-    curl_close($ch);
-    return $result;
 }
 
 /**
@@ -298,11 +297,13 @@ function wpdm_newversion_check(){
 
 function wpdm_access_token(){
     $at = get_option("__wpdm_access_token", false);
+
     if($at)
         return $at;
     if(get_option('__wpdm_suname') != '') {
-        $access_token = remote_get('https://www.wpdownloadmanager.com/?wpdm_api_req=getAccessToken&user=' . urlencode(get_option('__wpdm_suname')) . '&pass=' . urlencode(get_option('__wpdm_supass')));
+        $access_token = wpdm_remote_post('https://www.wpdownloadmanager.com/', array( 'wpdm_api_req' => 'getAccessToken', 'user' => get_option('__wpdm_suname'), 'pass' => get_option('__wpdm_supass')));
         $access_token = json_decode($access_token);
+        //print_r($access_token);die();
         if (isset($access_token->access_token)) {
             update_option("__wpdm_access_token", $access_token->access_token);
             return $access_token->access_token;

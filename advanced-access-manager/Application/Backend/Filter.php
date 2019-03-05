@@ -33,7 +33,9 @@ class AAM_Backend_Filter {
      */
     protected function __construct() {
         //menu filter
-        add_filter('parent_file', array($this, 'filterMenu'), 999, 1);
+        if (!AAM::isAAM() || !current_user_can('aam_manage_admin_menu')) {
+            add_filter('parent_file', array($this, 'filterMenu'), 999, 1);
+        }
         
         //manager WordPress metaboxes
         add_action("in_admin_header", array($this, 'metaboxes'), 999);
@@ -48,10 +50,6 @@ class AAM_Backend_Filter {
         add_filter('page_row_actions', array($this, 'postRowActions'), 10, 2);
         add_filter('post_row_actions', array($this, 'postRowActions'), 10, 2);
 
-        //default category filder
-        // TODO - THIS HAS TO GO TO THE PLUS PACKAGE EXTENSION
-        add_filter('pre_option_default_category', array($this, 'filterDefaultCategory'));
-        
         add_action('pre_post_update', array($this, 'prePostUpdate'), 10, 2);
         
         //user/role filters
@@ -60,15 +58,6 @@ class AAM_Backend_Filter {
             add_action('pre_get_users', array($this, 'filterUserQuery'), 999);
             add_filter('views_users', array($this, 'filterViews'));
         }
-        
-        // Check if user has ability to perform certain task based on provided
-        // capability and meta data
-        add_filter(
-            'user_has_cap', 
-            array(AAM_Shared_Manager::getInstance(), 'userHasCap'), 
-            999, 
-            3
-        );
         
         AAM_Backend_Authorization::bootstrap(); //bootstrap backend authorization
     }
@@ -125,7 +114,7 @@ class AAM_Backend_Filter {
      */
     public function adminNotices() {
         if (AAM_Core_API::capabilityExists('show_admin_notices')) {
-            if (!AAM::getUser()->hasCapability('show_admin_notices')) {
+            if (!current_user_can('show_admin_notices')) {
                 remove_all_actions('admin_notices');
                 remove_all_actions('network_admin_notices');
                 remove_all_actions('user_admin_notices');
@@ -147,7 +136,7 @@ class AAM_Backend_Filter {
         $object = AAM::getUser()->getObject('post', $post->ID, $post);
         
         //filter edit menu
-        if (!$this->isAllowed('backend.edit', $object)) {
+        if (!$object->allowed('backend.edit')) {
             if (isset($actions['edit'])) { 
                 unset($actions['edit']); 
             }
@@ -157,64 +146,19 @@ class AAM_Backend_Filter {
         }
         
         //filter delete menu
-        if (!$this->isAllowed('backend.delete', $object)) {
+        if (!$object->allowed('backend.delete')) {
             if (isset($actions['trash'])) { unset($actions['trash']); }
             if (isset($actions['delete'])) { unset($actions['delete']); }
         }
         
         //filter edit menu
-        if (!$this->isAllowed('backend.publish', $object)) {
+        if (!$object->allowed('backend.publish')) {
             if (isset($actions['inline hide-if-no-js'])) {
                 unset($actions['inline hide-if-no-js']);
             }
         }
 
         return $actions;
-    }
-    
-    /**
-     * Check if action is allowed
-     * 
-     * This method will take in consideration also *_others action
-     * 
-     * @param string               $action
-     * @param AAM_Core_Object_Post $object
-     * 
-     * @return boolean
-     * 
-     * @access protected
-     */
-    protected function isAllowed($action, $object) {
-        $edit   = $object->has($action);
-        $others = $object->has("{$action}_others");
-        $author = (intval($object->post_author) === get_current_user_id());
-        
-        return ($edit || ($others && !$author)) ? false : true;
-    }
-    
-    /**
-     * Override default category if defined
-     * 
-     * @param type $category
-     * 
-     * @return int
-     * 
-     * @access public
-     * @staticvar type $default
-     */
-    public function filterDefaultCategory($category) {
-        //check if user category is defined
-        $id      = get_current_user_id();
-        $default = AAM_Core_Config::get('feature.post.defaultTerm.user.' . $id , null);
-        $roles   = AAM::getUser()->roles;
-        
-        if (is_null($default) && count($roles)) {
-            $default = AAM_Core_Config::get(
-                'feature.post.defaultTerm.role.' . array_shift($roles), false
-            );
-        }
-        
-        return ($default ? $default : $category);
     }
     
     /**
@@ -245,15 +189,19 @@ class AAM_Backend_Filter {
      * @return array
      */
     public function filterRoles($roles) {
-        $userLevel = AAM_Core_API::maxLevel(AAM::getUser()->allcaps);
+        static $levels = array(); // to speed-up the execution
+        
+        $userLevel = AAM::getUser()->getMaxLevel();
         
         //filter roles
         foreach($roles as $id => $role) {
             if (!empty($role['capabilities']) && is_array($role['capabilities'])) {
-                $roleLevel = AAM_Core_API::maxLevel($role['capabilities']);
-                if ($userLevel < $roleLevel) {
+                if (!isset($levels[$id])) {
+                    $levels[$id] = AAM_Core_API::maxLevel($role['capabilities']);
+                }
+                if ($userLevel < $levels[$id]) {
                     unset($roles[$id]);
-                } elseif ($userLevel === $roleLevel && $this->filterSameLevel()) {
+                } elseif ($userLevel === $levels[$id] && $this->filterSameLevel()) {
                     unset($roles[$id]);
                 }
             }
@@ -270,7 +218,7 @@ class AAM_Backend_Filter {
         $response = false;
         
         if (AAM_Core_API::capabilityExists('manage_same_user_level')) {
-            $response = !AAM::getUser()->hasCapability('manage_same_user_level');
+            $response = !current_user_can('manage_same_user_level');
         }
         
         return $response;
@@ -289,7 +237,7 @@ class AAM_Backend_Filter {
      */
     public function filterUserQuery($query) {
         //current user max level
-        $max     = AAM_Core_API::maxLevel(AAM::getUser()->allcaps);
+        $max     = AAM::getUser()->getMaxLevel();
         $exclude = array();
         $roles   = AAM_Core_API::getRoles();
         
@@ -315,7 +263,7 @@ class AAM_Backend_Filter {
      * @access public
      */
     public function filterViews($views) {
-        $max   = AAM_Core_API::maxLevel(AAM::getUser()->allcaps);
+        $max   = AAM::getUser()->getMaxLevel();
         $roles = AAM_Core_API::getRoles();
         
         foreach($roles->role_objects as $id => $role) {

@@ -6,10 +6,9 @@ use MailPoet\Mailer\Methods\ErrorMappers\MailPoetMapper;
 use MailPoet\Mailer\Methods\ErrorMappers\PHPMailMapper;
 use MailPoet\Mailer\Methods\ErrorMappers\SendGridMapper;
 use MailPoet\Mailer\Methods\ErrorMappers\SMTPMapper;
-use MailPoet\Models\Setting;
+use MailPoet\Settings\SettingsController;
 
-if(!defined('ABSPATH')) exit;
-require_once(ABSPATH . 'wp-includes/pluggable.php');
+if (!defined('ABSPATH')) exit;
 
 class Mailer {
   public $mailer_config;
@@ -17,6 +16,8 @@ class Mailer {
   public $reply_to;
   public $return_path;
   public $mailer_instance;
+  /** @var SettingsController */
+  private $settings;
   const MAILER_CONFIG_SETTING_NAME = 'mta';
   const SENDING_LIMIT_INTERVAL_MULTIPLIER = 60;
   const METHOD_MAILPOET = 'MailPoet';
@@ -26,6 +27,7 @@ class Mailer {
   const METHOD_SMTP = 'SMTP';
 
   function __construct($mailer = false, $sender = false, $reply_to = false, $return_path = false) {
+    $this->settings = new SettingsController();
     $this->mailer_config = self::getMailerConfig($mailer);
     $this->sender = $this->getSenderNameAndAddress($sender);
     $this->reply_to = $this->getReplyToNameAndAddress($reply_to);
@@ -39,7 +41,7 @@ class Mailer {
   }
 
   function buildMailer() {
-    switch($this->mailer_config['method']) {
+    switch ($this->mailer_config['method']) {
       case self::METHOD_AMAZONSES:
         $mailer_instance = new $this->mailer_config['class'](
           $this->mailer_config['region'],
@@ -96,12 +98,13 @@ class Mailer {
   }
 
   static function getMailerConfig($mailer = false) {
-    if(!$mailer) {
-      $mailer = Setting::getValue(self::MAILER_CONFIG_SETTING_NAME);
-      if(!$mailer || !isset($mailer['method'])) throw new \Exception(__('Mailer is not configured.', 'mailpoet'));
+    $settings = new SettingsController();
+    if (!$mailer) {
+      $mailer = $settings->get(self::MAILER_CONFIG_SETTING_NAME);
+      if (!$mailer || !isset($mailer['method'])) throw new \Exception(__('Mailer is not configured.', 'mailpoet'));
     }
-    if(empty($mailer['frequency'])) {
-      $default_settings = Setting::getDefaults();
+    if (empty($mailer['frequency'])) {
+      $default_settings = $settings->getAllDefaults();
       $mailer['frequency'] = $default_settings['mta']['frequency'];
     }
     // add additional variables to the mailer object
@@ -113,9 +116,9 @@ class Mailer {
   }
 
   function getSenderNameAndAddress($sender = false) {
-    if(empty($sender)) {
-      $sender = Setting::getValue('sender', array());
-      if(empty($sender['address'])) throw new \Exception(__('Sender name and email are not configured.', 'mailpoet'));
+    if (empty($sender)) {
+      $sender = $this->settings->get('sender', []);
+      if (empty($sender['address'])) throw new \Exception(__('Sender name and email are not configured.', 'mailpoet'));
     }
     $from_name = $this->encodeAddressNamePart($sender['name']);
     return array(
@@ -126,8 +129,8 @@ class Mailer {
   }
 
   function getReplyToNameAndAddress($reply_to = array()) {
-    if(!$reply_to) {
-      $reply_to = Setting::getValue('reply_to');
+    if (!$reply_to) {
+      $reply_to = $this->settings->get('reply_to');
       $reply_to['name'] = (!empty($reply_to['name'])) ?
         $reply_to['name'] :
         $this->sender['from_name'];
@@ -135,7 +138,7 @@ class Mailer {
         $reply_to['address'] :
         $this->sender['from_email'];
     }
-    if(empty($reply_to['address'])) {
+    if (empty($reply_to['address'])) {
       $reply_to['address'] = $this->sender['from_email'];
     }
     $reply_to_name = $this->encodeAddressNamePart($reply_to['name']);
@@ -149,16 +152,16 @@ class Mailer {
   function getReturnPathAddress($return_path) {
     return ($return_path) ?
       $return_path :
-      Setting::getValue('bounce.address');
+      $this->settings->get('bounce.address');
   }
 
   function formatSubscriberNameAndEmailAddress($subscriber) {
     $subscriber = (is_object($subscriber)) ? $subscriber->asArray() : $subscriber;
-    if(!is_array($subscriber)) return $subscriber;
-    if(isset($subscriber['address'])) $subscriber['email'] = $subscriber['address'];
+    if (!is_array($subscriber)) return $subscriber;
+    if (isset($subscriber['address'])) $subscriber['email'] = $subscriber['address'];
     $first_name = (isset($subscriber['first_name'])) ? $subscriber['first_name'] : '';
     $last_name = (isset($subscriber['last_name'])) ? $subscriber['last_name'] : '';
-    if(!$first_name && !$last_name) return $subscriber['email'];
+    if (!$first_name && !$last_name) return $subscriber['email'];
     $full_name = sprintf('%s %s', $first_name, $last_name);
     $full_name = trim(preg_replace('!\s\s+!', ' ', $full_name));
     $full_name = $this->encodeAddressNamePart($full_name);
@@ -171,7 +174,7 @@ class Mailer {
   }
 
   function encodeAddressNamePart($name) {
-    if(mb_detect_encoding($name) === 'ASCII') return $name;
+    if (mb_detect_encoding($name) === 'ASCII') return $name;
     // encode non-ASCII string as per RFC 2047 (https://www.ietf.org/rfc/rfc2047.txt)
     return sprintf('=?utf-8?B?%s?=', base64_encode($name));
   }

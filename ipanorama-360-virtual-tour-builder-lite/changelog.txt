@@ -1,5 +1,9 @@
 *** iPanorama 360 WordPress Plugin Changelog ***
 
+= 1.3.9 =
+ * Fix: Black screen issue in Chrome with zooming
+ * Fix: Fullscreen toggle 
+ 
 = 1.3.8 =
  * Fix: Compatible with Smart Product Viewer
  * Fix: Exit full screen mode in IE

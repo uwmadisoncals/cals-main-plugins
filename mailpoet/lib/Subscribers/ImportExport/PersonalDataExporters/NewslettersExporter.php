@@ -20,18 +20,18 @@ class NewslettersExporter {
   }
 
   private function exportSubscriber($subscriber, $page) {
-    if(!$subscriber) return array();
+    if (!$subscriber) return array();
 
     $result = array();
 
-    $statistics = StatisticsNewsletters::getAllForSubsciber($subscriber)
+    $statistics = StatisticsNewsletters::getAllForSubscriber($subscriber)
       ->limit(self::LIMIT)
       ->offset(self::LIMIT * ($page - 1))
       ->findArray();
 
     $newsletters = $this->loadNewsletters($statistics);
 
-    foreach($statistics as $row) {
+    foreach ($statistics as $row) {
       $result[] = $this->exportNewsletter($row, $newsletters, $subscriber);
     }
 
@@ -48,7 +48,7 @@ class NewslettersExporter {
       'name' => __('Sent at', 'mailpoet'),
       'value' => $statistics_row['sent_at'],
     );
-    if(isset($statistics_row['opened_at'])) {
+    if (isset($statistics_row['opened_at'])) {
       $newsletter_data[] = array(
         'name' => __('Opened', 'mailpoet'),
         'value' => 'Yes',
@@ -63,7 +63,7 @@ class NewslettersExporter {
         'value' => __('No', 'mailpoet'),
       );
     }
-    if(isset($newsletters[$statistics_row['newsletter_id']])) {
+    if (isset($newsletters[$statistics_row['newsletter_id']])) {
       $newsletter_data[] = array(
         'name' => __('Email preview', 'mailpoet'),
         'value' => Url::getViewInBrowserUrl(
@@ -88,12 +88,12 @@ class NewslettersExporter {
       return $statistics_row['newsletter_id'];
     }, $statistics);
 
-    if(empty($newsletter_ids)) return array();
+    if (empty($newsletter_ids)) return array();
 
     $newsletters = Newsletter::whereIn('id', $newsletter_ids)->findMany();
 
     $result = array();
-    foreach($newsletters as $newsletter) {
+    foreach ($newsletters as $newsletter) {
       $result[$newsletter->id()] = $newsletter;
     }
     return $result;

@@ -193,17 +193,17 @@ final class AAM_Core_API {
      * @access public
      */
     public static function maxLevel($caps, $default = 0) {
-        $levels = array($default);
+        $max = $default;
         
         if (is_array($caps)) { //WP Error Fix bug report
             foreach($caps as $cap => $granted) {
-                if ($granted && preg_match('/^level_([0-9]+)$/i', $cap, $match)) {
-                    $levels[] = intval($match[1]);
+                if (!empty($granted) && preg_match('/^level_([0-9]+)$/', $cap, $match)) {
+                    $max = ($max < $match[1] ? $match[1] : $max);
                 }
             }
         }
         
-        return max($levels);
+        return intval($max);
     }
     
     /**
@@ -216,11 +216,13 @@ final class AAM_Core_API {
      * @access public
      */
     public static function getAllCapabilities() {
-        $caps = array();
+        static $caps = array();
         
-        foreach (self::getRoles()->role_objects as $role) {
-            if (is_array($role->capabilities)) {
-                $caps = array_merge($caps, $role->capabilities);
+        if (empty($caps)) {
+            foreach (self::getRoles()->role_objects as $role) {
+                if (is_array($role->capabilities)) {
+                    $caps = array_merge($caps, $role->capabilities);
+                }
             }
         }
         
@@ -238,9 +240,10 @@ final class AAM_Core_API {
      * @static
      */
     public static function capabilityExists($cap) {
-        $caps = self::getAllCapabilities();
+        $caps   = self::getAllCapabilities();
+        $exists = array_key_exists($cap, $caps) ? true : false;
         
-        return (is_string($cap) && array_key_exists($cap, $caps) ? true : false);
+        return (is_string($cap) && $exists);
     }
     
     /**
@@ -314,7 +317,7 @@ final class AAM_Core_API {
             $object = AAM::getUser()->getObject('redirect');
             $type   = $object->get("{$area}.redirect.type");
 
-            if (!empty($type) && ($type === 'login')) {
+            if ($type === 'login') {
                 $redirect = add_query_arg(
                         array('reason' => 'restricted'), 
                         wp_login_url(AAM_Core_Request::server('REQUEST_URI'))
@@ -357,6 +360,7 @@ final class AAM_Core_API {
      */
     public static function redirect($rule, $args = null) {
         $path = wp_parse_url($rule);
+        
         if ($path && !empty($path['host'])) {
             wp_redirect($rule, 307); exit;
         } elseif (preg_match('/^[\d]+$/', $rule)) {
@@ -424,7 +428,9 @@ final class AAM_Core_API {
         
         $res = $post;
         
-        if (!empty($wp_query->queried_object)) {
+        if (get_the_ID()) {
+            $res = get_post(get_the_ID());
+        } elseif (!empty($wp_query->queried_object)) {
             $res = $wp_query->queried_object;
         } elseif (!empty($wp_query->post)) {
             $res = $wp_query->post;

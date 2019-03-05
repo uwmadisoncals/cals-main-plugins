@@ -2,7 +2,7 @@
 
 namespace MailPoet\Config;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class Env {
   const NEWSLETTER_CONTENT_WIDTH = 1320;
@@ -10,6 +10,7 @@ class Env {
   static $version;
   static $plugin_name;
   static $plugin_path;
+  static $base_url;
   static $file;
   static $path;
   static $views_path;
@@ -41,6 +42,7 @@ class Env {
     self::$file = $file;
     self::$path = dirname(self::$file);
     self::$plugin_name = 'mailpoet';
+    self::$base_url = plugins_url('', $file);
     self::$views_path = self::$path . '/views';
     self::$assets_path = self::$path . '/assets';
     self::$assets_url = plugins_url('/assets', $file);
@@ -56,10 +58,10 @@ class Env {
     self::$db_host = DB_HOST;
     self::$db_port = 3306;
     self::$db_socket = false;
-    if(preg_match('/(?=:\d+$)/', DB_HOST)) {
+    if (preg_match('/(?=:\d+$)/', DB_HOST)) {
       list(self::$db_host, self::$db_port) = explode(':', DB_HOST);
     } else {
-      if(preg_match('/:/', DB_HOST)) {
+      if (preg_match('/:/', DB_HOST)) {
         self::$db_socket = true;
       }
     }
@@ -84,7 +86,7 @@ class Env {
       'dbname=',
       DB_NAME
     );
-    if(!empty($charset)) {
+    if (!empty($charset)) {
       $source_name[] = ';charset=' . $charset;
     }
     return implode('', $source_name);

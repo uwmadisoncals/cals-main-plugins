@@ -8,6 +8,16 @@ function rvm_delete_last_character( $str ) {
                 $output_temp = substr( $str, 0, -1 );
                 return $output_temp;
 }
+//Get rid of first character if match specific character
+function rvm_delete_first_character( $str, $chartomatch ) {
+                if( ( substr( $str, 0, 1 ) == $chartomatch ) ) {
+                    $output_temp = substr( $str, 1 );
+                }
+
+                else { $output_temp = $str; }                
+                
+                return $output_temp;
+}
 //check numeric entry values for array
 function rvm_check_is_number_in_array( $array_to_check ) //check if numeric, used e.g. for markers lat and long
                 {
@@ -147,7 +157,15 @@ function rvm_include_custom_map_settings( $map_id, $rvm_selected_map ) {
                                 } //$rvm_custom_maps_options as $key => $value
                 } //if ( rvm_is_custom_map( $map_id ) || rvm_retrieve_custom_maps_options() )
                 if ( !isset( $rvm_custom_maps_found_in_option ) ) {
-                                include RVM_INC_PLUGIN_DIR . '/regions/' . $rvm_selected_map . '-regions.php';
+                                if( file_exists( RVM_INC_PLUGIN_DIR . '/regions/' . $rvm_selected_map . '-regions.php') ) {
+                                    include RVM_INC_PLUGIN_DIR . '/regions/' . $rvm_selected_map . '-regions.php';
+                                    return $regions;
+                                }
+
+                                else { 
+                                    $regions = "";
+                                }
+                                
                 } //!isset($rvm_custom_maps_found_in_option)
                 return $regions;
 }

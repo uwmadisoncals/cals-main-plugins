@@ -5,8 +5,7 @@ namespace MailPoet\Newsletter\Shortcodes\Categories;
 use MailPoet\Models\Newsletter as NewsletterModel;
 use MailPoet\WP\Posts as WPPosts;
 
-if(!defined('ABSPATH')) exit;
-require_once(ABSPATH . "wp-includes/pluggable.php");
+if (!defined('ABSPATH')) exit;
 
 class Newsletter {
   static function process(
@@ -16,7 +15,7 @@ class Newsletter {
     $queue,
     $content
   ) {
-    switch($shortcode_details['action']) {
+    switch ($shortcode_details['action']) {
       case 'subject':
         return ($newsletter) ? $newsletter->subject : false;
 
@@ -30,7 +29,7 @@ class Newsletter {
         return ($latest_post) ? $latest_post['post_title'] : false;
 
       case 'number':
-        if($newsletter->type !== NewsletterModel::TYPE_NOTIFICATION_HISTORY) return false;
+        if ($newsletter->type !== NewsletterModel::TYPE_NOTIFICATION_HISTORY) return false;
         $sent_newsletters =
           NewsletterModel::where('parent_id', $newsletter->parent_id)
             ->where('status', NewsletterModel::STATUS_SENT)

@@ -7,11 +7,10 @@ use MailPoet\API\JSON\Endpoint as APIEndpoint;
 use MailPoet\API\JSON\Error as APIError;
 use MailPoet\Config\AccessControl;
 use MailPoet\Config\Installer;
-use MailPoet\Models\Setting;
 use MailPoet\Services\Bridge;
 use MailPoet\WP\DateTime;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class Services extends APIEndpoint {
   public $bridge;
@@ -28,7 +27,7 @@ class Services extends APIEndpoint {
   function checkMSSKey($data = array()) {
     $key = isset($data['key']) ? trim($data['key']) : null;
 
-    if(!$key) {
+    if (!$key) {
       return $this->badRequest(array(
         APIError::BAD_REQUEST  => __('Please specify a key.', 'mailpoet')
       ));
@@ -37,7 +36,7 @@ class Services extends APIEndpoint {
     try {
       $result = $this->bridge->checkMSSKey($key);
       $this->bridge->storeMSSKeyAndState($key, $result);
-    } catch(\Exception $e) {
+    } catch (\Exception $e) {
       return $this->errorResponse(array(
         $e->getCode() => $e->getMessage()
       ));
@@ -46,24 +45,24 @@ class Services extends APIEndpoint {
     $state = !empty($result['state']) ? $result['state'] : null;
 
     $success_message = null;
-    if($state == Bridge::KEY_VALID) {
+    if ($state == Bridge::KEY_VALID) {
       $success_message = __('Your MailPoet Sending Service key has been successfully validated.', 'mailpoet');
-    } elseif($state == Bridge::KEY_EXPIRING) {
+    } elseif ($state == Bridge::KEY_EXPIRING) {
       $success_message = sprintf(
         __('Your MailPoet Sending Service key expires on %s!', 'mailpoet'),
         $this->date_time->formatDate(strtotime($result['data']['expire_at']))
       );
     }
 
-    if(!empty($result['data']['public_id'])) {
+    if (!empty($result['data']['public_id'])) {
       Analytics::setPublicId($result['data']['public_id']);
     }
 
-    if($success_message) {
+    if ($success_message) {
       return $this->successResponse(array('message' => $success_message));
     }
 
-    switch($state) {
+    switch ($state) {
       case Bridge::KEY_INVALID:
         $error = __('Your MailPoet Sending Service key is invalid.', 'mailpoet');
         break;
@@ -74,7 +73,7 @@ class Services extends APIEndpoint {
         $code = !empty($result['code']) ? $result['code'] : Bridge::CHECK_ERROR_UNKNOWN;
         $errorMessage = __('Error validating MailPoet Sending Service key, please try again later (%s).', 'mailpoet');
         // If site runs on localhost
-        if( 1 === preg_match("/^(http|https)\:\/\/(localhost|127\.0\.0\.1)/", site_url()) ) {
+        if ( 1 === preg_match("/^(http|https)\:\/\/(localhost|127\.0\.0\.1)/", site_url()) ) {
           $errorMessage .= ' ' . __("Note that it doesn't work on localhost.", 'mailpoet');
         }
         $error = sprintf(
@@ -90,7 +89,7 @@ class Services extends APIEndpoint {
   function checkPremiumKey($data = array()) {
     $key = isset($data['key']) ? trim($data['key']) : null;
 
-    if(!$key) {
+    if (!$key) {
       return $this->badRequest(array(
         APIError::BAD_REQUEST  => __('Please specify a key.', 'mailpoet')
       ));
@@ -99,7 +98,7 @@ class Services extends APIEndpoint {
     try {
       $result = $this->bridge->checkPremiumKey($key);
       $this->bridge->storePremiumKeyAndState($key, $result);
-    } catch(\Exception $e) {
+    } catch (\Exception $e) {
       return $this->errorResponse(array(
         $e->getCode() => $e->getMessage()
       ));
@@ -108,27 +107,27 @@ class Services extends APIEndpoint {
     $state = !empty($result['state']) ? $result['state'] : null;
 
     $success_message = null;
-    if($state == Bridge::KEY_VALID) {
+    if ($state == Bridge::KEY_VALID) {
       $success_message = __('Your Premium key has been successfully validated.', 'mailpoet');
-    } elseif($state == Bridge::KEY_EXPIRING) {
+    } elseif ($state == Bridge::KEY_EXPIRING) {
       $success_message = sprintf(
         __('Your Premium key expires on %s.', 'mailpoet'),
         $this->date_time->formatDate(strtotime($result['data']['expire_at']))
       );
     }
 
-    if(!empty($result['data']['public_id'])) {
+    if (!empty($result['data']['public_id'])) {
       Analytics::setPublicId($result['data']['public_id']);
     }
 
-    if($success_message) {
+    if ($success_message) {
       return $this->successResponse(
         array('message' => $success_message),
         Installer::getPremiumStatus()
       );
     }
 
-    switch($state) {
+    switch ($state) {
       case Bridge::KEY_INVALID:
         $error = __('Your Premium key is invalid.', 'mailpoet');
         break;
@@ -148,7 +147,7 @@ class Services extends APIEndpoint {
   }
 
   private function getErrorDescriptionByCode($code) {
-    switch($code) {
+    switch ($code) {
       case Bridge::CHECK_ERROR_UNAVAILABLE:
         $text = __('Service unavailable', 'mailpoet');
         break;

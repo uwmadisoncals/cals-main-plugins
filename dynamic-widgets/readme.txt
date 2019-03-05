@@ -3,8 +3,8 @@ Contributors: Qurl
 Donate link: http://www.qurl.nl/dynamic-widgets/donate/
 Tags: widget, dynamic, sidebar, custom, rules, logic, display, condition, hide, show
 Requires at least: 3.0.0
-Tested up to: 4.8
-Stable tag: 1.5.13
+Tested up to: 5.0
+Stable tag: 1.5.14
 
 Dynamic Widgets gives you full control on which pages a widget will display. It lets you dynamicly show or hide widgets on WordPress pages.
 
@@ -191,6 +191,10 @@ Please check the [Issue Tracker](http://www.qurl.nl/dynamic-widgets/issue-tracke
 * Remove the directory 'dynamic-widgets' underneath to the `/wp-content/plugins/` directory.
 
 == Changelog ==
+
+= Version 1.5.14 =
+
+* Bugfix for a problem introduced in WordPress 5 when using the Pages module. Kudo's to @fjaeker for doing debugging for this!
 
 = Version 1.5.13 =
 
@@ -476,13 +480,16 @@ This version has 1 new feature and 1 bug fixed. See the changelog for details.
 
 == Upgrade Notice ==
 
-= 1.5.13 =
-When you upgrade manually, remove the dynamic-widgets directory first.
+When you upgrade manually, do a deactivate - activate cycle of the plugin.
 
-This version has 1 feature added, 1 language added and 3 bugs fixed.
+This version has 1 bug fixed.
 
 == Screenshots ==
 
 1. Widgets overview page
 2. Widget Options page
 3. Widget with Dynamic Widgets info and link
+
+== Privacy Policy ==
+
+Dynamic Widgets does not collect any private data, nor does it send any private data to remote servers. Please be aware that widgets might do. Dynamic Widgets does not read, write or alter contents or functionality of a widget it self, so this is beyond the scope and control of Dynamic Widgets.

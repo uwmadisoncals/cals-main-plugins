@@ -1150,6 +1150,7 @@ div.elfinder-cwd-wrapper-list .ui-icon-grip-dotted-vertical {
   padding: 0 23px;
   height: 24px;
   color: #fff;
+  width: 34% !important;
 }
 .elfinder .elfinder-button-search .elfinder-button-menu {
   margin-top: 4px;
@@ -1488,4 +1489,7 @@ a.ui-button:active .ui-icon,
 .elfinder-help *,
 .elfinder-help a {
   color: #546E7A;
+}
+.ui-front.ui-widget.ui-widget-content.elfinder-button-menu.elfinder-button-search-menu.ui-corner-all {
+top:30px !important;
 }

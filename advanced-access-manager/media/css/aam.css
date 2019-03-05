@@ -52,6 +52,7 @@
 .icon-angle-left:before { content: '\f104' !important; } /* 'ï' */
 .icon-angle-right:before { content: '\f105' !important; } /* 'ï' */
 .icon-angle-up:before { content: '\f106' !important; } /* 'ï' */
+.icon-pin:before { content: '\e81a' !important; } /* 'î ' */
 .icon-angle-down:before { content: '\f107' !important; } /* 'ï' */
 .icon-asterisk:before { content: '\e801' !important; } /* 'î ' */
 .icon-spin4:before { content: '\e802' !important; } /* 'î ' */
@@ -557,6 +558,14 @@ input[type=radio]:checked + label:before {
     display: inline;
 }
 
+.aam-small-highlighted {
+    font-size: 85%;
+    border-bottom: 1px solid #999999;
+    padding: 0px 20px 2px 0;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
 .aam-switch-user {
     float:right; 
     font-size:1em !important;
@@ -937,6 +946,10 @@ input[type=radio]:checked + label:before {
     margin-bottom: 20px !important;
 }
 
+.aam-outer-top-xxs {
+    margin-top: 10px;
+}
+
 .aam-info-modal, .aam-info-modal p, .aam-info-modal ul {
     font-size: 1.1em;
     -moz-hyphens: auto;
@@ -1049,6 +1062,15 @@ input[type=radio]:checked + label:before {
     color: rgba(220, 220, 220, 0.8);
 }
 
+.json-editor-blackbord {
+    background: #333333 !important;
+    border-radius: 0;
+    padding: 10px 25px;
+    border: 0;
+    max-height: 60vh;
+    overflow-y: scroll;
+}
+
 .aam-current-subject {
     background-color: #337ab7;
     padding: 5px 15px 4px 10px;
@@ -1156,14 +1178,12 @@ input[type=radio]:checked + label:before {
 /* GUTTER */
 
 .CodeMirror-gutters {
-  border-right: 1px solid #ddd;
-  background-color: #f7f7f7;
   white-space: nowrap;
 }
 .CodeMirror-linenumbers {}
 .CodeMirror-linenumber {
-  padding: 0 3px 0 5px;
-  min-width: 20px;
+  padding: 0 3px 0 0px;
+  min-width: 15px;
   text-align: right;
   color: #999;
   white-space: nowrap;
@@ -1386,6 +1406,9 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
   -webkit-tap-highlight-color: transparent;
   -webkit-font-variant-ligatures: contextual;
   font-variant-ligatures: contextual;
+}
+#policy-model .CodeMirror pre {
+    padding-left: 20px;
 }
 .CodeMirror-wrap pre {
   word-wrap: break-word;

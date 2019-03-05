@@ -1,5 +1,8 @@
 <?php
 
+use kigkonsult\iCalcreator\vcalendar;
+use kigkonsult\iCalcreator\timezoneHandler;
+
 /**
  * The ics import/export engine.
  *
@@ -56,7 +59,7 @@ class Ai1ec_Ics_Import_Export_Engine
         if ( $tz ) {
             $c->setProperty( 'X-WR-TIMEZONE', $tz );
             $tz_xprops = array( 'X-LIC-LOCATION' => $tz );
-            iCalUtilityFunctions::createTimezone( $c, $tz, $tz_xprops );
+            timezoneHandler::createTimezone( $c, $tz, $tz_xprops );
         }
 
         $this->_taxonomy_model = $this->_registry->get( 'model.taxonomy' );
@@ -128,11 +131,6 @@ class Ai1ec_Ics_Import_Export_Engine
 
         //sort by event date function _cmpfcn of iCalcreator.class.php
         $v->sort();
-
-        // Reverse the sort order, so that RECURRENCE-IDs are listed before the
-        // defining recurrence events, and therefore take precedence during
-        // caching.
-        $v->components = array_reverse( $v->components );
 
         // TODO: select only VEVENT components that occur after, say, 1 month ago.
         // Maybe use $v->selectComponents(), which takes into account recurrence
@@ -797,7 +795,7 @@ class Ai1ec_Ics_Import_Export_Engine
         $tz  = $this->_registry->get( 'date.timezone' )
             ->get_default_timezone();
 
-        $e   = & $calendar->newComponent( 'vevent' );
+        $e   = $calendar->newComponent( 'vevent' );
         $uid = '';
         if ( $event->get( 'ical_uid' ) ) {
             $uid = addcslashes( $event->get( 'ical_uid' ), "\\;,\n" );

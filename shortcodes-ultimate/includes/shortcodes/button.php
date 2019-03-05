@@ -204,6 +204,9 @@ function su_shortcode_button( $atts = null, $content = null ) {
 		'bottom-left'  => '-1px 1px'
 	);
 
+	// Sanitize the size value
+	$atts['size'] = intval( $atts['size'] );
+
 	// Common styles for button
 	$styles = array(
 		'size'     => round( ( $atts['size'] + 7 ) * 1.3 ),
@@ -304,9 +307,9 @@ function su_shortcode_button( $atts = null, $content = null ) {
 
 		if ( strpos( $atts['icon'], 'icon:' ) !== false ) {
 
-			$icon = '<i class="fa fa-' . trim( str_replace( 'icon:', '', $atts['icon'] ) ) . '" style="font-size:' . $styles['size'] . 'px;color:' . $atts['icon_color'] . '"></i>';
+			$icon = '<i class="sui sui-' . trim( str_replace( 'icon:', '', $atts['icon'] ) ) . '" style="font-size:' . $styles['size'] . 'px;color:' . $atts['icon_color'] . '"></i>';
 
-			su_query_asset( 'css', 'font-awesome' );
+			su_query_asset( 'css', 'su-icons' );
 
 		}
 		else {
@@ -345,6 +348,15 @@ function su_shortcode_button( $atts = null, $content = null ) {
 	$atts['onclick'] = $atts['onclick']
 		? ' onClick="' . $atts['onclick'] . '"'
 		: '';
+
+	// Prepend `noopener` to the rel attribute value
+	if ( 'blank' === $atts['target'] ) {
+
+		$atts['rel'] = $atts['rel']
+			? 'noopener ' . $atts['rel']
+			: 'noopener';
+
+	}
 
 	// Prepare rel attribute
 	$atts['rel'] = $atts['rel']

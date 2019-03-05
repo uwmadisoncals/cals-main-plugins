@@ -75,7 +75,7 @@ class Package {
 
 
         if(!isset($post_vars['btnclass']))
-            $post_vars['btnclass'] = '[btnclass]';
+            $post_vars['btnclass'] = wpdm_download_button_style(null, $ID);
 
         $tags = get_the_tags($post_vars['ID']);
         $taghtml = "";
@@ -238,7 +238,7 @@ class Package {
                 //$post_vars['download_link_popup'] = $post_vars['download_link'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'><span><i class='fas fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer download_footer_{$post_vars['ID']}' style='display: none'>{$post_vars['download_link']}</div></div>";
             }
 
-            $post_vars['download_link_extended'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'><span><i class='fas fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$post_vars['ID']}' style='display:none;'>{$post_vars['download_link_extended']}</div></div>";
+            $post_vars['download_link_extended'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label><input type='checkbox' class='wpdm-checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$post_vars['ID']}' style='display:none;'>{$post_vars['download_link_extended']}</div></div>";
 
 
         }
@@ -871,7 +871,7 @@ class Package {
         $package['access'] = wpdm_allowed_roles($package['ID']);
 
         if ($package['download_url'] != '#')
-            $package['download_link'] = $vars['download_link_extended'] = $vars['download_link_popup'] = "<a class='wpdm-download-link wpdm-download-locked {$btnclass}' rel='nofollow' href='#' onclick=\"location.href='{$package['download_url']}';return false;\"><i class='$wpdm_download_icon'></i>{$link_label}</a>";
+            $package['download_link'] = $vars['download_link_extended'] = $vars['download_link_popup'] = "<a class='wpdm-download-link {$package['btnclass']} {$btnclass}' rel='nofollow' href='#' onclick=\"location.href='{$package['download_url']}';return false;\"><i class='$wpdm_download_icon'></i>{$link_label}</a>";
         else
             $package['download_link'] = "<div class='alert alert-warning' data-title='" . __('DOWNLOAD ERROR:', 'download-manager') . "'>{$link_label}</div>";
         $caps = array_keys($current_user->caps);
@@ -910,11 +910,11 @@ class Package {
 
             if(isset($package['terms_lock']) && $package['terms_lock'] != 0 && (!function_exists('wpdmpp_effective_price') || wpdmpp_effective_price($package['ID']) ==0)){
                 if(!self::isLocked($package)) {
-                    $data = "<a href='#unlock' class='wpdm-download-link wpdm-download-locked {$package['btnclass']}' data-package='{$package['ID']}'>{$package['link_label']}</a>";
+                    $data = "<a href='#unlock' class='wpdm-download-link wpdm-download-locked {$package['btnclass']} {$btnclass}' data-package='{$package['ID']}'>{$package['link_label']}</a>";
 
                 }
                 if($embed == 1)
-                    $data = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$package['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input data-pid='{$package['ID']}' class='terms_checkbox terms_checkbox_{$package['ID']}' type='checkbox' onclick='jQuery(\".download_footer_{$package['ID']}\").slideToggle();'><span><i class='fas fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$package['ID']}' style='display:none;'>{$data}</div></div><script>jQuery(function($){ $('#wpdm-filelist-{$package['ID']} .btn.inddl, #xfilelist .btn.inddl').attr('disabled', 'disabled'); });</script>";
+                    $data = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$package['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label><input data-pid='{$package['ID']}' class='wpdm-checkbox terms_checkbox terms_checkbox_{$package['ID']}' type='checkbox' onclick='jQuery(\".download_footer_{$package['ID']}\").slideToggle();'> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$package['ID']}' style='display:none;'>{$data}</div></div>";
 
             }
 
@@ -1121,7 +1121,6 @@ class Package {
 
         // If need to re-process any data before fetch template
         $vars = apply_filters("wdm_before_fetch_template", $vars);
-
         foreach ($vars as $key => $value) {
             if(!is_array($value)) {
                 $keys[] = "[$key]";
@@ -1139,6 +1138,7 @@ class Package {
 
         //wp_reset_query();
         wp_reset_postdata();
+
 
         return @str_replace($keys, $values, @stripcslashes($template));
     }

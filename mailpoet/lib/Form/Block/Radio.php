@@ -1,7 +1,7 @@
 <?php
 namespace MailPoet\Form\Block;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class Radio extends Base {
 
@@ -22,14 +22,14 @@ class Radio extends Base {
 
     $selected_value = self::getFieldValue($block);
 
-    foreach($options as $option) {
+    foreach ($options as $option) {
       $html .= '<label class="mailpoet_radio_label">';
 
       $html .= '<input type="radio" class="mailpoet_radio" ';
 
       $html .= 'name="'.$field_name.'" ';
 
-      if(is_array($option['value'])) {
+      if (is_array($option['value'])) {
         $value = key($option['value']);
         $label = reset($option['value']);
       } else {

@@ -3,8 +3,8 @@
 Plugin Name: Download Manager
 Plugin URI: https://www.wpdownloadmanager.com/purchases/
 Description: Manage, Protect and Track File Downloads from your WordPress site
-Author: Shahjada
-Version: 2.9.81
+Author: W3 Eden
+Version: 2.9.90
 Author URI: https://www.wpdownloadmanager.com/
 Text Domain: download-manager
 Domain Path: /languages
@@ -13,11 +13,12 @@ Domain Path: /languages
 
 namespace WPDM;
 
+global $WPDM;
 
-if(!isset($_SESSION) && !strstr($_SERVER['REQUEST_URI'], 'wpdm-media/') && !isset($_REQUEST['wpdmdl']))
+if(!isset($_SESSION) && (!isset($_REQUEST['action']) || $_REQUEST['action'] !== 'edit-theme-plugin-file') && !strstr($_SERVER['REQUEST_URI'], 'wpdm-media/') && !isset($_REQUEST['wpdmdl']))
     @session_start();
 
-define('WPDM_Version','2.9.81');
+
 
 $content_dir = str_replace('\\','/',WP_CONTENT_DIR);
 
@@ -34,8 +35,10 @@ define('WPDM_BASE_URL',plugins_url('/download-manager/'));
 if(!defined('UPLOAD_DIR'))
 define('UPLOAD_DIR',$content_dir.'/uploads/download-manager-files/');
 
+$upload_dir = wp_upload_dir();
+$upload_dir = $upload_dir['basedir'];
 if(!defined('WPDM_CACHE_DIR'))
-define('WPDM_CACHE_DIR',dirname(__FILE__).'/cache/');
+define('WPDM_CACHE_DIR',$upload_dir.'/wpdm-cache/');
 
 if(!defined('_DEL_DIR'))
 define('_DEL_DIR',$content_dir.'/uploads/download-manager-files');
@@ -44,15 +47,8 @@ if(!defined('UPLOAD_BASE'))
 define('UPLOAD_BASE',$content_dir.'/uploads/');
 
 if(!defined('WPDM_TPL_DIR')) {
-    if((int)get_option('__wpdm_bsversion', '') === 4)
-        define('WPDM_TPL_DIR', dirname(__FILE__) . '/tpls4/');
-    else
-        define('WPDM_TPL_DIR', dirname(__FILE__) . '/tpls/');
+    define('WPDM_TPL_DIR', dirname(__FILE__) . '/tpls/');
 }
-
-include_once(dirname(__FILE__) . "/wpdm-functions.php");
-
-include(dirname(__FILE__)."/wpdm-core.php");
 
 
 ini_set('upload_tmp_dir',UPLOAD_DIR.'/cache/');
@@ -60,7 +56,11 @@ ini_set('upload_tmp_dir',UPLOAD_DIR.'/cache/');
 
 class WordPressDownloadManager{
 
+    var $apply;
+
     function __construct(){
+
+        define('WPDM_Version','2.9.90');
 
         register_activation_hook(__FILE__, array($this, 'Install'));
 
@@ -75,10 +75,16 @@ class WordPressDownloadManager{
 
         spl_autoload_register( array( $this, 'AutoLoad' ) );
 
+        include_once(dirname(__FILE__) . "/wpdm-functions.php");
+
+        include(dirname(__FILE__)."/wpdm-core.php");
+
         new \WPDM\libs\UserDashboard();
-        new \WPDM\libs\Apply();
+        $this->apply = new \WPDM\libs\Apply();
         new \WPDM\admin\WordPressDownloadManagerAdmin();
         new \WPDM\libs\ShortCodes();
+
+        //do_action("wpdm_addon_init", WPDM_Version);
 
     }
 
@@ -123,7 +129,7 @@ class WordPressDownloadManager{
 
         $this->RegisterPostTypeTaxonomy();
         flush_rewrite_rules();
-        self::CreateDir();
+        self::createDir();
 
     }
 
@@ -219,6 +225,12 @@ class WordPressDownloadManager{
         @chmod(UPLOAD_BASE, 0755);
         @mkdir(UPLOAD_DIR, 0755);
         @chmod(UPLOAD_DIR, 0755);
+
+        if(!file_exists(WPDM_CACHE_DIR)) {
+            @mkdir(WPDM_CACHE_DIR, 0755);
+            @chmod(WPDM_CACHE_DIR, 0755);
+        }
+
         self::setHtaccess();
         if (isset($_GET['re']) && $_GET['re'] == 1) {
             if (file_exists(UPLOAD_DIR)) $s = 1;
@@ -240,8 +252,7 @@ class WordPressDownloadManager{
     }
 
     function registerScripts(){
-        wp_enqueue_script('jquery');
-        wp_enqueue_script('jquery-form');
+
         wp_register_style('wpdm-bootstrap', WPDM_BASE_URL . 'assets/bootstrap/css/bootstrap.css');
         wp_register_style('wpdm-font-awesome', WPDM_BASE_URL . 'assets/fontawesome/css/all.css');
 
@@ -254,6 +265,15 @@ class WordPressDownloadManager{
     function enqueueScripts()
     {
         global $post;
+
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('jquery-form');
+
+        wp_localize_script('jquery', 'wpdm_url', array(
+            'home' => esc_url_raw(home_url('/')),
+            'site' => esc_url_raw(site_url('/')),
+            'ajax' => esc_url_raw(admin_url('/admin-ajax.php'))
+        ));
 
         $wpdmss = maybe_unserialize(get_option('__wpdm_disable_scripts', array()));
 
@@ -363,5 +383,5 @@ class WordPressDownloadManager{
 
 }
 
-new \WPDM\WordPressDownloadManager();
+$WPDM = new \WPDM\WordPressDownloadManager();
 

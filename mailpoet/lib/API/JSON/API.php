@@ -2,12 +2,13 @@
 namespace MailPoet\API\JSON;
 
 use MailPoet\Config\AccessControl;
-use MailPoet\Models\Setting;
+use MailPoet\Settings\SettingsController;
+use MailPoetVendor\Psr\Container\ContainerInterface;
 use MailPoet\Util\Helpers;
 use MailPoet\Util\Security;
-use MailPoet\WP\Hooks;
+use MailPoet\WP\Functions as WPFunctions;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class API {
   private $_request_api_version;
@@ -20,12 +21,32 @@ class API {
   private $_available_api_versions = array(
       'v1'
   );
+  /** @var ContainerInterface */
+  private $container;
+
+  /** @var AccessControl */
   private $access_control;
+
+  /** @var WPFunctions */
+  private $wp;
+
+  /** @var SettingsController */
+  private $settings;
+
   const CURRENT_VERSION = 'v1';
 
-  function __construct(AccessControl $access_control) {
+
+  function __construct(
+    ContainerInterface $container,
+    AccessControl $access_control,
+    SettingsController $settings,
+    WPFunctions $wp
+  ) {
+    $this->container = $container;
     $this->access_control = $access_control;
-    foreach($this->_available_api_versions as $available_api_version) {
+    $this->settings = $settings;
+    $this->wp = $wp;
+    foreach ($this->_available_api_versions as $available_api_version) {
       $this->addEndpointNamespace(
         sprintf('%s\%s', __NAMESPACE__, $available_api_version),
         $available_api_version
@@ -54,16 +75,16 @@ class API {
   }
 
   function setupAjax() {
-    Hooks::doAction('mailpoet_api_setup', array($this));
+    $this->wp->doAction('mailpoet_api_setup', array($this));
     $this->setRequestData($_POST);
 
     $ignoreToken = (
-      Setting::getValue('re_captcha.enabled') &&
+      $this->settings->get('re_captcha.enabled') &&
       $this->_request_endpoint === 'subscribers' &&
       $this->_request_method === 'subscribe'
     );
 
-    if(!$ignoreToken && $this->checkToken() === false) {
+    if (!$ignoreToken && $this->checkToken() === false) {
       $error_message = __("Sorry, but we couldn't connect to the MailPoet server. Please refresh the web page and try again.", 'mailpoet');
       $error_response = $this->createErrorResponse(Error::UNAUTHORIZED, $error_message, Response::STATUS_UNAUTHORIZED);
       return $error_response->send();
@@ -90,18 +111,18 @@ class API {
       ? trim($data['token'])
       : null;
 
-    if(!$this->_request_endpoint || !$this->_request_method || !$this->_request_api_version) {
+    if (!$this->_request_endpoint || !$this->_request_method || !$this->_request_api_version) {
       $error_message = __('Invalid API request.', 'mailpoet');
       $error_response = $this->createErrorResponse(Error::BAD_REQUEST, $error_message, Response::STATUS_BAD_REQUEST);
       return $error_response;
-    } else if(!empty($this->_endpoint_namespaces[$this->_request_api_version])) {
-      foreach($this->_endpoint_namespaces[$this->_request_api_version] as $namespace) {
+    } else if (!empty($this->_endpoint_namespaces[$this->_request_api_version])) {
+      foreach ($this->_endpoint_namespaces[$this->_request_api_version] as $namespace) {
         $endpoint_class = sprintf(
           '%s\%s',
           $namespace,
           ucfirst($this->_request_endpoint)
         );
-        if(class_exists($endpoint_class)) {
+        if ($this->container->has($endpoint_class)) {
           $this->_request_endpoint_class = $endpoint_class;
           break;
         }
@@ -111,7 +132,7 @@ class API {
         : array();
 
       // remove reserved keywords from data
-      if(is_array($this->_request_data) && !empty($this->_request_data)) {
+      if (is_array($this->_request_data) && !empty($this->_request_data)) {
         // filter out reserved keywords from data
         $reserved_keywords = array(
           'token',
@@ -131,26 +152,27 @@ class API {
 
   function processRoute() {
     try {
-      if(empty($this->_request_endpoint_class)) {
+      if (empty($this->_request_endpoint_class) ||
+        !$this->container->has($this->_request_endpoint_class)
+      ) {
         throw new \Exception(__('Invalid API endpoint.', 'mailpoet'));
       }
 
-      $endpoint = new $this->_request_endpoint_class();
-
-      if(!method_exists($endpoint, $this->_request_method)) {
+      $endpoint = $this->container->get($this->_request_endpoint_class);
+      if (!method_exists($endpoint, $this->_request_method)) {
         throw new \Exception(__('Invalid API endpoint method.', 'mailpoet'));
       }
 
       // check the accessibility of the requested endpoint's action
       // by default, an endpoint's action is considered "private"
-      if(!$this->validatePermissions($this->_request_method, $endpoint->permissions)) {
+      if (!$this->validatePermissions($this->_request_method, $endpoint->permissions)) {
         $error_message = __('You do not have the required permissions.', 'mailpoet');
         $error_response = $this->createErrorResponse(Error::FORBIDDEN, $error_message, Response::STATUS_FORBIDDEN);
         return $error_response;
       }
       $response = $endpoint->{$this->_request_method}($this->_request_data);
       return $response;
-    } catch(\Exception $e) {
+    } catch (\Exception $e) {
       $error_message = $e->getMessage();
       $error_response = $this->createErrorResponse(Error::BAD_REQUEST, $error_message, Response::STATUS_BAD_REQUEST);
       return $error_response;
@@ -181,7 +203,7 @@ class API {
   }
 
   function addEndpointNamespace($namespace, $version) {
-    if(!empty($this->_endpoint_namespaces[$version][$namespace])) return;
+    if (!empty($this->_endpoint_namespaces[$version][$namespace])) return;
     $this->_endpoint_namespaces[$version][] = $namespace;
   }
 

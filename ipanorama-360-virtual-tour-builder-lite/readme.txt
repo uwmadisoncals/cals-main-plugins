@@ -2,8 +2,8 @@
 Contributors: Avirtum
 Tags: 3d panorama, html5 panorama, real estate tour, panorama viewer, interactive tour, virtual tour, vtour, pano, responsive panorama, images, webgl panorama
 Requires at least: 4.0
-Tested up to: 4.9
-Stable tag: 1.3.8
+Tested up to: 5.0.0
+Stable tag: 1.3.9
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -59,6 +59,10 @@ Purchasing the plugin gets you access to the full version of the iPanorama 360 V
 
 
 == Changelog ==
+
+= 1.3.9 =
+ * Fix: Black screen issue in Chrome with zooming
+ * Fix: Fullscreen toggle 
 
 = 1.3.8 =
  * Fix: Compatible with Smart Product Viewer

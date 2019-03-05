@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2018 ServMask Inc.
+ * Copyright (C) 2014-2019 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,10 @@
  * ███████║███████╗██║  ██║ ╚████╔╝ ██║ ╚═╝ ██║██║  ██║███████║██║  ██╗
  * ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	die( 'Kangaroos cannot jump here' );
+}
 
 class Ai1wmme_Import_Blogs {
 
@@ -335,18 +339,34 @@ class Ai1wmme_Import_Blogs {
 			}
 		}
 
+		// Get WP CLI subsites
+		if ( defined( 'WP_CLI' ) ) {
+			foreach ( $sites as $site ) {
+				WP_CLI::log( sprintf( 'Old site url is: %s', $site['Old']['HomeURL'] ) );
+				if ( ( $url = readline( sprintf( 'Enter new site url (%s): ', $site['New']['HomeURL'] ) ) ) ) {
+					$params['options']['sites'][] = $url;
+				} else {
+					$params['options']['sites'][] = $site['New']['HomeURL'];
+				}
+			}
+
+			$params['options']['subsite'] = count( $sites );
+		}
+
 		// Get user subsites
 		if ( isset( $params['options']['sites'] ) && ( $subsites = $params['options']['sites'] ) ) {
 
 			// Read blogs.json file
-			$handle = ai1wm_open( ai1wm_blogs_path( $params ), 'r' );
+			if ( is_file( ai1wm_blogs_path( $params ) ) ) {
+				$handle = ai1wm_open( ai1wm_blogs_path( $params ), 'r' );
 
-			// Parse blogs.json file
-			$blogs = ai1wm_read( $handle, filesize( ai1wm_blogs_path( $params ) ) );
-			$blogs = json_decode( $blogs, true );
+				// Parse blogs.json file
+				$blogs = ai1wm_read( $handle, filesize( ai1wm_blogs_path( $params ) ) );
+				$blogs = json_decode( $blogs, true );
 
-			// Close handle
-			ai1wm_close( $handle );
+				// Close handle
+				ai1wm_close( $handle );
+			}
 
 			// Loop over user subsites
 			foreach ( $subsites as $i => $url ) {
@@ -387,29 +407,57 @@ class Ai1wmme_Import_Blogs {
 						);
 					}
 				} else {
-					if ( ( $blog_id = ai1wmme_create_blog( $blog_domain, trailingslashit( $blog_path ), $params['options']['network'] ) ) ) {
-						$blogs[] = array(
-							'Old' => array(
-								'BlogID'          => $sites[ $i ]['Old']['BlogID'],
-								'SiteURL'         => $sites[ $i ]['Old']['SiteURL'],
-								'HomeURL'         => $sites[ $i ]['Old']['HomeURL'],
-								'InternalSiteURL' => $sites[ $i ]['Old']['InternalSiteURL'],
-								'InternalHomeURL' => $sites[ $i ]['Old']['InternalHomeURL'],
-								'Plugins'         => $sites[ $i ]['Old']['Plugins'],
-								'Template'        => $sites[ $i ]['Old']['Template'],
-								'Stylesheet'      => $sites[ $i ]['Old']['Stylesheet'],
-							),
-							'New' => array(
-								'BlogID'          => $blog_id,
-								'SiteURL'         => get_site_url( $blog_id, null, $blog_scheme ),
-								'HomeURL'         => get_home_url( $blog_id, null, $blog_scheme ),
-								'InternalSiteURL' => get_site_url( $blog_id, null, $blog_scheme ),
-								'InternalHomeURL' => get_home_url( $blog_id, null, $blog_scheme ),
-								'Plugins'         => $sites[ $i ]['New']['Plugins'],
-								'Template'        => $sites[ $i ]['New']['Template'],
-								'Stylesheet'      => $sites[ $i ]['New']['Stylesheet'],
-							),
-						);
+					// This function has been deprecated. Use wp_insert_site() instead (WordPress >= 5.1)
+					if ( function_exists( 'wp_insert_site' ) ) {
+						if ( ( $blog_id = wp_insert_site( array( 'domain' => $blog_domain, 'path' => trailingslashit( $blog_path ), 'network_id' => $params['options']['network'] ) ) ) ) {
+							$blogs[] = array(
+								'Old' => array(
+									'BlogID'          => $sites[ $i ]['Old']['BlogID'],
+									'SiteURL'         => $sites[ $i ]['Old']['SiteURL'],
+									'HomeURL'         => $sites[ $i ]['Old']['HomeURL'],
+									'InternalSiteURL' => $sites[ $i ]['Old']['InternalSiteURL'],
+									'InternalHomeURL' => $sites[ $i ]['Old']['InternalHomeURL'],
+									'Plugins'         => $sites[ $i ]['Old']['Plugins'],
+									'Template'        => $sites[ $i ]['Old']['Template'],
+									'Stylesheet'      => $sites[ $i ]['Old']['Stylesheet'],
+								),
+								'New' => array(
+									'BlogID'          => $blog_id,
+									'SiteURL'         => get_site_url( $blog_id, null, $blog_scheme ),
+									'HomeURL'         => get_home_url( $blog_id, null, $blog_scheme ),
+									'InternalSiteURL' => get_site_url( $blog_id, null, $blog_scheme ),
+									'InternalHomeURL' => get_home_url( $blog_id, null, $blog_scheme ),
+									'Plugins'         => $sites[ $i ]['New']['Plugins'],
+									'Template'        => $sites[ $i ]['New']['Template'],
+									'Stylesheet'      => $sites[ $i ]['New']['Stylesheet'],
+								),
+							);
+						}
+					} else {
+						if ( ( $blog_id = create_empty_blog( $blog_domain, trailingslashit( $blog_path ), null, $params['options']['network'] ) ) ) {
+							$blogs[] = array(
+								'Old' => array(
+									'BlogID'          => $sites[ $i ]['Old']['BlogID'],
+									'SiteURL'         => $sites[ $i ]['Old']['SiteURL'],
+									'HomeURL'         => $sites[ $i ]['Old']['HomeURL'],
+									'InternalSiteURL' => $sites[ $i ]['Old']['InternalSiteURL'],
+									'InternalHomeURL' => $sites[ $i ]['Old']['InternalHomeURL'],
+									'Plugins'         => $sites[ $i ]['Old']['Plugins'],
+									'Template'        => $sites[ $i ]['Old']['Template'],
+									'Stylesheet'      => $sites[ $i ]['Old']['Stylesheet'],
+								),
+								'New' => array(
+									'BlogID'          => $blog_id,
+									'SiteURL'         => get_site_url( $blog_id, null, $blog_scheme ),
+									'HomeURL'         => get_home_url( $blog_id, null, $blog_scheme ),
+									'InternalSiteURL' => get_site_url( $blog_id, null, $blog_scheme ),
+									'InternalHomeURL' => get_home_url( $blog_id, null, $blog_scheme ),
+									'Plugins'         => $sites[ $i ]['New']['Plugins'],
+									'Template'        => $sites[ $i ]['New']['Template'],
+									'Stylesheet'      => $sites[ $i ]['New']['Stylesheet'],
+								),
+							);
+						}
 					}
 				}
 			}
@@ -435,13 +483,13 @@ class Ai1wmme_Import_Blogs {
 
 			// Set progress
 			Ai1wm_Status::blogs(
-				sprintf(
-					__(
-						'Subsite (%d of %d)',
-						AI1WMME_TEMPLATES_PATH
+				Ai1wm_Template::get_content(
+					'import/titles', array(
+						'networks' => $networks,
+						'sites'    => $sites,
+						'subsite'  => $subsite,
 					),
-					$subsite + 1,
-					count( $sites )
+					AI1WMME_TEMPLATES_PATH
 				),
 				Ai1wm_Template::get_content(
 					'import/sites', array(

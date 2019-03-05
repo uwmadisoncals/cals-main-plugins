@@ -8,26 +8,24 @@ use MailPoet\Models\SubscriberSegment;
 use MailPoet\Newsletter\Scheduler\Scheduler;
 use MailPoet\Subscribers\Source;
 
-if(!defined('ABSPATH')) exit;
-
-require_once(ABSPATH . 'wp-includes/pluggable.php');
+if (!defined('ABSPATH')) exit;
 
 class WP {
   static function synchronizeUser($wp_user_id, $old_wp_user_data = false) {
     $wp_user = \get_userdata($wp_user_id);
     $wp_segment = Segment::getWPSegment();
 
-    if($wp_user === false or $wp_segment === false) return;
+    if ($wp_user === false or $wp_segment === false) return;
 
     $subscriber = Subscriber::where('wp_user_id', $wp_user->ID)
       ->findOne();
     $schedule_welcome_newsletter = false;
 
-    switch(current_filter()) {
+    switch (current_filter()) {
       case 'delete_user':
       case 'deleted_user':
       case 'remove_user_from_blog':
-        if($subscriber !== false) {
+        if ($subscriber !== false) {
           // unlink subscriber from wp user and delete
           $subscriber->set('wp_user_id', null);
           $subscriber->delete();
@@ -41,7 +39,7 @@ class WP {
         // get first name & last name
         $first_name = $wp_user->first_name;
         $last_name = $wp_user->last_name;
-        if(empty($wp_user->first_name) && empty($wp_user->last_name)) {
+        if (empty($wp_user->first_name) && empty($wp_user->last_name)) {
           $first_name = $wp_user->display_name;
         }
         // subscriber data
@@ -54,7 +52,7 @@ class WP {
           'source' => Source::WORDPRESS_USER,
         );
 
-        if($subscriber !== false) {
+        if ($subscriber !== false) {
           $data['id'] = $subscriber->id();
           $data['deleted_at'] = null; // remove the user from the trash
           unset($data['status']); // don't override status for existing users
@@ -62,7 +60,7 @@ class WP {
         }
 
         $subscriber = Subscriber::createOrUpdate($data);
-        if($subscriber->getErrors() === false && $subscriber->id > 0) {
+        if ($subscriber->getErrors() === false && $subscriber->id > 0) {
           // add subscriber to the WP Users segment
           SubscriberSegment::subscribeToSegments(
             $subscriber,
@@ -70,7 +68,7 @@ class WP {
           );
 
           // welcome email
-          if($schedule_welcome_newsletter === true) {
+          if ($schedule_welcome_newsletter === true) {
             Scheduler::scheduleWPUserWelcomeNotification(
               $subscriber->id,
               (array)$wp_user,
@@ -105,7 +103,7 @@ class WP {
     array_filter($updated_emails, function($updated_email) use($validator) {
       return !$validator->validateEmail($updated_email['email']);
     }));
-    if(!$invalid_wp_user_ids) {
+    if (!$invalid_wp_user_ids) {
       return;
     }
     \ORM::for_table(Subscriber::$_table)->whereIn('wp_user_id', $invalid_wp_user_ids)->delete_many();
@@ -113,11 +111,11 @@ class WP {
 
   private static function updateSubscribersEmails() {
     global $wpdb;
-    Subscriber::raw_execute('SELECT NOW();');
-    $start_time = Subscriber::get_last_statement()->fetch(\PDO::FETCH_COLUMN);
+    Subscriber::rawExecute('SELECT NOW();');
+    $start_time = Subscriber::getLastStatement()->fetch(\PDO::FETCH_COLUMN);
 
     $subscribers_table = Subscriber::$_table;
-    Subscriber::raw_execute(sprintf('
+    Subscriber::rawExecute(sprintf('
       UPDATE IGNORE %1$s
         INNER JOIN %2$s as wu ON %1$s.wp_user_id = wu.id
       SET %1$s.email = wu.user_email;
@@ -139,7 +137,7 @@ class WP {
         WHERE mps.wp_user_id IS NULL AND %2$s.user_email != ""
       ', $subscribers_table, $wpdb->users))->findArray();
 
-    Subscriber::raw_execute(sprintf('
+    Subscriber::rawExecute(sprintf('
       INSERT IGNORE INTO %1$s(wp_user_id, email, status, created_at, source)
         SELECT wu.id, wu.user_email, "subscribed", CURRENT_TIMESTAMP(), "%3$s" FROM %2$s wu
           LEFT JOIN %1$s mps ON wu.id = mps.wp_user_id
@@ -153,7 +151,7 @@ class WP {
   private static function updateFirstNames() {
     global $wpdb;
     $subscribers_table = Subscriber::$_table;
-    Subscriber::raw_execute(sprintf('
+    Subscriber::rawExecute(sprintf('
       UPDATE %1$s
         JOIN %2$s as wpum ON %1$s.wp_user_id = wpum.user_id AND wpum.meta_key = "first_name"
       SET %1$s.first_name = wpum.meta_value
@@ -166,20 +164,20 @@ class WP {
   private static function updateLastNames() {
     global $wpdb;
     $subscribers_table = Subscriber::$_table;
-    Subscriber::raw_execute(sprintf('
+    Subscriber::rawExecute(sprintf('
       UPDATE %1$s
         JOIN %2$s as wpum ON %1$s.wp_user_id = wpum.user_id AND wpum.meta_key = "last_name"
       SET %1$s.last_name = wpum.meta_value
         WHERE %1$s.last_name = ""
         AND %1$s.wp_user_id IS NOT NULL
-        AND wpum.meta_value IS NOT NULL        
+        AND wpum.meta_value IS NOT NULL
     ', $subscribers_table, $wpdb->usermeta));
   }
 
   private static function updateFirstNameIfMissing() {
     global $wpdb;
     $subscribers_table = Subscriber::$_table;
-    Subscriber::raw_execute(sprintf('
+    Subscriber::rawExecute(sprintf('
       UPDATE %1$s
         JOIN %2$s wu ON %1$s.wp_user_id = wu.id
       SET %1$s.first_name = wu.display_name
@@ -192,7 +190,7 @@ class WP {
     $wp_segment = Segment::getWPSegment();
     $subscribers_table = Subscriber::$_table;
     $wp_mailpoet_subscriber_segment_table = SubscriberSegment::$_table;
-    Subscriber::raw_execute(sprintf('
+    Subscriber::rawExecute(sprintf('
      INSERT IGNORE INTO %s(subscriber_id, segment_id, created_at)
       SELECT mps.id, "%s", CURRENT_TIMESTAMP() FROM %s mps
         WHERE mps.wp_user_id > 0
@@ -201,7 +199,7 @@ class WP {
 
   private static function removeFromTrash() {
     $subscribers_table = Subscriber::$_table;
-    Subscriber::raw_execute(sprintf('
+    Subscriber::rawExecute(sprintf('
       UPDATE %1$s
       SET %1$s.deleted_at = NULL
         WHERE %1$s.wp_user_id IS NOT NULL

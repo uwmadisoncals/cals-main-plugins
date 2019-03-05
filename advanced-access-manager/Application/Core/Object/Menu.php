@@ -26,13 +26,26 @@ class AAM_Core_Object_Menu extends AAM_Core_Object {
      */
     public function __construct(AAM_Core_Subject $subject) {
         parent::__construct($subject);
-        
+    
         $option = $this->getSubject()->readOption('menu');
         
+        if (!empty($option)) {
+            $this->setOverwritten(true);
+        }
+        
+        // Load settings from Access & Security Policy
+        if (empty($option)) {
+            $stms = AAM_Core_Policy_Factory::get($subject)->find("/^BackendMenu:/i");
+            
+            foreach($stms as $key => $stm) {
+                $chunks = explode(':', $key);
+                $option[$chunks[1]] = ($stm['Effect'] === 'deny' ? 1 : 0);
+            }
+        }
+        
+        // Finally try to load from parent
         if (empty($option)) {
             $option = $this->getSubject()->inheritFromParent('menu');
-        } else {
-            $this->setOverwritten(true);
         }
         
         $this->setOption($option);
@@ -103,6 +116,27 @@ class AAM_Core_Object_Menu extends AAM_Core_Object {
         }
         
         return $menu;
+    }
+    
+    /**
+     * Update single option item
+     * 
+     * @param string $item
+     * @param mixed  $value
+     * 
+     * @return boolean Always true
+     * 
+     * @access public
+     */
+    public function updateOptionItem($item, $value) {
+        $option = $this->getOption();
+        
+        $option[$item]        = $value;
+        $option[crc32($item)] = $value;
+        
+        $this->setOption($option);
+        
+        return true;
     }
 
     /**
@@ -186,17 +220,18 @@ class AAM_Core_Object_Menu extends AAM_Core_Object {
     public function has($menu, $both = false) {
         //decode URL in case of any special characters like &amp;
         $decoded = htmlspecialchars_decode($menu);
+        
         $options = $this->getOption();
         $parent  = $this->getParentMenu($decoded);
         
         // Step #1. Check if menu is directly restricted
-        $direct = !empty($options[$decoded]);
+        $direct = !empty($options[$decoded]) || !empty($options[crc32($decoded)]);
         
         // Step #2. Check if whole branch is restricted
-        $branch = ($both && !empty($options['menu-' . $decoded]));
+        $branch = ($both && (!empty($options['menu-' . $decoded]) || !empty($options[crc32('menu-' . $decoded)])));
         
         // Step #3. Check if dynamic submenu is restricted because of whole branch
-        $indirect = ($parent && !empty($options['menu-' . $parent]));
+        $indirect = ($parent && (!empty($options['menu-' . $parent]) || !empty($options[crc32('menu-' . $parent)])));
         
         return $direct || $branch || $indirect;
     }
@@ -251,6 +286,15 @@ class AAM_Core_Object_Menu extends AAM_Core_Object {
      */
     public function reset() {
         return $this->getSubject()->deleteOption('menu');
+    }
+    
+    /**
+     * 
+     * @param type $external
+     * @return type
+     */
+    public function mergeOption($external) {
+        return AAM::api()->mergeSettings($external, $this->getOption(), 'menu');
     }
 
 }

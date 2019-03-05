@@ -4,13 +4,12 @@
  * Plugin Name: Simple Feature Requests
  * Plugin URI: http://jckemp.com
  * Description: Customer led feature requests with voting.
- * Version: 1.0.4
+ * Version: 1.0.5
  * Author: James Kemp
  * Author URI: https://jckemp.com
  * Text Domain: simple-feature-requests
  * Domain Path: /languages
  *
- * @fs_premium_only /templates/sidebar/categories.php, /templates/sidebar/top-requests.php
  */
 
 if ( !defined( 'ABSPATH' ) ) {
@@ -25,7 +24,7 @@ class JCK_Simple_Feature_Requests
      *
      * @var string
      */
-    public static  $version = "1.0.4" ;
+    public static  $version = "1.0.5" ;
     /**
      * Full name
      *

@@ -56,7 +56,7 @@
                         <div class="input-group">
                             <input type=text class="form-control" id="_wpdm_file_browser_root" name="_wpdm_file_browser_root" value="<?php echo htmlspecialchars(stripslashes(get_option('_wpdm_file_browser_root',ABSPATH))); ?>" />
                                 <span class="input-group-btn">
-                                    <button class="btn btn-default ttip" title="<?php _e('Reset Base Dir'); ?>" type="button" onclick="jQuery('#_wpdm_file_browser_root').val('<?php echo rtrim(ABSPATH,'/'); ?>');"><i class="fas fa-redo"></i></button>
+                                    <button class="btn btn-secondary ttip" title="<?php _e('Reset Base Dir'); ?>" type="button" onclick="jQuery('#_wpdm_file_browser_root').val('<?php echo rtrim(ABSPATH,'/'); ?>');"><i class="fas fa-redo"></i></button>
                                 </span>
                         </div>
                     </div>
@@ -115,7 +115,7 @@
                     <div class="form-group">
                         <label><?php _e('Chunk Size','download-manager'); ?></label><br/>
                         <div class="input-group">
-                            <input class="form-control" value="<?php echo get_option('__wpdm_chunk_size',1024); ?>" type="number"   name="__wpdm_chunk_size">
+                            <input class="form-control" value="<?php echo (int)get_option('__wpdm_chunk_size',1024); ?>" type="number"   name="__wpdm_chunk_size">
                             <div class="input-group-addon">KB</div>
                         </div>
                         <br/>
@@ -198,19 +198,7 @@
                 <div class="panel-heading"><?php _e("Misc Settings",'download-manager'); ?></div>
                 <div class="panel-body">
 
-                    <?php $wpdmss = maybe_unserialize(get_option('__wpdm_disable_scripts', array())); ?>
-                    <input type="hidden" name="__wpdm_disable_scripts[]" value="" >
-                    <fieldset>
-                        <legend><?php _e("Disable Style & Script",'download-manager'); ?></legend>
-                        <ul>
-                            <li><label><input <?php if(in_array('wpdm-bootstrap-js', $wpdmss)) echo 'checked=checked'; ?> type="checkbox" value="wpdm-bootstrap-js" name="__wpdm_disable_scripts[]"> <?php _e("Bootstrap JS",'download-manager'); ?></label></li>
-                            <li><label><input <?php if(in_array('wpdm-bootstrap-css', $wpdmss)) echo 'checked=checked'; ?> type="checkbox" value="wpdm-bootstrap-css" name="__wpdm_disable_scripts[]"> <?php _e("Bootstrap CSS",'download-manager'); ?></label></li>
-                            <li><label><input <?php if(in_array('wpdm-font-awesome', $wpdmss)) echo 'checked=checked'; ?> type="checkbox" value="wpdm-font-awesome" name="__wpdm_disable_scripts[]"> <?php _e("Font Awesome",'download-manager'); ?></label></li>
-                            <li><label><input <?php if(in_array('wpdm-front', $wpdmss)) echo 'checked=checked'; ?> type="checkbox" value="wpdm-front" name="__wpdm_disable_scripts[]"> <?php _e("Front CSS","wpdmpro"); ?></label></li>
-                        </ul>
-                        <em><?php _e('Because, sometimes your theme may have those scripts/styles enqueued already','download-manager'); ?></em>
-                    </fieldset>
-                    <br/>
+
                     <div class="form-group">
                         <label for="__wpdm_user_dashboard"><?php echo __('Login Page','download-manager'); ?></label><br/>
                         <?php wp_dropdown_pages(array('name' => '__wpdm_login_url', 'id' => '__wpdm_login_url', 'show_option_none' => __('None Selected','download-manager'), 'option_none_value' => '' , 'selected' => get_option('__wpdm_login_url'))) ?><br/>
@@ -230,8 +218,8 @@
 
                     <div class="form-group"><hr/>
                         <input type="hidden" value="0" name="__wpdm_rss_feed_main" />
-                        <label><input style="margin: 0 10px 0 0" type="checkbox" <?php checked(get_option('__wpdm_rss_feed_main'),1); ?> value="1" name="__wpdm_rss_feed_main"><?php _e('Include Packages in Main RSS Feed','wpdmpro'); ?></label><br/>
-                        <em><?php printf(__('Check this option if you want to show wpdm packages in your main <a target="_blank" href="%s">RSS Feed</a>','wpdmpro'), get_bloginfo('rss_url')); ?></em>
+                        <label><input style="margin: 0 10px 0 0" type="checkbox" <?php checked(get_option('__wpdm_rss_feed_main'),1); ?> value="1" name="__wpdm_rss_feed_main"><?php _e('Include Packages in Main RSS Feed','download-manager'); ?></label><br/>
+                        <em><?php printf(__('Check this option if you want to show wpdm packages in your main <a target="_blank" href="%s">RSS Feed</a>','download-manager'), get_bloginfo('rss_url')); ?></em>
                         <br/>
 
                     </div>

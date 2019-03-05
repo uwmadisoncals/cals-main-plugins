@@ -58,6 +58,10 @@
     color: #666 !important;
 }
 
+.ngg-navigation a.page-numbers {
+    display: inline;
+}
+
 .ngg-clear {
     clear: both;
 }

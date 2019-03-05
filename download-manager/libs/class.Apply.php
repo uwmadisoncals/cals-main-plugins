@@ -23,16 +23,16 @@ class Apply {
         add_filter('widget_text', 'do_shortcode');
         add_action('query_vars', array( $this, 'dashboardPageVars' ));
         add_action('init', array( $this, 'addWriteRules' ), 1, 0 );
-        add_action('init', array($this, 'Login'));
-        add_action('init', array($this, 'Register'));
+        add_action('init', array($this, 'login'));
+        add_action('init', array($this, 'register'));
         add_action('init', array($this, 'wpdmIframe'));
         add_action('wp', array($this, 'updateProfile'));
         add_action('wp', array($this, 'Logout'));
         add_action('request', array($this, 'rssFeed'));
         add_filter( 'ajax_query_attachments_args', array($this, 'usersMediaQuery') );
         add_action( 'init', array($this, 'sfbAccess'));
-        remove_action('wp_head', 'wp_generator');
-        add_action( 'wp_head', array($this, 'addGenerator'), 9);
+        add_action( 'wp_head', array($this, 'addGenerator'), 9999);
+        add_action( 'wp_head', array($this, 'googleFont'), 999999);
         add_filter('pre_get_posts', array($this, 'queryTag'));
         add_filter('the_excerpt_embed', array($this, 'oEmbed'));
 
@@ -43,9 +43,10 @@ class Apply {
     function AdminActions(){
         if(!is_admin()) return;
         add_action( 'admin_init', array($this, 'sfbAccess'));
-        add_action('save_post', array( $this, 'DashboardPages' ));
+        add_action('save_post', array( $this, 'dashboardPages' ));
         add_action( 'wp_ajax_wpdm_clear_stats', array($this, 'clearStats'));
         add_action( 'wp_ajax_clear_cache', array($this, 'clearCache'));
+        add_action( 'admin_head', array($this, 'uiColors'), 999999);
 
     }
 
@@ -80,7 +81,7 @@ class Apply {
 
     }
 
-    function DashboardPages($post_id){
+    function dashboardPages($post_id){
         if ( wp_is_post_revision( $post_id ) )  return;
         $page_id = get_option('__wpdm_user_dashboard', 0);
         $post = get_post($post_id);
@@ -157,54 +158,53 @@ class Apply {
         }
     }
 
-    function Register()
+    /**
+     * @usage Register an user
+     */
+    function register()
     {
         global $wp_query, $wpdb;
         if (!isset($_POST['wpdm_reg'])) return;
 
         $shortcode_params = \WPDM\libs\Crypt::Decrypt($_REQUEST['phash']);
 
-        if(isset($shortcode_params['captcha']) && $shortcode_params['captcha'] == 'true') {
-            if(isset($_REQUEST['g-recaptcha-response'])) {
-                $p = array('secret' => get_option('_wpdm_recaptcha_secret_key'), 'response' => $_REQUEST['g-recaptcha-response']);
-                $recap = remote_post('https://www.google.com/recaptcha/api/siteverify', $p);
-                $recap = json_decode($recap);
-            } else {
-                $recap = new \stdClass();
-                $recap->success = false;
-            }
-            if ($recap->success == false) {
-                $_SESSION['reg_error'] = __('Captcha Verification Failed!','download-manager');
-                if (wpdm_is_ajax()) die('Error: ' . $_SESSION['reg_error']);
-                header("location: " . $_POST['permalink']);
-                die();
-            }
-        }
-
-        if(!get_option('users_can_register') && isset($_POST['wpdm_reg'])){
-            if(wpdm_is_ajax()) die(__('Error: User registration is disabled!','download-manager'));
-            else $_SESSION['reg_error'] = __('Error: User registration is disabled!','download-manager');
-            header("location: " . esc_attr($_POST['permalink']));
+        if(!isset($_REQUEST['__reg_nonce']) || !wp_verify_nonce($_REQUEST['__reg_nonce'], NONCE_KEY)){
+            \WPDM\Session::set('reg_error',  __( "Something is Wrong! Please refresh the page and try again" , "download-manager" ));
+            if (wpdm_is_ajax()) { wp_send_json(array('success' => false, 'message' => 'Error: ' . \WPDM\Session::get('reg_error'))); die(); }
+            header("location: " . $_POST['permalink']);
             die();
         }
 
+        if(!get_option('users_can_register') && isset($_POST['wpdm_reg'])){
+            if(wpdm_is_ajax()) { wp_send_json(array('success' => false, 'message' => __( "Error: User registration is disabled!" , "download-manager" ))); die(); }
+            else \WPDM\Session::set('reg_error', __( "Error: User registration is disabled!" , "download-manager" ));
+            header("location: " . $_POST['permalink']);
+            die();
+        }
+
+
+        $_POST['wpdm_reg']['full_name'] = $_POST['wpdm_reg']['first_name']." ".$_POST['wpdm_reg']['last_name'];
         extract($_POST['wpdm_reg']);
+        $display_name = $first_name." ".$last_name;
+
         $_SESSION['tmp_reg_info'] = $_POST['wpdm_reg'];
         $user_id = username_exists($user_login);
         $loginurl = $_POST['permalink'];
         if ($user_login == '') {
-            $_SESSION['reg_error'] = __('Username is Empty!','download-manager');
 
-            if(wpdm_is_ajax()) die('Error: '.$_SESSION['reg_error']);
+            \WPDM\Session::set('reg_error',  __( "Username is Empty!" , "download-manager" ));
+
+            if(wpdm_is_ajax()) { wp_send_json(array('success' => false, 'message' => 'Error: ' . \WPDM\Session::get('reg_error'))); die(); }
 
 
             header("location: " . $_POST['permalink']);
             die();
         }
         if (!isset($user_email) || !is_email($user_email)) {
-            $_SESSION['reg_error'] = __('Invalid Email Address!','download-manager');
 
-            if(wpdm_is_ajax()) die($_SESSION['reg_error']);
+            \WPDM\Session::set('reg_error',  __( "Invalid Email Address!" , "download-manager" ));
+
+            if(wpdm_is_ajax()) { wp_send_json(array('success' => false, 'message' => 'Error: ' . \WPDM\Session::get('reg_error'))); die(); }
 
             header("location: " . $_POST['permalink']);
             die();
@@ -218,7 +218,8 @@ class Apply {
                 if(isset($shortcode_params['autologin']) && $shortcode_params['autologin'] == 'true')
                     $auto_login = 1;
 
-                $user_pass = (isset($shortcode_params['verifyemail']) && $shortcode_params['verifyemail'] == 'true')?wp_generate_password(12, false):$user_pass;
+                $user_pass = (isset($shortcode_params['verifyemail']) && $shortcode_params['verifyemail'] == 'true') || !isset($user_pass) || $user_pass == ''?wp_generate_password(12, false):$user_pass;
+                $emlpass = (isset($shortcode_params['verifyemail']) && $shortcode_params['verifyemail'] == 'true')?__( "Password: " , "download-manager" ).$user_pass."<br/>":"";
 
                 $errors = new \WP_Error();
 
@@ -227,65 +228,76 @@ class Apply {
                 $errors = apply_filters( 'registration_errors', $errors, $user_login, $user_email );
 
                 if ( $errors->get_error_code() ) {
-                    if(wpdm_is_ajax()) die('Error: ' . $errors->get_error_message() );
-                    else $_SESSION['reg_error'] = $errors->get_error_message();
+                    if(wpdm_is_ajax()) { wp_send_json(array('success' => false, 'message' => 'Error: ' . $errors->get_error_message())); die(); }
+                    else \WPDM\Session::set('reg_error',  'Error: ' . $errors->get_error_message());
                     header("location: " . $_POST['permalink']);
                     die();
                 }
 
                 $user_id = wp_create_user($user_login, $user_pass, $user_email);
-                $name = explode(" ", $display_name);
-                if(!isset($name[1])) $name[1] = '';
-                wp_update_user(array('ID' => $user_id, 'display_name' => $display_name, 'first_name' => $name[0], 'last_name' => $name[1]));
-                $display_name = isset($display_name)?$display_name:$user_id;
-                $headers = "From: " . get_option('sitename') . " <" . get_option('admin_email') . ">\r\nContent-type: text/html\r\n";
-                $message = file_get_contents(wpdm_tpl_path('wpdm-new-user.html',WPDM_BASE_DIR.'tpls/email-templates/'));
-                $loginurl = $_POST['permalink'];
-                $message = str_replace(array("[#support_email#]", "[#homeurl#]", "[#sitename#]", "[#loginurl#]", "[#name#]", "[#username#]", "[#password#]", "[#date#]"), array(get_option('admin_email'), site_url('/'), get_option('blogname'), $loginurl, $display_name, $user_login, $user_pass, date("M d, Y")), $message);
 
-                if ($user_id) {
-                    wp_mail($user_email, "Welcome to " . get_option('sitename'), $message, $headers);
+                wp_update_user(array('ID' => $user_id, 'display_name' => $display_name, 'first_name' => $first_name, 'last_name' => $last_name));
 
-                }
-                unset($_SESSION['guest_order']);
-                unset($_SESSION['login_error']);
-                unset($_SESSION['tmp_reg_info']);
-                //if(!isset($_SESSION['reg_warning']))
+                //To User
+                $usparams = array('to_email' => $user_email, 'name' => $display_name, 'first_name' => $first_name, 'last_name' => $last_name, 'user_email' => $user_email, 'username' => $user_login, 'password' => $user_pass);
+                \WPDM\Email::send("user-signup", $usparams);
+
+                //To Admin
+                $ip = wpdm_get_client_ip();
+                $data = array(
+                    array('Name', $display_name),
+                    array('Username', $user_login),
+                    array('Email', $user_email),
+                    array('IP', $ip)
+                );
+                $css = array('col' => array('background: #edf0f2 !important'), 'td' => 'border-bottom:1px solid #e6e7e8');
+                $table = MailUI::table(null, $data, $css);
+                $edit_user_btn = "<a class='button' style='display:block;margin:10px 0 0;text-decoration: none;text-align:center;' href='".admin_url('user-edit.php?user_id='.$user_id)."'> ".__( "Edit User" , "download-manager" )." </a>";
+                $message = __( "New user registration on your site WordPress Download Manager:" , "download-manager" )."<br/>".$table.$edit_user_btn; //.__( "Username" , "download-manager" ).": {$user_login}<br/>".__( "Email" , "download-manager" ).": {$user_email}<br/>".__( "IP" , "download-manager" ).": {$ip}<br/><strong><a style='text-decoration: none;' href='".admin_url('user-edit.php?user_id='.$user_id)."'>&mdash; ".__( "Edit User" , "download-manager" )." &mdash;</a></strong>";
+                $params = array('subject' => sprintf(__("[%s] New User Registration"), get_bloginfo( 'name' ), 'wpdmpro'), 'to_email' => get_option('admin_email'), 'message' => $message);
+                \WPDM\Email::send("default", $params);
+
+                \WPDM\Session::clear('guest_order');
+                \WPDM\Session::clear('login_error');
+                \WPDM\Session::clear('tmp_reg_info');
+
                 $creds['user_login'] = $user_login;
                 $creds['user_password'] = $user_pass;
                 $creds['remember'] = true;
-                $_SESSION['sccs_msg'] = "Your account has been created successfully and login info sent to your mail address.";
+                \WPDM\Session::set('sccs_msg', __( "Your account has been created successfully and login info sent to your mail address." , "download-manager" ));
+
                 if($auto_login==1) {
-                    $_SESSION['sccs_msg'] = "Your account has been created successfully";
+                    \WPDM\Session::set('sccs_msg', __( "Your account has been created successfully" , "download-manager" ));
                     wp_signon($creds);
                     wp_set_current_user($user_id);
                     wp_set_auth_cookie($user_id);
+                    $loginurl = wpdm_user_dashboard_url();
 
                 }
 
-                if(wpdm_is_ajax()) die('success');
+                if(wpdm_is_ajax()) {  wp_send_json(array('success' => true)); die(); }
 
                 header("location: " . $loginurl);
                 die();
             } else {
-                $_SESSION['reg_error'] = __('Email already exists.');
+                \WPDM\Session::set('reg_error', __( "Email already exists." , "download-manager" ));
                 $plink = $_POST['permalink'] ? $_POST['permalink'] : $_SERVER['HTTP_REFERER'];
 
-                if(wpdm_is_ajax()) die('Error: '.$_SESSION['reg_error']);
+                if(wpdm_is_ajax()) { wp_send_json(array('success' => false, 'message' => 'Error: ' . \WPDM\Session::get('reg_error'))); die(); }
 
                 header("location: " . $loginurl);
                 die();
             }
         } else {
-            $_SESSION['reg_error'] = __('User already exists.');
+            \WPDM\Session::set('reg_error', __( "Username already exists." , "download-manager" ));
             $plink = $_POST['permalink'] ? $_POST['permalink'] : $_SERVER['HTTP_REFERER'];
 
-            if(wpdm_is_ajax()) die('Error: '.$_SESSION['reg_error']);
+            if(wpdm_is_ajax()) { wp_send_json(array('success' => false, 'message' => 'Error: ' . \WPDM\Session::get('reg_error'))); die(); }
 
             header("location: " . $loginurl);
             die();
         }
-        die();
+
     }
 
     function updateProfile()
@@ -566,6 +578,80 @@ class Apply {
     }
 
 
+    function googleFont(){
+        $wpdmss = maybe_unserialize(get_option('__wpdm_disable_scripts', array()));
+        $uicolors = maybe_unserialize(get_option('__wpdm_ui_colors', array()));
+            ?>
+            <style>
+                <?php if(!in_array('google-font', $wpdmss)) { ?>
+                @import url('https://fonts.googleapis.com/css?family=Cantarell:400,700');
+                <?php } ?>
+
+
+
+                .w3eden .fetfont,
+                .w3eden .btn,
+                .w3eden .btn.wpdm-front h3.title,
+                .w3eden .wpdm-social-lock-box .IN-widget a span:last-child,
+                .w3eden #xfilelist .panel-heading,
+                .w3eden .wpdm-frontend-tabs a,
+                .w3eden .alert:before,
+                .w3eden .panel .panel-heading,
+                .w3eden .discount-msg,
+                .w3eden .panel.dashboard-panel h3,
+                .w3eden #wpdm-dashboard-sidebar .list-group-item,
+                .w3eden #package-description .wp-switch-editor,
+                .w3eden .w3eden.author-dashbboard .nav.nav-tabs li a,
+                .w3eden .wpdm_cart thead th,
+                .w3eden #csp .list-group-item,
+                .w3eden .modal-title {
+                    font-family: Cantarell, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                    text-transform: uppercase;
+                    font-weight: 700;
+                }
+                .w3eden #csp .list-group-item{
+                    text-transform: unset;
+                }
+            </style>
+            <?php
+            $this->uiColors();
+
+    }
+
+    function uiColors(){
+        $uicolors = maybe_unserialize(get_option('__wpdm_ui_colors', array()));
+        ?>
+        <style>
+
+            :root{
+                --color-primary: <?php echo isset($uicolors['primary'])?$uicolors['primary']:'#4a8eff'; ?>;
+                --color-primary-hover: <?php echo isset($uicolors['primary'])?$uicolors['primary_hover']:'#4a8eff'; ?>;
+                --color-primary-active: <?php echo isset($uicolors['primary'])?$uicolors['primary_active']:'#4a8eff'; ?>;
+                --color-success: <?php echo isset($uicolors['success'])?$uicolors['success']:'#4a8eff'; ?>;
+                --color-success-hover: <?php echo isset($uicolors['success_hover'])?$uicolors['success_hover']:'#4a8eff'; ?>;
+                --color-success-active: <?php echo isset($uicolors['success_active'])?$uicolors['success_active']:'#4a8eff'; ?>;
+                --color-info: <?php echo isset($uicolors['info'])?$uicolors['info']:'#2CA8FF'; ?>;
+                --color-info-hover: <?php echo isset($uicolors['info_hover'])?$uicolors['info_hover']:'#2CA8FF'; ?>;
+                --color-info-active: <?php echo isset($uicolors['info_active'])?$uicolors['info_active']:'#2CA8FF'; ?>;
+                --color-warning: <?php echo isset($uicolors['warning'])?$uicolors['warning']:'orange'; ?>;
+                --color-warning-hover: <?php echo isset($uicolors['warning_hover'])?$uicolors['warning_hover']:'orange'; ?>;
+                --color-warning-active: <?php echo isset($uicolors['warning_active'])?$uicolors['warning_active']:'orange'; ?>;
+                --color-danger: <?php echo isset($uicolors['danger'])?$uicolors['danger']:'#ff5062'; ?>;
+                --color-danger-hover: <?php echo isset($uicolors['danger_hover'])?$uicolors['danger_hover']:'#ff5062'; ?>;
+                --color-danger-active: <?php echo isset($uicolors['danger_active'])?$uicolors['danger_active']:'#ff5062'; ?>;
+                --color-green: <?php echo isset($uicolors['green'])?$uicolors['green']:'#30b570'; ?>;
+                --color-blue: <?php echo isset($uicolors['blue'])?$uicolors['blue']:'#0073ff'; ?>;
+                --color-purple: <?php echo isset($uicolors['purple'])?$uicolors['purple']:'#8557D3'; ?>;
+                --color-red: <?php echo isset($uicolors['red'])?$uicolors['red']:'#ff5062'; ?>;
+                --color-muted: rgba(69, 89, 122, 0.6);
+                --wpdm-font: Cantarell, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            }
+
+
+        </style>
+        <?php
+
+    }
 
 
 

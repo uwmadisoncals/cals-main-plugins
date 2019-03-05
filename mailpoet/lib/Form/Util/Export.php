@@ -14,7 +14,7 @@ class Export {
   }
 
   static function get($type = 'html', $form = null) {
-    switch($type) {
+    switch ($type) {
       case 'iframe':
         // generate url to load iframe's content
         $iframe_url = add_query_arg(array(
@@ -33,7 +33,7 @@ class Export {
           'id="mailpoet_form_iframe"',
           'vspace="0"',
           'tabindex="0"',
-          'onload="if(window[\'MailPoet\']) MailPoet.Iframe.autoSize(this);"',
+          'onload="if (window[\'MailPoet\']) MailPoet.Iframe.autoSize(this);"',
           'marginwidth="0"',
           'marginheight="0"',
           'hspace="0"',
@@ -61,7 +61,7 @@ class Export {
 
         // CSS
         $output[] = '<link rel="stylesheet" type="text/css" href="'.
-          Env::$assets_url.'/css/public.css?mp_ver='.MAILPOET_VERSION.
+          Env::$assets_url.'/dist/css/public.css?mp_ver='.MAILPOET_VERSION.
         '" />';
 
         // jQuery
@@ -71,10 +71,10 @@ class Export {
 
         // JS
         $output[] = '<script type="text/javascript" src="'.
-          Env::$assets_url.'/js/vendor.js?mp_ver='.MAILPOET_VERSION.
+          Env::$assets_url.'/dist/js/vendor.js?mp_ver='.MAILPOET_VERSION.
         '"></script>';
         $output[] = '<script type="text/javascript" src="'.
-          Env::$assets_url.'/js/public.js?mp_ver='.MAILPOET_VERSION.
+          Env::$assets_url.'/dist/js/public.js?mp_ver='.MAILPOET_VERSION.
         '"></script>';
 
         // (JS) variables...

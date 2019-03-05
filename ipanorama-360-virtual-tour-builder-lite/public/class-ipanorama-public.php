@@ -407,7 +407,7 @@ class iPanorama_Public {
 	echo 'var $el = jQuery( "#' . $id . ' .ipnrm-controls");' . PHP_EOL;
 	echo 'if($el.length) {' . PHP_EOL;
 	echo 'var link = document.createElement("a");' . PHP_EOL;
-	echo 'link.setAttribute("href", "https://wordpress.org/plugins/ipanorama-360-virtual-tour-builder-lite/");' . PHP_EOL;
+	echo 'link.setAttribute("href", "https://1.envato.market/c/1288327/275988/4415?subId1=web&u=https%3A%2F%2Fcodecanyon.net%2Fitem%2Fipanorama-360-virtual-tour-builder-for-wordpress%2F17028820");' . PHP_EOL;
 	echo 'link.setAttribute("target", "_blank");' . PHP_EOL;
 	echo 'link.setAttribute("rel", "nofollow");' . PHP_EOL;
 	echo 'link.className = "ipnrm-btn-info";' . PHP_EOL;

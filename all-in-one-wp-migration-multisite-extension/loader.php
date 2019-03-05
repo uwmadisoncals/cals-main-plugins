@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2018 ServMask Inc.
+ * Copyright (C) 2014-2019 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,21 @@
  * ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	die( 'Kangaroos cannot jump here' );
+}
+
 // Include all the files that you want to load in here
+if ( defined( 'WP_CLI' ) ) {
+	require_once AI1WMME_VENDOR_PATH .
+				DIRECTORY_SEPARATOR .
+				'servmask' .
+				DIRECTORY_SEPARATOR .
+				'command' .
+				DIRECTORY_SEPARATOR .
+				'class-ai1wm-backup-wp-cli-command.php';
+}
+
 require_once AI1WMME_CONTROLLER_PATH .
 			DIRECTORY_SEPARATOR .
 			'class-ai1wmme-main-controller.php';
@@ -31,6 +45,10 @@ require_once AI1WMME_CONTROLLER_PATH .
 require_once AI1WMME_CONTROLLER_PATH .
 			DIRECTORY_SEPARATOR .
 			'class-ai1wmme-export-controller.php';
+
+require_once AI1WMME_CONTROLLER_PATH .
+			DIRECTORY_SEPARATOR .
+			'class-ai1wmme-import-controller.php';
 
 require_once AI1WMME_EXPORT_PATH .
 			DIRECTORY_SEPARATOR .

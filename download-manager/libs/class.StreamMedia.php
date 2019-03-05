@@ -42,7 +42,7 @@ class StreamMedia
      * @return $this
      */
     private function setSpeed(){
-        $speed = get_option('__wpdm_download_speed', 10240);
+        $speed = (int)get_option('__wpdm_download_speed', 10240);
         $speed = $speed > 0 ? $speed:10240;
         $speed = apply_filters('wpdm_download_speed', $speed);
         $this->chunk = $speed * 1024;

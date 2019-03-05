@@ -8,7 +8,7 @@ use MailPoet\Models\SubscriberCustomField;
 class SubscriberPersonalDataEraser {
 
   function erase($email) {
-    if(empty($email)) {
+    if (empty($email)) {
       return array(
         'items_removed' => false,
         'items_retained' => false,
@@ -20,7 +20,7 @@ class SubscriberPersonalDataEraser {
     $subscriber = Subscriber::findOne(trim($email));
     $item_removed = false;
     $items_retained = true;
-    if($subscriber) {
+    if ($subscriber) {
       $this->eraseCustomFields($subscriber->id());
       $this->anonymizeSubscriberData($subscriber);
       $item_removed = true;
@@ -37,7 +37,7 @@ class SubscriberPersonalDataEraser {
 
   private function eraseCustomFields($subscriber_id) {
     $custom_fields = SubscriberCustomField::where('subscriber_id', $subscriber_id)->findMany();
-    foreach($custom_fields as $custom_field) {
+    foreach ($custom_fields as $custom_field) {
       $custom_field->value = '';
       $custom_field->save();
     }

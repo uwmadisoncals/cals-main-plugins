@@ -2,25 +2,27 @@
 
 namespace MailPoet\Newsletter\Editor;
 
-use MailPoet\WP\Hooks;
+use MailPoet\WP\Functions as WPFunctions;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class PostContentManager {
   const WP_POST_CLASS = 'mailpoet_wp_post';
 
   public $max_excerpt_length = 60;
 
+
   function __construct() {
-    $this->max_excerpt_length = Hooks::applyFilters('mailpoet_newsletter_post_excerpt_length', $this->max_excerpt_length);
+    $wp = new WPFunctions;
+    $this->max_excerpt_length = $wp->applyFilters('mailpoet_newsletter_post_excerpt_length', $this->max_excerpt_length);
   }
 
   function getContent($post, $displayType) {
-    if($displayType === 'titleOnly') {
+    if ($displayType === 'titleOnly') {
       return '';
-    } elseif($displayType === 'excerpt') {
+    } elseif ($displayType === 'excerpt') {
       // get excerpt
-      if(!empty($post->post_excerpt)) {
+      if (!empty($post->post_excerpt)) {
         return self::stripShortCodes($post->post_excerpt);
       } else {
         return $this->generateExcerpt(self::stripShortCodes($post->post_content));
@@ -48,12 +50,12 @@ class PostContentManager {
       '<p>', '<em>', '<span>', '<b>', '<strong>', '<i>',
       '<a>', '<ul>', '<ol>', '<li>', '<br>', '<blockquote>'
     );
-    if($display_type === 'full') {
-      $tags_not_being_stripped =  array_merge($tags_not_being_stripped, array('<img>', '<h1>', '<h2>', '<h3>'));
+    if ($display_type === 'full') {
+      $tags_not_being_stripped =  array_merge($tags_not_being_stripped, array('<figure>', '<img>', '<h1>', '<h2>', '<h3>'));
     }
 
     $content = strip_tags($content, implode('', $tags_not_being_stripped));
-    if($with_post_class) {
+    if ($with_post_class) {
       $content = str_replace('<p', '<p class="' . self::WP_POST_CLASS .'"', wpautop($content));
     } else {
       $content = wpautop($content);
@@ -66,7 +68,7 @@ class PostContentManager {
   private function generateExcerpt($content) {
     // if excerpt is empty then try to find the "more" tag
     $excerpts = explode('<!--more-->', $content);
-    if(count($excerpts) > 1) {
+    if (count($excerpts) > 1) {
       // <!--more--> separator was present
       return $excerpts[0];
     } else {

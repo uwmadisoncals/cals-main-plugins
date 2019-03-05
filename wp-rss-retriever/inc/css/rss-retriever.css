@@ -1,5 +1,6 @@
 .wp_rss_retriever li {
 	margin-bottom: 10px;
+	list-style: none;
 }
 
 a.wp_rss_retriever_title {
@@ -19,22 +20,24 @@ a.wp_rss_retriever_title {
 }
 
 .wp_rss_retriever_image img {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-  width: auto;
-  -webkit-transform: translate(-50%,-50%);
-      -ms-transform: translate(-50%,-50%);
-          transform: translate(-50%,-50%);
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	height: 100%;
+	max-width: none;
+	max-height: none;
+	width: auto;
+	-webkit-transform: translate(-50%,-50%);
+	  	-ms-transform: translate(-50%,-50%);
+	      	transform: translate(-50%,-50%);
+
+	object-fit: cover;
 
 }
 
 .wp_rss_retriever_image img.portrait {
-  width: 100%;
-  height: auto;
+	min-width: 100%;
+	min-height: 100%;
 }
 
 a.wp_rss_retriever_readmore {
@@ -54,4 +57,9 @@ a.wp_rss_retriever_readmore {
 	content: '';
 	display: table;
 	clear: both;
+}
+
+.wp_rss_retriever_credits {
+	text-align: right;
+	font-size: .5em;
 }

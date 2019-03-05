@@ -7,7 +7,7 @@
         wp_nonce_field(NONCE_KEY, '__wpdms_nonce');
         ?>
  <div class="panel panel-default" id="wpdm-wrapper-panel">
-     <div class="panel-heading"><button type="submit" class="btn btn-default pull-right" style="font-weight: 600"><i class="sinc fa fa-hdd color-green"></i> <?php _e("Save Settings",'download-manager'); ?></button><h3 class="h"><i class="fa fa-cogs color-purple"></i>&nbsp;&nbsp;<?php _e("Download Manager Settings",'download-manager'); ?></h3>
+     <div class="panel-heading"><button type="submit" class="btn btn-primary pull-right" style="font-weight: 600"><i class="sinc fa fa-hdd"></i> <?php _e("Save Settings",'download-manager'); ?></button><h3 class="h"><i class="fa fa-cogs color-purple"></i>&nbsp;&nbsp;<?php _e("Download Manager Settings",'download-manager'); ?></h3>
 
      </div>
      <div class="panel-heading" style="background: #f5f5f5 !important;border: 0;border-radius: 0;border-bottom: 1px solid #eeeeee;margin-top: 53px">
@@ -25,7 +25,7 @@
      <div class="tab-content">
 <div onclick="jQuery(this).slideUp();" class="alert alert-info" style="display: none" id="message"></div>
          <input type="hidden" name="task" id="task" value="wdm_save_settings" />
-<input type="hidden" name="action" id="action" value="wdm_settings" />
+<input type="hidden" name="action" id="action" value="wpdm_settings" />
 <input type="hidden" name="section" id="section" value="<?php echo (isset($_REQUEST['tab']))?esc_attr($_REQUEST['tab']):'basic'; ?>" />
 <div id="fm_settings">
 <?php
@@ -64,7 +64,7 @@ jQuery(document).ready(function(){
         jQuery('#wdms_loading').addClass('wpdm-spin');
         jQuery(this).append('<span class="wpdm-loading wpdm-spin pull-right" id="wpdm-lsp"></span>')
         var section = this.id;
-        jQuery.post(ajaxurl,{action:'wdm_settings',section:this.id},function(res){
+        jQuery.post(ajaxurl,{action:'wpdm_settings',section:this.id},function(res){
             jQuery('#fm_settings').html(res);
             jQuery('#section').val(section)
             jQuery('#wdms_loading').removeClass('wpdm-spin');

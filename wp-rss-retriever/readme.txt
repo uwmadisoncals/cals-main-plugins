@@ -1,20 +1,35 @@
-=== RSS Retriever ===
-Contributors: tjtaylor, stephenkhouri
-Donate link: http://travistaylor.com/wp-rss-retriever-demo/
-Tags: rss, rss plugin, rss retriever, wp rss retriever, rss aggregator, rss feed, rss fetch feed, rss fetch, fetch feed, rss widget, rss aggregator widget, rss shortcode, rss feed shortcode, rss aggregator shortcode, rss multiple feeds, fetch multiple feeds, rss cache, rss feed cache, rss thumbnails, rss images, rss feed image
+=== WordPress RSS Feed Retriever ===
+Contributors: tjtaylor
+Donate link: https://thememason.com/plugins/rss-retriever/
+Tags: rss aggregator, rss feed, rss import, rss parsing, news aggregator
 Requires at least: 2.8
-Tested up to: 4.1
-Stable tag: 1.1.1
+Tested up to: 5.0.3
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-A simple, lightweight RSS aggregator plugin which uses shortcode to fetch and display multiple RSS feeds.
+A simple, lightweight RSS aggregator plugin which uses shortcode to fetch and display multiple RSS feeds. Use as a news aggregator, autoblog, or RSS parsing.
 
 == Description ==
 
-This plugin fetchs an RSS feed, or multiple feeds, and displays them in an unordered list using shortcode.
+This plugin fetches an RSS feed, or multiple feeds, and displays them in an unordered list using shortcode.
 
-<h4>Features:</h4>
+<a title="WordPress RSS Feed Retriever Demo" href="http://demo.thememason.com/rss/" target="_blank">**Demo**</a> | <a title="WordPress RSS Feed Retriever Tutorial" href="https://www.youtube.com/watch?v=2EPdD65zS5U" target="_blank">**Video Tutorial**</a>
+
+<h3>How to use:</h3>
+
+[youtube https://www.youtube.com/watch?v=2EPdD65zS5U]
+
+Simply copy and paste the example code below to wherever you would like to display your RSS feed. Replace the url and other properties as needed. (See FAQ section below to use in Gutenberg blocks, widgets, and PHP)
+
+<h3>Example:</h3>
+<pre><code>[wp_rss_retriever url="http://feeds.feedburner.com/TechCrunch/" items="10" excerpt="50" read_more="true" credits="true" new_window="true" thumbnail="200" cache="7200"]</code></pre>
+
+
+<h3>Live Demo:</h3>
+<p><a title="WordPress RSS Feed Retriever Demo" href="http://demo.thememason.com/rss/" target="_blank">http://demo.thememason.com/rss/</a></p>
+
+<h3>Features:</h3>
 <ul>
 	<li>Fetch as many RSS feeds as you want</li>
 	<li>Display the RSS feed wherever you want using shortcode, including text widgets</li>
@@ -24,26 +39,21 @@ This plugin fetchs an RSS feed, or multiple feeds, and displays them in an unord
 	<li>Control whether links open in a new window or not</li>
 	<li>Simple, lightweight, and fast</li>
 	<li>Easy to setup</li>
-	<li><strong>**NEW**</strong> Fetch thumbnail or first image</li>
-	<li><strong>**NEW**</strong> Control size of thumbnail</li>
-	<li><strong>**NEW**</strong> Set cache time (in seconds)</li>
-	<li><strong>**NEW**</strong> Control order of items</li>
-	<li><strong>**NEW**</strong> Aggregate multiple feeds into one list</li>
+	<li>Fetch thumbnail or first image</li>
+	<li>Control size of thumbnail (width and height)</li>
+	<li>Set cache time (in seconds)</li>
+	<li>Control order of items</li>
+	<li>Aggregate multiple feeds into one list</li>
+	<li>Dofollow or nofollow options</li>
 </ul>
 
-<h4>Live Demo:</h4>
-<p><a href="http://travistaylor.com/wp-rss-retriever-demo/" target="_blank">http://travistaylor.com/wp-rss-retriever-demo/</a></p>
-
-<h4>Example:</h4>
-<pre><code>[wp_rss_retriever url="http://feeds.feedburner.com/TechCrunch/" items="10" excerpt="50" read_more="true" new_window="true" thumbnail="200" cache="7200"]</code></pre>
-
-<h4>Properties:</h4>
+<h3>Properties:</h3>
 <ul>
-	<li><strong>url</strong> - The url of the feed you wish to fetch from. For multiple urls simply use a comma between them.</li>
+	<li><strong>url</strong> - The url of the rss feed you wish to aggregate from. For multiple urls simply use a comma between them.</li>
 
-	<li><strong>items</strong> - Number of items from the feed you wish to fetch <em>(Default is 10)</em></li>
+	<li><strong>items</strong> - Number of items from the rss feed you wish to fetch <em>(Default is 10)</em></li>
 
-	<li><strong>orderby</strong> - Order the items by date or reverse date <em>(date or date_reverse)</em></li>
+	<li><strong>orderby</strong> - Order the items by date, reverse date, or random <em>(date, date_reverse, random)</em></li>
 
 	<li><strong>title</strong> - Whether to display the title or not <em>(true or false, defaults to true)</em></li>
 
@@ -53,18 +63,40 @@ This plugin fetchs an RSS feed, or multiple feeds, and displays them in an unord
 
 	<li><strong>new_window</strong> - Whether to open the title link and read more link in a new window	<em>(true or false, defaults to true)</em></li>
 
-	<li><strong>thumbnail**</strong> - Whether or not you want to display a thumbnail, and if so, what size you want it to be<em>(true or false, defaults to true. Inserting a number will change the size, default is 150)</em></li>
+	<li><strong>thumbnail**</strong> - Whether or not you want to display a thumbnail, and if so, what size you want it to be<em>(true or false, defaults to true. Inserting a number will change the size, default is 150, use 150x200 format to set both width and height)</em></li>
 
 	<li><strong>source</strong> - Whether to display the source or not <em>(true or false, defaults to true)</em></li>
 
 	<li><strong>date</strong> - Whether to display the publish date or not <em>(true or false, defaults to true)</em></li>
 
 	<li><strong>cache</strong> - How long you want the feed to cache the results in seconds <em>(Default is 43200, (12 hours))</em></li>
+
+	<li><strong>dofollow</strong> - Whether to make links dofollow or nofollow <em>(Defaults to nofollow)</em></li>
+
+	<li><strong>credits</strong> - Whether to give credit to the plugin author <em>(Defaults to false)</em></li>
 </ul>
 
 **PLEASE NOTE: Using thumbnails can cause longer load times depending on the feed you are fetching from, use with caution. 
 
 Please post any issues under the support tab. If you use and like this plugin, please don't forget to <strong>rate</strong> it! Additionally, if you would like to see more features for the plugin, please let me know.
+
+Shortcode can be used anywhere including in posts, pages, text widgets, and in PHP files by using the do_shortcode function. This RSS import plugin is very lightweight with a minimal amount of code as to insure it will not slow down your website. Build a custom news aggregator or use this plugin as a simple feed to post plugin by displaying the RSS parsing feed within the pages of your choice. This RSS aggregator is built on the SimplePie API.
+
+== Frequently Asked Questions ==
+
+= How do I display a feed in my content? =
+Copy and paste the example shortcode above into your content. Replace the url and other parameters as needed. Update/publish the page or post.
+
+= How do I display a feed in a widget? =
+Create a new text widget. Click on the "Text" tab. Copy and paste the example shortcode above. Replace the url and other parameters as needed.
+
+= How do I display a feed using PHP? =
+Here's an example of how to display an RSS feed with PHP
+<pre><code><?php echo do_shortcode('[wp_rss_retriever url="http://feeds.feedburner.com/TechCrunch/" items="10" excerpt="50" read_more="true" credits="true" new_window="true" thumbnail="200" cache="7200"]'); ?></code></pre>
+
+= How do I display a feed with a Gutenberg Block? =
+Click on the "+" icon to add a new block. Search for "shortcode". Click on the shortcode block to add it. Copy and paste the example shortcode above into the block. Replace the url and other parameters as needed. 
+
 
 == Installation ==
 
@@ -73,7 +105,8 @@ This section describes how to install the plugin and get it working.
 1. Upload `wp-rss-retriever.zip` to the `/wp-content/plugins/` directory
 2. Unzip the file
 3. Activate the plugin through the 'Plugins' menu in WordPress
-4. Use the shortcode [wp_rss_retriever] anywhere in your content
+4. Use the example shortcode [wp_rss_retriever url="http://feeds.feedburner.com/TechCrunch/" items="10" excerpt="50" read_more="true" credits="true" new_window="true" thumbnail="200" cache="7200"] anywhere in your content
+5. Change the url and other properties as needed
 
 
 == Changelog ==
@@ -99,3 +132,34 @@ This section describes how to install the plugin and get it working.
 * Ability to order posts by date or reverse date
 * Options to display or remove source and date
 * Option to remove title
+
+= 1.2 =
+* Fix SSL error
+* Add default nofollow for links
+* Add option for dofollow
+
+= 1.2.1 =
+* Fix a bug where the error message "No Items" was displaying outside of the list item
+* Fix an error that displays sometimes on 404 pages
+* Add optional plugin credits (disabled by default)
+* Add orderby="random" method
+
+= 1.2.2 =
+* Dates now translates to the language set in WordPress general settings
+* Date and time format now uses the format set via WordPress general settings
+
+= 1.2.4 =
+* Utilizes the local timezone set in WordPress general settings
+
+= 1.2.6 =
+* Fix HTML validation error
+
+= 1.3.0 =
+* Refactor image CSS to make img element act as background-size:cover
+* Remove default list-item styles
+* Include ability to set width and height on thumbnails (ie. 200x150)
+* Fix an issue where plugin CSS was not enqueuing when using the shortcode inside a text widget
+* Fix an issue where excerpt=0 was not stripping html tags from the feed.
+
+= 1.3.1 =
+* Fix an issue where excerpts in East Asian languages were not trimming words properly

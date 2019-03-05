@@ -102,9 +102,12 @@ class Wicked_Folders_Folder {
 
     /**
      * Load the folder from the database.
+     *
+     * @return boolean
+     *  True if the folder was successfully  loaded, false otherwise.
      */
     public function fetch() {
-        return $this;
+        return false;
     }
 
     public function get_ancestor_ids( $id = false ) {

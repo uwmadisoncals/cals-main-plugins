@@ -16,13 +16,27 @@ class Wicked_Folders_Post_Hierarchy_Dynamic_Folder extends Wicked_Folders_Dynami
     }
 
     public function pre_get_posts( $query ) {
-
         $this->parse_id();
 
-        if ( $this->post_id ) {
+        // Get include children setting
+        $include_children = Wicked_Folders::include_children( $this->post_type, $this->id );
+
+        // Include items from child folders if include children is enabled
+        if ( $include_children ) {
+            $ids            = array( $this->post_id );
+            $child_folders  = $this->get_child_folders();
+
+            foreach ( $child_folders as $folder ) {
+                $folder->parse_id();
+
+                $ids[] = $folder->post_id;
+            }
+
+            $query->set( 'post_parent__in', $ids );
+        } else {
+            // Otherwise, only show direct descendants
             $query->set( 'post_parent', $this->post_id );
         }
-
     }
 
     /**
@@ -81,6 +95,15 @@ class Wicked_Folders_Post_Hierarchy_Dynamic_Folder extends Wicked_Folders_Dynami
 
         $post = get_post( $this->post_id );
 
+        $children = get_posts( array(
+            'post_type'         => $post->post_type,
+            'posts_per_page'    => 1,
+            'post_parent'       => $post->ID,
+        ) );
+
+        // A post hierarchy folder should only 'exist' if it contains children
+        if ( empty( $children ) ) return false;
+
         if ( $post ) {
             $this->name         = $post->post_title;
             $this->parent       = 'dynamic_hierarchy_' . $post->post_parent;
@@ -89,7 +112,7 @@ class Wicked_Folders_Post_Hierarchy_Dynamic_Folder extends Wicked_Folders_Dynami
             $this->type         = 'Wicked_Folders_Post_Hierarchy_Dynamic_Folder';
         }
 
-        return $this;
+        return true;
     }
 
     public function get_ancestor_ids( $id = false ) {

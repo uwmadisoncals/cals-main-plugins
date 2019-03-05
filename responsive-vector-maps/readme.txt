@@ -1,44 +1,44 @@
 === RVM - Responsive Vector Maps ===
 Contributors: Enrico Urbinati
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40responsivemapsplugin%2ecom&lc=IT&item_name=responsive%20Vector%20Maps%20Plugin&item_number=rvm%2dplugin%2dwordpress%2drepo&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
-Tags: responsive maps, svg, maps, country maps, France map, Germany map, Italy map, Netherlands map, Norway map, Poland map, Portugal map, Spain map, Sweden map, Switzerland map, United Kingdom map, customizable maps, vector maps, svg map, linkable map, USA map, Belgium map, html tooltip,country maps, continent maps, city maps, region maps, clickable maps, linkable maps, professional maps      
+Tags: responsive maps,linkable maps,maps,map toggle elements,World Map,France Map,Cambodia Map,Chad Map,Côte D'Ivoire Map,Macedonia Map,Mali Map,Montenegro Map,Belgium Map ( Mercator ),Europe Map ( Miller ),Europe Map ( Mercator ),France Regions Map ( Miller ),France Regions Map ( Mercator ),Germany Map ( Mercator ),Netherlands Map ( Mercator ),Netherlands Map ( Miller ),Poland Map ( Mercator ),Poland Map ( Miller ),Sweden Map ( Mercator ),Sweden Map ( Miller ),Switzerland Map ( Mercator ),Angola Map,Argentina Map,Map Of Armenia,Bangladesh Map,Belarus Map,Belgium Map ( Miller ),Belize Map,Benin Map,Bhutan Map,Bolivia Map,Bosnia And Herzegovina Map,Botswana Map,Brazil Map,Brunei Map,Bulgaria Map,Burkina Faso FMap,United Kingdom Countries Map ( Mercator ),United Kingdom Countries Map ( Miller ),USA Map ( Mercator ),Norway Map,Burundi Map,Cameroon Map,Canada Map,Central African Republic Map,China Map,Colombia Map,Costa Rica Map,Cuba Map,Democratic Republic Of The Congo Map,Djibouti Map,Dominican Republic Map,Egypt Map,Eritrea Map,Spain Map ( Miller ),Germany Map ( Miller ),Ivory Coast Map,Republic Of The Congo Map,Switzerland Map ( Miller ),United Arab Emirates Map,Greece Map,Australia Map ( Mercator ),Syria Map,Ireland Map,Nepal Map,Iraq Map,Slovenia Map,Iceland Map,Saudi Arabia Map,Thailand Map,India Map,Israel Map,Mexico Map,New Zealand Map,Venezuela Map,Luxemburg Map,Sud Sudan Map,El Salvador Map,Ghana Map,Finland Map,Gabon Map,Iran Map,Nigeria Map,Jamaica Map,Estonia Map,Georgia Map,Equatorial Guinea Map,Greenland Map,Guatemala Map,Guinea Map,Guyana Map,Japan Map,Honduras Map,Haiti Map,Hungary Map,Indonesia Map,Kenya Map,Kyrgyzstan Map,Sri Lanka Map,Kuwait Map,Ukraine Map,Laos Map,Lebanon Map,Liberia Map,Africa Map ( Mercator ),Asia Map ( Mercator ),North America Map ( Mercator ),South America Map ( Mercator ),Oceania Map ( Mercator ),Continents Map ( Mercator ),Russia Map ( Mercator ),Austria Map,Italy Provinces Map ( Mercator ),Italy Provinces Map ( Miller ),New York City Map ( Mercator ),World Map ( Miller ),France Departments Map ( Mercator ),France Regions 2016 Map ( Mercator ),North America Map ( Miller ),Africa Map ( Miller ),Asia Map ( Miller ),Continents Map ( Miller ),South America Map ( Miller ),Oceania Map ( Miller ),Fiat 500 Vector,Darth Vader Reaching Out,Mongolia Map,Yemen Map,South Africa Map ( Mercator ),South Africa Map ( Miller ),Denmark Map (Miller),Denmark Map ( Mercator ),Perù Map,Turkey Map,Spain Map With Canary Islands ( Mercator ),Spain Map With Canary Islands ( Miller ),South Korea Map,World Map With French Guyane separated ( Miller ),Lombardia Map,Uganda Map,Pakistan Map,Afghanistan Map,Ethiopia Map,Albania Map,Romania Map,Custom Marker Icon Module,Portugal Map ( Mercator ),Portugal Map ( Miller ),Paraguay Map,Rwanda Map,Algeria Map,Bahamas Map,Cape Verde Map,Cyprus Map,Czech Republic Map,Faeroe Islands Map,Guinea Bissau Map,Hong Kong Map,Lesotho Map,Liechtenstein Map,Madagascar Map,Malawi Map,Malta Map,Moldova Map,Montserrat Map,United Kingdom Regions Map ( Mercator),United Kingdom Regions Map ( Miller),Latium Map,Abruzzo Map,Emilia Romagna Map,Apulia Map,Sicily Map,Campania Map,Molise Map,Basilicata Map,Sardinia Map,Piedmont Map,Calabria Map,Friuli Venezia Giulia Map,Marche Map,Tuscany Map,Liguria Map,Umbria Map,Trentino Alto Adige Map,Aosta Valley Map,Veneto Map,Italy Regions Plus,North Italy Map Pack,Central Italy Map Pack,South Italy Map Pack,Myanmar ( ex Birmania ) Map,Nicaragua Map,North Korea Map,Senegal Map,Sierra Leone Map,Slovakia Map,Solomon Islands Map,Suriname Map,Swaziland Map,Tajikistan Map,Taiwan Map,The Gambia Map,Timor-Leste Map,Togo Map,Uzbekistan Map,Vanuatu Map,Zambia Map,Zimbabwe Map,Chile Map,USA Map ( Albers ),USA Map ( Lambert ),html tooltip,country maps,continent maps,city maps,region maps,clickable maps,linkable maps,professional maps     
 Requires at least: 3.6
-Tested up to: 4.9.7
-Stable tag: 5.3.2
+Tested up to: 5.1
+Stable tag: 5.8.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Get RVM to create as many responsive vector maps as you want... stop using area tag to create your linkable maps.
+Create responsive linkable maps, many customizations possible, toggle elements on the page or display content over the maps, all settings in one page.
 
 == Description ==
 
-RVM ( Responsive Vector Maps ) allows you to create responsive vector maps for your Wordpress site.
+Create responsive linkable vector maps in one click, many customizations possible, toggle elements on the page or display content over the maps. All settings in one page !
 
-Vector maps have the advantage to not loose quality when reducing or increasing their sizes. Using RVM you will not need to create static images for area map tags.
-Based on great work of Kirill Lebedev [jvectormap](http://jvectormap.com/), this plugin uses a combination of css, html and javascript to create as many svg maps as you like for your site.
+Vector maps never loose quality when reducing or increasing their sizes. Using RVM you will not need to create static images for area map tags.
 
-You can use maps in sidebars as widgets or just in the post content using shortcodes.
-
-[Sponsored By: Infolinks, Smart Ads for WordPress Sites, Get Started](http://www.infolinks.com/join-us?aid=3113977)
+You can use maps in sidebars or just in post/page content using shortcodes.
 
 
 = Features = 
 
+* Default maps available for free : Italy and whole World ( with clickable countries ).
 * Responsive: Maps will adapt their width to any device
-* High quality image: Vector maps never loose quality
-* Cross-browser compatibility using ( yes, works even on IE7 )
-* More then 100  downloadable maps available on [responsivemapsplugin.com](http://www.responsivemapsplugin.com/redirect-to-custom-maps-from-wp-plugin-page/) 
+* High quality image
+* Cross-browser compatibility
+* More then 200  downloadable maps available on [responsivemapsplugin.com](//www.responsivemapsplugin.com/redirect-to-custom-maps-from-wp-plugin-page/) 
 * Chance to install dynamic maps with all kind of svg ( not only geographical maps ! )
 * Mouseover tooltip effect
-* Subdivisions: Customize background colours, links and html popup ( tooltip )
-* Markers: Add your linkable markers on the map using latitude and longitude. Chance to have html popup, dimension ( marker radius ) and min/max radius dimension scale
+* Linkable Subdivisions: Customize background colours, links and html popup ( tooltip )
+* Subdivisions' actions : show/hide elements on the page and display label content when clicking on subdivisions
+* Linkable Markers: Add your linkable markers on most of the maps using latitude and longitude. Chance to have html popup, dimension ( marker radius ) and min/max radius dimension scale
 * Pinpoints: Use your favourite images as icons for markers' pinpoints  
-* Customizable look and feel
+* Customizable look and feel ( even transparent background )
 * Preview functionality: WYSAWYG while creating/editing your map
-* Shortcodes: Use generated shortcodes in your posts
+* Shortcodes: Use generated shortcodes in your posts, pages or sidebars
 * Widget: Maps can be used in widget area too 
 * Zoom capabilities
-* Many default maps available: France ( regions ), Germany, Italy, Netherlands, Norway, Poland, Portugal, Spain, Sweden, Switzerland, United Kingdom, Europe, USA, Belgium and whole World ( with clickable countries ).
+* Export and Import features: backup and restore markers and subdivision settings in just one click
+
 
 
 == Installation ==
@@ -69,6 +69,7 @@ Yes, these are possible layout customizations:
 Yes, it's possible to customize links for each region/area displayed in the map. When creating a new map or editing an existing one, you will have chance to
 assign url to each area/region of the map. Default areas/regions have just a tooltip mouseover effect displaying area/region name.
 Actually is possible to add a custom html tooltip in a secure way.
+It's even possible show/hide elements on the page or show content over your maps.
 
 = Which WP version is the plugin compatible with ? =
 
@@ -89,6 +90,36 @@ an additional **width** parameter to the shortcode within a specific post. Your 
 5. The result... finally! We see a widget sidebar and a content map ( Notice we used two different shortcode/ID for Italy map )
 
 == Changelog ==
+
+= 5.8.2 =
+* New feature : introduced effect of markers' pinpoints falling down from top of the map ( special thanks to Brendan Carr )
+
+= 5.7.2 =
+* Fix : show custom selector action: selectors toggled properly
+
+= 5.7.1 =
+* Fix : Warning: call_user_func() expects parameter 1 to be a valid callback ...
+* Fix : Undefined index: rvm_custom_icon_marker_module_path_verified ...
+
+= 5.6.9 =
+* Fix :  Undefined index: field_region_onclick_action
+* Fix :  label content not opening onto default map card for certain maps
+* Fix :  Color picker bar overlapped by subdivisions' name
+
+= 5.6.6 =
+* Fix :  Undefined offset: 4 error fixed even for legacy products
+
+= 5.6.5 =
+* Fix :  Undefined offset: 4 error fixed
+
+= 5.6.4 =
+* New feature : show/hide custom elements on the page and display subdivisions' label content onto map layer
+* Improvements : responsive settings dashboard and better UX
+
+= 5.5.3 =
+* New feature : Export and import subdivisions of your maps
+* New feature : Export and import markers of your maps
+* Improvements : minor style update
 
 = 5.3.2 =
 * Fix : fix the "warning count() parameter must be an array or an object" issue of PHP ver 7.2

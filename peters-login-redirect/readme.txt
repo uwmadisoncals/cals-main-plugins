@@ -3,7 +3,7 @@ Contributors: pkthree
 Donate link: https://www.paypal.me/PeterKeung
 Tags: login, logout, redirect, admin, administration, dashboard, users, authentication
 Requires at least: 3.2
-Tested up to: 4.6
+Tested up to: 5.1
 Stable tag: trunk
 
 Redirect users to different locations after logging in and logging out.
@@ -208,6 +208,9 @@ For a deeper dive into this feature, please see this video:
 http://www.screenr.com/Gqi8
 
 == Changelog ==
+
+= 2.9.2 =
+* 2019-02-23: Add CSRF protection (thanks RIPS!). Fixed translations for "username" variable instruction (thanks Jaime!).
 
 = 2.9.1 =
 * 2016-08-10: Support utf8mb4 encoding and prevent cross-site scripting when editing redirect URLs.

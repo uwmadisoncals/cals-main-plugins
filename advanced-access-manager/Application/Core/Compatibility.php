@@ -17,6 +17,35 @@
 class AAM_Core_Compatibility {
     
     /**
+     * Convert config to the Policy Config
+     * 
+     * @param string $option
+     * @param mixed  $value
+     * 
+     * @return mixed
+     * 
+     * @access public
+     * @static
+     * @since v5.9
+     */
+    public static function convertConfig($option, $value) {
+        if (strpos($option, '.defaultTerm.') !== false && empty($value)) {
+            $param = AAM_Core_Policy_Factory::get()->getParam(
+                    'post:default:category'
+            );
+            if (!empty($param)) {
+                if (!is_numeric($param)) {
+                    $term  = get_term_by('slug', $param, 'category');
+                    $param = (is_wp_error($term) || empty($term) ? null : $term->term_id);
+                }
+            }
+            $value = (is_null($param) ? $value : $param);
+        }
+        
+        return $value;
+    }
+    
+    /**
      * 
      */
     public static function checkConfigPressCompatibility($key) {
@@ -33,6 +62,58 @@ class AAM_Core_Compatibility {
         }
         
         return $key;
+    }
+    
+    /**
+     * Converting metabox options from 2 dimensional to 1
+     * 
+     * @param array $metaboxes
+     * 
+     * @return array
+     * @todo Remove in 2021
+     */
+    public static function convertMetaboxes($metaboxes) {
+        $response = array();
+        
+        if (is_array($metaboxes)) {
+            foreach($metaboxes as $key => $value) {
+                if (is_array($value)) {
+                    foreach($value as $id => $grand) {
+                        $response["{$key}|{$id}"] = $grand;
+                    }
+                } else {
+                    $response[$key] = $value;
+                }
+            }
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * 
+     * @param type $list
+     * @return type
+     * @todo Remove in 2021
+     */
+    public static function convertRoute($list) {
+         $response = array();
+        
+        if (is_array($list)) {
+            foreach($list as $type => $routes) {
+                if (is_array($routes)) {
+                    foreach($routes as $route => $methods) {
+                        foreach($methods as $method => $grand) {
+                            $response[strtolower("{$type}|{$route}|{$method}")] = $grand;
+                        }
+                    }
+                } else {
+                    $response[$type] = $routes;
+                }
+            }
+        }
+        
+        return $response;
     }
     
     /**

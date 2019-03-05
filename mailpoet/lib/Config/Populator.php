@@ -1,20 +1,22 @@
 <?php
 namespace MailPoet\Config;
 
+use MailPoet\Config\PopulatorData\DefaultForm;
 use MailPoet\Cron\CronTrigger;
 use MailPoet\Mailer\MailerLog;
-use MailPoet\Models\Newsletter;
+use MailPoet\Models\NewsletterTemplate;
+use MailPoet\Models\Form;
 use MailPoet\Models\Segment;
-use MailPoet\Models\SendingQueue;
 use MailPoet\Models\StatisticsForms;
 use MailPoet\Models\Subscriber;
 use MailPoet\Segments\WP;
-use MailPoet\Models\Setting;
 use MailPoet\Settings\Pages;
+use MailPoet\Settings\SettingsController;
+use MailPoet\Subscribers\NewSubscriberNotificationMailer;
 use MailPoet\Subscribers\Source;
 use MailPoet\Util\Helpers;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
@@ -22,9 +24,13 @@ class Populator {
   public $prefix;
   public $models;
   public $templates;
+  private $default_segment;
+  /** @var SettingsController */
+  private $settings;
   const TEMPLATES_NAMESPACE = '\MailPoet\Config\PopulatorData\Templates\\';
 
   function __construct() {
+    $this->settings = new SettingsController();
     $this->prefix = Env::$db_prefix;
     $this->models = array(
       'newsletter_option_fields',
@@ -70,11 +76,33 @@ class Populator {
       'WideStoryLayout',
       'ScienceWeekly',
 
+      'BrandingAgencyNews',
+      'CityLocalNews',
+      'College',
+      'ComputerRepair',
+      'Engineering',
+      'FarmersMarket',
+      'HealthyFoodBlog',
+      'PrimarySchool',
+      'RenewableEnergy',
+      'Software',
+      'WordPressTheme',
+
       'WineCity',
       'DogFood',
       'Fitness',
       'KidsClothing',
       'Avocado',
+
+      'FashionBlogA',
+      'FashionShop',
+      'LifestyleBlogA',
+      'LifestyleBlogB',
+      'NewspaperTraditional',
+      'ClearNews',
+      'IndustryConference',
+      'BookStoreWithCoupon',
+      'FlowersWithCoupon',
     );
   }
 
@@ -85,9 +113,11 @@ class Populator {
     array_map(array($this, 'populate'), $this->models);
 
     $this->createDefaultSegments();
+    $this->createDefaultForm();
     $this->createDefaultSettings();
     $this->createMailPoetPage();
     $this->createSourceForSubscribers();
+    $this->updateNewsletterCategories();
   }
 
   private function createMailPoetPage() {
@@ -99,22 +129,22 @@ class Populator {
     ));
 
     $page = null;
-    if(!empty($pages)) {
+    if (!empty($pages)) {
       $page = array_shift($pages);
-      if(strpos($page->post_content, '[mailpoet_page]') === false) {
+      if (strpos($page->post_content, '[mailpoet_page]') === false) {
         $page = null;
       }
     }
 
-    if($page === null) {
+    if ($page === null) {
       $mailpoet_page_id = Pages::createMailPoetPage();
     } else {
       $mailpoet_page_id = (int)$page->ID;
     }
 
-    $subscription = Setting::getValue('subscription.pages', array());
-    if(empty($subscription)) {
-      Setting::setValue('subscription.pages', array(
+    $subscription = $this->settings->get('subscription.pages', array());
+    if (empty($subscription)) {
+      $this->settings->set('subscription.pages', array(
         'unsubscribe' => $mailpoet_page_id,
         'manage' => $mailpoet_page_id,
         'confirmation' => $mailpoet_page_id
@@ -126,8 +156,8 @@ class Populator {
     $current_user = wp_get_current_user();
 
     // set cron trigger option to default method
-    if(!Setting::getValue(CronTrigger::SETTING_NAME)) {
-      Setting::setValue(CronTrigger::SETTING_NAME, array(
+    if (!$this->settings->fetch(CronTrigger::SETTING_NAME)) {
+      $this->settings->set(CronTrigger::SETTING_NAME, array(
         'method' => CronTrigger::DEFAULT_METHOD
       ));
     }
@@ -139,13 +169,13 @@ class Populator {
     );
 
     // set default from name & address
-    if(!Setting::getValue('sender')) {
-      Setting::setValue('sender', $sender);
+    if (!$this->settings->fetch('sender')) {
+      $this->settings->set('sender', $sender);
     }
 
     // enable signup confirmation by default
-    if(!Setting::getValue('signup_confirmation')) {
-      Setting::setValue('signup_confirmation', array(
+    if (!$this->settings->fetch('signup_confirmation')) {
+      $this->settings->set('signup_confirmation', array(
         'enabled' => true,
         'from' => array(
           'name' => get_option('blogname'),
@@ -156,18 +186,36 @@ class Populator {
     }
 
     // set installation date
-    if(!Setting::getValue('installed_at')) {
-      Setting::setValue('installed_at', date("Y-m-d H:i:s"));
+    if (!$this->settings->fetch('installed_at')) {
+      $this->settings->set('installed_at', date("Y-m-d H:i:s"));
     }
 
     // set reCaptcha settings
-    $re_captcha = Setting::getValue('re_captcha');
-    if(empty($re_captcha)) {
-      Setting::setValue('re_captcha', array(
+    $re_captcha = $this->settings->fetch('re_captcha');
+    if (empty($re_captcha)) {
+      $this->settings->set('re_captcha', array(
         'enabled' => false,
         'site_token' => '',
         'secret_token' => ''
       ));
+    }
+
+    $subscriber_email_notification = $this->settings->fetch(NewSubscriberNotificationMailer::SETTINGS_KEY);
+    if (empty($subscriber_email_notification)) {
+      $sender = $this->settings->fetch('sender', []);
+      $this->settings->set('subscriber_email_notification', [
+        'enabled' => true,
+        'address' => isset($sender['address'])? $sender['address'] : null,
+      ]);
+    }
+
+    $stats_notifications = $this->settings->fetch('stats_notifications');
+    if (empty($stats_notifications)) {
+      $sender = $this->settings->fetch('sender', []);
+      $this->settings->set('stats_notifications', [
+        'enabled' => true,
+        'address' => isset($sender['address'])? $sender['address'] : null,
+      ]);
     }
 
     // reset mailer log
@@ -176,20 +224,37 @@ class Populator {
 
   private function createDefaultSegments() {
     // WP Users segment
-    $wp_segment = Segment::getWPSegment();
+    Segment::getWPSegment();
+    // WooCommerce customers segment
+    Segment::getWooCommerceSegment();
 
     // Synchronize WP Users
     WP::synchronizeUsers();
 
     // Default segment
-    if(Segment::where('type', 'default')->count() === 0) {
-      $default_segment = Segment::create();
-      $default_segment->hydrate(array(
+    if (Segment::where('type', 'default')->count() === 0) {
+      $this->default_segment = Segment::create();
+      $this->default_segment->hydrate([
         'name' => __('My First List', 'mailpoet'),
         'description' =>
           __('This list is automatically created when you install MailPoet.', 'mailpoet')
-      ));
-      $default_segment->save();
+      ]);
+      $this->default_segment->save();
+    }
+  }
+
+  private function createDefaultForm() {
+    if (Form::count() === 0) {
+      $factory = new DefaultForm();
+      if (!$this->default_segment) {
+        $this->default_segment = Segment::where('type', 'default')->orderByAsc('id')->limit(1)->findOne();
+      }
+      Form::createOrUpdate([
+        'name' => $factory->getName(),
+        'body' => serialize($factory->getBody()),
+        'settings' => serialize($factory->getSettings($this->default_segment)),
+        'styles' => $factory->getStyles(),
+      ]);
     }
   }
 
@@ -260,7 +325,7 @@ class Populator {
 
   protected function newsletterTemplates() {
     $templates = array();
-    foreach($this->templates as $template) {
+    foreach ($this->templates as $template) {
       $template = self::TEMPLATES_NAMESPACE . $template;
       $template = new $template(Env::$assets_url);
       $templates[] = $template->get();
@@ -286,16 +351,16 @@ class Populator {
     $remove_duplicates =
       isset($data_descriptor['remove_duplicates']) && $data_descriptor['remove_duplicates'];
 
-    foreach($rows as $row) {
+    foreach ($rows as $row) {
       $existence_comparison_fields = array_intersect_key(
         $row,
         $identification_columns
       );
 
-      if(!$this->rowExists($table, $existence_comparison_fields)) {
+      if (!$this->rowExists($table, $existence_comparison_fields)) {
         $this->insertRow($table, $row);
       } else {
-        if($remove_duplicates) {
+        if ($remove_duplicates) {
           $this->removeDuplicates($table, $row, $existence_comparison_fields);
         }
         $this->updateRow($table, $row, $existence_comparison_fields);
@@ -306,7 +371,7 @@ class Populator {
   private function rowExists($table, $columns) {
     global $wpdb;
 
-    $conditions = array_map(function($key) use ($columns) {
+    $conditions = array_map(function($key) {
       return $key . '=%s';
     }, array_keys($columns));
 
@@ -340,7 +405,7 @@ class Populator {
 
     $conditions = array('1=1');
     $values = array();
-    foreach($where as $field => $value) {
+    foreach ($where as $field => $value) {
       $conditions[] = "`t1`.`$field` = `t2`.`$field`";
       $conditions[] = "`t1`.`$field` = %s";
       $values[] = $value;
@@ -370,5 +435,25 @@ class Populator {
       ' WHERE `source` = "' . Source::UNKNOWN . '"' .
       ' AND `wp_user_id` IS NOT NULL'
     );
+    Subscriber::rawExecute(
+      'UPDATE LOW_PRIORITY `' . Subscriber::$_table . '`' .
+      ' SET `source` = "' . Source::WOOCOMMERCE_USER . '"' .
+      ' WHERE `source` = "' . Source::UNKNOWN . '"' .
+      ' AND `is_woocommerce_user` = 1'
+    );
+  }
+
+  private function updateNewsletterCategories() {
+    global $wpdb;
+    // perform once for versions below or equal to 3.14.0
+    if (version_compare($this->settings->get('db_version', '3.14.1'), '3.14.0', '>')) {
+      return false;
+    }
+    $query = "UPDATE `%s` SET categories = REPLACE(REPLACE(categories, ',\"blank\"', ''), ',\"sample\"', ',\"all\"')";
+    $wpdb->query(sprintf(
+      $query,
+      NewsletterTemplate::$_table
+    ));
+    return true;
   }
 }

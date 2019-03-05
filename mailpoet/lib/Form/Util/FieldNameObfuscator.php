@@ -17,14 +17,14 @@ class FieldNameObfuscator {
 
   public function deobfuscateFormPayload($data) {
     $result = array();
-    foreach($data as $key => $value) {
+    foreach ($data as $key => $value) {
       $result[$this->deobfuscateField($key)] = $value;
     }
     return $result;
   }
 
   private function deobfuscateField($name) {
-    if($this->wasFieldObfuscated($name)) {
+    if ($this->wasFieldObfuscated($name)) {
       return $this->deobfuscate($name);
     } else {
       return $name;

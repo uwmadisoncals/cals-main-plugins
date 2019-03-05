@@ -6,7 +6,7 @@ use MailPoet\Services\Bridge;
 use MailPoet\Util\License\License;
 use MailPoet\Util\pQuery\pQuery;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class Renderer {
   public $blocks_renderer;
@@ -15,13 +15,16 @@ class Renderer {
   public $CSS_inliner;
   public $newsletter;
   public $preview;
+  public $premium_activated;
+  public $mss_activated;
+  private $template;
   const NEWSLETTER_TEMPLATE = 'Template.html';
   const FILTER_POST_PROCESS = 'mailpoet_rendering_post_process';
 
   function __construct($newsletter, $preview = false) {
     $this->newsletter = (is_object($newsletter)) ? $newsletter->asArray() : $newsletter;
     $this->preview = $preview;
-    $this->blocks_renderer = new Blocks\Renderer($this->newsletter, $this->preview);
+    $this->blocks_renderer = new Blocks\Renderer($this->newsletter);
     $this->columns_renderer = new Columns\Renderer();
     $this->DOM_parser = new pQuery();
     $this->CSS_inliner = new \MailPoet\Util\CSS();
@@ -43,17 +46,19 @@ class Renderer {
       ? $body['globalStyles']
       : array();
 
-    if(!$this->premium_activated && !$this->mss_activated && !$this->preview) {
+    if (!$this->premium_activated && !$this->mss_activated && !$this->preview) {
       $content = $this->addMailpoetLogoContentBlock($content, $styles);
     }
 
     $content = $this->preProcessALC($content);
     $rendered_body = $this->renderBody($content);
     $rendered_styles = $this->renderStyles($styles);
+    $custom_fonts_links = StylesHelper::getCustomFontsLinks($styles);
 
     $template = $this->injectContentIntoTemplate($this->template, array(
       htmlspecialchars($newsletter['subject']),
       $rendered_styles,
+      $custom_fonts_links,
       $newsletter['preheader'],
       $rendered_body
     ));
@@ -75,8 +80,8 @@ class Renderer {
     $content_blocks = (array_key_exists('blocks', $content))
       ? $content['blocks']
       : array();
-    foreach($content_blocks as $block) {
-      if($block['type'] === 'automatedLatestContentLayout') {
+    foreach ($content_blocks as $block) {
+      if ($block['type'] === 'automatedLatestContentLayout') {
         $blocks = array_merge(
           $blocks,
           $this->blocks_renderer->automatedLatestContentTransformedPosts($block)
@@ -97,17 +102,12 @@ class Renderer {
 
     $_this = $this;
     $rendered_content = array_map(function($content_block) use($_this) {
-      $column_count = count($content_block['blocks']);
-      $column_data = $_this->blocks_renderer->render(
-        $content_block,
-        $column_count
-      );
-      $content_block_image = isset($content_block['image'])?$content_block['image']:null;
+
+      $columns_data = $_this->blocks_renderer->render($content_block);
+
       return $_this->columns_renderer->render(
-        $content_block['styles'],
-        $content_block_image,
-        $column_count,
-        $column_data
+        $content_block,
+        $columns_data
       );
     }, $blocks);
     return implode('', $rendered_content);
@@ -115,8 +115,8 @@ class Renderer {
 
   function renderStyles($styles) {
     $css = '';
-    foreach($styles as $selector => $style) {
-      switch($selector) {
+    foreach ($styles as $selector => $style) {
+      switch ($selector) {
         case 'text':
           $selector = 'td.mailpoet_paragraph, td.mailpoet_blockquote, li.mailpoet_paragraph';
           break;
@@ -153,7 +153,7 @@ class Renderer {
   function postProcessTemplate($template) {
     $DOM = $this->DOM_parser->parseStr($template);
     // replace spaces in image tag URLs
-    foreach($DOM->query('img') as $image) {
+    foreach ($DOM->query('img') as $image) {
       $image->src = str_replace(' ', '%20', $image->src);
     }
     $template = $DOM->query('.mailpoet_template');
@@ -173,7 +173,7 @@ class Renderer {
   }
 
   function addMailpoetLogoContentBlock($content, $styles) {
-    if(empty($content['blocks'])) return $content;
+    if (empty($content['blocks'])) return $content;
     $content['blocks'][] = array(
       'type' => 'container',
       'orientation' => 'horizontal',

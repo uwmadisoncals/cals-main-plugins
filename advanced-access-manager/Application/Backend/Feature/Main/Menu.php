@@ -14,6 +14,17 @@
  * @author Vasyl Martyniuk <vasyl@vasyltech.com>
  */
 class AAM_Backend_Feature_Main_Menu extends AAM_Backend_Feature_Abstract {
+    
+    /**
+     * Construct
+     */
+    public function __construct() {
+        parent::__construct();
+        
+        if (!current_user_can('aam_manage_admin_menu')) {
+            AAM::api()->denyAccess(array('reason' => 'aam_manage_admin_menu'));
+        }
+    }
 
     /**
      * Undocumented function
@@ -34,6 +45,14 @@ class AAM_Backend_Feature_Main_Menu extends AAM_Backend_Feature_Abstract {
 
        return wp_json_encode(array('status' => 'success'));
     }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function reset() {
+        return AAM_Backend_Subject::getInstance()->resetObject('menu');
+    }
 
     /**
      * Get subject's menu
@@ -47,30 +66,36 @@ class AAM_Backend_Feature_Main_Menu extends AAM_Backend_Feature_Abstract {
      * @global array  $menu
      */
     public function getMenu() {
-        global $menu;
+        $menu = json_decode(base64_decode(AAM_Core_Request::post('menu')), 1);
         
         $response = array();
         
         //let's create menu list with submenus
-        foreach ($menu as $item) {
-            if (preg_match('/^separator/', $item[2])) {
-                continue; //skip separator
-            }
-            
-            $submenu = $this->getSubmenu($item[2]);
-            
-            $allowed = AAM_Backend_Subject::getInstance()->hasCapability($item[1]);
-            
-            if ($allowed || count($submenu) > 0) {
-                $response[] = array(
-                    //add menu- prefix to define that this is the top level menu
-                    //WordPress by default gives the same menu id to the first
-                    //submenu
-                    'id'         => 'menu-' . $item[2],
-                    'name'       => $this->filterMenuName($item[0]),
-                    'submenu'    => $submenu,
-                    'capability' => $item[1]
-                );
+        if (!empty($menu)) {
+            $object = AAM_Backend_Subject::getInstance()->getObject('menu');
+            foreach ($menu as $item) {
+                if (preg_match('/^separator/', $item[2])) {
+                    continue; //skip separator
+                }
+
+                $submenu = $this->getSubmenu($item[2]);
+
+                $allowed = AAM_Backend_Subject::getInstance()->hasCapability($item[1]);
+
+                if ($allowed || count($submenu) > 0) {
+                    $menuItem = array(
+                        //add menu- prefix to define that this is the top level menu
+                        //WordPress by default gives the same menu id to the first
+                        //submenu
+                        'id'         => 'menu-' . $item[2],
+                        'name'       => $this->filterMenuName($item[0]),
+                        'submenu'    => $submenu,
+                        'capability' => $item[1],
+                        'crc32'      => crc32('menu-' . $item[2]),
+                    );
+                    $menuItem['checked'] = $object->has($menuItem['id']) || $object->has($menuItem['crc32']);
+                    $response[] = $menuItem;
+                }
             }
         }
 
@@ -108,7 +133,8 @@ class AAM_Backend_Feature_Main_Menu extends AAM_Backend_Feature_Abstract {
      * @global array  $submenu
      */
     protected function getSubmenu($menu) {
-        global $submenu;
+        $submenu = json_decode(base64_decode(AAM_Core_Request::post('submenu')), 1);
+        $object  = AAM_Backend_Subject::getInstance()->getObject('menu');
         
         $response  = array();
         $subject   = AAM_Backend_Subject::getInstance();
@@ -117,11 +143,15 @@ class AAM_Backend_Feature_Main_Menu extends AAM_Backend_Feature_Abstract {
         if (array_key_exists($menu, $submenu) && is_array($submenu[$menu])) {
             foreach ($submenu[$menu] as $item) {
                 if ($subject->hasCapability($item[1]) || $isDefault) {
-                    $response[] = array(
-                        'id'         => $this->normalizeItem($item[2]),
+                    $id = $this->normalizeItem($item[2]);
+                    $menuItem = array(
+                        'id'         => $id,
                         'name'       => $this->filterMenuName($item[0]),
-                        'capability' => $item[1]
+                        'capability' => $item[1],
+                        'crc32'      => crc32($id)
                     );
+                    $menuItem['checked'] = $object->has($menuItem['id']) || $object->has($menuItem['crc32']);
+                    $response[] = $menuItem;
                 }
             }
         }
@@ -149,16 +179,15 @@ class AAM_Backend_Feature_Main_Menu extends AAM_Backend_Feature_Abstract {
 
     /**
      * 
-     * @param type $object
      * @param type $subs
      * @return boolean
      */
-    protected function hasSubmenuChecked($object, $subs) {
+    protected function hasSubmenuChecked($subs) {
         $has = false;
         
         if (!empty($subs)) {
             foreach($subs as $submenu) {
-                if ($object->has($submenu['id'])) {
+                if ($submenu['checked']) {
                     $has = true;
                     break;
                 }

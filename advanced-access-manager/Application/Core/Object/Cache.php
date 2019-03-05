@@ -23,6 +23,15 @@ class AAM_Core_Object_Cache extends AAM_Core_Object {
      * @access protected 
      */
     protected $updated = false;
+    
+    /**
+     * Is cache enabled?
+     * 
+     * @var boolean
+     * 
+     * @access protected 
+     */
+    protected $enabled = true;
 
     /**
      * Constructor
@@ -36,15 +45,30 @@ class AAM_Core_Object_Cache extends AAM_Core_Object {
     public function __construct(AAM_Core_Subject $subject) {
         parent::__construct($subject);
         
-        if (!AAM::isAAM() 
-                && (AAM_Core_Config::get('core.cache.status', 'enabled') === 'enabled')) {
-            // Register shutdown hook
-            add_action('shutdown', array($this, 'save'));
-
-            // Just get the cache from current subject level. Do not trigger
-            // inheritance chain!
-            $this->setOption($this->getSubject()->readOption('cache'));
+        // Determine if cache is enabled
+        $action   = AAM_Core_Request::request('action');
+        $triggers = array('edit', 'editpost');
+        $status   = AAM_Core_Config::get('core.cache.status', 'enabled');
+        
+        if (AAM::isAAM() || ($status !== 'enabled') || in_array($action, $triggers, true)) {
+            $this->enabled = false;
         }
+        
+        if ($this->enabled) {
+            // Register shutdown hook
+            register_shutdown_function(array($this, 'save'));
+            
+            $this->reload();
+        }
+    }
+    
+    /**
+     * 
+     */
+    public function reload() {
+        // Just get the cache from current subject level. Do not trigger
+        // inheritance chain!
+        $this->setOption($this->getSubject()->readOption('cache'));
     }
     
     /**
@@ -86,7 +110,7 @@ class AAM_Core_Object_Cache extends AAM_Core_Object {
      * @access public
      */
     public function save() {
-        if ($this->updated) {
+        if ($this->enabled && $this->updated) {
             $this->getSubject()->updateOption($this->getOption(), 'cache');
         }
         
@@ -99,25 +123,6 @@ class AAM_Core_Object_Cache extends AAM_Core_Object {
      */
     public function reset() {
         return $this->getSubject()->deleteOption('cache');
-    }
-    
-    /**
-     * Read object from parent subject
-     * 
-     * @return mixed
-     * 
-     * @access public
-     */
-    public function inheritFromParent(){
-        $subject = $this->getParent();
-                
-        if (is_a($subject, 'AAM_Core_Subject')){
-            $option = $subject->getObject('cache')->getOption();
-        } else {
-            $option = array();
-        }
-        
-        return $option;
     }
     
 }

@@ -14,7 +14,7 @@ class WYSIJA_help_update extends WYSIJA_object {
 			'2.3.3','2.3.4',
 			'2.4', '2.4.1', '2.4.3','2.4.4',
 			'2.5','2.5.2','2.5.5','2.5.9.6', '2.5.9.7',
-			'2.6', '2.6.0.8', '2.6.15', '2.7.15'
+			'2.6', '2.6.0.8', '2.6.15', '2.7.15', '2.11'
 		);
 	}
 
@@ -519,6 +519,19 @@ class WYSIJA_help_update extends WYSIJA_object {
 				return true;
 				break;
 
+			case '2.11':
+				$alter_queries   = array();
+				$alter_queries[] = 'ALTER TABLE [wysija]user ADD COLUMN `count_confirmations` INT unsigned NOT NULL DEFAULT 0;';
+				$errors    = $this->run_update_queries( $alter_queries );
+
+				if ( $errors ) {
+					$this->error( implode( $errors, "\n" ) );
+					return false;
+				}
+
+				return true;
+        break;
+
 			default:
 				return false;
 		}
@@ -571,7 +584,7 @@ class WYSIJA_help_update extends WYSIJA_object {
 						$timeInstalled=$config->getValue('installed_time')+3600;
 						//if it is a fresh install then it redirects to the welcome screen otherwise to the update one
 						if(time()>$timeInstalled){
-							WYSIJA::redirect('admin.php?page=wysija_campaigns&action=whats_new');
+							WYSIJA::redirect('admin.php?page=wysija_mp3&arg=whats_new');
 						}else{
 							WYSIJA::redirect('admin.php?page=wysija_campaigns&action=welcome_new');
 						}

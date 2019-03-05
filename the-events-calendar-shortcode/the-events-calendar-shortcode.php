@@ -1,9 +1,9 @@
 <?php
 /***
- Plugin Name: The Events Calendar Shortcode
+ Plugin Name: The Events Calendar Shortcode & Block
  Plugin URI: https://eventcalendarnewsletter.com/the-events-calendar-shortcode/
- Description: An addon to add shortcode functionality for <a href="http://wordpress.org/plugins/the-events-calendar/">The Events Calendar Plugin by Modern Tribe</a>.
- Version: 1.9
+ Description: An addon to add shortcode and new editor block functionality for The Events Calendar Plugin by Modern Tribe.
+ Version: 2.1
  Author: Event Calendar Newsletter
  Author URI: https://eventcalendarnewsletter.com/the-events-calendar-shortcode
  Contributors: brianhogg
@@ -22,6 +22,7 @@ if ( !defined( 'ABSPATH' ) ) {
 define( 'TECS_CORE_PLUGIN_FILE', __FILE__ );
 
 include_once dirname( TECS_CORE_PLUGIN_FILE ) . '/includes/wp-requirements.php';
+include_once dirname( TECS_CORE_PLUGIN_FILE ) . '/block/init.php';
 
 // Check plugin requirements before loading plugin.
 $this_plugin_checks = new TECS_WP_Requirements( 'The Events Calendar Shortcode', plugin_basename( TECS_CORE_PLUGIN_FILE ), array(
@@ -34,6 +35,9 @@ if ( $this_plugin_checks->pass() === false ) {
     $this_plugin_checks->halt();
     return;
 }
+
+include_once dirname( TECS_CORE_PLUGIN_FILE ) . '/includes/ajax-endpoints.php';
+include_once dirname( TECS_CORE_PLUGIN_FILE ) . '/includes/notices/discounts.php';
 
 /**
  * Events calendar shortcode addon main class
@@ -52,7 +56,7 @@ class Events_Calendar_Shortcode
 	 *
 	 * @since 1.0.0
 	 */
-	const VERSION = '1.8';
+	const VERSION = '2.1';
 
 	private $admin_page = null;
 
@@ -72,6 +76,7 @@ class Events_Calendar_Shortcode
 		add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), array( $this, 'add_action_links' ) );
 		add_shortcode( 'ecs-list-events', array( $this, 'ecs_fetch_events' ) );
 		add_filter( 'ecs_ending_output', array( $this, 'add_event_schema_json' ), 10, 3 );
+		add_filter( 'ecs_ending_output', array( $this, 'add_ecs_link' ), 10, 3 );
 		add_action( 'plugins_loaded', array( $this, 'load_languages' ) );
 	} // END __construct()
 
@@ -89,9 +94,9 @@ class Events_Calendar_Shortcode
 
 	public function show_tec_not_installed_message() {
 		if ( current_user_can( 'activate_plugins' ) ) {
-			$url = 'plugin-install.php?tab=plugin-information&plugin=the-events-calendar&TB_iframe=true';
+			$url = 'plugin-install.php?s=the+events+calendar&tab=search&type=term';
 			$title = __( 'The Events Calendar', 'tribe-events-ical-importer' );
-			echo '<div class="error"><p>' . sprintf( esc_html( __( 'To begin using %s, please install the latest version of %s%s%s and add an event.', 'the-events-calendar-shortcode' ) ), 'The Events Calendar Shortcode', '<a href="' . esc_url( $url ) . '" class="thickbox" title="' . esc_attr( $title ) . '">', 'The Events Calendar', '</a>' ) . '</p></div>';
+			echo '<div class="error"><p>' . sprintf( esc_html( __( 'To begin using %s, please install the latest version of %s%s%s and add an event.', 'the-events-calendar-shortcode' ) ), 'The Events Calendar Shortcode', '<a href="' . esc_url( admin_url( $url ) ) . '" title="' . esc_attr( $title ) . '">', 'The Events Calendar', '</a>' ) . '</p></div>';
 		}
 	}
 
@@ -100,8 +105,7 @@ class Events_Calendar_Shortcode
 			return;
 		}
 
-		$page_title = esc_html__( 'Shortcode', 'the-events-calendar-shortcode' );
-		$menu_title = esc_html__( 'Shortcode', 'tribe-common' );
+		$page_title = $menu_title = esc_html__( 'Shortcode & Block', 'the-events-calendar-shortcode' );
 		$capability = apply_filters( 'ecs_admin_page_capability', 'install_plugins' );
 
 		$where = Tribe__Settings::instance()->get_parent_slug();
@@ -114,7 +118,7 @@ class Events_Calendar_Shortcode
 
 	public function enqueue() {
 		wp_enqueue_style( 'ecs-admin-css', plugins_url( 'static/ecs-admin.css', __FILE__ ), array(), self::VERSION );
-		wp_enqueue_script( 'ecs-admin-js', plugins_url( 'static/ecs-admin.js', __FILE__ ), array(), self::VERSION );
+		wp_enqueue_script( 'ecs-admin-js', plugins_url( 'static/ecs-admin.min.js', __FILE__ ), array(), self::VERSION );
 	}
 
 	/**
@@ -192,15 +196,18 @@ class Events_Calendar_Shortcode
 
 			foreach ( $atts['cats'] as $cat ) {
 				$atts['event_tax'][] = array(
-					'taxonomy' => 'tribe_events_cat',
-					'field' => 'name',
-					'terms' => $cat,
-				);
-				$atts['event_tax'][] = array(
-					'taxonomy' => 'tribe_events_cat',
-					'field' => 'slug',
-					'terms' => $cat,
-				);
+				    'relation' => 'OR',
+				    array(
+                        'taxonomy' => 'tribe_events_cat',
+                        'field' => 'name',
+                        'terms' => $cat,
+                    ),
+                    array(
+                        'taxonomy' => 'tribe_events_cat',
+                        'field' => 'slug',
+                        'terms' => $cat,
+                    )
+                );
 			}
 		}
 
@@ -271,17 +278,18 @@ class Events_Calendar_Shortcode
 		}
 
 		$atts = apply_filters( 'ecs_atts_pre_query', $atts, $meta_date_date, $meta_date_compare );
-		$posts = tribe_get_events( apply_filters( 'ecs_get_events_args', array(
-			'post_status' => 'publish',
-			'hide_upcoming' => true,
-			'posts_per_page' => $atts['limit'],
-			'tax_query'=> $atts['event_tax'],
-			'meta_key' => ( ( trim( $atts['orderby'] ) and 'title' != $atts['orderby'] ) ? $atts['orderby'] : $atts['key'] ),
-			'orderby' => ( $atts['orderby'] == 'title' ? 'title' : 'meta_value' ),
-			'author' => $atts['author'],
-			'order' => $atts['order'],
-			'meta_query' => apply_filters( 'ecs_get_meta_query', array( $atts['meta_date'] ), $atts, $meta_date_date, $meta_date_compare ),
-		), $atts, $meta_date_date, $meta_date_compare ) );
+		$args = apply_filters( 'ecs_get_events_args', array(
+            'post_status' => 'publish',
+            'hide_upcoming' => true,
+            'posts_per_page' => $atts['limit'],
+            'tax_query'=> $atts['event_tax'],
+            'meta_key' => ( ( trim( $atts['orderby'] ) and 'title' != $atts['orderby'] ) ? $atts['orderby'] : $atts['key'] ),
+            'orderby' => ( $atts['orderby'] == 'title' ? 'title' : 'meta_value' ),
+            'author' => $atts['author'],
+            'order' => $atts['order'],
+            'meta_query' => apply_filters( 'ecs_get_meta_query', array( $atts['meta_date'] ), $atts, $meta_date_date, $meta_date_compare ),
+        ), $atts, $meta_date_date, $meta_date_compare );
+		$posts = tribe_get_events( $args );
         $posts = apply_filters( 'ecs_filter_events_after_get', $posts, $atts );
 
 		if ( $posts or apply_filters( 'ecs_always_show', false, $atts ) ) {
@@ -331,7 +339,7 @@ class Events_Calendar_Shortcode
 
 						case 'excerpt':
 							if ( self::isValid( $atts['excerpt'] ) ) {
-								$excerptLength = is_numeric($atts['excerpt']) ? $atts['excerpt'] : 100;
+								$excerptLength = is_numeric( $atts['excerpt'] ) ? intval( $atts['excerpt'] ) : 100;
 								$event_output .= apply_filters( 'ecs_event_excerpt_tag_start', '<p class="ecs-excerpt">', $atts, $post ) .
 								           apply_filters( 'ecs_event_excerpt', self::get_excerpt( $excerptLength ), $atts, $post, $excerptLength ) .
 								           apply_filters( 'ecs_event_excerpt_tag_end', '</p>', $atts, $post );
@@ -383,6 +391,20 @@ class Events_Calendar_Shortcode
 
 		wp_reset_postdata();
 
+		return $output;
+	}
+
+	public function add_ecs_link( $output, $posts, $atts ) {
+        if ( ! apply_filters( 'ecs_show_upgrades', true ) ) {
+            return $output;
+        }
+		$output .= "<!--\n Event listing powered by The Events Calendar Shortcode\n https://eventcalendarnewsletter.com/the-events-calendar-shortcode/ \n-->";
+		if ( ! get_option( 'ecs-show-link', false ) ) {
+			return $output;
+		}
+		$output .= '<p class="ecs-powered-by-link">';
+		$output .= sprintf( esc_html__( 'Event listing powered by %sThe Events Calendar Shortcode%s', 'the-events-calendar-shortcode' ), '<a target="_blank" href="https://eventcalendarnewsletter.com/the-events-calendar-shortcode/?utm_source=footer&utm_campaign=powered-by-link">', '</a>' );
+		$output .= '</p>';
 		return $output;
 	}
 

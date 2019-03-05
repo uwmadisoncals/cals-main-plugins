@@ -1,11 +1,18 @@
 <?php
 namespace MailPoet\Models;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
+/**
+ * @property array $subscribers_count
+ * @property string $name
+ * @property string $type
+ * @property string $description
+ */
 class Segment extends Model {
   static $_table = MP_SEGMENTS_TABLE;
   const TYPE_WP_USERS = 'wp_users';
+  const TYPE_WC_USERS = 'woocommerce_users';
   const TYPE_DEFAULT = 'default';
 
   function __construct() {
@@ -43,8 +50,8 @@ class Segment extends Model {
   function duplicate($data = array()) {
     $duplicate = parent::duplicate($data);
 
-    if($duplicate !== false) {
-      foreach($this->subscribers()->findResultSet() as $relation) {
+    if ($duplicate !== false) {
+      foreach ($this->subscribers()->findResultSet() as $relation) {
         $new_relation = SubscriberSegment::create();
         $new_relation->set('subscriber_id', $relation->id);
         $new_relation->set('segment_id', $duplicate->id);
@@ -70,7 +77,7 @@ class Segment extends Model {
   }
 
   function withSubscribersCount() {
-    $this->subscribers_count = SubscriberSegment::table_alias('relation')
+    $this->subscribers_count = SubscriberSegment::tableAlias('relation')
       ->where('relation.segment_id', $this->id)
       ->join(
         MP_SUBSCRIBERS_TABLE,
@@ -107,19 +114,37 @@ class Segment extends Model {
   static function getWPSegment() {
     $wp_segment = self::where('type', self::TYPE_WP_USERS)->findOne();
 
-    if($wp_segment === false) {
+    if ($wp_segment === false) {
       // create the wp users segment
       $wp_segment = Segment::create();
       $wp_segment->hydrate(array(
         'name' => __('WordPress Users', 'mailpoet'),
         'description' =>
           __('This list contains all of your WordPress users.', 'mailpoet'),
-        'type' => 'wp_users'
+        'type' => self::TYPE_WP_USERS
       ));
       $wp_segment->save();
     }
 
     return $wp_segment;
+  }
+
+  static function getWooCommerceSegment() {
+    $wc_segment = self::where('type', self::TYPE_WC_USERS)->findOne();
+
+    if ($wc_segment === false) {
+      // create the WooCommerce customers segment
+      $wc_segment = Segment::create();
+      $wc_segment->hydrate(array(
+        'name' => __('WooCommerce Customers', 'mailpoet'),
+        'description' =>
+          __('This list contains all of your WooCommerce customers.', 'mailpoet'),
+        'type' => self::TYPE_WC_USERS
+      ));
+      $wc_segment->save();
+    }
+
+    return $wc_segment;
   }
 
   static function search($orm, $search = '') {
@@ -142,7 +167,7 @@ class Segment extends Model {
   }
 
   static function groupBy($orm, $group = null) {
-    if($group === 'trash') {
+    if ($group === 'trash') {
       $orm->whereNotNull('deleted_at');
     } else {
       $orm->whereNull('deleted_at');
@@ -152,7 +177,7 @@ class Segment extends Model {
 
   static function getSegmentsWithSubscriberCount($type = self::TYPE_DEFAULT) {
     $query = self::selectMany(array(self::$_table.'.id', self::$_table.'.name'))
-      ->whereIn('type', array(Segment::TYPE_WP_USERS, Segment::TYPE_DEFAULT))
+      ->whereIn('type', array(Segment::TYPE_DEFAULT, Segment::TYPE_WP_USERS, Segment::TYPE_WC_USERS))
       ->selectExpr(
         self::$_table.'.*, ' .
         'COUNT(IF('.
@@ -174,7 +199,7 @@ class Segment extends Model {
       ->orderByAsc(self::$_table.'.name')
       ->whereNull(self::$_table.'.deleted_at');
 
-    if(!empty($type)) {
+    if (!empty($type)) {
       $query->where(self::$_table.'.type', $type);
     }
 
@@ -182,11 +207,14 @@ class Segment extends Model {
   }
 
   static function getSegmentsForImport() {
-    return self::getSegmentsWithSubscriberCount($type = false);
+    $segments = self::getSegmentsWithSubscriberCount($type = false);
+    return array_values(array_filter($segments, function($segment) {
+      return $segment['type'] !== Segment::TYPE_WC_USERS;
+    }));
   }
 
   static function getSegmentsForExport() {
-    return self::raw_query(
+    return self::rawQuery(
       '(SELECT segments.id, segments.name, COUNT(relation.subscriber_id) as subscribers ' .
       'FROM ' . MP_SUBSCRIBER_SEGMENT_TABLE . ' relation ' .
       'LEFT JOIN ' . self::$_table . ' segments ON segments.id = relation.segment_id ' .
@@ -207,8 +235,8 @@ class Segment extends Model {
 
   static function listingQuery(array $data = array()) {
     $query = self::select('*');
-    $query->whereIn('type', array(Segment::TYPE_WP_USERS, Segment::TYPE_DEFAULT));
-    if(isset($data['group'])) {
+    $query->whereIn('type', array(Segment::TYPE_DEFAULT, Segment::TYPE_WP_USERS, Segment::TYPE_WC_USERS));
+    if (isset($data['group'])) {
       $query->filter('groupBy', $data['group']);
     }
     return $query;
@@ -249,12 +277,12 @@ class Segment extends Model {
   }
 
   static function getAnalytics() {
-    $analytics = Segment::select_expr('type, count(*) as count')
+    $analytics = Segment::selectExpr('type, count(*) as count')
                         ->whereNull('deleted_at')
                         ->groupBy('type')
                         ->findArray();
     $result = array();
-    foreach($analytics as $segment) {
+    foreach ($analytics as $segment) {
       $result[$segment['type']] = $segment['count'];
     }
     return $result;

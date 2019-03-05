@@ -18,15 +18,7 @@ $column_positions = array();
 //$coltemplate['title'] = $coltemplate['post_title'] = "%the_title%";
 $coltemplate['page_link'] = "<a class=\"package-title\" href=\"%s\">%s</a>";
 
-if(isset($params['jstable']) && $params['jstable']==1):
-
-    $datatable_col = ( isset($params['order_by']) && $params['order_by'] == 'title' ) ? '0' : '2';
-    $datatable_order = ( isset($params['order']) && $params['order'] == 'DESC' ) ? 'desc' : 'asc';
-
     ?>
-    <script src="<?php echo WPDM_BASE_URL.'assets/js/jquery.dataTables.min.js' ?>"></script>
-    <script src="<?php echo WPDM_BASE_URL.'assets/js/dataTables.bootstrap.min.js' ?>"></script>
-    <link href="<?php echo WPDM_BASE_URL.'assets/css/jquery.dataTables.min.css' ?>" rel="stylesheet" />
     <style>
         #wpdmmydls-<?php echo $tid; ?>{
             border-bottom: 1px solid #dddddd;
@@ -37,6 +29,9 @@ if(isset($params['jstable']) && $params['jstable']==1):
         #wpdmmydls-<?php echo $tid; ?> .wpdm-download-link img{
             box-shadow: none !important;
             max-width: 100px;
+        }
+        #wpdmmydls-<?php echo $tid; ?> a.wpdm-download-link{
+            display: block;
         }
         .w3eden .pagination{
             margin: 0 !important;
@@ -97,7 +92,16 @@ if(isset($params['jstable']) && $params['jstable']==1):
 
 
     </style>
-    <script>
+    <?php
+
+    if(isset($params['jstable']) && $params['jstable']==1):
+
+        $datatable_col = ( isset($params['order_by']) && $params['order_by'] == 'title' ) ? '0' : '2';
+        $datatable_order = ( isset($params['order']) && $params['order'] == 'DESC' ) ? 'desc' : 'asc';
+    ?>
+        <script src="<?php echo WPDM_BASE_URL.'assets/js/jquery.dataTables.min.js' ?>"></script>
+        <link href="<?php echo WPDM_BASE_URL.'assets/css/jquery.dataTables.min.css' ?>" rel="stylesheet" />
+        <script>
         jQuery(function($){
             var __dt = $('#wpdmmydls-<?php echo $tid; ?>').dataTable({
                 responsive: true,
@@ -128,6 +132,14 @@ if(isset($params['jstable']) && $params['jstable']==1):
                 "iDisplayLength": <?php echo $params['items_per_page'] ?>,
                 "aLengthMenu": [[<?php echo $params['items_per_page']; ?>, 10, 25, 50, -1], [<?php echo $params['items_per_page']; ?>, 10, 25, 50, "<?php _e("All",'download-manager'); ?>"]]
             });
+
+            __dt.on('page.dt', function() {
+                $('html, body').animate({
+                    scrollTop: $(".dataTables_wrapper").offset().top
+                }, 'slow');
+            });
+
+
 
         });
     </script>
@@ -212,12 +224,13 @@ if(isset($params['jstable']) && $params['jstable']==1):
                 $data['author_package_count'] = count_user_posts( $author->ID , "wpdmpro"  );
                 if($ext=='') $ext = 'unknown.svg';
                 if($ext==basename($ext) && file_exists(WPDM_BASE_DIR."assets/file-type-icons/".$ext)) $ext = plugins_url("download-manager/assets/file-type-icons/".$ext);
+                else if(strstr($ext, "://")) {}
                 else $ext = plugins_url("download-manager/assets/file-type-icons/unknown.svg");
                 $data['download_url'] = '';
-                $data['download_link'] = \WPDM\Package::downloadLink($data['ID']);//DownloadLink($data, 0);
+                $data['download_link'] = \WPDM\Package::downloadLink($data['ID'], array('btnclass' => 'btn btn-block'));//DownloadLink($data, 0);
                 $data = apply_filters("wpdm_after_prepare_package_data", $data);
                 $download_link = $data['download_link'];
-                if(isset($data['base_price']) && $data['base_price'] > 0 && function_exists('wpdmpp_currency_sign')) $download_link = "<a href='".$data['addtocart_url']."' class='btn btn-sm btn-info'>Buy ( ".$data['currency'].$data['effective_price']." )</a>";
+                if(isset($data['base_price']) && $data['base_price'] > 0 && function_exists('wpdmpp_currency_sign')) $download_link = "<a href='".$data['addtocart_url']."' class='btn btn-block btn-info'>Buy ( ".$data['currency'].$data['effective_price']." )</a>";
                 if($download_link != 'blocked'){
                     ?>
 

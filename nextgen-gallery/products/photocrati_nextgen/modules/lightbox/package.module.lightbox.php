@@ -32,6 +32,9 @@ class C_Lightbox_Library_Manager
      * @var C_Lightbox_Library_Manager
      */
     static $_instance = NULL;
+    /**
+     * @return C_Lightbox_Library_Manager
+     */
     static function get_instance()
     {
         if (!isset(self::$_instance)) {
@@ -223,7 +226,7 @@ class C_Lightbox_Library_Manager
                     wp_enqueue_style(array_pop($parts));
                 } else {
                     if (!empty($src)) {
-                        wp_enqueue_style($lightbox->name . "-{$i}", $this->_handle_url($src), FALSE, NGG_SCRIPT_VERSION);
+                        wp_enqueue_style($lightbox->name . "-{$i}", $this->_handle_url($src), array(), NGG_SCRIPT_VERSION);
                     }
                 }
             }
@@ -246,6 +249,7 @@ class C_Lightbox_Library_Manager
      * Parses certain paths through get_static_url
      *
      * @param string $url
+     * @param string $type Unused
      * @return string Resulting URL
      */
     static function _handle_url($url, $type = 'script')
@@ -264,6 +268,7 @@ class C_Lightbox_Library_Manager
      * @param string $object_name
      * @param mixed $object_value
      * @param bool $define
+     * @return bool
      */
     function _add_script_data($handle, $object_name, $object_value, $define = TRUE, $override = FALSE)
     {

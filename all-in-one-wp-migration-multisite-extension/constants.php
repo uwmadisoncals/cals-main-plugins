@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2018 ServMask Inc.
+ * Copyright (C) 2014-2019 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,14 @@
  * ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	die( 'Kangaroos cannot jump here' );
+}
+
 // ==================
 // = Plugin Version =
 // ==================
-define( 'AI1WMME_VERSION', '3.59' );
+define( 'AI1WMME_VERSION', '3.68' );
 
 // ===============
 // = Plugin Name =
@@ -62,6 +66,11 @@ define( 'AI1WMME_IMPORT_PATH', AI1WMME_MODEL_PATH . DIRECTORY_SEPARATOR . 'impor
 // = View Path =
 // =============
 define( 'AI1WMME_TEMPLATES_PATH', AI1WMME_LIB_PATH . DIRECTORY_SEPARATOR . 'view' );
+
+// ===============
+// = Vendor Path =
+// ===============
+define( 'AI1WMME_VENDOR_PATH', AI1WMME_LIB_PATH . DIRECTORY_SEPARATOR . 'vendor' );
 
 // =================
 // = Max File Size =

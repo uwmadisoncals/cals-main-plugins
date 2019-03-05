@@ -143,8 +143,10 @@ function su_shortcode_slider( $atts = null, $content = null ) {
 			'speed'      => 600,
 			'class'      => ''
 		), $atts, 'slider' );
-	// Get slides
-	$slides = (array) su_get_slides( $atts );
+
+	$slides = su_get_slides( $atts );
+	$slides = apply_filters( 'su/shortcode/slider/slides', $slides, $atts );
+
 	// Loop slides
 	if ( count( $slides ) ) {
 		// Prepare unique ID

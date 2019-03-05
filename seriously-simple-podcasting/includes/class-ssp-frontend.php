@@ -17,11 +17,11 @@ class SSP_Frontend {
 
 	// @todo reference prior to analytics launch
 	public $style_guide = array(
-		'dark'      => '#3A3A3A',
-		'medium'    => '#666666',
-		'light'     => '#939393',
-		'lightest'  => '#f9f9f9',
-		'accent'    => '#ea5451'
+		'dark'     => '#3A3A3A',
+		'medium'   => '#666666',
+		'light'    => '#939393',
+		'lightest' => '#f9f9f9',
+		'accent'   => '#ea5451',
 	);
 
 	public $version;
@@ -61,15 +61,15 @@ class SSP_Frontend {
 		// Add meta data to start of podcast content
 		$locations = get_option( 'ss_podcasting_player_locations', array() );
 
-		if ( in_array( 'content', (array) $locations ) ) {
+		if ( in_array( 'content', (array) $locations, true ) ) {
 			add_filter( 'the_content', array( $this, 'content_meta_data' ), 10, 1 );
 		}
 
-		if ( in_array( 'excerpt', (array) $locations ) ) {
+		if ( in_array( 'excerpt', (array) $locations, true ) ) {
 			add_filter( 'the_excerpt', array( $this, 'get_excerpt_meta_data' ), 10, 1 );
 		}
 
-		if ( in_array( 'excerpt_embed', (array) $locations ) ) {
+		if ( in_array( 'excerpt_embed', (array) $locations, true ) ) {
 			add_filter( 'the_excerpt_embed', array( $this, 'get_embed_meta_data' ), 10, 1 );
 		}
 
@@ -78,25 +78,22 @@ class SSP_Frontend {
 		add_action( 'get_the_generator_xhtml', array( $this, 'generator_tag' ), 10, 2 );
 
 		// Add RSS meta tag to site header
-		add_action( 'wp_head' , array( $this, 'rss_meta_tag' ) );
+		add_action( 'wp_head', array( $this, 'rss_meta_tag' ) );
 
 		// Add podcast episode to main query loop if setting is activated
-		add_action( 'pre_get_posts' , array( $this, 'add_to_home_query' ) );
+		add_action( 'pre_get_posts', array( $this, 'add_to_home_query' ) );
 
 		// Make sure to fetch all relevant post types when viewing series archive
-		add_action( 'pre_get_posts' , array( $this, 'add_all_post_types' ) );
+		add_action( 'pre_get_posts', array( $this, 'add_all_post_types' ) );
 
 		// Make sure to fetch all relevant post types when viewing a tag archive
-		add_action( 'pre_get_posts' , array( $this, 'add_all_post_types_for_tag_archive' ) );
+		add_action( 'pre_get_posts', array( $this, 'add_all_post_types_for_tag_archive' ) );
 
 		// Download podcast episode
 		add_action( 'wp', array( $this, 'download_file' ), 1 );
 
 		// Trigger import podcast process (if active)
-		add_action( 'wp_loaded', array( $this, 'import_existing_podcast_to_podmotor') );
-
-		// Update podmotor_episode_id and audio file values from import process
-		add_action( 'wp_loaded', array( $this, 'update_episode_data_from_podmotor') );
+		add_action( 'wp_loaded', array( $this, 'import_existing_podcast_to_podmotor' ) );
 
 		// Register widgets
 		add_action( 'widgets_init', array( $this, 'register_widgets' ), 1 );
@@ -256,6 +253,11 @@ class SSP_Frontend {
 			return $content;
 		}
 
+		// Don't output episode meta in a REST Request
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return $content;
+		}
+
 		$podcast_post_types = ssp_post_types( true );
 
 		$player_visibility = get_option( 'ss_podcasting_player_content_visibility', 'all' );
@@ -396,7 +398,7 @@ class SSP_Frontend {
 
 		return apply_filters( 'ssp_episode_download_link', esc_url( $link ), $episode_id, $file );
 	}
-	
+
 	/**
 	 * Get Album Art for Player
 	 *
@@ -410,16 +412,14 @@ class SSP_Frontend {
 	 * @since 1.19.4
 	 */
 	public function get_album_art( $episode_id = false ) {
-		
+
 		/**
 		 * In case the episode id is not passed
 		 */
 		if ( ! $episode_id ) {
 			return $this->get_no_album_art_image_array();
 		}
-		
-		$image_data_array = array();
-		
+
 		/**
 		 * Option 1 : if the episode has a featured image that is square, then use that
 		 */
@@ -430,46 +430,49 @@ class SSP_Frontend {
 				return $image_data_array;
 			}
 		}
-		
+
 		/**
 		 * Option 2: if the episode belongs to a series, which has an image that is square, then use that
 		 */
-		$series_id = false;
+		$series_id    = false;
 		$series_image = '';
 
 		$series = get_the_terms( $episode_id, 'series' );
+
 		if ( $series ) {
 			$series_id = ( ! empty( $series ) && isset( $series[0] ) ) ? $series[0]->term_id : false;
 		}
+
 		if ( $series_id ) {
 			$series_image = get_option( "ss_podcasting_data_image_{$series_id}", false );
 		}
+
 		if ( $series_image ) {
 			$series_image_attachment_id = ssp_get_image_id_from_url( $series_image );
-			$image_data_array = $this->return_renamed_image_array_keys( wp_get_attachment_image_src( $series_image_attachment_id, 'medium' ) );
+			$image_data_array           = $this->return_renamed_image_array_keys( wp_get_attachment_image_src( $series_image_attachment_id, 'medium' ) );
 			if ( $this->check_image_is_square( $image_data_array ) ) {
 				return $image_data_array;
 			}
 		}
-		
+
 		/**
 		 * Option 3: if the feed settings have an image that is square, then use that
 		 */
 		$feed_image = get_option( 'ss_podcasting_data_image', false );
 		if ( $feed_image ) {
 			$feed_image_attachment_id = ssp_get_image_id_from_url( $feed_image );
-			$image_data_array = $this->return_renamed_image_array_keys( wp_get_attachment_image_src( $feed_image_attachment_id, 'medium' ) );
+			$image_data_array         = $this->return_renamed_image_array_keys( wp_get_attachment_image_src( $feed_image_attachment_id, 'medium' ) );
 			if ( $this->check_image_is_square( $image_data_array ) ) {
 				return $image_data_array;
 			}
 		}
-		
+
 		/**
 		 * None of the above passed, return the no-album-art image
 		 */
 		return $this->get_no_album_art_image_array();
 	}
-	
+
 	/**
 	 * Convert the array returned from wp_get_attachment_image_src into a human readable version
 	 * @todo check if there is a WordPress function for this
@@ -478,15 +481,17 @@ class SSP_Frontend {
 	 *
 	 * @return mixed
 	 */
-	private function return_renamed_image_array_keys($image_data_array){
+	private function return_renamed_image_array_keys( $image_data_array ) {
+		$new_image_data_array = array();
 		if ( $image_data_array && ! empty( $image_data_array ) ) {
-			$new_image_data_array['src']    = isset($image_data_array[0]) ? $image_data_array[0] : '' ;
-			$new_image_data_array['width']  = isset($image_data_array[1]) ? $image_data_array[1] : '' ;
-			$new_image_data_array['height'] = isset($image_data_array[2]) ? $image_data_array[2] : '' ;
+			$new_image_data_array['src']    = isset( $image_data_array[0] ) ? $image_data_array[0] : '';
+			$new_image_data_array['width']  = isset( $image_data_array[1] ) ? $image_data_array[1] : '';
+			$new_image_data_array['height'] = isset( $image_data_array[2] ) ? $image_data_array[2] : '';
 		}
+
 		return $new_image_data_array;
 	}
-	
+
 	/**
 	 * Check if the image in the formatted image_data_array is a square image
 	 *
@@ -502,17 +507,17 @@ class SSP_Frontend {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Returns the no album art image
 	 *
 	 * @return array
 	 */
-	private function get_no_album_art_image_array(){
+	private function get_no_album_art_image_array() {
 		$src    = SSP_PLUGIN_URL . '/assets/images/no-album-art.png';
 		$width  = 300;
 		$height = 300;
-		
+
 		return compact( 'src', 'width', 'height' );
 	}
 
@@ -668,9 +673,9 @@ class SSP_Frontend {
 						</div>
 
 						<script>
-
-							document.addEventListener("DOMContentLoaded", function() {
-								(function($){
+							// @todo move this to a separate enqueued file and use data attributes
+							document.addEventListener("DOMContentLoaded", function () {
+								(function ($) {
 									var sspUpdateDuration<?php echo $large_player_instance_number; ?>;
 
 									// Create Player
@@ -704,69 +709,69 @@ class SSP_Frontend {
 									// @todo Track Player errors
 
 									// On Media Ready
-									window.ssp_player<?php echo $large_player_instance_number; ?>.on( 'ready', function(e){
+									window.ssp_player<?php echo $large_player_instance_number; ?>.on('ready', function (e) {
 
-										if(!window.ssp_player<?php echo $large_player_instance_number; ?>.loaded) {
+										if (!window.ssp_player<?php echo $large_player_instance_number; ?>.loaded) {
 											window.ssp_player<?php echo $large_player_instance_number; ?>.loaded = true;
 											window.ssp_player<?php echo $large_player_instance_number; ?>.play();
 										}
 
-										$( '#ssp_player_id_<?php echo $large_player_instance_number; ?> #sspTotalDuration' ).text( window.ssp_player<?php echo $large_player_instance_number; ?>.getDuration().toString().toFormattedDuration() );
-										$( '#ssp_player_id_<?php echo $large_player_instance_number; ?> #sspPlayedDuration' ).text( window.ssp_player<?php echo $large_player_instance_number; ?>.getCurrentTime().toString().toFormattedDuration() );
-									} );
+										$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #sspTotalDuration').text(window.ssp_player<?php echo $large_player_instance_number; ?>.getDuration().toString().toFormattedDuration());
+										$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #sspPlayedDuration').text(window.ssp_player<?php echo $large_player_instance_number; ?>.getCurrentTime().toString().toFormattedDuration());
+									});
 
 									// On Media Played
-									window.ssp_player<?php echo $large_player_instance_number; ?>.on( 'play', function(e){
+									window.ssp_player<?php echo $large_player_instance_number; ?>.on('play', function (e) {
 
-										if(!window.ssp_player<?php echo $large_player_instance_number; ?>.loaded) {
+										if (!window.ssp_player<?php echo $large_player_instance_number; ?>.loaded) {
 											window.ssp_player<?php echo $large_player_instance_number; ?>.load(window.ssp_player<?php echo $large_player_instance_number; ?>.track, window.ssp_player<?php echo $large_player_instance_number; ?>.backend.peaks);
 										}
 
 										// @todo Track Podcast Specific Play
 
-										$( '#ssp_player_id_<?php echo $large_player_instance_number; ?> #ssp-play-pause .ssp-icon' ).removeClass().addClass( 'ssp-icon ssp-icon-pause_icon' );
-										$( '#ssp_player_id_<?php echo $large_player_instance_number; ?> #sspPlayedDuration' ).text( window.ssp_player<?php echo $large_player_instance_number; ?>.getCurrentTime().toString().toFormattedDuration() )
+										$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #ssp-play-pause .ssp-icon').removeClass().addClass('ssp-icon ssp-icon-pause_icon');
+										$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #sspPlayedDuration').text(window.ssp_player<?php echo $large_player_instance_number; ?>.getCurrentTime().toString().toFormattedDuration())
 
-										sspUpdateDuration<?php echo $large_player_instance_number; ?> = setInterval( function(){
-											$( '#ssp_player_id_<?php echo $large_player_instance_number; ?> #sspPlayedDuration' ).text( window.ssp_player<?php echo $large_player_instance_number; ?>.getCurrentTime().toString().toFormattedDuration() );
-										}, 100 );
+										sspUpdateDuration<?php echo $large_player_instance_number; ?> = setInterval(function () {
+											$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #sspPlayedDuration').text(window.ssp_player<?php echo $large_player_instance_number; ?>.getCurrentTime().toString().toFormattedDuration());
+										}, 100);
 
-									} );
+									});
 
 									// On Media Paused
-									window.ssp_player<?php echo $large_player_instance_number; ?>.on( 'pause', function(e){
+									window.ssp_player<?php echo $large_player_instance_number; ?>.on('pause', function (e) {
 
 										// @todo Track Podcast Specific Pause
 
-										$( '#ssp_player_id_<?php echo $large_player_instance_number; ?> #ssp-play-pause .ssp-icon' ).removeClass().addClass( 'ssp-icon ssp-icon-play_icon' );
+										$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #ssp-play-pause .ssp-icon').removeClass().addClass('ssp-icon ssp-icon-play_icon');
 
-										clearInterval( sspUpdateDuration<?php echo $large_player_instance_number; ?> );
+										clearInterval(sspUpdateDuration<?php echo $large_player_instance_number; ?> );
 
-									} );
+									});
 
 									// On Media Finished
-									window.ssp_player<?php echo $large_player_instance_number; ?>.on( 'finish', function(e){
+									window.ssp_player<?php echo $large_player_instance_number; ?>.on('finish', function (e) {
 
-										$( '#ssp_player_id_<?php echo $large_player_instance_number; ?> #ssp-play-pause .ssp-icon' ).removeClass().addClass( 'ssp-icon ssp-icon-play_icon' );
+										$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #ssp-play-pause .ssp-icon').removeClass().addClass('ssp-icon ssp-icon-play_icon');
 
 										// @todo Track Podcast Specific Finish
 
-									} );
+									});
 
 									$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #ssp-play-pause').on( 'click', function(e){
 										window.ssp_player<?php echo $large_player_instance_number; ?>.playPause();
-									} );
+									});
 
-									$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #ssp-back-thirty').on( 'click', function(e){
+									$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #ssp-back-thirty').on('click', function (e) {
 
 										// @todo Track Podcast Specific Back 30
 
 										window.ssp_player<?php echo $large_player_instance_number; ?>.skipBackward();
 
-									} );
+									});
 
-									$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #ssp_playback_speed<?php echo $large_player_instance_number; ?>').on( 'click', function(e){
-										switch( $( e.currentTarget ).parent().find( '[data-ssp-playback-rate]' ).attr( 'data-ssp-playback-rate' ) ){
+									$('#ssp_player_id_<?php echo $large_player_instance_number; ?> #ssp_playback_speed<?php echo $large_player_instance_number; ?>').on('click', function (e) {
+										switch ($(e.currentTarget).parent().find('[data-ssp-playback-rate]').attr('data-ssp-playback-rate')) {
 											case "1":
 												$( e.currentTarget ).parent().find( '[data-ssp-playback-rate]' ).attr( 'data-ssp-playback-rate', '1.5' );
 												$( e.currentTarget ).parent().find( '[data-ssp-playback-rate]' ).text('1.5X' );
@@ -894,11 +899,11 @@ class SSP_Frontend {
 		if( $link && apply_filters( 'ssp_show_new_window_link', true, $context ) ) {
 			$meta['new_window'] = true;
 		}
-		
+
 		if( $link ) {
 			$meta['duration'] = $duration;
 		}
-		
+
 		if( $date_recorded ) {
 			$meta['date_recorded'] = $date_recorded;
 		}
@@ -915,7 +920,7 @@ class SSP_Frontend {
 		$subscribe_display = '';
 
 		$meta_sep = apply_filters( 'ssp_episode_meta_separator', ' | ' );
-		
+
 		foreach ( $meta as $key => $data ) {
 
 			if( ! $data ) {
@@ -936,7 +941,7 @@ class SSP_Frontend {
 					$play_link = add_query_arg( 'ref', 'new_window', $link );
 					$podcast_display .= '<a href="' . esc_url( $play_link ) . '" target="_blank" title="' . get_the_title() . ' " class="podcast-meta-new-window">' . __( 'Play in new window' , 'seriously-simple-podcasting' ) . '</a>';
 					break;
-				
+
 				case 'duration':
 					$podcast_display .= '<span class="podcast-meta-duration">' . __( 'Duration' , 'seriously-simple-podcasting' ) . ': ' . $data . '</span>';
 					break;
@@ -988,6 +993,7 @@ class SSP_Frontend {
 		$itunes_url = get_option( 'ss_podcasting_itunes_url', '' );
 		$stitcher_url = get_option( 'ss_podcasting_stitcher_url', '' );
 		$google_play_url = get_option( 'ss_podcasting_google_play_url', '' );
+		$spotify_url = get_option( 'ss_podcasting_spotify_url', '' );
 
 		if ( is_array( $terms ) ) {
 			if ( isset( $terms[0] ) ) {
@@ -1000,13 +1006,17 @@ class SSP_Frontend {
 				if ( false !== get_option( 'ss_podcasting_google_play_url_' . $terms[0]->term_id ) ) {
 					$google_play_url = get_option( 'ss_podcasting_google_play_url_' . $terms[0]->term_id, '' );
 				}
+				if ( false !== get_option( 'ss_podcasting_spotify_url_' . $terms[0]->term_id ) ) {
+					$spotify_url = get_option( 'ss_podcasting_spotify_url_' . $terms[0]->term_id, '' );
+				}
 			}
 		}
 
 		$subscribe_array = array(
 			'itunes_url' => $itunes_url,
 			'stitcher_url' => $stitcher_url,
-			'google_play_url' => $google_play_url
+			'google_play_url' => $google_play_url,
+			'spotify_url' => $spotify_url
 		);
 
 		$subscribe_urls = apply_filters( 'ssp_episode_subscribe_details', $subscribe_array, $episode_id, $context );
@@ -1035,6 +1045,10 @@ class SSP_Frontend {
 					$subscribe_display .= '<a href="' . esc_url( $data ) . '" target="_blank" title="' . apply_filters( 'ssp_subscribe_link_name_google_play', __( 'Google Play', 'seriously-simple-podcasting' ) ) . '" class="podcast-meta-itunes">' . apply_filters( 'ssp_subscribe_link_name_google_play', __( 'Google Play', 'seriously-simple-podcasting' ) ) . '</a>';
 				break;
 
+				case 'spotify_url':
+					$subscribe_display .= '<a href="' . esc_url( $data ) . '" target="_blank" title="' . apply_filters( 'ssp_subscribe_link_name_spotify', __( 'Spotify', 'seriously-simple-podcasting' ) ) . '" class="podcast-meta-itunes">' . apply_filters( 'ssp_subscribe_link_name_spotify', __( 'Spotify', 'seriously-simple-podcasting' ) ) . '</a>';
+					break;
+
 				default:
 					$allowed_tags = array(
 						'strong' => array(),
@@ -1053,11 +1067,11 @@ class SSP_Frontend {
 			}
 
 		}
-		
+
 		if ( ! empty( $podcast_display ) || ! empty( $subscribe_display ) ) {
-			
+
 			$meta_display .= '<div class="podcast_meta"><aside>';
-			
+
 			$ss_podcasting_player_meta_data_enabled = get_option('ss_podcasting_player_meta_data_enabled', 'on');
 
 			if ( $ss_podcasting_player_meta_data_enabled && $ss_podcasting_player_meta_data_enabled == 'on' ) {
@@ -1069,7 +1083,7 @@ class SSP_Frontend {
 					}
 				}
 			}
-			
+
 			if ( ! empty( $subscribe_display ) ) {
 				$subscribe_display = '<p>' . __( 'Subscribe:', 'seriously-simple-podcasting' ) . ' ' . $subscribe_display . '</p>';
 				$subscribe_display = apply_filters( 'ssp_include_podcast_subscribe_links', $subscribe_display );
@@ -1077,15 +1091,15 @@ class SSP_Frontend {
 					$meta_display .= $subscribe_display;
 				}
 			}
-			
+
 			$meta_display .= '</aside></div>';
 		}
 
 		return apply_filters('ssp_include_player_meta', $meta_display );
 
 	}
-	
-	
+
+
 	/**
 	 * Get size of media file
 	 * @param  string  $file File name & path
@@ -1211,6 +1225,11 @@ class SSP_Frontend {
 
 		if( post_password_required( $post->ID ) ) {
 			return $excerpt;
+		}
+
+		// Don't output episode meta in a REST Request
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return $content;
 		}
 
 		$podcast_post_types = ssp_post_types( true );
@@ -1511,33 +1530,6 @@ class SSP_Frontend {
 	}
 
 	/**
-	 * Public facing action which is triggered from Seriously Simple Hosting
-	 * Updates episode_id and audio_file data from import process
-	 * Expects ssp_podcast_updater, ssp_podcast_api_token form fields
-	 * and ssp_podcast_file csv data file
-	 */
-	public function update_episode_data_from_podmotor() {
-		$podcast_updater = ( isset( $_POST['podcast_updater'] ) ? filter_var( $_POST['podcast_updater'], FILTER_SANITIZE_STRING ) : '' );
-		if ( ! empty( $podcast_updater ) && 'true' == $podcast_updater ) {
-			$reponse = array( 'updated' => 'false' );
-			$ssp_podcast_api_token = ( isset( $_POST['ssp_podcast_api_token'] ) ? filter_var( $_POST['ssp_podcast_api_token'], FILTER_SANITIZE_STRING ) : '' );
-			$podmotor_api_token    = get_option( 'ss_podcasting_podmotor_account_api_token', '' );
-			if ( $ssp_podcast_api_token === $podmotor_api_token ) {
-				if ( isset( $_FILES['ssp_podcast_file'] ) ) {
-					$episode_data_array = array_map( 'str_getcsv', file( $_FILES['ssp_podcast_file']['tmp_name'] ) );
-					foreach ( $episode_data_array as $episode_data ) {
-						update_post_meta( $episode_data[0], 'podmotor_episode_id', $episode_data[1] );
-						update_post_meta( $episode_data[0], 'audio_file', $episode_data[2] );
-					}
-					ssp_email_podcasts_imported();
-					$reponse['updated'] = 'true';
-				}
-			}
-			wp_send_json( $reponse );
-		}
-	}
-
-	/**
 	 * Download file from `podcast_episode` query variable
 	 * @return void
 	 */
@@ -1730,7 +1722,7 @@ class SSP_Frontend {
 
 		return $attachment_id;
 	}
-	
+
 	/**
 	 * Get MIME type of attachment file
 	 *
@@ -1752,13 +1744,13 @@ class SSP_Frontend {
 				// Set the cache
 				wp_cache_set( $key, $mime, 'mime-type', DAY_IN_SECONDS );
 			}
-			
+
 			return $mime;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Display plugin name and version in generator meta tag
 	 * @return void

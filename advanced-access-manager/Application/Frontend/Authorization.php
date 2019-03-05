@@ -36,7 +36,7 @@ class AAM_Frontend_Authorization {
      * 
      * @access public
      */
-    public function chechReadAuth(AAM_Core_Object_Post $post) {
+    public function checkReadAuth(AAM_Core_Object_Post $post) {
         // pre post access hook
         do_action('aam-pre-post-authorization-action', $post);
         
@@ -95,10 +95,7 @@ class AAM_Frontend_Authorization {
      * @access protected
      */
     protected function checkReadAccess(AAM_Core_Object_Post $post) {
-        $read   = $post->has('frontend.read');
-        $others = $post->has('frontend.read_others');
-        
-        if ($read || ($others && (intval($post->post_author) !== get_current_user_id()))) {
+        if (!$post->allowed('frontend.read')) {
             $this->deny('post_read', 'frontend.read', $post->getPost());
         }
     }

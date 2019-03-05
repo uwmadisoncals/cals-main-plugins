@@ -30,10 +30,100 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
     const AAM_CAPKEY = 'aam_capability';
     
     /**
-     *
-     * @var type 
+     * List of all user specific capabilities
+     * 
+     * @var array
+     * 
+     * @access protected 
+     */
+    protected $aamCaps = array();
+    
+    /**
+     * Parent subject
+     * 
+     * @var AAM_Core_Subject
+     * 
+     * @access protected 
      */
     protected $parent = null;
+    
+    /**
+     * Max user level
+     * 
+     * @var int
+     * 
+     * @access protected 
+     */
+    protected $maxLevel = null;
+    
+    /**
+     * Constructor
+     * 
+     * @param int $id
+     * 
+     * @return void
+     * 
+     * @access public
+     */
+    public function __construct($id = '') {
+        parent::__construct($id);
+        
+        // Retrieve user capabilities set with AAM
+        $aamCaps = get_user_option(self::AAM_CAPKEY, $id);
+        
+        if (is_array($aamCaps)) {
+            $this->aamCaps = $aamCaps;
+        }
+    }
+    
+    /**
+     * 
+     */
+    public function initialize() {
+        $subject = $this->getSubject();
+        $manager = AAM_Core_Policy_Factory::get($this);
+        
+        // Retrieve all capabilities set in Access Policy
+        // Load Capabilities from the policy
+        $policyCaps = array();
+        
+        foreach($manager->find("/^Capability:[\w]+/i") as $key => $stm) {
+            $chunks = explode(':', $key);
+            $policyCaps[$chunks[1]] = ($stm['Effect'] === 'allow' ? 1 : 0);
+        }
+        
+        // Load Roles from the policy
+        $roles    = (array) $subject->roles;
+        $allRoles = AAM_Core_API::getRoles();
+        $roleCaps = array();
+        
+        foreach($manager->find("/^Role:/i") as $key => $stm) {
+            $chunks = explode(':', $key);
+            
+            if ($stm['Effect'] === 'allow') {
+                if (!in_array($chunks[1], $roles, true)) {
+                    if ($allRoles->is_role($chunks[1])) {
+                        $roleCaps = array_merge($roleCaps, $allRoles->get_role($chunks[1])->capabilities);
+                        $roleCaps[] = $chunks[1];
+                    }
+                    $roles[] = $chunks[1];
+                }
+            } elseif (in_array($chunks[1], $roles, true)) {
+                // Make sure that we delete all instances of the role
+                foreach($roles as $i => $role){ 
+                    if ($role === $chunks[1]) {
+                        unset($roles[$i]);
+                    }
+                }
+            }
+        }
+        
+        $subject->roles = $roles;
+        
+        //reset the user capabilities
+        $subject->allcaps = array_merge($subject->allcaps, $roleCaps, $policyCaps,  $this->aamCaps);
+        $subject->caps    = array_merge($subject->caps, $roleCaps, $policyCaps,  $this->aamCaps);
+    }
     
     /**
      * 
@@ -45,10 +135,23 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
         }
             
         //check if user is expired
-        $expired = get_user_option('aam_user_expiration', $this->ID);
+        $expired = get_user_meta($this->ID, 'aam_user_expiration', true);
         if (!empty($expired)) {
             $parts = explode('|', $expired);
-            if ($parts[0] <= date('Y-m-d H:i:s')) {
+            
+            // Set time
+            // TODO: Remove in Jan 2020
+            if (preg_match('/^[\d]{4}-/', $parts[0])) {
+                $expires = DateTime::createFromFormat('Y-m-d H:i:s', $parts[0]);
+            } else {
+                $expires = DateTime::createFromFormat('m/d/Y, H:i O', $parts[0]);
+            }
+            
+            $compare = new DateTime();
+            //TODO - PHP Warning:  DateTime::setTimezone(): Can only do this for zones with ID for now in
+            @$compare->setTimezone($expires->getTimezone());
+            
+            if ($expires->getTimestamp() <= $compare->getTimestamp()) {
                 $this->triggerExpiredUserAction($parts);
             }
         }
@@ -93,6 +196,10 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
         switch($config[1]) {
             case 'lock':
                 $this->block();
+                break;
+            
+            case 'logout':
+                wp_logout();
                 break;
             
             case 'change-role':
@@ -170,27 +277,15 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
      * @access protected
      */
     protected function retrieveSubject() {
-        $subject = new WP_User($this->getId());
-
-        //retrieve aam capabilities if are not retrieved yet
-        $caps = get_user_option(self::AAM_CAPKEY, $this->getId());
-        if (is_array($caps)) {
-            $caps    = array_merge($subject->caps, $caps);
-            $allcaps = array_merge($subject->allcaps, $caps);
-            
-            //reset the user capabilities
-            $subject->allcaps = $allcaps;
-            $subject->caps    = $caps;
-            
-            if (wp_get_current_user()->ID === $subject->ID) {
-                wp_get_current_user()->allcaps = $allcaps;
-                wp_get_current_user()->caps    = $caps;
-            }
+        if ($this->getId() === get_current_user_id()) {
+            $subject = wp_get_current_user();
+        } else {
+            $subject = new WP_User($this->getId());
         }
         
         return $subject;
     }
-
+    
     /**
      * Get user capabilities
      * 
@@ -270,7 +365,7 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
         if ($object === 'capability') {
             $result = delete_user_option($this->getId(), self::AAM_CAPKEY);
         } else {
-            $result = $this->deleteOption($object);
+            $result = parent::resetObject($object);
         }
 
         return $result;
@@ -332,12 +427,20 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
         if (is_null($this->parent)) {
             //try to get this option from the User's Role
             $roles  = $this->getSubject()->roles;
-            //first user role is counted only. AAM does not support multi-roles
-            $parent = array_shift($roles);
-
-            //in case of multisite & current user does not belong to the site
-            if ($parent) {
-                $this->parent = new AAM_Core_Subject_Role($parent);
+            $base   = array_shift($roles);
+            
+            if ($base) {
+                $this->parent = new AAM_Core_Subject_Role($base);
+                
+                // if user has more than one role that set subject as multi
+                if (AAM::api()->getConfig('core.settings.multiSubject', false) 
+                        && count($roles)) {
+                    $siblings = array();
+                    foreach($roles as $role) {
+                        $siblings[] = new AAM_Core_Subject_Role($role);
+                    }
+                    $this->parent->setSiblings($siblings);
+                }
             } else {
                 $this->parent = null;
             }
@@ -386,7 +489,11 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
      * @return type
      */
     public function getMaxLevel() {
-        return AAM_Core_API::maxLevel($this->allcaps);
+        if (is_null($this->maxLevel)) {
+            $this->maxLevel = AAM_Core_API::maxLevel($this->allcaps);
+        }
+        
+        return $this->maxLevel;
     }
     
 }

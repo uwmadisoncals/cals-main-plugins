@@ -1,18 +1,18 @@
 <?php
 /**
      * Plugin Name: RVM - Responsive Vector Maps
-     * Plugin URI: http://www.responsivemapsplugin.com/
+     * Plugin URI: https://www.responsivemapsplugin.com/
      * Description: Use RVM to create as many responsive vector maps as you want... stop using area tag to create your linkable maps.
-     * Version: 5.3.2
+     * Version: 5.8.2
      * Author: Enrico Urbinati
-     * Author URI: http://www.responsivemapsplugin.com/
+     * Author URI: https://www.responsivemapsplugin.com/
      * Text Domain: responsive-vector-maps
      * Domain Path: /languages
      * License: GPL2
      */
      
      
-     /*  Copyright 2014-2018  Enrico Urbinati  (email : info@responsivemapsplugin.com)
+     /*  Copyright 2014-2019  Enrico Urbinati  (email : info@responsivemapsplugin.com)
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
         the Free Software Foundation; either version 2 of the License, or
@@ -26,7 +26,7 @@
         Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     */
 
-define( 'RVM_VERSION' , '5.3.2' ) ; 
+define( 'RVM_VERSION' , '5.8.2' ) ; 
 define( 'RVM_PLUGIN_FILE' , plugin_basename( __FILE__ ) ) ;    
 define( 'RVM_PLUGIN_DIR_PATH' , plugin_dir_path( __FILE__ ) ) ;
 define( 'RVM_PLUGIN_DIR_URL' , plugin_dir_url( __FILE__ ) ) ;
@@ -42,10 +42,11 @@ define( 'PLUGIN_WIDGET_DESCR' ,  __( 'Display the map widget' , RVM_TEXT_DOMAIN 
 define( 'RVM_WP_VERSION' , get_bloginfo( 'version' ) ) ;
 define( 'PREFIX' , 'rvm_' ) ;
 define( 'RVM_LABEL_CLASS' , 'class="' . PREFIX . 'label"' ) ;
-define( 'RVM_REGION_LINK_CLASS' , 'class="' . PREFIX . 'region_links"' ) ;
-define( 'RVM_REGION_BG_CLASS' , 'class="' . PREFIX . 'region_bg"' ) ;
-define( 'RVM_REGION_POPUP_CLASS' , 'class="' . PREFIX . 'region_popup"' ) ;
+define( 'RVM_REGION_LINK_CLASS' , 'class="' . PREFIX . 'regions_links"' ) ;
+define( 'RVM_REGION_BG_CLASS' , 'class="' . PREFIX . 'regions_bg"' ) ;
+define( 'RVM_REGION_POPUP_CLASS' , 'class="' . PREFIX . 'regions_popup"' ) ;
 define( 'RVM_CUSTOM_MAPS_PATHS_DELIMITER' , '-@rvm@-' ) ;// to save into options both url path and dir path to custom map
+define( 'RVM_DOMAIN_URL' , 'https://www.responsivemapsplugin.com/' ) ;// to save into options both url
 
 //default settings for fallback
 define( 'RVM_MAP_TAB_ACTIVE' , 'rvm_main_settings' ) ;// default active tab 
@@ -64,11 +65,11 @@ define( 'RVM_MARKER_DIM_MIN_VALUE' , 4 ) ;
 define( 'RVM_MARKER_DIM_MAX_VALUE' , 12 ) ;
 define( 'RVM_DEQUEUE_WP_EMOJI' , "unchecked" ) ;
 
-
+@include_once RVM_INC_PLUGIN_DIR . '/rvm_general_functions.php';
 @include_once RVM_INC_PLUGIN_DIR . '/rvm_style_and_script.php';
 @include_once RVM_INC_PLUGIN_DIR . '/rvm_core.php';
 @include_once RVM_INC_PLUGIN_DIR . '/rvm_shortcode.php';
 @include_once RVM_INC_PLUGIN_DIR . '/rvm_widget.php';
-@include_once RVM_INC_PLUGIN_DIR . '/rvm_general_functions.php';
+
 
 ?>

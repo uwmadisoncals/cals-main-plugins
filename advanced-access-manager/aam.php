@@ -3,7 +3,7 @@
 /**
   Plugin Name: Advanced Access Manager
   Description: All you need to manage access to your WordPress website
-  Version: 5.4.3.2
+  Version: 5.9
   Author: Vasyl Martyniuk <vasyl@vasyltech.com>
   Author URI: https://vasyltech.com
 
@@ -114,10 +114,7 @@ class AAM {
     public static function onPluginsLoaded() {
         //load AAM core config
         AAM_Core_Config::bootstrap();
-
-        //load WP Core hooks
-        AAM_Shared_Manager::bootstrap();
-
+        
         //login control
         if (AAM_Core_Config::get('core.settings.secureLogin', true)) {
             AAM_Core_Login::bootstrap();
@@ -127,6 +124,17 @@ class AAM {
         if (AAM_Core_Config::get('core.settings.jwtAuthentication', false)) {
             AAM_Core_JwtAuth::bootstrap();
         }
+        
+        // Load AAM
+        AAM::getInstance();
+        
+        //load all installed extension
+        if (AAM_Core_Config::get('core.settings.extensionSupport', true)) {
+            AAM_Extension_Repository::getInstance()->load();
+        }
+        
+        //load WP Core hooks
+        AAM_Shared_Manager::bootstrap();
     }
     
     /**
@@ -138,17 +146,6 @@ class AAM {
      * @static
      */
     public static function onInit() {
-        // Load AAM
-        AAM::getInstance();
-        
-        //load all installed extension
-        if (AAM_Core_Config::get('core.settings.extensionSupport', true)) {
-            AAM_Extension_Repository::getInstance()->load();
-        }
-
-        //load media control
-        AAM_Core_Media::bootstrap();
-
         //bootstrap the correct interface
         if (AAM_Core_Api_Area::isBackend()) {
             AAM_Backend_Manager::bootstrap();
@@ -169,10 +166,13 @@ class AAM {
         if (is_null(self::$_instance)) {
             self::$_instance = new self;
             
+            // Load user capabilities
+            self::$_instance->getUser()->initialize();
+            
             // Logout user if he/she is blocked
             self::$_instance->getUser()->validateUserStatus();
             
-            load_plugin_textdomain(AAM_KEY);
+            load_plugin_textdomain(AAM_KEY, false, 'advanced-access-manager/Lang');
         }
 
         return self::$_instance;

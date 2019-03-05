@@ -203,16 +203,6 @@ jQuery(function($){
             // Create the select2 drop-down
             this.select_tag.$el.select2(this.select2_opts);
 
-            // Ensure that values are pre-populated
-            if (this.options.multiple) {
-                var selected = [];
-                _.each(this.collection.selected_ids(), function(id){
-                    selected.push(id.toString());
-                });
-                if (selected.length == 0) selected = '';
-                this.select_tag.$el.select2('val', selected);
-            }
-
             return this;
         }
     });
@@ -693,7 +683,11 @@ jQuery(function($){
 
             var selected = this.sources.selected();
             if (selected.length) {
-                var view_name = _.str.capitalize(selected.pop().id)+"Source";
+                function capitalizeFirstLetter(text) {
+                    text = String(text);
+                    return text.charAt(0).toUpperCase() + text.slice(1);
+                }
+                var view_name = capitalizeFirstLetter(selected.pop().id) + "Source";
                 if (typeof(Ngg.DisplayTab.Views[view_name]) != 'undefined') {
                     var selected_view = new Ngg.DisplayTab.Views[view_name];
                     this.$el.append(selected_view.render().el);
@@ -1487,7 +1481,13 @@ jQuery(function($){
 
         clicked: function(){
             this.set_display_settings();
-            insert_into_editor(this.displayed_gallery.to_shortcode(), (this.displayed_gallery.id ? this.displayed_gallery.id : igw_data.shortcode_ref));
+            var shortcode = this.displayed_gallery.to_shortcode();
+            insert_into_editor(shortcode, (this.displayed_gallery.id ? this.displayed_gallery.id : igw_data.shortcode_ref));
+            var editor = null
+            if ((editor = location.toString().match(/editor=([^\&]+)/)) && editor.length >= 2) {
+                top.tinyMCE.editors[editor[1]].fire('ngg-inserted', {shortcode: shortcode})
+            }
+            
             close_attach_to_post_window();
         },
 
@@ -1601,7 +1601,17 @@ jQuery(function($){
             }, this);
 
             // Bind to the 'selected' event for the source, updating the displayed gallery
-            this.sources.on('selected', function(){
+            this.sources.on('selected', function() {
+
+                // It is possible for fast acting users to get an invalid shortcode: by changing gallery source and
+                // then rushing to the 'insert gallery' button it's possible for the state to be unchanged when the new
+                // shortcode is written thus 'leaving behind' the old displayed gallery without the newly chosen attr.
+                // This just temporarily disables that button for one second for the internal state to catch up.
+                $('#save_displayed_gallery').prop('disabled', true);
+                setTimeout(function() {
+                    $('#save_displayed_gallery').prop('disabled', false);
+                }, 1000);
+
                 this.displayed_gallery.set('source', this.sources.selected_value());
 
                 // If the source changed, and it's not the set to the original value, then

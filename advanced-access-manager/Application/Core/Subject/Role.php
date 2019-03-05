@@ -39,7 +39,7 @@ class AAM_Core_Subject_Role extends AAM_Core_Subject {
 
         return $role;
     }
-
+    
     /**
      * Delete User Role 
      *
@@ -126,6 +126,28 @@ class AAM_Core_Subject_Role extends AAM_Core_Subject {
      */
     public function getCapabilities() {
         return $this->getSubject()->capabilities;
+    }
+    
+    /**
+     * Check if subject has capability
+     * 
+     * @param string $cap
+     * 
+     * @return boolean
+     * 
+     * @access public
+     */
+    public function hasCapability($cap) {
+        $has = $this->getSubject()->has_cap($cap);
+        
+        // Override by policy if is set
+        $manager = AAM::api()->getPolicyManager($this);
+        
+        if ($manager->isAllowed("Capability:{$cap}") === false) {
+            $has = false;
+        }
+        
+        return $has;
     }
 
     /**

@@ -1,12 +1,10 @@
 <?php
 namespace MailPoet\Cron;
 
-if(!defined('ABSPATH')) exit;
-require_once(ABSPATH . 'wp-includes/pluggable.php');
+if (!defined('ABSPATH')) exit;
 
 class DaemonHttpRunner {
   public $settings_daemon_data;
-  public $request_data;
   public $timer;
   public $token;
 
@@ -15,15 +13,11 @@ class DaemonHttpRunner {
 
   const PING_SUCCESS_RESPONSE = 'pong';
 
-  function __construct($request_data = false, $daemon = null) {
-    $this->request_data = $request_data;
+  function __construct(Daemon $daemon = null) {
     $this->settings_daemon_data = CronHelper::getDaemon();
     $this->token = CronHelper::createToken();
     $this->timer = microtime(true);
     $this->daemon = $daemon;
-    if(!$daemon) {
-      $this->daemon = new Daemon($this->settings_daemon_data);
-    }
   }
 
   function ping() {
@@ -31,26 +25,26 @@ class DaemonHttpRunner {
     $this->terminateRequest(self::PING_SUCCESS_RESPONSE);
   }
 
-  function run() {
+  function run($request_data) {
     ignore_user_abort(true);
-    if(strpos(@ini_get('disable_functions'), 'set_time_limit') === false) {
+    if (strpos(@ini_get('disable_functions'), 'set_time_limit') === false) {
       set_time_limit(0);
     }
     $this->addCacheHeaders();
-    if(!$this->request_data) {
+    if (!$request_data) {
       $error = __('Invalid or missing request data.', 'mailpoet');
     } else {
-      if(!$this->settings_daemon_data) {
+      if (!$this->settings_daemon_data) {
         $error = __('Daemon does not exist.', 'mailpoet');
       } else {
-        if(!isset($this->request_data['token']) ||
-          $this->request_data['token'] !== $this->settings_daemon_data['token']
+        if (!isset($request_data['token']) ||
+          $request_data['token'] !== $this->settings_daemon_data['token']
         ) {
           $error = 'Invalid or missing token.';
         }
       }
     }
-    if(!empty($error)) {
+    if (!empty($error)) {
       return $this->abortWithError($error);
     }
     $this->settings_daemon_data['token'] = $this->token;
@@ -58,12 +52,12 @@ class DaemonHttpRunner {
     // if workers took less time to execute than the daemon execution limit,
     // pause daemon execution to ensure that daemon runs only once every X seconds
     $elapsed_time = microtime(true) - $this->timer;
-    if($elapsed_time < CronHelper::DAEMON_EXECUTION_LIMIT) {
+    if ($elapsed_time < CronHelper::DAEMON_EXECUTION_LIMIT) {
       $this->pauseExecution(CronHelper::DAEMON_EXECUTION_LIMIT - $elapsed_time);
     }
     // after each execution, re-read daemon data in case it changed
     $settings_daemon_data = CronHelper::getDaemon();
-    if($this->shouldTerminateExecution($settings_daemon_data)) {
+    if ($this->shouldTerminateExecution($settings_daemon_data)) {
       return $this->terminateRequest();
     }
     return $this->callSelf();
@@ -99,7 +93,7 @@ class DaemonHttpRunner {
   }
 
   private function addCacheHeaders() {
-    if(headers_sent()) {
+    if (headers_sent()) {
       return;
     }
     // Common Cache Control header. Should be respected by cache proxies and CDNs.

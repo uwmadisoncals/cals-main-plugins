@@ -40,14 +40,11 @@ class AAM_Core_Object_Post extends AAM_Core_Object {
         //make sure that we are dealing with WP_Post object
         if (is_object($post)) {
             $this->setPost($post);
-        } elseif (intval($post)) {
+        } elseif (is_numeric($post)) {
             $this->setPost(get_post($post));
         }
         
-        // Do not initialize settings for posts that are about to be created
-        if ($this->getPost() && ($this->getPost()->post_status !== 'auto-draft')) {
-            $this->read();
-        }
+        $this->initialize();
     }
     
     /**
@@ -63,6 +60,15 @@ class AAM_Core_Object_Post extends AAM_Core_Object {
         $post = $this->getPost();
         
         return (is_object($post) && property_exists($post, $name) ? $post->$name : null);
+    }
+    
+    /**
+     * 
+     */
+    public function initialize() {
+        if ($this->getPost()) {
+            $this->read();
+        }
     }
 
     /**
@@ -87,6 +93,24 @@ class AAM_Core_Object_Post extends AAM_Core_Object {
             $option = get_post_meta($post->ID, $this->getOptionName(), true);
             $this->setOverwritten(!empty($option));
             
+            // Read settings from access policy
+            if (empty($option)) {
+                $stms = AAM_Core_Policy_Factory::get($subject)->find(
+                    "/^post:{$post->post_type}:({$post->post_name}|{$post->ID}):/",
+                    array('post' => $post)
+                );
+                $option = array();
+                    
+                foreach($stms as $key => $stm) {
+                    // TODO: Prepare better conversion from policy Action to AAM
+                    // post & term action. For example listToOthers -> list_others
+                    $chunks = explode(':', $key);
+                    $option["frontend.{$chunks[3]}"] = $stm['Effect'] === 'deny';
+                    $option["backend.{$chunks[3]}"]  = $stm['Effect'] === 'deny';
+                    $option["api.{$chunks[3]}"]      = $stm['Effect'] === 'deny';
+                }
+            }
+            
             // Inherit from terms or default settings - AAM Plus Package
             if (empty($option)) {
                 $option = apply_filters('aam-post-access-filter', $option, $this);
@@ -100,7 +124,7 @@ class AAM_Core_Object_Post extends AAM_Core_Object {
             }
             
             // Do not perform finalization if this is user level subject unless it
-            // is overriten. This is critical to avoid overloading database with too 
+            // is overwritten. This is critical to avoid overloading database with too 
             // much cache
             if ($this->allowCache($subject) || $this->isOverwritten()) {
                 $this->finalizeOption($post, $subject, $option);
@@ -193,7 +217,7 @@ class AAM_Core_Object_Post extends AAM_Core_Object {
         // set meta for revision, so let's bypass this constrain.
         if ($this->getPost()->post_type === 'revision') {
             $result = delete_metadata(
-                    'post', $this->getPost()->ID, $this->getOptionName()
+                'post', $this->getPost()->ID, $this->getOptionName()
             );
         } else {
             $result = delete_post_meta($this->getPost()->ID, $this->getOptionName());
@@ -245,6 +269,25 @@ class AAM_Core_Object_Post extends AAM_Core_Object {
         $option = $this->getOption();
 
         return (array_key_exists($property, $option) && !empty($option[$property]));
+    }
+    
+    /**
+     * Check if subject can do certain action
+     * 
+     * The difference between `can` and `allowed` is that can is more in-depth way 
+     * to take in consideration relationships between properties.
+     *  
+     * @return boolean
+     * 
+     * @access public
+     */
+    public function allowed() {
+        return apply_filters(
+            'aam-post-action-allowed-filter', 
+            !call_user_func_array(array($this, 'has'), func_get_args()), 
+            func_get_arg(0), 
+            $this
+        );
     }
     
     /**
@@ -332,6 +375,15 @@ class AAM_Core_Object_Post extends AAM_Core_Object {
         $this->setOption($option);
         
         return true;
+    }
+    
+    /**
+     * 
+     * @param type $external
+     * @return type
+     */
+    public function mergeOption($external) {
+        return AAM::api()->mergeSettings($external, $this->getOption(), 'post');
     }
     
     /**

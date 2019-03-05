@@ -8,8 +8,8 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: weaver theme, settings, save, subthemes
 Text Domain: show-posts
 Requires at least: 4.2
-Tested up to: 4.9
-Stable tag: 1.3.15
+Tested up to: 5.0
+Stable tag: 1.3.16
 
 == Description ==
 
@@ -59,6 +59,10 @@ Please use the WordPress Plugins:Install page to install this plugin.
 
 
 == Changelog ==
+
+= 1.3.16 =
+* Fix: clear styling issue for 3 column display
+
 = 1.3.15 =
 * Fix: Don't add schema.org to posts when in a post slider for Weaver Xtreme Schema Tags
 

@@ -16,6 +16,17 @@
 class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
     
     /**
+     * Construct
+     */
+    public function __construct() {
+        parent::__construct();
+        
+        if (!current_user_can('aam_manage_posts')) {
+            AAM::api()->denyAccess(array('reason' => 'aam_manage_posts'));
+        }
+    }
+    
+    /**
      * Get list for the table
      * 
      * @return string
@@ -57,7 +68,12 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
                 $type->labels->name, 
                 'drilldown,manage',
                 null,
-                apply_filters('aam-type-override-status', false, $type->name, AAM_Backend_Subject::getInstance())
+                apply_filters(
+                    'aam-type-override-status', 
+                    false, 
+                    $type->name, 
+                    AAM_Backend_Subject::getInstance()
+                )
             );
         }
         
@@ -122,6 +138,7 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
      */
     protected function retrieveTypeContent($type) {
         $list     = $this->prepareContentList($type);
+        $subject  = AAM_Backend_Subject::getInstance();
         $response = array(
             'data'            => array(), 
             'recordsTotal'    => $list->total, 
@@ -156,32 +173,23 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
                     $link,
                     'post',
                     get_the_title($record),
-                    'manage' . ($link ? ',edit' : ''),
+                    'manage' . ($link ? ',edit' : ',no-edit'),
                     $parent,
-                    AAM_Backend_Subject::getInstance()->getObject('post', $record->ID)->isOverwritten()
+                    $subject->getObject('post', $record->ID)->isOverwritten()
                 );
             } else { //term
                 $response['data'][] = array(
-                    $record->term_id . '|' . $record->taxonomy,
+                    $record->term_id . '|' . $record->taxonomy . '|' . $type,
                     get_edit_term_link($record->term_id, $record->taxonomy),
                     'term',
                     $record->name,
-                    'manage,edit',
-                    rtrim(get_term_parents_list(
-                        $record->term_id, 
-                        $record->taxonomy, 
-                        array(
-                            'link' => false, 
-                            'format' => 'name', 
-                            'separator' => '/', 
-                            'inclusive' => false
-                        )
-                    ), '/'),
+                    implode(',', apply_filters('aam-term-row-actions', array('manage', 'edit'), $subject, $record, $type)),
+                    rtrim($this->getParentTermList($record), '/'),
                     apply_filters(
                         'aam-term-override-status', 
                         false, 
                         $record->term_id . '|' . $record->taxonomy, 
-                        AAM_Backend_Subject::getInstance()
+                        $subject
                     )
                 );
             }
@@ -190,6 +198,51 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
         return $response;
     }
     
+    /**
+     * 
+     * @global type $wp_version
+     * @param type $term
+     * @return type
+     * @todo Remove when min WP version will be 4.8
+     */
+    protected function getParentTermList($term) {
+        global $wp_version;
+
+        $list = '';
+        $args = array(
+            'link'      => false,
+            'format'    => 'name',
+            'separator' => '/',
+            'inclusive' => false
+        );
+
+        if (version_compare($wp_version, '4.8.0') === -1) {
+            $term = get_term($term->term_id, $term->taxonomy);
+
+            foreach (array('link', 'inclusive') as $bool) {
+                $args[$bool] = wp_validate_boolean($args[$bool]);
+            }
+
+            $parents = get_ancestors($term->term_id, $term->taxonomy, 'taxonomy');
+
+            foreach (array_reverse($parents) as $term_id) {
+                $parent = get_term($term_id, $term->taxonomy);
+
+                if ($args['link']) {
+                    $url = esc_url(get_term_link($parent->term_id, $term->taxonomy));
+                    $list .= sprintf('<a href="%s">%s</a>', $url, $parent->name);
+                } else {
+                    $list .= $parent->name;
+                }
+                $list .= $args['separator'];
+            }
+        } else {
+            $list = get_term_parents_list($term->term_id, $term->taxonomy, $args);
+        }
+
+        return $list;
+    }
+
     /**
      * 
      * @return type
@@ -392,17 +445,19 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
         $object = AAM_Backend_Subject::getInstance()->getObject($type, $id);
         
         //prepare the response object
+        $bValues = array(1, '1', 0, '0', false, "false", true, "true");
         if (is_a($object, 'AAM_Core_Object')) {
             foreach($object->getOption() as $key => $value) {
-                if (in_array($value, array(1, '1', 0, '0', false, "false", true, "true"), true)) {
+                if (in_array($value, $bValues, true)) {
                     $access[$key] = !empty($value);
                 } else {
                     $access[$key] = $value;
                 }
             }
             $metadata = array('overwritten' => $object->isOverwritten());
+            $access   = apply_filters('aam-get-post-access-filter', $access, $object);
         }
-
+        
         return wp_json_encode(array(
             'access'  => $access, 
             'meta'    => $metadata,
@@ -479,7 +534,7 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
         $id     = AAM_Core_Request::post('objectId', null);
 
         $param = AAM_Core_Request::post('param');
-        $value = AAM_Core_Request::post('value');
+        $value = filter_input(INPUT_POST, 'value');
 
         //clear cache
         AAM_Core_API::clearCache();
@@ -525,7 +580,6 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
     
     /**
      * 
-     * @staticvar type $list
      * @param type $area
      * @return type
      */

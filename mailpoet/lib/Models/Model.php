@@ -2,12 +2,12 @@
 
 namespace MailPoet\Models;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 /**
  * @method static array|string getConfig($key = null, $connection_name = self::DEFAULT_CONNECTION)
  * @method static null resetConfig()
- * @method static \ORM forTable($table_name, $connection_name = self::DEFAULT_CONNECTION)
+ * @method static self forTable($table_name, $connection_name = self::DEFAULT_CONNECTION)
  * @method static null setDb($db, $connection_name = self::DEFAULT_CONNECTION)
  * @method static null resetDb()
  * @method static null setupLimitClauseStyle($connection_name)
@@ -18,27 +18,43 @@ if(!defined('ABSPATH')) exit;
  * @method static array getQueryLog($connection_name = self::DEFAULT_CONNECTION)
  * @method array getConnectionNames()
  * @method $this useIdColumn($id_column)
- * @method \ORM|bool findOne($id=null)
+ * @method $this|bool findOne($id=null)
+ * @method static static|bool findOne($id=null)
  * @method array|\IdiormResultSet findMany()
+ * @method static array|\IdiormResultSet findMany()
  * @method \IdiormResultSet findResultSet()
  * @method array findArray()
+ * @method static array findArray()
  * @method $this forceAllDirty()
+ * @method $this select_expr(string $expr, string $alias=null)
  * @method $this rawQuery($query, $parameters = array())
+ * @method static $this rawQuery($query, $parameters = array())
  * @method $this tableAlias($alias)
+ * @method static $this tableAlias($alias)
  * @method int countNullIdColumns()
+ * @method $this select($column, $alias=null)
+ * @method static $this select($column, $alias=null)
  * @method $this selectExpr($expr, $alias=null)
- * @method \ORM selectMany($values)
- * @method \ORM selectManyExpr($values)
+ * @method static $this selectExpr($expr, $alias=null)
+ * @method $this selectMany(...$values)
+ * @method static static selectMany(...$values)
+ * @method static selectManyExpr($values)
  * @method $this rawJoin($table, $constraint, $table_alias, $parameters = array())
  * @method $this innerJoin($table, $constraint, $table_alias=null)
+ * @method $this join(string $table, string $constraint, $table_alias=null)
  * @method $this leftOuterJoin($table, $constraint, $table_alias=null)
  * @method $this rightOuterJoin($table, $constraint, $table_alias=null)
  * @method $this fullOuterJoin($table, $constraint, $table_alias=null)
+ * @method $this where($column_name, $value=null)
+ * @method static $this where($column_name, $value=null)
  * @method $this whereEqual($column_name, $value=null)
+ * @method static $this whereEqual($column_name, $value=null)
  * @method $this whereNotEqual($column_name, $value=null)
+ * @method static $this whereNotEqual($column_name, $value=null)
  * @method $this whereIdIs($id)
  * @method $this whereAnyIs($values, $operator='=')
- * @method array|string whereIdIn($ids)
+ * @method $this whereIdIn($ids)
+ * @method static static whereIdIn($ids)
  * @method $this whereLike($column_name, $value=null)
  * @method $this whereNotLike($column_name, $value=null)
  * @method $this whereGt($column_name, $value=null)
@@ -46,13 +62,20 @@ if(!defined('ABSPATH')) exit;
  * @method $this whereGte($column_name, $value=null)
  * @method $this whereLte($column_name, $value=null)
  * @method $this whereIn($column_name, $values)
+ * @method static $this whereIn($column_name, $values)
  * @method $this whereNotIn($column_name, $values)
+ * @method static $this whereNotIn($column_name, $values)
  * @method $this whereNull($column_name)
+ * @method static $this whereNull($column_name)
  * @method $this whereNotNull($column_name)
+ * @method static $this whereNotNull($column_name)
  * @method $this whereRaw($clause, $parameters=array())
+ * @method static $this whereRaw($clause, $parameters=array())
  * @method $this deleteMany()
  * @method $this orderByDesc($column_name)
+ * @method static $this orderByDesc($column_name)
  * @method $this orderByAsc($column_name)
+ * @method static $this orderByAsc($column_name)
  * @method $this orderByExpr($clause)
  * @method $this groupBy($column_name)
  * @method $this groupByExpr($expr)
@@ -73,10 +96,26 @@ if(!defined('ABSPATH')) exit;
  * @method static $this clearCache($table_name = null, $connection_name = self::DEFAULT_CONNECTION)
  * @method bool setExpr($key, $value = null)
  * @method bool isDirty($key)
+ * @method static static filter(...$args)
+ * @method $this hasMany($associated_class_name, $foreign_key_name=null, $foreign_key_name_in_current_models_table=null, $connection_name=null)
+ * @method $this hasManyThrough($associated_class_name, $join_class_name=null, $key_to_base_table=null, $key_to_associated_table=null,  $key_in_base_table=null, $key_in_associated_table=null, $connection_name=null)
+ * @method $this hasOne($associated_class_name, $foreign_key_name=null, $foreign_key_name_in_current_models_table=null, $connection_name=null)
+ * @method $this|bool create($data=null)
+ * @method static $this|bool create($data=null)
+ * @method int count()
+ * @method static int count()
+ * @method static static limit(int $limit)
+ * @method static static distinct()
+ * @method $this set(string|array $key, string|null $value = null)
+ *
+ * @property string|null $created_at
+ * @property string|null $updated_at
+ * @property string|null $id
  */
 class Model extends \Sudzy\ValidModel {
   const DUPLICATE_RECORD = 23000;
 
+  public static $_table;
   protected $_errors;
   protected $_new_record;
 
@@ -97,20 +136,20 @@ class Model extends \Sudzy\ValidModel {
    *
    * @param  array   $data
    * @param  boolean $keys
-   * @param  callable $onCreate
+   * @param  callable|bool $onCreate
    * @return self
    */
   static protected function _createOrUpdate($data = array(), $keys = false, $onCreate = false) {
     $model = false;
 
-    if(isset($data['id']) && (int)$data['id'] > 0) {
+    if (isset($data['id']) && (int)$data['id'] > 0) {
       $model = static::findOne((int)$data['id']);
     }
 
-    if(!empty($keys)) {
+    if (!empty($keys)) {
       $first = true;
-      foreach($keys as $field => $value) {
-        if($first) {
+      foreach ($keys as $field => $value) {
+        if ($first) {
           $model = static::where($field, $value);
           $first = false;
         } else {
@@ -120,8 +159,8 @@ class Model extends \Sudzy\ValidModel {
       $model = $model->findOne();
     }
 
-    if($model === false) {
-      if(!empty($onCreate)) {
+    if ($model === false) {
+      if (!empty($onCreate)) {
         $data = $onCreate($data);
       }
       $model = static::create();
@@ -139,7 +178,7 @@ class Model extends \Sudzy\ValidModel {
   }
 
   function getErrors() {
-    if(empty($this->_errors)) {
+    if (empty($this->_errors)) {
       return false;
     } else {
       return $this->_errors;
@@ -147,11 +186,11 @@ class Model extends \Sudzy\ValidModel {
   }
 
   function setError($error = '', $error_code = null) {
-    if(!$error_code) {
+    if (!$error_code) {
       $error_code = count($this->_errors);
     }
-    if(!empty($error)) {
-      if(is_array($error)) {
+    if (!empty($error)) {
+      if (is_array($error)) {
         $this->_errors = array_merge($this->_errors, $error);
         $this->_errors = array_unique($this->_errors);
       } else {
@@ -165,13 +204,13 @@ class Model extends \Sudzy\ValidModel {
     $this->_new_record = $this->isNew();
     try {
       parent::save();
-    } catch(\Sudzy\ValidationException $e) {
+    } catch (\Sudzy\ValidationException $e) {
       $this->setError($e->getValidationErrors());
-    } catch(\PDOException $e) {
-      switch($e->getCode()) {
+    } catch (\PDOException $e) {
+      switch ($e->getCode()) {
         case 23000:
           preg_match("/for key \'(.*?)\'/i", $e->getMessage(), $matches);
-          if(isset($matches[1])) {
+          if (isset($matches[1])) {
             $column = $matches[1];
             $this->setError(
               sprintf(
@@ -243,7 +282,7 @@ class Model extends \Sudzy\ValidModel {
   static function bulkAction($orm, $callback = false) {
     $total = $orm->count();
 
-    if($total === 0) return false;
+    if ($total === 0) return false;
 
     $rows = $orm->select(static::$_table . '.id')
       ->offset(null)
@@ -254,7 +293,7 @@ class Model extends \Sudzy\ValidModel {
       return (int)$model['id'];
     }, $rows);
 
-    if(is_callable($callback)) {
+    if (is_callable($callback)) {
       $callback($ids);
     }
 
@@ -272,14 +311,16 @@ class Model extends \Sudzy\ValidModel {
     $duplicate->hydrate($model_data);
     $duplicate->set_expr('created_at', 'NOW()');
     $duplicate->set_expr('updated_at', 'NOW()');
-    $duplicate->set_expr('deleted_at', 'NULL');
+    if (isset($model_data['deleted_at'])) {
+      $duplicate->set_expr('deleted_at', 'NULL');
+    }
 
     $duplicate->save();
     return $duplicate;
   }
 
   function setTimestamp() {
-    if($this->created_at === null) {
+    if ($this->created_at === null) {
       $this->set_expr('created_at', 'NOW()');
     }
   }
@@ -293,28 +334,19 @@ class Model extends \Sudzy\ValidModel {
   }
 
   /**
-   * PHP 5.3 fix for incorrectly returned model results when using asArray() function.
-   * Jira reference: https://goo.gl/UZaMj5
-   * TODO: remove after phasing out PHP 5.3 support
-   */
-  function asArray() {
-    return call_user_func_array('parent::as_array', func_get_args());
-  }
-
-  /**
    * Rethrow PDOExceptions to prevent exposing sensitive data in stack traces
    */
   public static function __callStatic($method, $parameters) {
     try {
       return parent::__callStatic($method, $parameters);
-    } catch(\PDOException $e) {
+    } catch (\PDOException $e) {
       throw new \Exception($e->getMessage());
     }
   }
 
   public function validate() {
     $success = true;
-    foreach(array_keys($this->_validations) as $field) {
+    foreach (array_keys($this->_validations) as $field) {
       $success = $success && $this->validateField($field, $this->$field);
     }
     $this->setError($this->getValidationErrors());

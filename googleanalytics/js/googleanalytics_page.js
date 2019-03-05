@@ -131,7 +131,7 @@ const GA_AUTHENTICATION_CODE_ERROR = 'That looks like your Google Analytics Trac
                 checkbox.removeProp('checked');
             }
 
-            $("#ga-slider").on("click", function (e) {
+            $(".ga-slider-disable").on("click", function (e) {
                 var manually_enter_not_checked = $('#ga_enter_code_manually').not(':checked');
                 if (checkbox.not(':checked').length > 0) {
                     if (confirm('This will disable Dashboards, Viral Alerts and Google API')) {

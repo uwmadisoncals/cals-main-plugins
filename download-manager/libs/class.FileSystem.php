@@ -125,8 +125,8 @@ class FileSystem
                     echo fread($file, $buffer);
                 else
                     echo fread($file, $fsize);
-                ob_flush();
-                flush();
+                if( ob_get_level() > 0 ) @ob_flush();
+                @flush();
                 $fsize -= $buffer;
                 $bandwidth += $buffer;
                 if ($speed > 0 && ($bandwidth > $speed * $packet * 1024)) {

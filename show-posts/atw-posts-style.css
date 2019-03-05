@@ -75,7 +75,7 @@ Custom CSS features of on the Show Posts admin page
 	padding-left:   2%;
 }
 .atw-content-3-col:nth-of-type(3n+1) {
-	clear:			none;
+	clear:			none !important;
 }
 
 .atw-content-3-col:nth-of-type(2n+1) {
@@ -92,7 +92,7 @@ Custom CSS features of on the Show Posts admin page
 	padding-left:   0;
 }
 .atw-content-3-col:nth-of-type(3n+1) {
-	clear:			none;
+	clear:			none	!important;
 }
 
 .atw-content-3-col:nth-of-type(2n+1) {

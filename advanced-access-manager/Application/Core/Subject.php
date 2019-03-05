@@ -36,6 +36,17 @@ abstract class AAM_Core_Subject {
      * @access private
      */
     private $_subject;
+    
+    /**
+     * Covering the scenario of multi-subjects
+     * 
+     * For example this is quite typical for the multi-roles
+     * 
+     * @var array
+     * 
+     * @access private 
+     */
+    private $_siblings = array();
 
     /**
      * List of Objects to be access controlled for current subject
@@ -63,7 +74,12 @@ abstract class AAM_Core_Subject {
         //retrieve and set subject itself
         $this->setSubject($this->retrieveSubject());
     }
-
+    
+    /**
+     * 
+     */
+    public function initialize() { }
+    
     /**
      * Trigger Subject native methods
      *
@@ -185,6 +201,30 @@ abstract class AAM_Core_Subject {
     public function setSubject($subject) {
         $this->_subject = $subject;
     }
+    
+    /**
+     * 
+     * @param type $siblings
+     */
+    public function setSiblings($siblings) {
+        $this->_siblings = $siblings;
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function hasSiblings() {
+        return count($this->_siblings) ? true : false;
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getSiblings() {
+        return $this->_siblings;
+    }
 
     /**
      * Get Individual Object
@@ -200,7 +240,7 @@ abstract class AAM_Core_Subject {
         $object = null;
         
         //performance optimization
-        $id = (is_scalar($id) ? $id : 0); //prevent from any surprises
+        $id = (is_scalar($id) ? $id : 'none'); //prevent from any surprises
         
         //check if there is an object with specified ID
         if (!isset($this->_objects[$type][$id])) {
@@ -212,7 +252,7 @@ abstract class AAM_Core_Subject {
             
             $object = apply_filters('aam-object-filter', $object, $type, $id, $this);
             
-            if (is_a($object, 'AAM_Core_Object') && !AAM::isAAM()) {
+            if (is_a($object, 'AAM_Core_Object')) {
                 $this->_objects[$type][$id] = $object;
             }
         } else {
@@ -263,6 +303,8 @@ abstract class AAM_Core_Subject {
      * @access public
      */
     public function resetObject($object) {
+        AAM_Core_API::clearCache();
+        
         return $this->deleteOption($object);
     }
     
@@ -305,7 +347,9 @@ abstract class AAM_Core_Subject {
     /**
      * 
      */
-    abstract public function getOptionName($object, $id);
+    public function getOptionName($object, $id) {
+        return '';
+    }
     
     /**
      * Read object from parent subject
@@ -322,6 +366,15 @@ abstract class AAM_Core_Subject {
         
         if (is_a($subject, 'AAM_Core_Subject')){
             $option = $subject->getObject($object, $id, $param)->getOption();
+            $multi  = AAM::api()->getConfig('core.settings.multiSubject', false);
+            
+            if ($multi && $subject->hasSiblings()) {
+                foreach($subject->getSiblings() as $sibling) {
+                    $option = $sibling->getObject($object, $id, $param)->mergeOption(
+                            $option
+                    );
+                }
+            }
         } else {
             $option = null;
         }

@@ -3,9 +3,9 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: calendar, dates, times, event, events, scheduling, schedule, event manager, event calendar, class, concert, venue, location, box office, tickets, registration
 Requires at least: 4.4
-Tested up to: 4.9
+Tested up to: 5.1
 Requires PHP: 5.3
-Stable tag: 3.0.18
+Stable tag: 3.1.6
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -83,7 +83,65 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 
 == Changelog ==
 
-TODO: Support limiting views to multiple locations
+= 3.1.6 =
+
+* Bug fix: If a category name was blank, it would automatically be filtered to by upcoming events lists.
+* Bug fix: Show print view as list if main view is list.
+* Bug fix: Strip HTML tags from aria-label attributes
+* Bug fix: .details needs position: relative in twentyfifteen stylesheet
+* Adjust tested to value to 5.1
+
+= 3.1.5 =
+
+* Bug fix: PHP error checking broken due to session creation
+
+= 3.1.4 =
+
+* Bug fix: typo in category string parameter for ical output
+
+= 3.1.3 =
+
+* New filter: 'mc_list_titles_separator'
+* Bug fix: Help support data not displayed.
+* Override content overflow in Twentynineteen
+* Add support for iCal format in API exports
+
+= 3.1.2 =
+
+* Bug fix: Twentyeighteen styles missing from template directory
+* Bug fix: Declare width on th as well as td
+* Bug fix: optgroup close element broken
+* Bug fix: Shortcode generator fixes.
+* Bug fix: Handle case where hidden categories are not an array in event manager.
+* Bug fix: If template tag value contains only whitespace, do not render before & after attributes.
+* Bug fix: Handle form restrictions in KSES introduced in WP 5.0.1.
+* Bug fix: check whether PHP sessions are enabled before attempting to start
+* Change: Only render export links in search results if enabled in main settings
+* Change: [UI] Move stylesheet selector into sidebar
+* Change: Allow target attribute on links.
+* Change: Add label to links that open in new tab.
+
+= 3.1.1 =
+
+* Bug fix: unspamming event_ID passed incorrect variable name
+* Bug fix: Don't run spam check on users with mc_add_event 
+* Bug fix: Users with mc_add_event should not be able to trash other's events.
+* Bug fix: Refine permissions; add mc_publish_events allowing users to publish own events without access to others
+* Bug fix: Refine permissions; don't display links that users can't use.
+
+= 3.1.0 =
+
+* Add feature (by Josef Fällman): Print & export view for search results.
+* New filter: mcs_check_conflicts (impacts Pro only)
+* Bug fix: Fix issue causing duplication in some views.
+* Bug fix: Time format should be filtered in initial edit view.
+* Bug fix: Category relationships not retained when Group editing applied.
+* Bug fix: aria-describedby ID mismatch.
+
+= 3.0.19 =
+
+* Bug fix: Fatal error in export API when location object included.
+* BUg fix: my calendar categories queried private categories instead of public.
 
 = 3.0.18 =
 
@@ -308,4 +366,4 @@ The search feature in My Calendar is pretty basic; but [buying My Calendar Pro](
 
 == Upgrade Notice ==
 
-* 3.0.11 URGENT: Security fix - XSS scripting vulnerability resolved.
+* 3.1.0 Bug fixes; couple minor new features.

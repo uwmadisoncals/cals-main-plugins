@@ -4,7 +4,7 @@
 Plugin Name: Wicked Folders
 Plugin URI: https://wickedplugins.com/wicked-folders/
 Description: Organize your pages into folders.
-Version: 2.11.1
+Version: 2.11.3
 Author: Wicked Plugins
 Author URI: https://wickedplugins.com/
 Text Domain: wicked-folders

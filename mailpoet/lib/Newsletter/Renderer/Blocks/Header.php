@@ -2,6 +2,7 @@
 namespace MailPoet\Newsletter\Renderer\Blocks;
 
 use MailPoet\Newsletter\Renderer\StylesHelper;
+use MailPoet\Util\CSS;
 use MailPoet\Util\pQuery\pQuery;
 
 class Header {
@@ -13,11 +14,13 @@ class Header {
     );
     $DOM_parser = new pQuery();
     $DOM = $DOM_parser->parseStr($element['text']);
-    if(isset($element['styles']['link'])) {
+    if (isset($element['styles']['link'])) {
       $links = $DOM->query('a');
-      if($links->count()) {
-        foreach($links as $link) {
-          $link->style = StylesHelper::getStyles($element['styles'], 'link');
+      if ($links->count()) {
+        $css = new CSS();
+        foreach ($links as $link) {
+          $element_link_styles = StylesHelper::getStyles($element['styles'], 'link');
+          $link->style = $css->mergeInlineStyles($element_link_styles, $link->style);
         }
       }
     }
@@ -25,7 +28,7 @@ class Header {
     $background_color = ($background_color !== 'transparent') ?
       'bgcolor="' . $background_color . '"' :
       false;
-    if(!$background_color) unset($element['styles']['block']['backgroundColor']);
+    if (!$background_color) unset($element['styles']['block']['backgroundColor']);
     $template = '
       <tr>
         <td class="mailpoet_header_footer_padded mailpoet_header" ' . $background_color . '

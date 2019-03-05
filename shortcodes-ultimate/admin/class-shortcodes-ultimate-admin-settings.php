@@ -20,13 +20,13 @@ final class Shortcodes_Ultimate_Admin_Settings extends Shortcodes_Ultimate_Admin
 	private $plugin_settings;
 
 	/**
-	 * The slug of the settings page.
+	 * Default values for a single setting.
 	 *
 	 * @since    5.0.0
 	 * @access   private
-	 * @var      array     $settings_page   The slug of the settings page.
+	 * @var      array     $setting_defaults   Default values for a single setting.
 	 */
-	private $settings_page;
+	private $setting_defaults;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -35,20 +35,20 @@ final class Shortcodes_Ultimate_Admin_Settings extends Shortcodes_Ultimate_Admin
 	 * @param string  $plugin_file    The path of the main plugin file
 	 * @param string  $plugin_version The current version of the plugin
 	 */
-	public function __construct( $plugin_file, $plugin_version ) {
+	public function __construct( $plugin_file, $plugin_version, $plugin_prefix ) {
 
-		parent::__construct( $plugin_file, $plugin_version );
+		parent::__construct( $plugin_file, $plugin_version, $plugin_prefix );
 
-		$this->plugin_settings = array();
+		$this->plugin_settings  = array();
 		$this->setting_defaults = array(
 			'id'          => '',
 			'title'       => '',
 			'type'        => 'text',
 			'description' => '',
-			'page'        => 'shortcodes-ultimate-settings',
-			'section'     => 'shortcodes-ultimate-general',
-			'group'       => 'shortcodes-ultimate',
-			'callback'    => array( $this, 'display_settings_field' ),
+			'page'        => $this->plugin_prefix . 'settings',
+			'section'     => $this->plugin_prefix . 'general',
+			'group'       => rtrim( $this->plugin_prefix, '-_' ),
+			'callback'    => array( $this, 'the_settings_field' ),
 			'sanitize'    => 'sanitize_text_field',
 		);
 
@@ -59,18 +59,18 @@ final class Shortcodes_Ultimate_Admin_Settings extends Shortcodes_Ultimate_Admin
 	 *
 	 * @since   5.0.0
 	 */
-	public function admin_menu() {
+	public function add_menu_pages() {
 
 		/**
 		 * Submenu: Settings
 		 * admin.php?page=shortcodes-ultimate-settings
 		 */
 		$this->add_submenu_page(
-			'shortcodes-ultimate',
+			rtrim( $this->plugin_prefix, '-_' ),
 			__( 'Settings', 'shortcodes-ultimate' ),
 			__( 'Settings', 'shortcodes-ultimate' ),
 			$this->get_capability(),
-			'shortcodes-ultimate-settings',
+			$this->plugin_prefix . 'settings',
 			array( $this, 'the_menu_page' )
 		);
 
@@ -81,16 +81,16 @@ final class Shortcodes_Ultimate_Admin_Settings extends Shortcodes_Ultimate_Admin
 	 *
 	 * @since  5.0.0
 	 */
-	public function register_settings() {
+	public function add_settings() {
 
 		/**
 		 * Add default settings section.
 		 */
 		add_settings_section(
-			'shortcodes-ultimate-general',
+			$this->plugin_prefix . 'general',
 			__( 'General settings', 'shortcodes-ultimate' ),
-			array( $this, 'display_settings_section' ),
-			'shortcodes-ultimate-settings'
+			array( $this, 'the_settings_section' ),
+			$this->plugin_prefix . 'settings'
 		);
 
 		/**
@@ -120,63 +120,46 @@ final class Shortcodes_Ultimate_Admin_Settings extends Shortcodes_Ultimate_Admin
 	}
 
 	/**
-	 * Display settings section.
-	 *
-	 * @param mixed   $args Settings section data.
-	 * @since  5.0.0
-	 */
-	public function display_settings_section( $args ) {
-
-		$section = str_replace( 'shortcodes-ultimate-', '', $args['id'] );
-
-		$this->the_template( 'admin/partials/settings/sections/' . $section, $args );
-
-	}
-
-	/**
-	 * Display settings field.
-	 *
-	 * @param mixed   $args The field data.
-	 * @since  5.0.0
-	 */
-	public function display_settings_field( $args ) {
-		$this->the_template( 'admin/partials/settings/fields/' . $args['type'], $args );
-	}
-
-	/**
-	 * Add help tab and set help sidebar at Add-ons page.
+	 * Add help tabs and set help sidebar at Add-ons page.
 	 *
 	 * @since  5.0.0
 	 * @param WP_Screen $screen WP_Screen instance.
 	 */
-	public function add_help_tab( $screen ) {
+	public function add_help_tabs( $screen ) {
 
 		if ( ! $this->is_component_page() ) {
 			return;
 		}
 
-		$screen->add_help_tab( array(
+		$screen->add_help_tab(
+			array(
 				'id'      => 'shortcodes-ultimate-general',
 				'title'   => __( 'General settings', 'shortcodes-ultimate' ),
 				'content' => $this->get_template( 'admin/partials/help/settings' ),
-			) );
+			)
+		);
 
 		$screen->set_help_sidebar( $this->get_template( 'admin/partials/help/sidebar' ) );
 
 	}
 
 	/**
-	 * Callback function to sanitize checkbox value.
+	 * Filter to add action links at plugins screen.
 	 *
-	 * @since  5.0.0
-	 * @param mixed   $value String 'on' or null.
-	 * @return string        Sanitized checkbox value ('on' or empty string '').
+	 * @since 5.0.8
+	 * @param array $links Default links.
 	 */
-	public function sanitize_checkbox( $value ) {
+	public function add_action_links( $links ) {
 
-		$value = ( ! empty( $value ) && $value === 'on' ) ? 'on' : '';
+		$plugin_links = array(
+			sprintf(
+				'<a href="%s">%s</a>',
+				esc_attr( $this->get_component_url() ),
+				esc_html( __( 'Settings', 'shortcodes-ultimate' ) )
+			),
+		);
 
-		return $value;
+		return array_merge( $plugin_links, $links );
 
 	}
 
@@ -190,6 +173,21 @@ final class Shortcodes_Ultimate_Admin_Settings extends Shortcodes_Ultimate_Admin
 	protected function get_plugin_settings() {
 
 		if ( empty( $this->plugin_settings ) ) {
+
+			$this->plugin_settings[] = array(
+				'id'          => 'su_option_custom-css',
+				'type'        => 'css',
+				'sanitize'    => 'wp_strip_all_tags',
+				'title'       => __( 'Custom CSS code', 'shortcodes-ultimate' ),
+				'description' => __( 'In this field you can write your custom CSS code for shortcodes. These styles will have higher priority compared to original styles of shortcodes. You can use variables in your CSS code. These variables will be replaced by respective values.', 'shortcodes-ultimate' ),
+			);
+
+			$this->plugin_settings[] = array(
+				'id'          => 'su_option_prefix',
+				'sanitize'    => array( $this, 'sanitize_prefix' ),
+				'title'       => __( 'Shortcodes prefix', 'shortcodes-ultimate' ),
+				'description' => __( 'This prefix will be used in shortcode names. For example: set <code>MY_</code> prefix and shortcodes will look like <code>[MY_button]</code>. Please note that this setting does not change shortcodes that have been inserted earlier. Change this setting very carefully.', 'shortcodes-ultimate' ),
+			);
 
 			$this->plugin_settings[] = array(
 				'id'          => 'su_option_custom-formatting',
@@ -207,37 +205,46 @@ final class Shortcodes_Ultimate_Admin_Settings extends Shortcodes_Ultimate_Admin
 				'description' => __( 'Enable this option if you don\'t want the inserted shortcode to contain any settings that were not changed by you. As a result, inserted shortcodes will be much shorter.', 'shortcodes-ultimate' ),
 			);
 
+			/**
+			 * @since 5.1.0
+			 */
 			$this->plugin_settings[] = array(
-				'id'          => 'su_option_prefix',
-				'sanitize'    => array( $this, 'sanitize_prefix' ),
-				'title'       => __( 'Shortcodes prefix', 'shortcodes-ultimate' ),
-				'description' => __( 'This prefix will be used in shortcode names. For example: set <code>MY_</code> prefix and shortcodes will look like <code>[MY_button]</code>. Please note that this setting does not change shortcodes that have been inserted earlier. Change this setting very carefully.', 'shortcodes-ultimate' ),
+				'id'          => 'su_option_supported_blocks',
+				'type'        => 'checkbox-group',
+				'sanitize'    => array( $this, 'sanitize_checkbox_group' ),
+				'title'       => __( 'Supported blocks', 'shortcodes-ultimate' ),
+				'description' => __( 'Enable the "Insert Shortcode" button in selected blocks', 'shortcodes-ultimate' ),
+				'options'     => su_get_config( 'supported-blocks' ),
 			);
 
+			/**
+			 * @since 5.2.0
+			 */
 			$this->plugin_settings[] = array(
-				'id'          => 'su_option_custom-css',
-				'type'        => 'css',
-				'sanitize'    => 'wp_strip_all_tags',
-				'title'       => __( 'Custom CSS code', 'shortcodes-ultimate' ),
-				'description' => __( 'In this field you can write your custom CSS code for shortcodes. These styles will have higher priority compared to original styles of shortcodes. You can use variables in your CSS code. These variables will be replaced by respective values.', 'shortcodes-ultimate' ),
+				'id'          => 'su_option_generator_access',
+				'title'       => __( 'Required user capability', 'shortcodes-ultimate' ),
+				'description' => __( 'A user must have this capability to be able to use the "Insert Shortcode" button. Do not change this value if you do not understand its meaning as this may lower the plugin security.', 'shortcodes-ultimate' ),
+			);
+
+			/**
+			 * @since 5.2.0
+			 */
+			$this->plugin_settings[] = array(
+				'id'          => 'su_option_enable_shortcodes_in',
+				'type'        => 'checkbox-group',
+				'sanitize'    => array( $this, 'sanitize_checkbox_group' ),
+				'title'       => __( 'Enable shortcodes in', 'shortcodes-ultimate' ),
+				'description' => __( 'This option allows you to enable shortcodes in places where they are disabled by default', 'shortcodes-ultimate' ),
+				'options'     => array(
+					'category_description' => __( 'Category descriptions', 'shortcodes-ultimate' ),
+					'widget_text'          => __( 'Text widgets', 'shortcodes-ultimate' ),
+				),
 			);
 
 		}
 
 		return apply_filters( 'su/admin/settings', $this->plugin_settings );
 
-	}
-
-	/**
-	 * Callback function to sanitize prefix value.
-	 *
-	 * @since  5.0.1
-	 * @param string  $prefix Prefix value.
-	 * @return string          Sanitized string.
-	 * @see  https://developer.wordpress.org/reference/functions/add_shortcode/ Source of the RegExp.
-	 */
-	public function sanitize_prefix( $prefix ) {
-		return preg_replace( '@[<>&/\[\]\x00-\x20="\']@', '', $prefix );
 	}
 
 }

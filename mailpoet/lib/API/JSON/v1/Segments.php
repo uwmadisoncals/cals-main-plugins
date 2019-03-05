@@ -9,17 +9,31 @@ use MailPoet\Listing;
 use MailPoet\Models\Segment;
 use MailPoet\Segments\WP;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class Segments extends APIEndpoint {
   public $permissions = array(
     'global' => AccessControl::PERMISSION_MANAGE_SEGMENTS
   );
 
+  /** @var Listing\BulkActionController */
+  private $bulk_action;
+
+  /** @var Listing\Handler */
+  private $listing_handler;
+
+  function __construct(
+    Listing\BulkActionController $bulk_action,
+    Listing\Handler $listing_handler
+  ) {
+    $this->bulk_action = $bulk_action;
+    $this->listing_handler = $listing_handler;
+  }
+
   function get($data = array()) {
     $id = (isset($data['id']) ? (int)$data['id'] : false);
     $segment = Segment::findOne($id);
-    if($segment === false) {
+    if ($segment === false) {
       return $this->errorResponse(array(
         APIError::NOT_FOUND => __('This list does not exist.', 'mailpoet')
       ));
@@ -29,15 +43,10 @@ class Segments extends APIEndpoint {
   }
 
   function listing($data = array()) {
-    $listing = new Listing\Handler(
-      '\MailPoet\Models\Segment',
-      $data
-    );
-
-    $listing_data = $listing->get();
+    $listing_data = $this->listing_handler->get('\MailPoet\Models\Segment', $data);
 
     $data = array();
-    foreach($listing_data['items'] as $segment) {
+    foreach ($listing_data['items'] as $segment) {
       $segment->subscribers_url = admin_url(
         'admin.php?page=mailpoet-subscribers#/filter[segment='.$segment->id.']'
       );
@@ -58,7 +67,7 @@ class Segments extends APIEndpoint {
     $segment = Segment::createOrUpdate($data);
     $errors = $segment->getErrors();
 
-    if(!empty($errors)) {
+    if (!empty($errors)) {
       return $this->badRequest($errors);
     } else {
       return $this->successResponse(
@@ -70,7 +79,7 @@ class Segments extends APIEndpoint {
   function restore($data = array()) {
     $id = (isset($data['id']) ? (int)$data['id'] : false);
     $segment = Segment::findOne($id);
-    if($segment === false) {
+    if ($segment === false) {
       return $this->errorResponse(array(
         APIError::NOT_FOUND => __('This list does not exist.', 'mailpoet')
       ));
@@ -86,7 +95,7 @@ class Segments extends APIEndpoint {
   function trash($data = array()) {
     $id = (isset($data['id']) ? (int)$data['id'] : false);
     $segment = Segment::findOne($id);
-    if($segment === false) {
+    if ($segment === false) {
       return $this->errorResponse(array(
         APIError::NOT_FOUND => __('This list does not exist.', 'mailpoet')
       ));
@@ -102,7 +111,7 @@ class Segments extends APIEndpoint {
   function delete($data = array()) {
     $id = (isset($data['id']) ? (int)$data['id'] : false);
     $segment = Segment::findOne($id);
-    if($segment === false) {
+    if ($segment === false) {
       return $this->errorResponse(array(
         APIError::NOT_FOUND => __('This list does not exist.', 'mailpoet')
       ));
@@ -116,7 +125,7 @@ class Segments extends APIEndpoint {
     $id = (isset($data['id']) ? (int)$data['id'] : false);
     $segment = Segment::findOne($id);
 
-    if($segment === false) {
+    if ($segment === false) {
       return $this->errorResponse(array(
         APIError::NOT_FOUND => __('This list does not exist.', 'mailpoet')
       ));
@@ -127,7 +136,7 @@ class Segments extends APIEndpoint {
       $duplicate = $segment->duplicate($data);
       $errors = $duplicate->getErrors();
 
-      if(!empty($errors)) {
+      if (!empty($errors)) {
         return $this->errorResponse($errors);
       } else {
         return $this->successResponse(
@@ -141,7 +150,7 @@ class Segments extends APIEndpoint {
   function synchronize() {
     try {
       WP::synchronizeUsers();
-    } catch(\Exception $e) {
+    } catch (\Exception $e) {
       return $this->errorResponse(array(
         $e->getCode() => $e->getMessage()
       ));
@@ -152,13 +161,9 @@ class Segments extends APIEndpoint {
 
   function bulkAction($data = array()) {
     try {
-      $bulk_action = new Listing\BulkAction(
-        '\MailPoet\Models\Segment',
-        $data
-      );
-      $meta = $bulk_action->apply();
+      $meta = $this->bulk_action->apply('\MailPoet\Models\Segment', $data);
       return $this->successResponse(null, $meta);
-    } catch(\Exception $e) {
+    } catch (\Exception $e) {
       return $this->errorResponse(array(
         $e->getCode() => $e->getMessage()
       ));

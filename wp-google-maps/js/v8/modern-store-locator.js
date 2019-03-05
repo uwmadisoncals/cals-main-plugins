@@ -2,19 +2,22 @@
  * @namespace WPGMZA
  * @module ModernStoreLocator
  * @requires WPGMZA
+ * @pro-requires WPGMZA.UseMyLocationButton
  */
 jQuery(function($) {
 	
 	/**
-	 * The new modern look store locator. It takes the elements
-	 * from the default look and moves them into the map, wrapping
-	 * in a new element so we can apply new styles.
-	 * @return Object
+	 * The new modern look store locator. It takes the elements from the default look and moves them into the map, wrapping in a new element so we can apply new styles. <strong>Please <em>do not</em> call this constructor directly. Always use createInstance rather than instantiating this class directly.</strong> Using createInstance allows this class to be externally extensible.
+	 * @class WPGMZA.ModernStoreLocator
+	 * @constructor WPGMZA.ModernStoreLocator
+	 * @memberof WPGMZA
+	 * @param {int} map_id The ID of the map this store locator belongs to
 	 */
 	WPGMZA.ModernStoreLocator = function(map_id)
 	{
 		var self = this;
 		var original;
+		var map = WPGMZA.getMapByID(map_id);
 		
 		WPGMZA.assertInstanceOf(this, "ModernStoreLocator");
 		
@@ -51,6 +54,20 @@ jQuery(function($) {
 		
 		inner.append(addressInput);
 		
+		$(addressInput).on("keydown", function(event) {
+			
+			if(event.keyCode == 13 && self.searchButton.is(":visible"))
+				self.searchButton.trigger("click");
+			
+		});
+		
+		$(addressInput).on("input", function(event) {
+			
+			self.searchButton.show();
+			self.resetButton.hide();
+			
+		});
+		
 		inner.append($(original).find("select.wpgmza_sl_radius_select"));
 		// inner.append($(original).find(".wpgmza_filter_select_" + map_id));
 		
@@ -75,10 +92,14 @@ jQuery(function($) {
 				
 				self.searchButton.hide();
 				self.resetButton.show();
+				
+				map.storeLocator.state = WPGMZA.StoreLocator.STATE_APPLIED;
 			});
 			this.resetButton.on("click", function(event) {
 				self.resetButton.hide();
 				self.searchButton.show();
+				
+				map.storeLocator.state = WPGMZA.StoreLocator.STATE_INITIAL;
 			});
 		}
 		
@@ -128,7 +149,7 @@ jQuery(function($) {
 
 		
 		if(numCategories) {
-			this.optionsButton = $('<span class="wpgmza_store_locator_options_button"><i class="fas fa-list"></i></span>');
+			this.optionsButton = $('<span class="wpgmza_store_locator_options_button"><i class="fa fa-list"></i></span>');
 			$(this.searchButton).before(this.optionsButton);
 		}
 		
@@ -166,6 +187,13 @@ jQuery(function($) {
 		});
 	}
 	
+	/**
+	 * Creates an instance of a modern store locator, <strong>please <em>always</em> use this function rather than calling the constructor directly</strong>.
+	 * @method
+	 * @memberof WPGMZA.ModernStoreLocator
+	 * @param {int} map_id The ID of the map this store locator belongs to
+	 * @return {WPGMZA.ModernStoreLocator} An instance of WPGMZA.ModernStoreLocator
+	 */
 	WPGMZA.ModernStoreLocator.createInstance = function(map_id)
 	{
 		if(WPGMZA.settings.engine == "google-maps")

@@ -4,9 +4,12 @@ namespace MailPoet\Mailer;
 class MailerError {
   const OPERATION_CONNECT = 'connect';
   const OPERATION_SEND = 'send';
+  const OPERATION_AUTHORIZATION = 'authorization';
 
   const LEVEL_HARD = 'hard';
   const LEVEL_SOFT = 'soft';
+
+  const MESSAGE_EMAIL_NOT_AUTHORIZED = 'The email address is not authorized';
 
   /** @var string */
   private $operation;
@@ -82,13 +85,13 @@ class MailerError {
 
   function getMessageWithFailedSubscribers() {
     $message = $this->message ?: '';
-    if(!$this->subscribers_errors) {
+    if (!$this->subscribers_errors) {
       return $message;
     }
 
     $message .= $this->message ? ' ' : '';
 
-    if(count($this->subscribers_errors) === 1) {
+    if (count($this->subscribers_errors) === 1) {
       $message .=  __('Unprocessed subscriber:', 'mailpoet') . ' ';
     } else {
       $message .=  __('Unprocessed subscribers:', 'mailpoet') . ' ';

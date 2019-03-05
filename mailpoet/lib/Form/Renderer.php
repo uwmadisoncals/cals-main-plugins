@@ -1,9 +1,9 @@
 <?php
 namespace MailPoet\Form;
 
-use MailPoet\Models\Setting;
+use MailPoet\Settings\SettingsController;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class Renderer {
   // public: rendering method
@@ -25,14 +25,14 @@ class Renderer {
   }
 
   static function renderHTML($form = array()) {
-    if(isset($form['body']) && !empty($form['body'])) {
+    if (isset($form['body']) && !empty($form['body'])) {
       return static::renderBlocks($form['body']);
     }
     return '';
   }
 
   static function getStyles($form = array()) {
-    if(isset($form['styles'])
+    if (isset($form['styles'])
     && strlen(trim($form['styles'])) > 0) {
       return strip_tags($form['styles']);
     } else {
@@ -41,13 +41,14 @@ class Renderer {
   }
 
   static function renderBlocks($blocks = array(), $honeypot_enabled = true) {
+    $settings = new SettingsController();
     // add honeypot for spambots
     $html = ($honeypot_enabled) ?
       '<label class="mailpoet_hp_email_label">' . __('Please leave this field empty', 'mailpoet') . '<input type="email" name="data[email]"></label>' :
       '';
-    foreach($blocks as $key => $block) {
-      if($block['type'] == 'submit' && Setting::getValue('re_captcha.enabled')) {
-        $site_key = Setting::getValue('re_captcha.site_token');
+    foreach ($blocks as $key => $block) {
+      if ($block['type'] == 'submit' && $settings->get('re_captcha.enabled')) {
+        $site_key = $settings->get('re_captcha.site_token');
         $html .= '<div class="mailpoet_recaptcha" data-sitekey="'. $site_key .'">
           <div class="mailpoet_recaptcha_container"></div>
           <noscript>
@@ -69,13 +70,13 @@ class Renderer {
       }
       $html .= static::renderBlock($block) . PHP_EOL;
     }
-    
+
     return $html;
   }
 
   static function renderBlock($block = array()) {
     $html = '';
-    switch($block['type']) {
+    switch ($block['type']) {
       case 'html':
         $html .= Block\Html::render($block);
         break;

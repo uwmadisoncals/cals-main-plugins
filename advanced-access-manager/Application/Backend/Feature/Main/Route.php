@@ -16,6 +16,17 @@
 class AAM_Backend_Feature_Main_Route extends AAM_Backend_Feature_Abstract {
     
     /**
+     * Construct
+     */
+    public function __construct() {
+        parent::__construct();
+        
+        if (!current_user_can('aam_manage_api_routes')) {
+            AAM::api()->denyAccess(array('reason' => 'aam_manage_api_routes'));
+        }
+    }
+    
+    /**
      * 
      * @return type
      */
@@ -40,6 +51,14 @@ class AAM_Backend_Feature_Main_Route extends AAM_Backend_Feature_Abstract {
        $object->save($type, $route, $method, $value);
 
        return wp_json_encode(array('status' => 'success'));
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function reset() {
+        return AAM_Backend_Subject::getInstance()->resetObject('route');
     }
 
     /**

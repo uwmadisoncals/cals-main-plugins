@@ -225,9 +225,9 @@ class A_NextGen_Basic_Gallery_Validation extends Mixin
 class A_NextGen_Basic_Slideshow_Controller extends Mixin
 {
     /**
-     * Displays the ngglegacy thumbnail gallery.
-     * This method deprecates the use of the nggShowGallery() function.
-     * @param stdClass|C_Displayed_Gallery|C_DataMapper_Model $displayed_gallery
+     * @param C_Displayed_Gallery $displayed_gallery
+     * @param bool $return (optional)
+     * @return string
      */
     function index_action($displayed_gallery, $return = FALSE)
     {
@@ -272,11 +272,11 @@ class A_NextGen_Basic_Slideshow_Controller extends Mixin
      */
     function enqueue_frontend_resources($displayed_gallery)
     {
-        wp_enqueue_style('ngg_basic_slideshow_style', $this->get_static_url('photocrati-nextgen_basic_gallery#slideshow/ngg_basic_slideshow.css'), FALSE, NGG_SCRIPT_VERSION);
+        wp_enqueue_style('ngg_basic_slideshow_style', $this->get_static_url('photocrati-nextgen_basic_gallery#slideshow/ngg_basic_slideshow.css'), array(), NGG_SCRIPT_VERSION);
         // Add new scripts for slick based slideshow
         wp_enqueue_script('ngg_slick', $this->get_static_url("photocrati-nextgen_basic_gallery#slideshow/slick/slick.min.js"), array('jquery'), NGG_SCRIPT_VERSION);
-        wp_enqueue_style('ngg_slick_slideshow_style', $this->get_static_url('photocrati-nextgen_basic_gallery#slideshow/slick/slick.css'), FALSE, NGG_SCRIPT_VERSION);
-        wp_enqueue_style('ngg_slick_slideshow_theme', $this->get_static_url('photocrati-nextgen_basic_gallery#slideshow/slick/slick-theme.css'), FALSE, NGG_SCRIPT_VERSION);
+        wp_enqueue_style('ngg_slick_slideshow_style', $this->get_static_url('photocrati-nextgen_basic_gallery#slideshow/slick/slick.css'), array(), NGG_SCRIPT_VERSION);
+        wp_enqueue_style('ngg_slick_slideshow_theme', $this->get_static_url('photocrati-nextgen_basic_gallery#slideshow/slick/slick-theme.css'), array(), NGG_SCRIPT_VERSION);
         $this->call_parent('enqueue_frontend_resources', $displayed_gallery);
         $this->enqueue_ngg_styles();
     }
@@ -492,9 +492,9 @@ class A_NextGen_Basic_Thumbnails_Controller extends Mixin
         $this->add_mixin('Mixin_NextGen_Basic_Pagination');
     }
     /**
-     * Displays the ngglegacy thumbnail gallery.
-     * This method deprecates the use of the nggShowGallery() function.
-     * @param stdClass|C_Displayed_Gallery|C_DataMapper_Model $displayed_gallery
+     * @param C_Displayed_Gallery $displayed_gallery
+     * @param bool $return (optional)
+     * @return string
      */
     function index_action($displayed_gallery, $return = FALSE)
     {
@@ -525,9 +525,6 @@ class A_NextGen_Basic_Thumbnails_Controller extends Mixin
         } else {
             // just display the images for this page, as normal
             $images = $displayed_gallery->get_included_entities($display_settings['images_per_page'], $offset);
-        }
-        if (in_array($displayed_gallery->source, array('random_images', 'recent_images'))) {
-            $display_settings['disable_pagination'] = TRUE;
         }
         // Are there images to display?
         if ($images) {
@@ -611,11 +608,11 @@ class A_NextGen_Basic_Thumbnails_Controller extends Mixin
     function enqueue_frontend_resources($displayed_gallery)
     {
         $this->call_parent('enqueue_frontend_resources', $displayed_gallery);
-        wp_enqueue_style('nextgen_basic_thumbnails_style', $this->get_static_url('photocrati-nextgen_basic_gallery#thumbnails/nextgen_basic_thumbnails.css'), FALSE, NGG_SCRIPT_VERSION);
+        wp_enqueue_style('nextgen_basic_thumbnails_style', $this->get_static_url('photocrati-nextgen_basic_gallery#thumbnails/nextgen_basic_thumbnails.css'), array(), NGG_SCRIPT_VERSION);
         if ($displayed_gallery->display_settings['ajax_pagination']) {
-            wp_enqueue_script('nextgen-basic-thumbnails-ajax-pagination', $this->object->get_static_url('photocrati-nextgen_basic_gallery#thumbnails/ajax_pagination.js'), FALSE, NGG_SCRIPT_VERSION);
+            wp_enqueue_script('nextgen-basic-thumbnails-ajax-pagination', $this->object->get_static_url('photocrati-nextgen_basic_gallery#thumbnails/ajax_pagination.js'), array(), NGG_SCRIPT_VERSION);
         }
-        wp_enqueue_style('nextgen_pagination_style', $this->get_static_url('photocrati-nextgen_pagination#style.css'), FALSE, NGG_SCRIPT_VERSION);
+        wp_enqueue_style('nextgen_pagination_style', $this->get_static_url('photocrati-nextgen_pagination#style.css'), array(), NGG_SCRIPT_VERSION);
         $this->enqueue_ngg_styles();
     }
     /**

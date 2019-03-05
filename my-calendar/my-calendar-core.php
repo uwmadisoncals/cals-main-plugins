@@ -270,14 +270,10 @@ function mc_deal_with_deleted_user( $id ) {
 	$new        = $wpdb->get_var( 'SELECT MIN(ID) FROM ' . $wpdb->users, 0, 0 );
 	$new_author = apply_filters( 'mc_deleted_author', $new );
 	// This may not work quite right in multi-site. Need to explore further when I have time.
-	$wpdb->get_results(
-		$wpdb->prepare( 'UPDATE ' . my_calendar_table() . ' SET event_author=%d WHERE event_author=%d', $new_author, $id )
-	); // WPCS: unprepared SQL OK.
+	$wpdb->get_results( $wpdb->prepare( 'UPDATE ' . my_calendar_table() . ' SET event_author=%d WHERE event_author=%d', $new_author, $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 	$new_host = apply_filters( 'mc_deleted_host', $new );
-	$wpdb->get_results(
-		$wpdb->prepare( 'UPDATE ' . my_calendar_table() . ' SET event_host=%d WHERE event_host=%d', $new_host, $id )
-	); // WPCS: unprepared SQL OK.
+	$wpdb->get_results( $wpdb->prepare( 'UPDATE ' . my_calendar_table() . ' SET event_host=%d WHERE event_host=%d', $new_host, $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 }
 
 /**
@@ -434,6 +430,13 @@ function mc_footer_js() {
 				}
 				if ( $enqueue_mcjs ) {
 					wp_enqueue_script( 'mc.mcjs', plugins_url( 'js/mcjs.js', __FILE__ ), array( 'jquery' ) );
+					wp_localize_script(
+						'mc.mcjs',
+						'my_calendar',
+						array(
+							'newWindow' => __( 'Opens in new tab', 'my-calendar' ),
+						)
+					);
 				}
 			}
 		}
@@ -898,7 +901,7 @@ function my_calendar_send_email( $event ) {
  */
 function mc_spam( $event_url = '', $description = '', $post = array() ) {
 	global $akismet_api_host, $akismet_api_port;
-	if ( current_user_can( 'mc_manage_events' ) || apply_filters( 'mc_disable_spam_checking', false, $post ) ) { // is a privileged user.
+	if ( current_user_can( 'mc_add_events' ) || apply_filters( 'mc_disable_spam_checking', false, $post ) ) { // is a privileged user.
 		return apply_filters( 'mc_custom_spam_status', 0, $post );
 	}
 	$akismet = false;
@@ -951,11 +954,11 @@ function mc_spam( $event_url = '', $description = '', $post = array() ) {
  */
 function mc_update_count_cache() {
 	global $wpdb;
-	$published = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_approved = 1' ); // WPCS: unprepared SQL OK.
-	$draft     = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_approved = 0' ); // WPCS: unprepared SQL OK.
-	$trash     = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_approved = 2' ); // WPCS: unprepared SQL OK.
-	$archive   = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_status = 0' ); // WPCS: unprepared SQL OK.
-	$spam      = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_flagged = 1' ); // WPCS: unprepared SQL OK.
+	$published = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_approved = 1' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	$draft     = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_approved = 0' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	$trash     = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_approved = 2' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	$archive   = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_status = 0' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	$spam      = $wpdb->get_var( 'SELECT count( event_id ) FROM ' . my_calendar_table() . ' WHERE event_flagged = 1' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 	$counts    = array(
 		'published' => $published,
 		'draft'     => $draft,
@@ -1137,7 +1140,7 @@ function mc_ajax_delete_occurrence() {
 		global $wpdb;
 		$occur_id = (int) $_REQUEST['occur_id'];
 		$delete   = 'DELETE FROM `' . my_calendar_event_table() . '` WHERE occur_id = %d';
-		$result   = $wpdb->query( $wpdb->prepare( $delete, $occur_id ) ); // WPCS: unprepared SQL OK.
+		$result   = $wpdb->query( $wpdb->prepare( $delete, $occur_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( $result ) {
 			wp_send_json(
@@ -1336,13 +1339,12 @@ function mc_get_support_form() {
 	// Pro license status.
 	$license       = ( '' != get_option( 'mcs_license_key' ) ) ? get_option( 'mcs_license_key' ) : '';
 	$license_valid = get_option( 'mcs_license_key_valid' );
-	$checked       = ( 'valid' == get_option( 'mcs_license_key_valid' ) ) ? true : false;
+	$checked       = ( 'valid' == $license_valid ) ? true : false;
 
 	if ( $license ) {
 		$license = "
 		License: $license, $license_valid";
 	}
-
 	// send fields for all plugins.
 	$wp_version = get_bloginfo( 'version' );
 	$home_url   = home_url();
@@ -1373,7 +1375,7 @@ function mc_get_support_form() {
 			$plugins_string .= "$plugin_name: $plugin_version; $plugin_uri\n";
 		}
 	}
-	$data    = "
+	$data = "
 ================ Installation Data ====================
 ==My Calendar:==
 Version: $version
@@ -1404,68 +1406,70 @@ Version: $theme_version
 
 ==Active Plugins:==
 $plugins_string
-";
-	$request = '';
-	if ( isset( $_POST['mc_support'] ) ) {
-		$nonce = $_REQUEST['_wpnonce'];
-		if ( ! wp_verify_nonce( $nonce, 'my-calendar-nonce' ) ) {
-			wp_die( 'Security check failed' );
-		}
-		$request       = ( ! empty( $_POST['support_request'] ) ) ? stripslashes( $_POST['support_request'] ) : false;
-		$has_donated   = ( 'on' == $_POST['has_donated'] ) ? 'Donor' : 'No donation';
-		$has_purchased = ( $checked ) ? 'Purchaser' : 'No purchase';
-		$has_read_faq  = ( 'on' == $_POST['has_read_faq'] ) ? 'Read FAQ' : false;
-		$subject       = "My Calendar support request. $has_donated; $has_purchased";
-		$message       = $request . "\n\n" . $data;
-		// Get the site domain and get rid of www. from pluggable.php.
-		$sitename = strtolower( $_SERVER['SERVER_NAME'] );
-		if ( 'www.' == substr( $sitename, 0, 4 ) ) {
-			$sitename = substr( $sitename, 4 );
-		}
-		$from_email = 'wordpress@' . $sitename;
-		$from       = "From: \"$current_user->username\" <$from_email>\r\nReply-to: \"$current_user->username\" <$current_user->user_email>\r\n";
+	";
+	if ( $checked ) {
+		$request = '';
+		if ( isset( $_POST['mc_support'] ) ) {
+			$nonce = $_REQUEST['_wpnonce'];
+			if ( ! wp_verify_nonce( $nonce, 'my-calendar-nonce' ) ) {
+				wp_die( 'Security check failed' );
+			}
+			$request      = ( ! empty( $_POST['support_request'] ) ) ? stripslashes( $_POST['support_request'] ) : false;
+			$has_read_faq = ( 'on' == $_POST['has_read_faq'] ) ? 'Read FAQ' : false;
+			$subject      = 'My Calendar Pro support request.';
+			$message      = $request . "\n\n" . $data;
+			// Get the site domain and get rid of www. from pluggable.php.
+			$sitename = strtolower( $_SERVER['SERVER_NAME'] );
+			if ( 'www.' == substr( $sitename, 0, 4 ) ) {
+				$sitename = substr( $sitename, 4 );
+			}
+			$from_email = 'wordpress@' . $sitename;
+			$from       = "From: \"$current_user->username\" <$from_email>\r\nReply-to: \"$current_user->username\" <$current_user->user_email>\r\n";
 
-		if ( ! $has_read_faq ) {
-			echo '<div class="message error"><p>' . __( 'Please read the FAQ and other Help documents before making a support request.', 'my-calendar' ) . '</p></div>';
-		} elseif ( ! $request ) {
-			echo '<div class="message error"><p>' . __( 'Please describe your problem in detail. I\'m not psychic.', 'my-calendar' ) . '</p></div>';
-		} else {
-			$sent = wp_mail( 'plugins@joedolson.com', $subject, $message, $from );
-			if ( $sent ) {
-				if ( 'Donor' == $has_donated || 'Purchaser' == $has_purchased ) {
-					mc_show_notice( __( 'Thank you for supporting the continuing development of this plug-in! I\'ll get back to you as soon as I can.', 'my-calendar' ) );
-				} else {
-					mc_show_notice( __( 'I\'ll get back to you as soon as I can, after dealing with any support requests from plug-in supporters.', 'my-calendar' ) . __( 'You should receive an automatic response to your request when I receive it. If you do not receive this notice, then either I did not receive your message or the email it was sent from was not a valid address.', 'my-calendar' ) );
-				}
+			if ( ! $has_read_faq ) {
+				echo '<div class="message error"><p>' . __( 'Please read the FAQ and other Help documents before making a support request.', 'my-calendar' ) . '</p></div>';
+			} elseif ( ! $request ) {
+				echo '<div class="message error"><p>' . __( 'Please describe your problem in detail. I\'m not psychic.', 'my-calendar' ) . '</p></div>';
 			} else {
-				// Translators: Support form URL.
-				echo '<div class="message error"><p>' . __( "Sorry! I couldn't send that message. Here's the text of your request:", 'my-calendar' ) . '</p><p>' . sprintf( __( '<a href="%s">Contact me here</a>, instead', 'my-calendar' ), 'https://www.joedolson.com/contact/get-support/' ) . "</p><pre>$request</pre></div>";
+				$sent = wp_mail( 'plugins@joedolson.com', $subject, $message, $from );
+				if ( $sent ) {
+					if ( 'Donor' == $has_donated || 'Purchaser' == $has_purchased ) {
+						mc_show_notice( __( 'Thank you for supporting the continuing development of this plug-in! I\'ll get back to you as soon as I can.', 'my-calendar' ) );
+					} else {
+						mc_show_notice( __( 'I\'ll get back to you as soon as I can, after dealing with any support requests from plug-in supporters.', 'my-calendar' ) . __( 'You should receive an automatic response to your request when I receive it. If you do not receive this notice, then either I did not receive your message or the email it was sent from was not a valid address.', 'my-calendar' ) );
+					}
+				} else {
+					// Translators: Support form URL.
+					echo '<div class="message error"><p>' . __( "Sorry! I couldn't send that message. Here's the text of your request:", 'my-calendar' ) . '</p><p>' . sprintf( __( '<a href="%s">Contact me here</a>, instead', 'my-calendar' ), 'https://www.joedolson.com/contact/get-support/' ) . "</p><pre>$request</pre></div>";
+				}
 			}
 		}
-	}
 
-	echo '
-	<form method="post" action="' . admin_url( 'admin.php?page=my-calendar-help' ) . '">
-		<div><input type="hidden" name="_wpnonce" value="' . wp_create_nonce( 'my-calendar-nonce' ) . '" /></div>
-		<div>
-		<code>' . __( 'From:', 'my-calendar' ) . " \"$current_user->display_name\" &lt;$current_user->user_email&gt;</code>
-		</p>
-		<p>
-			<input type='checkbox' name='has_read_faq' id='has_read_faq' value='on' required='required' aria-required='true' /> <label for='has_read_faq'>" . __( 'I have read <a href="http://www.joedolson.com/my-calendar/faq/">the FAQ for this plug-in</a>.', 'my-calendar' ) . " <span>(required)</span></label>
-		</p>
-		<p>
-			<input type='checkbox' name='has_donated' id='has_donated' value='on' $checked /> <label for='has_donated'>" . __( 'I made a donation to help support this plug-in.', 'my-calendar' ) . "</label>
-		</p>
-		<p>
-			<label for='support_request'>Support Request:</label><br /><textarea name='support_request' id='support_request' required aria-required='true' cols='80' rows='10' class='widefat'>" . stripslashes( $request ) . "</textarea>
-		</p>
-		<p>
-			<input type='submit' value='" . __( 'Send Support Request', 'my-calendar' ) . "' name='mc_support' class='button-primary' />
-		</p>
-		<p>" . __( 'The following additional information will be sent with your support request:', 'my-calendar' ) . '</p>
-		<div class="mc_support">' . wpautop( $data ) . '</div>
-		</div>
-	</form>';
+		echo '
+		<form method="post" action="' . admin_url( 'admin.php?page=my-calendar-help' ) . '">
+			<div><input type="hidden" name="_wpnonce" value="' . wp_create_nonce( 'my-calendar-nonce' ) . '" /></div>
+			<div>
+			<code>' . __( 'From:', 'my-calendar' ) . " \"$current_user->display_name\" &lt;$current_user->user_email&gt;</code>
+			</p>
+			<p>
+				<input type='checkbox' name='has_read_faq' id='has_read_faq' value='on' required='required' aria-required='true' /> <label for='has_read_faq'>" . __( 'I have read <a href="http://www.joedolson.com/my-calendar/faq/">the FAQ for this plug-in</a>.', 'my-calendar' ) . " <span>(required)</span></label>
+			</p>
+			<p>
+				<input type='checkbox' name='has_donated' id='has_donated' value='on' $checked /> <label for='has_donated'>" . __( 'I made a donation to help support this plug-in.', 'my-calendar' ) . "</label>
+			</p>
+			<p>
+				<label for='support_request'>Support Request:</label><br /><textarea name='support_request' id='support_request' required aria-required='true' cols='80' rows='10' class='widefat'>" . stripslashes( $request ) . "</textarea>
+			</p>
+			<p>
+				<input type='submit' value='" . __( 'Send Support Request', 'my-calendar' ) . "' name='mc_support' class='button-primary' />
+			</p>
+			<p>" . __( 'The following additional information will be sent with your support request:', 'my-calendar' ) . '</p>
+			<div class="mc_support">' . wpautop( $data ) . '</div>
+			</div>
+		</form>';
+	} else {
+		echo '<p><a href="https://wordpress.org/support/plugin/my-calendar/">' . __( 'Request support at the WordPress.org Support Forums', 'my-calendar' ) . '</a> &bull; <a href="https://www.joedolson.com/my-calendar/pro/">' . __( 'Upgrade to Pro for direct plugin support!', 'my-calendar' ) . '</a></p><div class="mc_support">' . wpautop( $data ) . '</div>';
+	}
 }
 
 add_action( 'init', 'mc_register_actions' );
@@ -1764,7 +1768,7 @@ function my_calendar_privacy_export( $email_address, $page = 1 ) {
 	$user = get_user_by( 'email', $email_address );
 	if ( $user ) {
 		$user_ID  = $user->ID;
-		$calendar = $wpdb->get_results( $wpdb->prepare( 'SELECT event_id FROM ' . my_calendar_table() . ' WHERE event_host = %d OR event_author = %d', $user_ID, $user_ID ) ); // WPCS: unprepared SQL ok.
+		$calendar = $wpdb->get_results( $wpdb->prepare( 'SELECT event_id FROM ' . my_calendar_table() . ' WHERE event_host = %d OR event_author = %d', $user_ID, $user_ID ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		foreach ( $calendar as $obj ) {
 			$events[] = $obj->event_id;
 		}
@@ -1775,7 +1779,7 @@ function my_calendar_privacy_export( $email_address, $page = 1 ) {
 	} else {
 		foreach ( $events as $e ) {
 			$event_export = array();
-			$event        = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . my_calendar_table() . ' WHERE event_id = %d', $e ) ); // WPCS: unprepared SQL OK.
+			$event        = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . my_calendar_table() . ' WHERE event_id = %d', $e ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			$meta         = get_post_meta( $event->event_post );
 
 			foreach ( $event as $key => $value ) {
@@ -1862,7 +1866,7 @@ function my_calendar_privacy_eraser( $email_address, $page = 1 ) {
 	if ( $user ) {
 		$user_ID = $user->ID;
 		// for deletion, if *author*, delete; if *host*, change host.
-		$calendar = $wpdb->get_results( $wpdb->prepare( 'SELECT event_id, event_host, event_author FROM ' . my_calendar_table() . ' WHERE event_host = %d OR event_author = %d', $user_ID, $user_ID ) ); // WPCS: unprepared SQL ok.
+		$calendar = $wpdb->get_results( $wpdb->prepare( 'SELECT event_id, event_host, event_author FROM ' . my_calendar_table() . ' WHERE event_host = %d OR event_author = %d', $user_ID, $user_ID ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		foreach ( $calendar as $obj ) {
 			if ( $user_ID == $obj->event_host && $obj->event_host != $obj->event_author ) {
 				$updates[] = array( $obj->event_id, $obj->event_author );

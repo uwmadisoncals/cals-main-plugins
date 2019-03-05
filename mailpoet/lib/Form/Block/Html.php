@@ -5,12 +5,13 @@ class Html {
 
   static function render($block) {
     $html = '';
+    $text = '';
 
-    if(isset($block['params']['text']) && $block['params']['text']) {
+    if (isset($block['params']['text']) && $block['params']['text']) {
       $text = html_entity_decode($block['params']['text'], ENT_QUOTES);
     }
 
-    if(isset($block['params']['nl2br']) && $block['params']['nl2br']) {
+    if (isset($block['params']['nl2br']) && $block['params']['nl2br']) {
       $text = nl2br($text);
     }
 

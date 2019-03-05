@@ -26,7 +26,7 @@ class class_fma_adv_lang {
                           'magyar' => 'hu',
                           'Indonesian' => 'id',
                           'Italiano' => 'it',
-                          'Japanese' => 'jp',
+                          'Japanese' => 'ja',
                           'Korean' => 'ko',
                           'Dutch' => 'nl',
                           'Norwegian' => 'no',

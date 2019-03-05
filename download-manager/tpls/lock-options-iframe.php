@@ -26,18 +26,24 @@ $pack->Prepare(get_the_ID());
     <script src="<?php echo WPDM_BASE_URL; ?>assets/js/front.js"></script>
     <?php if((isset($pack->PackageData['form_lock']) && $pack->PackageData['form_lock'] == 1)  || $pack->PackageData['base_price'] > 0) wp_head(); ?>
     <style>
+        <?php
+        $wpdmss = maybe_unserialize(get_option('__wpdm_disable_scripts', array()));
+         if(!in_array('google-font', $wpdmss)) { ?>
+        @import url('https://fonts.googleapis.com/css?family=Cantarell:400,700');
+        <?php } ?>
+
         html, body{
             overflow: visible;
             height: 100%;
             width: 100%;
             padding: 0;
             margin: 0;
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: Cantarell, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             font-weight: 300;
             font-size: 10pt;
         }
         h4.modal-title{
-            font-family: 'Josefin Sans', sans-serif;
+            font-family: Cantarell, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -189,10 +195,43 @@ $pack->Prepare(get_the_ID());
             font-size: 11pt !important;
         }
 
+        .w3eden .fetfont,
+        .w3eden .btn,
+        .w3eden .btn.wpdm-front h3.title,
+        .w3eden .wpdm-social-lock-box .IN-widget a span:last-child,
+        .w3eden #xfilelist .panel-heading,
+        .w3eden .wpdm-frontend-tabs a,
+        .w3eden .alert:before,
+        .w3eden .panel .panel-heading,
+        .w3eden .discount-msg,
+        .w3eden .panel.dashboard-panel h3,
+        .w3eden #wpdm-dashboard-sidebar .list-group-item,
+        .w3eden #package-description .wp-switch-editor,
+        .w3eden .w3eden.author-dashbboard .nav.nav-tabs li a,
+        .w3eden .wpdm_cart thead th,
+        .w3eden #csp .list-group-item,
+        .w3eden .modal-title {
+            font-family: Cantarell, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .w3eden #csp .list-group-item{
+            text-transform: unset;
+        }
+
+
+
 
 
     </style>
-    <?php do_action("wpdm_modal_iframe_head"); ?>
+    <?php
+
+        do_action("wpdm_modal_iframe_head");
+
+        global $WPDM;
+    $WPDM->apply->uiColors();
+
+    ?>
 </head>
 <body class="w3eden" style="background: transparent">
 

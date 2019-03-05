@@ -17,11 +17,11 @@
  * License:     GPL-2.0+
  * License URI: http://www.gnu.org/license/gpl-2.0.txt
  * Domain Path: lang
- * Version:     3.0.18
+ * Version:     3.1.6
  */
 
 /*
-	Copyright 2009-2018  Joe Dolson (email : joe@joedolson.com)
+	Copyright 2009-2019  Joe Dolson (email : joe@joedolson.com)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 global $mc_version, $wpdb;
-$mc_version = '3.0.18';
+$mc_version = '3.1.6';
 
 define( 'MC_DEBUG', false );
 
@@ -59,6 +59,7 @@ function mc_plugin_activated() {
 		// Translators: Name of plug-in, required PHP version, current PHP version.
 		$message = sprintf( __( '%1$s requires PHP version %2$s or higher. Your current PHP version is %3$s', 'my-calendar' ), $plugin_data['Name'], $required_php_version, phpversion() );
 		echo "<div class='error'><p>$message</p></div>";
+		deactivate_plugins( plugin_basename( __FILE__ ) );
 		exit;
 	}
 
@@ -147,6 +148,32 @@ function mc_custom_canonical() {
 	if ( isset( $_GET['mc_id'] ) ) {
 		add_action( 'wp_head', 'mc_canonical' );
 		remove_action( 'wp_head', 'rel_canonical' );
+	}
+}
+
+add_action( 'init', 'mc_start_session', 1 );
+/**
+ * Makes sure session is started to be able to save search results.
+ */
+function mc_start_session() {
+	// Starting a session breaks the white screen check.
+	if ( isset( $_GET['wp_scrape_key'] ) ) {
+		return;
+	}
+	$required_php_version = '5.4.0';
+	if ( version_compare( PHP_VERSION, $required_php_version, '<' ) ) {
+		if ( ! session_id() ) {
+			session_start();
+		}
+	} else {
+		$status = session_status();
+		if ( PHP_SESSION_DISABLED === $status ) {
+			return;
+		}
+
+		if ( PHP_SESSION_NONE === $status ) {
+			session_start();
+		}
 	}
 }
 

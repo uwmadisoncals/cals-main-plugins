@@ -7,7 +7,7 @@ use Twig_Environment as TwigEnv;
 use Twig_Lexer as TwigLexer;
 use Twig_Loader_Filesystem as TwigFileSystem;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class Renderer {
   protected $cache_path;
@@ -32,8 +32,8 @@ class Renderer {
       )
     );
 
-    $this->assets_manifest_js = $this->getAssetManifest(Env::$assets_path . '/js/manifest.json');
-    $this->assets_manifest_css = $this->getAssetManifest(Env::$assets_path . '/css/manifest.json');
+    $this->assets_manifest_js = $this->getAssetManifest(Env::$assets_path . '/dist/js/manifest.json');
+    $this->assets_manifest_css = $this->getAssetManifest(Env::$assets_path . '/dist/css/manifest.json');
     $this->setupDebug();
     $this->setupTranslations();
     $this->setupFunctions();
@@ -41,6 +41,7 @@ class Renderer {
     $this->setupHandlebars();
     $this->setupHelpscout();
     $this->setupAnalytics();
+    $this->setupPolls();
     $this->setupGlobalVariables();
     $this->setupSyntax();
   }
@@ -69,9 +70,14 @@ class Renderer {
     $this->renderer->addExtension(new Twig\Analytics());
   }
 
+  function setupPolls() {
+    $this->renderer->addExtension(new Twig\Polls());
+  }
+
   function setupGlobalVariables() {
     $this->renderer->addExtension(new Twig\Assets(array(
       'version' => Env::$version,
+      'base_url' => Env::$base_url,
       'assets_url' => Env::$assets_url,
       'assets_manifest_js' => $this->assets_manifest_js,
       'assets_manifest_css' => $this->assets_manifest_css
@@ -93,7 +99,7 @@ class Renderer {
   }
 
   function setupDebug() {
-    if($this->debugging_enabled) {
+    if ($this->debugging_enabled) {
       $this->renderer->addExtension(new \Twig_Extension_Debug());
     }
   }
@@ -101,7 +107,7 @@ class Renderer {
   function render($template, $context = array()) {
     try {
       return $this->renderer->render($template, $context);
-    } catch(\RuntimeException $e) {
+    } catch (\RuntimeException $e) {
       throw new \Exception(sprintf(
         __('Failed to render template "%s". Please ensure the template cache folder "%s" exists and has write permissions. Terminated with error: "%s"'),
         $template,

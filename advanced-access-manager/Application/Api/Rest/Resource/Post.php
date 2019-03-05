@@ -48,7 +48,11 @@ class AAM_Api_Rest_Resource_Post {
                 case 'POST':
                 case 'PUT':
                 case 'PATCH':
-                    $result = $this->authorizeUpdate($post);
+                    if ($request['status'] === 'publish') {
+                        $result = $this->authorizePublish($post);
+                    } else {
+                        $result = $this->authorizeUpdate($post);
+                    }
                     break;
 
                 case 'DELETE':
@@ -98,9 +102,23 @@ class AAM_Api_Rest_Resource_Post {
      * @param AAM_Core_Object_Post $post
      * @return type
      */
+    protected function authorizePublish(AAM_Core_Object_Post $post) {
+        $steps = array(
+            // Step #1. Check if publish action is allowed
+            array($this, 'checkPublish'),
+        );
+        
+        return $this->processPipeline($steps, $post);
+    }
+    
+    /**
+     * 
+     * @param AAM_Core_Object_Post $post
+     * @return type
+     */
     protected function authorizeUpdate(AAM_Core_Object_Post $post) {
         $steps = array(
-            // Step #1. Check if edit action is alloed
+            // Step #1. Check if edit action is allowed
             array($this, 'checkUpdate'),
         );
         
@@ -114,7 +132,7 @@ class AAM_Api_Rest_Resource_Post {
      */
     protected function authorizeDelete(AAM_Core_Object_Post $post) {
         $steps = array(
-            // Step #1. Check if edit action is alloed
+            // Step #1. Check if edit action is allowed
             array($this, 'checkDelete'),
         );
         
@@ -179,10 +197,7 @@ class AAM_Api_Rest_Resource_Post {
     protected function checkReadAccess(AAM_Core_Object_Post $post) {
         $result = null;
         
-        $read   = $post->has('api.read');
-        $others = $post->has('api.read_others');
-        
-        if ($read || ($others && (intval($post->post_author) !== get_current_user_id()))) {
+        if (!$post->allowed('api.read')) {
             $result = new WP_Error(
                 'rest_post_cannot_read', 
                 "User is unauthorized to read the post. Access denied.", 
@@ -314,6 +329,33 @@ class AAM_Api_Rest_Resource_Post {
     }
     
     /**
+     * Check PUBLISH & PUBLISH_BY_OTHERS options
+     * 
+     * @param AAM_Core_Object_Post $post
+     * 
+     * @return void
+     * 
+     * @access protected
+     */
+    protected function checkPublish(AAM_Core_Object_Post $post) {
+        $result = null;
+        
+        // Keep this compatible with older version of Publish (without Gutenberg)
+        if (!$post->allowed('api.publish') || !$post->allowed('backend.publish')) {
+            $result = new WP_Error(
+                'rest_post_cannot_publish', 
+                "User is unauthorized to publish the post. Access denied.", 
+                array(
+                    'action' => 'api.publish',
+                    'status' => 401
+                )
+            );
+        }
+        
+        return $result;
+    }
+    
+    /**
      * Check EDIT & EDIT_BY_OTHERS options
      * 
      * @param AAM_Core_Object_Post $post
@@ -325,10 +367,7 @@ class AAM_Api_Rest_Resource_Post {
     protected function checkUpdate(AAM_Core_Object_Post $post) {
         $result = null;
         
-        $edit   = $post->has('api.edit');
-        $others = $post->has('api.edit_others');
-        
-        if ($edit || ($others && (intval($post->post_author) !== get_current_user_id()))) {
+        if (!$post->allowed('api.edit')) {
             $result = new WP_Error(
                 'rest_post_cannot_update', 
                 "User is unauthorized to update the post. Access denied.", 
@@ -354,10 +393,7 @@ class AAM_Api_Rest_Resource_Post {
     protected function checkDelete(AAM_Core_Object_Post $post) {
         $result = null;
         
-        $delete = $post->has('api.delete');
-        $others = $post->has('api.delete_others');
-        
-        if ($delete || ($others && (intval($post->post_author) !== get_current_user_id()))) {
+        if (!$post->allowed('api.delete')) {
             $result = new WP_Error(
                 'rest_post_cannot_delete', 
                 "User is unauthorized to delete the post. Access denied.", 

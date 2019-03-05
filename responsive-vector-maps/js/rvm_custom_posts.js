@@ -288,5 +288,179 @@
 
 		/****************  End: copy shortcode link *****************/
 
+
+		/****************  Start: Delete all Markers *****************/
+		
+		$('#rvm_delete_all_markers_button').click( function(e) {
+			e.preventDefault();
+			$('.rvm_markers,.rvm_added_markers_title').remove();
+			$(this).remove();
+		});
+
+		/****************  End: Delete all Markers *****************/
+
+
+		/****************  Start: Export Markers *****************/
+
+		$('#rvm_export_markers_button').click( function(e) {
+			e.preventDefault();
+			
+			/*var ajax_loader = '<img src=\"' ;
+			ajax_loader = ajax_loader + objectL10n.images_js_path ;
+			ajax_loader = ajax_loader + '\/rvm-ajax-loader.gif"></div>' ;
+			$('#rvm_export_markers_status').html(ajax_loader);*/
+
+			var rvm_mbe_map_name = $('#rvm_mbe_select_map').val();
+			
+			var data = {
+					//contentType: "application/csv",
+					action: 'rvm_export_markers', // The function for handling the request
+					rvm_mbe_post_id: $('#rvm_mbe_post_id').val(),
+					nonce: $('#rvm_ajax_nonce').text() // The security nonce							
+
+				};
+
+				$.post(ajaxurl, data, function (response) {
+					var uri = 'data:application/csv;charset=UTF-8,' + encodeURIComponent(response);
+					//the only way to assign a specific filename.extension is creating an anchor link
+					var link = document.createElement("a");
+					link.download =  $('#rvm_mbe_select_map').val() + '-markers.csv';
+					link.href = uri;
+
+					document.body.appendChild(link);
+					link.click();
+
+					// Cleanup the DOM
+					document.body.removeChild(link);
+					delete link;
+
+					//$('#rvm_export_markers_status').remove();
+
+
+				});
+		});
+
+		/****************  End: Export Markers *****************/
+
+
+		/****************  Start: Import Markers *****************/
+
+		$('#rvm_import_markers_button').click( function(e) {
+			e.preventDefault();
+			
+			var ajax_loader = '<img src=\"' ;
+			ajax_loader = ajax_loader + objectL10n.images_js_path ;
+			ajax_loader = ajax_loader + '\/rvm-ajax-loader.gif"></div>' ;
+			$('#rvm_import_markers_status').css("display","inline-block");
+			$('#rvm_import_markers_status').html(ajax_loader);
+
+			var rvm_mbe_map_name = $('#rvm_mbe_select_map').val();
+			
+			var data = {
+					//contentType: "application/csv",
+					action: 'rvm_import_markers', // The function for handling the request
+					rvm_mbe_post_id: $('#rvm_mbe_post_id').val(),
+					rvm_upload_markers_file_path: $('#rvm_upload_markers_file_path').val(),
+					nonce: $('#rvm_ajax_nonce').text() // The security nonce							
+
+				};
+
+				$.post(ajaxurl, data, function (response) {
+					$('#rvm_import_markers_status').html(objectL10n.markers_correctly_imported);
+					$('#rvm_mbe_fields_wrap').html(response);
+					$('#rvm_import_reset_markers_button').css("display","block");
+
+				});
+		});
+
+		/****************  End: Import Markers *****************/
+
+        
+		/****************  Start: Export Subdivions *****************/
+
+		$('#rvm_export_regions_button').click( function(e) {
+			e.preventDefault();
+			
+			/*var ajax_loader = '<img src=\"' ;
+			ajax_loader = ajax_loader + objectL10n.images_js_path ;
+			ajax_loader = ajax_loader + '\/rvm-ajax-loader.gif"></div>' ;
+			$('#rvm_export_regions_status').html(ajax_loader);*/
+
+			var rvm_mbe_map_name = $('#rvm_mbe_select_map').val();
+			
+			var data = {
+					//contentType: "application/csv",
+					action: 'rvm_export_regions', // The function for handling the request
+					rvm_mbe_post_id: $('#rvm_mbe_post_id').val(),
+					rvm_mbe_select_map: $('#rvm_mbe_select_map').val(),
+					nonce: $('#rvm_ajax_nonce').text() // The security nonce							
+
+				};
+
+				$.post(ajaxurl, data, function (response) {
+					var uri = 'data:application/csv;charset=UTF-8,' + encodeURIComponent(response);
+					//the only way to assign a specific filename.extension is creating an anchor link
+					var link = document.createElement("a");
+					link.download =  $('#rvm_mbe_select_map').val() + '-regions.csv';
+					link.href = uri;
+
+					document.body.appendChild(link);
+					link.click();
+
+					// Cleanup the DOM
+					document.body.removeChild(link);
+					delete link;
+
+					//$('#rvm_export_markers_status').remove();
+
+
+				});
+		});
+
+		/****************  End: Export Subdivions *****************/
+
+
+		/****************  Start: Import Subdivions *****************/
+
+		$('#rvm_import_regions_button').click( function(e) {
+			e.preventDefault();
+			
+			var ajax_loader = '<img src=\"' ;
+			ajax_loader = ajax_loader + objectL10n.images_js_path ;
+			ajax_loader = ajax_loader + '\/rvm-ajax-loader.gif"></div>' ;
+			$('#rvm_import_regions_status').css("display","inline-block");
+			$('#rvm_import_regions_status').html(ajax_loader);
+
+			var rvm_mbe_map_name = $('#rvm_mbe_select_map').val();
+			
+			var data = {
+					//contentType: "application/csv",
+					action: 'rvm_import_regions', // The function for handling the request
+					rvm_mbe_post_id: $('#rvm_mbe_post_id').val(),
+					rvm_upload_regions_file_path: $('#rvm_upload_regions_file_path').val(),
+					nonce: $('#rvm_ajax_nonce').text() // The security nonce							
+
+				};
+
+				$.post(ajaxurl, data, function (response) {
+					$('#rvm_import_regions_status').html(objectL10n.regions_correctly_imported);
+					$('#rvm_regions_from_db').html(response);
+					$('.rvm_color_picker_imported_regions').wpColorPicker();
+					$('#rvm_import_reset_regions_button').css("display","block");
+                    var rvm_item_handle = $('.rvm_region_name');
+                    var rvm_item_arrow = 'h4 > span.rvm_arrow';
+
+                    rvm_item_handle.click(function() {
+                        $(this).find('h4').toggleClass('rvm_region_active');
+                        $(this).next().toggle('fast');
+                        $(this).find(rvm_item_arrow).toggleClass('rvm_arrow_up');
+                    });
+					
+
+				});
+		});
+
+		/****************  End: Import Subdivions *****************/
+
 	});
 })(jQuery);

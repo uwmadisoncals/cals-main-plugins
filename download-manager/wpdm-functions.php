@@ -88,7 +88,7 @@ function wpdm_user_has_access($id, $type = 'package'){
  * @param array $extras
  * @return string
  */
-function DownloadLink(&$package, $embed = 0, $extras = array())
+function downloadLink(&$package, $embed = 0, $extras = array())
 {
     global $wpdb, $current_user, $wpdm_download_icon, $wpdm_download_lock_icon, $btnclass;
     if(is_array($extras))
@@ -514,6 +514,15 @@ function wpdm_query_var($var, $params = array())
     return $val;
 }
 
+/**
+ * @usage Escape script tag
+ * @param $html
+ * @return null|string|string[]
+ */
+function wpdm_escs($html){
+    return preg_replace('#<script(.*?)>(.*?)</script>#is', '', $html);
+}
+
 
 function wpdm_category($params)
 {
@@ -719,7 +728,7 @@ function wpdm_embed_category($params = array('id' => '', 'operator' => 'IN' , 'i
                    </div>
                    <div class="panel-footer">
                    
-                   <div class="btn-group btn-group-sm pull-right"><button type="button" class="btn btn-info" disabled="disabled">{$ord} &nbsp;</button><a class="btn btn-primary" href="{$burl}orderby={$orderby}&order=asc">{$tasc}</a><a class="btn btn-primary" href="{$burl}orderby={$orderby}&order=desc">{$tdsc}</a></div>                         
+                   <div class="btn-group btn-group-sm pull-right"><button type="button" class="btn btn-primary" disabled="disabled">{$ord} &nbsp;</button><a class="btn btn-primary" href="{$burl}orderby={$orderby}&order=asc">{$tasc}</a><a class="btn btn-primary" href="{$burl}orderby={$orderby}&order=desc">{$tdsc}</a></div>                         
                    <div class="btn-group btn-group-sm"><button type="button" class="btn btn-info" disabled="disabled">{$order_by_label} &nbsp;</button><a class="btn btn-info" href="{$burl}orderby=title&order=asc">{$ttitle}</a><a class="btn btn-info" href="{$burl}orderby=publish_date&order=desc">{$tcdate}</a></div>                         
                     
                    </div>
@@ -970,6 +979,18 @@ function FetchTemplate($template, $vars, $type = 'link')
 }
 
 /**
+ * @usage Fetch link/page template and return generated html
+ * @param $template
+ * @param $vars
+ * @param string $type
+ * @return mixed|string|void
+ */
+function wpdm_fetch_template($template, $vars, $type = 'link'){
+    return \WPDM\Package::fetchTemplate($template, $vars, $type);
+}
+
+
+/**
  * @usage Callback function for [wpdm_login_form] short-code
  * @return string
  */
@@ -1074,7 +1095,7 @@ function wpdm_view_countplus(){
     if(isset($_REQUEST['_nonce'])&&wp_verify_nonce($_REQUEST['_nonce'],"__wpdm_view_count")){
 
         $id = intval($_REQUEST['id']);
-        $views = get_post_meta($id, '__wpdm_view_count', true);
+        $views = (int)get_post_meta($id, '__wpdm_view_count', true);
         update_post_meta($id, '__wpdm_view_count', $views+1);
         echo $views+1;
         die();
@@ -1198,6 +1219,180 @@ function wpdm_pdf_thumbnail($pdf, $id){
     return \WPDM\libs\FileSystem::pdfThumbnail($pdf, $id);
 }
 
+
+function wpdm_media_field($data){
+    ob_start();
+    $attrs = '';
+    if(isset($data['attrs'])) {
+        foreach ($data['attrs'] as $attr => $value){
+            $attrs .= "$attr='$value' ";
+        }
+    }
+    ?>
+    <div class="input-group">
+        <input placeholder="<?php echo $data['placeholder']; ?>" <?php echo $attrs; ?> type="url" name="<?php echo $data['name']; ?>" id="<?php echo isset($data['id'])?$data['id']:($id = uniqid()); ?>" class="form-control" value="<?php echo isset($data['value']) ? $data['value'] : ''; ?>"/>
+        <span class="input-group-btn">
+                        <button class="btn btn-secondary btn-media-upload" type="button" rel="#<?php echo isset($data['id'])?$data['id']:$id; ?>"><i class="far fa-image"></i></button>
+                    </span>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function wpdm_image_selector($data){
+    ob_start();
+    $attrs = '';
+    if(isset($data['attrs'])) {
+        foreach ($data['attrs'] as $attr => $value){
+            $attrs .= "$attr='$value' ";
+        }
+    }
+    $id = uniqid();
+    ?>
+    <div class="panel panel-default text-center image-selector-panel" style="width: 250px">
+        <div class="panel-body">
+            <img id="<?php echo isset($data['id'])?$data['id']:$id; ?>"  src="<?php echo isset($data['value']) && $data['value'] != '' ? $data['value'] : WPDM_BASE_URL.'assets/images/image.png'; ?>" />
+        </div>
+        <div class="panel-footer">
+            <input id="<?php echo isset($data['id'])?$data['id']:$id; ?>_hidden" type="hidden" name="<?php echo $data['name']; ?>" value="<?php echo isset($data['value']) ? $data['value'] : ''; ?>"/>
+            <button class="btn btn-info btn-block btn-image-selector" type="button" rel="#<?php echo isset($data['id'])?$data['id']:$id; ?>"><i class="far fa-image"></i> <?php isset($data['btnlabel'])?$data['btnlabel']:_e('Select Image', 'download-manager'); ?></button>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function wpdm_image_uploader($data){
+    ob_start();
+    $attrs = '';
+    if(isset($data['attrs'])) {
+        foreach ($data['attrs'] as $attr => $value){
+            $attrs .= "$attr='$value' ";
+        }
+    }
+    $id = uniqid();
+    ?>
+    <div id="wpdm-upload-ui" class="panel panel-default text-center image-selector-panel" style="width: 250px">
+        <div id="wpdm-drag-drop-area">
+            <div class="panel-body">
+                <img id="<?php echo isset($data['id'])?$data['id']:$id; ?>"  src="<?php echo isset($data['value']) && $data['value'] != '' ? $data['value'] : WPDM_BASE_URL.'assets/images/image.png'; ?>" />
+            </div>
+            <div class="panel-footer">
+                <input id="<?php echo isset($data['id'])?$data['id']:$id; ?>_hidden" type="hidden" name="<?php echo $data['name']; ?>" value="<?php echo isset($data['value']) ? $data['value'] : ''; ?>"/>
+
+                <button id="wpdm-browse-button" style="font-size: 9px;text-transform: unset" type="button" class="btn btn-info btn-block"><?php echo isset($data['btnlabel'])?$data['btnlabel']:__('SELECT IMAGE', 'download-manager'); ?></button>
+                <div class="progress" id="wmprogressbar" style="height: 30px !important;border-radius: 3px !important;margin: 0;position: relative;background: #0d406799;display: none;box-shadow: none">
+                    <div id="wmprogress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;line-height: 30px;background-color: #007bff"></div>
+                    <div class="fetfont" style="font-size:9px;position: absolute;line-height: 30px;height: 30px;width: 100%;z-index: 999;text-align: center;color: #ffffff;font-weight: 800;letter-spacing: 1px">UPLOADING... <span id="wmloaded">0</span>%</div>
+                </div>
+
+                <?php
+
+                $plupload_init = array(
+                    'runtimes'            => 'html5,silverlight,flash,html4',
+                    'browse_button'       => 'wpdm-browse-button',
+                    'container'           => 'wpdm-upload-ui',
+                    'drop_element'        => 'wpdm-drag-drop-area',
+                    'file_data_name'      => 'wpdm_file',
+                    'multiple_queues'     => false,
+                    'url'                 => admin_url('admin-ajax.php'),
+                    'flash_swf_url'       => includes_url('js/plupload/plupload.flash.swf'),
+                    'silverlight_xap_url' => includes_url('js/plupload/plupload.silverlight.xap'),
+                    'filters'             => array(array('title' => __('Allowed Files'), 'extensions' => 'png,jpg,jpeg,gif')),
+                    'multipart'           => true,
+                    'urlstream_upload'    => true,
+
+                    // additional post data to send to our ajax hook
+                    'multipart_params'    => array(
+                        '_ajax_nonce' => wp_create_nonce(NONCE_KEY),
+                        'action'      => $data['action'],            // the ajax action name
+                    ),
+                );
+
+                $plupload_init['max_file_size'] = wp_max_upload_size().'b';
+
+                // we should probably not apply this filter, plugins may expect wp's media uploader...
+                $plupload_init = apply_filters('plupload_init', $plupload_init); ?>
+
+                <script type="text/javascript">
+
+                    jQuery(function($){
+
+                        // create the uploader and pass the config from above
+                        var uploader = new plupload.Uploader(<?php echo json_encode($plupload_init); ?>);
+
+                        // checks if browser supports drag and drop upload, makes some css adjustments if necessary
+                        uploader.bind('Init', function(up){
+                            var uploaddiv = $('#wpdm-upload-ui');
+
+                            if(up.features.dragdrop){
+                                uploaddiv.addClass('drag-drop');
+                                $('#drag-drop-area')
+                                    .bind('dragover.wp-uploader', function(){ uploaddiv.addClass('drag-over'); })
+                                    .bind('dragleave.wp-uploader, drop.wp-uploader', function(){ uploaddiv.removeClass('drag-over'); });
+
+                            }else{
+                                uploaddiv.removeClass('drag-drop');
+                                $('#drag-drop-area').unbind('.wp-uploader');
+                            }
+                        });
+
+                        uploader.init();
+
+                        uploader.bind('Error', function(uploader, error){
+                            wpdm_bootModal('Error', error.message);
+                            $('#wmprogressbar').hide();
+                            $('#wpdm-browse-button').show();
+                        });
+
+                        // a file was added in the queue
+                        uploader.bind('FilesAdded', function(up, files){
+                            //var hundredmb = 100 * 1024 * 1024, max = parseInt(up.settings.max_file_size, 10);
+
+                            $('#wpdm-browse-button').hide(); //attr('disabled', 'disabled');
+                            $('#wmprogressbar').show();
+
+                            plupload.each(files, function(file){
+                                $('#wmprogress').css('width', file.percent+"%");
+                                $('#wmloaded').html(file.percent);
+                                //jQuery('#wpdm-browse-button').hide(); //.html('<span id="' + file.id + '"><i class="fas fa-sun fa-spin"></i> <?php _e('Uploading', 'download-manager'); ?> (<span>' + plupload.formatSize(0) + '</span>/' + plupload.formatSize(file.size) + ') </span>');
+                            });
+
+                            up.refresh();
+                            up.start();
+                        });
+
+                        uploader.bind('UploadProgress', function(up, file) {
+                            //jQuery('#' + file.id + " span").html(plupload.formatSize(parseInt(file.size * file.percent / 100)));
+                            $('#wmprogress').css('width', file.percent+"%");
+                            $('#wmloaded').html(file.percent);
+                        });
+
+
+                        // a file was uploaded
+                        uploader.bind('FileUploaded', function(up, file, response) {
+                            res = JSON.parse(response.response);
+                            $('#<?php echo isset($data['id'])?$data['id']:$id; ?>').attr('src', res.image_url);
+                            $('#wmprogressbar').hide();
+                            $('#wpdm-browse-button').show(); //removeAttr('disabled').html('<?php echo isset($data['btnlabel'])?$data['btnlabel']:__('SELECT IMAGE', 'download-manager'); ?>');
+
+                        });
+
+                    });
+
+                </script>
+                <div id="filelist"></div>
+
+                <div class="clear"></div>
+
+            </div>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+
 /**
  * @usage Show admin notices
  */
@@ -1274,7 +1469,7 @@ function wpdm_user_logged_in($msg){
  * @param string $tpldir
  * @return string
  */
-function wpdm_tpl_path($file, $tpldir = ''){
+function wpdm_tpl_path1($file, $tpldir = ''){
     if(file_exists(get_stylesheet_directory().'/download-manager/'.$file)) 
         $path = get_stylesheet_directory().'/download-manager/'.$file;
     else if(file_exists(get_template_directory().'/download-manager/'.$file))
@@ -1284,6 +1479,31 @@ function wpdm_tpl_path($file, $tpldir = ''){
     else if($tpldir !='' && file_exists(get_template_directory().'/download-manager/'.$tpldir.'/'.$file))
         $path = get_template_directory().'/download-manager/'.$tpldir.'/'.$file;
     else $path = WPDM_BASE_DIR.'tpls/'.$file;
+
+    return $path;
+
+}
+
+/**
+ * @usage Returns download manager template file path
+ * @param $file
+ * @param string $tpldir
+ * @return string
+ */
+function wpdm_tpl_path($file, $tpldir = '', $fallback = ''){
+    if(file_exists(get_stylesheet_directory().'/download-manager/'.$file))
+        $path = get_stylesheet_directory().'/download-manager/'.$file;
+    else if(file_exists(get_template_directory().'/download-manager/'.$file))
+        $path = get_template_directory().'/download-manager/'.$file;
+    else if($tpldir !='' && file_exists($tpldir.'/'.$file))
+        $path = $tpldir.'/'.$file;
+    else if($tpldir !='' && file_exists(get_template_directory().'/download-manager/'.$tpldir.'/'.$file))
+        $path = get_template_directory().'/download-manager/'.$tpldir.'/'.$file;
+    else $path = WPDM_TPL_DIR.$file;
+
+    /* Fallack template directory*/
+    if($fallback != '' && !file_exists($path))
+        $path = $fallback.$file;
 
     return $path;
 
@@ -1480,3 +1700,12 @@ function wpdm_paginate_links($total, $items_per_page, $page = 1, $var = 'cp', $p
 }
 
 
+function wpdm_download_button_style($p = null, $pacakge_ID = null){
+    if(is_singular('wpdmpro') || $p === true)
+        $ui_button = get_option('__wpdm_ui_download_button');
+    else
+        $ui_button = get_option('__wpdm_ui_download_button_sc');
+    $class =  "btn ".(isset($ui_button['color'])?$ui_button['color']:'btn-primary')." ".(isset($ui_button['size'])?$ui_button['size']:'');
+    $class = apply_filters("wpdm_download_button_style", $class, $pacakge_ID);
+    return $class;
+}

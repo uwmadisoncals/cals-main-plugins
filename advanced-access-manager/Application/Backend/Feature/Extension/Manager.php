@@ -28,7 +28,9 @@ class AAM_Backend_Feature_Extension_Manager extends AAM_Backend_Feature_Abstract
         parent::__construct();
         
         if (AAM_Core_Config::get('core.settings.extensionSupport', true) === false) {
-            AAM_Core_API::reject('backend');
+            AAM::api()->denyAccess(array('reason' => 'core.settings.extensionSupport'));
+        } elseif (!current_user_can('aam_manage_extensions')) {
+            AAM::api()->denyAccess(array('reason' => 'aam_manage_extensions'));
         }
     }
     
@@ -62,23 +64,17 @@ class AAM_Backend_Feature_Extension_Manager extends AAM_Backend_Feature_Abstract
     public function install($storedLicense = null) {
         $repo    = AAM_Extension_Repository::getInstance();
         $license = AAM_Core_Request::post('license', $storedLicense);
+        $package = (object) AAM_Core_Request::post('package');
         
-        //download the extension from the server first
-        $package = AAM_Core_Server::download($license);
+        $error   = $repo->checkDirectory();
         
-        if (is_wp_error($package)) {
-            $manually = __('You may try to install extension manually.', AAM_KEY);
-            $response = array(
-                'status' => 'failure', 
-                'error'  => wp_strip_all_tags($package->get_error_message()) . ' ' . $manually
-            );
-        }elseif ($error = $repo->checkDirectory()) {
+        if ($error) {
             $response = $this->installFailureResponse($error, $package);
             $repo->storeLicense($package, $license);
         } elseif (empty($package->content)) { //any unpredictable scenario
             $response = array(
                 'status' => 'failure', 
-                'error'  => __('Download failure. Please try again or contact us.', AAM_KEY)
+                'error'  => __('Download failure. Try again or contact us.', AAM_KEY)
             );
         } else { //otherwise install the extension
             $result = $repo->add(base64_decode($package->content));
@@ -155,13 +151,15 @@ class AAM_Backend_Feature_Extension_Manager extends AAM_Backend_Feature_Abstract
      * @return type
      */
     public function fixDirectoryIssue() {
-        $dirname = AAM_Extension_Repository::getInstance()->getBasedir();
+        $repo    = AAM_Extension_Repository::getInstance();
+        $dirname = $repo->getBasedir();
+        
         if (file_exists($dirname) === false) {
-            @mkdir($dirname, fileperms( ABSPATH ) & 0777 | 0755, true);
+            @mkdir($dirname, fileperms(ABSPATH) & 0777 | 0755, true);
         }
         
         return wp_json_encode(array(
-            'status' => (AAM_Extension_Repository::getInstance()->isWriteableDirectory() ? 'success' : 'failed')
+            'status' => ($repo->isWriteableDirectory() ? 'success' : 'failed')
         ));
     }
     
@@ -180,20 +178,6 @@ class AAM_Backend_Feature_Extension_Manager extends AAM_Backend_Feature_Abstract
         }
         
         return $response;
-    }
-    
-    /**
-     * 
-     * @return type
-     */
-    public function canShowLicense() {
-        $result = true;
-        
-        if (AAM_Core_API::capabilityExists('aam_display_license')) {
-            $result = !empty(AAM::getUser()->allcaps['aam_display_license']);
-        }
-        
-        return $result;
     }
     
     /**

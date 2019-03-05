@@ -14,12 +14,12 @@ class SegmentsExporter {
   }
 
   private function exportSubscriber($subscriber) {
-    if(!$subscriber) return array();
+    if (!$subscriber) return array();
 
     $result = array();
     $segments = $subscriber->getAllSegmentNamesWithStatus();
 
-    foreach($segments as $segment) {
+    foreach ($segments as $segment) {
       $result[] = $this->exportSegment($segment);
     }
 

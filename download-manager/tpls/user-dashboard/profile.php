@@ -51,13 +51,15 @@ global $current_user, $wpdb;
                 if(\WPDM\Package::userCanAccess(get_the_ID())) {
                     ?>
                     <div class="col-md-4">
-                        <div class="card">
-
-
+                        <div class="panel panel-default">
+                            <div class="panel-body">
                             <?php wpdm_post_thumb(array(400, 300)); ?>
-                            <a href="<?php the_permalink(); ?>" class="card-footer">
+                            </div>
+                            <div  class="panel-footer">
+                            <a href="<?php the_permalink(); ?>">
                                 <?php the_title(); ?>
                             </a>
+                            </div>
                         </div>
                     </div>
 

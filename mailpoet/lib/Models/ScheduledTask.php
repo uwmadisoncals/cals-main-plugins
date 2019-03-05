@@ -4,8 +4,16 @@ namespace MailPoet\Models;
 
 use MailPoet\WP\Functions as WPFunctions;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
+/**
+ * @property int $id
+ * @property string $processed_at
+ * @property string|null $status
+ * @property string|null $type
+ * @property int $priority
+ * @property string $scheduled_at
+ */
 class ScheduledTask extends Model {
   public static $_table = MP_SCHEDULED_TASKS_TABLE;
   const STATUS_COMPLETED = 'completed';
@@ -16,12 +24,28 @@ class ScheduledTask extends Model {
   const PRIORITY_MEDIUM = 5;
   const PRIORITY_LOW = 10;
 
+  private $wp;
+
+  function __construct() {
+    parent::__construct();
+    $this->wp = new WPFunctions();
+  }
+
   function subscribers() {
     return $this->hasManyThrough(
       __NAMESPACE__.'\Subscriber',
       __NAMESPACE__.'\ScheduledTaskSubscriber',
       'task_id',
       'subscriber_id'
+    );
+  }
+
+  /** @return StatsNotification */
+  function statsNotification() {
+    return $this->hasOne(
+      StatsNotification::class,
+      'task_id',
+      'id'
     );
   }
 
@@ -61,7 +85,7 @@ class ScheduledTask extends Model {
   }
 
   function complete() {
-    $this->processed_at = WPFunctions::currentTime('mysql');
+    $this->processed_at = $this->wp->currentTime('mysql');
     $this->set('status', self::STATUS_COMPLETED);
     $this->save();
     return ($this->getErrors() === false && $this->id() > 0);
@@ -69,7 +93,7 @@ class ScheduledTask extends Model {
 
   function save() {
     // set the default priority to medium
-    if(!$this->priority) {
+    if (!$this->priority) {
       $this->priority = self::PRIORITY_MEDIUM;
     }
     parent::save();
@@ -82,7 +106,7 @@ class ScheduledTask extends Model {
       ScheduledTaskSubscriber::where('task_id', $this->id)->deleteMany();
       parent::delete();
       \ORM::get_db()->commit();
-    } catch(\Exception $error) {
+    } catch (\Exception $error) {
       \ORM::get_db()->rollBack();
       throw $error;
     }

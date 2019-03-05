@@ -4,9 +4,10 @@ Plugin Name: Peter's Login Redirect
 Plugin URI: http://www.theblog.ca/wplogin-redirect
 Description: Redirect users to different locations after logging in. Define a set of rules for specific users, user with specific roles, users with specific capabilities, and a blanket rule for all other users. This is all managed in Settings > Login/logout redirects.
 Author: Peter Keung
-Version: 2.9.1
+Version: 2.9.2
 Text Domain: peters-login-redirect
 Change Log:
+2019-02-23  2.9.2: Add CSRF protection (thanks RIPS!). Fixed translations for "username" variable instruction (thanks Jaime!).
 2016-08-10  2.9.1: Support utf8mb4 encoding and prevent cross-site scripting when editing redirect URLs.
 2015-09-25  2.9.0: Update translation text domain in order to support translate.wordpress.org translation system
 2015-08-03  2.8.3: Add new URL variable "userslug" to match author URLs
@@ -54,7 +55,7 @@ As of version 2.5.0 of this plugin and higher, all redirect settings are configu
 add_action( 'init', 'rul_textdomain' );
 function rul_textdomain()
 {
-	load_plugin_textdomain( 'peters-login-redirect', PLUGINDIR . '/' . dirname( plugin_basename(__FILE__) ), dirname( plugin_basename(__FILE__) ) );
+    load_plugin_textdomain( 'peters-login-redirect', PLUGINDIR . '/' . dirname( plugin_basename(__FILE__) ), dirname( plugin_basename(__FILE__) ) );
 }
 
 global $wpdb;
@@ -62,7 +63,7 @@ global $rul_db_addresses;
 global $rul_version;
 // Name of the database table that will hold group information and moderator rules
 $rul_db_addresses = $wpdb->prefix . 'login_redirects';
-$rul_version = '2.9.1';
+$rul_version = '2.9.2';
 
 // A global variable that we will add to on the fly when $rul_local_only is set to equal 1
 $rul_allowed_hosts = array();
@@ -574,14 +575,14 @@ function redirect_to_front_page( $redirect_to, $requested_redirect_to, $user )
 function rul_register( $before = '<li>', $after = '</li>', $give_echo = true ) {
     global $current_user;
     
-	if ( ! is_user_logged_in() ) {
-		if ( get_option('users_can_register') )
-			$link = $before . '<a href="' . site_url('wp-login.php?action=register', 'login') . '">' . __('Register', 'peters-login-redirect') . '</a>' . $after;
-		else
-			$link = '';
-	} else {
+    if ( ! is_user_logged_in() ) {
+        if ( get_option('users_can_register') )
+            $link = $before . '<a href="' . site_url('wp-login.php?action=register', 'login') . '">' . __('Register', 'peters-login-redirect') . '</a>' . $after;
+        else
+            $link = '';
+    } else {
         $link = $before . '<a href="' . redirect_to_front_page('', '', $current_user) . '">' . __('Site Admin', 'peters-login-redirect') . '</a>' . $after;;
-	}
+    }
     
     if ($give_echo) {
         echo $link;
@@ -751,6 +752,9 @@ if( is_admin() )
     {
         global $wpdb, $rul_db_addresses;
         
+        // Ensure that the request came from the back-end
+        check_admin_referer( 'rul_' . $type . '_submit' );
+        
         $rul_process_submit = '';
 
         if( $typeValue && ( $address || $address_logout ) )
@@ -814,6 +818,9 @@ if( is_admin() )
     function rul_edit_rule( $typeValue, $address, $address_logout, $order = 0, $type )
     {
         global $wpdb, $rul_db_addresses;
+
+        // Ensure that the request came from the back-end
+        check_admin_referer( 'rul_' . $type . '_edit' );
 
         if( $typeValue && ( $address || $address_logout ) )
         {
@@ -880,6 +887,9 @@ if( is_admin() )
     {
         global $wpdb, $rul_db_addresses;
 
+        // Ensure that the request came from the back-end
+        check_admin_referer( 'rul_' . $type . '_edit' );
+
         if( $typeValue )
         {
             // Validation depending on the type
@@ -911,6 +921,9 @@ if( is_admin() )
     function rul_submit_all( $update_or_delete, $address, $address_logout )
     {
         global $wpdb, $rul_db_addresses;
+        
+        // Ensure that the request came from the back-end
+        check_admin_referer( 'rul_allupdatesubmit' );
         
         $address = trim( $address );
         $address_logout = trim( $address_logout );
@@ -983,7 +996,10 @@ if( is_admin() )
     function rul_submit_register( $update_or_delete, $address )
     {
         global $wpdb, $rul_db_addresses;
-        
+
+        // Ensure that the request came from the back-end
+        check_admin_referer( 'rul_registerupdatesubmit' );
+
         $address = trim( $address );
 
         // Open the informational div
@@ -1053,6 +1069,9 @@ if( is_admin() )
     // Process submitted information to update plugin settings
     function rul_submit_settings()
     {
+        // Ensure that the request came from the back-end
+        check_admin_referer( 'settings' );
+
         $rul_settings = rulRedirectFunctionCollection::get_settings();
         foreach( $rul_settings as $setting_name => $setting_value )
         {
@@ -1100,7 +1119,7 @@ if( is_admin() )
 
         if ( isset( $lp['host'] ) && ( !in_array( $lp['host'], $allowed_hosts ) && $lp['host'] != strtolower( $wpp['host'] ) ) )
         {
-    		return false;
+            return false;
         }
         else
         {
@@ -1215,7 +1234,10 @@ if( is_admin() )
                     $rul_usernamevalues .= '<p>' . __('Login URL', 'peters-login-redirect' ) . '<br /><input type="text" size="90" maxlength="500" name="rul_username_address" value="' . htmlspecialchars( $rul_url ) . '" /></p>';
                     $rul_usernamevalues .= '<p>' . __('Logout URL', 'peters-login-redirect' ) . '<br /><input type="text" size="60" maxlength="500" name="rul_username_logout" value="' . htmlspecialchars( $rul_url_logout ) . '" /></p>';
                     $rul_usernamevalues .= '</td>';
-                    $rul_usernamevalues .= '<td><p><input name="rul_username_edit" type="submit" value="' . __( 'Edit', 'peters-login-redirect' ) . '" /> <input type="submit" name="rul_username_delete" value="' . __( 'Delete', 'peters-login-redirect' ) . '" /></p></td>';
+                    $rul_usernamevalues .= '<td><p>';
+                    $rul_usernamevalues .= '<input name="rul_username_edit" type="submit" value="' . __( 'Edit', 'peters-login-redirect' ) . '" /> <input type="submit" name="rul_username_delete" value="' . __( 'Delete', 'peters-login-redirect' ) . '" />';
+                    $rul_usernamevalues .= wp_nonce_field( 'rul_user_edit', '_wpnonce', true, false );
+                    $rul_usernamevalues .= '</p></td>';
                     $rul_usernamevalues .= '</tr>';
                     $rul_usernamevalues .= '</form>';
                     
@@ -1233,7 +1255,10 @@ if( is_admin() )
                     $rul_rolevalues .= '<p>' . __('Login URL', 'peters-login-redirect' ) . '<br /><input type="text" size="90" maxlength="500" name="rul_role_address" value="' . htmlspecialchars( $rul_url ) . '" /></p>';
                     $rul_rolevalues .= '<p>' . __('Logout URL', 'peters-login-redirect' ) . '<br /><input type="text" size="60" maxlength="500" name="rul_role_logout" value="' . htmlspecialchars( $rul_url_logout ) . '" /></p>';
                     $rul_rolevalues .= '</td>';
-                    $rul_rolevalues .= '<td><p><input name="rul_role_edit" type="submit" value="' . __( 'Edit', 'peters-login-redirect' ) . '" /> <input type="submit" name="rul_role_delete" value="' . __( 'Delete', 'peters-login-redirect' ) . '" /></p></td>';
+                    $rul_rolevalues .= '<td><p>';
+                    $rul_rolevalues .= '<input name="rul_role_edit" type="submit" value="' . __( 'Edit', 'peters-login-redirect' ) . '" /> <input type="submit" name="rul_role_delete" value="' . __( 'Delete', 'peters-login-redirect' ) . '" />';
+                    $rul_rolevalues .= wp_nonce_field( 'rul_role_edit', '_wpnonce', true, false );
+                    $rul_rolevalues .= '</p></td>';
                     $rul_rolevalues .= '</tr>';
                     $rul_rolevalues .= '</form>';
                     
@@ -1251,7 +1276,10 @@ if( is_admin() )
                     $rul_levelvalues .= '<p>' . __('Logout URL', 'peters-login-redirect' ) . '<br /><input type="text" size="60" maxlength="500" name="rul_level_logout" value="' . htmlspecialchars( $rul_url_logout ) . '" /></p>';
                     $rul_levelvalues .= '</td>';
                     $rul_levelvalues .= '<td><p><input name="rul_level_order" type="text" size="2" maxlength="2" value="' . $rul_order . '" /></td>';
-                    $rul_levelvalues .= '<td><p><input name="rul_level_edit" type="submit" value="' . __( 'Edit', 'peters-login-redirect' ) . '" /> <input type="submit" name="rul_level_delete" value="' . __( 'Delete', 'peters-login-redirect' ) . '" /></p></td>';
+                    $rul_levelvalues .= '<td><p>';
+                    $rul_levelvalues .= '<input name="rul_level_edit" type="submit" value="' . __( 'Edit', 'peters-login-redirect' ) . '" /> <input type="submit" name="rul_level_delete" value="' . __( 'Delete', 'peters-login-redirect' ) . '" />';
+                    $rul_levelvalues .= wp_nonce_field( 'rul_level_edit', '_wpnonce', true, false );
+                    $rul_levelvalues .= '</p></td>';
                     $rul_levelvalues .= '</tr>';
                     $rul_levelvalues .= '</form>';
 
@@ -1299,7 +1327,10 @@ if( is_admin() )
                 <br /><?php _e('URL:', 'peters-login-redirect' ); ?> <input type="text" size="90" maxlength="500" name="rul_username_address" />
                 <br /><?php _e('Logout URL:', 'peters-login-redirect' ); ?> <input type="text" size="90" maxlength="500" name="rul_username_logout" />
             </p>
-            <p class="submit"><input type="submit" name="rul_username_submit" value="<?php _e('Add username rule', 'peters-login-redirect' ); ?>" /></p>
+            <p class="submit">
+                <input type="submit" name="rul_username_submit" value="<?php _e('Add username rule', 'peters-login-redirect' ); ?>" />
+                <?php wp_nonce_field( 'rul_user_submit' ); ?>
+            </p>
         </form>
             
         <h3><?php _e('Specific roles', 'peters-login-redirect' ); ?></h3>
@@ -1321,7 +1352,10 @@ if( is_admin() )
                 <br /><?php _e('URL:', 'peters-login-redirect' ); ?>  <input type="text" size="90" maxlength="500" name="rul_role_address" />
                 <br /><?php _e('Logout URL:', 'peters-login-redirect' ); ?>  <input type="text" size="90" maxlength="500" name="rul_role_logout" />
             </p>
-            <p class="submit"><input type="submit" name="rul_role_submit" value="<?php _e( 'Add role rule', 'peters-login-redirect' ); ?>" /></p>
+            <p class="submit">
+                <input type="submit" name="rul_role_submit" value="<?php _e( 'Add role rule', 'peters-login-redirect' ); ?>" />
+                <?php wp_nonce_field( 'rul_role_submit' ); ?>
+            </p>
         </form> 
  
         <h3><?php _e('Specific levels', 'peters-login-redirect' ); ?></h3>
@@ -1352,14 +1386,20 @@ if( is_admin() )
                 <br /><?php _e('URL:', 'peters-login-redirect' ); ?> <input type="text" size="90" maxlength="500" name="rul_level_address" />
                 <br /><?php _e('Logout URL:', 'peters-login-redirect' ); ?> <input type="text" size="90" maxlength="500" name="rul_level_logout" />
             </p>
-            <p class="submit"><input type="submit" name="rul_level_submit" value="<?php _e('Add level rule', 'peters-login-redirect' ); ?>" /></p>
+            <p class="submit">
+                <input type="submit" name="rul_level_submit" value="<?php _e('Add level rule', 'peters-login-redirect' ); ?>" />
+                <?php wp_nonce_field( 'rul_level_submit' ); ?>
+            </p>
         </form> 
         
         <h3><?php _e( 'All other users', 'peters-login-redirect' ); ?></h3>
         <form name="rul_allform" action="<?php '?page=' . basename(__FILE__); ?>" method="post">
             <p><?php _e('URL:', 'peters-login-redirect' ) ?> <input type="text" size="90" maxlength="500" name="rul_all" value="<?php print htmlspecialchars( $rul_allvalue ); ?>" /></p>
             <p><?php _e('Logout URL:', 'peters-login-redirect' ) ?> <input type="text" size="90" maxlength="500" name="rul_all_logout" value="<?php print htmlspecialchars( $rul_allvalue_logout ); ?>" /></p>
-            <p class="submit"><input type="submit" name="rul_allupdatesubmit" value="<?php _e('Update', 'peters-login-redirect' ); ?>" /> <input type="submit" name="rul_alldeletesubmit" value="<?php _e('Delete', 'peters-login-redirect' ); ?>" /></p>
+            <p class="submit">
+                <input type="submit" name="rul_allupdatesubmit" value="<?php _e('Update', 'peters-login-redirect' ); ?>" /> <input type="submit" name="rul_alldeletesubmit" value="<?php _e('Delete', 'peters-login-redirect' ); ?>" />
+                <?php wp_nonce_field( 'rul_allupdatesubmit' ); ?>
+            </p>
         </form>
         
         <hr />
@@ -1367,7 +1407,10 @@ if( is_admin() )
         <h3><?php _e( 'Post-registration', 'peters-login-redirect' ); ?></h3>
         <form name="rul_registerform" action="<?php '?page=' . basename(__FILE__); ?>" method="post">
             <p><?php _e( 'URL:', 'peters-login-redirect' ) ?> <input type="text" size="90" maxlength="500" name="rul_register" value="<?php print htmlspecialchars( $rul_registervalue ); ?>" /></p>
-            <p class="submit"><input type="submit" name="rul_registerupdatesubmit" value="<?php _e( 'Update', 'peters-login-redirect' ); ?>" /> <input type="submit" name="rul_registerdeletesubmit" value="<?php _e( 'Delete', 'peters-login-redirect' ); ?>" /></p>
+            <p class="submit">
+                <input type="submit" name="rul_registerupdatesubmit" value="<?php _e( 'Update', 'peters-login-redirect' ); ?>" /> <input type="submit" name="rul_registerdeletesubmit" value="<?php _e( 'Delete', 'peters-login-redirect' ); ?>" />
+                <?php wp_nonce_field( 'rul_registerupdatesubmit' ); ?>
+            </p>
         </form>
         
         <hr />
@@ -1444,7 +1487,10 @@ if( is_admin() )
             </td>
         </tr>
         </table>
-        <p class="submit"><input name="rul_settingssubmit" type="submit" value="<?php _e( 'Update', 'peters-login-redirect' ); ?>" /></p>
+        <p class="submit">
+            <input name="rul_settingssubmit" type="submit" value="<?php _e( 'Update', 'peters-login-redirect' ); ?>" />
+            <?php wp_nonce_field( 'settings' ); ?>
+        </p>
         </form>
     </div>
 <?php
@@ -1558,7 +1604,7 @@ if( is_admin() )
     function rul_addoptionsmenu()
     {
         $rul_required_capability = rulRedirectFunctionCollection::get_settings( 'rul_required_capability' );
-    	add_options_page( 'Login/logout redirects', 'Login/logout redirects', $rul_required_capability, 'wplogin_redirect.php', 'rul_optionsmenu' );
+        add_options_page( 'Login/logout redirects', 'Login/logout redirects', $rul_required_capability, 'wplogin_redirect.php', 'rul_optionsmenu' );
     }
 
     add_action( 'admin_menu', 'rul_addoptionsmenu', 1 );

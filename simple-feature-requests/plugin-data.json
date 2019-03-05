@@ -1,6 +1,6 @@
 {
-  "version": "1.0.4",
-  "wp": "5.0.2",
+  "version": "1.0.5",
+  "wp": "5.1",
   "wp_requires": "4.9",
   "woo": "",
   "woo_requires": "",

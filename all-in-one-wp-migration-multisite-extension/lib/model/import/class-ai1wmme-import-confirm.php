@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2018 ServMask Inc.
+ * Copyright (C) 2014-2019 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,10 @@
  * ███████║███████╗██║  ██║ ╚████╔╝ ██║ ╚═╝ ██║██║  ██║███████║██║  ██╗
  * ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	die( 'Kangaroos cannot jump here' );
+}
 
 class Ai1wmme_Import_Confirm {
 
@@ -93,6 +97,20 @@ class Ai1wmme_Import_Confirm {
 					AI1WMME_PLUGIN_NAME
 				);
 			}
+		}
+
+		if ( defined( 'WP_CLI' ) ) {
+			$message = __(
+				'The import process will overwrite your website including the database, media, plugins, and themes. Are you sure to proceed?',
+				AI1WMME_PLUGIN_NAME
+			);
+
+			$assoc_args = array();
+			if ( isset( $params['cli_args'] ) ) {
+				$assoc_args = $params['cli_args'];
+			}
+			WP_CLI::confirm( $message, $assoc_args );
+			return $params;
 		}
 
 		// Set progress

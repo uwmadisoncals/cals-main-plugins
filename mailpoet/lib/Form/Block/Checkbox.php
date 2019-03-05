@@ -1,7 +1,7 @@
 <?php
 namespace MailPoet\Form\Block;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class Checkbox extends Base {
 
@@ -22,7 +22,7 @@ class Checkbox extends Base {
 
     $selected_value = self::getFieldValue($block);
 
-    foreach($options as $option) {
+    foreach ($options as $option) {
       $html .= '<label class="mailpoet_checkbox_label">';
       $html .= '<input type="checkbox" class="mailpoet_checkbox" ';
 

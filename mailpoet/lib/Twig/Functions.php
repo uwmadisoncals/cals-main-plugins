@@ -4,11 +4,19 @@ namespace MailPoet\Twig;
 
 use Carbon\Carbon;
 use MailPoet\Config\ServicesChecker;
-use MailPoet\Models\Setting;
+use MailPoet\Settings\SettingsController;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class Functions extends \Twig_Extension {
+
+  /** @var SettingsController */
+  private $settings;
+
+  public function __construct() {
+    $this->settings = new SettingsController();
+  }
+
   function getFunctions() {
     return array(
       new \Twig_SimpleFunction(
@@ -72,11 +80,6 @@ class Functions extends \Twig_Extension {
         array('is_safe' => array('all'))
       ),
       new \Twig_SimpleFunction(
-        'mailpoet_installed_in_last_two_weeks',
-        array($this, 'installedInLastTwoWeeks'),
-        array('is_safe' => array('all'))
-      ),
-      new \Twig_SimpleFunction(
         'wp_time_format',
         array($this, 'getWPTimeFormat'),
         array('is_safe' => array('all'))
@@ -101,6 +104,11 @@ class Functions extends \Twig_Extension {
         'number_format_i18n',
         array('is_safe' => array('all'))
       ),
+      new \Twig_SimpleFunction(
+        'mailpoet_locale',
+        array($this, 'getTwoLettersLocale'),
+        array('is_safe' => array('all'))
+      ),
     );
   }
 
@@ -116,9 +124,9 @@ class Functions extends \Twig_Extension {
       'hours' => __('every %1$d hours', 'mailpoet')
     );
 
-    if($value >= 60) {
+    if ($value >= 60) {
       // we're dealing with hours
-      if($value === 60) {
+      if ($value === 60) {
         $label = $labels['hour'];
       } else {
         $label = $labels['hours'];
@@ -126,14 +134,14 @@ class Functions extends \Twig_Extension {
       $value /= 60;
     } else {
       // we're dealing with minutes
-      if($value === 1) {
+      if ($value === 1) {
         $label = $labels['minute'];
       } else {
         $label = $labels['minutes'];
       }
     }
 
-    if($label !== null) {
+    if ($label !== null) {
       return sprintf($label, $value);
     } else {
       return $value;
@@ -166,7 +174,7 @@ class Functions extends \Twig_Extension {
 
   function params($key = null) {
     $args = stripslashes_deep($_GET);
-    if(array_key_exists($key, $args)) {
+    if (array_key_exists($key, $args)) {
       return $args[$key];
     }
     return null;
@@ -179,11 +187,15 @@ class Functions extends \Twig_Extension {
 
   function installedInLastTwoWeeks() {
     $max_number_of_weeks = 2;
-    $installed_at = Carbon::createFromFormat('Y-m-d H:i:s', Setting::getValue('installed_at'));
+    $installed_at = Carbon::createFromFormat('Y-m-d H:i:s', $this->settings->get('installed_at'));
     return $installed_at->diffInWeeks(Carbon::now()) < $max_number_of_weeks;
   }
 
   function isRtl() {
     return is_rtl();
+  }
+
+  function getTwoLettersLocale() {
+    return explode('_', get_locale())[0];
   }
 }

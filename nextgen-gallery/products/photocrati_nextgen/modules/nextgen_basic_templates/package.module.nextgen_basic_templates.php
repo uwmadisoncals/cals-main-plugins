@@ -187,6 +187,10 @@ class C_Legacy_Template_Locator extends C_Component
         $this->add_mixin('Mixin_Legacy_Template_Locator');
         $this->implement('I_Legacy_Template_Locator');
     }
+    /**
+     * @param bool|string $context
+     * @return C_Legacy_Template_Locator
+     */
     static function get_instance($context = FALSE)
     {
         if (!isset(self::$_instances[$context])) {
@@ -261,7 +265,8 @@ class Mixin_Legacy_Template_Locator extends Mixin
     }
     /**
      * Find a particular template by name
-     * @param $template
+     * @param string $template_name
+     * @return string
      */
     function find($template_name)
     {
@@ -310,9 +315,10 @@ class Mixin_NextGen_Basic_Templates extends Mixin
      * Renders NextGen-Legacy style templates
      *
      * @param string $template_name File name
-     * @param array $vars Specially formatted array of parameters
-     * @param bool $callback
-     * @param bool $return
+     * @param array $vars (optional) Specially formatted array of parameters
+     * @param bool $return (optional)
+     * @param string $prefix (optional)
+     * @return string
      */
     function legacy_render($template_name, $vars = array(), $return = FALSE, $prefix = NULL)
     {

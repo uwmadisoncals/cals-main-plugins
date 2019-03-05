@@ -221,7 +221,7 @@ class A_NextGen_Album_Child_Entities extends Mixin
      * Register each gallery belonging to the album that has just been rendered, so that when the MVC controller
      * system 'catches up' and runs $this->render_object() that method knows what galleries to inline as JS.
      *
-     * @param array $gallery
+     * @param array $galleries
      * @param $displayed_gallery
      * @return array mixed
      */
@@ -415,8 +415,9 @@ class A_NextGen_Basic_Album_Controller extends Mixin_NextGen_Basic_Pagination
     /**
      * Renders the front-end for the NextGen Basic Album display type
      *
-     * @param $displayed_gallery
+     * @param C_Displayed_Gallery $displayed_gallery
      * @param bool $return
+     * @return string
      */
     function index_action($displayed_gallery, $return = FALSE)
     {
@@ -537,7 +538,7 @@ class A_NextGen_Basic_Album_Controller extends Mixin_NextGen_Basic_Pagination
      *
      * @param $gallery
      * @param $display_settings
-     * @return $gallery
+     * @return C_Displayed_Gallery
      */
     function make_child_displayed_gallery($gallery, $display_settings)
     {
@@ -578,7 +579,7 @@ class A_NextGen_Basic_Album_Controller extends Mixin_NextGen_Basic_Pagination
     /**
      * Gets the parent album for the entity being displayed
      * @param int $entity_id
-     * @return stdClass (album)
+     * @return null|object Album object
      */
     function get_parent_album_for($entity_id)
     {
@@ -690,12 +691,12 @@ class A_NextGen_Basic_Album_Controller extends Mixin_NextGen_Basic_Pagination
     function enqueue_frontend_resources($displayed_gallery)
     {
         $this->call_parent('enqueue_frontend_resources', $displayed_gallery);
-        wp_enqueue_style('nextgen_basic_album_style', $this->object->get_static_url('photocrati-nextgen_basic_album#nextgen_basic_album.css'), FALSE, NGG_SCRIPT_VERSION);
-        wp_enqueue_style('nextgen_pagination_style', $this->get_static_url('photocrati-nextgen_pagination#style.css'), FALSE, NGG_SCRIPT_VERSION);
+        wp_enqueue_style('nextgen_basic_album_style', $this->object->get_static_url('photocrati-nextgen_basic_album#nextgen_basic_album.css'), array(), NGG_SCRIPT_VERSION);
+        wp_enqueue_style('nextgen_pagination_style', $this->get_static_url('photocrati-nextgen_pagination#style.css'), array(), NGG_SCRIPT_VERSION);
         wp_enqueue_script('jquery.dotdotdot', $this->object->get_static_url('photocrati-nextgen_basic_album#jquery.dotdotdot-1.5.7-packed.js'), array('jquery'), NGG_SCRIPT_VERSION);
         $ds = $displayed_gallery->display_settings;
         if (!empty($ds['enable_breadcrumbs']) && $ds['enable_breadcrumbs'] || !empty($ds['original_settings']['enable_breadcrumbs']) && $ds['original_settings']['enable_breadcrumbs']) {
-            wp_enqueue_style('nextgen_basic_album_breadcrumbs_style', $this->object->get_static_url('photocrati-nextgen_basic_album#breadcrumbs.css'), FALSE, NGG_SCRIPT_VERSION);
+            wp_enqueue_style('nextgen_basic_album_breadcrumbs_style', $this->object->get_static_url('photocrati-nextgen_basic_album#breadcrumbs.css'), array(), NGG_SCRIPT_VERSION);
         }
         $this->enqueue_ngg_styles();
     }
@@ -836,6 +837,7 @@ class Mixin_NextGen_Basic_Album_Form extends Mixin_Display_Type_Form
     /**
      * Renders the Gallery Display Type field
      * @param C_Display_Type $display_type
+     * @return string
      */
     function _render_nextgen_basic_album_gallery_display_type_field($display_type)
     {
@@ -852,6 +854,7 @@ class Mixin_NextGen_Basic_Album_Form extends Mixin_Display_Type_Form
     /**
      * Renders the Galleries Per Page field
      * @param C_Display_Type $display_type
+     * @return string
      */
     function _render_nextgen_basic_album_galleries_per_page_field($display_type)
     {

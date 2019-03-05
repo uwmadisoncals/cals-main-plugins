@@ -275,8 +275,8 @@ class ShortCodes
         $items_per_page = isset($items_per_page) ? $items_per_page : 0;
         update_post_meta(get_the_ID(), "__wpdm_link_template", $template);
         update_post_meta(get_the_ID(), "__wpdm_items_per_page", $items_per_page);
-
-        $html = $this->Packages(array('items_per_page' => $items_per_page, 'template' => $template, 's' => wpdm_query_var('q'), 'paging' => false, 'toolbar' => 0,'cols'=>3, 'colspad'=>2, 'colsphone' => 1));
+        $cols = isset($cols) && in_array($cols, array(1,2,3,4,6))?$cols:1;
+        $html = (!isset($init) || $init == 1 || wpdm_query_var('q') != '')? $this->Packages(array('items_per_page' => $items_per_page, 'template' => $template, 's' => wpdm_query_var('q'), 'paging' => false, 'toolbar' => 0,'cols'=> $cols, 'colspad'=>1, 'colsphone' => 1)) : '';
         $html = "<div class='w3eden'><form style='margin-bottom: 20px'><div class='input-group input-group-lg'><div class='input-group-addon no-radius'><i class='fa fa-search'></i></div><input type='text' name='q' value='".esc_attr(wpdm_query_var('q'))."' class='form-control input-lg no-radius' /></div></form><div class='container-fluid'><div class='row'>{$html}</div></div>";
         return str_replace(array("\r","\n"),"",$html);
     }
@@ -321,7 +321,7 @@ class ShortCodes
         else
             $linkURL = home_url("/?wpdmdl=".$params['id']);
         $target = isset($params['target'])?"target={$params['target']}":"";
-        $class = isset($params['class'])?"target={$params['class']}":"";
+        $class = isset($params['class'])?"class={$params['class']}":"";
         $id = isset($params['id'])?"target={$params['id']}":"";
         $linkLabel = isset($params['label']) && !empty($params['label'])?$params['label']:get_post_meta($params['id'], '__wpdm_link_label', true);
         $linkLabel = empty($linkLabel)?'Download '.get_the_title($params['id']):$linkLabel;

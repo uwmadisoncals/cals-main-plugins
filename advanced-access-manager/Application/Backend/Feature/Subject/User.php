@@ -16,6 +16,15 @@
 class AAM_Backend_Feature_Subject_User {
     
     /**
+     * Construct
+     */
+    public function __construct() {
+        if (!current_user_can('aam_manage_users')) {
+            AAM::api()->denyAccess(array('reason' => 'aam_manage_users'));
+        }
+    }
+    
+    /**
      * Retrieve list of users
      * 
      * Based on filters, get list of users
@@ -26,25 +35,21 @@ class AAM_Backend_Feature_Subject_User {
      */
     public function getTable() {
         $response = array(
-            'recordsTotal'    => 0,
-            'recordsFiltered' => 0,
-            'draw'            => AAM_Core_Request::request('draw'),
-            'data'            => array(),
+            'draw'  => AAM_Core_Request::request('draw'),
+            'data'  => array()
         );
         
-        if (current_user_can('list_users')) { 
-            //get total number of users
-            $total  = count_users();
-            $result = $this->query();
-            
-            $response['recordsTotal']    = $total['total_users'];
-            $response['recordsFiltered'] = $result->get_total();
+        //get total number of users
+        $total  = count_users();
+        $result = $this->query();
 
-            foreach ($result->get_results() as $row) {
-                $response['data'][] = $this->prepareRow(
-                        new AAM_Core_Subject_User($row->ID)
-                );
-            }
+        $response['recordsTotal']    = $total['total_users'];
+        $response['recordsFiltered'] = $result->get_total();
+
+        foreach ($result->get_results() as $row) {
+            $user = new AAM_Core_Subject_User($row->ID);
+            $user->initialize(true);
+            $response['data'][] = $this->prepareRow($user);
         }
 
         return wp_json_encode($response);
@@ -72,7 +77,7 @@ class AAM_Backend_Feature_Subject_User {
             if ($userId != get_current_user_id()) {
                 if ($this->isAllowed(new AAM_Core_Subject_User($userId))) {
                     $this->updateUserExpiration($userId, $expires, $action, $role);
-                    $response['status'] = 'success';
+                    $response = array('status' => 'success');
                 }
             } else {
                 $response['reason'] = __('You cannot set expiration to yourself', AAM_KEY);
@@ -80,6 +85,72 @@ class AAM_Backend_Feature_Subject_User {
         }
         
         return wp_json_encode($response);
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function switchToUser() {
+        $response = array(
+                'status' => 'failure', 
+                'reason' => 'You are not allowed to switch to this user'
+        );
+        
+        if (current_user_can('aam_switch_users')) { 
+            $user  = new WP_User(AAM_Core_Request::post('user'));
+            $max   = AAM::getUser()->getMaxLevel();
+
+            if ($max >= AAM_Core_API::maxLevel($user->allcaps)) {
+                AAM_Core_API::updateOption(
+                        'aam-user-switch-' . $user->ID, get_current_user_id()
+                );
+                
+                // Making sure that user that we are switching too is not logged in
+                // already. Reported by https://github.com/KenAer
+                $sessions = WP_Session_Tokens::get_instance($user->ID);
+                if (count($sessions->get_all()) > 1) {
+                    $sessions->destroy_all();
+                }
+                
+                // If there is jwt token in cookie, make sure it is deleted otherwise
+                // user technically will never be switched
+                if (AAM_Core_Request::cookie('aam-jwt')) {
+                    setcookie(
+                        'aam-jwt', 
+                        '', 
+                        time() - YEAR_IN_SECONDS,
+                        '/', 
+                        parse_url(get_bloginfo('url'), PHP_URL_HOST), 
+                        is_ssl()
+                    );
+                }
+
+                wp_clear_auth_cookie();
+                wp_set_auth_cookie( $user->ID, true );
+                wp_set_current_user( $user->ID );
+
+                $response = array('status' => 'success', 'redirect' => admin_url());
+            }
+        }
+        
+        return wp_json_encode($response);
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function generateJWT() {
+        $userId  = filter_input(INPUT_POST, 'user');
+        $expires = filter_input(INPUT_POST, 'expires');
+        
+        $jwt = AAM_Core_JwtAuth::generateJWT($userId, $expires);
+        
+        return wp_json_encode(array(
+            'status' => 'success',
+            'jwt'    => $jwt->token
+        ));
     }
     
     /**
@@ -145,7 +216,7 @@ class AAM_Backend_Feature_Subject_User {
 
             if ($this->isAllowed($subject->get())) {
                 //user is not allowed to lock himself
-                if ($subject->getId() != get_current_user_id()) {
+                if (intval($subject->getId()) !== get_current_user_id()) {
                     $result = $subject->block();
                 }
             }
@@ -169,7 +240,7 @@ class AAM_Backend_Feature_Subject_User {
             implode(', ', $this->getUserRoles($user->roles)),
             ($user->display_name ? $user->display_name : $user->user_nicename),
             implode(',', $this->prepareRowActions($user)),
-            AAM_Core_API::maxLevel($user->allcaps),
+            AAM_Core_API::maxLevel($user->getMaxLevel()),
             $this->getUserExpiration($user)
         );
     }
@@ -209,26 +280,32 @@ class AAM_Backend_Feature_Subject_User {
      * @access protected
      */
     protected function prepareRowActions(AAM_Core_Subject_User $user) {
-        if ($this->isAllowed($user) || ($user->ID == get_current_user_id())) {
-            $actions = array('manage');
-            
-            if (AAM_Core_Config::get('core.settings.secureLogin', true) 
-                    && current_user_can('aam_toggle_users')) {
-                $actions[] = ($user->user_status ? 'unlock' : 'lock');
-            }
-            
-            if (current_user_can('edit_users')) {
-                $actions[] = 'edit';
-                $actions[] = 'ttl';
+        if ($this->isAllowed($user) || ($user->ID === get_current_user_id())) {
+            $ui = AAM_Core_Request::post('ui', 'main');
+            $id = AAM_Core_Request::post('id');
+        
+            if ($ui === 'principal') {
+                $object = $user->getObject('policy');
+                $actions = array(($object->has($id) ? 'detach' : 'attach'));
             } else {
-                $actions[] = 'no-edit';
-                $actions[] = 'no-ttl';
-            }
-            
-            if (current_user_can('aam_switch_users')) {
-                $actions[] = 'switch';
-            } else {
-                $actions[] = 'no-switch';
+                $actions = array('manage');
+
+                if (AAM_Core_Config::get('core.settings.secureLogin', true) 
+                        && current_user_can('aam_toggle_users')) {
+                    $actions[] = ($user->user_status ? 'unlock' : 'lock');
+                }
+
+                if (current_user_can('edit_users')) {
+                    $actions[] = 'edit';
+                } else {
+                    $actions[] = 'no-edit';
+                }
+
+                if (current_user_can('aam_switch_users')) {
+                    $actions[] = 'switch';
+                } else {
+                    $actions[] = 'no-switch';
+                }
             }
         } else {
             $actions = array();
@@ -284,7 +361,7 @@ class AAM_Backend_Feature_Subject_User {
      * @access protected
      */
     protected function isAllowed(AAM_Core_Subject_User $user) {
-        $max = AAM_Core_API::maxLevel(AAM::getUser()->allcaps);
+        $max = AAM::getUser()->getMaxLevel();
         
         return $max >= AAM_Core_API::maxLevel($user->allcaps);
     }

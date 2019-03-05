@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2018 ServMask Inc.
+ * Copyright (C) 2014-2019 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,10 @@
  * ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	die( 'Kangaroos cannot jump here' );
+}
+
 class Ai1wmme_Main_Controller {
 
 	/**
@@ -36,7 +40,6 @@ class Ai1wmme_Main_Controller {
 		// Activate hooks
 		$this->activate_actions();
 		$this->activate_filters();
-		$this->activate_textdomain();
 	}
 
 	/**
@@ -53,7 +56,7 @@ class Ai1wmme_Main_Controller {
 	 *
 	 * @return void
 	 */
-	private function activate_textdomain() {
+	public function load_textdomain() {
 		load_plugin_textdomain( AI1WMME_PLUGIN_NAME, false, false );
 	}
 
@@ -96,6 +99,16 @@ class Ai1wmme_Main_Controller {
 			Ai1wm_Template::asset_link( 'javascript/export.min.js', 'AI1WMME' ),
 			array( 'ai1wm_export' )
 		);
+
+		wp_localize_script( 'ai1wmme_export', 'ai1wmme_export', array(
+			'ajax' => array(
+				'sites_paginator' => wp_make_link_relative( admin_url( 'admin-ajax.php?action=ai1wmme_sites_paginator' ) ),
+			),
+		) );
+
+		wp_localize_script( 'ai1wmme_export', 'ai1wmme_locale', array(
+			'unable_to_retrive_sites' => __( 'Unable to retrieve sites because: ', AI1WMME_PLUGIN_NAME ),
+		) );
 	}
 
 	/**
@@ -128,6 +141,27 @@ class Ai1wmme_Main_Controller {
 			Ai1wm_Template::asset_link( 'javascript/import.min.js', 'AI1WMME' ),
 			array( 'ai1wm_import' )
 		);
+
+		if ( ! defined( 'AI1WMUE_PLUGIN_NAME' ) ) {
+			wp_enqueue_script(
+				'ai1wmue_uploader',
+				Ai1wm_Template::asset_link( 'javascript/uploader.min.js', 'AI1WMME' ),
+				array( 'jquery' )
+			);
+
+			wp_localize_script( 'ai1wmue_uploader', 'ai1wmue_uploader', array(
+				'chunk_size'  => apply_filters( 'ai1wm_max_chunk_size', AI1WM_MAX_CHUNK_SIZE ),
+				'max_retries' => apply_filters( 'ai1wm_max_chunk_retries', AI1WM_MAX_CHUNK_RETRIES ),
+				'url'         => wp_make_link_relative( admin_url( 'admin-ajax.php?action=ai1wm_import' ) ),
+				'params'      => array(
+					'priority'   => 5,
+					'secret_key' => get_option( AI1WM_SECRET_KEY ),
+				),
+				'filters'     => array(
+					'ai1wm_archive_extension' => array( 'wpress' ),
+				),
+			) );
+		}
 	}
 
 	/**
@@ -169,21 +203,22 @@ class Ai1wmme_Main_Controller {
 	private function activate_actions() {
 		// Init
 		add_action( 'admin_init', array( $this, 'init' ) );
+		add_action( 'admin_init', array( $this, 'load_textdomain' ) );
 
-		// Admin header
+		// Router
+		add_action( 'admin_init', array( $this, 'router' ) );
+
 		add_action( 'admin_head', array( $this, 'admin_head' ) );
 
-		// All in One WP Migration
 		add_action( 'plugins_loaded', array( $this, 'ai1wm_loaded' ), 20 );
-
-		// Export and import commands
+		add_action( 'plugins_loaded', array( $this, 'ai1wm_buttons' ), 20 );
 		add_action( 'plugins_loaded', array( $this, 'ai1wm_commands' ), 20 );
+		add_action( 'plugins_loaded', array( $this, 'ai1wm_export_options' ), 20 );
+		add_action( 'plugins_loaded', array( $this, 'wp_cli' ), 20 );
 
-		// Enqueue export scripts and styles
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_export_scripts_and_styles' ), 20 );
-
-		// Enqueue import scripts and styles
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_import_scripts_and_styles' ), 20 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_backups_scripts_and_styles' ), 20 );
 	}
 
 	/**
@@ -194,6 +229,35 @@ class Ai1wmme_Main_Controller {
 	private function activate_filters() {
 		// Add links to plugin list page
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 5, 2 );
+	}
+
+	/**
+	 * Export and import buttons
+	 */
+	public function ai1wm_buttons() {
+		add_filter( 'ai1wm_pro', 'Ai1wmme_Import_Controller::pro', 20 );
+	}
+
+	/**
+	 * Advanced export options
+	 */
+	public function ai1wm_export_options() {
+		if ( ! defined( 'AI1WMUE_PLUGIN_NAME' ) ) {
+			// Add export inactive themes
+			if ( ! has_action( 'ai1wm_export_inactive_themes' ) ) {
+				add_action( 'ai1wm_export_inactive_themes', 'Ai1wmme_Export_Controller::inactive_themes' );
+			}
+
+			// Add export inactive plugins
+			if ( ! has_action( 'ai1wm_export_inactive_plugins' ) ) {
+				add_action( 'ai1wm_export_inactive_plugins', 'Ai1wmme_Export_Controller::inactive_plugins' );
+			}
+
+			// Add export cache files
+			if ( ! has_action( 'ai1wm_export_cache_files' ) ) {
+				add_action( 'ai1wm_export_cache_files', 'Ai1wmme_Export_Controller::cache_files' );
+			}
+		}
 	}
 
 	/**
@@ -266,7 +330,7 @@ class Ai1wmme_Main_Controller {
 			<p>
 				<?php
 				_e(
-					'Multisite extension requires <a href="https://wordpress.org/plugins/all-in-one-wp-migration/" target="_blank">All-in-One WP Migration plugin</a> to be activated. ' .
+					'Multisite Extension requires <a href="https://wordpress.org/plugins/all-in-one-wp-migration/" target="_blank">All-in-One WP Migration plugin</a> to be activated. ' .
 					'<a href="https://help.servmask.com/knowledgebase/install-instructions-for-multisite-extension/" target="_blank">Multisite Extension install instructions</a>',
 					AI1WMME_PLUGIN_NAME
 				);
@@ -274,6 +338,37 @@ class Ai1wmme_Main_Controller {
 			</p>
 		</div>
 		<?php
+	}
+
+	/**
+	 * WP CLI commands
+	 *
+	 * @return void
+	 */
+	public function wp_cli() {
+		if ( defined( 'WP_CLI' ) ) {
+			WP_CLI::add_command( 'ai1wm', 'Ai1wm_Backup_WP_CLI_Command', array( 'shortdesc' => __( 'All-in-One WP Migration Command', AI1WMME_PLUGIN_NAME ) ) );
+		}
+	}
+
+	/**
+	 * Enqueue scripts and styles for Backup Controller
+	 *
+	 * @param  string $hook Hook suffix
+	 * @return void
+	 */
+	public function enqueue_backups_scripts_and_styles( $hook ) {
+		if ( stripos( 'all-in-one-wp-migration_page_ai1wm_backups', $hook ) === false ) {
+			return;
+		}
+
+		if ( ! defined( 'AI1WMUE_PLUGIN_BASENAME' ) ) {
+			wp_enqueue_script(
+				'ai1wmue_restore',
+				Ai1wm_Template::asset_link( 'javascript/restore.min.js', 'AI1WMME' ),
+				array( 'jquery' )
+			);
+		}
 	}
 
 	/**
@@ -307,5 +402,15 @@ class Ai1wmme_Main_Controller {
 		if ( AI1WMME_PURCHASE_ID ) {
 			update_option( 'ai1wmme_plugin_key', AI1WMME_PURCHASE_ID );
 		}
+	}
+
+	/**
+	 * Register initial router
+	 *
+	 * @return void
+	 */
+	public function router() {
+		// Private actions
+		add_action( 'wp_ajax_ai1wmme_sites_paginator', 'Ai1wmme_Export_Controller::sites_paginator' );
 	}
 }

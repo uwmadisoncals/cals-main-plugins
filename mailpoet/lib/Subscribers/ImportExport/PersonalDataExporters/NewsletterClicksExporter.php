@@ -18,16 +18,16 @@ class NewsletterClicksExporter {
   }
 
   private function exportSubscriber($subscriber, $page) {
-    if(!$subscriber) return array();
+    if (!$subscriber) return array();
 
     $result = array();
 
-    $statistics = StatisticsClicks::getAllForSubsciber($subscriber)
+    $statistics = StatisticsClicks::getAllForSubscriber($subscriber)
        ->limit(self::LIMIT)
        ->offset(self::LIMIT * ($page - 1))
        ->findArray();
 
-    foreach($statistics as $row) {
+    foreach ($statistics as $row) {
       $result[] = $this->exportNewsletter($row);
     }
 

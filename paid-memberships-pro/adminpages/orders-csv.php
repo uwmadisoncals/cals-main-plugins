@@ -44,6 +44,12 @@ if ( isset( $_REQUEST['l'] ) ) {
 	$l = false;
 }
 
+if ( isset( $_REQUEST['discount-code'] ) ) {
+	$discount_code = intval( $_REQUEST['discount-code'] );
+} else {
+	$discount_code = false;
+}
+
 if ( isset( $_REQUEST['start-month'] ) ) {
 	$start_month = intval( $_REQUEST['start-month'] );
 } else {
@@ -130,7 +136,7 @@ if ( $filter == "all" || ! $filter ) {
 	$start_date = $start_date . " 00:00:00";
 	$end_date   = $end_date . " 23:59:59";
 
-	$condition = "timestamp BETWEEN '" . $start_date . "' AND '" . $end_date . "'";
+	$condition = "o.timestamp BETWEEN '" . $start_date . "' AND '" . $end_date . "'";
 } elseif ( $filter == "predefined-date-range" ) {
 	if ( $predefined_date == "Last Month" ) {
 		$start_date = date_i18n( "Y-m-d", strtotime( "first day of last month", current_time( "timestamp" ) ) );
@@ -152,11 +158,17 @@ if ( $filter == "all" || ! $filter ) {
 	$start_date = $start_date . " 00:00:00";
 	$end_date   = $end_date . " 23:59:59";
 
-	$condition = "timestamp BETWEEN '" . esc_sql( $start_date ) . "' AND '" . esc_sql( $end_date ) . "'";
+	$condition = "o.timestamp BETWEEN '" . esc_sql( $start_date ) . "' AND '" . esc_sql( $end_date ) . "'";
 } elseif ( $filter == "within-a-level" ) {
-	$condition = "membership_id = " . esc_sql( $l );
+	$condition = "o.membership_id = " . esc_sql( $l );
+} elseif ( $filter == 'with-discount-code' ) {
+	$condition = 'dc.code_id = ' . esc_sql( $discount_code );
 } elseif ( $filter == "within-a-status" ) {
-	$condition = "status = '" . esc_sql( $status ) . "' ";
+	$condition = "o.status = '" . esc_sql( $status ) . "' ";
+} elseif ( $filter == 'only-paid' ) {
+	$condition = "o.total > 0";
+} elseif( $filter == 'only-free' ) {
+	$condition = "o.total = 0";
 }
 
 //string search
@@ -172,6 +184,10 @@ if ( ! empty( $s ) ) {
 
 	if ( ! empty( $join_with_usermeta ) ) {
 		$sqlQuery .= "LEFT JOIN $wpdb->usermeta um ON o.user_id = um.user_id ";
+	}
+
+	if ( $filter === 'with-discount-code' ) {
+		$sqlQuery .= "LEFT JOIN $wpdb->pmpro_discount_codes_uses dc ON o.id = dc.order_id ";
 	}
 
 	$sqlQuery .= "WHERE (1=2 ";
@@ -214,12 +230,13 @@ if ( ! empty( $s ) ) {
 	$sqlQuery .= "GROUP BY o.id ORDER BY o.id DESC, o.timestamp DESC ";
 
 } else {
-	$sqlQuery = "
-		SELECT SQL_CALC_FOUND_ROWS id
-		FROM {$wpdb->pmpro_membership_orders}
-		WHERE {$condition}
-		ORDER BY id DESC, timestamp DESC
-		";
+	$sqlQuery = "SELECT SQL_CALC_FOUND_ROWS o.id FROM $wpdb->pmpro_membership_orders o ";
+
+	if ( $filter === 'with-discount-code' ) {
+		$sqlQuery .= "LEFT JOIN $wpdb->pmpro_discount_codes_uses dc ON o.id = dc.order_id ";
+	}
+
+	$sqlQuery .= "WHERE " . $condition . ' ORDER BY o.id DESC, o.timestamp DESC ';
 }
 
 if ( ! empty( $start ) && ! empty( $limit ) ) {
@@ -241,6 +258,7 @@ $headers[] = "Content-Disposition: attachment; filename={$filename};";
 
 $csv_file_header_array = array(
 	"id",
+	"code",
 	"user_id",
 	"user_login",
 	"first_name",
@@ -279,6 +297,7 @@ $csv_file_header_array = array(
 //these are the meta_keys for the fields (arrays are object, property. so e.g. $theuser->ID)
 $default_columns = array(
 	array( "order", "id" ),
+	array( "order", "code" ),
 	array( "user", "ID" ),
 	array( "user", "user_login" ),
 	array( "user", "first_name" ),

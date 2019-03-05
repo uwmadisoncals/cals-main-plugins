@@ -29,10 +29,22 @@ class AAM_Core_Object_Toolbar extends AAM_Core_Object {
         
         $option = $this->getSubject()->readOption('toolbar');
         
+        if (!empty($option)) {
+            $this->setOverwritten(true);
+        }
+        
+        // Load settings from Access & Security Policy
+        if (empty($option)) {
+            $stms = AAM_Core_Policy_Factory::get($subject)->find("/^Toolbar:/i");
+            
+            foreach($stms as $key => $stm) {
+                $chunks = explode(':', $key);
+                $option[$chunks[1]] = ($stm['Effect'] === 'deny' ? 1 : 0);
+            }
+        }
+        
         if (empty($option)) {
             $option = $this->getSubject()->inheritFromParent('toolbar');
-        } else {
-            $this->setOverwritten(true);
         }
         
         $this->setOption($option);
@@ -111,6 +123,15 @@ class AAM_Core_Object_Toolbar extends AAM_Core_Object {
      */
     public function reset() {
         return $this->getSubject()->deleteOption('toolbar');
+    }
+    
+    /**
+     * 
+     * @param type $external
+     * @return type
+     */
+    public function mergeOption($external) {
+        return AAM::api()->mergeSettings($external, $this->getOption(), 'toolbar');
     }
 
 }

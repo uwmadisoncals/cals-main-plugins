@@ -3,34 +3,36 @@ namespace MailPoet\Subscribers\ImportExport;
 
 use MailPoet\Models\CustomField;
 use MailPoet\Models\Segment;
-use MailPoet\Premium\Models\DynamicSegment;
 use MailPoet\Util\Helpers;
-use MailPoet\WP\Hooks;
+use MailPoet\WP\Functions as WPFunctions;
 
 class ImportExportFactory {
-  const IMPORT_ACTION = 'import'; 
+  const IMPORT_ACTION = 'import';
   const EXPORT_ACTION = 'export';
 
   public $action;
 
+  private $wp;
+
   function __construct($action = null) {
     $this->action = $action;
+    $this->wp = new WPFunctions;
   }
 
   function getSegments() {
-    if($this->action === self::IMPORT_ACTION) {
+    if ($this->action === self::IMPORT_ACTION) {
       $segments = Segment::getSegmentsForImport();
     } else {
       $segments = Segment::getSegmentsForExport();
-      $segments = Hooks::applyFilters('mailpoet_segments_with_subscriber_count', $segments);
+      $segments = $this->wp->applyFilters('mailpoet_segments_with_subscriber_count', $segments);
       $segments = array_values(array_filter($segments, function($segment) {
         return $segment['subscribers'] > 0;
       }));
     }
 
     return array_map(function($segment) {
-      if(!$segment['name']) $segment['name'] = __('Not In List', 'mailpoet');
-      if(!$segment['id']) $segment['id'] = 0;
+      if (!$segment['name']) $segment['name'] = __('Not In List', 'mailpoet');
+      if (!$segment['id']) $segment['id'] = 0;
       return array(
         'id' => $segment['id'],
         'name' => $segment['name'],
@@ -45,7 +47,7 @@ class ImportExportFactory {
       'first_name' => __('First name', 'mailpoet'),
       'last_name' => __('Last name', 'mailpoet')
     );
-    if($this->action === 'export') {
+    if ($this->action === 'export') {
       $fields = array_merge(
         $fields,
         array(
@@ -119,7 +121,7 @@ class ImportExportFactory {
         'children' => $this->formatSubscriberFields($subscriber_fields)
       )
     );
-    if($subscriber_custom_fields) {
+    if ($subscriber_custom_fields) {
       array_push($select2Fields, array(
         'name' => __('User fields', 'mailpoet'),
         'children' => $this->formatSubscriberCustomFields(
@@ -140,7 +142,7 @@ class ImportExportFactory {
         $subscriber_custom_fields
       )
     );
-    if($this->action === 'import') {
+    if ($this->action === 'import') {
       $data['subscriberFields'] = json_encode(
         array_merge(
           $this->formatSubscriberFields($subscriber_fields),
@@ -150,6 +152,7 @@ class ImportExportFactory {
       $data['maxPostSizeBytes'] = Helpers::getMaxPostSize('bytes');
       $data['maxPostSize'] = Helpers::getMaxPostSize();
     }
+    $data['zipExtensionLoaded'] = extension_loaded('zip');
     return $data;
   }
 }

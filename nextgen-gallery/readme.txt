@@ -2,11 +2,11 @@
 Contributors: photocrati, imagely
 Tags: wordpress gallery plugin, gallery, nextgen, nextgen gallery, photo gallery, image gallery, photography, slideshow, images, photo, photo album, watermark
 Requires at least: 4.0.0
-Stable tag: 3.0.13
-Tested up to: 4.9.8
+Stable tag: 3.1.7
+Tested up to: 5.1.0
 License: GPLv2
 
-The most popular WordPress gallery plugin and one of the most popular plugins of all time with over 22 million downloads.
+The most popular WordPress gallery plugin and one of the most popular plugins of all time with over 24 million downloads.
 
 == Description ==
 
@@ -61,7 +61,7 @@ Learn more or connect with us:<br>
 == Credits ==
 
 Copyright:<br>
-Imagely 2016-2018
+Imagely 2016-2019
 Photocrati Media 2012-2016<br>
 Alex Rabe 2007-2011
 
@@ -183,10 +183,71 @@ For more information, feel free to visit the official website for the NextGEN Ga
 
 == Changelog ==
 
+= V3.1.7 - 02.26.2019 =
+* Changed: Upgraded Freemius SDK to latest release
+
+= V3.1.6 - 01.16.2019 =
+* NEW:     Option to control caching duration of random widget galleries
+* Secured: DB record serialization
+* Fixed:   Compatibility with plugins that extend Gutenberg / Block Editor
+* Fixed:   Invalid regex causing warnings when viewing /ngg_tags/ pages
+* Fixed:   Misc grammatical and spelling mistakes
+
+= V3.1.5 - 01.08.2019 =
+* NEW:     Added constant NGG_DISABLE_SHUTDOWN_EXCEPTION_HANDLER
+* Secured: DB record serialization
+* Changed: Added 185 character limit to filenames to prevent filesystem issues
+* Changed: Removed caching of 'random' galleries; now only random widgets will be cached
+* Changed: Removed dependency on underscore.string.js
+* Changed: Updated base64.js library in attach-to-post module
+* Changed: Updated jquery.waitforimages.js
+* Fixed:   Uploading of non-JPEG images and uploading of JPEG with invalid EXIF data
+
+= V3.1.4 - 12.21.2018 =
+* Fixed:   Visual shortcode not displaying in WP 5.0.2
+
+= V3.1.3 - 01.08.2018 =
+* Fixed:   Post thumbnail support for NextGEN Gallery when using Block Editor
+
+= V3.1.2 - 12.18.2018 =
+* Fixed:   Variable mismatch error when using central gallery management pages
+
+= V3.1.1 - 11.29.2018 =
+* Fixed:   Don't enqueue block editor assets on frontend.
+* Fixed:   Broken styling for column blocks
+
+= V3.1.0 - 11.28.2018 =
+* NEW:     Gutengerg block for NextGEN Gallery
+* Secured: Other options page
+* Updated: Freemius SDK
+* Fixed:   Getting started wizard compatible with Gutenberg
+* Fixed:   WPML redirects
+* Fixed:   Missing descriptions and tags when re-importing image metadata
+
+= V3.0.16 - 10.24.2018 =
+* Fixed    Fontawesome 4 compatibility
+
+= v3.0.15 - 10.23.2018 =
+* NEW:     Added requirements notification manager
+* Changed: Basic Thumbnails default setting from "[Show slideshow]" to "Show slideshow"
+* Changed: Fixed order_by=rand and 'variations' system not working by storing random results in a transient for 24h
+* Changed: How gallery directories are removed
+* Changed: Improved memory use during thumbnail generation
+* Changed: Manage Albums page now uses GET for editing navigation
+* Changed: Upgrading FontAwesome to 5.0.13
+* Fixed:   Attribute 'target=_blank' not working in lightbox effects
+* Fixed:   Conflict with WP Social Widget
+* Fixed:   Corrected numerous phpdoc problems found by Phan
+* Fixed:   Editing of image attributes from search-galleries page
+* Fixed:   Gritter messages with long texts overlapped their close-notification icon
+* Fixed:   IGW gallery selections not persisting between edits
+* Fixed:   Orphaned entries being created and/or left in wp_postmeta
+* Fixed:   Repeated and missing images in featured images list
+
 = V3.0.13 - 10.11.2018 =
 * Changed: Added settings for basic slideshow
 
-= V3.0.9 - 10.02.2018 =
+= V3.0.9 - 09.25.2018 =
 * NEW:     Added 2.0 template mechanism for basic galleries
 * NEW:     Simple Lightbox is the new default Lightbox
 * Changed: Changed Javascript library and styling for basic slideshow

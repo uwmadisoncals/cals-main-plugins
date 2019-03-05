@@ -8,12 +8,21 @@
 	padding: 0;
 }
 
+/* Override overflow:hidden */
+div.site-content {
+	overflow: visible; 
+}
+
 .mc-main {
 	line-height: 1;
 }
 
 .mc-main article, .mc-main aside, .mc-main dialog, .mc-main figure, .mc-main footer, .mc-main header, .mc-main nav, .mc-main section, .mc-main blockquote {
 	display: block;
+}
+
+.mc-main h2:before {
+	display: none;
 }
 
 .mc-main nav ul {

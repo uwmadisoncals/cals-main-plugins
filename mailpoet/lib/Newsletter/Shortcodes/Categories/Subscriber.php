@@ -4,8 +4,7 @@ namespace MailPoet\Newsletter\Shortcodes\Categories;
 use MailPoet\Models\Subscriber as SubscriberModel;
 use MailPoet\Models\SubscriberCustomField;
 
-if(!defined('ABSPATH')) exit;
-require_once(ABSPATH . 'wp-includes/pluggable.php');
+if (!defined('ABSPATH')) exit;
 
 class Subscriber {
   static function process(
@@ -13,11 +12,11 @@ class Subscriber {
     $newsletter,
     $subscriber
   ) {
-    if($subscriber !== false && !is_object($subscriber)) return $shortcode_details['shortcode'];
+    if ($subscriber !== false && !is_object($subscriber)) return $shortcode_details['shortcode'];
     $default_value = ($shortcode_details['action_argument'] === 'default') ?
       $shortcode_details['action_argument_value'] :
       '';
-    switch($shortcode_details['action']) {
+    switch ($shortcode_details['action']) {
       case 'firstname':
         return (!empty($subscriber->first_name)) ? $subscriber->first_name : $default_value;
       case 'lastname':
@@ -25,7 +24,7 @@ class Subscriber {
       case 'email':
         return ($subscriber) ? $subscriber->email : false;
       case 'displayname':
-        if($subscriber && $subscriber->wp_user_id) {
+        if ($subscriber && $subscriber->wp_user_id) {
           $wp_user = get_userdata($subscriber->wp_user_id);
           return $wp_user->user_login;
         }
@@ -34,7 +33,7 @@ class Subscriber {
         return SubscriberModel::filter('subscribed')
           ->count();
       default:
-        if(preg_match('/cf_(\d+)/', $shortcode_details['action'], $custom_field) &&
+        if (preg_match('/cf_(\d+)/', $shortcode_details['action'], $custom_field) &&
           !empty($subscriber->id)
         ) {
           $custom_field = SubscriberCustomField

@@ -82,10 +82,13 @@ final class Wicked_Folders_Ajax {
 		$state->folder_type 			= $data->folder->type;
 		$state->expanded_folders 		= $data->expanded;
 		$state->tree_pane_width 		= $data->treePaneWidth;
-		$state->hide_assigned_items 	= $data->hideAssignedItems;
 		$state->orderby 				= $data->orderby;
 		$state->order 					= $data->order;
 		$state->is_folder_pane_visible 	= $data->isFolderPaneVisible;
+
+		if ( isset( $data->hideAssignedItems ) ) {
+			$state->hide_assigned_items = $data->hideAssignedItems;
+		}
 
 		$state->save();
 

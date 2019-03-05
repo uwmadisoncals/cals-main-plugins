@@ -5,8 +5,20 @@ use MailPoet\Util\Helpers;
 use MailPoet\WP\Emoji;
 use MailPoet\Tasks\Subscribers as TaskSubscribers;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
+/**
+ * @property int $count_processed
+ * @property int $count_to_process
+ * @property int $count_total
+ * @property string $newsletter_rendered_body
+ * @property string $newsletter_rendered_subject
+ * @property int $task_id
+ * @property int $newsletter_id
+ * @property string|object $meta
+ * @property string|array $subscribers
+ * @property string|null $deleted_at
+ */
 class SendingQueue extends Model {
   public static $_table = MP_SENDING_QUEUES_TABLE;
   const STATUS_COMPLETED = 'completed';
@@ -16,12 +28,15 @@ class SendingQueue extends Model {
   const PRIORITY_MEDIUM = 5;
   const PRIORITY_LOW = 10;
 
+  private $emoji;
+
   function __construct() {
     parent::__construct();
 
     $this->addValidations('newsletter_rendered_body', array(
       'validRenderedNewsletterBody' => __('Rendered newsletter body is invalid!', 'mailpoet')
     ));
+    $this->emoji = new Emoji();
   }
 
   function task() {
@@ -33,7 +48,7 @@ class SendingQueue extends Model {
   }
 
   function pause() {
-    if($this->count_processed === $this->count_total) {
+    if ($this->count_processed === $this->count_total) {
       return false;
     } else {
       return $this->task()->findOne()->pause();
@@ -41,7 +56,7 @@ class SendingQueue extends Model {
   }
 
   function resume() {
-    if($this->count_processed === $this->count_total) {
+    if ($this->count_processed === $this->count_total) {
       return $this->complete();
     } else {
       return $this->task()->findOne()->resume();
@@ -54,13 +69,13 @@ class SendingQueue extends Model {
 
   function save() {
     $this->newsletter_rendered_body = $this->getNewsletterRenderedBody();
-    if(!Helpers::isJson($this->newsletter_rendered_body) && !is_null($this->newsletter_rendered_body)) {
+    if (!Helpers::isJson($this->newsletter_rendered_body) && !is_null($this->newsletter_rendered_body)) {
       $this->set(
         'newsletter_rendered_body',
         json_encode($this->encodeEmojisInBody($this->newsletter_rendered_body))
       );
     }
-    if(!Helpers::isJson($this->meta)) {
+    if (!Helpers::isJson($this->meta)) {
       $this->set(
         'meta',
         json_encode($this->meta)
@@ -75,11 +90,11 @@ class SendingQueue extends Model {
    * Used only for checking processed subscribers in old queues
    */
   private function getSubscribers() {
-    if(!is_serialized($this->subscribers)) {
+    if (!is_serialized($this->subscribers)) {
       return $this->subscribers;
     }
     $subscribers = unserialize($this->subscribers);
-    if(empty($subscribers['processed'])) {
+    if (empty($subscribers['processed'])) {
       $subscribers['processed'] = array();
     }
     return $subscribers;
@@ -97,9 +112,9 @@ class SendingQueue extends Model {
   }
 
   function encodeEmojisInBody($newsletter_rendered_body) {
-    if(is_array($newsletter_rendered_body)) {
-      foreach($newsletter_rendered_body as $key => $value) {
-        $newsletter_rendered_body[$key] = Emoji::encodeForUTF8Column(
+    if (is_array($newsletter_rendered_body)) {
+      foreach ($newsletter_rendered_body as $key => $value) {
+        $newsletter_rendered_body[$key] = $this->emoji->encodeForUTF8Column(
           self::$_table,
           'newsletter_rendered_body',
           $value
@@ -110,22 +125,22 @@ class SendingQueue extends Model {
   }
 
   function decodeEmojisInBody($newsletter_rendered_body) {
-    if(is_array($newsletter_rendered_body)) {
-      foreach($newsletter_rendered_body as $key => $value) {
-        $newsletter_rendered_body[$key] = Emoji::decodeEntities($value);
+    if (is_array($newsletter_rendered_body)) {
+      foreach ($newsletter_rendered_body as $key => $value) {
+        $newsletter_rendered_body[$key] = $this->emoji->decodeEntities($value);
       }
     }
     return $newsletter_rendered_body;
   }
 
   function isSubscriberProcessed($subscriber_id) {
-    if(!empty($this->subscribers)
+    if (!empty($this->subscribers)
       && ScheduledTaskSubscriber::getTotalCount($this->task_id) === 0
     ) {
       $subscribers = $this->getSubscribers();
       return in_array($subscriber_id, $subscribers['processed']);
     } else {
-      if($task = $this->task()->findOne()) {
+      if ($task = $this->task()->findOne()) {
         $task_subscribers = new TaskSubscribers($task);
         return $task_subscribers->isSubscriberProcessed($subscriber_id);
       }
@@ -141,17 +156,17 @@ class SendingQueue extends Model {
   }
 
   private function decodeRenderedNewsletterBodyObject($rendered_body) {
-    if(is_serialized($rendered_body)) {
+    if (is_serialized($rendered_body)) {
       return $this->decodeEmojisInBody(unserialize($rendered_body));
     }
-    if(Helpers::isJson($rendered_body)) {
+    if (Helpers::isJson($rendered_body)) {
       return $this->decodeEmojisInBody(json_decode($rendered_body, true));
     }
     return $rendered_body;
   }
 
   static function getTasks() {
-    return ScheduledTask::table_alias('tasks')
+    return ScheduledTask::tableAlias('tasks')
     ->selectExpr('tasks.*')
     ->join(
       MP_SENDING_QUEUES_TABLE,
@@ -161,7 +176,7 @@ class SendingQueue extends Model {
   }
 
   static function joinWithTasks() {
-    return static::table_alias('queues')
+    return static::tableAlias('queues')
     ->join(
       MP_SCHEDULED_TASKS_TABLE,
       'tasks.id = queues.task_id',

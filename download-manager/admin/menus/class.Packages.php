@@ -140,7 +140,7 @@ class Packages
         if(get_post_type()!='wpdmpro') return;
         if ($column_name == 'download_count') {
 
-            echo get_post_meta($post_ID, '__wpdm_download_count', true);
+            echo (int)get_post_meta($post_ID, '__wpdm_download_count', true);
 
         }
         if ($column_name == 'wpdmshortcode') {

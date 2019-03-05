@@ -3,7 +3,6 @@ namespace MailPoet\Newsletter;
 
 use MailPoet\Router\Router;
 use MailPoet\Router\Endpoints\ViewInBrowser as ViewInBrowserEndpoint;
-use MailPoet\Models\Newsletter as NewsletterModel;
 use MailPoet\Models\Subscriber as SubscriberModel;
 
 class Url {
@@ -17,10 +16,10 @@ class Url {
     $queue = false,
     $preview = false
   ) {
-    if($subscriber instanceof SubscriberModel) {
+    if ($subscriber instanceof SubscriberModel) {
       $subscriber->token = SubscriberModel::generateToken($subscriber->email);
     }
-    switch($type) {
+    switch ($type) {
       case self::TYPE_ARCHIVE:
         // do not expose newsletter id when displaying archive newsletters
         $newsletter->id = null;

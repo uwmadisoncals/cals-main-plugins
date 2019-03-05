@@ -5,9 +5,10 @@ namespace MailPoet\Subscription;
 use MailPoet\Models\Subscriber;
 use MailPoet\Models\SubscriberSegment;
 use MailPoet\Models\CustomField;
-use MailPoet\Models\Setting;
 use MailPoet\Models\Segment;
 use MailPoet\Newsletter\Scheduler\Scheduler;
+use MailPoet\Settings\SettingsController;
+use MailPoet\Subscribers\NewSubscriberNotificationMailer;
 use MailPoet\Util\Helpers;
 use MailPoet\Util\Url as UrlHelper;
 use MailPoet\Form\Renderer as FormRenderer;
@@ -22,13 +23,23 @@ class Pages {
   private $action;
   private $data;
   private $subscriber;
+  /** @var NewSubscriberNotificationMailer */
+  private $new_subscriber_notification_sender;
+  /** @var SettingsController */
+  private $settings;
 
-  function __construct($action = false, $data = array(), $init_shortcodes = false, $init_page_filters = false) {
+  function __construct($action = false, $data = array(), $init_shortcodes = false, $init_page_filters = false, $new_subscriber_notification_sender = null) {
     $this->action = $action;
     $this->data = $data;
     $this->subscriber = $this->getSubscriber();
-    if($init_page_filters) $this->initPageFilters();
-    if($init_shortcodes) $this->initShortcodes();
+    if ($init_page_filters) $this->initPageFilters();
+    if ($init_shortcodes) $this->initShortcodes();
+    if ($new_subscriber_notification_sender) {
+      $this->new_subscriber_notification_sender = $new_subscriber_notification_sender;
+    } else {
+      $this->new_subscriber_notification_sender = new NewSubscriberNotificationMailer();
+    }
+    $this->settings = new SettingsController();
   }
 
   private function isPreview() {
@@ -52,7 +63,7 @@ class Pages {
     $email = (isset($this->data['email'])) ? $this->data['email'] : null;
     $wp_user = wp_get_current_user();
 
-    if(!$email && $wp_user->exists()) {
+    if (!$email && $wp_user->exists()) {
       return Subscriber::where('wp_user_id', $wp_user->ID)->findOne();
     }
 
@@ -62,7 +73,7 @@ class Pages {
   }
 
   function confirm() {
-    if($this->subscriber === false || $this->subscriber->status === Subscriber::STATUS_SUBSCRIBED) {
+    if ($this->subscriber === false || $this->subscriber->status === Subscriber::STATUS_SUBSCRIBED) {
       return false;
     }
 
@@ -74,26 +85,30 @@ class Pages {
     $this->subscriber->unconfirmed_data = null;
     $this->subscriber->save();
 
-    if($this->subscriber->getErrors() === false) {
+    if ($this->subscriber->getErrors() === false) {
       // send welcome notification
-      $subsciber_segments = $this->subscriber->segments()->findArray();
-      if($subsciber_segments) {
+      $subscriber_segments = $this->subscriber->segments()->findMany();
+      if ($subscriber_segments) {
         Scheduler::scheduleSubscriberWelcomeNotification(
           $this->subscriber->id,
-          array_column($subsciber_segments, 'id')
+          array_map(function ($segment) {
+            return $segment->get('id');
+          }, $subscriber_segments)
         );
       }
 
+      $this->new_subscriber_notification_sender->send($this->subscriber, $subscriber_segments);
+
       // update subscriber from stored data after confirmation
-      if(!empty($subscriber_data)) {
+      if (!empty($subscriber_data)) {
         Subscriber::createOrUpdate($subscriber_data);
       }
     }
   }
 
   function unsubscribe() {
-    if($this->subscriber !== false) {
-      if($this->subscriber->status !== Subscriber::STATUS_UNSUBSCRIBED) {
+    if ($this->subscriber !== false) {
+      if ($this->subscriber->status !== Subscriber::STATUS_UNSUBSCRIBED) {
         $this->subscriber->status = Subscriber::STATUS_UNSUBSCRIBED;
         $this->subscriber->save();
         SubscriberSegment::unsubscribeFromSegments($this->subscriber);
@@ -104,11 +119,11 @@ class Pages {
   function setPageTitle($page_title = '') {
     global $post;
 
-    if($this->isPreview() === false && $this->subscriber === false) {
+    if ($this->isPreview() === false && $this->subscriber === false) {
       return __("Hmmm... we don't have a record of you.", 'mailpoet');
     }
 
-    if(
+    if (
       ($post->post_title !== __('MailPoet Page', 'mailpoet'))
       ||
       ($page_title !== single_post_title('', false))
@@ -117,7 +132,7 @@ class Pages {
       return $page_title;
     } else {
       // when it's our own page, generate page title based on requested action
-      switch($this->action) {
+      switch ($this->action) {
         case self::ACTION_CONFIRM:
           return $this->getConfirmTitle();
 
@@ -134,14 +149,14 @@ class Pages {
     global $post;
 
     // if we're not in preview mode and the subscriber does not exist
-    if($this->isPreview() === false && $this->subscriber === false) {
+    if ($this->isPreview() === false && $this->subscriber === false) {
       return __("Your email address doesn't appear in our lists anymore. Sign up again or contact us if this appears to be a mistake.", 'mailpoet');
     }
 
-    if(strpos($page_content, '[mailpoet_page]') !== false) {
+    if (strpos($page_content, '[mailpoet_page]') !== false) {
       $content = '';
 
-      switch($this->action) {
+      switch ($this->action) {
         case self::ACTION_CONFIRM:
           $content = $this->getConfirmContent();
           break;
@@ -160,7 +175,7 @@ class Pages {
 
   function setWindowTitle($title, $separator, $separator_location = 'right') {
     $title_parts = explode(" $separator ", $title);
-    if($separator_location === 'right') {
+    if ($separator_location === 'right') {
       // first part
       $title_parts[0] = $this->setPageTitle($title_parts[0]);
     } else {
@@ -177,7 +192,7 @@ class Pages {
   }
 
   private function getConfirmTitle() {
-    if($this->isPreview()) {
+    if ($this->isPreview()) {
       $title = sprintf(
         __("You have subscribed to: %s", 'mailpoet'),
         'demo 1, demo 2'
@@ -187,7 +202,7 @@ class Pages {
         return $segment->name;
       }, $this->subscriber->segments()->findMany());
 
-      if(empty($segment_names)) {
+      if (empty($segment_names)) {
         $title = __("You are now subscribed!", 'mailpoet');
       } else {
         $title = sprintf(
@@ -200,32 +215,32 @@ class Pages {
   }
 
   private function getManageTitle() {
-    if($this->isPreview() || $this->subscriber !== false) {
+    if ($this->isPreview() || $this->subscriber !== false) {
       return __("Manage your subscription", 'mailpoet');
     }
   }
 
   private function getUnsubscribeTitle() {
-    if($this->isPreview() || $this->subscriber !== false) {
+    if ($this->isPreview() || $this->subscriber !== false) {
       return __("You are now unsubscribed.", 'mailpoet');
     }
   }
 
   private function getConfirmContent() {
-    if($this->isPreview() || $this->subscriber !== false) {
+    if ($this->isPreview() || $this->subscriber !== false) {
       return __("Yup, we've added you to our email list. You'll hear from us shortly.", 'mailpoet');
     }
   }
 
   public function getManageContent() {
-    if($this->isPreview()) {
+    if ($this->isPreview()) {
       $subscriber = Subscriber::create();
       $subscriber->hydrate(array(
         'email' => self::DEMO_EMAIL,
         'first_name' => 'John',
         'last_name' => 'Doe'
       ));
-    } else if($this->subscriber !== false) {
+    } else if ($this->subscriber !== false) {
       $subscriber = $this->subscriber
       ->withCustomFields()
       ->withSubscriptions();
@@ -238,7 +253,7 @@ class Pages {
       $custom_field = $custom_field->asArray();
       $custom_field['params']['value'] = $subscriber->{$custom_field['id']};
 
-      if($custom_field['type'] === 'date') {
+      if ($custom_field['type'] === 'date') {
         $date_formats = FormBlockDate::getDateFormats();
         $custom_field['params']['date_format'] = array_shift(
           $date_formats[$custom_field['params']['date_type']]
@@ -248,8 +263,8 @@ class Pages {
       return $custom_field;
     }, CustomField::findMany());
 
-    $segment_ids = Setting::getValue('subscription.segments', array());
-    if(!empty($segment_ids)) {
+    $segment_ids = $this->settings->get('subscription.segments', []);
+    if (!empty($segment_ids)) {
       $segments = Segment::getPublic()
         ->whereIn('id', $segment_ids)
         ->findMany();
@@ -258,9 +273,9 @@ class Pages {
         ->findMany();
     }
     $subscribed_segment_ids = array();
-    if(!empty($this->subscriber->subscriptions)) {
-      foreach($this->subscriber->subscriptions as $subscription) {
-        if($subscription['status'] === Subscriber::STATUS_SUBSCRIBED) {
+    if (!empty($this->subscriber->subscriptions)) {
+      foreach ($this->subscriber->subscriptions as $subscription) {
+        if ($subscription['status'] === Subscriber::STATUS_SUBSCRIBED) {
           $subscribed_segment_ids[] = $subscription['segment_id'];
         }
       }
@@ -282,7 +297,7 @@ class Pages {
         'params' => array(
           'label' => __('First name', 'mailpoet'),
           'value' => $subscriber->first_name,
-          'disabled' => ($subscriber->isWPUser())
+          'disabled' => ($subscriber->isWPUser() || $subscriber->isWooCommerceUser())
         )
       ),
       array(
@@ -291,7 +306,7 @@ class Pages {
         'params' => array(
           'label' => __('Last name', 'mailpoet'),
           'value' => $subscriber->last_name,
-          'disabled' => ($subscriber->isWPUser())
+          'disabled' => ($subscriber->isWPUser() || $subscriber->isWooCommerceUser())
         )
       ),
       array(
@@ -375,10 +390,10 @@ class Pages {
     $form_html .= '<label>Email *<br /><strong>'.$subscriber->email.'</strong></label>';
     $form_html .= '<br /><span style="font-size:85%;">';
     // special case for WP users as they cannot edit their subscriber's email
-    if($subscriber->isWPUser()) {
+    if ($subscriber->isWPUser() || $subscriber->isWooCommerceUser()) {
       // check if subscriber's associated WP user is the currently logged in WP user
       $wp_current_user = wp_get_current_user();
-      if($wp_current_user->user_email === $subscriber->email) {
+      if ($wp_current_user->user_email === $subscriber->email) {
         $form_html .= Helpers::replaceLinkTags(
           __('[link]Edit your profile[/link] to update your email.', 'mailpoet'),
           get_edit_profile_url(),
@@ -405,7 +420,7 @@ class Pages {
 
   private function getUnsubscribeContent() {
     $content = '';
-    if($this->isPreview() || $this->subscriber !== false) {
+    if ($this->isPreview() || $this->subscriber !== false) {
       $content .= '<p>'.__('Accidentally unsubscribed?', 'mailpoet').' <strong>';
       $content .= '[mailpoet_manage]';
       $content .= '</strong></p>';
@@ -414,7 +429,7 @@ class Pages {
   }
 
   function getManageLink($params) {
-    if(!$this->subscriber) return __('Link to subscription management page is only available to mailing lists subscribers.', 'mailpoet');
+    if (!$this->subscriber) return __('Link to subscription management page is only available to mailing lists subscribers.', 'mailpoet');
 
     // get label or display default label
     $text = (
@@ -424,7 +439,7 @@ class Pages {
     );
 
     return '<a href="'.Url::getManageUrl(
-      $this->subscriber
+      $this->subscriber ?: null
     ).'">'.$text.'</a>';
   }
 }

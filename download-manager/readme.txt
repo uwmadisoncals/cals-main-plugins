@@ -3,7 +3,7 @@ Contributors: w3eden, codename065, shahriar0822, shimo16ab, shafayat-alam
 Donate link: 
 Tags: digital store, eshop, ecommerce, e-commerce, file management,  document management plugin, download manager, file manager, download monitor, download counter, password protection, download protection
 Requires at least: 3.4
-Tested up to: 4.9
+Tested up to: 5.1
 License: GPLv2 or later
  
   
@@ -157,6 +157,41 @@ Check download stats and get a push notification when someone downloads, install
 15. Quick Add Panel
 
 == Changelog ==
+
+= 2.9.90 =
+* Fixed an issue with settings page tab load
+
+= 2.9.89 =
+* Fixed the issue with saving settings
+
+= 2.9.88 =
+* Compatibility update for WordPress 5.1
+
+= 2.9.87 =
+* Fixed an issue with wpdm_direct_link shortcode
+* Fixed an issue with session class namespace
+* Fixed an issue with signup form
+
+= 2.9.86 =
+* Fixed the issue with cache dir creation
+
+= 2.9.85 =
+* Fixed the conflict with the wordpress plugin/theme editor
+* Moved cache directory outside of plugins dir
+* Added new option to customize download button styles easily
+
+= 2.9.84 =
+* Updated sign up and login form
+* Updated email templates
+
+= 2.9.83 =
+* Added email template editor ( option to customize all email messages and templates send from wpdm )
+
+= 2.9.82 =
+* Improved search shortcode
+* Fixed text domain issue with registration form
+* Fixed a redirection issue with the login form
+* Option to enable/disable Google Fonts
 
 = 2.9.81 =
 * Changed Font Awesome enqueue ID

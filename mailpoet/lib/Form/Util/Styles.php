@@ -1,7 +1,7 @@
 <?php
 namespace MailPoet\Form\Util;
 
-use Sabberworm\CSS\Parser as CSSParser;
+use MailPoetVendor\Sabberworm\CSS\Parser as CSSParser;
 
 class Styles {
   public $styles;
@@ -58,24 +58,38 @@ class Styles {
 }
 
 .mailpoet_validate_success {
+  font-weight: 600;
   color:#468847;
 }
 
 .mailpoet_validate_error {
   color:#B94A48;
 }
+
+.mailpoet_form_loading {
+  width: 30px;
+  text-align: center;
+  line-height: normal;
+}
+
+.mailpoet_form_loading > span {
+  width: 5px;
+  height: 5px;
+  background-color: #5b5b5b;
+}
 EOL;
+  private $stylesheet;
 
   function __construct($stylesheet = null) {
     $this->stylesheet = $stylesheet;
   }
 
   function render($prefix = '') {
-    if(!$this->stylesheet) return;
+    if (!$this->stylesheet) return;
     $styles = new CSSParser($this->stylesheet);
     $styles = $styles->parse();
     $formatted_styles = array();
-    foreach($styles->getAllDeclarationBlocks() as $style_declaration) {
+    foreach ($styles->getAllDeclarationBlocks() as $style_declaration) {
       $selectors = array_map(function($selector) use ($prefix) {
         return sprintf('%s %s', $prefix, $selector->__toString());
       }, $style_declaration->getSelectors());

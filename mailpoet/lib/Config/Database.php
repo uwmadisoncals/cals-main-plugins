@@ -4,7 +4,7 @@ namespace MailPoet\Config;
 use ORM as ORM;
 use PDO as PDO;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 require_once(ABSPATH . 'wp-admin/includes/plugin.php');
 
@@ -34,9 +34,9 @@ class Database {
       'sql_mode=(SELECT REPLACE(@@sql_mode,"ONLY_FULL_GROUP_BY",""))',
     );
 
-    if(!empty(Env::$db_charset)) {
+    if (!empty(Env::$db_charset)) {
       $character_set = 'NAMES ' . Env::$db_charset;
-      if(!empty(Env::$db_collation)) {
+      if (!empty(Env::$db_collation)) {
         $character_set .= ' COLLATE ' . Env::$db_collation;
       }
       $driver_options[] = $character_set;
@@ -50,7 +50,7 @@ class Database {
       $current_options = ORM::for_table("")
         ->raw_query('SELECT @@session.wait_timeout as wait_timeout')
         ->findOne();
-      if($current_options && (int)$current_options->wait_timeout < $this->driver_option_wait_timeout) {
+      if ($current_options && (int)$current_options->wait_timeout < $this->driver_option_wait_timeout) {
         ORM::raw_execute('SET SESSION wait_timeout = ' . $this->driver_option_wait_timeout);
       }
     } catch (\PDOException $e) {
@@ -60,7 +60,7 @@ class Database {
   }
 
   function defineTables() {
-    if(!defined('MP_SETTINGS_TABLE')) {
+    if (!defined('MP_SETTINGS_TABLE')) {
       $settings = Env::$db_prefix . 'settings';
       $segments = Env::$db_prefix . 'segments';
       $forms = Env::$db_prefix . 'forms';
@@ -86,6 +86,7 @@ class Database {
       $statistics_forms = Env::$db_prefix . 'statistics_forms';
       $mapping_to_external_entities = Env::$db_prefix . 'mapping_to_external_entities';
       $log = Env::$db_prefix . 'log';
+      $stats_notifications = Env::$db_prefix . 'stats_notifications';
 
       define('MP_SETTINGS_TABLE', $settings);
       define('MP_SEGMENTS_TABLE', $segments);
@@ -112,6 +113,7 @@ class Database {
       define('MP_STATISTICS_FORMS_TABLE', $statistics_forms);
       define('MP_MAPPING_TO_EXTERNAL_ENTITIES_TABLE', $mapping_to_external_entities);
       define('MP_LOG_TABLE', $log);
+      define('MP_STATS_NOTIFICATIONS_TABLE', $stats_notifications);
     }
   }
 }

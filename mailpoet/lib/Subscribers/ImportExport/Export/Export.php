@@ -4,11 +4,8 @@ namespace MailPoet\Subscribers\ImportExport\Export;
 
 use MailPoet\Config\Env;
 use MailPoet\Models\CustomField;
-use MailPoet\Models\Segment;
-use MailPoet\Models\Subscriber;
-use MailPoet\Models\SubscriberSegment;
 use MailPoet\Subscribers\ImportExport\ImportExportFactory;
-use MailPoet\Util\Helpers;
+use function MailPoet\Util\array_column;
 use MailPoet\Util\Security;
 use MailPoet\Util\XLSXWriter;
 
@@ -26,7 +23,7 @@ class Export {
   public $dynamic_subscribers_getter;
 
   public function __construct($data) {
-    if(strpos(@ini_get('disable_functions'), 'set_time_limit') === false) {
+    if (strpos(@ini_get('disable_functions'), 'set_time_limit') === false) {
       set_time_limit(0);
     }
 
@@ -55,10 +52,10 @@ class Export {
   function process() {
     $this->default_subscribers_getter->reset();
     try {
-      if(is_writable($this->export_path) === false) {
+      if (is_writable($this->export_path) === false) {
         throw new \Exception(__('The export file could not be saved on the server.', 'mailpoet'));
       }
-      if(!extension_loaded('zip')) {
+      if (!extension_loaded('zip')) {
         throw new \Exception(__('Export requires a ZIP extension to be installed on the host.', 'mailpoet'));
       }
       $processed_subscribers = call_user_func(
@@ -67,7 +64,7 @@ class Export {
           'generate' . strtoupper($this->export_format_option)
         )
       );
-    } catch(\Exception $e) {
+    } catch (\Exception $e) {
       throw new \Exception($e->getMessage());
     }
     return array(
@@ -99,9 +96,9 @@ class Export {
     );
 
     $subscribers = $this->getSubscribers();
-    while($subscribers !== false) {
+    while ($subscribers !== false) {
       $processed_subscribers += count($subscribers);
-      foreach($subscribers as $subscriber) {
+      foreach ($subscribers as $subscriber) {
         $row = $this->formatSubscriberData($subscriber);
         $row[] = ucwords($subscriber['segment_name']);
         fwrite($CSV_file, implode(',', array_map($format_CSV, $row)) . "\n");
@@ -120,9 +117,9 @@ class Export {
     $processed_segments = array();
 
     $subscribers = $this->getSubscribers();
-    while($subscribers !== false) {
+    while ($subscribers !== false) {
       $processed_subscribers += count($subscribers);
-      foreach($subscribers as $i => $subscriber) {
+      foreach ($subscribers as $i => $subscriber) {
         $current_segment = ucwords($subscriber['segment_name']);
         // Sheet header (1st row) will be written only if:
         // * This is the first time we're processing a segment
@@ -132,7 +129,7 @@ class Export {
         // sorted by segment name (due to slow queries when using ORDER BY and LIMIT),
         // we need to keep track of processed segments so that we do not create header
         // multiple times when switching from one segment to another and back.
-        if((!count($processed_segments) || $last_segment !== $current_segment) &&
+        if ((!count($processed_segments) || $last_segment !== $current_segment) &&
           (!in_array($last_segment, $processed_segments) || !in_array($current_segment, $processed_segments))
         ) {
           $this->writeXLSX(
@@ -145,7 +142,7 @@ class Export {
         $last_segment = ucwords($subscriber['segment_name']);
         // detect RTL language and set Excel to properly display the sheet
         $RTL_regex = '/\p{Arabic}|\p{Hebrew}/u';
-        if(!$XLSX_writer->rtl && (
+        if (!$XLSX_writer->rtl && (
             preg_grep($RTL_regex, $subscriber) ||
             preg_grep($RTL_regex, $this->formatted_subscriber_fields))
         ) {
@@ -169,7 +166,7 @@ class Export {
 
   function getSubscribers() {
     $subscribers = $this->default_subscribers_getter->get();
-    if($subscribers === false) {
+    if ($subscribers === false) {
       $subscribers = $this->dynamic_subscribers_getter->get();
     }
     return $subscribers;

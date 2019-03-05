@@ -10,7 +10,7 @@ use MailPoet\Models\ScheduledTaskSubscriber;
 use MailPoet\Models\SendingQueue;
 use MailPoet\WP\Functions as WPFunctions;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 class Migration extends SimpleWorker {
   const TASK_TYPE = 'migration';
@@ -24,12 +24,15 @@ class Migration extends SimpleWorker {
 
   function prepareTask(ScheduledTask $task) {
     $unmigrated_columns = self::checkUnmigratedColumnsExist();
-    if($unmigrated_columns) {
+    $unmigrated_queues_count = 0;
+    $unmigrated_queue_subscribers = [];
+
+    if ($unmigrated_columns) {
       $unmigrated_queues_count = $this->getUnmigratedQueues()->count();
       $unmigrated_queue_subscribers = $this->getTaskIdsForUnmigratedSubscribers();
     }
 
-    if(!$unmigrated_columns ||
+    if (!$unmigrated_columns ||
       ($unmigrated_queues_count == 0
       && count($unmigrated_queue_subscribers) == 0)
     ) {
@@ -47,7 +50,7 @@ class Migration extends SimpleWorker {
 
   function pauseSending() {
     $mailer_log = MailerLog::getMailerLog();
-    if(MailerLog::isSendingPaused($mailer_log)) {
+    if (MailerLog::isSendingPaused($mailer_log)) {
       // sending is already paused
       return false;
     }
@@ -61,13 +64,13 @@ class Migration extends SimpleWorker {
 
   function resumeSending() {
     $mailer_log = MailerLog::getMailerLog();
-    if(!MailerLog::isSendingPaused($mailer_log)) {
+    if (!MailerLog::isSendingPaused($mailer_log)) {
       // sending is not paused
       return false;
     }
     $error = MailerLog::getError($mailer_log);
     // only resume sending if it was paused by migration
-    if(isset($error['operation']) && $error['operation'] === 'migration') {
+    if (isset($error['operation']) && $error['operation'] === 'migration') {
       return MailerLog::resumeSending();
     }
   }
@@ -127,12 +130,12 @@ class Migration extends SimpleWorker {
       'deleted_at'
     );
 
-    if(!empty($queues)) {
-      foreach(array_chunk($queues, self::BATCH_SIZE) as $queue_batch) {
+    if (!empty($queues)) {
+      foreach (array_chunk($queues, self::BATCH_SIZE) as $queue_batch) {
         // abort if execution limit is reached
         CronHelper::enforceExecutionLimit($this->timer);
 
-        foreach($queue_batch as $queue) {
+        foreach ($queue_batch as $queue) {
           // create a new scheduled task of type "sending"
           $wpdb->query(sprintf(
             'INSERT IGNORE INTO %1$s (`type`, %2$s) ' .
@@ -167,7 +170,7 @@ class Migration extends SimpleWorker {
     $task_ids = $this->getTaskIdsForUnmigratedSubscribers();
 
     // check if subscribers for each one were already migrated
-    if(!empty($task_ids)) {
+    if (!empty($task_ids)) {
       $task_ids = $wpdb->get_col(sprintf(
         'SELECT queues.`task_id` FROM %1$s queues WHERE queues.`task_id` IN(' . join(',', array_map('intval', $task_ids)) . ') ' .
         'AND queues.`count_total` > (SELECT COUNT(*) FROM %2$s subs WHERE subs.`task_id` = queues.`task_id`)',
@@ -176,8 +179,8 @@ class Migration extends SimpleWorker {
       ));
     }
 
-    if(!empty($task_ids)) {
-      foreach($task_ids as $task_id) {
+    if (!empty($task_ids)) {
+      foreach ($task_ids as $task_id) {
         // abort if execution limit is reached
         CronHelper::enforceExecutionLimit($this->timer);
 
@@ -204,15 +207,15 @@ class Migration extends SimpleWorker {
     ));
 
     // sanity check
-    if(empty($subscribers)) {
+    if (empty($subscribers)) {
       return false;
     }
 
     $subscribers = unserialize($subscribers);
 
-    if(!empty($subscribers['to_process'])) {
+    if (!empty($subscribers['to_process'])) {
       $subscribers_to_migrate = array_slice($subscribers['to_process'], $migrated_unprocessed_count);
-      foreach($subscribers_to_migrate as $sub_id) {
+      foreach ($subscribers_to_migrate as $sub_id) {
         // abort if execution limit is reached
         CronHelper::enforceExecutionLimit($this->timer);
 
@@ -224,9 +227,9 @@ class Migration extends SimpleWorker {
       }
     }
 
-    if(!empty($subscribers['processed'])) {
+    if (!empty($subscribers['processed'])) {
       $subscribers_to_migrate = array_slice($subscribers['processed'], $migrated_processed_count);
-      foreach($subscribers_to_migrate as $sub_id) {
+      foreach ($subscribers_to_migrate as $sub_id) {
         // abort if execution limit is reached
         CronHelper::enforceExecutionLimit($this->timer);
 
@@ -241,8 +244,11 @@ class Migration extends SimpleWorker {
     return true;
   }
 
-  static function getNextRunDate() {
+  static function getNextRunDate($wp = null) {
+    if (is_null($wp)) {
+      $wp = new WPFunctions();
+    }
     // run migration immediately
-    return Carbon::createFromTimestamp(WPFunctions::currentTime('timestamp'));
+    return Carbon::createFromTimestamp($wp->currentTime('timestamp'));
   }
 }

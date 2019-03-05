@@ -2,8 +2,8 @@
 Contributors: wickedplugins
 Tags: folders, administration, tree view, content management, page organization, custom post type organization, media library folders, media library categories, media library organization
 Requires at least: 4.6
-Tested up to: 5.0
-Stable tag: 2.11.1
+Tested up to: 5.1
+Stable tag: 2.11.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,6 +107,15 @@ The "Page Hierarchy" folder (found under "Dynamic Folders") is a dynamic folder 
 7. Pro feature: media library folders
 
 == Changelog ==
+
+= 2.11.3 =
+* Check if 'hideAssignedItems' property exists when saving state
+* Update 'Tested up to' flag to 5.1
+
+= 2.11.2 =
+* Revert to 'All Folders' when a previously selected dynamic folder no longer exists
+* Correct Post Hierarchy dynamic folder to only display root level pages
+* Correct Post Hierarchy folder to respect 'Include items from child folders' setting
 
 = 2.11.1 =
 * Fix missing order IDs when dragging WooCommerce orders to folders (Wicked Folders Pro)

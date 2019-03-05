@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2014-2018 ServMask Inc.
+ * Copyright (C) 2014-2019 ServMask Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,10 @@
  * ███████║███████╗██║  ██║ ╚████╔╝ ██║ ╚═╝ ██║██║  ██║███████║██║  ██╗
  * ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	die( 'Kangaroos cannot jump here' );
+}
 ?>
 
 <div class="ai1wm-field-set">
@@ -32,13 +36,9 @@
 				<?php _e( 'Network (all sites)', AI1WMME_PLUGIN_NAME ); ?>
 			</label>
 		</li>
-		<?php foreach ( ai1wmme_sites() as $site ) : ?>
-			<li>
-				<label for="ai1wmme-site-<?php echo esc_attr( $site['BlogID'] ); ?>">
-					<input type="checkbox" name="options[sites][]" value="<?php echo esc_attr( $site['BlogID'] ); ?>" id="ai1wmme-site-<?php echo esc_attr( $site['BlogID'] ); ?>" class="ai1wmme-sites" />
-					<?php echo esc_html( $site['Domain'] . untrailingslashit( $site['Path'] ) ); ?>
-				</label>
-			</li>
-		<?php endforeach; ?>
+		<div id="ai1wmme-pagination-holder">
+			<div class="ai1wmme-pagination-section"></div>
+			<span class="spinner"><?php _e( 'Loading sites ...', AI1WMME_PLUGIN_NAME ); ?></span>
+		</div>
 	</ul>
 </div>

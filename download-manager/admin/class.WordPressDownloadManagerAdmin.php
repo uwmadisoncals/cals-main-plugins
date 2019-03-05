@@ -9,6 +9,7 @@ class WordPressDownloadManagerAdmin
         new \WPDM\admin\menus\Welcome();
         new \WPDM\admin\menus\Packages();
         new \WPDM\admin\menus\Categories();
+        new \WPDM\admin\menus\Templates();
         new \WPDM\admin\menus\Addons();
         new \WPDM\admin\menus\Stats();
         new \WPDM\admin\menus\Settings();
@@ -21,6 +22,7 @@ class WordPressDownloadManagerAdmin
         add_action('admin_enqueue_scripts', array($this, 'enqueueScripts'));
         add_action('admin_init', array($this, 'metaBoxes'), 0);
         add_action('init', array($this, 'registerScripts'), 0);
+        add_action('admin_init', array(new \WPDM\Email(), 'preview'));
         add_action('wp_ajax_updatenow', array($this, 'updateNow'));
         add_action('admin_head', array($this, 'adminHead'));
 
@@ -65,6 +67,11 @@ class WordPressDownloadManagerAdmin
 
             wp_enqueue_script('wpdm-admin', plugins_url('/download-manager/assets/js/wpdm-admin.js'), array('jquery'));
             wp_enqueue_style('wpdm-font-awesome' );
+
+            wp_enqueue_style( 'wp-color-picker' );
+            wp_enqueue_script( 'wp-color-picker' );
+            //wp_enqueue_script( 'my-script-handle', plugins_url('my-script.js', __FILE__ ), array( 'wp-color-picker' ), false, true );
+
         }
 
         if(get_post_type()=='wpdmpro' || wpdm_query_var('post_type') == 'wpdmpro' || $hook == 'index.php'){
@@ -103,6 +110,7 @@ class WordPressDownloadManagerAdmin
      * @usage Single click add-on install
      */
     function installAddon(){
+
         if(isset($_POST['updateurl']) && current_user_can(WPDM_ADMIN_CAP)){
             include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
             include_once ABSPATH . 'wp-admin/includes/plugin-install.php';

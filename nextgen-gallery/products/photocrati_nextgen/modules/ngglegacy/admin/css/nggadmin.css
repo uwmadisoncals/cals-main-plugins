@@ -233,6 +233,12 @@ a.switch-expert {
     margin: -10px 0 40px 0;
 }
 
+.ngg_admin_notice ul {
+	list-style: circle inside;
+	margin: 0;
+	padding: 0;
+}
+
 .gallery_page_nggallery-manage-gallery #ngg_page_content .ngg_page_content_main {
     padding-top: 30px;
 }
@@ -1174,7 +1180,6 @@ DIV that shows the image as you drag it
 	}
 	table#ngg-listimages tr {
 		padding: 10px 5px !important;
-		border-bottom: ;
 	}
 	#ngg-listimages thead, 
 	#ngg-listimages thead th {

@@ -7,10 +7,11 @@ class MailChimp {
   public $api_key;
   public $max_post_size;
   public $data_center;
-  public $export_url;
+  private $export_url;
+  private $lists_url;
   const API_KEY_REGEX = '/[a-zA-Z0-9]{32}-[a-zA-Z0-9]{2,4}$/';
 
-  function __construct($api_key, $lists = false) {
+  function __construct($api_key) {
     $this->api_key = $this->getAPIKey($api_key);
     $this->max_post_size = Helpers::getMaxPostSize('bytes');
     $this->data_center = $this->getDataCenter($this->api_key);
@@ -19,19 +20,19 @@ class MailChimp {
   }
 
   function getLists() {
-    if(!$this->api_key || !$this->data_center) {
+    if (!$this->api_key || !$this->data_center) {
       return $this->throwException('API');
     }
 
     $connection = @fopen(sprintf($this->lists_url, $this->data_center, $this->api_key), 'r');
 
-    if(!$connection) {
+    if (!$connection) {
       return $this->throwException('connection');
     } else {
       $response = '';
-      while(!feof($connection)) {
+      while (!feof($connection)) {
         $buffer = fgets($connection, 4096);
-        if(trim($buffer) !== '') {
+        if (trim($buffer) !== '') {
           $response .= $buffer;
         }
       }
@@ -40,11 +41,12 @@ class MailChimp {
 
     $response = json_decode($response);
 
-    if(!$response) {
+    if (!$response) {
       return $this->throwException('API');
     }
 
-    foreach($response->data as $list) {
+    $lists = [];
+    foreach ($response->data as $list) {
       $lists[] = array(
         'id' => $list->id,
         'name' => $list->name
@@ -55,35 +57,36 @@ class MailChimp {
   }
 
   function getSubscribers($lists = array()) {
-    if(!$this->api_key || !$this->data_center) {
+    if (!$this->api_key || !$this->data_center) {
       return $this->throwException('API');
     }
 
-    if(!$lists) {
+    if (!$lists) {
       return $this->throwException('lists');
     }
 
     $bytes_fetched = 0;
-    foreach($lists as $list) {
+    $subscribers = [];
+    $header = [];
+    foreach ($lists as $list) {
       $url = sprintf($this->export_url, $this->data_center, $this->api_key, $list);
       $connection = @fopen($url, 'r');
-      if(!$connection) {
+      if (!$connection) {
         return $this->throwException('connection');
       }
       $i = 0;
-      $header = array();
-      while(!feof($connection)) {
+      while (!feof($connection)) {
         $buffer = fgets($connection, 4096);
-        if(trim($buffer) !== '') {
+        if (trim($buffer) !== '') {
           $obj = json_decode($buffer);
-          if($i === 0) {
+          if ($i === 0) {
             $header = $obj;
-            if(is_object($header) && isset($header->error)) {
+            if (is_object($header) && isset($header->error)) {
               return $this->throwException('lists');
             }
-            if(!isset($header_hash)) {
+            if (!isset($header_hash)) {
               $header_hash = md5(implode(',', $header));
-            } elseif(md5(implode(',', $header) !== $header_hash)) {
+            } elseif (md5(implode(',', $header) !== $header_hash)) {
               return $this->throwException('headers');
             }
           } else {
@@ -92,14 +95,14 @@ class MailChimp {
           $i++;
         }
         $bytes_fetched += strlen($buffer);
-        if($bytes_fetched > $this->max_post_size) {
+        if ($bytes_fetched > $this->max_post_size) {
           return $this->throwException('size');
         }
       }
       fclose($connection);
     }
 
-    if(!count($subscribers)) {
+    if (!count($subscribers)) {
       return $this->throwException('subscribers');
     }
 
@@ -113,7 +116,7 @@ class MailChimp {
   }
 
   function getDataCenter($api_key) {
-    if(!$api_key) return false;
+    if (!$api_key) return false;
     $api_key_parts = explode('-', $api_key);
     return end($api_key_parts);
   }
@@ -123,7 +126,8 @@ class MailChimp {
   }
 
   function throwException($error) {
-    switch($error) {
+    $errorMessage = __('Unknown MailChimp error.', 'mailpoet');
+    switch ($error) {
       case 'API':
         $errorMessage = __('Invalid API Key.', 'mailpoet');
         break;

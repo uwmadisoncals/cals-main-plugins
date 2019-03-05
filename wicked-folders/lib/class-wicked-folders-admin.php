@@ -1309,9 +1309,12 @@ final class Wicked_Folders_Admin {
 				// The active dyanmic folder may by the child of a lazy folder
 				// in which case it hasn't been loaded yet...try to get it
 				if ( ! $folder_exists ) {
-					$folder = Wicked_Folders::get_dynamic_folder( $active_folder_type, $active_folder_id, $post_type );
-					if ( $folder ) {
-						$folder->fetch();
+					$folder 	= Wicked_Folders::get_dynamic_folder( $active_folder_type, $active_folder_id, $post_type );
+					$fetched 	= $folder->fetch();
+
+					// Fetch should return false if the folder doesn't exist;
+					// check that dynamic folder exists
+					if ( $fetched ) {
 						// Add the folder's ancestors to the expanded list to
 						// ensure that the parent's get loaded
 						$ancestor_ids = $folder->get_ancestor_ids();

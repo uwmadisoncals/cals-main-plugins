@@ -3,7 +3,7 @@ Contributors: jamesckemp
 Donate link:
 Tags: features, feature request, feature requests, uservoice, vote, votes, user voice, community, feedback
 Requires at least: 4.0
-Tested up to: 5.0.2
+Tested up to: 5.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -59,6 +59,9 @@ You need to refresh your permalinks. Go to Settings > Permalinks. Just visiting 
 == Screenshots ==
 
 == Changelog ==
+
+**v1.0.5** (2019-03-02)
+[fix] Security Fix
 
 **v1.0.4** (2019-01-04)
 [new] Pro - Categories

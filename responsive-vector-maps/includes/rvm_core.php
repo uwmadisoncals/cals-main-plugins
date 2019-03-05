@@ -3,7 +3,8 @@
  * CORE SCRIPT
  * ----------------------------------------------------------------------------
  */
- 
+
+
 /* Localization and internazionalization */
 add_action( 'plugins_loaded', 'rvm_load_plugin_textdomain' );
 function rvm_load_plugin_textdomain( ) {
@@ -59,7 +60,7 @@ function rvm_fields_array( )
                          'rvm_mbe_width',
                         'text',
                         __( 'Map Width', RVM_TEXT_DOMAIN ),
-                        __( '<span class="rvm_field_descr">( You can use em, %, px , rem. Leave it blank for a responsive map )</span>', RVM_TEXT_DOMAIN ),
+                        __( '<span class="rvm_field_descr rvm_notice_messages">( You can use em, %, px , rem. Leave it blank for a responsive map )</span>', RVM_TEXT_DOMAIN ),
                         '',
                         10,
                         1,
@@ -70,7 +71,7 @@ function rvm_fields_array( )
                          'rvm_mbe_map_padding',
                         'text',
                         __( 'Map Padding', RVM_TEXT_DOMAIN ),
-                        __( '<span class="rvm_field_descr">( You can use em, %, px , rem. Leave it blank for default behaviour )</span>', RVM_TEXT_DOMAIN ),
+                        __( '<span class="rvm_field_descr rvm_notice_messages">( You can use em, %, px , rem. Leave it blank for default behaviour )</span>', RVM_TEXT_DOMAIN ),
                         '',
                         10,
                         1,
@@ -125,24 +126,13 @@ function rvm_fields_array( )
                          'rvm_mbe_border_width',
                         'text',
                         __( 'Borders width', RVM_TEXT_DOMAIN ),
-                        __( '<span class="rvm_field_descr">px ( accepts decimal separated by a dot i.e.: 0.5 )</span>', RVM_TEXT_DOMAIN ),
+                        __( '<span class="rvm_field_descr rvm_notice_messages">px ( accepts decimal separated by a dot i.e.: 0.5 )</span>', RVM_TEXT_DOMAIN ),
                         5,
                         5,
                         1,
                         'main',
                         'hidden_when_custom_map' 
             );
-            /*$fields[ 'rvm_mbe_map_delete_padding' ] = array(
-                         'rvm_mbe_map_delete_padding',
-                        'checkbox',
-                        __( 'Get Rid Of Map Padding', RVM_TEXT_DOMAIN ),
-                         __( '<span class="rvm_field_descr">Not visible in map preview.</span>', RVM_TEXT_DOMAIN ),
-                        '',
-                        '',
-                        '',
-                        'main',
-                        'hidden_when_custom_map' 
-            );*/
             $fields[ 'rvm_mbe_subdivision_background_selected_status' ] = array(
                          'rvm_mbe_subdivision_background_selected_status',
                         'checkbox',
@@ -169,7 +159,7 @@ function rvm_fields_array( )
                          'rvm_mbe_regions_mouseover_colour',
                         'text',
                         __( 'Subdivisions Hover Colour', RVM_TEXT_DOMAIN ),
-                        __( '<span class="rvm_field_descr">Not visible in map preview . You can enable it for each region in <strong>"Subdivision"</strong> tab</span>', RVM_TEXT_DOMAIN ),
+                        __( '<span class="rvm_field_descr rvm_notice_messages">Not visible in map preview . You can enable it for each region in <strong>"Subdivisions"</strong> tab</span>', RVM_TEXT_DOMAIN ),
                         7,
                         7,
                         1,
@@ -180,24 +170,13 @@ function rvm_fields_array( )
                          'rvm_mbe_regions_mouseover_colour_opacity',
                         'text',
                         __( 'Subdivisions Hover Colour Opacity', RVM_TEXT_DOMAIN ),
-                        __( '<span class="rvm_field_descr">value must be between 0 and 1 i.e.: 0.5', RVM_TEXT_DOMAIN ),
+                        __( '<span class="rvm_field_descr rvm_notice_messages">value must be between 0 and 1 i.e.: 0.5', RVM_TEXT_DOMAIN ),
                         3,
                         3,
                         1,
                         'main',
                         'hidden_when_custom_map' 
-            );
-             /*$fields[ 'rvm_mbe_select_target' ] = array(
-                         'rvm_mbe_select_target',
-                        'select',
-                        __( 'Links target', RVM_TEXT_DOMAIN ),
-                        __( '( Ex. "_blank" will open all the links in a new window )', RVM_TEXT_DOMAIN ),
-                        '',
-                        10,
-                        1,
-                        'main',
-                        'hidden_when_custom_map' 
-            );*/     
+            );     
            $fields[ 'rvm_mbe_enable_link_target' ] = array(
                          'rvm_mbe_enable_link_target',
                         'checkbox',
@@ -281,6 +260,16 @@ function rvm_fields_array( )
                         1,
                         'markers' 
             );
+            $fields[ 'rvm_mbe_map_markers_rain_effect' ] = array(
+                        'rvm_mbe_map_markers_rain_effect',
+                        'checkbox',
+                        __( 'Markers rain', RVM_TEXT_DOMAIN ),
+                        __( 'When checked, markers pinpoints will fall down from top of the map on scrolling', RVM_TEXT_DOMAIN ),
+                        '',
+                        '',
+                        1,
+                        'markers' 
+            );
             return $fields;
 }
 
@@ -300,138 +289,7 @@ function rvm_countries_array( )
                         '',
                         ''
             );
-            $countries[ 'belgium' ] = array(
-                         'belgium',
-                        __( 'Belgium', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-be_merc_js',
-                        'be_merc_en',
-                        1.2244422,
-                        'default_maps',
-                        '',
-                        ''
-            );
-            $countries[ 'france' ] = array(
-                         'france',
-                        __( 'France', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-fr_merc_js',
-                        'fr_merc_en',
-                        0.8057915,
-                        'default_maps',
-                        '',
-                        '' 
-            );
-            $countries[ 'germany' ] = array(
-                         'germany',
-                        __( 'Germany', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-de_merc_js',
-                        'de_merc_en',
-                        0.7353884,
-                        'default_maps',
-                        '',
-                        '' 
-            );
 
-            $countries[ 'netherlands' ] = array(
-                         'netherlands',
-                        __( 'Netherlands', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-nl_merc_js',
-                        'nl_merc_en',
-                        0.8399607,
-                        'default_maps',
-                        '',
-                        '' 
-            );
-            $countries[ 'norway' ] = array(
-                         'norway',
-                        __( 'Norway', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-no_merc_js',
-                        'no_merc_en',
-                        0.7592786,
-                        'default_maps',
-                        '',
-                        '' 
-            );
-            $countries[ 'poland' ] = array(
-                         'poland',
-                        __( 'Poland', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-pl_merc_js',
-                        'pl_merc_en',
-                        1.0555115,
-                        'default_maps',
-                        '',
-                        '' 
-            );
-            $countries[ 'portugal' ] = array(
-                         'portugal',
-                        __( 'Portugal', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-pt_merc_js',
-                        'pt_merc_en',
-                        0.6724137,
-                        'default_maps',
-                        '',
-                        '' 
-            );
-            $countries[ 'spain' ] = array(
-                         'spain',
-                        __( 'Spain', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-es_merc_js',
-                        'es_merc_en',
-                        1.3405912,
-                        'default_maps',
-                        '',
-                        '' 
-            );
-            $countries[ 'sweden' ] = array(
-                         'sweden',
-                        __( 'Sweden', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-se_merc_js',
-                        'se_merc_en',
-                        0.4359546,
-                        'default_maps',
-                        '',
-                        '' 
-            );
-            $countries[ 'switzerland' ] = array(
-                         'switzerland',
-                        __( 'Switzerland', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-ch_merc_js',
-                        'ch_merc_en',
-                        1.614945,
-                        'default_maps',
-                        '',
-                        ''
-            );
-            $countries[ 'unitedkingdom' ] = array(
-                         'unitedkingdom',
-                        __( 'United Kingdom', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-uk_merc_js',
-                        'uk_merc_en',
-                        0.5354944,
-                        'default_maps',
-                        '',
-                        '' 
-            );
-            /*world*/
-            $countries[ 'europe' ]  = array(
-                         'europe',
-                        __( 'Europe', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-europe_merc_js',
-                        'europe_merc_en',
-                        0.8991364,
-                        'default_maps',
-                        '',
-                        '' 
-            );
-            $countries[ 'usa' ] = array(
-                         'usa',
-                        __( 'Usa', RVM_TEXT_DOMAIN ),
-                        'rvm_jquery-jvectormap-us_merc_js',
-                        'us_merc_en',
-                        1.3110130,
-                        'default_maps', 
-                        '',
-                        ''
-            );
             $countries[ 'world' ] = array(
                          'world',
                         __( 'World', RVM_TEXT_DOMAIN ),
@@ -581,6 +439,8 @@ function regionsparams( $postid, $region )
                         $regionsparams_array[ 'field_region_link' ]  = '';
                         $regionsparams_array[ 'field_region_bg' ]    = '';
                         $regionsparams_array[ 'field_region_popup' ] = '';
+                        $regionsparams_array[ 'field_region_mouse_hover_over_colour' ]    = 'unchecked';
+                        $regionsparams_array[ 'field_region_onclick_action' ] = 'open_link';
             } //empty($field_value)
             
             else {
@@ -589,12 +449,20 @@ function regionsparams( $postid, $region )
                                     $regionsparams_array[ 'field_region_link' ] = $field_value[ 0 ];
                                     $regionsparams_array[ 'field_region_bg' ]   = $field_value[ 1 ];
                                     /* from now on isset is mandatory for any added values */
+                                                                        
                                     if ( isset( $field_value[ 2 ] ) ) {
                                                 $regionsparams_array[ 'field_region_popup' ] = $field_value[ 2 ];
                                     } //legacy with old versions
                                     if ( isset( $field_value[ 3 ] ) ) {
                                                 $regionsparams_array[ 'field_region_mouse_hover_over_colour' ] = $field_value[ 3 ];
                                     } //legacy with old versions
+                                    if ( isset( $field_value[ 4 ] ) ) {
+                                        $regionsparams_array[ 'field_region_onclick_action' ] = $field_value[ 4 ];
+                                    }
+
+
+
+                                     //legacy with old versions
                         } //is_array(unserialize($field_value))
                         else {
                                     if ( $field_value = 'http://N;' ) {
@@ -603,6 +471,8 @@ function regionsparams( $postid, $region )
                                     $regionsparams_array[ 'field_region_link' ] = $field_value; // legacy with previous version
                         }
             }
+
+
 
             return $regionsparams_array;
 }
@@ -655,11 +525,12 @@ function rvm_mb_function( $post )
             
             
             /**************** Start: Main settings *****************/
-            
+
             
             // Check if is a custom map and if still the files are in the upload subdir            
             if ( rvm_is_custom_map( $post->ID ) ) {                        
-                        $rvm_custom_map_name = get_post_meta( $post->ID, '_rvm_mbe_select_map', true );                
+                        //$rvm_custom_map_name = get_post_meta( $post->ID, '_rvm_mbe_select_map', true );
+                        $rvm_custom_map_name = $rvm_selected_map;                
                         $rvm_custom_maps_options = rvm_retrieve_custom_maps_options();
                         if ( !empty( $rvm_custom_maps_options ) && !empty( $rvm_custom_map_name ) ) {
                                     $rvm_custom_maps_options = array_reverse( $rvm_custom_maps_options );
@@ -683,7 +554,22 @@ function rvm_mb_function( $post )
                          } // if ( !empty( $rvm_custom_maps_options ) && !empty( $rvm_custom_map_name ) )                       
             } //if ( rvm_is_custom_map( $post->ID ) )
 
-            $rvm_div_class = isset( $rvm_tab_active_default ) || ( isset( $rvm_tab_active ) && $rvm_tab_active == 'rvm_main_settings' ) ? ' class="rvm_active hidden"  ' : ' class="hidden"  ';
+            else {//if we're using a default map
+                    //Check if default map existing
+                    $array_regions = rvm_include_custom_map_settings( $post->ID,  $rvm_selected_map );
+                    if( ( $screen->action != 'add' ) && isset( $array_regions ) && empty( $array_regions ) ) {
+                        $output .= '<div class="rvm_messages rvm_error_messages rvm_message_map_not_available">' . __( 'Sorry, this map is no longer available by default.<br>', RVM_TEXT_DOMAIN );
+                        $output .= '<a href="' . RVM_DOMAIN_URL . 'redirect-from-map-to-purchase-user-site/" target="_blank" class="rvm_download_custom_map">'. __( 'You can now download &nbsp;<span>' . $rvm_selected_map . '</span>&nbsp; map here', RVM_TEXT_DOMAIN ). '</a>';                        
+                        $output .= '</div>';
+
+                        /*global $is_chrome ;
+                        if( !$is_chrome ) {
+                            $output .= '<div style="margin-bottom:20px" class="rvm_messages rvm_success_messages">' . __( 'In case you had not exported settings through the "Export Subdivisions" feature available since ver 5.5.3, do not worry, you can still copy them onto the new purchased map! <a href="http://www.responsivemapsplugin.com/tips-tricks-answering-common-questions-you-may-come-up-with-using-rvm-plugin/#rvm_copy_settings_anchor" target="_blank">In this video</a> you\' ll learn an easy way to do it manually.', RVM_TEXT_DOMAIN ) .'</div>';
+                        }//if( !$is_chrome )*/
+                    }
+            }
+
+            $rvm_div_class = isset( $rvm_tab_active_default ) || ( isset( $rvm_tab_active ) && $rvm_tab_active == 'rvm_main_settings' ) ? ' class="rvm_main_flex rvm_active hidden"  ' : ' class="hidden"  ';
             $output .= '<div id="rvm_main_settings" ' . $rvm_div_class . '>';
             
             foreach ( $array_fields as $field ) {
@@ -724,10 +610,19 @@ function rvm_mb_function( $post )
                                                             $output .= ' size="' . $field[ 5 ] . '" ';
                                                 } //!empty($field[5])
                                                 $output .= ' />&nbsp;' . $field[ 3 ];
-                                                 if( $field[ 0 ] == 'rvm_mbe_map_bg_selected_color' 
+                                                 /*if( $field[ 0 ] == 'rvm_mbe_map_bg_selected_color' 
                                                  || $field[ 0 ] == 'rvm_mbe_border_width' 
                                                  || $field[ 0 ] == 'rvm_mbe_regions_mouseover_colour_opacity' ) {
                                                     $output .= '<hr class="rvm_separator">' ;
+                                                }*/
+                                                if( $field[ 0 ] == 'rvm_mbe_map_bg_selected_color' ) {
+                                                    $output .= '<h2 class="rvm_h2_title rvm_hidden_when_custom_map">Subdivisions hover status</h2>' ;
+                                                }
+                                                else if( $field[ 0 ] == 'rvm_mbe_border_width' ) {
+                                                    $output .= '<h2 class="rvm_h2_title rvm_hidden_when_custom_map">Subdivisions selected status</h2>' ;
+                                                }
+                                                else if( $field[ 0 ] == 'rvm_mbe_regions_mouseover_colour_opacity' ) {
+                                                    $output .= '<h2 class="rvm_h2_title rvm_hidden_when_custom_map">General link settings</h2>' ;
                                                 }
                                     } // if( $field[ 1 ] == 'text' )
                                     if ( $field[ 1 ] == 'select' ) {
@@ -814,10 +709,14 @@ function rvm_mb_function( $post )
                                                 //By default the selected status is checked
                                                 if (  empty( $field[ 0 ] ) && $field[ 0 ] == 'rvm_mbe_subdivision_background_selected_status' ) {
                                                             $field_value = RVM_MAP_REGION_BG_SELECTED_STATUS;
-                                                } //empty($field_value) && $field[0] == 'rvm_mbe_subdivision_background_selected_status'                                      
+                                                } //empty($field_value) && $field[0] == 'rvm_mbe_subdivision_background_selected_status' 
+
+
                                                 $output .= 'class="' . PREFIX . $field[ 8 ] . '" >'; // close tag p specifying the class
                                                 $output .= '<label for="' . $field[ 0 ] . '" ' . RVM_LABEL_CLASS . '>' . $field[ 2 ] . '</label>';
-                                                $output .= '<input ' . $id_and_class . ' type="' . $field[ 1 ] . '" name="' . $field[ 0 ] . '"   ' . checked( 'checked', $field_value, false ) . ' />&nbsp;' . $field[ 3 ];                                               
+                                                $output .= '<input ' . $id_and_class . ' type="' . $field[ 1 ] . '" name="' . $field[ 0 ] . '"   ' . checked( 'checked', $field_value, false ) . ' />&nbsp;' . $field[ 3 ];
+
+                                                                                               
                                       
                                     } //$field[1] == 'checkbox'
                                     $output .= '</p>';
@@ -876,6 +775,18 @@ function rvm_mb_function( $post )
                                                             $output_marker_dim_max .= '</select></p>';
                                                 } //$field[0] == 'rvm_mbe_map_marker_dim_max'
                                     } //if( $field[ 1 ] == 'select' )
+
+
+                                    
+                                    if ( $field[ 1 ] == 'checkbox' ) {
+                                        if ( $field[ 0 ] == 'rvm_mbe_map_markers_rain_effect' ) {
+                                                    $output_markers_rain_effect = '<p id="rvm_markers_rain_effect_wrapper">';
+                                                    $output_markers_rain_effect .= '<label for="' . $field[ 0 ] . '" ' . RVM_LABEL_CLASS . '>' . $field[ 2 ] . '</label>';
+                                                    $output_markers_rain_effect .= '<input ' . $id_and_class . ' type="' . $field[ 1 ] . '" name="' . $field[ 0 ] . '"   ' . checked( 'checked', $field_value, false ) . ' />&nbsp;' . $field[ 3 ] . '</p>';
+                                                    
+                                        } //$field[0] == 'rvm_mbe_map_markers_rain_effect'
+                                    } //if( $field[ 1 ] == 'checkbox' )
+
                         } //if( $field[ 7 ] == 'markers' )
             } //foreach( $array_fields as $field )
             $output .= '<input type="hidden"  id="rvm_mbe_post_id" value="' .  $post->ID. '" />' ;
@@ -956,7 +867,7 @@ function rvm_mb_function( $post )
         <img style="vertical-align:middle;margin-left:5px;" src="' . RVM_IMG_PLUGIN_DIR . '/donate_button.png" /></a></p></div>';
             } //if( !empty( $rvm_selected_map ) )
             
-            
+        
             /**************** Start: Download Custom Maps Link *****************/
             
             @include RVM_INC_PLUGIN_DIR . '/rvm_download_custom_maps.php';
@@ -978,9 +889,10 @@ function rvm_mb_save_meta( $post_id )
                                     if ( isset( $_POST[ $field[ 0 ] ] ) ) {
                                                 //Check values sent
                                                 if ( $field[ 0 ] == 'rvm_mbe_zoom'  
-                                                ||  $field[ 0 ] == 'rvm_mbe_subdivision_background_selected_status' 
+                                                || $field[ 0 ] == 'rvm_mbe_subdivision_background_selected_status' 
                                                 || $field[ 0 ] == 'rvm_mbe_map_transparent_canvas'
-                                                || $field[ 0 ] == 'rvm_mbe_enable_link_target'  ) {
+                                                || $field[ 0 ] == 'rvm_mbe_enable_link_target' 
+                                                || $field[ 0 ] == 'rvm_mbe_map_markers_rain_effect' ) {
                                                             $_POST[ $field[ 0 ] ] = 'checked';
                                                 } //$field[0] == 'rvm_mbe_zoom'
                                                if ( ( $field[ 0 ] == 'rvm_mbe_width' || $field[ 0 ] == 'rvm_mbe_map_padding'  )  && !preg_match( '/^[0-9]*\.?[0-9]*(px|%|rem|em)$/', $_POST[ $field[ 0 ] ] ) ) {
@@ -1003,9 +915,9 @@ function rvm_mb_save_meta( $post_id )
                                                             $_POST[ 'rvm_mbe_map_marker_dim_max' ] = RVM_MARKER_DIM_MAX_VALUE;
                                                 } //f( isset( $_POST[ 'rvm_mbe_map_marker_dim_min' ] ) && isset( $_POST[ 'rvm_mbe_map_marker_dim_max' ] ) && ( $_POST[ 'rvm_mbe_map_marker_dim_min' ] > $_POST[ 'rvm_mbe_map_marker_dim_max' ] ) )
 
-			                                    if ( isset( $_POST[ 'rvm_mbe_custom_marker_icon_path' ] ) && $field[ 0 ] == 'rvm_mbe_custom_marker_icon_path' && !empty( $_POST[ 'rvm_mbe_custom_marker_icon_path' ] )) {
-														$_POST[ $field[ 0 ] ] = rvm_retrieve_marker_icon_name( $_POST[ 'rvm_mbe_custom_marker_icon_path' ] );
-			                                    }
+                                                if ( isset( $_POST[ 'rvm_mbe_custom_marker_icon_path' ] ) && $field[ 0 ] == 'rvm_mbe_custom_marker_icon_path' && !empty( $_POST[ 'rvm_mbe_custom_marker_icon_path' ] )) {
+                                                        $_POST[ $field[ 0 ] ] = rvm_retrieve_marker_icon_name( $_POST[ 'rvm_mbe_custom_marker_icon_path' ] );
+                                                }
 
                                                 else if ( empty( $_POST[ 'rvm_mbe_custom_marker_icon_path' ] ) && $field[ 0 ] == 'rvm_mbe_custom_marker_icon_path' && isset( $_POST[ 'rvm_mbe_custom_marker_icon_path_hidden' ] ) && !empty( $_POST[ 'rvm_mbe_custom_marker_icon_path_hidden' ] )) {
                                                         $_POST[ $field[ 0 ] ] = rvm_retrieve_marker_icon_name( $_POST[ 'rvm_mbe_custom_marker_icon_path_hidden' ] );
@@ -1016,7 +928,8 @@ function rvm_mb_save_meta( $post_id )
                                     else if ( $field[ 0 ] == 'rvm_mbe_zoom'  
                                      || $field[ 0 ] == 'rvm_mbe_subdivision_background_selected_status'  
                                      || $field[ 0 ] == 'rvm_mbe_map_transparent_canvas'
-                                     || $field[ 0 ] == 'rvm_mbe_enable_link_target' ) { // if  checkbox not isset means is unchecked
+                                     || $field[ 0 ] == 'rvm_mbe_enable_link_target' 
+                                     || $field[ 0 ] == 'rvm_mbe_map_markers_rain_effect' ) { // if  checkbox not isset means is unchecked
                                                 update_post_meta( $post_id, '_' . $field[ 0 ], 'unchecked' );
                                     } //$field[0] == 'rvm_mbe_zoom'          
                         } //foreach( $array_fields as $field )                     
@@ -1025,12 +938,48 @@ function rvm_mb_save_meta( $post_id )
                       /****************  Start: Save region fields to DB *****************/
                         $array_regions = rvm_include_custom_map_settings( $post_id ,  $_POST[ 'rvm_mbe_select_map' ] );   
                         
+
                         foreach ( $array_regions as $field ) {
+
                                     if ( isset( $_POST[ $field[ 1 ] ] ) ) {
                                                 $rvm_region_array = $_POST[ $field[ 1 ] ];
-                                                 //Check the hover background checkbox value
-                                                $rvm_region_array[ 3 ] = !empty( $rvm_region_array[ 3 ] ) ? 'checked' : 'unchecked' ;
+                                                // if we have one of this value in the array means we have at least 5 values
+                                                if( in_array( "open_link", $rvm_region_array ) || in_array("open_label_onto_default_card", $rvm_region_array ) || in_array("show_custom_selector", $rvm_region_array ) ) {
+
+                                                    //Check the hover background checkbox value
+                                                    //5 because we have 5 inputs with same name: changing this number must change this limit too
+                                                    if ( count( $rvm_region_array ) < 5 ) {
+
+                                                        //if array sent is made of 4 elem could be an old version (only 4 elem ) or
+                                                        //it means checkbox for "mouse over background" has not been checked and no value sent
+                                                        //In this situation checkbox takes value of following input, the "onclick action" in this case
+                                                        //So we use a trick assigning the selected value to "onclick action"
+                                                    
+
+                                                    
+
+                                                        $rvm_region_array[ 4 ] = $rvm_region_array[ 3 ];
+                                                        //and then re-assign the 'unchecked status' to the checkbox input ( unchecked as it has non been checked )
+                                                        $rvm_region_array[ 3 ] = 'unchecked';
+                                                    }
+                                                    //a better way to solve this situation would be replacing checkbox with a select (taking option value of 'checked' and 'uncheked'), but we could not use checkboses anymore or we should need a sort of javascript check before submit
+
+                                                    else {
+                                                        $rvm_region_array[ 3 ] = 'checked' ;
+                                                    }
+
+
+                                                } //in_array( "open_link", $rvm_region_array ) ...
+                                                
+                                                else {
+                                                    // means we are in version <= 5.3.2 and we check last value which is the hover over background
+                                                    $rvm_region_array[ 3 ] = !empty( $rvm_region_array[ 3 ] ) ? 'checked' : 'unchecked' ;
+                                                }                                          
+
+
                                                 $rvm_regions_data = wp_slash( serialize( $rvm_region_array ) ); //escape quote with slash
+                                                  //$rvm_regions_data =  $rvm_region_array[ 3 ];
+                                                
                                                 update_post_meta( $post_id, '_' . $field[ 1 ], $rvm_regions_data );
                                     } //if( isset( $_POST[ $field[ 1 ] ] ) )
                         } //foreach( $array_fields as $field ) 

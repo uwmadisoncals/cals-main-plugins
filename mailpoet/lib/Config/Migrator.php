@@ -5,11 +5,16 @@ use MailPoet\Models\Subscriber;
 use MailPoet\Models\Newsletter;
 use MailPoet\Util\Helpers;
 
-if(!defined('ABSPATH')) exit;
+if (!defined('ABSPATH')) exit;
 
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 class Migrator {
+
+  public $prefix;
+  private $charset_collate;
+  private $models;
+
   function __construct() {
     $this->prefix = Env::$db_prefix;
     $this->charset_collate = Env::$db_charset_collate;
@@ -18,6 +23,7 @@ class Migrator {
       'settings',
       'custom_fields',
       'scheduled_tasks',
+      'stats_notifications',
       'scheduled_task_subscribers',
       'sending_queues',
       'subscribers',
@@ -45,13 +51,12 @@ class Migrator {
   function up() {
     global $wpdb;
 
-    $_this = $this;
-    $migrate = function($model) use($_this) {
+    $output = [];
+    foreach ($this->models as $model) {
       $modelMethod = Helpers::underscoreToCamelCase($model);
-      dbDelta($_this->$modelMethod());
-    };
-
-    array_map($migrate, $this->models);
+      $output = array_merge(dbDelta($this->$modelMethod()), $output);
+    }
+    return $output;
   }
 
   function down() {
@@ -72,9 +77,9 @@ class Migrator {
       'name varchar(90) NOT NULL,',
       'type varchar(90) NOT NULL DEFAULT "default",',
       'description varchar(250) NOT NULL DEFAULT "",',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
-      'deleted_at TIMESTAMP NULL,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'deleted_at timestamp NULL,',
       'PRIMARY KEY  (id),',
       'UNIQUE KEY name (name)'
     );
@@ -86,8 +91,8 @@ class Migrator {
       'id int(11) unsigned NOT NULL AUTO_INCREMENT,',
       'name varchar(50) NOT NULL,',
       'value longtext,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'UNIQUE KEY name (name)'
     );
@@ -100,8 +105,8 @@ class Migrator {
       'name varchar(90) NOT NULL,',
       'type varchar(90) NOT NULL,',
       'params longtext NOT NULL,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'UNIQUE KEY name (name)'
     );
@@ -114,11 +119,11 @@ class Migrator {
       'type varchar(90) NULL DEFAULT NULL,',
       'status varchar(12) NULL DEFAULT NULL,',
       'priority mediumint(9) NOT NULL DEFAULT 0,',
-      'scheduled_at TIMESTAMP NULL,',
-      'processed_at TIMESTAMP NULL,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
-      'deleted_at TIMESTAMP NULL,',
+      'scheduled_at timestamp NULL,',
+      'processed_at timestamp NULL,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'deleted_at timestamp NULL,',
       'PRIMARY KEY  (id),',
       'KEY type (type),',
       'KEY status (status)',
@@ -126,14 +131,28 @@ class Migrator {
     return $this->sqlify(__FUNCTION__, $attributes);
   }
 
-  function scheduledTaskSubscribers() {
+  function statsNotifications() {
     $attributes = array(
+      'id int(11) unsigned NOT NULL AUTO_INCREMENT,',
+      'newsletter_id int(11) unsigned NOT NULL,',
+      'task_id int(11) unsigned NOT NULL,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'PRIMARY KEY (id),',
+      'UNIQUE KEY newsletter_id_task_id (newsletter_id, task_id),',
+      'KEY task_id (task_id)',
+    );
+    return $this->sqlify(__FUNCTION__, $attributes);
+  }
+
+  function scheduledTaskSubscribers() {
+    $attributes = array (
       'task_id int(11) unsigned NOT NULL,',
       'subscriber_id int(11) unsigned NOT NULL,',
       'processed int(1) NOT NULL,',
-      'failed int(1) NOT NULL,',
+      'failed smallint(1) NOT NULL DEFAULT 0,',
       'error text NULL,',
-      'created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,',
+      'created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (task_id, subscriber_id),',
       'KEY subscriber_id (subscriber_id)'
     );
@@ -152,9 +171,9 @@ class Migrator {
       'count_processed int(11) unsigned NOT NULL DEFAULT 0,',
       'count_to_process int(11) unsigned NOT NULL DEFAULT 0,',
       'meta longtext,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
-      'deleted_at TIMESTAMP NULL,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'deleted_at timestamp NULL,',
       'PRIMARY KEY  (id),',
       'KEY task_id (task_id),',
       'KEY newsletter_id (newsletter_id)',
@@ -166,18 +185,20 @@ class Migrator {
     $attributes = array(
       'id int(11) unsigned NOT NULL AUTO_INCREMENT,',
       'wp_user_id bigint(20) NULL,',
+      'is_woocommerce_user int(1) NOT NULL DEFAULT 0,',
       'first_name varchar(255) NOT NULL DEFAULT "",',
       'last_name varchar(255) NOT NULL DEFAULT "",',
       'email varchar(150) NOT NULL,',
       'status varchar(12) NOT NULL DEFAULT "' . Subscriber::STATUS_UNCONFIRMED . '",',
       'subscribed_ip varchar(45) NULL,',
       'confirmed_ip varchar(45) NULL,',
-      'confirmed_at TIMESTAMP NULL,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
-      'deleted_at TIMESTAMP NULL,',
+      'confirmed_at timestamp NULL,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'deleted_at timestamp NULL,',
       'unconfirmed_data longtext,',
-      'source ENUM("form", "imported", "administrator", "api", "wordpress_user", "unknown") DEFAULT "unknown",',
+      "source enum('form','imported','administrator','api','wordpress_user','woocommerce_user','unknown') DEFAULT 'unknown',",
+      'count_confirmations int(11) unsigned NOT NULL DEFAULT 0,',
       'PRIMARY KEY  (id),',
       'UNIQUE KEY email (email),',
       'KEY wp_user_id (wp_user_id),',
@@ -192,8 +213,8 @@ class Migrator {
       'subscriber_id int(11) unsigned NOT NULL,',
       'segment_id int(11) unsigned NOT NULL,',
       'status varchar(12) NOT NULL DEFAULT "' . Subscriber::STATUS_SUBSCRIBED . '",',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'UNIQUE KEY subscriber_segment (subscriber_id,segment_id),',
       'KEY segment_id (segment_id)',
@@ -207,8 +228,8 @@ class Migrator {
       'subscriber_id int(11) unsigned NOT NULL,',
       'custom_field_id int(11) unsigned NOT NULL,',
       'value text NOT NULL,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'UNIQUE KEY subscriber_id_custom_field_id (subscriber_id,custom_field_id)'
     );
@@ -218,7 +239,7 @@ class Migrator {
   function subscriberIps() {
     $attributes = array(
       'ip varchar(45) NOT NULL,',
-      'created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,',
+      'created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (created_at, ip),',
       'KEY ip (ip)'
     );
@@ -239,10 +260,10 @@ class Migrator {
       'reply_to_name varchar(150) NOT NULL DEFAULT "",',
       'preheader varchar(250) NOT NULL DEFAULT "",',
       'body longtext,',
-      'sent_at TIMESTAMP NULL,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
-      'deleted_at TIMESTAMP NULL,',
+      'sent_at timestamp NULL,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'deleted_at timestamp NULL,',
       'PRIMARY KEY  (id)'
     );
     return $this->sqlify(__FUNCTION__, $attributes);
@@ -251,15 +272,15 @@ class Migrator {
   function newsletterTemplates() {
     $attributes = array(
       'id int(11) unsigned NOT NULL AUTO_INCREMENT,',
-      'newsletter_id int NULL DEFAULT 0,',
+      'newsletter_id int(11) NULL DEFAULT 0,',
       'name varchar(250) NOT NULL,',
       'categories varchar(250) NOT NULL DEFAULT "[]",',
       'description varchar(255) NOT NULL DEFAULT "",',
-      'body LONGTEXT,',
-      'thumbnail LONGTEXT,',
-      'readonly TINYINT(1) DEFAULT 0,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'body longtext,',
+      'thumbnail longtext,',
+      'readonly tinyint(1) DEFAULT 0,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id)'
     );
     return $this->sqlify(__FUNCTION__, $attributes);
@@ -270,8 +291,8 @@ class Migrator {
       'id int(11) unsigned NOT NULL AUTO_INCREMENT,',
       'name varchar(90) NOT NULL,',
       'newsletter_type varchar(90) NOT NULL,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'UNIQUE KEY name_newsletter_type (newsletter_type,name)'
     );
@@ -284,8 +305,8 @@ class Migrator {
       'newsletter_id int(11) unsigned NOT NULL,',
       'option_field_id int(11) unsigned NOT NULL,',
       'value longtext,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'UNIQUE KEY newsletter_id_option_field_id (newsletter_id,option_field_id)'
     );
@@ -297,8 +318,8 @@ class Migrator {
       'id int(11) unsigned NOT NULL AUTO_INCREMENT,',
       'newsletter_id int(11) unsigned NOT NULL,',
       'segment_id int(11) unsigned NOT NULL,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'UNIQUE KEY newsletter_segment (newsletter_id,segment_id)'
     );
@@ -312,11 +333,12 @@ class Migrator {
       'queue_id int(11) unsigned NOT NULL,',
       'url varchar(2083) NOT NULL,',
       'hash varchar(20) NOT NULL,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'KEY newsletter_id (newsletter_id),',
-      'KEY queue_id (queue_id)',
+      'KEY queue_id (queue_id),',
+      'KEY url (url(255))',
     );
     return $this->sqlify(__FUNCTION__, $attributes);
   }
@@ -326,8 +348,8 @@ class Migrator {
       'id int(11) unsigned NOT NULL AUTO_INCREMENT,',
       'newsletter_id int(11) unsigned NOT NULL,',
       'post_id int(11) unsigned NOT NULL,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'KEY newsletter_id (newsletter_id)',
     );
@@ -341,9 +363,9 @@ class Migrator {
       'body longtext,',
       'settings longtext,',
       'styles longtext,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
-      'deleted_at TIMESTAMP NULL,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'deleted_at timestamp NULL,',
       'PRIMARY KEY  (id)'
     );
     return $this->sqlify(__FUNCTION__, $attributes);
@@ -355,7 +377,7 @@ class Migrator {
       'newsletter_id int(11) unsigned NOT NULL,',
       'subscriber_id int(11) unsigned NOT NULL,',
       'queue_id int(11) unsigned NOT NULL,',
-      'sent_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'sent_at timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'KEY newsletter_id (newsletter_id),',
       'KEY subscriber_id (subscriber_id)',
@@ -371,8 +393,8 @@ class Migrator {
       'queue_id int(11) unsigned NOT NULL,',
       'link_id int(11) unsigned NOT NULL,',
       'count int(11) unsigned NOT NULL,',
-      'created_at TIMESTAMP NULL,',
-      'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
+      'created_at timestamp NULL,',
+      'updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'KEY newsletter_id (newsletter_id),',
       'KEY queue_id (queue_id),',
@@ -387,7 +409,7 @@ class Migrator {
       'newsletter_id int(11) unsigned NOT NULL,',
       'subscriber_id int(11) unsigned NOT NULL,',
       'queue_id int(11) unsigned NOT NULL,',
-      'created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,',
+      'created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'KEY newsletter_id (newsletter_id),',
       'KEY queue_id (queue_id),',
@@ -402,7 +424,7 @@ class Migrator {
       'newsletter_id int(11) unsigned NOT NULL,',
       'subscriber_id int(11) unsigned NOT NULL,',
       'queue_id int(11) unsigned NOT NULL,',
-      'created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,',
+      'created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'KEY newsletter_id (newsletter_id),',
       'KEY queue_id (queue_id),',
@@ -416,7 +438,7 @@ class Migrator {
       'id int(11) unsigned NOT NULL AUTO_INCREMENT,',
       'form_id int(11) unsigned NOT NULL,',
       'subscriber_id int(11) unsigned NOT NULL,',
-      'created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,',
+      'created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,',
       'PRIMARY KEY  (id),',
       'UNIQUE KEY form_subscriber (form_id,subscriber_id)'
     );
@@ -428,7 +450,7 @@ class Migrator {
       'old_id int(11) unsigned NOT NULL,',
       'type varchar(50) NOT NULL,',
       'new_id int(11) unsigned NOT NULL,',
-      'created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,',
+      'created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,',
       'PRIMARY KEY (old_id, type),',
       'KEY new_id (new_id)'
     );
@@ -437,11 +459,11 @@ class Migrator {
 
   function log() {
     $attributes = [
-      'id BIGINT unsigned NOT NULL AUTO_INCREMENT,',
-      'name VARCHAR(255),',
-      'level INTEGER,',
-      'message LONGTEXT,',
-      'created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,',
+      'id bigint(20) unsigned NOT NULL AUTO_INCREMENT,',
+      'name varchar(255),',
+      'level int(11),',
+      'message longtext,',
+      'created_at timestamp DEFAULT CURRENT_TIMESTAMP,',
       'PRIMARY KEY (id)',
     ];
     return $this->sqlify(__FUNCTION__, $attributes);

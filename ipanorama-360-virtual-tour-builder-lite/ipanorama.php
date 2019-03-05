@@ -15,7 +15,7 @@
  * Plugin Name:       iPanorama 360
  * Plugin URI:        http://avirtum.com
  * Description:       iPanorama 360 is the WordPress plugin out there that lets you create awesome virtual tours for clients from directly inside the WordPress admin in seconds. The plugin supports hotspots for providing information about any part of the scene or for navigation to other rooms/areas. It uses their own tooltip system, you can enrich it with text, images, video and other online media. Use this plugin to create interactive tours, maps and presentations.
- * Version:           1.3.8
+ * Version:           1.3.9
  * Author:            Avirtum
  * Author URI:        http://codecanyon.net/user/avirtum/portfolio?ref=avirtum
  * Text Domain:       ipanorama

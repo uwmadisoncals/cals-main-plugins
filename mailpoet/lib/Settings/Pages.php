@@ -54,8 +54,8 @@ class Pages {
    */
   static function isMailpoetPage($id) {
     $mailpoetPages = static::getMailPoetPages();
-    foreach($mailpoetPages as $mailpoetPage) {
-      if($mailpoetPage->ID === $id) {
+    foreach ($mailpoetPages as $mailpoetPage) {
+      if ($mailpoetPage->ID === $id) {
         return true;
       }
     }
@@ -69,7 +69,7 @@ class Pages {
     );
 
     $pages = array();
-    foreach($all_pages as $page) {
+    foreach ($all_pages as $page) {
       $pages[] = static::getPageData($page);
     }
 
