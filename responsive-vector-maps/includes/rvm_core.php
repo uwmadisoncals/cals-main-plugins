@@ -170,7 +170,7 @@ function rvm_fields_array( )
                          'rvm_mbe_regions_mouseover_colour_opacity',
                         'text',
                         __( 'Subdivisions Hover Colour Opacity', RVM_TEXT_DOMAIN ),
-                        __( '<span class="rvm_field_descr rvm_notice_messages">value must be between 0 and 1 i.e.: 0.5', RVM_TEXT_DOMAIN ),
+                        __( '<span class="rvm_field_descr rvm_notice_messages">value must be between 0 and 1 i.e.: 0.5</span>', RVM_TEXT_DOMAIN ),
                         3,
                         3,
                         1,
@@ -503,7 +503,7 @@ function rvm_mb_function( $post )
                         $rvm_tab_class_main_settings = '';
             }
 
-            $output .= '<div id="rvm_tabs"><ul><li id="rvm_main_settings_tab" class="rvm_tabs ' . $rvm_tab_class_main_settings . '" rel="rvm_main_settings"><a href="#">Main settings</a></li>';
+            $output .= '<div id="rvm_tabs"><ul><li id="rvm_main_settings_tab" class="rvm_tabs ' . $rvm_tab_class_main_settings . '" rel="rvm_main_settings"><a href="#">'  .  __( 'Main Settings ', RVM_TEXT_DOMAIN )  . '</a></li>';
             
             if ( !empty( $rvm_selected_map ) ) {
                         if ( !isset( $rvm_tab_active_default ) && ( isset( $rvm_tab_active ) && $rvm_tab_active == 'rvm_regions_countries' ) ) {
@@ -559,13 +559,10 @@ function rvm_mb_function( $post )
                     $array_regions = rvm_include_custom_map_settings( $post->ID,  $rvm_selected_map );
                     if( ( $screen->action != 'add' ) && isset( $array_regions ) && empty( $array_regions ) ) {
                         $output .= '<div class="rvm_messages rvm_error_messages rvm_message_map_not_available">' . __( 'Sorry, this map is no longer available by default.<br>', RVM_TEXT_DOMAIN );
-                        $output .= '<a href="' . RVM_DOMAIN_URL . 'redirect-from-map-to-purchase-user-site/" target="_blank" class="rvm_download_custom_map">'. __( 'You can now download &nbsp;<span>' . $rvm_selected_map . '</span>&nbsp; map here', RVM_TEXT_DOMAIN ). '</a>';                        
+                        $output .= '<a href="' . RVM_DOMAIN_URL . 'redirect-from-map-to-purchase-user-site/" target="_blank" class="rvm_download_custom_map">'. __( 'You can now download map here', RVM_TEXT_DOMAIN ). '</a>';                        
                         $output .= '</div>';
 
-                        /*global $is_chrome ;
-                        if( !$is_chrome ) {
-                            $output .= '<div style="margin-bottom:20px" class="rvm_messages rvm_success_messages">' . __( 'In case you had not exported settings through the "Export Subdivisions" feature available since ver 5.5.3, do not worry, you can still copy them onto the new purchased map! <a href="http://www.responsivemapsplugin.com/tips-tricks-answering-common-questions-you-may-come-up-with-using-rvm-plugin/#rvm_copy_settings_anchor" target="_blank">In this video</a> you\' ll learn an easy way to do it manually.', RVM_TEXT_DOMAIN ) .'</div>';
-                        }//if( !$is_chrome )*/
+
                     }
             }
 
@@ -616,13 +613,13 @@ function rvm_mb_function( $post )
                                                     $output .= '<hr class="rvm_separator">' ;
                                                 }*/
                                                 if( $field[ 0 ] == 'rvm_mbe_map_bg_selected_color' ) {
-                                                    $output .= '<h2 class="rvm_h2_title rvm_hidden_when_custom_map">Subdivisions hover status</h2>' ;
+                                                    $output .= '<h2 class="rvm_h2_title rvm_hidden_when_custom_map">' . __('Subdivisions Hover Status' , RVM_TEXT_DOMAIN ) . '</h2>' ;
                                                 }
                                                 else if( $field[ 0 ] == 'rvm_mbe_border_width' ) {
-                                                    $output .= '<h2 class="rvm_h2_title rvm_hidden_when_custom_map">Subdivisions selected status</h2>' ;
+                                                    $output .= '<h2 class="rvm_h2_title rvm_hidden_when_custom_map">' . __('Subdivisions Selected Status' , RVM_TEXT_DOMAIN ) . '</h2>' ;
                                                 }
                                                 else if( $field[ 0 ] == 'rvm_mbe_regions_mouseover_colour_opacity' ) {
-                                                    $output .= '<h2 class="rvm_h2_title rvm_hidden_when_custom_map">General link settings</h2>' ;
+                                                    $output .= '<h2 class="rvm_h2_title rvm_hidden_when_custom_map">' . __('General Link Settings' , RVM_TEXT_DOMAIN ) . '</h2>' ;
                                                 }
                                     } // if( $field[ 1 ] == 'text' )
                                     if ( $field[ 1 ] == 'select' ) {

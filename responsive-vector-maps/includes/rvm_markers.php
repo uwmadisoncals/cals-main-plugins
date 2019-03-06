@@ -96,7 +96,7 @@ if( !rvm_check_custom_marker_icon_available( $rvm_custom_marker_icon_path ) || e
     $output .=  '</div>' ; //.rvm_markers_values
     $output .= '<div style="clear:left;"></div>' ;
     $output .= '<h2 class="rvm_h2_title">' . __( 'Markers Dimensions' , RVM_TEXT_DOMAIN ) . '</h2>' ;
-    $output .= '<p>' . __( 'Minimum and maximum values will affect the radius dimensions of the markers. Basically they are a scale within input values for marker dimensions will be represented. The smallest will be equal to "minimum value" while the biggest will be equal to "maximum value". Default values are ' . RVM_MARKER_DIM_MIN_VALUE . ' and ' . RVM_MARKER_DIM_MAX_VALUE , RVM_TEXT_DOMAIN ) . '.</p>' ;
+    $output .= '<p>' . __( 'Minimum and maximum values will affect the radius dimensions of the markers. Basically they are a scale within input values for marker dimensions will be represented. The smallest will be equal to "minimum value" while the biggest will be equal to "maximum value". Default values are', RVM_TEXT_DOMAIN ) .  RVM_MARKER_DIM_MIN_VALUE . __(' and ', RVM_TEXT_DOMAIN ) . RVM_MARKER_DIM_MAX_VALUE . '.</p>' ;
     $output .= isset( $output_marker_dim_min ) ? $output_marker_dim_min : '' ;
     $output .= isset( $output_marker_dim_max ) ? $output_marker_dim_max : '' ;  
     $output .= '<div style="clear:left;"></div>' ;   

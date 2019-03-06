@@ -86,6 +86,7 @@ class AAM_Backend_Feature_Main_Route extends AAM_Backend_Feature_Abstract {
 
                 foreach(array_unique($methods) as $method) {
                     $response[] = array(
+                        $route,
                         'restful',
                         $method,
                         htmlspecialchars($route),
@@ -99,6 +100,7 @@ class AAM_Backend_Feature_Main_Route extends AAM_Backend_Feature_Abstract {
         if (AAM::api()->getConfig('core.settings.xmlrpc', true)) {
             foreach(array_keys(AAM_Core_API::getXMLRPCServer()->methods) as $route) {
                 $response[] = array(
+                    $route,
                     'xmlrpc',
                     'POST',
                     htmlspecialchars($route),

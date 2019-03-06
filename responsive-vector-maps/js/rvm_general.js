@@ -106,7 +106,7 @@
 	    	}
 
 	    	else {//case show_custom_selector
-	    		var rvm_label_link_var = "Show following tag (use ID selector without '#')";
+	    		var rvm_label_link_var = objectL10n.show_custom_tag_label;
 	    		$("#rvm_region_input_link_" + region_id).addClass("rvm_show");
 	    		$("#rvm_region_input_link_" + region_id).removeClass("rvm_hide");	    			
 	    	}

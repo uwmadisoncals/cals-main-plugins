@@ -149,7 +149,8 @@ function rvm_add_scripts( )
                         //set the path for javascript files
                         'images_js_path' => RVM_IMG_PLUGIN_DIR, //path for images to be called from javascript  
                         'markers_correctly_imported' =>  __( 'Markers correctly imported. Remember <strong>to update this post</strong> in order to save imported markers into database.', RVM_TEXT_DOMAIN ),
-                        'regions_correctly_imported' =>  __( 'Subdivisions correctly imported. Remember <strong>to update this post</strong> in order to save imported subdivisions into database', RVM_TEXT_DOMAIN )
+                        'regions_correctly_imported' =>  __( 'Subdivisions correctly imported. Remember <strong>to update this post</strong> in order to save imported subdivisions into database', RVM_TEXT_DOMAIN ),
+                        'show_custom_tag_label' =>  __( 'Show following tag (use ID selector without "#")', RVM_TEXT_DOMAIN ),
             ) );
 
             //Localize in javascript rvm_admin_js

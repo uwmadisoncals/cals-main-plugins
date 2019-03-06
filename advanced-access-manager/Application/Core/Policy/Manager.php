@@ -127,6 +127,37 @@ final class AAM_Core_Policy_Manager {
         
         return $allowed;
     }
+
+    /**
+     * Determine if resource is the boundary
+     * 
+     * The Boundary is type of resource that is denied and is enforced so no other
+     * statements can override it. For example edit_posts capability can be boundary
+     * for any statement that user Role resource
+     *
+     * @param string $resource
+     * @param array  $args
+     * 
+     * @return boolean
+     * 
+     * @access public
+     */
+    public function isBoundary($resource, $args = array()) {
+        $denied = false;
+        $tree   = $this->preparePolicyTree();
+        $id     = strtolower($resource);
+        
+        if (isset($tree['Statement'][$id])) {
+            $stm = $tree['Statement'][$id];
+            
+            if ($this->isApplicable($stm, $args)) {
+                $effect  = strtolower($stm['Effect']);
+                $denied = ($effect === 'deny' && !empty($stm['Enforce']));
+            }
+        }
+        
+        return $denied;
+    }
     
     /**
      * Get Policy Param

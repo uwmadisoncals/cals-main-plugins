@@ -2954,6 +2954,12 @@
                         $('.post-redirect-action').hide();
                         $('.post-redirect-value').val('');
                         $('.post-redirect-type').prop('checked', false);
+
+                        if (getAAM().getSubject().type === 'visitor') {
+                            $('#post-login-redirect-visitor').removeClass('hidden');
+                        } else {
+                            $('#post-login-redirect-visitor').addClass('hidden');
+                        }
                         
                         if ($('#post-redirect-rule').val()) {
                             var rule = $('#post-redirect-rule').val().split('|');
@@ -3477,7 +3483,7 @@
                             }
                         },
                         columnDefs: [
-                           // {visible: false, targets: [0]},
+                            {visible: false, targets: [0]},
                             {className: 'text-center', targets: [0, 1]}
                         ],
                         language: {
@@ -3485,23 +3491,23 @@
                             searchPlaceholder: getAAM().__('Search Route'),
                             info: getAAM().__('_TOTAL_ route(s)'),
                             infoFiltered: '',
-                            emptyTable: getAAM().__('No API enpoints found. You might have APIs disabled.'),
+                            emptyTable: getAAM().__('No API endpoints found. You might have APIs disabled.'),
                             infoEmpty: getAAM().__('Nothing to show'),
                             lengthMenu: '_MENU_'
                         },
                         createdRow: function (row, data) {
                             // decorate the method
                             var method = $('<span/>', {
-                                'class': 'aam-api-method ' + data[1].toLowerCase()
-                            }).text(data[1]);
+                                'class': 'aam-api-method ' + data[2].toLowerCase()
+                            }).text(data[2]);
                             
                             $('td:eq(0)', row).html(
-                                $('<small/>').text(data[0] === 'restful' ? 'JSON' : 'XML')
+                                $('<small/>').text(data[1] === 'restful' ? 'JSON' : 'XML')
                             );
                             
                             $('td:eq(1)', row).html(method);
                             
-                            var actions = data[3].split(',');
+                            var actions = data[4].split(',');
 
                             var container = $('<div/>', {'class': 'aam-row-actions'});
                             $.each(actions, function (i, action) {
@@ -3510,7 +3516,7 @@
                                         $(container).append($('<i/>', {
                                             'class': 'aam-row-action text-muted icon-check-empty'
                                         }).bind('click', function () {
-                                            save(data[0], data[2], data[1], this);
+                                            save(data[1], data[0], data[2], this);
                                         }));
                                         break;
 
@@ -3518,7 +3524,7 @@
                                         $(container).append($('<i/>', {
                                             'class': 'aam-row-action text-danger icon-check'
                                         }).bind('click', function () {
-                                            save(data[0], data[2], data[1], this);
+                                            save(data[1], data[0], data[2], this);
                                         }));
                                         break;
 

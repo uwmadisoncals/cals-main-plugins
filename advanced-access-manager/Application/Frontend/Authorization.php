@@ -143,7 +143,11 @@ class AAM_Frontend_Authorization {
             $code = apply_filters('aam-post-redirect-http-code-filter', 307);
             
             if (count($rule) === 1) { // TODO: legacy. Remove in Jul 2020
-                AAM_Core_API::redirect($rule[0]);
+                if ($rule[0] === 'login') {
+                    AAM::api()->redirect('login');
+                } else {
+                    AAM_Core_API::redirect($rule[0]);
+                }
             } elseif ($rule[0] === 'page') {
                 wp_safe_redirect(get_page_link($rule[1]), $code); exit;
             } elseif ($rule[0] === 'url') {

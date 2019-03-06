@@ -109,7 +109,7 @@ class AAM_Backend_Feature_Subject_User {
                 // Making sure that user that we are switching too is not logged in
                 // already. Reported by https://github.com/KenAer
                 $sessions = WP_Session_Tokens::get_instance($user->ID);
-                if (count($sessions->get_all()) > 1) {
+                if (count($sessions->get_all()) >= 1) {
                     $sessions->destroy_all();
                 }
                 

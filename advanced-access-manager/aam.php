@@ -3,7 +3,7 @@
 /**
   Plugin Name: Advanced Access Manager
   Description: All you need to manage access to your WordPress website
-  Version: 5.9
+  Version: 5.9.1
   Author: Vasyl Martyniuk <vasyl@vasyltech.com>
   Author URI: https://vasyltech.com
 
@@ -275,7 +275,7 @@ if (defined('ABSPATH')) {
         wp_schedule_event(time(), 'daily', 'aam-cron');
     }
     add_action('aam-cron', 'AAM::cron');
-    
+
     //activation & deactivation hooks
     register_activation_hook(__FILE__, array('AAM', 'activate'));
     register_uninstall_hook(__FILE__, array('AAM', 'uninstall'));

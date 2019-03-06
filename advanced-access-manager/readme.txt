@@ -3,7 +3,7 @@ Contributors: vasyltech
 Tags: access control, membership, backend menu, user role, restricted content, security, jwt
 Requires at least: 4.0
 Tested up to: 5.1
-Stable tag: 5.9
+Stable tag: 5.9.1
 
 All you need to manage access to you WordPress websites on frontend, backend and API levels for any role, user or visitors.
 
@@ -79,6 +79,14 @@ https://www.youtube.com/watch?v=mj5Xa_Wc16Y
 
 == Changelog ==
 
+= 5.9.1 =
+* Fixed the bug with controlling which capability can be deleted with Access Policy
+* Fixed typo in the aam_edit_others_policies capability slug
+* Fixed the bug with API Routes not being saved property for those that have htmlspecial characters in it
+* Fixed major bug with keeping track of active user sessions that prevents multiple session per same user
+* Added "Redirect To Login" to the LIMIT option for visitors on Posts & Terms tab
+* Added the new concept of "Boundary" to Access Policy that allows to Enforce certain statements
+
 = 5.9 =
 * Fixed the bug with publish pages not being managed correctly
 * Fixed the bug with getting correct post from the list of posts
@@ -90,7 +98,7 @@ https://www.youtube.com/watch?v=mj5Xa_Wc16Y
 * Fixed the bug with multi-lingual support
 * Fixed the bug with LIMIT option that escaped quotes in the message
 * Fixed the bug with managing access to Access Policies
-* Added support for aam_edit_policy, aam_read_policy, aam_delete_policy, aam_delete_policies, aam_edit_policies, aam_edit_other_policies, aam_publish_policies capabilities
+* Added support for aam_edit_policy, aam_read_policy, aam_delete_policy, aam_delete_policies, aam_edit_policies, aam_edit_others_policies, aam_publish_policies capabilities
 * Refactored Default Category functionality (moved it to Plus Package extension)
 * Added support for the nav_menu_meta_box_object hook to filter posts on Menu Builder page
 * Extend Access Policy with more features

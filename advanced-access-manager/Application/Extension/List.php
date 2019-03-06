@@ -22,7 +22,7 @@ class AAM_Extension_List {
                 'description' => 'Get the complete list of all premium AAM extensions in one package and all future premium extensions already included for now additional cost.',
                 'url'         => 'https://aamplugin.com/complete-package',
                 'version'     => (defined('AAM_COMPLETE_PACKAGE') ? constant('AAM_COMPLETE_PACKAGE') : null),
-                'latest'      => '3.8.14'
+                'latest'      => '3.8.16'
             ),
             'AAM_PLUS_PACKAGE' => array(
                 'title'       => 'Plus Package',

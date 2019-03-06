@@ -506,6 +506,8 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
                         $preview = __('Valid URL', AAM_KEY);
                     } elseif ($chunks[0] === 'callback') {
                         $preview = __('Custom Callback', AAM_KEY);
+                    } elseif ($chunks[0] === 'login') {
+                        $preview = __('Redirect To Login Page', AAM_KEY);
                     }
                 }
                 break;

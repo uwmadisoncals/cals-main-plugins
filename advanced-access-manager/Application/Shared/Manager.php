@@ -23,7 +23,7 @@ class AAM_Shared_Manager {
      * @access private 
      */
     private static $_instance = null;
-    
+
     /**
      * Constructor
      * 
@@ -98,6 +98,9 @@ class AAM_Shared_Manager {
             add_filter(
                 'gettext', array(self::$_instance, 'escapeTranslation'), 999, 3
             );
+
+            //get control over commenting stuff
+            add_filter('comments_open', array(self::$_instance, 'commentOpen'), 10, 2);
             
             // Role Manager. Tracking user role changes and if there is expiration
             // set, then trigger hooks
@@ -144,7 +147,7 @@ class AAM_Shared_Manager {
                 'delete_post'       => 'aam_delete_policy',
                 'delete_posts'      => 'aam_delete_policies',
                 'edit_posts'        => 'aam_edit_policies',
-                'edit_others_posts' => 'aam_edit_other_policies',
+                'edit_others_posts' => 'aam_edit_others_policies',
                 'publish_posts'     => 'aam_publish_policies',
             )
         ));
@@ -421,7 +424,7 @@ class AAM_Shared_Manager {
         
         return $response;
     }
-    
+
     /**
      * Check user capability
      * 
@@ -430,58 +433,26 @@ class AAM_Shared_Manager {
      * "0" element, it performs additional check on user's capability to manage
      * post, users etc.
      * 
-     * @param array $caps
-     * @param array $meta
-     * @param array $args
+     * @param array  $caps
+     * @param string $cap
+     * @param int    $user_id
+     * @param array  $args
      * 
      * @return array
      * 
      * @access public
      */
     public function mapMetaCaps($caps, $cap, $user_id, $args) {
-        global $post;
-        
+        global $post; 
+
         switch($cap) {
             case 'edit_user':
             case 'delete_user':
                 $caps = $this->authorizeUserUpdate($caps, $args[0]);
                 break;
             
-            case 'edit_post':
-            case 'edit_page':
-            case 'aam_edit_policy':
-                $caps = $this->authorizePostEdit($caps, $args[0]);
-                break;
-            
-            case 'delete_post':
-            case 'delete_page':
-            case 'aam_delete_policy':
-                $caps = $this->authorizePostDelete($caps, $args[0]);
-                break;
-            
-            case 'read_post':
-            case 'read_page':
-            case 'aam_read_policy':
-                $caps = $this->authorizePostRead($caps, $args[0]);
-                break;
-            
-            case 'publish_post':
-            case 'aam_publish_policy':
-                $caps = $this->authorizePublishPost($caps, $args[0]);
-                break;
-            
             case 'install_plugins':
                 $caps = $this->checkPluginsAction('install', $caps, $cap);
-                break;
-            
-            case 'publish_posts':
-            case 'publish_pages':
-            case 'aam_publish_policies':
-                // There is a bug in WP core that instead of checking if user has
-                // ability to publish_post, it checks for edit_post
-                if (is_a($post, 'WP_Post')) {
-                    $caps = $this->authorizePublishPost($caps, $post->ID);
-                }
                 break;
             
             case 'delete_plugins':
@@ -509,12 +480,68 @@ class AAM_Shared_Manager {
                 break;
             
             default:
+                //potentially post type cap
+                $caps = $this->checkPostPermission(
+                    $caps, $cap, (isset($args[0]) ? $args[0] : null)
+                );
                 break;
         }
         
         return $caps;
     }
-    
+
+    /**
+     * Check Post Permissions
+     *
+     * @param [type] $caps
+     * @param [type] $cap
+     * @param [type] $id
+     * 
+     * @return array
+     * 
+     * @access protected
+     */
+    protected function checkPostPermission($caps, $cap, $id = null) {
+        global $post;
+
+        $postId = (empty($id) && is_a($post, 'WP_Post') ?  $post->ID : $id);
+        switch($cap) {
+            case 'edit_post':
+            case 'aam_edit_policy':
+                $caps = $this->authorizePostEdit($caps, $postId);
+                break;
+        
+            case 'delete_post':
+            case 'aam_delete_policy':
+                $caps = $this->authorizePostDelete($caps, $postId);
+                break;
+        
+            case 'read_post':
+            case 'read':
+            case 'aam_read_policy':
+                $caps = $this->authorizePostRead($caps, $postId);
+                break;
+        
+            
+            case 'publish_post':
+            case 'publish_posts':
+            case 'publish_pages':
+            case 'aam_publish_policies':
+                // There is a bug in WP core that instead of checking if user has
+                // ability to publish_post, it checks for edit_post. That is why
+                // user has to be on the edit
+                if (is_a($post, 'WP_Post')) {
+                    $caps = $this->authorizePublishPost($caps, $postId);
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        return $caps;
+    }
+
     /**
      * 
      * @param type $action
@@ -639,6 +666,23 @@ class AAM_Shared_Manager {
         
         return $caps;
     }
+
+    /**
+     * Control frontend commenting feature
+     *
+     * @param boolean $open
+     * @param int     $post_id
+     *
+     * @return boolean
+     *
+     * @access public
+     */
+    public function commentOpen($open, $post_id) {
+        $object = AAM::getUser()->getObject('post', $post_id);
+        $area   = AAM_Core_Api_Area::get();
+
+        return ($object->has($area . '.comment') ? false : $open);
+    }
     
     /**
      * Check if current user is allowed to edit post
@@ -697,11 +741,11 @@ class AAM_Shared_Manager {
     protected function authorizePublishPost($caps, $id) {
         $object = AAM::getUser()->getObject('post', $id);
         $area   = AAM_Core_Api_Area::get();
-
+        
         if (!$object->allowed($area . '.publish')) {
             $caps[] = 'do_not_allow';
         }
-        
+
         return $caps;
     }
     

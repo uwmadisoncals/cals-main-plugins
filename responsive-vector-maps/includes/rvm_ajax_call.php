@@ -66,7 +66,7 @@ function rvm_ajax_preview( ) {
                                 }
                 } //isset( $_REQUEST[ 'nonce' ] ) && isset( $_REQUEST[ 'map' ] ) && $_REQUEST[ 'map' ] != 'select_country'
                 else {
-                                die( __( 'Choose a valid region from the drop down menu', RVM_TEXT_DOMAIN ) );
+                                die( __( 'Choose a valid map from the drop down menu', RVM_TEXT_DOMAIN ) );
                 }
 } // add_action( 'wp_ajax_rvm_preview', 'rvm_ajax_preview' );
 /* Custom Maps */
@@ -382,7 +382,7 @@ $output .= '<div class="rvm_regions_input rvm_regions_wrapper_hover_color"><labe
 
 
 if( isset($rvm_imported_regions_array[ $i ][ 6 ])) {
- $output .= '<div class="rvm_regions_input rvm_regions_onclick_action"><label for="rvm_region_onclick_action" ' . RVM_LABEL_CLASS . ' >' . __( 'When click onto this subdivision: ', RVM_TEXT_DOMAIN ) .  '</label><select class="rvm_region_label_action" name="' . strval( $rvm_imported_regions_array[ $i ][ 0 ] ) . '[]"><option ' . selected( 'open_link', $rvm_imported_regions_array[ $i ][ 6 ] , false ) . ' value="open_link">Open link</option><option ' . selected( 'open_label_onto_default_card', $rvm_imported_regions_array[ $i ][ 6 ] , false ) . ' value="open_label_onto_default_card" >Open label content onto default card</option><option ' . selected( 'show_custom_selector', $rvm_imported_regions_array[ $i ][ 6 ] , false ) . ' value="show_custom_selector">Show custom selector</option></select>';
+ $output .= '<div class="rvm_regions_input rvm_regions_onclick_action"><label for="rvm_region_onclick_action" ' . RVM_LABEL_CLASS . ' >' . __( 'When click onto this subdivision: ', RVM_TEXT_DOMAIN ) .  '</label><select class="rvm_region_label_action" name="' . strval( $rvm_imported_regions_array[ $i ][ 0 ] ) . '[]"><option ' . selected( 'open_link', $rvm_imported_regions_array[ $i ][ 6 ] , false ) . ' value="open_link">' . __( 'Open link', RVM_TEXT_DOMAIN ) .  '</option><option ' . selected( 'open_label_onto_default_card', $rvm_imported_regions_array[ $i ][ 6 ] , false ) . ' value="open_label_onto_default_card" >' . __( 'Open label content onto default card', RVM_TEXT_DOMAIN ) .  '</option><option ' . selected( 'show_custom_selector', $rvm_imported_regions_array[ $i ][ 6 ] , false ) . ' value="show_custom_selector">' . __( 'Show custom selector', RVM_TEXT_DOMAIN ) .  '</option></select>';
 }
             else {
                 $output .= '<div class="rvm_regions_input rvm_regions_onclick_action"><label for="rvm_region_onclick_action" ' . RVM_LABEL_CLASS . ' >' . __( 'When click onto this subdivision: ', RVM_TEXT_DOMAIN ) .  '</label><select class="rvm_region_label_action" name="' . strval( $rvm_imported_regions_array[ $i ][ 0 ] ) . '[]"><option selcted="selected" value="open_link">Open link</option><option value="open_label_onto_default_card" >Open label content onto default card</option><option value="show_custom_selector">Show custom selector</option></select>';

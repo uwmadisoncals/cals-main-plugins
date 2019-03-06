@@ -3,7 +3,7 @@
      * Plugin Name: RVM - Responsive Vector Maps
      * Plugin URI: https://www.responsivemapsplugin.com/
      * Description: Use RVM to create as many responsive vector maps as you want... stop using area tag to create your linkable maps.
-     * Version: 5.8.2
+     * Version: 5.9.3
      * Author: Enrico Urbinati
      * Author URI: https://www.responsivemapsplugin.com/
      * Text Domain: responsive-vector-maps
@@ -26,11 +26,11 @@
         Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     */
 
-define( 'RVM_VERSION' , '5.8.2' ) ; 
+define( 'RVM_VERSION' , '5.9.3' ) ; 
 define( 'RVM_PLUGIN_FILE' , plugin_basename( __FILE__ ) ) ;    
 define( 'RVM_PLUGIN_DIR_PATH' , plugin_dir_path( __FILE__ ) ) ;
 define( 'RVM_PLUGIN_DIR_URL' , plugin_dir_url( __FILE__ ) ) ;
-define( 'RVM_TEXT_DOMAIN' , 'rvm_text_domain' ) ;
+define( 'RVM_TEXT_DOMAIN' , 'responsive-vector-maps' ) ;
 define( 'RVM_INC_PLUGIN_DIR' , RVM_PLUGIN_DIR_PATH . 'includes' ) ;
 define( 'RVM_INC_REGIONS_PLUGIN_DIR' , RVM_PLUGIN_DIR_PATH . 'includes/regions' ) ;
 define( 'RVM_JS_PLUGIN_DIR', RVM_PLUGIN_DIR_URL . 'js' ) ;
@@ -46,7 +46,7 @@ define( 'RVM_REGION_LINK_CLASS' , 'class="' . PREFIX . 'regions_links"' ) ;
 define( 'RVM_REGION_BG_CLASS' , 'class="' . PREFIX . 'regions_bg"' ) ;
 define( 'RVM_REGION_POPUP_CLASS' , 'class="' . PREFIX . 'regions_popup"' ) ;
 define( 'RVM_CUSTOM_MAPS_PATHS_DELIMITER' , '-@rvm@-' ) ;// to save into options both url path and dir path to custom map
-define( 'RVM_DOMAIN_URL' , 'https://www.responsivemapsplugin.com/' ) ;// to save into options both url
+define( 'RVM_DOMAIN_URL' , 'https://www.responsivemapsplugin.com/' ) ;
 
 //default settings for fallback
 define( 'RVM_MAP_TAB_ACTIVE' , 'rvm_main_settings' ) ;// default active tab 

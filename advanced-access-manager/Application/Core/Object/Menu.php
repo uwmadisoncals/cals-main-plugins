@@ -89,7 +89,7 @@ class AAM_Core_Object_Menu extends AAM_Core_Object {
                 }
             }
         }
-        
+
         // remove duplicated separators
         $count = 0;
         foreach ($menu as $id => $item) {

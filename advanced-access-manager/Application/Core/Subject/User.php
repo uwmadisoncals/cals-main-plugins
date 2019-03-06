@@ -70,7 +70,7 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
         
         // Retrieve user capabilities set with AAM
         $aamCaps = get_user_option(self::AAM_CAPKEY, $id);
-        
+
         if (is_array($aamCaps)) {
             $this->aamCaps = $aamCaps;
         }
@@ -103,7 +103,7 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
             if ($stm['Effect'] === 'allow') {
                 if (!in_array($chunks[1], $roles, true)) {
                     if ($allRoles->is_role($chunks[1])) {
-                        $roleCaps = array_merge($roleCaps, $allRoles->get_role($chunks[1])->capabilities);
+                        $roleCaps   = array_merge($roleCaps, $allRoles->get_role($chunks[1])->capabilities);
                         $roleCaps[] = $chunks[1];
                     }
                     $roles[] = $chunks[1];
@@ -123,6 +123,32 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
         //reset the user capabilities
         $subject->allcaps = array_merge($subject->allcaps, $roleCaps, $policyCaps,  $this->aamCaps);
         $subject->caps    = array_merge($subject->caps, $roleCaps, $policyCaps,  $this->aamCaps);
+
+        //make sure that no capabilities are going outside of define boundary
+        $subject->allcaps = $this->applyCapabilityBoundaries($manager, $subject->allcaps);
+        $subject->caps = $this->applyCapabilityBoundaries($manager, $subject->caps);
+    }
+
+    /**
+     * Check if any of the capabilities going out of the defined boundary
+     *
+     * @param AAM_Core_Policy_Manager $manager
+     * @param array                    $caps
+     * 
+     * @return array
+     * 
+     * @access protected
+     */
+    protected function applyCapabilityBoundaries($manager, $caps) {
+        $final = array();
+
+        foreach($caps as $key => $effect) {
+            if ($manager->isBoundary("Capability:{$key}") === false) {
+                $final[$key] = $effect;
+            }
+        }
+
+        return $final;
     }
     
     /**

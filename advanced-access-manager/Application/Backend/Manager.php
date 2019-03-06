@@ -833,7 +833,7 @@ class AAM_Backend_Manager {
     public function printJavascript() {
         if (AAM::isAAM()) {
             wp_enqueue_script('aam-vendor', AAM_MEDIA . '/js/vendor.js');
-            wp_enqueue_script('aam-main', AAM_MEDIA . '/js/aam-5.9.js');
+            wp_enqueue_script('aam-main', AAM_MEDIA . '/js/aam-5.9.1.js');
             
             //add plugin localization
             $this->printLocalization('aam-main');
