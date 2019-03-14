@@ -19,6 +19,20 @@ class GF_Block {
 	public $type = '';
 
 	/**
+	 * Handle of primary block script.
+	 *
+	 * @var string
+	 */
+	public $script_handle = '';
+
+	/**
+	 * Block attributes.
+	 *
+	 * @var array
+	 */
+	public $attributes = array();
+
+	/**
 	 * Register block type.
 	 * Enqueue editor assets.
 	 *
@@ -66,6 +80,8 @@ class GF_Block {
 
 		register_block_type( $this->get_type(), array(
 			'render_callback' => array( $this, 'render_block' ),
+			'editor_script'   => $this->script_handle,
+			'attributes'      => $this->attributes,
 		) );
 
 	}
@@ -235,27 +251,6 @@ class GF_Block {
 
 
 
-	// # BLOCK PREVIEW -------------------------------------------------------------------------------------------------
-
-	/**
-	 * Display block contents in block editor.
-	 *
-	 * @since  1.0-beta-3
-	 * @access public
-	 *
-	 * @param array $attributes Block attributes.
-	 *
-	 * @return string
-	 */
-	public function preview_block( $attributes = array() ) {
-
-		return '';
-
-	}
-
-
-
-
 
 	// # CONDITIONAL LOGIC ---------------------------------------------------------------------------------------------
 
@@ -274,7 +269,7 @@ class GF_Block {
 	 */
 	public function can_view_block( $logic ) {
 
-		if ( ! rgar( $logic, 'enabled' ) || ( isset( $logic['rules'] ) && empty( $logic['rules'] ) ) ) {
+		if ( ! rgar( $logic, 'enabled' ) || ! rgar( $logic, 'rules' ) ) {
 			return true;
 		}
 

@@ -141,29 +141,20 @@ class GF_Gutenberg extends GFAddOn {
 	 */
 	public function get_forms() {
 
-		// Initialize options array.
-		$options = array(
-			array(
-				'label' => esc_html__( 'Select a Form', 'gravityforms' ),
-				'value' => '',
-			),
-		);
+		// Load GFFormDisplay.
+		if ( ! class_exists( 'GFFormDisplay' ) ) {
+			require_once GFCommon::get_base_path() . '/form_display.php';
+		}
 
 		// Get forms.
 		$forms = GFAPI::get_forms();
 
-		// Loop through forms.
-		foreach ( $forms as $form ) {
-
-			// Add form as option.
-			$options[] = array(
-				'label' => $form['title'],
-				'value' => $form['id'],
-			);
-
+		// Loop through forms, add conditional logic check.
+		foreach ( $forms as &$form ) {
+			$form['hasConditionalLogic'] = GFFormDisplay::has_conditional_logic( $form );
 		}
 
-		return $options;
+		return $forms;
 
 	}
 

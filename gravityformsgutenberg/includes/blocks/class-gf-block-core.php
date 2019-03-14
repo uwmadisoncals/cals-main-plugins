@@ -19,6 +19,28 @@ class GF_Block_Core extends GF_Block {
 	public $type = 'gravityforms/block';
 
 	/**
+	 * Handle of primary block script.
+	 *
+	 * @var string
+	 */
+	public $script_handle = 'gform_editor_block_core';
+
+	/**
+	 * Block attributes.
+	 *
+	 * @var array
+	 */
+	public $attributes = array(
+		'formId'           => array( 'type' => 'integer' ),
+		'title'            => array( 'type' => 'boolean' ),
+		'description'      => array( 'type' => 'boolean' ),
+		'ajax'             => array( 'type' => 'boolean' ),
+		'tabindex'         => array( 'type' => 'integer' ),
+		'formPreview'      => array( 'type' => 'boolean' ),
+		'conditionalLogic' => array( 'type' => 'object' ),
+	);
+
+	/**
 	 * Get instance of this class.
 	 *
 	 * @since  1.0
@@ -34,6 +56,14 @@ class GF_Block_Core extends GF_Block {
 		}
 
 		return self::$_instance;
+
+	}
+
+	public function init() {
+
+		parent::init();
+
+		add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_form_scripts' ) );
 
 	}
 
@@ -58,9 +88,9 @@ class GF_Block_Core extends GF_Block {
 
 		return array(
 			array(
-				'handle'   => 'gform_editor_block_core',
+				'handle'   => $this->script_handle,
 				'src'      => gf_gutenberg()->get_base_url() . '/js/blocks/core.min.js',
-				'deps'     => array( 'wp-blocks', 'wp-element', 'wp-date', 'wp-components', 'wp-i18n' ),
+				'deps'     => array( 'wp-blocks', 'wp-element', 'wp-date', 'wp-components', 'wp-i18n', 'wp-editor' ),
 				'version'  => filemtime( gf_gutenberg()->get_base_path() . '/js/blocks/core.min.js' ),
 				'callback' => array( $this, 'localize_script' ),
 			),
@@ -88,6 +118,20 @@ class GF_Block_Core extends GF_Block {
 			)
 		);
 
+		if ( function_exists( 'wp_get_jed_locale_data' ) ) {
+
+			// Get locale data.
+			$locale_data = wp_get_jed_locale_data( 'gravityforms' );
+
+			// Localize.
+			wp_add_inline_script(
+				$this->script_handle,
+				'wp.i18n.setLocaleData( ' . wp_json_encode( $locale_data ) . ', "gravityforms" );',
+				'before'
+			);
+
+		}
+
 	}
 
 	/**
@@ -113,6 +157,40 @@ class GF_Block_Core extends GF_Block {
 		);
 
 	}
+
+	/**
+	 * Parse current post's blocks for Gravity Forms block and enqueue required form scripts.
+	 *
+	 * @since  1.0-rc-1.2
+	 * @access public
+	 */
+	public function maybe_enqueue_form_scripts() {
+		global $wp_query;
+
+		if( ! isset( $wp_query->posts ) || ! is_array( $wp_query->posts ) ) {
+			return;
+		}
+
+		foreach ( $wp_query->posts as $post ) {
+
+			if ( ! $post instanceof WP_Post ) {
+				continue;
+			}
+
+			$blocks = parse_blocks( $post->post_content );
+
+			foreach( $blocks as $block ) {
+				if( $block['blockName'] == $this->type && rgars( $block, 'attrs/formId' ) ) {
+					require_once( GFCommon::get_base_path() . '/form_display.php' );
+					$form = GFAPI::get_form( rgars( $block, 'attrs/formId' ) );
+					GFFormDisplay::enqueue_form_scripts( $form, rgars( $block, 'attrs/ajax' ) );
+				}
+			}
+
+		}
+
+	}
+
 
 
 
@@ -140,37 +218,15 @@ class GF_Block_Core extends GF_Block {
 		$logic       = isset( $attributes['conditionalLogic'] ) ? $attributes['conditionalLogic'] : array();
 
 		// If form ID was not provided or form does not exist, return.
-		if ( ! $form_id || ( $form_id && ! GFAPI::get_form( $form_id ) ) || ! $this->can_view_block( $logic ) ) {
+		if ( ! $form_id || ( $form_id && ! GFAPI::get_form( $form_id ) ) || ( ! empty( $logic ) && ! $this->can_view_block( $logic ) && 'edit' !== rgget( 'context' ) ) ) {
 			return '';
 		}
 
-		return gravity_form( $form_id, $title, $description, false, null, $ajax, $tabindex, false );
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST && rgget( 'context' ) === 'edit' ) {
+			return gravity_form( $form_id, $title, $description, false, null, $ajax, $tabindex, false );
+		}
 
-	}
-
-
-
-
-	// # BLOCK PREVIEW -------------------------------------------------------------------------------------------------
-
-	/**
-	 * Display block contents in block editor.
-	 *
-	 * @since  1.0-beta-3
-	 * @access public
-	 *
-	 * @param array $attributes Block attributes.
-	 *
-	 * @return string
-	 */
-	public function preview_block( $attributes = array() ) {
-
-		ob_start();
-		include_once gf_gutenberg()->get_base_path() . '/includes/preview.php';
-		$html = ob_get_contents();
-		ob_end_clean();
-
-		return $html;
+		return sprintf( '[gravityforms id="%d" title="%s" description="%s" ajax="%s" tabindex="%d"]', $form_id, ( $title ? 'true' : 'false' ), ( $description ? 'true' : 'false' ), ( $ajax ? 'true' : 'false' ), $tabindex );
 
 	}
 
