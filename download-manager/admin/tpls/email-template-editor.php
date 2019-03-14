@@ -1,6 +1,8 @@
 <?php
-$tpl = \WPDM\Email::template($_GET['id']);
-$info = \WPDM\Email::info($_GET['id']);
+$id = esc_attr($_GET['id']);
+$tpl = \WPDM\Email::template($id);
+$info = \WPDM\Email::info($id);
+
 ?><div class="wrap w3eden">
      <div class="panel panel-default" id="wpdm-wrapper-panel">
          <div class="panel-heading">
@@ -18,7 +20,7 @@ $info = \WPDM\Email::info($_GET['id']);
          <div class="tab-content" style="padding-top: 15px;">
 
 
-
+             <?php if(isset($tpl['subject'])){ ?>
 <div style="padding: 15px;">
 <div class="row">
 <div class="col-md-12">
@@ -32,10 +34,11 @@ $info = \WPDM\Email::info($_GET['id']);
     </div>
     <div class="row">
 <div class="col-md-8">
+
 <form action="" method="post" id="email-editor-form">
 
 
-                <input type="hidden" name="id" value="<?php echo $_GET['id']; ?>" />
+                <input type="hidden" name="id" value="<?php echo $id; ?>" />
                 <input type="text" name="email_template[subject]" required="required" title="<?php echo __( "Email Subject" , "download-manager" ); ?>" placeholder="<?php echo __( "Email Subject" , "download-manager" ); ?>" x-moz-errormessage="<?php echo __( "Email Subject" , "download-manager" ); ?>" value="<?php echo $tpl['subject']; ?>" class="form-control input-lg">
                 <ul class="nav nav-tabs" style="margin-top: 10px; ">
                     <li class="active"><a href="#code" data-toggle="tab"><?php echo __( "Message" , "download-manager" ); ?></a></li>
@@ -100,6 +103,7 @@ $info = \WPDM\Email::info($_GET['id']);
 </form>
 
 
+
 </div>
 
 
@@ -161,7 +165,7 @@ $info = \WPDM\Email::info($_GET['id']);
             tinyMCE.triggerSave();
             jQuery('#email-editor-form').ajaxSubmit({
                 success: function (res) {
-                    jQuery('#preview').html("<iframe style='width:100%;height:700px;border:0;' src='edit.php?action=email_template_preview&id=<?php echo $_GET['id']; ?>'></iframe>");
+                    jQuery('#preview').html("<iframe style='width:100%;height:700px;border:0;' src='edit.php?action=email_template_preview&id=<?php echo esc_attr($_GET['id']); ?>'></iframe>");
                 }
             });
             //jQuery.post(ajaxurl,{action:'',template:'<?php echo wpdm_query_var('id'); ?>'},function(res){
@@ -194,6 +198,11 @@ $info = \WPDM\Email::info($_GET['id']);
 
 
 </div>
+             <?php } else { ?>
+                <div class="alert alert-danger" style="margin: 30px">
+                    <?php echo __( "Invalid template ID!", "download-manager" ) ?>
+                </div>
+             <?php } ?>
 </div>
 </div>
 </div>

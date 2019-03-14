@@ -1709,3 +1709,8 @@ function wpdm_download_button_style($p = null, $pacakge_ID = null){
     $class = apply_filters("wpdm_download_button_style", $class, $pacakge_ID);
     return $class;
 }
+
+function wpdm_hex2rgb($hex){
+    list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+    return "$r, $g, $b";
+}

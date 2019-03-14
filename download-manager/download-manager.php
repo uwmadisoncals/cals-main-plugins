@@ -4,7 +4,7 @@ Plugin Name: Download Manager
 Plugin URI: https://www.wpdownloadmanager.com/purchases/
 Description: Manage, Protect and Track File Downloads from your WordPress site
 Author: W3 Eden
-Version: 2.9.90
+Version: 2.9.91
 Author URI: https://www.wpdownloadmanager.com/
 Text Domain: download-manager
 Domain Path: /languages
@@ -60,7 +60,7 @@ class WordPressDownloadManager{
 
     function __construct(){
 
-        define('WPDM_Version','2.9.90');
+        define('WPDM_Version','2.9.91');
 
         register_activation_hook(__FILE__, array($this, 'Install'));
 
@@ -323,6 +323,11 @@ class WordPressDownloadManager{
      * @usage insert code in wp head
      */
     function wpHead(){
+        if(is_singular('wpdmpro'))
+            $ui_button = get_option('__wpdm_ui_download_button');
+        else
+            $ui_button = get_option('__wpdm_ui_download_button_sc');
+        $class =  ".btn.".(isset($ui_button['color'])?$ui_button['color']:'btn-primary').".".(isset($ui_button['size'])?$ui_button['size']:'');
         ?>
 
         <script>
@@ -332,6 +337,11 @@ class WordPressDownloadManager{
             var wpdm_ajax_url = '<?php echo admin_url('admin-ajax.php'); ?>';
             var wpdm_ajax_popup = '<?php echo get_option('__wpdm_ajax_popup', 0); ?>';
         </script>
+        <style>
+            .wpdm-download-link<?php echo $class; ?>{
+                border-radius: <?php echo (isset($ui_button['borderradius'])?$ui_button['borderradius']:4); ?>px;
+            }
+        </style>
 
 
         <?php

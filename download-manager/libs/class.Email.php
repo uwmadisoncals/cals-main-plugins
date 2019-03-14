@@ -58,7 +58,7 @@ class Email {
     public static function info( $id ) {
         $templates = self::templates();
 
-        return $templates[ $id ];
+        return isset($templates[ $id ])?$templates[ $id ]:null;
     }
 
     public static function tags() {
@@ -96,7 +96,7 @@ class Email {
     public static function defaultTemplate( $id ) {
         $templates = self::templates();
 
-        return $templates[ $id ]['default'];
+        return isset($templates[ $id ])?$templates[ $id ]['default']:null;
     }
 
     public static function template( $id ) {

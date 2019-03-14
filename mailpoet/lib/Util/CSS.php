@@ -35,7 +35,6 @@ class CSS {
   */
   function inlineCSS($url, $contents=null) {
     $html = \pQuery::parseStr($contents);
-
     if (!is_object($html)) {
       return false;
     }
@@ -62,11 +61,15 @@ class CSS {
     // This is an array with, amongst other things, the keys 'properties', which hold the CSS properties
     // and the 'selector', which holds the CSS selector
     $rules = $this->parseCSS($raw_css);
+    $nodes_map = [];
 
     // We loop over each rule by increasing order of specificity, find the nodes matching the selector
     // and apply the CSS properties
     foreach ($rules as $rule) {
-      foreach ($html->query($rule['selector']) as $node) {
+      if (!isset($nodes_map[$rule['selector']])) {
+        $nodes_map[$rule['selector']] = $html->query($rule['selector']);
+      }
+      foreach ($nodes_map[$rule['selector']] as $node) {
         // I'm leaving this for debug purposes, it has proved useful.
         /*
         if ($node->already_styled === 'yes')
@@ -109,7 +112,7 @@ class CSS {
         if (strpos($value, '!important') === false) {
           continue;
         }
-        foreach ($html->query($rule['selector']) as $node) {
+        foreach ($nodes_map[$rule['selector']] as $node) {
           $style = $this->styleToArray($node->style);
           $style[$key] = $value;
           $node->style = $this->arrayToStyle($style);
@@ -120,7 +123,7 @@ class CSS {
     }
 
     // Let simple_html_dom give us back our HTML with inline CSS!
-    return (string)$html;
+    return $html;
   }
 
   function parseCSS($text) {

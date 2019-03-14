@@ -4,6 +4,7 @@ namespace MailPoet\Models;
 use MailPoet\Util\Helpers;
 use MailPoet\WP\Emoji;
 use MailPoet\Tasks\Subscribers as TaskSubscribers;
+use MailPoet\WP\Functions as WPFunctions;
 
 if (!defined('ABSPATH')) exit;
 
@@ -19,6 +20,7 @@ if (!defined('ABSPATH')) exit;
  * @property string|array $subscribers
  * @property string|null $deleted_at
  */
+
 class SendingQueue extends Model {
   public static $_table = MP_SENDING_QUEUES_TABLE;
   const STATUS_COMPLETED = 'completed';
@@ -34,7 +36,7 @@ class SendingQueue extends Model {
     parent::__construct();
 
     $this->addValidations('newsletter_rendered_body', array(
-      'validRenderedNewsletterBody' => __('Rendered newsletter body is invalid!', 'mailpoet')
+      'validRenderedNewsletterBody' => WPFunctions::get()->__('Rendered newsletter body is invalid!', 'mailpoet')
     ));
     $this->emoji = new Emoji();
   }

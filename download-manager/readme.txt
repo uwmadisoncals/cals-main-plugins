@@ -1,7 +1,7 @@
 ﻿=== WordPress Download Manager ===
 Contributors: w3eden, codename065, shahriar0822, shimo16ab, shafayat-alam
 Donate link: 
-Tags: digital store, eshop, ecommerce, e-commerce, file management,  document management plugin, download manager, file manager, download monitor, download counter, password protection, download protection
+Tags: download manager, document management, file manager, digital store, ecommerce, document management plugin,  download monitor, download counter, password protection, download protection
 Requires at least: 3.4
 Tested up to: 5.1
 License: GPLv2 or later
@@ -157,6 +157,11 @@ Check download stats and get a push notification when someone downloads, install
 15. Quick Add Panel
 
 == Changelog ==
+
+= 2.9.91 =
+* Fixed an issue with email template edit
+* Improved UI settings
+* Fixed invalid input issue with package settings
 
 = 2.9.90 =
 * Fixed an issue with settings page tab load

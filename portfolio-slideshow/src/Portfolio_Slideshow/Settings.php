@@ -615,7 +615,7 @@ class Portfolio_Slideshow_Settings {
 	 * @return void
 	 */
 	static function get_tooltip_label( $args ) {
-		$image = '<img width="18" class="portfolio-slideshow-tooltip" title="' . esc_attr( $args['desc'] ) . '" src="' . Portfolio_Slideshow_Plugin::$plugin_url . '/src/resources/img/q.png" alt="?">';
+		$image = '<img width="18" class="portfolio-slideshow-tooltip" title="' . esc_attr( $args['desc'] ) . '" src="' . PORTFOLIO_SLIDESHOW_URL . 'src/resources/img/q.png" alt="?">';
 		return ! empty( $args['desc'] ) ? sprintf( '<label for="portfolio_slideshow_options[' . $args['id'] . ']">%s</label>', $image ) : '';
 	}
 

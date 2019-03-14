@@ -3,7 +3,7 @@ Contributors: vasyltech
 Tags: access control, membership, backend menu, user role, restricted content, security, jwt
 Requires at least: 4.0
 Tested up to: 5.1
-Stable tag: 5.9.1
+Stable tag: 5.9.1.1
 
 All you need to manage access to you WordPress websites on frontend, backend and API levels for any role, user or visitors.
 
@@ -78,6 +78,13 @@ https://www.youtube.com/watch?v=mj5Xa_Wc16Y
 11. Improve your website security
 
 == Changelog ==
+
+= 5.9.1.1 =
+* Fixed the bug with saving Metaboxes & Widgets settings
+* Fixed the bug with saving Access Policy that has backward slashes in it
+* Fixed the bug with fetching Param values from the Access Policies
+* Fixed the bug with Access Policy resource "Role" when Effect is set to "deny"
+* Adjusted AAM core to prevent PHP warning when edit_user or delete_user capability is checked without user ID provided (caused by other plugins)
 
 = 5.9.1 =
 * Fixed the bug with controlling which capability can be deleted with Access Policy

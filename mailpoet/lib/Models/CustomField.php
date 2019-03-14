@@ -2,6 +2,7 @@
 namespace MailPoet\Models;
 
 use MailPoet\Form\Block\Date;
+use MailPoet\WP\Functions as WPFunctions;
 
 if (!defined('ABSPATH')) exit;
 
@@ -9,6 +10,7 @@ if (!defined('ABSPATH')) exit;
  * @property string $type
  * @property string|array $params
  */
+
 class CustomField extends Model {
   public static $_table = MP_CUSTOM_FIELDS_TABLE;
   const TYPE_DATE = 'date';
@@ -21,10 +23,10 @@ class CustomField extends Model {
   function __construct() {
     parent::__construct();
     $this->addValidations('name', array(
-      'required' => __('Please specify a name.', 'mailpoet')
+      'required' => WPFunctions::get()->__('Please specify a name.', 'mailpoet')
     ));
     $this->addValidations('type', array(
-      'required' => __('Please specify a type.', 'mailpoet')
+      'required' => WPFunctions::get()->__('Please specify a type.', 'mailpoet')
     ));
   }
 
