@@ -1,3 +1,23 @@
+# 1.0-rc-1.2 | 2018-12-18
+    - Fix issue where jQuery is not loaded in time when embedding AJAX enabled forms with blocks.
+    - Update build process to address conflicts with third-party plugins.
+    - Update core block to render using shortcode on frontend to avoid conflicts with wptexturizer().
+
+
+# 1.0-rc-1.1 | 2018-12-06
+    - Fix shortcodes not correctly converting to blocks.
+
+
+# 1.0-rc-1 | 2018-12-06
+    - Fix block disappearing in editor when using a form with conditional logic.
+    - Fix issue with block crashing when using date conditional logic filter.
+
+
+# 1.0-beta-6 | 2018-11-05
+   - Add support for Gutenberg 4.1.0.
+   - Update block preview to use ServerSideRender component.
+
+
 # 1.0-beta-5 | 2018-07-16
    - Add support for Gutenberg 3.2.0.
 

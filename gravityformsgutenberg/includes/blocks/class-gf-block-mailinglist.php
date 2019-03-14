@@ -65,7 +65,7 @@ class GF_Block_MailingList extends GF_Block {
 		$logic = isset( $attributes['conditionalLogic'] ) ? $attributes['conditionalLogic'] : array();
 
 		// If conditional logic did not pass, return.
-		if ( ! $this->can_view_block( $logic ) ) {
+		if ( ! $this->can_view_block( $logic ) && 'edit' !== rgget( 'context' ) ) {
 			return null;
 		}
 

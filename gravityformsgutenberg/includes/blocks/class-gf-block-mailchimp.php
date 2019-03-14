@@ -21,6 +21,13 @@ class GF_Block_MailChimp extends GF_Block_MailingList {
 	public $type = 'gravityforms/mailchimp';
 
 	/**
+	 * Handle of primary block script.
+	 *
+	 * @var string
+	 */
+	public $script_handle = 'gform_editor_block_mailchimp';
+
+	/**
 	 * Get instance of this class.
 	 *
 	 * @since  1.0-beta-3
@@ -73,9 +80,9 @@ class GF_Block_MailChimp extends GF_Block_MailingList {
 
 		return array(
 			array(
-				'handle'   => 'gform_editor_block_mailchimp',
+				'handle'   => $this->script_handle,
 				'src'      => gf_gutenberg()->get_base_url() . '/js/blocks/mailchimp.min.js',
-				'deps'     => array( 'wp-blocks', 'wp-element', 'wp-date', 'wp-components', 'wp-i18n' ),
+				'deps'     => array( 'wp-blocks', 'wp-element', 'wp-date', 'wp-components', 'wp-i18n', 'wp-editor' ),
 				'version'  => filemtime( gf_gutenberg()->get_base_path() . '/js/blocks/mailchimp.min.js' ),
 				'callback' => array( $this, 'localize_script' ),
 			),
