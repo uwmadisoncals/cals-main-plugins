@@ -259,7 +259,12 @@ class AjaxTable extends Table
 		if(!empty($having))
 			$qstr .= " HAVING $having";
 		
-		$qstr .= " ORDER BY $order_column $order_dir";
+		// This code allows for more natural numeric sorting on text fields, not just numeric fields
+		if(empty($order_column))
+			$order_column = 'id';
+		if(empty($order_dir))
+			$order_dir = 'ASC';
+		$qstr .= " ORDER BY ISNULL({$order_column}), {$order_column}+0 {$order_dir}, {$order_column} {$order_dir}";
 		
 		// Limit
 		if(isset($input_params['length']))
@@ -295,9 +300,6 @@ class AjaxTable extends Table
 		else
 			$stmt = $qstr;
 		
-		//print_r($stmt);
-		//exit;
-		
 		$rows = $wpdb->get_results($stmt);
 		
 		$this->filterResults($rows);
@@ -317,7 +319,7 @@ class AjaxTable extends Table
 			'meta'				=> apply_filters('wpgmza_ajax_table_meta', $meta)
 		);
 		
-		if($wpgmza->settings->developer_mode)
+		if($wpgmza->isInDeveloperMode())
 			$result->query		= $stmt;
 		
 		return $result;

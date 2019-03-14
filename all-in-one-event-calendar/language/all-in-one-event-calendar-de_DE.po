@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the 2.3 package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2018-12-04 20:11:08+0000\n"
+"PO-Revision-Date: 2019-03-08 18:38:44+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -12,7 +12,7 @@ msgstr ""
 
 #: app/model/settings.php:870
 msgid "<div class=\"ai1ec-twitterinfo-wrap\"><b>Twitter</b><br>This feature allows your events to be automatically tweeted before they happen. Great way to add regular content to your twitter roll and keep your audience informed of all your great events. This feature is not yet enabled in your product. Please purchase it as a standalone for a low annual subscription or inside the Core+ bundle. <a target=\"_blank\" href=\"https://time.ly/wordpress-calendar-plugin/addons/\">Click here.</a></div>"
-msgstr ""
+msgstr "<div class=\"ai1ec-twitterinfo-wrap\"><b>Twitter</b><br><br>Diese Funktion ermöglicht es, dass deine Events automatisch getwittert werden, bevor sie stattfinden. Eine großartige Möglichkeit, deinem Twitter-Feed regelmäßige Inhalte hinzuzufügen und dein Publikum über all deine großartigen Events auf dem Laufenden zu halten. Diese Funktion ist in deinem Produkt noch nicht aktiviert. Bitte kauf es als Standalone-Version für ein kleines Jahresabonnement oder im Core+ Bundle. <a target=\"_blank\" href=\"https://time.ly/wordpress-calendar-plugin/addons/\" >Klick hier.</a></div>"
 
 #: app/view/admin/settings.php:158
 msgid "Twitter"
@@ -20,11 +20,11 @@ msgstr "Twitter"
 
 #: public/admin/box_support.php:44
 msgid "More Features"
-msgstr ""
+msgstr "Mehr Funktionen"
 
 #: app/view/admin/add-new-event.php:35
 msgid "Empower your calendar, build your community"
-msgstr ""
+msgstr "Verbessere deinen Kalender, baue deine Community auf."
 
 #: app/view/admin/add-new-event.php:50
 msgid "<ul class=\"ai1ec-features-list\"><li><a href=\"https://time.ly/hub\" target=\"_blank\">Pull events from other calendars</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">Pull events from Facebook</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">Add a Newsletter</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">Get public event submissions</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">Charge people to post events</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">Add social sharing</a></li><li><a href=\"https://time.ly/hub\" target=\"_blank\">And more</a></li></ul>"
@@ -45,6 +45,13 @@ msgid ""
 "                        Any existing markup found within the target will be replaced\n"
 "                        by the calendar."
 msgstr ""
+"Optional. Benutze diese JavaScript-basierte Verknüpfung, um den \n"
+" Kalender mit einem anderen DOM-Element als dem üblichen Seiteninhalt container\n"
+" zu versehen, wenn du keine passendes Seiten Template\n"
+" für die Kalenderseite erstellen kannst. Zur Verwendung gibst du a\n"
+" <a target=\"_blank\" href=\"https://api.jquery.com/category/selectors/\">\n"
+" jQuery-Selektor</a> ein, der zu einem einzigen DOM-Element evaluiert.\n"
+" Jedes vorhandene Markup, das innerhalb des Ziels gefunden wird, wird durch den Kalender ersetzt."
 
 #: app/model/settings.php:588
 msgid ""
@@ -64,69 +71,74 @@ msgstr ""
 
 #: app/controller/javascript.php:462
 msgid "Please enter a valid Registration URL, starting with https:// or http://."
-msgstr ""
+msgstr "Bitte gib eine gültige Registrierungs-URL ein, beginnend mit https:// oder http://."
 
 #: app/view/event/single.php:209
 msgid "No data"
-msgstr ""
+msgstr "Keine Daten"
 
 #: public/admin/plugins/ics/import_feed.php:8
 msgid "unlimited"
-msgstr ""
+msgstr "unlimitiert"
 
 #: public/admin/plugins/ics/import_feed.php:45
 msgid ""
 "<b>You have reached the limit of how many feeds you can import.</b><br>\n"
 "        Please sign up for EventBoost plan <a href=\"https://time.ly/eventboost/\" target=\"_blank\">here</a>."
 msgstr ""
+"<b> Du hast die Obergrenze der Feeds erreicht, die du importieren kannst.</b><br><br>\n"
+"        Bitte meld dich für den EventBoost-Plan <a href=\"https://time.ly/eventboost/\" target=\"_blank\">hier</a> an."
 
 #: app/view/admin/settings.php:214
 msgid "Calendar Type:"
-msgstr ""
+msgstr "Kalender Typ:"
 
 #: app/view/admin/settings.php:216
 msgid "Tourism"
-msgstr ""
+msgstr "Tourismus"
 
 #: app/view/admin/settings.php:217
 msgid "Media"
-msgstr ""
+msgstr "Medien"
 
 #: app/view/admin/settings.php:218
 msgid "Community Hubs"
-msgstr ""
+msgstr "Community Hubs"
 
 #: app/view/admin/settings.php:219
 msgid "Education"
-msgstr ""
+msgstr "Bildung"
 
 #: app/view/admin/settings.php:220
 msgid "Venue/Business"
-msgstr ""
+msgstr "Veranstaltungsort/Unternehmen"
 
 #: app/view/admin/settings.php:221
 msgid "Artist/Performer"
-msgstr ""
+msgstr "Künstler/Darstellerin"
 
 #: app/view/admin/settings.php:222
 msgid "Church/Spiritual"
-msgstr ""
+msgstr "Kirche/Geistliches"
 
 #: app/view/admin/settings.php:223
 msgid "Association/Group"
-msgstr ""
+msgstr "Verein/Gruppe"
 
 #: app/view/admin/settings.php:224
 msgid "Other"
-msgstr ""
+msgstr "Sonstiges"
 
 #: app/view/admin/add-new-event.php:337
 msgid "Timely Ticketing saves time & money. Create ticketing/registration right here and now. You do not pay any ticketing fees (other than regular PayPal transaction costs). Create as many ticketing/registration as you'd like.<br /><br />Ticketing feature is not enabled for this website. Please sign up for Ticketing plan <a href=\"https://time.ly/tickets-existing-users/\" target=\"_blank\">here</a>."
 msgstr ""
+"Frühzeitiger Ticketverkauf spart Zeit und Geld. Erstelle Tickets/Anmeldungen direkt hier und jetzt. Du bezahlst keine Ticketgebühren (außer den regulären PayPal-Transaktionskosten). Erstellen Sie so viele Tickets/Anmeldungen, wie du möchtest.<br /><br /><br />Ticketing-Funktion ist für diese Website nicht aktiviert. Bitte melde dich für den Ticketing-Plan an <a href=\"https://time.ly/tickets-existing-users/\" target=\"_blank\">hier</a>.\n"
+"\n"
+"Übersetzt mit www.DeepL.com/Translator"
 
 #: app/view/event/single.php:231
 msgid "This post was imported from a CSV/ICS file."
-msgstr ""
+msgstr "Dieser Post wurde aus einer CSV/ICS-Datei importiert."
 
 #: app/view/admin/tickets.php:77 app/view/admin/tickets.php:93
 #: app/view/admin/tickets.php:104 app/view/admin/tickets.php:116
@@ -400,7 +412,7 @@ msgstr ""
 
 #: app/view/admin/add-new-event.php:446
 msgid ", email: "
-msgstr ""
+msgstr ", E-Mail:"
 
 #: app/view/admin/add-new-event.php:450
 msgid "<span class=\"ai1ec-info-text\">The event was submitted by %s.</span>"

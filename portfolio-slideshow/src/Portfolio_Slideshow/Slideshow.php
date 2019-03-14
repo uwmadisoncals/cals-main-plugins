@@ -49,9 +49,9 @@ class Portfolio_Slideshow_Slideshow {
 		$excluded = array();
 
 		if ( empty( $slides ) ) {
-			
+
 			$slides = array();
-			
+
 			$slides_query_args = array(
 				'post_parent'    => $this->ID,
 				'post_type'      => 'attachment',
@@ -75,9 +75,9 @@ class Portfolio_Slideshow_Slideshow {
 					)
 				)
 			);
-	
+
 			$slides_query_args = apply_filters( 'portfolio_slideshow_slides_query_args', $slides_query_args );
-	
+
 			$slides_query = new WP_Query( $slides_query_args );
 
 			if ( $slides_query->have_posts() ) {
@@ -117,7 +117,7 @@ class Portfolio_Slideshow_Slideshow {
 
 		if ( ! empty( $this->args['include'] ) ) {
 			$included = explode( ',', $this->args['include'] );
-			
+
 			foreach ( wp_list_pluck( $slides, 'image' ) as $key => $slide_id ) {
 				if ( ! in_array( $slide_id, $included ) )
 					$excluded[] = $slide_id;
@@ -173,7 +173,7 @@ class Portfolio_Slideshow_Slideshow {
 		$showcaps   = $this->arg( 'showcaps' );
 		$showdesc   = $this->arg( 'showdesc' );
 
-		include Portfolio_Slideshow_Plugin::$plugin_path . 'src/views/meta.php';
+		include PORTFOLIO_SLIDESHOW_PATH . 'src/views/meta.php';
 	}
 
 	/**
@@ -184,7 +184,7 @@ class Portfolio_Slideshow_Slideshow {
 	function the_nav() {
 		$key = absint( $this->key );
 
-		include Portfolio_Slideshow_Plugin::$plugin_path . 'src/views/nav/text.php';
+		include PORTFOLIO_SLIDESHOW_PATH . 'src/views/nav/text.php';
 	}
 
 	/**
@@ -196,7 +196,7 @@ class Portfolio_Slideshow_Slideshow {
 		$key    = absint( $this->key );
 		$slides = $this->slides;
 
-		include Portfolio_Slideshow_Plugin::$plugin_path . 'src/views/pager/thumbs.php';
+		include PORTFOLIO_SLIDESHOW_PATH . 'src/views/pager/thumbs.php';
 	}
 
 	/**
@@ -212,7 +212,7 @@ class Portfolio_Slideshow_Slideshow {
 			$maybe_min_height = sprintf( 'min-height: %spx !important;', $this->arg( 'slideheight' ) );
 		}
 
-		include Portfolio_Slideshow_Plugin::$plugin_path . 'src/views/slides.php';
+		include PORTFOLIO_SLIDESHOW_PATH . 'src/views/slides.php';
 	}
 
 	/**
@@ -221,7 +221,7 @@ class Portfolio_Slideshow_Slideshow {
 	 * @return string
 	 */
 	function the_slideshow() {
-		
+
 		if ( ! is_array( $this->slides ) || empty( $this->slides ) ) {
 			return;
 		}
@@ -233,7 +233,7 @@ class Portfolio_Slideshow_Slideshow {
 		ob_start();
 
 			$vars_html = '';
-			
+
 			$vars_raw = array(
 				'timeout'  => $this->arg( 'timeout' ),
 				'autoplay' => $this->arg( 'autoplay' ),

@@ -4,12 +4,10 @@
  * Plugin URI: http://wordpress.org/plugins/portfolio-slideshow
  * Description: Build elegant, responsive slideshows in seconds.
  * Author: George Gecewicz
- * Version: 1.12.1
+ * Version: 1.13.0
  * Author URI: http://ggwi.cz
  * License: GPLv2 or later
  * Text Domain: portfolio-slideshow
- *
- * Copyright 2016 George Gecewicz
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,8 +24,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-define( '__PORTFOLIO_SLIDESHOW_PLUGIN_FILE__', __FILE__ );
+define( 'PORTFOLIO_SLIDESHOW_VERSION', '1.13.0' );
+define( 'PORTFOLIO_SLIDESHOW_URL', plugin_dir_url( __FILE__ ) );
+define( 'PORTFOLIO_SLIDESHOW_PATH', plugin_dir_path( __FILE__ ) );
+define( 'PORTFOLIO_SLIDESHOW_INC', PORTFOLIO_SLIDESHOW_PATH . 'includes/' );
 
-require_once( dirname( __PORTFOLIO_SLIDESHOW_PLUGIN_FILE__ ) . '/src/Portfolio_Slideshow/Plugin.php' );
+require_once( PORTFOLIO_SLIDESHOW_PATH . '/src/Portfolio_Slideshow/Plugin.php' );
 
 Portfolio_Slideshow_Plugin::instance();

@@ -20,35 +20,35 @@
     <table cellpadding="5" id="file_settings_table" cellspacing="0" width="100%" class="table table-bordered table-hover">
         <tr id="version_row">
             <td width="150px"><?php echo __('Version:','download-manager'); ?></td>
-            <td><input size="10" type="text" class="form-control input-sm" style="width: 100px" value="<?php echo get_post_meta($post->ID,'__wpdm_version',true); ?>" name="file[version]" />
+            <td><input size="10" type="text" class="form-control input-sm" style="width: 100px" value="<?php echo esc_attr(get_post_meta($post->ID,'__wpdm_version',true)); ?>" name="file[version]" />
             </td></tr>
 
         <tr id="link_label_row">
             <td><?php echo __('Link Label:','download-manager'); ?></td>
-            <td><input size="10" type="text" class="form-control input-sm" style="width: 200px" value="<?php echo get_post_meta($post->ID,'__wpdm_link_label',true); ?>" name="file[link_label]" />
+            <td><input size="10" type="text" class="form-control input-sm" style="width: 200px" value="<?php echo esc_attr(get_post_meta($post->ID,'__wpdm_link_label',true)); ?>" name="file[link_label]" />
             </td></tr>
 
         <tr id="package_size_row">
             <td><?php echo __('File&nbsp;Size:','download-manager'); ?></td>
-            <td><input size="10" style="width: 80px" class="form-control input-sm" type="text" name="file[package_size]" value="<?php echo get_post_meta($post->ID,'__wpdm_package_size',true); ?>" /></td>
+            <td><input size="10" style="width: 80px" class="form-control input-sm" type="text" name="file[package_size]" value="<?php echo esc_attr(get_post_meta($post->ID,'__wpdm_package_size',true)); ?>" /></td>
         </tr>
 
 
         <tr id="stock_row">
             <td><?php echo __('Stock&nbsp;Limit:','download-manager'); ?></td>
-            <td><input size="10" class="form-control input-sm" style="width: 80px" type="number" name="file[quota]" value="<?php echo get_post_meta($post->ID,'__wpdm_quota',true); ?>" /></td>
+            <td><input size="10" class="form-control input-sm" style="width: 80px" type="number" name="file[quota]" value="<?php echo (int)get_post_meta($post->ID,'__wpdm_quota',true); ?>" /></td>
         </tr>
 
 
 
         <tr id="view_count_row">
             <td><?php echo __('View&nbsp;Count:','download-manager'); ?></td>
-            <td><input size="10" style="width: 80px" type="number" class="form-control input-sm" name="file[view_count]" value="<?php echo get_post_meta($post->ID,'__wpdm_view_count',true); ?>" /> <i class="info fa fa-info" title="Set/Reset Download Count for this package"></i></td>
+            <td><input size="10" style="width: 80px" type="number" class="form-control input-sm" name="file[view_count]" value="<?php echo (int)get_post_meta($post->ID,'__wpdm_view_count',true); ?>" /> <i class="info fa fa-info" title="Set/Reset Download Count for this package"></i></td>
         </tr>
 
        <tr id="download_count_row">
             <td><?php echo __('Download&nbsp;Count:','download-manager'); ?></td>
-            <td><input size="10" style="width: 80px" type="number" class="form-control input-sm" name="file[download_count]" value="<?php echo get_post_meta($post->ID,'__wpdm_download_count',true); ?>" /> <i class="info fa fa-info" title="Set/Reset Download Count for this package"></i></td>
+            <td><input size="10" style="width: 80px" type="number" class="form-control input-sm" name="file[download_count]" value="<?php echo (int)get_post_meta($post->ID,'__wpdm_download_count',true); ?>" /> <i class="info fa fa-info" title="Set/Reset Download Count for this package"></i></td>
         </tr>
 
 
@@ -78,7 +78,7 @@
 
 
                         ?>
-                        <option value="<?php echo $role; ?>" <?php echo $sel  ?>> <?php echo $name; ?></option>
+                        <option value="<?php echo $role; ?>" <?php echo $sel  ?>> <?php echo esc_attr($name); ?></option>
                     <?php } ?>
                 </select>
             </td></tr>

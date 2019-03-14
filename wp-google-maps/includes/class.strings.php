@@ -31,7 +31,10 @@ class Strings
 			'my_location'				=> __('My Location', 'wp-google-maps'),
 			
 			'kilometers_away'			=> __('km away', 'wp-google-maps'),
-			'miles_away'				=> __('miles away', 'wp-google-maps')
+			'miles_away'				=> __('miles away', 'wp-google-maps'),
+			
+			'import_completed'			=> __( 'Import completed.', 'wp-google-maps' ),
+			'importing_please_wait'		=> __('Importing, this may take a moment...', 'wp-google-maps')
 		));
 	}
 	

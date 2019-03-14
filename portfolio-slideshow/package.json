@@ -1,0 +1,31 @@
+{
+  "name": "portfolio-slideshow",
+  "version": "1.13.0",
+  "description": "A simple slideshow plugin for WordPress.",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp": "^4.0.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-uglify": "^3.0.2",
+    "node-sass": "^4.11.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ggwicz/portfolio-slideshow.git"
+  },
+  "keywords": [
+    "wordpress",
+    "wordpress-plugin"
+  ],
+  "author": "George Gecewicz, Dalton Rooney",
+  "license": "GPL-2.0+",
+  "bugs": {
+    "url": "https://github.com/ggwicz/portfolio-slideshow/issues"
+  },
+  "homepage": "https://github.com/ggwicz/portfolio-slideshow#readme"
+}

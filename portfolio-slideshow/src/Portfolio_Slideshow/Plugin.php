@@ -4,32 +4,23 @@ defined( 'WPINC' ) or die;
 
 class Portfolio_Slideshow_Plugin {
 
-	const VERSION = '1.12.1';
-
 	public static $defaults;
 	public static $dot_min;
 	public static $instance;
 	public static $options;
-	public static $plugin_dir;
-	public static $plugin_path;
-	public static $plugin_url;
 
 	public function __construct() {
-
-		self::$plugin_path = trailingslashit( dirname( __PORTFOLIO_SLIDESHOW_PLUGIN_FILE__ ) );
-		self::$plugin_dir  = trailingslashit( basename( self::$plugin_path ) );
-		self::$plugin_url  = plugins_url( self::$plugin_dir );
 
 		self::$dot_min = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		self::$options  = $this->get_options();
 		self::$defaults = $this->get_defaults();
 
-		require_once self::$plugin_path . 'src/Portfolio_Slideshow/Settings.php';
-		require_once self::$plugin_path . 'src/public/functions.php';
-		require_once self::$plugin_path . 'src/Portfolio_Slideshow/Shortcode.php';
-		require_once self::$plugin_path . 'src/Portfolio_Slideshow/Upgrader.php';
-		require_once self::$plugin_path . 'src/Portfolio_Slideshow/Slideshow.php';
+		require PORTFOLIO_SLIDESHOW_PATH . 'src/Portfolio_Slideshow/Settings.php';
+		require PORTFOLIO_SLIDESHOW_PATH . 'src/functions/template-tags.php';
+		require PORTFOLIO_SLIDESHOW_PATH . 'src/Portfolio_Slideshow/Shortcode.php';
+		require PORTFOLIO_SLIDESHOW_PATH . 'src/Portfolio_Slideshow/Upgrader.php';
+		require PORTFOLIO_SLIDESHOW_PATH . 'src/Portfolio_Slideshow/Slideshow.php';
 
 		add_action( 'add_meta_boxes',        array( $this, 'add_meta_boxes' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
@@ -41,12 +32,9 @@ class Portfolio_Slideshow_Plugin {
 		add_action( 'wp_enqueue_scripts',    array( $this, 'wp_enqueue_scripts' ) );
 		add_action( 'wp_head',               array( 'Portfolio_Slideshow_Slideshow', 'wp_head' ) );
 
-		// Temporary for version 1.12.1 only.
-		add_action( 'admin_notices', array( $this, 'temporary_survey_notice' ) );
-
 		add_filter( 'attachment_fields_to_edit', array( $this, 'attachment_fields_to_edit' ), 10, 2 );
 		add_filter( 'attachment_fields_to_save', array( $this, 'attachment_fields_to_save' ), 10, 2 );
-		add_filter( 'plugin_action_links_' . plugin_basename( plugin_dir_path( __PORTFOLIO_SLIDESHOW_PLUGIN_FILE__ ) . 'plugin.php' ), array( $this, 'plugin_action_links' ) );
+		add_filter( 'plugin_action_links_' . plugin_basename( PORTFOLIO_SLIDESHOW_PATH . 'plugin.php' ), array( $this, 'plugin_action_links' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 4 );
 
 		add_shortcode( 'portfolio_slideshow', array( 'Portfolio_Slideshow_Shortcode', 'do_shortcode' ) );
@@ -58,7 +46,7 @@ class Portfolio_Slideshow_Plugin {
 	 * @return array
 	 */
 	public function add_meta_box( $post ) {
-		require_once( self::$plugin_path . 'src/admin/uploader.php' );
+		require PORTFOLIO_SLIDESHOW_PATH . 'src/admin-views/uploader.php';
 	}
 
 	/**
@@ -69,7 +57,7 @@ class Portfolio_Slideshow_Plugin {
 	 */
 	public function add_meta_boxes( $post_type ) {
 		if ( in_array( $post_type, $this->get_supported_types() ) ) {
-			add_meta_box( 'portfolio_slideshow_uploader_meta_box', __( 'Portfolio Slideshow', 'portfolio-slideshow' ), array( $this, 'add_meta_box' ), $post_type, 'normal', 'high' );
+			add_meta_box( 'portfolio_slideshow_uploader_meta_box', esc_html__( 'Portfolio Slideshow', 'portfolio-slideshow' ), array( $this, 'add_meta_box' ), $post_type, 'normal', 'high' );
 		}
 	}
 
@@ -79,7 +67,7 @@ class Portfolio_Slideshow_Plugin {
 	 * @return void
 	 */
 	public function add_options_page() {
-		require_once( self::$plugin_path . 'src/admin/settings.php' );
+		require PORTFOLIO_SLIDESHOW_PATH . 'src/admin-views/settings.php';
 	}
 
 	/**
@@ -98,12 +86,12 @@ class Portfolio_Slideshow_Plugin {
 		if ( 'settings_page_portfolio_slideshow' == $hook ) {
 			$js_deps[]  = 'jquery-ui-tooltip';
 			$css_deps[] = 'portfolio-slideshow-tooltip-css';
-			wp_register_style( 'portfolio-slideshow-tooltip-css', self::vendor_resource_url( 'jquery-ui/jquery-ui.css' ), array(), self::VERSION, 'all' );
+			wp_register_style( 'portfolio-slideshow-tooltip-css', self::vendor_resource_url( 'jquery-ui/jquery-ui.css' ), array(), PORTFOLIO_SLIDESHOW_VERSION, 'all' );
 		}
 
 		if ( in_array( $hook, $slugs ) && in_array( get_post_type(), $this->get_supported_types() ) || 'settings_page_portfolio_slideshow' == $hook ) {
-			wp_enqueue_style( 'portfolio-slideshow-admin-css', self::resource_url( 'admin.css' ), $css_deps, self::VERSION, 'all' );
-			wp_enqueue_script( 'portfolio-slideshow-admin-js', self::resource_url( 'admin.js', true ), $js_deps, self::VERSION, true );
+			wp_enqueue_style( 'portfolio-slideshow-admin-css', PORTFOLIO_SLIDESHOW_URL . 'src/resources/css/admin.css', [], PORTFOLIO_SLIDESHOW_VERSION, 'all' );
+			wp_enqueue_script( 'portfolio-slideshow-admin-js', PORTFOLIO_SLIDESHOW_URL . 'src/resources/js/admin.js', $js_deps, PORTFOLIO_SLIDESHOW_VERSION, true );
 
 			wp_localize_script( 'portfolio-slideshow-admin-js', 'portfolio_slideshow_admin_i18n', array(
 				'strings' => array(
@@ -215,9 +203,9 @@ class Portfolio_Slideshow_Plugin {
 			'size'             => 400,
 			'nowrap'           => false,
 			'loop'             => false,
-			'speed'            => 4000,
+			'speed'            => 1000,
 			'trans'            => 'fade',
-			'timeout'          => 3000,
+			'timeout'          => 4000,
 			'exclude_featured' => false,
 			'autoplay'         => true,
 			'pagerpos'         => 'bottom',
@@ -366,15 +354,15 @@ class Portfolio_Slideshow_Plugin {
 	public static function resource_url( $resource = '', $has_min = false ) {
 
 		if ( '' == $resource )
-			return self::$plugin_url . 'src/resources/';
+			return PORTFOLIO_SLIDESHOW_URL . 'src/resources/';
 
 		if ( ! $has_min )
-			return esc_url_raw( self::$plugin_url . 'src/resources/' . $resource );
+			return esc_url_raw( PORTFOLIO_SLIDESHOW_URL . 'src/resources/' . $resource );
 
 		$file    = pathinfo( $resource );
 		$sub_dir = '.' !== $file['dirname'] ? $file['dirname'] . '/' : '';
 
-		return esc_url_raw( self::$plugin_url . 'src/resources/' . $sub_dir . $file['filename'] . self::$dot_min .'.'. $file['extension'] );
+		return esc_url_raw( PORTFOLIO_SLIDESHOW_URL . 'src/resources/' . $sub_dir . $file['filename'] . self::$dot_min .'.'. $file['extension'] );
 	}
 
 	/**
@@ -387,15 +375,15 @@ class Portfolio_Slideshow_Plugin {
 	public static function vendor_resource_url( $resource = '', $has_min = false ) {
 
 		if ( '' == $resource )
-			return self::$plugin_url . 'vendor/';
+			return PORTFOLIO_SLIDESHOW_URL . 'vendor/';
 
 		if ( ! $has_min )
-			return esc_url_raw( self::$plugin_url . 'vendor/' . $resource );
+			return esc_url_raw( PORTFOLIO_SLIDESHOW_URL . 'vendor/' . $resource );
 
 		$file    = pathinfo( $resource );
 		$sub_dir = '.' !== $file['dirname'] ? $file['dirname'] . '/' : '';
 
-		return esc_url_raw( self::$plugin_url . 'vendor/' . $sub_dir . $file['filename'] . self::$dot_min .'.'. $file['extension'] );
+		return esc_url_raw( PORTFOLIO_SLIDESHOW_URL . 'vendor/' . $sub_dir . $file['filename'] . self::$dot_min .'.'. $file['extension'] );
 	}
 
 	/**
@@ -408,10 +396,10 @@ class Portfolio_Slideshow_Plugin {
 		$css_deps = array();
 		$js_deps  = array();
 
-		wp_register_style( 'psp-photoswipe-css', self::vendor_resource_url( 'photoswipe.css', true ), array(), self::VERSION, 'all' );
+		wp_register_style( 'psp-photoswipe-css', self::vendor_resource_url( 'photoswipe.css', true ), array(), PORTFOLIO_SLIDESHOW_VERSION, 'all' );
 
 		wp_register_script( 'psp-scrollable', self::vendor_resource_url( 'scrollable.js', true ), array( 'jquery' ), '1.2.5', true );
-		wp_register_script( 'psp-photoswipe-js', self::vendor_resource_url( 'code.photoswipe.jquery-3.0.4.js' ), array( 'jquery' ), self::VERSION, true );
+		wp_register_script( 'psp-photoswipe-js', self::vendor_resource_url( 'code.photoswipe.jquery-3.0.4.js' ), array( 'jquery' ), PORTFOLIO_SLIDESHOW_VERSION, true );
 		wp_register_script( 'psp-cycle', self::vendor_resource_url( 'jquery-cycle/jquery.cycle.all.min.js' ), array( 'jquery' ), '2.99', true );
 
 		if ( 'true' == self::get_option( 'scrollable' ) ) {
@@ -425,25 +413,7 @@ class Portfolio_Slideshow_Plugin {
 
 		$js_deps[]  = 'psp-cycle';
 
-		wp_register_style( 'ps-public-css', self::resource_url( 'public.css' ), $css_deps, self::VERSION, 'all' );
-		wp_register_script( 'ps-public-js', self::resource_url( 'public.js' ), $js_deps, self::VERSION, true );
-	}
-
-	/**
-	 * A one-time temporary survey.
-	 *
-	 * @since 1.12.1
-	 */
-	public function temporary_survey_notice() {
-
-		if ( isset( $_GET['portfolioslideshow_dismiss'] ) && 'yes' === $_GET['portfolioslideshow_dismiss'] ) {
-			return update_option( 'portfolio_slideshow_temp_survey_dismissed', 'yes' );
-		}
-
-		if ( 'yes' === get_option( 'portfolio_slideshow_temp_survey_dismissed' ) ) {
-			return;
-		}
-
-		include_once( self::$plugin_path . 'src/views/survey-notice.php' );
+		wp_register_style( 'ps-public-css', PORTFOLIO_SLIDESHOW_URL . 'src/resources/css/public.css', $css_deps, PORTFOLIO_SLIDESHOW_VERSION, 'all' );
+		wp_register_script( 'ps-public-js', PORTFOLIO_SLIDESHOW_URL . 'src/resources/js/public.js', $js_deps, PORTFOLIO_SLIDESHOW_VERSION, true );
 	}
 }

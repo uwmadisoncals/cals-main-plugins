@@ -1,7 +1,8 @@
 <?php
 
-use kigkonsult\iCalcreator\vcalendar;
+use kigkonsult\iCalcreator\iCalXML;
 use kigkonsult\iCalcreator\timezoneHandler;
+use kigkonsult\iCalcreator\vcalendar;
 
 /**
  * The ics import/export engine.
@@ -40,9 +41,7 @@ class Ai1ec_Ics_Import_Export_Engine
      */
     public function export( array $arguments, array $params = array() ) {
         $vparams = array();
-        if ( isset( $params['xml'] ) && true === $params['xml'] ) {
-            $vparams['format'] = 'xcal';
-        }
+
         $c = new vcalendar( $vparams );
         $c->setProperty( 'calscale', 'GREGORIAN' );
         $c->setProperty( 'method', 'PUBLISH' );
@@ -80,7 +79,13 @@ class Ai1ec_Ics_Import_Export_Engine
         }
         $this->_registry->get( 'controller.content-filter' )
             ->restore_the_content_filters();
-        $str = ltrim( $c->createCalendar() );
+
+        if ( isset( $params['xml'] ) && true === $params['xml'] ) {
+            $str = iCalXML::iCal2XML( $c );
+        } else {
+            $str = ltrim( $c->createCalendar() );
+        }
+
         return $str;
     }
 

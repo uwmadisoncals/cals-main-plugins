@@ -478,7 +478,7 @@ class Package {
 
         if(get_post_type($ID) !='wpdmpro') return false;
 
-        $size = get_post_meta($ID, '__wpdm_package_size', true);
+        $size = esc_attr(get_post_meta($ID, '__wpdm_package_size', true));
 
         if($size!="" && !$recalculate) return $size;
 
@@ -612,6 +612,7 @@ class Package {
             foreach ($cdata as $k => $v) {
                 $k = str_replace("__wpdm_", "", $k);
                 $data[$k] = maybe_unserialize($v[0]);
+                if(!is_array($data[$k])) $data[$k] = esc_attr($data[$k]);
             }}
 
         if(!isset($data['access']) || !is_array($data['access'])) $data['access'] = array();

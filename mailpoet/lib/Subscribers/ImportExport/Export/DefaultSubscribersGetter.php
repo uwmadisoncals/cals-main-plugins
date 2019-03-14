@@ -5,10 +5,12 @@ namespace MailPoet\Subscribers\ImportExport\Export;
 use MailPoet\Models\Segment;
 use MailPoet\Models\Subscriber;
 use MailPoet\Models\SubscriberSegment;
+use MailPoet\WP\Functions as WPFunctions;
 
 /**
  * Gets batches of subscribers from default segments.
  */
+
 class DefaultSubscribersGetter extends SubscribersGetter {
 
   /**
@@ -53,7 +55,7 @@ class DefaultSubscribersGetter extends SubscribersGetter {
         ->selectExpr(
           'MAX(CASE WHEN ' . Segment::$_table . '.name IS NOT NULL ' .
           'THEN ' . Segment::$_table . '.name ' .
-          'ELSE "' . __('Not In Segment', 'mailpoet') . '" END) as segment_name'
+          'ELSE "' . WPFunctions::get()->__('Not In Segment', 'mailpoet') . '" END) as segment_name'
         )
         ->whereRaw(
           SubscriberSegment::$_table . '.segment_id IN (' .

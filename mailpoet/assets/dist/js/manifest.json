@@ -1,11 +1,11 @@
 {
   "mp2migrator.js": "mp2migrator.65e1b491.js",
   "public.js": "public.70d9ace1.js",
-  "vendor.js": "vendor.9e0dfbe4.js",
-  "admin_vendor_chunk.js": "admin_vendor_chunk.9e0dfbe4.chunk.js",
-  "admin.js": "admin.9e0dfbe4.chunk.js",
-  "admin_vendor.js": "admin_vendor.9e0dfbe4.chunk.js",
-  "form_editor.js": "form_editor.9e0dfbe4.chunk.js",
-  "mailpoet.js": "mailpoet.9e0dfbe4.chunk.js",
-  "newsletter_editor.js": "newsletter_editor.9e0dfbe4.chunk.js"
+  "vendor.js": "vendor.3dacc5f3.js",
+  "admin_vendor_chunk.js": "admin_vendor_chunk.3dacc5f3.chunk.js",
+  "admin.js": "admin.3dacc5f3.chunk.js",
+  "admin_vendor.js": "admin_vendor.3dacc5f3.chunk.js",
+  "form_editor.js": "form_editor.3dacc5f3.chunk.js",
+  "mailpoet.js": "mailpoet.3dacc5f3.chunk.js",
+  "newsletter_editor.js": "newsletter_editor.3dacc5f3.chunk.js"
 }
