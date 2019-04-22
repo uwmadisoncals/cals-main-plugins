@@ -235,48 +235,63 @@
 
             <div row'>
             <?php
+            if(is_array($data)) {
+                foreach ($data as $package) {
+                    //wppmdd($package);
+                    $files = (array)$package->files;
+                    $file = str_replace(".zip", "", array_shift($files));
+                    $file = explode("/", $file);
+                    $file = end($file);
+                    $plugininfo = wpdm_plugin_data($file);
 
-            foreach($data as $package){
-                //wppmdd($package);
-                $files = (array)$package->files;
-                $file = str_replace(".zip", "",array_shift($files));
-                $file = explode("/", $file);
-                $file = end($file);
-                $plugininfo = wpdm_plugin_data($file);
+                    $linklabel = ($plugininfo) ? '<i class="fa fa-sync"></i> Re-Install' : '<i class="fa fa-plus-circle"></i> Install';
+                    ?>
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 all <?php echo implode(" ", (array)$package->categories); ?>">
 
-                $linklabel = ($plugininfo)?'<i class="fas fa-sync"></i> Re-Install':'<i class="fa fa-plus-circle"></i> Install';
-                ?>
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 all <?php echo implode(" ", (array)$package->categories); ?>">
-
-                    <div class="addonlist panel panel-default">
-                        <div class="panel-body" style="height: 90px">
-                            <div class="media">
-                                <div class="pull-left">
-                                    <img style="width: 64px" src="<?php echo $package->thumbnail; ?>" alt="Thumb" />
-                                </div>
-                                <div class="media-body">
-                                    <b><a target="_blank" title="<?php echo $package->post_title; ?>" class="ttip" href="<?php echo $package->link; ?>"><?php echo $package->post_title;?></a></b><br/>
-                                    <?php echo $package->excerpt; ?>
+                        <div class="addonlist panel panel-default">
+                            <div class="panel-body" style="height: 90px">
+                                <div class="media">
+                                    <div class="pull-left">
+                                        <img style="width: 64px" src="<?php echo $package->thumbnail; ?>" alt="Thumb"/>
+                                    </div>
+                                    <div class="media-body">
+                                        <b><a target="_blank" title="<?php echo $package->post_title; ?>" class="ttip"
+                                              href="<?php echo $package->link; ?>"><?php echo $package->post_title; ?></a></b><br/>
+                                        <?php echo $package->excerpt; ?>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="panel-footer text-right">
+                                <?php if ($package->price > 0) { ?>
+                                    <div class="btn-group btn-group-xs">
+                                        <a class="btn btn-info btn-purchase" data-toggle="modal" data-backdrop="true"
+                                           data-target="#addonmodal" href="#" rel="<?php echo $package->ID; ?>"
+                                           style="border: 0;border-radius: 2px;"><i class="fa fa-shopping-cart"></i>
+                                            &nbsp;Buy Now</a><span
+                                                class="btn btn-secondary"><?php echo $package->currency . $package->price; ?></span>
+                                    </div>
+                                <?php } else { ?>
+                                    <div class="btn-group btn-group-xs">
+                                        <a class="btn-install btn btn-success" data-toggle="modal"
+                                           data-addondir="<?php echo $file; ?>"
+                                           data-wpdmpinn="<?php echo wp_create_nonce($package->ID . NONCE_KEY); ?>"
+                                           rel="<?php echo $package->ID; ?>" data-backdrop="true"
+                                           data-target="#addonmodal" href="#"><?php echo $linklabel; ?></a><span
+                                                class="btn btn-secondary">Free</span>
+                                    </div>
+                                <?php } ?>
+                                <span class="note pull-left"><i class="fa fa-server"
+                                                                aria-hidden="true"></i> &nbsp;<?php echo $package->version; ?></span>
+                            </div>
                         </div>
-                        <div class="panel-footer text-right">
-                            <?php if($package->price>0){ ?>
-                                <div class="btn-group btn-group-xs">
-                                    <a class="btn btn-info btn-purchase" data-toggle="modal" data-backdrop="true" data-target="#addonmodal" href="#" rel="<?php echo $package->ID; ?>" style="border: 0;border-radius: 2px;"><i class="fa fa-shopping-cart"></i> &nbsp;Buy Now</a><span class="btn btn-inverse"><?php echo $package->currency.$package->price; ?></span>
-                                </div>
-                            <?php } else { ?>
-                                <div class="btn-group btn-group-xs">
-                                    <a class="btn-install btn btn-success" data-toggle="modal" data-addondir="<?php echo $file; ?>" data-wpdmpinn="<?php echo wp_create_nonce($package->ID.NONCE_KEY); ?>" rel="<?php echo $package->ID; ?>" data-backdrop="true" data-target="#addonmodal" href="#"><?php echo $linklabel; ?></a><span class="btn btn-inverse">Free</span>
-                                </div>
-                            <?php } ?>
-                            <span class="note pull-left"><i class="fa fa-server" aria-hidden="true"></i> &nbsp;<?php echo $package->version; ?></span>
-                        </div>
+
+
                     </div>
-
-
-                </div>
-                <?php
+                    <?php
+                }
+            } else {
+                \WPDM\Session::clear('wpdm_addon_store_data');
+                \WPDM\Session::clear('wpdm_addon_store_cats');
             }
             ?>
 
@@ -285,8 +300,8 @@
 
 </div>
 <?php } else {
-    unset($_SESSION['wpdm_addon_store_data']);
-    unset($_SESSION['wpdm_addon_store_cats']);
+    \WPDM\Session::clear('wpdm_addon_store_data');
+    \WPDM\Session::clear('wpdm_addon_store_cats');
     ?>
 
     <div class="alert alert-danger" style="margin: 20px"><?php _e('Failed to connect with server!','download-manager'); ?></div>
@@ -300,7 +315,7 @@
                 <h4 class="modal-title" id="myModalLabel">Add-On Installer</h4>
             </div>
             <div class="modal-body" id="modalcontents">
-                <i class="fa fa-spinner fa-spin"></i> Please Wait...
+                <i class="fas fa-sun  fa-spin"></i> Please Wait...
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
@@ -322,7 +337,7 @@
         });
 
         jQuery(".btn-install, .btn-purchase").click(function(){
-            jQuery('#modalcontents').html('<i class="fa fa-spinner fa-spin"></i> Please Wait...');
+            jQuery('#modalcontents').html('<i class="fas fa-sun  fa-spin"></i> Please Wait...');
         });
         jQuery('#addonmodal').on('shown.bs.modal', function (e) {
             if(jQuery(e.relatedTarget).hasClass('btn-install')){
@@ -337,7 +352,7 @@
             if(jQuery(e.relatedTarget).hasClass('btn-purchase')){
                 jQuery('.modal-dialog').css('width','800px');
                 jQuery('.modal-footer').css('margin',0);
-                jQuery('.modal-footer .btn-danger').html('<i class="fa fa-spinner fa-spin"></i> Please Wait...');
+                jQuery('.modal-footer .btn-danger').html('<i class="fas fa-sun  fa-spin"></i> Please Wait...');
                 jQuery('#modalcontents').css('padding',0).css('background','#f2f2f2').html("<iframe onload=\"jQuery('.modal-footer .btn-danger').html('Continue Shopping...');jQuery('#adddding').hide();jQuery('#prcbtn, #adddd').show();\" style='width: 0;padding-top: 20px; background: #f2f2f2;height: 0px;border: 0' src='https://www.wpdownloadmanager.com/?addtocart="+e.relatedTarget.rel+"'></iframe><div style='padding: 50px;text-align: center;' id='adddding'>Adding Item To Cart...</div><div style='display: none;padding: 50px;text-align: center;' id='adddd'><i class='fa fa-check-circle'></i> Item Added To Cart.</div>");
             }
         })

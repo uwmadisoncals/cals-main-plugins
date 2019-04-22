@@ -12,6 +12,7 @@ class SettingsController {
   const DEFAULT_SENDING_METHOD = 'PHPMail';
   const DEFAULT_SENDING_FREQUENCY_EMAILS = 25;
   const DEFAULT_SENDING_FREQUENCY_INTERVAL = 5; // in minutes
+  const DEFAULT_DEACTIVATE_SUBSCRIBER_AFTER_INACTIVE_DAYS = 180;
 
   private static $loaded = false;
 
@@ -65,6 +66,7 @@ class SettingsController {
           'enabled' => false,
         ],
         'display_nps_poll' => true,
+        'deactivate_subscriber_after_inactive_days' => self::DEFAULT_DEACTIVATE_SUBSCRIBER_AFTER_INACTIVE_DAYS,
       ];
     }
     return $this->defaults;
@@ -129,7 +131,7 @@ class SettingsController {
 
   private function fetchValue($key) {
     $setting = Setting::where('name', $key)->findOne();
-    if ($setting === false) {
+    if (!$setting instanceof Setting) {
       return null;
     }
     if (is_serialized($setting->value)) {

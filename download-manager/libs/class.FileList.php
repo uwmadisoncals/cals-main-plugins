@@ -172,7 +172,7 @@ class FileList
 
         $cur = is_user_logged_in()?$current_user->roles:array('guest');
 
-        $_SESSION['wpdmfilelistcd_'.$file['ID']] = 1;
+        Session::set('wpdmfilelistcd_'.$file['ID'], 1);
 
         if(($xd>0 && $xd<time()) || ($pd>0 && $pd>time()))  $idvdl = 0;
 

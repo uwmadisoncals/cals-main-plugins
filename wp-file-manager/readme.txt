@@ -4,7 +4,7 @@ Tags: wp-file-manager, elfinder,file manager, ftp, wp-filemanager,file manager, 
 Requires at least: 4.0
 Tested up to: 5.1
 Requires PHP: 5.2.4
-Stable tag: 4.4
+Stable tag: 4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,7 @@ Key Features in the Free File Manager plugin include:
 * **Drag and drop**: File Drag & Drop file upload function available
 * **Functions Toolbar**: Rich context menu and file manager functions toolbar
 * **Thumbnails**: Thumbnails for all types of image files
+* **Upload to Media Library**: We have now included the ability to enable images, pdf's, and zip files to be uploaded to you folders and as well be available via the native Wordpress Media Library
 
 = Key Features in File Manager Pro Editions =
 
@@ -132,6 +133,14 @@ Yes, You can achieve any files and folders as zip then simple download it. Pleas
 
 
 == Changelog ==
+
+= 4.6 (18th APR, 2019) =
+
+* Elfinder Library Updated, Security Fixes
+
+= 4.5 (17th APR, 2019) =
+
+* PHP 7 issues fixes
 
 = 4.4 (22nd FEB, 2019) =
 

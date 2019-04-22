@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: RVM trans 1.0\n"
-"POT-Creation-Date: 2019-03-06 16:36+0100\n"
-"PO-Revision-Date: 2019-03-06 16:37+0100\n"
+"POT-Creation-Date: 2019-03-25 15:11+0100\n"
+"PO-Revision-Date: 2019-03-25 15:37+0100\n"
 "Last-Translator: \n"
 "Language-Team: info@responsivemapsplugin.com\n"
 "Language: it_IT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.2.1\n"
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -30,15 +30,15 @@ msgstr "Installazione della mappa avvenuta correttamente!"
 
 #: includes/rvm_ajax_call.php:156
 msgid "Now you can <strong>Publish</strong> your post."
-msgstr "Adesso puoi  <strong>Pubblicare</strong> il tuo post"
+msgstr "Adesso puoi  <strong>Pubblicare</strong> il tuo post."
 
 #: includes/rvm_ajax_call.php:161
 msgid ""
-"Damned... Something went wrong !  Please check if name of the map is correct "
-"( place just map name)  or if you have uploaded the map previous month and "
-"try again uploading map now using wordpress media uploader."
+"Damn it... Something went wrong !  Please check if name of the map is "
+"correct ( place just map name)  or if you have uploaded the map previous "
+"month and try again uploading map now using wordpress media uploader."
 msgstr ""
-"Accidenti…qualcosa è andato storto! Per favore controlla che il nome della "
+"Accidenti… qualcosa è andato storto! Per favore controlla che il nome della "
 "mappa sia corretto ( solo il nome mappa senza estensione ) altrimenti nel "
 "caso tu abbia già installato la mappa il mese precedente prova nuovamente a "
 "ricaricare la mappa tramite l’uploader."
@@ -53,7 +53,7 @@ msgid ""
 "provided a valid map name... come on !"
 msgstr ""
 "È possibile tu non abbia la funzione unzip_file() disponibile per il tuo "
-"Wordpress, oppure non hai fornito un nome mappa valido."
+"Wordpress, oppure non hai fornito un nome mappa valido!"
 
 #: includes/rvm_ajax_call.php:175
 msgid "Please select the custom map option from the drop menu "
@@ -62,7 +62,7 @@ msgstr ""
 
 #: includes/rvm_ajax_call.php:241
 msgid "Marker module installed correctly"
-msgstr "Modulo Marker correttamente installato!"
+msgstr "Modulo Marker correttamente installato"
 
 #: includes/rvm_ajax_call.php:248
 msgid ""
@@ -70,24 +70,24 @@ msgid ""
 "provided a valid marker module!"
 msgstr ""
 "È possibile tu non abbia la funzione unzip_file() disponibile per il tuo "
-"Wordpress, oppure non hai fornito un nome di modulo marker valido."
+"Wordpress, oppure non hai fornito un nome di modulo marker valido!"
 
 #: includes/rvm_ajax_call.php:255
 msgid "It seems you are trying to upload an incorrect file"
 msgstr "Credo stia provando ad installare un file non corretto"
 
 #: includes/rvm_ajax_call.php:262
-msgid "Uhmmm...there are some issues installing the marker module"
-msgstr "Dannazione…ci sono dei problemi nell’installazione del modulo marker"
+msgid "Uhmmm... there are some issues installing the marker module"
+msgstr "Dannazione… ci sono dei problemi nell’installazione del modulo marker"
 
 #: includes/rvm_ajax_call.php:276
 msgid "Default marker icon correctly restored !"
 msgstr "Icona per i marker di default ripristinata!"
 
 #: includes/rvm_ajax_call.php:279
-msgid "Uhmmm...there are some issues restoring the marker icon"
+msgid "Uhmmm... there are some issues restoring the marker icon"
 msgstr ""
-"Dannazione…ci sono problemi nelripristino dell’icona marker predefinita"
+"Dannazione… ci sono problemi nelripristino dell’icona marker predefinita"
 
 #: includes/rvm_ajax_call.php:352 includes/rvm_ajax_call.php:357
 #: includes/rvm_ajax_call.php:367 includes/rvm_regions.php:32
@@ -137,7 +137,7 @@ msgstr ""
 #: includes/rvm_ajax_call.php:385 includes/rvm_ajax_call.php:388
 #: includes/rvm_regions.php:59
 msgid "When click onto this subdivision: "
-msgstr "Quando fai click su questa suddivisione"
+msgstr "Quando fai click su questa suddivisione:"
 
 #: includes/rvm_ajax_call.php:385 includes/rvm_regions.php:59
 msgid "Open link"
@@ -153,11 +153,11 @@ msgstr "Mostra un blocco html ( ID )"
 
 #: includes/rvm_ajax_call.php:468 includes/rvm_markers.php:49
 msgid "Added Markers"
-msgstr "Markers aggiunti"
+msgstr "Marcatori aggiunti"
 
 #: includes/rvm_ajax_call.php:468 includes/rvm_markers.php:49
 msgid " ( Not visible in map preview )"
-msgstr "( Non visibili nell’anteprima della mappa )"
+msgstr " ( Non visibili nell’anteprima della mappa )"
 
 #: includes/rvm_ajax_call.php:473 includes/rvm_markers.php:54
 #: includes/rvm_style_and_script.php:135
@@ -303,7 +303,7 @@ msgstr ""
 
 #: includes/rvm_core.php:183
 msgid "Links target "
-msgstr "Target dei Link"
+msgstr "Target dei Link "
 
 #: includes/rvm_core.php:184
 msgid "Open all url in a new window"
@@ -311,7 +311,7 @@ msgstr "Apri le URL in una nuova finestra"
 
 #: includes/rvm_core.php:226
 msgid "Markers Background Color"
-msgstr "Colore di Sfondo dei Markers"
+msgstr "Colore di Sfondo dei Marcatori"
 
 #: includes/rvm_core.php:227 includes/rvm_core.php:237
 msgid "Not visible in map preview"
@@ -319,7 +319,7 @@ msgstr "Non visibile in anteprima mappa"
 
 #: includes/rvm_core.php:236
 msgid "Markers Border Color"
-msgstr "Colore dei Bordi dei Markers"
+msgstr "Colore dei Bordi dei Marcatori"
 
 #: includes/rvm_core.php:246
 msgid "Minimum Value"
@@ -331,14 +331,14 @@ msgstr "Valore Massimo"
 
 #: includes/rvm_core.php:266
 msgid "Markers rain"
-msgstr "Pioggia di Markers"
+msgstr "Pioggia di Marcatori"
 
 #: includes/rvm_core.php:267
 msgid ""
-"When checked, markers pinpoints will fall down from top of the map on "
+"When checked, Markers pinpoints will fall down from top of the map on "
 "scrolling"
 msgstr ""
-"Se abilitato, i segnaposto dei markers cadranno dal lato superiore della "
+"Se abilitato, i segnaposto dei Marcatori cadranno dal lato superiore della "
 "mappa"
 
 #: includes/rvm_core.php:284
@@ -398,16 +398,20 @@ msgid "Responsive Vector Map Wherever You Like"
 msgstr "Responsive Vector Map Ovunque Tu Voglia"
 
 #: includes/rvm_core.php:401
-msgid "Settings For "
-msgstr "Impostazioni Per"
+msgid "Settings For:"
+msgstr "Impostazioni Per:"
 
 #: includes/rvm_core.php:506
 msgid "Main Settings "
-msgstr "Impostazioni Principali"
+msgstr "Impostazioni Principali "
 
 #: includes/rvm_core.php:521
 msgid "Subdivisions "
-msgstr "Suddivisioni"
+msgstr "Suddivisioni "
+
+#: includes/rvm_core.php:522
+msgid "Markers "
+msgstr "Marcatori "
 
 #: includes/rvm_core.php:547
 msgid "It seems custom map is not in upload dir anymore"
@@ -423,7 +427,7 @@ msgstr "Questo è il percorso dove dovrebbe trovarsi la mappa : "
 
 #: includes/rvm_core.php:550
 msgid "Please remove this map from posts / pages / widgets "
-msgstr "Per favore rimuovi questa mappa da articoli / pagine / widgets"
+msgstr "Per favore rimuovi questa mappa da articoli / pagine / widgets "
 
 #: includes/rvm_core.php:551
 msgid ""
@@ -431,7 +435,7 @@ msgid ""
 "Custom Map\" in the select drop down "
 msgstr ""
 "Per usare questa mappa caricala ancora una volta usando il “Media Uploader” "
-"e usa “Aggiungi Mappa Personalizzata” nel menù a tendina"
+"e usa “Aggiungi Mappa Personalizzata” nel menù a tendina "
 
 #: includes/rvm_core.php:561
 msgid "Sorry, this map is no longer available by default.<br>"
@@ -523,9 +527,7 @@ msgstr "Data"
 #: includes/rvm_donation.php:8
 msgid ""
 "Do you like <strong>RVM</strong> ? Please consider making a donation now"
-msgstr ""
-"Se ti piace <strong>RVM</strong>, perchè non prendi in considerazione di "
-"fare una piccola donazione ora ?"
+msgstr "Ti piace <strong>RVM</strong> ? Fai una piccola donazione ora"
 
 #: includes/rvm_download_custom_maps.php:10
 msgid ""
@@ -539,19 +541,35 @@ msgstr ""
 msgid "Settings"
 msgstr "Impostazioni"
 
+#: includes/rvm_global_settings.php:22
+msgid "RVM settings"
+msgstr "Impostazioni RVM"
+
+#: includes/rvm_global_settings.php:23 includes/rvm_global_settings.php:122
+msgid "RVM global settings"
+msgstr "Impostazioni Globali RVM"
+
 #: includes/rvm_global_settings.php:44
 msgid "Main settings"
 msgstr "Impostazioni Principali"
 
+#: includes/rvm_global_settings.php:51
+msgid "Disable wp_emoji"
+msgstr "Disabilita wp_emoji"
+
+#: includes/rvm_global_settings.php:63
+msgid "Install module for custom marker icon"
+msgstr "Installa il modulo per l’icona personalizzata del modulo"
+
 #: includes/rvm_global_settings.php:89
 msgid ""
-"(<span>In case you may notice issues related to wp_emoji enable following "
-"checkbox. It's well documented this script has problems with svg ( vector "
-"images ) on which RVM relies on.</span>)"
+"In case you may notice issues related to wp_emoji enable following checkbox. "
+"It's well documented this script has problems with svg ( vector images ) on "
+"which RVM relies on."
 msgstr ""
-"(<span>Nel caso notassi problemi legati a “wp_emoji “, spunta la casella "
-"seguente. È un problema noto l’interazione di questo script con i formati "
-"svg ( immagini vettoriali ) su cui si basa RVM.</span>)"
+"Nel caso notassi problemi legati a “wp_emoji “, spunta la casella seguente. "
+"È un problema noto l’interazione di questo script con i formati svg "
+"( immagini vettoriali ) su cui si basa RVM."
 
 #: includes/rvm_global_settings.php:94
 msgid "Select Marker Module"
@@ -580,39 +598,39 @@ msgstr ""
 
 #: includes/rvm_markers.php:28
 msgid ""
-"Tired to use the default circle icon for markers' pinpoints? This is the "
-"right time to <a href=\"http://www.responsivemapsplugin.com/redirect-to-"
+"Tired to use the default circle icon for Markers' pinpoints? This is the "
+"right time to <a href=\"https://www.responsivemapsplugin.com/redirect-to-"
 "marker-icon-module-from-plugin-dashboard/\" target=\"_blank\">download the "
 "Custom Icon Marker Module!</a>"
 msgstr ""
-"Stanco di usare la solita icona del cerchio come segnaposto dei markers? "
-"Allora è il momento giusto per <a href=\"http://www.responsivemapsplugin.com/"
-"redirect-to-marker-icon-module-from-plugin-dashboard/\" target=\"_blank"
+"Stanco di usare la solita icona del cerchio come segnaposto dei Marcatori? "
+"Allora è il momento giusto per <a href=\"https://www.responsivemapsplugin."
+"com/redirect-to-marker-icon-module-from-plugin-dashboard/\" target=\"_blank"
 "\">scaricare il Modulo Marker per usare Icone Personalizzate!</a>"
 
 #: includes/rvm_markers.php:34
 msgid "Create New Markers"
-msgstr "Crea un Nuovo Marker"
+msgstr "Crea  Nuovi Marcatori"
 
 #: includes/rvm_markers.php:36
 msgid "Add Markers"
-msgstr "Aggiungi Marker"
+msgstr "Aggiungi Marcatori"
 
 #: includes/rvm_markers.php:75
-msgid "Delete all markers"
-msgstr "Cancella tutti i markers"
+msgid "Delete all Markers"
+msgstr "Cancella tutti i Marcatori"
 
 #: includes/rvm_markers.php:88
 msgid "Markers Colours"
-msgstr "Colori dei Markers"
+msgstr "Colori dei Marcatori"
 
 #: includes/rvm_markers.php:98
 msgid "Markers Dimensions"
-msgstr "Dimensioni dei Markers"
+msgstr "Dimensioni dei Marcatori"
 
 #: includes/rvm_markers.php:99
 msgid ""
-"Minimum and maximum values will affect the radius dimensions of the markers. "
+"Minimum and maximum values will affect the radius dimensions of the Markers. "
 "Basically they are a scale within input values for marker dimensions will be "
 "represented. The smallest will be equal to \"minimum value\" while the "
 "biggest will be equal to \"maximum value\". Default values are"
@@ -621,7 +639,7 @@ msgstr ""
 "del segnaposto dei Marker. In pratica sono una scala entro cui i valori dei "
 "campi “Dimensioni” per ogni marker verrà rappresentato. Il marker più "
 "piccolo sarà uguale al valore”Minimo” mentre il più grande avrà il valore "
-"“Massimo”. I valori predefiniti "
+"“Massimo”. I valori predefiniti"
 
 #: includes/rvm_markers.php:99
 msgid " and "
@@ -633,25 +651,25 @@ msgstr "Effetti"
 
 #: includes/rvm_markers.php:117 includes/rvm_markers.php:119
 msgid "Export Markers"
-msgstr "Esporta i Markers"
+msgstr "Esporta i Marcatori"
 
 #: includes/rvm_markers.php:126
 msgid "Import Markers  ( please use exported files from RVM only )"
 msgstr ""
-"Importa i Markers ( per favore usa solo file esportati precedentemente da "
+"Importa i Marcatori ( per favore usa solo file esportati precedentemente da "
 "RVM )"
 
 #: includes/rvm_markers.php:129
 msgid "Select Markers File"
-msgstr "Seleziona il file Markers"
+msgstr "Seleziona il file Marcatori"
 
 #: includes/rvm_markers.php:130
 msgid "Import Markers"
-msgstr "Importa i Markers"
+msgstr "Importa i Marcatori"
 
-#: includes/rvm_markers.php:131 includes/rvm_regions.php:90
-msgid "Oops...I messed up, I want to go back"
-msgstr "Ahii…ho fatto un casino e voglio ripristinare i valori precedenti"
+#: includes/rvm_markers.php:131
+msgid "Oops... I messed up, I want to go back"
+msgstr "Ahii… ho fatto un casino e voglio ripristinare i valori precedenti"
 
 #: includes/rvm_regions.php:9
 msgid "( Not visible in map preview )"
@@ -680,6 +698,10 @@ msgstr "Seleziona il File Suddivisioni"
 msgid "Import Subdivisions Settings"
 msgstr "Importa Suddivisioni1634882"
 
+#: includes/rvm_regions.php:90
+msgid "Oops...I messed up, I want to go back"
+msgstr "Ahii…ho fatto un casino e voglio ripristinare i valori precedenti"
+
 #: includes/rvm_shortcode.php:651
 msgid "Unfortunately map is no longer available"
 msgstr "Purtroppo la mappa non è più disponibile"
@@ -694,7 +716,7 @@ msgstr "Decomprimi la mappa personalizzata"
 
 #: includes/rvm_style_and_script.php:146
 msgid "Installing Map..."
-msgstr "Installa la Mappa"
+msgstr "Installazione della Mappa…"
 
 #: includes/rvm_style_and_script.php:147 includes/rvm_style_and_script.php:159
 msgid "Registering..."
@@ -709,8 +731,8 @@ msgid ""
 "Markers correctly imported. Remember <strong>to update this post</strong> in "
 "order to save imported markers into database."
 msgstr ""
-"I Markers sono correttamente importati. Ricorda <strong>di aggiornare questa "
-"pagina</strong> affinchè i markers vengano salvati  nel database."
+"I Marcatori sono correttamente importati. Ricorda <strong>di aggiornare "
+"questa pagina</strong> affinchè i marcatori vengano salvati  nel database."
 
 #: includes/rvm_style_and_script.php:152
 msgid ""
@@ -718,7 +740,7 @@ msgid ""
 "strong> in order to save imported subdivisions into database"
 msgstr ""
 "Suddivisioni correttamente importate. Ricorda <strong>di aggiornare questa "
-"pagina</strong> affinchè le suddivisioni vengano salvati nel database."
+"pagina</strong> affinchè le suddivisioni vengano salvate nel database"
 
 #: includes/rvm_style_and_script.php:158
 msgid "Installing Marker Module..."

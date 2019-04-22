@@ -2,8 +2,8 @@
 Contributors: algoritmika, anbinder
 Tags: download, plugin, theme, zip, dashboard
 Requires at least: 3.1
-Tested up to: 5.0
-Stable tag: 1.4.1
+Tested up to: 5.1
+Stable tag: 1.4.2
 Requires PHP: 5.0.0
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -44,6 +44,9 @@ Also there are "Download all" plugins and/or themes tools in "Settings > Downloa
 3. Settings.
 
 == Changelog ==
+
+= 1.4.2 - 19/04/2019 =
+* Dev - "Tested up to" updated.
 
 = 1.4.1 - 09/12/2018 =
 * Dev - Advanced Settings - "ZIP library" option added.

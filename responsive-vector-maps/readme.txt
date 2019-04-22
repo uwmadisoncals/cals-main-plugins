@@ -3,8 +3,8 @@ Contributors: Enrico Urbinati
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40responsivemapsplugin%2ecom&lc=IT&item_name=responsive%20Vector%20Maps%20Plugin&item_number=rvm%2dplugin%2dwordpress%2drepo&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Tags: responsive maps,linkable maps,maps,map toggle elements,World Map,France Map,Cambodia Map,Chad Map,Côte D'Ivoire Map,Macedonia Map,Mali Map,Montenegro Map,Belgium Map ( Mercator ),Europe Map ( Miller ),Europe Map ( Mercator ),France Regions Map ( Miller ),France Regions Map ( Mercator ),Germany Map ( Mercator ),Netherlands Map ( Mercator ),Netherlands Map ( Miller ),Poland Map ( Mercator ),Poland Map ( Miller ),Sweden Map ( Mercator ),Sweden Map ( Miller ),Switzerland Map ( Mercator ),Angola Map,Argentina Map,Map Of Armenia,Bangladesh Map,Belarus Map,Belgium Map ( Miller ),Belize Map,Benin Map,Bhutan Map,Bolivia Map,Bosnia And Herzegovina Map,Botswana Map,Brazil Map,Brunei Map,Bulgaria Map,Burkina Faso FMap,United Kingdom Countries Map ( Mercator ),United Kingdom Countries Map ( Miller ),USA Map ( Mercator ),Norway Map,Burundi Map,Cameroon Map,Canada Map,Central African Republic Map,China Map,Colombia Map,Costa Rica Map,Cuba Map,Democratic Republic Of The Congo Map,Djibouti Map,Dominican Republic Map,Egypt Map,Eritrea Map,Spain Map ( Miller ),Germany Map ( Miller ),Ivory Coast Map,Republic Of The Congo Map,Switzerland Map ( Miller ),United Arab Emirates Map,Greece Map,Australia Map ( Mercator ),Syria Map,Ireland Map,Nepal Map,Iraq Map,Slovenia Map,Iceland Map,Saudi Arabia Map,Thailand Map,India Map,Israel Map,Mexico Map,New Zealand Map,Venezuela Map,Luxemburg Map,Sud Sudan Map,El Salvador Map,Ghana Map,Finland Map,Gabon Map,Iran Map,Nigeria Map,Jamaica Map,Estonia Map,Georgia Map,Equatorial Guinea Map,Greenland Map,Guatemala Map,Guinea Map,Guyana Map,Japan Map,Honduras Map,Haiti Map,Hungary Map,Indonesia Map,Kenya Map,Kyrgyzstan Map,Sri Lanka Map,Kuwait Map,Ukraine Map,Laos Map,Lebanon Map,Liberia Map,Africa Map ( Mercator ),Asia Map ( Mercator ),North America Map ( Mercator ),South America Map ( Mercator ),Oceania Map ( Mercator ),Continents Map ( Mercator ),Russia Map ( Mercator ),Austria Map,Italy Provinces Map ( Mercator ),Italy Provinces Map ( Miller ),New York City Map ( Mercator ),World Map ( Miller ),France Departments Map ( Mercator ),France Regions 2016 Map ( Mercator ),North America Map ( Miller ),Africa Map ( Miller ),Asia Map ( Miller ),Continents Map ( Miller ),South America Map ( Miller ),Oceania Map ( Miller ),Fiat 500 Vector,Darth Vader Reaching Out,Mongolia Map,Yemen Map,South Africa Map ( Mercator ),South Africa Map ( Miller ),Denmark Map (Miller),Denmark Map ( Mercator ),Perù Map,Turkey Map,Spain Map With Canary Islands ( Mercator ),Spain Map With Canary Islands ( Miller ),South Korea Map,World Map With French Guyane separated ( Miller ),Lombardia Map,Uganda Map,Pakistan Map,Afghanistan Map,Ethiopia Map,Albania Map,Romania Map,Custom Marker Icon Module,Portugal Map ( Mercator ),Portugal Map ( Miller ),Paraguay Map,Rwanda Map,Algeria Map,Bahamas Map,Cape Verde Map,Cyprus Map,Czech Republic Map,Faeroe Islands Map,Guinea Bissau Map,Hong Kong Map,Lesotho Map,Liechtenstein Map,Madagascar Map,Malawi Map,Malta Map,Moldova Map,Montserrat Map,United Kingdom Regions Map ( Mercator),United Kingdom Regions Map ( Miller),Latium Map,Abruzzo Map,Emilia Romagna Map,Apulia Map,Sicily Map,Campania Map,Molise Map,Basilicata Map,Sardinia Map,Piedmont Map,Calabria Map,Friuli Venezia Giulia Map,Marche Map,Tuscany Map,Liguria Map,Umbria Map,Trentino Alto Adige Map,Aosta Valley Map,Veneto Map,Italy Regions Plus,North Italy Map Pack,Central Italy Map Pack,South Italy Map Pack,Myanmar ( ex Birmania ) Map,Nicaragua Map,North Korea Map,Senegal Map,Sierra Leone Map,Slovakia Map,Solomon Islands Map,Suriname Map,Swaziland Map,Tajikistan Map,Taiwan Map,The Gambia Map,Timor-Leste Map,Togo Map,Uzbekistan Map,Vanuatu Map,Zambia Map,Zimbabwe Map,Chile Map,USA Map ( Albers ),USA Map ( Lambert ),html tooltip,country maps,continent maps,city maps,region maps,clickable maps,linkable maps,professional maps     
 Requires at least: 3.6
-Tested up to: 5.1
-Stable tag: 5.9.3
+Tested up to: 5.1.1
+Stable tag: 5.9.7
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,16 @@ an additional **width** parameter to the shortcode within a specific post. Your 
 
 == Changelog ==
 
+= 5.9.7 =
+* Fix: issue on RVM domain text - missing for some copy tags
+* Fix: issue on Marker Module translation - out of domain text translation need to be hardcoded
+
+= 5.9.5 =
+* Fix: issue on RVM "Settings for" in rvm_core (tahnks Giulio Alfonso for your effort in this - @senjoralfonso )
+
+= 5.9.4 =
+* Fix: issue on RVM global settings impeded to translate copy
+
 = 5.9.3 =
 * New feature : introducing translations - starting with the Italian one
 * Fix: issue on text domain which impeded RVM to be translated
@@ -102,8 +112,8 @@ an additional **width** parameter to the shortcode within a specific post. Your 
 * Fix : show custom selector action: selectors toggled properly
 
 = 5.7.1 =
-* Fix : Warning: call_user_func() expects parameter 1 to be a valid callback ...
-* Fix : Undefined index: rvm_custom_icon_marker_module_path_verified ...
+* Fix : Warning: call_user_func() expects parameter 1 to be a valid callback...
+* Fix : Undefined index: rvm_custom_icon_marker_module_path_verified...
 
 = 5.6.9 =
 * Fix :  Undefined index: field_region_onclick_action

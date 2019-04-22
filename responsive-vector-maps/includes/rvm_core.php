@@ -264,7 +264,7 @@ function rvm_fields_array( )
                         'rvm_mbe_map_markers_rain_effect',
                         'checkbox',
                         __( 'Markers rain', RVM_TEXT_DOMAIN ),
-                        __( 'When checked, markers pinpoints will fall down from top of the map on scrolling', RVM_TEXT_DOMAIN ),
+                        __( 'When checked, Markers pinpoints will fall down from top of the map on scrolling', RVM_TEXT_DOMAIN ),
                         '',
                         '',
                         1,
@@ -398,7 +398,7 @@ function rvm_post_type( )
 add_action( 'add_meta_boxes', 'rvm_meta_boxes_create' );
 function rvm_meta_boxes_create( )
 {
-            add_meta_box( 'rvm_meta', __( 'Settings For ' . get_the_title(), RVM_TEXT_DOMAIN ), 'rvm_mb_function', 'rvm', 'normal', 'high' );
+            add_meta_box( 'rvm_meta', __( 'Settings For:', RVM_TEXT_DOMAIN ) . '&nbsp;' . get_the_title(), 'rvm_mb_function', 'rvm', 'normal', 'high' );
 }
 
 // manage markers arrays from db
@@ -519,7 +519,7 @@ function rvm_mb_function( $post )
                                     $rvm_tab_class_markers = '';
                         }
                         $output .= '<li id="rvm_regions_countries_tab" class="rvm_tabs ' . $rvm_tab_class_region_countries . '" rel="rvm_regions_countries"><a href="#">'  .  __( 'Subdivisions ', RVM_TEXT_DOMAIN )  . '</a></li>';
-                        $output .= '<li id="rvm_markers_tab" class="rvm_tabs  ' . $rvm_tab_class_markers . '" rel="rvm_markers"><a href="#">Markers</a></li>';
+                        $output .= '<li id="rvm_markers_tab" class="rvm_tabs  ' . $rvm_tab_class_markers . '" rel="rvm_markers"><a href="#">'  .  __( 'Markers ', RVM_TEXT_DOMAIN )  . '</a></li>';
             } //if( !empty( $rvm_selected_map ) )
             $output .= '</ul></div>';
             

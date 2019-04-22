@@ -3,12 +3,12 @@
 Plugin Name: Download Plugins and Themes from Dashboard
 Plugin URI: https://wpfactory.com/item/download-plugins-and-themes-from-dashboard/
 Description: Download installed plugins and themes ZIP files directly from your admin dashboard without using FTP.
-Version: 1.4.1
+Version: 1.4.2
 Author: Algoritmika Ltd
 Author URI: http://www.algoritmika.com
 Text Domain: download-plugins-dashboard
 Domain Path: /langs
-Copyright: © 2018 Algoritmika Ltd.
+Copyright: © 2019 Algoritmika Ltd.
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 */
@@ -52,7 +52,7 @@ final class Alg_Download_Plugins {
 	 * @var   string
 	 * @since 1.0.0
 	 */
-	public $version = '1.4.1';
+	public $version = '1.4.2';
 
 	/**
 	 * @var   Alg_Download_Plugins The single instance of the class

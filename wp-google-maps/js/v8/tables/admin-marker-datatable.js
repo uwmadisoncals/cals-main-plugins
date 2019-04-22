@@ -67,7 +67,7 @@ jQuery(function($) {
 	$(document).ready(function(event) {
 		
 		$("[data-wpgmza-admin-marker-datatable]").each(function(index, el) {
-			new WPGMZA.AdminMarkerDataTable(el);
+			WPGMZA.adminMarkerDataTable = new WPGMZA.AdminMarkerDataTable(el);
 		});
 		
 	});

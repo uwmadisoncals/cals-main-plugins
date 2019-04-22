@@ -8,7 +8,7 @@ $path = str_replace('\\','/', ABSPATH);
 <h2><?php _e('Advanced File Manager','file-manager-advanced')?>
 
  <?php if(!class_exists('file_manager_advanced_shortcode')) { ?><a href="http://modalwebstore.com/product/file-manager-advanced-shortcode/" class="button button-primary" target="_blank"><?php _e('Buy Shortcode Addon','file-manager-advanced')?></a><?php } ?></h2>
- <?php if (false === ($fma_hide_review_section = get_transient('fma_hide_review_section'))) { ?>
+ <?php if ('done' != (get_option('fma_hide_review_section'))) { ?>
     <div class="gb-fm-row review-block" id="fma_rate_us">
             <div class="message">
             <img src="<?php echo plugins_url( 'images/rateme.png', __FILE__ );?>" class="fma_img_rate_me">
@@ -16,7 +16,7 @@ $path = str_replace('\\','/', ABSPATH);
             </div>
             <div class="actions">
                 <a target="_blank" href="https://wordpress.org/support/plugin/file-manager-advanced/reviews/?filter=5" class="btn btn-review fma_review_link" title="Leave us a review" data-task="done"><?php _e('I love your plugin!','file-manager-advanced');?></a>
-                <a href="javascript:void(0)" class="btn fma_review_link" title="Remind me later" data-task="later"><?php _e('Not Now','file-manager-advanced');?></a>               
+                <a href="javascript:void(0)" class="btn fma_review_link" title="Remind me later" data-task="done"><?php _e('Not Now','file-manager-advanced');?></a>               
             </div>
 		</div>
  <?php } ?>       
@@ -35,8 +35,7 @@ $path = str_replace('\\','/', ABSPATH);
  </tr>
 </table>
 </div>
-<?php
-if (false === ($fma_hide_review_section = get_transient('fma_hide_review_section'))) { ?>
+ <?php if('done' != (get_option('fma_hide_review_section'))) { ?>
 <style>
 .fma .review-block {
     background-color: #fff;

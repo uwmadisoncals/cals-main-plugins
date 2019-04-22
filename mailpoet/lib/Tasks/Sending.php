@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) exit;
 
 /**
  * A facade class containing all necessary models to work with a sending queue
- * @property string $status
+ * @property string|null $status
  * @property int $task_id
  * @property int $id
  */
@@ -235,7 +235,10 @@ class Sending {
 
   public function __call($name, $args) {
     $obj = method_exists($this->queue, $name) ? $this->queue : $this->task;
-    return call_user_func_array(array($obj, $name), $args);
+    $callback = [$obj, $name];
+    if (is_callable($callback)) {
+      return call_user_func_array($callback, $args);
+    }
   }
 
   private function isQueueProperty($prop) {

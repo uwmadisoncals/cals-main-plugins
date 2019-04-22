@@ -2,7 +2,7 @@ jQuery(document).ready(function ($) {
 	$('#add_field').on('click', function () {
 		$('#event_span').show();
 		var num = $('.clonedInput').length; // how many "duplicatable" input fields we currently have.
-		var newNum = new Number(num + 1);	  // the numeric ID of the new input field being added.
+		var newNum = new Number(num + 1);   // the numeric ID of the new input field being added.
 		// create the new element via clone(), and manipulate it's ID using newNum value.
 		var newElem = $('#event' + num).clone().attr('id', 'event' + newNum);
 		// insert the new element after the last "duplicatable" input field.
@@ -51,13 +51,13 @@ jQuery(document).ready(function ($) {
 		}
 	});
 
-	var publish_text = $( 'input[name=save]' ).val();
+	var publishText = $( 'input[name=save]' ).val();
 	$( '#e_approved' ).on( 'change', function (e) {
 		var event_status = $(this).val();
 		if ( event_status == 0 ) {
 			$( 'input[name=save]' ).val( draftText );
 		} else {
-			$( 'input[name=save]' ).val( publish_text );
+			$( 'input[name=save]' ).val( publishText );
 		}
 	});
 
@@ -90,6 +90,39 @@ jQuery(document).ready(function ($) {
 			$( '#mc-generator .custom' ).show();
 		} else {
 			$( '#mc-generator .custom' ).hide();
+		}
+	});
+
+	$('#mc-sortable').sortable({
+		placeholder: 'mc-ui-state-highlight',
+		update: function (event, ui) {
+			$('#mc-sortable-update').html( 'Submit form to save changes' );
+		}
+	});
+	$('#mc-sortable .up').on('click', function (e) {
+		var parentEls = $( this ).parents().map(function() { return this.tagName; } ).get();
+		var parentLi  = $.inArray( 'LI', parentEls );
+		if ( 1 == parentLi ) {
+			$(this).parents('li').insertBefore($(this).parents('li').prev());
+			$( '#mc-sortable li' ).removeClass( 'mc-updated' );
+			$(this).parents('li').addClass( 'mc-updated' );
+		} else {
+			$(this).parents('tr').insertBefore($(this).parents('tr').prev());
+			$( '#mc-sortable tr' ).removeClass( 'mc-updated' );
+			$(this).parents('tr').addClass( 'mc-updated' );
+		}
+	});
+	$('#mc-sortable .down').on('click', function (e) {
+		var parentEls = $( this ).parents().map(function() { return this.tagName; } ).get();
+		var parentLi  = $.inArray( 'LI', parentEls );
+		if ( 1 == parentLi ) {
+			$(this).parents('li').insertAfter($(this).parents('li').next());
+			$( '#mc-sortable li' ).removeClass( 'mc-updated' );
+			$(this).parents('li').addClass( 'mc-updated' );
+		} else {
+			$(this).parents('tr').insertAfter($(this).parents('tr').next());
+			$( '#mc-sortable tr' ).removeClass( 'mc-updated' );
+			$(this).parents('tr').addClass( 'mc-updated' );
 		}
 	});
 });
@@ -148,23 +181,3 @@ var mediaPopup = '';
 			})
 	});
 })(jQuery);
-
-jQuery(document).ready(function ($) {
-	$('#mc-sortable').sortable({
-		update: function (event, ui) {
-			$('#mc-sortable-update').html( 'Submit form to save changes' );
-		}
-	});
-	$('#mc-sortable .up').on('click', function (e) {
-		e.preventDefault();
-		$(this).parents('li').insertBefore($(this).parents('li').prev());
-		$( '#mc-sortable li' ).removeClass( 'mc-updated' );
-		$(this).parents('li').addClass( 'mc-updated' );
-	});
-	$('#mc-sortable .down').on('click', function (e) {
-		e.preventDefault();
-		$(this).parents('li').insertAfter($(this).parents('li').next());
-		$( '#mc-sortable li' ).removeClass( 'mc-updated' );
-		$(this).parents('li').addClass( 'mc-updated' );
-	});
-});

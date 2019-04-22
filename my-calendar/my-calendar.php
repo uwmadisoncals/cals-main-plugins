@@ -4,7 +4,7 @@
  *
  * @package     MyCalendar
  * @author      Joe Dolson
- * @copyright   2009-2018 Joe Dolson
+ * @copyright   2009-2019 Joe Dolson
  * @license     GPL-2.0+
  *
  * @wordpress-plugin
@@ -17,7 +17,7 @@
  * License:     GPL-2.0+
  * License URI: http://www.gnu.org/license/gpl-2.0.txt
  * Domain Path: lang
- * Version:     3.1.6
+ * Version:     3.1.9
  */
 
 /*
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 global $mc_version, $wpdb;
-$mc_version = '3.1.6';
+$mc_version = '3.1.9';
 
 define( 'MC_DEBUG', false );
 
@@ -148,10 +148,23 @@ function mc_custom_canonical() {
 	if ( isset( $_GET['mc_id'] ) ) {
 		add_action( 'wp_head', 'mc_canonical' );
 		remove_action( 'wp_head', 'rel_canonical' );
+		add_filter( 'wpseo_canonical', 'mc_disable_yoast_canonical' );
 	}
 }
 
-add_action( 'init', 'mc_start_session', 1 );
+/**
+ * When Yoast is enabled with canonical URLs, it returns an invalid URL for single events. Disable on single events.
+ *
+ * @return boolean
+ */
+function mc_disable_yoast_canonical() {
+	return false;
+}
+
+if ( isset( $_REQUEST['mcs'] ) ) {
+	// Only call a session if a search has been performed.
+	add_action( 'init', 'mc_start_session', 1 );
+}
 /**
  * Makes sure session is started to be able to save search results.
  */

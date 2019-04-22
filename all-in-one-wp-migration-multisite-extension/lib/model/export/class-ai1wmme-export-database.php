@@ -96,7 +96,7 @@ class Ai1wmme_Export_Database {
 				}
 
 				// Exclude site options
-				$mysql->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'options', array( sprintf( "`option_name` NOT IN ('%s', '%s', '%s', '%s', '%s', '%s', '%s')", AI1WM_ACTIVE_PLUGINS, AI1WM_ACTIVE_TEMPLATE, AI1WM_ACTIVE_STYLESHEET, AI1WM_STATUS, AI1WM_SECRET_KEY, AI1WM_AUTH_USER, AI1WM_AUTH_PASSWORD ) ) );
+				$mysql->set_table_where_clauses( ai1wm_table_prefix( $site['BlogID'] ) . 'options', array( sprintf( "`option_name` NOT IN ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')", AI1WM_ACTIVE_PLUGINS, AI1WM_ACTIVE_TEMPLATE, AI1WM_ACTIVE_STYLESHEET, AI1WM_STATUS, AI1WM_SECRET_KEY, AI1WM_AUTH_USER, AI1WM_AUTH_PASSWORD, AI1WM_BACKUPS_LABELS ) ) );
 
 				// Replace table prefix on columns
 				$mysql->set_table_prefix_columns( ai1wm_table_prefix( $site['BlogID'] ) . 'options', array( 'option_name' ) );

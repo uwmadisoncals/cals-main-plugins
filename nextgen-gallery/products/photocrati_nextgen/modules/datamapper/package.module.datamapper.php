@@ -673,6 +673,10 @@ class C_DataMapper_Driver_Base extends C_Component
             return $default;
         }
     }
+    function flush_query_cache()
+    {
+        $this->_cache = array();
+    }
 }
 /**
  * Provides instance methods for C_CustomTable_DataMapper_Driver

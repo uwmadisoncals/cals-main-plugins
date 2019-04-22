@@ -1139,8 +1139,21 @@ function mc_ajax_delete_occurrence() {
 	if ( current_user_can( 'mc_manage_events' ) ) {
 		global $wpdb;
 		$occur_id = (int) $_REQUEST['occur_id'];
+		$event_id = (int) $_REQUEST['event_id'];
+		$begin    = $_REQUEST['occur_begin'];
+		$end      = $_REQUEST['occur_end'];
 		$delete   = 'DELETE FROM `' . my_calendar_event_table() . '` WHERE occur_id = %d';
 		$result   = $wpdb->query( $wpdb->prepare( $delete, $occur_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+		$event_post  = mc_get_event_post( $event_id );
+		$instances   = get_post_meta( $event_post, '_mc_deleted_instances', true );
+		$instances   = ( ! is_array( $instances ) ) ? array() : $instances;
+		$instances[] = array(
+			'occur_event_id' => $event_id,
+			'occur_begin'    => $begin,
+			'occur_end'      => $end,
+		);
+		update_post_meta( $event_post, '_mc_deleted_instances', $instances );
 
 		if ( $result ) {
 			wp_send_json(
@@ -1207,20 +1220,25 @@ function mc_ajax_add_date() {
 		$begin = strtotime( $event_date . ' ' . $event_time );
 		$end   = ( '' != $event_endtime ) ? strtotime( $event_end . ' ' . $event_endtime ) : strtotime( $event_end . ' ' . $event_time ) + HOUR_IN_SECONDS;
 
-		$format = array( '%d', '%s', '%s', '%d' );
-		$data   = array(
+		$format      = array( '%d', '%s', '%s', '%d' );
+		$data        = array(
 			'occur_event_id' => $event_id,
 			'occur_begin'    => date( 'Y-m-d  H:i:s', $begin ),
 			'occur_end'      => date( 'Y-m-d  H:i:s', $end ),
 			'occur_group_id' => $group_id,
 		);
-		$result = $wpdb->insert( my_calendar_event_table(), $data, $format );
+		$result      = $wpdb->insert( my_calendar_event_table(), $data, $format );
+		$event_post  = mc_get_event_post( $event_id );
+		$instances   = get_post_meta( $event_post, '_mc_custom_instances', true );
+		$instances   = ( ! is_array( $instances ) ) ? array() : $instances;
+		$instances[] = $data;
+		update_post_meta( $event_id, '_mc_custom_instances', $instances );
 
 		if ( $result ) {
 			wp_send_json(
 				array(
 					'success'  => 1,
-					'response' => __( 'Thanks! I added your new date.', 'my-calendar' ),
+					'response' => __( 'Thanks! Your new date is saved to your calendar.', 'my-calendar' ),
 				)
 			);
 		} else {
@@ -1240,6 +1258,7 @@ function mc_ajax_add_date() {
 		);
 	}
 }
+
 
 /**
  * Test whether currently mobile using wp_is_mobile() with custom filter

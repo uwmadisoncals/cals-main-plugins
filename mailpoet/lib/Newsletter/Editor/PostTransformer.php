@@ -168,7 +168,7 @@ class PostTransformer {
      * https://mailpoet.atlassian.net/browse/MAILPOET-1365
      */
     global $content_width; // default is NULL
-    
+
     $content_width_copy = $content_width;
     $content_width = Env::NEWSLETTER_CONTENT_WIDTH;
     $image_info = $this->wp->wpGetAttachmentImageSrc($id, 'mailpoet_newsletter_max');
@@ -179,7 +179,7 @@ class PostTransformer {
 
   private function getFeaturedImage($post) {
     $post_id = $post->ID;
-    $post_title = $post->post_title;
+    $post_title = $this->sanitizeTitle($post->post_title);
     $image_full_width = (bool)filter_var($this->args['imageFullWidth'], FILTER_VALIDATE_BOOLEAN);
 
     if (!has_post_thumbnail($post_id)) {
@@ -236,8 +236,7 @@ class PostTransformer {
   }
 
   private function getTitle($post) {
-    $title = $post->post_title;
-    $top_padding = '20px';
+    $title = $this->sanitizeTitle($post->post_title);
 
     if (filter_var($this->args['titleIsLink'], FILTER_VALIDATE_BOOLEAN)) {
       $title = '<a href="' . $this->wp->getPermalink($post->ID) . '">' . $title . '</a>';
@@ -247,7 +246,6 @@ class PostTransformer {
       $tag = $this->args['titleFormat'];
     } elseif ($this->args['titleFormat'] === 'ul') {
       $tag = 'li';
-      $top_padding = '0';
     } else {
       $tag = 'h1';
     }
@@ -258,12 +256,19 @@ class PostTransformer {
     return array(
       'type' => 'text',
       'text' => $title,
-      'styles' => [
-        'block' => [
-          'paddingTop' => $top_padding,
-        ],
-      ]
     );
+  }
+
+  /**
+   * Replaces double quote character with a unicode
+   * alternative to avoid problems when inlining CSS.
+   * [MAILPOET-1937]
+   *
+   * @param  string $title
+   * @return string
+   */
+  private function sanitizeTitle($title) {
+    return str_replace('"', '＂', $title);
   }
 
 }

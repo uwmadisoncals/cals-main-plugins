@@ -21,7 +21,8 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
     public function __construct() {
         parent::__construct();
         
-        if (!current_user_can('aam_manage_posts')) {
+        $allowed = AAM_Backend_Subject::getInstance()->isAllowedToManage();
+        if (!$allowed || !current_user_can('aam_manage_posts')) {
             AAM::api()->denyAccess(array('reason' => 'aam_manage_posts'));
         }
     }
@@ -157,9 +158,8 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
                 }
                 
                 if (empty($parent)) {
-                    $taxonomies = array_filter(
-                        get_object_taxonomies($record), 'is_taxonomy_hierarchical'
-                    );
+                    $taxonomies = get_object_taxonomies($record);
+
                     if (!empty($taxonomies)) {
                         $terms  = wp_get_object_terms(
                                 $record->ID, $taxonomies, array('fields' => 'names')
@@ -181,10 +181,10 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
                 $response['data'][] = array(
                     $record->term_id . '|' . $record->taxonomy . '|' . $type,
                     get_edit_term_link($record->term_id, $record->taxonomy),
-                    'term',
+                    (is_taxonomy_hierarchical($record->taxonomy) ? 'cat' : 'tag'),
                     $record->name,
                     implode(',', apply_filters('aam-term-row-actions', array('manage', 'edit'), $subject, $record, $type)),
-                    rtrim($this->getParentTermList($record), '/'),
+                    is_taxonomy_hierarchical($record->taxonomy) ? rtrim($this->getParentTermList($record), '/') : '',
                     apply_filters(
                         'aam-term-override-status', 
                         false, 
@@ -244,8 +244,11 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
     }
 
     /**
+     * Undocumented function
+     *
+     * @param string $type
      * 
-     * @return type
+     * @return void
      */
     protected function prepareContentList($type) {
         $list   = array();
@@ -257,10 +260,10 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
         //calculate how many term and/or posts we need to fetch
         $paging = $this->getFetchPagination($type, $s, $start, $length);
         
-        //first retrieve all hierarchical terms that belong to Post Type
+        //first retrieve all terms that belong to Post Type
         if ($paging['terms']) {
             $list = $this->retrieveTermList(
-                $this->getTypeTaxonomies($type), 
+                get_object_taxonomies($type), 
                 $s, 
                 $paging['term_offset'], 
                 $paging['terms']
@@ -287,24 +290,6 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
     /**
      * 
      * @param type $type
-     * @return type
-     */
-    protected function getTypeTaxonomies($type) {
-        $list = array();
-        
-        foreach (get_object_taxonomies($type) as $name) {
-            if (is_taxonomy_hierarchical($name)) {
-                //get all terms that have no parent category
-                $list[] = $name;
-            }
-        }
-        
-        return $list;
-    }
-    
-    /**
-     * 
-     * @param type $type
      * @param type $search
      * @param type $offset
      * @param type $limit
@@ -314,7 +299,7 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
         $result = array('terms' => 0, 'posts' => 0, 'term_offset' => $offset);
         
         //get terms count
-        $taxonomy = $this->getTypeTaxonomies($type);
+        $taxonomy = get_object_taxonomies($type);
         
         if (!empty($taxonomy)) {
             $terms = get_terms(array(
@@ -395,11 +380,12 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
     
     /**
      * 
-     * @param type $type
-     * @param type $search
-     * @param type $offset
-     * @param type $limit
-     * @return type
+     * @param string $type
+     * @param string $search
+     * @param int    $offset
+     * @param int    $limit
+     * 
+     * @return array
      */
     protected function retrievePostList($type, $search, $offset, $limit) {
         return get_posts(array(

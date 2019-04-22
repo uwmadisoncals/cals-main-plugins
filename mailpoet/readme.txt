@@ -3,7 +3,7 @@ Contributors: mailpoet, wysija
 Tags: email marketing, newsletter, newsletter subscribers, email, welcome email, post notification, WooCommerce emails, newsletter builder
 Requires at least: 4.7
 Tested up to: 5.1
-Stable tag: 3.21.0
+Stable tag: 3.23.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -18,6 +18,8 @@ Our newsletter builder integrates perfectly with WordPress so any website owner 
 Schedule your newsletters, send them right away or set it up to send new blog post notifications automatically in just a few clicks.
 
 Trusted by 300,000 WordPress websites since 2011.
+
+[Visit our website to see the templates or try the demo](https://www.mailpoet.com/)
 
 = All features =
 
@@ -171,6 +173,42 @@ Stop by our [support site](https://www.mailpoet.com/support).
 6. WooCommerce emails
 
 == Changelog ==
+
+= 3.23.2 - 2019-04-16 =
+* Improved: UI clarity and user-friendliness;
+* Improved: security of the plugin. Thanks to Jan van der Put and Harm Blankers of REQON Security for the report!
+* Improved: UX for stats reporting emails;
+* Fixed: subscription confirmation email to include a plain text version of the email. Thanks Mathieu!
+
+= 3.23.1 - 2019-04-08 =
+* Added: new email type icons;
+* Improved: clearer steps in welcome wizard;
+* Fixed: added missing translation string;
+* Fixed: previewing unsubscribe page no longer unsubscribes the viewer;
+* Fixed: form validation error message translation strings.
+
+= 3.23.0 - 2019-04-02 =
+* Added: 12 fresh new templates;
+* Improved: mouse over highlights entire text block instead of partially;
+* Fixed: post titles with single and double quotes break email rendering in ALC and Post blocks;
+* Fixed: "import again" subscriber import errors fixed;
+* Fixed: Twig conflicts with third party plugins.
+* Fixed: import subscribers with custom fields no longer fails;
+* Fixed: social icon margins;
+* Fixed: updating an imported subscriber no longer triggers welcome email.
+
+= 3.22.0 - 2019-03-26 =
+* Improved: minor tweaks and fixes, special thanks to valdrinkoshi for a very helpful PR;
+* Improved: admin notices for authorizing FROM addresses;
+* Fixed: German umlaut characters no longer break JSON encoding and sending on some hosts. Thanks Oliver and others;
+* Fixed: increased limit for visible custom fields in form editor to 40;
+* Fixed: sending post notifications with "Monthly on the..." setting.
+
+= 3.21.1 - 2019-03-18 =
+* Improved: better highlighting when resizing widgets in editor;
+* Improved: sending with consistent FROM address;
+* Fixed: db connection issues for connections via socket. Thanks Nicolas!
+* Fixed: react console warnings when sending is paused.
 
 = 3.21.0 - 2019-03-11 =
 * Added: backwards compatibility method to fix 3rd party integrations;

@@ -135,7 +135,6 @@ class A_NextGen_API_Ajax extends Mixin
         $response = array();
         if ($user_obj != null && !is_a($user_obj, 'WP_Error')) {
             wp_set_current_user($user_obj->ID);
-            $security = $this->get_registry()->get_utility('I_Security_Manager');
             $app_config = $this->object->param('app_config');
             $task_list = $this->object->param('task_list');
             $extra_data = $this->object->param('extra_data');
@@ -167,7 +166,7 @@ class A_NextGen_API_Ajax extends Mixin
                     $task_auth = false;
                     switch ($task_type) {
                         case 'gallery_add':
-                            $task_auth = $security->is_allowed('nextgen_edit_gallery');
+                            $task_auth = M_Security::is_allowed('nextgen_edit_gallery');
                             break;
                         case 'gallery_remove':
                         case 'gallery_edit':
@@ -179,20 +178,19 @@ class A_NextGen_API_Ajax extends Mixin
                                 $gallery = $gallery_mapper->find($query_id);
                             }
                             if ($gallery != null) {
-                                $actor = $security->get_current_actor();
-                                $task_auth = $actor->get_entity_id() == $gallery->author || $actor->is_allowed('nextgen_edit_gallery_unowned');
+                                $task_auth = wp_get_current_user()->ID == $gallery->author || M_Security::is_allowed('nextgen_edit_gallery_unowned');
                             } else {
-                                $task_auth = $security->is_allowed('nextgen_edit_gallery');
+                                $task_auth = M_Security::is_allowed('nextgen_edit_gallery');
                             }
                             break;
                         case 'album_add':
-                            $task_auth = $security->is_allowed('nextgen_edit_album');
+                            $task_auth = M_Security::is_allowed('nextgen_edit_album');
                             break;
                         case 'album_remove':
-                            $task_auth = $security->is_allowed('nextgen_edit_album');
+                            $task_auth = M_Security::is_allowed('nextgen_edit_album');
                             break;
                         case 'album_edit':
-                            $task_auth = $security->is_allowed('nextgen_edit_album');
+                            $task_auth = M_Security::is_allowed('nextgen_edit_album');
                             break;
                         case 'image_list_move':
                             break;
@@ -865,7 +863,7 @@ class C_NextGen_API extends C_Component
                                                         $ngg_image = $storage->upload_base64_image($gallery, $image_data, $image_filename, $image_id, true);
                                                         if ($ngg_image != null) {
                                                             $image_status = 'done';
-                                                            $image_id = $ngg_image->{$ngg_image->id_field};
+                                                            $image_id = is_int($ngg_image) ? $ngg_image : $ngg_image->{$ngg_image->id_field};
                                                         }
                                                     } catch (E_NoSpaceAvailableException $e) {
                                                         $image_error = __('No space available for image (%1$s).', 'nggallery');
@@ -1303,6 +1301,7 @@ class C_NextGen_API_XMLRPC extends C_Component
                     try {
                         $image = $storage->upload_base64_image($gallery, $data['bits'], $data['name'], $data['image_id'], $data['override']);
                         if ($image) {
+                            $image = is_int($image) ? C_Image_Mapper::get_instance()->find($image, TRUE) : $image;
                             $storage = C_Gallery_Storage::get_instance();
                             $image->imageURL = $storage->get_image_url($image);
                             $image->thumbURL = $storage->get_thumb_url($image);

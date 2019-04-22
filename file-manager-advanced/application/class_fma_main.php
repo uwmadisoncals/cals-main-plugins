@@ -32,6 +32,14 @@ class class_fma_main {
                 wp_enqueue_script( 'elfinder-ui.min', plugins_url('library/js/jquery-ui.min.js', __FILE__));
 				wp_enqueue_script( 'elfinder_min', plugins_url('library/js/elfinder.full.js',  __FILE__ ));
 				//wp_enqueue_script( 'elfinder_editors', plugins_url('library/js/extras/editors.default.js',  __FILE__ ));
+				wp_enqueue_script( 'codemirror', plugins_url('library/codemirror/lib/codemirror.js',  __FILE__ ));
+				wp_enqueue_style( 'codemirror', plugins_url('library/codemirror/lib/codemirror.css', __FILE__));
+				wp_enqueue_script( 'htmlmixed', plugins_url('library/codemirror/mode/htmlmixed/htmlmixed.js',  __FILE__ ));
+				wp_enqueue_script( 'xml', plugins_url('library/codemirror/mode/xml/xml.js',  __FILE__ ));
+				wp_enqueue_script( 'css', plugins_url('library/codemirror/mode/css/css.js',  __FILE__ ));
+				wp_enqueue_script( 'javascript', plugins_url('library/codemirror/mode/javascript/javascript.js',  __FILE__ ));
+				wp_enqueue_script( 'clike', plugins_url('library/codemirror/mode/clike/clike.js',  __FILE__ ));
+				wp_enqueue_script( 'php', plugins_url('library/codemirror/mode/php/php.js',  __FILE__ ));	
 				wp_enqueue_script( 'elfinder_script', plugins_url('library/js/elfinder_script.js', __FILE__));
 				wp_enqueue_style( 'user_interface', plugins_url('library/css/user_interface.css', __FILE__));
 				wp_enqueue_style( 'elfinder.min', plugins_url('library/css/elfinder.min.css', __FILE__));
@@ -62,22 +70,12 @@ class class_fma_main {
         public function fma_review_ajax()
         {
             $task = sanitize_text_field($_POST['task']);
-            $expiry_days = 10;
-            if ($task == 'done') {
-                $expiry_days = 365;
-            } elseif ($task == 'later') {
-                $expiry_days = 10;
-            }
-            if (false === ($fma_hide_review_section = get_transient('fma_hide_review_section'))) {
-                $done = set_transient('fma_hide_review_section', 'done', 60 * 60 * 24 * $expiry_days);
+            $done = update_option('fma_hide_review_section', $task);
                 if ($done) {
                     echo '1';
                 } else {
                     echo '0';
                 }
-            } else {
-                echo '2';
-            }
             die;
         }
 }

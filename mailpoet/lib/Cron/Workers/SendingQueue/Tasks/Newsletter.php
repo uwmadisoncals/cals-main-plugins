@@ -121,7 +121,9 @@ class Newsletter {
     if (!$queue_errors) {
       // verify that the rendered body was successfully saved
       $queue = SendingQueueModel::findOne($queue->id);
-      $queue_errors = ($queue->validate() !== true);
+      if ($queue instanceof SendingQueueModel) {
+        $queue_errors = ($queue->validate() !== true);
+      }
     }
     if ($queue_errors) {
       $this->stopNewsletterPreProcessing(sprintf('QUEUE-%d-SAVE', $queue->id));
@@ -156,6 +158,7 @@ class Newsletter {
     }
     $prepared_newsletter = Helpers::splitObject($prepared_newsletter);
     return array(
+      'id' => $newsletter->id,
       'subject' => $prepared_newsletter[0],
       'body' => array(
         'html' => $prepared_newsletter[1],

@@ -16,7 +16,7 @@ class M_Third_Party_Compat extends C_Base_Module
             'photocrati-third_party_compat',
             'Third Party Compatibility',
             "Adds Third party compatibility hacks, adjustments, and modifications",
-            '3.1.4.2',
+            '3.1.11.1',
             'https://www.imagely.com/wordpress-gallery-plugin/nextgen-gallery/',
             'Imagely',
             'https://www.imagely.com'
@@ -90,6 +90,12 @@ class M_Third_Party_Compat extends C_Base_Module
         {
             if (!defined('NGG_DISABLE_FILTER_THE_CONTENT')) define('NGG_DISABLE_FILTER_THE_CONTENT', TRUE);
             if (!defined('NGG_DISABLE_RESOURCE_MANAGER'))   define('NGG_DISABLE_RESOURCE_MANAGER', TRUE);
+        }
+
+        // Elementor's graphical builder is broken by our resource manager
+        if (defined('ELEMENTOR_VERSION'))
+        {
+            if (!defined('NGG_DISABLE_RESOURCE_MANAGER')) define('NGG_DISABLE_RESOURCE_MANAGER', TRUE);
         }
     }
 

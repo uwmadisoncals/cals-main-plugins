@@ -32,7 +32,7 @@ class elFinder
      *
      * @var integer
      */
-    protected static $ApiRevision = 46;
+    protected static $ApiRevision = 49;
 
     /**
      * Storages (root dirs)
@@ -504,12 +504,6 @@ class elFinder
     {
         // set default_charset
         if (version_compare(PHP_VERSION, '5.6', '>=')) {
-            if (($_val = ini_get('iconv.internal_encoding')) && strtoupper($_val) !== 'UTF-8') {
-                ini_set('iconv.internal_encoding', '');
-            }
-            if (($_val = ini_get('mbstring.internal_encoding')) && strtoupper($_val) !== 'UTF-8') {
-                ini_set('mbstring.internal_encoding', '');
-            }
             if (($_val = ini_get('internal_encoding')) && strtoupper($_val) !== 'UTF-8') {
                 ini_set('internal_encoding', '');
             }
@@ -1787,7 +1781,7 @@ class elFinder
             if (strpos($filenameEncoded, '%') === false) { // ASCII only
                 $filename = 'filename="' . $name . '"';
             } else {
-                $ua = $_SERVER['HTTP_USER_AGENT'];
+                $ua = isset($_SERVER['HTTP_USER_AGENT'])? $_SERVER['HTTP_USER_AGENT'] : '';
                 if (preg_match('/MSIE [4-8]/', $ua)) { // IE < 9 do not support RFC 6266 (RFC 2231/RFC 5987)
                     $filename = 'filename="' . $filenameEncoded . '"';
                 } elseif (strpos($ua, 'Chrome') === false && strpos($ua, 'Safari') !== false && preg_match('#Version/[3-5]#', $ua)) { // Safari < 6
@@ -2427,12 +2421,17 @@ class elFinder
             if (preg_match('/\b(?:localhost|localdomain)\b/', $host)) {
                 return false;
             }
+            // wildcard DNS (e.g xip.io)
+            if (preg_match('/0x[0-9a-f]+|[0-9]+(?:\.(?:0x[0-9a-f]+|[0-9]+)){1,3}/', $host)) {
+                $host = gethostbyname($host);
+            }
             // check IPv4 local loopback, private network and link local
             if (preg_match('/^0x[0-9a-f]+|[0-9]+(?:\.(?:0x[0-9a-f]+|[0-9]+)){1,3}$/', $host, $m)) {
                 $long = (int)sprintf('%u', ip2long($host));
                 if (!$long) {
                     return false;
                 }
+
                 $local = (int)sprintf('%u', ip2long('127.255.255.255')) >> 24;
                 $prv1 = (int)sprintf('%u', ip2long('10.255.255.255')) >> 24;
                 $prv2 = (int)sprintf('%u', ip2long('172.31.255.255')) >> 20;
@@ -2451,7 +2450,7 @@ class elFinder
                     return false;
                 }
             }
-            $method = (function_exists('curl_exec') && !ini_get('safe_mode') && !ini_get('open_basedir')) ? 'curl_get_contents' : 'fsock_get_contents';
+            $method = (function_exists('curl_exec') && !ini_get('open_basedir')) ? 'curl_get_contents' : 'fsock_get_contents';
             return $this->$method($url, $timeout, $redirect_max, $ua, $fp);
         }
         return false;
@@ -4647,7 +4646,7 @@ class elFinder
      */
     public static function curlExec($curl, $options = array(), $headers = array())
     {
-        $followLocation = (!ini_get('safe_mode') && !ini_get('open_basedir'));
+        $followLocation = (!ini_get('open_basedir'));
         if ($followLocation) {
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         }

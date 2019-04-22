@@ -12,11 +12,12 @@ global $current_user; ?>
                 </div>
                 <?php foreach($this->dashboard_menu as $page_id => $menu_item){
                     $menu_url = get_permalink(get_the_ID()).$page_id.($page_id!=''?'/':'');
-                    if(isset($params['flaturl']) && $params['flaturl'] == 0 && $page_id != '')
+                    if(!isset($params['flaturl']) || $params['flaturl'] == 0 && $page_id != '')
                         $menu_url = get_permalink(get_the_ID()).'?udb_page='.$page_id;
                     ?>
                     <a class="list-group-item <?php echo $udb_page == $page_id?'selected':''; ?>" href="<?php echo $menu_url; ?>"><?php echo $menu_item['name']; ?></a>
                 <?php } ?>
+                <a class="list-group-item " href="<?php echo wpdm_logout_url(); ?>"><span class="color-red"><?php _e('Logout', 'wmdpro'); ?></span></a>
 
             </div>
 

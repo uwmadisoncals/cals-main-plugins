@@ -20,6 +20,7 @@ use MailPoet\Services\Bridge;
 use MailPoet\Settings\Hosts;
 use MailPoet\Settings\Pages;
 use MailPoet\Settings\SettingsController;
+use MailPoet\Settings\UserFlagsController;
 use MailPoet\Subscribers\ImportExport\ImportExportFactory;
 use MailPoet\Tasks\Sending;
 use MailPoet\Tasks\State;
@@ -35,7 +36,7 @@ if (!defined('ABSPATH')) exit;
 
 class Menu {
   const MAIN_PAGE_SLUG = 'mailpoet-newsletters';
-  const LAST_ANNOUNCEMENT_DATE = '2019-03-12 10:00:00';
+  const LAST_ANNOUNCEMENT_DATE = '2019-04-02 10:00:00';
 
   /** @var WooCommerceHelper */
   private $woocommerce_helper;
@@ -49,6 +50,8 @@ class Menu {
   private $access_control;
   /** @var SettingsController */
   private $settings;
+  /** @var UserFlagsController */
+  private $user_flags;
   /** @var WPFunctions */
   private $wp;
   /** @var ServicesChecker */
@@ -62,7 +65,8 @@ class Menu {
     SettingsController $settings,
     WPFunctions $wp,
     WooCommerceHelper $woocommerce_helper,
-    ServicesChecker $servicesChecker
+    ServicesChecker $servicesChecker,
+    UserFlagsController $user_flags
   ) {
     $this->renderer = $renderer;
     $this->access_control = $access_control;
@@ -70,6 +74,7 @@ class Menu {
     $this->settings = $settings;
     $this->woocommerce_helper = $woocommerce_helper;
     $this->servicesChecker = $servicesChecker;
+    $this->user_flags = $user_flags;
   }
 
   function init() {
@@ -384,7 +389,7 @@ class Menu {
       'is_woocommerce_active' => $this->woocommerce_helper->isWooCommerceActive(),
       'finish_wizard_url' => WPFunctions::get()->adminUrl('admin.php?page=' . self::MAIN_PAGE_SLUG),
       'sender' => $this->settings->get('sender'),
-      'reply_to' => $this->settings->get('reply_to'),
+      'admin_email' => get_option('admin_email'),
     ];
     $this->displayPage('welcome_wizard.html', $data);
   }
@@ -465,6 +470,7 @@ class Menu {
       'flags' => $flags,
       'current_user' => WPFunctions::get()->wpGetCurrentUser(),
       'linux_cron_path' => dirname(dirname(__DIR__)),
+      'is_woocommerce_active' => $this->woocommerce_helper->isWooCommerceActive(),
       'ABSPATH' => ABSPATH,
       'hosts' => array(
         'web' => Hosts::getWebHosts(),
@@ -605,6 +611,7 @@ class Menu {
     });
     $data['segments'] = $segments;
     $data['settings'] = $this->settings->getAll();
+    $data['mss_active'] = Bridge::isMPSendingServiceEnabled();
     $data['current_wp_user'] = WPFunctions::get()->wpGetCurrentUser()->to_array();
     $data['current_wp_user_firstname'] = WPFunctions::get()->wpGetCurrentUser()->user_firstname;
     $data['site_url'] = WPFunctions::get()->siteUrl();
@@ -630,9 +637,13 @@ class Menu {
     $data['is_woocommerce_active'] = $this->woocommerce_helper->isWooCommerceActive();
 
     $user_id = $data['current_wp_user']['ID'];
-    $data['feature_announcement_has_news'] = empty($data['settings']['last_announcement_seen'][$user_id])
-      || $data['settings']['last_announcement_seen'][$user_id] < strtotime(self::LAST_ANNOUNCEMENT_DATE);
-    $data['last_announcement_seen'] = isset($data['settings']['last_announcement_seen']) ? $data['settings']['last_announcement_seen'] : false;
+
+    $last_announcement_seen = $this->user_flags->get('last_announcement_seen');
+    $data['feature_announcement_has_news'] = (
+      empty($last_announcement_seen) ||
+      $last_announcement_seen < strtotime(self::LAST_ANNOUNCEMENT_DATE)
+    );
+    $data['last_announcement_seen'] = $last_announcement_seen;
 
     $data['automatic_emails'] = array(
       array(
@@ -700,6 +711,7 @@ class Menu {
     $data = array(
       'shortcodes' => ShortcodesHelper::getShortcodes(),
       'settings' => $this->settings->getAll(),
+      'editor_tutorial_seen' => $this->user_flags->get('editor_tutorial_seen'),
       'current_wp_user' => array_merge($subscriber_data, WPFunctions::get()->wpGetCurrentUser()->to_array()),
       'sub_menu' => self::MAIN_PAGE_SLUG,
       'mss_active' => Bridge::isMPSendingServiceEnabled()
@@ -736,7 +748,7 @@ class Menu {
   function formEditor() {
     $id = (isset($_GET['id']) ? (int)$_GET['id'] : 0);
     $form = Form::findOne($id);
-    if ($form !== false) {
+    if ($form instanceof Form) {
       $form = $form->asArray();
     }
 

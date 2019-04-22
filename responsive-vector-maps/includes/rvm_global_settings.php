@@ -19,8 +19,8 @@ add_action( 'admin_menu', 'rvm_options_add_page' ) ;
 function rvm_options_add_page() {
     
     add_options_page( 
-        'RVM settings', // Page title on browser bar 
-        'RVM global settings', // menu item text
+        __( 'RVM settings', RVM_TEXT_DOMAIN ), // Page title on browser bar 
+        __( 'RVM global settings', RVM_TEXT_DOMAIN ), // menu item text
         'manage_options', // only administartors can open this
         'rvm_options_page', // unique name of settings page
         'rvm_options_form' //call to fucntion which creates the form
@@ -48,7 +48,7 @@ function rvm_admin_init(){
     
     add_settings_field(            
             'rvm_option_dequeue_wp_emoji', //id
-            'Disable wp_emoji', //title
+            __('Disable wp_emoji', RVM_TEXT_DOMAIN ), //title
             'rvm_settings_field', //callback
             'rvm_options_page',//page
             'rvm_main_settings',//section
@@ -60,7 +60,7 @@ function rvm_admin_init(){
     
     add_settings_field(            
             'rvm_option_custom_marker_icon_module_path', //id
-            'Install module for custom marker icon', //title
+            __('Install module for custom marker icon', RVM_TEXT_DOMAIN ), //title
             'rvm_settings_field', //callback
             'rvm_options_page',//page
             'rvm_main_settings',//section
@@ -74,7 +74,7 @@ function rvm_admin_init(){
 
 // Add forms to options page
 function rvm_section_main() {
-    echo '<p>In case you may notice issues related to wp_emoji enable following checkbox. It\'s well documented this script has problems with svg ( vector images ) on which RVM relies on.</p>';
+
 }
 
 // Add fields to options page
@@ -86,7 +86,7 @@ function rvm_settings_field( $args ) {
     
     if ( $args[ 1 ] == 'checkbox' ) {
     	$rvm_option_dequeue_wp_emoji =  !empty( $rvm_options[ $args[ 0 ] ] ) ? 'checked="checked"' : '' ;    
-    	$output .= '<input  ' .  $rvm_option_dequeue_wp_emoji  . ' type="' . $args[ 1 ] . '" name="rvm_options['.$args[ 0 ].']" id="'.$args[ 0 ].'" />' . __('(<span>In case you may notice issues related to wp_emoji enable following checkbox. It\'s well documented this script has problems with svg ( vector images ) on which RVM relies on.</span>)', RVM_TEXT_DOMAIN );
+    	$output .= '<input  ' .  $rvm_option_dequeue_wp_emoji  . ' type="' . $args[ 1 ] . '" name="rvm_options['.$args[ 0 ].']" id="'.$args[ 0 ].'" /><span>' . __('In case you may notice issues related to wp_emoji enable following checkbox. It\'s well documented this script has problems with svg ( vector images ) on which RVM relies on.', RVM_TEXT_DOMAIN ) . '</span>';
     }
 
     else {
@@ -119,7 +119,7 @@ function rvm_options_form() {
     ?>
     
     <div class="wrap">
-        <h2>RVM global settings</h2>
+        <h2><?php _e('RVM global settings', RVM_TEXT_DOMAIN );?></h2>
                         <form action="options.php" method="post" id="rvm_options_form">
                     <?php settings_fields('rvm_settings'); ?>
                      <?php do_settings_sections('rvm_options_page'); ?>

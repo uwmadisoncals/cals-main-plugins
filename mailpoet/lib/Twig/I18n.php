@@ -4,10 +4,12 @@ namespace MailPoet\Twig;
 
 use MailPoet\Config\Localizer;
 use MailPoet\WP\Functions as WPFunctions;
+use MailPoetVendor\Twig\Extension\AbstractExtension;
+use MailPoetVendor\Twig\TwigFunction;
 
 if (!defined('ABSPATH')) exit;
 
-class I18n extends \Twig_Extension {
+class I18n extends AbstractExtension {
 
   private $_text_domain;
 
@@ -30,7 +32,7 @@ class I18n extends \Twig_Extension {
     );
 
     foreach ($functions as $twig_function => $function) {
-      $twig_functions[] = new \Twig_SimpleFunction(
+      $twig_functions[] = new TwigFunction(
         $twig_function,
         array($this, $function),
         array('is_safe' => array('all'))
@@ -90,7 +92,7 @@ class I18n extends \Twig_Extension {
       $date = strtotime($date);
     }
 
-    return WPFunctions::get()->getDateFromGmt(date('Y-m-d H:i:s', $date), $date_format);
+    return WPFunctions::get()->getDateFromGmt(date('Y-m-d H:i:s', (int)$date), $date_format);
   }
 
   private function setTextDomain($args = array()) {

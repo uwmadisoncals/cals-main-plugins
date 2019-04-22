@@ -9,7 +9,7 @@
         <p class="description">
           <%= __('Your bounced emails will be sent to this address.') %>
           <a href="http://beta.docs.mailpoet.com/article/180-how-bounce-management-works-in-mailpoet-3"
-             target="_blank" 
+             target="_blank"
           ><%= _x('Read more.', 'support article link label') %></a>
         </p>
       </th>
@@ -45,6 +45,7 @@
               type="radio"
               name="cron_trigger[method]"
               value="<%= cron_trigger.wordpress %>"
+              data-automation-id="wordress_cron_radio"
               <% if (settings.cron_trigger.method == cron_trigger.wordpress) %>
               checked="checked"
               <% endif %>
@@ -57,6 +58,7 @@
               type="radio"
               name="cron_trigger[method]"
               value="<%= cron_trigger.mailpoet %>"
+              data-automation-id="mailpoet_cron_radio"
               <% if (settings.cron_trigger.method == cron_trigger.mailpoet) %>
                 checked="checked"
                 <% endif %>
@@ -72,6 +74,7 @@
               type="radio"
               name="cron_trigger[method]"
               value="<%= cron_trigger.linux_cron %>"
+              data-automation-id="linux_cron_radio"
             <% if (settings.cron_trigger.method == cron_trigger.linux_cron) %>
             checked="checked"
             <% endif %>
@@ -152,6 +155,69 @@
               checked="checked"
               <% endif %>
             /><%= __('No') %>
+          </label>
+        </p>
+      </td>
+    </tr>
+    <!-- inactive subscribers -->
+    <tr style="display:none">
+      <th scope="row">
+        <label>
+          <%= __('Stop sending to inactive subscribers') %>
+        </label>
+        <p class="description">
+          <%= __("Gmail, Yahoo and other email providers will treat your emails like spam if your subscribers don't open your emails in the long run. This option will mark your subscribers as Inactive and MailPoet will stop sending to them.") %>
+        </p>
+      </th>
+      <td
+        class="mailpoet_inactive_subscribers_disabled<% if (settings.tracking.enabled) %> mailpoet_hidden<% endif %>"
+        data-automation-id="inactive-subscribers-disabled"
+      >
+        <p><i><%= __('This option is disabled because tracking is disabled.') %></i></p>
+      </td>
+      <td
+        class="mailpoet_inactive_subscribers_enabled<% if not(settings.tracking.enabled) %> mailpoet_hidden<% endif %>"
+        data-automation-id="inactive-subscribers-enabled"
+      >
+        <p>
+          <label>
+            <input
+              type="radio"
+              name="deactivate_subscriber_after_inactive_days"
+              value=""
+              <% if not(settings.deactivate_subscriber_after_inactive_days) %>checked="checked"<% endif %>
+            /><%= __('Never') %>
+          </label>
+        </p>
+        <p>
+          <label>
+            <input
+              type="radio"
+              name="deactivate_subscriber_after_inactive_days"
+              value="90"
+              <% if (settings.deactivate_subscriber_after_inactive_days == 90) %>checked="checked"<% endif %>
+            /><%= __('After 3 months (recommended if you send once a day)') %>
+          </label>
+        </p>
+        <p>
+          <label>
+            <input
+              type="radio"
+              name="deactivate_subscriber_after_inactive_days"
+              value="180"
+              data-automation-id="inactive-subscribers-default"
+              <% if (settings.deactivate_subscriber_after_inactive_days == 180) %>checked="checked"<% endif %>
+            /><%= __('After 6 months (default, recommended if you send at least once a month)')%>
+          </label>
+        </p>
+        <p>
+          <label>
+            <input
+              type="radio"
+              name="deactivate_subscriber_after_inactive_days"
+              value="365"
+              <% if (settings.deactivate_subscriber_after_inactive_days == 365) %>checked="checked"<% endif %>
+            /><%= __('After 12 months') %>
           </label>
         </p>
       </td>
@@ -285,21 +351,25 @@
       <td>
         <select
           name="logging"
+          data-automation-id="logging-select-box"
         >
           <option
             value="everything"
+            data-automation-id="log-everything"
             <% if settings.logging == "everything" %>
               selected
             <% endif %>
           ><%= _x('Everything', 'In settings: "Logging: Everything"') %>
           <option
             value="errors"
+            data-automation-id="log-errors"
             <% if settings.logging != "nothing" and settings.logging != "everything" %>
               selected
             <% endif %>
           ><%= _x('Errors only', 'In settings: "Logging: Errors only"') %>
           <option
             value="nothing"
+            data-automation-id="log-nothing"
             <% if settings.logging == "nothing" %>
               selected
             <% endif %>
@@ -307,3 +377,20 @@
         </select>
   </tbody>
 </table>
+
+<script type="text/javascript">
+  jQuery(function($) {
+    $(function() {
+      $('input[name="tracking[enabled]"').on('change', function() {
+        var trackingEnabled = $(this).val();
+        if (trackingEnabled) {
+          $('.mailpoet_inactive_subscribers_enabled').removeClass('mailpoet_hidden');
+          $('.mailpoet_inactive_subscribers_disabled').addClass('mailpoet_hidden');
+        } else {
+          $('.mailpoet_inactive_subscribers_enabled').addClass('mailpoet_hidden');
+          $('.mailpoet_inactive_subscribers_disabled').removeClass('mailpoet_hidden');
+        }
+      });
+    });
+  });
+</script>

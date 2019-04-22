@@ -22,8 +22,8 @@ if (!defined('ABSPATH')) exit;
  * @method $this useIdColumn($id_column)
  * @method $this|bool findOne($id=null)
  * @method static static|bool findOne($id=null)
- * @method array|\IdiormResultSet findMany()
- * @method static array|\IdiormResultSet findMany()
+ * @method array findMany()
+ * @method static array findMany()
  * @method \IdiormResultSet findResultSet()
  * @method array findArray()
  * @method static array findArray()
@@ -41,12 +41,12 @@ if (!defined('ABSPATH')) exit;
  * @method $this selectMany(...$values)
  * @method static static selectMany(...$values)
  * @method static selectManyExpr($values)
- * @method $this rawJoin($table, $constraint, $table_alias, $parameters = array())
- * @method $this innerJoin($table, $constraint, $table_alias=null)
- * @method $this join(string $table, string $constraint, $table_alias=null)
- * @method $this leftOuterJoin($table, $constraint, $table_alias=null)
- * @method $this rightOuterJoin($table, $constraint, $table_alias=null)
- * @method $this fullOuterJoin($table, $constraint, $table_alias=null)
+ * @method $this rawJoin(string $table, string|array $constraint, string $table_alias, array $parameters = array())
+ * @method $this innerJoin(string $table, string|array $constraint, string $table_alias=null)
+ * @method $this join(string $table, string|array $constraint, string $table_alias=null)
+ * @method $this leftOuterJoin(string $table, string|array $constraint, string $table_alias=null)
+ * @method $this rightOuterJoin(string $table, string|array $constraint, string $table_alias=null)
+ * @method $this fullOuterJoin(string $table, string|array $constraint, string $table_alias=null)
  * @method $this where($column_name, $value=null)
  * @method static $this where($column_name, $value=null)
  * @method $this whereEqual($column_name, $value=null)
@@ -58,6 +58,7 @@ if (!defined('ABSPATH')) exit;
  * @method $this whereIdIn($ids)
  * @method static static whereIdIn($ids)
  * @method $this whereLike($column_name, $value=null)
+ * @method static $this whereLike($column_name, $value=null)
  * @method $this whereNotLike($column_name, $value=null)
  * @method $this whereGt($column_name, $value=null)
  * @method static $this whereLt($column_name, $value=null)
@@ -101,7 +102,7 @@ if (!defined('ABSPATH')) exit;
  * @method static static filter(...$args)
  * @method $this hasMany($associated_class_name, $foreign_key_name=null, $foreign_key_name_in_current_models_table=null, $connection_name=null)
  * @method $this hasManyThrough($associated_class_name, $join_class_name=null, $key_to_base_table=null, $key_to_associated_table=null,  $key_in_base_table=null, $key_in_associated_table=null, $connection_name=null)
- * @method $this hasOne($associated_class_name, $foreign_key_name=null, $foreign_key_name_in_current_models_table=null, $connection_name=null)
+ * @method mixed hasOne($associated_class_name, $foreign_key_name=null, $foreign_key_name_in_current_models_table=null, $connection_name=null)
  * @method $this|bool create($data=null)
  * @method static $this|bool create($data=null)
  * @method int count()
@@ -138,7 +139,7 @@ class Model extends \Sudzy\ValidModel {
    * given, it's used to transform `$data` before creating the new row.
    *
    * @param  array   $data
-   * @param  boolean $keys
+   * @param  array|boolean $keys
    * @param  callable|bool $onCreate
    * @return self
    */
@@ -149,21 +150,19 @@ class Model extends \Sudzy\ValidModel {
       $model = static::findOne((int)$data['id']);
     }
 
-    if (!empty($keys)) {
-      $first = true;
+    if ($model === false && !empty($keys)) {
       foreach ($keys as $field => $value) {
-        if ($first) {
+        if ($model === false) {
           $model = static::where($field, $value);
-          $first = false;
         } else {
           $model = $model->where($field, $value);
         }
       }
-      $model = $model->findOne();
+      if ($model) $model = $model->findOne();
     }
 
     if ($model === false) {
-      if (!empty($onCreate)) {
+      if (!empty($onCreate) && is_callable($onCreate)) {
         $data = $onCreate($data);
       }
       $model = static::create();

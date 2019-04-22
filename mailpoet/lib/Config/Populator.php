@@ -9,6 +9,8 @@ use MailPoet\Models\Form;
 use MailPoet\Models\Segment;
 use MailPoet\Models\StatisticsForms;
 use MailPoet\Models\Subscriber;
+use MailPoet\Models\UserFlag;
+use MailPoet\Models\Setting;
 use MailPoet\Segments\WP;
 use MailPoet\Settings\Pages;
 use MailPoet\Settings\SettingsController;
@@ -38,29 +40,6 @@ class Populator {
       'newsletter_templates',
     );
     $this->templates = array(
-      'NewsletterBlank1Column',
-      'NewsletterBlank12Column',
-      'NewsletterBlank121Column',
-      'NewsletterBlank13Column',
-      'SimpleText',
-      'TakeAHike',
-      'Faith',
-      'NewsDay',
-      'WorldCup',
-      'FoodBox',
-      'FestivalEvent',
-      'RetroComputingMagazine',
-      'Shoes',
-      'PieceOfCake',
-      'Coffee',
-      'Drone',
-      'Retro',
-      'Hotels',
-      'Music',
-      'YogaStudio',
-      'Charity',
-      'FashionStore',
-
       'WelcomeBlank1Column',
       'WelcomeBlank12Column',
       'GiftWelcome',
@@ -69,41 +48,72 @@ class Populator {
       'Sunglasses',
       'RealEstate',
       'AppWelcome',
-
+      'FoodBox',
+      'Poet',
       'PostNotificationsBlank1Column',
       'ModularStyleStories',
-      'NotSoMedium',
       'RssSimpleNews',
+      'NotSoMedium',
       'WideStoryLayout',
+      'IndustryConference',
       'ScienceWeekly',
-
-      'BrandingAgencyNews',
-      'CityLocalNews',
-      'College',
-      'ComputerRepair',
-      'Engineering',
-      'FarmersMarket',
-      'HealthyFoodBlog',
-      'PrimarySchool',
-      'RenewableEnergy',
-      'Software',
-      'WordPressTheme',
-
-      'WineCity',
-      'DogFood',
-      'Fitness',
-      'KidsClothing',
-      'Avocado',
-
-      'FashionBlogA',
-      'FashionShop',
-      'LifestyleBlogA',
-      'LifestyleBlogB',
       'NewspaperTraditional',
       'ClearNews',
-      'IndustryConference',
+      'DogFood',
+      'KidsClothing',
+      'RockBand',
+      'WineCity',
+      'Fitness',
+      'Motor',
+      'Avocado',
       'BookStoreWithCoupon',
       'FlowersWithCoupon',
+      'NewsletterBlank1Column',
+      'NewsletterBlank12Column',
+      'NewsletterBlank121Column',
+      'NewsletterBlank13Column',
+      'SimpleText',
+      'TakeAHike',
+      'NewsDay',
+      'WorldCup',
+      'FestivalEvent',
+      'RetroComputingMagazine',
+      'Shoes',
+      'Music',
+      'Hotels',
+      'PieceOfCake',
+      'BuddhistTemple',
+      'Mosque',
+      'Synagogue',
+      'Faith',
+      'College',
+      'RenewableEnergy',
+      'PrimarySchool',
+      'ComputerRepair',
+      'YogaStudio',
+      'Retro',
+      'Charity',
+      'CityLocalNews',
+      'Coffee',
+      'Vlogger',
+      'Birds',
+      'Engineering',
+      'BrandingAgencyNews',
+      'WordPressTheme',
+      'Drone',
+      'FashionBlog',
+      'FashionStore',
+      'FashionBlogA',
+      'Photography',
+      'JazzClub',
+      'Guitarist',
+      'HealthyFoodBlog',
+      'Software',
+      'LifestyleBlogA',
+      'FashionShop',
+      'LifestyleBlogB',
+      'Painter',
+      'FarmersMarket',
     );
   }
 
@@ -116,6 +126,7 @@ class Populator {
     $this->createDefaultSegments();
     $this->createDefaultForm();
     $this->createDefaultSettings();
+    $this->createDefaultUsersFlags();
     $this->createMailPoetPage();
     $this->createSourceForSubscribers();
     $this->updateNewsletterCategories();
@@ -221,6 +232,35 @@ class Populator {
 
     // reset mailer log
     MailerLog::resetMailerLog();
+  }
+
+  private function createDefaultUsersFlags() {
+    $last_announcement_seen = $this->settings->fetch('last_announcement_seen');
+    if (!empty($last_announcement_seen)) {
+      foreach ($last_announcement_seen as $user_id => $value) {
+        UserFlag::createOrUpdate([
+          'user_id' => $user_id,
+          'name' => 'last_announcement_seen',
+          'value' => $value,
+        ]);
+      }
+      $this->settings->delete('last_announcement_seen');
+    }
+
+    $prefix = 'user_seen_editor_tutorial';
+    $prefix_length = strlen($prefix);
+    $users_seen_editor_tutorial = Setting::whereLike('name', $prefix . '%')->findMany();
+    if (!empty($users_seen_editor_tutorial)) {
+      foreach ($users_seen_editor_tutorial as $setting) {
+        $user_id = substr($setting->name, $prefix_length);
+        UserFlag::createOrUpdate([
+          'user_id' => $user_id,
+          'name' => 'editor_tutorial_seen',
+          'value' => $setting->value,
+        ]);
+      }
+      Setting::whereLike('name', $prefix . '%')->deleteMany();
+    }
   }
 
   private function createDefaultSegments() {

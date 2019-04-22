@@ -108,12 +108,13 @@ class Pages {
   }
 
   function unsubscribe() {
-    if ($this->subscriber !== false) {
-      if ($this->subscriber->status !== Subscriber::STATUS_UNSUBSCRIBED) {
-        $this->subscriber->status = Subscriber::STATUS_UNSUBSCRIBED;
-        $this->subscriber->save();
-        SubscriberSegment::unsubscribeFromSegments($this->subscriber);
-      }
+    if (!$this->isPreview()
+      && ($this->subscriber !== false)
+      && ($this->subscriber->status !== Subscriber::STATUS_UNSUBSCRIBED)
+    ) {
+      $this->subscriber->status = Subscriber::STATUS_UNSUBSCRIBED;
+      $this->subscriber->save();
+      SubscriberSegment::unsubscribeFromSegments($this->subscriber);
     }
   }
 
@@ -379,7 +380,7 @@ class Pages {
       ' value="mailpoet_subscription_update" />';
     $form_html .= '<input type="hidden" name="data[segments]" value="" />';
     $form_html .= '<input type="hidden" name="mailpoet_redirect" '.
-      'value="'.UrlHelper::getCurrentUrl().'" />';
+      'value="' . htmlspecialchars(UrlHelper::getCurrentUrl(), ENT_QUOTES) . '" />';
     $form_html .= '<input type="hidden" name="data[email]" value="'.
       $subscriber->email.
     '" />';
@@ -388,7 +389,7 @@ class Pages {
     '" />';
 
     $form_html .= '<p class="mailpoet_paragraph">';
-    $form_html .= '<label>Email *<br /><strong>'.$subscriber->email.'</strong></label>';
+    $form_html .= '<label>'.__('Email', 'mailpoet').' *<br /><strong>' . htmlspecialchars($subscriber->email) . '</strong></label>';
     $form_html .= '<br /><span style="font-size:85%;">';
     // special case for WP users as they cannot edit their subscriber's email
     if ($subscriber->isWPUser() || $subscriber->isWooCommerceUser()) {
@@ -435,7 +436,7 @@ class Pages {
     // get label or display default label
     $text = (
       isset($params['text'])
-      ? $params['text']
+      ? htmlspecialchars($params['text'])
       : WPFunctions::get()->__('Manage your subscription', 'mailpoet')
     );
 

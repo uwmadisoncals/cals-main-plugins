@@ -25,12 +25,14 @@ class Gutenberg extends \WPGMZA\Factory
 		));
 		
 		if(function_exists('register_block_type'))
+		{
 			register_block_type('gutenberg-wpgmza/block', array(
 				'render_callback' => array(
 					$this,
 					'onRender'
 				)
 			));
+		}
 	}
 	
 	/**
@@ -88,6 +90,15 @@ class Gutenberg extends \WPGMZA\Factory
 	{
 		extract($attr);
 		
-		return '[wpgmza id="1"]';
+		$attributes = array_merge(array('id' => 1), $attr);
+		
+		$str = "[wpgmza";
+		
+		foreach($attributes as $name => $value)
+			$str .= " $name=\"" . addslashes($value) . "\"";
+		
+		$str .= "]";
+		
+		return $str;
 	}
 }

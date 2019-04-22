@@ -15,14 +15,16 @@
         if(isset($up['host']) && $up['host'] != $_SERVER['SERVER_NAME']) $reg_redirect = home_url('/');
 
         $reg_redirect = esc_attr(esc_url($reg_redirect));
-        if(!is_array($params)) $params = array();
+
+        $tmp_reg_info = \WPDM\Session::get('tmp_reg_info');
+
         if(!isset($params['logo'])) $params['logo'] = get_site_icon_url();
 
         if(get_option('users_can_register')){
             ?>
             <?php if(isset($params['logo']) && $params['logo'] != '' && !isset($nologo)){ ?>
             <div class="text-center wpdmlogin-logo">
-                <img src="<?php echo $params['logo'];?>" />
+                <a href="<?php echo home_url('/'); ?>"><img alt="Logo" src="<?php echo $params['logo'];?>" /></a>
             </div>
         <?php } ?>
             <form method="post" action="" id="registerform" name="registerform" class="login-form">
@@ -43,28 +45,28 @@
                         <div class="col-sm-7">
                             <div class="input-group input-group-lg">
                                 <span class="input-group-addon" ><i class="fa fa-male"></i></span>
-                                <input class="form-control input-lg" required="required" placeholder="<?php _e( "First Name" , "download-manager" ); ?>" type="text" size="20" id="first_name" value="<?php echo isset($_SESSION['tmp_reg_info']['first_name'])?$_SESSION['tmp_reg_info']['first_name']:''; ?>" name="wpdm_reg[first_name]">
+                                <input class="form-control input-lg" required="required" placeholder="<?php _e( "First Name" , "download-manager" ); ?>" type="text" size="20" id="first_name" value="<?php echo isset($tmp_reg_info['first_name'])?$tmp_reg_info['first_name']:''; ?>" name="wpdm_reg[first_name]">
                             </div>
                         </div>
                         <div class="col-sm-5" style="padding-left: 0">
-                            <input class="form-control input-lg" required="required" placeholder="<?php _e( "Last Name" , "download-manager" ); ?>" type="text" size="20" id="last_name" value="<?php echo isset($_SESSION['tmp_reg_info']['last_name'])?$_SESSION['tmp_reg_info']['last_name']:''; ?>" name="wpdm_reg[last_name]">
+                            <input class="form-control input-lg" required="required" placeholder="<?php _e( "Last Name" , "download-manager" ); ?>" type="text" size="20" id="last_name" value="<?php echo isset($tmp_reg_info['last_name'])?$tmp_reg_info['last_name']:''; ?>" name="wpdm_reg[last_name]">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="input-group input-group-lg">
                             <span class="input-group-addon" ><i class="fa fa-user"></i></span>
-                            <input class="form-control" required="required" placeholder="<?php _e( "Username" , "download-manager" ); ?>" type="text" size="20" class="required" id="user_login" value="<?php echo isset($_SESSION['tmp_reg_info']['user_login'])?$_SESSION['tmp_reg_info']['user_login']:''; ?>" name="wpdm_reg[user_login]">
+                            <input class="form-control" required="required" placeholder="<?php _e( "Username" , "download-manager" ); ?>" type="text" size="20" class="required" id="user_login" value="<?php echo isset($tmp_reg_info['user_login'])?$tmp_reg_info['user_login']:''; ?>" name="wpdm_reg[user_login]">
                         </div>
                     </div>
                     <div class="form-group">
 
                         <div class="input-group input-group-lg">
                             <span class="input-group-addon" ><i class="fa fa-envelope"></i></span>
-                            <input class="form-control input-lg" required="required" type="email" size="25" placeholder="<?php _e( "E-mail" , "download-manager" ); ?>" id="user_email" value="<?php echo isset($_SESSION['tmp_reg_info']['user_email'])?$_SESSION['tmp_reg_info']['user_email']:''; ?>" name="wpdm_reg[user_email]">
+                            <input class="form-control input-lg" required="required" type="email" size="25" placeholder="<?php _e( "E-mail" , "download-manager" ); ?>" id="user_email" value="<?php echo isset($tmp_reg_info['user_email'])?$tmp_reg_info['user_email']:''; ?>" name="wpdm_reg[user_email]">
                         </div>
-                        <!-- div class="human">
+                        <div class="human">
                             <input type="text" placeholder="Retype Email" name="user_email_confirm" id="user_email_confirm" class="form-control input-lg">
-                        </div -->
+                        </div>
 
                     </div>
 
@@ -119,11 +121,10 @@
                         </div>
                     <?php } ?>
 
-
                     <?php if($loginurl != ''){ ?>
                         <div class="col-sm-12">
                             <br/>
-                            <a href="<?php echo $loginurl;?>" class="btn btn-link btn-xs btn-block wpdm-login-link color-green" id="registerform-login" name="wp-submit"><?php _e("Already have an account?", "download-manager"); ?> <i class="fa fa-lock"></i> <?php _e( "Login" , "download-manager" ); ?></a>
+                            <a href="<?php echo $loginurl;?>" class="btn btn-link btn-xs btn-block wpdm-login-link color-success" id="registerform-login" name="wp-submit"><?php _e("Already have an account?", "download-manager"); ?> <i class="fa fa-lock"></i> <?php _e( "Login" , "download-manager" ); ?></a>
                         </div>
                     <?php } ?>
                 </div>

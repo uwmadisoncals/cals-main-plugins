@@ -19,6 +19,11 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
      * Subject UID: USER
      */
     const UID = 'user';
+
+    /**
+     * User status is BLOCKED
+     */
+    const STATUS_BLOCKED = 1;
     
     /**
      * AAM Capability Key
@@ -26,6 +31,8 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
      * It is very important to have all user capability changes be stored in
      * separate options from the wp_capabilities usermeta cause if AAM is not
      * active as a plugin, it reverts back to the default WordPress settings
+     * 
+     * @todo Remove in June 2020
      */
     const AAM_CAPKEY = 'aam_capability';
     
@@ -55,6 +62,15 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
      * @access protected 
      */
     protected $maxLevel = null;
+
+    /**
+     * Current user status
+     *
+     * @var array
+     * 
+     * @access protected
+     */
+    protected $status = null;
     
     /**
      * Constructor
@@ -140,7 +156,9 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
         // prepare the list of capabilities that should still be assigned to user
         $keepCaps = array();
         foreach($roles as $role) {
-            $keepCaps = array_merge($keepCaps, $allRoles->get_role($role)->capabilities);
+            if ($allRoles->is_role($role)) {
+                $keepCaps = array_merge($keepCaps, $allRoles->get_role($role)->capabilities);
+            }
         }
 
         foreach(array_keys($removeCaps) as $key) {
@@ -176,20 +194,103 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
     }
     
     /**
+     * Get current user's status
      * 
+     * @return array
+     * 
+     * @access public
      */
-    public function validateUserStatus() {
-        //check if user is blocked
-        if ($this->user_status === 1) {
-            wp_logout();
-        }
+    public function getUserStatus() {
+        if (is_null($this->status)) {
+            $this->status = (object) array('status' => 'active');
+            $steps  = array(
+                'UserRecordStatus', // Check if user's record states that it is blocked
+                'UserExpiration', // Check if user's account is expired
+                'RoleExpiration', // Legacy: Check if user's role is expired
+                'UserTtl' // Check if user's session ttl is expired
+            );
             
-        //check if user is expired
+            foreach($steps as $step) {
+                $result = call_user_func(array($this, "check{$step}"));
+                if ($result !== true) {
+                    $this->status = (object) $result;
+                    break;
+                }
+            }
+        }
+
+        return $this->status;
+    }
+
+    /**
+     * Restrain user account based on status
+     *
+     * @param object $status
+     * 
+     * @return void
+     * @see    AAM_Core_Subject_User::getUserStatus
+     * 
+     * @access public
+     */
+    public function restrainUserAccount($status) {
+        switch($status->action) {
+            case 'lock':
+                $this->block();
+                break;
+            
+            case 'change-role':
+                $this->set_role(''); // First reset all roles
+                foreach((array)$status->meta as $role) {
+                    $this->add_role($role);
+                }
+                break;
+
+            case 'delete':
+                require_once(ABSPATH . 'wp-admin/includes/user.php' );
+                $reasign = AAM_Core_Config::get('core.reasign.ownership.user');
+                wp_delete_user($this->getId(), $reasign);
+                // Finally logout user
+
+            default:
+                wp_logout();
+                break;
+        }
+        
+        // Delete `aam_user_expiration`
+        delete_user_meta($this->getId(), 'aam_user_expiration');
+    }
+
+    /**
+     * Check if user status is blocked
+     *
+     * @return array|bool
+     * 
+     * @access protected
+     */
+    protected function checkUserRecordStatus() {
+        if (intval($this->user_status) === self::STATUS_BLOCKED) {
+            $status = array('status' => 'inactive', 'action' => 'logout');
+        } else {
+            $status = true;
+        }
+
+        return $status;
+    }
+
+    /**
+     * Check if user account is expired
+     *
+     * @return array|bool
+     * 
+     * @access protected
+     */
+    protected function checkUserExpiration() {
+        $status = true;
+
         $expired = get_user_meta($this->ID, 'aam_user_expiration', true);
         if (!empty($expired)) {
             $parts = explode('|', $expired);
             
-            // Set time
             // TODO: Remove in Jan 2020
             if (preg_match('/^[\d]{4}-/', $parts[0])) {
                 $expires = DateTime::createFromFormat('Y-m-d H:i:s', $parts[0]);
@@ -197,27 +298,67 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
                 $expires = DateTime::createFromFormat('m/d/Y, H:i O', $parts[0]);
             }
             
-            $compare = new DateTime();
-            //TODO - PHP Warning:  DateTime::setTimezone(): Can only do this for zones with ID for now in
-            @$compare->setTimezone($expires->getTimezone());
-            
-            if ($expires->getTimestamp() <= $compare->getTimestamp()) {
-                $this->triggerExpiredUserAction($parts);
+            if ($expires) {
+                $compare = new DateTime();
+                //TODO - PHP Warning:  DateTime::setTimezone(): Can only do this for zones with ID for now in
+                @$compare->setTimezone($expires->getTimezone());
+                
+                if ($expires->getTimestamp() <= $compare->getTimestamp()) {
+                    $status = array(
+                        'status' => 'inactive', 
+                        'action' => $parts[1],
+                        'meta'   => (isset($parts[2]) ? $parts[2] : null)
+                    );
+                }
             }
         }
 
-        //check if user's role expired
-        $roleExpire = get_user_option('aam-role-expires', $this->ID);
+        return $status;
+    }
+
+    /**
+     * Check if role is expired
+     *
+     * @return array|bool
+     * 
+     * @access protected
+     * @todo Remove in April 2020
+     */
+    protected function checkRoleExpiration() {
+        $status = true;
+
+        $roleExpire = get_user_option('aam-role-expires', $this->getId());
         if ($roleExpire && ($roleExpire <= time())) {
-            $this->restoreRoles();
-        }
+            $roles = get_user_option('aam-original-roles');
+
+            $status = array(
+                'status' => 'inactive', 
+                'action' => 'change-role',
+                'meta'   => ($roles ? $roles : 'subscriber')
+            );
         
-        //finally check if session tracking is enabled and if so, check if used
-        //has to be logged out
+            //delete options
+            delete_user_option($this->getId(), 'aam-role-expires');
+            delete_user_option($this->getId(), 'aam-original-roles');
+        }
+
+        return $status;
+    }
+
+    /**
+     * Check user TTL
+     *
+     * @return array|bool
+     * 
+     * @access protected
+     */
+    protected function checkUserTtl() {
+        $status = true;
+
         if (AAM::api()->getConfig('core.session.tracking', false)) {
             $ttl = AAM::api()->getConfig(
-                    "core.session.user.{$this->ID}.ttl",
-                    AAM::api()->getConfig("core.session.user.ttl", null)
+                "core.session.user.{$this->ID}.ttl",
+                AAM::api()->getConfig("core.session.user.ttl", null)
             );
 
             if (!empty($ttl)) {
@@ -227,51 +368,14 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
                 
                 if ($timestamp && ($timestamp + intval($ttl) <= time())) {
                     delete_user_meta($this->ID, 'aam-authenticated-timestamp');
-                    wp_logout();
+                    $status = array('status' => 'inactive', 'action' => 'logout');
                 }
             }
         }
-    }
-    
-    /**
-     * Expire user
-     * 
-     * @param array $config
-     * 
-     * @return void
-     * 
-     * @access 
-     */
-    public function triggerExpiredUserAction($config) {
-        switch($config[1]) {
-            case 'lock':
-                $this->block();
-                break;
-            
-            case 'logout':
-                wp_logout();
-                break;
-            
-            case 'change-role':
-                if (AAM_Core_API::getRoles()->is_role($config[2])) {
-                    $this->getSubject()->set_role($config[2]);
-                    delete_user_option($this->getSubject()->ID, 'aam_user_expiration');
-                }
-                break;
 
-            case 'delete':
-                require_once(ABSPATH . 'wp-admin/includes/user.php' );
-                wp_delete_user(
-                    $this->getId(), AAM_Core_Config::get('core.reasign.ownership.user')
-                );
-                wp_logout();
-                break;
-
-            default:
-                break;
-        }
+        return $status;
     }
-    
+
     /**
      * Block User
      *
@@ -285,9 +389,9 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
 
         $status = ($this->getSubject()->user_status ? 0 : 1);
         $result = $wpdb->update(
-                $wpdb->users, 
-                array('user_status' => $status), 
-                array('ID' => $this->getId())
+            $wpdb->users, 
+            array('user_status' => $status), 
+            array('ID' => $this->getId())
         );
         
         if ($result) {
@@ -296,27 +400,6 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
         }
 
         return $result;
-    }
-    
-    /**
-     * 
-     */
-    public function restoreRoles() {
-        $roles = get_user_option('aam-original-roles');
-        
-        //remove curren roles
-        foreach((array) $this->roles as $role) {
-            $this->remove_role($role);
-        }
-        
-        //add original roles
-        foreach(($roles ? $roles : array('subscriber')) as $role) {
-            $this->add_role($role);
-        }
-            
-        //delete options
-        delete_user_option($this->getId(), 'aam-role-expires');
-        delete_user_option($this->getId(), 'aam-original-roles');
     }
     
     /**
@@ -344,7 +427,16 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
      * @access public
      */
     public function getCapabilities() {
-        return $this->getSubject()->allcaps;
+        $caps  = $this->getSubject()->caps;
+        $roles = AAM_Core_API::getRoles();
+
+        foreach($caps as $cap => $effect) {
+            if ($roles->is_role($cap)) {
+                unset($caps[$cap]);
+            }
+        }
+
+        return $caps;
     }
 
     /**
@@ -370,7 +462,9 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
      * @access public
      */
     public function addCapability($capability) {
-        return $this->updateCapability($capability, true);
+        $this->getSubject()->add_cap($capability);
+
+        return true;
     }
 
     /**
@@ -383,26 +477,9 @@ class AAM_Core_Subject_User extends AAM_Core_Subject {
      * @access public
      */
     public function removeCapability($capability) {
-        return $this->updateCapability($capability, false);
-    }
+        $this->getSubject()->remove_cap($capability);
 
-    /**
-     * Update User's Capability Set
-     *
-     * @param string  $capability
-     * @param boolean $grand
-     *
-     * @return boolean
-     *
-     * @access public
-     */
-    public function updateCapability($capability, $grand) {
-        //update capability
-        $caps = $this->getSubject()->caps;
-        $caps[$capability] = $grand;
-        
-        //save and return the result of operation
-        return update_user_option($this->getId(), self::AAM_CAPKEY, $caps);
+        return true;
     }
 
     /**

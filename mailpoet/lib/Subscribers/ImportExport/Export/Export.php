@@ -45,12 +45,21 @@ class Export {
       $this->subscriber_fields,
       $this->subscriber_custom_fields
     );
-    $this->export_path = Env::$temp_path;
+    $this->export_path = self::getExportPath();
     $this->export_file = $this->getExportFile($this->export_format_option);
     $this->export_file_URL = $this->getExportFileURL($this->export_file);
   }
 
+  static function getFilePrefix() {
+    return 'MailPoet_export_';
+  }
+
+  static function getExportPath() {
+    return Env::$temp_path;
+  }
+
   function process() {
+    $processed_subscribers = 0;
     $this->default_subscribers_getter->reset();
     try {
       if (is_writable($this->export_path) === false) {
@@ -59,12 +68,13 @@ class Export {
       if (!extension_loaded('zip')) {
         throw new \Exception(__('Export requires a ZIP extension to be installed on the host.', 'mailpoet'));
       }
-      $processed_subscribers = call_user_func(
-        array(
-          $this,
-          'generate' . strtoupper($this->export_format_option)
-        )
-      );
+      $callback = [
+        $this,
+        'generate' . strtoupper($this->export_format_option)
+      ];
+      if (is_callable($callback)) {
+        $processed_subscribers = call_user_func($callback);
+      }
     } catch (\Exception $e) {
       throw new \Exception($e->getMessage());
     }
@@ -183,7 +193,7 @@ class Export {
 
   function getExportFile($format) {
     return sprintf(
-      $this->export_path . '/MailPoet_export_%s.%s',
+      $this->export_path . '/' . self::getFilePrefix() . '%s.%s',
       Security::generateRandomString(15),
       $format
     );

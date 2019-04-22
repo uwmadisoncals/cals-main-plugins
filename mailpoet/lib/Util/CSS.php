@@ -1,6 +1,10 @@
 <?php
 namespace MailPoet\Util;
+
 use csstidy;
+use MailPoet\Util\pQuery\DomNode;
+use MailPoet\Util\pQuery\pQuery;
+use MailPoet\Newsletter\Renderer\EscapeHelper as EHelper;
 
 /*
   Copyright 2013-2014, François-Marie de Jouvencel
@@ -28,15 +32,15 @@ use csstidy;
 */
 
 class CSS {
-  /*
-  * The core of the algorithm, takes a URL and returns the HTML found there with the CSS inlined.
-  * If you pass $contents then the original HTML is not downloaded and $contents is used instead.
-  * $url is mandatory as it is used to resolve the links to the stylesheets found in the HTML.
-  */
-  function inlineCSS($url, $contents=null) {
-    $html = \pQuery::parseStr($contents);
-    if (!is_object($html)) {
-      return false;
+  /**
+   * @param string $contents
+   * @return DomNode
+   */
+  function inlineCSS($contents) {
+    $html = pQuery::parseStr($contents);
+
+    if (!$html instanceof DomNode) {
+      throw new \InvalidArgumentException('Error parsing contents.');
     }
 
     $css_blocks = '';
@@ -122,7 +126,6 @@ class CSS {
       }
     }
 
-    // Let simple_html_dom give us back our HTML with inline CSS!
     return $html;
   }
 
@@ -256,6 +259,7 @@ class CSS {
   * into an array of properties (like: array("border" => "1px solid black", "color" => "red"))
   */
   private function styleToArray($str) {
+    $str = EHelper::unescapeHtmlStyleAttr($str);
     $array = array();
 
     if (trim($str) === '') return $array;
@@ -264,7 +268,6 @@ class CSS {
       if ($kv === '') {
         continue;
       }
-
       list($selector, $rule) = explode(':', $kv, 2);
       $array[trim($selector)] = trim($rule);
     }
@@ -281,6 +284,6 @@ class CSS {
     foreach ($array as $k => $v) {
       $parts[] = "$k:$v";
     }
-    return implode(';', $parts);
+    return EHelper::escapeHtmlStyleAttr(implode(';', $parts));
   }
 }

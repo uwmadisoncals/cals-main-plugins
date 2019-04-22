@@ -2,8 +2,8 @@
 Contributors: uchu, calvinyeh, raquelleira, renatotbueno, domanb, elirenato, hubrik, vtowel, yani.iliev, nicolapeluchetti, jbutkus, lpawlik, bangelov
 Tags: calendar, event, ical, feed, ics, icalendar, sync, aggregator, google, venue, calendar widget, events widget
 Requires at least: 3.5
-Tested up to: 5.1
-Stable tag: 2.5.37
+Tested up to: 5.1.1
+Stable tag: 2.5.38
 Requires PHP: 5.4
 License: GNU General Public License, version 3 (GPL-3.0)
 
@@ -123,6 +123,9 @@ You can help translate by going to [https://translate.time.ly](https://translate
 **[ai1ec exact_date="5-10-2017"]**
 
 == Changelog ==
+
+= Version 2.5.38 =
+* Fixed: Invalid file location for the current theme options would throw HTTP 500 error on specific server environments.
 
 = Version 2.5.37 =
 * Fixed: Exporting as XML wasn't working as expected.

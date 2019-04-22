@@ -4,7 +4,7 @@ Tags: file-manager, wp-filemanager, wp file manager, file manager, elfinder, wp-
 Requires at least: 4.0
 Tested up to: 5.1
 Requires PHP: 5.0.0
-Stable tag:2.6
+Stable tag: 2.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ File manager is a tool for wordpress provides you ability to Edit, Delete, Uploa
 
 == Description ==
 
-File Manager is a tool for files management in wordpress. Edit, Delete, upload, delete, download, zip, copy etc multiple operations, No need of any cpanel and FTP. You can access files inside and outside wordpress root directory.
+ Edit, Delete, upload, delete, download, zip, copy etc multiple file operations, No need of any cpanel and FTP. You can access files inside and outside wordpress root directory.
 
 
 
@@ -109,6 +109,10 @@ Yes you can, go to settings, change root path.
 11. Multiple Languages for File Manager
 
 == Changelog ==
+
+= 2.7 (24th Mar, 2019) =
+
+* Minor Fixes
 
 = 2.6 (21st Feb, 2019) =
 

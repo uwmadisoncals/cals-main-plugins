@@ -554,9 +554,7 @@ class A_Stylesheet_Ajax_Actions extends Mixin
      */
     function _authorized_for_stylesheet_action()
     {
-        $security = $this->get_registry()->get_utility('I_Security_Manager');
-        $sec_actor = $security->get_current_actor();
-        return $sec_actor->is_allowed('nextgen_edit_style');
+        return M_Security::is_allowed('nextgen_edit_style');
     }
 }
 /**
@@ -603,24 +601,18 @@ class A_Watermarking_Ajax_Actions extends Mixin
      */
     function get_watermark_preview_url_action()
     {
-        $security = $this->get_registry()->get_utility('I_Security_Manager');
-        $sec_actor = $security->get_current_actor();
-        if ($sec_actor->is_allowed('nextgen_edit_settings')) {
+        if (M_Security::is_allowed('nextgen_edit_settings')) {
             $settings = C_NextGen_Settings::get_instance();
             $imagegen = C_Dynamic_Thumbnails_Manager::get_instance();
             $mapper = C_Image_Mapper::get_instance();
             $image = $mapper->find_first();
             $storage = C_Gallery_Storage::get_instance();
-            $sizeinfo = array('quality' => 100, 'height' => 250, 'crop' => FALSE, 'watermark' => TRUE);
+            $watermark_options = $this->param('watermark_options');
+            $sizeinfo = array('quality' => 100, 'height' => 250, 'crop' => false, 'watermark' => true, 'wmFont' => trim(esc_sql($watermark_options['wmFont'])), 'wmType' => trim(esc_sql($watermark_options['wmType'])), 'wmPos' => trim(esc_sql($watermark_options['wmPos'])), 'wmXpos' => intval(trim($watermark_options['wmXpos'])), 'wmYpos' => intval(trim($watermark_options['wmYpos'])), 'wmPath' => trim(esc_sql($watermark_options['wmPath'])), 'wmText' => trim(esc_sql($watermark_options['wmText'])), 'wmOpaque' => intval(trim($watermark_options['wmOpaque'])), 'wmFont' => trim(esc_sql($watermark_options['wmFont'])), 'wmSize' => intval(trim($watermark_options['wmSize'])), 'wmColor' => trim(esc_sql($watermark_options['wmColor'])));
             $size = $imagegen->get_size_name($sizeinfo);
+            $storage->generate_image_size($image, $size, $sizeinfo);
+            $storage->flush_image_path_cache($image, $size);
             $thumbnail_url = $storage->get_image_url($image, $size);
-            // Temporarily update the watermark options. Generate a new image based on these settings
-            if ($watermark_options = $this->param('watermark_options')) {
-                $settings->set('wmFont', trim($watermark_options['wmFont']));
-                $storage->generate_image_size($image, $size);
-                $thumbnail_url = $storage->get_image_url($image, $size);
-                $settings->load();
-            }
             return array('thumbnail_url' => $thumbnail_url);
         } else {
             return array('thumbnail_url' => '', 'error' => 'You are not allowed to perform this operation');
@@ -712,7 +704,14 @@ class A_Watermarks_Form extends Mixin
         $storage = C_Gallery_Storage::get_instance();
         $image = C_Image_Mapper::get_instance()->find_first();
         $imagegen = C_Dynamic_Thumbnails_Manager::get_instance();
-        $size = $imagegen->get_size_name(array('height' => 250, 'crop' => FALSE, 'watermark' => TRUE));
+        $settings = C_NextGen_Settings::get_instance();
+        $watermark_setting_keys = array('wmFont', 'wmType', 'wmPos', 'wmXpos', 'wmYpos', 'wmPath', 'wmText', 'wmOpaque', 'wmFont', 'wmSize', 'wmColor');
+        $watermark_options = array();
+        foreach ($watermark_setting_keys as $watermark_setting_key) {
+            $watermark_options[$watermark_setting_key] = $settings->get($watermark_setting_key);
+        }
+        $sizeinfo = array('quality' => 100, 'height' => 250, 'crop' => false, 'watermark' => true, 'wmFont' => trim(esc_sql($watermark_options['wmFont'])), 'wmType' => trim(esc_sql($watermark_options['wmType'])), 'wmPos' => trim(esc_sql($watermark_options['wmPos'])), 'wmXpos' => trim(intval($watermark_options['wmXpos'])), 'wmYpos' => trim(intval($watermark_options['wmYpos'])), 'wmPath' => trim(esc_sql($watermark_options['wmPath'])), 'wmText' => trim(esc_sql($watermark_options['wmText'])), 'wmOpaque' => intval(trim($watermark_options['wmOpaque'])), 'wmFont' => trim(esc_sql($watermark_options['wmFont'])), 'wmSize' => trim(intval($watermark_options['wmSize'])), 'wmColor' => trim(esc_sql($watermark_options['wmColor'])));
+        $size = $imagegen->get_size_name($sizeinfo);
         $url = $image ? $storage->get_image_url($image, $size) : NULL;
         $abspath = $image ? $storage->get_image_abspath($image, $size) : NULL;
         return array('url' => $url, 'abspath' => $abspath);

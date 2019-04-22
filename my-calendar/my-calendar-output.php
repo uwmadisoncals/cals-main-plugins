@@ -34,6 +34,17 @@ function mc_get_template( $template ) {
 }
 
 /**
+ * Get the date format for My Calendar primary views.
+ *
+ * @return string
+ */
+function mc_date_format() {
+	$date_format = ( '' == get_option( 'mc_date_format' ) ) ? get_option( 'date_format' ) : get_option( 'mc_date_format' );
+
+	return $date_format;
+}
+
+/**
  * HTML output for event time
  *
  * @param object $e Current event.
@@ -42,8 +53,8 @@ function mc_get_template( $template ) {
  * @return string HTML output.
  */
 function mc_time_html( $e, $type ) {
-	$orig_format = get_option( 'mc_date_format' );
-	$date_format = ( '' != $orig_format ) ? $orig_format : get_option( 'date_format' );
+	$date_format = mc_date_format();
+	$orig_format = $date_format;
 	$time_format = get_option( 'mc_time_format' );
 	$start       = date( 'Y-m-d', strtotime( $e->occur_begin ) );
 	$end         = date( 'Y-m-d', strtotime( $e->occur_end ) );
@@ -69,7 +80,7 @@ function mc_time_html( $e, $type ) {
 		$time_content .= "\n
 		<span class='event-time dtstart'>
 			<time class='value-title' datetime='" . $start . 'T' . $e->event_time . "' title='" . $start . 'T' . $e->event_time . "'>" .
-				date_i18n( $time_format, strtotime( $e->event_time ) ) . '
+				date_i18n( $time_format, strtotime( $e->occur_begin ) ) . '
 			</time>
 		</span>';
 		if ( 0 == $e->event_hide_end ) {
@@ -77,7 +88,7 @@ function mc_time_html( $e, $type ) {
 				$time_content .= "
 					<span class='time-separator'> &ndash; </span>$final
 					<span class='end-time dtend'>
-						<time class='value-title' datetime='" . $end . 'T' . $e->event_endtime . "' title='" . $end . 'T' . $e->event_endtime . "'>" . date_i18n( $time_format, strtotime( $e->event_endtime ) ) . '
+						<time class='value-title' datetime='" . $end . 'T' . $e->event_endtime . "' title='" . $end . 'T' . $e->event_endtime . "'>" . date_i18n( $time_format, strtotime( $e->occur_end ) ) . '
 						</time>
 					</span>';
 			}
@@ -297,9 +308,14 @@ function my_calendar_draw_event( $event, $type = 'calendar', $process_date, $tim
 	}
 
 	$event_title = mc_draw_template( $data, $title_template );
+	if ( 0 === strpos( $event_title, ': ' ) ) {
+		// If the first two characters of the title are ": ", this is the default templates but no time.
+		$event_title = str_replace( ': ', '', $event_title );
+	}
 	$event_title = ( '' == $event_title ) ? $data['title'] : strip_tags( $event_title, mc_strip_tags() );
+	$no_link     = apply_filters( 'mc_disable_link', false, $data );
 
-	if ( ( strpos( $event_title, 'href' ) === false ) && 'mini' != $type && 'list' != $type ) {
+	if ( ( ( strpos( $event_title, 'href' ) === false ) && 'mini' != $type && 'list' != $type ) && ! $no_link ) {
 		if ( 'true' == $open_uri ) {
 			$details_link = esc_url( mc_get_details_link( $event ) );
 			$wrap         = ( _mc_is_url( $details_link ) ) ? "<a href='$details_link' class='url summary$has_image'>" : '<span class="no-link">';
@@ -543,6 +559,24 @@ function mc_get_event_image( $event, $data ) {
 }
 
 /**
+ * If option to disable link is toggled, disable the link.
+ *
+ * @param boolean $status Default value.
+ * @param array   $event Event details.
+ *
+ * @return boolean
+ */
+function mc_disable_link( $status, $event ) {
+	$option = get_option( 'mc_no_link' );
+	if ( 'true' == $option ) {
+		$status = true;
+	}
+
+	return $status;
+}
+add_filter( 'mc_disable_link', 'mc_disable_link', 10, 2 );
+
+/**
  * Generate classes for a given event
  *
  * @param object $event Event Object.
@@ -635,7 +669,9 @@ function mc_category_class( $object, $prefix ) {
  * @return boolean
  */
 function mc_show_details( $time, $type ) {
-	return ( 'calendar' == $type && 'true' == get_option( 'mc_open_uri' ) && 'day' != $time ) ? false : true;
+	$no_link = apply_filters( 'mc_disable_link', false, array() );
+
+	return ( ( 'calendar' == $type && 'true' == get_option( 'mc_open_uri' ) && 'day' != $time ) || $no_link ) ? false : true;
 }
 
 add_filter( 'mc_after_event', 'mc_edit_panel', 10, 4 );
@@ -1573,7 +1609,7 @@ function my_calendar( $args ) {
 	$grid_js_class = ( 0 == get_option( 'mc_calendar_javascript' ) ) ? 'gridjs' : '';
 	$mini_js_class = ( 0 == get_option( 'mc_mini_javascript' ) ) ? 'minijs' : '';
 	$ajax_js_class = ( 0 == get_option( 'mc_ajax_javascript' ) ) ? 'ajaxjs' : '';
-	$date_format   = ( '' != get_option( 'mc_date_format' ) ) ? get_option( 'mc_date_format' ) : get_option( 'date_format' );
+	$date_format   = mc_date_format();
 	$start_of_week = ( get_option( 'start_of_week' ) == 1 ) ? 1 : 7; // convert start of week to ISO 8601 (Monday/Sunday).
 	$show_weekends = ( get_option( 'mc_show_weekends' ) == 'true' ) ? true : false;
 	$skip_holidays = get_option( 'mc_skip_holidays_category' );

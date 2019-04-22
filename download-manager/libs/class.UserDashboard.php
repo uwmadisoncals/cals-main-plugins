@@ -16,7 +16,7 @@ class UserDashboard
         $this->dashboard_menu[''] = array('name'=> __('Profile','download-manager'), 'callback' => array($this, 'Profile'));
         $this->dashboard_menu['download-history'] = array('name'=> __('Download History','download-manager'), 'callback' => array($this, 'DownloadHistory'));
         $this->dashboard_menu['edit-profile'] = array('name'=> __('Edit Profile','download-manager'), 'callback' => array($this, 'EditProfile'));
-        $this->dashboard_menu['logout'] = array('name'=> __('Logout','download-manager'), 'callback' => array($this, 'Logout'));
+        //$this->dashboard_menu['logout'] = array('name'=> __('Logout','download-manager'), 'callback' => array($this, 'Logout'));
         $this->dashboard_menu = apply_filters("wpdm_user_dashboard_menu", $this->dashboard_menu);
         $this->dashboard_menu_actions = apply_filters("wpdm_dashboard_menu_actions", $this->dashboard_menu_actions);
     }

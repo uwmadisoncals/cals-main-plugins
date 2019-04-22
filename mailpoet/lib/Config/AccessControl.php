@@ -13,6 +13,7 @@ class AccessControl {
   const PERMISSION_MANAGE_FORMS = 'mailpoet_manage_forms';
   const PERMISSION_MANAGE_SEGMENTS = 'mailpoet_manage_segments';
   const NO_ACCESS_RESTRICTION = 'mailpoet_no_access_restriction';
+  const ALL_ROLES_ACCESS = 'mailpoet_all_roles_access';
 
   function getDefaultPermissions() {
     return array(
@@ -70,6 +71,15 @@ class AccessControl {
 
   function validatePermission($permission) {
     if ($permission === self::NO_ACCESS_RESTRICTION) return true;
+    if ($permission === self::ALL_ROLES_ACCESS) {
+      $capabilities = array_keys($this->getDefaultPermissions());
+      foreach ($capabilities as $capability) {
+        if (WPFunctions::get()->currentUserCan($capability)) {
+          return true;
+        }
+      }
+      return false;
+    }
     return WPFunctions::get()->currentUserCan($permission);
   }
 }

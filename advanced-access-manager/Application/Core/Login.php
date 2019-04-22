@@ -77,7 +77,7 @@ class AAM_Core_Login {
                 $this->updateLoginCounter(-1);
             }
             
-            // Delete User Switch flag in case admin is inpersonating user
+            // Delete User Switch flag in case admin is impersonating user
             AAM_Core_API::deleteOption('aam-user-switch-' . $user->ID);
             
             // Experimental feature. Track user session
@@ -89,10 +89,6 @@ class AAM_Core_Login {
                 if (!empty($ttl)) {
                     add_user_meta($user->ID, 'aam-authenticated-timestamp', time());
                 }
-            }
-            
-            if (AAM::api()->getConfig('core.settings.setJwtCookieAfterLogin', false)) {
-                AAM_Core_JwtAuth::getInstance()->issueJWT($user->ID, 'cookie');
             }
             
             if ($this->aamLogin === false) {
@@ -252,8 +248,14 @@ class AAM_Core_Login {
         }
 
         if ($attempts >= AAM_Core_Config::get('security.login.attempts', 20)) {
-            wp_safe_redirect(site_url('index.php'));
-            exit;
+            if (AAM_Core_Api_Area::isAPI()) {
+                throw new Exception(
+                    'Exceeded maximum number for authentication attempts. Please try later again.'
+                );
+            } else {
+                wp_safe_redirect(site_url('index.php'));
+                exit;
+            }
         } else {
             set_transient('aam_login_attempts', $attempts, $timeout);
         }
@@ -270,7 +272,7 @@ class AAM_Core_Login {
         $this->aamLogin = true;
         
         if ($set_cookie === false) {
-            add_filter('send_auth_cookies', function() { return false; });
+            add_filter('send_auth_cookies', '__return_false');
         }
         
         $response = array(

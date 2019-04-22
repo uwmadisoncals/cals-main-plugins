@@ -156,6 +156,9 @@ class GDPRCompliance
 	{
 		global $wpgmza;
 		
+		// Dropped in 7.11.*
+		return '';
+		
 		if(!empty($wpgmza->settings->privacy_policy_notice_dismissed))
 			return '';
 		

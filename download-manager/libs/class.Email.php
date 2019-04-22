@@ -32,7 +32,7 @@ class Email {
                     'subject'    => sprintf( __( "Welcome to %s" , "download-manager" ), $sitename ),
                     'from_name'  => get_option( 'blogname' ),
                     'from_email' => $admin_email,
-                    'message'    => '<h3>Welcome to [#sitename#]</h3>Hello [#name#],<br/>Thanks for registering to [#sitename#]. For the record, here is your login info again:<br/>Username: [#username#]<br/><b>Login URL: <a href="[#loginurl#]">[#loginurl#]</a></b><br/><br/>Best Regards,<br/>Support Team<br/><b><a href="[#homeurl#]">[#sitename#]</a></b>'
+                    'message'    => '<h3>Welcome to [#sitename#]</h3>Hello [#first_name#],<br/>Thanks for registering to [#sitename#]. For the record, here is your login info again:<br/>Username: [#username#]<br/>Password: [#password#]<br/><b>Login URL: <a href="[#loginurl#]">[#loginurl#]</a></b><br/><br/>Best Regards,<br/>Support Team<br/><b><a href="[#homeurl#]">[#sitename#]</a></b>'
                 )
             ),
             'password-reset'       => array(
@@ -45,7 +45,16 @@ class Email {
                     'message'    => 'You have requested for your password to be reset.<br/>Please confirm by clicking the button below:  <a href="[#reset_password#]">[#reset_password#]</a><br/>No action required if you did not request it.</b><br/><br/>Best Regards,<br/>Support Team<br/><b><a href="[#homeurl#]">[#sitename#]</a></b>'
                 )
             ),
-
+            'email-lock'           => array(
+                'label'   => __( "Email Lock Notification" , "download-manager" ),
+                'for'     => 'customer',
+                'default' => array(
+                    'subject'    => __( "Download [#package_name#]" , "download-manager" ),
+                    'from_name'  => get_option( 'blogname' ),
+                    'from_email' => $admin_email,
+                    'message'    => 'Thanks for Subscribing to [#sitename#]<br/>Please click on following link to start download:<br/><b><a style="display: block;text-align: center" class="button" href="[#download_url#]">Download</a></b><br/><br/><br/>Best Regards,<br/>Support Team<br/><b>[#sitename#]</b>'
+                )
+            ),
 
         );
 
@@ -58,7 +67,7 @@ class Email {
     public static function info( $id ) {
         $templates = self::templates();
 
-        return isset($templates[ $id ])?$templates[ $id ]:null;
+        return $templates[ $id ];
     }
 
     public static function tags() {
@@ -96,7 +105,7 @@ class Email {
     public static function defaultTemplate( $id ) {
         $templates = self::templates();
 
-        return isset($templates[ $id ])?$templates[ $id ]['default']:null;
+        return $templates[ $id ]['default'];
     }
 
     public static function template( $id ) {
@@ -150,9 +159,18 @@ class Email {
     public static function send( $id, $params ) {
         $email       = self::info( $id );
         $template    = self::prepare( $id, $params );
-        $headers     = "From: " . $template['from_name'] . " <" . $template['from_email'] . ">\r\nContent-type: text/html\r\n";
+        $headers[]     = "From: " . $template['from_name'] . " <" . $template['from_email'] . ">";
+        $headers[]     = "Content-type: text/html";
         $to          = $email['for'] !== 'admin' && !isset($params['to_seller']) ? $params['to_email'] : $template['to_email'];
         $headers     = apply_filters( "wpdm_email_headers_" . str_replace("-", "_", $id), $headers );
+        if(isset($params['cc'])){
+            $headers[] = "CC: {$params['cc']}";
+            unset($params['cc']);
+        }
+        if(isset($params['bcc'])){
+            $headers[] = "Bcc: {$params['bcc']}";
+            unset($params['bcc']);
+        }
         $attachments = apply_filters( "wpdm_email_attachments_" . str_replace("-", "_", $id), array(), $params );
         return wp_mail( $to, $template['subject'], $template['message'], $headers, $attachments );
     }
@@ -185,6 +203,21 @@ class Email {
         echo $template['message'];
         die();
 
+    }
+
+    static public function fetch($template, $message) {
+        global $current_user;
+        if ( ! current_user_can( WPDM_MENU_ACCESS_CAP ) ) {
+            die( 'Error' );
+        }
+
+
+
+        $params['message'] = $message;
+        $params['template_file'] = $template;
+
+        $template = self::prepare( 'default', $params );
+        return $template['message'];
     }
 
 

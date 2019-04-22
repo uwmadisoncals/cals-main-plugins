@@ -25,13 +25,14 @@ final class AAM_Core_Policy_Token {
      * @static 
      */
     protected static $map = array(
-        'USER'          => 'AAM_Core_Policy_Token::getUserValue',
-        'DATETIME'      => 'AAM_Core_Policy_Token::getDateTimeValue',
-        'GET'           => 'AAM_Core_Request::get',
-        'POST'          => 'AAM_Core_Request::post',
-        'COOKIE'        => 'AAM_Core_Request::cookie',
-        'SERVER'        => 'AAM_Core_Request::server',
-        'ARGS'          => 'AAM_Core_Policy_Token::getArgValue'
+        'USER'      => 'AAM_Core_Policy_Token::getUserValue',
+        'USERMETA'  => 'AAM_Core_Policy_Token::getUserMetaValue',
+        'DATETIME'  => 'AAM_Core_Policy_Token::getDateTimeValue',
+        'GET'       => 'AAM_Core_Request::get',
+        'POST'      => 'AAM_Core_Request::post',
+        'COOKIE'    => 'AAM_Core_Request::cookie',
+        'SERVER'    => 'AAM_Core_Request::server',
+        'ARGS'      => 'AAM_Core_Policy_Token::getArgValue'
     );
     
     /**
@@ -75,7 +76,7 @@ final class AAM_Core_Policy_Token {
      */
     protected static function getValue($token, $args) {
         $parts = explode('.', $token);
-        
+
         if (isset(self::$map[$parts[0]])) {
             $value = call_user_func(self::$map[$parts[0]], $parts[1], $args);
         } elseif ($parts[0] === 'CALLBACK' && is_callable($parts[1])) {
@@ -105,12 +106,14 @@ final class AAM_Core_Policy_Token {
                 break;
             
             case 'authenticated':
+            case 'isauthenticated':
                 $value = $user->isVisitor() ? false : true;
                 break;
 
             case 'capabilities':
+            case 'caps':
                 $value = array();
-                foreach($user->allcaps as $cap => $effect) {
+                foreach((array) $user->allcaps as $cap => $effect) {
                     if (!empty($effect)) {
                         $value[] = $cap;
                     }
@@ -122,6 +125,35 @@ final class AAM_Core_Policy_Token {
                 break;
         }
         
+        return $value;
+    }
+
+    /**
+     * Get user meta value(s)
+     *
+     * @param string $metakey
+     * 
+     * @return void
+     * 
+     * @access protected
+     * @static
+     */
+    protected static function getUserMetaValue($metakey) {
+        $value = null;
+        $id    = get_current_user_id();
+
+        if (!empty($id)) { // Only authenticated users have some sort of meta
+            $meta = get_user_meta($id, $metakey);
+
+            // If $meta has only one value in the array, then extract it, otherwise
+            // return the array of values
+            if (count($meta) === 1) {
+                $value = array_shift($meta);
+            } else {
+                $value = array_values($meta);
+            }
+        }
+
         return $value;
     }
     

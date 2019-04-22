@@ -35,7 +35,7 @@ define( 'AI1WM_DEBUG', false );
 // ==================
 // = Plugin Version =
 // ==================
-define( 'AI1WM_VERSION', '6.86' );
+define( 'AI1WM_VERSION', '6.91' );
 
 // ===============
 // = Plugin Name =
@@ -117,6 +117,11 @@ define( 'AI1WM_REPORT_URL', 'https://servmask.com/ai1wm/report/create' );
 // ==============================
 define( 'AI1WM_ARCHIVE_TOOLS_URL', 'https://servmask.com/archive/tools' );
 
+// ===========================
+// = ServMask Activation URL =
+// ===========================
+define( 'AI1WM_ACTIVATION_URL', 'https://servmask.com/purchase/activations' );
+
 // =========================
 // = ServMask Table Prefix =
 // =========================
@@ -166,6 +171,11 @@ define( 'AI1WM_FILEMAP_NAME', 'filemap.list' );
 // = Archive Must-Use Plugins Name =
 // =================================
 define( 'AI1WM_MUPLUGINS_NAME', 'mu-plugins' );
+
+// =============================
+// = Less Cache Extension Name =
+// =============================
+define( 'AI1WM_LESS_CACHE_NAME', '.less.cache' );
 
 // =============================
 // = Endurance Page Cache Name =
@@ -261,6 +271,11 @@ define( 'AI1WM_ACTIVE_TEMPLATE', 'template' );
 // = Active Stylesheet =
 // =====================
 define( 'AI1WM_ACTIVE_STYLESHEET', 'stylesheet' );
+
+// ===================
+// = Backups Labels  =
+// ===================
+define( 'AI1WM_BACKUPS_LABELS', 'ai1wm_backups_labels' );
 
 // ============
 // = Cron Key =

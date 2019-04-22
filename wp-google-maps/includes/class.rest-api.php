@@ -39,8 +39,13 @@ class RestAPI extends Factory
 	 */
 	public function onRestAPIInit()
 	{
-		register_rest_route(RestAPI::NS, '/markers(\/\d+)?/', array(
+		register_rest_route(RestAPI::NS, '/maps(\/\d+)?/', array(
 			'methods'				=> 'GET',
+			'callback'				=> array($this, 'maps')
+		));
+		
+		register_rest_route(RestAPI::NS, '/markers(\/\d+)?/', array(
+			'methods'				=> array('GET'),
 			'callback'				=> array($this, 'markers')
 		));
 		
@@ -56,6 +61,58 @@ class RestAPI extends Factory
 			'methods'				=> array('GET', 'POST'),
 			'callback'				=> array($this, 'datatables')
 		));
+	}
+	
+	public function maps($request)
+	{
+		global $wpdb;
+		global $WPGMZA_TABLE_NAME_MAPS;
+		
+		$route = $request->get_route();
+		
+		switch($_SERVER['REQUEST_METHOD'])
+		{
+			case 'GET':
+				if(preg_match('#/wpgmza/v1/markers/(\d+)#', $route, $m))
+				{
+					$map = Map::createInstance($m[1]);
+					return $map;
+				}
+				
+				$ids = $wpdb->get_col("SELECT id FROM $WPGMZA_TABLE_NAME_MAPS WHERE active=0");
+				
+				$result = array();
+				
+				if(empty($ids))
+					return $result;
+				
+				foreach($ids as $id)
+					$result[] = Map::createInstance($id);
+				
+				return $result;
+				
+				break;
+			
+			default:
+				return new \WP_Error('wpgmza_invalid_request_method', 'Invalid request method');
+				break;
+		}
+	}
+	
+	protected function sanitizeFieldNames($fields, $table)
+	{
+		global $wpdb;
+		
+		$whitelist = $wpdb->get_col("SHOW COLUMNS FROM $table");
+		$result = array();
+		
+		foreach($fields as $name)
+		{
+			if(array_search($name, $whitelist) !== false)
+				$result[] = $name;
+		}
+		
+		return $result;
 	}
 	
 	/**
@@ -86,6 +143,9 @@ class RestAPI extends Factory
 				else if(!empty($_GET['fields']))
 					$fields = $_GET['fields'];
 				
+				if(!empty($fields))
+					$fields = $this->sanitizeFieldNames($fields, $wpgmza_tblname);
+				
 				if(!empty($_GET['filter']))
 				{
 					$filteringParameters = json_decode( stripslashes($_GET['filter']) );
@@ -99,17 +159,15 @@ class RestAPI extends Factory
 				}
 				else if(!empty($fields))
 				{
-					//$placeholders = array_fill(0, count($fields), '%s');
-					//$placeholders = implode(',', $placeholders);
+					$query = new Query();
 					
-					foreach($fields as $key => $value)
-						$fields[$key] = '`' . preg_replace('/[a-z_]/i', '', $value) . '`';
+					$query->type = "SELECT";
+					$query->table = $wpgmza_tblname;
+					$query->fields = $fields;
 					
-					$imploded = implode(',', $fields);
+					$qstr = $query->build();
 					
-					$stmt = $wpdb->prepare("SELECT $imploded FROM $wpgmza_tblname");
-					
-					$results = $wpdb->get_results($stmt);
+					$results = $wpdb->get_results($qstr);
 				}
 				else if(!$fields)
 				{
@@ -134,7 +192,7 @@ class RestAPI extends Factory
 				
 				if(isset($request['id']))
 				{
-					$marker = new Marker($request['id']);
+					$marker = Marker::createInstance($request['id']);
 					$marker->trash();
 				}
 				

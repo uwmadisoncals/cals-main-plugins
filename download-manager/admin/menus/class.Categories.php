@@ -132,7 +132,7 @@ class Categories
         $MetaData = maybe_unserialize($MetaData);
         $icon = get_term_meta(wpdm_query_var('tag_ID', 'int'), '__wpdm_icon', true);
         if($icon == '')
-            $icon = isset($MetaData[$_GET['tag_ID']]['icon'])?$MetaData[$_GET['tag_ID']]['icon']:'';
+            $icon = isset($MetaData[(int)$_GET['tag_ID']]['icon'])?$MetaData[(int)$_GET['tag_ID']]['icon']:'';
 
         ?>
         <tr class="form-field">
@@ -206,7 +206,7 @@ class Categories
 
                     $currentAccess = maybe_unserialize(get_term_meta(wpdm_query_var('tag_ID', 'int'), '__wpdm_access', true));
                     if(!is_array($currentAccess))
-                        $currentAccess = isset($MetaData[$_GET['tag_ID']])?$MetaData[$_GET['tag_ID']]['access']:array();
+                        $currentAccess = isset($MetaData[(int)$_GET['tag_ID']])?$MetaData[(int)$_GET['tag_ID']]['access']:array();
 
                     $selz = '';
                     if(  $currentAccess ) $selz = (in_array('guest',$currentAccess))?'checked=checked':'';

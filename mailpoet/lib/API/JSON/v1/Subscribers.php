@@ -10,6 +10,7 @@ use MailPoet\Listing;
 use MailPoet\Models\Form;
 use MailPoet\Models\StatisticsForms;
 use MailPoet\Models\Subscriber;
+use MailPoet\Models\SubscriberSegment;
 use MailPoet\Newsletter\Scheduler\Scheduler;
 use MailPoet\Segments\BulkAction;
 use MailPoet\Segments\SubscribersListings;
@@ -119,7 +120,7 @@ class Subscribers extends APIEndpoint {
 
     $recaptcha = $this->settings->get('re_captcha');
 
-    if (!$form) {
+    if (!$form instanceof Form) {
       return $this->badRequest(array(
         APIError::BAD_REQUEST => WPFunctions::get()->__('Please specify a valid form ID.', 'mailpoet')
       ));
@@ -160,7 +161,7 @@ class Subscribers extends APIEndpoint {
     $data = $this->deobfuscateFormPayload($data);
 
     try {
-      $this->required_custom_field_validator->validate($data);
+      $this->required_custom_field_validator->validate($data, $form);
     } catch (\Exception $e) {
       return $this->badRequest([APIError::BAD_REQUEST => $e->getMessage()]);
     }
@@ -229,6 +230,7 @@ class Subscribers extends APIEndpoint {
     if (empty($data['segments'])) {
       $data['segments'] = array();
     }
+    $new_segments = $this->findNewSegments($data);
     $subscriber = Subscriber::createOrUpdate($data);
     $errors = $subscriber->getErrors();
 
@@ -241,8 +243,8 @@ class Subscribers extends APIEndpoint {
       $subscriber->save();
     }
 
-    if (!empty($data['segments'])) {
-      Scheduler::scheduleSubscriberWelcomeNotification($subscriber->id, $data['segments']);
+    if (!empty($new_segments)) {
+      Scheduler::scheduleSubscriberWelcomeNotification($subscriber->id, $new_segments);
     }
 
     return $this->successResponse(
@@ -250,48 +252,63 @@ class Subscribers extends APIEndpoint {
     );
   }
 
+  private function findNewSegments(array $data) {
+    $old_segment_ids = [];
+    if (isset($data['id']) && (int)$data['id'] > 0) {
+      $old_segments = SubscriberSegment::where('subscriber_id', $data['id'])->findMany();
+      foreach ($old_segments as $old_segment) {
+        $old_segment_ids[] = $old_segment->segment_id;
+      }
+    }
+    return array_diff($data['segments'], $old_segment_ids);
+  }
+
   function restore($data = array()) {
     $id = (isset($data['id']) ? (int)$data['id'] : false);
     $subscriber = Subscriber::findOne($id);
-    if ($subscriber === false) {
+    if ($subscriber instanceof Subscriber) {
+      $subscriber->restore();
+      $subscriber = Subscriber::findOne($subscriber->id);
+      if(!$subscriber instanceof Subscriber) return $this->errorResponse();
+      return $this->successResponse(
+        $subscriber->asArray(),
+        array('count' => 1)
+      );
+    } else {
       return $this->errorResponse(array(
         APIError::NOT_FOUND => WPFunctions::get()->__('This subscriber does not exist.', 'mailpoet')
       ));
-    } else {
-      $subscriber->restore();
-      return $this->successResponse(
-        Subscriber::findOne($subscriber->id)->asArray(),
-        array('count' => 1)
-      );
     }
   }
 
   function trash($data = array()) {
     $id = (isset($data['id']) ? (int)$data['id'] : false);
     $subscriber = Subscriber::findOne($id);
-    if ($subscriber === false) {
+    if ($subscriber instanceof Subscriber) {
+      $subscriber->trash();
+      $subscriber = Subscriber::findOne($subscriber->id);
+      if(!$subscriber instanceof Subscriber) return $this->errorResponse();
+      return $this->successResponse(
+        $subscriber->asArray(),
+        array('count' => 1)
+      );
+    } else {
       return $this->errorResponse(array(
         APIError::NOT_FOUND => WPFunctions::get()->__('This subscriber does not exist.', 'mailpoet')
       ));
-    } else {
-      $subscriber->trash();
-      return $this->successResponse(
-        Subscriber::findOne($subscriber->id)->asArray(),
-        array('count' => 1)
-      );
     }
   }
 
   function delete($data = array()) {
     $id = (isset($data['id']) ? (int)$data['id'] : false);
     $subscriber = Subscriber::findOne($id);
-    if ($subscriber === false) {
+    if ($subscriber instanceof Subscriber) {
+      $subscriber->delete();
+      return $this->successResponse(null, array('count' => 1));
+    } else {
       return $this->errorResponse(array(
         APIError::NOT_FOUND => WPFunctions::get()->__('This subscriber does not exist.', 'mailpoet')
       ));
-    } else {
-      $subscriber->delete();
-      return $this->successResponse(null, array('count' => 1));
     }
   }
 

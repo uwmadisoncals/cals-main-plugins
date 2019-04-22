@@ -18,7 +18,7 @@ class FashionBlogA {
 
   function get() {
     return array(
-      'name' => WPFunctions::get()->__("Fashion Blog - A", 'mailpoet'),
+      'name' => WPFunctions::get()->__("Women Fashion Store", 'mailpoet'),
       'categories' => json_encode(array('standard', 'all')),
       'readonly' => 1,
       'thumbnail' => $this->getThumbnail(),
@@ -972,7 +972,7 @@ class FashionBlogA {
                         'type' => 'socialIcon',
                         'iconType' => 'facebook',
                         'link' => 'http://www.facebook.com',
-                        'image' => $this->social_icon_url.'/07-full-symbol-black/Facebook.png?mailpoet_version=3.16.3',
+                        'image' => $this->social_icon_url.'/07-full-symbol-black/Facebook.png',
                         'height' => '32px',
                         'width' => '32px',
                         'text' => 'Facebook',
@@ -982,7 +982,7 @@ class FashionBlogA {
                         'type' => 'socialIcon',
                         'iconType' => 'twitter',
                         'link' => 'http://www.twitter.com',
-                        'image' => $this->social_icon_url.'/07-full-symbol-black/Twitter.png?mailpoet_version=3.16.3',
+                        'image' => $this->social_icon_url.'/07-full-symbol-black/Twitter.png',
                         'height' => '32px',
                         'width' => '32px',
                         'text' => 'Twitter',
@@ -992,7 +992,7 @@ class FashionBlogA {
                         'type' => 'socialIcon',
                         'iconType' => 'instagram',
                         'link' => 'http://instagram.com',
-                        'image' => $this->social_icon_url.'/07-full-symbol-black/Instagram.png?mailpoet_version=3.16.3',
+                        'image' => $this->social_icon_url.'/07-full-symbol-black/Instagram.png',
                         'height' => '32px',
                         'width' => '32px',
                         'text' => 'Instagram',

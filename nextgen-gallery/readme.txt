@@ -2,11 +2,11 @@
 Contributors: photocrati, imagely
 Tags: wordpress gallery plugin, gallery, nextgen, nextgen gallery, photo gallery, image gallery, photography, slideshow, images, photo, photo album, watermark
 Requires at least: 4.0.0
-Stable tag: 3.1.7
-Tested up to: 5.1.0
+Stable tag: 3.1.17
+Tested up to: 5.1.1
 License: GPLv2
 
-The most popular WordPress gallery plugin and one of the most popular plugins of all time with over 24 million downloads.
+The most popular WordPress gallery plugin and one of the most popular plugins of all time with over 25 million downloads.
 
 == Description ==
 
@@ -182,6 +182,31 @@ For more information, feel free to visit the official website for the NextGEN Ga
 
 
 == Changelog ==
+
+= V3.1.17 - 04.02.2019 =
+* Fixed:   Preview images for display types giving get_static_abspath error
+* Fixed:   Compatibility with the Imagely Lightroom plugin
+
+= V3.1.14 - 03.26.2019 =
+* Changed: Restored original behavior of ngg_after_new_images_added hook
+* Changed: Images with EXIF rotation metadata are now rotated automatically at upload
+* Changed: Moved confirmation message presented after editing a thumbnail
+* Fixed:   Ability to import zips of images
+* Fixed:   Gallery folder not created on filesystem after adding new gallery
+* Fixed:   IGW not working with Gutenberg / Block Editor
+* Fixed:   Compatibility with EWWW Image Optimizer
+* Fixed:   Compatibility with Elementor
+* Fixed:   Compatibility with Imagify
+* Fixed:   NextGen 3.1.11 passed an incorrect path to load_plugin_textdomain()
+* Fixed:   Simplelightbox initialization was opening more than once for certain images
+
+= V3.1.11 - 03.020.2019 =
+* NEW:     Many performance enhancements
+* Fixed:   Broken Overview page on WordPress 5.1
+* Fixed:   Problem with notices not being dismissible
+* Fixed:   Recover images from backup generating errors
+* Fixed:   Manage Tags the only menu option after activating
+* Fixed:   Compatibility with environments which don't have mime_content_type function
 
 = V3.1.7 - 02.26.2019 =
 * Changed: Upgraded Freemius SDK to latest release

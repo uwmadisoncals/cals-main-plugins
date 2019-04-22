@@ -948,7 +948,7 @@ class Package {
         $key = uniqid();
         $exp = array('use' => $usageLimit, 'expire' => time()+$expirePeriod);
         update_post_meta($ID, "__wpdmkey_".$key, $exp);
-        $_SESSION['_wpdm_unlocked_'.$ID] = 1;
+        Session::set( '__wpdm_unlocked_'.$ID , 1 );
         $download_url = self::getDownloadURL($ID, "_wpdmkey={$key}");
         return $download_url;
     }
@@ -960,11 +960,11 @@ class Package {
      * @return string
      */
     public static function getDownloadURL($ID, $ext = ''){
-        if(self::isLocked($ID) && !isset($_SESSION['_wpdm_unlocked_'.$ID])) return '#locked';
+        if(self::isLocked($ID) && !Session::get( '__wpdm_unlocked_'.$ID )) return '#locked';
         if ($ext) $ext = '&' . $ext;
         $permalink = get_permalink($ID);
         $sap = strpos($permalink, '?')?'&':'?';
-        return $permalink.$sap."wpdmdl={$ID}{$ext}";
+        return $permalink.$sap."wpdmdl={$ID}{$ext}&refresh=".uniqid().time();
     }
 
     public static function getMasterDownloadURL($ID){

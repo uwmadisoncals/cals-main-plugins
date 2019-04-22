@@ -3,7 +3,7 @@ Contributors: vasyltech
 Tags: access control, membership, backend menu, user role, restricted content, security, jwt
 Requires at least: 4.0
 Tested up to: 5.1
-Stable tag: 5.9.1.1
+Stable tag: 5.9.5
 
 All you need to manage access to you WordPress websites on frontend, backend and API levels for any role, user or visitors.
 
@@ -18,7 +18,7 @@ https://www.youtube.com/watch?v=mj5Xa_Wc16Y
 * The only plugin that gives you absolute freedom to define the most granular access to any aspect of your website and most of the feature are free;
 * Bullet-proven plugin that is used on over 100,000 websites where all features are well-tested and [documented](https://aamplugin.com/support). Very low amount of support tickets speaks for quality;
 * It is the only plugin that gives you the ability to manage access to your website content for any role, individual user and visitors or even define the default access to all posts, pages, custom post types, categories and custom hierarchical taxonomies;
-* AAM is [developer oriented plugin](https://aamplugin.com/developers). It has dozens of hooks and configurations. It is integrated with WordPress RESTful and XML-RPC APIs and has numerous abstract layers to simplify coding;
+* AAM is developer oriented plugin. It has dozens of hooks and configurations. It is integrated with WordPress RESTful and XML-RPC APIs and has numerous abstract layers to simplify coding;
 * No ads or other promotional crap. The UI is clean and well crafted so you can focus only on what matters;
 * No need to be a "paid" customer to get help. Request support via email or start chat with Google Hangout;
 * Some features are limited or available only with [premium extensions](https://aamplugin.com/store). AAM functionality is transparent and you will absolute know when you need to get a premium extension;
@@ -37,6 +37,7 @@ https://www.youtube.com/watch?v=mj5Xa_Wc16Y
 
 * [free] Manage Backend Menu. Manage access to the backend menu for any user or role. Find out more from [How to manage WordPress backend menu](https://aamplugin.com/article/how-to-manage-wordpress-backend-menu) article;
 * [free] Manage Roles & Capabilities. Manage all your WordPress role and capabilities.
+* [free] All necessary set of tools to manage JWT authentication [Ultimate guide to WordPress JWT Authentication](https://aamplugin.com/article/ultimate-guide-to-wordpress-jwt-authentication)
 * [free] Create temporary user accounts. Create and manage temporary user accounts. Find out more from [How to create temporary WordPress user account](https://aamplugin.com/article/how-to-create-temporary-wordpress-user-account);
 * [limited] Content access. Very granular access to unlimited number of post, page or custom post type ([19 different options](https://aamplugin.com/reference/plugin#posts-terms)). With premium [Plus Package](https://aamplugin.com/extension/plus-package) extension also manage access to hierarchical taxonomies or setup the default access to all post types and taxonomies. Find out more from [How to manage access to the WordPress content](https://aamplugin.com/article/how-to-manage-access-to-the-wordpress-content) article;
 * [free] Manage Admin Toolbar. Filter out unnecessary items from the top admin toolbar for any role or user. 
@@ -78,6 +79,51 @@ https://www.youtube.com/watch?v=mj5Xa_Wc16Y
 11. Improve your website security
 
 == Changelog ==
+
+= 5.9.5 =
+* Fixed the bug with Access Policy `Param` value that was not evaluating embedded markers
+* Fixed the bug that was causing PHP Warning for users that have none-existing role assigned
+* Fixed the bug with Customizer that was blocking user from publishing changes
+* Added support for `tags` - the ability to manage access to posts by none-hierarchical terms
+* Added the ability to define dynamic Resource names with markers in Access Policies
+* Added new Access Policy marker USERMETA https://aamplugin.com/reference/policy#usermeta
+
+= 5.9.4 =
+* Fixed the bug with incorrectly identifying CPT capabilities
+* Fixed the bug with URI Access where there where no way to override wildcard rule
+* Fixed multiple bugs related to JWT authentication
+* Fixed the bug with Access Policy that triggers PHP Notice for visitors
+* Removed support for ConfigPress option `core.settings.setJwtCookieAfterLogin`
+* Added the ability to obtain Login URL from the "Manage User" modal
+* Added the ability to control AAM cache size https://aamplugin.com/reference/plugin#core-cache-limit
+* Refactored Capabilities feature to follow the best practices for integration with WP Core
+* Refactored JWT authentication so it can be more seamlessly integrated with user status
+
+= 5.9.3 =
+* Fixed the bug with LIST and LIST TO OTHERS options for multiple roles support
+* Fixed the bug with managing access to custom post types that contain "-" in name
+* Added ability to refresh JWT token with new RESTful endpoint /refresh-jwt
+* Added ability to filter out metabox by its name with Access Policy
+* Improved Posts & Terms access control with Access Policy
+
+= 5.9.2.1 =
+* Fixed several bugs that are related to post, page or custom post type editing
+
+= 5.9.2 =
+* Fixed the bug with Access Policy access control
+* Fixed the bug with Access Policy tab shows only 10 last Policies
+* Fixed the bug where AAM was not determining correct max user level
+* Fixed the bug where user was able to manage his roles on the profile page
+* Fixed the bug with Access Policy "Between" condition
+* Optimized AAM to support unusual access capabilities for custom post types https://forum.aamplugin.com/d/99-custom-post-type-does-not-honor-edit-delete-publish-overrides/5
+* Enhanced Access Policy with few new features. The complete reference is here https://aamplugin.com/reference/policy
+* Enabled 'JWT Authentication' by default
+* Significantly improved AAM UI page security
+* Added new JWT Tokens feature to the list of AAM features https://aamplugin.com/reference/plugin#jwt-tokens
+* Added new capability aam_manage_jwt
+* Added "Add New Policies" submenu to fix WordPress core bug with managing access to submenus
+* Removed "Role Expiration" feature - it was too confusing to work with
+* Removed allow_ajax_calls capability support - it was too confusing for end users
 
 = 5.9.1.1 =
 * Fixed the bug with saving Metaboxes & Widgets settings

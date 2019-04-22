@@ -4,7 +4,7 @@ Plugin Name: Download Manager
 Plugin URI: https://www.wpdownloadmanager.com/purchases/
 Description: Manage, Protect and Track File Downloads from your WordPress site
 Author: W3 Eden
-Version: 2.9.91
+Version: 2.9.95
 Author URI: https://www.wpdownloadmanager.com/
 Text Domain: download-manager
 Domain Path: /languages
@@ -15,8 +15,8 @@ namespace WPDM;
 
 global $WPDM;
 
-if(!isset($_SESSION) && (!isset($_REQUEST['action']) || $_REQUEST['action'] !== 'edit-theme-plugin-file') && !strstr($_SERVER['REQUEST_URI'], 'wpdm-media/') && !isset($_REQUEST['wpdmdl']))
-    @session_start();
+//if(!isset($_SESSION) && (!isset($_REQUEST['action']) || $_REQUEST['action'] !== 'edit-theme-plugin-file') && !strstr($_SERVER['REQUEST_URI'], 'wpdm-media/') && !isset($_REQUEST['wpdmdl']) && !isset($_GET['health-check-troubleshoot-enable-plugin']))
+//    @session_start();
 
 
 
@@ -50,6 +50,9 @@ if(!defined('WPDM_TPL_DIR')) {
     define('WPDM_TPL_DIR', dirname(__FILE__) . '/tpls/');
 }
 
+if(!defined('WPDM_TPL_FALLBACK')) {
+    define('WPDM_TPL_FALLBACK', dirname(__FILE__) . '/tpls/');
+}
 
 ini_set('upload_tmp_dir',UPLOAD_DIR.'/cache/');
 
@@ -60,7 +63,7 @@ class WordPressDownloadManager{
 
     function __construct(){
 
-        define('WPDM_Version','2.9.91');
+        define('WPDM_Version','2.9.95');
 
         register_activation_hook(__FILE__, array($this, 'Install'));
 

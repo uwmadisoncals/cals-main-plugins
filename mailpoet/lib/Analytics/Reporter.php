@@ -1,6 +1,7 @@
 <?php
 namespace MailPoet\Analytics;
 
+use Carbon\Carbon;
 use MailPoet\Config\ServicesChecker;
 use MailPoet\Cron\CronTrigger;
 use MailPoet\Models\Newsletter;
@@ -19,9 +20,9 @@ class Reporter {
   /** @var WooCommerceHelper */
   private $woocommerce_helper;
 
-  public function __construct(SettingsController $settings) {
+  public function __construct(SettingsController $settings, WooCommerceHelper $woocommerce_helper) {
     $this->settings = $settings;
-    $this->woocommerce_helper = new WooCommerceHelper;
+    $this->woocommerce_helper = $woocommerce_helper;
   }
 
   function getData() {
@@ -102,4 +103,21 @@ class Reporter {
     );
   }
 
+  function getTrackingData() {
+    $newletters = Newsletter::getAnalytics();
+    $segments = Segment::getAnalytics();
+    $mta = $this->settings->get('mta', []);
+    $installed_at = new Carbon($this->settings->get('installed_at'));
+    return [
+      'installedAtIso' => $installed_at->format(Carbon::ISO8601),
+      'newslettersSent' => $newletters['sent_newsletters_count'],
+      'welcomeEmails' => $newletters['welcome_newsletters_count'],
+      'postnotificationEmails' => $newletters['notifications_count'],
+      'woocommerceEmails' => $newletters['automatic_emails_count'],
+      'subscribers' => Subscriber::getTotalSubscribers(),
+      'lists' => isset($segments['default']) ? (int)$segments['default'] : 0,
+      'sendingMethod' => isset($mta['method']) ? $mta['method'] : null,
+      'woocommerceIsInstalled' => $this->woocommerce_helper->isWooCommerceActive(),
+    ];
+  }
 }

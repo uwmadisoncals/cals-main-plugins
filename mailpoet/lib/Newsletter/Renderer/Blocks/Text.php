@@ -3,12 +3,12 @@ namespace MailPoet\Newsletter\Renderer\Blocks;
 
 use MailPoet\Newsletter\Editor\PostContentManager;
 use MailPoet\Newsletter\Renderer\StylesHelper;
+use MailPoet\Newsletter\Renderer\EscapeHelper as EHelper;
 use MailPoet\Util\pQuery\pQuery;
 
 class Text {
   static function render($element) {
     $html = $element['text'];
-    $padding_top = isset($element['styles']['block']['paddingTop']) ? $element['styles']['block']['paddingTop'] : '0';
     // replace &nbsp; with spaces
     $html = str_replace('&nbsp;', ' ', $html);
     $html = str_replace('\xc2\xa0', ' ', $html);
@@ -19,7 +19,7 @@ class Text {
     $html = self::removeLastLineBreak($html);
     $template = '
       <tr>
-        <td class="mailpoet_text mailpoet_padded_bottom mailpoet_padded_side" valign="top" style="word-break:break-word;word-wrap:break-word;padding-top:' . $padding_top .'">
+        <td class="mailpoet_text mailpoet_padded_vertical mailpoet_padded_side" valign="top" style="word-break:break-word;word-wrap:break-word;">
           ' . $html . '
         </td>
       </tr>';
@@ -37,7 +37,7 @@ class Text {
         if (preg_match('/h\d/', $paragraph->getTag())) {
           $contents[] = $paragraph->getOuterText();
         } else {
-          $contents[] = $paragraph->html();
+          $contents[] = str_replace('&', '&amp;', $paragraph->html());
         }
           if ($index + 1 < $paragraphs->count()) $contents[] = '<br />';
           $paragraph->remove();
@@ -103,7 +103,7 @@ class Text {
       if (!preg_match('/text-align/i', $style)) {
         $style = 'text-align: left;' . $style;
       }
-      $contents = $paragraph->html();
+      $contents =  str_replace('&', '&amp;', $paragraph->html());
       $paragraph->setTag('table');
       $paragraph->style = 'border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;';
       $paragraph->width = '100%';
@@ -126,7 +126,7 @@ class Text {
       }
       $paragraph->html('
         <tr>
-          <td class="mailpoet_paragraph" style="word-break:break-word;word-wrap:break-word;' . $style . '">
+          <td class="mailpoet_paragraph" style="word-break:break-word;word-wrap:break-word;' . EHelper::escapeHtmlStyleAttr($style) . '">
             ' . $contents . $line_breaks . '
           </td>
          </tr>'
@@ -142,7 +142,7 @@ class Text {
     if (!$lists->count()) return $html;
     foreach ($lists as $list) {
       if ($list->tag === 'li') {
-        $list->setInnertext($list->html());
+        $list->setInnertext(str_replace('&', '&amp;', $list->html()));
         $list->class = 'mailpoet_paragraph';
       } else {
         $list->class = 'mailpoet_paragraph';
@@ -150,6 +150,7 @@ class Text {
       }
       $list->style = StylesHelper::applyTextAlignment($list->style);
       $list->style .= 'margin-bottom:10px;';
+      $list->style = EHelper::escapeHtmlStyleAttr($list->style);
     }
     return $DOM->__toString();
   }
@@ -162,6 +163,7 @@ class Text {
     foreach ($headings as $heading) {
       $heading->style = StylesHelper::applyTextAlignment($heading->style);
       $heading->style .= 'padding:0;font-style:normal;font-weight:normal;';
+      $heading->style = EHelper::escapeHtmlStyleAttr($heading->style);
     }
     return $DOM->__toString();
   }

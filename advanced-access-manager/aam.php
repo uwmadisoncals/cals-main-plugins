@@ -1,17 +1,17 @@
 <?php
 
 /**
-  Plugin Name: Advanced Access Manager
-  Description: All you need to manage access to your WordPress website
-  Version: 5.9.1.1
-  Author: Vasyl Martyniuk <vasyl@vasyltech.com>
-  Author URI: https://vasyltech.com
-
-  -------
-  LICENSE: This file is subject to the terms and conditions defined in
-  file 'license.txt', which is part of Advanced Access Manager source package.
+ * Plugin Name: Advanced Access Manager
+ * Description: All you need to manage access to your WordPress website
+ * Version: 5.9.5
+ * Author: Vasyl Martyniuk <vasyl@vasyltech.com>
+ * Author URI: https://vasyltech.com
  *
- */
+ * -------
+ * LICENSE: This file is subject to the terms and conditions defined in
+ * file 'license.txt', which is part of Advanced Access Manager source package.
+ *
+ **/
 
 /**
  * Main plugin's class
@@ -69,8 +69,12 @@ class AAM {
     }
     
     /**
+     * Get AAM API manager
      * 
-     * @return type
+     * @return AAM_Core_Gateway
+     * 
+     * @access public
+     * @static
      */
     public static function api() {
         return AAM_Core_Gateway::getInstance();
@@ -114,15 +118,15 @@ class AAM {
     public static function onPluginsLoaded() {
         //load AAM core config
         AAM_Core_Config::bootstrap();
-        
+
         //login control
         if (AAM_Core_Config::get('core.settings.secureLogin', true)) {
             AAM_Core_Login::bootstrap();
         }
 
         //JWT Authentication
-        if (AAM_Core_Config::get('core.settings.jwtAuthentication', false)) {
-            AAM_Core_JwtAuth::bootstrap();
+        if (AAM_Core_Config::get('core.settings.jwtAuthentication', true)) {
+            AAM_Core_Jwt_Manager::bootstrap();
         }
         
         // Load AAM
@@ -165,12 +169,20 @@ class AAM {
     public static function getInstance() {
         if (is_null(self::$_instance)) {
             self::$_instance = new self;
+
+            // Get current user
+            $user = self::$_instance->getUser();
             
             // Load user capabilities
-            self::$_instance->getUser()->initialize();
-            
+            $user->initialize();
+
             // Logout user if he/she is blocked
-            self::$_instance->getUser()->validateUserStatus();
+            $status = $user->getUserStatus();
+
+            // If user is not active, then perform rollback on user
+            if (!empty($status) && $status->status !== 'active') {
+                $user->restrainUserAccount($status);
+            }
             
             load_plugin_textdomain(AAM_KEY, false, 'advanced-access-manager/Lang');
         }
@@ -261,7 +273,8 @@ if (defined('ABSPATH')) {
     require (dirname(__FILE__) . '/autoloader.php');
     AAM_Autoloader::register();
     
-    add_action('plugins_loaded', 'AAM::onPluginsLoaded', 1);
+    // Keep this as the lowest priority
+    add_action('plugins_loaded', 'AAM::onPluginsLoaded', -1);
     
     //the highest priority (higher the core)
     //this is important to have to catch events like register core post types

@@ -158,6 +158,19 @@ Check download stats and get a push notification when someone downloads, install
 
 == Changelog ==
 
+= 2.9.95 =
+* Fixed an issue with the captcha lock
+
+= 2.9.94 =
+* Sanitized user inputs with category shortcode
+
+= 2.9.93 =
+* Improved session management
+
+= 2.9.92 =
+* Fixed issued with the password reset form
+* Fixed the conflict with health check plugin
+
 = 2.9.91 =
 * Fixed an issue with email template edit
 * Improved UI settings

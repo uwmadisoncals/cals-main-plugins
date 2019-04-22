@@ -16,6 +16,8 @@ use lsolesen\pel\PelJpeg;
 use lsolesen\pel\PelTiff;
 use lsolesen\pel\PelExif;
 use lsolesen\pel\PelIfd;
+use lsolesen\pel\PelTag;
+use lsolesen\pel\PelEntryShort;
 
 use lsolesen\pel\PelInvalidArgumentException;
 use lsolesen\pel\PelIfdException;
@@ -208,6 +210,33 @@ class C_Exif_Writer
     static public function is_jpeg_file($filename)
     {
         $extension = M_I18n::mb_pathinfo($filename, PATHINFO_EXTENSION);
-        return in_array(strtolower($extension), array('jpeg', 'jpg')) ? TRUE : FALSE;
+        return in_array(strtolower($extension), array('jpeg', 'jpg', 'jpeg_backup', 'jpg_backup')) ? TRUE : FALSE;
+    }
+
+    /**
+     * Sets the EXIF' Orientation field to 1 aka Default or "TopLeft"
+     *
+     * This method is necessary to prevent images rotated by NextGen to appear even further rotated.
+     * @param array $exif
+     * @return array
+     */
+    static public function reset_orientation($exif = array())
+    {
+        $tiff = $exif->getTiff();
+        if (empty($tiff))
+            return $exif;
+
+        $ifd0 = $tiff->getIfd();
+        if (empty($ifd0))
+            return $exif;
+
+        $orientation = $ifd0->getEntry(PelTag::ORIENTATION);
+        if (empty($orientation))
+            return $exif;
+
+        $orientation = new PelEntryShort(PelTag::ORIENTATION, 1);
+        $ifd0->addEntry($orientation);
+
+        return $exif;
     }
 }

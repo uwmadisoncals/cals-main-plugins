@@ -35,7 +35,7 @@
     <tbody class="list:post" id="the-list">
 
     <?php 
-    $ttype = isset($_GET['_type'])?$_GET['_type']:'link';
+    $ttype = isset($_GET['_type'])?esc_attr($_GET['_type']):'link';
     if($ttype != 'email'){
         $ctpls = WPDM\admin\menus\Templates::Dropdown(array('data_type' => 'ARRAY', 'type' => $ttype));
         $ctemplates = maybe_unserialize(get_option("_fm_{$ttype}_templates",true));

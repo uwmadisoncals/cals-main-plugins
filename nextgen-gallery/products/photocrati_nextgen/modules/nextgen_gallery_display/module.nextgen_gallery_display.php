@@ -23,10 +23,10 @@ class M_Gallery_Display extends C_Base_Module
 			'photocrati-nextgen_gallery_display',
 			'Gallery Display',
 			'Provides the ability to display gallery of images',
-			'3.1.4.2',
+			'3.1.17',
 			'https://www.imagely.com/wordpress-gallery-plugin/nextgen-gallery/',
-      'Imagely',
-      'https://www.imagely.com'
+            'Imagely',
+            'https://www.imagely.com'
 		);
 
 		C_Photocrati_Installer::add_handler($this->module_id, 'C_Display_Type_Installer');
@@ -511,7 +511,20 @@ class C_Display_Type_Installer
 	function get_registry()
 	{
 		return C_Component_Registry::get_instance();
-	}
+    }
+    
+    function delete_duplicates($name)
+    {
+        $mapper				= C_Display_Type_Mapper::get_instance();
+        $results =          $mapper->find_all(array('name = %s', $name));
+        if (count($results) > 0) {
+            $kept = array_pop($results); // the last should be the latest
+            foreach ($results as $display_type) {
+                $mapper->destroy($display_type);
+            }
+        }
+        $mapper->flush_query_cache();
+    }
 
 	/**
 	 * Installs a display type
@@ -520,24 +533,24 @@ class C_Display_Type_Installer
 	 */
 	function install_display_type($name, $properties=array())
 	{
+        $this->delete_duplicates($name);
+
 		// Try to find the existing entity. If it doesn't exist, we'll create
 		$fs					= C_Fs::get_instance();
-		$mapper				= C_Display_Type_Mapper::get_instance();
-		$display_type		= $mapper->find_by_name($name);
+        $mapper				= C_Display_Type_Mapper::get_instance();
+        $display_type		= $mapper->find_by_name($name);
+        $mapper->flush_query_cache();
 		if (!$display_type)	$display_type = new stdClass;
 
 		// Update the properties of the display type
 		$properties['name'] = $name;
 		$properties['installed_at_version'] = NGG_PLUGIN_VERSION;
 		foreach ($properties as $key=>$val) {
-			if ($key == 'preview_image_relpath') {
-				$val = $fs->find_static_abspath($val, FALSE, TRUE);
-			}
 			$display_type->$key = $val;
 		}
 
 		// Save the entity
-		$retval = $mapper->save($display_type);
+        $retval = $mapper->save($display_type);
 		return $retval;
 	}
 
@@ -565,7 +578,16 @@ class C_Display_Type_Installer
 	 */
 	function install($reset=FALSE)
 	{
-		// Display types are registered in other modules
+        // Note: NGG Display types are registered in other modules
+
+        // Force Pro display types to register themselves
+        if (class_exists('C_NextGen_Pro_Installer')) {
+            $pro_installer = new C_NextGen_Pro_Installer();
+            $pro_installer->install_display_types();
+        } elseif (class_exists('C_NextGen_Plus_Installer')) {
+            $plus_installer = new C_NextGen_Plus_Installer();
+            $plus_installer->install_display_types();
+        }
 	}
 
 	/**

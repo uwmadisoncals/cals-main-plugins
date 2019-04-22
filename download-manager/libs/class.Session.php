@@ -19,7 +19,7 @@ class Session
     function __construct()
     {
 
-        $deviceID = md5($_SERVER['REMOTE_ADDR'].$_SERVER['HTTP_USER_AGENT']);
+        $deviceID = md5(wpdm_get_client_ip().$_SERVER['HTTP_USER_AGENT']);
 
         if(file_exists(WPDM_CACHE_DIR."session-{$deviceID}.txt")) {
             $data = file_get_contents(WPDM_CACHE_DIR . "session-{$deviceID}.txt");
@@ -53,6 +53,7 @@ class Session
             $value = null;
         }
         return $value;
+
     }
 
     static function clear($name = ''){

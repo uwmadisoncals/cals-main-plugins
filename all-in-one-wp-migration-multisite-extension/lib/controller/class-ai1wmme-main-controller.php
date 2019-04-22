@@ -48,7 +48,21 @@ class Ai1wmme_Main_Controller {
 	 * @return void
 	 */
 	public function activation_hook() {
+		global $wpdb;
 
+		if ( constant( 'AI1WMME_PURCHASE_ID' ) ) {
+			@wp_remote_post( AI1WM_ACTIVATION_URL, array(
+				'timeout' => 15,
+				'body'    => array(
+					'url'           => @get_site_url(),
+					'email'         => @get_option( 'admin_email' ),
+					'wp_version'    => @get_bloginfo( 'version' ),
+					'php_version'   => PHP_VERSION,
+					'mysql_version' => @$wpdb->db_version(),
+					'uuid'          => AI1WMME_PURCHASE_ID,
+				),
+			) );
+		}
 	}
 
 	/**

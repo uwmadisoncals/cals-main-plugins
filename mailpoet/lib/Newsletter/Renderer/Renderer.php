@@ -5,8 +5,9 @@ use MailPoet\Config\Env;
 use MailPoet\Models\Newsletter;
 use MailPoet\Services\Bridge;
 use MailPoet\Util\License\License;
-use MailPoet\Util\pQuery\pQuery;
+use MailPoet\Util\pQuery\DomNode;
 use MailPoet\WP\Functions as WPFunctions;
+use MailPoet\Newsletter\Renderer\EscapeHelper as EHelper;
 
 if (!defined('ABSPATH')) exit;
 
@@ -21,7 +22,7 @@ class Renderer {
   private $template;
   const NEWSLETTER_TEMPLATE = 'Template.html';
   const FILTER_POST_PROCESS = 'mailpoet_rendering_post_process';
-  
+
   /**
    * @param \MailPoet\Models\Newsletter|array $newsletter
    */
@@ -62,7 +63,7 @@ class Renderer {
       htmlspecialchars($newsletter['subject']),
       $rendered_styles,
       $custom_fonts_links,
-      $newsletter['preheader'],
+      EHelper::escapeHtmlText($newsletter['preheader']),
       $rendered_body
     ));
     $template_dom = $this->inlineCSSStyles($template);
@@ -152,7 +153,7 @@ class Renderer {
 
   /**
    * @param string $template
-   * @param string $content
+   * @param string[] $content
    * @return string|string[]|null
    */
   private function injectContentIntoTemplate($template, $content) {
@@ -163,10 +164,10 @@ class Renderer {
 
   /**
    * @param string $template
-   * @return \pQuery\DomNode
+   * @return DomNode
    */
   private function inlineCSSStyles($template) {
-    return $this->CSS_inliner->inlineCSS(null, $template);
+    return $this->CSS_inliner->inlineCSS($template);
   }
 
   /**
@@ -179,23 +180,14 @@ class Renderer {
   }
 
   /**
-   * @param \pQuery\DomNode $template_dom
+   * @param DomNode $template_dom
    * @return string
    */
-  private function postProcessTemplate(\pQuery\DomNode $template_dom) {
+  private function postProcessTemplate(DomNode $template_dom) {
     // replace spaces in image tag URLs
     foreach ($template_dom->query('img') as $image) {
       $image->src = str_replace(' ', '%20', $image->src);
     }
-    $template = $template_dom->query('.mailpoet_template');
-    // replace all !important tags except for in the body tag
-    $template->html(
-      str_replace('!important', '', $template->html())
-    );
-    // encode ampersand
-    $template->html(
-      str_replace('&', '&amp;', $template->html())
-    );
     $template = WPFunctions::get()->applyFilters(
       self::FILTER_POST_PROCESS,
       $template_dom->__toString()

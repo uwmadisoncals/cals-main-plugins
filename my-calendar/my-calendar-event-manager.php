@@ -123,6 +123,9 @@ function mc_add_post_meta_data( $post_id, $post, $data, $event_id ) {
 	update_post_meta( $post_id, '_mc_event_id', $event_id );
 	update_post_meta( $post_id, '_mc_event_desc', $description );
 	update_post_meta( $post_id, '_mc_event_image', $image );
+	// This is only used by My Tickets, so only the first date occurrence is required.
+	$event_date = ( is_array( $data['event_begin'] ) ) ? $data['event_begin'][0] : $data['event_begin'];
+	update_post_meta( $post_id, '_mc_event_date', strtotime( $event_date ) );
 	update_post_meta( $post_id, '_event_time_label', ( isset( $_POST['event_time_label'] ) ) ? $_POST['event_time_label'] : '' );
 	$location_id = ( isset( $post['location_preset'] ) ) ? (int) $post['location_preset'] : false;
 	if ( $location_id ) { // only change location ID if dropdown set.
@@ -785,6 +788,10 @@ function my_calendar_save( $action, $output, $event_id = false ) {
 					// Function mc_increment_event uses previous events and re-uses same ID if new has same date as old event.
 					$instances = mc_get_instances( $event_id );
 					mc_delete_instances( $event_id );
+					// Delete previously created custom & deleted instance records.
+					$post_ID = mc_get_data( 'event_post', $event_id );
+					delete_post_meta( $post_ID, '_mc_custom_instances' );
+					delete_post_meta( $post_ID, '_mc_deleted_instances' );
 					mc_increment_event( $event_id, array(), false, $instances );
 				}
 			}
@@ -1379,17 +1386,9 @@ function mc_form_fields( $data, $mode, $event_id ) {
 			}
 		}
 		echo apply_filters( 'mc_before_event_form', '', $event_id );
-		$action = add_query_arg( $query_args, admin_url( 'admin.php?page=my-calendar' ) );
-		if ( ! empty( $data->event_group_id ) && 'copy' != $mode ) {
-			$group_id = $data->event_group_id;
-		} else {
-			$group_id = mc_group_id();
-		}
-		if ( 'edit' != $mode ) {
-			$event_author = $user_ID;
-		} else {
-			$event_author = $data->event_author;
-		}
+		$action       = add_query_arg( $query_args, admin_url( 'admin.php?page=my-calendar' ) );
+		$group_id     = ( ! empty( $data->event_group_id ) && 'copy' != $mode ) ? $data->event_group_id : mc_group_id();
+		$event_author = ( 'edit' != $mode ) ? $user_ID : $data->event_author;
 		?>
 <form id="my-calendar" method="post" action="<?php echo $action; ?>">
 <div>
@@ -1431,12 +1430,21 @@ function mc_form_fields( $data, $mode, $event_id ) {
 		<h2><?php esc_html( $text ); ?></h2>
 		<div class="inside">
 		<div class='mc-controls'>
-			<?php echo mc_controls( $mode, $has_data, $data ); ?>
+			<?php
+			if ( $post_id ) {
+				$deleted = get_post_meta( $post_id, '_mc_deleted_instances', true );
+				$custom  = get_post_meta( $post_id, '_mc_custom_instances', true );
+				if ( $deleted || $custom ) {
+					mc_show_notice( __( 'Some repetitions of this recurring event have been deleted or modified. Update the date or recurring pattern for the event to reset its repeat events.', 'my-calendar' ) );
+				}
+			}
+			echo mc_controls( $mode, $has_data, $data );
+			?>
 		</div>
 			<?php
 			if ( ! empty( $_GET['date'] ) && 'S' != $data->event_recur ) {
 				$event = mc_get_event( $instance );
-				$date  = date_i18n( get_option( 'mc_date_format' ), mc_strtotime( $event->occur_begin ) );
+				$date  = date_i18n( mc_date_format(), mc_strtotime( $event->occur_begin ) );
 				// Translators: Date of a specific event occurrence.
 				$message = sprintf( __( 'You are editing the <strong>%s</strong> instance of this event. Other instances of this event will not be changed.', 'my-calendar' ), $date );
 				mc_show_notice( $message );
@@ -2282,8 +2290,7 @@ function mc_list_events() {
 							} else {
 								$event_time = mc_notime_label( $event );
 							}
-							$date_format = ( get_option( 'mc_date_format' ) == '' ) ? get_option( 'date_format' ) : get_option( 'mc_date_format' );
-							$begin       = date_i18n( $date_format, mc_strtotime( $event->event_begin ) );
+							$begin = date_i18n( mc_date_format(), mc_strtotime( $event->event_begin ) );
 							echo esc_html( "$begin, $event_time" );
 							?>
 								<div class="recurs">
@@ -3063,16 +3070,18 @@ function mc_instance_list( $args ) {
  */
 function mc_admin_instances( $id, $occur = false ) {
 	global $wpdb;
-	$output  = '';
-	$results = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . my_calendar_event_table() . ' WHERE occur_event_id=%d ORDER BY occur_begin ASC', $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	$output     = '';
+	$results    = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . my_calendar_event_table() . ' WHERE occur_event_id=%d ORDER BY occur_begin ASC', $id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	$event_post = mc_get_event_post( $id );
+	$deleted    = get_post_meta( $event_post, '_mc_deleted_instances', true );
 	if ( is_array( $results ) && is_admin() ) {
 		foreach ( $results as $result ) {
-			$begin = "<span id='occur_date_$result->occur_id'>" . date_i18n( get_option( 'mc_date_format' ), mc_strtotime( $result->occur_begin ) ) . ', ' . date( get_option( 'mc_time_format' ), mc_strtotime( $result->occur_begin ) ) . '</span>';
+			$begin = "<span id='occur_date_$result->occur_id'>" . date_i18n( mc_date_format(), mc_strtotime( $result->occur_begin ) ) . ', ' . date( get_option( 'mc_time_format' ), mc_strtotime( $result->occur_begin ) ) . '</span>';
 			if ( $result->occur_id == $occur ) {
 				$control = '';
 				$edit    = '<em>' . __( 'Editing Now', 'my-calendar' ) . '</em>';
 			} else {
-				$control = "$begin: <button class='delete_occurrence' type='button' data-value='$result->occur_id' aria-describedby='occur_date_$result->occur_id' />" . __( 'Delete', 'my-calendar' ) . '</button> ';
+				$control = "$begin: <button class='delete_occurrence' type='button' data-event='$result->occur_event_id' data-begin='$result->occur_begin' data-end='$result->occur_end' data-value='$result->occur_id' aria-describedby='occur_date_$result->occur_id' />" . __( 'Delete', 'my-calendar' ) . '</button> ';
 				$edit    = "<a href='" . admin_url( 'admin.php?page=my-calendar' ) . "&amp;mode=edit&amp;event_id=$id&amp;date=$result->occur_id' aria-describedby='occur_date_$result->occur_id'>" . __( 'Edit', 'my-calendar' ) . '</a>';
 			}
 			$output .= "<li>$control$edit</li>";
@@ -3132,13 +3141,15 @@ function mc_standard_datetime_input( $form, $has_data, $data, $instance, $contex
 	if ( $has_data ) {
 		$event_begin = esc_attr( $data->event_begin );
 		$event_end   = esc_attr( $data->event_end );
+
 		if ( isset( $_GET['date'] ) ) {
 			$event       = mc_get_event( (int) $_GET['date'] );
 			$event_begin = date( 'Y-m-d', mc_strtotime( $event->occur_begin ) );
 			$event_end   = date( 'Y-m-d', mc_strtotime( $event->occur_end ) );
-			if ( $event_begin == $event_end ) {
-				$event_end = '';
-			}
+		}
+		// Set event end to empty if matches begin. Makes input and changes easier.
+		if ( $event_begin == $event_end ) {
+			$event_end = '';
 		}
 		$starttime = ( mc_is_all_day( $data ) ) ? '' : date( apply_filters( 'mc_time_format', 'h:i A' ), mc_strtotime( $data->event_time ) );
 		$endtime   = ( mc_is_all_day( $data ) ) ? '' : date( apply_filters( 'mc_time_format', 'h:i A' ), mc_strtotime( $data->event_endtime ) );
@@ -3425,7 +3436,7 @@ function mc_related_events( $id ) {
 			$event    = $result->occur_event_id;
 			$current  = '<a href="' . admin_url( 'admin.php?page=my-calendar' ) . '&amp;mode=edit&amp;event_id=' . $event . '">';
 			$end      = '</a>';
-			$begin    = date_i18n( get_option( 'mc_date_format' ), strtotime( $result->occur_begin ) ) . ', ' . date( get_option( 'mc_time_format' ), strtotime( $result->occur_begin ) );
+			$begin    = date_i18n( mc_date_format(), strtotime( $result->occur_begin ) ) . ', ' . date( get_option( 'mc_time_format' ), strtotime( $result->occur_begin ) );
 			$template = $current . $begin . $end;
 			$output  .= "<li>$template</li>";
 		}
@@ -3754,9 +3765,7 @@ function mc_increment_event( $id, $post = array(), $test = false, $instances = a
 						if ( 'test' == $test && $i > 0 ) {
 							return $data;
 						}
-						if ( true == $test ) {
-							$return[] = $data;
-						}
+						$return[] = $data;
 						if ( ! $test ) {
 							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'daily' );
 							if ( ! $insert ) {
@@ -3786,9 +3795,7 @@ function mc_increment_event( $id, $post = array(), $test = false, $instances = a
 								if ( 'test' == $test && $i > 0 ) {
 									return $data;
 								}
-								if ( true == $test ) {
-									$return[] = $data;
-								}
+								$return[] = $data;
 								if ( ! $test ) {
 									$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'daily' );
 									if ( ! $insert ) {
@@ -3815,9 +3822,7 @@ function mc_increment_event( $id, $post = array(), $test = false, $instances = a
 							if ( 'test' == $test && $i > 0 ) {
 								return $data;
 							}
-							if ( true == $test ) {
-								$return[] = $data;
-							}
+							$return[] = $data;
 							if ( ! $test ) {
 								$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'daily' );
 								if ( ! $insert ) {
@@ -3842,9 +3847,7 @@ function mc_increment_event( $id, $post = array(), $test = false, $instances = a
 						if ( 'test' == $test && $i > 0 ) {
 							return $data;
 						}
-						if ( true == $test ) {
-							$return[] = $data;
-						}
+						$return[] = $data;
 						if ( ! $test ) {
 							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'weekly' );
 							if ( ! $insert ) {
@@ -3868,9 +3871,7 @@ function mc_increment_event( $id, $post = array(), $test = false, $instances = a
 						if ( 'test' == $test && $i > 0 ) {
 							return $data;
 						}
-						if ( true == $test ) {
-							$return[] = $data;
-						}
+						$return[] = $data;
 						if ( ! $test ) {
 							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'biweekly' );
 							if ( ! $insert ) {
@@ -3894,9 +3895,7 @@ function mc_increment_event( $id, $post = array(), $test = false, $instances = a
 						if ( 'test' == $test && $i > 0 ) {
 							return $data;
 						}
-						if ( true == $test ) {
-							$return[] = $data;
-						}
+						$return[] = $data;
 						if ( ! $test ) {
 							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'monthly' );
 							if ( ! $insert ) {
@@ -3952,6 +3951,7 @@ function mc_increment_event( $id, $post = array(), $test = false, $instances = a
 						if ( 'test' == $test && $i > 0 ) {
 							return $data;
 						}
+						$return[] = $data;
 						if ( ! $test ) {
 							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'month-by-day' );
 							if ( ! $insert ) {
@@ -3977,9 +3977,7 @@ function mc_increment_event( $id, $post = array(), $test = false, $instances = a
 						if ( 'test' == $test && $i > 0 ) {
 							return $data;
 						}
-						if ( true == $test ) {
-							$return[] = $data;
-						}
+						$return[] = $data;
 						if ( ! $test ) {
 							$insert = apply_filters( 'mc_insert_recurring', false, $data, $format, $id, 'annual' );
 							if ( ! $insert ) {

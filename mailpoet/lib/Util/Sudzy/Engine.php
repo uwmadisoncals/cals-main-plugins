@@ -37,7 +37,10 @@ class Engine
 
     public function executeOne($check, $val, $params=array())
     {
-        return call_user_func(__NAMESPACE__ .'\Engine::'.$check, $val, $params);
+      $callback = __NAMESPACE__ .'\Engine::'.$check;
+      if (is_callable($callback)) {
+        return call_user_func($callback, $val, $params);
+      }
     }
 
     /**
@@ -62,7 +65,7 @@ class Engine
     }
 
     /**
-    * @return string The list of usable validator methods
+    * @return array<int, int|string> The list of usable validator methods
     */
     public function getValidators()
     {

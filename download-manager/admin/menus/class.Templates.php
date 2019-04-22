@@ -22,7 +22,7 @@ class Templates
     }
 
     function UI(){
-        $ttype = isset($_GET['_type']) ? $_GET['_type'] : 'link';
+        $ttype = isset($_GET['_type']) ? esc_attr($_GET['_type']) : 'link';
 
        if (isset($_GET['task']) && $_GET['task'] == 'EditEmailTemplate')
             \WPDM\admin\menus\Templates::EmailEditor();
@@ -70,7 +70,7 @@ class Templates
     function Save()
     {
         if (!isset($_GET['page']) || $_GET['page'] != 'templates') return;
-        $ttype = isset($_GET['_type']) ? $_GET['_type'] : 'link';
+        $ttype = isset($_GET['_type']) ? esc_attr($_GET['_type']) : 'link';
         if (isset($_GET['task']) && $_GET['task'] == 'DeleteTemplate') {
             $tpldata = maybe_unserialize(get_option("_fm_{$ttype}_templates"));
             if (!is_array($tpldata)) $tpldata = array();

@@ -158,7 +158,7 @@ function rvm_ajax_custom_map( $post_id ) {
                                                                                 $output .= '<script>jQuery( "#unzip_button" ).attr("disabled", "disabled");</script>';
                                                                 } //if ( $unzipfile && $rvm_valid_unzip  )
                                                                 else {
-                                                                                $output .= '<p class="rvm_messages rvm_error_messages"><img  src="' . RVM_IMG_PLUGIN_DIR . '/warning-icon.png" alt="Warning" /><span>' . __( 'Damned... Something went wrong !  Please check if name of the map is correct ( place just map name)  or if you have uploaded the map previous month and try again uploading map now using wordpress media uploader.', RVM_TEXT_DOMAIN ) . '</span></p>';
+                                                                                $output .= '<p class="rvm_messages rvm_error_messages"><img  src="' . RVM_IMG_PLUGIN_DIR . '/warning-icon.png" alt="Warning" /><span>' . __( 'Damn it... Something went wrong !  Please check if name of the map is correct ( place just map name)  or if you have uploaded the map previous month and try again uploading map now using wordpress media uploader.', RVM_TEXT_DOMAIN ) . '</span></p>';
                                                                 }
                                                                 
                                                                 die( $output );
@@ -259,7 +259,7 @@ function rvm_ajax_custom_marker_icon_module() {
         }//isset( $_REQUEST[ 'nonce' ] ) && isset( $_REQUEST[ 'custom_marker_icon_module_path' ] )
 
         else {
-            $output .= '<p class="rvm_messages rvm_error_messages"><img  src="' . RVM_IMG_PLUGIN_DIR . '/warning-icon.png" alt="Warning" /><span>' . __( 'Uhmmm...there are some issues installing the marker module', RVM_TEXT_DOMAIN ) . '</span></p>';
+            $output .= '<p class="rvm_messages rvm_error_messages"><img  src="' . RVM_IMG_PLUGIN_DIR . '/warning-icon.png" alt="Warning" /><span>' . __( 'Uhmmm... there are some issues installing the marker module', RVM_TEXT_DOMAIN ) . '</span></p>';
         }
     
         die( $output );
@@ -276,7 +276,7 @@ function rvm_ajax_restore_default_marker_icon() {
         $output .= '<p class="rvm_messages rvm_success_messages"><img  src="' . RVM_IMG_PLUGIN_DIR . '/green-check4.png" alt="Success" /><span>' . __( 'Default marker icon correctly restored !', RVM_TEXT_DOMAIN ) . '</span></p>';
     }
     else {
-        $output .= '<p class="rvm_messages rvm_error_messages"><img  src="' . RVM_IMG_PLUGIN_DIR . '/warning-icon.png" alt="Warning" /><span>' . __( 'Uhmmm...there are some issues restoring the marker icon', RVM_TEXT_DOMAIN ) . '</span></p>';
+        $output .= '<p class="rvm_messages rvm_error_messages"><img  src="' . RVM_IMG_PLUGIN_DIR . '/warning-icon.png" alt="Warning" /><span>' . __( 'Uhmmm... there are some issues restoring the marker icon', RVM_TEXT_DOMAIN ) . '</span></p>';
     }
 
     die( $output ) ;

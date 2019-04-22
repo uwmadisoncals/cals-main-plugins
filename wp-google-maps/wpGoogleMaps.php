@@ -3,7 +3,7 @@
 Plugin Name: WP Google Maps
 Plugin URI: https://www.wpgmaps.com
 Description: The easiest to use Google Maps plugin! Create custom Google Maps with high quality markers containing locations, descriptions, images and links. Add your customized map to your WordPress posts and/or pages quickly and easily with the supplied shortcode. No fuss.
-Version: 7.11.14
+Version: 7.11.21
 Author: WP Google Maps
 Author URI: https://www.wpgmaps.com
 Text Domain: wp-google-maps
@@ -11,6 +11,45 @@ Domain Path: /languages
 */
 
 /*
+ * 7.11.21 :- 2019-04-16 :- Low priority
+ * Added serializeFormData to DOMDocument and DOMElement
+ * Added new event for InfoWindows - domready.wpgmza
+ * Added new function WPGMZA.extend for shorthand extension of modules
+ * Added warning when WPGMZA.RestAPI.call is called (as opposed to WPGMZA.restAPI.call)
+ * Implemented factory method for map settings page JS module
+ * Changed RestAPI to not throw an error when a call is aborted
+ * Changed DB version checks to use global version string (this module is currently not used)
+ * Fixed missing comma in DB installation code preventing marker table from being created (this module is currently not used)
+ *
+ * 7.11.20 :- 2019-04-09 :- Low priority
+ * Added Mexican Spanish (es_MX) translations
+ * Added revert back to DB pull when XML folder not present
+ * Updated PO files from sources
+ * Fixed rectangles not working when using v6 of Pro
+ *
+ * 7.11.19 :- 2019-04-02 :- Low priority
+ * Readme.txt Upgrade Notice updated
+ * Fixed markers sometimes off position when using OpenLayers
+ *
+ * 7.11.18 :- 2019-04-02 :- High priority
+ * Fixed potential REST API exploit (affects 7.11.00 - 7.11.17 - with thanks to Thomas Chauchefoin)
+ *
+ * 7.11.17 :- 2019-04-02 :- Low priority
+ * Added shortcode attribute classname
+ * Fixed Custom CSS classes in Gutenberg editor not being applied
+ *
+ * 7.11.16 :- 2019-03-28 :- Low priority
+ * Added Catalan translation files
+ * Added hide POI logic to WPGMZA.GoogleMap
+ * Added new global setting WPGMZA.settings.hide_points_of_interest
+ *
+ * 7.11.15 :- 2019-03-25 :- Medium priority
+ * Added caching warning to GDPR Compliance settings panel
+ * Added check for wp.components in Gutenberg module
+ * Renamed Croation translations to correct -hr.* suffix
+ * Fixed incorrect logic causing unapproved markers to appear in Pro marker listings
+ * Relaxed "combined file would be blank" from exception to an admin notice when in the WordPress environment
+ *
  * 7.11.14 :- 2019-03-14 :- Low priority
  * Added convenience function WPGMZA.getQueryParamValue
  * Most PHP now uses isInDeveloperMode() rather than referencing the setting directly

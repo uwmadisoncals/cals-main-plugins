@@ -3,7 +3,6 @@ namespace MailPoet\Models;
 
 use MailPoet\DI\ContainerWrapper;
 use MailPoet\Settings\SettingsController;
-use MailPoet\Subscribers\ConfirmationEmailMailer;
 use MailPoet\Util\Helpers;
 use function MailPoet\Util\array_column;
 use MailPoet\WP\Functions as WPFunctions;
@@ -36,6 +35,7 @@ class Subscriber extends Model {
   const STATUS_UNSUBSCRIBED = 'unsubscribed';
   const STATUS_UNCONFIRMED = 'unconfirmed';
   const STATUS_BOUNCED = 'bounced';
+  const STATUS_INACTIVE = 'inactive';
   const SUBSCRIBER_TOKEN_LENGTH = 6;
 
   /** @var string|bool */
@@ -77,9 +77,7 @@ class Subscriber extends Model {
 
   function delete() {
     // WP Users cannot be deleted
-    if ($this->isWPUser() || $this->isWooCommerceUser()) {
-      return false;
-    } else {
+    if (!$this->isWPUser() && !$this->isWooCommerceUser()) {
       // delete all relations to segments
       SubscriberSegment::deleteSubscriptions($this);
       // delete all relations to custom fields
@@ -151,7 +149,7 @@ class Subscriber extends Model {
   }
 
   static function search($orm, $search = '') {
-    if (strlen(trim($search) === 0)) {
+    if (strlen(trim($search)) === 0) {
       return $orm;
     }
 
@@ -221,7 +219,7 @@ class Subscriber extends Model {
           return self::filter('withoutSegments');
         } else {
           $segment = Segment::findOne($value);
-          if ($segment !== false) {
+          if ($segment instanceof Segment) {
             return $segment->subscribers();
           }
         }
@@ -256,6 +254,11 @@ class Subscriber extends Model {
         'name' => self::STATUS_BOUNCED,
         'label' => WPFunctions::get()->__('Bounced', 'mailpoet'),
         'count' => self::filter(self::STATUS_BOUNCED)->count()
+      ),
+      array(
+        'name' => self::STATUS_INACTIVE,
+        'label' => WPFunctions::get()->__('Inactive', 'mailpoet'),
+        'count' => self::filter(self::STATUS_INACTIVE)->count()
       ),
       array(
         'name' => 'trash',
@@ -462,10 +465,10 @@ class Subscriber extends Model {
       ->where('subscriber_id', $this->id())
       ->findOne();
 
-    if ($custom_field === false) {
-      return $default;
-    } else {
+    if ($custom_field instanceof SubscriberCustomField) {
       return $custom_field->value;
+    } else {
+      return $default;
     }
   }
 
@@ -498,7 +501,10 @@ class Subscriber extends Model {
 
   function setUnconfirmedData(array $subscriber_data) {
     $subscriber_data = self::filterOutReservedColumns($subscriber_data);
-    $this->unconfirmed_data = json_encode($subscriber_data);
+    $encoded = json_encode($subscriber_data);
+    if (is_string($encoded)) {
+      $this->unconfirmed_data = $encoded;
+    }
   }
 
   function getUnconfirmedData() {
@@ -514,7 +520,7 @@ class Subscriber extends Model {
     $segment_id = (isset($data['segment_id']) ? (int)$data['segment_id'] : 0);
     $segment = Segment::findOne($segment_id);
 
-    if ($segment === false) return false;
+    if (!$segment instanceof Segment) return false;
 
     $count = parent::bulkAction($orm,
       function($subscriber_ids) use($segment) {
@@ -534,7 +540,7 @@ class Subscriber extends Model {
     $segment_id = (isset($data['segment_id']) ? (int)$data['segment_id'] : 0);
     $segment = Segment::findOne($segment_id);
 
-    if ($segment === false) return false;
+    if (!$segment instanceof Segment) return false;
 
     $count = parent::bulkAction($orm,
       function($subscriber_ids) use($segment) {
@@ -555,7 +561,7 @@ class Subscriber extends Model {
     $segment_id = (isset($data['segment_id']) ? (int)$data['segment_id'] : 0);
     $segment = Segment::findOne($segment_id);
 
-    if ($segment === false) return false;
+    if (!$segment instanceof Segment) return false;
 
     $count = $orm->count();
 
@@ -583,30 +589,11 @@ class Subscriber extends Model {
     );
   }
 
-  static function bulkSendConfirmationEmail($orm) {
-    $subscribers = $orm
-      ->where('status', self::STATUS_UNCONFIRMED)
-      ->findMany();
-
-    $emails_sent = 0;
-    if (!empty($subscribers)) {
-      $sender = new ConfirmationEmailMailer();
-      foreach ($subscribers as $subscriber) {
-        if ($sender->sendConfirmationEmail($subscriber)) {
-          $emails_sent++;
-        }
-      }
-    }
-
-    return array(
-      'count' => $emails_sent
-    );
-  }
-
   static function getTotalSubscribers() {
     return self::whereIn('status', array(
       self::STATUS_SUBSCRIBED,
-      self::STATUS_UNCONFIRMED
+      self::STATUS_UNCONFIRMED,
+      self::STATUS_INACTIVE
     ))
     ->whereNull('deleted_at')
     ->count();
@@ -668,6 +655,12 @@ class Subscriber extends Model {
     return $orm
       ->whereNull('deleted_at')
       ->where('status', self::STATUS_BOUNCED);
+  }
+
+  static function inactive($orm) {
+    return $orm
+      ->whereNull('deleted_at')
+      ->where('status', self::STATUS_INACTIVE);
   }
 
   static function withoutSegments($orm) {
@@ -819,5 +812,14 @@ class Subscriber extends Model {
     trigger_error('Calling Subscriber::subscribe() is deprecated and will be removed. Use MailPoet\API\MP\v1\API instead. ', E_USER_DEPRECATED);
     $service = ContainerWrapper::getInstance()->get(\MailPoet\Subscribers\SubscriberActions::class);
     return $service->subscribe($subscriber_data, $segment_ids);
+  }
+
+  /**
+   * @deprecated
+   */
+  static function bulkSendConfirmationEmail($orm) {
+    trigger_error('Calling Subscriber::bulkSendConfirmationEmail() is deprecated and will be removed. Use MailPoet\API\MP\v1\API instead. ', E_USER_DEPRECATED);
+    $service = ContainerWrapper::getInstance()->get(\MailPoet\Subscribers\SubscriberActions::class);
+    return $service->bulkSendConfirmationEmail($orm);
   }
 }

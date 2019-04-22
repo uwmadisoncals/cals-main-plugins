@@ -5,7 +5,7 @@ Tags: calendar, dates, times, event, events, scheduling, schedule, event manager
 Requires at least: 4.4
 Tested up to: 5.1
 Requires PHP: 5.3
-Stable tag: 3.1.6
+Stable tag: 3.1.9
 Text domain: my-calendar
 License: GPLv2 or later
 
@@ -82,6 +82,28 @@ Translating my plug-ins is always appreciated. Visit <a href="https://translate.
 4. Visit My Calendar -> Help for assistance with shortcode options or widget configuration.
 
 == Changelog ==
+
+= 3.1.9 =
+
+* Undefined variable notice.
+* Disable Yoast canonical URL output on single events
+* Use same time variable in templates & in main layout.
+* Using default title template and empty time text, don't display unneeded colon.
+
+= 3.1.8 =
+
+* Bug fix: 'event_begin' is not always a string, so 'mc_event_date' not always registered correctly.
+* Update 'sortable' code to be prepared for My Calendar Pro 1.9.0.
+* Add 'mc_date_format()' function to get appropriate date format
+* Minor settings design changes.
+
+= 3.1.7 =
+
+* Add meta field '_mc_event_date' for use in My Tickets
+* Add option to disable output link using an explicit option.
+* Change the JS so popups are only attached to links.
+* Better UI with custom & deleted occurrences in recurring events.
+* Bug fix: sessions should only be started if a search has been performed.
 
 = 3.1.6 =
 

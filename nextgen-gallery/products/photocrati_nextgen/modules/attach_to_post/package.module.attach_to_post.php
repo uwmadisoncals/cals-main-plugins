@@ -445,7 +445,6 @@ class Mixin_Attach_To_Post extends Mixin
         $image_mapper = $this->get_registry()->get_utility('I_Image_Mapper', $context);
         $display_type_mapper = $this->get_registry()->get_utility('I_Display_Type_Mapper', $context);
         $sources = C_Displayed_Gallery_Source_Manager::get_instance();
-        $security = $this->get_registry()->get_utility('I_Security_Manager');
         $settings = C_NextGen_Settings::get_instance();
         // Get the nextgen tags
         global $wpdb;
@@ -456,6 +455,7 @@ class Mixin_Attach_To_Post extends Mixin
         array_unshift($tags, $all_tags);
         $display_types = array();
         $registry = C_Component_Registry::get_instance();
+        $display_type_mapper->flush_query_cache();
         foreach ($display_type_mapper->find_all() as $display_type) {
             if (isset($display_type->hidden_from_igw) && $display_type->hidden_from_igw || isset($display_type->hidden_from_ui) && $display_type->hidden_from_ui) {
                 continue;
@@ -464,12 +464,25 @@ class Mixin_Attach_To_Post extends Mixin
             if (!apply_filters('ngg_atp_show_display_type', $available, $display_type)) {
                 continue;
             }
+            // Some display types were saved with values like "nextgen-gallery-pro/modules/nextgen_pro_imagebrowser/static/preview.jpg"
+            // as the preview_image_relpath property
+            if (strpos($display_type->preview_image_relpath, '#') === FALSE) {
+                $static_path = preg_replace("#^.*static/#", "", $display_type->preview_image_relpath);
+                $module_id = isset($display_type->module_id) ? $display_type->module_id : $display_type->name;
+                if ($module_id == 'photocrati-nextgen_basic_slideshow') {
+                    $display_type->module_id = $module_id = 'photocrati-nextgen_basic_gallery';
+                }
+                $display_type->preview_image_relpath = "{$module_id}#{$static_path}";
+                $display_type_mapper->save($display_type);
+                $display_type_mapper->flush_query_cache();
+            }
+            $display_type->preview_image_url = M_Static_Assets::get_static_url($display_type->preview_image_relpath);
             $display_types[] = $display_type;
         }
         usort($display_types, array($this->object, '_display_type_list_sort'));
         wp_enqueue_script('ngg_display_tab', $this->get_static_url('photocrati-attach_to_post#display_tab.js'), array('jquery', 'backbone', 'photocrati_ajax'), NGG_SCRIPT_VERSION);
         $this->object->mark_script('ngg_display_tab');
-        wp_localize_script('ngg_display_tab', 'igw_data', array('displayed_gallery_preview_url' => $settings->gallery_preview_url, 'displayed_gallery' => $this->object->_displayed_gallery->get_entity(), 'sources' => $sources->get_all(), 'gallery_primary_key' => $gallery_mapper->get_primary_key_column(), 'galleries' => $gallery_mapper->find_all(), 'albums' => $album_mapper->find_all(), 'tags' => $tags, 'display_types' => $display_types, 'sec_token' => $security->get_request_token('nextgen_edit_displayed_gallery')->get_json(), 'image_primary_key' => $image_mapper->get_primary_key_column(), 'display_type_priority_base' => NGG_DISPLAY_PRIORITY_BASE, 'display_type_priority_step' => NGG_DISPLAY_PRIORITY_STEP, 'shortcode_ref' => isset($_REQUEST['ref']) ? floatval($_REQUEST['ref']) : null, 'shortcode_defaults' => array('order_by' => $settings->galSort, 'order_direction' => $settings->galSortDir, 'returns' => 'included', 'maximum_entity_count' => $settings->maximum_entity_count), 'shortcode_attr_replacements' => array('source' => 'src', 'container_ids' => 'ids', 'display_type' => 'display'), 'i18n' => array('sources' => __('Are you inserting a Gallery (default), an Album, or images based on Tags?', 'nggallery'), 'optional' => __('(optional)', 'nggallery'), 'slug_tooltip' => __('Sets an SEO-friendly name to this gallery for URLs. Currently only in use by the Pro Lightbox', 'nggallery'), 'slug_label' => __('Slug', 'nggallery'), 'no_entities' => __('No entities to display for this source', 'nggallery'), 'exclude_question' => __('Exclude?', 'nggallery'), 'select_gallery' => __('Select a Gallery', 'nggallery'), 'galleries' => __('Select one or more galleries (click in box to see available galleries).', 'nggallery'), 'albums' => __('Select one album (click in box to see available albums).', 'nggallery'))));
+        wp_localize_script('ngg_display_tab', 'igw_data', array('displayed_gallery_preview_url' => $settings->gallery_preview_url, 'displayed_gallery' => $this->object->_displayed_gallery->get_entity(), 'sources' => $sources->get_all(), 'gallery_primary_key' => $gallery_mapper->get_primary_key_column(), 'galleries' => $gallery_mapper->find_all(), 'albums' => $album_mapper->find_all(), 'tags' => $tags, 'display_types' => $display_types, 'nonce' => M_Security::create_nonce('nextgen_edit_displayed_gallery'), 'image_primary_key' => $image_mapper->get_primary_key_column(), 'display_type_priority_base' => NGG_DISPLAY_PRIORITY_BASE, 'display_type_priority_step' => NGG_DISPLAY_PRIORITY_STEP, 'shortcode_ref' => isset($_REQUEST['ref']) ? floatval($_REQUEST['ref']) : null, 'shortcode_defaults' => array('order_by' => $settings->galSort, 'order_direction' => $settings->galSortDir, 'returns' => 'included', 'maximum_entity_count' => $settings->maximum_entity_count), 'shortcode_attr_replacements' => array('source' => 'src', 'container_ids' => 'ids', 'display_type' => 'display'), 'i18n' => array('sources' => __('Are you inserting a Gallery (default), an Album, or images based on Tags?', 'nggallery'), 'optional' => __('(optional)', 'nggallery'), 'slug_tooltip' => __('Sets an SEO-friendly name to this gallery for URLs. Currently only in use by the Pro Lightbox', 'nggallery'), 'slug_label' => __('Slug', 'nggallery'), 'no_entities' => __('No entities to display for this source', 'nggallery'), 'exclude_question' => __('Exclude?', 'nggallery'), 'select_gallery' => __('Select a Gallery', 'nggallery'), 'galleries' => __('Select one or more galleries (click in box to see available galleries).', 'nggallery'), 'albums' => __('Select one album (click in box to see available albums).', 'nggallery'))));
     }
     function start_resource_monitoring()
     {
@@ -603,18 +616,16 @@ class Mixin_Attach_To_Post extends Mixin
     function _get_main_tabs()
     {
         $retval = array();
-        $security = $this->get_registry()->get_utility('I_Security_Manager');
-        $sec_actor = $security->get_current_actor();
-        if ($sec_actor->is_allowed('NextGEN Manage gallery')) {
+        if (M_Security::is_allowed('NextGEN Manage gallery')) {
             $retval['displayed_tab'] = array('content' => $this->object->_render_display_tab(), 'title' => __('Insert Into Page', 'nggallery'));
         }
-        if ($sec_actor->is_allowed('NextGEN Upload images')) {
+        if (M_Security::is_allowed('NextGEN Upload images')) {
             $retval['create_tab'] = array('content' => $this->object->_render_create_tab(), 'title' => __('Upload Images', 'nggallery'));
         }
-        if ($sec_actor->is_allowed('NextGEN Manage others gallery') && $sec_actor->is_allowed('NextGEN Manage gallery')) {
+        if (M_Security::is_allowed('NextGEN Manage others gallery') && M_Security::is_allowed('NextGEN Manage gallery')) {
             $retval['galleries_tab'] = array('content' => $this->object->_render_galleries_tab(), 'title' => __('Manage Galleries', 'nggallery'));
         }
-        if ($sec_actor->is_allowed('NextGEN Edit album')) {
+        if (M_Security::is_allowed('NextGEN Edit album')) {
             $retval['albums_tab'] = array('content' => $this->object->_render_albums_tab(), 'title' => __('Manage Albums', 'nggallery'));
         }
         // if ($sec_actor->is_allowed('NextGEN Manage tags')) {

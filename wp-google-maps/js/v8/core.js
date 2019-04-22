@@ -78,6 +78,15 @@ jQuery(function($) {
 			
 		},
 		
+		extend: function(child, parent) {
+			
+			var constructor = child;
+			
+			child.prototype = Object.create(parent.prototype);
+			child.prototype.constructor = constructor;
+			
+		},
+		
 		/**
 		 * Generates and returns a GUID
 		 * @method guid
@@ -255,6 +264,15 @@ jQuery(function($) {
 				callback(result);
 			};
 			img.src = src;
+		},
+		
+		decodeEntities: function(input)
+		{
+			return input.replace(/&(nbsp|amp|quot|lt|gt);/g, function(m, e) {
+				return m[e];
+			}).replace(/&#(\d+);/gi, function(m, e) {
+				return String.fromCharCode(parseInt(e, 10));
+			});
 		},
 		
 		/**
@@ -542,6 +560,7 @@ jQuery(function($) {
 			return m[1];
 			
 		}
+		
 	};
 	
 	if(window.WPGMZA)

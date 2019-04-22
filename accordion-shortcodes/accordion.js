@@ -13,7 +13,7 @@
 	$.fn.accordionShortcodes = function(options) {
 
 		var items          = [];
-		var allControllers = $('.js-accordion-controller');
+		var allControllers = $('#' + options.id + ' .js-accordion-controller');
 		var selectedId     = window.location.hash;
 		var duration       = 250;
 		var settings       = $.extend({
@@ -74,7 +74,7 @@
 				clickControllerHandler(item);
 			});
 
-			$(this).keydown(function(event) {
+			$(this).keyup(function(event) {
 				var code = event.which;
 
 				// We only need to add manual keyboard events if _not_ using `<button>` elements

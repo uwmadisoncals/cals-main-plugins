@@ -25,7 +25,7 @@ if ( !empty( $rvm_options[ 'rvm_custom_icon_marker_module_path_verified' ] ) ) {
 }//if ( !empty( $rvm_options[ 'rvm_custom_icon_marker_module_path_verified' ] ) && ( $rvm_options['rvm_custom_icon_marker_module_path_verified'] != 'default' ) )
 
 else {
-	$output .= '<div class="rvm_messages rvm_notice_messages rvm_marker_messages"><img src="' . RVM_IMG_PLUGIN_DIR . '/map-icon-16x16.png' . '" alt="Map pintpoint icon"/>' . __( 'Tired to use the default circle icon for markers\' pinpoints? This is the right time to <a href="http://www.responsivemapsplugin.com/redirect-to-marker-icon-module-from-plugin-dashboard/" target="_blank">download the Custom Icon Marker Module!</a>' , RVM_TEXT_DOMAIN ) . '</div>';
+	$output .= '<div class="rvm_messages rvm_notice_messages rvm_marker_messages"><img src="' . RVM_IMG_PLUGIN_DIR . '/map-icon-16x16.png' . '" alt="Map pintpoint icon"/>' . __( 'Tired to use the default circle icon for Markers\' pinpoints? This is the right time to <a href="https://www.responsivemapsplugin.com/redirect-to-marker-icon-module-from-plugin-dashboard/" target="_blank">download the Custom Icon Marker Module!</a>' , RVM_TEXT_DOMAIN ) . '</div>';
 }
 
 //End : marker uploader   
@@ -72,7 +72,7 @@ if( is_array( $marker_array_unserialized[ 'rvm_marker_name_array' ] ) && ( $rvm_
 
     $output .= '<div id="rvm_markers_delete_button_wrapper">' ;
 
-    $output .= '<input type="button" id="rvm_delete_all_markers_button" class="button-primary"  value=" ' . __( 'Delete all markers', RVM_TEXT_DOMAIN ) . '" />';
+    $output .= '<input type="button" id="rvm_delete_all_markers_button" class="button-primary"  value=" ' . __( 'Delete all Markers', RVM_TEXT_DOMAIN ) . '" />';
 
     $output .= '</div>';
     
@@ -96,7 +96,7 @@ if( !rvm_check_custom_marker_icon_available( $rvm_custom_marker_icon_path ) || e
     $output .=  '</div>' ; //.rvm_markers_values
     $output .= '<div style="clear:left;"></div>' ;
     $output .= '<h2 class="rvm_h2_title">' . __( 'Markers Dimensions' , RVM_TEXT_DOMAIN ) . '</h2>' ;
-    $output .= '<p>' . __( 'Minimum and maximum values will affect the radius dimensions of the markers. Basically they are a scale within input values for marker dimensions will be represented. The smallest will be equal to "minimum value" while the biggest will be equal to "maximum value". Default values are', RVM_TEXT_DOMAIN ) .  RVM_MARKER_DIM_MIN_VALUE . __(' and ', RVM_TEXT_DOMAIN ) . RVM_MARKER_DIM_MAX_VALUE . '.</p>' ;
+    $output .= '<p>' . __( 'Minimum and maximum values will affect the radius dimensions of the Markers. Basically they are a scale within input values for marker dimensions will be represented. The smallest will be equal to "minimum value" while the biggest will be equal to "maximum value". Default values are', RVM_TEXT_DOMAIN ) .  RVM_MARKER_DIM_MIN_VALUE . __(' and ', RVM_TEXT_DOMAIN ) . RVM_MARKER_DIM_MAX_VALUE . '.</p>' ;
     $output .= isset( $output_marker_dim_min ) ? $output_marker_dim_min : '' ;
     $output .= isset( $output_marker_dim_max ) ? $output_marker_dim_max : '' ;  
     $output .= '<div style="clear:left;"></div>' ;   
@@ -128,7 +128,7 @@ $output .= '<div class="rvm_import_markers_button_wrapper">';
 $output .= '<input type="hidden" id="rvm_upload_markers_file_path" value=""/>';
 $output .= '<input type="button" id="rvm_upload_markers_button" class="button-primary rvm_media_uploader"  value=" ' . __( 'Select Markers File', RVM_TEXT_DOMAIN ) . '" />';
 $output .= '<input type="button" id="rvm_import_markers_button" class="button-primary"  value=" ' . __( 'Import Markers', RVM_TEXT_DOMAIN ) . '" />';
-$output .= '<input type="button" id="rvm_import_reset_markers_button" class="button-secondary"  value=" ' . __( 'Oops...I messed up, I want to go back', RVM_TEXT_DOMAIN ) . '" onclick="window.location.reload();" />';
+$output .= '<input type="button" id="rvm_import_reset_markers_button" class="button-secondary"  value=" ' . __( 'Oops... I messed up, I want to go back', RVM_TEXT_DOMAIN ) . '" onclick="window.location.reload();" />';
 
 $output .= '</div>';// .rvm_import_markers_button_wrapper
 $output .= '<div id="rvm_import_markers_status" class="rvm_messages rvm_notice_messages"></div>' ;

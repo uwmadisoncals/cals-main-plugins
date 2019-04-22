@@ -8,6 +8,8 @@
 namespace WPDM\admin\menus;
 
 
+use WPDM\Session;
+
 class Addons
 {
 
@@ -18,18 +20,18 @@ class Addons
 
     function Menu()
     {
-        add_submenu_page('edit.php?post_type=wpdmpro', __('Add-Ons &lsaquo; Download Manager', "wpdmpro"), __('Add-Ons', "wpdmpro"), WPDM_MENU_ACCESS_CAP, 'wpdm-addons', array($this, 'UI'));
+        add_submenu_page('edit.php?post_type=wpdmpro', __( "Add-Ons &lsaquo; Download Manager" , "download-manager" ), __("Add-Ons" , "download-manager" ), WPDM_MENU_ACCESS_CAP, 'wpdm-addons', array($this, 'UI'));
     }
 
     function UI(){
-        if (!isset($_SESSION['wpdm_addon_store_data']) || !is_array(json_decode($_SESSION['wpdm_addon_store_data']))) {
+        if (!Session::get('wpdm_addon_store_data') || !is_array(json_decode(Session::get('wpdm_addon_store_data')))) {
             $data = remote_get('https://www.wpdownloadmanager.com/?wpdm_api_req=getPackageList');
             $cats = remote_get('https://www.wpdownloadmanager.com/?wpdm_api_req=getCategoryList');
-            $_SESSION['wpdm_addon_store_data'] = $data;
-            $_SESSION['wpdm_addon_store_cats'] = $cats;
+            Session::set('wpdm_addon_store_data', $data);
+            Session::set('wpdm_addon_store_cats', $cats);
         } else {
-            $data = $_SESSION['wpdm_addon_store_data'];
-            $cats = $_SESSION['wpdm_addon_store_cats'];
+            $data = Session::get('wpdm_addon_store_data');
+            $cats = Session::get('wpdm_addon_store_cats');
         }
         $error = $data;
         $data = json_decode($data);

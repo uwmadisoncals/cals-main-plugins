@@ -90,13 +90,13 @@ function ga_google_analytics_universal() {
 			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 			})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+<?php if ($custom_code) echo "\t\t\t" . $custom_code . "\n"; ?>
 			ga('create', '<?php echo $tracking_id; ?>', 'auto'<?php if ($tracker_object) echo ', '. $tracker_object; ?>);
 			<?php 
-				if ($display_ads) echo $ga_display  . "\n\t\t\t";
-				if ($link_attr)   echo $ga_link     . "\n\t\t\t";
-				if ($anonymize)   echo $ga_anon     . "\n\t\t\t";
-				if ($force_ssl)   echo $ga_ssl      . "\n\t\t\t";
-				if ($custom_code) echo $custom_code . "\n\t\t\t";
+				if ($display_ads) echo $ga_display . "\n\t\t\t";
+				if ($link_attr)   echo $ga_link    . "\n\t\t\t";
+				if ($anonymize)   echo $ga_anon    . "\n\t\t\t";
+				if ($force_ssl)   echo $ga_ssl     . "\n\t\t\t";
 			?>ga('send', 'pageview');
 		</script>
 
@@ -116,10 +116,9 @@ function ga_google_analytics_global() {
 		<script>
 			window.dataLayer = window.dataLayer || [];
 			function gtag(){dataLayer.push(arguments);}
+<?php if ($custom_code) echo "\t\t\t" . $custom_code . "\n"; ?>
 			gtag('js', new Date());
 			gtag('config', '<?php echo $tracking_id; ?>'<?php if ($tracker_object) echo ', '. $tracker_object; ?>);
-			<?php if ($custom_code) echo $custom_code; ?>
-
 		</script>
 
 	<?php

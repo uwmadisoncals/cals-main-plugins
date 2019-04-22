@@ -18,7 +18,7 @@ class M_NextGen_Settings extends C_Base_Module
 			'photocrati-nextgen_settings',
 			'NextGEN Gallery Settings',
 			'Provides central management for NextGEN Gallery settings',
-			'3.1.6',
+			'3.1.8',
 			'https://www.imagely.com/wordpress-gallery-plugin/nextgen-gallery/',
 			'Imagely',
 			'https://www.imagely.com'
@@ -53,10 +53,9 @@ class C_NextGen_Settings_Installer
 			'wpmuImportFolder' => FALSE,
 			'wpmuZipUpload'    => FALSE,
 			'wpmuQuotaCheck'   => FALSE,
-			'datamapper_driver'     => 'custom_table_datamapper',
-			'gallerystorage_driver' => 'ngglegacy_gallery_storage',
-			'maximum_entity_count'  => 500,
-			'router_param_slug'     => 'nggallery'
+			'datamapper_driver'    => 'custom_table_datamapper',
+			'maximum_entity_count' => 500,
+			'router_param_slug'    => 'nggallery'
 		);
 
 		$this->_local_settings = array(

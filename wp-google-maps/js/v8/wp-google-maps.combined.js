@@ -80,6 +80,15 @@ jQuery(function($) {
 			
 		},
 		
+		extend: function(child, parent) {
+			
+			var constructor = child;
+			
+			child.prototype = Object.create(parent.prototype);
+			child.prototype.constructor = constructor;
+			
+		},
+		
 		/**
 		 * Generates and returns a GUID
 		 * @method guid
@@ -257,6 +266,15 @@ jQuery(function($) {
 				callback(result);
 			};
 			img.src = src;
+		},
+		
+		decodeEntities: function(input)
+		{
+			return input.replace(/&(nbsp|amp|quot|lt|gt);/g, function(m, e) {
+				return m[e];
+			}).replace(/&#(\d+);/gi, function(m, e) {
+				return String.fromCharCode(parseInt(e, 10));
+			});
 		},
 		
 		/**
@@ -544,6 +562,7 @@ jQuery(function($) {
 			return m[1];
 			
 		}
+		
 	};
 	
 	if(window.WPGMZA)
@@ -2390,6 +2409,11 @@ jQuery(function($) {
 		});
 	}
 	
+	WPGMZA.MapSettingsPage.createInstance = function()
+	{
+		return new WPGMZA.MapSettingsPage();
+	}
+	
 	/**
 	 * Updates engine specific controls, hiding irrelevant controls (eg Google controls when OpenLayers is the selected engine) and showing relevant controls.
 	 * @method
@@ -2443,7 +2467,7 @@ jQuery(function($) {
 		if(!window.location.href.match(/wp-google-maps-menu-settings/))
 			return;
 		
-		WPGMZA.mapSettingsPage = new WPGMZA.MapSettingsPage();
+		WPGMZA.mapSettingsPage = WPGMZA.MapSettingsPage.createInstance();
 		
 	});
 	
@@ -3810,6 +3834,11 @@ jQuery(function($) {
 		
 	}
 	
+	WPGMZA.Marker.prototype.setOpacity = function(opacity)
+	{
+		
+	}
+	
 	/**
 	 * Centers the map this marker belongs to on this marker
 	 * @method
@@ -4847,7 +4876,23 @@ jQuery(function($) {
 			xhr.setRequestHeader('X-WP-Nonce', WPGMZA.restnonce);
 		};
 		
+		if(!params.error)
+			params.error = function(xhr, status, message) {
+				if(status == "abort")
+					return;	// Don't report abort, let it happen silently
+				
+				throw new Error(message);
+			}
+		
 		return $.ajax(WPGMZA.RestAPI.URL + route, params);
+	}
+	
+	var nativeCallFunction = WPGMZA.RestAPI.call;
+	WPGMZA.RestAPI.call = function()
+	{
+		console.warn("WPGMZA.RestAPI.call was called statically, did you mean to call the function on WPGMZA.restAPI?");
+		
+		nativeCallFunction.apply(this, arguments);
 	}
 	
 });
@@ -5005,6 +5050,10 @@ jQuery(function($) {
 		
 	}
 	
+	WPGMZA.Version.GREATER_THAN		= 1;
+	WPGMZA.Version.EQUAL_TO			= 0;
+	WPGMZA.Version.LESS_THAN		= -1;
+	
 	/**
 	 * Compare two software version numbers (e.g. 1.7.1)
 	 * Returns:
@@ -5082,7 +5131,7 @@ jQuery(function($) {
  */
 jQuery(function ($) {
 
-	if (!window.wp || !wp.i18n || !wp.blocks || !wp.editor) return;
+	if (!window.wp || !wp.i18n || !wp.blocks || !wp.editor || !wp.components) return;
 
 	var __ = wp.i18n.__;
 	var registerBlockType = wp.blocks.registerBlockType;
@@ -5331,6 +5380,25 @@ jQuery(function($) {
 	
 	WPGMZA.GoogleCircle.prototype = Object.create(WPGMZA.Circle.prototype);
 	WPGMZA.GoogleCircle.prototype.constructor = WPGMZA.GoogleCircle;
+	
+	WPGMZA.GoogleCircle.prototype.setCenter = function(center)
+	{
+		WPGMZA.Circle.prototype.setCenter.apply(this, arguments);
+		
+		this.googleCircle.setCenter(center);
+	}
+	
+	WPGMZA.GoogleCircle.prototype.setRadius = function(radius)
+	{
+		WPGMZA.Circle.prototype.setRadius.apply(this, arguments);
+		
+		this.googleCircle.setRadius(parseFloat(radius) * 1000);
+	}
+	
+	WPGMZA.GoogleCircle.prototype.setVisible = function(visible)
+	{
+		this.googleCircle.setVisible(visible ? true : false);
+	}
 	
 });
 
@@ -5589,6 +5657,11 @@ jQuery(function($) {
 			return;
 		
 		this.googleInfoWindow = new google.maps.InfoWindow();
+		
+		google.maps.event.addListener(this.googleInfoWindow, "domready", function(event) {
+			self.trigger("domready");
+		});
+		
 		google.maps.event.addListener(this.googleInfoWindow, "closeclick", function(event) {
 			self.mapObject.map.trigger("infowindowclose");
 		});
@@ -5792,7 +5865,7 @@ jQuery(function($) {
 			this.enableTrafficLayer(true);
 		if(this.settings.transport == 1)
 			this.enablePublicTransportLayer(true);
-		this.showPointsOfInterest(this.settings.show_points_of_interest);
+		this.showPointsOfInterest(this.settings.show_point_of_interest);
 		
 		// Move the loading wheel into the map element (it has to live outside in the HTML file because it'll be overwritten by Google otherwise)
 		$(this.engineElement).append($(this.element).find(".wpgmza-loader"));
@@ -5812,6 +5885,24 @@ jQuery(function($) {
 				lat: parseFloat(clone.center.lat),
 				lng: parseFloat(clone.center.lng)
 			};
+		
+		if(this.settings.hide_point_of_interest == "1")
+		{
+			var noPoi = {
+				featureType: "poi",
+				elementType: "labels",
+				stylers: [
+					{
+						visibility: "off"
+					}
+				]
+			};
+			
+			if(!clone.styles)
+				clone.styles = [];
+			
+			clone.styles.push(noPoi);
+		}
 		
 		this.googleMap.setOptions(clone);
 	}
@@ -6391,6 +6482,11 @@ jQuery(function($) {
 		this.googleMarker.setDraggable(draggable);
 	}
 	
+	WPGMZA.GoogleMarker.prototype.setOpacity = function(opacity)
+	{
+		this.googleMarker.setOpacity(opacity);
+	}
+	
 });
 
 // js/v8/google-maps/google-modern-store-locator-circle.js
@@ -6937,38 +7033,46 @@ jQuery(function($) {
 		
 		this.olStyle = new ol.style.Style(this.getStyleFromSettings());
 		
-		// IMPORTANT: Please note that due to what appears to be a bug in OpenLayers, the following code MUST be exected specifically in this order, or the circle won't appear
-		var vectorLayer3857 = new ol.layer.Vector({
+		this.vectorLayer3857 = this.layer = new ol.layer.Vector({
 			source: new ol.source.Vector(),
 			style: this.olStyle
 		});
 		
 		if(olFeature)
-		{
 			this.olFeature = olFeature;
-		}
 		else
-		{
-			var wgs84Sphere = new ol.Sphere(6378137);
-			var radius = this.radius;
-			var x, y;
-			
-			x = this.center.lng;
-			y = this.center.lat;
-			
-			var circle4326 = ol.geom.Polygon.circular(wgs84Sphere, [x, y], radius, 64);
-			var circle3857 = circle4326.clone().transform('EPSG:4326', 'EPSG:3857');
-			
-			vectorLayer3857.getSource().addFeature(new ol.Feature(circle3857));
-		}
-		
-		this.layer = vectorLayer3857;
-		
-		options.map.olMap.addLayer(vectorLayer3857);
+			this.recreate();
 	}
 	
 	WPGMZA.OLCircle.prototype = Object.create(Parent.prototype);
 	WPGMZA.OLCircle.prototype.constructor = WPGMZA.OLCircle;
+	
+	WPGMZA.OLCircle.prototype.recreate = function()
+	{
+		if(this.olFeature)
+		{
+			this.layer.getSource().removeFeature(this.olFeature);
+			delete this.olFeature;
+		}
+		
+		if(!this.center || !this.radius)
+			return;
+		
+		// IMPORTANT: Please note that due to what appears to be a bug in OpenLayers, the following code MUST be exected specifically in this order, or the circle won't appear
+		var wgs84Sphere = new ol.Sphere(6378137);
+		var radius = parseFloat(this.radius) * 1000;
+		var x, y;
+		
+		x = this.center.lng;
+		y = this.center.lat;
+		
+		var circle4326 = ol.geom.Polygon.circular(wgs84Sphere, [x, y], radius, 64);
+		var circle3857 = circle4326.clone().transform('EPSG:4326', 'EPSG:3857');
+		
+		this.olFeature = new ol.Feature(circle3857);
+		
+		this.layer.getSource().addFeature(this.olFeature);
+	}
 	
 	WPGMZA.OLCircle.prototype.getStyleFromSettings = function()
 	{
@@ -6993,6 +7097,25 @@ jQuery(function($) {
 		var params = this.getStyleFromSettings();
 		this.olStyle = new ol.style.Style(params);
 		this.layer.setStyle(this.olStyle);
+	}
+	
+	WPGMZA.OLCircle.prototype.setVisible = function(visible)
+	{
+		this.layer.setVisible(visible ? true : false);
+	}
+	
+	WPGMZA.OLCircle.prototype.setCenter = function(center)
+	{
+		WPGMZA.Circle.prototype.setCenter.apply(this, arguments);
+		
+		this.recreate();
+	}
+	
+	WPGMZA.OLCircle.prototype.setRadius = function(radius)
+	{
+		WPGMZA.Circle.prototype.setRadius.apply(this, arguments);
+		
+		this.recreate();
 	}
 	
 });
@@ -7246,6 +7369,7 @@ jQuery(function($) {
 		$(this.element).show();
 		
 		this.trigger("infowindowopen");
+		this.trigger("domready");
 	}
 	
 	WPGMZA.OLInfoWindow.prototype.close = function(event)
@@ -7934,6 +8058,11 @@ jQuery(function($) {
 			$(this.element).draggable({disabled: true});
 	}
 	
+	WPGMZA.OLMarker.prototype.setOpacity = function(opacity)
+	{
+		$(this.element).css({opacity: opacity});
+	}
+	
 	WPGMZA.OLMarker.prototype.onDragStart = function(event)
 	{
 		this.isBeingDragged = true;
@@ -8404,8 +8533,10 @@ jQuery(function($) {
 		this.element.wpgmzaDataTable = this;
 		this.dataTableElement = this.getDataTableElement();
 
+		var settings = this.getDataTableSettings();
+		
 		this.phpClass			= $(element).attr("data-wpgmza-php-class");
-		this.dataTable			= $(this.dataTableElement).DataTable(this.getDataTableSettings());
+		this.dataTable			= $(this.dataTableElement).DataTable(settings);
 		this.wpgmzaDataTable	= this;
 	}
 	
@@ -8431,6 +8562,9 @@ jQuery(function($) {
 				method: "POST",	// We don't use GET because the request can get bigger than some browsers maximum URL lengths
 				data: function(data, settings) {
 					return self.onAJAXRequest(data, settings);
+				},
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader('X-WP-Nonce', WPGMZA.restnonce);
 				}
 			};
 			
@@ -8841,7 +8975,7 @@ jQuery(function($) {
 	$(document).ready(function(event) {
 		
 		$("[data-wpgmza-admin-marker-datatable]").each(function(index, el) {
-			new WPGMZA.AdminMarkerDataTable(el);
+			WPGMZA.adminMarkerDataTable = new WPGMZA.AdminMarkerDataTable(el);
 		});
 		
 	});
