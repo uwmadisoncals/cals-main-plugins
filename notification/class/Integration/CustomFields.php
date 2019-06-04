@@ -31,10 +31,12 @@ class CustomFields {
 			return;
 		}
 
-		if ( ! empty( $_POST['acf'] ) && function_exists( 'acf' ) ) {
+		if ( ! empty( $_POST['acf'] ) && function_exists( 'acf' ) ) {  // phpcs:ignore
 			$trigger->postpone_action( 'acf/save_post', 10 );
 		} else {
-			$trigger->postpone_action( 'save_post', 1000 );
+			if ( apply_filters( 'notification/integration/custom_fields/should_postpone_save_post', true, $trigger ) ) {
+				$trigger->postpone_action( 'save_post', 1000 );
+			}
 		}
 
 	}

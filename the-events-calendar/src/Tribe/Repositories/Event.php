@@ -282,16 +282,16 @@ class Tribe__Events__Repositories__Event extends Tribe__Repository {
 		$date = Tribe__Date_Utils::build_date_object( $datetime, $timezone )
 		                         ->setTimezone( $this->normal_timezone );
 
-		return array(
-			'meta_query' => array(
-				'ends-before' => array(
+		return [
+			'meta_query' => [
+				'ends-before' => [
 					'key'     => $this->end_meta_key,
 					'compare' => '<',
 					'value'   => $date->format( Tribe__Date_Utils::DBDATETIMEFORMAT ),
 					'type'    => 'DATETIME',
-				),
-			),
-		);
+				],
+			],
+		];
 	}
 
 	/**
@@ -1264,6 +1264,9 @@ class Tribe__Events__Repositories__Event extends Tribe__Repository {
 	 * {@inheritdoc}
 	 */
 	public function filter_postarr_for_create( array $postarr ) {
+		// Before checking on the meta integrity and coherency let's try to normalize it an fill the missing fields.
+		$postarr = $this->filter_meta_input( $postarr );
+
 		// Require some minimum fields.
 		if ( ! isset(
 			$postarr['post_title'],
@@ -1272,7 +1275,7 @@ class Tribe__Events__Repositories__Event extends Tribe__Repository {
 			return false;
 		}
 
-		return parent::filter_postarr_for_create( $this->filter_meta_input( $postarr ) );
+		return parent::filter_postarr_for_create( $postarr );
 	}
 
 	/**

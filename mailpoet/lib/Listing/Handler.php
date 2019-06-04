@@ -17,7 +17,7 @@ class Handler {
         [$data]
       );
       if (!empty($data['selection'])) {
-        $custom_query->whereIn($table_name.'.id', $data['selection']);
+        $custom_query->whereIn($table_name . '.id', $data['selection']);
       }
       return $custom_query;
     } else {
@@ -26,7 +26,7 @@ class Handler {
       $this->setSearch($model, $data);
 
       if (!empty($data['selection'])) {
-        $model->whereIn($table_name.'.id', $data['selection']);
+        $model->whereIn($table_name . '.id', $data['selection']);
       }
       return $model;
     }
@@ -37,28 +37,28 @@ class Handler {
     $table_name = $model_class::$_table;
     $model = \Model::factory($model_class);
     // get groups
-    $groups = array();
+    $groups = [];
     if (method_exists($model_class, 'groups')) {
       $groups = call_user_func_array(
-        array($model_class, 'groups'),
-        array($data)
+        [$model_class, 'groups'],
+        [$data]
       );
     }
 
     // get filters
-    $filters = array();
+    $filters = [];
     if (method_exists($model_class, 'filters')) {
       $filters = call_user_func_array(
-        array($model_class, 'filters'),
-        array($data)
+        [$model_class, 'filters'],
+        [$data]
       );
     }
 
     // get items and total count
     if (method_exists($model_class, 'listingQuery')) {
       $custom_query = call_user_func_array(
-        array($model_class, 'listingQuery'),
-        array($data)
+        [$model_class, 'listingQuery'],
+        [$data]
       );
 
       $count = $custom_query->count();
@@ -66,8 +66,8 @@ class Handler {
       $items = $custom_query
         ->offset($data['offset'])
         ->limit($data['limit'])
-        ->{'order_by_'.$data['sort_order']}(
-          $table_name.'.'.$data['sort_by']
+        ->{'order_by_' . $data['sort_order']}(
+          $table_name . '.' . $data['sort_by']
         )
         ->findMany();
     } else {
@@ -84,12 +84,12 @@ class Handler {
         ->findMany();
     }
 
-    return array(
+    return [
       'count' => $count,
       'filters' => $filters,
       'groups' => $groups,
-      'items' => $items
-    );
+      'items' => $items,
+    ];
   }
 
   private function setSearch(\ORMWrapper $model, array $data) {
@@ -101,8 +101,8 @@ class Handler {
 
   private function setOrder(\ORMWrapper $model, array $data, $table_name) {
     return $model
-      ->{'order_by_'.$data['sort_order']}(
-        $table_name.'.'.$data['sort_by']);
+      ->{'order_by_' . $data['sort_order']}(
+        $table_name . '.' . $data['sort_by']);
   }
 
   private function setGroup(\ORMWrapper $model, array $data) {
@@ -153,7 +153,7 @@ class Handler {
       // filters
       'filter' => (isset($data['filter']) ? $data['filter'] : null),
       // selection
-      'selection' => (isset($data['selection']) ? $data['selection'] : null)
+      'selection' => (isset($data['selection']) ? $data['selection'] : null),
     ];
 
     return $data;

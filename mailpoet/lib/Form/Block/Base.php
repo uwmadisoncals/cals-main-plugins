@@ -7,8 +7,8 @@ use MailPoet\Models\ModelValidator;
 use MailPoet\WP\Functions as WPFunctions;
 
 abstract class Base {
-  protected static function getInputValidation($block, $extra_rules = array()) {
-    $rules = array();
+  protected static function getInputValidation($block, $extra_rules = []) {
+    $rules = [];
 
     if ($block['id'] === 'email') {
       $rules['required'] = true;
@@ -38,18 +38,18 @@ abstract class Base {
       }
     }
 
-    if (in_array($block['type'], array('radio', 'checkbox'))) {
-      $rules['group'] = 'custom_field_'.$block['id'];
-      $rules['errors-container'] = '.mailpoet_error_'.$block['id'];
+    if (in_array($block['type'], ['radio', 'checkbox'])) {
+      $rules['group'] = 'custom_field_' . $block['id'];
+      $rules['errors-container'] = '.mailpoet_error_' . $block['id'];
       $rules['required-message'] = WPFunctions::get()->__('Please select at least one option', 'mailpoet');
     }
 
     if ($block['type'] === 'date') {
-      $rules['group'] = 'custom_field_'.$block['id'];
-      $rules['errors-container'] = '.mailpoet_error_'.$block['id'];
+      $rules['group'] = 'custom_field_' . $block['id'];
+      $rules['errors-container'] = '.mailpoet_error_' . $block['id'];
     }
 
-    $validation = array();
+    $validation = [];
 
     $rules = array_merge($rules, $extra_rules);
 
@@ -59,7 +59,7 @@ abstract class Base {
         if (is_bool($value)) {
           $value = ($value) ? 'true' : 'false';
         }
-        $validation[] = 'data-parsley-'.$rule.'="'.$value.'"';
+        $validation[] = 'data-parsley-' . $rule . '="' . $value . '"';
       }
     }
     return join(' ', $validation);
@@ -75,7 +75,7 @@ abstract class Base {
     }
     if (isset($block['params']['label'])
       && strlen(trim($block['params']['label'])) > 0) {
-      $html .= '<label class="mailpoet_'.$block['type'].'_label">';
+      $html .= '<label class="mailpoet_' . $block['type'] . '_label">';
       $html .= htmlspecialchars($block['params']['label']);
 
       if (isset($block['params']['required']) && $block['params']['required']) {
@@ -107,29 +107,29 @@ abstract class Base {
   }
 
   // return field name depending on block data
-  protected static function getFieldName($block = array()) {
+  protected static function getFieldName($block = []) {
     if ((int)$block['id'] > 0) {
-      return 'cf_'.$block['id'];
+      return 'cf_' . $block['id'];
     } else {
       $obfuscator = new FieldNameObfuscator();
       return $obfuscator->obfuscate($block['id']);//obfuscate field name for spambots
     }
   }
 
-  protected static function getFieldLabel($block = array()) {
+  protected static function getFieldLabel($block = []) {
     return (isset($block['params']['label'])
             && strlen(trim($block['params']['label'])) > 0)
             ? trim($block['params']['label']) : '';
   }
 
-  protected static function getFieldValue($block = array()) {
+  protected static function getFieldValue($block = []) {
     return (isset($block['params']['value'])
             && strlen(trim($block['params']['value'])) > 0)
             ? WPFunctions::get()->escAttr(trim($block['params']['value'])) : '';
   }
 
-  protected static function getInputModifiers($block = array()) {
-    $modifiers = array();
+  protected static function getInputModifiers($block = []) {
+    $modifiers = [];
 
     if (isset($block['params']['readonly']) && $block['params']['readonly']) {
       $modifiers[] = 'readonly';

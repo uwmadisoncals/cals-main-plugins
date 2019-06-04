@@ -4,7 +4,7 @@ Plugin Name: Download Manager
 Plugin URI: https://www.wpdownloadmanager.com/purchases/
 Description: Manage, Protect and Track File Downloads from your WordPress site
 Author: W3 Eden
-Version: 2.9.95
+Version: 2.9.96
 Author URI: https://www.wpdownloadmanager.com/
 Text Domain: download-manager
 Domain Path: /languages
@@ -54,6 +54,14 @@ if(!defined('WPDM_TPL_FALLBACK')) {
     define('WPDM_TPL_FALLBACK', dirname(__FILE__) . '/tpls/');
 }
 
+if(!defined('NONCE_KEY')){
+    //To avoid warning when not defined
+    define('NONCE_SALT',       'Bm|_Ek@F|HdkA7)=alSJg5_<z-j-JmhK<l&*.d<J+/71?&7pL~XBXnF4jKz>{Apx');
+    /**
+     * Generate WordPress Security Keys and Salts from https://api.wordpress.org/secret-key/1.1/salt/ and place them in your wp-config.php
+     */
+}
+
 ini_set('upload_tmp_dir',UPLOAD_DIR.'/cache/');
 
 
@@ -63,7 +71,7 @@ class WordPressDownloadManager{
 
     function __construct(){
 
-        define('WPDM_Version','2.9.95');
+        define('WPDM_Version','2.9.96');
 
         register_activation_hook(__FILE__, array($this, 'Install'));
 
@@ -82,7 +90,7 @@ class WordPressDownloadManager{
 
         include(dirname(__FILE__)."/wpdm-core.php");
 
-        new \WPDM\libs\UserDashboard();
+        new \WPDM\UserDashboard();
         $this->apply = new \WPDM\libs\Apply();
         new \WPDM\admin\WordPressDownloadManagerAdmin();
         new \WPDM\libs\ShortCodes();

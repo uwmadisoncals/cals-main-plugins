@@ -104,6 +104,7 @@ class ContainerBuilder extends \MailPoetVendor\Symfony\Component\DependencyInjec
     private $vendors;
     private $autoconfiguredInstanceof = [];
     private $removedIds = [];
+    private $removedBindingIds = [];
     private static $internalTypes = ['int' => \true, 'float' => \true, 'string' => \true, 'bool' => \true, 'resource' => \true, 'object' => \true, 'array' => \true, 'null' => \true, 'callable' => \true, 'iterable' => \true, 'mixed' => \true];
     public function __construct(\MailPoetVendor\Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface $parameterBag = null)
     {
@@ -738,6 +739,9 @@ class ContainerBuilder extends \MailPoetVendor\Symfony\Component\DependencyInjec
     public function setAlias($alias, $id)
     {
         $alias = $this->normalizeId($alias);
+        if ('' === $alias || '\\' === \substr($alias, -1) || \strlen($alias) !== \strcspn($alias, "\0\r\n'")) {
+            throw new \MailPoetVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException(\sprintf('Invalid alias id: "%s"', $alias));
+        }
         if (\is_string($id)) {
             $id = new \MailPoetVendor\Symfony\Component\DependencyInjection\Alias($this->normalizeId($id));
         } elseif (!$id instanceof \MailPoetVendor\Symfony\Component\DependencyInjection\Alias) {
@@ -874,6 +878,9 @@ class ContainerBuilder extends \MailPoetVendor\Symfony\Component\DependencyInjec
             throw new \MailPoetVendor\Symfony\Component\DependencyInjection\Exception\BadMethodCallException('Adding definition to a compiled container is not allowed');
         }
         $id = $this->normalizeId($id);
+        if ('' === $id || '\\' === \substr($id, -1) || \strlen($id) !== \strcspn($id, "\0\r\n'")) {
+            throw new \MailPoetVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException(\sprintf('Invalid service id: "%s"', $id));
+        }
         unset($this->aliasDefinitions[$id], $this->removedIds[$id]);
         return $this->definitions[$id] = $definition;
     }
@@ -1285,6 +1292,33 @@ class ContainerBuilder extends \MailPoetVendor\Symfony\Component\DependencyInjec
             $id = (string) $id;
         }
         return isset($this->definitions[$id]) || isset($this->aliasDefinitions[$id]) || isset($this->removedIds[$id]) ? $id : parent::normalizeId($id);
+    }
+    /**
+     * Gets removed binding ids.
+     *
+     * @return array
+     *
+     * @internal
+     */
+    public function getRemovedBindingIds()
+    {
+        return $this->removedBindingIds;
+    }
+    /**
+     * Adds a removed binding id.
+     *
+     * @param int $id
+     *
+     * @internal
+     */
+    public function addRemovedBindingIds($id)
+    {
+        if ($this->hasDefinition($id)) {
+            foreach ($this->getDefinition($id)->getBindings() as $key => $binding) {
+                list(, $bindingId) = $binding->getValues();
+                $this->removedBindingIds[(int) $bindingId] = \true;
+            }
+        }
     }
     /**
      * Returns the Service Conditionals.

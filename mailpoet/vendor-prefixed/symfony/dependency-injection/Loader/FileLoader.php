@@ -81,6 +81,7 @@ abstract class FileLoader extends \MailPoetVendor\Symfony\Component\Config\Loade
      */
     protected function setDefinition($id, \MailPoetVendor\Symfony\Component\DependencyInjection\Definition $definition)
     {
+        $this->container->addRemovedBindingIds($id);
         if ($this->isLoadingInstanceof) {
             if (!$definition instanceof \MailPoetVendor\Symfony\Component\DependencyInjection\ChildDefinition) {
                 throw new \MailPoetVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException(\sprintf('Invalid type definition "%s": ChildDefinition expected, "%s" given.', $id, \get_class($definition)));

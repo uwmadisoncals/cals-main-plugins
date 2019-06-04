@@ -16,7 +16,7 @@ class BulkActionController {
   }
 
   function apply($model_class, array $data) {
-    $bulk_action_method = 'bulk'.ucfirst($data['action']);
+    $bulk_action_method = 'bulk' . ucfirst($data['action']);
     unset($data['action']);
 
     $action_class = $this->factory->getActionClass($model_class, $bulk_action_method);
@@ -25,7 +25,7 @@ class BulkActionController {
     if (is_callable($callback)) {
       return call_user_func_array(
         $callback,
-        array($this->handler->getSelection($model_class, $data['listing']), $data)
+        [$this->handler->getSelection($model_class, $data['listing']), $data]
       );
     }
   }

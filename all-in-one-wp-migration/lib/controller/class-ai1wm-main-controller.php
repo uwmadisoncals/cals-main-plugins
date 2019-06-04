@@ -232,7 +232,7 @@ class Ai1wm_Main_Controller {
 		add_filter( 'plugin_row_meta', 'Ai1wm_Updater_Controller::plugin_row_meta', 10, 2 );
 
 		// Add storage folder daily cleanup cron
-		add_action( 'ai1wm_cleanup_cron', 'Ai1wm_Export_Controller::cleanup' );
+		add_action( 'ai1wm_storage_cleanup', 'Ai1wm_Export_Controller::cleanup' );
 	}
 
 	/**
@@ -301,9 +301,14 @@ class Ai1wm_Main_Controller {
 	 * @return void
 	 */
 	public function schedule_crons() {
-		// Check if storage cleanup cron is scheduled
-		if ( ! wp_next_scheduled( 'ai1wm_cleanup_cron' ) ) {
-			Ai1wm_Cron::add( 'ai1wm_cleanup_cron', 'daily' );
+		// Delete old cleanup cronjob
+		if ( Ai1wm_Cron::exists( 'ai1wm_cleanup_cron' ) ) {
+			Ai1wm_Cron::clear( 'ai1wm_cleanup_cron' );
+		}
+
+		// Schedule a new daily cleanup
+		if ( ! Ai1wm_Cron::exists( 'ai1wm_storage_cleanup' ) ) {
+			Ai1wm_Cron::add( 'ai1wm_storage_cleanup', 'daily', time() );
 		}
 	}
 
@@ -748,6 +753,7 @@ class Ai1wm_Main_Controller {
 			'unable_to_stop_the_import'           => __( 'Unable to stop the import. Refresh the page and try again', AI1WM_PLUGIN_NAME ),
 			'please_wait_stopping_the_import'     => __( 'Please wait, stopping the import...', AI1WM_PLUGIN_NAME ),
 			'close_import'                        => __( 'Close', AI1WM_PLUGIN_NAME ),
+			'finish_import'                       => __( 'Finish', AI1WM_PLUGIN_NAME ),
 			'stop_import'                         => __( 'Stop import', AI1WM_PLUGIN_NAME ),
 			'confirm_import'                      => __( 'Proceed', AI1WM_PLUGIN_NAME ),
 			'continue_import'                     => __( 'Continue', AI1WM_PLUGIN_NAME ),
@@ -865,6 +871,7 @@ class Ai1wm_Main_Controller {
 			'unable_to_prepare_blogs_on_import'   => __( 'Unable to prepare blogs on import. Refresh the page and try again', AI1WM_PLUGIN_NAME ),
 			'unable_to_stop_the_import'           => __( 'Unable to stop the import. Refresh the page and try again', AI1WM_PLUGIN_NAME ),
 			'please_wait_stopping_the_import'     => __( 'Please wait, stopping the import...', AI1WM_PLUGIN_NAME ),
+			'finish_import'                       => __( 'Finish', AI1WM_PLUGIN_NAME ),
 			'close_import'                        => __( 'Close', AI1WM_PLUGIN_NAME ),
 			'stop_import'                         => __( 'Stop import', AI1WM_PLUGIN_NAME ),
 			'confirm_import'                      => __( 'Proceed', AI1WM_PLUGIN_NAME ),
@@ -876,7 +883,7 @@ class Ai1wm_Main_Controller {
 			'thanks_for_submitting_your_request'  => __( 'Thanks for submitting your request!', AI1WM_PLUGIN_NAME ),
 			'want_to_delete_this_file'            => __( 'Are you sure you want to delete this file?', AI1WM_PLUGIN_NAME ),
 			'unlimited'                           => __( 'Restoring a backup is available via Unlimited extension. <a href="https://servmask.com/products/unlimited-extension" target="_blank">Get it here</a>', AI1WM_PLUGIN_NAME ),
-			'restore_from_file'                   => __( '"Restore" functionality has been moved to a paid extension. <a href="https://servmask.com/products/unlimited-extension" target="_blank">Get it here</a> or download the backup and then use "Import from file".', AI1WM_PLUGIN_NAME ),
+			'restore_from_file'                   => __( '"Restore" functionality is available in a <a href="https://servmask.com/products/unlimited-extension" target="_blank">paid extension</a>.<br />You could also download the backup and then use "Import from file".', AI1WM_PLUGIN_NAME ),
 			'unable_to_add_backup_label'          => __( 'Unable to add label for backup because: ', AI1WM_PLUGIN_NAME ),
 			'click_to_set_backup_label'           => __( 'Click to set a label for this backup', AI1WM_PLUGIN_NAME ),
 		) );

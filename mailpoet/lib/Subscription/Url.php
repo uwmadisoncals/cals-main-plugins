@@ -31,29 +31,29 @@ class Url {
     $url = WPFunctions::get()->getPermalink($post);
 
     if ($subscriber !== null) {
-      $data = array(
+      $data = [
         'token' => Subscriber::generateToken($subscriber->email),
-        'email' => $subscriber->email
-      );
+        'email' => $subscriber->email,
+      ];
     } else {
-      $data = array(
-        'preview' => 1
-      );
+      $data = [
+        'preview' => 1,
+      ];
     }
 
-    $params = array(
+    $params = [
       Router::NAME,
-      'endpoint='.SubscriptionEndpoint::ENDPOINT,
-      'action='.$action,
-      'data='.Router::encodeRequestData($data)
-    );
+      'endpoint=' . SubscriptionEndpoint::ENDPOINT,
+      'action=' . $action,
+      'data=' . Router::encodeRequestData($data),
+    ];
 
     // add parameters
-    $url .= (parse_url($url, PHP_URL_QUERY) ? '&' : '?').join('&', $params);
+    $url .= (parse_url($url, PHP_URL_QUERY) ? '&' : '?') . join('&', $params);
 
     $url_params = parse_url($url);
     if (empty($url_params['scheme'])) {
-      $url = WPFunctions::get()->getBloginfo('url').$url;
+      $url = WPFunctions::get()->getBloginfo('url') . $url;
     }
 
     return $url;

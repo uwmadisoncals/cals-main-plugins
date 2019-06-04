@@ -57,7 +57,7 @@ jQuery(function($) {
 		};
 		
 		if(options.componentRestrictions && options.componentRestrictions.country)
-			data.countryCodes = options.componentRestrictions.country;
+			data.countrycodes = options.componentRestrictions.country;
 		
 		$.ajax("https://nominatim.openstreetmap.org/search/", {
 			data: data,
@@ -87,6 +87,25 @@ jQuery(function($) {
 				response: JSON.stringify(response)
 			},
 			method: "POST"
+		});
+	}
+
+	/**
+	 * @function clearCache
+	 * @access protected
+	 * @summary Clears the Nomanatim geocode cache
+	 * @returns {void}
+	 */
+	WPGMZA.OLGeocoder.prototype.clearCache = function(callback)
+	{
+		$.ajax(WPGMZA.ajaxurl, {
+			data: {
+				action: "wpgmza_clear_nominatim_cache"
+			},
+			method: "POST",
+			success: function(response){
+				callback(response);
+			}
 		});
 	}
 	

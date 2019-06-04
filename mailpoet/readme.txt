@@ -2,8 +2,8 @@
 Contributors: mailpoet, wysija
 Tags: email marketing, newsletter, newsletter subscribers, email, welcome email, post notification, WooCommerce emails, newsletter builder
 Requires at least: 4.7
-Tested up to: 5.1
-Stable tag: 3.23.2
+Tested up to: 5.2
+Stable tag: 3.28.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -18,6 +18,8 @@ Our newsletter builder integrates perfectly with WordPress so any website owner 
 Schedule your newsletters, send them right away or set it up to send new blog post notifications automatically in just a few clicks.
 
 Trusted by 300,000 WordPress websites since 2011.
+
+**New!** Our Premium is now free for sites with 1,000 subscribers or less.
 
 [Visit our website to see the templates or try the demo](https://www.mailpoet.com/)
 
@@ -54,6 +56,8 @@ Please note:
 
 = WooCommerce emails (Premium) =
 
+**All WooCommerce features are free for stores of 1,000 customers or less.**
+
 Increase your sales and stay in touch with your customers with our emails for WooCommerce!
 
 With our WooCommerce emails, you can :
@@ -65,7 +69,7 @@ With our WooCommerce emails, you can :
 
 = Premium details =
 
-MailPoet's free version is fully featured, and comes with access to a free sending plan for up to 2,000 subscribers.
+**MailPoet Premium is entirely free and includes quality sending for users with 1,000 subscribers or less. [Read more.](https://www.mailpoet.com/free-plan/)**
 
 The Premium version adds the following features:
 
@@ -76,8 +80,6 @@ The Premium version adds the following features:
 * Send to over 2,000 subscribers with your own sending method (host, SendGrid, Amazon SES)
 
 See the [short video summary on the Premium](http://beta.docs.mailpoet.com/article/208-video-overview-of-mailpoet-premium)
-
-Visit the Premium page inside the plugin for more info.
 
 = MailPoet Sending Service =
 Sending emails and newsletter with your host is not a good idea. You might face sending speed limitations and see your emails ending up in the spam box.
@@ -90,7 +92,7 @@ To help your sending go without a hitch, we’ve created an advanced email deliv
 
 The MailPoet Sending Service is very easy to setup, you just have to enter a key in your WordPress admin and you’re all set!
 
-[Signup now](https://account.mailpoet.com/?utm_source=wordpress&utm_medium=readme&utm_campaign=mss), it’s free for your first 2,000 readers (pay as you go afterwards).
+[Signup now](https://account.mailpoet.com/?utm_source=wordpress&utm_medium=readme&utm_campaign=mss), it’s free for your first 1,000 subscribers (pay as you go afterwards).
 
 = Translations =
 
@@ -125,35 +127,6 @@ We welcome experienced translators to translate directly on [our Transifex proje
 
 Have a question for us? Reach us at security@ our domain.
 
-== Installation ==
-
-= Minimum requirements =
-PHP version 5.6 or greater. We highly recommend PHP 7.1 or greater. Speak to your host about upgrading. It's easier than you think!
-Visit our [Minimum and Recommended Requirements](https://beta.docs.mailpoet.com/article/152-minimum-requirements-for-mailpoet-3) page for a detailed list of server requirements and instructions to upgrade your PHP version.
-
-There are 3 ways to install this plugin:
-
-= 1. The super easy way =
-1. In your WordPress dashboard, navigate to Plugins > Add New
-1. Search for `MailPoet`
-1. Click on "install now"
-1. Activate the plugin
-1. A new `MailPoet` menu will appear in your WordPress dashboard
-
-= 2. The easy way =
-1. Download the plugin (.zip file) by using the blue "download" button underneath the plugin banner at the top
-1. In your WordPress dashboard, navigate to Plugins > Add New
-1. Click on "Upload Plugin"
-1. Upload the .zip file
-1. Activate the plugin
-1. A new `MailPoet` menu will appear in your WordPress dashboard
-
-= 3. The old-fashioned and reliable way (FTP) =
-1. Download the plugin (.zip file) by using the blue "download" button underneath the plugin banner at the top
-1. Extract the archive and then upload, via FTP, the `mailpoet` folder to the `<WP install folder>/wp-content/plugins/` folder on your host
-1. Activate the plugin
-1. A new `MailPoet` menu will appear in your WordPress dashboard
-
 == Frequently Asked Questions ==
 
 Question: Is it MailPoet or Mail poet?
@@ -173,6 +146,55 @@ Stop by our [support site](https://www.mailpoet.com/support).
 6. WooCommerce emails
 
 == Changelog ==
+
+= 3.28.0 - 2019-06-04 =
+* Added: enforcement for authorized sending address for automatic and scheduled emails for new users after March 5;
+* Improvement: authorized sending email enforcement for new users since March 5;
+* Fixed: error when using single or double quotes in sender name.
+
+= 3.27.0 - 2019-05-28 =
+* Added: API documentation for developers on github.com/mailpoet/mailpoet;
+* Fixed: email editor's text editing not working due to TinyMCE conflict with some plugins;
+* Fixed: some translations that could previously be only in English;
+* Fixed: duplicating scheduled newsletters to not include the original scheduled date.
+
+= 3.26.1 - 2019-05-21 =
+* Added: Woo Commerce customers now have their own list;
+* Improved: users can now scroll through newsletter content while settings sidebar is open;
+* Fixed: sign-up confirmation no longer overwritten by default sender on page refresh;
+* Fixed: edge cases where blank post notification emails were being sent;
+* Fixed: imported subscribers from MP2 no longer marked inactive by default.
+
+= 3.26.0 - 2019-05-14 =
+* Improved: minor change of default email confirmation text;
+* Improved: WooCommerce customer sync with MailPoet lists for stores with 30k or larger customer lists;
+* Fixed: edge case bug where a user with a user_id of 0 would break links in newsletters for some users;
+* Fixed: uncaught TypeError related to deleted segments.
+
+= 3.25.1 - 2019-05-06 =
+* Improved: subscriber import speed for users importing many subscribers with many custom fields;
+* Fixed: typo in Product widget;
+* Fixed: conflict with POJO themes in form editor;
+* Fixed: backwards compatibility between wpdb:parse_db_host and WP versions earlier than 4.9;
+* Fixed: bounced subscribers will continue being synchronized when sending is paused and MailPoet Sending Service is used;
+* Fixed: conflict with Thrive Leads where confirmation emails were not being sent.
+
+= 3.25.0 - 2019-04-29 =
+* Improved: ALC post fetching consistency;
+* Improved: template preview display;
+* Improved: now able to turn off inactive subscribers feature;
+* Improved: WooCommerce product widget shows price by default now;
+* Improved: updated links to knowledge base for bounced and inactive users;
+* Improved: clarified how subscribers display within lists when unsubscribed;
+* Fixed: issue where bounce task would not run after a failure;
+* Fixed: scheduling calendar respects "week starts on" WordPress setting;
+* Fixed: links with special characters in email body no longer break sending;
+* Fixed: conflict with third-party plugins that was displaying private posts in ALC blocks.
+
+= 3.24.0 - 2019-04-23 =
+* Added: add WooCommerce product blocks to your email;
+* Added: an optional way to automatically deactivate inactive subscribers who don't read your emails;
+* Added: setting to stop sending for inactive subscribers who haven't opened newsletters in a span of time.
 
 = 3.23.2 - 2019-04-16 =
 * Improved: UI clarity and user-friendliness;

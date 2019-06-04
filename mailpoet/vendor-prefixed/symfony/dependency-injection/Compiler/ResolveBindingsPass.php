@@ -31,6 +31,7 @@ class ResolveBindingsPass extends \MailPoetVendor\Symfony\Component\DependencyIn
      */
     public function process(\MailPoetVendor\Symfony\Component\DependencyInjection\ContainerBuilder $container)
     {
+        $this->usedBindings = $container->getRemovedBindingIds();
         try {
             parent::process($container);
             foreach ($this->unusedBindings as list($key, $serviceId)) {
@@ -98,7 +99,14 @@ class ResolveBindingsPass extends \MailPoetVendor\Symfony\Component\DependencyIn
             if ($method instanceof \ReflectionFunctionAbstract) {
                 $reflectionMethod = $method;
             } else {
-                $reflectionMethod = $this->getReflectionMethod($value, $method);
+                try {
+                    $reflectionMethod = $this->getReflectionMethod($value, $method);
+                } catch (\MailPoetVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException $e) {
+                    if ($value->getFactory()) {
+                        continue;
+                    }
+                    throw $e;
+                }
             }
             foreach ($reflectionMethod->getParameters() as $key => $parameter) {
                 if (\array_key_exists($key, $arguments) && '' !== $arguments[$key]) {

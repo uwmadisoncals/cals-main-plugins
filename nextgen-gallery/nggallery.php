@@ -4,7 +4,7 @@ if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You 
 /**
  * Plugin Name: NextGEN Gallery
  * Description: The most popular gallery plugin for WordPress and one of the most popular plugins of all time with over 25 million downloads.
- * Version: 3.1.17
+ * Version: 3.2.4
  * Author: Imagely
  * Plugin URI: https://www.imagely.com/wordpress-gallery-plugin/nextgen-gallery/
  * Author URI: https://www.imagely.com
@@ -673,9 +673,9 @@ class C_NextGEN_Bootstrap
 		C_Photocrati_Installer::uninstall(NGG_PLUGIN_BASENAME);
 	}
 
-	public static function activate()
-    {
-        // Set the capabilities for the administrator
+	public static function set_role_caps()
+	{
+		// Set the capabilities for the administrator
         $role = get_role('administrator');
 
         // We need this role, no other chance
@@ -701,8 +701,13 @@ class C_NextGEN_Bootstrap
         foreach ($capabilities as $capability) {
             $role->add_cap($capability);
 		}
+	}
+
+	public static function activate()
+    {
+        self::set_role_caps();
 		
-		set_transient('ngg-activated', time());
+		set_transient('ngg-activated', time(), 30);
     }
 
 	/**
@@ -720,7 +725,7 @@ class C_NextGEN_Bootstrap
 		define('NGG_PRODUCT_URL', path_join(str_replace("\\" , '/', NGG_PLUGIN_URL), 'products'));
 		define('NGG_MODULE_URL', path_join(str_replace("\\", '/', NGG_PRODUCT_URL), 'photocrati_nextgen/modules'));
 		define('NGG_PLUGIN_STARTED_AT', microtime());
-		define('NGG_PLUGIN_VERSION', '3.1.17');
+		define('NGG_PLUGIN_VERSION', '3.2.4');
 
 		define(
 			'NGG_SCRIPT_VERSION',

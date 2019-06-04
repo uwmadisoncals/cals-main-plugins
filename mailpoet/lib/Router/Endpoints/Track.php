@@ -19,22 +19,31 @@ class Track {
   const ENDPOINT = 'track';
   const ACTION_CLICK = 'click';
   const ACTION_OPEN = 'open';
-  public $allowed_actions = array(
+  public $allowed_actions = [
     self::ACTION_CLICK,
-    self::ACTION_OPEN
-  );
-  public $permissions = array(
-    'global' => AccessControl::NO_ACCESS_RESTRICTION
-  );
+    self::ACTION_OPEN,
+  ];
+  public $permissions = [
+    'global' => AccessControl::NO_ACCESS_RESTRICTION,
+  ];
+
+  /** @var Clicks */
+  private $clicks;
+
+  /** @var Opens */
+  private $opens;
+
+  public function __construct(Clicks $clicks, Opens $opens) {
+    $this->clicks = $clicks;
+    $this->opens = $opens;
+  }
 
   function click($data) {
-    $click_event = new Clicks();
-    return $click_event->track($this->_processTrackData($data));
+    return $this->clicks->track($this->_processTrackData($data));
   }
 
   function open($data) {
-    $open_event = new Opens();
-    return $open_event->track($this->_processTrackData($data));
+    return $this->opens->track($this->_processTrackData($data));
   }
 
   function _processTrackData($data) {

@@ -23,7 +23,8 @@ class API {
     $code = $this->wp->wpRemoteRetrieveResponseCode($result);
     switch ($code) {
       case 200:
-        if ($body = $this->wp->wpRemoteRetrieveBody($result)) {
+        $body = $this->wp->wpRemoteRetrieveBody($result);
+        if ($body) {
           $body = json_decode($body);
         }
         break;
@@ -43,13 +44,13 @@ class API {
     return $this->api_key;
   }
 
-  private function request($url, $params = array()) {
+  private function request($url, $params = []) {
     $params['license'] = $this->api_key;
     $url = WPFunctions::get()->addQueryArg($params, $url);
-    $args = array(
+    $args = [
       'timeout' => 10,
-      'httpversion' => '1.0'
-    );
+      'httpversion' => '1.0',
+    ];
     return $this->wp->wpRemoteGet($url, $args);
   }
 }

@@ -4,42 +4,50 @@
   <div id="newsletters_container"></div>
 
   <script type="text/javascript">
-    var mailpoet_listing_per_page = <%= items_per_page %>;
-    var mailpoet_display_nps_poll = <%= settings.display_nps_poll ? 'true' : 'false' %>;
-    var mailpoet_segments = <%= json_encode(segments) %>;
-    var mailpoet_show_congratulate_after_first_newsletter = <%= show_congratulate_after_first_newsletter %>;
-    var mailpoet_installed_days_ago = <%= installed_days_ago %>;
-    var mailpoet_current_wp_user = <%= json_encode(current_wp_user) %>;
-    var mailpoet_current_wp_user_firstname = '<%= current_wp_user_firstname %>';
-    var mailpoet_lists = <%= json_encode(lists) %>;
-    var mailpoet_roles = <%= json_encode(roles) %>;
-    var mailpoet_current_date = <%= json_encode(current_date) %>;
-    var mailpoet_current_time = <%= json_encode(current_time) %>;
-    var mailpoet_schedule_time_of_day = <%= json_encode(schedule_time_of_day) %>;
-    var mailpoet_date_display_format = "<%= wp_date_format() %>";
-    var mailpoet_site_url = "<%= site_url %>";
-    var mailpoet_date_storage_format = "Y-m-d";
-    var mailpoet_tracking_enabled = <%= json_encode(tracking_enabled) %>;
-    var mailpoet_premium_active = <%= json_encode(premium_plugin_active) %>;
-    var mailpoet_woocommerce_active = <%= json_encode(is_woocommerce_active) %>;
-    var mailpoet_automatic_emails = <%= json_encode(automatic_emails) %>;
-    var mailpoet_feature_announcement_has_news = <%= json_encode(feature_announcement_has_news) %>;
-    var mailpoet_last_announcement_seen = <%= json_encode(last_announcement_seen) %>;
-    var mailpoet_user_locale = '<%= get_locale() %>';
-    var mailpoet_congratulations_success_image = '<%= cdn_url('newsletter/congrat-illu-success.20181121-1440.png') %>';
-    var mailpoet_congratulations_loading_image = '<%= cdn_url('newsletter/congratulation-page-illustration-transparent-LQ.20181121-1440.png') %>';
-    var mailpoet_main_page = '<%= mailpoet_main_page %>';
-    var mailpoet_review_request_illustration_url = '<%= cdn_url('review-request/review-request-illustration.20181207-1345.png') %>';
-    <% set newUser = (is_new_user == true) ? 'true' : 'false' %>
-    var mailpoet_is_new_user = <%= newUser %>;
-    var mailpoet_installed_at = '<%= settings.installed_at %>';
-    var mailpoet_mss_active = <%= json_encode(mss_active) %>;
+    <% autoescape 'js' %>
+      var mailpoet_update_available = <%= is_mailpoet_update_available ? 'true' : 'false' %>
+      var mailpoet_listing_per_page = <%= items_per_page %>;
+      var mailpoet_display_nps_poll = <%= settings.display_nps_poll ? 'true' : 'false' %>;
+      var mailpoet_segments = <%= json_encode(segments) %>;
+      var mailpoet_show_congratulate_after_first_newsletter = <%= show_congratulate_after_first_newsletter %>;
+      var mailpoet_installed_days_ago = <%= installed_days_ago %>;
+      var mailpoet_current_wp_user = <%= json_encode(current_wp_user) %>;
+      var mailpoet_current_wp_user_firstname = '<%= current_wp_user_firstname %>';
+      var mailpoet_lists = <%= json_encode(lists) %>;
+      var mailpoet_roles = <%= json_encode(roles) %>;
+      var mailpoet_current_date = <%= json_encode(current_date) %>;
+      var mailpoet_current_time = <%= json_encode(current_time) %>;
+      var mailpoet_schedule_time_of_day = <%= json_encode(schedule_time_of_day) %>;
+      var mailpoet_date_display_format = "<%= wp_date_format() %>";
+      var mailpoet_start_of_week = "<%= wp_start_of_week() %>";
+      var mailpoet_site_url = "<%= site_url %>";
+      var mailpoet_date_storage_format = "Y-m-d";
+      var mailpoet_tracking_enabled = <%= json_encode(tracking_enabled) %>;
+      var mailpoet_premium_active = <%= json_encode(premium_plugin_active) %>;
+      var mailpoet_woocommerce_active = <%= json_encode(is_woocommerce_active) %>;
+      var mailpoet_automatic_emails = <%= json_encode(automatic_emails) %>;
+      var mailpoet_feature_announcement_has_news = <%= json_encode(feature_announcement_has_news) %>;
+      var mailpoet_last_announcement_seen = <%= json_encode(last_announcement_seen) %>;
+      var mailpoet_user_locale = '<%= get_locale() %>';
+      var mailpoet_congratulations_success_image = '<%= cdn_url('newsletter/congrat-illu-success.20181121-1440.png') %>';
+      var mailpoet_congratulations_loading_image = '<%= cdn_url('newsletter/congratulation-page-illustration-transparent-LQ.20181121-1440.png') %>';
+      var mailpoet_main_page = '<%= mailpoet_main_page %>';
+      var mailpoet_review_request_illustration_url = '<%= cdn_url('review-request/review-request-illustration.20181207-1345.png') %>';
+      <% set newUser = (is_new_user == true) ? 'true' : 'false' %>
+      var mailpoet_is_new_user = <%= newUser %>;
+      var mailpoet_installed_at = '<%= settings.installed_at %>';
+      var mailpoet_mss_active = <%= json_encode(mss_active) %>;
+      var mailpoet_free_plan_announcement_seen = !!+'<%= settings.free_plan_announcement_seen %>';
+      var mailpoet_mta_method = '<%= settings.mta.method %>';
+    <% endautoescape %>
   </script>
 <% endblock %>
 
 <% block translations %>
   <%= localize({
     'pageTitle': __('Emails'),
+
+    'dismissButton': __('Dismiss this notice.'),
 
     'tabStandardTitle': __('Newsletters'),
     'tabWelcomeTitle': __('Welcome Emails'),
@@ -124,6 +132,7 @@
     'openedStatTooltip': __('Above 30% is excellent.\\nBetween 10 and 30% is good.\\nUnder 10% is bad.'),
     'clickedStatTooltip': __('Above 3% is excellent.\\nBetween 1 and 3% is good.\\nUnder 1% is bad.'),
     'unsubscribedStatTooltip': __('Under 1% is excellent.\\nBetween 1 and 3% is good.\\nOver 3% is bad.'),
+    'revenueStatsTooltip': __('Revenues generated by customers who clicked on this email in the last two weeks. This is the sum of the order totals including shipping and taxes.'),
     'checkBackInHours': __('Nice job! Check back in %$1d hour(s) for more stats.'),
     'improveThisLinkText': __('What can I do to improve this?'),
 
@@ -257,6 +266,7 @@
     'newsletterBeingSent': __('The newsletter is being sent...'),
     'newsletterHasBeenScheduled': __('The newsletter has been scheduled.'),
     'newsletterSendingHasBeenResumed': __('The newsletter sending has been resumed.'),
+    'newsletterInvalidFromAddress': _x('You need to authorize the email address <i>%$1s</i> to be able to send with it. [link]Authorize my email address[/link]', 'Users need to confirm that they own the email address they want to use to send their newsletter'),
     'welcomeEmailActivated': __('Your Welcome Email is now activated!'),
     'welcomeEmailActivationFailed': __('Your Welcome Email could not be activated, please check the settings.'),
     'postNotificationActivated': __('Your post notification is now active!'),
@@ -287,7 +297,6 @@
     'mailerErrorCode': __('Error code: %$1s'),
     'mailerCheckSettingsNotice': __('Check your [link]sending method settings[/link].'),
     'mailerResumeSendingButton': __('Resume sending'),
-    'mailerSendingResumedNotice': __('Sending has been resumed.'),
     'confirmEdit': __('Sending is in progress. Do you want to pause sending and edit the newsletter?'),
     'confirmTitle': __('Confirm to proceed'),
     'confirmLabel': __('Confirm'),
@@ -317,6 +326,11 @@
     'introDone': _x('Done', 'A label on a button'),
 
     'whatsNew': __("What’s new"),
+    'updateMailPoetNotice': __('[link]Update MailPoet[/link] to see the latest changes'),
+
+    'freePlanTitle': __('A new and more generous free plan!'),
+    'freePlanDescription': __('MailPoet Premium and sending is now entirely free for users that have 1,000 subscribers or less.'),
+    'freePlanButton': __('Get MailPoet Premium for free now'),
 
     'congratulationsSendSuccessHeader': __('Congratulations, your newsletter is being sent!'),
     'congratulationsScheduleSuccessHeader': __('Congratulations, your newsletter is scheduled to be sent.'),

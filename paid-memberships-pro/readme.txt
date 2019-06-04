@@ -2,8 +2,8 @@
 Contributors: strangerstudios
 Tags: membership, memberships, member, members, ecommerce, e-commerce, paypal, stripe, braintree, authorize.net, payflow, restrict access, restrict content, directory
 Requires at least: 4
-Tested up to: 5.0.3
-Stable tag: 2.0.4
+Tested up to: 5.2.1
+Stable tag: 2.0.7
 
 Get Paid with Paid Memberships Pro: The most complete member management and membership subscriptions plugin for your WordPress site.
 
@@ -11,7 +11,7 @@ Get Paid with Paid Memberships Pro: The most complete member management and memb
 = The most complete member management and membership subscriptions plugin for WordPress =
 Paid Memberships Pro is designed for premium content sites, clubs/associations, subscription products, newsletters and more! The plugin adds a new revenue source to your site and is flexible enough to fit the needs of almost all online and offline businesses.
 
-[youtube http://www.youtube.com/watch?v=RC04q0hvQb4]
+[youtube http://www.youtube.com/watch?v=7bmml48fylw]
 
 = Simple to install and get running – deeply customizable! =
 * Unlimited Levels with Flexible Membership Pricing
@@ -128,6 +128,33 @@ Not sure? You can find out by doing a bit a research.
 [View All Screenshots](http://www.paidmembershipspro.com/features/screenshots/)
 
 == Changelog ==
+
+= 2.0.7 - 2019-05-30 =
+* BUG FIX: Fixed issue where the profile start date would sometimes be set incorrectly on the Stripe subscription.
+* BUG FIX: Fixed issue where the membership shortcode would not work properly if more than one level name was given.
+* BUG FIX: Fixed issue where an incorrect email address was sometimes set in the confirm email field on the update billing page. (Thanks, Jessica Thomas)
+* BUG FIX/ENHANCEMENT: Fixed placement of the hr tag above the user fields at checkout for consistency.
+* ENHANCEMENT: Set the priority on the Require Membership meta box to "high" so it appears higher in the right sidebar.
+
+= 2.0.6 - 2019-05-30 =
+* SECURITY: Now using wp_safe_redirect when possible, especially in includes/login.php where the user-provided redirect_to URL parameter is used. (Thanks PluginVulnerabilities.com)
+
+= 2.0.5 - 2019-04-25 =
+* BUG FIX: Fixed fatal error on return from 2Checkout.
+* BUG FIX: Removed error when installing PMPro via WP-CLI.
+* BUG FIX: Fix database upgrade error on localhost environment. (Thanks, codezz on GitHub)
+* BUG FIX: Fixed issue where the credit card expiring email didn't include user info because the user ID wasn't passed in properly. (Thanks, David Cervantes Caballero)
+* BUG FIX: Fixed typo on edit level page. (Thanks, Theuns Coetzee)
+* BUG FIX: Fixed bug with daily revenue reports not showing up in some cases.
+* BUG FIX: Now checking before cancelling a Stripe subscription at the gateway to see if it has already been cancelled.
+* BUG FIX/ENHANCEMENT: Now caching the query results in pmpro_getMembershipLevelsForUser(). This improves performance, especially when there are many posts on one page to check membership for. (Thanks, Seagyn Davis)
+* BUG FIX/ENHANCEMENT: Now sending display_name to the $data array passed to PMPro email filters. (Thanks, David Cervantes Caballero)
+* BUG FIX/ENHANCEMENT: Now searching for the last order with "success" or "pending" status on the Billing page.
+* BUG FIX/ENHANCEMENT: Added pmpro_checkout_preheader_before_get_level_at_checkout and pmpro_checkout_preheader_after_get_level_at_checkout action hooks. Using pmpro_checkout_preheader_before_get_level_at_checkout to start the session earlier now.
+* BUG FIX/ENHANCEMENT: Removed the "membership_code_id" and "membership_code" as field options for the member shortcode. These weren't working and it's unclear what would be meant to ask for a user's discount code since a user could have several orders with or without discount codes. Added "membership_description" and "membership_confirmation" instead.
+* BUG FIX/ENHANCEMENT: Filtering the password reset message to make sure the link still works in all cases when we convert emails to HTML.
+* BUG FIX/ENHANCEMENT: Added reCAPTCHA v3 and invisible reCAPTCHA support. It is recommended sites using Stripe or Braintree update to the reCAPTCHA v3 option. Read more here: https://www.paidmembershipspro.com/pmpro-update-2-0-5/
+* REFACTOR: Now running the pmpro_billing_preheader hook after the jquery.creditCardValidator script is enqueued in preheader/billing.php to match how we do it in preheader/checkout.php. (Thanks, Rafe Colton)
 
 = 2.0.4 - 2019-01-14 =
 * BUG FIX: Fixed warning in code added in 2.0.3 that could cause issues at checkout.

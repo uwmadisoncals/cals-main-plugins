@@ -9,12 +9,12 @@ class NewsletterOptionField extends Model {
 
   function __construct() {
     parent::__construct();
-    $this->addValidations('name', array(
-      'required' => WPFunctions::get()->__('Please specify a name.', 'mailpoet')
-    ));
-    $this->addValidations('newsletter_type', array(
-      'required' => WPFunctions::get()->__('Please specify a newsletter type.', 'mailpoet')
-    ));
+    $this->addValidations('name', [
+      'required' => WPFunctions::get()->__('Please specify a name.', 'mailpoet'),
+    ]);
+    $this->addValidations('newsletter_type', [
+      'required' => WPFunctions::get()->__('Please specify a newsletter type.', 'mailpoet'),
+    ]);
   }
 
   function newsletters() {
@@ -23,6 +23,6 @@ class NewsletterOptionField extends Model {
       __NAMESPACE__ . '\NewsletterOption',
       'option_field_id',
       'newsletter_id'
-    )->select_expr(MP_NEWSLETTER_OPTION_TABLE.'.value');
+    )->select_expr(MP_NEWSLETTER_OPTION_TABLE . '.value');
   }
 }

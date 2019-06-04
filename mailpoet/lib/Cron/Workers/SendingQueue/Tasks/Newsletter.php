@@ -5,6 +5,7 @@ namespace MailPoet\Cron\Workers\SendingQueue\Tasks;
 use MailPoet\Cron\Workers\SendingQueue\Tasks\Links as LinksTask;
 use MailPoet\Cron\Workers\SendingQueue\Tasks\Posts as PostsTask;
 use MailPoet\Cron\Workers\SendingQueue\Tasks\Shortcodes as ShortcodesTask;
+use MailPoet\Logging\Logger;
 use MailPoet\Mailer\MailerLog;
 use MailPoet\Models\Newsletter as NewsletterModel;
 use MailPoet\Models\NewsletterSegment as NewsletterSegmentModel;
@@ -24,13 +25,20 @@ class Newsletter {
   /** @var WPFunctions */
   private $wp;
 
-  function __construct(WPFunctions $wp = null) {
+  /** @var PostsTask */
+  private $posts_task;
+
+  function __construct(WPFunctions $wp = null, PostsTask $posts_task = null) {
     $settings = new SettingsController();
     $this->tracking_enabled = (boolean)$settings->get('tracking.enabled');
-    if ($wp == null) {
+    if ($wp === null) {
       $wp = new WPFunctions;
     }
     $this->wp = $wp;
+    if ($posts_task === null) {
+      $posts_task = new PostsTask;
+    }
+    $this->posts_task = $posts_task;
   }
 
   function getNewsletterFromQueue($queue) {
@@ -38,10 +46,10 @@ class Newsletter {
     $newsletter = $queue->newsletter()
       ->whereNull('deleted_at')
       ->whereAnyIs(
-        array(
-          array('status' => NewsletterModel::STATUS_ACTIVE),
-          array('status' => NewsletterModel::STATUS_SENDING)
-        )
+        [
+          ['status' => NewsletterModel::STATUS_ACTIVE],
+          ['status' => NewsletterModel::STATUS_SENDING],
+        ]
       )
       ->findOne();
     if (!$newsletter) return false;
@@ -50,10 +58,10 @@ class Newsletter {
       $parent_newsletter = $newsletter->parent()
         ->whereNull('deleted_at')
         ->whereAnyIs(
-          array(
-            array('status' => NewsletterModel::STATUS_ACTIVE),
-            array('status' => NewsletterModel::STATUS_SENDING)
-          )
+          [
+            ['status' => NewsletterModel::STATUS_ACTIVE],
+            ['status' => NewsletterModel::STATUS_SENDING],
+          ]
         )
         ->findOne();
       if (!$parent_newsletter) return false;
@@ -68,6 +76,10 @@ class Newsletter {
         $this->stopNewsletterPreProcessing(sprintf('QUEUE-%d-RENDER', $queue->id)) :
         $newsletter;
     }
+    Logger::getLogger('newsletters')->addInfo(
+      'pre-processing newsletter',
+      ['newsletter_id' => $newsletter->id, 'task_id' => $queue->task_id]
+    );
     // if tracking is enabled, do additional processing
     if ($this->tracking_enabled) {
       // hook to the newsletter post-processing filter and add tracking image
@@ -90,17 +102,20 @@ class Newsletter {
         $newsletter
       );
     }
-    // check if this is a post notification and if it contains posts
-    $newsletter_contains_posts = strpos($rendered_newsletter['html'], 'data-post-id');
+    // check if this is a post notification and if it contains at least 1 ALC post
     if ($newsletter->type === NewsletterModel::TYPE_NOTIFICATION_HISTORY &&
-      !$newsletter_contains_posts
+      $this->posts_task->getAlcPostsCount($rendered_newsletter, $newsletter) === 0
     ) {
       // delete notification history record since it will never be sent
+      Logger::getLogger('post-notifications')->addInfo(
+        'no posts in post notification, deleting it',
+        ['newsletter_id' => $newsletter->id, 'task_id' => $queue->task_id]
+      );
       $newsletter->delete();
       return false;
     }
     // extract and save newsletter posts
-    PostsTask::extractAndSave($rendered_newsletter, $newsletter);
+    $this->posts_task->extractAndSave($rendered_newsletter, $newsletter);
     // update queue with the rendered and pre-processed newsletter
     $queue->newsletter_rendered_subject = ShortcodesTask::process(
       $newsletter->subject,
@@ -136,11 +151,11 @@ class Newsletter {
     // to speed the processing, join content into a continuous string
     $rendered_newsletter = $queue->getNewsletterRenderedBody();
     $prepared_newsletter = Helpers::joinObject(
-      array(
+      [
         $queue->newsletter_rendered_subject,
         $rendered_newsletter['html'],
-        $rendered_newsletter['text']
-      )
+        $rendered_newsletter['text'],
+      ]
     );
     $prepared_newsletter = ShortcodesTask::process(
       $prepared_newsletter,
@@ -157,14 +172,14 @@ class Newsletter {
       );
     }
     $prepared_newsletter = Helpers::splitObject($prepared_newsletter);
-    return array(
+    return [
       'id' => $newsletter->id,
       'subject' => $prepared_newsletter[0],
-      'body' => array(
+      'body' => [
         'html' => $prepared_newsletter[1],
-        'text' => $prepared_newsletter[2]
-      )
-    );
+        'text' => $prepared_newsletter[2],
+      ],
+    ];
   }
 
   function markNewsletterAsSent($newsletter, $queue) {

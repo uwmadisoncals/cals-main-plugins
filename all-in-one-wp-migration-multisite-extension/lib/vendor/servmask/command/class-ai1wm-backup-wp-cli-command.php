@@ -114,6 +114,7 @@ if ( defined( 'WP_CLI' ) && ! class_exists( 'Ai1wm_Backup_WP_CLI_Command' ) ) {
 		 * $ wp ai1wm backup --replace "wp" "WordPress"
 		 * Backup in progress...
 		 * Backup complete.
+		 * Backup file: migration-wp-20170913-095743-931.wpress
 		 * Backup location: /repos/migration/wp/wp-content/ai1wm-backups/migration-wp-20170913-095743-931.wpress
 		 *
 		 * @subcommand backup
@@ -216,6 +217,7 @@ if ( defined( 'WP_CLI' ) && ! class_exists( 'Ai1wm_Backup_WP_CLI_Command' ) ) {
 			}
 
 			WP_CLI::success( __( 'Backup complete.', AI1WM_PLUGIN_NAME ) );
+			WP_CLI::log( sprintf( __( 'Backup file: %s', AI1WM_PLUGIN_NAME ), ai1wm_archive_name( $params ) ) );
 			WP_CLI::log( sprintf( __( 'Backup location: %s', AI1WM_PLUGIN_NAME ), ai1wm_backup_path( $params ) ) );
 		}
 

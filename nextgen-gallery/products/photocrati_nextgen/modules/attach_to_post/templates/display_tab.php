@@ -31,7 +31,7 @@
 			<input type="button" class="button button-primary button-large ngg_display_tab_save" id="save_displayed_gallery" value="<?php if ($displayed_gallery->id()) { _e('Save Changes', 'nggallery'); } else { _e('Insert Gallery', 'nggallery'); } ?>"/>
 		</p>
         <div class="ngg_igw_video">
-        	<p class="ngg_igw_video_open"><?php esc_html_e('Need a quick tutorial?', 'nggallery'); ?></p>
+        	<p class="ngg_igw_video_open button-primary"><?php esc_html_e('Need a quick tutorial?', 'nggallery'); ?></p>
         	<div class="ngg_igw_video_inner">
         		<span class="ngg_igw_video_close"><?php esc_html_e('Click to Close', 'nggallery'); ?></span>
         	</div>

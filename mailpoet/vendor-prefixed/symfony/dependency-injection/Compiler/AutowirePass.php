@@ -154,7 +154,15 @@ class AutowirePass extends \MailPoetVendor\Symfony\Component\DependencyInjection
             if ($method instanceof \ReflectionFunctionAbstract) {
                 $reflectionMethod = $method;
             } else {
-                $reflectionMethod = $this->getReflectionMethod(new \MailPoetVendor\Symfony\Component\DependencyInjection\Definition($reflectionClass->name), $method);
+                $definition = new \MailPoetVendor\Symfony\Component\DependencyInjection\Definition($reflectionClass->name);
+                try {
+                    $reflectionMethod = $this->getReflectionMethod($definition, $method);
+                } catch (\MailPoetVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException $e) {
+                    if ($definition->getFactory()) {
+                        continue;
+                    }
+                    throw $e;
+                }
             }
             $arguments = $this->autowireMethod($reflectionMethod, $arguments);
             if ($arguments !== $call[1]) {

@@ -97,8 +97,10 @@ var WPDM = {
      * @param type
      * @param position
      */
-    notify: function(message, type = 'info', position = 'top-right'){
+    notify: function(message, type, position){
         var $ = jQuery;
+        if(type === undefined) type = "info";
+        position = 'top-right';
         var notifycont = '#wpdm-notify-'+position;
         if($(notifycont).length  == 0)
             $('body').prepend("<div id='wpdm-notify-"+position+"'></div>");
@@ -114,8 +116,9 @@ var WPDM = {
      * @param type
      * @param position
      */
-    floatify: function(html, position = 'top-right'){
+    floatify: function(html, position){
         var $ = jQuery;
+        position = 'top-right';
         var floatifycont = '#wpdm-floatify-'+position;
         if($(floatifycont).length  == 0)
             $('body').prepend("<div class='w3eden' id='wpdm-floatify-"+position+"'></div>");
@@ -194,6 +197,14 @@ var WPDM = {
 jQuery(function ($) {
 
     $('.wpdm_hide.wpdm_remove_empty').remove();
+
+    $('.wpdm-checkbox.wpdm-lock-terms').on('click', function () {
+        var target = $(this).data('target');
+        if($(this).is(':checked'))
+            $(target).slideDown();
+        else
+            $(target).slideUp();
+    });
 
     $('.input-group input').on('focus', function () {
         $(this).parent().find('.input-group-addon').addClass('input-group-addon-active');

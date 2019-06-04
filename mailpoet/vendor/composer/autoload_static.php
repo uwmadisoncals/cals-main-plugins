@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit7fa52a9ccfbeb0d96668fd768562a9c4
+class ComposerStaticInit6ce68694395dd2124a559abefa438100
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -35,7 +35,6 @@ class ComposerStaticInit7fa52a9ccfbeb0d96668fd768562a9c4
         'C' => 
         array (
             'Cron\\' => 5,
-            'Codeception\\Extension\\' => 22,
         ),
     );
 
@@ -79,10 +78,6 @@ class ComposerStaticInit7fa52a9ccfbeb0d96668fd768562a9c4
         'Cron\\' => 
         array (
             0 => __DIR__ . '/..' . '/mtdowling/cron-expression/src/Cron',
-        ),
-        'Codeception\\Extension\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/redcomponent/teststatistics/src',
         ),
     );
 
@@ -797,10 +792,10 @@ class ComposerStaticInit7fa52a9ccfbeb0d96668fd768562a9c4
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit7fa52a9ccfbeb0d96668fd768562a9c4::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit7fa52a9ccfbeb0d96668fd768562a9c4::$prefixDirsPsr4;
-            $loader->fallbackDirsPsr4 = ComposerStaticInit7fa52a9ccfbeb0d96668fd768562a9c4::$fallbackDirsPsr4;
-            $loader->classMap = ComposerStaticInit7fa52a9ccfbeb0d96668fd768562a9c4::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit6ce68694395dd2124a559abefa438100::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit6ce68694395dd2124a559abefa438100::$prefixDirsPsr4;
+            $loader->fallbackDirsPsr4 = ComposerStaticInit6ce68694395dd2124a559abefa438100::$fallbackDirsPsr4;
+            $loader->classMap = ComposerStaticInit6ce68694395dd2124a559abefa438100::$classMap;
 
         }, null, ClassLoader::class);
     }

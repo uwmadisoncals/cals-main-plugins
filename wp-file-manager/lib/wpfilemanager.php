@@ -1,4 +1,4 @@
-    <?php if (!defined('ABSPATH')) {
+<?php if (!defined('ABSPATH')) {
         exit;
     }?>
     <div class="wrap wp-filemanager-wrap">

@@ -26,7 +26,9 @@
     importData = {},
     mailpoetColumnsSelect2 = <%= subscriberFieldsSelect2|raw %>,
     mailpoetColumns = <%= subscriberFields|raw %>,
-    mailpoetSegments = <%= segments|raw %>
+    mailpoetSegments = <%= segments|raw %>;
+    <% set newUser = (is_new_user == true) ? 'true' : 'false' %>
+    var mailpoet_is_new_user = <%= newUser %>;
 </script>
 <% endblock %>
 
@@ -89,7 +91,18 @@
 'weWillSuspend': __('If you send with the MailPoet Sending Service, we will automatically suspend your account if our systems detect bad behavior.'),
 'previousStep': __('Previous step'),
 'nextStep': __('Next step'),
+'seeVideo': __(' See video guide'),
 'importAgain': __('Import again'),
-'viewSubscribers': __('View subscribers')
+'viewSubscribers': __('View subscribers'),
+'methodPaste': __('Paste the data into a text box'),
+'methodUpload': __('Upload a file'),
+'methodMailChimp': __('Import from MailChimp'),
+'methodMailChimpLabel': __('Enter your MailChimp API key'),
+'methodMailChimpVerify': __('Verify'),
+'methodMailChimpSelectList': __('Select list(s)'),
+'methodMailChimpSelectPlaceholder': _x('Select', 'Verb'),
+'pasteLabel': __('Copy and paste your subscribers from Excel/Spreadsheets'),
+'pasteDescription': __('This file needs to be formatted in a CSV style (comma-separated-values.) Look at some [link]examples on our support site[/link].'),
+'methodSelectionHead': __('How would you like to import subscribers?')
 }) %>
 <% endblock %>

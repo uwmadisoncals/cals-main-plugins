@@ -13,8 +13,7 @@ class Social {
         }
 
         $style = 'width:' . $icon['width'] . ';height:' . $icon['width'] . ';-ms-interpolation-mode:bicubic;border:0;display:inline;outline:none;';
-        $icons_block .= '<a 
-          href="' . EHelper::escapeHtmlLinkAttr($icon['link']) . '" style="text-decoration:none!important;"
+        $icons_block .= '<a href="' . EHelper::escapeHtmlLinkAttr($icon['link']) . '" style="text-decoration:none!important;"
         ><img 
           src="' . EHelper::escapeHtmlLinkAttr($icon['image']) . '"
           width="' . (int)$icon['width'] . '" 
@@ -28,7 +27,7 @@ class Social {
     if (!empty($icons_block)) {
       $template = '
       <tr>
-        <td class="mailpoet_padded_side mailpoet_padded_vertical" valign="top" align="'. EHelper::escapeHtmlAttr($alignment) . '">
+        <td class="mailpoet_padded_side mailpoet_padded_vertical" valign="top" align="' . EHelper::escapeHtmlAttr($alignment) . '">
           ' . $icons_block . '
         </td>
       </tr>';

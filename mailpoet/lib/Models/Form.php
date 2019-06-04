@@ -1,6 +1,7 @@
 <?php
 namespace MailPoet\Models;
 
+use MailPoet\Settings\SettingsController;
 use MailPoet\WP\Functions as WPFunctions;
 
 if (!defined('ABSPATH')) exit;
@@ -17,9 +18,9 @@ class Form extends Model {
   function __construct() {
     parent::__construct();
 
-    $this->addValidations('name', array(
-      'required' => WPFunctions::get()->__('Please specify a name.', 'mailpoet')
-    ));
+    $this->addValidations('name', [
+      'required' => __('Please specify a name.', 'mailpoet'),
+    ]);
   }
 
   function getSettings() {
@@ -57,8 +58,8 @@ class Form extends Model {
       return false;
     }
 
-    $skipped_types = array('html', 'divider', 'submit');
-    $fields = array();
+    $skipped_types = ['html', 'divider', 'submit'];
+    $fields = [];
 
     foreach ((array)$body as $field) {
       if (empty($field['id'])
@@ -77,10 +78,10 @@ class Form extends Model {
     return $fields ?: false;
   }
 
-  function filterSegments(array $segment_ids = array()) {
+  function filterSegments(array $segment_ids = []) {
     $settings = $this->getSettings();
     if (empty($settings['segments'])) {
-      return array();
+      return [];
     }
 
     if (!empty($settings['segments_selected_by'])
@@ -95,22 +96,22 @@ class Form extends Model {
   }
 
   static function search($orm, $search = '') {
-    return $orm->whereLike('name', '%'.$search.'%');
+    return $orm->whereLike('name', '%' . $search . '%');
   }
 
   static function groups() {
-    return array(
-      array(
+    return [
+      [
         'name' => 'all',
-        'label' => WPFunctions::get()->__('All', 'mailpoet'),
-        'count' => Form::getPublished()->count()
-      ),
-      array(
+        'label' => __('All', 'mailpoet'),
+        'count' => Form::getPublished()->count(),
+      ],
+      [
         'name' => 'trash',
-        'label' => WPFunctions::get()->__('Trash', 'mailpoet'),
-        'count' => Form::getTrashed()->count()
-      )
-    );
+        'label' => __('Trash', 'mailpoet'),
+        'count' => Form::getTrashed()->count(),
+      ],
+    ];
   }
 
   static function groupBy($orm, $group = null) {
@@ -118,6 +119,32 @@ class Form extends Model {
       return $orm->whereNotNull('deleted_at');
     }
     return $orm->whereNull('deleted_at');
+  }
+
+  static function getDefaultSuccessMessage() {
+    $settings = new SettingsController;
+    if ($settings->get('signup_confirmation.enabled')) {
+      return __('Check your inbox or spam folder to confirm your subscription.', 'mailpoet');
+    }
+    return __('You’ve been successfully subscribed to our newsletter!', 'mailpoet');
+  }
+
+  static function updateSuccessMessages() {
+    $right_message = self::getDefaultSuccessMessage();
+    $wrong_message = (
+      $right_message === __('Check your inbox or spam folder to confirm your subscription.', 'mailpoet')
+      ? __('You’ve been successfully subscribed to our newsletter!', 'mailpoet')
+      : __('Check your inbox or spam folder to confirm your subscription.', 'mailpoet')
+    );
+    $forms = self::findMany();
+    foreach ($forms as $form) {
+      $settings = $form->getSettings();
+      if (isset($settings['success_message']) && $settings['success_message'] === $wrong_message) {
+        $settings['success_message'] = $right_message;
+        $form->set('settings', serialize($settings));
+        $form->save();
+      }
+    }
   }
 
 }

@@ -28,14 +28,14 @@ class SettingsController {
       $default = $this->getDefaultValue($key_parts);
     }
     foreach ($key_parts as $key_part) {
-      if (array_key_exists($key_part, $setting)) {
+      if (is_array($setting) && array_key_exists($key_part, $setting)) {
         $setting = $setting[$key_part];
       } else {
         return $default;
       }
     }
     if (is_array($setting) && is_array($default)) {
-      return WPFunctions::get()->arrayReplaceRecursive($default, $setting);
+      return array_replace_recursive($default, $setting);
     }
     return $setting;
   }
@@ -44,23 +44,23 @@ class SettingsController {
     if ($this->defaults === null) {
       $this->defaults = [
         'mta_group' => self::DEFAULT_SENDING_METHOD_GROUP,
-        'mta' => array(
+        'mta' => [
           'method' => self::DEFAULT_SENDING_METHOD,
-          'frequency' => array(
+          'frequency' => [
             'emails' => self::DEFAULT_SENDING_FREQUENCY_EMAILS,
-            'interval' => self::DEFAULT_SENDING_FREQUENCY_INTERVAL
-          )
-        ),
+            'interval' => self::DEFAULT_SENDING_FREQUENCY_INTERVAL,
+          ],
+        ],
         CronTrigger::SETTING_NAME => [
-          'method' => CronTrigger::DEFAULT_METHOD
+          'method' => CronTrigger::DEFAULT_METHOD,
         ],
         'signup_confirmation' => [
           'enabled' => true,
           'subject' => sprintf(__('Confirm your subscription to %1$s', 'mailpoet'), WPFunctions::get()->getOption('blogname')),
-          'body' => WPFunctions::get()->__("Hello,\n\nWelcome to our newsletter!\n\nPlease confirm your subscription to the list(s): [lists_to_confirm] by clicking the link below: \n\n[activation_link]Click here to confirm your subscription.[/activation_link]\n\nThank you,\n\nThe Team", 'mailpoet')
+          'body' => WPFunctions::get()->__("Hello,\n\nWelcome to our newsletter!\n\nPlease confirm your subscription to the list(s): [lists_to_confirm] by clicking the link below: \n\n[activation_link]Click here to confirm your subscription.[/activation_link]\n\nThank you,\n\nThe Team", 'mailpoet'),
         ],
         'tracking' => [
-          'enabled' => true
+          'enabled' => true,
         ],
         'analytics' => [
           'enabled' => false,
@@ -85,7 +85,7 @@ class SettingsController {
 
   function getAll() {
     $this->ensureLoaded();
-    return WPFunctions::get()->arrayReplaceRecursive($this->getAllDefaults(), self::$settings);
+    return array_replace_recursive($this->getAllDefaults(), self::$settings);
   }
 
   function set($key, $value) {

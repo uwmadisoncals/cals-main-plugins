@@ -3,7 +3,7 @@ Contributors: w3eden, codename065, shahriar0822, shimo16ab, shafayat-alam
 Donate link: 
 Tags: download manager, document management, file manager, digital store, ecommerce, document management plugin,  download monitor, download counter, password protection, download protection
 Requires at least: 3.4
-Tested up to: 5.1
+Tested up to: 5.2
 License: GPLv2 or later
  
   
@@ -157,6 +157,10 @@ Check download stats and get a push notification when someone downloads, install
 15. Quick Add Panel
 
 == Changelog ==
+
+= 2.9.96 =
+* Compatibility update for WordPress 5.2
+* Improved user dashboard area
 
 = 2.9.95 =
 * Fixed an issue with the captcha lock

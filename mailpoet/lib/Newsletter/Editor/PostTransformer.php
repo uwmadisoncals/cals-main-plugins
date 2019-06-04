@@ -1,10 +1,9 @@
 <?php
 namespace MailPoet\Newsletter\Editor;
 
+use MailPoet\WooCommerce\Helper as WooCommerceHelper;
 use MailPoet\WP\Functions as WPFunctions;
 use MailPoet\Config\Env;
-
-if (!defined('ABSPATH')) exit;
 
 class PostTransformer {
 
@@ -13,20 +12,24 @@ class PostTransformer {
   private $image_position;
   private $wp;
 
+  /** @var WooCommerceHelper */
+  private $woocommerce_helper;
+
   function __construct($args) {
     $this->args = $args;
     $this->with_layout = isset($args['withLayout']) ? (bool)filter_var($args['withLayout'], FILTER_VALIDATE_BOOLEAN) : false;
     $this->image_position = 'left';
     $this->wp = new WPFunctions();
+    $this->woocommerce_helper = new WooCommerceHelper();
   }
 
   function getDivider() {
     if (empty($this->with_layout)) {
       return $this->args['divider'];
     }
-    return LayoutHelper::row(array(
-      LayoutHelper::col(array($this->args['divider']))
-    ));
+    return LayoutHelper::row([
+      LayoutHelper::col([$this->args['divider']]),
+    ]);
   }
 
   function transform($post) {
@@ -42,7 +45,14 @@ class PostTransformer {
     $featured_image = $this->getFeaturedImage($post);
     $featured_image_position = $this->args['featuredImagePosition'];
 
-    if ($featured_image && $featured_image_position === 'belowTitle' && $this->args['displayType'] === 'excerpt') {
+    if (
+      $featured_image
+      && $featured_image_position === 'belowTitle'
+      && (
+        $this->args['displayType'] === 'excerpt'
+        || $this->isProduct($post)
+      )
+    ) {
       array_unshift($content, $title, $featured_image);
       return $content;
     }
@@ -68,14 +78,21 @@ class PostTransformer {
 
     $featured_image_position = $this->args['featuredImagePosition'];
 
-    if (!$featured_image || $featured_image_position === 'none' || $this->args['displayType'] !== 'excerpt') {
+    if (
+      !$featured_image
+      || $featured_image_position === 'none'
+      || (
+        $this->args['displayType'] !== 'excerpt'
+        && !$this->isProduct($post)
+      )
+    ) {
       array_unshift($content, $title);
 
-      return array(
-        LayoutHelper::row(array(
-          LayoutHelper::col($content)
-        ))
-      );
+      return [
+        LayoutHelper::row([
+          LayoutHelper::col($content),
+        ]),
+      ];
     }
     $title_position = isset($this->args['titlePosition']) ? $this->args['titlePosition'] : '';
 
@@ -89,11 +106,11 @@ class PostTransformer {
       } else {
         array_unshift($content, $title, $featured_image);
       }
-      return array(
-        LayoutHelper::row(array(
-          LayoutHelper::col($content)
-        ))
-      );
+      return [
+        LayoutHelper::row([
+          LayoutHelper::col($content),
+        ]),
+      ];
     }
 
     if ($title_position === 'aboveExcerpt') {
@@ -105,18 +122,18 @@ class PostTransformer {
     }
 
     $content = ($featured_image_position === 'left')
-      ? array(
-        LayoutHelper::col(array($featured_image)),
-        LayoutHelper::col($content)
-      )
-      : array(
+      ? [
+        LayoutHelper::col([$featured_image]),
         LayoutHelper::col($content),
-        LayoutHelper::col(array($featured_image))
-      );
+      ]
+      : [
+        LayoutHelper::col($content),
+        LayoutHelper::col([$featured_image]),
+      ];
 
-    $result = array(
-      LayoutHelper::row($content)
-    );
+    $result = [
+      LayoutHelper::row($content),
+    ];
 
     if ($title_position !== 'aboveExcerpt') {
       array_unshift(
@@ -147,6 +164,10 @@ class PostTransformer {
 
     $structure_transformer = new StructureTransformer();
     $content = $structure_transformer->transform($content, $this->args['imageFullWidth'] === true);
+
+    if ($this->isProduct($post)) {
+      $content = $this->addProductDataToContent($content, $post);
+    }
 
     $read_more_btn = $this->getReadMoreButton($post);
     $blocks_count = count($content);
@@ -200,7 +221,7 @@ class PostTransformer {
       $alt_text = trim(strip_tags($post_title));
     }
 
-    return array(
+    return [
       'type' => 'image',
       'link' => $this->wp->getPermalink($post_id),
       'src' => $image_info[0],
@@ -208,12 +229,12 @@ class PostTransformer {
       'fullWidth' => $image_full_width,
       'width' => $image_info[1],
       'height' => $image_info[2],
-      'styles' => array(
-        'block' => array(
+      'styles' => [
+        'block' => [
           'textAlign' => 'center',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
   }
 
   private function getReadMoreButton($post) {
@@ -229,10 +250,10 @@ class PostTransformer {
       $this->args['readMoreText']
     );
 
-    return array(
+    return [
       'type' => 'text',
       'text' => $read_more_text,
-    );
+    ];
   }
 
   private function getTitle($post) {
@@ -242,7 +263,7 @@ class PostTransformer {
       $title = '<a href="' . $this->wp->getPermalink($post->ID) . '">' . $title . '</a>';
     }
 
-    if (in_array($this->args['titleFormat'], array('h1', 'h2', 'h3'))) {
+    if (in_array($this->args['titleFormat'], ['h1', 'h2', 'h3'])) {
       $tag = $this->args['titleFormat'];
     } elseif ($this->args['titleFormat'] === 'ul') {
       $tag = 'li';
@@ -250,13 +271,50 @@ class PostTransformer {
       $tag = 'h1';
     }
 
-    $alignment = (in_array($this->args['titleAlignment'], array('left', 'right', 'center'))) ? $this->args['titleAlignment'] : 'left';
+    $alignment = (in_array($this->args['titleAlignment'], ['left', 'right', 'center'])) ? $this->args['titleAlignment'] : 'left';
 
     $title = '<' . $tag . ' data-post-id="' . $post->ID . '" style="text-align: ' . $alignment . ';">' . $title . '</' . $tag . '>';
-    return array(
+    return [
       'type' => 'text',
       'text' => $title,
-    );
+    ];
+  }
+
+  private function getPrice($post) {
+    $price = null;
+    $product = null;
+    if ($this->woocommerce_helper->isWooCommerceActive()) {
+      $product = $this->woocommerce_helper->wcGetProduct($post->ID);
+    }
+    if ($product) {
+      $price = '<h2>' . strip_tags($product->get_price_html(), '<span><del>') . '</h2>';
+    }
+    return $price;
+  }
+
+  private function addProductDataToContent($content, $post) {
+    if (!isset($this->args['pricePosition']) || $this->args['pricePosition'] === 'hidden') {
+      return $content;
+    }
+    $price = $this->getPrice($post);
+    $blocks_count = count($content);
+    if ($blocks_count > 0 && $content[$blocks_count - 1]['type'] === 'text') {
+      if ($this->args['pricePosition'] === 'below') {
+        $content[$blocks_count - 1]['text'] = $content[$blocks_count - 1]['text'] . $price;
+      } else {
+        $content[$blocks_count - 1]['text'] = $price . $content[$blocks_count - 1]['text'];
+      }
+    } else {
+      $content[] = [
+        'type' => 'text',
+        'text' => $price,
+      ];
+    }
+    return $content;
+  }
+
+  private function isProduct($post) {
+    return $post->post_type === 'product';
   }
 
   /**

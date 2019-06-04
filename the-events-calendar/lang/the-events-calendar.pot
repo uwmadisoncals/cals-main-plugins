@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the The Events Calendar package.
 msgid ""
 msgstr ""
-"Project-Id-Version: The Events Calendar 4.9\n"
+"Project-Id-Version: The Events Calendar 4.9.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/the-events-"
 "calendar\n"
-"POT-Creation-Date: 2019-04-16 21:10:15+00:00\n"
+"POT-Creation-Date: 2019-05-15 19:53:34+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2019-04-16 21:10\n"
+"PO-Revision-Date: 2019-05-15 19:53\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 
@@ -1716,7 +1716,7 @@ msgid ""
 "%enddatewithyear%%."
 msgstr ""
 
-#: src/Tribe/Cost_Utils.php:120
+#: src/Tribe/Cost_Utils.php:130
 msgctxt "Cost range separator"
 msgid " – "
 msgstr ""
@@ -2380,6 +2380,10 @@ msgid ""
 "the file manually."
 msgstr ""
 
+#: src/Tribe/JSON_LD/Event.php:170
+msgid "Free"
+msgstr ""
+
 #: src/Tribe/Linked_Posts/Chooser_Meta_Box.php:170
 msgid "Create New %s"
 msgstr ""
@@ -2492,14 +2496,14 @@ msgstr ""
 msgid "Events List"
 msgstr ""
 
-#: src/Tribe/List_Widget.php:249
+#: src/Tribe/List_Widget.php:251
 msgid "Upcoming Events"
 msgstr ""
 
-#. #-#-#-#-#  the-events-calendar.pot (The Events Calendar 4.9)  #-#-#-#-#
+#. #-#-#-#-#  the-events-calendar.pot (The Events Calendar 4.9.2)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: src/Tribe/Main.php:836 src/Tribe/Main.php:1190 src/Tribe/Privacy.php:29
-#: src/functions/template-tags/general.php:1351 the-events-calendar.php:51
+#: src/functions/template-tags/general.php:1351 the-events-calendar.php:54
 msgid "The Events Calendar"
 msgstr ""
 
@@ -6929,7 +6933,7 @@ msgid ""
 "plural, and this singular.%3$sYour single Event URL is like: %4$s"
 msgstr ""
 
-#: src/functions/template-tags/venue.php:775
+#: src/functions/template-tags/venue.php:779
 msgctxt "Address separator"
 msgid ", "
 msgstr ""

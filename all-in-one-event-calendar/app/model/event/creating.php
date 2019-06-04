@@ -49,7 +49,7 @@ class Ai1ec_Event_Creating extends Ai1ec_Base {
         /**
          * =====================================================================
          *
-         * CHANGE CODE BELLOW TO HAVE FOLLOWING PROPERTIES:
+         * CHANGE CODE BELOW TO HAVE FOLLOWING PROPERTIES:
          * - be initializiable from model;
          * - have sane defaults;
          * - avoid that cluster of isset and ternary operator.
@@ -57,33 +57,33 @@ class Ai1ec_Event_Creating extends Ai1ec_Base {
          * =====================================================================
          */
 
-        $all_day          = isset( $_POST['ai1ec_all_day_event'] )    ? 1                                             : 0;
-        $instant_event    = isset( $_POST['ai1ec_instant_event'] )    ? 1                                             : 0;
-        $timezone_name    = isset( $_POST['ai1ec_timezone_name'] )    ? $_POST['ai1ec_timezone_name']                 : 'sys.default';
-        $start_time       = isset( $_POST['ai1ec_start_time'] )       ? $_POST['ai1ec_start_time']                    : '';
-        $end_time         = isset( $_POST['ai1ec_end_time'] )         ? $_POST['ai1ec_end_time']                      : '';
-        $venue            = isset( $_POST['ai1ec_venue'] )            ? $_POST['ai1ec_venue']                         : '';
-        $address          = isset( $_POST['ai1ec_address'] )          ? $_POST['ai1ec_address']                       : '';
-        $city             = isset( $_POST['ai1ec_city'] )             ? $_POST['ai1ec_city']                          : '';
-        $province         = isset( $_POST['ai1ec_province'] )         ? $_POST['ai1ec_province']                      : '';
-        $postal_code      = isset( $_POST['ai1ec_postal_code'] )      ? $_POST['ai1ec_postal_code']                   : '';
-        $country          = isset( $_POST['ai1ec_country'] )          ? $_POST['ai1ec_country']                       : '';
-        $google_map       = isset( $_POST['ai1ec_google_map'] )       ? 1                                             : 0;
-        $cost             = isset( $_POST['ai1ec_cost'] )             ? $_POST['ai1ec_cost']                          : '';
-        $is_free          = isset( $_POST['ai1ec_is_free'] )          ? (bool)$_POST['ai1ec_is_free']                 : false;
-        $ticket_url       = isset( $_POST['ai1ec_ticket_url'] )       ? $_POST['ai1ec_ticket_url']                    : '';
-        $contact_name     = isset( $_POST['ai1ec_contact_name'] )     ? $_POST['ai1ec_contact_name']                  : '';
-        $contact_phone    = isset( $_POST['ai1ec_contact_phone'] )    ? $_POST['ai1ec_contact_phone']                 : '';
-        $contact_email    = isset( $_POST['ai1ec_contact_email'] )    ? $_POST['ai1ec_contact_email']                 : '';
-        $contact_url      = isset( $_POST['ai1ec_contact_url'] )      ? $_POST['ai1ec_contact_url']                   : '';
-        $show_coordinates = isset( $_POST['ai1ec_input_coordinates'] )? 1                                             : 0;
-        $longitude        = isset( $_POST['ai1ec_longitude'] )        ? $_POST['ai1ec_longitude']                     : '';
-        $latitude         = isset( $_POST['ai1ec_latitude'] )         ? $_POST['ai1ec_latitude']                      : '';
-        $cost_type        = isset( $_POST['ai1ec_cost_type'] )        ? $_POST['ai1ec_cost_type']                     : '';
-        $rrule  = null;
-        $exrule = null;
-        $exdate = null;
-        $rdate  = null;
+        $all_day          = isset( $_POST['ai1ec_all_day_event'] )    ? 1                                                                 : 0;
+        $instant_event    = isset( $_POST['ai1ec_instant_event'] )    ? 1                                                                 : 0;
+        $timezone_name    = isset( $_POST['ai1ec_timezone_name'] )    ? sanitize_text_field( $_POST['ai1ec_timezone_name'] )              : 'sys.default';
+        $start_time       = isset( $_POST['ai1ec_start_time'] )       ? sanitize_text_field( $_POST['ai1ec_start_time'] )                 : '';
+        $end_time         = isset( $_POST['ai1ec_end_time'] )         ? sanitize_text_field( $_POST['ai1ec_end_time'] )                   : '';
+        $venue            = isset( $_POST['ai1ec_venue'] )            ? sanitize_text_field( $_POST['ai1ec_venue'] )                      : '';
+        $address          = isset( $_POST['ai1ec_address'] )          ? sanitize_text_field( $_POST['ai1ec_address'] )                    : '';
+        $city             = isset( $_POST['ai1ec_city'] )             ? sanitize_text_field( $_POST['ai1ec_city'] )                       : '';
+        $province         = isset( $_POST['ai1ec_province'] )         ? sanitize_text_field( $_POST['ai1ec_province'] )                   : '';
+        $postal_code      = isset( $_POST['ai1ec_postal_code'] )      ? sanitize_text_field( $_POST['ai1ec_postal_code'] )                : '';
+        $country          = isset( $_POST['ai1ec_country'] )          ? sanitize_text_field( $_POST['ai1ec_country'] )                    : '';
+        $google_map       = isset( $_POST['ai1ec_google_map'] )       ? 1                                                                 : 0;
+        $cost             = isset( $_POST['ai1ec_cost'] )             ? sanitize_text_field( $_POST['ai1ec_cost'] )                       : '';
+        $is_free          = isset( $_POST['ai1ec_is_free'] )          ? (bool)$_POST['ai1ec_is_free']                                     : false;
+        $ticket_url       = isset( $_POST['ai1ec_ticket_url'] )       ? sanitize_text_field( $_POST['ai1ec_ticket_url'] )                 : '';
+        $contact_name     = isset( $_POST['ai1ec_contact_name'] )     ? sanitize_text_field( $_POST['ai1ec_contact_name'] )               : '';
+        $contact_phone    = isset( $_POST['ai1ec_contact_phone'] )    ? sanitize_text_field( $_POST['ai1ec_contact_phone'] )              : '';
+        $contact_email    = isset( $_POST['ai1ec_contact_email'] )    ? sanitize_text_field( $_POST['ai1ec_contact_email'] )              : '';
+        $contact_url      = isset( $_POST['ai1ec_contact_url'] )      ? sanitize_text_field( $_POST['ai1ec_contact_url'] )                : '';
+        $show_coordinates = isset( $_POST['ai1ec_input_coordinates'] )? 1                                                                 : 0;
+        $longitude        = isset( $_POST['ai1ec_longitude'] )        ? sanitize_text_field( $_POST['ai1ec_longitude'] )                  : '';
+        $latitude         = isset( $_POST['ai1ec_latitude'] )         ? sanitize_text_field( $_POST['ai1ec_latitude'] )                   : '';
+        $cost_type        = isset( $_POST['ai1ec_cost_type'] )        ? sanitize_text_field( $_POST['ai1ec_cost_type'] )                  : '';
+        $rrule            = null;
+        $exrule           = null;
+        $exdate           = null;
+        $rdate            = null;
 
         if ( 'external' !== $cost_type ) {
             $ticket_url = '';
@@ -218,10 +218,10 @@ class Ai1ec_Event_Creating extends Ai1ec_Base {
             return null;
         }
         $event        = $data['event'];
-        $is_new       = $data[ 'is_new'];
+        $is_new       = $data['is_new'];
 
-        $banner_image = isset( $_POST['ai1ec_banner_image'] )     ? $_POST['ai1ec_banner_image'] : '';
-        $cost_type    = isset( $_POST['ai1ec_cost_type'] )        ? $_POST['ai1ec_cost_type'] : '';
+        $banner_image = isset( $_POST['ai1ec_banner_image'] )     ? sanitize_text_field( $_POST['ai1ec_banner_image'] ) : '';
+        $cost_type    = isset( $_POST['ai1ec_cost_type'] )        ? sanitize_text_field( $_POST['ai1ec_cost_type'] )    : '';
 
         update_post_meta( $post_id, 'ai1ec_banner_image', $banner_image );
         if ( $cost_type ) {
@@ -300,7 +300,7 @@ class Ai1ec_Event_Creating extends Ai1ec_Base {
         case 'inline-save': //quick edit from edit page
             $fields = array();
             if ( false === ai1ec_is_blank( $_REQUEST['post_title'] ) ) {
-                $fields['title'] = $_REQUEST['post_title'];
+                $fields['title'] = sanitize_text_field( $_REQUEST['post_title'] );
             }
             if ( false === ai1ec_is_blank( $_REQUEST['_status'] ) ) {
                 $fields['status'] = $_REQUEST['_status'];
@@ -425,8 +425,11 @@ class Ai1ec_Event_Creating extends Ai1ec_Base {
                 $_POST[$field] = $to_value;
             }
         }
-        $_POST   = _wp_translate_postdata( false, $_POST );
-        $_POST['post_parent'] = $old_post_id;
+        $_POST                   = _wp_translate_postdata( false, $_POST );
+        $_POST['post_parent']    = $old_post_id;
+        if ( isset( $_POST['post_title'] ) ) {
+            $_POST['post_title'] = sanitize_text_field( $_POST['post_title'] );
+        }
         $post_id = wp_insert_post( $_POST );
         $this->_registry->get( 'model.event.parent' )->event_parent(
             $post_id,

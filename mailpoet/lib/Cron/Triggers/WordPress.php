@@ -1,7 +1,8 @@
 <?php
 namespace MailPoet\Cron\Triggers;
 
-use Carbon\Carbon;
+use MailPoet\Cron\Workers\AuthorizedSendingEmailsCheck;
+use MailPoet\Cron\Workers\InactiveSubscribers;
 use MailPoet\Services\Bridge;
 use MailPoet\Cron\CronHelper;
 use MailPoet\Mailer\MailerLog;
@@ -15,6 +16,7 @@ use MailPoet\Cron\Workers\SendingQueue\SendingQueue as SendingQueueWorker;
 use MailPoet\Cron\Workers\KeyCheck\PremiumKeyCheck as PremiumKeyCheckWorker;
 use MailPoet\Cron\Workers\StatsNotifications\Worker as StatsNotificationsWorker;
 use MailPoet\Cron\Workers\KeyCheck\SendingServiceKeyCheck as SendingServiceKeyCheckWorker;
+use MailPoet\Cron\Workers\WooCommerceSync as WooCommerceSyncWorker;
 
 if (!defined('ABSPATH')) exit;
 
@@ -38,17 +40,17 @@ class WordPress {
     $migration_due_tasks = self::getTasksCount([
       'type' => MigrationWorker::TASK_TYPE,
       'scheduled_in' => [self::SCHEDULED_IN_THE_PAST],
-      'status' => ['null', ScheduledTask::STATUS_SCHEDULED]
+      'status' => ['null', ScheduledTask::STATUS_SCHEDULED],
     ]);
     $migration_completed_tasks = self::getTasksCount([
       'type' => MigrationWorker::TASK_TYPE,
       'scheduled_in' => [self::SCHEDULED_IN_THE_PAST, self::SCHEDULED_IN_THE_FUTURE],
-      'status' => [ScheduledTask::STATUS_COMPLETED]
+      'status' => [ScheduledTask::STATUS_COMPLETED],
     ]);
     $migration_future_tasks = self::getTasksCount([
       'type' => MigrationWorker::TASK_TYPE,
       'scheduled_in' => [self::SCHEDULED_IN_THE_FUTURE],
-      'status' => [ScheduledTask::STATUS_SCHEDULED]
+      'status' => [ScheduledTask::STATUS_SCHEDULED],
     ]);
     // sending queue
     $scheduled_queues = SchedulerWorker::getScheduledQueues();
@@ -61,41 +63,60 @@ class WordPress {
     $bounce_due_tasks = self::getTasksCount([
       'type' => BounceWorker::TASK_TYPE,
       'scheduled_in' => [self::SCHEDULED_IN_THE_PAST],
-      'status' => ['null', ScheduledTask::STATUS_SCHEDULED]
+      'status' => ['null', ScheduledTask::STATUS_SCHEDULED],
     ]);
     $bounce_future_tasks = self::getTasksCount([
       'type' => BounceWorker::TASK_TYPE,
       'scheduled_in' => [self::SCHEDULED_IN_THE_FUTURE],
-      'status' => [ScheduledTask::STATUS_SCHEDULED]
+      'status' => [ScheduledTask::STATUS_SCHEDULED],
     ]);
     // sending service key check
     $msskeycheck_due_tasks = self::getTasksCount([
       'type' => SendingServiceKeyCheckWorker::TASK_TYPE,
       'scheduled_in' => [self::SCHEDULED_IN_THE_PAST],
-      'status' => ['null', ScheduledTask::STATUS_SCHEDULED]
+      'status' => ['null', ScheduledTask::STATUS_SCHEDULED],
     ]);
     $msskeycheck_future_tasks = self::getTasksCount([
       'type' => SendingServiceKeyCheckWorker::TASK_TYPE,
       'scheduled_in' => [self::SCHEDULED_IN_THE_FUTURE],
-      'status' => [ScheduledTask::STATUS_SCHEDULED]
+      'status' => [ScheduledTask::STATUS_SCHEDULED],
     ]);
     // premium key check
     $premium_key_specified = Bridge::isPremiumKeySpecified();
     $premium_keycheck_due_tasks = self::getTasksCount([
       'type' => PremiumKeyCheckWorker::TASK_TYPE,
       'scheduled_in' => [self::SCHEDULED_IN_THE_PAST],
-      'status' => ['null', ScheduledTask::STATUS_SCHEDULED]
+      'status' => ['null', ScheduledTask::STATUS_SCHEDULED],
     ]);
     $premium_keycheck_future_tasks = self::getTasksCount([
       'type' => PremiumKeyCheckWorker::TASK_TYPE,
       'scheduled_in' => [self::SCHEDULED_IN_THE_FUTURE],
-      'status' => [ScheduledTask::STATUS_SCHEDULED]
+      'status' => [ScheduledTask::STATUS_SCHEDULED],
     ]);
     // stats notifications
     $stats_notifications_tasks = self::getTasksCount([
       'type' => StatsNotificationsWorker::TASK_TYPE,
       'scheduled_in' => [self::SCHEDULED_IN_THE_PAST],
-      'status' => ['null', ScheduledTask::STATUS_SCHEDULED]
+      'status' => ['null', ScheduledTask::STATUS_SCHEDULED],
+    ]);
+    // inactive subscribers check
+    $inactive_subscribers_tasks = self::getTasksCount([
+      'type' => InactiveSubscribers::TASK_TYPE,
+      'scheduled_in' => [self::SCHEDULED_IN_THE_PAST],
+      'status' => ['null', ScheduledTask::STATUS_SCHEDULED],
+    ]);
+    // WooCommerce sync
+    $woo_commerce_sync_tasks = self::getTasksCount([
+      'type' => WooCommerceSyncWorker::TASK_TYPE,
+      'scheduled_in' => [self::SCHEDULED_IN_THE_PAST],
+      'status' => ['null', ScheduledTask::STATUS_SCHEDULED],
+    ]);
+
+    // Authorized email addresses check
+    $authorized_email_addresses_tasks = self::getTasksCount([
+      'type' => AuthorizedSendingEmailsCheck::TASK_TYPE,
+      'scheduled_in' => [self::SCHEDULED_IN_THE_PAST],
+      'status' => ['null', ScheduledTask::STATUS_SCHEDULED],
     ]);
 
     // check requirements for each worker
@@ -112,6 +133,9 @@ class WordPress {
       || $sending_service_key_check_active
       || $premium_key_check_active
       || $stats_notifications_tasks
+      || $inactive_subscribers_tasks
+      || $woo_commerce_sync_tasks
+      || $authorized_email_addresses_tasks
     );
   }
 

@@ -5,7 +5,7 @@
  * Description: A calendar system with month, week, day, agenda views, upcoming events widget, color-coded categories, recurrence, and import/export of .ics feeds.
  * Author: Time.ly Network Inc.
  * Author URI: https://time.ly/
- * Version: 2.5.38
+ * Version: 2.5.41
  * Text Domain: all-in-one-event-calendar
  * Domain Path: /language
  */
@@ -72,7 +72,7 @@ require $ai1ec_base_dir . DIRECTORY_SEPARATOR . 'lib' .
     DIRECTORY_SEPARATOR . 'global-functions.php';
 
 require $ai1ec_base_dir . DIRECTORY_SEPARATOR . 'lib' .
-    DIRECTORY_SEPARATOR . 'iCal' . DIRECTORY_SEPARATOR . 'iCalcreator-2.24.2' . DIRECTORY_SEPARATOR . 'autoload.php';
+    DIRECTORY_SEPARATOR . 'iCal' . DIRECTORY_SEPARATOR . 'iCalcreator-2.26.9' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 require $ai1ec_base_dir . DIRECTORY_SEPARATOR . 'app' .
     DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'extension.php';

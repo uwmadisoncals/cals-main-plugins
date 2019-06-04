@@ -4,7 +4,7 @@
 <link rel="stylesheet" type="text/css" href="<?php echo plugins_url('/download-manager/assets/bootstrap/css/bootstrap.css');?>" />
 <script  src="<?php echo plugins_url('/download-manager/assets/bootstrap/js/bootstrap.min.js');?>"></script>
 <link href='http://fonts.googleapis.com/css?family=Overpass:300,400,700' rel='stylesheet' type='text/css'>
-<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="<?php echo WPDM_BASE_URL . 'assets/fontawesome/css/all.css'; ?>" rel="stylesheet">
 <style>
     .w3eden .lead,
     .w3eden .btn,

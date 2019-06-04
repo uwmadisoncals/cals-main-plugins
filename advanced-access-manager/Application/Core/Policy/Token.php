@@ -29,10 +29,12 @@ final class AAM_Core_Policy_Token {
         'USERMETA'  => 'AAM_Core_Policy_Token::getUserMetaValue',
         'DATETIME'  => 'AAM_Core_Policy_Token::getDateTimeValue',
         'GET'       => 'AAM_Core_Request::get',
+        'QUERY'     => 'AAM_Core_Request::get',
         'POST'      => 'AAM_Core_Request::post',
         'COOKIE'    => 'AAM_Core_Request::cookie',
         'SERVER'    => 'AAM_Core_Request::server',
-        'ARGS'      => 'AAM_Core_Policy_Token::getArgValue'
+        'ARGS'      => 'AAM_Core_Policy_Token::getArgValue',
+        'CONST'     => 'AAM_Core_Policy_Token::defined'
     );
     
     /**
@@ -55,11 +57,11 @@ final class AAM_Core_Policy_Token {
 
             $part = str_replace(
                 $token, 
-                (is_scalar($val) ? $val : json_encode($val)), 
+                (is_scalar($val) || is_null($val) ? $val : json_encode($val)), 
                 $part
             );
         }
-        
+
         return $part;
     }
     
@@ -75,14 +77,19 @@ final class AAM_Core_Policy_Token {
      * @static
      */
     protected static function getValue($token, $args) {
+        $value = null;
         $parts = explode('.', $token);
 
         if (isset(self::$map[$parts[0]])) {
-            $value = call_user_func(self::$map[$parts[0]], $parts[1], $args);
-        } elseif ($parts[0] === 'CALLBACK' && is_callable($parts[1])) {
-            $value = call_user_func($parts[1], $args);
+            if ($parts[0] === 'ARG') {
+                $value = call_user_func(self::$map[$parts[0]], $parts[1], $args);
+            } else {
+                $value = call_user_func(self::$map[$parts[0]], $parts[1]);
+            }
+        } elseif ($parts[0] === 'CALLBACK') {
+            $value = is_callable($parts[1]) ? call_user_func($parts[1], $args) : null;
         }
-        
+
         return $value;
     }
     
@@ -184,6 +191,20 @@ final class AAM_Core_Policy_Token {
      */
     protected static function getDateTimeValue($prop) {
         return date($prop);
+    }
+    
+    /**
+     * Get a value for the defined constant
+     *
+     * @param string $const
+     * 
+     * @return mixed
+     * 
+     * @access protected
+     * @static
+     */
+    protected static function defined($const) {
+        return (defined($const) ? constant($const) : null);
     }
     
 }

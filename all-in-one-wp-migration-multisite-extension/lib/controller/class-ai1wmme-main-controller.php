@@ -48,18 +48,30 @@ class Ai1wmme_Main_Controller {
 	 * @return void
 	 */
 	public function activation_hook() {
+		if ( constant( 'AI1WMME_PURCHASE_ID' ) ) {
+			@$this->create_activation_request( AI1WMME_PURCHASE_ID );
+		}
+	}
+
+	/**
+	 * Create activation request
+	 *
+	 * @param  string $purchase_id Purchase ID
+	 * @return void
+	 */
+	public function create_activation_request( $purchase_id ) {
 		global $wpdb;
 
-		if ( constant( 'AI1WMME_PURCHASE_ID' ) ) {
-			@wp_remote_post( AI1WM_ACTIVATION_URL, array(
+		if ( defined( 'AI1WMME_ACTIVATION_URL' ) ) {
+			wp_remote_post( AI1WMME_ACTIVATION_URL, array(
 				'timeout' => 15,
 				'body'    => array(
-					'url'           => @get_site_url(),
-					'email'         => @get_option( 'admin_email' ),
-					'wp_version'    => @get_bloginfo( 'version' ),
+					'url'           => get_site_url(),
+					'email'         => get_option( 'admin_email' ),
+					'wp_version'    => get_bloginfo( 'version' ),
 					'php_version'   => PHP_VERSION,
-					'mysql_version' => @$wpdb->db_version(),
-					'uuid'          => AI1WMME_PURCHASE_ID,
+					'mysql_version' => $wpdb->db_version(),
+					'uuid'          => $purchase_id,
 				),
 			) );
 		}

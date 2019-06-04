@@ -3,8 +3,8 @@ Contributors: pt-guy
 Donate link: https://www.contentviewspro.com/?utm_source=wordpress&utm_medium=plugin&utm_campaign=donate
 Tags: post grid, grid plugin, grid, latest post, display post, post, page, category, responsive, list, thumbnail
 Requires at least: 3.3
-Tested up to: 5.1
-Stable tag: 2.1.3.2
+Tested up to: 5.2.1
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -158,6 +158,13 @@ If you are using "Your latest posts" as home page, you should paste this code `<
 
 
 == Changelog ==
+
+= 2.2.0 - 2019/05/31 =
+* Enhancement: upgrade bootstrap framework to latest secure version 3.4.1
+
+= 2.1.3.3 - 2019/05/07 =
+* Tested up to WordPress 5.2
+* Prevent grid layout issues caused by grid/flexbox styles of some themes
 
 = 2.1.3.2 - 2019/02/22 =
 * Tested up to WordPress 5.1

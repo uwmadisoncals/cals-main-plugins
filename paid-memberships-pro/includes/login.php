@@ -1,11 +1,11 @@
 <?php
 //redirect control
-function pmpro_login_redirect($redirect_to, $request, $user)
+function pmpro_login_redirect($redirect_to, $request = NULL, $user = NULL)
 {
 	global $wpdb;
 
 	//is a user logging in?
-	if(!empty($user->ID))
+	if(!empty($user) && !empty($user->ID))
 	{
 		//logging in, let's figure out where to send them
 		if(pmpro_isAdmin($user->ID))
@@ -161,7 +161,7 @@ function pmpro_redirect_to_logged_in()
 {	
 	if((pmpro_is_login_page() || is_page("login")) && !empty($_REQUEST['redirect_to']) && is_user_logged_in() && (empty($_REQUEST['action']) || $_REQUEST['action'] == 'login') && empty($_REQUEST['reauth']))
 	{
-		wp_redirect($_REQUEST['redirect_to']);
+		wp_safe_redirect($_REQUEST['redirect_to']);
 		exit;
 	}
 }

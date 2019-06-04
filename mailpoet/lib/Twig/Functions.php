@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use MailPoet\Config\ServicesChecker;
 use MailPoet\Settings\SettingsController;
 use MailPoet\Util\FreeDomains;
+use MailPoet\WooCommerce\Helper as WooCommerceHelper;
 use MailPoet\WP\Functions as WPFunctions;
 use MailPoetVendor\Twig\Extension\AbstractExtension;
 use MailPoetVendor\Twig\TwigFunction;
@@ -17,108 +18,117 @@ class Functions extends AbstractExtension {
   /** @var SettingsController */
   private $settings;
 
+  /** @var WooCommerceHelper */
+  private $woocommerce_helper;
+
   public function __construct() {
     $this->settings = new SettingsController();
+    $this->woocommerce_helper = new WooCommerceHelper();
   }
 
   function getFunctions() {
-    return array(
+    return [
       new TwigFunction(
         'json_encode',
         'json_encode',
-        array('is_safe' => array('all'))
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'json_decode',
         'json_decode',
-        array('is_safe' => array('all'))
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'wp_nonce_field',
         'wp_nonce_field',
-        array('is_safe' => array('all'))
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'params',
-        array($this, 'params'),
-        array('is_safe' => array('all'))
+        [$this, 'params'],
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'admin_url',
         'admin_url',
-        array('is_safe' => array('all'))
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'get_option',
         'get_option',
-        array('is_safe' => array('all'))
-      ),
-      new TwigFunction(
-        'get_option',
-        'get_option',
-        array('is_safe' => array('all'))
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'sending_frequency',
-        array($this, 'getSendingFrequency'),
-        array('is_safe' => array('all'))
+        [$this, 'getSendingFrequency'],
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'wp_date_format',
-        array($this, 'getWPDateFormat'),
-        array('is_safe' => array('all'))
+        [$this, 'getWPDateFormat'],
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'mailpoet_version',
-        array($this, 'getMailPoetVersion'),
-        array('is_safe' => array('all'))
+        [$this, 'getMailPoetVersion'],
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'mailpoet_premium_version',
-        array($this, 'getMailPoetPremiumVersion'),
-        array('is_safe' => array('all'))
+        [$this, 'getMailPoetPremiumVersion'],
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'mailpoet_has_valid_premium_key',
-        array($this, 'hasValidPremiumKey'),
-        array('is_safe' => array('all'))
+        [$this, 'hasValidPremiumKey'],
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'wp_time_format',
-        array($this, 'getWPTimeFormat'),
-        array('is_safe' => array('all'))
+        [$this, 'getWPTimeFormat'],
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'wp_datetime_format',
-        array($this, 'getWPDateTimeFormat'),
-        array('is_safe' => array('all'))
+        [$this, 'getWPDateTimeFormat'],
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'do_action',
         'do_action',
-        array('is_safe' => array('all'))
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'is_rtl',
-        array($this, 'isRtl'),
-        array('is_safe' => array('all'))
+        [$this, 'isRtl'],
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'number_format_i18n',
         'number_format_i18n',
-        array('is_safe' => array('all'))
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'mailpoet_locale',
-        array($this, 'getTwoLettersLocale'),
-        array('is_safe' => array('all'))
+        [$this, 'getTwoLettersLocale'],
+        ['is_safe' => ['all']]
       ),
       new TwigFunction(
         'mailpoet_free_domains',
-        array($this, 'getFreeDomains'),
-        array('is_safe' => array('all'))
+        [$this, 'getFreeDomains'],
+        ['is_safe' => ['all']]
       ),
-    );
+      new TwigFunction(
+        'is_woocommerce_active',
+        [$this, 'isWoocommerceActive'],
+        ['is_safe' => ['all']]
+      ),
+      new TwigFunction(
+        'wp_start_of_week',
+        [$this, 'getWPStartOfWeek'],
+        ['is_safe' => ['all']]
+      ),
+    ];
   }
 
   function getSendingFrequency() {
@@ -126,12 +136,12 @@ class Functions extends AbstractExtension {
     $value = (int)array_shift($args);
 
     $label = null;
-    $labels = array(
+    $labels = [
       'minute' => WPFunctions::get()->__('every minute', 'mailpoet'),
       'minutes' => WPFunctions::get()->__('every %1$d minutes', 'mailpoet'),
       'hour' => WPFunctions::get()->__('every hour', 'mailpoet'),
-      'hours' => WPFunctions::get()->__('every %1$d hours', 'mailpoet')
-    );
+      'hours' => WPFunctions::get()->__('every %1$d hours', 'mailpoet'),
+    ];
 
     if ($value >= 60) {
       // we're dealing with hours
@@ -158,9 +168,11 @@ class Functions extends AbstractExtension {
   }
 
   function getWPDateFormat() {
-    return (get_option('date_format')) ?
-      WPFunctions::get()->getOption('date_format') :
-      'F j, Y';
+    return WPFunctions::get()->getOption('date_format') ?: 'F j, Y';
+  }
+
+  function getWPStartOfWeek() {
+    return WPFunctions::get()->getOption('start_of_week') ?: 0;
   }
 
   function getMailPoetVersion() {
@@ -172,9 +184,7 @@ class Functions extends AbstractExtension {
   }
 
   function getWPTimeFormat() {
-    return (get_option('time_format')) ?
-      WPFunctions::get()->getOption('time_format') :
-      'g:i a';
+    return WPFunctions::get()->getOption('time_format') ?: 'g:i a';
   }
 
   function getWPDateTimeFormat() {
@@ -210,5 +220,9 @@ class Functions extends AbstractExtension {
 
   function getFreeDomains() {
     return FreeDomains::FREE_DOMAINS;
+  }
+
+  function isWoocommerceActive() {
+    return $this->woocommerce_helper->isWooCommerceActive();
   }
 }

@@ -5,6 +5,7 @@ namespace MailPoet\Cron\Workers\StatsNotifications;
 use Carbon\Carbon;
 use MailPoet\Config\Renderer;
 use MailPoet\Cron\CronHelper;
+use MailPoet\Features\FeaturesController;
 use MailPoet\Mailer\Mailer;
 use MailPoet\Models\Newsletter;
 use MailPoet\Models\NewsletterLink;
@@ -13,6 +14,7 @@ use MailPoet\Models\StatsNotification;
 use MailPoet\Settings\SettingsController;
 use MailPoet\Tasks\Sending;
 use MailPoet\WP\Functions as WPFunctions;
+use MailPoet\WooCommerce\Helper as WCHelper;
 
 class Worker {
 
@@ -31,11 +33,26 @@ class Worker {
   /** @var SettingsController */
   private $settings;
 
-  function __construct(Mailer $mailer, Renderer $renderer, SettingsController $settings, $timer = false) {
+  /** @var FeaturesController */
+  private $features_controller;
+
+  /** @var WCHelper */
+  private $woocommerce_helper;
+
+  function __construct(
+    Mailer $mailer,
+    Renderer $renderer,
+    SettingsController $settings,
+    FeaturesController $features_controller,
+    WCHelper $woocommerce_helper,
+    $timer = false
+  ) {
     $this->timer = $timer ?: microtime(true);
     $this->renderer = $renderer;
     $this->mailer = $mailer;
     $this->settings = $settings;
+    $this->features_controller = $features_controller;
+    $this->woocommerce_helper = $woocommerce_helper;
   }
 
   /** @throws \Exception */
@@ -92,7 +109,7 @@ class Worker {
     return $newsletter
       ->withSendingQueue()
       ->withTotalSent()
-      ->withStatistics();
+      ->withStatistics($this->woocommerce_helper, $this->features_controller);
   }
 
   /**
@@ -104,7 +121,7 @@ class Worker {
     $clicked = ($newsletter->statistics['clicked'] * 100) / $newsletter->total_sent;
     $opened = ($newsletter->statistics['opened'] * 100) / $newsletter->total_sent;
     $unsubscribed = ($newsletter->statistics['unsubscribed'] * 100) / $newsletter->total_sent;
-    $context =  [
+    $context = [
       'subject' => $newsletter->subject,
       'preheader' => sprintf(_x(
         '%1$s%% opens, %2$s%% clicks, %3$s%% unsubscribes in a nutshell.', 'newsletter open rate, click rate and unsubscribe rate', 'mailpoet'),

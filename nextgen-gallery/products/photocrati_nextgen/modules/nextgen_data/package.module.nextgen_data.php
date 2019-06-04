@@ -3386,6 +3386,7 @@ class C_NggLegacy_Thumbnail
 /**
  * Basic gallery storage methods; please consult the other available mixin.gallerystorage_base_(.*).php files before
  * adding new methods to this class: new methods may be more appropriately defined in other mixins.
+ * @property C_Gallery_Storage $object
  */
 class Mixin_GalleryStorage_Base extends Mixin
 {
@@ -3416,7 +3417,7 @@ class Mixin_GalleryStorage_Base extends Mixin
     function render_image($image, $size = FALSE)
     {
         $format_list = $this->object->get_image_format_list();
-        $abspath = $this->get_image_abspath($image, $size, true);
+        $abspath = $this->object->get_image_abspath($image, $size, true);
         if ($abspath == null) {
             $thumbnail = $this->object->generate_image_size($image, $size);
             if ($thumbnail != null) {
@@ -3518,6 +3519,7 @@ class Mixin_GalleryStorage_Base extends Mixin
 }
 /**
  * Provides methods to C_Gallery_Storage related to dynamic images, thumbnails, clones, etc
+ * @property C_Gallery_Storage $object
  */
 class Mixin_GalleryStorage_Base_Dynamic extends Mixin
 {
@@ -3825,6 +3827,30 @@ class Mixin_GalleryStorage_Base_Dynamic extends Mixin
                 // Something went wrong...
                 return null;
             }
+            // We now need to estimate the 'quality' or level of compression applied to the original JPEG: *IF* the
+            // original image has a quality lower than the $quality parameter we will end up generating a new image
+            // that is MUCH larger than the original. 'Quality' as an EXIF or IPTC property is quite unreliable
+            // and not all software honors or treats it the same way. This calculation is simple: just compare the size
+            // that our image could become to what it currently is. '3' is important here as JPEG uses 3 bytes per pixel.
+            //
+            // First we attempt to use ImageMagick if we can; it has a more robust method of calculation.
+            if (!empty($dimensions['mime']) && $dimensions['mime'] == 'image/jpeg') {
+                $possible_quality = NULL;
+                if (extension_loaded('imagick') && class_exists('Imagick')) {
+                    $img = new Imagick($image_path);
+                    if (method_exists($img, 'getImageCompressionQuality')) {
+                        $possible_quality = $img->getImageCompressionQuality();
+                    }
+                }
+                // ImageMagick wasn't available so we guess it from the dimensions and filesize
+                if ($possible_quality === NULL) {
+                    $filesize = filesize($image_path);
+                    $possible_quality = 101 - $width * $height * 3 / $filesize;
+                }
+                if ($possible_quality !== NULL && $possible_quality < $quality) {
+                    $quality = $possible_quality;
+                }
+            }
             $result['clone_path'] = $clone_path;
             $result['clone_directory'] = $clone_dir;
             $result['clone_suffix'] = $clone_suffix;
@@ -4103,6 +4129,7 @@ class Mixin_GalleryStorage_Base_Dynamic extends Mixin
 }
 /**
  * Provides getter methods to C_Gallery_Storage for determining absolute paths, URL, etc
+ * @property C_Gallery_Storage $object
  */
 class Mixin_GalleryStorage_Base_Getters extends Mixin
 {
@@ -4724,6 +4751,7 @@ class Mixin_GalleryStorage_Base_Getters extends Mixin
 }
 /**
  * Provides the basic methods of gallery management to C_Gallery_Storage
+ * @property C_Gallery_Storage $object
  */
 class Mixin_GalleryStorage_Base_Management extends Mixin
 {
@@ -4961,6 +4989,7 @@ class Mixin_GalleryStorage_Base_Management extends Mixin
 }
 /**
  * This class contains methods C_Gallery_Storage needs to interact with (like say, importing from) the WP Media Library
+ * * @property C_Gallery_Storage $object
  */
 class Mixin_GalleryStorage_Base_MediaLibrary extends Mixin
 {
@@ -5006,6 +5035,7 @@ class Mixin_GalleryStorage_Base_MediaLibrary extends Mixin
     }
     /**
      * Delete the given NGG image from the media library
+     * @var int|stdClass $imageId
      */
     function delete_from_media_library($imageId)
     {
@@ -5044,6 +5074,7 @@ class Mixin_GalleryStorage_Base_MediaLibrary extends Mixin
 }
 /**
  * Provides upload-related methods used by C_Gallery_Storage
+ * @property C_Gallery_Storage $object
  */
 class Mixin_GalleryStorage_Base_Upload extends Mixin
 {
@@ -5121,6 +5152,16 @@ class Mixin_GalleryStorage_Base_Upload extends Mixin
             return $retval;
         }
         return FALSE;
+    }
+    /**
+     * @param string $filename
+     * @return bool
+     */
+    public function is_allowed_image_extension($filename)
+    {
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $allowed_extensions = apply_filters('ngg_allowed_file_types', array('jpeg', 'jpg', 'png', 'gif'));
+        return in_array($extension, $allowed_extensions);
     }
     function is_current_user_over_quota()
     {
@@ -5385,51 +5426,102 @@ class Mixin_GalleryStorage_Base_Upload extends Mixin
         }
         return $retval;
     }
+    /**
+     * @param int $gallery_id
+     * @return array|bool
+     */
     function upload_zip($gallery_id)
     {
+        if (!$this->object->is_zip()) {
+            return FALSE;
+        }
+        $retval = FALSE;
         $memory_limit = intval(ini_get('memory_limit'));
         if (!extension_loaded('suhosin') && $memory_limit < 256) {
             @ini_set('memory_limit', '256M');
         }
-        $retval = FALSE;
-        if ($this->object->is_zip()) {
-            $fs = C_Fs::get_instance();
-            // Uses the WordPress ZIP abstraction API
-            include_once $fs->join_paths(ABSPATH, 'wp-admin', 'includes', 'file.php');
-            WP_Filesystem(FALSE, get_temp_dir(), TRUE);
-            // Ensure that we truly have the gallery id
-            $gallery_id = $this->_get_gallery_id($gallery_id);
-            $zipfile = $_FILES['file']['tmp_name'];
-            $dest_path = implode(DIRECTORY_SEPARATOR, array(rtrim(get_temp_dir(), "/\\"), 'unpacked-' . M_I18n::mb_basename($zipfile)));
-            wp_mkdir_p($dest_path);
-            if (unzip_file($zipfile, $dest_path) === TRUE) {
-                $dest_dir = $dest_path . DIRECTORY_SEPARATOR;
-                $files = glob($dest_dir . '*');
-                $size = 0;
-                foreach ($files as $file) {
-                    if (is_file($dest_dir . $file)) {
-                        $size += filesize($dest_dir . $file);
-                    }
-                }
-                if ($size == 0) {
-                    $this->object->delete_directory($dest_path);
-                    $destination = wp_upload_dir();
-                    $destination_path = $destination['basedir'];
-                    $dest_path = implode(DIRECTORY_SEPARATOR, array(rtrim($destination_path, "/\\"), 'unpacked-' . M_I18n::mb_basename($zipfile)));
-                    wp_mkdir_p($dest_path);
-                    if (unzip_file($zipfile, $dest_path) === TRUE) {
-                        $retval = $this->object->import_gallery_from_fs($dest_path, $gallery_id);
-                    }
-                } else {
-                    $retval = $this->object->import_gallery_from_fs($dest_path, $gallery_id);
-                }
+        $fs = C_Fs::get_instance();
+        // Uses the WordPress ZIP abstraction API
+        include_once $fs->join_paths(ABSPATH, 'wp-admin', 'includes', 'file.php');
+        WP_Filesystem(FALSE, get_temp_dir(), TRUE);
+        // Ensure that we truly have the gallery id
+        $gallery_id = $this->object->_get_gallery_id($gallery_id);
+        $zipfile = $_FILES['file']['tmp_name'];
+        $dest_path = implode(DIRECTORY_SEPARATOR, array(rtrim(get_temp_dir(), "/\\"), 'unpacked-' . M_I18n::mb_basename($zipfile)));
+        // Attempt to extract the zip file into the normal system directory
+        $extracted = $this->object->extract_zip($zipfile, $dest_path);
+        // Now verify it worked. get_temp_dir() will check each of the following directories to ensure they are
+        // a directory and against wp_is_writable(). Should ALL of those options fail we will fallback to wp_upload_dir().
+        //
+        // WP_TEMP_DIR
+        // sys_get_temp_dir()
+        // ini/upload_tmp_dir
+        // WP_CONTENT_DIR
+        // /tmp
+        $size = 0;
+        $files = glob($dest_path . DIRECTORY_SEPARATOR . '*');
+        foreach ($files as $file) {
+            if (is_array(stat($file))) {
+                $size += filesize($file);
             }
-            $this->object->delete_directory($dest_path);
         }
+        // Extraction failed; attempt again with wp_upload_dir()
+        if ($size == 0) {
+            // Remove the empty directory we may have possibly created but could not write to
+            $this->object->delete_directory($dest_path);
+            $destination = wp_upload_dir();
+            $destination_path = $destination['basedir'];
+            $dest_path = implode(DIRECTORY_SEPARATOR, array(rtrim($destination_path, "/\\"), rand(), 'unpacked-' . M_I18n::mb_basename($zipfile)));
+            $extracted = $this->object->extract_zip($zipfile, $dest_path);
+        }
+        if ($extracted) {
+            $retval = $this->object->import_gallery_from_fs($dest_path, $gallery_id);
+        }
+        $this->object->delete_directory($dest_path);
         if (!extension_loaded('suhosin')) {
             @ini_set('memory_limit', $memory_limit . 'M');
         }
         return $retval;
+    }
+    /**
+     * @param string $zipfile
+     * @param string $dest_path
+     * @return bool FALSE on failure
+     */
+    public function extract_zip($zipfile, $dest_path)
+    {
+        wp_mkdir_p($dest_path);
+        if (class_exists('ZipArchive', FALSE) && apply_filters('unzip_file_use_ziparchive', TRUE)) {
+            $zipObj = new ZipArchive();
+            if ($zipObj->open($zipfile) === FALSE) {
+                return FALSE;
+            }
+            for ($i = 0; $i < $zipObj->numFiles; $i++) {
+                $filename = $zipObj->getNameIndex($i);
+                if (!$this->object->is_allowed_image_extension($filename)) {
+                    continue;
+                }
+                $zipObj->extractTo($dest_path, array($zipObj->getNameIndex($i)));
+            }
+        } else {
+            require_once ABSPATH . 'wp-admin/includes/class-pclzip.php';
+            $zipObj = new PclZip($zipfile);
+            $zipContent = $zipObj->listContent();
+            $indexesToExtract = array();
+            foreach ($zipContent as $zipItem) {
+                if ($zipItem['folder']) {
+                    continue;
+                }
+                if (!$this->object->is_allowed_image_extension($zipItem['stored_filename'])) {
+                    continue;
+                }
+                $indexesToExtract[] = $zipItem['index'];
+            }
+            if (!$zipObj->extractByIndex(implode(',', $indexesToExtract), $dest_path)) {
+                return FALSE;
+            }
+        }
+        return TRUE;
     }
 }
 /**

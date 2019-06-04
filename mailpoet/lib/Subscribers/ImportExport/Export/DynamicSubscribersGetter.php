@@ -37,7 +37,7 @@ class DynamicSubscribersGetter extends SubscribersGetter {
     );
 
     if (!is_array($filters) || empty($filters)) {
-      return array();
+      return [];
     }
 
     $name = Segment::findOne($segment_id)->name;
@@ -47,10 +47,10 @@ class DynamicSubscribersGetter extends SubscribersGetter {
     }
 
     return $subscribers
-      ->selectMany(array(
-        'list_status' => Subscriber::$_table . '.status'
-      ))
-      ->selectExpr("'". $name . "' AS segment_name")
+      ->selectMany([
+        'list_status' => Subscriber::$_table . '.status',
+      ])
+      ->selectExpr("'" . $name . "' AS segment_name")
       ->offset($this->offset)
       ->limit($this->batch_size)
       ->findArray();

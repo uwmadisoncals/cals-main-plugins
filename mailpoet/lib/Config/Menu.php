@@ -5,6 +5,7 @@ namespace MailPoet\Config;
 use Carbon\Carbon;
 use MailPoet\Cron\CronHelper;
 use MailPoet\Cron\CronTrigger;
+use MailPoet\Features\FeaturesController;
 use MailPoet\Form\Block;
 use MailPoet\Form\Renderer as FormRenderer;
 use MailPoet\Helpscout\Beacon;
@@ -36,7 +37,7 @@ if (!defined('ABSPATH')) exit;
 
 class Menu {
   const MAIN_PAGE_SLUG = 'mailpoet-newsletters';
-  const LAST_ANNOUNCEMENT_DATE = '2019-04-02 10:00:00';
+  const LAST_ANNOUNCEMENT_DATE = '2019-05-07 10:00:00';
 
   /** @var WooCommerceHelper */
   private $woocommerce_helper;
@@ -50,6 +51,10 @@ class Menu {
   private $access_control;
   /** @var SettingsController */
   private $settings;
+
+  /** @var FeaturesController */
+  private $features_controller;
+
   /** @var UserFlagsController */
   private $user_flags;
   /** @var WPFunctions */
@@ -63,6 +68,7 @@ class Menu {
     Renderer $renderer,
     AccessControl $access_control,
     SettingsController $settings,
+    FeaturesController $featuresController,
     WPFunctions $wp,
     WooCommerceHelper $woocommerce_helper,
     ServicesChecker $servicesChecker,
@@ -72,6 +78,7 @@ class Menu {
     $this->access_control = $access_control;
     $this->wp = $wp;
     $this->settings = $settings;
+    $this->features_controller = $featuresController;
     $this->woocommerce_helper = $woocommerce_helper;
     $this->servicesChecker = $servicesChecker;
     $this->user_flags = $user_flags;
@@ -82,27 +89,26 @@ class Menu {
     $this->subscribers_over_limit = $subscribers_feature->check();
     $this->checkMailPoetAPIKey();
     $this->checkPremiumKey();
-    $this->checkFromEmailAuthorization();
 
-    WPFunctions::get()->addAction(
+    $this->wp->addAction(
       'admin_menu',
-      array(
+      [
         $this,
-        'setup'
-      )
+        'setup',
+      ]
     );
   }
 
   function setup() {
     if (!$this->access_control->validatePermission(AccessControl::PERMISSION_ACCESS_PLUGIN_ADMIN)) return;
     if (self::isOnMailPoetAdminPage()) {
-      WPFunctions::get()->doAction('mailpoet_conflict_resolver_styles');
-      WPFunctions::get()->doAction('mailpoet_conflict_resolver_scripts');
+      $this->wp->doAction('mailpoet_conflict_resolver_styles');
+      $this->wp->doAction('mailpoet_conflict_resolver_scripts');
 
       if ($_REQUEST['page'] === 'mailpoet-newsletter-editor') {
         // Disable WP emojis to not interfere with the newsletter editor emoji handling
         $this->disableWPEmojis();
-        WPFunctions::get()->addAction('admin_head', function() {
+        $this->wp->addAction('admin_head', function() {
           $fonts = 'Arvo:400,400i,700,700i'
            . '|Lato:400,400i,700,700i'
            . '|Lora:400,400i,700,700i'
@@ -123,7 +129,7 @@ class Menu {
     }
 
     // Main page
-    WPFunctions::get()->addMenuPage(
+    $this->wp->addMenuPage(
       'MailPoet',
       'MailPoet',
       AccessControl::PERMISSION_ACCESS_PLUGIN_ADMIN,
@@ -134,288 +140,343 @@ class Menu {
     );
 
     // Emails page
-    $newsletters_page = WPFunctions::get()->addSubmenuPage(
+    $newsletters_page = $this->wp->addSubmenuPage(
       self::MAIN_PAGE_SLUG,
       $this->setPageTitle(__('Emails', 'mailpoet')),
-      WPFunctions::get()->__('Emails', 'mailpoet'),
+      $this->wp->__('Emails', 'mailpoet'),
       AccessControl::PERMISSION_MANAGE_EMAILS,
       self::MAIN_PAGE_SLUG,
-      array(
+      [
         $this,
-        'newsletters'
-      )
+        'newsletters',
+      ]
     );
 
     // add limit per page to screen options
-    WPFunctions::get()->addAction('load-' . $newsletters_page, function() {
-      WPFunctions::get()->addScreenOption('per_page', array(
-        'label' => WPFunctions::get()->x(
+    $this->wp->addAction('load-' . $newsletters_page, function() {
+      $this->wp->addScreenOption('per_page', [
+        'label' => $this->wp->_x(
           'Number of newsletters per page',
           'newsletters per page (screen options)',
           'mailpoet'
         ),
-        'option' => 'mailpoet_newsletters_per_page'
-      ));
+        'option' => 'mailpoet_newsletters_per_page',
+      ]);
     });
 
     // newsletter editor
-    WPFunctions::get()->addSubmenuPage(
+    $this->wp->addSubmenuPage(
       true,
       $this->setPageTitle(__('Newsletter', 'mailpoet')),
-      WPFunctions::get()->__('Newsletter Editor', 'mailpoet'),
+      $this->wp->__('Newsletter Editor', 'mailpoet'),
       AccessControl::PERMISSION_MANAGE_EMAILS,
       'mailpoet-newsletter-editor',
-      array(
+      [
         $this,
-        'newletterEditor'
-      )
+        'newletterEditor',
+      ]
     );
 
     // Forms page
-    $forms_page = WPFunctions::get()->addSubmenuPage(
+    $forms_page = $this->wp->addSubmenuPage(
       self::MAIN_PAGE_SLUG,
       $this->setPageTitle(__('Forms', 'mailpoet')),
-      WPFunctions::get()->__('Forms', 'mailpoet'),
+      $this->wp->__('Forms', 'mailpoet'),
       AccessControl::PERMISSION_MANAGE_FORMS,
       'mailpoet-forms',
-      array(
+      [
         $this,
-        'forms'
-      )
+        'forms',
+      ]
     );
 
     // add limit per page to screen options
-    WPFunctions::get()->addAction('load-' . $forms_page, function() {
-      WPFunctions::get()->addScreenOption('per_page', array(
-        'label' => WPFunctions::get()->x(
+    $this->wp->addAction('load-' . $forms_page, function() {
+      $this->wp->addScreenOption('per_page', [
+        'label' => $this->wp->_x(
           'Number of forms per page',
           'forms per page (screen options)',
           'mailpoet'
         ),
-        'option' => 'mailpoet_forms_per_page'
-      ));
+        'option' => 'mailpoet_forms_per_page',
+      ]);
     });
 
     // form editor
-    WPFunctions::get()->addSubmenuPage(
+    $this->wp->addSubmenuPage(
       true,
       $this->setPageTitle(__('Form Editor', 'mailpoet')),
-      WPFunctions::get()->__('Form Editor', 'mailpoet'),
+      $this->wp->__('Form Editor', 'mailpoet'),
       AccessControl::PERMISSION_MANAGE_FORMS,
       'mailpoet-form-editor',
-      array(
+      [
         $this,
-        'formEditor'
-      )
+        'formEditor',
+      ]
     );
 
     // Subscribers page
-    $subscribers_page = WPFunctions::get()->addSubmenuPage(
+    $subscribers_page = $this->wp->addSubmenuPage(
       self::MAIN_PAGE_SLUG,
       $this->setPageTitle(__('Subscribers', 'mailpoet')),
-      WPFunctions::get()->__('Subscribers', 'mailpoet'),
+      $this->wp->__('Subscribers', 'mailpoet'),
       AccessControl::PERMISSION_MANAGE_SUBSCRIBERS,
       'mailpoet-subscribers',
-      array(
+      [
         $this,
-        'subscribers'
-      )
+        'subscribers',
+      ]
     );
 
     // add limit per page to screen options
-    WPFunctions::get()->addAction('load-' . $subscribers_page, function() {
-      WPFunctions::get()->addScreenOption('per_page', array(
-        'label' => WPFunctions::get()->x(
+    $this->wp->addAction('load-' . $subscribers_page, function() {
+      $this->wp->addScreenOption('per_page', [
+        'label' => $this->wp->_x(
           'Number of subscribers per page',
           'subscribers per page (screen options)',
           'mailpoet'
         ),
-        'option' => 'mailpoet_subscribers_per_page'
-      ));
+        'option' => 'mailpoet_subscribers_per_page',
+      ]);
     });
 
     // import
-    WPFunctions::get()->addSubmenuPage(
+    $this->wp->addSubmenuPage(
       'admin.php?page=mailpoet-subscribers',
       $this->setPageTitle(__('Import', 'mailpoet')),
-      WPFunctions::get()->__('Import', 'mailpoet'),
+      $this->wp->__('Import', 'mailpoet'),
       AccessControl::PERMISSION_MANAGE_SUBSCRIBERS,
       'mailpoet-import',
-      array(
+      [
         $this,
-        'import'
-      )
+        'import',
+      ]
     );
 
     // export
-    WPFunctions::get()->addSubmenuPage(
+    $this->wp->addSubmenuPage(
       true,
       $this->setPageTitle(__('Export', 'mailpoet')),
-      WPFunctions::get()->__('Export', 'mailpoet'),
+      $this->wp->__('Export', 'mailpoet'),
       AccessControl::PERMISSION_MANAGE_SUBSCRIBERS,
       'mailpoet-export',
-      array(
+      [
         $this,
-        'export'
-      )
+        'export',
+      ]
     );
 
     // Segments page
-    $segments_page = WPFunctions::get()->addSubmenuPage(
+    $segments_page = $this->wp->addSubmenuPage(
       self::MAIN_PAGE_SLUG,
       $this->setPageTitle(__('Lists', 'mailpoet')),
-      WPFunctions::get()->__('Lists', 'mailpoet'),
+      $this->wp->__('Lists', 'mailpoet'),
       AccessControl::PERMISSION_MANAGE_SEGMENTS,
       'mailpoet-segments',
-      array(
+      [
         $this,
-        'segments'
-      )
+        'segments',
+      ]
     );
 
     // add limit per page to screen options
-    WPFunctions::get()->addAction('load-' . $segments_page, function() {
-      WPFunctions::get()->addScreenOption('per_page', array(
-        'label' => WPFunctions::get()->x(
+    $this->wp->addAction('load-' . $segments_page, function() {
+      $this->wp->addScreenOption('per_page', [
+        'label' => $this->wp->_x(
           'Number of segments per page',
           'segments per page (screen options)',
           'mailpoet'
         ),
-        'option' => 'mailpoet_segments_per_page'
-      ));
+        'option' => 'mailpoet_segments_per_page',
+      ]);
     });
 
-    WPFunctions::get()->doAction('mailpoet_menu_after_lists');
+    $this->wp->doAction('mailpoet_menu_after_lists');
 
     // Settings page
-    WPFunctions::get()->addSubmenuPage(
+    $this->wp->addSubmenuPage(
       self::MAIN_PAGE_SLUG,
       $this->setPageTitle(__('Settings', 'mailpoet')),
-      WPFunctions::get()->__('Settings', 'mailpoet'),
+      $this->wp->__('Settings', 'mailpoet'),
       AccessControl::PERMISSION_MANAGE_SETTINGS,
       'mailpoet-settings',
-      array(
+      [
         $this,
-        'settings'
-      )
+        'settings',
+      ]
     );
 
     // Help page
-    WPFunctions::get()->addSubmenuPage(
+    $this->wp->addSubmenuPage(
       self::MAIN_PAGE_SLUG,
       $this->setPageTitle(__('Help', 'mailpoet')),
-      WPFunctions::get()->__('Help', 'mailpoet'),
+      $this->wp->__('Help', 'mailpoet'),
       AccessControl::PERMISSION_ACCESS_PLUGIN_ADMIN,
       'mailpoet-help',
-      array(
+      [
         $this,
-        'help'
-      )
+        'help',
+      ]
     );
 
     // Premium page
     // Only show this page in menu if the Premium plugin is not activated
-    WPFunctions::get()->addSubmenuPage(
+    $this->wp->addSubmenuPage(
       License::getLicense() ? true : self::MAIN_PAGE_SLUG,
       $this->setPageTitle(__('Premium', 'mailpoet')),
-      WPFunctions::get()->__('Premium', 'mailpoet'),
+      $this->wp->__('Premium', 'mailpoet'),
       AccessControl::PERMISSION_ACCESS_PLUGIN_ADMIN,
       'mailpoet-premium',
-      array(
+      [
         $this,
-        'premium'
-      )
+        'premium',
+      ]
     );
 
     // Welcome wizard page
-    WPFunctions::get()->addSubmenuPage(
+    $this->wp->addSubmenuPage(
       true,
       $this->setPageTitle(__('Welcome Wizard', 'mailpoet')),
-      WPFunctions::get()->__('Welcome Wizard', 'mailpoet'),
+      $this->wp->__('Welcome Wizard', 'mailpoet'),
       AccessControl::PERMISSION_ACCESS_PLUGIN_ADMIN,
       'mailpoet-welcome-wizard',
-      array(
+      [
         $this,
-        'welcomeWizard'
-      )
+        'welcomeWizard',
+      ]
+    );
+
+    // WooCommerce List Import
+    $this->wp->addSubmenuPage(
+      true,
+      $this->setPageTitle($this->wp->__('WooCommerce List Import', 'mailpoet')),
+      $this->wp->__('WooCommerce List Import', 'mailpoet'),
+      AccessControl::PERMISSION_ACCESS_PLUGIN_ADMIN,
+      'mailpoet-woocommerce-list-import',
+      [
+        $this,
+        'wooCommerceListImport',
+      ]
+    );
+
+    // WooCommerce List Import
+    $this->wp->addSubmenuPage(
+      true,
+      $this->setPageTitle($this->wp->__('Track WooCommerce revenues with cookies', 'mailpoet')),
+      $this->wp->__('Track WooCommerce revenues with cookies', 'mailpoet'),
+      AccessControl::PERMISSION_ACCESS_PLUGIN_ADMIN,
+      'mailpoet-revenue-tracking-permission',
+      [
+        $this,
+        'revenueTrackingPermission',
+      ]
     );
 
     // Update page
-    WPFunctions::get()->addSubmenuPage(
+    $this->wp->addSubmenuPage(
       true,
       $this->setPageTitle(__('Update', 'mailpoet')),
-      WPFunctions::get()->__('Update', 'mailpoet'),
+      $this->wp->__('Update', 'mailpoet'),
       AccessControl::PERMISSION_ACCESS_PLUGIN_ADMIN,
       'mailpoet-update',
-      array(
+      [
         $this,
-        'update'
-      )
+        'update',
+      ]
     );
 
     // Migration page
-    WPFunctions::get()->addSubmenuPage(
+    $this->wp->addSubmenuPage(
       true,
       $this->setPageTitle(__('Migration', 'mailpoet')),
       '',
       AccessControl::PERMISSION_ACCESS_PLUGIN_ADMIN,
       'mailpoet-migration',
-      array(
+      [
         $this,
-        'migration'
-      )
+        'migration',
+      ]
+    );
+
+    // Settings page
+    $this->wp->addSubmenuPage(
+      true,
+      $this->setPageTitle('Experimental Features'),
+      '',
+      AccessControl::PERMISSION_MANAGE_FEATURES,
+      'mailpoet-experimental',
+      [$this, 'experimentalFeatures']
     );
   }
 
   function disableWPEmojis() {
-    WPFunctions::get()->removeAction('admin_print_scripts', 'print_emoji_detection_script');
-    WPFunctions::get()->removeAction('admin_print_styles', 'print_emoji_styles');
+    $this->wp->removeAction('admin_print_scripts', 'print_emoji_detection_script');
+    $this->wp->removeAction('admin_print_styles', 'print_emoji_styles');
   }
 
   function migration() {
     $mp2_migrator = new MP2Migrator();
     $mp2_migrator->init();
-    $data = array(
+    $data = [
       'log_file_url' => $mp2_migrator->log_file_url,
       'progress_url' => $mp2_migrator->progressbar->url,
-    );
+    ];
     $this->displayPage('mp2migration.html', $data);
   }
 
   function welcomeWizard() {
     if ((bool)(defined('DOING_AJAX') && DOING_AJAX)) return;
     $data = [
-      'is_mp2_migration_complete' => (bool)$this->settings->get('mailpoet_migration_complete'),
+      'is_mp2_migration_complete' => (bool)$this->settings->get(MP2Migrator::MIGRATION_COMPLETE_SETTING_KEY),
       'is_woocommerce_active' => $this->woocommerce_helper->isWooCommerceActive(),
-      'finish_wizard_url' => WPFunctions::get()->adminUrl('admin.php?page=' . self::MAIN_PAGE_SLUG),
+      'finish_wizard_url' => $this->wp->adminUrl('admin.php?page=' . self::MAIN_PAGE_SLUG),
       'sender' => $this->settings->get('sender'),
       'admin_email' => get_option('admin_email'),
     ];
     $this->displayPage('welcome_wizard.html', $data);
   }
 
+  function wooCommerceListImport() {
+    if ((bool)(defined('DOING_AJAX') && DOING_AJAX)) return;
+    $data = [
+      'finish_wizard_url' => $this->wp->adminUrl('admin.php?page=' . self::MAIN_PAGE_SLUG),
+    ];
+    $this->displayPage('woocommerce_list_import.html', $data);
+  }
+
+  function revenueTrackingPermission() {
+    if (!$this->features_controller->isSupported(FeaturesController::FEATURE_DISPLAY_WOOCOMMERCE_REVENUES)) {
+      return;
+    }
+    if ((bool)(defined('DOING_AJAX') && DOING_AJAX)) return;
+    $data = [
+      'finish_wizard_url' => $this->wp->adminUrl('admin.php?page=' . self::MAIN_PAGE_SLUG),
+    ];
+    $this->displayPage('revenue_tracking_permission.html', $data);
+  }
+
   function update() {
     global $wp;
-    $current_url = WPFunctions::get()->homeUrl(add_query_arg($wp->query_string, $wp->request));
+    $current_url = $this->wp->homeUrl(add_query_arg($wp->query_string, $wp->request));
     $redirect_url =
       (!empty($_GET['mailpoet_redirect']))
         ? urldecode($_GET['mailpoet_redirect'])
-        : WPFunctions::get()->wpGetReferer();
+        : $this->wp->wpGetReferer();
 
     if (
       $redirect_url === $current_url
       or
       strpos($redirect_url, 'mailpoet') === false
     ) {
-      $redirect_url = WPFunctions::get()->adminUrl('admin.php?page=' . self::MAIN_PAGE_SLUG);
+      $redirect_url = $this->wp->adminUrl('admin.php?page=' . self::MAIN_PAGE_SLUG);
     }
 
-    $data = array(
+    $data = [
       'settings' => $this->settings->getAll(),
-      'current_user' => WPFunctions::get()->wpGetCurrentUser(),
+      'current_user' => $this->wp->wpGetCurrentUser(),
       'redirect_url' => $redirect_url,
       'sub_menu' => self::MAIN_PAGE_SLUG,
-    );
+    ];
 
     $data['is_new_user'] = true;
     $data['is_old_user'] = false;
@@ -439,11 +500,11 @@ class Menu {
   }
 
   function premium() {
-    $data = array(
+    $data = [
       'subscriber_count' => Subscriber::getTotalSubscribers(),
       'sub_menu' => self::MAIN_PAGE_SLUG,
-      'display_discount' => time() <= strtotime('2018-11-30 23:59:59')
-    );
+      'display_discount' => time() <= strtotime('2018-11-30 23:59:59'),
+    ];
 
     $this->displayPage('premium.html', $data);
   }
@@ -456,7 +517,7 @@ class Menu {
     // force MSS key check even if the method isn't active
     $mp_api_key_valid = $this->servicesChecker->isMailPoetAPIKeyValid(false, true);
 
-    $data = array(
+    $data = [
       'settings' => $settings,
       'segments' => Segment::getSegmentsWithSubscriberCount(),
       'cron_trigger' => CronTrigger::getAvailableMethods(),
@@ -465,18 +526,19 @@ class Menu {
       'premium_key_valid' => !empty($this->premium_key_valid),
       'mss_active' => Bridge::isMPSendingServiceEnabled(),
       'mss_key_valid' => !empty($mp_api_key_valid),
-      'members_plugin_active' => WPFunctions::get()->isPluginActive('members/members.php'),
+      'members_plugin_active' => $this->wp->isPluginActive('members/members.php'),
       'pages' => Pages::getAll(),
       'flags' => $flags,
-      'current_user' => WPFunctions::get()->wpGetCurrentUser(),
+      'current_user' => $this->wp->wpGetCurrentUser(),
       'linux_cron_path' => dirname(dirname(__DIR__)),
       'is_woocommerce_active' => $this->woocommerce_helper->isWooCommerceActive(),
+      'display_revenues' => $this->features_controller->isSupported(FeaturesController::FEATURE_DISPLAY_WOOCOMMERCE_REVENUES),
       'ABSPATH' => ABSPATH,
-      'hosts' => array(
+      'hosts' => [
         'web' => Hosts::getWebHosts(),
-        'smtp' => Hosts::getSMTPHosts()
-      )
-    );
+        'smtp' => Hosts::getSMTPHosts(),
+      ],
+    ];
 
     $data['is_new_user'] = $this->isNewUser();
 
@@ -492,12 +554,12 @@ class Menu {
     $system_status_data = [
       'cron' => [
         'url' => CronHelper::getCronUrl(CronDaemon::ACTION_PING),
-        'isReachable' => CronHelper::pingDaemon(true)
+        'isReachable' => CronHelper::pingDaemon(true),
       ],
       'mss' => [
         'enabled' => (Bridge::isMPSendingServiceEnabled()) ?
           ['isReachable' => Bridge::pingBridge()] :
-          false
+          false,
       ],
       'cronStatus' => CronHelper::getDaemon(),
       'queueStatus' => MailerLog::getMailerLog(),
@@ -507,30 +569,34 @@ class Menu {
     $system_status_data['queueStatus']['latestTasks'] = $tasks_state->getLatestTasks(Sending::TASK_TYPE);
     $this->displayPage(
       'help.html',
-      array(
+      [
         'systemInfoData' => $system_info_data,
-        'systemStatusData' => $system_status_data
-      )
+        'systemStatusData' => $system_status_data,
+      ]
     );
+  }
+
+  function experimentalFeatures() {
+    $this->displayPage('experimental-features.html', []);
   }
 
   private function _getFlags() {
     // flags (available features on WP install)
-    $flags = array();
+    $flags = [];
 
     if (is_multisite()) {
       // get multisite registration option
-      $registration = WPFunctions::get()->applyFilters(
+      $registration = $this->wp->applyFilters(
         'wpmu_registration_enabled',
-        WPFunctions::get()->getSiteOption('registration', 'all')
+        $this->wp->getSiteOption('registration', 'all')
       );
 
       // check if users can register
       $flags['registration_enabled'] =
-        !(in_array($registration, array(
+        !(in_array($registration, [
           'none',
-          'blog'
-        )));
+          'blog',
+        ]));
     } else {
       // check if users can register
       $flags['registration_enabled'] =
@@ -541,11 +607,11 @@ class Menu {
   }
 
   function subscribers() {
-    $data = array();
+    $data = [];
 
     $data['items_per_page'] = $this->getLimitPerPage('subscribers');
     $segments = Segment::getSegmentsWithSubscriberCount($type = false);
-    $segments = WPFunctions::get()->applyFilters('mailpoet_segments_with_subscriber_count', $segments);
+    $segments = $this->wp->applyFilters('mailpoet_segments_with_subscriber_count', $segments);
     usort($segments, function ($a, $b) {
       return strcasecmp($a["name"], $b["name"]);
     });
@@ -555,7 +621,7 @@ class Menu {
       $field['params'] = unserialize($field['params']);
 
       if (!empty($field['params']['values'])) {
-        $values = array();
+        $values = [];
 
         foreach ($field['params']['values'] as $value) {
           $values[$value['value']] = $value['value'];
@@ -575,7 +641,7 @@ class Menu {
   }
 
   function segments() {
-    $data = array();
+    $data = [];
     $data['items_per_page'] = $this->getLimitPerPage('segments');
     $this->displayPage('segments.html', $data);
   }
@@ -583,7 +649,7 @@ class Menu {
   function forms() {
     if ($this->subscribers_over_limit) return $this->displaySubscriberLimitExceededTemplate();
 
-    $data = array();
+    $data = [];
 
     $data['items_per_page'] = $this->getLimitPerPage('forms');
     $data['segments'] = Segment::findArray();
@@ -601,22 +667,22 @@ class Menu {
 
     global $wp_roles;
 
-    $data = array();
+    $data = [];
 
     $data['items_per_page'] = $this->getLimitPerPage('newsletters');
     $segments = Segment::getSegmentsWithSubscriberCount($type = false);
-    $segments = WPFunctions::get()->applyFilters('mailpoet_segments_with_subscriber_count', $segments);
+    $segments = $this->wp->applyFilters('mailpoet_segments_with_subscriber_count', $segments);
     usort($segments, function ($a, $b) {
       return strcasecmp($a["name"], $b["name"]);
     });
     $data['segments'] = $segments;
     $data['settings'] = $this->settings->getAll();
     $data['mss_active'] = Bridge::isMPSendingServiceEnabled();
-    $data['current_wp_user'] = WPFunctions::get()->wpGetCurrentUser()->to_array();
-    $data['current_wp_user_firstname'] = WPFunctions::get()->wpGetCurrentUser()->user_firstname;
-    $data['site_url'] = WPFunctions::get()->siteUrl();
+    $data['current_wp_user'] = $this->wp->wpGetCurrentUser()->to_array();
+    $data['current_wp_user_firstname'] = $this->wp->wpGetCurrentUser()->user_firstname;
+    $data['site_url'] = $this->wp->siteUrl();
     $data['roles'] = $wp_roles->get_names();
-    $data['roles']['mailpoet_all'] = WPFunctions::get()->__('In any WordPress role', 'mailpoet');
+    $data['roles']['mailpoet_all'] = $this->wp->__('In any WordPress role', 'mailpoet');
 
     $installedAtDateTime = new \DateTime($data['settings']['installed_at']);
     $data['installed_days_ago'] = (int)$installedAtDateTime->diff(new \DateTime())->format('%a');
@@ -629,12 +695,13 @@ class Menu {
       '+1 hour',
       24
     );
-    $data['mailpoet_main_page'] = WPFunctions::get()->adminUrl('admin.php?page=' . self::MAIN_PAGE_SLUG);
-    $data['show_congratulate_after_first_newsletter'] = isset($data['settings']['show_congratulate_after_first_newsletter'])?$data['settings']['show_congratulate_after_first_newsletter']:'false';
+    $data['mailpoet_main_page'] = $this->wp->adminUrl('admin.php?page=' . self::MAIN_PAGE_SLUG);
+    $data['show_congratulate_after_first_newsletter'] = isset($data['settings']['show_congratulate_after_first_newsletter']) ? $data['settings']['show_congratulate_after_first_newsletter'] : 'false';
 
     $data['tracking_enabled'] = $this->settings->get('tracking.enabled');
     $data['premium_plugin_active'] = License::getLicense();
     $data['is_woocommerce_active'] = $this->woocommerce_helper->isWooCommerceActive();
+    $data['is_mailpoet_update_available'] = array_key_exists(Env::$plugin_path, $this->wp->getPluginUpdates());
 
     $user_id = $data['current_wp_user']['ID'];
 
@@ -645,62 +712,52 @@ class Menu {
     );
     $data['last_announcement_seen'] = $last_announcement_seen;
 
-    $data['automatic_emails'] = array(
-      array(
+    $data['automatic_emails'] = [
+      [
         'slug' => 'woocommerce',
         'beta' => true,
         'premium' => true,
-        'title' => WPFunctions::get()->__('WooCommerce', 'mailpoet'),
-        'description' => WPFunctions::get()->__('Automatically send an email when there is a new WooCommerce product, order and some other action takes place.', 'mailpoet'),
-        'events' => array(
-          array(
+        'title' => $this->wp->__('WooCommerce', 'mailpoet'),
+        'description' => $this->wp->__('Automatically send an email when there is a new WooCommerce product, order and some other action takes place.', 'mailpoet'),
+        'events' => [
+          [
             'slug' => 'woocommerce_abandoned_shopping_cart',
-            'title' => WPFunctions::get()->__('Abandoned Shopping Cart', 'mailpoet'),
-            'description' => WPFunctions::get()->__('Send an email to logged-in visitors who have items in their shopping carts but left your website without checking out. Can convert up to 5% of abandoned carts.', 'mailpoet'),
+            'title' => $this->wp->__('Abandoned Shopping Cart', 'mailpoet'),
+            'description' => $this->wp->__('Send an email to logged-in visitors who have items in their shopping carts but left your website without checking out. Can convert up to 5% of abandoned carts.', 'mailpoet'),
             'soon' => true,
-            'badge' => array(
-              'text' => WPFunctions::get()->__('Must-have', 'mailpoet'),
-              'style' => 'red'
-            )
-          ),
-          array(
-            'slug' => 'woocommerce_big_spender',
-            'title' => WPFunctions::get()->__('Big Spender', 'mailpoet'),
-            'description' => WPFunctions::get()->__('Let MailPoet send an email to customers who have spent a certain amount to thank them, possibly with a coupon.', 'mailpoet'),
-            'soon' => true,
-            'badge' => array(
-              'text' => WPFunctions::get()->__('Smart to have', 'mailpoet'),
-              'style' => 'teal'
-            )
-          ),
-          array(
+            'badge' => [
+              'text' => $this->wp->__('Must-have', 'mailpoet'),
+              'style' => 'red',
+            ],
+          ],
+          [
             'slug' => 'woocommerce_first_purchase',
-            'title' => WPFunctions::get()->__('First Purchase', 'mailpoet'),
-            'description' => WPFunctions::get()->__('Let MailPoet send an email to customers who make their first purchase.', 'mailpoet'),
-            'badge' => array(
-              'text' => WPFunctions::get()->__('Must-have', 'mailpoet'),
-              'style' => 'red'
-            )
-          ),
-          array(
+            'title' => $this->wp->__('First Purchase', 'mailpoet'),
+            'description' => $this->wp->__('Let MailPoet send an email to customers who make their first purchase.', 'mailpoet'),
+            'badge' => [
+              'text' => $this->wp->__('Must-have', 'mailpoet'),
+              'style' => 'red',
+            ],
+          ],
+          [
             'slug' => 'woocommerce_product_purchased_in_category',
-            'title' => WPFunctions::get()->__('Purchased In This Category', 'mailpoet'),
-            'description' => WPFunctions::get()->__('Let MailPoet send an email to customers who purchase a product from a specific category.', 'mailpoet'),
-            'soon' => true
-          ),
-          array(
+            'title' => $this->wp->__('Purchased In This Category', 'mailpoet'),
+            'description' => $this->wp->__('Let MailPoet send an email to customers who purchase a product from a specific category.', 'mailpoet'),
+            'soon' => true,
+          ],
+          [
             'slug' => 'woocommerce_product_purchased',
-            'title' => WPFunctions::get()->__('Purchased This Product', 'mailpoet'),
-            'description' => WPFunctions::get()->__('Let MailPoet send an email to customers who purchase a specific product.', 'mailpoet'),
-          )
-        )
-      )
-    );
+            'title' => $this->wp->__('Purchased This Product', 'mailpoet'),
+            'description' => $this->wp->__('Let MailPoet send an email to customers who purchase a specific product.', 'mailpoet'),
+          ],
+        ],
+      ],
+    ];
 
     $data['is_new_user'] = $this->isNewUser();
 
-    WPFunctions::get()->wpEnqueueScript('jquery-ui');
-    WPFunctions::get()->wpEnqueueScript('jquery-ui-datepicker');
+    $this->wp->wpEnqueueScript('jquery-ui');
+    $this->wp->wpEnqueueScript('jquery-ui-datepicker');
 
     $this->displayPage('newsletters.html', $data);
   }
@@ -708,17 +765,17 @@ class Menu {
   function newletterEditor() {
     $subscriber = Subscriber::getCurrentWPUser();
     $subscriber_data = $subscriber ? $subscriber->asArray() : [];
-    $data = array(
+    $data = [
       'shortcodes' => ShortcodesHelper::getShortcodes(),
       'settings' => $this->settings->getAll(),
       'editor_tutorial_seen' => $this->user_flags->get('editor_tutorial_seen'),
-      'current_wp_user' => array_merge($subscriber_data, WPFunctions::get()->wpGetCurrentUser()->to_array()),
+      'current_wp_user' => array_merge($subscriber_data, $this->wp->wpGetCurrentUser()->to_array()),
       'sub_menu' => self::MAIN_PAGE_SLUG,
-      'mss_active' => Bridge::isMPSendingServiceEnabled()
-    );
-    WPFunctions::get()->wpEnqueueMedia();
-    WPFunctions::get()->wpEnqueueScript('tinymce-wplink', WPFunctions::get()->includesUrl('js/tinymce/plugins/wplink/plugin.js'));
-    WPFunctions::get()->wpEnqueueStyle('editor', WPFunctions::get()->includesUrl('css/editor.css'));
+      'mss_active' => Bridge::isMPSendingServiceEnabled(),
+    ];
+    $this->wp->wpEnqueueMedia();
+    $this->wp->wpEnqueueScript('tinymce-wplink', $this->wp->includesUrl('js/tinymce/plugins/wplink/plugin.js'));
+    $this->wp->wpEnqueueStyle('editor', $this->wp->includesUrl('css/editor.css'));
 
     $this->displayPage('newsletter/editor.html', $data);
   }
@@ -726,12 +783,12 @@ class Menu {
   function import() {
     $import = new ImportExportFactory(ImportExportFactory::IMPORT_ACTION);
     $data = $import->bootstrap();
-    $data = array_merge($data, array(
+    $data = array_merge($data, [
       'date_types' => Block\Date::getDateTypes(),
       'date_formats' => Block\Date::getDateFormats(),
       'month_names' => Block\Date::getMonthNames(),
-      'sub_menu' => 'mailpoet-subscribers'
-    ));
+      'sub_menu' => 'mailpoet-subscribers',
+    ]);
 
     $data['is_new_user'] = $this->isNewUser();
 
@@ -752,7 +809,7 @@ class Menu {
       $form = $form->asArray();
     }
 
-    $data = array(
+    $data = [
       'form' => $form,
       'pages' => Pages::getAll(),
       'segments' => Segment::getSegmentsWithSubscriberCount(),
@@ -760,8 +817,8 @@ class Menu {
       'date_types' => Block\Date::getDateTypes(),
       'date_formats' => Block\Date::getDateFormats(),
       'month_names' => Block\Date::getMonthNames(),
-      'sub_menu' => 'mailpoet-forms'
-    );
+      'sub_menu' => 'mailpoet-forms',
+    ];
 
     $this->displayPage('form/editor.html', $data);
   }
@@ -769,22 +826,22 @@ class Menu {
   function setPageTitle($title) {
     return sprintf(
       '%s - %s',
-      WPFunctions::get()->__('MailPoet', 'mailpoet'),
+      $this->wp->__('MailPoet', 'mailpoet'),
       $title
     );
   }
 
   function displaySubscriberLimitExceededTemplate() {
-    $this->displayPage('limit.html', array(
-      'limit' => SubscribersFeature::SUBSCRIBERS_LIMIT
-    ));
+    $this->displayPage('limit.html', [
+      'limit' => SubscribersFeature::SUBSCRIBERS_LIMIT,
+    ]);
     exit;
   }
 
   function displayMailPoetAPIKeyInvalidTemplate() {
-    $this->displayPage('invalidkey.html', array(
-      'subscriber_count' => Subscriber::getTotalSubscribers()
-    ));
+    $this->displayPage('invalidkey.html', [
+      'subscriber_count' => Subscriber::getTotalSubscribers(),
+    ]);
     exit;
   }
 
@@ -825,10 +882,10 @@ class Menu {
       'MailPoet',
       AccessControl::PERMISSION_ACCESS_PLUGIN_ADMIN,
       $_REQUEST['page'],
-      array(
+      [
         __CLASS__,
-        'errorPageCallback'
-      )
+        'errorPageCallback',
+      ]
     );
   }
 
@@ -852,20 +909,13 @@ class Menu {
     $this->premium_key_valid = $checker->isPremiumKeyValid($show_notices);
   }
 
-  private function checkFromEmailAuthorization() {
-    if (self::isOnMailPoetAdminPage() && stripos($_REQUEST['page'], self::MAIN_PAGE_SLUG) === false) {
-      $checker = $this->servicesChecker;
-      $checker->isFromEmailAuthorized();
-    }
-  }
-
   function getLimitPerPage($model = null) {
     if ($model === null) {
       return Listing\Handler::DEFAULT_LIMIT_PER_PAGE;
     }
 
-    $listing_per_page = WPFunctions::get()->getUserMeta(
-      WPFunctions::get()->getCurrentUserId(), 'mailpoet_' . $model . '_per_page', true
+    $listing_per_page = $this->wp->getUserMeta(
+      $this->wp->getCurrentUserId(), 'mailpoet_' . $model . '_per_page', true
     );
     return (!empty($listing_per_page))
       ? (int)$listing_per_page
@@ -873,8 +923,11 @@ class Menu {
   }
 
   function displayPage($template, $data) {
+    $defaults = [
+      'feature_flags' => $this->features_controller->getAllFlags(),
+    ];
     try {
-      echo $this->renderer->render($template, $data);
+      echo $this->renderer->render($template, $data + $defaults);
     } catch (\Exception $e) {
       $notice = new WPNotice(WPNotice::TYPE_ERROR, $e->getMessage());
       $notice->displayWPNotice();

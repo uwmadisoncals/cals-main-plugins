@@ -1,6 +1,8 @@
 <?php
 
 namespace MailPoet\Models;
+
+use MailPoet\Util\Helpers;
 use MailPoet\WP\Functions as WPFunctions;
 
 if (!defined('ABSPATH')) exit;
@@ -12,6 +14,7 @@ if (!defined('ABSPATH')) exit;
  * @property string|null $type
  * @property int $priority
  * @property string|null $scheduled_at
+ * @property string|array|null $meta
  */
 class ScheduledTask extends Model {
   public static $_table = MP_SCHEDULED_TASKS_TABLE;
@@ -32,8 +35,8 @@ class ScheduledTask extends Model {
 
   function subscribers() {
     return $this->hasManyThrough(
-      __NAMESPACE__.'\Subscriber',
-      __NAMESPACE__.'\ScheduledTaskSubscriber',
+      __NAMESPACE__ . '\Subscriber',
+      __NAMESPACE__ . '\ScheduledTaskSubscriber',
       'task_id',
       'subscriber_id'
     );
@@ -96,8 +99,24 @@ class ScheduledTask extends Model {
     if (!$this->priority) {
       $this->priority = self::PRIORITY_MEDIUM;
     }
+    if (!is_null($this->meta) && !Helpers::isJson($this->meta)) {
+      $this->set(
+        'meta',
+        json_encode($this->meta)
+      );
+    }
     parent::save();
     return $this;
+  }
+
+  function asArray() {
+    $model = parent::asArray();
+    $model['meta'] = $this->getMeta();
+    return $model;
+  }
+
+  function getMeta() {
+    return (Helpers::isJson($this->meta)) ? json_decode($this->meta, true) : $this->meta;
   }
 
   function delete() {

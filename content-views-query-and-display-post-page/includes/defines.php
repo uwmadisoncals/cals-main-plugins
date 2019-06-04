@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines common constant
  *
@@ -9,7 +10,7 @@
  * @copyright 2014 PT Guy
  */
 if ( !defined( 'ABSPATH' ) ) {
-	exit;
+    exit;
 }
 
 define( 'PT_CV_DOMAIN', 'content-views' );
@@ -43,13 +44,12 @@ define( 'PT_CV_DEBUG', false );
 
 // Name of parameter for non-ajax pagination
 define( 'PT_CV_PAGE_VAR', 'pages' );
-
 /**
  * Check if CV layout was damaged by theme/another plugin's style
  * @since 1.8.7
  * @return bool
  */
 function cv_is_damaged_style() {
-	# Plugin: Divi Builder, v1.3.8
-	return apply_filters( PT_CV_PREFIX_ . 'damaged_style', defined( 'ET_BUILDER_PLUGIN_VERSION' ) );
+    # Plugin: Divi Builder (v1.3.8). Theme: cheerup
+    return apply_filters( PT_CV_PREFIX_ . 'damaged_style', defined( 'ET_BUILDER_PLUGIN_VERSION' ) || get_template() === 'cheerup' );
 }

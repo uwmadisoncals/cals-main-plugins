@@ -4,7 +4,10 @@ namespace MailPoet\Subscribers;
 
 use Html2Text\Html2Text;
 use MailPoet\Mailer\Mailer;
+use MailPoet\Mailer\MailerError;
 use MailPoet\Models\Subscriber;
+use MailPoet\Services\AuthorizedEmailsController;
+use MailPoet\Services\Bridge;
 use MailPoet\Settings\SettingsController;
 use MailPoet\Subscription\Url;
 use MailPoet\Util\Helpers;
@@ -51,6 +54,12 @@ class ConfirmationEmailMailer {
       return false;
     }
 
+    $authorization_emails_validation = $this->settings->get(AuthorizedEmailsController::AUTHORIZED_EMAIL_ADDRESSES_ERROR_SETTING);
+    $unauthorized_confirmation_email = isset($authorization_emails_validation['invalid_confirmation_address']);
+    if (Bridge::isMPSendingServiceEnabled() && $unauthorized_confirmation_email) {
+      return false;
+    }
+
     $segments = $subscriber->segments()->findMany();
     $segment_names = array_map(function($segment) {
       return $segment->name;
@@ -61,7 +70,7 @@ class ConfirmationEmailMailer {
     // replace list of segments shortcode
     $body = str_replace(
       '[lists_to_confirm]',
-      '<strong>'.join(', ', $segment_names).'</strong>',
+      '<strong>' . join(', ', $segment_names) . '</strong>',
       $body
     );
 
@@ -69,7 +78,7 @@ class ConfirmationEmailMailer {
     $body = Helpers::replaceLinkTags(
       $body,
       Url::getConfirmationUrl($subscriber),
-      array('target' => '_blank'),
+      ['target' => '_blank'],
       'activation_link'
     );
 
@@ -77,13 +86,13 @@ class ConfirmationEmailMailer {
     $text = @Html2Text::convert((mb_detect_encoding($body, 'UTF-8', true)) ? $body : utf8_encode($body));
 
     // build email data
-    $email = array(
+    $email = [
       'subject' => $signup_confirmation['subject'],
       'body' => [
         'html' => $body,
         'text' => $text,
-      ]
-    );
+      ],
+    ];
 
     // set from
     $from = (
@@ -106,7 +115,12 @@ class ConfirmationEmailMailer {
       }
       $this->mailer->getSenderNameAndAddress($from);
       $this->mailer->getReplyToNameAndAddress($reply_to);
-      return $this->mailer->send($email, $subscriber);
+      $result = $this->mailer->send($email, $subscriber);
+      if ($result['response'] === false) {
+        $subscriber->setError($result['error'] instanceof MailerError ? $result['error']->getMessage() : 'Unknown Error.');
+        return false;
+      };
+      return true;
     } catch (\Exception $e) {
       $subscriber->setError($e->getMessage());
       return false;

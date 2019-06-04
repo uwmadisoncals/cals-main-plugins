@@ -26,6 +26,7 @@ class CronHelper {
       'run_started_at' => null,
       'run_completed_at' => null,
       'last_error' => null,
+      'last_error_date' => null,
     ];
     self::saveDaemon($daemon);
     return $daemon;
@@ -44,6 +45,7 @@ class CronHelper {
     $daemon = self::getDaemon();
     if ($daemon) {
       $daemon['last_error'] = $error;
+      $daemon['last_error_date'] = time();
       self::saveDaemon($daemon);
     }
   }
@@ -95,7 +97,7 @@ class CronHelper {
   }
 
   static function accessDaemon($token) {
-    $data = array('token' => $token);
+    $data = ['token' => $token];
     $url = self::getCronUrl(
       CronDaemonEndpoint::ACTION_RUN,
       $data
@@ -137,12 +139,12 @@ class CronHelper {
     }
     $args = $wp->applyFilters(
       'mailpoet_cron_request_args',
-      array(
+      [
         'blocking' => true,
         'sslverify' => false,
         'timeout' => self::DAEMON_REQUEST_TIMEOUT,
-        'user-agent' => 'MailPoet Cron'
-      )
+        'user-agent' => 'MailPoet Cron',
+      ]
     );
     return $wp->wpRemotePost($url, $args);
   }

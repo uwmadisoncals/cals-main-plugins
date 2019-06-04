@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) exit;
  * @property string $newsletter_rendered_subject
  * @property int $task_id
  * @property int $newsletter_id
- * @property string|object $meta
+ * @property string|object|null $meta
  * @property string|array $subscribers
  * @property string|null $deleted_at
  */
@@ -35,9 +35,9 @@ class SendingQueue extends Model {
   function __construct() {
     parent::__construct();
 
-    $this->addValidations('newsletter_rendered_body', array(
-      'validRenderedNewsletterBody' => WPFunctions::get()->__('Rendered newsletter body is invalid!', 'mailpoet')
-    ));
+    $this->addValidations('newsletter_rendered_body', [
+      'validRenderedNewsletterBody' => WPFunctions::get()->__('Rendered newsletter body is invalid!', 'mailpoet'),
+    ]);
     $this->emoji = new Emoji();
   }
 
@@ -77,7 +77,7 @@ class SendingQueue extends Model {
         json_encode($this->encodeEmojisInBody($this->newsletter_rendered_body))
       );
     }
-    if (!Helpers::isJson($this->meta)) {
+    if (!is_null($this->meta) && !Helpers::isJson($this->meta)) {
       $this->set(
         'meta',
         json_encode($this->meta)
@@ -97,7 +97,7 @@ class SendingQueue extends Model {
     }
     $subscribers = unserialize($this->subscribers);
     if (empty($subscribers['processed'])) {
-      $subscribers['processed'] = array();
+      $subscribers['processed'] = [];
     }
     return $subscribers;
   }
@@ -142,7 +142,8 @@ class SendingQueue extends Model {
       $subscribers = $this->getSubscribers();
       return in_array($subscriber_id, $subscribers['processed']);
     } else {
-      if ($task = $this->task()->findOne()) {
+      $task = $this->task()->findOne();
+      if ($task) {
         $task_subscribers = new TaskSubscribers($task);
         return $task_subscribers->isSubscriberProcessed($subscriber_id);
       }

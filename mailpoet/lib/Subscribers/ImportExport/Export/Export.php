@@ -70,7 +70,7 @@ class Export {
       }
       $callback = [
         $this,
-        'generate' . strtoupper($this->export_format_option)
+        'generate' . strtoupper($this->export_format_option),
       ];
       if (is_callable($callback)) {
         $processed_subscribers = call_user_func($callback);
@@ -78,10 +78,10 @@ class Export {
     } catch (\Exception $e) {
       throw new \Exception($e->getMessage());
     }
-    return array(
+    return [
       'totalExported' => $processed_subscribers,
-      'exportFileURL' => $this->export_file_URL
-    );
+      'exportFileURL' => $this->export_file_URL,
+    ];
   }
 
   function generateCSV() {
@@ -125,7 +125,7 @@ class Export {
     $XLSX_writer = new XLSXWriter();
     $XLSX_writer->setAuthor('MailPoet (www.mailpoet.com)');
     $last_segment = false;
-    $processed_segments = array();
+    $processed_segments = [];
 
     $subscribers = $this->getSubscribers();
     while ($subscribers !== false) {

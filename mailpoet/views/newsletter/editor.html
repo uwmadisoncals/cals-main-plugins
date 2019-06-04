@@ -1338,19 +1338,16 @@
           postStatus: 'publish', // 'draft'|'pending'|'publish'
           inclusionType: 'include', // 'include'|'exclude'
           displayType: 'excerpt', // 'excerpt'|'full'|'titleOnly'
-          titleFormat: 'h1', // 'h1'|'h2'|'h3'|'ul'
+          titleFormat: 'h1', // 'h1'|'h2'|'h3'
           titleAlignment: 'left', // 'left'|'center'|'right'
           titleIsLink: false, // false|true
           imageFullWidth: false, // true|false
           featuredImagePosition: 'alternate', // 'centered'|'left'|'right'|'alternate'|'none',
-          showAuthor: 'no', // 'no'|'aboveText'|'belowText'
-          authorPrecededBy: '<%= __('Author:') | escape('js') %>',
-          showCategories: 'no', // 'no'|'aboveText'|'belowText'
-          categoriesPrecededBy: '<%= __('Categories:') | escape('js') %>',
+          pricePosition: 'below', // 'hidden'|'above'|'below'
           readMoreType: 'link', // 'link'|'button'
-          readMoreText: '<%= __('Read more') | escape('js') %>',
+          readMoreText: '<%= _x('Buy now', 'Text of a button which links to an ecommerce product page') | escape('js') %>',
           readMoreButton: {
-            text: '<%= __('Read more') | escape('js') %>',
+            text: '<%= _x('Buy now', 'Text of a button which links to an ecommerce product page') | escape('js') %>',
             url: '[postLink]',
             context: 'posts.readMoreButton',
             styles: {
@@ -1471,7 +1468,6 @@
       dragDemoUrlSettings: '<%= editor_tutorial_seen %>',
       installedAt: '<%= settings["installed_at"] %>',
       mtaMethod: '<%= settings["mta"]["method"] %>',
-      displayWcProductsWidget: '<%= settings["display_wc_products_widget"] %>',
     };
     wp.hooks.doAction('mailpoet_newsletters_editor_initialize', config);
 

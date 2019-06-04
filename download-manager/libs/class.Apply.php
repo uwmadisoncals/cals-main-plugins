@@ -165,7 +165,7 @@ class Apply {
     function logout()
     {
 
-        if (wp_verify_nonce(wpdm_query_var('logout'), NONCE_KEY)) {
+        if (isset($_REQUEST['logout']) && wp_verify_nonce(wpdm_query_var('logout'), NONCE_KEY)) {
             wp_logout();
             header("location: " . wpdm_login_url());
             die();
@@ -667,7 +667,7 @@ class Apply {
             ?>
             <style>
                 <?php if(!in_array('google-font', $wpdmss)) { ?>
-                @import url('https://fonts.googleapis.com/css?family=Cantarell:400,700');
+                @import url('https://fonts.googleapis.com/css?family=Rubik:400,500');
                 <?php } ?>
 
 
@@ -688,9 +688,9 @@ class Apply {
                 .w3eden .wpdm_cart thead th,
                 .w3eden #csp .list-group-item,
                 .w3eden .modal-title {
-                    font-family: Cantarell, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                    font-family: Rubik, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
                     text-transform: uppercase;
-                    font-weight: 700;
+                    font-weight: 500;
                 }
                 .w3eden #csp .list-group-item{
                     text-transform: unset;
@@ -703,23 +703,40 @@ class Apply {
 
     function uiColors(){
         $uicolors = maybe_unserialize(get_option('__wpdm_ui_colors', array()));
+        $primary = isset($uicolors['primary'])?$uicolors['primary']:'#4a8eff';
+        $secondary = isset($uicolors['secondary'])?$uicolors['secondary']:'#4a8eff';
+        $success = isset($uicolors['success'])?$uicolors['success']:'#18ce0f';
+        $info = isset($uicolors['info'])?$uicolors['info']:'#2CA8FF';
+        $warning = isset($uicolors['warning'])?$uicolors['warning']:'#f29e0f';
+        $danger = isset($uicolors['danger'])?$uicolors['danger']:'#ff5062';
+        $font = get_option('__wpdm_google_font', 'Rubik');
+        $font = $font?$font.',':'';
         ?>
         <style>
 
             :root{
-                --color-primary: <?php echo isset($uicolors['primary'])?$uicolors['primary']:'#4a8eff'; ?>;
+                --color-primary: <?php echo $primary; ?>;
+                --color-primary-rgb: <?php echo wpdm_hex2rgb($primary); ?>;
                 --color-primary-hover: <?php echo isset($uicolors['primary'])?$uicolors['primary_hover']:'#4a8eff'; ?>;
                 --color-primary-active: <?php echo isset($uicolors['primary'])?$uicolors['primary_active']:'#4a8eff'; ?>;
-                --color-success: <?php echo isset($uicolors['success'])?$uicolors['success']:'#4a8eff'; ?>;
+                --color-secondary: <?php echo $secondary; ?>;
+                --color-secondary-rgb: <?php echo wpdm_hex2rgb($secondary); ?>;
+                --color-secondary-hover: <?php echo isset($uicolors['secondary'])?$uicolors['secondary_hover']:'#4a8eff'; ?>;
+                --color-secondary-active: <?php echo isset($uicolors['secondary'])?$uicolors['secondary_active']:'#4a8eff'; ?>;
+                --color-success: <?php echo $success; ?>;
+                --color-success-rgb: <?php echo wpdm_hex2rgb($success); ?>;
                 --color-success-hover: <?php echo isset($uicolors['success_hover'])?$uicolors['success_hover']:'#4a8eff'; ?>;
                 --color-success-active: <?php echo isset($uicolors['success_active'])?$uicolors['success_active']:'#4a8eff'; ?>;
-                --color-info: <?php echo isset($uicolors['info'])?$uicolors['info']:'#2CA8FF'; ?>;
+                --color-info: <?php echo $info; ?>;
+                --color-info-rgb: <?php echo wpdm_hex2rgb($info); ?>;
                 --color-info-hover: <?php echo isset($uicolors['info_hover'])?$uicolors['info_hover']:'#2CA8FF'; ?>;
                 --color-info-active: <?php echo isset($uicolors['info_active'])?$uicolors['info_active']:'#2CA8FF'; ?>;
-                --color-warning: <?php echo isset($uicolors['warning'])?$uicolors['warning']:'orange'; ?>;
+                --color-warning: <?php echo $warning; ?>;
+                --color-warning-rgb: <?php echo wpdm_hex2rgb($warning); ?>;
                 --color-warning-hover: <?php echo isset($uicolors['warning_hover'])?$uicolors['warning_hover']:'orange'; ?>;
                 --color-warning-active: <?php echo isset($uicolors['warning_active'])?$uicolors['warning_active']:'orange'; ?>;
-                --color-danger: <?php echo isset($uicolors['danger'])?$uicolors['danger']:'#ff5062'; ?>;
+                --color-danger: <?php echo $danger; ?>;
+                --color-danger-rgb: <?php echo wpdm_hex2rgb($danger); ?>;
                 --color-danger-hover: <?php echo isset($uicolors['danger_hover'])?$uicolors['danger_hover']:'#ff5062'; ?>;
                 --color-danger-active: <?php echo isset($uicolors['danger_active'])?$uicolors['danger_active']:'#ff5062'; ?>;
                 --color-green: <?php echo isset($uicolors['green'])?$uicolors['green']:'#30b570'; ?>;
@@ -727,7 +744,7 @@ class Apply {
                 --color-purple: <?php echo isset($uicolors['purple'])?$uicolors['purple']:'#8557D3'; ?>;
                 --color-red: <?php echo isset($uicolors['red'])?$uicolors['red']:'#ff5062'; ?>;
                 --color-muted: rgba(69, 89, 122, 0.6);
-                --wpdm-font: Cantarell, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                --wpdm-font: <?php echo $font; ?> -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             }
 
 

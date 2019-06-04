@@ -1,8 +1,8 @@
 <?php
 
-use kigkonsult\iCalcreator\iCalXML;
-use kigkonsult\iCalcreator\timezoneHandler;
-use kigkonsult\iCalcreator\vcalendar;
+use Kigkonsult\Icalcreator\IcalXML;
+use Kigkonsult\Icalcreator\TimezoneHandler;
+use Kigkonsult\Icalcreator\Vcalendar;
 
 /**
  * The ics import/export engine.
@@ -42,7 +42,7 @@ class Ai1ec_Ics_Import_Export_Engine
     public function export( array $arguments, array $params = array() ) {
         $vparams = array();
 
-        $c = new vcalendar( $vparams );
+        $c = new Vcalendar( $vparams );
         $c->setProperty( 'calscale', 'GREGORIAN' );
         $c->setProperty( 'method', 'PUBLISH' );
         // if no post id are specified do not export those properties
@@ -58,7 +58,7 @@ class Ai1ec_Ics_Import_Export_Engine
         if ( $tz ) {
             $c->setProperty( 'X-WR-TIMEZONE', $tz );
             $tz_xprops = array( 'X-LIC-LOCATION' => $tz );
-            timezoneHandler::createTimezone( $c, $tz, $tz_xprops );
+            TimezoneHandler::createTimezone( $c, $tz, $tz_xprops );
         }
 
         $this->_taxonomy_model = $this->_registry->get( 'model.taxonomy' );
@@ -81,7 +81,7 @@ class Ai1ec_Ics_Import_Export_Engine
             ->restore_the_content_filters();
 
         if ( isset( $params['xml'] ) && true === $params['xml'] ) {
-            $str = iCalXML::iCal2XML( $c );
+            $str = IcalXML::iCal2XML( $c );
         } else {
             $str = ltrim( $c->createCalendar() );
         }
@@ -110,9 +110,9 @@ class Ai1ec_Ics_Import_Export_Engine
     }
 
     /**
-     * Process vcalendar instance - add events to database.
+     * Process Vcalendar instance - add events to database.
      *
-     * @param vcalendar $v    Calendar to retrieve data from.
+     * @param Vcalendar $v    Calendar to retrieve data from.
      * @param array     $args Arbitrary arguments map.
      *
      * @throws Ai1ec_Parse_Exception
@@ -124,7 +124,7 @@ class Ai1ec_Ics_Import_Export_Engine
      * @return int Count of events added to database.
      */
     public function add_vcalendar_events_to_db(
-        vcalendar $v,
+        Vcalendar $v,
         array $args
     ) {
         $forced_timezone = null;
@@ -784,7 +784,7 @@ class Ai1ec_Ics_Import_Export_Engine
      * the calendar.
      *
      * @param Ai1ec_Event $event    Event object.
-     * @param vcalendar   $calendar Calendar object.
+     * @param Vcalendar   $calendar Calendar object.
      * @param bool        $export   States whether events are created for export.
      * @param array       $params   Additional parameters for export.
      *
@@ -792,7 +792,7 @@ class Ai1ec_Ics_Import_Export_Engine
      */
     protected function _insert_event_in_calendar(
             Ai1ec_Event $event,
-            vcalendar $calendar,
+            Vcalendar $calendar,
             $export = false,
             array $params = array()
     ) {
@@ -1371,7 +1371,7 @@ class Ai1ec_Ics_Import_Export_Engine
     /**
      * Returns modified ical uid for google recurring edited events.
      *
-     * @param vevent $e Vevent object.
+     * @param Vevent $e Vevent object.
      *
      * @return string ICAL uid.
      */
@@ -1389,7 +1389,7 @@ class Ai1ec_Ics_Import_Export_Engine
     /**
      * Returns modified exclusions structure for given event.
      *
-     * @param vcalendar       $e          Vcalendar event object.
+     * @param Vcalendar       $e          Vcalendar event object.
      * @param array           $exclusions Exclusions.
      * @param Ai1ec_Date_Time $start Date time object.
      *

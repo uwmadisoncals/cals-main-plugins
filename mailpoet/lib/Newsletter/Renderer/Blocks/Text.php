@@ -31,7 +31,7 @@ class Text {
     $DOM = $DOM_parser->parseStr($html);
     $blockquotes = $DOM->query('blockquote');
     foreach ($blockquotes as $blockquote) {
-      $contents = array();
+      $contents = [];
       $paragraphs = $blockquote->query('p, h1, h2, h3, h4', 0);
       foreach ($paragraphs as $index => $paragraph) {
         if (preg_match('/h\d/', $paragraph->getTag())) {
@@ -103,7 +103,7 @@ class Text {
       if (!preg_match('/text-align/i', $style)) {
         $style = 'text-align: left;' . $style;
       }
-      $contents =  str_replace('&', '&amp;', $paragraph->html());
+      $contents = str_replace('&', '&amp;', $paragraph->html());
       $paragraph->setTag('table');
       $paragraph->style = 'border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;';
       $paragraph->width = '100%';
@@ -129,7 +129,7 @@ class Text {
           <td class="mailpoet_paragraph" style="word-break:break-word;word-wrap:break-word;' . EHelper::escapeHtmlStyleAttr($style) . '">
             ' . $contents . $line_breaks . '
           </td>
-         </tr>'
+        </tr>'
       );
     }
     return $DOM->__toString();
@@ -174,11 +174,11 @@ class Text {
 
   static function insertLineBreak($element) {
     $element->parent->insertChild(
-      array(
+      [
         'tag_name' => 'br',
         'self_close' => true,
-        'attributes' => array()
-      ),
+        'attributes' => [],
+      ],
       $element->index() + 1
     );
     return $element;

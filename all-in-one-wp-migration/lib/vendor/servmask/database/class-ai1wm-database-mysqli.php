@@ -36,7 +36,14 @@ class Ai1wm_Database_Mysqli extends Ai1wm_Database {
 	 * @return resource
 	 */
 	public function query( $input ) {
-		return mysqli_query( $this->wpdb->dbh, $input, MYSQLI_STORE_RESULT );
+		if ( mysqli_real_query( $this->wpdb->dbh, $input ) ) {
+			// Copy results from the internal mysqlnd buffer into the PHP variables fetched
+			if ( defined( 'MYSQLI_STORE_RESULT_COPY_DATA' ) ) {
+				return mysqli_store_result( $this->wpdb->dbh, MYSQLI_STORE_RESULT_COPY_DATA );
+			}
+
+			return mysqli_store_result( $this->wpdb->dbh );
+		}
 	}
 
 	/**
@@ -94,16 +101,6 @@ class Ai1wm_Database_Mysqli extends Ai1wm_Database {
 	 */
 	public function fetch_row( $result ) {
 		return mysqli_fetch_row( $result );
-	}
-
-	/**
-	 * Return the field from MySQL query as row
-	 *
-	 * @param  resource $result MySQL resource
-	 * @return object
-	 */
-	public function fetch_field( $result ) {
-		return mysqli_fetch_field( $result );
 	}
 
 	/**

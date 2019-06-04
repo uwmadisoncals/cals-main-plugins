@@ -33,7 +33,7 @@ class Registration {
           id="mailpoet_subscribe_on_register"
           value="1"
           name="mailpoet[subscribe_on_register]"
-        />&nbsp;'.esc_attr($label).'
+        />&nbsp;' . esc_attr($label) . '
       </label>
     </p>';
   }
@@ -78,10 +78,10 @@ class Registration {
 
     if (!empty($segment_ids)) {
       $this->subscriber_actions->subscribe(
-        array(
+        [
           'email' => $email,
-          'first_name' => $name
-        ),
+          'first_name' => $name,
+        ],
         $segment_ids
       );
     }

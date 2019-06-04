@@ -74,6 +74,37 @@
             }
         },
 
+		// Show hide other date range settings
+		toggleDateRange: function(item) {
+            var value = jQuery(item).val();
+			var panel = item.parentElement.parentElement;
+			jQuery(panel).find('.categoryPosts-date-range p').hide();
+			jQuery(panel).find('.categoryPosts-date-range').show();
+            switch ( value ) {
+				case 'off':
+					jQuery(panel).find('.categoryPosts-date-range').hide();
+				break;
+				case 'days_ago':
+					jQuery(panel).find('.categoryPosts-days_ago').show();
+				break;
+				case 'between_dates':
+					jQuery(panel).find('.categoryPosts-start_date').show();
+					jQuery(panel).find('.categoryPosts-end_date').show();
+				break;
+            }
+        },
+
+		// Show/hide no match related settings
+		toggleNoMatch: function(item) {
+            var value = jQuery(item).val();
+			var panel = item.parentElement.parentElement;
+			if ( 'text' == value ) {
+				jQuery(panel).find('.categoryPosts-no-match-text').show();
+			} else {
+				jQuery(panel).find('.categoryPosts-no-match-text').hide();
+			}
+        },
+
 		// Show template help
 		toggleTemplateHelp: function(item,event) {
 			event.preventDefault();
@@ -102,6 +133,16 @@
             }
         },
 
+		toggleLoadMore: function(item) {
+            var value = jQuery(item).attr('checked');
+			var panel = item.parentElement.parentElement.parentElement;
+            if (value != 'checked') {
+                jQuery(panel).find('.loadmore-settings').hide();
+            } else {
+                jQuery(panel).find('.loadmore-settings').show();
+            }
+        },
+
 		selectPremadeTemplate: function(item) {
 			var panel = item.parentElement.parentElement.parentElement;
 			var div = item.parentElement.parentElement;
@@ -127,14 +168,13 @@
 					template += '%thumb%\n';
 					template += '<span class="dashicons dashicons-admin-comments"></span> %commentnum% ';
 					template += '<span class="dashicons dashicons-admin-users"></span> %author%\n';
-					template += '%excerpt%\n';
+					template += '%excerpt%';
 					template += 'Categories: %category% ';
 					template += '<span class="dashicons dashicons-tag"></span> %post_tag%';
 			}
             var textarea = jQuery(panel).find('textarea');
 			textarea.val(template);
-			textarea.trigger('input');
-			textarea.trigger('change');
+			textarea.trigger('input', 'change');
         },
 
 		// Close all open panels if open
@@ -189,11 +229,11 @@
 				var template = jQuery(elem).val();
 				var tags = tiptoppress[ this.php_settings_var ].template_tags;
 				var widget_cont = jQuery(elem.parentElement.parentElement.parentElement.parentElement);
-				for (var i = 0; i < tags.length; i++) {
-					if ( -1 !== template.indexOf( tags[i] ) ) {
-						widget_cont.find(this.template_panel_prefix + tags[i] ).show();
+				for (var key in tags) {
+					if ( -1 !== template.indexOf( tags[key] ) ) {
+						widget_cont.find(this.template_panel_prefix + tags[key] ).show();
 					} else {
-						widget_cont.find(this.template_panel_prefix + tags[i] ).hide();
+						widget_cont.find(this.template_panel_prefix + tags[key] ).hide();
 					}
 				}
 			}
@@ -205,6 +245,142 @@
 
 		},
 
+		thumbnailSizeChange : function (elem) {
+
+			var _that = jQuery(elem),
+				thumb_h,
+				thumb_w,
+				_input_thumb_h = _that.closest('.categoryposts-data-panel-thumb').find('.thumb_h'),
+				_input_thumb_w = _that.closest('.categoryposts-data-panel-thumb').find('.thumb_w');
+
+			if (_that.hasClass('smaller')) {
+				thumb_w = _input_thumb_w.val() / 1.015;
+				thumb_h = _input_thumb_h.val() / 1.015;
+			} else if (_that.hasClass('quarter')) {
+				thumb_w = _input_thumb_w.val() / 4;
+				thumb_h = _input_thumb_h.val() / 4;
+			} else if (_that.hasClass('half')){
+				thumb_h = _input_thumb_h.val() / 2;
+				thumb_w = _input_thumb_w.val() / 2;
+			} else if (_that.hasClass('double')){
+				thumb_h = _input_thumb_h.val() * 2;
+				thumb_w = _input_thumb_w.val() * 2;
+			} else if (_that.hasClass('bigger')) {
+				thumb_w = _input_thumb_w.val() * 1.02;
+				thumb_h = _input_thumb_h.val() * 1.02;
+			} else if (_that.hasClass('square')) {
+				if (_input_thumb_w.val() >= _input_thumb_h.val() ) {
+					thumb_w = _input_thumb_h.val();
+					thumb_h = _input_thumb_h.val();
+				} else{
+					thumb_w = _input_thumb_w.val();
+					thumb_h = _input_thumb_w.val();
+				}
+			} else if (_that.hasClass('standard')) {
+				if (_input_thumb_w.val() >= _input_thumb_h.val() ) {
+					thumb_w = _input_thumb_h.val() * 4 / 3;
+					thumb_h = _input_thumb_h.val();
+				} else {
+					thumb_w = _input_thumb_h.val() / 4 * 3
+					thumb_h = _input_thumb_h.val();
+				}
+			} else if (_that.hasClass('wide')) {
+				if (_input_thumb_w.val() >= _input_thumb_h.val() ) {
+					thumb_w = _input_thumb_h.val() * 16 / 9;
+					thumb_h = _input_thumb_h.val();
+				} else {
+					thumb_w = _input_thumb_h.val() / 16 * 9;
+					thumb_h = _input_thumb_h.val();
+				}
+			} else if (_that.hasClass('switch')){
+				thumb_h = _input_thumb_w.val();
+				thumb_w = _input_thumb_h.val();
+			} else {
+				thumb_w = _that.data("thumb-w");
+				thumb_h = _that.data("thumb-h");
+			}
+			_input_thumb_w.val(Math.floor(thumb_w));
+			_input_thumb_h.val(Math.floor(thumb_h));
+			_input_thumb_w.trigger('input', 'change');
+			_input_thumb_h.trigger('input', 'change');
+
+			return false;
+		},
+
+		thumbnailFluidWidthChange : function (elem) {
+
+			var _that = jQuery(elem),
+				_input_thumb_h = _that.closest('.categoryposts-data-panel-thumb').find('.thumb_h');
+
+			_that.closest( 'label' ).find( 'span' ).html( _that.val() + '%' );
+
+			_input_thumb_h.val(0);
+			_input_thumb_h.trigger('input', 'change');
+			
+			return false;
+		},
+
+		openAddPlaceholder : function (elem) {
+
+			var _that = jQuery(elem);
+
+			_that.closest( '.cat-post-add_premade_templates' ).find( '.cpwp-placeholder-dropdown-menu' ).toggle();
+
+			_that.closest( '.cat-post-add_premade_templates' ).find( '.cpwp-placeholder-dropdown-menu span' ).off('click').on('click', function() {
+				var text = jQuery( this ).data( 'value' );
+				switch( text ){
+					case 'NewLine':
+						text = '\n';
+					break;
+					case 'EmptyLine':
+						text = '\n\n';
+					break;
+					default:
+						text = '%' + text + '%';
+					break;
+				}
+				var _div = this.parentElement.parentElement.parentElement;
+				var textarea = jQuery( _div ).find( 'textarea' );
+				var textareaPos = textarea[0].selectionStart;
+				var textareaTxt = textarea.val();
+				textarea.val( textareaTxt.substring(0, textareaPos) + text + textareaTxt.substring(textareaPos) );
+
+				textarea[0].selectionStart = textareaPos + text.length;
+				textarea[0].selectionEnd = textareaPos + text.length;
+				textarea.focus();
+				textarea.trigger('input', 'change');
+
+				//_that.closest( '.cat-post-add_premade_templates' ).find( '.cpwp-placeholder-dropdown-menu' ).hide();
+			});
+
+			_that.closest( '.cat-post-add_premade_templates' ).find( '.cpwp-placeholder-dropdown-menu' ).on('mouseenter', function(){
+				jQuery(this).addClass('cpw-doNotClose');
+			});
+			_that.closest( '.cat-post-add_premade_templates' ).find( '.cpwp-placeholder-dropdown-menu' ).on('mouseleave', function(){
+				jQuery(this).removeClass('cpw-doNotClose');
+			});
+
+			return false;
+		},
+
+		selectPlaceholderHelper : function (elem) {
+
+			var textarea = jQuery(elem);
+			var textareaPos = textarea[0].selectionStart;
+			var textareaTxt = textarea.val();
+
+			var nStartSel = textareaTxt.substring(0, textareaPos).lastIndexOf( '%' );
+			var nEndSel = textareaPos + textareaTxt.substring(textareaPos).indexOf( '%' ) + 1;
+
+			var strSelTxt = textareaTxt.substring(nStartSel, nEndSel);
+			if( strSelTxt.indexOf( '\n' ) >= 0 || strSelTxt.indexOf( ' ' ) >= 0 || strSelTxt.length <=2 ) {
+				return false;
+			}
+
+			textarea[0].selectionStart = nStartSel;
+			textarea[0].selectionEnd = nEndSel;
+			return false;
+		},
     }
 
 jQuery(document).ready( function () {
@@ -263,15 +439,27 @@ jQuery(document).ready( function () {
 			cwp_namespace.toggleAssignedCategoriesTop(this);
 		});
 
-		jQuery(document).on('click', class_namespace+' .hide_title', function () {
+		jQuery(document).on('click', class_namespace+' .categoryPosts-hide_title input', function () {
 			cwp_namespace.toggleHideTitle(this);
+		});
+
+		jQuery(document).on('click', class_namespace+' .categoryPosts-enable_loadmore input', function () {
+			cwp_namespace.toggleLoadMore(this);
 		});
 
 		jQuery(document).on('change', class_namespace+' .categoryPosts-preset_date_format select', function () { // change date format
 			cwp_namespace.toggleDateFormat(this);
 		});
 
-		jQuery(document).off('click', class_namespace+' a.toggle-template-help').on('click', class_namespace+' a.toggle-template-help', function (event) { // show template help
+		jQuery(document).on('change', class_namespace+' .categoryPosts-date_range select', function () { // change date range
+			cwp_namespace.toggleDateRange(this);
+		});
+
+		jQuery(document).on('change', class_namespace+' .categoryPosts-no_match_handling select', function () { // change date range
+			cwp_namespace.toggleNoMatch(this);
+		});
+
+		jQuery(class_namespace+' a.toggle-template-help').off('click').on('click', function (event) { // show template help
 			cwp_namespace.toggleTemplateHelp(this, event);
 		});
 
@@ -286,6 +474,28 @@ jQuery(document).ready( function () {
 
 		jQuery(document).on('input', class_namespace+' .categoryPosts-template textarea', function () { // prevent refresh ontemplate selection
 			cwp_namespace.templateChange(this);
+		});
+
+		jQuery(document).on('click', class_namespace+' .cat-post-thumb-change-size button', function () { // find a thumbnail size
+			cwp_namespace.thumbnailSizeChange(this);
+		});
+
+		jQuery(document).on('change', class_namespace+' .thumb_fluid_width', function () { // select a thumbnail fluid size
+			cwp_namespace.thumbnailFluidWidthChange(this);
+		});
+
+		jQuery(class_namespace+' .cpwp-open-placholder-dropdown-menu').off('click').on('click', function () { // open drop down and add placeholder
+			cwp_namespace.openAddPlaceholder(this);
+		});
+
+		jQuery(document).on('onfocusout, blur', class_namespace+' .cpwp-open-placholder-dropdown-menu,'+class_namespace+' .categoryPosts-template textarea', function () { // close drop down placeholder, if not used
+			jQuery(this).closest( class_namespace+' .categoryPosts-template' ).parent().find( '.cpwp-placeholder-dropdown-menu' ).not('.cpw-doNotClose').hide();
+		});
+
+		jQuery(document).on('mousedown', class_namespace+' .categoryPosts-template textarea', function () { // help to select the placeholder
+			var _that = this;
+			setTimeout(function(){ cwp_namespace.selectPlaceholderHelper(_that); }, 0);
+			;
 		});
 	}
 

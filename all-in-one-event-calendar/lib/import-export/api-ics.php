@@ -56,9 +56,8 @@ class Ai1ec_Api_Ics_Import_Export_Engine
     }
 
     /**
-     * Process vcalendar instance - add events to database.
+     * Process event instance - add events to database.
      *
-     * @param vcalendar $v    Calendar to retrieve data from.
      * @param array     $args Arbitrary arguments map.
      *
      * @throws Ai1ec_Parse_Exception
@@ -83,10 +82,10 @@ class Ai1ec_Api_Ics_Import_Export_Engine
 
         $messages        = array();
 
-        $current_timestamp = $this->_registry->get( 'date.time' )->format_to_gmt();
-
         // initialize empty custom exclusions structure
-        $exclusions        = array();
+        $exclusions      = array();
+        $api             = null;
+
         // go over each event
         foreach ( $cal as $e ) {
 
@@ -544,7 +543,7 @@ class Ai1ec_Api_Ics_Import_Export_Engine
     /**
      * Returns modified ical uid for google recurring edited events.
      *
-     * @param vevent $e Vevent object.
+     * @param array $e Vevent object.
      *
      * @return string ICAL uid.
      */
@@ -745,7 +744,7 @@ class Ai1ec_Api_Ics_Import_Export_Engine
     /**
      * Returns modified exclusions structure for given event.
      *
-     * @param vcalendar       $e          Vcalendar event object.
+     * @param array           $e          Event object.
      * @param array           $exclusions Exclusions.
      * @param Ai1ec_Date_Time $start Date time object.
      *

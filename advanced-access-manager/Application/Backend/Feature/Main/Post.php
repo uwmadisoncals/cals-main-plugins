@@ -524,9 +524,6 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
         $param = AAM_Core_Request::post('param');
         $value = filter_input(INPUT_POST, 'value');
 
-        //clear cache
-        AAM_Core_API::clearCache();
-
         $result = $subject->save($param, $value, $object, $id);
 
         return wp_json_encode(array(
@@ -550,8 +547,6 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
         $object = AAM_Backend_Subject::getInstance()->getObject($type, $id);
         if ($object instanceof AAM_Core_Object) {
             $result = $object->reset();
-            //clear cache
-            AAM_Core_API::clearCache();
         } else {
             $result = false;
         }
@@ -606,7 +601,7 @@ class AAM_Backend_Feature_Main_Post extends AAM_Backend_Feature_Abstract {
      */
     public static function renderAccessForm() {
         ob_start();
-        require_once AAM_BASEDIR . '/Application/Backend/phtml/partial/post-access-form.phtml';
+        require_once AAM_BASEDIR . '/application/Backend/phtml/partial/post-access-form.phtml';
         $content = ob_get_contents();
         ob_end_clean();
 

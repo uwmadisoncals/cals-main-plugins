@@ -9,10 +9,10 @@ Author URI: https://plugin-planet.com/
 Donate link: https://monzillamedia.com/donate.html
 Contributors: specialk
 Requires at least: 4.1
-Tested up to: 5.1
-Stable tag: 20190311
-Version: 20190311
-Requires PHP: 5.2
+Tested up to: 5.2
+Stable tag: 20190501
+Version: 20190501
+Requires PHP: 5.6.20
 Text Domain: ga-google-analytics
 Domain Path: /languages
 License: GPL v2 or later
@@ -23,8 +23,9 @@ Adds your Google Analytics Tracking Code to your WordPress site.
 
 == Description ==
 
+> Connects Google Analytics to WordPress
+> Supports Universal Analytics / analytics.js
 > Supports Global Site Tag / gtag.js
-> GDPR compliant: does not collect any user data
 
 This plugin enables Google Analytics for your entire WordPress site. Lightweight and fast with plenty of great features.
 
@@ -89,6 +90,9 @@ __User Data:__ This plugin does not collect any user data. Even so, the tracking
 __Cookies:__ This plugin uses simple cookies for the visitor Opt-Out Box to remember user preference for opt-in or out of Google Analytics.
 
 __Services:__ This plugin does not connect to any third-party locations or services, but it does enable Google to collect all sorts of data.
+
+
+> Works with or without Gutenberg Block Editor
 
 
 
@@ -246,6 +250,14 @@ If you like GA Google Analytics, please take a moment to [give a 5-star rating](
 
 > New Pro version available! Check out [GA Pro &raquo;](https://plugin-planet.com/ga-google-analytics-pro/)
 
+
+**20190501**
+
+* Bumps [minimum PHP version](https://codex.wordpress.org/Template:Server_requirements) to 5.6.20
+* Updates Link Attribution tracking code
+* Tweaks plugin settings screen content
+* Updates default translation template
+* Tests on WordPress 5.2
 
 **20190311**
 

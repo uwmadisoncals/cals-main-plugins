@@ -295,15 +295,17 @@ function wpdm_newversion_check(){
     <?php
 }
 
+
 function wpdm_access_token(){
     $at = get_option("__wpdm_access_token", false);
-
     if($at)
         return $at;
     if(get_option('__wpdm_suname') != '') {
-        $access_token = wpdm_remote_post('https://www.wpdownloadmanager.com/', array( 'wpdm_api_req' => 'getAccessToken', 'user' => get_option('__wpdm_suname'), 'pass' => get_option('__wpdm_supass')));
+        $auth = array('login' => get_option('__wpdm_suname'), 'pass' => get_option('__wpdm_supass'));
+        $auth = base64_encode(serialize($auth));
+        $access_token = remote_get('https://www.wpdownloadmanager.com/?wpdm_api_req=getAccessToken&__wpdm_auth=' . $auth);
         $access_token = json_decode($access_token);
-        //print_r($access_token);die();
+        //wpdmdd($access_token);
         if (isset($access_token->access_token)) {
             update_option("__wpdm_access_token", $access_token->access_token);
             return $access_token->access_token;

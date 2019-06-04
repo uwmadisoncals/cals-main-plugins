@@ -13,9 +13,13 @@ use MailPoet\Cron\Workers\KeyCheck\PremiumKeyCheck as PremiumKeyCheckWorker;
 use MailPoet\Cron\Workers\KeyCheck\SendingServiceKeyCheck as SendingServiceKeyCheckWorker;
 use MailPoet\Cron\Workers\WooCommerceSync as WooCommerceSyncWorker;
 use MailPoet\Cron\Workers\SendingQueue\SendingErrorHandler;
+use MailPoet\Features\FeaturesController;
 use MailPoet\Segments\WooCommerce as WooCommerceSegment;
+use MailPoet\Services\AuthorizedEmailsController;
+use MailPoet\WooCommerce\Helper as WooCommerceHelper;
 use MailPoet\Mailer\Mailer;
 use MailPoet\Settings\SettingsController;
+use MailPoet\Subscribers\InactiveSubscribersController;
 
 class WorkersFactory {
 
@@ -31,8 +35,20 @@ class WorkersFactory {
   /** @var SettingsController */
   private $settings;
 
+  /** @var FeaturesController */
+  private $features_controller;
+
   /** @var WooCommerceSegment */
   private $woocommerce_segment;
+
+  /** @var InactiveSubscribersController */
+  private $inactive_subscribers_controller;
+
+  /** @var WooCommerceHelper */
+  private $woocommerce_helper;
+
+  /** @var AuthorizedEmailsController */
+  private $authorized_emails_controller;
 
   /**
    * @var Renderer
@@ -45,14 +61,22 @@ class WorkersFactory {
     Mailer $mailer,
     Renderer $renderer,
     SettingsController $settings,
-    WooCommerceSegment $woocommerce_segment
+    FeaturesController $features_controller,
+    WooCommerceSegment $woocommerce_segment,
+    InactiveSubscribersController $inactive_subscribers_controller,
+    WooCommerceHelper $woocommerce_helper,
+    AuthorizedEmailsController $authorized_emails_controller
   ) {
     $this->sending_error_handler = $sending_error_handler;
     $this->scheduler = $scheduler;
     $this->mailer = $mailer;
     $this->renderer = $renderer;
     $this->settings = $settings;
+    $this->features_controller = $features_controller;
     $this->woocommerce_segment = $woocommerce_segment;
+    $this->inactive_subscribers_controller = $inactive_subscribers_controller;
+    $this->woocommerce_helper = $woocommerce_helper;
+    $this->authorized_emails_controller = $authorized_emails_controller;
   }
 
   /** @return SchedulerWorker */
@@ -66,7 +90,7 @@ class WorkersFactory {
   }
 
   function createStatsNotificationsWorker($timer) {
-    return new StatsNotificationsWorker($this->mailer, $this->renderer, $this->settings, $timer);
+    return new StatsNotificationsWorker($this->mailer, $this->renderer, $this->settings, $this->features_controller, $this->woocommerce_helper, $timer);
   }
 
   /** @return SendingServiceKeyCheckWorker */
@@ -91,12 +115,22 @@ class WorkersFactory {
 
   /** @return WooCommerceSyncWorker */
   function createWooCommerceSyncWorker($timer) {
-    return new WooCommerceSyncWorker($this->woocommerce_segment, $timer);
+    return new WooCommerceSyncWorker($this->woocommerce_segment, $this->woocommerce_helper, $timer);
   }
 
   /** @return ExportFilesCleanup */
   function createExportFilesCleanupWorker($timer) {
     return new ExportFilesCleanup($timer);
+  }
+
+  /** @return InactiveSubscribers */
+  function createInactiveSubscribersWorker($timer) {
+    return new InactiveSubscribers($this->inactive_subscribers_controller, $this->settings, $timer);
+  }
+
+  /** @return AuthorizedSendingEmailsCheck */
+  function createAuthorizedSendingEmailsCheckWorker($timer) {
+    return new AuthorizedSendingEmailsCheck($this->authorized_emails_controller, $timer);
   }
 
 }

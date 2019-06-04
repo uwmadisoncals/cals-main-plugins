@@ -1,6 +1,6 @@
 <?php
 
-use kigkonsult\iCalcreator\util\utilRecur;
+use Kigkonsult\Icalcreator\Util\UtilRecur;
 
 /**
  * Event instance management model.
@@ -105,17 +105,19 @@ class Ai1ec_Event_Instance extends Ai1ec_Base {
             = $this->_parsed_date_array( $_start, $timezone );
         $enddate['year']   = $enddate['year'] + 10;
         $exclude_dates     = array();
+        $exception_rules   = $event->get( 'exception_dates' );
         $recurrence_dates  = array();
-        if ( $recurrence_dates = $event->get( 'recurrence_dates' ) ) {
+        $recurrence_rules  = $event->get( 'recurrence_dates' );
+        if ( $recurrence_rules ) {
             $recurrence_dates  = $this->_populate_recurring_dates(
-                $recurrence_dates,
+                $recurrence_rules,
                 $startdate,
                 $timezone
             );
         }
-        if ( $exception_dates = $event->get( 'exception_dates' ) ) {
+        if ( $exception_rules ) {
             $exclude_dates = $this->_populate_recurring_dates(
-                $exception_dates,
+                $exception_rules,
                 $startdate,
                 $timezone
             );
@@ -128,13 +130,13 @@ class Ai1ec_Event_Instance extends Ai1ec_Base {
                 );
             unset($exception_rules['EXDATE']);
             if ( ! empty( $exception_rules ) ) {
-                $exception_rules = utilRecur::setRexrule(
+                $exception_rules = UtilRecur::setRexrule(
                     $exception_rules
                 );
                 $result = array();
                 date_default_timezone_set( $timezone );
                 // The first array is the result and it is passed by reference
-                utilRecur::recur2date(
+                UtilRecur::recur2date(
                     $exclude_dates,
                     $exception_rules,
                     $wdate,
@@ -163,16 +165,17 @@ class Ai1ec_Event_Instance extends Ai1ec_Base {
                 $event->get( 'recurrence_rules' )
             );
 
-        $recurrence_rules = utilRecur::setRexrule( $recurrence_rules );
+        $recurrence_rules = UtilRecur::setRexrule( $recurrence_rules );
         if ( $recurrence_rules ) {
             date_default_timezone_set( $timezone );
-            utilRecur::recur2date(
+            UtilRecur::recur2date(
                 $recurrence_dates,
                 $recurrence_rules,
                 $wdate,
                 $startdate,
                 $enddate
             );
+
             // Get start date time
             $startHour   = isset( $startdate['hour'] ) ? sprintf( "%02d", $startdate['hour'] ) : '00';
             $startMinute = isset( $startdate['min'] )  ? sprintf( "%02d", $startdate['min'] )  : '00';

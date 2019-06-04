@@ -2,8 +2,8 @@
 Contributors: photocrati, imagely
 Tags: wordpress gallery plugin, gallery, nextgen, nextgen gallery, photo gallery, image gallery, photography, slideshow, images, photo, photo album, watermark
 Requires at least: 4.0.0
-Stable tag: 3.1.17
-Tested up to: 5.1.1
+Stable tag: 3.2.4
+Tested up to: 5.2.1
 License: GPLv2
 
 The most popular WordPress gallery plugin and one of the most popular plugins of all time with over 25 million downloads.
@@ -16,19 +16,20 @@ NextGEN Gallery has been the industry's standard **WordPress gallery plugin** si
 
 On the back end, NextGEN offers a complete WordPress gallery management system with the ability to batch upload photos, import meta data, add/delete/rearrange/sort photos, edit thumbnails, group galleries into albums, and more.
 
-On the front end, the free version of NextGEN provides two main gallery styles (slideshows and thumbnail galleries) and two album styles (compact and extended), all of which come with a wide array of options for controlling size, style, timing, transitions, controls, lightbox effects, and more. Learn more about <a href="https://www.imagely.com/wordpress-gallery-plugin/" target="_blank">NextGEN WordPress Gallery Plugin features.</a>
+On the front end, the free version of NextGEN provides three main gallery styles (slideshow, thumbnail, and imagebrowser galleries) and two album styles (compact and extended), all of which come with a wide array of options for controlling size, style, timing, transitions, controls, lightbox effects, and more. Learn more about <a href="https://www.imagely.com/wordpress-gallery-plugin/" target="_blank">NextGEN WordPress Gallery Plugin features.</a>
 
-https://www.youtube.com/embed/mNEnY23i9DE
+https://www.youtube.com/embed/4Phvmm3etnw
 
 **NEXTGEN GALLERY DEMOS**<br>
 *<a href="https://www.imagely.com/wordpress-gallery-plugin/basic-thumbnail-gallery/" target="_blank">Basic Thumbnail Gallery</a><br>
 *<a href="https://www.imagely.com/wordpress-gallery-plugin/basic-slideshow-gallery/" target="_blank">Basic Slideshow Gallery</a><br>
+*<a href="https://www.imagely.com/wordpress-gallery-plugin/basic-imagebrowser-gallery/" target="_blank">Basic Imagebrowser Gallery</a><br>
 *<a href="https://www.imagely.com/wordpress-gallery-plugin/basic-compact-album/" target="_blank">Basic Compact Album</a><br>
 *<a href="https://www.imagely.com/wordpress-gallery-plugin/basic-extended-album/" target="_blank">Basic List Album</a><br>
 
 **INTRODUCING NEXTGEN GALLERY PRO.** NextGEN Plus and NextGEN Pro are premium WordPress gallery plugin extensions for NextGEN Gallery that add new photo gallery displays, lightboxes, ecommerce, proofing, and pro support. Learn more about <a href="https://www.imagely.com/wordpress-gallery-plugin/" target="_blank">NextGEN Plus and NextGEN Pro photo plugin features.</a>
 
-https://www.youtube.com/embed/zmA-b_jiXN0
+https://www.youtube.com/embed/ePnYGQX0Lf8
 
 **NEXTGEN PRO DEMOS**<br>
 *<a href="https://www.imagely.com/wordpress-gallery-plugin/pro-mosaic-gallery/" target="_blank">Pro Mosaic Gallery</a><br>
@@ -46,7 +47,7 @@ https://www.youtube.com/embed/zmA-b_jiXN0
 
 = About Imagely =
 
-NextGEN Gallery is maintained by Imagely. We're the WordPress photography experts. In addition to NextGEN Gallery, NextGEN Plus, and NextGEN Pro, we also make WordPress themes for photographers, provide turnkey websites for photographers, and run the WordPress Photography Podcast.
+NextGEN Gallery is a WordPress gallery plugin maintained by Imagely. We're the WordPress photography experts. In addition to NextGEN Gallery, NextGEN Plus, and NextGEN Pro, we also make WordPress themes for photographers, provide turnkey websites for photographers, and run the WordPress Photography Podcast.
 
 Learn more or connect with us:<br>
 *<a href="https://www.imagely.com/" target="_blank">Imagely Website</a><br>
@@ -65,33 +66,28 @@ Imagely 2016-2019
 Photocrati Media 2012-2016<br>
 Alex Rabe 2007-2011
 
-This program is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+This program is free software released under the terms of the GNU General Public License.
 
 == Installation ==
 
 INSTALLATION: The easiest way to start uploading your photos is to login to you WordPress dashboard, go to Plugins > Add New, search for NextGEN Gallery, and click to install the plugin. You can also download the plugin zip file from this page and upload it from the Plugins > Add New > Upload page.
 
-HOW TO USE: Just go to a page or post and click the NextGEN Gallery icon or the Add Gallery button. From our Insert Gallery Window, you can create, manage, customize, and display your WordPress photo galleries. You can also manage your photo galleries and gallery settings from the central options area under the "Gallery" tab on your dashboard menu.
+HOW TO USE: Just go to a page or post and add a NextGEN Gallery block. Within the block, click the Add Gallery button to open our Insert Gallery Window, where you can create, manage, customize, and display your WordPress photo galleries. You can also manage your photo galleries and gallery settings from the central options area under the "Gallery" tab on your dashboard menu.
 
 DOCUMENTATION: See <a href="https://www.imagely.com/docs/nextgen-gallery/" target="_blank">NextGEN Gallery Documentation</a>.
 
 That's it ... have fun! For more information, feel free to visit the official website for the NextGEN Gallery <a href="https://www.imagely.com/wordpress-gallery-plugin" target="_blank">WordPress Gallery Plugin</a>.
 
-https://www.youtube.com/watch?v=qwNr5ZNGavo
-
 == Screenshots ==
 
 1. Thumbnail Gallery
 2. Slideshow Gallery
-3. Manage Gallery Page
-4. Insert Gallery Window
-5. Gallery Settings Page
+3. Imagebrowser Gallery
+4. Manage Gallery Page
+5. Insert Gallery Window
+6. Gallery Settings Page
 
-== Shortcode ==
+== Shortcodes ==
 
 NextGEN Gallery offers an easy-to-use Insert Gallery Window, which means you never need to work with shortcodes again when inserting and manageing galleries - if you would prefer not too.
 
@@ -123,7 +119,7 @@ Nope, we use no flash elements.
 
 = Are the galleries mobile friendly? =
 
-Yes, we've put a lot of work into this and, NextGEN Galleries are compatible with Android, iOS. All photo galleries are also responsive, so galleries look good on diverse screen sizes. NextGEN Pro also includes a full screen, responsive Pro Lightbox with mobile gesture support. It's great for viewing photos on mobile devices.
+Yes, we've put a lot of work into this and, NextGEN Galleries are compatible with phones and tablets, inluding Android and iOS operating systems. All photo galleries are also responsive, so galleries look good on diverse screen sizes. NextGEN Pro also includes a full screen, responsive Pro Lightbox with mobile gesture support. It's great for viewing photos on mobile devices.
 
 
 = What is the difference between a gallery and an album? =
@@ -182,6 +178,36 @@ For more information, feel free to visit the official website for the NextGEN Ga
 
 
 == Changelog ==
+
+= V3.2.4 - 06.04.2019 =
+* NEW:     Added some methods to the window.galleries object prototype for retrieving display settings
+* Changed: Removed the now-deprecated 'publish' link from the Manage Gallery image actions row
+* Changed: Updated the uploaded zip extraction process
+* Fixed:   A PHP warning emitted on Gallery > Other Options if the current gallery path cannot be written to
+* Fixed:   Added compatibility check for the official FontAwesome plugin
+* Fixed:   Clicking a checkbox in the Insert Gallery Window's "Sort or exclude images" tab was not functioning
+* Fixed:   Resized images were becoming larger than the original in some circumstances
+* Fixed:   URL to static assets like JS and CSS files was incorrect when NextGen Gallery was a symlink
+
+= V3.2.2 - 05.09.2019 =
+* Changed: Updated video Links
+* Changed: Branding updates in Readme.txt file
+
+= V3.2.1 - 05.08.2019 =
+* Fixed:   Missing settings after Reset with NextGEN Plus
+* Fixed:   Small styling issues with WordPress 5.2
+
+= V3.2.0 - 05.07.2019 =
+* NEW:     Branding update
+* NEW:     API methods for detecting NextGEN provided pages and custom post types
+* Fixed:   Missing menus after Reset
+* Fixed:   Ajax pagination with Simplelightbox
+* Fixed:   Datamapper query cache not purged after saving an entity
+* Fixed:   Gallery folder not created when using Manage Galleries -> New Gallery
+* Fixed:   Notifications not appearing on all Nextgen-provided pages
+* Fixed:   Gallery wizard conflicting with NextGEN Pro ecommerce wizard
+* Fixed:   Upgrade to pro button
+* Fixed:   NGG activation transient not given a time-to-live value
 
 = V3.1.17 - 04.02.2019 =
 * Fixed:   Preview images for display types giving get_static_abspath error

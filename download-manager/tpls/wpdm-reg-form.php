@@ -3,6 +3,7 @@
 <div class="w3eden">
     <div class='w3eden' id='wpdmreg'>
         <?php
+        if(!is_array($params)) $params = array();
 
         $loginurl = wpdm_login_url();
         $reg_redirect =  $loginurl;

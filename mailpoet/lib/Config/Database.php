@@ -29,10 +29,10 @@ class Database {
   }
 
   function setupDriverOptions() {
-    $driver_options = array(
+    $driver_options = [
       'TIME_ZONE = "' . Env::$db_timezone_offset . '"',
       'sql_mode=(SELECT REPLACE(@@sql_mode,"ONLY_FULL_GROUP_BY",""))',
-    );
+    ];
 
     if (!empty(Env::$db_charset)) {
       $character_set = 'NAMES ' . Env::$db_charset;
@@ -42,9 +42,9 @@ class Database {
       $driver_options[] = $character_set;
     }
 
-    ORM::configure('driver_options', array(
-      PDO::MYSQL_ATTR_INIT_COMMAND => 'SET ' . implode(', ', $driver_options)
-    ));
+    ORM::configure('driver_options', [
+      PDO::MYSQL_ATTR_INIT_COMMAND => 'SET ' . implode(', ', $driver_options),
+    ]);
 
     try {
       $current_options = ORM::for_table("")
@@ -84,10 +84,12 @@ class Database {
       define('MP_STATISTICS_OPENS_TABLE', Env::$db_prefix . 'statistics_opens');
       define('MP_STATISTICS_UNSUBSCRIBES_TABLE', Env::$db_prefix . 'statistics_unsubscribes');
       define('MP_STATISTICS_FORMS_TABLE', Env::$db_prefix . 'statistics_forms');
+      define('MP_STATISTICS_WOOCOMMERCE_PURCHASES_TABLE', Env::$db_prefix . 'statistics_woocommerce_purchases');
       define('MP_MAPPING_TO_EXTERNAL_ENTITIES_TABLE', Env::$db_prefix . 'mapping_to_external_entities');
       define('MP_LOG_TABLE', Env::$db_prefix . 'log');
       define('MP_STATS_NOTIFICATIONS_TABLE', Env::$db_prefix . 'stats_notifications');
       define('MP_USER_FLAGS_TABLE', Env::$db_prefix . 'user_flags');
+      define('MP_FEATURE_FLAGS_TABLE', Env::$db_prefix . 'feature_flags');
     }
   }
 }

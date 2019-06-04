@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // ==================
 // = Plugin Version =
 // ==================
-define( 'AI1WMME_VERSION', '3.71' );
+define( 'AI1WMME_VERSION', '3.74' );
 
 // ===============
 // = Plugin Name =
@@ -71,6 +71,11 @@ define( 'AI1WMME_TEMPLATES_PATH', AI1WMME_LIB_PATH . DIRECTORY_SEPARATOR . 'view
 // = Vendor Path =
 // ===============
 define( 'AI1WMME_VENDOR_PATH', AI1WMME_LIB_PATH . DIRECTORY_SEPARATOR . 'vendor' );
+
+// ===========================
+// = ServMask Activation URL =
+// ===========================
+define( 'AI1WMME_ACTIVATION_URL', 'https://servmask.com/purchase/activations' );
 
 // =================
 // = Max File Size =

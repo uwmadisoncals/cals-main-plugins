@@ -2,8 +2,8 @@
 Contributors: vasyltech
 Tags: access control, membership, backend menu, user role, restricted content, security, jwt
 Requires at least: 4.0
-Tested up to: 5.1
-Stable tag: 5.9.5
+Tested up to: 5.2
+Stable tag: 5.9.7
 
 All you need to manage access to you WordPress websites on frontend, backend and API levels for any role, user or visitors.
 
@@ -79,6 +79,40 @@ https://www.youtube.com/watch?v=mj5Xa_Wc16Y
 11. Improve your website security
 
 == Changelog ==
+
+= 5.9.7 =
+* Prep for upcoming AAM v6 release. Converting all extensions to plugins
+* Covered odd use-case when some plugins decide to register CPT capabilities during plugin activation
+* Improved Backend Menu feature functionality
+
+= 5.9.6.3 =
+* Fixed the bug with merging access settings for multiple roles
+* Improved the way capabilities are managed internally by AAM
+* Fixed PHP notice reported by jaerlo https://forum.aamplugin.com/d/207-indirect-modification-of-overloaded-property-aam-core-subject-user-roles
+* Fixed PHP fatal error reported by kevinagar https://wordpress.org/support/topic/fatal-error-3199/
+* Fixed the bug with Backend Menu feature where all the menu items that require "administrator" capability where not shown
+
+= 5.9.6.2 =
+* Fixed the bug added slashes to the Access Policy JSON document
+* Fixed the bug with Metaboxes & Widgets to prevent PHP warning for widgets that registered with Closure callback
+* Fixed the bug in URI Access feature that causes PHP warning when data is merged for multiple roles
+* Fixed the bug with Access Policy rules that are not initialized correctly for Visitors 
+* Fixed the bug reported on GitHub https://github.com/aamplugin/advanced-access-manager/issues/6
+* Changed the way AAM hooks into get_options pipeline with Access Policy "Params". This is done to support array options
+* Changed the way Login Widget is registered to reduce code
+
+= 5.9.6.1 =
+* Fixed the fatal error related to URI object
+
+= 5.9.6 =
+* Fixed the bug with URI Access feature for URIs with trailing forward slash "/"
+* Fixed the bug with Access Policy where incorrect default value was propagated  
+* Fixed the bug with API Routes not merged properly with multiple-roles support
+* Added HTTP Redirect Code to URI Access, Posts & Terms features
+* Added new Access Policy marker type QUERY that is alias for the GET
+* Added support for the null data type for Access Policy data type casting
+* Improved the way password-protected feature works; enhanced Access Policy to support it https://aamplugin.com/reference/policy#post
+* Deprecated and removed internal AAM cache by optimizing AAM performance. Cache became major constrain for the dynamic Access Policy conditions
 
 = 5.9.5 =
 * Fixed the bug with Access Policy `Param` value that was not evaluating embedded markers
@@ -1001,7 +1035,7 @@ https://www.youtube.com/watch?v=mj5Xa_Wc16Y
 * Added Post Delete feature
 * Added Post's Restore Default Restrictions feature
 * Added ConfigPress Extension turn on/off setting
-* Russian translation by (Maxim Kernozhitskiy http://aeromultimedia.com)
+* Russian translation by (Maxim Kernozhitskiy https://aeromultimedia.com)
 * Removed Migration possibility
 * Refactored AAM Core Console model
 * Increased the number of saved restriction for basic version

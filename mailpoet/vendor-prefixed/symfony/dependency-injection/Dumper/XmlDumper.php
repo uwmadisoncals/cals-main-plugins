@@ -43,7 +43,7 @@ class XmlDumper extends \MailPoetVendor\Symfony\Component\DependencyInjection\Du
         $this->document->formatOutput = \true;
         $container = $this->document->createElementNS('http://symfony.com/schema/dic/services', 'container');
         $container->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-        $container->setAttribute('xsi:schemaLocation', 'http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd');
+        $container->setAttribute('xsi:schemaLocation', 'http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd');
         $this->addParameters($container);
         $this->addServices($container);
         $this->document->appendChild($container);
@@ -254,12 +254,12 @@ class XmlDumper extends \MailPoetVendor\Symfony\Component\DependencyInjection\Du
             } elseif ($value instanceof \MailPoetVendor\Symfony\Component\DependencyInjection\Reference) {
                 $element->setAttribute('type', 'service');
                 $element->setAttribute('id', (string) $value);
-                $behaviour = $value->getInvalidBehavior();
-                if (\MailPoetVendor\Symfony\Component\DependencyInjection\ContainerInterface::NULL_ON_INVALID_REFERENCE == $behaviour) {
+                $behavior = $value->getInvalidBehavior();
+                if (\MailPoetVendor\Symfony\Component\DependencyInjection\ContainerInterface::NULL_ON_INVALID_REFERENCE == $behavior) {
                     $element->setAttribute('on-invalid', 'null');
-                } elseif (\MailPoetVendor\Symfony\Component\DependencyInjection\ContainerInterface::IGNORE_ON_INVALID_REFERENCE == $behaviour) {
+                } elseif (\MailPoetVendor\Symfony\Component\DependencyInjection\ContainerInterface::IGNORE_ON_INVALID_REFERENCE == $behavior) {
                     $element->setAttribute('on-invalid', 'ignore');
-                } elseif (\MailPoetVendor\Symfony\Component\DependencyInjection\ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE == $behaviour) {
+                } elseif (\MailPoetVendor\Symfony\Component\DependencyInjection\ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE == $behavior) {
                     $element->setAttribute('on-invalid', 'ignore_uninitialized');
                 }
             } elseif ($value instanceof \MailPoetVendor\Symfony\Component\DependencyInjection\Definition) {

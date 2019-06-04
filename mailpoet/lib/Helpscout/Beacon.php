@@ -22,7 +22,7 @@ class Beacon {
     $current_theme = WPFunctions::get()->wpGetTheme();
     $current_user = WPFunctions::get()->wpGetCurrentUser();
     $premium_key = $settings->get(Bridge::PREMIUM_KEY_SETTING_NAME) ?: $settings->get(Bridge::API_KEY_SETTING_NAME);
-    return array(
+    return [
       'name' => $current_user->display_name,
       'email' => $current_user->user_email,
       'PHP version' => PHP_VERSION,
@@ -42,8 +42,8 @@ class Beacon {
       'PHP post_max_size' => ini_get('post_max_size'),
       'WordPress language' => WPFunctions::get()->getLocale(),
       'Multisite environment?' => (is_multisite() ? 'Yes' : 'No'),
-      'Current Theme' => $current_theme->get('Name').
-        ' (version '.$current_theme->get('Version').')',
+      'Current Theme' => $current_theme->get('Name') .
+        ' (version ' . $current_theme->get('Version') . ')',
       'Active Plugin names' => join(", ", WPFunctions::get()->getOption('active_plugins')),
       'Sending Method' => $mta['method'],
       'Sending Frequency' => sprintf('%d emails every %d minutes',
@@ -57,8 +57,8 @@ class Beacon {
       'Default FROM address' => $settings->get('sender.address'),
       'Default Reply-To address' => $settings->get('reply_to.address'),
       'Bounce Email Address' => $settings->get('bounce.address'),
-      'Total number of subscribers' =>  Subscriber::getTotalSubscribers(),
-      'Plugin installed at' => $settings->get('installed_at')
-    );
+      'Total number of subscribers' => Subscriber::getTotalSubscribers(),
+      'Plugin installed at' => $settings->get('installed_at'),
+    ];
   }
 }

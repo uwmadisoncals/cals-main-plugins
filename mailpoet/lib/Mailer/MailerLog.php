@@ -3,8 +3,6 @@ namespace MailPoet\Mailer;
 
 use MailPoet\Settings\SettingsController;
 
-if (!defined('ABSPATH')) exit;
-
 class MailerLog {
   const SETTING_NAME = 'mta_log';
   const STATUS_PAUSED = 'paused';
@@ -22,14 +20,14 @@ class MailerLog {
   }
 
   static function createMailerLog() {
-    $mailer_log = array(
+    $mailer_log = [
       'sent' => null,
       'started' => time(),
       'status' => null,
       'retry_attempt' => null,
       'retry_at' => null,
-      'error' => null
-    );
+      'error' => null,
+    ];
     $settings = new SettingsController();
     $settings->set(self::SETTING_NAME, $mailer_log);
     return $mailer_log;
@@ -118,10 +116,10 @@ class MailerLog {
   }
 
   static function setError($mailer_log, $operation, $error_message, $error_code = null) {
-    $mailer_log['error'] = array(
+    $mailer_log['error'] = [
       'operation' => $operation,
-      'error_message' => $error_message
-    );
+      'error_message' => $error_message,
+    ];
     if ($error_code) {
       $mailer_log['error']['error_code'] = $error_code;
     }

@@ -10,13 +10,13 @@ if (!defined('ABSPATH')) exit;
 
 class Renderer {
   // public: rendering method
-  static function render($form = array()) {
+  static function render($form = []) {
     $html = static::renderStyles($form);
     $html .= static::renderHTML($form);
     return $html;
   }
 
-  static function renderStyles($form = array(), $prefix = null) {
+  static function renderStyles($form = [], $prefix = null) {
     $styles = new Util\Styles(static::getStyles($form));
 
     $html = '<style type="text/css">';
@@ -27,14 +27,14 @@ class Renderer {
     return $html;
   }
 
-  static function renderHTML($form = array()) {
+  static function renderHTML($form = []) {
     if (isset($form['body']) && !empty($form['body'])) {
       return static::renderBlocks($form['body']);
     }
     return '';
   }
 
-  static function getStyles($form = array()) {
+  static function getStyles($form = []) {
     if (isset($form['styles'])
     && strlen(trim($form['styles'])) > 0) {
       return strip_tags($form['styles']);
@@ -43,7 +43,7 @@ class Renderer {
     }
   }
 
-  static function renderBlocks($blocks = array(), $honeypot_enabled = true) {
+  static function renderBlocks($blocks = [], $honeypot_enabled = true) {
     $settings = new SettingsController();
     // add honeypot for spambots
     $html = ($honeypot_enabled) ?
@@ -52,13 +52,13 @@ class Renderer {
     foreach ($blocks as $key => $block) {
       if ($block['type'] == 'submit' && $settings->get('re_captcha.enabled')) {
         $site_key = $settings->get('re_captcha.site_token');
-        $html .= '<div class="mailpoet_recaptcha" data-sitekey="'. $site_key .'">
+        $html .= '<div class="mailpoet_recaptcha" data-sitekey="' . $site_key . '">
           <div class="mailpoet_recaptcha_container"></div>
           <noscript>
             <div>
               <div style="width: 302px; height: 422px; position: relative;">
                 <div style="width: 302px; height: 422px; position: absolute;">
-                  <iframe src="https://www.google.com/recaptcha/api/fallback?k='. $site_key .'" frameborder="0" scrolling="no" style="width: 302px; height:422px; border-style: none;">
+                  <iframe src="https://www.google.com/recaptcha/api/fallback?k=' . $site_key . '" frameborder="0" scrolling="no" style="width: 302px; height:422px; border-style: none;">
                   </iframe>
                 </div>
               </div>
@@ -77,7 +77,7 @@ class Renderer {
     return $html;
   }
 
-  static function renderBlock($block = array()) {
+  static function renderBlock($block = []) {
     $html = '';
     switch ($block['type']) {
       case 'html':

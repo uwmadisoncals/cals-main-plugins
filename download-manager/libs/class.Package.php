@@ -238,7 +238,7 @@ class Package {
                 //$post_vars['download_link_popup'] = $post_vars['download_link'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label class='eden-checkbox'><input type='checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'><span><i class='fas fa-check'></i></span> {$data['terms_check_label']}</label></div><div class='panel-footer download_footer_{$post_vars['ID']}' style='display: none'>{$post_vars['download_link']}</div></div>";
             }
 
-            $post_vars['download_link_extended'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label><input type='checkbox' class='wpdm-checkbox' onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$post_vars['ID']}' style='display:none;'>{$post_vars['download_link_extended']}</div></div>";
+            $post_vars['download_link_extended'] = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$data['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label><input type='checkbox' class='wpdm-checkbox wpdm-lock-terms' data-target='.download_footer_{$post_vars['ID']}' > {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$post_vars['ID']}' style='display:none;'>{$post_vars['download_link_extended']}</div></div>"; // onclick='jQuery(\".download_footer_{$post_vars['ID']}\").slideToggle();'
 
 
         }
@@ -915,7 +915,7 @@ class Package {
 
                 }
                 if($embed == 1)
-                    $data = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$package['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label><input data-pid='{$package['ID']}' class='wpdm-checkbox terms_checkbox terms_checkbox_{$package['ID']}' type='checkbox' onclick='jQuery(\".download_footer_{$package['ID']}\").slideToggle();'> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$package['ID']}' style='display:none;'>{$data}</div></div>";
+                    $data = "<div class='panel panel-default terms-panel' style='margin: 0'><div class='panel-heading'>{$package['terms_title']}</div><div class='panel-body' style='max-height: 200px;overflow: auto'>{$data['terms_conditions']}</div><div class='panel-footer'><label><input data-pid='{$package['ID']}' data-target='.download_footer_{$package['ID']}' class='wpdm-checkbox wpdm-lock-terms terms_checkbox terms_checkbox_{$package['ID']}' type='checkbox'> {$data['terms_check_label']}</label></div><div class='panel-footer  download_footer_{$package['ID']}' style='display:none;'>{$data}</div></div>"; // onclick='jQuery(\".download_footer_{$package['ID']}\").slideToggle();'
 
             }
 

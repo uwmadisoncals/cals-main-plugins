@@ -79,7 +79,7 @@ function ga_google_analytics_universal() {
 	$custom_code = ga_google_analytics_custom($custom_code);
 	
 	$ga_display = "ga('require', 'displayfeatures');";
-	$ga_link    = "ga('require', 'linkid', 'linkid.js');";
+	$ga_link    = "ga('require', 'linkid');";
 	$ga_anon    = "ga('set', 'anonymizeIp', true);";
 	$ga_ssl     = "ga('set', 'forceSSL', true);";
 	

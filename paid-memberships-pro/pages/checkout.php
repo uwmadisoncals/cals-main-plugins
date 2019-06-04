@@ -164,8 +164,8 @@
 	?>
 
 	<?php if(!$skip_account_fields && !$pmpro_review) { ?>
-	<hr />
 	<div id="pmpro_user_fields" class="pmpro_checkout">
+		<hr />
 		<h3>
 			<span class="pmpro_checkout-h3-name"><?php _e('Account Information', 'paid-memberships-pro' );?></span>
 			<span class="pmpro_checkout-h3-msg"><?php _e('Already have an account?', 'paid-memberships-pro' );?> <a href="<?php echo wp_login_url(pmpro_url("checkout", "?level=" . $pmpro_level->id)); ?>"><?php _e('Log in here', 'paid-memberships-pro' );?></a></span>
@@ -591,7 +591,7 @@
 				<input type="hidden" name="confirm" value="1" />
 				<input type="hidden" name="token" value="<?php echo esc_attr($pmpro_paypal_token); ?>" />
 				<input type="hidden" name="gateway" value="<?php echo esc_attr($gateway); ?>" />
-				<input type="submit" class="pmpro_btn pmpro_btn-submit-checkout" value="<?php _e('Complete Payment', 'paid-memberships-pro' );?> &raquo;" />
+				<input type="submit" id="pmpro_btn-submit" class="pmpro_btn pmpro_btn-submit-checkout" value="<?php _e('Complete Payment', 'paid-memberships-pro' );?> &raquo;" />
 			</span>
 
 		<?php } else { ?>
@@ -603,7 +603,7 @@
 				?>
 				<span id="pmpro_submit_span">
 					<input type="hidden" name="submit-checkout" value="1" />
-					<input type="submit" class="pmpro_btn pmpro_btn-submit-checkout" value="<?php if($pmpro_requirebilling) { _e('Submit and Check Out', 'paid-memberships-pro' ); } else { _e('Submit and Confirm', 'paid-memberships-pro' );}?> &raquo;" />
+					<input type="submit"  id="pmpro_btn-submit" class="pmpro_btn pmpro_btn-submit-checkout" value="<?php if($pmpro_requirebilling) { _e('Submit and Check Out', 'paid-memberships-pro' ); } else { _e('Submit and Confirm', 'paid-memberships-pro' );}?> &raquo;" />
 				</span>
 				<?php
 				}

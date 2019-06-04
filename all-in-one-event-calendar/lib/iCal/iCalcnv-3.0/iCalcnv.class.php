@@ -1,5 +1,4 @@
 <?php
-
 /**
  * iCalcnv ver 3.0
  * copyright (c) 2011 Kjell-Inge Gustafsson kigkonsult
@@ -88,51 +87,51 @@ class iCalcnv {
     $fp = false;
     $string_to_parse = $this->getConfig( 'string_to_parse' );
     if( $string_to_parse ) {
-        $fp = fopen( 'php://temp/maxmemory:' . 1024*1024, 'rw' );
-        fputs( $fp, $string_to_parse );
-        fseek( $fp, 0 );
+    	$fp = fopen( 'php://temp/maxmemory:' . 1024*1024, 'rw' );
+    	fputs( $fp, $string_to_parse );
+    	fseek( $fp, 0 );
     } else {
-        /** check input/output directory and filename */
-        $inputdirFile   = $outputdirFile   =  '';
-        $inputFileParts = $outputFileParts = array();
-        $remoteInput    = $remoteOutput    = FALSE;
-        if( FALSE === $this->_fixIO( 'input', 'csv', $inputdirFile, $inputFileParts, $remoteInput )) {
-            if( $this->log ) {
-                $this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ), 5 ).' sec', PEAR_LOG_ERR );
-                $this->log->log( "ERROR 2, invalid input ($inputdirFile)", PEAR_LOG_ERR );
-                $this->log->flush();
-            }
-            return FALSE;
-        }
-        if( FALSE === $this->_fixIO( 'output', FALSE, $outputdirFile, $outputFileParts, $remoteOutput )) {
-            if( FALSE === $this->setConfig( 'outputfilename', $inputFileParts['filename'].'.ics' )) {
-                if( $this->log ) {
-                    $this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ),  5 ).' sec', PEAR_LOG_ERR );
-                    $this->log->log( 'ERROR 3,invalid output ('.$inputFileParts['filename'].'.csv)', PEAR_LOG_ERR );
-                    $this->log->flush();
-                }
-                return FALSE;
-            }
-            $outputdirFile   = $this->getConfig ('outputdirectory' ).DIRECTORY_SEPARATOR.$inputFileParts['filename'].'.ics';
-            $outputFileParts = pathinfo( $outputdirFile );
-            if( $this->log )
-                $this->log->log( "output set to '$outputdirFile'", PEAR_LOG_NOTICE );
-        }
-        if( $this->log ) {
-            $this->log->log( "INPUT..FILE:$inputdirFile", PEAR_LOG_NOTICE );
-            $this->log->log( "OUTPUT.FILE:$outputdirFile", PEAR_LOG_NOTICE );
-        }
-        /** read csv file into input array */
-    ini_set( 'auto_detect_line_endings', true );
-        $fp = fopen( $inputdirFile, "r" );
-        if( FALSE === $fp ) {
-            if( $this->log ) {
-                $this->log->log( "ERROR 4, unable to read file: '$inputdirFile'", PEAR_LOG_ERR );
-                $this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ),  5 ).' sec', PEAR_LOG_DEBUG );
-                $this->log->flush();
-            }
-            return FALSE;
-        }
+    	/** check input/output directory and filename */
+    	$inputdirFile   = $outputdirFile   =  '';
+    	$inputFileParts = $outputFileParts = array();
+    	$remoteInput    = $remoteOutput    = FALSE;
+    	if( FALSE === $this->_fixIO( 'input', 'csv', $inputdirFile, $inputFileParts, $remoteInput )) {
+    		if( $this->log ) {
+    			$this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ), 5 ).' sec', PEAR_LOG_ERR );
+    			$this->log->log( "ERROR 2, invalid input ($inputdirFile)", PEAR_LOG_ERR );
+    			$this->log->flush();
+    		}
+    		return FALSE;
+    	}
+    	if( FALSE === $this->_fixIO( 'output', FALSE, $outputdirFile, $outputFileParts, $remoteOutput )) {
+    		if( FALSE === $this->setConfig( 'outputfilename', $inputFileParts['filename'].'.ics' )) {
+    			if( $this->log ) {
+    				$this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ),  5 ).' sec', PEAR_LOG_ERR );
+    				$this->log->log( 'ERROR 3,invalid output ('.$inputFileParts['filename'].'.csv)', PEAR_LOG_ERR );
+    				$this->log->flush();
+    			}
+    			return FALSE;
+    		}
+    		$outputdirFile   = $this->getConfig ('outputdirectory' ).DIRECTORY_SEPARATOR.$inputFileParts['filename'].'.ics';
+    		$outputFileParts = pathinfo( $outputdirFile );
+    		if( $this->log )
+    			$this->log->log( "output set to '$outputdirFile'", PEAR_LOG_NOTICE );
+    	}
+    	if( $this->log ) {
+    		$this->log->log( "INPUT..FILE:$inputdirFile", PEAR_LOG_NOTICE );
+    		$this->log->log( "OUTPUT.FILE:$outputdirFile", PEAR_LOG_NOTICE );
+    	}
+    	/** read csv file into input array */
+	ini_set( 'auto_detect_line_endings', true );
+    	$fp = fopen( $inputdirFile, "r" );
+    	if( FALSE === $fp ) {
+    		if( $this->log ) {
+    			$this->log->log( "ERROR 4, unable to read file: '$inputdirFile'", PEAR_LOG_ERR );
+    			$this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ),  5 ).' sec', PEAR_LOG_DEBUG );
+    			$this->log->flush();
+    		}
+    		return FALSE;
+    	}
     }
     $rows = array();
     while ( FALSE !== ( $row = fgetcsv( $fp, FALSE, $conf['sep'], $conf['del'] )))
@@ -141,38 +140,38 @@ class iCalcnv {
     ini_set( 'auto_detect_line_endings', false );
     $cntrows = count( $rows );
             /** iCalcreator checks when setting directory and filename */
-    $calendar = new kigkonsult\iCalcreator\vcalendar();
+    $calendar = new Kigkonsult\Icalcreator\Vcalendar();
     if( FALSE !== ( $unique_id = $this->getConfig( 'unique_id' )))
       $calendar->setConfig( 'unique_id', $unique_id );
     if( ! $this->getConfig( 'outputobj' ) ) {
-        if( $remoteOutput ) {
-            if( FALSE === $calendar->setConfig( 'url', $outputdirFile )) {
-                if( $this->log ) {
-                    $this->log->log( "ERROR 5, iCalcreator: invalid url: '$outputdirFile'", PEAR_LOG_ERR );
-                    $this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ),  5 ).' sec', PEAR_LOG_DEBUG );
-                    $this->log->flush();
-                }
-                return FALSE;
-            }
-        }
-        else {
-            if( FALSE === $calendar->setConfig( 'directory', $outputFileParts['dirname'] )) {
-                if( $this->log ) {
-                    $this->log->log( "ERROR 6, INPUT FILE:'$inputdirFile'  iCalcreator: invalid directory: '".$outputFileParts['dirname']."'", PEAR_LOG_ERR );
-                    $this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ),  5 ).' sec', PEAR_LOG_DEBUG );
-                    $this->log->flush();
-                }
-                return FALSE;
-            }
-            if( FALSE === $calendar->setConfig( 'filename', $outputFileParts['basename'] )) {
-                if( $this->log ) {
-                    $this->log->log( "ERROR 7, INPUT FILE:'$inputdirFile' iCalcreator: invalid filename: '".$outputFileParts['basename']."'", PEAR_LOG_ERR );
-                    $this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ),  5 ).' sec',PEAR_LOG_DEBUG );
-                    $this->log->flush();
-                }
-                return FALSE;
-            }
-        }
+    	if( $remoteOutput ) {
+    		if( FALSE === $calendar->setConfig( 'url', $outputdirFile )) {
+    			if( $this->log ) {
+    				$this->log->log( "ERROR 5, iCalcreator: invalid url: '$outputdirFile'", PEAR_LOG_ERR );
+    				$this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ),  5 ).' sec', PEAR_LOG_DEBUG );
+    				$this->log->flush();
+    			}
+    			return FALSE;
+    		}
+    	}
+    	else {
+    		if( FALSE === $calendar->setConfig( 'directory', $outputFileParts['dirname'] )) {
+    			if( $this->log ) {
+    				$this->log->log( "ERROR 6, INPUT FILE:'$inputdirFile'  iCalcreator: invalid directory: '".$outputFileParts['dirname']."'", PEAR_LOG_ERR );
+    				$this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ),  5 ).' sec', PEAR_LOG_DEBUG );
+    				$this->log->flush();
+    			}
+    			return FALSE;
+    		}
+    		if( FALSE === $calendar->setConfig( 'filename', $outputFileParts['basename'] )) {
+    			if( $this->log ) {
+    				$this->log->log( "ERROR 7, INPUT FILE:'$inputdirFile' iCalcreator: invalid filename: '".$outputFileParts['basename']."'", PEAR_LOG_ERR );
+    				$this->log->log( number_format(( microtime( TRUE ) - $timeexec['start'] ),  5 ).' sec',PEAR_LOG_DEBUG );
+    				$this->log->flush();
+    			}
+    			return FALSE;
+    		}
+    	}
     }
     $timeexec['fileOk'] = microtime( TRUE );
             /** info rows */
@@ -238,16 +237,16 @@ class iCalcnv {
         if( 'VTIMEZONE' == $compname ) {
           if( $comp )
             $calendar->setComponent( $comp );
-          $comp = new kigkonsult\iCalcreator\vtimezone();
+          $comp = new Kigkonsult\Icalcreator\Vtimezone();
           $actcomp = & $comp;
           $cntprops += 1;
         }
         elseif( 'STANDARD' == $compname ) {
-          $subcomp = new kigkonsult\iCalcreator\vtimezone( 'STANDARD' );
+          $subcomp = new Kigkonsult\Icalcreator\Vtimezone( 'STANDARD' );
           $actcomp = & $subcomp;
         }
         elseif( 'DAYLIGHT' == $compname ) {
-          $subcomp = new kigkonsult\iCalcreator\vtimezone( 'DAYLIGHT' );
+          $subcomp = new Kigkonsult\Icalcreator\Vtimezone( 'DAYLIGHT' );
           $actcomp = & $subcomp;
         }
         else {
@@ -333,13 +332,13 @@ class iCalcnv {
         if( in_array( $compname, $allowedComps )) {
           if( $comp )
             $calendar->setComponent( $comp );
-          $className = 'kigkonsult\\iCalcreator\\' . $rows[$row][0];
+          $className = 'Kigkonsult\\Icalcreator\\' . ucwords( $rows[$row][0] );
           $comp = new $className;
           $actcomp = & $comp;
           $cntprops += 1;
         }
         elseif( 'VALARM' == $compname ) {
-          $subcomp = new kigkonsult\iCalcreator\valarm();
+          $subcomp = new Kigkonsult\Icalcreator\Valarm();
           $actcomp = & $subcomp;
         }
         else {
@@ -439,7 +438,7 @@ class iCalcnv {
             /** return calendar, save or send the file */
     if( $this->getConfig( 'outputobj' ) ) {
       if( $this->log ) {
-        $this->log->log( "INPUT FILE:'$inputdirFile' returning iCalcreator vcalendar instance", PEAR_LOG_NOTICE );
+        $this->log->log( "INPUT FILE:'$inputdirFile' returning iCalcreator Vcalendar instance", PEAR_LOG_NOTICE );
         $this->log->flush();
       }
       return $calendar;
@@ -734,11 +733,11 @@ class iCalcnv {
       if( $this->log )
         $this->log->log( "found (1): '$dirFile'", PEAR_LOG_DEBUG );
       if( $this->getConfig( 'extension_check' ) ) {
-          if( $ext && ( strtolower( $ext ) !== strtolower( substr( $dirFile, -3 )))) {
-              if( $this->log )
-                  $this->log->log( "ERROR 1, '$ext' wanted, invalid file extension found ($dirFile)", PEAR_LOG_ERR );
-              return FALSE;
-          }
+      	if( $ext && ( strtolower( $ext ) !== strtolower( substr( $dirFile, -3 )))) {
+      		if( $this->log )
+      			$this->log->log( "ERROR 1, '$ext' wanted, invalid file extension found ($dirFile)", PEAR_LOG_ERR );
+      		return FALSE;
+      	}
       }
       $dirFile   = $this->getConfig( $operation.'directory' ).DIRECTORY_SEPARATOR.$dirFile;
       $fileParts = pathinfo( $dirFile );
@@ -818,7 +817,7 @@ class iCalcnv {
     if( $calendar )
       $calnl = $calendar->getConfig( 'nl' );
     else {  /** iCalcreator set config, read and parse input iCal file */
-      $calendar = new kigkonsult\iCalcreator\vcalendar();
+      $calendar = new Kigkonsult\Icalcreator\Vcalendar();
       if( FALSE !== ( $unique_id = $this->getConfig( 'unique_id' )))
         $calendar->setConfig( 'unique_id', $unique_id );
       $calnl = $calendar->getConfig( 'nl' );
@@ -1392,7 +1391,7 @@ class iCalcnv {
     if( $calendar )
       $calnl = $calendar->getConfig( 'nl' );
     else {    /** iCalcreator set config, read and parse input iCal file */
-      $calendar = new kigkonsult\iCalcreator\vcalendar();
+      $calendar = new Kigkonsult\Icalcreator\Vcalendar();
       if( FALSE !== ( $unique_id = $this->getConfig( 'unique_id' )))
         $calendar->setConfig( 'unique_id', $unique_id );
       $calnl = $calendar->getConfig( 'nl' );
@@ -1869,4 +1868,4 @@ class iCalcnv {
     return TRUE;
   }
 }
-?>
+

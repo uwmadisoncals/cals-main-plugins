@@ -47,7 +47,7 @@ class Comment {
           id="mailpoet_subscribe_on_comment"
           value="1"
           name="mailpoet[subscribe_on_comment]"
-        />&nbsp;'.esc_attr($label).'
+        />&nbsp;' . esc_attr($label) . '
       </label>
     </p>';
   }
@@ -94,16 +94,16 @@ class Comment {
   }
 
   private function subscribeAuthorOfComment($comment_id) {
-    $segment_ids = $this->settings->get('subscribe.on_comment.segments', array());
+    $segment_ids = $this->settings->get('subscribe.on_comment.segments', []);
 
     if (!empty($segment_ids)) {
       $comment = WPFunctions::get()->getComment($comment_id);
 
       $result = $this->subscriber_actions->subscribe(
-        array(
+        [
           'email' => $comment->comment_author_email,
-          'first_name' => $comment->comment_author
-        ),
+          'first_name' => $comment->comment_author,
+        ],
         $segment_ids
       );
     }

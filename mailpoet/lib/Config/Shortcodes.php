@@ -18,43 +18,43 @@ class Shortcodes {
 
   function init() {
     // form widget shortcode
-    WPFunctions::get()->addShortcode('mailpoet_form', array($this, 'formWidget'));
+    WPFunctions::get()->addShortcode('mailpoet_form', [$this, 'formWidget']);
 
     // subscribers count shortcode
-    WPFunctions::get()->addShortcode('mailpoet_subscribers_count', array(
-      $this, 'getSubscribersCount'
-    ));
-    WPFunctions::get()->addShortcode('wysija_subscribers_count', array(
-      $this, 'getSubscribersCount'
-    ));
+    WPFunctions::get()->addShortcode('mailpoet_subscribers_count', [
+      $this, 'getSubscribersCount',
+    ]);
+    WPFunctions::get()->addShortcode('wysija_subscribers_count', [
+      $this, 'getSubscribersCount',
+    ]);
 
     // archives page
-    WPFunctions::get()->addShortcode('mailpoet_archive', array(
-      $this, 'getArchive'
-    ));
+    WPFunctions::get()->addShortcode('mailpoet_archive', [
+      $this, 'getArchive',
+    ]);
 
-    $this->wp->addFilter('mailpoet_archive_date', array(
-      $this, 'renderArchiveDate'
-    ), 2);
-    $this->wp->addFilter('mailpoet_archive_subject', array(
-      $this, 'renderArchiveSubject'
-    ), 2, 3);
+    $this->wp->addFilter('mailpoet_archive_date', [
+      $this, 'renderArchiveDate',
+    ], 2);
+    $this->wp->addFilter('mailpoet_archive_subject', [
+      $this, 'renderArchiveSubject',
+    ], 2, 3);
 
     // initialize subscription management shortcodes
     $subscription_page = new Pages();
     $subscription_page->initShortcodes();
   }
 
-  function formWidget($params = array()) {
+  function formWidget($params = []) {
     // IMPORTANT: fixes conflict with MagicMember
     WPFunctions::get()->removeShortcode('user_list');
 
     if (isset($params['id']) && (int)$params['id'] > 0) {
       $form_widget = new \MailPoet\Form\Widget();
-      return $form_widget->widget(array(
+      return $form_widget->widget([
         'form' => (int)$params['id'],
-        'form_type' => 'shortcode'
-      ));
+        'form_type' => 'shortcode',
+      ]);
     }
   }
 
@@ -78,7 +78,7 @@ class Shortcodes {
   }
 
   function getArchive($params) {
-    $segment_ids = array();
+    $segment_ids = [];
     if (!empty($params['segments'])) {
       $segment_ids = array_map(function($segment_id) {
         return (int)trim($segment_id);
@@ -99,17 +99,17 @@ class Shortcodes {
     } else {
       $title = $this->wp->applyFilters('mailpoet_archive_title', '');
       if (!empty($title)) {
-        $html .= '<h3 class="mailpoet_archive_title">'.$title.'</h3>';
+        $html .= '<h3 class="mailpoet_archive_title">' . $title . '</h3>';
       }
       $html .= '<ul class="mailpoet_archive">';
       foreach ($newsletters as $newsletter) {
         $queue = $newsletter->queue()->findOne();
-        $html .= '<li>'.
-          '<span class="mailpoet_archive_date">'.
-            $this->wp->applyFilters('mailpoet_archive_date', $newsletter).
+        $html .= '<li>' .
+          '<span class="mailpoet_archive_date">' .
+            $this->wp->applyFilters('mailpoet_archive_date', $newsletter) .
           '</span>
-          <span class="mailpoet_archive_subject">'.
-            $this->wp->applyFilters('mailpoet_archive_subject', $newsletter, $subscriber, $queue).
+          <span class="mailpoet_archive_subject">' .
+            $this->wp->applyFilters('mailpoet_archive_subject', $newsletter, $subscriber, $queue) .
           '</span>
         </li>';
       }
@@ -132,9 +132,9 @@ class Shortcodes {
       $subscriber,
       $queue
     );
-    return '<a href="'.esc_attr($preview_url).'" target="_blank" title="'
-      .esc_attr(__('Preview in a new tab', 'mailpoet')).'">'
-      .esc_attr($newsletter->newsletter_rendered_subject).
+    return '<a href="' . esc_attr($preview_url) . '" target="_blank" title="'
+      . esc_attr(__('Preview in a new tab', 'mailpoet')) . '">'
+      . esc_attr($newsletter->newsletter_rendered_subject) .
     '</a>';
   }
 }

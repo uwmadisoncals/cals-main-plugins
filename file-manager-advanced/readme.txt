@@ -2,9 +2,9 @@
 Contributors: modalweb
 Tags: file-manager, wp-filemanager, wp file manager, file manager, elfinder, wp-file-manager, ftp
 Requires at least: 4.0
-Tested up to: 5.1
+Tested up to: 5.2
 Requires PHP: 5.0.0
-Stable tag: 2.7
+Stable tag: 2.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,10 @@ Yes you can, go to settings, change root path.
 11. Multiple Languages for File Manager
 
 == Changelog ==
+
+= 2.8 (14th May, 2019) =
+
+* WordPress 5.2 compatible
 
 = 2.7 (24th Mar, 2019) =
 

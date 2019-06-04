@@ -6,18 +6,26 @@ global $current_user; ?>
 <div class="w3eden user-dashboard">
     <div class="row">
         <div class="col-md-3" id="wpdm-dashboard-sidebar">
-            <div class="list-group">
-                <div class="list-group-item">
-                    <?php echo get_avatar( $current_user->user_email, 512 ); ?>
-                </div>
-                <?php foreach($this->dashboard_menu as $page_id => $menu_item){
-                    $menu_url = get_permalink(get_the_ID()).$page_id.($page_id!=''?'/':'');
-                    if(!isset($params['flaturl']) || $params['flaturl'] == 0 && $page_id != '')
-                        $menu_url = get_permalink(get_the_ID()).'?udb_page='.$page_id;
-                    ?>
-                    <a class="list-group-item <?php echo $udb_page == $page_id?'selected':''; ?>" href="<?php echo $menu_url; ?>"><?php echo $menu_item['name']; ?></a>
-                <?php } ?>
-                <a class="list-group-item " href="<?php echo wpdm_logout_url(); ?>"><span class="color-red"><?php _e('Logout', 'wmdpro'); ?></span></a>
+
+            <div id="logo-block">
+                <?php echo get_avatar( $current_user->user_email, 512, '', '', array('class' => 'shop-logo') ); ?>
+            </div>
+            <div id="tabs">
+                <?php
+
+                foreach($this->dashboard_menu as $section_id => $section){
+                    echo "<div id='udm-{$section_id}'>";
+                    if(isset($section['title']) && $section['title'] != '') echo "<h3><i class='udbsap'></i> &nbsp; {$section['title']} </h3>";
+                    foreach($section['items'] as $page_id => $menu_item){
+                        $menu_url = get_permalink(get_the_ID()).($page_id != ''?'?udb_page='.$page_id:'');
+                        if(isset($params['flaturl']) && $params['flaturl'] == 1)
+                            $menu_url = get_permalink(get_the_ID()).$page_id.($page_id!=''?'/':'');
+                        ?>
+                        <a class="udb-item <?php echo $udb_page == $page_id?'selected':'';?>" href="<?php echo $menu_url; ?>"><i class="<?php echo isset($menu_item['icon'])?$menu_item['icon']:$default_icons[$page_id]; ?> mr-3"></i><?php echo $menu_item['name']; ?></a>
+                    <?php }
+                    echo "</div>";
+                } ?>
+                <a class="udb-item" href="<?php echo wpdm_logout_url(); ?>"><i class="fas fa-sign-out-alt color-danger mr-3"></i><span class="color-red"><?php _e('Logout', 'wmdpro'); ?></span></a>
 
             </div>
 

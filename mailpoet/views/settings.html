@@ -40,10 +40,12 @@
         <% include 'settings/signup.html' %>
       </div>
 
-      <!-- sign-up confirmation -->
-      <div data-tab="woocommerce" class="mailpoet_tab_panel">
-        <% include 'settings/woocommerce.html' %>
-      </div>
+      <% if is_woocommerce_active %>
+        <!-- woocommerce -->
+        <div data-tab="woocommerce" class="mailpoet_tab_panel">
+          <% include 'settings/woocommerce.html' %>
+        </div>
+      <% endif %>
 
      <!-- advanced -->
       <div data-tab="advanced" class="mailpoet_tab_panel">
@@ -115,6 +117,18 @@
           } else {
             $('#settings_stats_notifications_error').hide();
           }
+          <% if is_woocommerce_active %>
+            // if WooCommerce opt-in on checkout is enabled but the checkbox message is empty, show an error
+            var woocommerce_optin_on_checkout_enabled = $('input[name="woocommerce[optin_on_checkout][enabled]"]:checked').val(),
+              woocommerce_optin_on_checkout_message = $('input[name="woocommerce[optin_on_checkout][message]"]').val().trim();
+            if (woocommerce_optin_on_checkout_enabled && woocommerce_optin_on_checkout_message == '') {
+              $('#settings_woocommerce_optin_on_checkout_error').show();
+              window.location.href = '#woocommerce';
+              errorFound = true;
+            } else {
+              $('#settings_woocommerce_optin_on_checkout_error').hide();
+            }
+          <% endif %>
           // stop processing if an error was found
           if (errorFound) {
             return false;
@@ -201,6 +215,10 @@
         $('#settings_subscriber_email_notification_error').hide();
         $('#settings_stats_notifications_error').hide();
 
+        <% if is_woocommerce_active %>
+          $('#settings_woocommerce_optin_on_checkout_error').hide();
+        <% endif %>
+
         function toggleLinuxCronSettings() {
           if ($('input[name="cron_trigger[method]"]:checked').val() === '<%= cron_trigger.linux_cron %>') {
             $('#settings_linux_cron').show();
@@ -226,13 +244,17 @@
       });
     });
     <% set newUser = (is_new_user == true) ? 'true' : 'false' %>
-    var mailpoet_is_new_user = <%= newUser %>;
-    var mailpoet_settings_sender_name = "<%= settings.sender.name %>";
-    var mailpoet_settings_sender_adddress = "<%= settings.sender.address %>";
-    var mailpoet_settings_reply_to_name = "<%= settings.reply_to.name %>";
-    var mailpoet_settings_reply_to_address = "<%= settings.reply_to.address %>";
-    var mailpoet_installed_at = '<%= settings.installed_at %>';
-    var mailpoet_mss_active = <%= json_encode(settings.mta_group == 'mailpoet') %>;
+    <% autoescape 'js' %>
+      var mailpoet_is_new_user = <%= newUser %>;
+      var mailpoet_settings_sender_name = "<%= settings.sender.name %>";
+      var mailpoet_settings_sender_adddress = "<%= settings.sender.address %>";
+      var mailpoet_settings_reply_to_name = "<%= settings.reply_to.name %>";
+      var mailpoet_settings_reply_to_address = "<%= settings.reply_to.address %>";
+      var mailpoet_settings_signup_confirmation_name = "<%= settings.signup_confirmation.from.name %>";
+      var mailpoet_settings_signup_confirmation_address = "<%= settings.signup_confirmation.from.address %>";
+      var mailpoet_installed_at = '<%= settings.installed_at %>';
+      var mailpoet_mss_active = <%= json_encode(settings.mta_group == 'mailpoet') %>;
+    <% endautoescape %>
   </script>
 <% endblock %>
 <% block translations %>

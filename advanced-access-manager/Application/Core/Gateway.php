@@ -136,13 +136,14 @@ final class AAM_Core_Gateway {
      * Redirect request
      * 
      * @param string $type
-     * @param mixed  $arg
+     * @param mixed  $location
+     * @param int    $code
      * 
      * @return void
      * 
      * @access public
      */
-    public function redirect($type, $arg = null) {
+    public function redirect($type, $location = null, $code = 307) {
         $area = AAM_Core_Api_Area::get();
         
         switch($type) {
@@ -150,29 +151,29 @@ final class AAM_Core_Gateway {
                 wp_redirect(add_query_arg(
                     array('reason' => 'restricted'), 
                     wp_login_url(AAM_Core_Request::server('REQUEST_URI'))
-                ), 307);
+                ), $code);
                 break;
             
             case 'page':
                 $page = AAM_Core_API::getCurrentPost();
-                if(empty($page) || ($page->ID !== intval($arg))) {
-                    wp_safe_redirect(get_page_link($arg), 307);
+                if(empty($page) || ($page->ID !== intval($location))) {
+                    wp_safe_redirect(get_page_link($location), $code);
                 }
                 break;
                 
             case 'message':
-                wp_die($arg);
+                wp_die($location);
                 break;
             
             case 'url':
-                if (stripos($arg, AAM_Core_Request::server('REQUEST_URI')) === false) {
-                    wp_redirect($arg, 307);
+                if (stripos($location, AAM_Core_Request::server('REQUEST_URI')) === false) {
+                    wp_redirect($location, $code);
                 }
                 break;
                 
             case 'callback':
-                if (is_callable($arg)) {
-                    call_user_func($arg);
+                if (is_callable($location)) {
+                    call_user_func($location);
                 }
                 break;
                 
@@ -226,7 +227,7 @@ final class AAM_Core_Gateway {
     public function mergeSettings($set1, $set2, $objectType, $preference = null) {
         $combined = array($set1, $set2);
         $merged   = array();
-        
+
         if (is_null($preference)) {
             $preference = $this->getConfig(
                 "core.settings.{$objectType}.merge.preference", 'deny'
@@ -234,8 +235,14 @@ final class AAM_Core_Gateway {
         }
         
         // first get the complete list of unique keys
-        $keys = array_keys(call_user_func_array('array_merge', $combined));
-        
+        $keys = array_keys($set1);
+
+        foreach(array_keys($set2) as $key) {
+            if (!in_array($key, $keys, true)) {
+                $keys[] = $key;
+            }
+        }
+
         foreach($keys as $key) {
             foreach($combined as $options) {
                 // If merging preference is "deny" and at least one of the access

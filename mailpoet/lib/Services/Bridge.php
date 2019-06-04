@@ -2,8 +2,10 @@
 
 namespace MailPoet\Services;
 
+use Carbon\Carbon;
 use MailPoet\Mailer\Mailer;
 use MailPoet\Models\Subscriber;
+use MailPoet\Services\Bridge\API;
 use MailPoet\Settings\SettingsController;
 use MailPoet\WP\Functions as WPFunctions;
 
@@ -12,6 +14,8 @@ if (!defined('ABSPATH')) exit;
 class Bridge {
   const API_KEY_SETTING_NAME = 'mta.mailpoet_api_key';
   const API_KEY_STATE_SETTING_NAME = 'mta.mailpoet_api_key_state';
+
+  const AUTHORIZED_EMAIL_ADDRESSES_ERROR_SETTING_NAME = 'authorized_emails_addresses_check';
 
   const PREMIUM_KEY_SETTING_NAME = 'premium.premium_key';
   const PREMIUM_KEY_STATE_SETTING_NAME = 'premium.premium_key_state';
@@ -29,13 +33,17 @@ class Bridge {
 
   const BRIDGE_URL = 'https://bridge.mailpoet.com';
 
+  /** @var API|null */
   public $api;
 
   /** @var SettingsController */
   private $settings;
 
-  function __construct() {
-    $this->settings = new SettingsController();
+  function __construct(SettingsController $settingsController = null) {
+    if ($settingsController === null) {
+      $settingsController = new SettingsController;
+    }
+    $this->settings = $settingsController;
   }
 
   static function isMPSendingServiceEnabled() {
@@ -61,10 +69,10 @@ class Bridge {
   }
 
   static function pingBridge() {
-    $params = array(
+    $params = [
       'blocking' => true,
-      'timeout' => 10
-    );
+      'timeout' => 10,
+    ];
     $wp = new WPFunctions();
     $result = $wp->wpRemoteGet(self::BRIDGE_URL, $params);
     return $wp->wpRemoteRetrieveResponseCode($result) === 200;
@@ -76,6 +84,11 @@ class Bridge {
     } else {
       $this->api = new Bridge\API($api_key);
     }
+  }
+
+  function getAuthorizedEmailAddresses() {
+    $this->initApi($this->settings->get(self::API_KEY_SETTING_NAME));
+    return $this->api->getAuthorizedEmailAddresses();
   }
 
   function checkMSSKey($api_key) {
@@ -111,12 +124,12 @@ class Bridge {
   }
 
   private function processKeyCheckResult(array $result) {
-    $state_map = array(
+    $state_map = [
       200 => self::KEY_VALID,
       401 => self::KEY_INVALID,
       402 => self::KEY_ALREADY_USED,
-      403 => self::KEY_INVALID
-    );
+      403 => self::KEY_INVALID,
+    ];
 
     if (!empty($result['code']) && isset($state_map[$result['code']])) {
       if ($state_map[$result['code']] == self::KEY_VALID
@@ -157,11 +170,11 @@ class Bridge {
   }
 
   private function buildKeyState($key_state, $result) {
-    $state = array(
+    $state = [
       'state' => $key_state,
       'data' => !empty($result['data']) ? $result['data'] : null,
-      'code' => !empty($result['code']) ? $result['code'] : self::CHECK_ERROR_UNKNOWN
-    );
+      'code' => !empty($result['code']) ? $result['code'] : self::CHECK_ERROR_UNKNOWN,
+    ];
 
     return $state;
   }
@@ -180,7 +193,7 @@ class Bridge {
     $settings = new SettingsController();
     $settings->set(
       self::API_KEY_STATE_SETTING_NAME,
-      array('state' => self::KEY_INVALID)
+      ['state' => self::KEY_INVALID]
     );
   }
 

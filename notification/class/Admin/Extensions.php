@@ -7,7 +7,7 @@
 
 namespace BracketSpace\Notification\Admin;
 
-use BracketSpace\Notification\License;
+use BracketSpace\Notification\Core\License;
 use BracketSpace\Notification\Utils\View;
 use BracketSpace\Notification\Utils\EDDUpdater;
 use BracketSpace\Notification\Utils\Cache\Transient as TransientCache;
@@ -29,31 +29,21 @@ class Extensions {
 	 *
 	 * @var array
 	 */
-	private $extensions = array();
+	private $extensions = [];
 
 	/**
 	 * Premium Extensions list
 	 *
 	 * @var array
 	 */
-	private $premium_extensions = array();
+	private $premium_extensions = [];
 
 	/**
-	 * View object
+	 * Extensions admin page hook
 	 *
-	 * @var object
+	 * @var string
 	 */
-	private $view;
-
-	/**
-	 * Extensions constructor
-	 *
-	 * @since 5.0.0
-	 * @param View $view View class.
-	 */
-	public function __construct( View $view ) {
-		$this->view = $view;
-	}
+	public $page_hook = 'none';
 
 	/**
 	 * Register Extensions page under plugin's menu
@@ -81,10 +71,10 @@ class Extensions {
 			$page_menu_label,
 			'manage_options',
 			'extensions',
-			array( $this, 'extensions_page' )
+			[ $this, 'extensions_page' ]
 		);
 
-		add_action( 'load-' . $this->page_hook, array( $this, 'load_extensions' ) );
+		add_action( 'load-' . $this->page_hook, [ $this, 'load_extensions' ] );
 
 	}
 
@@ -142,7 +132,7 @@ class Extensions {
 		if ( false === $extensions ) {
 
 			$response   = wp_remote_get( $this->api_url );
-			$extensions = array();
+			$extensions = [];
 
 			if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
 				$extensions = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -171,9 +161,10 @@ class Extensions {
 	 * @return void
 	 */
 	public function extensions_page() {
-		$this->view->set_var( 'premium_extensions', $this->premium_extensions );
-		$this->view->set_var( 'extensions', $this->extensions );
-		$this->view->get_view( 'extension/page' );
+		$view = notification_create_view();
+		$view->set_var( 'premium_extensions', $this->premium_extensions );
+		$view->set_var( 'extensions', $this->extensions );
+		$view->get_view( 'extension/page' );
 	}
 
 	/**
@@ -190,7 +181,7 @@ class Extensions {
 		}
 
 		$extensions   = $this->get_raw_extensions();
-		$premium      = array();
+		$premium      = [];
 		$wp_plugins   = get_plugins();
 		$plugin_slugs = array_keys( $wp_plugins );
 
@@ -211,13 +202,13 @@ class Extensions {
 			new EDDUpdater(
 				$extension['edd']['store_url'],
 				$extension['slug'],
-				array(
+				[
 					'version'   => $wp_plugin['Version'],
 					'license'   => '',
 					'item_name' => $extension['edd']['item_name'],
 					'author'    => $extension['author'],
 					'beta'      => false,
-				)
+				]
 			);
 
 		}
@@ -233,7 +224,7 @@ class Extensions {
 	 */
 	public function activate() {
 
-		$data = $_POST;
+		$data = $_POST; // phpcs:ignore
 
 		$extension = $this->get_raw_extension( $data['extension'] );
 
@@ -242,8 +233,8 @@ class Extensions {
 			exit();
 		}
 
-		if ( ! wp_verify_nonce( $data['_wpnonce'], 'activate_extension_' . $extension['slug'] ) ) {
-			wp_safe_redirect( add_query_arg( 'activation-status', 'wrong-nonce', $data['_wp_http_referer'] ) );
+		if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'activate_extension_' . $extension['slug'] ) ) { // phpcs:ignore
+			wp_safe_redirect( add_query_arg( 'activation-status', 'wrong-nonce', $_POST['_wp_http_referer'] ) ); // phpcs:ignore
 			exit();
 		}
 
@@ -251,7 +242,18 @@ class Extensions {
 		$activation = $license->activate( $data['license-key'] );
 
 		if ( is_wp_error( $activation ) ) {
-			wp_safe_redirect( add_query_arg( 'activation-status', $activation->get_error_message(), $data['_wp_http_referer'] ) );
+
+			$license_data = $activation->get_error_data();
+			$params       = [
+				'activation-status' => $activation->get_error_message(),
+				'extension'         => rawurlencode( $license_data->item_name ),
+			];
+
+			if ( 'expired' === $activation->get_error_message() ) {
+				$params['expiration'] = $license_data->expires;
+			}
+
+			wp_safe_redirect( add_query_arg( $params, $data['_wp_http_referer'] ) );
 			exit();
 		}
 
@@ -269,7 +271,7 @@ class Extensions {
 	 */
 	public function deactivate() {
 
-		$data = $_POST;
+		$data = $_POST; // phpcs:ignore
 
 		$extension = $this->get_raw_extension( $data['extension'] );
 
@@ -278,8 +280,8 @@ class Extensions {
 			exit();
 		}
 
-		if ( ! wp_verify_nonce( $data['_wpnonce'], 'activate_extension_' . $extension['slug'] ) ) {
-			wp_safe_redirect( add_query_arg( 'activation-status', 'wrong-nonce', $data['_wp_http_referer'] ) );
+		if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'activate_extension_' . $extension['slug'] ) ) {  // phpcs:ignore
+			wp_safe_redirect( add_query_arg( 'activation-status', 'wrong-nonce', $_POST['_wp_http_referer'] ) );  // phpcs:ignore
 			exit();
 		}
 
@@ -287,8 +289,16 @@ class Extensions {
 		$activation = $license->deactivate();
 
 		if ( is_wp_error( $activation ) ) {
-			wp_safe_redirect( add_query_arg( 'activation-status', $activation->get_error_message(), $data['_wp_http_referer'] ) );
+
+			$license_data = $activation->get_error_data();
+			$params       = [
+				'activation-status' => $activation->get_error_message(),
+				'extension'         => rawurlencode( $license_data->item_name ),
+			];
+
+			wp_safe_redirect( add_query_arg( $params, $data['_wp_http_referer'] ) );
 			exit();
+
 		}
 
 		wp_safe_redirect( add_query_arg( 'activation-status', 'deactivated', $data['_wp_http_referer'] ) );
@@ -305,11 +315,11 @@ class Extensions {
 	 */
 	public function activation_notices() {
 
-		if ( ! isset( $_GET['activation-status'] ) ) {
+		if ( ! isset( $_GET['activation-status'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return;
 		}
 
-		switch ( $_GET['activation-status'] ) {
+		switch ( $_GET['activation-status'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			case 'success':
 				$view    = 'success';
 				$message = __( 'Your license has been activated.', 'notification' );
@@ -330,7 +340,7 @@ class Extensions {
 				$message = sprintf(
 					// translators: 1. Date.
 					__( 'Your license key expired on %s.', 'notification' ),
-					date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) )
+					date_i18n( get_option( 'date_format' ), strtotime( $_GET['expiration'], current_time( 'timestamp' ) ) ) // phpcs:ignore
 				);
 				break;
 
@@ -342,7 +352,7 @@ class Extensions {
 
 			case 'missing':
 				$view    = 'error';
-				$message = __( 'Invalid license key.', 'notification' );
+				$message = sprintf( __( 'Invalid license key for %s.', 'notification' ), $_GET['extension'] ); // phpcs:ignore
 				break;
 
 			case 'invalid':
@@ -354,7 +364,7 @@ class Extensions {
 			case 'item_name_mismatch':
 				$view = 'error';
 				// translators: 1. Extension name.
-				$message = sprintf( __( 'This appears to be an invalid license key for %s.', 'notification' ), $this->extension['edd']['item_name'] );
+				$message = sprintf( __( 'This appears to be an invalid license key for %s.', 'notification' ), $_GET['extension'] ); // phpcs:ignore
 				break;
 
 			case 'no_activations_left':
@@ -368,8 +378,9 @@ class Extensions {
 				break;
 		}
 
-		$this->view->set_var( 'message', $message );
-		$this->view->get_view( 'extension/activation-' . $view );
+		$view_class = notification_create_view();
+		$view_class->set_var( 'message', $message );
+		$view_class->get_view( 'extension/activation-' . $view );
 
 	}
 
@@ -393,9 +404,7 @@ class Extensions {
 		$extensions = $this->get_raw_extensions();
 
 		foreach ( $extensions as $extension ) {
-
 			if ( isset( $extension['edd'] ) && is_plugin_active( $extension['slug'] ) ) {
-
 				$license = new License( $extension );
 
 				if ( ! $license->is_valid() ) {
@@ -407,8 +416,9 @@ class Extensions {
 						'<a href="' . admin_url( 'edit.php?post_type=notification&page=extensions' ) . '">' . __( 'Go to Extensions', 'notification' ) . '</a>'
 					);
 
-					$this->view->set_var( 'message', $message, true );
-					$this->view->get_view( 'extension/activation-error' );
+					$view = notification_create_view();
+					$view->set_var( 'message', $message, true );
+					$view->get_view( 'extension/activation-error' );
 
 				}
 			}
